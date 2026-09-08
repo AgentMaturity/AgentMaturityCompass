@@ -25,7 +25,7 @@ If the guide reports a missing workspace, initialize explicitly with `amc init -
 
 Real providers require a model ID you choose and can access. Responses currently supports text and function-tool exchanges; unsupported reasoning replay, media and hosted-tool output are refused. Selecting another provider does not silently fall back to `stub`.
 
-For a custom Responses server, `--base-url` is the server origin, for example `http://127.0.0.1:8080`. AMC appends `/v1/responses`; do not include `/v1` or `/responses` in that option. The server must implement the supported Responses contract; an OpenAI-compatible Chat endpoint alone is insufficient.
+Guide and chat accept the same explicit `--base-url` origin as run and retain it in every task and resume command. They reject embedded credentials, paths, query strings and fragments before generating a command. For a custom Responses server, `--base-url` is the server origin, for example `http://127.0.0.1:8080`. AMC appends `/v1/responses`; do not include `/v1` or `/responses` in that option. The server must implement the supported Responses contract; an OpenAI-compatible Chat endpoint alone is insufficient.
 
 Store a credential using its reference name, with the value entered at the masked prompt or through stdin:
 
@@ -36,7 +36,7 @@ amc credentials describe OPENAI_API_KEY
 
 Never put the value in a command argument. `describe` reports configuration metadata without printing the secret. Lookup precedence is environment, managed credential file, project `.env`, then user `.env`. If you use `--credentials-home` or `--credentials-file` with the guide/run/chat commands, use the matching `--home` or `--file` with `credentials`. Follow the guide's exact generated action when file paths or permissions need attention.
 
-**Native identity is currently `default`.** Global `--agent` does not switch the native runner or its workspace tool recorder. Other commands, including imports and external adapters, have their own explicit agent selectors.
+**Select the native agent explicitly with `--agent reviewer`.** Guide, run and chat use the same selection order as AMC: the explicit flag, `AMC_AGENT_ID`, `.amc/current-agent`, then `default`. The guide pins the resolved identity in its next native command. Chat pins it for all turns, inspections and authenticated approval requests, even if the current-agent file changes while the terminal is open. Tools, budgets, MCP and delegates receive that same identity; selecting an agent does not create or widen its grants. Resume requires the original signed session identity and refuses a mismatch before recovery or dispatch. Fork creates a fresh conversation under the selected identity with verified parent lineage; it does not copy the parent conversation.
 
 ## Run and continue a task
 

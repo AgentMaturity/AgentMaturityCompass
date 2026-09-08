@@ -50,6 +50,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   const entry = process.argv[1];
   if (entry === undefined) { io.error("The AMC CLI entrypoint is unavailable."); io.fail(); return; }
   const cwd = resolve(options.workspace);
+  let selectedAgentId: string | null = null;
   const skillNames = () => {
     const catalog = buildSkillCatalog(workspaceSkillRoots(cwd, options.credentialsHome));
     return new Set([...catalog.skills, ...catalog.problems].map(skill => skill.name));
@@ -107,14 +108,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const interactiveApprovals = display.interactiveApprovals === true;
     let running: ChildProcess;
     try {
-      running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...args], {
+      running = spawn(process.execPath, [...process.execArgv, resolve(entry), ...(selectedAgentId === null ? [] : ["--agent", selectedAgentId]), ...args], {
         cwd, env: process.env, shell: false,
         stdio: interactiveApprovals ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
       });
     } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated }); return; }
     child = running;
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
-      child: running, workspace: cwd, entry, question, log: io.log, error: io.error
+      child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, log: io.log, error: io.error
     }) : null;
     running.stdout!.setEncoding("utf8");
     running.stderr!.setEncoding("utf8");
@@ -163,6 +164,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.fail();
       return;
     }
+    selectedAgentId = guide.agentId;
     const tools = options.tools ?? (provider === "stub" ? "echo" : "none");
     if (!["none", "echo", "workspace"].includes(tools)) {
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
@@ -196,13 +198,14 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
     }
     const credentialFile = guide.nextAction.argv[guide.nextAction.argv.indexOf("--credentials-file") + 1]!;
-    const routeBaseArgs = ["--provider", provider!, "--model", guide.model!, "--credentials-file", credentialFile,
+    const routeBaseArgs = ["--agent", guide.agentId, "--provider", provider!, ...(guide.baseUrl === null ? [] : ["--base-url", guide.baseUrl]), "--model", guide.model!, "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens,
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
     const showScope = () => {
-      io.log(`Native chat · agent default · provider ${provider} · model ${guide.model}`);
+      io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
+      if (guide.baseUrl !== null) io.log(`Provider origin: ${guide.baseUrl}`);
       if (profile.presetId !== null) io.log(`Signed native preset: ${profile.presetId}; changes require a new reviewed chat.`);
       if (options.delegate) io.log("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
       io.log(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");

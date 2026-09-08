@@ -9,7 +9,7 @@ import { openSessionEventStore } from "../src/persistence/openSessionEventStore.
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
-import { forkSession, resumeSession, SessionResumeRefused } from "../src/session/sessionResume.js";
+import { assertSessionResumeAgent, forkSession, resumeSession, SessionResumeRefused } from "../src/session/sessionResume.js";
 import type { RecoveryClaimant } from "../src/session/sessionRecovery.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
@@ -75,6 +75,20 @@ function rowsOf(dir: string, sessionId: string): readonly EvidenceEvent[] {
 }
 
 describe("AMC-1511 — resume across processes", () => {
+  test("a different agent cannot take over or recover a signed session", () => {
+    const dir = workspace();
+    const a = new SessionService(dir);
+    a.open({ ...OPEN, agentId: "reviewer" });
+    a.startTurn({ trigger: "user" });
+    a.recordUserMessage("unclosed turn must not be recovered by another identity");
+    const before = rowsOf(dir, a.sessionId);
+    try {
+      expect(() => assertSessionResumeAgent({ workspace: dir, sessionId: a.sessionId, agentId: "default" })).toThrow(/AGENT_MISMATCH/);
+      expect(() => resumeSession({ workspace: dir, sessionId: a.sessionId, claimant: B, ...OPEN })).toThrow(/AGENT_MISMATCH/);
+      expect(rowsOf(dir, a.sessionId)).toEqual(before);
+    } finally { a.releaseWithoutClosing(); }
+  });
+
   test("B verifies and resumes A's session: byte-consistent history, old signatures kept, new evidence appended", () => {
     const dir = workspace();
     const { sessionId, rows: aRows } = processA(dir);

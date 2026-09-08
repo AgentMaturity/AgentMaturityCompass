@@ -220,6 +220,24 @@ describe("amc agent-loop — the operator surface", () => {
     const run = (program: Command, argv: string[]): Promise<unknown> =>
       program.parseAsync(argv, { from: "user" });
 
+    it("records the selected native identity and refuses another agent resuming its session", async () => {
+      process.chdir(dir);
+      const { program, captured } = programWith();
+      await run(program, ["agent-loop", "run", "hello", "--agent", "reviewer", "--credentials-home", home, "--keep-open", "--json"]);
+      expect(captured.failures).toEqual([]);
+      const summary = JSON.parse(captured.out[captured.out.length - 1]!) as AgentRunSummary;
+      const before = events(summary.sessionId);
+      expect(JSON.parse(before.find(row => row.event_type === "session/open")!.meta_json).agentId).toBe("reviewer");
+      const refused = programWith();
+      await expect(run(refused.program, ["agent-loop", "run", "second", "--agent", "other", "--session", summary.sessionId, "--credentials-home", home, "--json"])).rejects.toThrow(/AGENT_MISMATCH/);
+      expect(events(summary.sessionId)).toEqual(before);
+      const resumed = programWith();
+      await run(resumed.program, ["agent-loop", "run", "second", "--agent", "reviewer", "--session", summary.sessionId, "--credentials-home", home, "--json"]);
+      expect(resumed.captured.failures).toEqual([]);
+      expect(events(summary.sessionId).filter(row => row.event_type === "session/resume").map(row => JSON.parse(row.meta_json).agentId)).toEqual(["reviewer"]);
+      expect((await verifyAgentRun(dir, summary.sessionId)).ok).toBe(true);
+    });
+
     it("runs a turn from argv and reports what the log recorded", async () => {
       process.chdir(dir);
       const { program, captured } = programWith();

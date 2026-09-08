@@ -27,16 +27,16 @@ afterEach(() => {
   if (oldPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = oldPassphrase;
   vi.restoreAllMocks();
 });
-function fixture() {
+function fixture(agentId = "default") {
   const workspace = mkdtempSync(join(tmpdir(), "amc-native-approval-")); roots.push(workspace);
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-  initActionPolicy(workspace); initToolsConfig(workspace); initBudgets(workspace, "default");
+  initWorkspace({ workspacePath: workspace, agentId, trustBoundaryMode: "isolated" });
+  initActionPolicy(workspace); initToolsConfig(workspace); initBudgets(workspace, agentId);
   const approvalId = `apr_${randomUUID()}`;
-  const created = createApprovalForIntent({ workspace, agentId: "default", intentId: approvalId,
+  const created = createApprovalForIntent({ workspace, agentId, intentId: approvalId,
     toolName: "fs.write", actionClass: "WRITE_LOW", requestedMode: "EXECUTE", effectiveMode: "EXECUTE", riskTier: "medium",
     intentPayload: { toolName: "fs.write", rawArguments: '{"path":"notes.txt"}' } });
   const approvalRequestId = created.request.approvalRequestId;
-  const item = getApprovalInboxItem({ workspace, agentId: "default", approvalRequestId });
+  const item = getApprovalInboxItem({ workspace, agentId, approvalRequestId });
   return { workspace, approvalId, approvalRequestId, created, item };
 }
 function signedArtifact(workspace: string, path: string) {
@@ -49,6 +49,32 @@ function childFixture() {
 }
 
 describe("native approvals retain authenticated authority and exact request binding", () => {
+  it("reviews the actual request for a matching nondefault native identity", async () => {
+    const f = fixture("reviewer"), child = childFixture();
+    let prompted!: () => void; const asked = new Promise<void>(resolve => { prompted = resolve; });
+    const question = vi.fn(async () => { prompted(); return "cancel"; });
+    const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: "unused-cli.js", agentId: "reviewer",
+      question, log: () => {}, error: () => {} });
+    child.emit("message", { type: "amc/native-approval-raised", v: 1, agentId: "reviewer", approvalId: f.approvalId, approvalRequestId: f.approvalRequestId });
+    await asked; await helper.close();
+    expect(question).toHaveBeenCalled();
+    expect(child.kill).toHaveBeenCalledWith("SIGINT");
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: "reviewer", approvalRequestId: f.approvalRequestId })).toEqual([]);
+  });
+
+  it("refuses an IPC agent outside the parent-pinned identity before asking for approval", async () => {
+    const f = fixture(), child = childFixture(), question = vi.fn(async () => "cancel");
+    const errors: string[] = [];
+    const helper = createNativeInteractiveApprovals({ child, workspace: f.workspace, entry: "unused-cli.js", agentId: "reviewer",
+      question, log: () => {}, error: message => errors.push(message) });
+    child.emit("message", { type: "amc/native-approval-raised", v: 1, agentId: "default", approvalId: f.approvalId, approvalRequestId: f.approvalRequestId });
+    await helper.close();
+    expect(question).not.toHaveBeenCalled();
+    expect(child.kill).toHaveBeenCalledWith("SIGINT");
+    expect(errors.join("\n")).toContain("invalid request identity");
+    expect(listApprovalDecisions({ workspace: f.workspace, agentId: "default", approvalRequestId: f.approvalRequestId })).toEqual([]);
+  });
+
   it("retains a reviewed digest across legitimate status transitions and rejects later changed request content", () => {
     const f = fixture();
     decideApprovalForIntent({ workspace: f.workspace, agentId: "default", approvalId: f.approvalRequestId,

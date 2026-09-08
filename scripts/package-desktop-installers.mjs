@@ -329,9 +329,9 @@ WORKSPACE_DIR="$HOME/Library/Application Support/Agent Maturity Compass/studio-w
 DIGEST_FILE="$RUNTIME_DIR/package.sha256"
 AMC_BIN="$RUNTIME_DIR/node_modules/.bin/amc"
 
-# Finder/LaunchServices apps do not inherit an interactive shell PATH. Include
-# the common Homebrew/npm locations so the desktop app behaves like Terminal.
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+# Preserve an explicitly selected Node/npm runtime. Finder/LaunchServices have
+# a minimal PATH, so append the common installation locations as fallbacks.
+export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 mkdir -p "$LOG_DIR"
 

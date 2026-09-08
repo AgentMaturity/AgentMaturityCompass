@@ -52,6 +52,55 @@ describe("native first-use local inspection", () => {
     return result;
   }
 
+  it("pins a custom provider origin through every real-provider action without contacting it", async () => {
+    workspaceMarker(); ownedStore();
+    const ready = await inspect({ baseUrl: "http://127.0.0.1:43123/" });
+    expect(ready.baseUrl).toBe("http://127.0.0.1:43123");
+    for (const action of [ready.nextAction, ready.recheck]) expect(action?.argv).toEqual(expect.arrayContaining(["--base-url", "http://127.0.0.1:43123"]));
+    const choices = await inspect({ provider: undefined, baseUrl: "https://models.example" });
+    expect(choices.choices.filter(choice => choice.provider !== "stub").every(choice => choice.action.argv.includes("https://models.example"))).toBe(true);
+  });
+  it.each(["https://user:secret@example.test", "https://example.test/v1", "https://example.test?key=secret", "https://example.test#secret", "file:///tmp/model", "https://exa\nmple.test"])("withholds invalid provider origins from actionable commands: %s", async baseUrl => {
+    const result = await inspect({ baseUrl });
+    expect(result.code).toBe("PROVIDER_ORIGIN_INVALID");
+    expect(result.nextAction).toBeNull(); expect(result.recheck).toBeNull(); expect(result.choices).toEqual([]);
+    expect(result.baseUrl).toBeNull();
+    expect(JSON.stringify(result)).not.toContain(baseUrl);
+  });
+
+  it("pins an explicit identity in choices, recheck and the bounded run without writes", async () => {
+    workspaceMarker(); ownedStore();
+    fs.writeFileSync(join(workspace, ".amc", "current-agent"), "background\n");
+    const before = snapshot(root);
+    const guide = await inspectNativeFirstUse(input({ agentId: "Reviewer", provider: undefined }));
+    expect(guide.agentId).toBe("reviewer");
+    expect(guide.choices.every(choice => choice.action.argv.slice(0, 4).join(" ") === "amc --agent reviewer agent-loop")).toBe(true);
+    const ready = await inspectNativeFirstUse(input({ agentId: "Reviewer" }));
+    expect(ready.status).toBe("ready");
+    expect(ready.recheck?.argv.slice(0, 5)).toEqual(["amc", "--agent", "reviewer", "agent-loop", "guide"]);
+    expect(ready.nextAction?.argv.slice(0, 5)).toEqual(["amc", "--agent", "reviewer", "agent-loop", "run"]);
+    expect(snapshot(root)).toEqual(before);
+  });
+  it("resolves the current workspace agent and reports an unreadable selector without writes", async () => {
+    workspaceMarker();
+    const previous = process.env.AMC_AGENT_ID;
+    delete process.env.AMC_AGENT_ID;
+    try {
+      const selected = join(workspace, ".amc", "current-agent");
+      fs.writeFileSync(selected, "reviewer\n");
+      expect((await inspectNativeFirstUse(input())).agentId).toBe("reviewer");
+      process.env.AMC_AGENT_ID = "environment-agent";
+      expect((await inspectNativeFirstUse(input())).agentId).toBe("environment-agent");
+      delete process.env.AMC_AGENT_ID;
+      fs.unlinkSync(selected); fs.mkdirSync(selected);
+      const before = snapshot(root);
+      expect((await inspectNativeFirstUse(input())).code).toBe("AGENT_SELECTION_INVALID");
+      expect(snapshot(root)).toEqual(before);
+    } finally {
+      if (previous === undefined) delete process.env.AMC_AGENT_ID; else process.env.AMC_AGENT_ID = previous;
+    }
+  });
+
   it("recommends explicit minimal setup without creating even a credentials home", async () => {
     const result = await inspect();
     expect(result.status).toBe("needs-setup");

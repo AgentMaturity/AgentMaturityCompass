@@ -5,6 +5,8 @@ import { readNativeApprovalActor } from "./nativeApprovalIdentity.js";
 
 export interface NativeApprovalPromptOptions {
   readonly child: ChildProcess; readonly workspace: string; readonly entry: string;
+  /** Pin the expected identity before receiving any child messages. */
+  readonly agentId?: string;
   /** The parent should cancel its readline question when this signal aborts. */
   readonly question: (prompt: string, signal?: AbortSignal) => Promise<string | null>;
   readonly log: (line: string) => void; readonly error: (line: string) => void;
@@ -13,10 +15,10 @@ interface Raised {
   readonly type: "amc/native-approval-raised"; readonly v: 1;
   readonly agentId: string; readonly approvalId: string; readonly approvalRequestId: string;
 }
-function raised(value: unknown): value is Raised {
+function raised(value: unknown, agentId: string): value is Raised {
   if (value === null || typeof value !== "object") return false;
   const item = value as Record<string, unknown>;
-  return item.type === "amc/native-approval-raised" && item.v === 1 && item.agentId === "default"
+  return item.type === "amc/native-approval-raised" && item.v === 1 && item.agentId === agentId
     && typeof item.approvalId === "string" && /^apr_[a-f0-9-]{36}$/.test(item.approvalId)
     && typeof item.approvalRequestId === "string" && /^apprreq_[a-f0-9]{32}$/.test(item.approvalRequestId);
 }
@@ -138,7 +140,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
   };
   const onMessage = (value: unknown) => {
     if (closed || channelLost) return;
-    if (!raised(value)) {
+    if (!raised(value, options.agentId ?? "default")) {
       if (value !== null && typeof value === "object" && (value as { type?: unknown }).type === "amc/native-approval-raised") {
         options.error("Native approval IPC had an invalid request identity; cancelling the turn."); cancelTurn();
       }

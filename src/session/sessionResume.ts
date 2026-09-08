@@ -16,6 +16,7 @@
  *                       sessions without signed ownership are also refused.
  *   TAMPERED            the per-session chain (seq / prevSessionEventHash) or
  *                       the ledger's own hash/signature verification fails
+ *   AGENT_MISMATCH      the requested agent differs from the signed session/open identity
  *   LIVE_WRITER         signed ownership still belongs to a live local process,
  *                       or a remote/unknown process whose death cannot be proved.
  *                       A turn seal and an elapsed timeout never release a writer.
@@ -39,7 +40,7 @@ import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./s
 export const SESSION_ENVELOPE_VERSION = 1;
 const DEFAULT_STALE_AFTER_MS = 60_000;
 
-export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "LIVE_WRITER" | "UNRECOVERED";
+export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "AGENT_MISMATCH" | "LIVE_WRITER" | "UNRECOVERED";
 
 export class SessionResumeRefused extends Error {
   constructor(readonly code: ResumeRefusal, message: string, readonly details: readonly string[] = []) {
@@ -155,6 +156,18 @@ function withReadOnlyStore<T>(params: { workspace: string; store?: SessionEventS
   try { return use(store); } finally { store.close(); }
 }
 
+function assertResumeAgent(rows: readonly EvidenceEvent[], agentId: string): void {
+  const opened = rows.find(row => row.event_type === "session/open");
+  if (opened === undefined || meta(opened).agentId !== agentId) {
+    throw new SessionResumeRefused("AGENT_MISMATCH", "resume requires the agent recorded in session/open; inspect the session and select that agent explicitly");
+  }
+}
+
+/** Refuse a different signed identity before a caller starts an external MCP server. */
+export function assertSessionResumeAgent(params: { workspace: string; sessionId: string; agentId: string }): void {
+  withReadOnlyStore(params, store => assertResumeAgent(verifiedRows({ ...params, store }, false), params.agentId));
+}
+
 export function resumeSession(params: ResumeSessionParams): { service: SessionService; report: ResumeReport } {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   let recovery: RecoveryReport | null = null;
@@ -165,6 +178,8 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
     if (store.backendId !== "sqlite") throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "JSONL resume requires atomic ownership takeover; read or fork this session instead");
     return verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false);
   });
+  // Check identity before ownership takeover or crash recovery can append rows.
+  assertResumeAgent(rows, params.agentId);
   try { assertSessionOwnerAvailable(rows[rows.length - 1]!); }
   catch (error) {
     if (error instanceof SessionWriterRefused) throw new SessionResumeRefused(error.code === "LIVE_WRITER" ? "LIVE_WRITER" : "UNSUPPORTED_FORMAT", error.message);

@@ -115,6 +115,8 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
 
   const guideOptions: NativeFirstUseOptions = {
     workspace: options.workspace,
+    ...(options.agentId === undefined ? {} : { agentId: options.agentId }),
+    ...(options.baseUrl === undefined ? {} : { baseUrl: options.baseUrl }),
     ...(provider === undefined ? {} : { provider }),
     ...(model === undefined ? {} : { model }),
     ...(options.credential === undefined ? {} : { credential: options.credential }),

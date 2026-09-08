@@ -31,6 +31,7 @@ import { hostname } from "node:os";
  * `turn/end`.
  */
 import type { Command } from "commander";
+import { resolveAgentId } from "./fleet/paths.js";
 import chalk from "chalk";
 import {
   STUB_PROVIDER_ID,
@@ -99,6 +100,10 @@ async function importRunner(
   }
 }
 
+function selectedAgentOption(command: Command): string | undefined {
+  return command.opts<{ agent?: string }>().agent ?? command.optsWithGlobals<{ agent?: string }>().agent;
+}
+
 export function registerAgentCommands(program: Command, io: AgentLoopCliIo = defaultIo): void {
   // The system-prompt group is registered from here rather than from cli.ts
   // because cli.ts sits at its line-ratchet floor, and because the assembled
@@ -108,19 +113,21 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   const group = program
     .command("agent-loop")
-    .description("Guide, run, and verify native tasks with signed session evidence (agent default)");
+    .description("Guide, run, and verify native tasks with signed session evidence for the selected agent");
 
   group
     .command("guide")
+    .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Inspect local setup without writes or provider calls and show the next native task command")
     .option("--provider <id>", "choose openai (Chat Completions), openai-responses, anthropic, or stub (local demonstration)")
     .option("--model <model>", "your model ID; required for a real provider")
+    .option("--base-url <origin>", "explicit HTTP(S) provider origin; no path or embedded credentials")
     .option("--credential <ref>", "credential reference name, never a key value")
     .option("--credentials-home <dir>", "same credential home as agent-loop run")
     .option("--credentials-file <path>", "same explicit credential file as agent-loop run")
     .option("--json", "Output local inspection status and structured next-action argv")
-    .action(async (opts: Omit<NativeFirstUseOptions, "workspace" | "env" | "userEnvPath"> & { json?: boolean }) => {
-      const guide = await inspectNativeFirstUse({ ...opts, workspace: process.cwd() });
+    .action(async (opts: Omit<NativeFirstUseOptions, "workspace" | "env" | "userEnvPath"> & { agent?: string; json?: boolean }, command: Command) => {
+      const guide = await inspectNativeFirstUse({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() });
       io.log(opts.json ? JSON.stringify(guide, null, 2) : renderNativeFirstUseGuide(guide));
       if (guide.status === "blocked") io.fail();
     });
@@ -159,7 +166,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
   group
     .command("chat")
-    .description("Interactive native tasks over the existing governed run/resume path (agent default)")
+    .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
+    .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
     .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
@@ -169,6 +177,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
     .option("--provider <id>", "explicit provider; asks in a terminal when omitted")
     .option("--model <model>", "your model ID; asks for a real provider when omitted")
+    .option("--base-url <origin>", "explicit HTTP(S) provider origin; retained for every turn and resume command")
     .option("--credential <ref>", "credential reference name, never a key value")
     .option("--credentials-home <dir>", "same credential home as agent-loop run")
     .option("--credentials-file <path>", "same explicit credential file as agent-loop run")
@@ -181,13 +190,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
-    .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions) => {
+    .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions, command: Command) => {
       const { runNativeInteractiveSession } = await import("./setup/nativeInteractiveSession.js");
-      await runNativeInteractiveSession({ ...opts, workspace: process.cwd() }, io);
+      await runNativeInteractiveSession({ ...opts, agentId: selectedAgentOption(command), workspace: process.cwd() }, io);
     });
 
   group
     .command("run")
+    .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
@@ -248,7 +258,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
-    .action(async (promptParts: string[], opts: RunOptions) => {
+    .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
+      const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
       if (opts.interactiveApprovals && (typeof process.send !== "function" || !process.connected)) {
         io.error("--interactive-approvals requires an AMC parent with a dedicated IPC channel. Use native chat or the ordinary approvals CLI."); io.fail(); return;
       }
@@ -391,6 +402,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.fail(); return;
         }
       }
+      if (opts.session !== undefined && mcpConfig !== null) {
+        // Mounting can execute a process or contact a server. Check the signed
+        // identity first; resumeSession repeats admission before taking ownership.
+        const { assertSessionResumeAgent } = await import("./session/sessionResume.js");
+        assertSessionResumeAgent({ workspace: process.cwd(), sessionId: opts.session, agentId });
+      }
       const runner = await importRunner(io);
       if (runner === null) return;
 
@@ -439,7 +456,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         };
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(),
-          agentId: "default",
+          agentId,
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row) },
@@ -504,7 +521,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             const resolved = resolveForeignRunner({
               providerId,
               workspace: process.cwd(),
-              agentId: "default",
+              agentId,
               ...(delegateTimeout > 0 ? { timeoutMs: delegateTimeout } : {})
             });
             if (!resolved.ok) {
@@ -561,7 +578,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           const { resolveNativeMcpServer } = await import("./setup/nativeMcpConfig.js");
           const { mountNativeMcpServer } = await import("./mcp/nativeMcpClient.js");
           const server = await resolveNativeMcpServer(mcpConfig.config, { ...opts, workspace: process.cwd() });
-          mcpMount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId: "default",
+          mcpMount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId,
             toolset: workspaceToolset, ...mcpReview, signal: mcpAbort.signal });
           progress(`Mounted reviewed MCP tools for this run: ${mcpMount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
         }
@@ -573,7 +590,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(opts.forkFrom === undefined ? {} : { forkFrom: { parentSessionId: opts.forkFrom, claimant } }),
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
-          agentId: "default",
+          agentId,
           ...(opts.stream ? { onLiveText: (event: import("./llm/adapter/liveTextPreview.js").LiveTextPreviewEvent) => {
             if (event.kind === "text") {
               if (previewRequest !== event.headerEventId) {
@@ -620,7 +637,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
                       try {
-                        process.send({ type: "amc/native-approval-raised", v: 1, agentId: "default",
+                        process.send({ type: "amc/native-approval-raised", v: 1, agentId,
                           approvalId: event.approvalId, approvalRequestId: event.approvalRequestId }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
@@ -632,7 +649,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                     io.error(
                       chalk.yellow(
                         `awaiting approval ${event.approvalRequestId} — ` +
-                          `answer it with: amc approvals approve --agent default --mode execute --reason "review reason" --username <reviewer> --roles <reviewer-roles> ${event.approvalRequestId}`
+                          `answer it with: amc approvals approve --agent ${agentId} --mode execute --reason "review reason" --username <reviewer> --roles <reviewer-roles> ${event.approvalRequestId}`
                       )
                     );
                   }

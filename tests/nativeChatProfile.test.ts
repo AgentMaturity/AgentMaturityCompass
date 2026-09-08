@@ -78,6 +78,13 @@ function chatResumeArguments(profile: NativeChatProfile, sessionId: string): str
 }
 
 describe("signed native chat composition admission", () => {
+  it("retains an explicit agent and provider origin for the guide and interactive session", () => {
+    const profile = resolveNativeChatProfile({ workspace: workspace(), agentId: "reviewer", baseUrl: "http://127.0.0.1:43123" });
+    expect(profile.guideOptions).toMatchObject({ agentId: "reviewer", baseUrl: "http://127.0.0.1:43123" });
+    expect(profile.effectiveOptions).toMatchObject({ agentId: "reviewer", baseUrl: "http://127.0.0.1:43123" });
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
   it("keeps provider/model intent absent when neither a flag nor a signed profile selects it", () => {
     const profile = resolveNativeChatProfile({ workspace: workspace() });
     expect(profile.guideOptions.provider).toBeUndefined();

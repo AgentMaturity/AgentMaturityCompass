@@ -7,7 +7,7 @@ import { buildCommandInventory, renderGroupedHelp } from "../src/cliUx.js";
 function registry() {
   const output: string[] = [];
   const failures: number[] = [];
-  const program = new Command().exitOverride().configureOutput({ writeErr: () => {} });
+  const program = new Command().option("--agent <id>").exitOverride().configureOutput({ writeErr: () => {} });
   const io = { log: (line: string) => output.push(line), error: (line: string) => output.push(line), fail: () => { failures.push(1); } };
   registerAgentCommands(program, io);
   registerCredentialsCommands(program, { ...io, readSecret: async () => { throw new Error("Guide must not read a secret"); } });
@@ -25,6 +25,19 @@ describe("native first-use CLI discovery", () => {
     expect(native.helpInformation()).toContain("guide");
     expect(renderGroupedHelp(program)).toContain("amc agent-loop guide");
     expect(renderGroupedHelp(program)).toContain("Assess existing evidence");
+  });
+
+  it.each([
+    ["--agent", "global-reviewer", "agent-loop", "guide", "--json"],
+    ["agent-loop", "guide", "--agent", "global-reviewer", "--json"],
+    ["--agent", "ignored-global", "agent-loop", "guide", "--agent", "global-reviewer", "--json"]
+  ])("keeps the selected identity in the copyable native action: %j", async (...argv) => {
+    const { program, output, failures } = registry();
+    await program.parseAsync(argv, { from: "user" });
+    const result = JSON.parse(output.join("\n"));
+    expect(result.agentId).toBe("global-reviewer");
+    expect(result.choices[0].action.argv.slice(0, 4)).toEqual(["amc", "--agent", "global-reviewer", "agent-loop"]);
+    expect(failures).toEqual([]);
   });
 
   it("returns provider choices without prompting or silently selecting a stub", async () => {
