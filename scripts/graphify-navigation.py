@@ -121,6 +121,7 @@ MAPS = {
         "src/adapters/deepseekHarnessLaunch.ts", "src/adapters/builtins/deepseekHarness.ts",
         "src/adapters/adapterRunner.ts", "src/adapters/adapterCli.ts",
         "src/adapters/adapterConfigSchema.ts", "src/adapters/registry.ts",
+        "src/gateway/server.ts", "src/gateway/streamPassthrough.ts",
     ],
 }
 RELATIONS = {"calls", "imports", "imports_from", "re_exports", "dynamic_import"}
