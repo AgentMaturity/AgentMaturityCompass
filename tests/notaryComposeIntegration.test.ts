@@ -198,5 +198,21 @@ describe("optional Compose notary listener and policy signing", () => {
     expect(notary.healthcheck.disable).not.toBe(true);
     expect(notary.healthcheck.test.slice(0, 3)).toEqual(["CMD", "node", "-e"]);
     expect(compose.services["amc-studio"].depends_on["amc-notary"]).toEqual({ condition: "service_healthy" });
+    const proxy = compose.services.caddy;
+    expect(proxy.environment.AMC_TLS_HOST).toBe("${AMC_TLS_HOST:-localhost}");
+    expect(proxy.cap_drop).toEqual(["ALL"]);
+    expect(proxy.cap_add).toEqual(["NET_BIND_SERVICE"]);
+    expect(notary.cap_add).toBeUndefined();
+    expect(compose.services["amc-studio"].cap_add).toBeUndefined();
+    const caddyfile = readFileSync(new URL("../deploy/compose/Caddyfile", import.meta.url), "utf8");
+    expect(caddyfile).toContain("{$AMC_TLS_HOST:localhost}:443");
+    expect(caddyfile).toMatch(/^\s*auto_https disable_redirects$/m);
+    expect(caddyfile).toMatch(/^\s*skip_install_trust$/m);
+    expect(caddyfile).toMatch(/^\s*tls internal$/m);
+    expect(caddyfile).not.toMatch(/^\s*auto_https off$/m);
+    // Matched handlers must precede the fallback in Caddy's mutually exclusive
+    // handle group; a top-level reverse_proxy otherwise loses to the fallback.
+    expect(caddyfile).toMatch(/handle @console\s*\{\s*reverse_proxy amc-studio:3212\s*\}/);
+    expect(caddyfile).toMatch(/handle @gateway\s*\{\s*reverse_proxy amc-studio:3210\s*\}/);
   });
 });

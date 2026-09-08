@@ -28,6 +28,8 @@ Endpoints:
 
 ## TLS Deployment (Caddy, local CA/internal cert)
 
+Set `AMC_TLS_HOST` in `.env` to the exact hostname or IP address clients will use (default `localhost`). Do not include a scheme, port or path. Caddy needs this identity to issue its internal certificate; a hostless listener with certificate automation disabled cannot complete TLS handshakes.
+
 ```bash
 cd deploy/compose
 cp .env.example .env
@@ -35,14 +37,27 @@ docker compose -f docker-compose.tls.yml up -d --build
 ```
 
 Endpoints:
-- HTTPS console/API: `https://<host>:8443/console`
+- HTTPS console/API: `https://<AMC_TLS_HOST>:8443/console`
 - Notary (internal to this TLS stack): `http://amc-notary:4343`
+
+Caddy retains only `NET_BIND_SERVICE`, required by the official image's executable and port 443; Studio and notary still drop all capabilities. The proxy creates a private local CA in its persistent `caddy_data` volume. Certificate issuance stays enabled, HTTP redirects are disabled because this stack does not publish port 80, and automatic trust-store installation is disabled.
+
+Export only the public CA certificate and explicitly trust it in each client that uses this deployment:
+
+```bash
+docker compose -f docker-compose.tls.yml cp caddy:/data/caddy/pki/authorities/local/root.crt ./amc-local-ca.crt
+curl --cacert ./amc-local-ca.crt "https://localhost:8443/readyz"
+```
+
+Use the configured hostname in the client URL. Keep the CA private keys inside the volume; do not export the whole `/data` directory or disable certificate verification. This is local/private PKI, not a publicly trusted certificate. See [Caddy's local HTTPS guidance](https://caddyserver.com/docs/automatic-https#local-https).
 
 ## Notary listener and readiness
 
 The TLS stack explicitly starts notary with `--bind 0.0.0.0` so Studio can reach it on the internal Compose network. No notary host port is published. The override applies only to this process; local `amc notary start` retains the saved listen address, initially `127.0.0.1`. A saved Unix socket and a TCP `--bind` override are rejected together.
 
-Studio waits for the notary's bounded `/readyz` healthcheck to report `READY`, including signer, log and auth-secret initialization. Readiness alone does not prove Studio holds the matching secret or can obtain a valid signature. The shared image smoke runs Studio with notary disabled. Actual authenticated signing, wrong-secret refusal, restart persistence and TLS access remain separate acceptance requirements; the source correction has not yet been verified in a Linux container.
+Studio waits for the notary's bounded `/readyz` healthcheck to report `READY`, including signer, log and auth-secret initialization. Readiness alone does not prove Studio holds the matching secret or can obtain a valid signature. The shared image smoke runs Studio with notary disabled.
+
+The separate [2026-09-08 optional-stack acceptance](../../AMC_OS/RESEARCH/2026-09-08-dsh-pi/optional-notary-tls-acceptance/README.md) exercised the actual Linux ARM containers with notary enabled: policy-bound `MERKLE_ROOT` signing, independent signature verification, missing/wrong authentication and checksum/replay refusal, identity persistence and fresh signing after restart, and trusted TLS Studio access with anonymous refusal. Its exact source, immutable images and configuration hashes are recorded. The probe used an isolated internal network, unique disposable volumes, and the local `localhost` CA; it does not claim public deployment, other platforms, hardware attestation or external-provider connectivity.
 
 ## Notary Mode (Fail-Closed Signing Boundary)
 

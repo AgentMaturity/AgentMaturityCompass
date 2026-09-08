@@ -88,6 +88,8 @@ services:
     restart: unless-stopped
     depends_on:
       - amc-studio
+    environment:
+      AMC_TLS_HOST: ${AMC_TLS_HOST:-localhost}
     ports:
       - "${AMC_TLS_PORT:-8443}:443"
     volumes:
@@ -99,6 +101,9 @@ services:
       - /tmp
     cap_drop:
       - ALL
+    # The official Caddy executable carries this file capability for port 443.
+    cap_add:
+      - NET_BIND_SERVICE
 
 volumes:
   amc_data:

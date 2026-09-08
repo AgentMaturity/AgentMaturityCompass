@@ -1,16 +1,22 @@
 {
-  auto_https off
+  # Keep internal certificate issuance; only the unpublished HTTP redirect is off.
+  auto_https disable_redirects
+  skip_install_trust
 }
 
-:443 {
+{$AMC_TLS_HOST:localhost}:443 {
   tls internal
   encode gzip
 
   @console path /console* /auth* /org* /transform* /approvals* /benchmarks* /integrations* /status /healthz /readyz
-  reverse_proxy @console amc-studio:3212
+  handle @console {
+    reverse_proxy amc-studio:3212
+  }
 
   @gateway path /openai* /anthropic* /gemini* /grok* /openrouter* /local* /__amc/health
-  reverse_proxy @gateway amc-studio:3210
+  handle @gateway {
+    reverse_proxy amc-studio:3210
+  }
 
   handle {
     respond "AMC TLS reverse proxy" 200
