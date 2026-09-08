@@ -53,6 +53,8 @@ const isTs = (n) => n.endsWith(".ts");
 
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
+  // Retained for inventory consumers: lexical matches, not discovered cases
+  // or execution outcomes. Public surfaces use testFiles instead.
   const testBlocks = walk(join(root, "tests"), (n) => n.endsWith(".test.ts"))
     .reduce((sum, f) => {
       const src = readFileSync(f, "utf8");
@@ -75,6 +77,7 @@ export async function collectCounts() {
     })(),
     testFiles,
     testBlocks,
+    testBlocksMethodology: "Regex matches for direct it()/test() calls in tests/**/*.test.ts; may include comments and omit parameterized or generated cases. Not executed tests or passing results.",
     version: pkg.version,
     license: pkg.license
   };
@@ -87,70 +90,9 @@ if (mode === "json") {
   process.exit(0);
 }
 
-// ── Marker rewriting / verification ──────────────────────────────────────
-const TRACKED_FILES = ["README.md"];
-const failures = [];
-let rewrote = 0;
-
-for (const rel of TRACKED_FILES) {
-  const path = join(root, rel);
-  if (!existsSync(path)) continue;
-  const original = readFileSync(path, "utf8");
-  let updated = original;
-
-  updated = updated.replace(
-    /<!-- amc:count:(\w+) -->(.*?)<!-- \/amc:count -->/g,
-    (whole, key, current) => {
-      // Counts appear in prose, so large ones are written with thousands
-      // separators to match how a reader sees them.
-      const raw = counts[key];
-      const truth =
-        typeof raw === "number" && raw >= 1000 ? raw.toLocaleString("en-US") : raw;
-      if (raw === undefined || raw === null) {
-        failures.push(`${rel}: unknown count key "${key}"`);
-        return whole;
-      }
-      if (String(truth) !== current) {
-        if (mode === "check") {
-          failures.push(
-            `${rel}: ${key} says ${current}, actual is ${truth}. Run: node scripts/gen-counts.mjs --write`
-          );
-        }
-        return `<!-- amc:count:${key} -->${truth}<!-- /amc:count -->`;
-      }
-      return whole;
-    }
-  );
-
-  if (mode === "write" && updated !== original) {
-    writeFileSync(path, updated);
-    rewrote += 1;
-  }
-}
-
-// ── Prose surfaces ───────────────────────────────────────────────────────
-/**
- * Nine public files state the same counts as plain prose rather than markers,
- * so `--write` updated README and left the badge, both websites, CONTRIBUTING,
- * the launch drafts and the whitepaper to be hand-edited. That is precisely the
- * drift this script exists to end, and it is what let the published figure sit
- * at 8,604 while the repository held 8,478.
- *
- * Each pattern is anchored to its surrounding words so only genuine count
- * claims are rewritten, never an unrelated number that happens to look similar.
- */
-const PROSE_PATTERNS = [
-  // README CI badge, where the thousands separator is URL-encoded.
-  { key: "testBlocks", encoded: true, re: /(tests-)([\d,]|%2C)+(%20passing)/g, wrap: (m, truth) => `tests-${truth}%20passing` },
-  { key: "testBlocks", re: /([\d,]+)( passing Vitest tests)/g },
-  { key: "testBlocks", re: /([\d,]+)( passing tests)/g },
-  { key: "testBlocks", re: /([\d,]+)( Passing Tests)/g },
-  { key: "testBlocks", re: /(?<=stat-value">)([\d,]+)(?=<\/span><span class="stat-label">passing tests)/g },
-  { key: "testBlocks", re: /(?<=<b>)([\d,]+)(?=<\/b><span>Tests)/g },
-  { key: "testFiles", re: /(across )([\d,]+)( files)/g, group: 2 }
-];
-
-const PROSE_SURFACES = [
+// Only current-facing surfaces are managed. Dated audit/source-review records
+// remain historical evidence and are deliberately outside this allowlist.
+const PUBLIC_SURFACES = [
   "README.md",
   "CONTRIBUTING.md",
   "website/index.html",
@@ -162,50 +104,75 @@ const PROSE_SURFACES = [
   "docs/internal/mirofish-simulation-council.md",
   "whitepaper/AMC_WHITEPAPER_v1.md"
 ];
+const failures = [];
+const updates = new Map();
+const marker = /<!-- amc:count:(\w+) -->(.*?)<!-- \/amc:count -->/g;
+const fileCount = counts.testFiles.toLocaleString("en-US");
+const encodedFileCount = fileCount.replace(/,/g, "%2C");
 
-const plain = (key) => counts[key].toLocaleString("en-US");
-const encoded = (key) => plain(key).replace(/,/g, "%2C");
-
-for (const rel of PROSE_SURFACES) {
+for (const rel of PUBLIC_SURFACES) {
   const path = join(root, rel);
   if (!existsSync(path)) continue;
   const original = readFileSync(path, "utf8");
   let updated = original;
 
-  for (const pattern of PROSE_PATTERNS) {
-    const truth = pattern.encoded ? encoded(pattern.key) : plain(pattern.key);
-    updated = updated.replace(pattern.re, (whole, ...groups) => {
-      if (pattern.wrap) return pattern.wrap(whole, truth);
-      if (pattern.group === 2) {
-        const [before, current, after] = groups;
-        return current === truth ? whole : `${before}${truth}${after}`;
-      }
-      // Lookaround patterns capture the bare number; the rest carry a suffix.
-      if (groups.length >= 2 && typeof groups[1] === "string") {
-        const [current, after] = groups;
-        return current === truth ? whole : `${truth}${after}`;
-      }
-      return whole === truth ? whole : truth;
-    });
+  // Strip markers/tags before inspecting rendered claims, including split
+  // HTML labels. A source count cannot attest that any test passed.
+  const visible = original.replace(marker, "$2").replace(/<[^>]*>/g, " ");
+  const passingClaim = /\b\d[\d,]*\s+(?:passing\s+(?:Vitest\s+)?tests?\b|(?:Vitest\s+)?tests?\s+passing\b)/i;
+  const passingBadge = /tests-(?:\d|,|%2c)+%20passing/i;
+  if (passingClaim.test(visible) || passingBadge.test(original)) {
+    failures.push(`${rel}: unsupported passing-test claim. Publish test source files; execution results require a separate run receipt.`);
   }
+  if (original.includes("<!-- amc:count:testBlocks -->")) {
+    failures.push(`${rel}: testBlocks is regex inventory, not a public test result. Use the testFiles source inventory.`);
+  }
+
+  updated = updated.replace(marker, (whole, key, current) => {
+    // Counts appear in prose, so large ones use thousands separators.
+    const raw = counts[key];
+    const truth =
+      typeof raw === "number" && raw >= 1000 ? raw.toLocaleString("en-US") : raw;
+    if (raw === undefined || raw === null) {
+      failures.push(`${rel}: unknown count key "${key}"`);
+      return whole;
+    }
+    if (String(truth) !== current) {
+      if (mode === "check") {
+        failures.push(
+          `${rel}: ${key} says ${current}, actual is ${truth}. Run: node scripts/gen-counts.mjs --write`
+        );
+      }
+      return `<!-- amc:count:${key} -->${truth}<!-- /amc:count -->`;
+    }
+    return whole;
+  });
+
+  // Anchored inventory templates: never rewrite an unrelated number or a
+  // historical runtime result to the value measured from source paths.
+  updated = updated
+    .replace(/test%20source%20files-(?:\d|,|%2c)+/gi, `test%20source%20files-${encodedFileCount}`)
+    .replace(/\b\d[\d,]*(?= (?:Vitest )?test source files\b)/gi, fileCount)
+    .replace(/(?<=stat-value">)[\d,]+(?=<\/span><span class="stat-label">test source files)/g, fileCount)
+    .replace(/(?<=<b>)[\d,]+(?=<\/b><span>Test source<br>files)/g, fileCount);
 
   if (updated !== original) {
     if (mode === "check") {
       failures.push(`${rel}: published counts are stale. Run: node scripts/gen-counts.mjs --write`);
-    } else if (mode === "write") {
-      writeFileSync(path, updated);
-      rewrote += 1;
+    } else {
+      updates.set(path, updated);
     }
   }
 }
 
+if (failures.length > 0) {
+  console.error("Published count check failed:\n" + failures.map((f) => `  - ${f}`).join("\n"));
+  process.exit(1);
+}
 if (mode === "check") {
-  if (failures.length > 0) {
-    console.error("Count drift detected:\n" + failures.map((f) => `  - ${f}`).join("\n"));
-    process.exit(1);
-  }
-  console.log("Counts match the repository.");
+  console.log("Published source counts match the repository; this check does not execute tests.");
   process.exit(0);
 }
 
-console.log(rewrote > 0 ? `Updated ${rewrote} file(s).` : "No changes needed.");
+for (const [path, content] of updates) writeFileSync(path, content);
+console.log(updates.size > 0 ? `Updated ${updates.size} file(s).` : "No changes needed.");

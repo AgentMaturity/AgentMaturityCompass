@@ -27,7 +27,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile
 pnpm run build     # pnpm: the vendored @amc/* packages use the workspace protocol npm cannot resolve
-npm test          # 10,031 passing Vitest tests, all must pass in CI
+npm test          # the full Vitest suite; all must pass in CI
 npm run check:clean-source   # proves the path above on a fresh clone (slow: clones and builds)
 ```
 
@@ -48,6 +48,8 @@ npx vitest run tests/myNewTest.test.ts            # single file
 npx vitest run --grep "my test name"              # by name
 cd platform/python && python3 -m pytest tests/ -q # Python
 ```
+
+The root suite contains <!-- amc:count:testFiles -->1,314<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
 
 All tests must pass before submitting a PR.
 
