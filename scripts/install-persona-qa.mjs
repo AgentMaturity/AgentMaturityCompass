@@ -8,26 +8,12 @@ import {
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { delimiter, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import { isolatedInstallEnvironment } from "./packed-install-check.mjs";
 
-const root = process.cwd();
-const args = process.argv.slice(2);
-const json = args.includes("--json");
-const keep = args.includes("--keep");
-const outIndex = args.indexOf("--out");
-const outPath = outIndex >= 0 ? resolve(root, args[outIndex + 1]) : join(root, "tmp", "persona-install-qa", "latest.json");
-const reportIndex = args.indexOf("--report");
-const reportPath = reportIndex >= 0
-  ? resolve(root, args[reportIndex + 1])
-  : outPath.endsWith(".json")
-    ? `${outPath.slice(0, -5)}.md`
-    : `${outPath}.md`;
 const nodeBin = dirname(process.execPath);
-
-if ((outIndex >= 0 && !args[outIndex + 1]) || (reportIndex >= 0 && !args[reportIndex + 1])) {
-  throw new Error("--out and --report require file paths");
-}
 
 const personas = [
   {
@@ -105,14 +91,20 @@ const personas = [
   }
 ];
 
-function env(tmp) {
-  const npmCache = join(tmp, "npm-cache");
-  return {
-    ...process.env,
-    PATH: `${nodeBin}:${process.env.PATH ?? ""}`,
-    npm_config_cache: npmCache,
-    NPM_CONFIG_CACHE: npmCache
-  };
+export function createPersonaEnvironment(base, temporary) {
+  // Packing and every persona get a different home, including npm config/cache.
+  const home = mkdtempSync(join(temporary, "home-"));
+  const isolated = isolatedInstallEnvironment(base, home);
+  isolated.PATH = `${nodeBin}${delimiter}${base.PATH ?? ""}`;
+  isolated.USERPROFILE = home;
+  isolated.APPDATA = join(home, "AppData", "Roaming");
+  isolated.LOCALAPPDATA = join(home, "AppData", "Local");
+  isolated.XDG_CONFIG_HOME = join(home, ".config");
+  isolated.XDG_CACHE_HOME = join(home, ".cache");
+  isolated.XDG_DATA_HOME = join(home, ".local", "share");
+  writeFileSync(isolated.npm_config_userconfig, "");
+  writeFileSync(isolated.npm_config_globalconfig, "");
+  return isolated;
 }
 
 function run(command, args, options) {
@@ -302,8 +294,8 @@ function stepWithDuration(id, step, startedMs) {
   });
 }
 
-function installPackedPackage(dir, tarball, qaEnv) {
-  const install = run("npm", ["install", "--no-audit", "--fund=false", "--package-lock=false", tarball], {
+function installPackedPackage(dir, tarball, qaEnv, execute) {
+  const install = execute("npm", ["install", "--no-audit", "--fund=false", "--package-lock=false", tarball], {
     cwd: dir,
     env: qaEnv,
     timeoutMs: 120_000
@@ -317,7 +309,8 @@ function installPackedPackage(dir, tarball, qaEnv) {
   });
 }
 
-function runPersona(persona, tarball, tmp, qaEnv) {
+export function runPersona(persona, tarball, tmp, { baseEnv = process.env, execute = run } = {}) {
+  const qaEnv = createPersonaEnvironment(baseEnv, tmp);
   const dir = join(tmp, "personas", persona.id);
   mkdirSync(dir, { recursive: true });
   writePersonaFixture(dir, persona);
@@ -325,9 +318,14 @@ function runPersona(persona, tarball, tmp, qaEnv) {
 
   let t0 = Date.now();
   steps.push(stepWithDuration("package-install", requirePassed(
-    installPackedPackage(dir, tarball, qaEnv),
+    installPackedPackage(dir, tarball, qaEnv, execute),
     "Packed package extraction or dependency linking failed."
   ), t0));
+
+  // A failed install may still leave a bin. Never execute that partial consumer.
+  if (steps[0].status !== "passed") {
+    return { persona, workspace: dir, steps, rating: 0, feedback: personaFeedback(persona, steps, null) };
+  }
 
   const amc = join(dir, "node_modules", ".bin", "amc");
   if (!existsSync(amc)) {
@@ -357,7 +355,7 @@ function runPersona(persona, tarball, tmp, qaEnv) {
   for (const [id, commandArgs, remediation] of commonCommands) {
     t0 = Date.now();
     steps.push(stepWithDuration(id, requirePassed(
-      run(commandArgs[0], commandArgs.slice(1), { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
+      execute(commandArgs[0], commandArgs.slice(1), { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
       remediation
     ), t0));
   }
@@ -365,7 +363,7 @@ function runPersona(persona, tarball, tmp, qaEnv) {
   for (const [id, commandArgs, remediation] of persona.checks) {
     t0 = Date.now();
     steps.push(stepWithDuration(id, requirePassed(
-      run(amc, commandArgs, { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
+      execute(amc, commandArgs, { cwd: dir, env: qaEnv, timeoutMs: 60_000 }),
       remediation
     ), t0));
   }
@@ -496,8 +494,24 @@ function renderMarkdownReport(receipt) {
 }
 
 function main() {
+  const root = process.cwd();
+  const args = process.argv.slice(2);
+  const json = args.includes("--json");
+  const keep = args.includes("--keep");
+  const outIndex = args.indexOf("--out");
+  const outPath = outIndex >= 0 ? resolve(root, args[outIndex + 1]) : join(root, "tmp", "persona-install-qa", "latest.json");
+  const reportIndex = args.indexOf("--report");
+  const reportPath = reportIndex >= 0
+    ? resolve(root, args[reportIndex + 1])
+    : outPath.endsWith(".json")
+      ? `${outPath.slice(0, -5)}.md`
+      : `${outPath}.md`;
+
+  if ((outIndex >= 0 && !args[outIndex + 1]) || (reportIndex >= 0 && !args[reportIndex + 1])) {
+    throw new Error("--out and --report require file paths");
+  }
   const tmp = mkdtempSync(join(tmpdir(), "amc-install-persona-qa-"));
-  const qaEnv = env(tmp);
+  const qaEnv = createPersonaEnvironment(process.env, tmp);
   const startedAt = new Date().toISOString();
   const setupSteps = [];
   let tarball = null;
@@ -515,7 +529,7 @@ function main() {
       throw new Error("npm pack did not produce an installable tarball");
     }
 
-    const results = personas.map((persona) => runPersona(persona, tarball, tmp, qaEnv));
+    const results = personas.map((persona) => runPersona(persona, tarball, tmp));
     const failedPersonas = results.filter((result) => result.rating < 10);
     const averageRating = Math.round((results.reduce((sum, result) => sum + result.rating, 0) / results.length) * 10) / 10;
     const receipt = {
@@ -550,7 +564,7 @@ function main() {
       }
     }
     if (receipt.status !== "passed") {
-      process.exit(1);
+      process.exitCode = 1;
     }
   } finally {
     if (!keep) {
@@ -559,4 +573,6 @@ function main() {
   }
 }
 
-main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main();
+}

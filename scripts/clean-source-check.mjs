@@ -20,10 +20,11 @@
  * them, and tests/cleanSourceDocs.test.ts asserts the docs quote them verbatim.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isolatedInstallEnvironment } from "./packed-install-check.mjs";
 
 /** The source-install path as documented. Change the docs and this together. */
 export const DOCUMENTED_SOURCE_COMMANDS = Object.freeze([
@@ -33,6 +34,20 @@ export const DOCUMENTED_SOURCE_COMMANDS = Object.freeze([
 
 /** The keyless smoke: stub provider, isolated workspace, no credentials. */
 export const SMOKE_PROMPT = "say hello";
+
+export function cleanSourceRuntimeEnvironment(base, home) {
+  const isolated = isolatedInstallEnvironment(base, home);
+  isolated.AMC_VAULT_PASSPHRASE = "clean-source-check";
+  isolated.USERPROFILE = home;
+  isolated.APPDATA = join(home, "AppData", "Roaming");
+  isolated.LOCALAPPDATA = join(home, "AppData", "Local");
+  isolated.XDG_CONFIG_HOME = join(home, ".config");
+  isolated.XDG_CACHE_HOME = join(home, ".cache");
+  isolated.XDG_DATA_HOME = join(home, ".local", "share");
+  writeFileSync(isolated.npm_config_userconfig, "");
+  writeFileSync(isolated.npm_config_globalconfig, "");
+  return isolated;
+}
 
 function run(label, cmd, args, opts) {
   const started = Date.now();
@@ -59,7 +74,7 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
   const env = { ...process.env, CI: "1" };
   // Runtime steps get an empty HOME: a check that quietly read this machine's
   // ~/.amc would prove nothing about a new contributor's experience.
-  const isolated = { ...env, HOME: home, AMC_VAULT_PASSPHRASE: "clean-source-check" };
+  const isolated = cleanSourceRuntimeEnvironment(env, home);
   const cli = join(clone, "dist", "cli.js");
   const handover = { sessionId: "" };
 
