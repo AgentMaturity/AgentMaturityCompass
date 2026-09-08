@@ -1,0 +1,119 @@
+import { spawn } from "node:child_process";
+import { createServer, type Server } from "node:http";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { afterEach, expect, test, vi } from "vitest";
+import YAML from "yaml";
+import { initWorkspace } from "../src/workspace.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { extractEnvelope } from "../src/session/sessionTypes.js";
+import type { AgentRunSummary } from "../src/agent/runReport.js";
+
+interface ModelRequest {
+  tools?: Array<{ type: string; function: { name: string } }>;
+  messages: Array<{ role: string; content?: unknown; tool_call_id?: string }>;
+}
+let workspace: string | undefined, server: Server | undefined;
+afterEach(async () => {
+  if (server) {
+    server.closeAllConnections(); await new Promise<void>(done => server!.close(() => done())); server = undefined;
+  }
+  if (workspace) { rmSync(workspace, { recursive: true, force: true }); workspace = undefined; }
+  vi.unstubAllEnvs();
+});
+
+test("the built native CLI advertises and executes only the signed read subset; guessed write/shell calls are recorded denials", async () => {
+  const cli = resolve("dist/cli.js");
+  if (!existsSync(cli)) throw new Error("Build the coordinated candidate before the native subset CLI regression.");
+  const pass = "synthetic-cli-subset-vault", credential = "synthetic-loopback-subset-key";
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", pass);
+  workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-cli-subset-")));
+  const root = workspace, home = join(root, "isolated-home"); mkdirSync(home, { mode: 0o700 });
+  initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  initBudgets(root, "default"); writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
+  mkdirSync(join(root, "workspace"), { recursive: true });
+  const fixtureText = "independent read-only fixture bytes: 17b4";
+  writeFileSync(join(root, "workspace", "review.txt"), fixtureText);
+  const config = defaultToolsConfig();
+  config.tools.allowedTools = config.tools.allowedTools.filter(tool => ["fs.read", "glob", "grep"].includes(tool.name));
+  // The browser/CLI must not require granting either write or bash to review code.
+  const policyPath = join(root, ".amc", "tools.yaml"); writeFileSync(policyPath, YAML.stringify(config));
+  const originalPolicy = readFileSync(policyPath);
+  const env: NodeJS.ProcessEnv = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass,
+    AMC_SUBSET_LOOPBACK_KEY: credential, NO_COLOR: "1" };
+  async function run(args: string[]) {
+    return new Promise<{ code: number | null; stdout: string; stderr: string }>((done, reject) => {
+      const child = spawn(process.execPath, [cli, ...args], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
+      let stdout = "", stderr = "", timedOut = false;
+      const timeout = setTimeout(() => { timedOut = true; child.kill("SIGTERM"); }, 30_000);
+      const kill = setTimeout(() => child.kill("SIGKILL"), 33_000);
+      child.stdout.setEncoding("utf8"); child.stderr.setEncoding("utf8");
+      child.stdout.on("data", (chunk: string) => { stdout += chunk; if (stdout.length > 2_000_000) child.kill("SIGKILL"); });
+      child.stderr.on("data", (chunk: string) => { stderr += chunk; if (stderr.length > 2_000_000) child.kill("SIGKILL"); });
+      child.once("error", error => { clearTimeout(timeout); clearTimeout(kill); reject(error); });
+      child.once("close", code => { clearTimeout(timeout); clearTimeout(kill);
+        if (timedOut) reject(new Error("Actual CLI subset fixture exceeded its process deadline.")); else done({ code, stdout, stderr }); });
+    });
+  }
+  const signed = await run(["tools", "sign", "--json"]);
+  expect(signed.code, signed.stderr).toBe(0); expect(JSON.parse(signed.stdout).ok).toBe(true);
+  const requests: ModelRequest[] = [], auth: boolean[] = [], fixtureErrors: string[] = [];
+  const calls = [
+    { name: "fs.read", arguments: { path: "workspace/review.txt" } },
+    { name: "fs.write", arguments: { path: "workspace/forbidden.txt", content: "must not write" } },
+    { name: "bash", arguments: { command: "touch workspace/forbidden-shell.txt" } }
+  ];
+  server = createServer(async (request, response) => {
+    try {
+      const chunks: Buffer[] = []; let bytes = 0;
+      for await (const chunk of request) { const data = Buffer.from(chunk); bytes += data.length;
+        if (bytes > 1_000_000) throw new Error("request exceeded fixture bound"); chunks.push(data); }
+      if (request.url !== "/v1/chat/completions") throw new Error("unexpected provider route");
+      requests.push(JSON.parse(Buffer.concat(chunks).toString("utf8")) as ModelRequest);
+      auth.push(request.headers.authorization === `Bearer ${credential}`);
+      const index = requests.length - 1, tool = calls[index];
+      response.writeHead(200, { "content-type": "text/event-stream" });
+      const send = (value: object) => response.write(`data: ${JSON.stringify({ id: `fixture-${index}`, object: "chat.completion.chunk", created: 1, model: "subset-fixture", ...value })}\n\n`);
+      send({ choices: [{ index: 0, delta: tool
+        ? { role: "assistant", tool_calls: [{ index: 0, id: `subset-call-${index}`, type: "function", function: { name: tool.name, arguments: JSON.stringify(tool.arguments) } }] }
+        : { role: "assistant", content: "Synthetic subset conformance complete." }, finish_reason: null }] });
+      send({ choices: [{ index: 0, delta: {}, finish_reason: tool ? "tool_calls" : "stop" }] });
+      send({ choices: [], usage: { prompt_tokens: 10, completion_tokens: 3, total_tokens: 13, prompt_tokens_details: { cached_tokens: 0 } } });
+      response.end("data: [DONE]\n\n");
+    } catch { fixtureErrors.push("Loopback fixture refused an invalid or oversized request."); response.destroy(); }
+  });
+  await new Promise<void>(done => server!.listen(0, "127.0.0.1", done));
+  const address = server.address(); if (!address || typeof address === "string") throw new Error("No fixture port.");
+  const prompt = "Read the signed-scope fixture; synthetic requests will also probe ungranted tools.";
+  const result = await run(["agent-loop", "run", prompt, "--provider", "openai", "--model", "subset-fixture",
+    "--base-url", `http://127.0.0.1:${address.port}`, "--credential", "AMC_SUBSET_LOOPBACK_KEY", "--credentials-home", home,
+    "--tools", "workspace", "--max-steps", "6", "--max-tokens", "64", "--json"]);
+  expect(result.code, result.stderr).toBe(0); expect(fixtureErrors).toEqual([]);
+  const summary = JSON.parse(result.stdout) as AgentRunSummary;
+  expect(summary.requests).toBe(4); expect(summary.toolCalls).toBe(3); expect(summary.unsignedRows).toBe(0);
+  expect(requests).toHaveLength(4); expect(auth).toEqual([true, true, true, true]);
+  for (const request of requests) expect(request.tools?.map(tool => tool.function.name).sort()).toEqual(["fs.read", "glob", "grep"]);
+  expect(requests[0]!.messages.some(message => message.role === "user" && message.content === prompt)).toBe(true);
+  expect(requests[1]!.messages.find(message => message.tool_call_id === "subset-call-0")?.content).toBe(fixtureText);
+  expect(String(requests[2]!.messages.find(message => message.tool_call_id === "subset-call-1")?.content)).toContain("denied");
+  expect(String(requests[3]!.messages.find(message => message.tool_call_id === "subset-call-2")?.content)).toContain("denied");
+  expect(existsSync(join(root, "workspace", "forbidden.txt"))).toBe(false);
+  expect(existsSync(join(root, "workspace", "forbidden-shell.txt"))).toBe(false);
+  expect(readFileSync(policyPath)).toEqual(originalPolicy);
+  const ledger = openLedger(root, { readonly: true });
+  try {
+    const audits = ledger.getAllEvents().filter(row => row.session_id === summary.sessionId && String(JSON.parse(row.meta_json).auditType).startsWith("TOOL_CALL_"));
+    expect(audits.map(row => ({ name: JSON.parse(row.meta_json).toolName, type: JSON.parse(row.meta_json).auditType })))
+      .toEqual([{ name: "fs.read", type: "TOOL_CALL_ALLOWED" }, { name: "fs.write", type: "TOOL_CALL_DENIED" }, { name: "bash", type: "TOOL_CALL_DENIED" }]);
+    for (const row of audits) { expect(row.writer_sig).not.toBe("unsigned"); expect(extractEnvelope(row.meta_json)?.sessionId).toBe(summary.sessionId); }
+  } finally { ledger.close(); }
+  for (const args of [["session", "verify", "--json"], ["agent-loop", "verify", summary.sessionId, "--json"]]) {
+    const verification = await run(args); expect(verification.code, verification.stderr).toBe(0);
+    expect(JSON.parse(verification.stdout).ok).toBe(true);
+  }
+  expect(JSON.stringify({ stdout: result.stdout, stderr: result.stderr })).not.toContain(credential);
+}, 90_000);

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
-import { agentToolset } from "../src/agent/agentToolset.js";
+import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName, type MountedNativeMcpServer } from "../src/mcp/nativeMcpClient.js";
@@ -196,6 +196,36 @@ describe("native MCP pinned stdio integration", () => {
 });
 
 describe("native MCP configuration admission", () => {
+  test("a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool", async () => {
+    const fixture = setup({ tools: [tool()] });
+    const config = loadToolsConfig(fixture.workspace);
+    config.tools.allowedTools = config.tools.allowedTools.filter(entry => entry.name === nativeMcpToolName("fixture", "lookup"));
+    initToolsConfig(fixture.workspace, config);
+    const discovered = await discoverNativeMcpCatalog(fixture.server, fixture.workspace);
+    const path = join(fixture.workspace, "mcp-only.json");
+    writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: fixture.server, expectedCatalogDigest: discovered.digest,
+      grants: [{ name: "lookup", actionClass: "READ_ONLY" }] }));
+    const review = requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path), fixture.workspace, "READ_ONLY");
+    expect(checkToolsetReadiness(fixture.workspace).ready).toBe(false);
+    expect(checkToolsetReadiness(fixture.workspace, { additionalCapabilities: review.capabilities }).ready).toBe(true);
+    expect(fixture.tools.seam.schemas()).toBeNull();
+    await fixture.mount();
+    expect(fixture.tools.seam.schemas()?.map(schema => schema.name)).toEqual([nativeMcpToolName("fixture", "lookup")]);
+    expect((await fixture.call("lookup", { query: "only reviewed remote capability" })).outcome).toBe("OK");
+    expect(fixture.calls()).toHaveLength(1);
+  });
+  test("an explicitly wrong MCP context cannot qualify a reviewed subset", () => {
+    const fixture = setup({ tools: [tool()] });
+    const path = join(fixture.workspace, "wrong-context.json");
+    writeFileSync(path, JSON.stringify({ schemaVersion: 1, server: { id: "fixture", command: process.execPath },
+      expectedCatalogDigest: "a".repeat(64), grants: [{ name: "lookup", actionClass: "READ_ONLY" }] }));
+    const config = loadToolsConfig(fixture.workspace);
+    config.tools.allowedTools = [{ name: nativeMcpToolName("fixture", "lookup"), actionClass: "READ_ONLY",
+      context: { kind: "mcp", server: { id: "different", name: "Different", transport: "stdio" } } }];
+    initToolsConfig(fixture.workspace, config);
+    expect(() => requireReviewedNativeMcpGrants(loadNativeMcpConfiguration(path), fixture.workspace, "READ_ONLY")).toThrow(/context must match/);
+    expect(fixture.calls()).toEqual([]);
+  });
   test("pins exact config bytes, refuses literal secrets and checks the signed grant class", async () => {
     const fixture = setup({ tools: [tool()] });
     const path = join(fixture.workspace, "mcp-config.json");

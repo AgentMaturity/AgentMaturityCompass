@@ -7,6 +7,11 @@ import { pathToFileURL } from "node:url";
 import { afterEach, beforeAll, beforeEach, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
+import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { nativeTaskId } from "../src/studio/nativeTaskDescriptors.js";
@@ -44,6 +49,30 @@ function service(workspace = root): NativeTaskService {
 function input(prompt = "Record this synthetic native Studio turn."): NativeTaskStart {
   return { agentId: "default", clientRequestId: randomUUID(), provider: "stub", tools: "none", prompt, maxSteps: 2, maxTokens: 64 };
 }
+
+test("Studio offers a signed read-only subset without advertising unknown or misclassified tools", async () => {
+  const config = defaultToolsConfig();
+  config.tools.allowedTools = config.tools.allowedTools.filter(tool => ["fs.read", "glob", "grep"].includes(tool.name));
+  config.tools.allowedTools.push({ name: "fs.write", actionClass: "READ_ONLY" }, { name: "unknown.tool", actionClass: "READ_ONLY" });
+  initToolsConfig(root, config);
+  initBudgets(root, "default"); initApprovalPolicy(root);
+  writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
+  const s = service();
+  const setup = await s.configuration({ ...actor, demo: false });
+  expect(setup.scope.ready).toBe(true);
+  expect(setup.scope.tools.map(tool => tool.name).sort()).toEqual(["fs.read", "glob", "grep"]);
+  expect(setup.scope.message).toContain("Read-only tools are available");
+  expect(setup.scope.message).toContain("WRITE_HIGH approval quorum");
+  expect(setup.scope.approvalRequired).toBe(true);
+  const demonstration = await s.configuration(actor);
+  expect(demonstration.scope.ready).toBe(false);
+
+  config.tools.allowedTools = [{ name: "fs.write", actionClass: "READ_ONLY" }];
+  initToolsConfig(root, config);
+  const incompatible = await s.configuration({ ...actor, demo: false });
+  expect(incompatible.scope.ready).toBe(false);
+  expect(incompatible.scope.tools).toEqual([]);
+});
 function rows(sessionId?: string | null) {
   const ledger = openLedger(root, { readonly: true });
   try { return ledger.getAllEvents().filter(row => !sessionId || row.session_id === sessionId); } finally { ledger.close(); }
