@@ -11,7 +11,8 @@ import { writeLifecycleRunArtifact, type WriteLifecycleRunArtifactResult } from 
 import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
 import type { ProductionTrace } from "../agents/traceIngestion.js";
-import type { DiagnosticReport, QuestionScore } from "../types.js";
+import type { DiagnosticReport } from "../types.js";
+import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -129,7 +130,6 @@ interface ParsedCandidate {
   traces: Array<AMCTraceV1 | ProductionTrace>;
   collaborationTelemetry: CollaborationTelemetryCandidate[];
   evidenceRefs: string[];
-  flags: string[];
 }
 
 interface CollaborationTelemetryCandidate {
@@ -265,11 +265,6 @@ function redactDeep(value: unknown): { value: unknown; count: number } {
     return { value: out, count };
   }
   return { value, count: 0 };
-}
-
-function textHasSecret(text: string): boolean {
-  SECRET_RE.lastIndex = 0;
-  return SECRET_RE.test(text);
 }
 
 function safeJsonParse(text: string): unknown {
@@ -562,12 +557,6 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
     const collaborationTelemetry = collaborationTelemetryFromCandidate(redacted.value, agentId, sourceRelative(sourcePath, file));
     const count = recordCount(parsed);
-    const flags = [
-      ...(redacted.count > 0 || textHasSecret(text) ? ["redacted sensitive values"] : []),
-      ...(category === "eval-output" && canonicalize(parsed).match(/failed|false|timeout|error/i) ? ["eval failures present"] : []),
-      ...(category === "trace-jsonl" && traces.some((trace) => "error" in trace && trace.error) ? ["trace failures present"] : []),
-      ...(collaborationTelemetry.length > 0 ? ["collaboration telemetry only"] : [])
-    ];
     parsedCandidates.push({
       candidate: {
         category,
@@ -583,8 +572,7 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       redacted: redacted.value,
       traces,
       collaborationTelemetry,
-      evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`],
-      flags
+      evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`]
     });
   }
 
@@ -666,21 +654,10 @@ function buildImportedDiagnosticReport(input: {
   parsedCandidates: ParsedCandidate[];
 }): DiagnosticReport {
   const ts = Date.now();
-  const evidenceCoverage = Math.min(1, input.plan.candidateCount / 6);
-  const questionScores: QuestionScore[] = input.parsedCandidates.map((candidate, index) => {
-    const flags = candidate.flags;
-    const finalLevel = flags.some((flag) => /failure|malformed|unsupported/i.test(flag)) ? 2 : flags.length > 0 ? 3 : 4;
-    return {
-      questionId: `IMPORT-${index + 1}.${candidate.candidate.category}`,
-      claimedLevel: 4,
-      supportedMaxLevel: finalLevel,
-      finalLevel,
-      confidence: candidate.candidate.confidence,
-      evidenceEventIds: candidate.evidenceRefs,
-      flags,
-      narrative: candidate.candidate.summary
-    };
-  });
+  // Keep the legacy report envelope for existing import consumers, but do not
+  // manufacture a maturity measurement from file counts or parseable fields.
+  // Zero numeric values mean no accepted diagnostic evidence; no questions or
+  // layers were evaluated. Source trust is separate from artifact signing.
   const reportBase: Omit<DiagnosticReport, "reportJsonSha256"> = {
     agentId: input.agentId,
     runId: input.importId,
@@ -689,30 +666,31 @@ function buildImportedDiagnosticReport(input: {
     windowEndTs: ts,
     status: "UNSIGNED",
     verificationPassed: false,
-    trustBoundaryViolated: input.plan.redactionCount > 0,
-    trustBoundaryMessage: input.plan.redactionCount > 0 ? "Imported artifacts contained sensitive-looking values that were redacted before persistence." : null,
-    integrityIndex: input.plan.status === "ready" ? 0.72 : 0.2,
-    trustLabel: "DEVELOPING — some evidence, needs more coverage",
+    trustBoundaryViolated: false,
+    trustBoundaryMessage: null,
+    integrityIndex: 0,
+    trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS",
     targetProfileId: null,
-    layerScores: [
-      {
-        layerName: "Resilience",
-        avgFinalLevel: questionScores.length === 0 ? 0 : questionScores.reduce((sum, row) => sum + row.finalLevel, 0) / questionScores.length,
-        confidenceWeightedFinalLevel: questionScores.length === 0 ? 0 : questionScores.reduce((sum, row) => sum + row.finalLevel * row.confidence, 0) / questionScores.length
-      }
-    ],
-    questionScores,
+    layerScores: [],
+    questionScores: [],
     inflationAttempts: [],
-    unsupportedClaimCount: input.plan.unsupported.length,
+    unsupportedClaimCount: 0,
     contradictionCount: 0,
-    correlationRatio: questionScores.length > 0 ? 1 : 0,
+    correlationRatio: 0,
     invalidReceiptsCount: 0,
     correlationWarnings: input.plan.warnings,
-    evidenceCoverage,
+    evidenceCoverage: 0,
     evidenceTrustCoverage: {
-      observed: Number(evidenceCoverage.toFixed(6)),
+      observed: 0,
       attested: 0,
-      selfReported: 0
+      selfReported: 1
+    },
+    importProvenance: {
+      evaluationPerformed: false,
+      sourceTrustTier: "SELF_REPORTED",
+      artifactCount: input.plan.candidateCount,
+      recordCount: input.plan.candidates.reduce((sum, candidate) => sum + candidate.recordCount, 0),
+      evidenceRefs: [...new Set(input.parsedCandidates.flatMap((candidate) => candidate.evidenceRefs))].sort()
     },
     targetDiff: [],
     prioritizedUpgradeActions: input.plan.unsupported.length > 0
@@ -721,6 +699,7 @@ function buildImportedDiagnosticReport(input: {
     evidenceToCollectNext: ["Run a full AMC score after importing to correlate imported evidence with live maturity questions."],
     runSealSig: "unsigned-import",
   };
+  reportBase.evidenceReadiness = evaluateDiagnosticEvidenceReadiness(reportBase);
   return {
     ...reportBase,
     reportJsonSha256: sha256Hex(canonicalize(reportBase))
@@ -737,6 +716,8 @@ function renderImportedReportMarkdown(report: DiagnosticReport, plan: NeutralImp
     `- Candidates: ${plan.candidateCount}`,
     `- Redactions: ${plan.redactionCount}`,
     `- Status: ${plan.status}`,
+    "- Source trust: SELF_REPORTED — source claims have not been verified.",
+    "- Evaluation: No maturity evaluation was performed. Import completion is not a score.",
     "",
     "## Imported Artifacts",
     ...plan.candidates.map((candidate) => `- ${candidate.category}: ${candidate.path} (${candidate.recordCount} record(s))`),
@@ -912,15 +893,15 @@ export function runNeutralImport(input: {
     resourceManifests: [enforceResourceManifestRef(resourceManifest)],
     surfaceOverrides: {
       Watch: {
-        status: traceFailureIndex ? "complete" : "partial",
+        status: traceFailureIndex ? "partial" : "pending",
         summary: traceFailureIndex
-          ? `Imported trace evidence produced ${traceFailureIndex.ref.entryCount} trace failure index entrie(s).`
+          ? `Imported traces produced ${traceFailureIndex.ref.entryCount} failure index entries. Runtime monitoring was not evaluated.`
           : "Imported evidence did not include trace rows.",
         refs: traceFailureIndex ? [traceFailureIndex.ref.indexId] : []
       },
       Enforce: {
-        status: "complete",
-        summary: "Neutral import artifacts were included in the resource manifest.",
+        status: "partial",
+        summary: "Imported artifacts were recorded in the resource manifest. Policy enforcement was not evaluated.",
         refs: [resourceManifest.manifest.manifestId]
       }
     }

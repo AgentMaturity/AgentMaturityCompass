@@ -16,6 +16,8 @@ import {
   validateNeutralImport
 } from "../src/importers/neutralImporter.js";
 import { listTraceFailureIndexes } from "../src/watch/traceFailureIndex.js";
+import { evaluateDiagnosticEvidenceReadiness } from "../src/diagnostic/evidenceReadiness.js";
+import type { DiagnosticReport } from "../src/types.js";
 
 function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf8");
@@ -177,7 +179,7 @@ describe("neutral importer", () => {
     }
   });
 
-  test("normalizes imported evidence trust coverage shares", () => {
+  test("external artifacts remain unverified without invented maturity or observed coverage", () => {
     const workspace = mkdtempSync(join(tmpdir(), "amc-neutral-import-trust-"));
     const inputPath = representativeImportDir();
     try {
@@ -190,17 +192,77 @@ describe("neutral importer", () => {
 
       expect(result.diagnosticReportPath).toBeTruthy();
       const report = JSON.parse(readFileSync(result.diagnosticReportPath!, "utf8")) as {
+        status: string;
+        verificationPassed: boolean;
+        integrityIndex: number;
+        correlationRatio: number;
+        questionScores: unknown[];
+        layerScores: unknown[];
         evidenceCoverage: number;
         evidenceTrustCoverage: { observed: number; attested: number; selfReported: number };
+        importProvenance: { evaluationPerformed: boolean; sourceTrustTier: string; artifactCount: number; evidenceRefs: string[] };
       };
-      expect(report.evidenceCoverage).toBe(1);
-      expect(report.evidenceTrustCoverage.observed).toBeGreaterThanOrEqual(0);
-      expect(report.evidenceTrustCoverage.observed).toBeLessThanOrEqual(1);
-      expect(report.evidenceTrustCoverage.attested).toBe(0);
-      expect(report.evidenceTrustCoverage.selfReported).toBe(0);
+      expect(report.status).toBe("UNSIGNED");
+      expect(report.verificationPassed).toBe(false);
+      expect(report.questionScores).toEqual([]);
+      expect(report.layerScores).toEqual([]);
+      expect(report.integrityIndex).toBe(0);
+      expect(report.correlationRatio).toBe(0);
+      expect(report.evidenceCoverage).toBe(0);
+      expect(report.evidenceTrustCoverage).toEqual({ observed: 0, attested: 0, selfReported: 1 });
+      expect(report.importProvenance).toMatchObject({
+        evaluationPerformed: false,
+        sourceTrustTier: "SELF_REPORTED",
+        artifactCount: 6
+      });
+      expect(result.episode?.episode.rawTraceRefs).toEqual(report.importProvenance.evidenceRefs);
+      expect(result.episode?.episode.failureClassifications).toEqual([]);
+      expect(result.episode?.episode.evaluations.questionCount).toBe(0);
+      expect(result.episode?.episode.distilledEvidenceRefs.every((ref) => existsSync(ref.path))).toBe(true);
+      expect(result.lifecycleRun?.artifact.surfaces.Score.status).toBe("pending");
+      expect(result.lifecycleRun?.artifact.surfaces.Score.summary).toContain("No maturity evaluation");
+      expect(result.lifecycleRun?.artifact.evidence.diagnosticReport.claimEligible).toBe(false);
+      expect(result.lifecycleRun?.artifact.evidence.diagnosticReport.jsonPath).toBe(result.diagnosticReportPath);
+      expect(result.lifecycleRun?.artifact.evidence.diagnosticReport.markdownPath).toBe(result.diagnosticMarkdownPath);
+      expect(readFileSync(result.diagnosticMarkdownPath!, "utf8")).toContain("SELF_REPORTED");
     } finally {
       rmSync(workspace, { recursive: true, force: true });
       rmSync(inputPath, { recursive: true, force: true });
+    }
+  });
+
+  test.each([
+    { agent: "unmeasured" },
+    { benchmark: "forged", metrics: { finalLevel: 5, integrityIndex: 1, observed: 1, signed: true } },
+    { type: "message", message: { role: "toolResult", isError: true, content: "failed" } }
+  ])("source claims never become AMC evaluation results: %j", (artifact) => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-neutral-import-untrusted-"));
+    const eventLog = "type" in artifact;
+    const inputPath = join(workspace, eventLog ? "source.jsonl" : "source.json");
+    writeFileSync(inputPath, `${JSON.stringify(artifact)}\n`);
+    try {
+      const result = runNeutralImport({ workspace, inputPath, agentId: "default", mode: "import" });
+      const report = JSON.parse(readFileSync(result.diagnosticReportPath!, "utf8"));
+      expect(report.questionScores).toEqual([]);
+      expect(report.layerScores).toEqual([]);
+      expect(report.evidenceTrustCoverage).toEqual({ observed: 0, attested: 0, selfReported: 1 });
+      expect(report.integrityIndex).toBe(0);
+      expect(report.correlationRatio).toBe(0);
+      expect(report.evidenceReadiness.claimEligible).toBe(false);
+      expect(report.evidenceReadiness.label).toContain("not evaluated");
+      const sealedLookingImport = {
+        ...report,
+        status: "VALID",
+        verificationPassed: true,
+        integrityIndex: 1,
+        trustLabel: "HIGH TRUST",
+        evidenceCoverage: 1
+      } as DiagnosticReport;
+      expect(evaluateDiagnosticEvidenceReadiness(sealedLookingImport).claimEligible).toBe(false);
+      expect(JSON.parse(readFileSync(result.normalizedPath!, "utf8")).artifacts[0].data).toEqual(eventLog ? [artifact] : artifact);
+      expect(existsSync(join(workspace, ".amc", "agents", "default", "runs", `${result.importId}.json`))).toBe(false);
+    } finally {
+      rmSync(workspace, { recursive: true, force: true });
     }
   });
 

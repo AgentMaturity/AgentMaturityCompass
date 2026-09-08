@@ -17,6 +17,7 @@ export type DiagnosticEvidenceReadinessInput = Pick<
   | "trustLabel"
   | "evidenceCoverage"
   | "evidenceTrustCoverage"
+  | "importProvenance"
 >;
 
 function readiness(
@@ -48,6 +49,15 @@ function finiteNumber(value: unknown): value is number {
 export function evaluateDiagnosticEvidenceReadiness(
   report: DiagnosticEvidenceReadinessInput
 ): DiagnosticEvidenceReadiness {
+  if (report.importProvenance) {
+    return readiness(
+      "UNVERIFIED",
+      "External import — not evaluated",
+      ["NO_ACCEPTED_EVIDENCE"],
+      "Imported content is SELF_REPORTED. Importing or signing an artifact does not verify source claims or perform a maturity evaluation.",
+      "Capture observed evidence or obtain a named attestation, then run a full AMC assessment."
+    );
+  }
   if (report.status === "UNSIGNED") {
     return readiness(
       "UNVERIFIED",

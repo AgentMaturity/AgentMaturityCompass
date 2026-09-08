@@ -4025,6 +4025,14 @@ export interface DiagnosticReport {
     selfReported: number;
   };
   evidenceReadiness?: DiagnosticEvidenceReadiness;
+  /** Import bookkeeping is not a maturity evaluation or verified source evidence. */
+  importProvenance?: {
+    evaluationPerformed: false;
+    sourceTrustTier: "SELF_REPORTED";
+    artifactCount: number;
+    recordCount: number;
+    evidenceRefs: string[];
+  };
   autonomyAllowanceIndex?: number;
   dualityCompliance?: {
     executeWithValidTicket: number;

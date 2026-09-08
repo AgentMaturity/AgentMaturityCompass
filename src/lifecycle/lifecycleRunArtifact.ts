@@ -158,7 +158,19 @@ export interface LifecycleRunArtifactExportResult {
   redacted: boolean;
 }
 
-function lifecycleSurfaces(report: DiagnosticReport): Record<AMCSurface, LifecycleSurfaceSummary> {
+function lifecycleSurfaces(report: DiagnosticReport, imported: boolean): Record<AMCSurface, LifecycleSurfaceSummary> {
+  if (imported) {
+    return {
+      Score: { status: "pending", summary: "No maturity evaluation was performed. Imported content is SELF_REPORTED and unverified.", refs: [report.runId] },
+      Shield: { status: "pending", summary: "No assurance packs were executed by this import.", refs: [] },
+      Enforce: { status: "pending", summary: "Importing artifacts does not evaluate policy enforcement.", refs: [] },
+      Vault: { status: "partial", summary: "Import hashes record artifact integrity; source claims remain unverified.", refs: [report.reportJsonSha256] },
+      Watch: { status: "pending", summary: "Runtime monitoring was not evaluated by this import.", refs: [] },
+      Comply: { status: "pending", summary: "Compliance was not evaluated by this import.", refs: [] },
+      Fleet: { status: "pending", summary: "Fleet governance was not evaluated by this import.", refs: [] },
+      Passport: { status: "pending", summary: "No portable maturity proof was issued by this import.", refs: [] }
+    };
+  }
   const readiness = evaluateDiagnosticEvidenceReadiness(report);
   const scoreLevel = report.layerScores.length === 0
     ? 0
@@ -218,7 +230,7 @@ export function buildLifecycleRunArtifact(input: WriteLifecycleRunArtifactInput)
   const readiness = evaluateDiagnosticEvidenceReadiness(input.report);
   const paths = getAgentPaths(input.workspace, input.report.agentId);
   const surfaces = {
-    ...lifecycleSurfaces(input.report),
+    ...lifecycleSurfaces(input.report, input.source === "import"),
     ...input.surfaceOverrides
   };
   if ((input.observabilityRecords ?? []).length > 0 && !input.surfaceOverrides?.Watch) {
@@ -259,8 +271,8 @@ export function buildLifecycleRunArtifact(input: WriteLifecycleRunArtifactInput)
         artifactStatus: input.report.status,
         evidenceStatus: readiness.status,
         claimEligible: readiness.claimEligible,
-        jsonPath: join(paths.runsDir, `${input.report.runId}.json`),
-        markdownPath: join(paths.reportsDir, `${input.report.runId}.md`),
+        jsonPath: join(input.source === "import" ? join(paths.runsDir, "..", "imported-runs") : paths.runsDir, `${input.report.runId}.json`),
+        markdownPath: join(input.source === "import" ? join(paths.reportsDir, "..", "imported-reports") : paths.reportsDir, `${input.report.runId}.md`),
         reportJsonSha256: input.report.reportJsonSha256
       },
       episodeRecords: input.episodeRecords ?? [],

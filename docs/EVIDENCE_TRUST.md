@@ -15,6 +15,8 @@ AMC maturity scoring is evidence-derived. Agents cannot raise their own scores b
 - Missing required evidence produces `UNKNOWN` outcomes with capped scores.
 - If evidence quality/coverage is weak, AMC returns insufficient-evidence style outputs rather than inflated certainty.
 
+`amc import` stores external artifacts as unverified, `SELF_REPORTED` content. It does not run a maturity evaluation: import summaries contain no question or layer scores, no observed or attested coverage, and no measured integrity or receipt correlation. Numeric zero fields in the legacy report envelope mean no accepted diagnostic evidence; `importProvenance.evaluationPerformed` is `false`. Artifact counts and source references describe what was imported, not evidence quality. Signing an import artifact preserves its integrity without verifying its source claims. Capture observed evidence or obtain a named attestation, then run a full AMC assessment before making maturity claims.
+
 ## Anti-Cheat Guarantees
 
 - Agents cannot submit question-level scores directly (current implementation: 89-question bank).

@@ -38,7 +38,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
           }
           return;
         }
-        console.log(chalk.green("  Imported into AMC evidence."));
+        console.log(chalk.green("  Imported as SELF_REPORTED evidence. No maturity evaluation was performed."));
         console.log(`  Episode: ${result.episode?.episode.episodeId ?? "-"}`);
         console.log(`  Lifecycle: ${result.lifecycleRun?.artifact.lifecycleRunId ?? "-"}`);
         console.log(`  Trace index: ${result.traceFailureIndex?.ref.indexId ?? "-"}`);

@@ -29,6 +29,7 @@ export interface EpisodeRecord {
     finalLevel: number;
   }>;
   evaluations: {
+    evaluationPerformed?: false;
     diagnosticRunId: string;
     status: DiagnosticReport["status"];
     integrityIndex: number;
@@ -65,13 +66,16 @@ export interface EpisodeRecordExportResult {
 }
 
 function uniqueEvidenceEventIds(report: DiagnosticReport): string[] {
+  if (report.importProvenance) return [...report.importProvenance.evidenceRefs];
   return [...new Set(report.questionScores.flatMap((question) => question.evidenceEventIds))].sort();
 }
 
 export function buildEpisodeRecord(input: WriteEpisodeRecordInput): EpisodeRecord {
   const paths = getAgentPaths(input.workspace, input.report.agentId);
-  const diagnosticJson = join(paths.runsDir, `${input.report.runId}.json`);
-  const diagnosticMarkdown = join(paths.reportsDir, `${input.report.runId}.md`);
+  const runsDir = input.source === "import" ? join(paths.runsDir, "..", "imported-runs") : paths.runsDir;
+  const reportsDir = input.source === "import" ? join(paths.reportsDir, "..", "imported-reports") : paths.reportsDir;
+  const diagnosticJson = join(runsDir, `${input.report.runId}.json`);
+  const diagnosticMarkdown = join(reportsDir, `${input.report.runId}.md`);
   return {
     schemaVersion: "2026-05-22",
     episodeId: `episode-${input.report.runId}`,
@@ -97,6 +101,7 @@ export function buildEpisodeRecord(input: WriteEpisodeRecordInput): EpisodeRecor
         finalLevel: question.finalLevel
       })),
     evaluations: {
+      ...(input.source === "import" ? { evaluationPerformed: false as const } : {}),
       diagnosticRunId: input.report.runId,
       status: input.report.status,
       integrityIndex: input.report.integrityIndex,
@@ -204,9 +209,13 @@ function episodeRecordMarkdown(episode: EpisodeRecord): string {
     `- Started: ${episode.startedAt}`,
     `- Ended: ${episode.endedAt}`,
     `- Status: ${episode.evaluations.status}`,
-    `- Integrity index: ${episode.evaluations.integrityIndex}`,
-    `- Evidence coverage: ${episode.evaluations.evidenceCoverage}`,
-    `- Questions: ${episode.evaluations.questionCount}`,
+    ...(episode.source === "import"
+      ? ["- Evaluation: Not performed. Imported content is SELF_REPORTED and unverified."]
+      : [
+          `- Integrity index: ${episode.evaluations.integrityIndex}`,
+          `- Evidence coverage: ${episode.evaluations.evidenceCoverage}`,
+          `- Questions: ${episode.evaluations.questionCount}`
+        ]),
     `- Raw trace refs: ${episode.rawTraceRefs.length}`,
     `- Failure classifications: ${episode.failureClassifications.length}`,
     `- Enforce resource manifests: ${episode.resourceManifestIds.length}`,
