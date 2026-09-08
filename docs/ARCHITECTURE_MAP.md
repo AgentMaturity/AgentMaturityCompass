@@ -2,7 +2,7 @@
 
 This map reflects current source structure and runtime boundaries in the repository.
 
-Use [ARCHITECTURE_NAVIGATION.md](ARCHITECTURE_NAVIGATION.md) for guided source walks and Graphify maps of the native agent loop, imports and trust/export paths.
+Use [the code graph guide](CODE_GRAPH.md) for guided source walks and Graphify maps of the native agent loop, imports and trust/export paths.
 
 For the readable overview, start with [ARCHITECTURE_BRIEF.md](ARCHITECTURE_BRIEF.md). This file remains the appendix-style path map. For capabilities by AMC surface, see [SYSTEM_CAPABILITIES.md](SYSTEM_CAPABILITIES.md).
 

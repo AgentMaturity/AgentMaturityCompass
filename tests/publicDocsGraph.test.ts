@@ -89,6 +89,7 @@ describe("AMC public Docs graph", () => {
       "DOMAIN_PROOF_LANE",
       "EXAMPLES_INDEX",
       "EXECUTIVE_OVERVIEW",
+      "KEY_HISTORY",
       "PLATFORM_ENGINEER_QUICKSTART",
       "PLATFORM_PATH",
       "QUESTION_BANK",

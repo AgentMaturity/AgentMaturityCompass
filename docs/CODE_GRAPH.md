@@ -6,9 +6,12 @@ containment relationships. Built with [Graphify](https://github.com/Graphify-Lab
 has unresolved and inferred relationships; it does not capture every runtime
 connection. Counts depend on corpus, extraction and build stages.
 
-Start with [the guided reading paths and focused maps](ARCHITECTURE_NAVIGATION.md)
-for native execution, evidence import and trust/publication. Those maps are
-small enough to read directly and can also be exported to Obsidian.
+In a [repository checkout](https://github.com/AgentMaturity/AgentMaturityCompass)
+that includes the focused-map tooling, read `docs/ARCHITECTURE_NAVIGATION.md`
+for guided paths through native execution, evidence import and trust/publication.
+That contributor guide and its generated maps are checkout resources rather
+than pages in this public Docs collection. The maps can also be exported to
+Obsidian.
 
 ## Build
 
