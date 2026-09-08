@@ -62,6 +62,16 @@ describe("container source build and runtime contracts", () => {
     expect(existsSync(join(result.dir, "workspace with spaces"))).toBe(false);
   });
 
+  it.each([
+    { command: ["session", "verify", "--json"] },
+    { command: ["agent-loop", "verify", "preserved-session", "--json"] }
+  ])("runs cold $command without bootstrap credentials or state initialization", ({ command }) => {
+    const result = entrypoint(command, { missingSecret: true });
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.calls).toEqual([command]);
+    expect(existsSync(join(result.dir, "workspace with spaces"))).toBe(false);
+  });
+
   it("preserves an explicit studio subcommand rather than applying the default startup", () => {
     const result = entrypoint(["studio", "--help"], { missingSecret: true });
     expect(result.status, result.stderr).toBe(0);
@@ -109,5 +119,96 @@ describe("container source build and runtime contracts", () => {
     expect(result.status, result.stderr).toBe(0);
     expect(result.calls).toHaveLength(1);
     expect(result.calls[0].slice(0, 2)).toEqual(["studio", "start"]);
+  });
+
+  it.each(["success", "container-removal-fails", "volume-removal-fails"])("pins runtime images and continues recorded cleanup when %s", (mode) => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-container-cleanup-")); dirs.push(dir);
+    const preload = join(dir, "synthetic-docker.mjs");
+    const callsPath = join(dir, "calls.jsonl");
+    const receiptPath = join(dir, "receipt.json");
+    // Run the real smoke main with synthetic Docker/HTTP outcomes; no daemon or
+    // image is used. Qualification passes so only cleanup can change the verdict.
+    writeFileSync(preload, `
+import child from "node:child_process";
+import { syncBuiltinESMExports } from "node:module";
+import { appendFileSync } from "node:fs";
+const sessionId="11111111-1111-4111-8111-111111111111";
+const otherSessionId="22222222-2222-4222-8222-222222222222";
+const studioImage="sha256:"+"1".repeat(64),runnerImage="sha256:"+"2".repeat(64);
+let killed=false;
+globalThis.fetch=async()=>({ok:true,body:{cancel:async()=>{}}});
+child.spawnSync=(command,args)=>{
+  if(command!=="docker")throw Error("Unexpected command "+command);
+  appendFileSync(process.env.AMC_TEST_CALLS,JSON.stringify(args)+"\\n");
+  // The inspected tags can now point elsewhere. Only the inspected immutable
+  // IDs retain the fixture's known runtime; using either original tag fails.
+  if(args[0]==="run"&&args.some(arg=>arg==="review/studio:mutable"||arg==="review/runner:mutable"))return {status:125,stdout:"",stderr:"synthetic mutable tag moved after inspect"};
+  if(args[0]==="rm"&&process.env.AMC_TEST_CLEANUP==="container-removal-fails")return {status:1,stdout:"",stderr:"synthetic container removal failure"};
+  if(args[0]==="volume"&&args[1]==="rm"&&process.env.AMC_TEST_CLEANUP==="volume-removal-fails")return {status:1,stdout:"",stderr:"synthetic volume removal failure"};
+  if(args[0]==="kill")killed=true;
+  let output="",status=0;
+  if(args[0]==="info")output=JSON.stringify({OSType:"linux",Architecture:"aarch64",ServerVersion:"synthetic"});
+  else if(args[0]==="image")output=JSON.stringify([{Id:args[2].includes("studio")?studioImage:runnerImage,Architecture:"arm64",Os:"linux"}]);
+  else if(args[0]==="inspect")output=args.includes("--format")?"true":JSON.stringify([{NetworkSettings:{Ports:{"3212/tcp":[{HostPort:"3212"}]}}}]);
+  else if(args[0]==="volume"&&args[1]==="create")output=args[2];
+  else if(args[0]==="run"&&args.includes("node"))output=JSON.stringify({uid:10001,bundledPackages:1,version:"1.0.0"});
+  else if(args.includes("--version"))output="1.0.0";
+  else if(args.includes("--help"))output="Usage: amc\\namc evidence verify\\namc --help --all";
+  else if(args.includes("agent-loop")&&args[args.indexOf("agent-loop")+1]==="run")output=JSON.stringify({sessionId,driverStatus:"idle",unsignedRows:0,events:5,turns:1,requests:1,toolCalls:1,endings:[{turn:1,reason:"complete",interrupted:false}]});
+  else if(args.includes("verify")){
+    const interrupted=killed&&!args.includes(runnerImage);
+    const errors=interrupted?["Session "+otherSessionId+" missing seal"]:[];
+    status=interrupted?1:0;
+    output=JSON.stringify(args.includes("agent-loop")
+      ?{ok:!interrupted,sessionId,ledgerOk:!interrupted,ledgerErrors:errors,sessionChainErrors:[],unsignedRowIds:[],requests:[{status:"reconstructed",headerEventId:"header1"}]}
+      :{ok:!interrupted,chain:{ok:!interrupted,errors},errors,sessions:{closed:[sessionId]}});
+  }
+  return {status,stdout:output,stderr:""};
+};
+syncBuiltinESMExports();
+`);
+    const result = spawnSync(process.execPath, ["--import", preload, resolve("scripts/container-smoke.mjs"),
+      "--studio-image", "review/studio:mutable", "--runner-image", "review/runner:mutable", "--out", receiptPath], {
+      encoding: "utf8", timeout: 15_000,
+      env: { PATH: process.env.PATH, HOME: dir, AMC_TEST_CALLS: callsPath, AMC_TEST_CLEANUP: mode }
+    });
+    const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
+    const calls = readFileSync(callsPath, "utf8").trim().split("\n").map((line) => JSON.parse(line) as string[]);
+    expect(receipt).toMatchObject({ requestedStudioImage: "review/studio:mutable", requestedRunnerImage: "review/runner:mutable",
+      studioImage: `sha256:${"1".repeat(64)}`, runnerImage: `sha256:${"2".repeat(64)}` });
+    const runs = calls.filter((args) => args[0] === "run");
+    expect(runs.length).toBeGreaterThan(6);
+    for (const args of runs) {
+      expect(args).not.toContain("review/studio:mutable");
+      expect(args).not.toContain("review/runner:mutable");
+      expect(args.some((arg) => arg === receipt.studioImage || arg === receipt.runnerImage)).toBe(true);
+    }
+    const coldVerifiers = runs.filter((args) => args.includes("--network") && args.includes("verify"));
+    expect(coldVerifiers).toHaveLength(6);
+    const studioDataMount = runs.find((args) => args.includes("-d"))!.find((arg) => arg.startsWith("type=volume,"))!;
+    for (const args of coldVerifiers) {
+      expect(args[args.indexOf("--network") + 1]).toBe("none");
+      expect(args).toContain(receipt.studioImage);
+      expect(args).toContain(studioDataMount);
+      expect(args.filter((arg) => arg.startsWith("type=bind,"))).toEqual([expect.stringMatching(/dst=\/run\/secrets\/vault,readonly$/)]);
+      expect(args.some((arg) => /AMC_BOOTSTRAP|owner-user|owner-pass/.test(arg))).toBe(false);
+    }
+    const lifecycle = calls.filter((args) => ["start", "stop", "kill"].includes(args[0]!) || coldVerifiers.includes(args))
+      .map((args) => args[0] === "run" ? args.includes("agent-loop") ? "run-verify" : "ledger-verify" : args[0]);
+    expect(lifecycle).toEqual(["stop", "ledger-verify", "run-verify", "start", "stop", "ledger-verify", "run-verify", "start", "kill", "ledger-verify", "run-verify"]);
+    const containerRemoval = calls.findIndex((args) => args[0] === "rm");
+    const volumeRemoval = calls.findIndex((args) => args[0] === "volume" && args[1] === "rm");
+    expect(containerRemoval).toBeGreaterThan(-1);
+    expect(volumeRemoval).toBeGreaterThan(containerRemoval);
+    const secretMount = calls.flat().find((arg) => arg.startsWith("type=bind,src=") && arg.includes("dst=/run/secrets/vault"))!;
+    expect(existsSync(secretMount.split("src=")[1]!.split(",dst=")[0]!)).toBe(false);
+    expect(receipt.checks.find((check: { name: string }) => check.name === "studio: interrupted gateway is refused by both cold verifiers")).toMatchObject({ passed: true });
+    expect(result.status, result.stderr).toBe(mode === "success" ? 0 : 1);
+    expect(receipt.ok).toBe(mode === "success");
+    expect(receipt.cleanupResults.map((entry: { resource: string }) => entry.resource)).toEqual(["container", "volume", "volume", "secret files"]);
+    if (mode !== "success") {
+      expect(receipt.cleanupResults.some((entry: { ok: boolean }) => entry.ok === false)).toBe(true);
+      expect(JSON.stringify(receipt)).toContain(mode === "container-removal-fails" ? "synthetic container removal failure" : "synthetic volume removal failure");
+    }
   });
 });
