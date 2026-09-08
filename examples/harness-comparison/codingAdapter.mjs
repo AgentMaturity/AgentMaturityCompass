@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve, sep } from "node:path";
+import { basename, dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { VERSION, invoke, putJson, readJson, seedRepository } from "./codingCommon.mjs";
 import { codingGateway } from "./codingGateway.mjs";
@@ -139,7 +139,13 @@ try {
   if (context.schemaVersion !== VERSION || fixture.schemaVersion !== VERSION || !["amc", "dsh", "pi"].includes(receipt.targetId)
     || typeof fixture.id !== "string" || typeof fixture.prompt !== "string" || !fixture.prompt.trim() || Buffer.byteLength(fixture.prompt) > 32768
     || fixture.prompt.trimStart().startsWith("-") || fixture.prompt.includes("\0")) throw new Error("Invalid coding fixture or target identity");
-  if (resolve(context.observationsPath) !== join(workspace, "observations.json")) throw new Error("Observations must remain in the exact comparison workspace location");
+  const observationPath = resolve(context.observationsPath);
+  // macOS can name the same temporary directory through /var and /private/var.
+  // Compare the real parent without following a model-writable output leaf;
+  // the observer atomically replaces that exact leaf after the harness exits.
+  if (basename(observationPath) !== "observations.json" || realpathSync(dirname(observationPath)) !== workspace) {
+    throw new Error("Observations must remain in the exact comparison workspace location");
+  }
   const lane = context.lane;
   if (lane?.kind !== "local-provider" || typeof lane.model !== "string" || !lane.model || !Number.isSafeInteger(lane.budgets?.maxTokens)
     || lane.budgets.maxTokens < 1 || !Number.isSafeInteger(lane.budgets.timeoutMs) || lane.budgets.timeoutMs < 5000) throw new Error("This binding requires a finite local-model coding lane");
