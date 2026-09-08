@@ -1,0 +1,29 @@
+[
+  {
+    "schemaVersion": "2026-09-08",
+    "id": "coding-range-normalization",
+    "description": "Repair inclusive integer range normalization without mutating inputs.",
+    "prompt": "Repair repo/solution.mjs in place. Keep it a self-contained JavaScript ES module with no imports, external packages, file access, network access, or subprocesses. Implement the specified exported function; do not change its name. Inputs must not be mutated, including nested arrays and objects, on either success or failure. Return ordinary JSON-compatible arrays/strings/numbers, not promises or custom serialization objects. Only edit repo/solution.mjs. Export normalizeRanges(ranges). ranges is an array of exactly two-element arrays whose endpoints are JavaScript safe integers. Throw TypeError for any other input. Reverse descending endpoints, sort by start then end, and merge overlapping or adjacent inclusive intervals, including transitive merges. Return a new array of new [start,end] arrays; an empty input returns []. For example, [[5,3],[1,2]] becomes [[1,5]], and [[1,2],[4,5]] stays separate.",
+    "files": {
+      "repo/solution.mjs": "export function normalizeRanges(ranges) {\n  ranges.sort((a, b) => a[0] - b[0]);\n  return ranges.filter((range, index) => index === 0 || range[0] > ranges[index - 1][1]);\n}\n"
+    }
+  },
+  {
+    "schemaVersion": "2026-09-08",
+    "id": "coding-quoted-csv",
+    "description": "Repair CSV parsing with quoted fields, escaped quotes and exact record boundaries.",
+    "prompt": "Repair repo/solution.mjs in place. Keep it a self-contained JavaScript ES module with no imports, external packages, file access, network access, or subprocesses. Implement the specified exported function; do not change its name. Inputs must not be mutated, including nested arrays and objects, on either success or failure. Return ordinary JSON-compatible arrays/strings/numbers, not promises or custom serialization objects. Only edit repo/solution.mjs. Export parseCsv(text). A non-string input throws TypeError. Parse comma-delimited fields and LF or CRLF record separators. A quoted field begins with a double quote at the start of that field, ends with a matching double quote, and uses doubled double quotes to encode one literal double quote. Commas, LF and CRLF inside quotes are preserved exactly. Preserve all spaces and empty fields, including a final empty field after a comma. The empty string returns []; a single blank record (a newline) returns [[\"\"]]. A final record separator ends the existing record without adding another one. Throw SyntaxError for an unterminated quoted field, a quote in an unquoted field, any character after a closing quote other than comma/record separator/end, or a bare CR outside quotes. Return an array of record arrays. Example: a,\"b,c\" followed by a newline returns [[\"a\",\"b,c\"]].",
+    "files": {
+      "repo/solution.mjs": "export function parseCsv(text) {\n  if (!text) return [];\n  return text.trim().split(/\\r?\\n/).map(line => line.split(\",\"));\n}\n"
+    }
+  },
+  {
+    "schemaVersion": "2026-09-08",
+    "id": "coding-stable-dependencies",
+    "description": "Repair deterministic dependency ordering with validation and cycle detection.",
+    "prompt": "Repair repo/solution.mjs in place. Keep it a self-contained JavaScript ES module with no imports, external packages, file access, network access, or subprocesses. Implement the specified exported function; do not change its name. Inputs must not be mutated, including nested arrays and objects, on either success or failure. Return ordinary JSON-compatible arrays/strings/numbers, not promises or custom serialization objects. Only edit repo/solution.mjs. Export orderDependencies(records). records is an array of non-null, non-array objects with a nonempty string id and a dependsOn array of nonempty string IDs. Record IDs must be unique and every dependency must name a record. Ignore extra object fields. Duplicate IDs within one dependsOn array count once. Throw TypeError for invalid input, duplicate record IDs or unknown dependencies. Return an array of IDs in topological order. At each step, among all records whose dependencies have already been returned, choose the one appearing earliest in the original input; do not use alphabetical ordering or a FIFO readiness queue. Throw RangeError if a cycle prevents returning all records, including a self-dependency. Empty input returns []. Example: [{id:\"c\",dependsOn:[\"a\"]},{id:\"b\",dependsOn:[]},{id:\"a\",dependsOn:[]}] returns [\"b\",\"a\",\"c\"].",
+    "files": {
+      "repo/solution.mjs": "export function orderDependencies(records) {\n  return records.sort((a, b) => a.id.localeCompare(b.id)).map(record => record.id);\n}\n"
+    }
+  }
+]

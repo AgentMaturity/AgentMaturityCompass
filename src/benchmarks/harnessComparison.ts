@@ -11,10 +11,14 @@ import { renderHarnessComparisonReport, summarizeHarnessComparison } from "./har
 
 export interface HarnessComparisonTrial {
   id: string; targetId: string; taskId: string; laneId: string; repetition: number;
-  laneKind: "keyless-conformance" | "live-provider";
+  laneKind: HarnessComparisonManifest["lanes"][number]["kind"];
   scenario: string;
   status: "executed" | "unavailable" | "inconclusive";
   verdict: "pass" | "fail" | null;
+  /** Independent task result after intact oracle and pin checks, before budget/cleanup qualification. */
+  observedOutcome: "pass" | "fail" | null;
+  /** Reported by the pinned adapter; null means unknown, never inferred from process exit. */
+  modelCalled: boolean | null;
   reason: string | null;
   laneConfigurationSha256: string;
   process: Pick<ProcessOutcome, "exitCode" | "signal" | "terminatedBy" | "treeExitProven" | "durationMs"> | null;
@@ -131,6 +135,8 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
       "Source commits are declared provenance. Determinate trials require artifact, executable, fixture, adapter and oracle file digests to match before and after execution; this does not attest a build-to-source relationship or every dynamic dependency.",
       "Latency is complete target-command wall time including adapter startup and process-group wait, not model-only latency. Failed and inconclusive executions retain their timing.",
       "Token/cache/cost/action counters remain attributed observations; missing values are unknown, and token/spend comparisons are retrospective rather than a substitute for live budget enforcement.",
+      "Local-provider lanes declare literal loopback origins and operator model/runtime digests; the pinned adapter must enforce actual upstream/redirect boundaries and verify those identities. Loopback can still host a proxy; the runner does not attest where inference occurred.",
+      "A reported model call and an observed task result are separate from qualification. Missing local token usage leaves the bounded trial inconclusive; no monetary observation or scripted-backend quality claim is manufactured.",
       "Durable raw captures are bounded and redacted; digests identify those retained bytes, not an undisclosed original. No superiority factor is inferred."
     ], manifest, trials: [], artifacts: []
   };
@@ -146,7 +152,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
         const trial: HarnessComparisonTrial = {
           id: `t${report.trials.length + 1}-${target.id}-${task.id}-r${repetition + 1}`, targetId: target.id, taskId: task.id, laneId: lane.id,
           repetition: repetition + 1, laneKind: lane.kind, scenario: task.scenario,
-          status: "unavailable", verdict: null, reason: null, laneConfigurationSha256: comparisonSha256(JSON.stringify(lane)),
+          status: "unavailable", verdict: null, observedOutcome: null, modelCalled: null, reason: null, laneConfigurationSha256: comparisonSha256(JSON.stringify(lane)),
           process: null, oracle: null, observations: null, budgetStatus: "unknown", artifacts: []
         };
         report.trials.push(trial);
@@ -156,7 +162,7 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
         else if (options.signal?.aborted) trial.reason = "Comparison cancelled before this trial started.";
         else if (!binding?.command) trial.reason = binding?.unavailableReason ?? "No executable binding is supplied for this target/scenario; source-only.";
         else if (lane.kind === "live-provider" && !options.allowLive) trial.reason = "Live-provider execution was not enabled.";
-        else if (lane.kind === "live-provider" && !binding.supportsBoundedLiveExecution) trial.reason = "This adapter does not declare bounded live execution support.";
+        else if (lane.kind !== "keyless-conformance" && !binding.supportsBoundedLiveExecution) trial.reason = "This adapter does not declare bounded live execution support.";
         else if (lane.requiredSecretEnv.some(name => !options.secretEnv?.[name])) trial.reason = "Required named live credentials are unavailable.";
         if (trial.reason) continue;
 
@@ -200,11 +206,17 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           if (existsSync(observationsPath)) {
             const raw = readComparisonFile(observationsPath).toString("utf8");
             trial.artifacts.push(writeComparisonArtifact(output, `${trial.id}.observations.txt`, raw, secrets, true));
-            trial.observations = comparisonObservationsSchema.parse(JSON.parse(raw));
+            const observations = comparisonObservationsSchema.parse(JSON.parse(raw));
+            if (lane.kind === "local-provider" && observations.cost !== undefined) {
+              trial.reason = "Local-provider monetary observations are not admitted; the raw adapter claim is retained without becoming a cost measurement.";
+              continue;
+            }
+            trial.observations = observations;
+            trial.modelCalled = observations.modelExecution?.modelCalled ?? null;
           }
           trial.budgetStatus = budgetStatus(lane, trial.observations);
           const oracleInput = JSON.stringify({ schemaVersion: HARNESS_COMPARISON_VERSION, trialId: trial.id,
-            taskId: task.id, lane, process: trial.process, stdout: outcome.stdout.text, stderr: outcome.stderr.text,
+            targetId: target.id, taskId: task.id, lane, process: trial.process, stdout: outcome.stdout.text, stderr: outcome.stderr.text,
             observations: trial.observations, fixtureSha256: task.fixture.sha256 });
           // The oracle sees the bounded original captures through stdin, before
           // publication redaction. Otherwise runner redaction could fake a pass.
@@ -230,6 +242,11 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
           if (comparisonSha256(readComparisonFile(fixturePath)) !== task.fixture.sha256) throw new Error("The trial fixture changed.");
           if (trial.oracle.verdict === "unsupported") { trial.reason = "The executed oracle identified an unsupported capability."; continue; }
           if (trial.oracle.verdict === "inconclusive") { trial.reason = "The independent oracle could not determine the scenario outcome."; continue; }
+          if (lane.kind === "local-provider" && trial.modelCalled !== true) {
+            trial.reason = "The local-provider adapter did not record an actual inference request; command or oracle success alone cannot establish a model task.";
+            continue;
+          }
+          trial.observedOutcome = trial.oracle.verdict;
           if (trial.budgetStatus === "unknown") { trial.reason = "Required token/spend observations were not recorded."; continue; }
           trial.status = "executed";
           trial.verdict = trial.budgetStatus === "exceeded" ? "fail" : trial.oracle.verdict;

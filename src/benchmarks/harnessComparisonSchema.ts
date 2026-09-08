@@ -5,6 +5,19 @@ const id = z.string().regex(/^[a-z0-9][a-z0-9_-]{0,63}$/);
 const hash = z.string().regex(/^[a-f0-9]{64}$/);
 const boundedText = z.string().min(1).max(4096);
 const envName = z.string().regex(/^[A-Z][A-Z0-9_]{0,127}$/);
+/** Literal, canonical loopback origins only; no DNS, credentials or URL paths. */
+function isLoopbackOrigin(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  try {
+    const url = new URL(value);
+    const ipv4 = url.hostname.split(".");
+    const loopback = url.hostname === "[::1]" || (ipv4.length === 4 && ipv4[0] === "127" &&
+      ipv4.every(part => /^\d{1,3}$/.test(part) && Number(part) <= 255));
+    return loopback && (url.protocol === "http:" || url.protocol === "https:") &&
+      !url.username && !url.password && url.port !== "0" && value === url.origin;
+  } catch { return false; }
+}
+const localModelIdentitySchema = z.object({ runtimeSha256: hash, weightsSha256: z.array(hash).min(1).max(64) }).strict();
 export const comparisonFilePinSchema = z.object({ path: boundedText, sha256: hash }).strict();
 export const comparisonCommandSchema = z.object({
   executable: comparisonFilePinSchema,
@@ -29,7 +42,7 @@ export const harnessComparisonManifestSchema = z.object({
   repetitions: z.number().int().min(1).max(100),
   captureBytesPerStream: z.number().int().min(1024).max(1_048_576).default(262_144),
   lanes: z.array(z.object({
-    id, kind: z.enum(["keyless-conformance", "live-provider"]),
+    id, kind: z.enum(["keyless-conformance", "live-provider", "local-provider"]),
     provider: z.string().max(256).nullable(), model: z.string().max(256).nullable(),
     settings: z.record(z.string(), z.unknown()),
     permissions: z.object({
@@ -76,6 +89,19 @@ export const harnessComparisonManifestSchema = z.object({
     if (lane.requiredSecretEnv.some(name => /^(?:HOME|USERPROFILE|PATH|TMPDIR|TEMP|TMP|XDG_.*|NODE_.*|LD_.*|DYLD_.*)$/i.test(name) || !/(?:KEY|TOKEN|SECRET|PASSWORD|PASSPHRASE|CREDENTIAL|AUTH)/i.test(name))) reject("Live secret names cannot override the execution environment.");
     if (lane.kind === "keyless-conformance" && (lane.provider !== null || lane.model !== null || lane.requiredSecretEnv.length > 0 || lane.permissions.network.length > 0)) reject("Keyless lanes cannot request a provider, model, secret or network destination.");
     if (lane.kind === "live-provider" && (!lane.provider || !lane.model || lane.budgets.maxTokens === null || lane.budgets.maxCostUsd === null)) reject("Live lanes require a model, provider and finite token/spend limits.");
+    if (lane.kind === "local-provider") {
+      if (!lane.provider?.trim() || !lane.model?.trim() || lane.budgets.maxTokens === null || lane.budgets.maxCostUsd !== null) {
+        reject("Local-provider lanes require a model, provider, finite token limit and no monetary budget.");
+      }
+      if (!isLoopbackOrigin(lane.settings.baseURL) || !lane.permissions.network.includes(lane.settings.baseURL) ||
+          !lane.permissions.network.every(isLoopbackOrigin)) {
+        reject("Local-provider destinations must be canonical literal loopback origins including settings.baseURL.");
+      }
+      if (lane.requiredSecretEnv.length) reject("Local-provider adapters must use task-owned local authentication, not inherited credentials.");
+      if (lane.settings.modelKind !== "local-inference" || !localModelIdentitySchema.safeParse(lane.settings.modelIdentity).success) {
+        reject("Local-provider lanes require explicit local-inference classification and operator runtime/weight digest pins; scripted backends are not model-quality evidence.");
+      }
+    }
   }
   if (manifest.targets.length * manifest.tasks.length * manifest.repetitions > 2000) reject("A comparison is limited to 2,000 trials.");
 });
@@ -84,6 +110,8 @@ const count = z.number().int().nonnegative().max(1_000_000_000_000);
 const sourceRef = z.string().min(1).max(2048);
 export const comparisonObservationsSchema = z.object({
   schemaVersion: z.literal(HARNESS_COMPARISON_VERSION),
+  /** Attributed adapter evidence, not an attestation of the served model or its quality. */
+  modelExecution: z.object({ modelCalled: z.boolean(), source: z.literal("adapter-observation"), evidenceRef: sourceRef }).strict().optional(),
   usage: z.object({ inputTokens: count, outputTokens: count, cacheReadTokens: count.nullable(), cacheWriteTokens: count.nullable(),
     source: z.enum(["provider-response", "local-counter"]), evidenceRef: sourceRef }).strict().optional(),
   cost: z.object({ amountUsd: z.number().finite().nonnegative().max(1_000_000_000), source: z.enum(["provider-invoice", "published-rate-calculation"]),

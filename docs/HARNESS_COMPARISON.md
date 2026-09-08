@@ -123,6 +123,79 @@ oracle rerun must never overwrite or relabel the original failed receipt.
 
 ## Inputs and execution
 
+### Local inference without paid-provider credentials
+
+An explicit `local-provider` lane supports a real local model. It is separate
+from the native corpus's canned stub and from the paid `live-provider` lane.
+The existing `--allow-adapter-execution` opt-in authorizes its pinned local
+adapter; `--live` remains the separate paid-provider opt-in. This lane alone
+does not provide an installed model server, comparator bindings or a coding
+oracle.
+
+A local lane requires a nonempty `provider` and `model`, finite `timeoutMs` and
+`maxTokens`, `maxCostUsd: null`, and `requiredSecretEnv: []`. Its adapter must own
+any synthetic local authentication and must not discover ambient provider keys.
+Required settings are:
+
+```json
+{
+  "baseURL": "http://127.0.0.1:18080",
+  "modelKind": "local-inference",
+  "modelIdentity": {
+    "runtimeSha256": "<actual runtime digest: 64 lowercase hex characters>",
+    "weightsSha256": ["<actual model weight digest: 64 lowercase hex characters>"]
+  }
+}
+```
+
+The angle-bracket values are explanatory placeholders, not valid pins. Keep
+generation settings, model/template versions and the recorded model-runtime
+recipe in the same settings object. The runner validates the operator identity
+declaration; the adapter must verify the actual files and serving identity.
+Neither a digest declaration nor `modelCalled: true` authenticates the served
+model or makes a scripted backend a model-quality measurement.
+
+`baseURL` must be a canonical HTTP(S) origin with a literal IPv4 loopback address
+in `127.0.0.0/8` or IPv6 `[::1]`, and must also occur in `permissions.network`.
+Every listed network destination must meet that same rule. DNS names including
+`localhost`, wildcard listeners, credentials, URL paths/query/fragments and
+noncanonical address spellings are refused. An adapter can use an owned
+ephemeral loopback gateway to reach the declared upstream origin; it must
+enforce the exact upstream and refuse redirects. This is a configuration
+contract, not an OS network sandbox: a loopback service could itself forward
+elsewhere. Actual local inference needs its own runtime/model evidence.
+
+After actual inference requests, the adapter records attributed evidence:
+
+```json
+{
+  "schemaVersion": "2026-09-08",
+  "modelExecution": {
+    "modelCalled": true,
+    "source": "adapter-observation",
+    "evidenceRef": "retained request/response receipt and model-runtime identity"
+  }
+}
+```
+
+Absent or false `modelCalled` keeps a local trial inconclusive even when its
+command and oracle succeed. Genuine usage can use the existing
+`provider-response` or `local-counter` observation contract. Missing usage is
+accepted as unknown data: a verified independent oracle result is retained in
+`observedOutcome`, but the token bound remains unknown, qualification remains
+inconclusive, and the CLI still exits nonzero. A measured token overrun fails
+qualification even if the task outcome passed. Summary and Markdown reports
+separate observed task pass/fail counts from qualified pass/fail counts.
+
+Local monetary observations are not admitted, including a made-up zero-dollar
+provider invoice. Such an adapter claim is retained as raw redacted evidence,
+the trial is inconclusive, and the claim does not enter accepted cost metrics.
+With ordinary valid local observations, cost samples remain absent/unknown.
+The paid lane's required token/spend accounting and the keyless lane's prohibition
+on models, credentials and network destinations are unchanged.
+
+### Runner API
+
 `runHarnessComparison` in `src/benchmarks/harnessComparison.ts` accepts:
 
 ```ts
@@ -188,7 +261,7 @@ filesystem/network boundary and enforce live token/spend limits. Keyless lanes
 cannot request a provider/model, secrets or network destinations. That manifest
 restriction does not itself block sockets. Run adversarial or unknown target
 code in an independently qualified container/VM rather than treating an
-isolated HOME as kernel confinement. Live bindings must declare bounded live
+isolated HOME as kernel confinement. Both live-provider and local-provider bindings must declare bounded live
 execution support; unknown limits or absent measurements cannot pass a bounded
 trial.
 
@@ -231,6 +304,12 @@ to the recorded adapter/oracle evidence, not independently authenticated by
 this runner.
 
 ## Scenarios and reports
+
+The [three-harness coding workflow](../examples/harness-comparison/codingREADME.md)
+materializes real installed AMC, DSH and Pi bindings, shared repository repair
+tasks and a target-neutral module-output oracle. AMC executes natively; comparator
+packages are optional study inputs. Materialization and scripted protocol checks
+do not establish real-model performance.
 
 Keyless conformance scenarios cover success, refusal, injection, redaction,
 budget exhaustion, cancellation, crash recovery, tool-error attribution, resume,

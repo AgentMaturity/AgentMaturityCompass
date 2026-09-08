@@ -36,6 +36,18 @@ export function summarizeHarnessComparison(report: HarnessComparisonReport) {
         failed: determinate.filter(row => row.verdict === "fail").length,
         unavailable: rows.filter(row => row.status === "unavailable").length,
         inconclusive: rows.filter(row => row.status === "inconclusive").length,
+        observedTaskOutcomes: {
+          passed: rows.filter(row => row.observedOutcome === "pass").length,
+          failed: rows.filter(row => row.observedOutcome === "fail").length,
+          unknown: rows.filter(row => row.observedOutcome !== "pass" && row.observedOutcome !== "fail").length
+        },
+        reportedModelCalls: {
+          called: rows.filter(row => row.modelCalled === true).length,
+          notCalled: rows.filter(row => row.modelCalled === false).length,
+          unknown: rows.filter(row => typeof row.modelCalled !== "boolean").length,
+          source: "adapter-observation" as const
+        },
+        budgetUnknown: rows.filter(row => row.budgetStatus === "unknown").length,
         // Denominator is always visible. Unavailable trials are never failures
         // or passes, and a contract pass rate is not a human usability rating.
         oraclePassRate: determinate.length ? passing / determinate.length : null,
@@ -78,11 +90,19 @@ export function renderHarnessComparisonReport(report: HarnessComparisonReport): 
     "",
     `Manifest SHA-256: \`${report.manifestSha256}\`. Started ${report.startedAt}; finished ${report.finishedAt}.`,
     "",
-    "| Target | Lane | Requested | Ran | Determinate | Pass | Fail | Unavailable | Inconclusive | Command wall median ms | Timing samples |",
+    "| Target | Lane | Requested | Ran | Determinate | Qualified pass | Qualified fail | Unavailable | Inconclusive | Command wall median ms | Timing samples |",
     "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ...summary.groups.map(group => `| ${cell(group.targetId)} | ${cell(group.laneId)} (${group.laneKind}) | ${group.requestedTrials} | ${group.commandsExecuted} | ${group.determinate} | ${group.passed} | ${group.failed} | ${group.unavailable} | ${group.inconclusive} | ${number(group.latencyMsIncludingFailedAndInconclusiveExecutions.median)} | ${group.latencyMsIncludingFailedAndInconclusiveExecutions.samples} |`),
     "",
     "Timing includes failed/inconclusive executions and adapter startup/cleanup wait. Missing timings, usage, cache, costs and interventions remain unknown; `summary.json` includes each metric's actual sample count and missing count. Cost observations retain their source URL/date. Human actions and automated fixture actions are separate.",
+    "",
+    "## Observed task outcomes before qualification",
+    "",
+    "These independent oracle outcomes passed the input-integrity checks. They do not imply verified budgets or successful cleanup. A local model call is an attributed adapter observation, not model-identity or quality attestation; missing token usage keeps the qualification above inconclusive.",
+    "",
+    "| Target | Lane | Task pass | Task fail | Outcome unknown | Model called (reported) | Model call unknown | Budget unknown |",
+    "|---|---|---:|---:|---:|---:|---:|---:|",
+    ...summary.groups.map(group => `| ${cell(group.targetId)} | ${cell(group.laneId)} | ${group.observedTaskOutcomes.passed} | ${group.observedTaskOutcomes.failed} | ${group.observedTaskOutcomes.unknown} | ${group.reportedModelCalls.called} | ${group.reportedModelCalls.unknown} | ${group.budgetUnknown} |`),
     "",
     "## Repeat",
     "",
