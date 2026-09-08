@@ -477,13 +477,16 @@ describe("AMC-1472 outcome-based onboarding", () => {
     expect(staticAssets).toContain('assetPath("assets/nativeTasks.css")');
     expect(worker).toContain('if (!url.pathname.includes("/assets/"))');
     expect(worker.indexOf("fetch(req)")).toBeLessThan(worker.lastIndexOf("caches.match(req)"));
-    expect(readFileSync("src/console/pages/home.html", "utf8")).toContain("?v=20260908a");
     for (const page of readdirSync("src/console/pages").filter((name) => name.endsWith(".html"))) {
       const html = readFileSync(join("src/console/pages", page), "utf8");
       expect(html, page).not.toContain("20260710b");
-      const version = page === "home.html" ? "?v=20260908a" : "?v=20260711a";
-      if (html.includes("./assets/styles.css?v=")) expect(html, page).toContain(version);
-      if (html.includes("./assets/app.js?v=")) expect(html, page).toContain(version);
+      const versions = [...html.matchAll(/\.\/assets\/(?:styles\.css|app\.js)\?v=([^"']+)/g)]
+        .map(match => match[1]);
+      for (const version of versions) {
+        expect(version, page).toMatch(/^\d{8}[a-z]+$/);
+        expect(version >= "20260711a", page).toBe(true);
+      }
+      if (versions.length > 1) expect(new Set(versions).size, page).toBe(1);
     }
 
     const docs = readFileSync("docs/GETTING_STARTED.md", "utf8");

@@ -21,7 +21,8 @@ describe("full OpenAPI contract", () => {
       expect(path.startsWith("/v1/native-tasks")).toBe(true);
       for (const server of spec.servers) {
         const base = server.url.replace("{host}", "amc.example.com");
-        expect(new URL(base + path).pathname).toBe("/api" + path);
+        const concretePath = path.replace("{taskId}", "a".repeat(64));
+        expect(new URL(base + concretePath).pathname).toBe("/api" + concretePath);
       }
       for (const operation of Object.values(methods as Record<string, any>)) {
         expect(operation.security).toEqual([{ amcAdminToken: [] }, { amcSessionCookie: [] }]);
