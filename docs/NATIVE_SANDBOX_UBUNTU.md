@@ -61,6 +61,21 @@ sudo apparmor_parser -a -K "$profile_target"
 
 The profile does not grant an AMC tool permission. Existing signed AMC tool policy, approval requirements and the shell write-directory grant remain necessary. See the [native workflow guide](NATIVE_AGENT_WORKFLOW.md) for the application workflow. Keep namespace restrictions enabled; do not substitute an `unconfined` profile, setuid Bubblewrap, a privileged AMC process, or an unrestricted shell fallback.
 
+## Sign the native shell grant
+
+In the existing `.amc/tools.yaml` `bash` entry, review and add:
+
+```yaml
+nativeSandbox:
+  kind: linux-bwrap
+  writableDirectories:
+    - workspace/output
+```
+
+Create the intended directory first, keep the `WRITE_HIGH` action class and existing argv restrictions, then explicitly run `amc tools sign` and `amc tools verify`. Directory names are exact relative workspace paths, not `/**` patterns. No grant is borrowed from `fs.write` or `fs.edit`. An empty list produces a read-only host workspace.
+
+Do not configure shell mounts through `bash.allow.paths`: those rules require a path in each call, while the native shell's public arguments are `command` and `timeoutMs`. Old path rules are not silently migrated or bypassed. The new signed requirement refuses legacy ToolHub, non-Linux and replacement shell implementations. Native admission binds the selected immutable shell and policy digest; a policy change before launch requires a fresh call. [ToolHub's policy reference](TOOLHUB.md) explains the complete signed entry. These source changes require the final installed native CLI acceptance; the backend fixture result below is a separate historical receipt.
+
 ## Verify the operating-system prerequisite
 
 These diagnostics use read-only host mounts inside fresh namespaces and do not grant an AMC session authority:

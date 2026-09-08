@@ -1,3 +1,4 @@
+import { nativeSandboxPermitMatches, type NativeSandboxValidationPermit } from "../sandbox/nativeSandboxBinding.js";
 import { readFileSync } from "node:fs";
 import { protectedPathReason } from "./protectedPaths.js";
 import {
@@ -325,7 +326,11 @@ export function validateToolRequest(input: {
   workspace: string;
   tool: ToolDefinition;
   args: Record<string, unknown>;
+  nativeSandboxPermit?: NativeSandboxValidationPermit;
 }): { ok: boolean; reason?: string } {
+  if (input.tool.nativeSandbox && !nativeSandboxPermitMatches(input.nativeSandboxPermit, input.workspace, input.tool, input.args)) {
+    return { ok: false, reason: "nativeSandbox requires the bound native Linux Bubblewrap shell; this caller cannot enforce it" };
+  }
   // The invariant, first and for every tool. This replaces a branch that
   // applied a hardcoded glob list to `git.*` alone — protection three tools
   // happened to get because of how they were named.

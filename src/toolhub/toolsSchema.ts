@@ -52,7 +52,16 @@ export const toolDefinitionSchema = z.object({
   maxBytes: z.number().int().positive().optional(),
   requireExecTicket: z.boolean().optional(),
   denyByDefault: z.boolean().optional(),
-  context: toolContextSchema.optional()
+  context: toolContextSchema.optional(),
+  // These are mount grants, never per-call path glob exceptions.
+  nativeSandbox: z.object({
+    kind: z.literal("linux-bwrap"),
+    writableDirectories: z.array(z.string().min(1).max(4096)).max(64)
+  }).strict().optional()
+}).superRefine((tool, ctx) => {
+  if (tool.nativeSandbox && (tool.name !== "bash" || tool.actionClass !== "WRITE_HIGH" || tool.context?.kind === "mcp")) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["nativeSandbox"], message: "nativeSandbox requires the native bash WRITE_HIGH tool" });
+  }
 });
 
 export const toolsConfigSchema = z.object({

@@ -1,3 +1,4 @@
+import { admitNativeSandboxPolicy } from "../../sandbox/nativeSandboxBinding.js";
 import { reserveNativeToolBudget } from "../../budgets/nativeBudgetAdmission.js";
 import { evaluateRuntimeFirewall } from "../../runtime/firewall.js";
 import {
@@ -8,7 +9,7 @@ import {
 } from "../../toolhub/toolhubValidators.js";
 import { BLOCK_CONFIDENCE, matchInjection } from "../../shield/injection/injectionMatcher.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
-import type { ToolGuard } from "../toolTypes.js";
+import type { ToolDefinition, ToolExecution, ToolGuard } from "../toolTypes.js";
 
 /**
  * AMC's existing policy engines, wired in as monotonic guards (P4.1, ADR-4).
@@ -82,7 +83,8 @@ export function budgetGuard(workspace: string, sessionId?: string): ToolGuard {
  * `denyByDefault`, which is its own default. `validateToolRequest` already
  * returns `{ok, reason}` — deny-only — so it composes here without adaptation.
  */
-export function toolhubAllowlistGuard(workspace: string): ToolGuard {
+export function toolhubAllowlistGuard(workspace: string,
+  visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined): ToolGuard {
   return (execution) => {
     // The Code Mode transport is presentation infrastructure, not a
     // capability, and the allowlist has nothing useful to say about it. What
@@ -106,7 +108,10 @@ export function toolhubAllowlistGuard(workspace: string): ToolGuard {
     const verdict = validateToolRequest({
       workspace,
       tool: definition,
-      args: execution.arguments as Record<string, unknown>
+      args: execution.arguments as Record<string, unknown>,
+      nativeSandboxPermit: snapshot.digestSha256
+        ? admitNativeSandboxPolicy(visibleDefinition?.(execution), execution, definition, snapshot.digestSha256)
+        : undefined
     });
     // No second implementation here. `validateToolRequest` used to key its
     // checks on tool NAMES, so this guard carried a patch applying argv deny

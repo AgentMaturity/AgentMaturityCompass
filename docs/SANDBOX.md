@@ -5,8 +5,9 @@ Sandbox mode executes agent commands in Docker and writes explicit sandbox attes
 ## Native Linux shell tools
 
 Native `agentToolset` shell calls on Linux use the Bubblewrap backend. This is
-a separate path from the Docker command below. The source implementation is
-present; its real Linux acceptance run is pending. Binary discovery alone does
+a separate path from the Docker command below. The constrained Ubuntu backend
+has a dated acceptance receipt; the corrected signed native CLI policy is being
+qualified separately. Binary discovery alone does
 not qualify a machine or establish that a command was confined.
 
 The backend requires a root-owned, non-setuid `/usr/bin/bwrap`, an x64 or arm64
@@ -16,16 +17,34 @@ unsupported prerequisites refuse the shell call. AMC does not install the
 binary automatically and this native path never falls back to an unconfined
 shell.
 
-Write authority comes from the verified, signed `bash.allow.paths` definition
-in the workspace tools configuration. Each grant must be an existing relative
-directory followed by `/**`, for example `./workspace/output/**`. No grant means
-no host writes. Permissions granted to `fs.write` or `fs.edit` do not also grant
-shell writes. Wildcard ancestors, symlink directory grants, paths outside the
-selected workspace, `.amc` grants, and path exceptions that intersect a write
-mount are refused. Existing hard-link aliases and special files in a write
-grant are also refused; admission is bounded to 20,000 entries per grant, so use
-dedicated output directories. Narrow the signed grant instead of approximating
-an unsupported pattern.
+Write authority comes from the verified, signed `bash.nativeSandbox` definition
+in the workspace tools configuration. Add this object to the existing reviewed
+`bash` tool definition, then sign the policy with `amc tools sign`:
+
+```yaml
+nativeSandbox:
+  kind: linux-bwrap
+  writableDirectories:
+    - workspace/output
+```
+
+Each entry names an existing relative directory inside the selected workspace;
+it is not a glob and has no `/**` suffix. An empty list permits no host writes.
+The explicit requirement refuses use by legacy ToolHub, non-Linux composition
+or a replacement tool body that cannot supply the bound native implementation.
+Without the field, the native Linux shell remains confined with no writable
+host directories; it does not impose that new requirement on other runtimes.
+
+The old `bash.allow.paths` mount recipe was incompatible with the command-only
+shell interface. Those `allow.paths` and `deny.paths` fields remain ordinary
+per-call argument checks; they are never interpreted as shell mounts or
+silently migrated. Review any old shell path rules when adopting the new
+object. Permissions granted to `fs.write` or `fs.edit` do not also grant shell
+writes. Wildcards, symlink directory grants, paths outside the selected
+workspace, `.amc` grants, existing hard-link aliases and special files are
+refused. Admission is bounded to 20,000 entries per grant, so use dedicated
+output directories. A policy change between admission and execution refuses
+the call rather than changing its authorized write scope.
 
 The shell sees read-only system runtime files and the selected workspace, with
 `.amc` masked. Explicit host write grants are mounted separately. Scratch space
@@ -62,7 +81,10 @@ retain their separate scopes.
 The final Linux qualification must exercise successful granted writes, outside
 and symlink write denial, TCP and pathname Unix-socket denial, cancellation and
 escaped-descendant cleanup, missing/broken launchers, and signed native receipts.
-Those checks have not been run for this implementation. Bubblewrap's official
+The earlier 36-case Ubuntu backend receipt covers that component boundary;
+the installed corrected native CLI path has its own qualification. See the
+[Ubuntu setup guide](NATIVE_SANDBOX_UBUNTU.md) for the exact profile and scope.
+Bubblewrap's official
 [project](https://github.com/containers/bubblewrap) and
 [option reference](https://github.com/containers/bubblewrap/blob/main/bwrap.xml)
 describe the namespace, seccomp, and launcher-status interfaces used here.

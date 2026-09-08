@@ -3,6 +3,7 @@ import { freezeToolArguments } from "./toolArguments.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import type {
   ToolBody,
+  ToolDefinition,
   ToolDenial,
   ToolExecution,
   ToolMode,
@@ -94,6 +95,13 @@ function denialOutcome(denied: ToolDenial): ToolOutcome {
   };
 }
 
+// The selected body must remain distinguishable from a later scoped override
+// while approval is awaited. Callers cannot assign this binding through argv.
+const selectedDefinitions = new WeakMap<ToolExecution, ToolDefinition>();
+export function selectedToolDefinitionFor(execution: ToolExecution): ToolDefinition | undefined {
+  return selectedDefinitions.get(execution);
+}
+
 export class ToolPipeline {
   constructor(private readonly init: ToolPipelineInit) {}
 
@@ -143,7 +151,13 @@ export class ToolPipeline {
       ...(input.signal === undefined ? {} : { signal: input.signal })
     };
 
-    const outcome = await this.runStages(execution, definition.body);
+    selectedDefinitions.set(execution, definition);
+    let outcome: ToolOutcome;
+    try {
+      outcome = await this.runStages(execution, definition.body);
+    } finally {
+      selectedDefinitions.delete(execution);
+    }
     try {
       this.init.record?.(execution, outcome);
     } catch {
