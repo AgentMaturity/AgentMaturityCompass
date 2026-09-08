@@ -20,6 +20,7 @@
  * never as a fabricated zero.
  */
 import type { ProductionTrace } from "../agents/traceIngestion.js";
+import { sha256Hex } from "../utils/hash.js";
 
 export const PI_SESSION_SUPPORTED_VERSION = 3;
 
@@ -33,15 +34,19 @@ const FAILED_STOP_REASONS = new Set(["error", "aborted"]);
 export interface PiSessionFormat {
   name: "pi-session";
   version: typeof PI_SESSION_SUPPORTED_VERSION;
+  /** AMC mapping contract; independent of the source session version. */
+  mappingVersion: 2;
   sessionId: string | null;
   entries: { message: number; structural: number; total: number };
   malformedEntries: number;
+  unknownTraceTimestamps: number;
   branch: {
     /** The last well-formed entry in the file — Pi's leaf on reload. */
     leafEntryId: string | null;
     currentPathLength: number;
     offPathEntries: number;
     branchPoints: string[];
+    orphanedEntries: number;
     /** `parentSession` from the header: the file this one was forked from. */
     forkedFrom: string | null;
   };
@@ -97,7 +102,7 @@ function wellFormed(value: unknown): Entry | null {
   return { type: value.type, id: value.id, parentId: value.parentId as string | null, timestamp: value.timestamp, raw: value };
 }
 
-/** Parse line by line; a bad line is counted, never fatal, never a trace. */
+/** Bad lines are counted; ambiguous identities and cyclic ancestry refuse the file. */
 export function parsePiSession(text: string): ParsedPiSession {
   const rows: unknown[] = [];
   const malformedLines: number[] = [];
@@ -118,9 +123,82 @@ export function parsePiSession(text: string): ParsedPiSession {
   return { rows, format, malformedLines };
 }
 
+/** Recognized Pi files never fall back to generic parsing after a format error. */
+export function parseDetectedPiSession(text: string): ParsedPiSession | null {
+  const detected = detectPiSession(text);
+  if (detected?.kind === "unsupported") throw new Error(detected.reason);
+  return detected ? parsePiSession(text) : null;
+}
+
+export function piSessionWarnings(session: ParsedPiSession, source: string): string[] {
+  const warnings: string[] = [];
+  const malformed = session.malformedLines.length;
+  if (malformed > 0) warnings.push(`${malformed} malformed entr${malformed === 1 ? "y" : "ies"} in ${source} (line${malformed === 1 ? "" : "s"} ${session.malformedLines.join(", ")}) were counted and produced no evidence.`);
+  if (session.format.branch.orphanedEntries) warnings.push(`${session.format.branch.orphanedEntries} Pi entries reference missing parents; affected ancestry is incomplete.`);
+  if (session.format.unknownTraceTimestamps) warnings.push(`${session.format.unknownTraceTimestamps} Pi trace timestamps are unknown or invalid; no event time was inferred.`);
+  return warnings;
+}
+
+/** Iterative validation is bounded even for disconnected cycles and deep trees. */
+function inspectTree(entries: Entry[]) {
+  const byId = new Map<string, Entry>();
+  for (const entry of entries) {
+    if (byId.has(entry.id)) throw new Error("Pi session has duplicate entry IDs; ancestry is ambiguous.");
+    byId.set(entry.id, entry);
+  }
+  const ancestryComplete = new Map<string, boolean>();
+  for (const entry of entries) {
+    const path = new Set<string>();
+    let cursor: string | null = entry.id;
+    while (cursor !== null && byId.has(cursor) && !ancestryComplete.has(cursor)) {
+      if (path.has(cursor)) throw new Error("Pi session has cyclic ancestry; import refused.");
+      path.add(cursor);
+      cursor = byId.get(cursor)!.parentId;
+    }
+    const complete = cursor === null || ancestryComplete.get(cursor) === true;
+    for (const id of path) ancestryComplete.set(id, complete);
+  }
+  return { byId, ancestryComplete };
+}
+
+/** Preserve identities across redaction without collapsing distinct IDs to one marker. */
+export function sanitizePiSession(parsed: ParsedPiSession, redactedRows: unknown[], redact: (value: string) => string): ParsedPiSession {
+  const safeId = (value: unknown, namespace: "entry" | "session" | "tool"): unknown => {
+    if (typeof value !== "string") return value;
+    return redact(value) !== value || value.startsWith("pi-redacted-")
+      ? `pi-redacted-${namespace}-${sha256Hex(`AMC_PI_ID_V1\0${namespace}\0${value}`)}`
+      : value;
+  };
+  const rows = redactedRows.map((row, index) => {
+    const source = parsed.rows[index];
+    if (!isRecord(row) || !isRecord(source)) return row;
+    const safe = { ...row };
+    for (const key of ["id", "parentId", "fromId", "targetId", "firstKeptEntryId"]) {
+      if (typeof source[key] === "string") safe[key] = safeId(source[key], source.type === "session" && key === "id" ? "session" : "entry");
+    }
+    if (isRecord(source.message) && isRecord(row.message)) {
+      const message = { ...row.message };
+      if (typeof source.message.toolCallId === "string") message.toolCallId = safeId(source.message.toolCallId, "tool");
+      const sourceContent = source.message.content;
+      if (Array.isArray(sourceContent) && Array.isArray(message.content)) {
+        message.content = message.content.map((block, blockIndex) => {
+          const original = sourceContent[blockIndex];
+          return isRecord(block) && isRecord(original) && original.type === "toolCall" && typeof original.id === "string"
+            ? { ...block, id: safeId(original.id, "tool") } : block;
+        });
+      }
+      safe.message = message;
+    }
+    return safe;
+  });
+  const header = rows.find((row): row is Record<string, unknown> => isRecord(row) && row.type === "session") ?? null;
+  const entries = rows.map(wellFormed).filter((entry): entry is Entry => entry !== null && entry.type !== "session");
+  return { rows, format: analyseTree(header, entries, parsed.malformedLines.length), malformedLines: parsed.malformedLines };
+}
+
 function analyseTree(header: Record<string, unknown> | null, entries: Entry[], malformed: number): PiSessionFormat {
   const children = new Map<string, number>();
-  const byId = new Map(entries.map((entry) => [entry.id, entry] as const));
+  const { byId } = inspectTree(entries);
   for (const entry of entries) {
     if (entry.parentId !== null) children.set(entry.parentId, (children.get(entry.parentId) ?? 0) + 1);
   }
@@ -134,14 +212,19 @@ function analyseTree(header: Record<string, unknown> | null, entries: Entry[], m
   return {
     name: "pi-session",
     version: PI_SESSION_SUPPORTED_VERSION,
+    mappingVersion: 2,
     sessionId: typeof header?.id === "string" ? header.id : null,
     entries: { message: messages, structural: entries.length - messages, total: entries.length },
     malformedEntries: malformed,
+    unknownTraceTimestamps: entries.filter((entry) => isRecord(entry.raw.message)
+      && ["assistant", "toolResult"].includes(String(entry.raw.message.role))
+      && entryTimestamp(entry, entry.raw.message) === null).length,
     branch: {
       leafEntryId: leaf?.id ?? null,
       currentPathLength: currentPath.size,
       offPathEntries: entries.filter((entry) => !currentPath.has(entry.id)).length,
       branchPoints: entries.filter((entry) => (children.get(entry.id) ?? 0) > 1).map((entry) => entry.id),
+      orphanedEntries: entries.filter((entry) => entry.parentId !== null && !byId.has(entry.parentId)).length,
       forkedFrom: typeof header?.parentSession === "string" ? header.parentSession : null
     }
   };
@@ -156,14 +239,20 @@ function contentText(content: unknown): string {
     .join("\n");
 }
 
-function entryTimestamp(entry: Entry, message: Record<string, unknown> | null): number {
-  if (typeof entry.timestamp === "string") {
-    const parsed = Date.parse(entry.timestamp);
+function entryTimestamp(entry: Entry, message: Record<string, unknown> | null): number | null {
+  for (const value of [entry.timestamp, message?.timestamp]) {
+    if (typeof value !== "string" && typeof value !== "number") continue;
+    if (typeof value === "string") {
+      // Pi writes ISO timestamps. Reject permissive Date parsing/rollover of malformed dates.
+      const iso = /^((?:\d{4}|[+-]\d{6})-\d{2}-\d{2})T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.exec(value);
+      if (!iso) continue;
+      const calendar = new Date(`${iso[1]}T00:00:00.000Z`);
+      if (!Number.isFinite(calendar.getTime()) || !calendar.toISOString().startsWith(`${iso[1]}T`)) continue;
+    }
+    const parsed = new Date(value).getTime();
     if (Number.isFinite(parsed)) return parsed;
   }
-  if (typeof entry.timestamp === "number" && Number.isFinite(entry.timestamp)) return entry.timestamp;
-  if (typeof message?.timestamp === "number" && Number.isFinite(message.timestamp)) return message.timestamp;
-  return 0;
+  return null;
 }
 
 /**
@@ -177,14 +266,17 @@ export function piSessionTraces(
   options: { agentId: string; source: string }
 ): ProductionTrace[] {
   const entries = redactedRows.map(wellFormed).filter((entry): entry is Entry => entry !== null && entry.type !== "session");
-  const byId = new Map(entries.map((entry) => [entry.id, entry] as const));
+  const { byId, ancestryComplete } = inspectTree(entries);
   const leaf = entries.length > 0 ? entries[entries.length - 1]! : null;
   const onPath = new Set<string>();
   for (let cursor: Entry | null = leaf; cursor !== null && !onPath.has(cursor.id); cursor = cursor.parentId === null ? null : byId.get(cursor.parentId) ?? null) {
     onPath.add(cursor.id);
   }
   const ancestorMessage = (entry: Entry, predicate: (message: Record<string, unknown>) => boolean): Record<string, unknown> | null => {
+    const visited = new Set<string>();
     for (let cursor = entry.parentId === null ? null : byId.get(entry.parentId) ?? null; cursor !== null; cursor = cursor.parentId === null ? null : byId.get(cursor.parentId) ?? null) {
+      if (visited.has(cursor.id)) break;
+      visited.add(cursor.id);
       const message = cursor.type === "message" && isRecord(cursor.raw.message) ? cursor.raw.message : null;
       if (message && predicate(message)) return message;
     }
@@ -194,6 +286,7 @@ export function piSessionTraces(
     entryType: entry.type,
     entryId: entry.id,
     parentId: entry.parentId,
+    ancestryComplete: ancestryComplete.get(entry.id) === true,
     onCurrentPath: onPath.has(entry.id),
     sessionParent: format.branch.forkedFrom,
     sourceFormat: `pi-session-v${format.version}`

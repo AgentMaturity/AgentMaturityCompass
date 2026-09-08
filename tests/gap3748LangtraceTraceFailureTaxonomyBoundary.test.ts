@@ -93,7 +93,7 @@ describe("GAP-3748 Langtrace trace failure taxonomy boundary", () => {
       ],
     });
 
-    expect(index.schemaVersion).toBe("2026-05-22");
+    expect(index.schemaVersion).toBe("2026-09-08");
     expect(index.entries.map((entry) => entry.failureClass)).toEqual(expect.arrayContaining([
       "prompt_error",
       "retrieval_error",

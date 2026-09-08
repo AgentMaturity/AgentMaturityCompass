@@ -11,7 +11,7 @@ import { writeLifecycleRunArtifact, type WriteLifecycleRunArtifactResult } from 
 import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
 import type { ProductionTrace } from "../agents/traceIngestion.js";
-import { detectPiSession, parsePiSession, piSessionSummary, piSessionTraces, type PiSessionFormat } from "./piSessionImport.js";
+import { parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
 import { tracesFromCandidate } from "./traceMapping.js";
 import type { DiagnosticReport } from "../types.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
@@ -489,16 +489,10 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
     }
     const raw = readFileSync(file);
     const text = raw.toString("utf8");
-    // A versioned format is recognised BEFORE the generic parse: an unsupported
-    // version is refused by name, never fed to the generic path as a success.
-    const pi = format === "jsonl" ? detectPiSession(text) : null;
-    if (pi?.kind === "unsupported") {
-      unsupported.push({ path: file, reason: pi.reason });
-      continue;
-    }
-    const piSession = pi ? parsePiSession(text) : null;
+    let piSession: ParsedPiSession | null = null;
     let parsed: unknown;
     try {
+      piSession = format === "jsonl" ? parseDetectedPiSession(text) : null;
       parsed = piSession ? piSession.rows : parseFile(file, format);
     } catch (error) {
       unsupported.push({ path: file, reason: `Could not parse ${format.toUpperCase()}: ${error instanceof Error ? error.message : String(error)}` });
@@ -510,15 +504,17 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       continue;
     }
     const redacted = redactDeep(parsed);
+    if (piSession) {
+      piSession = sanitizePiSession(piSession, redacted.value as unknown[], (value) => redactString(value).value);
+      redacted.value = piSession.rows;
+    }
     const amcTraces = piSession ? [] : amcTracesFromText(file, text);
     const traces = piSession
       ? piSessionTraces(redacted.value as unknown[], piSession.format, { agentId, source: sourceRelative(sourcePath, file) })
       : amcTraces.length > 0
         ? amcTraces
         : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
-    if (piSession && piSession.malformedLines.length > 0) {
-      warnings.push(`${piSession.malformedLines.length} malformed entr${piSession.malformedLines.length === 1 ? "y" : "ies"} in ${sourceRelative(sourcePath, file)} (line${piSession.malformedLines.length === 1 ? "" : "s"} ${piSession.malformedLines.join(", ")}) were counted and produced no evidence.`);
-    }
+    if (piSession) warnings.push(...piSessionWarnings(piSession, sourceRelative(sourcePath, file)));
     const collaborationTelemetry = collaborationTelemetryFromCandidate(redacted.value, agentId, sourceRelative(sourcePath, file));
     const count = recordCount(parsed);
     parsedCandidates.push({

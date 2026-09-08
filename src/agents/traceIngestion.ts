@@ -29,8 +29,8 @@ export interface ProductionTrace {
   output: unknown;
   /** Duration of the agent run in ms, or null when the source recorded none. Never a fabricated 0. */
   durationMs: number | null;
-  /** Timestamp of trace creation */
-  timestamp: number;
+  /** Source event time in milliseconds, or null when unknown. */
+  timestamp: number | null;
   /** Span count in the trace */
   spanCount?: number;
   /** Session/group identifier */
@@ -77,7 +77,8 @@ export interface IngestionStats {
   totalTestcasesGenerated: number;
   totalErrors: number;
   avgScoreOverall: number;
-  avgLatencyMs: number;
+  /** Lifetime mean of finite nonnegative measured samples, or null when none exist. */
+  avgLatencyMs: number | null;
   tracesByAgent: Record<string, number>;
   flagRate: number;
 }
@@ -101,6 +102,7 @@ export class TraceIngestionPipeline {
   private scoredTraces: ScoredTrace[] = [];
   private generatedTestcases: GeneratedTestcase[] = [];
   private stats: IngestionStats;
+  private measuredLatencyCount = 0;
 
   constructor(config?: Partial<IngestionConfig>) {
     this.config = {
@@ -122,7 +124,7 @@ export class TraceIngestionPipeline {
       totalTestcasesGenerated: 0,
       totalErrors: 0,
       avgScoreOverall: 0,
-      avgLatencyMs: 0,
+      avgLatencyMs: null,
       tracesByAgent: {},
       flagRate: 0,
     };
@@ -131,6 +133,12 @@ export class TraceIngestionPipeline {
   /** Ingest a single production trace */
   ingest(trace: ProductionTrace): ScoredTrace {
     this.stats.totalIngested++;
+    if (typeof trace.durationMs === 'number' && Number.isFinite(trace.durationMs) && trace.durationMs >= 0) {
+      this.measuredLatencyCount++;
+      // Incremental mean avoids sum overflow and is independent of scoring/buffer retention.
+      const mean = this.stats.avgLatencyMs ?? 0;
+      this.stats.avgLatencyMs = mean + (trace.durationMs - mean) / this.measuredLatencyCount;
+    }
     this.stats.tracesByAgent[trace.agentType] = (this.stats.tracesByAgent[trace.agentType] ?? 0) + 1;
 
     if (trace.error) this.stats.totalErrors++;
@@ -222,12 +230,6 @@ export class TraceIngestionPipeline {
     // Update running averages
     const totalScores = this.scoredTraces.reduce((s, t) => s + t.metrics.overallScore, 0) + metrics.overallScore;
     this.stats.avgScoreOverall = totalScores / (this.stats.totalScored);
-    // Traces with unknown timing (imported sources record none) are left out
-    // of the average rather than counted as 0 ms.
-    const timed = [...this.scoredTraces.map((s) => s.trace.durationMs), trace.durationMs]
-      .filter((ms): ms is number => typeof ms === "number");
-    const totalLatency = timed.reduce((sum, ms) => sum + ms, 0);
-    this.stats.avgLatencyMs = totalLatency / this.stats.totalIngested;
     this.stats.flagRate = this.stats.totalFlagged / Math.max(this.stats.totalScored, 1);
 
     const result: ScoredTrace = {
@@ -295,6 +297,7 @@ export class TraceIngestionPipeline {
   clear(): void {
     this.scoredTraces = [];
     this.generatedTestcases = [];
+    this.measuredLatencyCount = 0;
     this.stats = this.createEmptyStats();
   }
 

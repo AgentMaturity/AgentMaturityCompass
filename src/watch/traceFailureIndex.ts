@@ -39,7 +39,8 @@ export interface TraceFailureIndexEntry {
   model: string | null;
   provider: string | null;
   lifecycleStage: string | null;
-  timestamp: string;
+  /** Source event time; null when the source recorded no valid timestamp. */
+  timestamp: string | null;
   outcome: TraceFailureOutcome;
   policyDecision: string | null;
   scoreImpact: number;
@@ -63,8 +64,8 @@ export interface TraceFailureCluster {
   episodes: string[];
   tools: string[];
   models: string[];
-  firstSeenAt: string;
-  lastSeenAt: string;
+  firstSeenAt: string | null;
+  lastSeenAt: string | null;
   sampleEntryIds: string[];
   sampleEvidenceRefs: string[];
   sampleSnippet: string;
@@ -78,7 +79,7 @@ export interface TraceFailureCluster {
 }
 
 export interface TraceFailureIndex {
-  schemaVersion: "2026-05-22";
+  schemaVersion: "2026-05-22" | "2026-09-08";
   indexId: string;
   workspace: string;
   agentId: string;
@@ -120,6 +121,18 @@ export interface BuildTraceFailureIndexInput {
 }
 
 const SECRET_RE = /(sk-[a-z0-9_-]{10,}|bearer\s+[a-z0-9._-]{10,}|(?:api|secret|token|key)\s*[:=]\s*[a-z0-9._-]{10,})/gi;
+
+function timestampIso(value: unknown): string | null {
+  if (typeof value !== "number" && typeof value !== "string") return null;
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
+function timeBounds(values: Array<string | null>): { firstSeenAt: string | null; lastSeenAt: string | null } {
+  const known = values.map(timestampIso).filter((value): value is string => value !== null)
+    .sort((a, b) => Date.parse(a) - Date.parse(b));
+  return { firstSeenAt: known[0] ?? null, lastSeenAt: known[known.length - 1] ?? null };
+}
 
 function redactSnippet(text: string, maxChars = 260): string {
   const redacted = text.replace(SECRET_RE, "[REDACTED]");
@@ -212,7 +225,7 @@ function entriesFromReport(report: DiagnosticReport, episode?: EpisodeRecord): T
         model: null,
         provider: null,
         lifecycleStage: episode?.lifecycleStage ?? "score.generated",
-        timestamp: new Date(report.ts).toISOString(),
+        timestamp: timestampIso(report.ts),
         outcome: question.finalLevel < 3 ? "warning" : "unknown",
         policyDecision: question.flags.find((flag) => /blocked|denied|policy|guardrail/i.test(flag)) ?? null,
         scoreImpact,
@@ -262,7 +275,7 @@ function entriesFromTraces(input: BuildTraceFailureIndexInput, runId: string): T
         model: prod ? String(trace.metadata.model ?? "") || null : trace.model ?? null,
         provider: prod ? String(trace.metadata.providerId ?? "") || null : trace.providerId ?? null,
         lifecycleStage: input.episode?.lifecycleStage ?? null,
-        timestamp: new Date(prod ? trace.timestamp : trace.ts).toISOString(),
+        timestamp: timestampIso(prod ? trace.timestamp : trace.ts),
         outcome,
         policyDecision: /blocked|denied/i.test(errorMessage) ? "blocked" : null,
         scoreImpact,
@@ -294,7 +307,6 @@ function buildClusters(entries: TraceFailureIndexEntry[]): TraceFailureCluster[]
   }
   return [...groups.entries()]
     .map(([fingerprint, rows]) => {
-      const sorted = [...rows].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
       const scoreImpact = rows.reduce((sum, row) => sum + row.scoreImpact, 0);
       const topSeverity = rows.reduce((max, row) => Math.max(max, row.scoreImpact), 0);
       const failureClass = rows[0]?.failureClass ?? "unknown_failure";
@@ -310,8 +322,7 @@ function buildClusters(entries: TraceFailureIndexEntry[]): TraceFailureCluster[]
         episodes: uniqueSorted(rows.map((row) => row.episodeId)),
         tools: uniqueSorted(rows.map((row) => row.tool)),
         models: uniqueSorted(rows.map((row) => row.model)),
-        firstSeenAt: sorted[0]?.timestamp ?? new Date(0).toISOString(),
-        lastSeenAt: sorted[sorted.length - 1]?.timestamp ?? new Date(0).toISOString(),
+        ...timeBounds(rows.map((row) => row.timestamp)),
         sampleEntryIds: rows.slice(0, 5).map((row) => row.entryId),
         sampleEvidenceRefs: uniqueSorted(rows.flatMap((row) => row.evidenceRefs)).slice(0, 8),
         sampleSnippet: rows[0]?.redactedSnippet ?? "",
@@ -344,10 +355,11 @@ export function buildTraceFailureIndex(input: BuildTraceFailureIndexInput): Trac
     ...entriesFromTraces(input, runId)
   ];
   const deduped = [...new Map(entries.map((entry) => [entry.entryId, entry])).values()]
-    .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    .sort((a, b) => a.timestamp === null ? (b.timestamp === null ? 0 : 1)
+      : b.timestamp === null ? -1 : Date.parse(b.timestamp) - Date.parse(a.timestamp));
   const clusters = buildClusters(deduped);
   return {
-    schemaVersion: "2026-05-22",
+    schemaVersion: "2026-09-08",
     indexId: `trace-index-${runId}`,
     workspace,
     agentId,
@@ -462,8 +474,7 @@ export function topTraceFailureClusters(input: { workspace: string; agentId?: st
       episodes: uniqueSorted([...existing.episodes, ...cluster.episodes]),
       tools: uniqueSorted([...existing.tools, ...cluster.tools]),
       models: uniqueSorted([...existing.models, ...cluster.models]),
-      firstSeenAt: existing.firstSeenAt < cluster.firstSeenAt ? existing.firstSeenAt : cluster.firstSeenAt,
-      lastSeenAt: existing.lastSeenAt > cluster.lastSeenAt ? existing.lastSeenAt : cluster.lastSeenAt,
+      ...timeBounds([existing.firstSeenAt, existing.lastSeenAt, cluster.firstSeenAt, cluster.lastSeenAt]),
       sampleEntryIds: uniqueSorted([...existing.sampleEntryIds, ...cluster.sampleEntryIds]).slice(0, 5),
       sampleEvidenceRefs: uniqueSorted([...existing.sampleEvidenceRefs, ...cluster.sampleEvidenceRefs]).slice(0, 8)
     });
