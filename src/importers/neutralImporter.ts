@@ -1,3 +1,4 @@
+import { buildNeutralRecordMapping, parsedJsonlLineNumbers, type NeutralRecordMappingReceipt } from "./neutralImportMapping.js";
 import { existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import YAML from "yaml";
@@ -52,12 +53,15 @@ export interface NeutralImportCandidate {
 
 export interface NeutralImportUnsupported {
   path: string;
+  digest?: string;
+  format?: "json" | "jsonl" | "yaml";
   reason: string;
   kind?: "unsupported-format" | "oversized" | "malformed" | "unsupported-shape";
 }
 
 export interface NeutralNormalizationReceipt {
   normalizerVersion: "amc-neutral/2026-09-08";
+  recordMapping?: NeutralRecordMappingReceipt;
   semanticDigest: string;
   sourceTrust: "SELF_REPORTED";
   evaluation: "NOT_EVALUATED";
@@ -452,8 +456,8 @@ function categorySummary(category: NeutralImportCategory, count: number): string
     case "workflow-graph": return `${count} workflow graph element(s) ready for Enforce manifest tracking`;
     case "agent-config": return `${count} agent config field(s) ready for resource manifest tracking`;
     case "memory-store": return `${count} memory item(s) ready for redacted evidence linkage`;
-    case "eval-output": return `${count} evaluator result(s) ready for Score evidence`;
-    case "benchmark-result": return `${count} benchmark metric/sample item(s) ready for lifecycle evidence`;
+    case "eval-output": return `${count} evaluator result(s) retained as self-reported source claims; not evaluated`;
+    case "benchmark-result": return `${count} benchmark metric/sample item(s) retained as self-reported source claims; not evaluated`;
   }
 }
 
@@ -525,13 +529,13 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       callbackTelemetry = format === "json" ? parseDetectedCallbackTelemetry(text) : null;
       parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(file, format);
     } catch (error) {
-      unsupported.push({ path: file, kind: "malformed", reason: error instanceof PiSessionFormatError ? error.message
+      unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "malformed", reason: error instanceof PiSessionFormatError ? error.message
         : `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
       continue;
     }
     const category = dshSession || piSession || callbackTelemetry ? "event-log" : detectCategory(file, format, parsed);
     if (!category) {
-      unsupported.push({ path: file, kind: "unsupported-shape", reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
+      unsupported.push({ path: file, digest: sha256Hex(raw), format, kind: "unsupported-shape", reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
       continue;
     }
     const redacted = redactDeep(parsed);
@@ -572,6 +576,8 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         ...(dshSession ? { sourceFormat: dshSession.format } : piSession ? { sourceFormat: piSession.format } : callbackTelemetry ? { sourceFormat: callbackTelemetry.format } : {})
       },
       redacted: redacted.value,
+      sourceLineNumbers: format === "jsonl" ? parsedJsonlLineNumbers(text) : undefined,
+      malformedSourceLines: piSession?.malformedLines,
       traces,
       collaborationTelemetry,
       evidenceRefs: [`import:${sourceRelative(sourcePath, file)}:${sha256Hex(raw).slice(0, 12)}`]
@@ -659,6 +665,8 @@ function buildNeutralImportPlan(input: { workspace: string; inputPath: string; a
     normalization: {
       normalizerVersion: "amc-neutral/2026-09-08", semanticDigest, sourceTrust: "SELF_REPORTED", evaluation: "NOT_EVALUATED",
       confidenceMeaning: "format-classification-only",
+      recordMapping: buildNeutralRecordMapping({ candidates: parsed.candidates, unsupported: parsed.unsupported,
+        sourceRelative: path => sourceRelative(sourcePath, path), semanticDigest }),
       counts: { recognizedFiles: candidates.length, skippedFiles: parsed.unsupported.length,
         malformedFiles: parsed.unsupported.filter((item) => item.kind === "malformed").length,
         unsupportedFiles: parsed.unsupported.filter((item) => item.kind === "unsupported-format" || item.kind === "unsupported-shape").length,

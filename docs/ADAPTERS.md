@@ -232,3 +232,13 @@ AMC accepts leases via these headers:
 - `api-key`
 
 Real provider API keys never leave the vault. Agents receive dummy keys (`amc_dummy`).
+
+## Review imported records
+
+File import is optional interoperability; it does not run a source harness or verify its claims. Use `amc import /path/to/export --dry-run --json` to review the existing normalization receipt before applying. `plan.normalization.recordMapping` adds a versioned, deterministic record map with its own SHA-256 tied to the source semantic digest. CLI JSON, the import API and Studio's Evidence → Neutral Import review expose the same map; `amc imports show <import-id> --json` retains it after import.
+
+The map separates records projected into traces, retained source context, malformed records and unsupported values. Source-relative JSON pointers refer to the redacted parsed artifact; JSONL source lines are recorded where available. These locators are not execution identities or verified evidence. Original source digests and recognized format versions are listed separately; an unversioned format stays unknown. Records in skipped files are not counted as zero when the parser could not inspect them.
+
+Each trace link shows its source time separately from `plan.detectedAt` (ingestion/review time). A retained duration is source-reported, not independently measured by AMC. Missing or invalid duration remains null; no inter-event latency, successful outcome, monetary cost or maturity result is inferred. Fields retained only in the source artifact and partially projected content/metadata are listed without payload excerpts. Redaction markers include nested values; the complete redacted source remains in `normalized.json` when applied.
+
+Presentation detail is bounded to 2,000 records and 2 MB, with up to 80 top-level fields and 32 trace links per record. Accounting still includes omitted records, and the receipt reports every detail limit and omission explicitly. Studio initially displays up to 100 retained record details; the JSON receipt contains the remaining retained detail. Source files with parser errors are listed with actionable reasons. Follow-up argv is copy/review data, never executed by the view. Import application still checks the reviewed semantic digest and writes the same parsed snapshot.

@@ -47,7 +47,8 @@ MAPS = {
     ],
     "evidence-imports": [
         "src/cli-import-commands.ts", "src/importers/neutralImporter.ts",
-        "src/importers/neutralImportPresentation.ts",
+        "src/importers/neutralImportPresentation.ts", "src/importers/neutralImportMapping.ts",
+        "src/console/assets/neutralImportReview.js", "src/console/assets/app.js",
         "src/importers/traceMapping.ts", "src/importers/piSessionImport.ts",
         "src/importers/dshSessionImport.ts", "src/importers/dshSessionContract.ts",
         "src/importers/piTelemetryCallbacks.ts", "src/importers/callbackTelemetryCapture.ts",
@@ -86,7 +87,8 @@ MAPS = {
         "src/auth/authApi.ts", "src/agent/delegationScope.ts",
         "src/extensions/nativeExtensionManifest.ts", "src/extensions/nativeExtensionStore.ts",
         "src/extensions/nativeExtensionRuntime.ts", "src/skills/skillTurn.ts",
-        "src/mcp/nativeMcpClient.ts", "src/sdk/nativeAgentClient.ts", "src/sdk/index.ts",
+        "src/mcp/nativeMcpClient.ts", "src/mcp/nativeMcpHttpTransport.ts",
+        "src/sdk/nativeAgentClient.ts", "src/sdk/index.ts",
         "src/acp/acpAgentServer.ts", "src/acp/acpProjection.ts", "src/acp/acpCli.ts",
         "src/acp/acpStdioMain.ts", "src/agent/agentSession.ts", "src/agent/agentToolset.ts",
         "src/acp/acpCommittedUpdates.ts", "src/acp/acpNativeSession.ts",
@@ -100,7 +102,7 @@ MAPS = {
     "native-budgets": [
         "src/cli-budget-commands.ts", "src/budgets/budgets.ts", "src/budgets/nativeBudgetUsage.ts",
         "src/budgets/nativeBudgetAdmission.ts", "src/tools/guards/policyGuards.ts",
-        "src/cli-tools-commands.ts", "src/toolhub/toolhubValidators.ts",
+        "src/cli-tools-commands.ts", "src/toolhub/toolsSchema.ts", "src/toolhub/toolhubValidators.ts",
         "src/tools/toolPipeline.ts", "src/agent/agentToolset.ts",
         "src/agent/delegationIdentity.ts", "src/agent/subagentRunner.ts",
         "src/llm/adapter/llmRuntime.ts", "src/llm/adapter/streamRecorder.ts",
@@ -111,6 +113,8 @@ MAPS = {
     ],
     "sandbox-and-launch": [
         "src/tools/builtin/bashTool.ts", "src/agent/agentToolset.ts",
+        "src/toolhub/toolsSchema.ts", "src/toolhub/toolhubValidators.ts",
+        "src/tools/guards/policyGuards.ts", "src/tools/toolPipeline.ts", "src/sandbox/nativeSandboxBinding.ts",
         "src/sandbox/nativeSandboxPolicy.ts", "src/sandbox/bwrapBackend.ts",
         "src/sandbox/sandboxRunner.ts", "src/sandbox/sandboxTypes.ts",
         "src/exec/runProcess.ts", "src/exec/processTypes.ts",

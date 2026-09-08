@@ -128,9 +128,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
   group
     .command("mcp-catalog")
     .description("Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect")
-    .requiredOption("--config <path>", "operator-authored MCP JSON config; envRefs holds references, never literal credentials")
-    .option("--credentials-home <dir>", "credential home used to resolve explicit server envRefs")
-    .option("--credentials-file <path>", "explicit credential file used to resolve server envRefs")
+    .requiredOption("--config <path>", "operator-authored MCP JSON config; envRefs/headerRefs hold references, never literal credentials")
+    .option("--credentials-home <dir>", "credential home used to resolve explicit server credential references")
+    .option("--credentials-file <path>", "explicit credential file used to resolve server credential references")
     .option("--json", "Output the discovered catalog and exact generated allowlist names")
     .action(async (opts: { config: string; credentialsHome?: string; credentialsFile?: string; json?: boolean }) => {
       const controller = new AbortController();

@@ -1,3 +1,4 @@
+import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, setAdminToken, whoami } from "./api.js";
 import { renderBars, renderLine } from "./charts.js";
 import { renderQrLike } from "./qr.js";
@@ -819,12 +820,7 @@ async function renderEvidence() {
         }, null, 2))}</pre>
         <div class="scroll"><table><thead><tr><th>Import</th><th>Agent</th><th>Artifacts</th><th>Categories</th><th>Redactions</th></tr></thead><tbody>${neutralImports.map((row) => `
           <tr>
-            <td><details><summary><code>${htmlEscape(shortId(row.importId, 18))}</code></summary><pre class="scroll">${htmlEscape(JSON.stringify({
-              sourceTrust: "SELF_REPORTED", evaluation: "NOT_EVALUATED",
-              normalization: row.plan?.normalization ?? { status: "legacy receipt; mapping detail unavailable" },
-              sources: (row.plan?.candidates || []).map((candidate) => ({ path: candidate.path, digest: candidate.digest, sourceFormat: candidate.sourceFormat ?? candidate.format })),
-              warnings: row.plan?.warnings || []
-            }, null, 2))}</pre></details></td>
+            <td><details><summary><code>${htmlEscape(shortId(row.importId, 18))}</code></summary>${renderNeutralImportReview(row.plan, { applied: true })}</details></td>
             <td>${htmlEscape(row.agentId || "-")}</td>
             <td>${Number(row.plan?.candidateCount || 0)}</td>
             <td>${htmlEscape((row.plan?.categories || []).join(", ") || "-")}</td>
@@ -1030,14 +1026,8 @@ async function renderEvidence() {
       const payload = apiPayload(out) || out;
       if (outNode) outNode.textContent = JSON.stringify(payload, null, 2);
       const receipt = payload.plan?.normalization;
-      const count = receipt?.counts;
       const review = document.getElementById("neutralImportReview");
-      if (review) review.textContent = count
-        ? `${count.recognizedFiles} recognized files; ${count.normalizedTraces} mapped traces; ${count.failureTraces} source-reported failures. `
-          + `${count.skippedFiles} files skipped, including ${count.malformedFiles} malformed. `
-          + `${count.unknownTimestamps} event times and ${count.unknownDurations} durations are unknown. `
-          + `${(receipt.losses || []).join(" ")}`
-        : "A normalization receipt is unavailable. Review the raw result; applying is disabled.";
+      if (review) review.innerHTML = renderNeutralImportReview(payload.plan, { applied: payload.applied === true });
       reviewedImport = dryRun && payload.plan?.status === "ready" && /^[a-f0-9]{64}$/.test(receipt?.semanticDigest || "")
         && input?.value?.trim() === inputPath ? { inputPath, digest: receipt.semanticDigest } : null;
       setStatus(dryRun ? (reviewedImport ? "Import review ready. No evidence has been written." : "Import is not ready to apply.")

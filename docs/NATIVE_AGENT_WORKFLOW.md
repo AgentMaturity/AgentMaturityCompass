@@ -2,7 +2,7 @@
 
 AMC runs its own model loop with workspace tools, approval gates, sessions, context compaction and MCP connections. It does not need DSH, Pi or another agent runtime. Use this path to request an answer, work with explicitly permitted files, continue a recorded conversation and inspect its evidence. A first score is a baseline; it is not an agent task.
 
-Installed local exercises cover file editing, terminal chat and extensions, TypeScript/Python session lifecycle, and governed stdio MCP calls with real approvals. They use scripted local providers; live-provider quality, broader platforms and human usability remain separate measurements. The Linux shell-policy correction and Streamable HTTP MCP follow-on have their own qualification boundaries.
+Installed local exercises cover file editing, terminal chat and extensions, TypeScript/Python session lifecycle, and governed stdio/HTTP MCP calls with real approvals. They use scripted local providers; live-provider quality, broader platforms and human usability remain separate measurements. The corrected native Linux shell and Streamable HTTP MCP each have separate installed acceptance receipts.
 
 ## Inspect and set up
 
@@ -118,7 +118,7 @@ For a local or remote MCP server, follow [Native MCP](NATIVE_MCP.md):
 3. Review the catalog digest and original/generated tool names. Pin `expectedCatalogDigest`, choose each remote tool/action-class grant, and independently add the exact generated names and matching classes to signed tool policy.
 4. Supply `--mcp-config mcp.json`, `--tools workspace` and the matching `--approve-tools ACTION_CLASS` to run/chat. All grants in that invocation must match the approval class. No allowlist is widened automatically.
 
-Changed catalogs/configuration, missing grants or broken connections refuse dispatch. Mounts belong to the selected session and are disposed at exit/cancellation; no old connection grants are reused automatically. The native client supports stdio and Streamable HTTP; HTTP qualification is tracked separately from the accepted stdio artifact.
+Changed catalogs/configuration, missing grants or broken connections refuse dispatch. Mounts belong to the selected session and are disposed at exit/cancellation; no old connection grants are reused automatically. The native client supports stdio and Streamable HTTP, with separate installed CLI/SDK acceptance for each transport.
 
 ## Embed the native runtime
 

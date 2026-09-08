@@ -10,6 +10,8 @@ import type { NeutralImportCandidate, NeutralImportPlan } from "./neutralImporte
 export interface NeutralImportProjection {
   candidate: NeutralImportCandidate;
   redacted: unknown;
+  sourceLineNumbers?: number[];
+  malformedSourceLines?: number[];
   traces: Array<AMCTraceV1 | ProductionTrace>;
   evidenceRefs: string[];
 }
@@ -90,6 +92,16 @@ export function renderImportedReportMarkdown(report: DiagnosticReport, plan: Neu
     "## Imported Artifacts",
     ...plan.candidates.map((candidate) => `- ${candidate.category}: ${candidate.path} (${candidate.recordCount} record(s))`),
     "",
+    "## Mapping Review",
+    ...(plan.normalization?.recordMapping ? [
+      `- Mapping version: ${plan.normalization.recordMapping.schemaVersion}`,
+      `- Mapping digest: ${plan.normalization.recordMapping.digestSha256}`,
+      `- Records: ${plan.normalization.recordMapping.counts.records}; mapped: ${plan.normalization.recordMapping.counts.mapped}; retained context: ${plan.normalization.recordMapping.counts.retainedOnly}; malformed: ${plan.normalization.recordMapping.counts.malformed}; unsupported: ${plan.normalization.recordMapping.counts.unsupported}`,
+      `- Detail complete: ${plan.normalization.recordMapping.detailCoverage.complete}; omitted record details: ${plan.normalization.recordMapping.detailCoverage.omittedRecords}`,
+      "- Per-record source pointers, trace links, source time, unknown durations and projection losses are in the JSON manifest's plan.normalization.recordMapping. Ingestion time is separate.",
+      "- No source payload excerpts or inferred successful outcome/cost are included in the mapping review."
+    ] : ["- Legacy receipt: per-record mapping details are unavailable."]),
+    "",
     "## Warnings",
     ...(plan.warnings.length > 0 ? plan.warnings.map((warning) => `- ${warning}`) : ["- None"]),
     ""
@@ -104,6 +116,7 @@ export function normalizedImportBody(input: {
     category: candidate.candidate.category,
     path: candidate.candidate.path,
     digest: candidate.candidate.digest,
+    sourceFormat: candidate.candidate.sourceFormat ?? null,
     redactionCount: candidate.candidate.redactionCount,
     recordCount: candidate.candidate.recordCount,
     data: candidate.redacted,
