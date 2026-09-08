@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../../crypto/keys.js";
-import { getVaultSecret, setVaultSecret } from "../../vault/vault.js";
+import { getVaultSecretReadOnly, setVaultSecret } from "../../vault/vault.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import {
@@ -237,7 +237,7 @@ export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buff
     // only key that can still open it. Read-only; nothing writes it again.
     return LEGACY_NO_SIGN_KEY;
   }
-  const value = getVaultSecret(workspace, blobKeySecretName(keyVersion));
+  const value = getVaultSecretReadOnly(workspace, blobKeySecretName(keyVersion));
   if (!value) {
     throw new Error(`blob key material missing for version ${keyVersion}`);
   }

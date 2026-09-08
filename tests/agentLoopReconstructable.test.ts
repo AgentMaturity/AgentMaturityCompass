@@ -1,4 +1,5 @@
-import { rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { afterEach, describe, expect, test } from "vitest";
@@ -8,6 +9,8 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { deriveRecordedRequest } from "../src/llm/request/deriveRequest.js";
 import { readAgentRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
+import { initWorkspace } from "../src/workspace.js";
+import { lockVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { bodyFromChunks } from "../src/llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../src/llm/adapter/transport.js";
@@ -185,6 +188,42 @@ describe("P3.2 — the run reconstructs and is signed", () => {
     expect(report.requests).toHaveLength(3);
     expect(report.requests.every((request) => request.status === "reconstructed")).toBe(true);
     expect(report.ok).toBe(true);
+  });
+
+  test.each(["summary", "verification"] as const)("public-only %s reads preserve the supplied keys without creating a vault", async (reader) => {
+    const source = mkdtempSync(join(tmpdir(), "amc-run-report-source-"));
+    const snapshot = mkdtempSync(join(tmpdir(), "amc-run-report-public-"));
+    try {
+      initWorkspace({ workspacePath: source, trustBoundaryMode: "isolated" });
+      mkdirSync(join(snapshot, ".amc"));
+      cpSync(join(source, ".amc", "keys"), join(snapshot, ".amc", "keys"), { recursive: true });
+      const ledger = openLedger(source);
+      try {
+        ledger.startSession({ sessionId: "public-run", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+        ledger.appendEvidence({ sessionId: "public-run", runtime: "unknown", eventType: "stdout", payload: "signed snapshot event", inline: true });
+        ledger.sealSession("public-run");
+        await ledger.db.backup(join(snapshot, ".amc", "evidence.sqlite"));
+      } finally {
+        ledger.close();
+      }
+      const keys = join(snapshot, ".amc", "keys");
+      const keyBytes = () => Object.fromEntries(readdirSync(keys).sort().map((file) => [file, sha256Hex(readFileSync(join(keys, file)))]));
+      const before = keyBytes();
+      if (reader === "summary") {
+        expect(readAgentRunSummary(snapshot, "public-run", "idle").events).toBe(1);
+      } else {
+        // This fixture checks reader side effects, not request reconstruction.
+        expect((await verifyAgentRun(snapshot, "public-run")).ledgerOk).toBe(true);
+      }
+      expect(keyBytes()).toEqual(before);
+      expect(existsSync(join(snapshot, ".amc", "vault.amcvault"))).toBe(false);
+      expect(existsSync(join(snapshot, ".amc", "vault.amcvault.meta.json"))).toBe(false);
+    } finally {
+      lockVault(source);
+      lockVault(snapshot);
+      rmSync(source, { recursive: true, force: true });
+      rmSync(snapshot, { recursive: true, force: true });
+    }
   });
 
   test("NEGATIVE: an unsigned workspace does not pass, and says which rows are unsigned", async () => {

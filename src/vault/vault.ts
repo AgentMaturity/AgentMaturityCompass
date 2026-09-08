@@ -40,6 +40,14 @@ interface VaultSession {
 }
 
 const sessions = new Map<string, VaultSession>();
+// Verification can read encrypted evidence without granting ordinary vault
+// access. Cache only authenticated secrets here, never signing-key payloads.
+const readOnlySecrets = new Map<string, {
+  secrets: Record<string, string>;
+  passphrase: string;
+  envelopeDigest: string;
+  lastReadTs: number;
+}>();
 const VAULT_SESSION_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 /** Evict stale vault sessions that haven't been used in VAULT_SESSION_TTL_MS */
@@ -53,6 +61,9 @@ function evictStaleSessions(): void {
       session.envelopeDigest = null;
       sessions.delete(key);
     }
+  }
+  for (const [key, cached] of readOnlySecrets) {
+    if (now - cached.lastReadTs > VAULT_SESSION_TTL_MS) readOnlySecrets.delete(key);
   }
 }
 
@@ -357,6 +368,7 @@ export function unlockVault(workspace: string, passphrase?: string): void {
 }
 
 export function lockVault(workspace: string): void {
+  readOnlySecrets.delete(workspace);
   const session = sessionFor(workspace);
   session.unlocked = false;
   session.payload = null;
@@ -645,4 +657,34 @@ export function getVaultSecret(workspace: string, secretKey: string): string | n
   const payload = requireUnlockedPayload(workspace);
   const value = payload.secrets[secretKey];
   return typeof value === "string" ? value : null;
+}
+
+/** Read existing encrypted secrets without unlocking or migrating the vault. */
+export function getVaultSecretReadOnly(workspace: string, secretKey: string): string | null {
+  assertSafeSecretKey(secretKey);
+  const session = sessionFor(workspace);
+  if (session.unlocked && session.payload) return getVaultSecret(workspace, secretKey);
+
+  try {
+    // An earlier read does not authorize a later call without this credential.
+    const passphrase = process.env.AMC_VAULT_PASSPHRASE;
+    if (!passphrase) throw new Error("Read-only vault access requires a passphrase");
+    const envelopeRaw = readEnvelopeRaw(workspace);
+    const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
+    let cached = readOnlySecrets.get(workspace);
+    if (!cached || cached.passphrase !== passphrase || cached.envelopeDigest !== envelopeDigest) {
+      const payload = parseVaultPayload(
+        decryptVaultPayload(JSON.parse(envelopeRaw) as VaultEnvelope, passphrase).toString("utf8")
+      );
+      cached = { secrets: payload.secrets, passphrase, envelopeDigest, lastReadTs: Date.now() };
+      readOnlySecrets.set(workspace, cached);
+    } else {
+      cached.lastReadTs = Date.now();
+    }
+    const value = cached.secrets[secretKey];
+    return typeof value === "string" ? value : null;
+  } catch {
+    readOnlySecrets.delete(workspace);
+    throw new Error("Read-only vault access failed: missing passphrase or vault, incorrect passphrase, or corrupted vault.");
+  }
 }

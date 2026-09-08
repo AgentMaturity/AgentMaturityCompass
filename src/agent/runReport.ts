@@ -71,7 +71,7 @@ export interface AgentRunSummary {
 
 /** Read one session's committed rows in commit order. */
 function sessionEvents(workspace: string, sessionId: string): EvidenceEvent[] {
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, { readonly: true });
   try {
     return ledger.getAllEvents().filter((event) => event.session_id === sessionId);
   } finally {
@@ -191,7 +191,7 @@ export interface AgentRunVerification {
 export async function verifyAgentRun(workspace: string, sessionId: string): Promise<AgentRunVerification> {
   const result = await verifyLedgerIntegrity(workspace);
   const sessionChainErrors: string[] = [];
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, { readonly: true });
   let unsignedRowIds: string[];
   try {
     verifySessionChains(ledger, sessionChainErrors);

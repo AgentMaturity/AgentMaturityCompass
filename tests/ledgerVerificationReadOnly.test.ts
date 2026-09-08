@@ -1,6 +1,8 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { pathToFileURL } from "node:url";
 import { afterEach, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
@@ -9,6 +11,8 @@ import { openSessionEventStore } from "../src/persistence/openSessionEventStore.
 import { SqliteSessionEventStore } from "../src/persistence/sqliteSessionEventStore.js";
 import { jsonlEventsPath } from "../src/persistence/jsonl/jsonlEventLog.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { decryptVaultPayload, encryptVaultPayload } from "../src/vault/vaultCrypto.js";
+import { lockVault, vaultPaths } from "../src/vault/vault.js";
 
 const roots: string[] = [];
 function temporaryWorkspace(): string {
@@ -17,8 +21,87 @@ function temporaryWorkspace(): string {
   return root;
 }
 afterEach(() => {
-  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  for (const root of roots.splice(0)) {
+    lockVault(root);
+    rmSync(root, { recursive: true, force: true });
+  }
 });
+
+function evidenceDiskState(workspace: string): Record<string, { sha256: string; mtimeMs: number; mode: number }> {
+  const root = join(workspace, ".amc");
+  return Object.fromEntries(readdirSync(root, { recursive: true }).map(String).sort().flatMap((relative) => {
+    const path = join(root, relative);
+    const stat = statSync(path);
+    // SQLite can coordinate a live WAL through sidecars while reading.
+    if (!stat.isFile() || /evidence\.sqlite-(wal|shm)$/.test(relative)) return [];
+    return [[relative, { sha256: sha256Hex(readFileSync(path)), mtimeMs: stat.mtimeMs, mode: stat.mode }]];
+  }));
+}
+
+function coldVerify(workspace: string, phrase: string | undefined) {
+  const moduleUrl = pathToFileURL(resolve("src/ledger/ledger.ts")).href;
+  const env = { ...process.env };
+  if (phrase === undefined) delete env.AMC_VAULT_PASSPHRASE;
+  else env.AMC_VAULT_PASSPHRASE = phrase;
+  const result = spawnSync(process.execPath, [
+    "--import", "tsx", "--input-type=module", "--eval",
+    `import { verifyLedgerIntegrity } from ${JSON.stringify(moduleUrl)};
+     const result = verifyLedgerIntegrity(process.argv[1]);
+     console.log(JSON.stringify(result)); process.exit(result.ok ? 0 : 1);`,
+    workspace
+  ], { env, encoding: "utf8", timeout: 30_000 });
+  expect(result.error, result.stderr).toBeUndefined();
+  return { status: result.status, verdict: JSON.parse(result.stdout) as ReturnType<typeof verifyLedgerIntegrity> };
+}
+
+function encryptedWorkspace(): { workspace: string; phrase: string } {
+  const workspace = temporaryWorkspace();
+  const phrase = process.env.AMC_VAULT_PASSPHRASE ?? "amc-test-passphrase";
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  const ledger = openLedger(workspace);
+  try {
+    ledger.startSession({ sessionId: "encrypted-proof", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+    const eventId = ledger.appendEvidence({ sessionId: "encrypted-proof", runtime: "unknown", eventType: "stdout", payload: "authenticated encrypted event", inline: false });
+    expect(ledger.getAllEvents().find((event) => event.id === eventId)?.payload_path).toBeTruthy();
+    ledger.sealSession("encrypted-proof");
+  } finally {
+    ledger.close();
+    lockVault(workspace);
+  }
+  return { workspace, phrase };
+}
+
+test.each(["current", "legacy"] as const)("cold-process %s vault verification reads encrypted evidence without trust mutations", (format) => {
+  const { workspace, phrase } = encryptedWorkspace();
+  if (format === "legacy") {
+    const path = vaultPaths(workspace).vaultFile;
+    const payload = JSON.parse(decryptVaultPayload(JSON.parse(readFileSync(path, "utf8")), phrase).toString("utf8"));
+    delete payload.leasePrivateKeyPem;
+    delete payload.sessionPrivateKeyPem;
+    writeFileSync(path, JSON.stringify(encryptVaultPayload(Buffer.from(JSON.stringify(payload)), phrase)));
+  }
+  const before = evidenceDiskState(workspace);
+  const result = coldVerify(workspace, phrase);
+  expect(result.verdict.errors).toEqual([]);
+  expect(result.status).toBe(0);
+  expect(evidenceDiskState(workspace)).toEqual(before);
+});
+
+test.each(["missing-passphrase", "wrong-passphrase", "missing-vault", "corrupt-vault"] as const)(
+  "cold-process encrypted evidence fails closed for %s without modifying disk",
+  (failure) => {
+    const { workspace, phrase } = encryptedWorkspace();
+    const path = vaultPaths(workspace).vaultFile;
+    if (failure === "missing-vault") rmSync(path);
+    if (failure === "corrupt-vault") writeFileSync(path, "corrupt vault");
+    const before = evidenceDiskState(workspace);
+    const result = coldVerify(workspace, failure === "missing-passphrase" ? undefined : failure === "wrong-passphrase" ? "wrong-readonly-passphrase" : phrase);
+    expect(result.status).toBe(1);
+    expect(result.verdict.ok).toBe(false);
+    expect(result.verdict.chain.errors.join(" ")).toMatch(/payload authentication failed/);
+    expect(evidenceDiskState(workspace)).toEqual(before);
+  }
+);
 
 test("public-only ledger verification preserves the supplied trust anchors without creating a vault", async () => {
   const source = temporaryWorkspace();

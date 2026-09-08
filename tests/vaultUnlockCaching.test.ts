@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault, unlockVault, vaultPaths, vaultStatus, getVaultSecret, setVaultSecret } from "../src/vault/vault.js";
 import * as vaultCrypto from "../src/vault/vaultCrypto.js";
+import { readBlobKeyMaterial } from "../src/storage/blobs/blobKeys.js";
 
 /**
  * Unlocking an already-unlocked vault must not re-run the passphrase KDF.
@@ -68,6 +69,7 @@ function writeSecretInChild(dir: string): void {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   while (roots.length > 0) {
     const root = roots.pop();
     if (root) {
@@ -162,6 +164,36 @@ describe("unlocking an already-unlocked vault", () => {
     const before = diskState(dir);
 
     expect(getVaultSecret(dir, "legacy-token")).toBe("legacy-value");
+    expect(diskState(dir)).toEqual(before);
+  });
+
+  it("reads cold blob secrets without unlocking ordinary access or repeating the KDF", () => {
+    const dir = workspace(PASS);
+    const material = Buffer.alloc(32, 7);
+    setVaultSecret(dir, "vault.secrets.blobKeys.1", material.toString("base64"));
+    lockVault(dir);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS);
+    const before = diskState(dir);
+    const decrypt = vi.spyOn(vaultCrypto, "decryptVaultPayload");
+
+    expect(readBlobKeyMaterial(dir, 1)).toEqual(material);
+    expect(readBlobKeyMaterial(dir, 1)).toEqual(material);
+    expect(decrypt).toHaveBeenCalledTimes(1);
+    expect(vaultStatus(dir).unlocked).toBe(false);
+    expect(() => getVaultSecret(dir, "vault.secrets.blobKeys.1")).toThrow(/Vault locked/);
+    expect(diskState(dir)).toEqual(before);
+
+    // A previous successful read must not authorize a different or absent phrase.
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", OTHER_PASS);
+    expect(() => readBlobKeyMaterial(dir, 1)).toThrow();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    expect(() => readBlobKeyMaterial(dir, 1)).toThrow();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS);
+    expect(readBlobKeyMaterial(dir, 1)).toEqual(material);
+    lockVault(dir);
+    const callsBefore = decrypt.mock.calls.length;
+    expect(readBlobKeyMaterial(dir, 1)).toEqual(material);
+    expect(decrypt.mock.calls.length).toBe(callsBefore + 1);
     expect(diskState(dir)).toEqual(before);
   });
 
