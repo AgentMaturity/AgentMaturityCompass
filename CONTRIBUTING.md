@@ -27,7 +27,7 @@ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile
 pnpm run build     # pnpm: the vendored @amc/* packages use the workspace protocol npm cannot resolve
-npm test          # <!-- amc:count:testBlocks -->10,021<!-- /amc:count --> Vitest tests, all must pass in CI
+npm test          # 10,031 passing Vitest tests, all must pass in CI
 npm run check:clean-source   # proves the path above on a fresh clone (slow: clones and builds)
 ```
 

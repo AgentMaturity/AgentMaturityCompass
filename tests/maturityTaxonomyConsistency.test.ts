@@ -230,9 +230,11 @@ describe("AMC aggregate maturity taxonomy", () => {
   });
 
   it("keeps current README, Docs, website, and whitepaper surfaces on the same names", () => {
+    // AMC_COMPLETE_KNOWLEDGE.md is deliberately .gitignore'd (a local working
+    // reference), so it is not a public surface and cannot be checked on a
+    // clean clone — listing it made this test pass only on one machine.
     const publicFiles = [
       "README.md",
-      "AMC_COMPLETE_KNOWLEDGE.md",
       "docs/AFTER_FIRST_SCORE.md",
       "docs/AMC_STANDARD_RFC.md",
       "docs/GETTING_STARTED.md",
