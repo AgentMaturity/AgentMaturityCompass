@@ -1,4 +1,5 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
+import { renderNativeTasksPage } from "./nativeTasks.js";
 import { apiGet, apiPost, getAdminToken, getCurrentUser, login, logout, setAdminToken, whoami } from "./api.js";
 import { renderBars, renderLine } from "./charts.js";
 import { renderQrLike } from "./qr.js";
@@ -114,6 +115,7 @@ function firstUseCard(agentId) {
   // This is a POSIX terminal handoff, never a browser execution request.
   const quotedAgent = `'${String(agentId).replaceAll("'", "'\\''")}'`;
   const connectCommand = `amc connect --agent=${quotedAgent}`;
+  const guideCommand = `amc --agent=${quotedAgent} agent-loop guide`;
   return `
     <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">
       <div class="studio-kicker">Start here</div>
@@ -130,10 +132,11 @@ function firstUseCard(agentId) {
         </button>
       </div>
       <div id="firstUseNative" class="first-use-panel" hidden>
-        <h3>Continue in your workspace terminal</h3>
-        <p>Run this on the machine hosting this Studio workspace. The guide checks local setup before suggesting a task; copying it does not run anything.</p>
-        <p class="muted">Native tasks currently use the <strong>default agent</strong>, even when another agent is selected in Studio. The guide distinguishes a real model task from a keyless local demonstration.</p>
-        <pre><code id="nativeGuideCommand" tabindex="0">amc agent-loop guide</code></pre>
+        <h3>Run a native task in Studio</h3>
+        <p>Choose a provider, inspect the existing tool scope, and follow recorded activity for <strong>${htmlEscape(agentId)}</strong>.</p>
+        <a class="button" href="./native-tasks?agent=${encodeURIComponent(agentId)}">Open Native Tasks</a>
+        <p class="muted">Prefer your terminal? Run this guide on the machine hosting this workspace. Copying the command makes no changes.</p>
+        <pre><code id="nativeGuideCommand" tabindex="0">${htmlEscape(guideCommand)}</code></pre>
         <button id="copyNativeGuide" class="secondary">Copy guide command</button>
         <span id="nativeCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
       </div>
@@ -1571,6 +1574,8 @@ async function renderEqualizer() {
 
 async function renderApprovals() {
   const agentId = currentAgent();
+  const demoActor = !getAdminToken() && getCurrentUser()?.userId === "local-demo";
+  const approvalActorAllowed = !demoActor && (Boolean(getAdminToken()) || (getCurrentUser()?.roles || []).some(role => ["APPROVER", "OWNER", "AUDITOR"].includes(role)));
   const selectedApprovalId = qs("approval");
   const activity = selectedApprovalId
     ? null
@@ -1606,6 +1611,7 @@ async function renderApprovals() {
   const actionClasses = ["", "READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
   root.innerHTML = `
     ${card("Approvals Inbox", `
+      ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
       ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : ""}
       ${selectedApprovalId ? "" : `
         <form id="approvalActivityFilters" class="row wrap">
@@ -1668,7 +1674,7 @@ async function renderApprovals() {
   `;
   const body = document.getElementById("apprRows");
   body.innerHTML = integrityValid ? rows.map((row) => {
-    const canDecide = row.status === "PENDING" &&
+    const canDecide = approvalActorAllowed && row.status === "PENDING" &&
       row.requestIntegrity?.valid === true &&
       row.chainIntegrity?.valid === true &&
       row.contextIntegrity?.valid === true;
@@ -1725,42 +1731,27 @@ async function renderApprovals() {
     });
     await renderApprovals();
   });
-  body.querySelectorAll("button[data-approve]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const id = button.getAttribute("data-approve");
-      const reason = window.prompt("Reason for EXECUTE approval:", "Approved execute");
-      if (!reason) return;
-      await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, {
-        decision: "APPROVE_EXECUTE",
-        reason
+  for (const [attribute, decision, label, initialReason] of [
+    ["data-approve", "APPROVE_EXECUTE", "EXECUTE approval", "Approved execute"],
+    ["data-sim", "APPROVE_SIMULATE", "SIMULATE approval", "Approved simulate"],
+    ["data-deny", "DENY", "denial", "Denied"]
+  ]) {
+    body.querySelectorAll(`button[${attribute}]`).forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute(attribute);
+        const reason = window.prompt(`Reason for ${label}:`, initialReason);
+        if (!reason) return;
+        button.disabled = true;
+        try {
+          await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, { decision, reason });
+          await renderApprovals();
+        } catch (error) {
+          setStatus(`${errText(error)} Refresh the approval before another decision; nothing was retried automatically.`, true);
+          button.disabled = false;
+        }
       });
-      await renderApprovals();
     });
-  });
-  body.querySelectorAll("button[data-sim]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const id = button.getAttribute("data-sim");
-      const reason = window.prompt("Reason for SIMULATE approval:", "Approved simulate");
-      if (!reason) return;
-      await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, {
-        decision: "APPROVE_SIMULATE",
-        reason
-      });
-      await renderApprovals();
-    });
-  });
-  body.querySelectorAll("button[data-deny]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const id = button.getAttribute("data-deny");
-      const reason = window.prompt("Reason for denial:", "Denied");
-      if (!reason) return;
-      await apiPost(`/approvals/requests/${encodeURIComponent(id)}/decide`, {
-        decision: "DENY",
-        reason
-      });
-      await renderApprovals();
-    });
-  });
+  }
   subscribeOrgSse((event) => {
     if (String(event?.type || "").startsWith("APPROVAL_")) {
       void renderApprovals();
@@ -3611,10 +3602,12 @@ async function renderPage() {
   } else if (getAdminToken()) {
     setStatus("Using admin token session.");
   }
-  await refreshUnifiedBanner();
+  if (page === "native-tasks") { if (bannerEl) bannerEl.hidden = true; }
+  else await refreshUnifiedBanner();
 
   try {
     if (page === "home") return await renderHome();
+    if (page === "native-tasks") return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
     if (page === "agent") return await renderAgent();
     if (page === "evidence") return await renderEvidence();
     if (page === "runtime") return await renderRuntimeRuns();

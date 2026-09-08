@@ -105,6 +105,10 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { allowStudioCors as allowCors } from "./studioCors.js";
+import { createNativeTaskService } from "./nativeTaskService.js";
+import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
+import { admitStudioApproval } from "./studioApprovalAdmission.js";
 import { openLedger } from "../ledger/ledger.js";
 import { sha256Hex } from "../utils/hash.js";
 import { approvalStatusPayload } from "../approvals/approvalEngine.js";
@@ -402,6 +406,7 @@ interface StudioApiOptions {
   trustedProxyHops?: number;
   maxRequestBytes?: number;
   corsAllowedOrigins?: string[];
+  nativeAllowedOrigins?: readonly string[];
   minFreeDiskMb?: number;
   publicConsoleBasePath?: string;
 }
@@ -412,6 +417,8 @@ interface AuthContext {
   scopes: Set<string>;
   roles: Set<UserRole>;
   username: string | null;
+  userId: string | null;
+  nativeCsrfToken: string | null;
   sessionAuthSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
@@ -519,36 +526,6 @@ function extractClientIp(req: IncomingMessage, trustedProxyHops: number, trustFo
   return extractSocketIp(req.socket.remoteAddress);
 }
 
-function allowCors(req: IncomingMessage, res: ServerResponse, options: StudioApiOptions): boolean {
-  const origin = req.headers.origin;
-  if (!origin || typeof origin !== "string") {
-    return true;
-  }
-  const allowed = new Set([`http://${options.host}:${options.port}`, ...(options.corsAllowedOrigins ?? [])]);
-  let hostMatches = false;
-  try {
-    const originUrl = new URL(origin);
-    hostMatches = originUrl.host === (req.headers.host ?? "");
-  } catch {
-    hostMatches = false;
-  }
-  if (!hostMatches && !allowed.has(origin)) {
-    res.statusCode = 403;
-    res.end("CORS origin denied");
-    return false;
-  }
-  res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Origin", origin);
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Headers", "content-type, x-amc-admin-token, x-amc-agent-token, authorization, x-amc-lease");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  if ((req.method ?? "GET").toUpperCase() === "OPTIONS") {
-    res.statusCode = 204;
-    res.end();
-    return false;
-  }
-  return true;
-}
 
 function workspaceWritable(workspace: string): boolean {
   try {
@@ -1023,7 +1000,9 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
       agentId: null,
       scopes: new Set(["*"]),
       roles: new Set(["OWNER", "AUDITOR", "APPROVER", "OPERATOR", "VIEWER", "AGENT"]),
-      username: "bootstrap-admin"
+      username: "bootstrap-admin",
+      userId: "bootstrap-admin",
+      nativeCsrfToken: null
     };
   }
 
@@ -1036,8 +1015,10 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
       isAdmin: false,
       agentId: null,
       scopes: new Set(["console:session"]),
-      roles: new Set(session.payload.roles),
+      roles: new Set<UserRole>(session.payload.userId === "local-demo" ? ["VIEWER"] : session.payload.roles),
       username: session.payload.username,
+      userId: session.payload.userId,
+      nativeCsrfToken: nativeCsrfTokenForSession(session.payload),
       sessionAuthSource: session.authSource
     };
   }
@@ -1051,7 +1032,7 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
         agentId: resolved.agentId,
         scopes: new Set(resolved.scopes),
         roles: new Set(["AGENT"]),
-        username: "agent-token"
+        username: "agent-token", userId: null, nativeCsrfToken: null
       };
     }
   }
@@ -1067,7 +1048,7 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
           agentId: resolved.agentId,
           scopes: new Set(resolved.scopes),
           roles: new Set(["AGENT"]),
-          username: "agent-token"
+          username: "agent-token", userId: null, nativeCsrfToken: null
         };
       }
     }
@@ -1097,7 +1078,7 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
         agentId: verification.payload.agentId,
         scopes: new Set(verification.payload.scopes),
         roles: new Set(["AGENT"]),
-        username: "agent-lease"
+        username: "agent-lease", userId: null, nativeCsrfToken: null
       };
     }
   }
@@ -1569,6 +1550,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
   promptInitForApi(options.workspace);
   passportInitForApi(options.workspace);
   const toolhub = new ToolHubService(options.workspace);
+  const nativeTaskService = createNativeTaskService({ workspace: options.workspace });
   const orgSse = new OrgSseHub();
   const allowByIp = (ip: string): boolean => {
     const cidrs = options.allowedCidrs ?? ["127.0.0.1/32", "::1/128"];
@@ -1823,6 +1805,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json,
           apiLimiter,
           privilegedApiLimiter,
+          nativeTaskService,
+          nativeExecutionAllowed: () => !requiresReadOnlyMode(options.workspace),
+          nativeAllowedOrigins: isNativeStudioPath(pathname) ? nativeAllowedBrowserOrigins(options.host,
+            (server.address() as { port?: number } | null)?.port ?? options.port,
+            [...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? [])]) : undefined,
           setRateLimitHeaders: (response, decision) => setRateLimitHeaders(response, decision)
         });
         if (handled) return;
@@ -2149,6 +2136,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (auth?.isAdmin) {
           json(res, 200, {
             userId: "bootstrap-admin",
+            nativeCsrfToken: null,
             username: auth.username ?? "bootstrap-admin",
             roles: [...auth.roles],
             issuedTs: Date.now(),
@@ -2166,8 +2154,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         json(res, 200, {
           userId: session.payload.userId,
+          nativeCsrfToken: nativeCsrfTokenForSession(session.payload),
           username: session.payload.username,
-          roles: session.payload.roles,
+          roles: session.payload.userId === "local-demo" ? ["VIEWER"] : session.payload.roles,
           issuedTs: session.payload.issuedTs,
           expiresTs: session.payload.expiresTs
         });
@@ -2299,6 +2288,9 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         json(res, 401, { error: "missing or invalid token" });
         return;
       }
+      if (isNativeApprovalMutationPath(pathname, method) && !admitStudioApproval({ req, res, actor: auth,
+        allowedOrigins: nativeAllowedBrowserOrigins(options.host, (server.address() as { port?: number } | null)?.port ?? options.port,
+          [...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? [])]), readOnly: requiresReadOnlyMode(options.workspace) })) return;
 
       const denyMechanicLeaseAccess = (): boolean => {
         if (!auth.isAdmin && auth.agentId) {
@@ -6672,6 +6664,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             actor: {
               isAdmin: auth.isAdmin,
               username: auth.username ?? "admin-token",
+              userId: auth.userId ?? "bootstrap-admin",
               roles: [...auth.roles]
             },
             input: parsedResult.data,
@@ -6727,6 +6720,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             actor: {
               isAdmin: auth.isAdmin,
               username: auth.username ?? "admin-token",
+              userId: auth.userId ?? "bootstrap-admin",
               roles: [...auth.roles]
             },
             input: { decision: "DENY", reason: parsedResult.data.reason },
@@ -8850,6 +8844,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
     url: `http://${host}:${port}`,
     close: async () => {
       shuttingDown = true;
+      let nativeCleanupError: unknown;
+      try { await nativeTaskService.close(); } catch (error) { nativeCleanupError = error; }
       for (const socket of openSockets) {
         socket.setKeepAlive(false);
       }
@@ -8872,6 +8868,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         await new Promise((resolvePromise) => setTimeout(resolvePromise, 50));
       }
       closeScoreSessionStores(options.workspace);
+      if (nativeCleanupError) throw nativeCleanupError;
     }
   };
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v7";
+const CACHE_NAME = "amc-console-v8";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);
@@ -15,6 +15,7 @@ function staticAssets() {
   return [
     assetPath(""),
     assetPath("home"),
+    assetPath("native-tasks"),
     assetPath("login"),
     assetPath("agent"),
     assetPath("evidence"),
@@ -36,6 +37,9 @@ function staticAssets() {
     assetPath("northstar"),
     assetPath("assets/app.js"),
     assetPath("assets/api.js"),
+    assetPath("assets/nativeTasks.js"),
+    assetPath("assets/nativeTasksView.js"),
+    assetPath("assets/nativeTasks.css"),
     assetPath("assets/charts.js"),
     assetPath("assets/northstar.js"),
     assetPath("assets/components/promptViewer.js"),

@@ -20,6 +20,20 @@ from graphify.export import to_canvas, to_html, to_json, to_obsidian
 
 
 MAPS = {
+    "native-studio": [
+        "src/console/assets/nativeTasks.js", "src/console/assets/nativeTasksView.js",
+        "src/console/assets/api.js", "src/api/nativeTasksRouter.ts",
+        "src/studio/apiDelegation.ts", "src/studio/nativeAdmission.ts",
+        "src/studio/nativeTaskService.ts", "src/studio/nativeTaskTypes.ts",
+        "src/studio/nativeTaskDescriptors.ts", "src/studio/nativeTaskProjection.ts",
+        "src/studio/studioApprovalAdmission.ts", "src/studio/nativeTaskOpenapi.ts",
+        "src/approvals/approvalStudioService.ts", "src/approvals/approvalInbox.ts",
+        "src/sdk/nativeAgentClient.ts", "src/acp/acpCli.ts", "src/acp/acpStdioMain.ts",
+        "src/agent/agentSession.ts", "src/agent/agentToolset.ts",
+        "src/tools/guards/policyGuards.ts", "src/toolhub/toolhubValidators.ts",
+        "src/workspaces/workspaceRuntimeRegistry.ts", "src/workspaces/workspaceStudioProxy.ts",
+        "src/workspaces/workspaceRouter.ts", "src/studio/studioServer.ts",
+    ],
     "native-runtime": [
         "src/cli-agent-commands.ts", "src/cli-agent-options.ts", "src/kernel/agentLoopRunner.ts",
         "src/kernel/amcRuntime.ts",

@@ -8,6 +8,10 @@ Make AMC an installable, usable standalone governed agent runtime. Its model loo
 
 The August superharness plan and state ledger are historical snapshots. Current source already has Cordis composition, a native agent loop, signed JSONL/SQLite sessions, guarded tool execution, approvals, provider streaming, delegation, prompt caching and score-input verification. Do not recreate these or repeat old verified-absence claims. At the initial audit the native `agent-loop` command was hidden and checkout-only because `@amc/core` was private/workspace-backed. Commit `616b7a6b` bundled that closure into the local package, and later dated installed-artifact receipts exercised it. Those receipts do not qualify the current implementation batch. A local bundle does not establish a public release.
 
+## Active next implementation — Native Tasks in Studio
+
+[AMC-1536](https://linear.app/agentmaturitycompass/issue/AMC-1536) adds direct governed native tasks, activity, approvals, cancellation and signed resume inside Studio. The current terminal handoff and stale default-agent copy leave this path incomplete. Source work is in progress; implementation precedes testing. The accepted gate below applies to its exact source, not these edits. [Implementation contract](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-task-workspace.md). Current queue: 31 children, 27 In Review and 4 In Progress.
+
 ## Current checkpoint
 
 AMC owns its provider loop, streaming chat, workspace file tools and confined Linux shell, authenticated approvals, signed budgets, delegation, sessions, resume/fork, origin-addressed compaction, signed extensions, stdio/HTTP MCP and TypeScript/Python SDKs. Native execution requires neither DSH nor Pi.

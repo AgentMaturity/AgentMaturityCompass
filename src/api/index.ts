@@ -49,6 +49,7 @@ import { buildHealthPayload } from './health.js';
 import { deprecatedBridgeRoute, sdkVersionPolicy } from '../sdk/versioning.js';
 import { handleMarketplaceRoute } from '../marketplace/marketplaceRouter.js';
 import { handleDomainProofRoute } from './domainProofRouter.js';
+import { handleNativeTasksRoute, type NativeTaskApiContext } from './nativeTasksRouter.js';
 
 export type ApiAuthPolicy = 'public' | 'protected';
 export type ApiValidationPolicy = 'schema-validated' | 'router-local' | 'passthrough';
@@ -62,6 +63,8 @@ export interface ApiRouteContext {
    * person must read it from here rather than trusting a body field.
    */
   principal?: string;
+  /** Present only after Studio has checked native-task browser admission. */
+  nativeTasks?: NativeTaskApiContext;
 }
 
 export type ApiRouteHandler = (
@@ -102,6 +105,15 @@ export const PUBLIC_API_V1_PATHS = new Set<string>([
 ]);
 
 export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
+  {
+    id: 'native-tasks',
+    description: 'Authenticated standalone native task sessions in Studio',
+    prefixes: ['/api/v1/native-tasks'],
+    methods: ['GET', 'POST'],
+    auth: 'protected',
+    validationPolicy: 'schema-validated',
+    handler: handleNativeTasksRoute
+  },
   {
     id: 'score',
     description: 'Scoring, diagnostics, quickscore, and trust scoring',
@@ -499,14 +511,17 @@ export async function handleApiRoute(
   res: ServerResponse,
   workspace = process.cwd(),
   apiToken?: string,
-  principal?: string
+  principal?: string,
+  nativeTasks?: NativeTaskApiContext
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
 
   try {
     const route = matchApiRoute(pathname);
     if (route) {
-      const handled = await route.handler(pathname, method, req, res, { workspace, apiToken, principal });
+      const handled = await route.handler(pathname, method, req, res, {
+        workspace, apiToken, principal, ...(nativeTasks ? { nativeTasks } : {})
+      });
       if (handled) {
         return true;
       }

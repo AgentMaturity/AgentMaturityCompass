@@ -25,7 +25,9 @@ export function registerAcpCommands(program: Command): void {
     .option("--credential <ref>", "Credential reference to resolve per request")
     .option("--credentials-home <dir>", "Credential home fixed for this ACP process")
     .option("--credentials-file <path>", "Explicit credential file fixed for this ACP process")
+    .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
+    .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
     .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
@@ -41,7 +43,9 @@ export function registerAcpCommands(program: Command): void {
       credential?: string;
       credentialsHome?: string;
       credentialsFile?: string;
+      credentialsMode: string;
       tools: string;
+      expectedToolsDigest?: string;
       approveTools?: string;
       approveRisk?: string;
       mcpConfig?: string;
@@ -59,10 +63,12 @@ export function registerAcpCommands(program: Command): void {
           providerId: opts.provider,
           systemPrompt: opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
+          ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),
           maxTokens: Number(opts.maxTokens),
           ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
           ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),
           ...(opts.credentialsFile === undefined ? {} : { credentialsFile: opts.credentialsFile }),
+          credentialsMode: opts.credentialsMode as "layered" | "operator-only",
           ...(opts.approveTools === undefined ? {} : { approveTools: opts.approveTools }),
           ...(opts.approveRisk === undefined ? {} : { approveRisk: opts.approveRisk }),
           ...(opts.mcpConfig === undefined ? {} : { mcpConfig: opts.mcpConfig }),

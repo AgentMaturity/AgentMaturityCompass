@@ -13,15 +13,8 @@ import { generateBridgeOpenApiSpec, type OpenApiSpec } from "../setup/integratio
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import YAML from "yaml";
-
-interface OpenApiOperation {
-  summary?: string;
-  tags?: string[];
-  security?: Array<Record<string, unknown[]>>;
-  parameters?: Array<Record<string, unknown>>;
-  requestBody?: Record<string, unknown>;
-  responses?: Record<string, unknown>;
-}
+import type { OpenApiOperation } from "./openapiTypes.js";
+import { nativeTaskEndpoints, nativeTaskSchemas } from "./nativeTaskOpenapi.js";
 
 export interface OpenApiContractIssue {
   severity: "error" | "warning";
@@ -2131,11 +2124,13 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
     ...bridgeSpec.paths,
     ...studioEndpoints(),
     ...gatewayEndpoints(),
+    ...nativeTaskEndpoints(),
   };
 
   const allSchemas = {
     ...bridgeSpec.components.schemas,
     ...studioSchemas(),
+    ...nativeTaskSchemas(),
   };
 
   return {

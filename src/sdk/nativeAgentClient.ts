@@ -29,18 +29,24 @@ export interface AMCNativeClientOptions {
   readonly baseUrl?: string;
   readonly agentId?: string;
   readonly tools?: "none" | "workspace";
+  /** Pin the signed workspace tool policy for every native tool dispatch. */
+  readonly expectedToolsDigest?: string;
   readonly approveTools?: string;
   readonly approveRisk?: "low" | "medium" | "high" | "critical";
   readonly mcpConfig?: string;
   readonly mcpConfigSha256?: string;
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
+  /** Exclude project and user dotenv fallback in operator-owned server integrations. */
+  readonly credentialsMode?: "layered" | "operator-only";
   readonly maxTokens?: number;
   readonly maxSteps?: number;
   /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
   readonly command?: readonly [string, ...string[]];
   readonly env?: NodeJS.ProcessEnv;
   readonly timeoutMs?: number;
+  /** Cancel process initialization before it has returned a usable client. */
+  readonly startupSignal?: AbortSignal;
 }
 
 export interface AMCNativeUpdate {
@@ -205,9 +211,11 @@ export class AMCNativeClient {
     const args = [...this.command.slice(1), "acp", "--provider", options.provider];
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],
       ["--base-url", options.baseUrl], ["--agent-id", options.agentId], ["--tools", options.tools],
+      ["--expected-tools-digest", options.expectedToolsDigest],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
       ["--mcp-config", options.mcpConfig], ["--mcp-config-sha256", options.mcpConfigSha256],
       ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
+      ["--credentials-mode", options.credentialsMode],
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
       if (value !== undefined) args.push(flag, String(value));
     }
@@ -227,14 +235,19 @@ export class AMCNativeClient {
   }
 
   static async start(options: AMCNativeClientOptions): Promise<AMCNativeClient> {
+    if (options.startupSignal?.aborted) throw new AMCNativeProtocolError("native client startup was cancelled");
     const client = new AMCNativeClient(options);
+    const abort = () => { void client.close(); };
+    options.startupSignal?.addEventListener("abort", abort, { once: true });
     try {
       const result = await client.request("initialize", { protocolVersion: 1, clientCapabilities: {} });
       if (result.protocolVersion !== 1 || !object(result.agentInfo) || result.agentInfo.name !== "agent-maturity-compass"
         || !object(result.agentCapabilities)) throw new AMCNativeProtocolError("unsupported native agent identity or protocol");
+      if (options.startupSignal?.aborted) throw new AMCNativeProtocolError("native client startup was cancelled");
       client.agentInfo = result.agentInfo; client.capabilities = result.agentCapabilities;
       return client;
     } catch (error) { await client.close(); throw error; }
+    finally { options.startupSignal?.removeEventListener("abort", abort); }
   }
 
   async newSession(): Promise<AMCNativeSession> {

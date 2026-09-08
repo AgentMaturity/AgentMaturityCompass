@@ -1,10 +1,16 @@
-import { createServer, request as httpRequest, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { renameSync } from "node:fs";
 import { URL } from "node:url";
 import { startStudioApiServer } from "../studio/studioServer.js";
+import {
+  assertNativeBrowserAdmission, assertNativeApprovalIdentity, isNativeApprovalMutationPath, isNativeProtectedPath, nativeAllowedBrowserOrigins,
+  nativeCsrfTokenForSession, NativeAdmissionError
+} from "../studio/nativeAdmission.js";
 import { ensureAdminToken } from "../studio/studioState.js";
 import { WorkspaceManager } from "./workspaceManager.js";
+import { proxyStudioWorkspaceRequest } from "./workspaceStudioProxy.js";
+import { WorkspaceRuntimeRegistry, WorkspaceRuntimeClosingError } from "./workspaceRuntimeRegistry.js";
 import { DEFAULT_WORKSPACE_ID, normalizeWorkspaceId } from "./workspaceId.js";
 import {
   appendHostAudit,
@@ -695,55 +701,6 @@ function verifyWorkspaceLeaseToken(
   }
 }
 
-async function proxyToWorkspace(
-  req: IncomingMessage,
-  res: ServerResponse,
-  runtime: WorkspaceApiRuntime,
-  targetPath: string
-): Promise<void> {
-  const method = (req.method ?? "GET").toUpperCase();
-  const {
-    origin: _origin,
-    host: _host,
-    "x-amc-admin-token": _clientAdminToken,
-    ...forwardHeaders
-  } = req.headers;
-  const upstream = httpRequest(
-    {
-      host: runtime.host,
-      port: runtime.port,
-      method,
-      path: targetPath,
-      headers: {
-        ...forwardHeaders,
-        host: `${runtime.host}:${runtime.port}`
-      }
-    },
-    (upstreamRes) => {
-      res.statusCode = upstreamRes.statusCode ?? 500;
-      for (const [key, value] of Object.entries(upstreamRes.headers)) {
-        if (typeof value !== "undefined") {
-          if (key.toLowerCase() === "service-worker-allowed" && targetPath === "/console/assets/sw.js") {
-            const originalPath = new URL(req.url ?? "/", "http://localhost").pathname;
-            const suffix = "/assets/sw.js";
-            const allowedScope = originalPath.endsWith(suffix)
-              ? `${originalPath.slice(0, -suffix.length)}/`
-              : value;
-            res.setHeader(key, allowedScope);
-          } else {
-            res.setHeader(key, value);
-          }
-        }
-      }
-      upstreamRes.pipe(res);
-    }
-  );
-  upstream.on("error", () => {
-    json(res, 502, { error: "workspace proxy failure" });
-  });
-  req.pipe(upstream);
-}
-
 export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions): Promise<HostRuntime> {
   if (options.allowLocalDemoWorkspace === true && !isLoopbackHost(options.host)) {
     throw new Error("Local demo workspace requires a loopback host (127.0.0.1, ::1, or localhost).");
@@ -754,49 +711,55 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
     maxOpenWorkspaces: 32
   });
   const defaultWorkspaceId = manager.resolveWorkspaceId(options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID);
-  const workspaceApis = new Map<string, WorkspaceApiRuntime>();
+  const workspaceApis = new WorkspaceRuntimeRegistry<WorkspaceApiRuntime>();
+  let shutdown: Promise<void> | undefined;
   const hostEvents = new HostSseHub();
   const hostLoginLimiter = makeRateLimiter(20, 60_000);
   const workspaceLoginLimiter = makeRateLimiter(20, 60_000);
+  const publicNativeOrigins = (): readonly string[] => {
+    const address = server.address();
+    const port = typeof address === "object" && address ? address.port : options.port;
+    return nativeAllowedBrowserOrigins(options.host, port, options.corsAllowedOrigins);
+  };
 
   const ensureWorkspaceApi = async (workspaceId: string): Promise<WorkspaceApiRuntime> => {
     const normalized = manager.resolveWorkspaceId(workspaceId);
-    const existing = workspaceApis.get(normalized);
-    if (existing) {
-      return existing;
-    }
-    const runtime = manager.withWorkspace(normalized, (context) => {
-      const token = ensureAdminToken(context.workspaceDir);
-      return {
+    return workspaceApis.getOrCreate(normalized, async () => {
+      const runtime = manager.withWorkspace(normalized, (context) => {
+        const token = ensureAdminToken(context.workspaceDir);
+        return {
+          workspaceId: normalized,
+          workspaceDir: context.workspaceDir,
+          token
+        };
+      });
+      const localPort = await pickFreeLocalPort("127.0.0.1");
+      if (workspaceApis.closing) throw new WorkspaceRuntimeClosingError();
+      const api = await startStudioApiServer({
+        workspace: runtime.workspaceDir,
+        host: "127.0.0.1",
+        port: localPort,
+        token: runtime.token,
+        allowedCidrs: options.allowedCidrs,
+        trustedProxyHops: options.trustedProxyHops,
+        maxRequestBytes: options.maxRequestBytes,
+        corsAllowedOrigins: options.corsAllowedOrigins,
+        nativeAllowedOrigins: publicNativeOrigins(),
+        publicConsoleBasePath: `/w/${normalized}/console`
+      });
+      const result: WorkspaceApiRuntime = {
         workspaceId: normalized,
-        workspaceDir: context.workspaceDir,
-        token
+        host: "127.0.0.1",
+        port: localPort,
+        token: runtime.token,
+        close: async () => api.close()
       };
+      return result;
     });
-    const localPort = await pickFreeLocalPort("127.0.0.1");
-    const api = await startStudioApiServer({
-      workspace: runtime.workspaceDir,
-      host: "127.0.0.1",
-      port: localPort,
-      token: runtime.token,
-      allowedCidrs: options.allowedCidrs,
-      trustedProxyHops: options.trustedProxyHops,
-      maxRequestBytes: options.maxRequestBytes,
-      corsAllowedOrigins: options.corsAllowedOrigins,
-      publicConsoleBasePath: `/w/${normalized}/console`
-    });
-    const result: WorkspaceApiRuntime = {
-      workspaceId: normalized,
-      host: "127.0.0.1",
-      port: localPort,
-      token: runtime.token,
-      close: async () => api.close()
-    };
-    workspaceApis.set(normalized, result);
-    return result;
   };
 
   const server = createServer(async (req, res) => {
+    if (workspaceApis.closing) { json(res, 503, { error: "workspace router is stopping" }); return; }
     try {
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
@@ -1589,11 +1552,27 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       const workspaceSession = verifyWorkspaceSession(manager, urlWorkspaceId, req.headers.cookie);
       let workspaceSessionValid = workspaceSession.ok;
+      const nativeRequest = isNativeProtectedPath(workspacePath, req.method ?? "GET");
+      if (nativeRequest) {
+        // Native routes never mint a demo session implicitly, and a host login
+        // alone does not substitute for the scoped, tracked workspace session.
+        const payload = workspaceSession.ok ? workspaceSession.payload : null;
+        const actor = { isAdmin: false, userId: payload?.userId ?? null,
+          nativeCsrfToken: payload ? nativeCsrfTokenForSession(payload) : null };
+        assertNativeBrowserAdmission({ req, actor, allowedOrigins: publicNativeOrigins() });
+        if (isNativeApprovalMutationPath(workspacePath, req.method ?? "GET")) assertNativeApprovalIdentity(actor);
+      }
       const lease = extractLeaseCarrier({
         headers: req.headers,
         url,
         allowQueryCarrier: false
       });
+      if (nativeRequest && lease.leaseToken) {
+        // A lease must not select the branch that skips current human membership
+        // checks merely because the same request also carries a session cookie.
+        json(res, 403, { error: "agent leases cannot authorize native task workspace requests" });
+        return;
+      }
       if (lease.leaseToken) {
         const claimWorkspaceId = workspaceFromLeaseToken(lease.leaseToken);
         if (claimWorkspaceId && claimWorkspaceId !== urlWorkspaceId) {
@@ -1756,8 +1735,13 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       }
 
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);
-      await proxyToWorkspace(req, res, runtime, workspacePath);
+      await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath);
     } catch (error) {
+      if (error instanceof WorkspaceRuntimeClosingError) { json(res, 503, { error: error.message }); return; }
+      if (error instanceof NativeAdmissionError) {
+        json(res, error.statusCode, { error: error.message, code: error.code });
+        return;
+      }
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("PAYLOAD_TOO_LARGE")) {
         json(res, 413, { error: "payload too large" });
@@ -1779,14 +1763,15 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   return {
     host: options.host,
     port: options.port,
-    close: async () => {
+    close: () => {
+      if (shutdown) return shutdown;
       hostEvents.closeAll();
-      await new Promise<void>((resolvePromise) => {
-        server.close(() => resolvePromise());
+      // Begin service teardown before HTTP drain: hosted streams may be waiting on those services.
+      const runtimesClosing = workspaceApis.close();
+      shutdown = Promise.allSettled([runtimesClosing, new Promise<void>(done => server.close(() => done()))]).then(results => {
+        if (results.some(result => result.status === "rejected")) throw new Error("Workspace router shutdown did not complete cleanly.");
       });
-      for (const runtime of workspaceApis.values()) {
-        await runtime.close();
-      }
+      return shutdown;
     }
   };
 }

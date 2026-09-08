@@ -2,6 +2,8 @@
 
 AMC runs its own model loop with workspace tools, approval gates, sessions, context compaction and MCP connections. It does not need DSH, Pi or another agent runtime. Use this path to request an answer, work with explicitly permitted files, continue a recorded conversation and inspect its evidence. A first score is a baseline; it is not an agent task.
 
+For a browser workflow, open **Native Tasks** in Studio. It runs the same native AMC runtime with selected-agent ownership, bounded turns, cancellation, approval links and resumable sessions. See [Run native AMC tasks in Studio](NATIVE_STUDIO_TASKS.md) for setup, recovery and the browser's tool boundaries.
+
 Installed local exercises cover file editing, terminal chat and extensions, TypeScript/Python session lifecycle, and governed stdio/HTTP MCP calls with real approvals. They use scripted local providers; live-provider quality, broader platforms and human usability remain separate measurements. The corrected native Linux shell and Streamable HTTP MCP each have separate installed acceptance receipts.
 
 ## Inspect and set up

@@ -1,0 +1,36 @@
+.native-tasks { max-width: 1400px; margin: 0 auto; min-width: 0; }
+.native-tasks-heading, .native-task-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+.native-tasks-heading h2 { margin:6px 0; font-size:clamp(1.6rem,3vw,2.3rem); }
+.native-task-notice { min-height:1.5em; }
+.native-task-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,300px); gap:18px; align-items:start; }
+.native-task-layout > *, .native-task-fields > * { min-width:0; }
+.native-task-fields { display:flex; flex-wrap:wrap; align-items:end; gap:12px; }
+.native-task-fields label { display:flex; flex:1 1 165px; flex-direction:column; gap:6px; }
+.native-task-fields input, .native-task-fields select, #nativeTaskPrompt { width:100%; min-width:0; }
+.native-task-fields button { margin-bottom:0; }
+.native-task-conversation h3 { margin:0; }
+.native-task-transcript { margin:18px 0; }
+.native-task-event { border:1px solid var(--border); border-radius:8px; margin:12px 0; padding:14px; overflow-wrap:anywhere; }
+.native-task-event-user { background:rgba(74,239,121,.035); }
+.native-task-event-tool, .native-task-event-tool-update { border-left:3px solid var(--border-strong); }
+.native-task-event-heading { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; }
+.native-task-event pre { margin:10px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; max-height:420px; overflow:auto; }
+.native-task-event small, .native-task-identity code, .native-task-approval code, .native-task-scope-item code { overflow-wrap:anywhere; word-break:break-word; }
+.native-task-identity { margin:0; }
+.native-task-identity dt { color:var(--muted); font-size:.8rem; margin-top:12px; }
+.native-task-identity dd { margin:3px 0 0; overflow-wrap:anywhere; }
+.native-task-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+.native-task-sidebar .card { margin-bottom:18px; }
+.native-task-approval { border-top:1px solid var(--border-strong); padding-top:12px; margin:12px 0; }
+.native-task-approval p, .native-task-scope-item p { font-size:.85rem; }
+.native-task-scope-item { padding:10px 0; border-bottom:1px solid var(--border); }
+.native-task-list-item { display:flex; flex-direction:column; text-align:left; gap:6px; width:100%; margin-bottom:8px; overflow-wrap:anywhere; }
+.native-task-list-item span { font-size:.75rem; }
+.native-task-list-item[aria-current] { border-color:var(--accent); }
+#nativeTaskPromptForm label { display:block; margin:16px 0 8px; }
+#nativeTaskPrompt { resize:vertical; min-height:110px; }
+.native-tasks [hidden] { display:none !important; }
+.native-tasks :is(button,input,select,textarea,a,summary):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.native-task-sr { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+@media (max-width:1050px) { .native-task-layout { grid-template-columns:minmax(0,1fr); } .native-task-sidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
+@media (max-width:560px) { .native-task-sidebar { display:block; } .native-task-fields { display:block; } .native-task-fields label { margin:12px 0; } .native-task-actions > button { width:100%; } .native-task-event { padding:10px; } }

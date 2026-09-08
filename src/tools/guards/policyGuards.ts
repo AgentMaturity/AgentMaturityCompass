@@ -84,7 +84,8 @@ export function budgetGuard(workspace: string, sessionId?: string): ToolGuard {
  * returns `{ok, reason}` — deny-only — so it composes here without adaptation.
  */
 export function toolhubAllowlistGuard(workspace: string,
-  visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined): ToolGuard {
+  visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined,
+  expectedToolsDigest?: string): ToolGuard {
   return (execution) => {
     // The Code Mode transport is presentation infrastructure, not a
     // capability, and the allowlist has nothing useful to say about it. What
@@ -93,12 +94,17 @@ export function toolhubAllowlistGuard(workspace: string,
     // mean an operator had to allowlist `run_code` itself, and denying it
     // would leave code mode unable to call anything at all — the same reason
     // `restrict()` refuses to name it.
-    if (execution.name === RUN_CODE_TOOL) return undefined;
+    if (execution.name === RUN_CODE_TOOL && expectedToolsDigest === undefined) return undefined;
     const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
     if (!snapshot.signatureValid || !snapshot.config) {
       // An unverifiable allowlist is not an empty allowlist.
       return `tools config is not verifiable: ${snapshot.reason ?? "unknown reason"}`;
     }
+    // This synchronous guard runs after approval and immediately before the
+    // selected body. Compare the exact snapshot also used for allowlist and
+    // sandbox admission; a later signed policy cannot widen this task's pin.
+    if (expectedToolsDigest !== undefined && snapshot.digestSha256 !== expectedToolsDigest) return "signed tool policy differs from the native task's reviewed digest";
+    if (execution.name === RUN_CODE_TOOL) return undefined;
     const definition = findToolDefinition(snapshot.config, execution.name);
     if (!definition) {
       return snapshot.config.tools.denyByDefault

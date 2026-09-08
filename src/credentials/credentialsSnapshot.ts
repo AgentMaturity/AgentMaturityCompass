@@ -84,14 +84,14 @@ function readOwnedFile(paths: CredentialsPaths): {
  * "the last good snapshot survived" indistinguishable from "the file is now
  * empty".
  */
-export function loadCredentialsSnapshot(paths: CredentialsPaths): CredentialsSnapshot {
+export function loadCredentialsSnapshot(paths: CredentialsPaths, includeDotenv = true): CredentialsSnapshot {
   const owned = readOwnedFile(paths);
   return Object.freeze({
     file: owned.entries,
     // A disabled project layer contributes no entries at all, so nothing the
     // evaluated agent can write is even read.
-    projectEnv: paths.projectEnvFile === null ? new Map() : readDotenvLayer(paths.projectEnvFile),
-    userEnv: readDotenvLayer(paths.userEnvFile),
+    projectEnv: !includeDotenv || paths.projectEnvFile === null ? new Map() : readDotenvLayer(paths.projectEnvFile),
+    userEnv: includeDotenv ? readDotenvLayer(paths.userEnvFile) : new Map(),
     loadedAt: new Date().toISOString(),
     filePresent: owned.present
   });

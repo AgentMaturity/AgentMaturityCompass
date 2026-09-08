@@ -135,6 +135,8 @@ export async function decideApprovalInStudio(params: {
   actor: {
     isAdmin: boolean;
     username: string;
+    /** Verified caller identity; older trusted local callers retain their username fallback. */
+    userId?: string;
     roles: UserRole[];
   };
   input: StudioApprovalDecisionInput;
@@ -169,7 +171,8 @@ export async function decideApprovalInStudio(params: {
   if (
     (rule?.requireDistinctUsers ?? false) &&
     decision !== "DENY" &&
-    inbox.decisions.some((row) => row.username === params.actor.username && row.decision !== "DENY")
+    inbox.decisions.some((row) => row.decision !== "DENY" &&
+      (row.username === params.actor.username || row.userId === (params.actor.userId ?? params.actor.username)))
   ) {
     params.writeAudit({
       auditType: "APPROVAL_QUORUM_FAILED",
@@ -230,7 +233,7 @@ export async function decideApprovalInStudio(params: {
       reason,
       decisionReceiptId: audit.receiptId,
       username: params.actor.username,
-      userId: params.actor.username,
+      userId: params.actor.userId ?? params.actor.username,
       userRoles: params.actor.roles.length > 0 ? params.actor.roles : ["OWNER"]
     });
   } catch (error) {

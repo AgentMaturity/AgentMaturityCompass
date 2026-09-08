@@ -52,15 +52,29 @@ function withBase(path) {
   return `${prefix}${normalized}`;
 }
 
+export class ConsoleApiError extends Error {
+  constructor(message, status, code, data = null) {
+    super(message);
+    this.name = "ConsoleApiError";
+    this.status = status;
+    this.code = code;
+    this.data = data;
+  }
+}
+
 async function request(path, options) {
   const response = await fetch(withBase(path), {
     method: options?.method || "GET",
     credentials: "include",
+    signal: options?.signal,
+    cache: options?.cache,
     headers: buildHeaders(options?.headers),
     body: options?.body ? JSON.stringify(options.body) : undefined
   });
   const text = await response.text();
-  const parsed = text ? JSON.parse(text) : {};
+  let parsed;
+  try { parsed = text ? JSON.parse(text) : {}; }
+  catch { throw new ConsoleApiError("Studio returned an unreadable response. Refresh the task status before trying another action.", response.status, "INVALID_RESPONSE"); }
   if (!response.ok) {
     if (options?.allowAuthErrors && (response.status === 401 || response.status === 403)) {
       return {
@@ -70,7 +84,8 @@ async function request(path, options) {
         error: parsed.error || `HTTP ${response.status}`
       };
     }
-    throw new Error(parsed.error || `HTTP ${response.status}`);
+    throw new ConsoleApiError(typeof parsed.error === "string" ? parsed.error : `HTTP ${response.status}`,
+      response.status, typeof parsed.code === "string" ? parsed.code : "HTTP_ERROR", parsed);
   }
   return {
     ok: true,
@@ -119,15 +134,47 @@ export async function whoami() {
   return state.me;
 }
 
-export async function apiGet(path) {
-  const result = await request(path);
+export async function apiGet(path, options) {
+  const result = await request(path, { signal: options?.signal });
   return result.data;
 }
 
+/** Native task writes use the authenticated inspection token, never a URL credential. */
+export async function apiNativeRequest(path, options = {}) {
+  if (!/^\/api\/v1\/native-tasks(?:[/?]|$)/.test(path)) throw new Error("Invalid native task API path");
+  const method = options.method || "GET";
+  const headers = {};
+  if (method !== "GET") {
+    if (!state.adminToken && (typeof options.nativeCsrfToken !== "string" || !options.nativeCsrfToken)) {
+      throw new ConsoleApiError("Refresh task setup before submitting an action.", 403, "NATIVE_CSRF_REQUIRED");
+    }
+    headers["content-type"] = "application/json";
+    headers["x-amc-native-intent"] = "task-workspace-v1";
+    if (options.nativeCsrfToken) headers["x-amc-native-csrf"] = options.nativeCsrfToken;
+  }
+  const result = await request(path, { method, headers, body: options.body, signal: options.signal, cache: "no-store" });
+  if (result.data?.ok !== true || !Object.prototype.hasOwnProperty.call(result.data, "data")) {
+    throw new ConsoleApiError("Studio returned an unsupported task response. Refresh status before another action.", result.status, "INVALID_RESPONSE");
+  }
+  return result.data.data;
+}
+
 export async function apiPost(path, body) {
+  const headers = { "content-type": "application/json" };
+  // Only existing approval decisions share the native browser intent boundary.
+  // Bootstrap admin uses its explicit header; cookie actors need the session proof.
+  if (/^\/approvals\/(?:[^/]+\/(?:approve|deny)|requests\/[^/]+\/(?:decide|cancel))$/.test(path)) {
+    headers["x-amc-native-intent"] = "task-workspace-v1";
+    if (!state.adminToken) {
+      if (!state.me?.nativeCsrfToken) await whoami();
+      if (state.me?.userId === "local-demo") throw new ConsoleApiError("Sign in with an authorized identity to decide approvals. Demo sessions cannot approve tools.", 403, "NATIVE_DEMO_APPROVAL_REFUSED");
+      if (!state.me?.nativeCsrfToken) throw new ConsoleApiError("Sign in again before deciding an approval.", 403, "NATIVE_CSRF_REQUIRED");
+      headers["x-amc-native-csrf"] = state.me.nativeCsrfToken;
+    }
+  }
   const result = await request(path, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers,
     body: body || {}
   });
   return result.data;

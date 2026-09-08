@@ -70,12 +70,14 @@ export interface AcpStdioInit {
   readonly credential?: string;
   readonly systemPrompt: string;
   readonly tools?: "none" | "workspace";
+  readonly expectedToolsDigest?: string;
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly mcpConfig?: string;
   readonly mcpConfigSha256?: string;
   readonly credentialsHome?: string;
   readonly credentialsFile?: string;
+  readonly credentialsMode?: "layered" | "operator-only";
   readonly maxTokens?: number;
   readonly maxSteps?: number;
   /** Defaults to the real streams; injected by tests. */
@@ -142,10 +144,12 @@ export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly err
 }
 
 export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
+  if (init.credentialsMode !== undefined && init.credentialsMode !== "layered" && init.credentialsMode !== "operator-only") throw new Error("ACP credentials mode must be layered or operator-only.");
   const route = acpRouteFor(init);
   if ("error" in route) throw new Error(route.error);
   const tools = init.tools ?? "none";
   if (tools !== "none" && tools !== "workspace") throw new Error("ACP --tools must be none or workspace.");
+  if (init.expectedToolsDigest !== undefined && (tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A tool policy pin requires workspace tools and an exact SHA-256 digest.");
   const maxTokens = init.maxTokens ?? 512;
   const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
@@ -158,6 +162,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   if (tools === "workspace") {
     const readiness = checkToolsetReadiness(init.workspace);
     if (!readiness.ready) throw new Error("ACP workspace tools require the existing signed native tool/firewall policies; run the native guide and configure them explicitly.");
+    if (init.expectedToolsDigest !== undefined && loadVerifiedToolsConfigSnapshot(init.workspace).digestSha256 !== init.expectedToolsDigest) throw new Error("The signed workspace tool policy changed before native startup.");
   }
   if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
   const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
@@ -177,6 +182,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const registry = new AdapterRegistry();
   registry.register(route);
   const credentials = new LocalCredentialsService({ projectDir: init.workspace, watch: false,
+    includeDotenv: init.credentialsMode !== "operator-only",
     ...(init.credentialsHome === undefined ? {} : { homeDir: init.credentialsHome }),
     ...(init.credentialsFile === undefined ? {} : { path: init.credentialsFile }) });
 
@@ -207,9 +213,11 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       },
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
-      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null })),
-      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null })),
-      tools, maxSteps
+      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+        ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
+      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
+        ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
+      tools, maxSteps, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest })
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };

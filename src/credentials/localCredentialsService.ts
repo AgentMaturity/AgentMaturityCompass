@@ -55,6 +55,8 @@ export interface CredentialsUpdate {
 }
 
 export interface LocalCredentialsOptions extends CredentialsPathsInput {
+  /** Operator services may exclude both repository and user dotenv layers. Defaults true. */
+  readonly includeDotenv?: boolean;
   /**
    * The environment forming the top layer. Defaults to `process.env`, and is
    * held by reference rather than copied so later mutations are seen — that is
@@ -96,16 +98,18 @@ export class LocalCredentialsService implements CredentialsService {
   private readonly watcher: CredentialsWatcher;
 
   private snapshot: CredentialsSnapshot;
+  private readonly includeDotenv: boolean;
   private reloadError: unknown = null;
 
   constructor(options: LocalCredentialsOptions = {}) {
+    this.includeDotenv = options.includeDotenv !== false;
     this.paths = resolveCredentialsPaths(options);
     this.env = options.env ?? process.env;
     this.lockTimeoutMs = options.lockTimeoutMs ?? DEFAULT_LOCK_TIMEOUT_MS;
     this.onUpdate = options.onUpdate ?? null;
     this.onReloadError = options.onReloadError ?? null;
 
-    this.snapshot = loadCredentialsSnapshot(this.paths);
+    this.snapshot = loadCredentialsSnapshot(this.paths, this.includeDotenv);
     this.publish("boot");
 
     if (options.watch === false || !this.prepareWatchDir()) {
@@ -205,7 +209,7 @@ export class LocalCredentialsService implements CredentialsService {
    * every provider, which is a far larger failure than the edit that caused it.
    */
   reload(): void {
-    this.applySnapshot(loadCredentialsSnapshot(this.paths), "reload");
+    this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "reload");
     this.reloadError = null;
   }
 
@@ -238,7 +242,7 @@ export class LocalCredentialsService implements CredentialsService {
 
   private reloadFromWatch(): void {
     try {
-      this.applySnapshot(loadCredentialsSnapshot(this.paths), "watch");
+      this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "watch");
       this.reloadError = null;
     } catch (error) {
       // Keep the last good snapshot. The failure is recorded and reported, but
@@ -277,7 +281,7 @@ export class LocalCredentialsService implements CredentialsService {
       operation: () => {
         // Re-read disk first: this also re-asserts permissions, so a file that
         // went world-readable since boot is refused before it is written to.
-        this.applySnapshot(loadCredentialsSnapshot(this.paths), "reload");
+        this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "reload");
 
         // Re-judged after queuing, against the environment as it stands now.
         // A key exported into the process while this write waited its turn now
@@ -294,7 +298,7 @@ export class LocalCredentialsService implements CredentialsService {
         if (!patched.changed) return false;
 
         writeCredentialsFileAtomic(this.paths.file, patched.text);
-        this.applySnapshot(loadCredentialsSnapshot(this.paths), "write");
+        this.applySnapshot(loadCredentialsSnapshot(this.paths, this.includeDotenv), "write");
         return true;
       }
     });

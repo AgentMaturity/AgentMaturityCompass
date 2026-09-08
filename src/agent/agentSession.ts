@@ -55,6 +55,7 @@ export interface AgentSessionInit {
   readonly policyDigest: string;
   /** ACP explicitly defaults to none; existing direct callers retain workspace tools. */
   readonly tools?: "none" | "workspace";
+  readonly expectedToolsDigest?: string;
   readonly maxSteps?: number;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
@@ -99,6 +100,7 @@ export function resumeAgentSession(init: AgentSessionInit & { readonly sessionId
 
 function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant): AgentSession {
   if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
+  if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
   if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
   const sessionId = init.sessionId ?? randomUUID();
   const session = claimant === undefined ? new SessionService(init.workspace) : resumeSession({
@@ -115,6 +117,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     workspace: init.workspace,
     agentId: init.agentId,
     sessionId,
+    ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
     // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
     // rows at the right session id was only half of it: written through the raw
     // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to

@@ -27,6 +27,19 @@ For packaging changes, follow [`bundle-kernel.mjs`](../scripts/bundle-kernel.mjs
 
 [`packed-install-check.mjs`](../scripts/packed-install-check.mjs) qualifies a built tarball in a separate consumer directory. [`packed-evidence-verification.mjs`](../scripts/packed-evidence-verification.mjs) checks the installed commands' structured verifier results and unique reconstructed request IDs. These scripts establish the artifact acceptance path for AMC-1510; a source graph alone does not establish that a package has been qualified, published, or released. Build-time file paths and package resolution may not appear as direct AST edges in the focused map.
 
+## Native tasks in Studio
+
+The new browser flow has small modules for each boundary. Until the next extraction receipt is recorded, the September 8 `12de7b4f` graph remains the prior source snapshot; the following reading path describes the newly implemented source.
+
+1. [`nativeTasks.js`](../src/console/assets/nativeTasks.js) owns page state, one request ID per submission, revision-bound controls and cursor reads. [`nativeTasksView.js`](../src/console/assets/nativeTasksView.js) renders scope, committed events and separate outcome/verification states. [`api.js`](../src/console/assets/api.js) preserves authentication and the hosted workspace prefix.
+2. [`apiDelegation.ts`](../src/studio/apiDelegation.ts) derives the owner from a verified human session; [`nativeAdmission.ts`](../src/studio/nativeAdmission.ts) validates browser origin and mutation proof. [`nativeTasksRouter.ts`](../src/api/nativeTasksRouter.ts) accepts typed task inputs and checks read-only execution policy.
+3. [`nativeTaskService.ts`](../src/studio/nativeTaskService.ts) owns bounded native clients, cancellation and release. [`nativeTaskDescriptors.ts`](../src/studio/nativeTaskDescriptors.ts) persists signed owner/agent/request/revision bindings before dispatch; [`nativeTaskProjection.ts`](../src/studio/nativeTaskProjection.ts) reads authenticated committed events and actual pending approvals.
+4. [`nativeAgentClient.ts`](../src/sdk/nativeAgentClient.ts) opens the fixed AMC ACP process. [`acpCli.ts`](../src/acp/acpCli.ts), [`acpStdioMain.ts`](../src/acp/acpStdioMain.ts) and [`agentSession.ts`](../src/agent/agentSession.ts) carry the server-owned credential and tool-scope constraints into the existing native loop. The guarded tool path checks the reviewed scope again at execution.
+5. [`studioApprovalAdmission.ts`](../src/studio/studioApprovalAdmission.ts) protects existing approval mutation aliases. [`approvalStudioService.ts`](../src/approvals/approvalStudioService.ts) retains real reviewer roles and quorum; a task's projected approval link is not a grant.
+6. [`workspaceRuntimeRegistry.ts`](../src/workspaces/workspaceRuntimeRegistry.ts) shares one pending startup per workspace and drains accepted starts at shutdown. [`workspaceStudioProxy.ts`](../src/workspaces/workspaceStudioProxy.ts) preserves only validated native request context and cancels upstream transport on disconnect.
+
+The `native-studio` selection in the Graphify reducer generates a focused dependency map after a fresh source extraction. Process messages and HTTP calls cross runtime boundaries; static edges cannot establish that a task executed. The [Studio task guide](NATIVE_STUDIO_TASKS.md) describes the user workflow and explicit limits.
+
 ## External evidence import
 
 The reading order is [`cli-import-commands.ts`](../src/cli-import-commands.ts) → [`neutralImporter.ts`](../src/importers/neutralImporter.ts) → the lifecycle, readiness and Watch writers it calls.

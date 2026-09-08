@@ -38,6 +38,8 @@ import type { AgentToolSeam } from "./toolSeam.js";
 export interface AgentToolsetOptions {
   readonly workspace: string;
   readonly agentId: string;
+  /** Immutable reviewed tool scope, enforced on the execution guard's exact signed snapshot. */
+  readonly expectedToolsDigest?: string;
   /** `code` collapses every direct call onto `run_code`. */
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
@@ -197,6 +199,7 @@ export interface AgentToolset {
 }
 
 export function agentToolset(options: AgentToolsetOptions): AgentToolset {
+  if (options.expectedToolsDigest !== undefined && !/^[a-f0-9]{64}$/.test(options.expectedToolsDigest)) throw new Error("Invalid native tool policy digest pin.");
   // `agentId` KEYS BUDGETS AND GUARD SCOPES. `budgetForAgent` falls back to the
   // `default` limits for an unknown id while usage is counted per id, and
   // `ToolRegistry` resolves guard scopes with `scopes.get(execution.agentId)` —
@@ -256,7 +259,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // replace it. Resolve the current session only when the guard executes.
   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
   registry.guard("network-egress", networkEgressGuard(workspace));
-  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name)));
+  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest));
 
   const pipeline = new ToolPipeline({
     registry,

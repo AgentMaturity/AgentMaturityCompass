@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Compass Console - AMC Studio</title>
+    <title>Native Tasks - AMC Studio</title>
     <link rel="manifest" href="./assets/manifest.json" />
     <link rel="stylesheet" href="./assets/styles.css?v=20260908b" />
+    <link rel="stylesheet" href="./assets/nativeTasks.css?v=20260908b" />
   </head>
-  <body data-page="home">
+  <body data-page="native-tasks">
     <div class="shell">
       <nav>
         <h1>amc</h1>
@@ -45,7 +46,7 @@
         </details>
       </nav>
       <main>
-        <div id="ucBanner" class="card banner muted">Unified Clarity loading…</div>
+        <div id="ucBanner" class="card banner muted" hidden></div>
         <p id="status" class="muted">Authentication required.</p>
         <div id="app"></div>
       </main>

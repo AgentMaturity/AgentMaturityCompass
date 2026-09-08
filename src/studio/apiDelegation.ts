@@ -1,12 +1,18 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleApiRoute, isPublicApiRoute } from "../api/index.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
+import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
+import type { NativeTaskService } from "./nativeTaskTypes.js";
+import { assertNativeBrowserAdmission, isNativeStudioPath, NativeAdmissionError } from "./nativeAdmission.js";
 
 export interface StudioApiAuthContext {
   isAdmin: boolean;
   agentId: string | null;
   username: string | null;
   roles: ReadonlySet<string>;
+  userId?: string | null;
+  nativeCsrfToken?: string | null;
+  sessionAuthSource?: "LOCAL_USER" | "WORKSPACE_ROUTER";
 }
 
 export interface StudioApiRateLimitDecision {
@@ -36,6 +42,9 @@ export interface StudioApiDelegationParams {
   apiLimiter: (key: string) => StudioApiRateLimitDecision;
   privilegedApiLimiter: (key: string) => StudioApiRateLimitDecision;
   setRateLimitHeaders: (res: ServerResponse, decision: StudioApiRateLimitDecision) => void;
+  nativeTaskService?: NativeTaskService;
+  nativeAllowedOrigins?: readonly string[];
+  nativeExecutionAllowed?: () => boolean;
 }
 
 /**
@@ -72,6 +81,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
   }
 
   let principal: string | undefined;
+  let nativeTasks: NativeTaskApiContext | undefined;
   if (!isPublicApiRoute(params.pathname)) {
     const apiAuth = params.authenticate(params.req, params.workspace, params.token);
     if (!apiAuth) {
@@ -83,17 +93,39 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
       return true;
     }
     const accessPolicy = resolveApiRolePolicy(params.pathname, params.method);
+    const nativeDemo = apiAuth.userId === "local-demo" && isNativeStudioPath(params.pathname);
     if (
       !params.requireRoles({
         auth: apiAuth,
         res: params.res,
         workspace: params.workspace,
-        roles: accessPolicy.roles
+        // Demo VIEWER is admitted only to the separately constrained stub/no-tools task API.
+        roles: nativeDemo ? ["VIEWER"] : accessPolicy.roles
       })
     ) {
       return true;
     }
     principal = principalFromAuth(apiAuth) ?? undefined;
+    if (isNativeStudioPath(params.pathname)) {
+      const actor = { isAdmin: apiAuth.isAdmin, userId: apiAuth.userId ?? null, nativeCsrfToken: apiAuth.nativeCsrfToken ?? null };
+      try {
+        assertNativeBrowserAdmission({ req: params.req, actor, allowedOrigins: params.nativeAllowedOrigins ?? [] });
+      } catch (error) {
+        if (!(error instanceof NativeAdmissionError)) throw error;
+        params.json(params.res, error.statusCode, { ok: false, error: error.message, code: error.code });
+        return true;
+      }
+      if (!params.nativeTaskService) {
+        params.json(params.res, 503, { error: "Native task service is unavailable." });
+        return true;
+      }
+      // A renamed/recreated username must not inherit another user's task ownership.
+      const principalId = apiAuth.isAdmin ? "bootstrap-admin"
+        : `session:${apiAuth.sessionAuthSource ?? "LOCAL_USER"}:${actor.userId}`;
+      nativeTasks = { service: params.nativeTaskService, principalId, demo: actor.userId === "local-demo",
+        nativeCsrfToken: actor.nativeCsrfToken, admissionActor: actor,
+        executionAllowed: params.nativeExecutionAllowed ?? (() => false) };
+    }
   }
 
   return handleApiRoute(
@@ -103,6 +135,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     params.res,
     params.workspace,
     params.token,
-    principal
+    principal,
+    nativeTasks
   );
 }
