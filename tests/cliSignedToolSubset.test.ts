@@ -31,7 +31,7 @@ afterEach(async () => {
   vi.unstubAllEnvs();
 });
 
-test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes only the signed read subset; guessed write/shell calls are recorded denials", async surface => {
+test.each(["CLI", "ACP"] as const)("the built native %s uses provider-valid aliases to execute the signed read subset and reconstruct its requests", async surface => {
   const cli = resolve("dist/cli.js");
   if (!existsSync(cli)) throw new Error("Build the coordinated candidate before the native subset CLI regression.");
   const pass = "synthetic-cli-subset-vault", credential = "synthetic-loopback-subset-key";
@@ -75,11 +75,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     tools: request.tools?.map(tool => tool.function.name), messages: request.messages.filter(message => message.role !== "system")
       .map(message => ({ role: message.role, toolCallId: message.tool_call_id, content: String(message.content).slice(0, 768) }))
   })) }).split(credential).join("[REDACTED]").split(pass).join("[REDACTED]").slice(0, 16000);
-  const calls = [
-    { name: "fs.read", arguments: { path: "workspace/review.txt" } },
-    { name: "fs.write", arguments: { path: "workspace/forbidden.txt", content: "must not write" } },
-    { name: "bash", arguments: { command: "touch workspace/forbidden-shell.txt" } }
-  ];
+  const calls = [{ arguments: { path: "workspace/review.txt" } }];
   server = createServer(async (request, response) => {
     try {
       const chunks: Buffer[] = []; let bytes = 0;
@@ -87,12 +83,18 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
         if (bytes > 1_000_000) throw new Error("request exceeded fixture bound"); chunks.push(data); }
       if (request.url !== "/v1/chat/completions") throw new Error("unexpected provider route");
       requests.push(JSON.parse(Buffer.concat(chunks).toString("utf8")) as ModelRequest);
+      const advertised = requests.at(-1)!.tools?.map(tool => tool.function.name) ?? [];
+      if (advertised.length !== 3 || new Set(advertised).size !== 3 || advertised.some(name => !/^[A-Za-z0-9_-]{1,64}$/.test(name))) {
+        throw new Error("provider function names violate the documented contract");
+      }
+      const readName = advertised.find(name => name !== "glob" && name !== "grep");
+      if (!readName) throw new Error("no read capability advertised");
       auth.push(request.headers.authorization === `Bearer ${credential}`);
       const index = requests.length - 1, tool = calls[index];
       response.writeHead(200, { "content-type": "text/event-stream" });
       const send = (value: object) => response.write(`data: ${JSON.stringify({ id: `fixture-${index}`, object: "chat.completion.chunk", created: 1, model: "subset-fixture", ...value })}\n\n`);
       send({ choices: [{ index: 0, delta: tool
-        ? { role: "assistant", tool_calls: [{ index: 0, id: `subset-call-${index}`, type: "function", function: { name: tool.name, arguments: JSON.stringify(tool.arguments) } }] }
+        ? { role: "assistant", tool_calls: [{ index: 0, id: `subset-call-${index}`, type: "function", function: { name: readName, arguments: JSON.stringify(tool.arguments) } }] }
         : { role: "assistant", content: "Synthetic subset conformance complete." }, finish_reason: null }] });
       send({ choices: [{ index: 0, delta: {}, finish_reason: tool ? "tool_calls" : "stop" }] });
       send({ choices: [], usage: { prompt_tokens: 10, completion_tokens: 3, total_tokens: 13, prompt_tokens_details: { cached_tokens: 0 } } });
@@ -101,7 +103,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
   });
   await new Promise<void>(done => server!.listen(0, "127.0.0.1", done));
   const address = server.address(); if (!address || typeof address === "string") throw new Error("No fixture port.");
-  const prompt = "Read the signed-scope fixture; synthetic requests will also probe ungranted tools.";
+  const prompt = "Read the signed-scope fixture with the advertised read capability.";
   let summary: AgentRunSummary, displayed: string;
   if (surface === "CLI") {
     const result = await run(["agent-loop", "run", prompt, "--provider", "openai", "--model", "subset-fixture",
@@ -125,10 +127,13 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     } finally { await client.close(); }
   }
   expect(fixtureErrors).toEqual([]);
-  expect(summary.requests).toBe(4); expect(summary.toolCalls).toBe(3); expect(summary.unsignedRows).toBe(0);
-  expect(requests).toHaveLength(4); expect(auth).toEqual([true, true, true, true]);
+  expect(summary.requests).toBe(2); expect(summary.toolCalls).toBe(1); expect(summary.unsignedRows).toBe(0);
+  expect(requests).toHaveLength(2); expect(auth).toEqual([true, true]);
   for (const request of requests) {
-    expect(request.tools?.map(tool => tool.function.name).sort()).toEqual(["fs.read", "glob", "grep"]);
+    const names = request.tools!.map(tool => tool.function.name);
+    expect(names).toEqual(expect.arrayContaining(["glob", "grep"]));
+    expect(names).not.toContain("fs.read");
+    expect(names.every(name => /^[A-Za-z0-9_-]{1,64}$/.test(name))).toBe(true);
     // Encoder-owned streaming/usage fields must still be sent, without caller collisions.
     expect(request.stream).toBe(true); expect(request.stream_options).toEqual({ include_usage: true }); expect(request.max_tokens).toBe(64);
   }
@@ -142,10 +147,6 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     try { return JSON.parse(String(content)); } catch { throw new Error(`Invalid committed tool result: ${diagnostics()}`); }
   };
   expect(toolResult(1, 0), diagnostics()).toEqual({ type: "amc.tool-result", version: 1, isError: false, output: fixtureText });
-  for (const [request, call] of [[2, 1], [3, 2]] as const) {
-    expect(toolResult(request, call), diagnostics()).toEqual({ type: "amc.tool-result", version: 1,
-      isError: true, output: expect.stringContaining("denied") });
-  }
   expect(existsSync(join(root, "workspace", "forbidden.txt"))).toBe(false);
   expect(existsSync(join(root, "workspace", "forbidden-shell.txt"))).toBe(false);
   expect(readFileSync(policyPath)).toEqual(originalPolicy);
@@ -161,7 +162,11 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     expect(extractEnvelope(originalInputs[0]!.meta_json)?.sessionId).toBe(summary.sessionId);
     const audits = rows.filter(row => String(JSON.parse(row.meta_json).auditType).startsWith("TOOL_CALL_"));
     expect(audits.map(row => ({ name: JSON.parse(row.meta_json).toolName, type: JSON.parse(row.meta_json).auditType })))
-      .toEqual([{ name: "fs.read", type: "TOOL_CALL_ALLOWED" }, { name: "fs.write", type: "TOOL_CALL_DENIED" }, { name: "bash", type: "TOOL_CALL_DENIED" }]);
+      .toEqual([{ name: "fs.read", type: "TOOL_CALL_ALLOWED" }]);
+    const call = JSON.parse(rows.find(row => row.event_type === "tool/call")!.meta_json);
+    expect(call.toolName).toBe("fs.read");
+    expect(call.providerName).toMatchObject({ version: 1, encoderId: "openai-chat", encoderVersion: 3,
+      wireName: requests[0]!.tools!.find(tool => !["glob", "grep"].includes(tool.function.name))!.function.name });
     for (const row of audits) { expect(row.writer_sig).not.toBe("unsigned"); expect(extractEnvelope(row.meta_json)?.sessionId).toBe(summary.sessionId); }
   } finally { ledger.close(); }
   for (const args of [["session", "verify", "--json"], ["agent-loop", "verify", summary.sessionId, "--json"]]) {

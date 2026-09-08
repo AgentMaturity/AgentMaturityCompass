@@ -58,6 +58,8 @@ import type { HttpResponse, HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
+import { bindProviderToolNames, usesProviderToolNames } from "../request/providerToolNames.js";
+import { ProviderToolBinding } from "./providerToolBinding.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -124,7 +126,8 @@ export class PreparedCall {
   private settlement: SettledStream | null = null;
 
   /** @internal — minted only by {@link LlmRuntime.prepare}. */
-  constructor(runtime: LlmRuntime, route: PinnedRoute, prepared: PreparedRequest, spec: LlmCallSpec) {
+  constructor(runtime: LlmRuntime, route: PinnedRoute, prepared: PreparedRequest, spec: LlmCallSpec,
+    private readonly toolNames: ReadonlyMap<string, string> | null = null) {
     this.runtime = runtime;
     this.route = route;
     this.prepared = prepared;
@@ -154,7 +157,7 @@ export class PreparedCall {
     this.dispatched = true;
     return this.runtime.dispatch(this.route, this.prepared, this.spec, (settled) => {
       this.settlement = settled;
-    });
+    }, this.toolNames);
   }
 }
 
@@ -199,6 +202,10 @@ export class LlmRuntime {
     // Before anything durable: an adapter that cannot carry these params says so
     // now, rather than after a signed header row commits to bytes it will refuse.
     route.adapter.assertParams?.(spec.params);
+    // Capture authority before dispatch. Mutating caller-owned schemas after
+    // prepare cannot change what this request permits the provider to name.
+    const toolNames = usesProviderToolNames(route.encoderId, route.encoderVersion)
+      ? bindProviderToolNames(spec.tools ?? []) : null;
     const prepared = prepareRequest(this.init.session, {
       model: spec.model,
       providerId: route.providerId,
@@ -213,7 +220,7 @@ export class LlmRuntime {
       assertRequest: (request) => assertRequestCapabilities(route.capabilities, request),
       ...(this.init.encoders !== undefined ? { encoders: this.init.encoders } : {})
     });
-    return new PreparedCall(this, route, prepared, spec);
+    return new PreparedCall(this, route, prepared, spec, toolNames);
   }
 
   /** Prepare and dispatch in one call — the direct `ctx.llm.stream()` path. */
@@ -234,7 +241,8 @@ export class LlmRuntime {
     route: PinnedRoute,
     prepared: PreparedRequest,
     spec: LlmCallSpec,
-    onSettled: (settled: SettledStream) => void
+    onSettled: (settled: SettledStream) => void,
+    toolNames: ReadonlyMap<string, string> | null = null
   ): AsyncIterable<StreamChunk> {
     // Resolved HERE, per request, and never hoisted: a key rotated between two
     // steps of the same turn applies to the second one.
@@ -328,8 +336,10 @@ export class LlmRuntime {
     let recorded = false;
     const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
       secret, notify: this.init.onLiveText });
+    const binding = toolNames === null ? null : new ProviderToolBinding(toolNames);
     try {
-      for await (const chunk of route.adapter.decode(response)) {
+      for await (const decoded of route.adapter.decode(response)) {
+        const chunk = binding?.bind(decoded) ?? decoded;
         // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
         // breaks the contract must not reach a caller who might act on it.
         recorder.push(chunk);

@@ -306,11 +306,13 @@ export class StreamRecorder {
             ? `${block.name}${block.arguments}`
             : JSON.stringify(block)
         : `${record.partial?.text ?? ""}${record.partial?.toolArguments ?? ""}`;
+    const wireName = block?.kind === "tool_use" ? block.providerWireName : record.partial?.providerWireName;
     return this.init.session.recordAssistantBlock({
       blockIndex: record.ordinal,
       blockKind: record.blockKind === "tool_use" ? "tool_use" : record.blockKind,
       stopReason,
-      content
+      content: wireName === undefined ? content : JSON.stringify({ type: "amc.provider-tool-drop", version: 1,
+        providerName: this.providerName(wireName), content })
     }).eventId;
   }
 
@@ -338,6 +340,7 @@ export class StreamRecorder {
         return session.recordToolCall({
           toolCallId: block.id,
           toolName: block.name,
+          ...(block.providerWireName === undefined ? {} : { providerName: this.providerName(block.providerWireName) }),
           dispatch: "native",
           parentToken: null,
           args: block.arguments
@@ -349,5 +352,10 @@ export class StreamRecorder {
             `a provider stream produces model output, and neither kind has a durable payload this seam can record`
         );
     }
+  }
+
+  private providerName(wireName: string) {
+    return { version: 1 as const, wireName, headerEventId: this.init.headerEventId,
+      encoderId: this.init.pinned.encoderId, encoderVersion: this.init.pinned.encoderVersion };
   }
 }

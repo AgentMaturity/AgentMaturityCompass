@@ -20,6 +20,20 @@ from graphify.export import to_canvas, to_html, to_json, to_obsidian
 
 
 MAPS = {
+    "native-provider-names": [
+        "src/llm/adapter/llmRuntime.ts", "src/llm/adapter/providerToolBinding.ts",
+        "src/llm/adapter/streamRecorder.ts", "src/llm/blockAssembler.ts",
+        "src/llm/streamChunk.ts", "src/llm/request/providerToolNames.ts",
+        "src/llm/request/prepareRequest.ts", "src/llm/request/deriveRequest.ts",
+        "src/llm/request/requestSources.ts", "src/llm/request/builtInEncoders.ts",
+        "src/llm/request/openaiChatEncoderV3.ts", "src/llm/request/openaiChatEncoderV2.ts",
+        "src/llm/request/openaiChatEncoder.ts", "src/llm/request/openaiResponsesEncoderV2.ts",
+        "src/llm/request/openaiResponsesEncoder.ts", "src/llm/request/anthropicMessagesEncoderV3.ts",
+        "src/llm/request/anthropicMessagesEncoder.ts", "src/llm/providers/openaiAdapter.ts",
+        "src/llm/providers/openaiResponsesAdapter.ts", "src/llm/providers/anthropicAdapter.ts",
+        "src/session/sessionService.ts", "src/session/sessionApiTypes.ts",
+        "src/agent/stepRunner.ts", "src/agent/pipelineToolSeam.ts",
+    ],
     "native-studio": [
         "src/console/assets/nativeTasks.js", "src/console/assets/nativeTasksView.js",
         "src/console/assets/api.js", "src/api/nativeTasksRouter.ts",
@@ -143,6 +157,12 @@ MAPS = {
     ],
 }
 READING_PATHS = {
+    "native-provider-names": [
+        ["src/llm/adapter/llmRuntime.ts", "src/llm/request/providerToolNames.ts"],
+        ["src/llm/adapter/llmRuntime.ts", "src/llm/adapter/providerToolBinding.ts"],
+        ["src/llm/adapter/llmRuntime.ts", "src/llm/adapter/streamRecorder.ts", "src/session/sessionService.ts"],
+        ["src/llm/request/deriveRequest.ts", "src/llm/request/builtInEncoders.ts", "src/llm/request/openaiChatEncoderV3.ts", "src/llm/request/providerToolNames.ts"],
+    ],
     "native-runtime": [["src/agent/agentToolset.ts", "src/agent/nativeToolCapabilities.ts"]],
     "native-studio": [["src/studio/nativeTaskService.ts", "src/agent/nativeToolCapabilities.ts"]],
 }

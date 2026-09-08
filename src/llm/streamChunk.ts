@@ -87,6 +87,8 @@ export interface ToolUseContentBlock {
   /** Provider-issued call id; correlates with the matching tool result. */
   readonly id: ToolCallId;
   readonly name: string;
+  /** Decoded provider name before request-scoped binding; not raw HTTP bytes. */
+  readonly providerWireName?: string;
   /** Raw JSON string exactly as the model produced it — never re-parsed in transit. */
   readonly arguments: string;
 }
@@ -225,6 +227,7 @@ export type StreamChunk =
       readonly id: ToolCallId;
       /** Arrives once, usually on the first frame of the call. */
       readonly name?: string;
+      readonly providerWireName?: string;
       readonly argumentsDelta: string;
     }
   | { readonly type: "block-end"; readonly index: number; readonly block: ContentBlock }

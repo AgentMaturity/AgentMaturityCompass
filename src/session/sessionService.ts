@@ -500,7 +500,8 @@ export class SessionService extends SessionEventWriter {
         toolName: call.toolName,
         argsSha256,
         dispatch: call.dispatch,
-        parentToken: call.parentToken
+        parentToken: call.parentToken,
+        ...(call.providerName === undefined ? {} : { providerName: call.providerName })
       }),
       turn,
       step

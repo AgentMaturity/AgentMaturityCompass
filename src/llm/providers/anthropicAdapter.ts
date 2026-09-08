@@ -327,9 +327,9 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
 export const anthropicAdapter: LlmAdapter = {
   capabilities: ANTHROPIC_CAPABILITIES,
   id: ANTHROPIC_ADAPTER_ID,
-  version: 2,
+  version: 3,
   encoderId: ANTHROPIC_MESSAGES_ENCODER_ID,
-  encoderVersion: 2,
+  encoderVersion: 3,
 
   assertParams(params: Record<string, unknown>): void {
     // `anthropic-messages@1` does not own `stream` — bumping the encoder to take

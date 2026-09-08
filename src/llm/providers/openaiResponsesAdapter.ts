@@ -194,7 +194,7 @@ async function* decodeResponses(response: HttpResponse): AsyncIterable<StreamChu
   return fail("connection ended before a terminal response event");
 }
 export const openaiResponsesAdapter: LlmAdapter = {
-  id: OPENAI_RESPONSES_ADAPTER_ID, version: 1, encoderId: OPENAI_RESPONSES_ENCODER_ID, encoderVersion: 1,
+  id: OPENAI_RESPONSES_ADAPTER_ID, version: 2, encoderId: OPENAI_RESPONSES_ENCODER_ID, encoderVersion: 2,
   capabilities: OPENAI_RESPONSES_CAPABILITIES,
   envelope(input) {
     return { url: `${input.baseUrl}/v1/responses`, method: "POST", headers: { ...input.extraHeaders,

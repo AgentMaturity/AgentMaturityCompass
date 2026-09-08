@@ -14,13 +14,19 @@
 import { anthropicMessagesEncoder, anthropicMessagesEncoderV2 } from "./anthropicMessagesEncoder.js";
 import { openaiChatEncoder } from "./openaiChatEncoder.js";
 import { openaiChatEncoderV2 } from "./openaiChatEncoderV2.js";
+import { openaiChatEncoderV3 } from "./openaiChatEncoderV3.js";
+import { anthropicMessagesEncoderV3 } from "./anthropicMessagesEncoderV3.js";
 import { openaiResponsesEncoder } from "./openaiResponsesEncoder.js";
+import { openaiResponsesEncoderV2 } from "./openaiResponsesEncoderV2.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 
 export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
   anthropicMessagesEncoder,
   anthropicMessagesEncoderV2,
+  anthropicMessagesEncoderV3,
   openaiChatEncoder,
   openaiChatEncoderV2,
-  openaiResponsesEncoder
+  openaiChatEncoderV3,
+  openaiResponsesEncoder,
+  openaiResponsesEncoderV2
 ];

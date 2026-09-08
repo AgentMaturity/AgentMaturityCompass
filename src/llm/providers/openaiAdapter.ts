@@ -273,9 +273,9 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
 export const openaiAdapter: LlmAdapter = {
   capabilities: OPENAI_CHAT_CAPABILITIES,
   id: OPENAI_ADAPTER_ID,
-  version: 2,
+  version: 3,
   encoderId: OPENAI_CHAT_ENCODER_ID,
-  encoderVersion: 2,
+  encoderVersion: 3,
 
   assertParams(params): void {
     if ((params.n !== undefined && params.n !== 1) || params.functions !== undefined || params.function_call !== undefined

@@ -90,6 +90,7 @@ export type BlockOutcome =
 export interface PartialBlockContent {
   readonly text: string;
   readonly toolName: string | null;
+  readonly providerWireName?: string;
   readonly toolArguments: string;
 }
 
@@ -157,6 +158,7 @@ interface PartialBlockState {
   text: string;
   toolCallId: ToolCallId | null;
   toolName: string | null;
+  providerWireName?: string;
   toolArguments: string;
   closedBlock: ContentBlock | null;
 }
@@ -223,6 +225,7 @@ export class BlockAssembler {
         // A provider sends the tool name once, usually on the first frame;
         // later frames carry an empty name that must not erase it.
         if (chunk.name !== undefined && chunk.name.length > 0) partial.toolName = chunk.name;
+        if (chunk.providerWireName !== undefined) partial.providerWireName = chunk.providerWireName;
         partial.toolArguments += chunk.argumentsDelta;
         return;
       }
@@ -322,6 +325,7 @@ export class BlockAssembler {
           ? Object.freeze({
               text: partial.text,
               toolName: partial.toolName,
+              ...(partial.providerWireName === undefined ? {} : { providerWireName: partial.providerWireName }),
               toolArguments: partial.toolArguments
             })
           : null
@@ -361,6 +365,7 @@ function assembleOpen(partial: PartialBlockState): ContentBlock | null {
             kind: "tool_use",
             id: partial.toolCallId,
             name: partial.toolName ?? "",
+            ...(partial.providerWireName === undefined ? {} : { providerWireName: partial.providerWireName }),
             arguments: partial.toolArguments
           };
     case "tool_result":

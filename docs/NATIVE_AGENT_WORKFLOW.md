@@ -163,3 +163,7 @@ Use the [Code Graph guide](CODE_GRAPH.md) for extraction and queries. The follow
 | Imported and portable history | `src/importers/dshSessionImport.ts`; `src/importers/neutralImporter.ts` | `src/importers/externalEvidenceExport.ts`; `src/standard/externalEvidenceFiles.ts` |
 
 Follow the actual extracted edges and read callback bindings where no static path exists. A code graph makes the implementation easier to navigate; it is not runtime evidence.
+
+### Provider-valid tool names
+
+Keep signed permissions and explicit tool choices in AMC's original names, such as `fs.read`. AMC translates names for its native Chat, Responses and Anthropic APIs and resolves responses against the exact offered tool set. Signed call records retain both the original permission identity and decoded provider name. Unknown or changed provider names refuse before execution; historical replay does not restore a removed grant. See [native provider identity](PROVIDERS.md#native-tool-identity-and-provider-names).

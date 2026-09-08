@@ -104,6 +104,9 @@ export {
 } from "./request/anthropicMessagesEncoder.js";
 export { OPENAI_CHAT_ENCODER_ID, openaiChatEncoder } from "./request/openaiChatEncoder.js";
 export { openaiChatEncoderV2 } from "./request/openaiChatEncoderV2.js";
+export { openaiChatEncoderV3 } from "./request/openaiChatEncoderV3.js";
+export { anthropicMessagesEncoderV3 } from "./request/anthropicMessagesEncoderV3.js";
+export { openaiResponsesEncoderV2 } from "./request/openaiResponsesEncoderV2.js";
 export { BUILT_IN_REQUEST_ENCODERS } from "./request/builtInEncoders.js";
 export {
   DEFAULT_REQUEST_ENCODERS,

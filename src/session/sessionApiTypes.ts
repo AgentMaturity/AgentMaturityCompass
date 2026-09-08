@@ -174,6 +174,14 @@ export interface ToolCallInput {
   readonly dispatch: ToolDispatch;
   readonly parentToken: string | null;
   readonly args: string | Buffer; // payload; argsSha256 = payload_sha256
+  /** Request-scoped provider identity; canonical toolName remains the policy key. */
+  readonly providerName?: {
+    readonly version: 1;
+    readonly wireName: string;
+    readonly headerEventId: string;
+    readonly encoderId: string;
+    readonly encoderVersion: number;
+  };
 }
 
 /**
