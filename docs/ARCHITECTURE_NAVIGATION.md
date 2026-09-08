@@ -40,6 +40,8 @@ The new browser flow has small modules for each boundary. Until the next extract
 
 The `native-studio` selection in the Graphify reducer generates a focused dependency map after a fresh source extraction. Process messages and HTTP calls cross runtime boundaries; static edges cannot establish that a task executed. The [Studio task guide](NATIVE_STUDIO_TASKS.md) describes the user workflow and explicit limits.
 
+For reopening a task while Studio is running, follow [`acpNativeSession.ts`](../src/acp/acpNativeSession.ts) to [`sessionResume.ts`](../src/session/sessionResume.ts), [`sessionRecovery.ts`](../src/session/sessionRecovery.ts) and [`ledgerVerification.ts`](../src/ledger/ledgerVerification.ts). The native continuation check validates the recorded prefix and selected native identity, treating only unfinished unrelated legacy sessions as incomplete. Present seals, payloads, signatures and chains remain checked. The normal cold verifier keeps its complete-archive rules; continuation admission is not an archive verification verdict.
+
 ## External evidence import
 
 The reading order is [`cli-import-commands.ts`](../src/cli-import-commands.ts) → [`neutralImporter.ts`](../src/importers/neutralImporter.ts) → the lifecycle, readiness and Watch writers it calls.

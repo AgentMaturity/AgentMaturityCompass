@@ -29,7 +29,7 @@
  */
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
-import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import type { EvidenceEvent, RuntimeName } from "../types.js";
 import { recoverSession, type RecoveryClaimant, type RecoveryReport } from "./sessionRecovery.js";
 import { SessionService } from "./sessionService.js";
@@ -122,8 +122,8 @@ function assertChainIntact(sessionId: string, rows: readonly EvidenceEvent[]): v
 }
 
 /** The ledger's own hash/signature verdict; refused on any chain error. */
-function assertLedgerVerifies(workspace: string): void {
-  const verdict = verifyLedgerIntegrity(workspace);
+function assertLedgerVerifies(workspace: string, sessionId: string, allowIncompleteLegacy: boolean): void {
+  const verdict = allowIncompleteLegacy ? verifyNativeSessionContinuation(workspace, sessionId) : verifyLedgerIntegrity(workspace);
   if (!verdict.chain.ok) {
     throw new SessionResumeRefused("TAMPERED", "the evidence ledger does not verify", verdict.chain.errors);
   }
@@ -138,7 +138,7 @@ function verifiedRows(params: { workspace: string; sessionId: string; store: Ses
   const rows = envelopedRows(params.store.readSessionEvents(params.sessionId));
   if (rows.length === 0) throw new SessionResumeRefused("MISSING", `session ${params.sessionId} has no enveloped rows`);
   assertChainIntact(params.sessionId, rows);
-  assertLedgerVerifies(params.workspace);
+  assertLedgerVerifies(params.workspace, params.sessionId, !allowSealed);
   return rows;
 }
 

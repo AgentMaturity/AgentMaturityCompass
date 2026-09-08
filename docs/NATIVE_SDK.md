@@ -42,6 +42,10 @@ Call `turn.cancel()` or pass an `AbortSignal` to `session.prompt()`. Cancellatio
 
 The client validates protocol identity, reply IDs, frame and output limits, stop reasons and verifier structure. It rejects loading or writer release when the installed runtime does not advertise support. `resumeSession()` never silently creates a different session.
 
+The SDK canonicalizes the fixed workspace directory before starting its native child. Filesystem aliases for that same directory, including macOS temporary-directory aliases, share one workspace identity. A session request for a genuinely different directory is still refused.
+
 For a resumable handoff, finish the prompt and call `await session.release()` before closing the first client. This explicitly releases the signed writer without sealing the session. A later client can call `await nextAgent.resumeSession(sessionId)`; its `history` contains the committed replay separately from new turn updates. Ordinary `close()` retains sealing behavior, so a sealed session cannot be resumed as if it were still open. Existing ownership, signature and recovery rules decide admission. Python exposes the same local-process lifecycle in the canonical `amc_sdk` package.
+
+Native continuation checks the recorded ledger prefix and the selected native session while other workspace services may still be running. It validates row hashes, signatures, payloads, receipts and any existing seals, then applies native identity and writer-ownership rules. Missing final seals on unrelated legacy sessions are incomplete evidence for continuation, not a complete archive verdict. The normal cold verifier still requires those final seals; stop and release the relevant writers before requesting a complete archive result.
 
 The packaged TypeScript and Python lifecycle paths have separate local installed-consumer receipts. Python acceptance used a clean wheel with tools disabled; it does not imply Python tool/MCP coverage from the TypeScript result. These exercises cover macOS ARM64 with Node 22 and scripted local providers. Other platforms, real-provider quality and performance are separate qualification scopes.

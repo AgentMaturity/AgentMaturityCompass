@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C363-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C364-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -45,6 +45,8 @@ amc agent-loop guide
 ```
 
 The guide reports the next setup or task command without changing the workspace or calling a model. Follow [Your first native AMC workflow](docs/NATIVE_AGENT_WORKFLOW.md) for provider credentials, interactive tasks, reviewed file permissions and approvals. [Native SDK](docs/NATIVE_SDK.md) covers application integration; [code navigation](docs/ARCHITECTURE_NAVIGATION.md) follows the implementation through Graphify's focused maps. Local source and installed-package acceptance do not imply a public release or measured superiority over another harness.
+
+In Studio, open **Native Tasks** to run the same native AMC runtime from the browser. Select an agent, inspect the tool scope, submit a task, review approvals and continue or cancel its recorded session. The [Studio task guide](docs/NATIVE_STUDIO_TASKS.md) explains setup and recovery. The local recording demonstration needs no provider key.
 
 ## Assess agent maturity
 
@@ -172,7 +174,7 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && pnpm run build && n
 
 ---
 
-## Run a Native Agent Task
+## Continue a native task
 
 AMC runs its own model loop, workspace tools, approvals and recorded sessions. You do not need DSH, Pi or another agent runtime. From your project directory, inspect the local setup and open an interactive session:
 
@@ -181,11 +183,11 @@ amc agent-loop guide
 amc agent-loop chat
 ```
 
-The guide creates nothing and calls no provider. Chat asks you to choose a provider and model, then shows the local setup or credential steps still needed. Choose OpenAI Chat Completions, OpenAI Responses, or Anthropic for a real task; `stub` is an explicit local recording demonstration. Native execution currently uses agent `default`.
+The guide creates nothing and calls no provider. Chat asks you to choose a provider and model, then shows the local setup or credential steps still needed. Choose OpenAI Chat Completions, OpenAI Responses, or Anthropic for a real task; `stub` is an explicit local recording demonstration. Select an agent with `--agent reviewer`; the resolved identity stays pinned through turns and resume.
 
 Chat shows provisional live text and then the recorded result. Use `/inspect` to see history, `/verify` to check evidence, `/compact` to summarize a reviewed range, `/fork` to queue a new conversation with parent lineage, and `/exit` to leave. Resume eligible sessions across processes while preserving original evidence. Start with tools disabled, then enable workspace or MCP tools after reviewing their signed policy and grants. Applications can own an AMC process through the native SDK.
 
-See the [native workflow guide](docs/NATIVE_AGENT_WORKFLOW.md), [signed native extensions](docs/NATIVE_EXTENSIONS.md), [MCP setup](docs/NATIVE_MCP.md), [session handoff](docs/SESSION_RESUME.md), and [native SDK](docs/NATIVE_SDK.md). Optional external capture and portable imports are separate evidence workflows, not dependencies of native execution. These newly implemented workflows await their combined validation pass; no live-provider success, platform coverage or usability benchmark is implied.
+See the [native workflow guide](docs/NATIVE_AGENT_WORKFLOW.md), [signed native extensions](docs/NATIVE_EXTENSIONS.md), [MCP setup](docs/NATIVE_MCP.md), [session handoff](docs/SESSION_RESUME.md), and [native SDK](docs/NATIVE_SDK.md). Optional external capture and portable imports are separate evidence workflows. Installed local-provider acceptance, live-provider outcomes, platform qualification and human usability remain distinct measurements.
 
 ---
 
@@ -879,7 +881,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,363<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,364<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

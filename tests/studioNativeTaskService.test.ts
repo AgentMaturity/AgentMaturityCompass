@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -35,8 +36,8 @@ afterEach(async () => {
   if (prior === undefined) delete process.env.AMC_VAULT_PASSPHRASE; else process.env.AMC_VAULT_PASSPHRASE = prior;
   expect(outcomes.filter(outcome => outcome.status === "rejected")).toEqual([]);
 });
-function service(): NativeTaskService {
-  const value = createService({ workspace: root, credentialsHome: credentialHome, credentialsFile: join(credentialHome, ".credentials.yaml"),
+function service(workspace = root): NativeTaskService {
+  const value = createService({ workspace, credentialsHome: credentialHome, credentialsFile: join(credentialHome, ".credentials.yaml"),
     environment: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass } });
   services.push(value); return value;
 }
@@ -123,3 +124,43 @@ test("cancel during initial preparation prevents the original prompt from later 
   const repeated = await s.start(actor, request); expect(repeated.taskId).toBe(taskId);
   expect(rows().filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 30_000);
+
+test("a physical workspace alias runs the same native session, while a different ACP root is refused", async () => {
+  const alias = join(root, "same-workspace-alias"); symlinkSync(root, alias, "junction");
+  const s = service(alias), task = await s.start(actor, input("Alias workspace recording."));
+  const settled = await idle(s, task.taskId);
+  expect(rows(settled.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(1);
+  await s.release(actor, task.taskId, 1);
+  const unrelated = join(root, "different-workspace"); mkdirSync(unrelated);
+  const child = spawn(process.execPath, [resolve("dist/cli.js"), "acp", "--provider", "stub", "--credentials-mode", "operator-only",
+    "--credentials-home", credentialHome, "--credentials-file", join(credentialHome, ".credentials.yaml")], {
+    cwd: root, env: { HOME: credentialHome, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass }, stdio: "pipe"
+  });
+  child.stderr.resume(); let buffer = "";
+  const frames: Array<{ id?: number; error?: { code?: number }; result?: unknown }> = [];
+  child.stdout.setEncoding("utf8"); child.stdout.on("data", (chunk: string) => {
+    buffer += chunk; for (let at = buffer.indexOf("\n"); at >= 0; at = buffer.indexOf("\n")) {
+      const line = buffer.slice(0, at); buffer = buffer.slice(at + 1); if (line.trim()) frames.push(JSON.parse(line));
+    }
+  });
+  async function request(id: number, method: string, params: object) {
+    child.stdin.write(`${JSON.stringify({ jsonrpc: "2.0", id, method, params })}\n`);
+    const deadline = Date.now() + 5000;
+    while (!frames.some(frame => frame.id === id)) {
+      if (Date.now() > deadline || child.exitCode !== null) throw new Error("Actual ACP scope fixture did not answer.");
+      await new Promise(done => setTimeout(done, 20));
+    }
+    return frames.find(frame => frame.id === id)!;
+  }
+  try {
+    expect((await request(1, "initialize", { protocolVersion: 1, clientCapabilities: {} })).result).toBeDefined();
+    const before = rows();
+    expect((await request(2, "session/new", { cwd: unrelated, mcpServers: [] })).error?.code).toBe(-32602);
+    expect(rows()).toEqual(before);
+  } finally {
+    if (child.exitCode === null && child.signalCode === null) {
+      await new Promise<void>(done => { const timer = setTimeout(() => child.kill("SIGKILL"), 3000);
+        child.once("close", () => { clearTimeout(timer); done(); }); child.stdin.end(); });
+    }
+  }
+}, 40_000);

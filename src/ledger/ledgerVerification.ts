@@ -349,12 +349,18 @@ interface SessionLifecycle {
   closed: string[];
 }
 
+interface NativeContinuationScope {
+  readonly targetSessionId: string;
+  readonly incompleteLegacySessions: string[];
+}
+
 
 function verifySessions(
   ledger: Ledger,
   workspace: string,
   errors: string[],
-  staleAfterMs: number
+  staleAfterMs: number,
+  continuation?: NativeContinuationScope
 ): SessionLifecycle {
   const monitorKeys = getPublicKeyHistory(workspace, "monitor");
   const sessions = ledger.getAllSessions();
@@ -381,6 +387,14 @@ function verifySessions(
   }
 
   const knownSessionIds = new Set(sessions.map((session) => session.session_id));
+  if (continuation) {
+    const opening = events.find(event => event.session_id === continuation.targetSessionId);
+    const envelope = opening ? extractEnvelope(opening.meta_json) : null;
+    if (!knownSessionIds.has(continuation.targetSessionId) || opening?.event_type !== "session/open"
+      || envelope?.sessionId !== continuation.targetSessionId || envelope.seq !== 0) {
+      errors.push("Native continuation requires an existing signed native session opening");
+    }
+  }
   for (const event of events) {
     if (!knownSessionIds.has(event.session_id)) {
       errors.push(`Event ${event.id} references missing session ${event.session_id}`);
@@ -401,6 +415,17 @@ function verifySessions(
     const isAgentSession =
       openedSessions.has(session.session_id) || agentSessions.has(session.session_id);
     const isClosed = closedSessions.has(session.session_id);
+    const expectedFinalHash = lastEventHashBySession.get(session.session_id) ?? sha256Hex("EMPTY_SESSION");
+    // Continuation never treats a supplied seal as optional, including an
+    // inconsistent seal attached to a native session with no session/close.
+    if (continuation && isAgentSession && !isClosed
+      && (session.session_final_event_hash !== null || session.session_seal_sig !== null)) {
+      if (!session.session_final_event_hash || !session.session_seal_sig) errors.push(`Session ${session.session_id} missing seal`);
+      else {
+        if (session.session_final_event_hash !== expectedFinalHash) errors.push(`Session ${session.session_id} final hash mismatch`);
+        if (!verifyHexDigestAny(session.session_final_event_hash, session.session_seal_sig, monitorKeys)) errors.push(`Session ${session.session_id} seal signature invalid`);
+      }
+    }
 
     // An agent session with no chained, signed session/close is live, not broken.
     // Its openness is read from the ABSENCE of that event — not from a nullable
@@ -425,8 +450,12 @@ function verifySessions(
 
     // Everything else keeps today's strict rule verbatim — a closed agent session
     // and every legacy (non-agent) session must carry a valid row seal.
-    const expectedFinalHash = lastEventHashBySession.get(session.session_id) ?? sha256Hex("EMPTY_SESSION");
     if (!session.session_final_event_hash || !session.session_seal_sig) {
+      if (continuation && session.session_id !== continuation.targetSessionId && !isAgentSession
+        && session.ended_ts === null && session.session_final_event_hash === null && session.session_seal_sig === null) {
+        continuation.incompleteLegacySessions.push(session.session_id);
+        continue;
+      }
       errors.push(`Session ${session.session_id} missing seal`);
       continue;
     }
@@ -594,6 +623,26 @@ export function verifyLedgerIntegrity(
   workspacePath: string,
   options: LedgerVerifyOptions = {}
 ): VerifyResult {
+  return verifyLedger(workspacePath, options);
+}
+
+/** A verified recorded prefix for native takeover, never a complete-ledger verdict.
+ * Unended unrelated legacy sessions may lack both final-seal fields; their
+ * recorded rows still undergo every integrity check and their IDs are explicit.
+ * Every present seal is checked. The native caller must separately enforce the
+ * selected opening/owner and atomically claim its verified exact head.
+ */
+export function verifyNativeSessionContinuation(workspacePath: string, targetSessionId: string): {
+  scope: "verified-prefix"; targetSessionId: string; chain: VerifyResult["chain"];
+  trustRoot: VerifyResult["trustRoot"]; incompleteLegacySessions: readonly string[];
+} {
+  const continuation: NativeContinuationScope = { targetSessionId, incompleteLegacySessions: [] };
+  const result = verifyLedger(workspacePath, {}, continuation);
+  return { scope: "verified-prefix", targetSessionId, chain: result.chain, trustRoot: result.trustRoot,
+    incompleteLegacySessions: continuation.incompleteLegacySessions };
+}
+
+function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, continuation?: NativeContinuationScope): VerifyResult {
   let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
   const governanceErrors: string[] = [];
@@ -640,11 +689,12 @@ export function verifyLedgerIntegrity(
     } else if (!jsonlBackend) {
       chainErrors.push("Evidence ledger is missing; verification does not initialize a workspace");
     }
+    if (continuation && (!ledger || jsonlBackend)) chainErrors.push("Native continuation requires the SQLite native session store");
     chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint));
     if (ledger) {
       verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
       verifySessionChains(ledger, chainErrors);
-      sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs);
+      sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs, continuation);
       verifyRuns(ledger, workspacePath, chainErrors);
       verifyOutcomeEvents(ledger, workspacePath, chainErrors);
     }

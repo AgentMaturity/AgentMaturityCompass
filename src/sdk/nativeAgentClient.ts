@@ -1,4 +1,5 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import type { AgentRunVerification } from "../agent/runReport.js";
@@ -200,7 +201,9 @@ export class AMCNativeClient {
     if (!options.provider || (options.provider !== "stub" && !options.model)) {
       throw new Error("Choose an explicit provider and an accessible model; stub is a local demonstration.");
     }
-    this.workspace = resolve(options.workspace);
+    // The child reports its physical process.cwd(). Pin that same directory,
+    // so an authorized symlink alias is not mistaken for a second root.
+    this.workspace = realpathSync(resolve(options.workspace));
     this.timeout = options.timeoutMs ?? 120_000;
     if (!Number.isSafeInteger(this.timeout) || this.timeout <= 0) throw new Error("timeoutMs must be a positive integer");
     for (const bound of [options.maxTokens, options.maxSteps]) {

@@ -7,7 +7,7 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
-import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import { assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused } from "./sessionOwnership.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
@@ -435,8 +435,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: 0, closed: false,
       reason: "JSONL recovery requires atomic ownership takeover; no recovery was attempted" });
     preflightEvents = readSessionEvents(readStore, params.sessionId);
-    const verification = verifyLedgerIntegrity(params.workspace);
-    if (!verification.chain.ok) return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+    const verification = preflightEvents.length > 0 ? verifyNativeSessionContinuation(params.workspace, params.sessionId) : null;
+    if (verification && !verification.chain.ok) return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
       syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false,
       reason: verification.chain.errors.join("; ") });
   } finally { if (params.store === undefined) readStore.close(); }

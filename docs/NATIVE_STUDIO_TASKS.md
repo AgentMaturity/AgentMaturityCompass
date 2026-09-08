@@ -36,6 +36,8 @@ The activity view displays authenticated, committed updates. It does not provide
 
 If a request loses its response, keep the draft and refresh status. The browser retains its request ID and does not automatically submit a replacement. A conflicting request ID or stale revision produces a conflict response. After a Studio restart, eligible tasks appear released; resume explicitly before submitting a new turn. Uncertain prior admissions are flagged rather than replayed.
 
+Resume checks the signed native session and recorded ledger prefix even while Studio's unrelated gateway session is still open. It does not classify that incomplete archive as fully verified. Existing signatures, present seals, native identity and writer ownership remain admission requirements; complete cold verification remains a separate operation.
+
 ## Capacity and retention
 
 Studio admits at most four active native tasks per workspace, one turn per task, eight steps and 1,024 output tokens per turn. The page can reduce those step/token limits. A turn times out after two minutes; idle native writers release after 15 minutes, and a live task process is limited to one hour. Prompts are limited to 16 KiB UTF-8.
