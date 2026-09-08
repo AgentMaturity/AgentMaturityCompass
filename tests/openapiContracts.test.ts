@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import YAML from "yaml";
 
 import {
   generateFullOpenApiSpec,
@@ -11,6 +12,43 @@ import {
 } from "../src/studio/openapi.js";
 
 describe("full OpenAPI contract", () => {
+  test("publishes native routes with the public server prefix, declared auth and OpenAPI 3.0 schemas", () => {
+    const spec = YAML.parse(readFileSync(new URL("../website/openapi.yaml", import.meta.url), "utf8"));
+    expect(spec.openapi).toBe("3.0.3");
+    const endpoints = Object.entries(spec.paths).filter(([path]) => path.includes("native-tasks"));
+    expect(endpoints).toHaveLength(8);
+    for (const [path, methods] of endpoints) {
+      expect(path.startsWith("/v1/native-tasks")).toBe(true);
+      for (const server of spec.servers) {
+        const base = server.url.replace("{host}", "amc.example.com");
+        expect(new URL(base + path).pathname).toBe("/api" + path);
+      }
+      for (const operation of Object.values(methods as Record<string, any>)) {
+        expect(operation.security).toEqual([{ amcAdminToken: [] }, { amcSessionCookie: [] }]);
+        for (const scheme of operation.security.flatMap((requirement: object) => Object.keys(requirement))) {
+          expect(spec.components.securitySchemes).toHaveProperty(scheme);
+        }
+      }
+    }
+    function inspect(value: unknown): void {
+      if (!value || typeof value !== "object") return;
+      if (Array.isArray(value)) return value.forEach(inspect);
+      const node = value as Record<string, unknown>;
+      expect(node.type).not.toBe("null");
+      expect(Array.isArray(node.type)).toBe(false);
+      expect(node).not.toHaveProperty("const");
+      if (typeof node.$ref === "string" && node.$ref.startsWith("#/components/schemas/")) {
+        expect(spec.components.schemas).toHaveProperty(node.$ref.split("/").at(-1)!);
+      }
+      Object.values(node).forEach(inspect);
+    }
+    endpoints.forEach(([, methods]) => inspect(methods));
+    Object.entries(spec.components.schemas).filter(([name]) => name.startsWith("NativeTask"))
+      .forEach(([, schema]) => inspect(schema));
+    expect(spec.components.schemas.NativeTask.properties.sessionId).toMatchObject({ type: "string", nullable: true });
+    expect(spec.components.schemas.NativeTaskOptions.properties.providers.items.properties.credential)
+      .toMatchObject({ type: "object", nullable: true });
+  });
   test("includes studio + bridge + gateway endpoints", () => {
     const spec = generateFullOpenApiSpec();
 

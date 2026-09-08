@@ -2,7 +2,7 @@
 
 Start with the flow you need to change. The [Graphify guide](CODE_GRAPH.md) explains how to query the complete local graph. The smaller maps below reduce that graph to a few connected files so a contributor can follow an operation without opening the CLI monolith first.
 
-The September 8 maps use the clean source checkpoint `12de7b4f10cd23eb614eea0792a52021874d8606`, including the standalone native workflow, MCP HTTP transport, immutable native shell binding, import record mapping, native budget admission, selected-agent identity and gateway stream cleanup. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-stream-cleanup-graphify-12de7b4f/README.md) pins the exact source, tool and raw graph hashes. Six views cover native execution, imports, trust, native integrations, native budgets and sandbox/optional DSH launch boundaries. The extraction contains 25,265 symbols/75,793 relationships; the reduced local graph contains 2,080 files/7,502 directed file pairs. A generated map records source dependencies and supplies no runtime acceptance claim. Earlier qualification receipts below apply only to their named historical revisions.
+The current maps use clean source `b8e82167556b5196819523b8814661f11865f196`, including native tasks in Studio, workspace admission, approvals, canonical SDK workspace identity and native continuation beside a live gateway. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-graphify-b8e82167/README.md) pins source, tool and raw graph hashes. Seven views cover Studio tasks, native execution, imports, trust, integrations, budgets and sandbox/optional DSH launch boundaries. Graphify extracted 25,461 symbols and 76,408 relationships; the reduced graph contains 2,095 files and 7,561 directed pairs. All 38 recorded reading paths have extracted hops. Generated maps describe source dependencies; runtime qualification remains separate, and historical receipts below apply only to their named revisions.
 
 ## Native agent execution
 
@@ -29,7 +29,7 @@ For packaging changes, follow [`bundle-kernel.mjs`](../scripts/bundle-kernel.mjs
 
 ## Native tasks in Studio
 
-The new browser flow has small modules for each boundary. Until the next extraction receipt is recorded, the September 8 `12de7b4f` graph remains the prior source snapshot; the following reading path describes the newly implemented source.
+The browser flow has small modules for each boundary. The `native-studio` map contains all 31 requested files and 50 extracted directed pairs; 393 pairs cross its focused boundary and are omitted from this view.
 
 1. [`nativeTasks.js`](../src/console/assets/nativeTasks.js) owns page state, one request ID per submission, revision-bound controls and cursor reads. [`nativeTasksView.js`](../src/console/assets/nativeTasksView.js) renders scope, committed events and separate outcome/verification states. [`api.js`](../src/console/assets/api.js) preserves authentication and the hosted workspace prefix.
 2. [`apiDelegation.ts`](../src/studio/apiDelegation.ts) derives the owner from a verified human session; [`nativeAdmission.ts`](../src/studio/nativeAdmission.ts) validates browser origin and mutation proof. [`nativeTasksRouter.ts`](../src/api/nativeTasksRouter.ts) accepts typed task inputs and checks read-only execution policy.
@@ -38,7 +38,7 @@ The new browser flow has small modules for each boundary. Until the next extract
 5. [`studioApprovalAdmission.ts`](../src/studio/studioApprovalAdmission.ts) protects existing approval mutation aliases. [`approvalStudioService.ts`](../src/approvals/approvalStudioService.ts) retains real reviewer roles and quorum; a task's projected approval link is not a grant.
 6. [`workspaceRuntimeRegistry.ts`](../src/workspaces/workspaceRuntimeRegistry.ts) shares one pending startup per workspace and drains accepted starts at shutdown. [`workspaceStudioProxy.ts`](../src/workspaces/workspaceStudioProxy.ts) preserves only validated native request context and cancels upstream transport on disconnect.
 
-The `native-studio` selection in the Graphify reducer generates a focused dependency map after a fresh source extraction. Process messages and HTTP calls cross runtime boundaries; static edges cannot establish that a task executed. The [Studio task guide](NATIVE_STUDIO_TASKS.md) describes the user workflow and explicit limits.
+Open `graphify-out/navigation/native-studio/graph.html` or the Native Studio canvas in the generated Obsidian folder. Process messages and HTTP calls cross runtime boundaries; static edges cannot establish that a task executed. The [Studio task guide](NATIVE_STUDIO_TASKS.md) describes the user workflow and explicit limits.
 
 For reopening a task while Studio is running, follow [`acpNativeSession.ts`](../src/acp/acpNativeSession.ts) to [`sessionResume.ts`](../src/session/sessionResume.ts), [`sessionRecovery.ts`](../src/session/sessionRecovery.ts) and [`ledgerVerification.ts`](../src/ledger/ledgerVerification.ts). The native continuation check validates the recorded prefix and selected native identity, treating only unfinished unrelated legacy sessions as incomplete. Present seals, payloads, signatures and chains remain checked. The normal cold verifier keeps its complete-archive rules; continuation admission is not an archive verification verdict.
 
@@ -79,7 +79,7 @@ The `native-integrations` map separates operator interfaces from runtime composi
 
 ## Native budget admission
 
-The `native-budgets` map separates operator policy, pre-dispatch admission and usage reconstruction. At `12de7b4f` it contains 22 files and 36 directed source pairs; open `graphify-out/navigation/native-budgets/graph.html`. Older map receipts remain historical snapshots.
+The `native-budgets` map separates operator policy, pre-dispatch admission and usage reconstruction. At `b8e82167` it contains 22 files and 36 directed source pairs; open `graphify-out/navigation/native-budgets/graph.html`. Older map receipts remain historical snapshots.
 
 1. [`cli-budget-commands.ts`](../src/cli-budget-commands.ts) exposes reviewed budget signing and status. [`cli-tools-commands.ts`](../src/cli-tools-commands.ts) exposes reviewed tool grants separately. Signing validates the existing bytes instead of replacing the policy with defaults.
 2. [`llmRuntime.ts`](../src/llm/adapter/llmRuntime.ts) admits a model dispatch after request preparation and before transport. [`policyGuards.ts`](../src/tools/guards/policyGuards.ts) admits a native tool before its body executes.

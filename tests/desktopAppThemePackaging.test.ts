@@ -97,9 +97,14 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("const launchCommand = demoMode");
     expect(app).toContain('setAttribute("aria-label", "Toggle navigation")');
     expect(app).toContain('nav.classList.toggle("mobile-nav-open"');
-    expect(read("src/console/assets/sw.js")).toContain('CACHE_NAME = "amc-console-v7"');
-    expect(read("src/console/assets/sw.js")).toContain("self.skipWaiting()");
-    expect(read("src/console/assets/sw.js")).toContain('req.mode === "navigate"');
+    const worker = read("src/console/assets/sw.js");
+    expect(worker).toMatch(/const CACHE_NAME = "amc-console-v[1-9]\d*";/);
+    const staticAssets = worker.match(/function staticAssets\(\) \{([\s\S]*?)\n\}/)?.[1];
+    for (const asset of ["native-tasks", "assets/nativeTasks.js", "assets/nativeTasksView.js", "assets/nativeTasks.css"]) {
+      expect(staticAssets).toContain(`assetPath("${asset}")`);
+    }
+    expect(worker).toContain("self.skipWaiting()");
+    expect(worker).toContain('req.mode === "navigate"');
   });
 
   test("CLI format uses the same public website green and tagline", () => {

@@ -46,7 +46,7 @@ The service retains at most 512 displayed events and 2 MiB of event text, 32 adm
 
 ## API clients and hosted workspaces
 
-The typed API is `/api/v1/native-tasks`; the [OpenAPI reference](../website/openapi.yaml) documents options, listing, committed updates, submissions and revision-bound controls. Responses use `{ok: true, data: ...}` and `Cache-Control: no-store`. A `202` means admission or cancellation was recorded, not that a task succeeded.
+The typed API is `/api/v1/native-tasks`; Studio's `/openapi.yaml` reference documents options, listing, committed updates, submissions and revision-bound controls. See [API surfaces](API_SURFACES.md) for the public reference. Responses use `{ok: true, data: ...}` and `Cache-Control: no-store`. A `202` means admission or cancellation was recorded, not that a task succeeded.
 
 Mutations require `x-amc-native-intent: task-workspace-v1`. Human session-cookie clients must also send `x-amc-native-csrf` from the options response or `/auth/me`, plus an `Origin` matching the configured browser origin and request host. Keep the proof out of URLs. Bootstrap admin-token clients may omit Origin and CSRF, but must send the intent header; supplied origins are still validated. Agent tokens and leases cannot act as human task owners.
 

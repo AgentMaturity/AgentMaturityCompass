@@ -469,7 +469,12 @@ describe("AMC-1472 outcome-based onboarding", () => {
     expect(commandCount).toBeGreaterThan(0);
     expect(studioSource).toContain(`${commandCount.toLocaleString("en-US")} CLI paths`);
     const worker = readFileSync("src/console/assets/sw.js", "utf8");
-    expect(worker).toContain('const CACHE_NAME = "amc-console-v7"');
+    expect(worker).toMatch(/const CACHE_NAME = "amc-console-v[1-9]\d*";/);
+    const staticAssets = worker.match(/function staticAssets\(\) \{([\s\S]*?)\n\}/)?.[1];
+    expect(staticAssets).toContain('assetPath("native-tasks")');
+    expect(staticAssets).toContain('assetPath("assets/nativeTasks.js")');
+    expect(staticAssets).toContain('assetPath("assets/nativeTasksView.js")');
+    expect(staticAssets).toContain('assetPath("assets/nativeTasks.css")');
     expect(worker).toContain('if (!url.pathname.includes("/assets/"))');
     expect(worker.indexOf("fetch(req)")).toBeLessThan(worker.lastIndexOf("caches.match(req)"));
     expect(readFileSync("src/console/pages/home.html", "utf8")).toContain("?v=20260908a");
