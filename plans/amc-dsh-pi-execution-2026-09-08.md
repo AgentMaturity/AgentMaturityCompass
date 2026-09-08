@@ -8,11 +8,21 @@ Make AMC an installable, usable standalone governed agent runtime. Its model loo
 
 The August superharness plan and state ledger are historical snapshots. Current source already has Cordis composition, a native agent loop, signed JSONL/SQLite sessions, guarded tool execution, approvals, provider streaming, delegation, prompt caching and score-input verification. Do not recreate these or repeat old verified-absence claims. At the initial audit the native `agent-loop` command was hidden and checkout-only because `@amc/core` was private/workspace-backed. Commit `616b7a6b` bundled that closure into the local package, and later dated installed-artifact receipts exercised it. Those receipts do not qualify the current implementation batch. A local bundle does not establish a public release.
 
-## Active next implementation — Native Tasks in Studio
+## Native Tasks in Studio — local acceptance, September 9
 
-[AMC-1536](https://linear.app/agentmaturitycompass/issue/AMC-1536) adds direct governed native tasks, activity, approvals, cancellation and signed resume inside Studio. The current terminal handoff and stale default-agent copy leave this path incomplete. Source work is in progress; implementation precedes testing. The accepted gate below applies to its exact source, not these edits. [Implementation contract](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-task-workspace.md). Current queue: 31 children, 27 In Review and 4 In Progress.
+AMC-1536 implements a standalone native task workspace in Studio: selected-agent tasks, committed conversation and tool activity, actual signed approvals, cancellation, release/resume and separate evidence verification. It uses AMC's native SDK/ACP, signed descriptors and execution controls; no DSH or Pi runtime is required. Scope changes during approval/model waits cannot widen an accepted task. Cookie origin/CSRF checks, demo limits, owner binding, idempotency and bounded lifecycle are enforced.
 
-## Current checkpoint
+Execution source `b8e82167` built successfully and passed 111/111 focused runtime cases plus all 10 actual installed Chromium scenarios on macOS ARM64/Node22 with the deterministic native stub. Four native cold verifiers and the whole ledger passed after orderly shutdown. The live Verify screen correctly reports the incomplete whole-ledger result while the gateway is open; that is not a positive cryptographic result.
+
+The original full run remains **13/14 executed checks passed, with 11,582/11,587 tests passing and five documentation/presentation failures**; live deployment health was skipped. Those failures are corrected. Seven affected suites have passing results covering 49 distinct cases across the scoped follow-ups, with publisher consistency and test types passing. This is a composite disposition, not a new full-suite pass. Final correction source `0ac9be93` changes docs/tests and API-reference metadata after b8; native task execution is unchanged. No full-suite repetition or package repack was done for these corrections.
+
+Graphify 0.9.56 at b8 maps 25,461 symbols and 76,408 relations into seven focused maps. The actual Obsidian vault now contains 306 generated notes and seven canvases; 1,018 wiki links, 215 file cards, 400 canvas edges and 38 source-backed reading paths resolve. The new Native Studio map contains 31 files and 50 directed dependencies. Static navigation is separate from runtime evidence.
+
+Current queue: **31 children, 28 In Review and 3 In Progress**. AMC-1536 is In Review. AMC-1512 retains real-provider and human first-use evidence; AMC-1518 retains matched comparative outcomes; AMC-1530 retains the broader platform/install matrix. Browser positive file editing, service-worker/offline behavior, physical mobile devices and live deployment are not qualified by the deterministic browser run. No measured 10x advantage, public release or standard adoption is claimed.
+
+Evidence: `AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-task-acceptance/final-disposition.json` (SHA256 `079ac61f48cd80077ee2769b594d720fbada1ca423216bb179d04533a669ff66`), plus `studio-native-browser-acceptance/` and `native-studio-graphify-b8e82167/`. Private accepted package SHA256: `cfd5ccc4f4563f683f2558535d16d844d769ebc7eabf067e43857a9b95bdd553`. Actual Obsidian Home, Now, Roadmap, Current Operations and Native Studio Task Workspace notes are reconciled to these receipts.
+
+## Historical accepted baseline — before Native Studio
 
 AMC owns its provider loop, streaming chat, workspace file tools and confined Linux shell, authenticated approvals, signed budgets, delegation, sessions, resume/fork, origin-addressed compaction, signed extensions, stdio/HTTP MCP and TypeScript/Python SDKs. Native execution requires neither DSH nor Pi.
 
