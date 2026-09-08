@@ -21,12 +21,15 @@ from graphify.export import to_canvas, to_html, to_json, to_obsidian
 
 MAPS = {
     "native-runtime": [
-        "src/cli-agent-commands.ts", "src/kernel/agentLoopRunner.ts",
+        "src/cli-agent-commands.ts", "src/cli-agent-options.ts", "src/kernel/agentLoopRunner.ts",
         "src/kernel/amcRuntime.ts",
         "src/kernel/services/agentLoopServices.ts", "src/kernel/services/llmServices.ts",
         "src/kernel/services/promptServices.ts", "src/kernel/services/approvalServices.ts",
         "src/agent/agentDriver.ts", "src/agent/stepRunner.ts", "src/agent/approvalGate.ts",
         "src/agent/pipelineToolSeam.ts", "src/agent/agentToolset.ts", "src/agent/subagentRunner.ts",
+        "src/agent/delegateTool.ts", "src/agent/subagentSpawn.ts",
+        "src/agent/delegationIdentity.ts", "src/agent/delegationScope.ts",
+        "src/agent/delegationEvidenceWriter.ts", "src/fleet/delegationPacket.ts",
         "src/agent/runReport.ts",
         "src/tools/toolPipeline.ts", "src/llm/adapter/llmRuntime.ts",
         "src/session/sessionService.ts", "src/session/sessionSpine.ts",
@@ -44,6 +47,7 @@ MAPS = {
     ],
     "evidence-imports": [
         "src/cli-import-commands.ts", "src/importers/neutralImporter.ts",
+        "src/importers/neutralImportPresentation.ts",
         "src/importers/traceMapping.ts", "src/importers/piSessionImport.ts",
         "src/importers/dshSessionImport.ts", "src/importers/dshSessionContract.ts",
         "src/importers/piTelemetryCallbacks.ts", "src/importers/callbackTelemetryCapture.ts",
@@ -74,11 +78,12 @@ MAPS = {
         "scripts/qualify-platform.mjs", "scripts/release-gate.mjs",
     ],
     "native-integrations": [
-        "src/cli-agent-commands.ts", "src/setup/nativeFirstUseGuide.ts",
+        "src/cli-agent-commands.ts", "src/cli-agent-options.ts", "src/setup/nativeFirstUseGuide.ts",
         "src/setup/nativeInteractiveSession.ts", "src/setup/nativeMcpConfig.ts",
         "src/setup/nativeChatProfile.ts", "src/setup/nativeInteractiveApprovals.ts",
         "src/setup/nativeApprovalIdentity.ts", "src/cli-native-extension-commands.ts",
         "src/approvals/nativeApprovalLogin.ts", "src/approvals/nativeApprovalLoginCli.ts",
+        "src/auth/authApi.ts", "src/agent/delegationScope.ts",
         "src/extensions/nativeExtensionManifest.ts", "src/extensions/nativeExtensionStore.ts",
         "src/extensions/nativeExtensionRuntime.ts", "src/skills/skillTurn.ts",
         "src/mcp/nativeMcpClient.ts", "src/sdk/nativeAgentClient.ts", "src/sdk/index.ts",

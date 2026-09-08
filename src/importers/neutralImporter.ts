@@ -10,7 +10,7 @@ import { writeEpisodeRecord, type WriteEpisodeRecordResult } from "../lifecycle/
 import { writeLifecycleRunArtifact, type WriteLifecycleRunArtifactResult } from "../lifecycle/lifecycleRunArtifact.js";
 import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
-import { parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
+import { PiSessionFormatError, parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
 import { tracesFromCandidate } from "./traceMapping.js";
 import { parseDetectedCallbackTelemetry, parseCallbackTelemetry, callbackTelemetryTraces, callbackTelemetryWarnings,
   type ParsedCallbackTelemetry } from "./callbackTelemetryImport.js";
@@ -524,8 +524,9 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
       piSession = !dshSession && format === "jsonl" ? parseDetectedPiSession(text) : null;
       callbackTelemetry = format === "json" ? parseDetectedCallbackTelemetry(text) : null;
       parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(file, format);
-    } catch {
-      unsupported.push({ path: file, kind: "malformed", reason: `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
+    } catch (error) {
+      unsupported.push({ path: file, kind: "malformed", reason: error instanceof PiSessionFormatError ? error.message
+        : `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
       continue;
     }
     const category = dshSession || piSession || callbackTelemetry ? "event-log" : detectCategory(file, format, parsed);

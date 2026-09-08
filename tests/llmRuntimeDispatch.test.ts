@@ -23,6 +23,7 @@ import {
 } from "../src/llm/index.js";
 import type { HttpTransport, LlmAdapter, StreamChunk } from "../src/llm/index.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { ANTHROPIC_CAPABILITIES } from "../src/llm/adapter/providerCapabilities.js";
 import {
   anthropicTextStream,
   errorResponse,
@@ -95,6 +96,7 @@ class StubCredentials implements CredentialsService {
 /** An adapter that replays a scripted chunk list, ignoring the wire entirely. */
 function scriptedAdapter(chunks: readonly StreamChunk[], id = "scripted"): LlmAdapter {
   return {
+    capabilities: { ...ANTHROPIC_CAPABILITIES, usage: "synthetic-demonstration" },
     id,
     version: 1,
     encoderId: "anthropic-messages",

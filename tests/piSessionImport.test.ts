@@ -186,6 +186,19 @@ describe("AMC-1507 — Pi v3 session import", () => {
     }
   });
 
+  test("an invalid version value produces a useful diagnostic without echoing source values", () => {
+    const secret = "synthetic-version-secret-never-render";
+    const workspace = scratch("amc-pi-ws-");
+    for (const version of [secret, { private: secret }]) {
+      const inputPath = writeSession([header({ version }), user("m1", null, "hi", 1)]);
+      const plan = validateNeutralImport({ workspace, inputPath, agentId: "default" });
+      expect(plan.status).toBe("unsupported");
+      expect(plan.unsupported[0]?.reason).toContain("invalid version field");
+      expect(JSON.stringify(plan)).not.toContain(secret);
+      expect(plan.candidates).toEqual([]);
+    }
+  });
+
   test("provenance stays self-reported and redacted, with the source digest", () => {
     const rows = [header(), user("m1", null, "key sk-testsecret123456 please", 1),
       assistant("m2", "m1", 2, { stopReason: "stop", content: [{ type: "text", text: "no" }] })];

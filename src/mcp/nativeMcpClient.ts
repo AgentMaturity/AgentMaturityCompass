@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport, getDefaultEnvironment } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { ToolListChangedNotificationSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { ToolListChangedNotificationSchema, CallToolResultSchema, McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
 import type { AgentToolset } from "../agent/agentToolset.js";
 import type { ActionClass } from "../types.js";
@@ -23,6 +23,7 @@ export interface NativeMcpCatalogTool {
   readonly inputSchema: Record<string, unknown>;
   readonly outputSchema: Record<string, unknown> | null;
   readonly annotations: Record<string, unknown> | null;
+  readonly execution: Record<string, unknown> | null;
 }
 
 export interface NativeMcpCatalog {
@@ -83,7 +84,8 @@ async function catalog(client: Client, server: NativeMcpServer, timeout: number,
     for (const tool of page.tools) {
       if (tools.length >= 256 || tools.some((item) => item.name === tool.name)) throw new Error("MCP catalog is oversized or repeats a tool name");
       tools.push({ name: tool.name, description: tool.description ?? "", inputSchema: tool.inputSchema,
-        outputSchema: tool.outputSchema ?? null, annotations: tool.annotations ?? null });
+        outputSchema: tool.outputSchema ?? null, annotations: tool.annotations ?? null,
+        execution: tool.execution ?? null });
     }
     cursor = page.nextCursor;
     if (cursor) { if (cursors.has(cursor)) throw new Error("MCP catalog pagination repeated a cursor"); cursors.add(cursor); }
@@ -161,14 +163,19 @@ export async function mountNativeMcpServer(options: {
     await client.connect(transport, { timeout, signal: options.signal });
     const initial = await catalog(client, server, timeout, options.signal);
     if (!active || initial.digest !== options.expectedCatalogDigest) throw new Error("MCP catalog differs from the reviewed digest");
-    const validators = new AjvJsonSchemaValidator();
     const names: string[] = [];
     for (const grant of options.grants) {
       const remote = initial.tools.find((tool) => tool.name === grant.name);
       if (!remote) throw new Error("MCP grant names a tool absent from the pinned catalog");
+      // This mount runs synchronous calls. Preserve task admission explicitly;
+      // the SDK's page-local metadata cache cannot establish this capability.
+      if (remote.execution?.taskSupport === "required") throw new Error("MCP tool requires unsupported task-based execution");
       // Stable short names satisfy provider function-name constraints without alias collisions.
       const name = nativeMcpToolName(server.id, remote.name);
-      const validate = validators.getValidator(remote.inputSchema);
+      // Each reviewed schema has its own namespace. Reusing an Ajv instance
+      // lets one tool's $id select a different tool's previously cached schema.
+      const validate = new AjvJsonSchemaValidator().getValidator(remote.inputSchema);
+      const validateOutput = remote.outputSchema === null ? null : new AjvJsonSchemaValidator().getValidator(remote.outputSchema);
       if (toolset.registry.visible(agentId).has(name)) throw new Error("MCP tool registration would shadow an existing capability");
       names.push(name);
       dispose.push(toolset.registry.define({ name, actionClass: grant.actionClass,
@@ -185,12 +192,19 @@ export async function mountNativeMcpServer(options: {
           try {
             const current = await catalog(client, server, timeout, signal);
             if (!active || current.digest !== initial.digest) { await close(); throw new Error("catalog changed"); }
-            const result = await client.callTool({ name: remote.name, arguments: { ...execution.arguments } }, undefined, { timeout, signal });
+            // listTools() resets the SDK output-validator cache for EACH page.
+            // Accept only AMC's pinned per-tool schema, independently of that
+            // mutable cache and before redaction changes returned values.
+            const result = await client.request({ method: "tools/call", params: { name: remote.name, arguments: { ...execution.arguments } } }, CallToolResultSchema, { timeout, signal });
+            if (validateOutput !== null) {
+              if (result.structuredContent === undefined && result.isError !== true) throw new Error("MCP structured output is missing");
+              if (result.structuredContent !== undefined && !validateOutput(result.structuredContent).valid) throw new Error("MCP structured output does not match the reviewed schema");
+            }
             const output = JSON.stringify(scrubResult(result, Object.values(server.env ?? {}).filter(Boolean)));
-            return { output, bytes: Buffer.byteLength(output), exitCode: result.isError === true ? 1 : 0 };
+            return { ok: result.isError !== true, output, bytes: Buffer.byteLength(output), exitCode: result.isError === true ? 1 : 0 };
           } catch (error) {
             await close().catch(() => {});
-            return { exitCode: 1, timedOut: error instanceof McpError && error.code === ErrorCode.RequestTimeout,
+            return { ok: false, exitCode: 1, timedOut: error instanceof McpError && error.code === ErrorCode.RequestTimeout,
               output: signal?.aborted ? "MCP call cancelled; connection and grants disposed" : "MCP call failed or catalog changed; review and mount again" };
           } finally { signal?.removeEventListener("abort", abort); }
         }

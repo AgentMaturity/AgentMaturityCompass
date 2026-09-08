@@ -5,8 +5,8 @@ requirement, does not replace AMC tools or sessions, and is not needed to use
 AMC. A manifest can contain only AMC for native conformance, or add independently
 installed comparator artifacts for a matched study.
 
-The source runner and concrete AMC-only corpus exist; no benchmark execution or
-superiority result is claimed by this implementation. Source audits and
+The source runner and concrete AMC-only corpus make no superiority claim.
+Execution claims require the artifact-specific trial receipts. Source audits and
 automated install contracts are separate evidence from task trials and human
 usability studies.
 
@@ -63,7 +63,7 @@ that is a plan, **not an executed sample count**.
 
 | Case | Real action | Independent observable checks |
 | --- | --- | --- |
-| Echo | Native CLI, installed stub transport and echo demo tool | Actual call/result rows, fixture bytes, two recorded requests, both cold verifiers |
+| Echo | Native CLI, installed stub transport and echo demo tool | Exact signed arguments/result equality, original prompt bytes retained, two recorded requests, both cold verifiers |
 | No tools | Explicit native `tools=none` | Recorded assistant turn, zero dispatch/result rows, valid closure |
 | Step bound | One-step native loop with echo | Exactly one request/step, actual tool call, signed `max_steps` ending |
 | Retry | Installed stub's one-429 failure injection | Durable request failure, one signed retry, second request and completion |
@@ -72,8 +72,8 @@ that is a plan, **not an executed sample count**.
 | Fork | Fork a closed verified parent | Distinct child, signed exact parent head/sequence, unchanged parent |
 | Compaction | Apply explicit summary to a measured user origin | Exact UTF-8 byte difference, replacement hash, raw origin retained, successful continuation |
 | Stale edit refusal | Reuse a reviewed head after compaction advanced it | Explicit refusal and byte-identical event/hash/signature snapshot across refusal |
-| Tampering | Change one stored signature in the disposable fixture | Both verifiers pass before mutation and refuse afterwards; exactly one signature changed |
-| Crash recovery | SIGKILL the real CLI after a durable request header | Dead owner takeover, signed synthetic closure, unchanged prefix, no redispatch |
+| Tampering | Prove ordinary mutation refusal, then model privileged offline signature corruption in the disposable fixture | Original storage-trigger schema restored; both verifiers pass before corruption and refuse afterwards; exactly one signature changed |
+| Crash recovery | SIGKILL the real CLI after a durable request header, then wait beyond the default freshness window | Ordinary recovery without force/stale override; dead owner takeover, signed synthetic closure, unchanged prefix, no redispatch |
 | Public SDK continuation | Installed `./sdk/native`, committed-update iteration, release, fresh-client load and close | Replayed history, two actual turns, unchanged signed prefix, SDK receipt plus both cold verifiers |
 
 The adapter uses AMC's installed process runner with bounded captures/deadlines
@@ -94,11 +94,22 @@ no provider calls and no price/cost observations. A Node preload refuses socket,
 DNS, HTTP and fetch entry points in fixture and native processes. This boundary
 is for trusted offline fixture code; it is not kernel confinement or protection
 against native addons. Echo checks the side-effect-free demo tool, not workspace
-shell/write approval enforcement. Fork checks branching, not subagent
+shell/write approval enforcement. The synthetic stub chooses the last encoded
+user text, which may be a later runtime-context snapshot. Exact echo arguments
+and result bytes are compared while the original prompt's persisted bytes are
+checked independently; this is not a prompt-following or semantic task-quality
+test. Fork checks branching, not subagent
 delegation. Crash recovery interrupts a request before tool dispatch and does
 not measure recovery of an uncertain external side effect. Step exhaustion
 measures the native step bound, not tokens or spend. Compaction measures payload
-bytes, not token savings. SDK updates are committed completed blocks, not a
+bytes, not token savings. The tamper fixture briefly removes its own exact
+immutable-update trigger after proving ordinary mutation refusal, restores the
+original trigger SQL before verification, and checks the resulting schema
+fingerprints. Production policy is unchanged. The crash fixture waits an actual
+61 seconds after its process has been killed; this deliberate freshness wait is
+part of wall time. SDK results, streamed updates and loaded history are compared
+exactly against authenticated assistant/user payloads and session identities.
+SDK updates are committed completed blocks, not a
 provider token-latency measurement. Timings include CLI/adapter startup,
 workspace initialization and runtime-inventory hashing.
 
@@ -106,8 +117,9 @@ The missing injection, redaction, tool-error attribution and unsupported
 capability scenarios remain explicit coverage gaps. Live model evaluation,
 DSH/Pi execution and human usability/evidence-preparation studies are unavailable
 in this corpus. They cannot contribute a zero, pass, ranking or tenfold claim.
-The source scripts, materializer and trials remain **unexecuted** until the
-deferred implementation-batch qualification.
+Every materialization and trial run must retain its actual artifact and helper
+hashes, failures, corrected-fixture provenance and final outcomes. A corrected
+oracle rerun must never overwrite or relabel the original failed receipt.
 
 ## Inputs and execution
 

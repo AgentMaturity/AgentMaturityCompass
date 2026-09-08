@@ -1,7 +1,7 @@
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { createAcpAgent, type AcpAgent } from "../src/acp/acpAgentServer.js";
 import { checkAcpDefinition } from "../src/acp/acpSchema.js";
@@ -27,6 +27,7 @@ const agents: AcpAgent[] = [];
 
 interface Harness {
   readonly agent: AcpAgent;
+  readonly workspace: string;
   readonly sent: Record<string, unknown>[];
   send(message: Record<string, unknown>): void;
   /** Resolve the pending stub prompt. */
@@ -35,17 +36,21 @@ interface Harness {
 }
 
 /** A session whose prompt resolves only when the test says so. */
-function stubSession(cancels: string[], pending: { resolve?: (r: AgentPromptResult) => void }): AgentSession {
+function stubSession(sessionId: string, cancels: string[], pending: { resolve?: (r: AgentPromptResult) => void }): AgentSession {
   return {
-    sessionId: "stub",
+    sessionId,
     prompt: () => new Promise<AgentPromptResult>((resolve) => { pending.resolve = resolve; }),
-    cancel: (_cause, by) => { cancels.push(by); },
+    cancel: (_cause, by) => {
+      cancels.push(by);
+      if (by === "acp-shutdown") pending.resolve?.({ ok: false, reason: "cancelled" });
+    },
     readEvents: (): readonly EvidenceEvent[] => [],
     close: () => undefined
   };
 }
 
 function harness(): Harness {
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", "acp-protocol-fixture-passphrase");
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-acp-")));
   dirs.push(dir);
   initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
@@ -62,12 +67,13 @@ function harness(): Harness {
         if (line.length > 0) sent.push(JSON.parse(line) as Record<string, unknown>);
       }
     },
-    sessionFactory: () => stubSession(cancels, pending)
+    sessionFactory: ({ sessionId }) => stubSession(sessionId, cancels, pending)
   });
   agents.push(agent);
 
   return {
     agent,
+    workspace: dir,
     sent,
     cancels,
     send: (message) => agent.connection.ingest(Buffer.from(`${JSON.stringify(message)}\n`, "utf8")),
@@ -90,9 +96,10 @@ async function initialized(): Promise<Harness> {
   return h;
 }
 
-afterEach(() => {
-  for (const agent of agents.splice(0)) agent.close();
+afterEach(async () => {
+  for (const agent of agents.splice(0)) await agent.close();
   for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true });
+  vi.unstubAllEnvs();
 });
 
 describe("the handshake", () => {
@@ -102,8 +109,8 @@ describe("the handshake", () => {
     expect(result["protocolVersion"]).toBe(1);
 
     const capabilities = result["agentCapabilities"] as Record<string, unknown>;
-    // False rather than absent, because there is no path to re-attach a driver
-    // to a sealed session. Claiming it would be the undeclarable kind of lie.
+    // This fixture supplies no verified resume factory, so loading must not
+    // be advertised merely because the production host can compose it.
     expect(capabilities["loadSession"]).toBe(false);
     // Absent is normatively unsupported: none of these has a handler.
     for (const never of ["sessionCapabilities", "mcpCapabilities"]) {
@@ -114,7 +121,7 @@ describe("the handshake", () => {
 
   it("refuses session work before initialize, and says which problem it is", async () => {
     const h = harness();
-    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: "/tmp", mcpServers: [] } });
+    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
     await settle();
     // -32002, not -32601. The method exists; reporting method-not-found would
     // send a client hunting a capability problem it does not have.
@@ -132,23 +139,33 @@ describe("the handshake", () => {
 describe("session/new", () => {
   it("opens a session", async () => {
     const h = await initialized();
-    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: "/tmp", mcpServers: [] } });
+    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
     await settle();
     expect(resultOf(replyTo(h.sent, 1))["sessionId"]).toBeTypeOf("string");
+  });
+
+  it("refuses a different workspace rather than silently running under the launch directory", async () => {
+    const h = await initialized();
+    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: join(h.workspace, "other-root"), mcpServers: [] } });
+    await settle();
+    expect(errorOf(replyTo(h.sent, 1))).toMatchObject({ code: -32602 });
+    expect(errorOf(replyTo(h.sent, 1)).message).toContain("workspace is fixed");
+    expect(replyTo(h.sent, 1)?.["result"]).toBeUndefined();
   });
 
   it("refuses MCP servers loudly instead of accepting and ignoring them", async () => {
     const h = await initialized();
     h.send({
       jsonrpc: "2.0", id: 1, method: "session/new",
-      params: { cwd: "/tmp", mcpServers: [{ name: "x", command: "y", args: [], env: [] }] }
+      params: { cwd: h.workspace, mcpServers: [{ name: "x", command: "y", args: [], env: [] }] }
     });
     await settle();
     const error = errorOf(replyTo(h.sent, 1));
     expect(error.code).toBe(-32602);
     // Silently ignoring the array is the dishonest form and the easy one to
     // write by accident: the client would believe its servers were connected.
-    expect(error.message).toContain("MCP server");
+    expect(error.message).toContain("client-selected MCP commands");
+    expect(error.message).toContain("--mcp-config");
   });
 
   it("refuses params the schema rejects", async () => {
@@ -164,7 +181,7 @@ describe("session/new", () => {
 describe("session/prompt and cancellation", () => {
   async function promptingHarness(): Promise<{ h: Harness; sessionId: string }> {
     const h = await initialized();
-    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: "/tmp", mcpServers: [] } });
+    h.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: h.workspace, mcpServers: [] } });
     await settle();
     return { h, sessionId: resultOf(replyTo(h.sent, 1))["sessionId"] as string };
   }
@@ -239,7 +256,7 @@ describe("the frames it emits", () => {
   it("validates every response against the vendored schema", async () => {
     const { h, sessionId } = await (async () => {
       const started = await initialized();
-      started.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: "/tmp", mcpServers: [] } });
+      started.send({ jsonrpc: "2.0", id: 1, method: "session/new", params: { cwd: started.workspace, mcpServers: [] } });
       await settle();
       return { h: started, sessionId: resultOf(replyTo(started.sent, 1))["sessionId"] as string };
     })();

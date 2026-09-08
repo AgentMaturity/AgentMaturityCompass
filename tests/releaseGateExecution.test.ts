@@ -61,7 +61,7 @@ describe("release gate execution and qualification scope", () => {
     expect(f.calls.findIndex((call) => call.id === "build")).toBeLessThan(f.calls.indexOf(packed[0]!));
     expect(f.calls.filter((call) => call.args.join(" ") === "run build")).toHaveLength(1);
     expect(receipt).toMatchObject({ status: "passed", qualification: "complete", partial: false,
-      counts: { executed: 14, passed: 14, failed: 0, skipped: 0, total: 14 } });
+      counts: { executed: 15, passed: 15, failed: 0, skipped: 0, total: 15 } });
     const inventory = receipt.steps.find((step: { id: string }) => step.id === "command-inventory");
     expect(inventory.artifact).toMatchObject({ temporary: true, retained: false });
     expect(inventory.artifact.path.startsWith(f.root)).toBe(false);
@@ -79,7 +79,7 @@ describe("release gate execution and qualification scope", () => {
     const f = fixture();
     const receipt = await releaseGate({ root: f.root, execute: f.execute, quick: true, liveUrl: "" });
     expect(receipt).toMatchObject({ status: "passed", qualification: "partial", partial: true,
-      counts: { executed: 10, passed: 10, failed: 0, skipped: 4, total: 14 } });
+      counts: { executed: 11, passed: 11, failed: 0, skipped: 4, total: 15 } });
     expect(receipt.steps.filter((step: { status: string }) => step.status === "skipped").map((step: { id: string }) => step.id))
       .toEqual(["packed-install", "full-test-suite", "install-persona-qa", "live-deploy-health"]);
     expect(f.calls.some((call) => ["packed-install", "full-test-suite", "install-persona-qa"].includes(call.id))).toBe(false);
@@ -93,7 +93,7 @@ describe("release gate execution and qualification scope", () => {
     const f = fixture();
     const receipt = await releaseGate({ root: f.root, execute: f.execute, liveUrl: "" });
     expect(receipt).toMatchObject({ status: "passed", qualification: "partial", partial: true,
-      counts: { executed: 13, passed: 13, failed: 0, skipped: 1, total: 14 } });
+      counts: { executed: 14, passed: 14, failed: 0, skipped: 1, total: 15 } });
     expect(receipt.summary).toContain("live-deploy-health");
   });
 
@@ -108,7 +108,7 @@ describe("release gate execution and qualification scope", () => {
       expect(result.remediation).toMatch(/Build failed/);
     }
     expect(receipt).toMatchObject({ status: "failed", qualification: "failed", partial: true,
-      counts: { executed: 8, passed: 7, failed: 1, skipped: 6, total: 14 } });
+      counts: { executed: 9, passed: 8, failed: 1, skipped: 6, total: 15 } });
     expect(readFileSync(f.tracked, "utf8")).toBe("keep tracked inventory unchanged\n");
     expect(existsSync(join(f.root, "tmp", "release-gate"))).toBe(false);
   });
@@ -117,7 +117,7 @@ describe("release gate execution and qualification scope", () => {
     const f = fixture(["packed-install"]);
     const receipt = await releaseGate({ root: f.root, execute: f.execute, liveUrl: "https://health.example.invalid" });
     expect(receipt).toMatchObject({ status: "failed", qualification: "failed", partial: false,
-      counts: { executed: 14, passed: 13, failed: 1, skipped: 0, total: 14 } });
+      counts: { executed: 15, passed: 14, failed: 1, skipped: 0, total: 15 } });
     expect(receipt.remediations).toEqual([{ id: "packed-install", status: "failed", remediation: "repair fixture" }]);
   });
 

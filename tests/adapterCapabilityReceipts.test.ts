@@ -67,7 +67,9 @@ afterAll(() => {
 describe("adapter capability declarations", () => {
   test("all built-ins declare exact events, controls, lossiness, version semantics, and fixture evidence", () => {
     const adapters = listBuiltInAdapters();
-    expect(adapters).toHaveLength(15);
+    expect(adapters).toHaveLength(16);
+    expect(adapters.filter(adapter => adapter.capabilities.verification.status === "unverified").map(adapter => adapter.id))
+      .toEqual(["deepseek-harness"]);
 
     for (const adapter of adapters) {
       const declaration = adapter.capabilities;
@@ -79,7 +81,7 @@ describe("adapter capability declarations", () => {
       expect(new Set(declaration.controls.map((row) => row.id)).size).toBe(declaration.controls.length);
       expect(declaration.lossiness.level).not.toBe("unknown");
       expect(declaration.lossiness.omitted.length).toBeGreaterThan(0);
-      expect(declaration.verification.status).toBe("fixture_verified");
+      expect(declaration.verification.status).toBe(adapter.id === "deepseek-harness" ? "unverified" : "fixture_verified");
       expect(declaration.verification.authority).toBe("amc");
       expect(declaration.verification.evidenceRefs.length).toBeGreaterThan(0);
     }

@@ -45,7 +45,9 @@ describe("matched harness execution receipts", () => {
   test("records an actual oracle pass while missing timing-independent metrics remain unknown", async () => {
     const context = fixture(); const report = await context.run(); const trial = report.trials[0]!;
     expect(trial.status).toBe("executed"); expect(trial.verdict).toBe("pass");
-    expect(trial.process?.durationMs).toBeGreaterThanOrEqual(0); expect(trial.observations).toBeNull();
+    expect(trial.process?.durationMs).toBeGreaterThan(0);
+    expect(trial.process?.durationMs).toBeLessThan(context.manifest.lanes[0]!.budgets.timeoutMs);
+    expect(trial.observations).toBeNull();
     const group = summarizeHarnessComparison(report).groups[0]!;
     expect(group.commandsExecuted).toBe(1); expect(group.costUsd).toMatchObject({ samples: 0, mean: null, unknown: 1 });
     expect(group.inputTokens).toMatchObject({ samples: 0, mean: null, unknown: 1 });

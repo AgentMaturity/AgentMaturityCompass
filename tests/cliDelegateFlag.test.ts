@@ -200,11 +200,11 @@ describe("amc agent-loop run --delegate", () => {
     const tightened = programWith();
     await run(tightened.program, argvFor(["--delegate", "--max-delegation-depth", "1", "--json"]));
     expect(tightened.captured.failures).toEqual([]);
-    expect(tightened.captured.out.join("\n")).toContain("bounded at depth 1");
+    expect(tightened.captured.errors.join("\n")).toContain("bounded at depth 1");
 
     const defaulted = programWith();
     await run(defaulted.program, argvFor(["--delegate", "--json"]));
-    expect(defaulted.captured.out.join("\n"), "and the default when none is given")
+    expect(defaulted.captured.errors.join("\n"), "and the default when none is given")
       .toContain(`bounded at depth ${DEFAULT_MAX_DELEGATION_DEPTH}`);
     // The composed native runner grants onward delegation and enforces this
     // actual depth at each generation. The signed child/grandchild behavior is
@@ -244,7 +244,7 @@ describe("the operator can scope a delegation", () => {
     await run(program, argvFor(["--delegate", "--delegate-scope", "READ_ONLY", "--json"]));
 
     expect(captured.failures).toEqual([]);
-    expect(captured.out.join("\n")).toContain("delegates are scoped to: READ_ONLY");
+    expect(captured.errors.join("\n")).toContain("delegates are scoped to: READ_ONLY");
   });
 
   it("says so when a delegate is unscoped, rather than staying quiet", async () => {
@@ -256,7 +256,7 @@ describe("the operator can scope a delegation", () => {
 
     await run(program, argvFor(["--delegate", "--json"]));
 
-    expect(captured.out.join("\n")).toContain("delegates are unscoped");
+    expect(captured.errors.join("\n")).toContain("delegates have no additional action-class scope");
   });
 
   it("refuses an action class that is not one", async () => {
@@ -280,7 +280,7 @@ describe("the operator chooses who executes a delegation", () => {
     await run(program, argvFor(["--delegate", "--json"]));
 
     expect(captured.failures).toEqual([]);
-    expect(captured.out.join("\n")).toContain("delegates run in-process");
+    expect(captured.errors.join("\n")).toContain("delegates run in-process");
   });
 
   it("refuses a foreign provider when there is no gateway to route it through", async () => {
@@ -369,7 +369,7 @@ describe("a preset composes the run", () => {
     await run(program, argvFor(["--preset", "reviewer", "--json"]));
 
     expect(captured.failures).toEqual([]);
-    expect(captured.out.join("\n"), "names the preset it composed from")
+    expect(captured.errors.join("\n"), "names the preset it composed from")
       .toContain("reviewer");
 
     // And APPLIED it. Reporting the preset is not the same as composing from

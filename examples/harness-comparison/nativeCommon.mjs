@@ -38,7 +38,9 @@ export function verifyInventory(path) {
 }
 export function dependencyRoot(from, name) {
   const require = createRequire(join(from, "package.json"));
-  for (const searchPath of require.resolve.paths(name) ?? []) {
+  // A declared npm package can share a builtin name (for example `buffer`).
+  // Search its package subpath so builtin short-circuiting cannot hide it.
+  for (const searchPath of require.resolve.paths(`${name}/package.json`) ?? []) {
     const candidate = join(searchPath, name, "package.json");
     if (existsSync(candidate)) {
       const resolved = dirname(realpathSync(candidate)), metadata = jsonFile(join(resolved, "package.json"));
@@ -83,7 +85,13 @@ export async function runtime(cli, workspace, passphrase) {
       : db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid").all(sessionId); }
     finally { db.close(); }
   };
-  return { run, runSdk, start, rows, Database, root,
+  const triggers = () => {
+    const db = new Database(join(workspace, ".amc/evidence.sqlite"), { readonly: true, fileMustExist: true });
+    try { return db.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'evidence_events' ORDER BY name").all()
+      .map(row => ({ name: row.name, sha256: createHash("sha256").update(row.sql).digest("hex") })); }
+    finally { db.close(); }
+  };
+  return { run, runSdk, start, rows, triggers, Database, root,
     async dispose() {
       const pending = [...active]; for (const child of pending) child.terminate("dispose");
       const outcomes = await Promise.allSettled(pending.map(child => child.done));

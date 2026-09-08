@@ -4,17 +4,17 @@ Generated from the live Commander command registry. Use this as the source of tr
 
 | Command | Description | Options | Aliases |
 |---|---|---|---|
-| `amc acp` | Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames) | `--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--agent-id <id>`<br>`--system-prompt <text>` | - |
+| `amc acp` | Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames) | `--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--tools <mode>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--max-tokens <n>`<br>`--max-steps <n>`<br>`--agent-id <id>`<br>`--system-prompt <text>` | - |
 | `amc action-queue` | Show prioritized actions sorted by risk-reduction-per-effort | `--limit <n>` | - |
 | `amc adapters` | Built-in adapter system for one-line agent integration | - | - |
 | `amc adapters capabilities` | Issue a signed Passport receipt for declared and effective adapter capabilities | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--out <path>`<br>`--json` | - |
-| `amc adapters configure` | Set adapter profile for an agent (signed adapters.yaml) | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--route <route>`<br>`--model <model>`<br>`--mode <mode>` | - |
+| `amc adapters configure` | Set adapter profile for an agent (signed adapters.yaml) | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--route <route>`<br>`--model <model>`<br>`--mode <mode>`<br>`--launch-config <file>` | - |
 | `amc adapters detect` | Detect installed adapter runtimes and versions | - | - |
 | `amc adapters env` | Print adapter-compatible environment exports without lease token | `--agent <agentId>`<br>`--adapter <adapterId>` | - |
 | `amc adapters init` | Create signed adapters.yaml defaults | - | - |
 | `amc adapters init-project` | Generate runnable local adapter sample for library-based frameworks | `--adapter <adapterId>`<br>`--agent <agentId>`<br>`--route <route>` | - |
 | `amc adapters list` | List built-in adapters and per-agent preferences | - | - |
-| `amc adapters run` | Run an agent under full observation: mints a lease, routes through the gateway, captures OBSERVED evidence (preferred over 'amc wrap' and 'amc supervise') | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--workorder <workOrderId>`<br>`--mode <mode>` | - |
+| `amc adapters run` | Run an adapter with a lease and process capture; model evidence requires actual gateway traffic, and tool coverage depends on native hooks | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--workorder <workOrderId>`<br>`--mode <mode>` | - |
 | `amc adapters verify` | Verify adapters.yaml signature | - | - |
 | `amc admin` | Administrative controls, identity, and trust operations | - | - |
 | `amc admin help` | Show admin-focused command groups | - | - |
@@ -31,6 +31,12 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc agent remove` | Remove an agent from the fleet | - | - |
 | `amc agent run` | Run an AMC-governed agent (content-moderation, data-pipeline, legal-contract) | `--input <input>` | - |
 | `amc agent use` | Set current agent | - | - |
+| `amc agent-loop` | Guide, run, and verify native tasks with signed session evidence (agent default) | - | - |
+| `amc agent-loop chat` | Interactive native tasks over the existing governed run/resume path (agent default) | `--extension <manifest>`<br>`--extension-pin <sha256>`<br>`--preset <id>`<br>`--persona <text>`<br>`--delegate`<br>`--max-delegation-depth <n>`<br>`--delegate-scope <classes>`<br>`--provider <id>`<br>`--model <model>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--tools <mode>`<br>`--max-tokens <n>`<br>`--max-steps <n>`<br>`--session <id>`<br>`--fork-from <id>` | - |
+| `amc agent-loop guide` | Inspect local setup without writes or provider calls and show the next native task command | `--provider <id>`<br>`--model <model>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--json` | - |
+| `amc agent-loop mcp-catalog` | Start an explicitly configured stdio MCP server, report its catalog, and dispose it (executes a local program) | `--config <path>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--json` | - |
+| `amc agent-loop run` | Run one agent turn and report what the signed log recorded | `--extension <manifest>`<br>`--extension-pin <sha256>`<br>`--stream`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--max-tokens <n>`<br>`--max-steps <n>`<br>`--tools <mode>`<br>`--tool-mode <mode>`<br>`--session <id>`<br>`--fork-from <id>`<br>`--keep-open`<br>`--delegate`<br>`--max-delegation-depth <n>`<br>`--delegate-provider <id>`<br>`--delegate-timeout <ms>`<br>`--preset <id>`<br>`--delegate-scope <classes>`<br>`--fail-first <n>`<br>`--think-ms <n>`<br>`--cancel-after <ms>`<br>`--steer <text>`<br>`--steer-after <ms>`<br>`--persona <text>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--interactive-approvals`<br>`--approval-exception <file>`<br>`--json` | - |
+| `amc agent-loop verify` | Re-derive every model request in a session from the log and check the chains | `--json` | - |
 | `amc alert` | SIEM/webhook alerting — configure and send alerts from anomalies | - | - |
 | `amc alert config` | Configure alert destinations (webhooks, Slack, PagerDuty) | `--set-webhook <url>`<br>`--set-slack <url>`<br>`--set-pagerduty <key>`<br>`--show`<br>`--json` | - |
 | `amc alert send` | Send an alert to a webhook endpoint | `--url <url>`<br>`--message <text>`<br>`--severity <level>`<br>`--agent <agentId>`<br>`--json` | - |
@@ -50,9 +56,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc api start` | Start the AMC API server (alias for 'amc up') | `--port <port>` | - |
 | `amc api status` | Show API integration status | - | - |
 | `amc approvals` | Signed approval inbox operations | - | - |
-| `amc approvals approve` | - | `--agent <agentId>`<br>`--mode <simulate|execute>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>` | - |
-| `amc approvals deny` | - | `--agent <agentId>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>` | - |
+| `amc approvals approve` | - | `--agent <agentId>`<br>`--mode <simulate|execute>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>`<br>`--session-token-file <path>`<br>`--expect-request-digest <sha256>` | - |
+| `amc approvals deny` | - | `--agent <agentId>`<br>`--reason <text>`<br>`--username <username>`<br>`--roles <roles>`<br>`--user-id <userId>`<br>`--session-token-file <path>`<br>`--expect-request-digest <sha256>` | - |
 | `amc approvals list` | - | `--agent <agentId>`<br>`--status <status>`<br>`--query <requestId>`<br>`--action-class <class>`<br>`--risk-tier <tier>`<br>`--effective-mode <mode>`<br>`--created-after <timestamp>`<br>`--created-before <timestamp>`<br>`--order <order>`<br>`--limit <count>`<br>`--json` | - |
+| `amc approvals login` | Authenticate an existing local user and write a new private tracked session-token file for native approvals | `--username <name>`<br>`--token-file <newpath>`<br>`--ttl-minutes <n>`<br>`--password-stdin`<br>`--json` | - |
 | `amc approvals show` | - | `--agent <agentId>` | - |
 | `amc archetype` | Archetype packs | - | - |
 | `amc archetype apply` | Apply archetype context/targets/guardrails/evals to an agent | `--agent <agentId>` | - |
@@ -129,6 +136,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bench compare` | Compute local vs imported ecosystem comparison | `--scope <scope>`<br>`--id <id>`<br>`--against <mode>` | - |
 | `amc bench comparison-latest` | Read latest bench comparison artifact | - | - |
 | `amc bench create` | Create deterministic signed .amcbench artifact | `--scope <scope>`<br>`--out <file.amcbench>`<br>`--id <id>`<br>`--window-days <n>`<br>`--named`<br>`--industry <value>`<br>`--agent-type <value>`<br>`--deployment <value>` | - |
+| `amc bench harness-compare` | Run pinned comparison adapters and independent oracles; unavailable measurements remain N/A | `--manifest <path>`<br>`--out <directory>`<br>`--allow-adapter-execution`<br>`--live` | - |
 | `amc bench import` | Import one bench artifact from allowlisted registry | `--registry-id <id>`<br>`--bench <benchId@version|benchId@latest>` | - |
 | `amc bench init` | Initialize signed bench policy | - | - |
 | `amc bench list-exports` | List locally exported bench artifacts | - | - |
@@ -280,6 +288,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc corrections-verify-closure` | Show open feedback loops that need closure | `--agent <id>` | - |
 | `amc costs` | Track and analyze actual agent costs from observability data | - | - |
 | `amc costs show` | Show cost report for an agent | `--agent <agentId>`<br>`--window <days>`<br>`--json` | - |
+| `amc credentials` | Provider credential references — list, describe, set, unset. Never prints a value | - | - |
+| `amc credentials describe` | Report whether a reference is configured, by which layer, and whether AMC may write it | `--json`<br>`--home <path>`<br>`--file <path>`<br>`--project-dir <path>` | - |
+| `amc credentials list` | List every reference the file-backed layers configure, plus any named explicitly | `--json`<br>`--home <path>`<br>`--file <path>`<br>`--project-dir <path>` | - |
+| `amc credentials set` | Store a value for a reference. The value is read from stdin or prompted — never from argv | `--json`<br>`--home <path>`<br>`--file <path>`<br>`--project-dir <path>` | - |
+| `amc credentials unset` | Remove a reference from the writable layer (refused when the environment supplies it) | `--json`<br>`--home <path>`<br>`--file <path>`<br>`--project-dir <path>` | - |
 | `amc dag` | Orchestration DAG capture and scoring | - | - |
 | `amc dag capture` | Capture orchestration DAG for agents | `--json` | - |
 | `amc dag score` | Score DAG governance | `--json` | - |
@@ -549,11 +562,12 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc identity provider` | Identity provider management | - | - |
 | `amc identity provider add` | Add an identity provider | `--host-dir <path>`<br>`--id <providerId>`<br>`--display-name <name>`<br>`--issuer <issuer>`<br>`--client-id <id>`<br>`--client-secret-file <path>`<br>`--redirect-uri <uri>`<br>`--scopes <scopes>`<br>`--use-well-known <bool>`<br>`--authorization-endpoint <url>`<br>`--token-endpoint <url>`<br>`--jwks-uri <url>`<br>`--entry-point <url>`<br>`--idp-cert-file <path>`<br>`--sp-entity-id <id>`<br>`--acs-url <url>` | - |
 | `amc identity verify` | Verify identity.yaml signature | `--host-dir <path>` | - |
-| `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks | `--agent <agentId>`<br>`--dry-run`<br>`--validate`<br>`--json` | - |
+| `amc import` | Import neutral traces, runs, workflow graphs, configs, memory, evals, and benchmarks | `--agent <agentId>`<br>`--dry-run`<br>`--validate`<br>`--json`<br>`--expected-digest <sha256>` | - |
 | `amc imports` | List, inspect, and roll back neutral import runs | - | - |
 | `amc imports list` | List recent neutral import runs | `--limit <n>`<br>`--json` | - |
 | `amc imports rollback` | Remove files written by a neutral import run | `--json` | - |
 | `amc imports show` | Inspect a neutral import manifest | `--json` | - |
+| `amc imports verify-profile` | Independently verify an external-evidence profile without opening a workspace | `--authorities <path>`<br>`--original <path>`<br>`--expected-digest <sha256>`<br>`--json` | - |
 | `amc improve` | Guided improvement — shows what to fix next based on your current score | `--json` | - |
 | `amc incident` | Incident tracking and response operations | - | - |
 | `amc incident close` | Close an incident with a resolution summary | `--resolution <text>` | - |
@@ -706,13 +720,17 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc monitor metrics` | Get metrics for a specific agent | `--agent <id>`<br>`--json` | - |
 | `amc monitor start` | Start continuous monitoring: scores agent at intervals, detects drift, sends alerts on degradation | `--agent <id>`<br>`--scoring-interval <ms>`<br>`--drift-interval <ms>`<br>`--score-drop-threshold <n>`<br>`--no-webhooks` | - |
 | `amc monitor status` | Show monitoring status for all agents | `--json` | - |
+| `amc native-extension` | Inspect, explicitly sign and install declarative native context and prompt commands | - | - |
+| `amc native-extension inspect` | Read manifest/content hashes and workspace signature status without loading or writing | `--expect-digest <sha256>`<br>`--json` | - |
+| `amc native-extension install` | Copy an already signed extension into the local plugin store without activation | `--expect-digest <sha256>`<br>`--json` | - |
+| `amc native-extension sign` | Sign the exact reviewed manifest with existing AMC workspace BUNDLE signing policy | `--expect-digest <sha256>`<br>`--json` | - |
 | `amc notary` | AMC Notary signing boundary operations | - | - |
 | `amc notary attest` | Generate signed notary runtime attestation bundle (.amcattest) | `--out <file>`<br>`--notary-dir <dir>`<br>`--workspace <dir>` | - |
 | `amc notary init` | Initialize AMC Notary config and signing backend | `--notary-dir <dir>`<br>`--external-command <cmd>`<br>`--external-args <args...>` | - |
 | `amc notary log-verify` | Verify notary append-only signing log + seal signature | `--notary-dir <dir>` | - |
 | `amc notary pubkey` | Print notary public key and fingerprint | `--notary-dir <dir>` | - |
 | `amc notary sign` | Sign a payload file using Notary (admin utility) | `--kind <kind>`<br>`--in <file>`<br>`--out <file>`<br>`--notary-dir <dir>` | - |
-| `amc notary start` | Start AMC Notary service (foreground) | `--notary-dir <dir>`<br>`--workspace <dir>` | - |
+| `amc notary start` | Start AMC Notary service (foreground) | `--notary-dir <dir>`<br>`--workspace <dir>`<br>`--bind <host>` | - |
 | `amc notary status` | Show notary backend and log status | `--notary-dir <dir>` | - |
 | `amc notary verify-attest` | Verify a .amcattest bundle offline | - | - |
 | `amc observe` | Observability — timeline, anomaly detection, and tracing | - | - |
@@ -895,7 +913,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release` | Deterministic release engineering and offline verification | - | - |
 | `amc release init` | Initialize AMC release signing keypair | `--write-private-to <path>` | - |
 | `amc release licenses` | Generate dependency license inventory | `--out <file>` | - |
-| `amc release pack` | Build a signed deterministic .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build` | - |
+| `amc release pack` | Build a signed .amcrelease bundle | `--out <file>`<br>`--private-key <path>`<br>`--skip-install-build` | - |
 | `amc release print` | Print release bundle manifest summary | - | - |
 | `amc release provenance` | Generate AMC provenance record | `--out <file>` | - |
 | `amc release sbom` | Generate deterministic CycloneDX SBOM | `--out <file>` | - |
@@ -995,6 +1013,15 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score task-horizon` | Score task-completion time horizon (METR-inspired) | `--json` | - |
 | `amc score tier` | Run tiered maturity assessment (quick/standard/deep) | `--tier <tier>`<br>`--question-set <version>`<br>`--json` | - |
 | `amc score transparency-log` | Score network transparency log (Merkle tree, inclusion proofs) | `--json` | - |
+| `amc session` | Native signed sessions: inspect, compact, verify, replay and recover | - | - |
+| `amc session anchor` | Anchor a closed session's root into the transparency log | `--json` | - |
+| `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
+| `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
+| `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
+| `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
+| `amc session show` | Show a session's projected conversation and its event spine | `--json` | - |
+| `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed) | `--json`<br>`--expect-monitor <fingerprint>` | - |
+| `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
 | `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
 | `amc setup` | Setup wizard for the full-score path and Studio gateway | `--provider <name>`<br>`--auto`<br>`--non-interactive`<br>`--demo` | - |

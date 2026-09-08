@@ -66,6 +66,11 @@ export interface ParsedPiSession {
   malformedLines: number[];
 }
 
+/** Only bounded format diagnostics belong in the public import plan. */
+export class PiSessionFormatError extends Error {
+  override readonly name = "PiSessionFormatError";
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -87,7 +92,9 @@ export function detectPiSession(text: string): PiSessionDetection | null {
   if (!isRecord(header) || header.type !== "session") return null;
   const version = header.version;
   if (version === PI_SESSION_SUPPORTED_VERSION) return { kind: "supported", version: PI_SESSION_SUPPORTED_VERSION };
-  const label = version === undefined ? "version 1 (no version field)" : `version ${String(version)}`;
+  const label = version === undefined ? "version 1 (no version field)"
+    : typeof version === "number" && Number.isSafeInteger(version) && version >= 0
+      ? `version ${version}` : "with an invalid version field";
   return {
     kind: "unsupported",
     reason: `Pi session ${label} is not supported; AMC imports Pi v${PI_SESSION_SUPPORTED_VERSION} session JSONL. Open the session in pi to migrate it, then re-import.`
@@ -126,7 +133,7 @@ export function parsePiSession(text: string): ParsedPiSession {
 /** Recognized Pi files never fall back to generic parsing after a format error. */
 export function parseDetectedPiSession(text: string): ParsedPiSession | null {
   const detected = detectPiSession(text);
-  if (detected?.kind === "unsupported") throw new Error(detected.reason);
+  if (detected?.kind === "unsupported") throw new PiSessionFormatError(detected.reason);
   return detected ? parsePiSession(text) : null;
 }
 
@@ -143,7 +150,7 @@ export function piSessionWarnings(session: ParsedPiSession, source: string): str
 function inspectTree(entries: Entry[]) {
   const byId = new Map<string, Entry>();
   for (const entry of entries) {
-    if (byId.has(entry.id)) throw new Error("Pi session has duplicate entry IDs; ancestry is ambiguous.");
+    if (byId.has(entry.id)) throw new PiSessionFormatError("Pi session has duplicate entry IDs; ancestry is ambiguous.");
     byId.set(entry.id, entry);
   }
   const ancestryComplete = new Map<string, boolean>();
@@ -151,7 +158,7 @@ function inspectTree(entries: Entry[]) {
     const path = new Set<string>();
     let cursor: string | null = entry.id;
     while (cursor !== null && byId.has(cursor) && !ancestryComplete.has(cursor)) {
-      if (path.has(cursor)) throw new Error("Pi session has cyclic ancestry; import refused.");
+      if (path.has(cursor)) throw new PiSessionFormatError("Pi session has cyclic ancestry; import refused.");
       path.add(cursor);
       cursor = byId.get(cursor)!.parentId;
     }

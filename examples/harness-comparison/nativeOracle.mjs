@@ -48,20 +48,31 @@ try {
     check("both-verifiers-refuse", verifierFacts.every(row => row.exit !== 0 && row.ok === false && Array.isArray(row.errors) && row.errors.length > 0), evidence(verifierFacts));
     const before = receipt.snapshots.before, after = briefRows(all[0].rows), changed = after.filter((row, index) => row.signatureSha256 !== before[index]?.signatureSha256);
     check("exact-signature-mutation", before.length === after.length && after.every((row, index) => row.id === before[index].id && row.hash === before[index].hash) && changed.length === 1 && changed[0].id === receipt.tamperedEventId, evidence({ changed: changed.map(row => row.id), rowsBefore: before.length, rowsAfter: after.length }));
+    const currentTriggers = native.triggers();
+    check("storage-guard-restored", receipt.immutableGuardRefused === true && receipt.triggersBefore.length > 0 && JSON.stringify(receipt.triggersBefore) === JSON.stringify(receipt.triggersAfter) && JSON.stringify(receipt.triggersBefore) === JSON.stringify(currentTriggers), evidence({ ordinaryUpdateRefused: receipt.immutableGuardRefused, triggerFingerprints: currentTriggers }));
   } else {
     check("cold-verifiers-pass", verifierFacts.every(row => row.exit === 0 && row.ok === true && Array.isArray(row.errors) && row.errors.length === 0), evidence(verifierFacts));
     check("closed-sessions", all.every(({ id }) => ledger.json?.sessions?.closed?.includes(id)), evidence(ledger.json?.sessions));
   }
   const rows = all.at(-1).rows, endings = rows.filter(row => row.event_type === "turn/end").map(meta);
   const calls = rows.filter(row => row.event_type === "tool/call"), results = rows.filter(row => row.event_type === "tool/result");
-  if (fixture.kind === "echo") {
-    check("echo-dispatched-once", calls.length === 1 && results.length === 1 && count(rows, "request/header") === 2, evidence({ calls: calls.length, results: results.length, requests: count(rows, "request/header") }));
+  let payloadText;
+  if (fixture.kind === "echo" || fixture.kind === "sdk-resume") {
     const { readEventPayload } = await import(pathToFileURL(join(native.root, "dist/session/eventPayload.js")).href);
-    // Cold CLI processes unlock their own vaults. This process needs its own in-memory unlock for the independently read bytes.
     const { unlockVault } = await import(pathToFileURL(join(native.root, "dist/vault/vault.js")).href);
     unlockVault(workspace, loadPassphrase(workspace));
-    const payload = results[0] && readEventPayload(workspace, results[0]);
-    check("echo-bytes", payload?.status === "ok" && payload.bytes.toString("utf8").includes(fixture.prompt), payload?.status === "ok" ? `Actual tool-result bytes sha256=${hash(payload.bytes.toString("utf8"))}; expected fixture marker is present.` : "Tool-result payload unavailable.");
+    payloadText = row => {
+      if (!row) throw new Error("Expected committed payload row is missing");
+      const payload = readEventPayload(workspace, row);
+      if (payload.status !== "ok" || hash(payload.bytes.toString("utf8")) !== row.payload_sha256) throw new Error("Expected payload is unavailable or disagrees with its signed digest");
+      return payload.bytes.toString("utf8");
+    };
+  }
+  if (fixture.kind === "echo") {
+    check("echo-dispatched-once", calls.length === 1 && results.length === 1 && count(rows, "request/header") === 2, evidence({ calls: calls.length, results: results.length, requests: count(rows, "request/header") }));
+    const arguments_ = JSON.parse(payloadText(calls[0])), result = payloadText(results[0]);
+    check("echo-bytes", typeof arguments_.text === "string" && result === arguments_.text && meta(calls[0]).toolName === "echo" && meta(results[0]).toolCallId === meta(calls[0]).toolCallId && meta(results[0]).outcome === "OK", evidence({ toolCallId: meta(calls[0]).toolCallId, argumentTextSha256: typeof arguments_.text === "string" ? hash(arguments_.text) : null, resultSha256: hash(result), resultBytes: Buffer.byteLength(result) }));
+    check("original-prompt-retained", rows.filter(row => row.event_type === "user/message").some(row => payloadText(row) === fixture.prompt), `Exact pinned original prompt digest=${hash(fixture.prompt)} remains in the authenticated user-message evidence. Stub argument selection can choose a later runtime-context snapshot; no prompt-following quality is inferred.`);
   } else if (fixture.kind === "none") {
     check("no-tool-dispatch", calls.length === 0 && results.length === 0 && count(rows, "request/header") === 1 && count(rows, "assistant/block") > 0, evidence({ calls: calls.length, results: results.length, requests: count(rows, "request/header"), assistantBlocks: count(rows, "assistant/block") }));
   } else if (fixture.kind === "step-bound") {
@@ -94,11 +105,22 @@ try {
   } else if (fixture.kind === "sdk-resume") {
     const sdk = command("sdk").json;
     check("public-sdk-lifecycle", sdk.publicExport === "./sdk/native" && sdk.sessionId === all[0].id && sdk.verified?.state === "verified" && sdk.verified?.report?.ok === true, evidence({ publicExport: sdk.publicExport, sessionId: sdk.sessionId, receiptState: sdk.verified?.state, ok: sdk.verified?.report?.ok }));
-    check("sdk-committed-stream", sdk.updates.length > 0 && sdk.nextUpdates.length > 0 && [...sdk.updates, ...sdk.nextUpdates].every(update => update.sessionId === sdk.sessionId) && sdk.firstResult.verification === "not-verified" && sdk.secondResult.verification === "not-verified" && sdk.firstResult.text.includes(fixture.prompt) && sdk.secondResult.text.includes(`${fixture.prompt}: continued`), evidence({ updates: sdk.updates.length, nextUpdates: sdk.nextUpdates.length, runVerification: [sdk.firstResult.verification, sdk.secondResult.verification] }));
-    check("sdk-history-replay", sdk.history.length > 0 && count(rows, "turn/start") === 2 && count(rows, "request/header") === 2 && prefix(receipt.snapshots.before, briefRows(rows)), evidence({ historyUpdates: sdk.history.length, turns: count(rows, "turn/start"), requests: count(rows, "request/header"), originalPrefix: receipt.snapshots.before.length }));
+    const turns = rows.filter(row => row.event_type === "turn/start").map(row => meta(row).amcSession.turn);
+    const blocks = turn => rows.filter(row => row.event_type === "assistant/block" && meta(row).blockKind === "text" && meta(row).amcSession.turn === turn).map(row => payloadText(row));
+    const expected = turns.map(blocks);
+    const actualUpdates = updates => updates.map(value => ({ sessionId: value.sessionId, kind: value.update?.sessionUpdate, type: value.update?.content?.type, text: value.update?.content?.text }));
+    const matches = (updates, texts) => updates.length === texts.length && updates.every((value, index) => value.sessionId === sdk.sessionId && value.update?.sessionUpdate === "agent_message_chunk" && value.update?.content?.type === "text" && value.update.content.text === texts[index]);
+    check("sdk-committed-stream", expected.length === 2 && expected.every(value => value.length > 0) && matches(sdk.updates, expected[0]) && matches(sdk.nextUpdates, expected[1]) && JSON.stringify(sdk.firstResult.updates) === JSON.stringify(sdk.updates) && JSON.stringify(sdk.secondResult.updates) === JSON.stringify(sdk.nextUpdates) && sdk.firstResult.verification === "not-verified" && sdk.secondResult.verification === "not-verified" && sdk.firstResult.text === expected[0].join("") && sdk.secondResult.text === expected[1].join(""), evidence({ expectedBlockDigests: expected.map(turn => turn.map(hash)), firstUpdatesDigest: hash(actualUpdates(sdk.updates)), secondUpdatesDigest: hash(actualUpdates(sdk.nextUpdates)), runVerification: [sdk.firstResult.verification, sdk.secondResult.verification] }));
+    const messages = rows.filter(row => row.event_type === "user/message").map(row => payloadText(row));
+    check("sdk-original-prompts-retained", messages.includes(fixture.prompt) && messages.includes(`${fixture.prompt}: continued`), `Both exact pinned SDK prompts remain in authenticated user-message payloads; digests=${hash(fixture.prompt)},${hash(`${fixture.prompt}: continued`)}.`);
+    const priorIds = new Set(receipt.snapshots.before.map(row => row.id));
+    const history = rows.filter(row => priorIds.has(row.id) && (row.event_type === "user/message" || row.event_type === "assistant/block" && meta(row).blockKind === "text"))
+      .map(row => ({ kind: row.event_type === "user/message" ? "user_message_chunk" : "agent_message_chunk", text: payloadText(row) }));
+    check("sdk-history-replay", history.length > 0 && sdk.history.length === history.length && sdk.history.every((value, index) => value.sessionId === sdk.sessionId && value.update?.sessionUpdate === history[index].kind && value.update?.content?.type === "text" && value.update.content.text === history[index].text) && count(rows, "turn/start") === 2 && count(rows, "request/header") === 2 && prefix(receipt.snapshots.before, briefRows(rows)), evidence({ historyUpdates: sdk.history.length, expectedHistoryDigest: hash(history), turns: count(rows, "turn/start"), requests: count(rows, "request/header"), originalPrefix: receipt.snapshots.before.length }));
   } else if (fixture.kind === "crash") {
     const recovery = command("recover").json;
     check("real-dead-owner-recovery", command("crash").signal === "SIGKILL" && command("crash").treeExitProven && recovery.verdict === "RECOVERED" && recovery.wonClaim === true && recovery.syntheticTurnEnds === 1 && recovery.syntheticStepEnds === 1 && recovery.closed === true, evidence({ signal: command("crash").signal, recovery }));
+    check("ordinary-recovery-window", receipt.recoveryWaitMs >= fixture.staleWaitMs && fixture.staleWaitMs === 61000 && !command("recover").args.includes("--force") && !command("recover").args.includes("--stale-after"), evidence({ actualWaitMs: receipt.recoveryWaitMs, requiredWaitMs: fixture.staleWaitMs, args: command("recover").args }));
     check("recovery-append-only", prefix(receipt.snapshots.before, briefRows(rows)), `Original interrupted prefix of ${receipt.snapshots.before.length} rows retained.`);
     check("no-recovery-redispatch", count(rows, "request/header") === 1 && calls.length === 0 && results.length === 0 && endings.some(row => row.interrupted === true && row.amcSession?.synthetic === true), evidence({ requests: count(rows, "request/header"), calls: calls.length, results: results.length, endings }));
   }

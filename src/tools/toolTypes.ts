@@ -109,6 +109,8 @@ export interface ToolOutcome {
 
 /** What a tool body receives and returns. */
 export interface ToolBodyResult {
+  /** Explicit application result, independent of exitCode/timedOut. Omitted preserves legacy resolved-body success. */
+  readonly ok?: boolean;
   readonly output: string;
   readonly bytes?: number;
   readonly exitCode?: number | null;

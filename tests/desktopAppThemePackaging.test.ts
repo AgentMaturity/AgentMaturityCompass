@@ -97,7 +97,7 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("const launchCommand = demoMode");
     expect(app).toContain('setAttribute("aria-label", "Toggle navigation")');
     expect(app).toContain('nav.classList.toggle("mobile-nav-open"');
-    expect(read("src/console/assets/sw.js")).toContain('CACHE_NAME = "amc-console-v6"');
+    expect(read("src/console/assets/sw.js")).toContain('CACHE_NAME = "amc-console-v7"');
     expect(read("src/console/assets/sw.js")).toContain("self.skipWaiting()");
     expect(read("src/console/assets/sw.js")).toContain('req.mode === "navigate"');
   });

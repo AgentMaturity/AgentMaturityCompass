@@ -28,6 +28,15 @@ describe("published standard schemas", () => {
 
       for (const file of files) {
         const schema = JSON.parse(readFileSync(join(dir, file), "utf8"));
+        if (file === "external-evidence.schema.json") {
+          expect(schema.$id).toBe("https://agentmaturity.co/standards/external-evidence/v1/schema.json");
+          expect(schema.$comment).toContain("Shape validation does not establish provenance authority");
+          expect(schema.$comment).toContain("independently admitted authority keys");
+          expect(schema.$comment).toContain("Import signatures cannot elevate source trust");
+          expect(schema.additionalProperties).toBe(false);
+          expect(schema.required).toContain("signature");
+          continue;
+        }
         expect(schema.$comment, file).toMatch(/does NOT mean AMC would accept/);
         // The looseness the caveat is warning about must actually be present,
         // otherwise the warning is describing a different document.

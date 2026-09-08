@@ -189,7 +189,7 @@ export class ToolPipeline {
         result.output
       );
       return {
-        ok: true,
+        ok: result.ok ?? true,
         exitCode: result.exitCode ?? null,
         timedOut: result.timedOut ?? false,
         denied: null,

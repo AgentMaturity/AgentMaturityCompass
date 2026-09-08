@@ -52,6 +52,10 @@ try {
       receipt.commands.push({ label: "crash", args, ...outcome, json: null });
       if (outcome.signal !== "SIGKILL" || !outcome.treeExitProven || outcome.stdout.droppedBytes || outcome.stderr.droppedBytes) throw new Error("Crash fixture could not prove its interrupted process had settled");
     } finally { child.terminate("dispose"); await child.done; }
+    if (fixture.staleWaitMs !== 61000) throw new Error("Crash fixture must observe the ordinary recovery freshness window");
+    const waiting = performance.now();
+    await new Promise(resolve => setTimeout(resolve, fixture.staleWaitMs));
+    receipt.recoveryWaitMs = performance.now() - waiting;
     requiredJson(await call("recover", ["session", "recover", pending, "--close", "--json"]));
   } else if (fixture.kind === "resume" || fixture.kind === "fork") {
     const parent = await open("first", prompt, fixture.kind === "resume" ? ["--keep-open"] : []);
@@ -87,11 +91,28 @@ try {
       if (!target) throw new Error("Tamper fixture has no actual recorded request");
       receipt.snapshots.before = briefRows(rows);
       receipt.tamperedEventId = target.id;
+      receipt.triggersBefore = native.triggers();
       const db = new native.Database(join(workspace, ".amc/evidence.sqlite"), { fileMustExist: true });
       try {
-        const result = db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("offline-fixture-invalid-signature", target.id);
-        if (result.changes !== 1) throw new Error("Tamper fixture did not change exactly one synthetic workspace row");
+        const update = () => db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("offline-fixture-invalid-signature", target.id);
+        try { update(); }
+        catch (error) {
+          if (!(error instanceof Error) || error.message !== "evidence immutable fields changed") throw error;
+          receipt.immutableGuardRefused = true;
+        }
+        if (!receipt.immutableGuardRefused) throw new Error("Ordinary fixture mutation was not refused by the immutable-field guard");
+        const guard = db.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'evidence_events'").all()
+          .filter(row => row.sql.includes("evidence immutable fields changed"));
+        if (guard.length !== 1) throw new Error("Fixture cannot identify its exact immutable-update guard");
+        // Model privileged offline file corruption only in this disposable fixture.
+        // Ordinary API/SQL mutation was already proven refused; restore the schema before any verifier reads it.
+        db.exec(`DROP TRIGGER "${guard[0].name.replaceAll('"', '""')}"`);
+        try {
+          const result = update();
+          if (result.changes !== 1) throw new Error("Tamper fixture did not change exactly one synthetic workspace row");
+        } finally { db.exec(guard[0].sql); }
       } finally { db.close(); }
+      receipt.triggersAfter = native.triggers();
     }
   }
   verifyInventory(inventoryFile);

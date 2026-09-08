@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalCredentialsService } from "../src/credentials/localCredentialsService.js";
+import * as credentialWatcher from "../src/credentials/credentialsWatcher.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "../src/setup/nativeFirstUseGuide.js";
 
 const SECRET = "synthetic-guide-value-never-render";
@@ -143,7 +144,7 @@ describe("native first-use local inspection", () => {
     workspaceMarker(); ownedStore();
     const methods = ["resolve", "set", "unset", "reload"] as const;
     const spies = methods.map(method => vi.spyOn(LocalCredentialsService.prototype, method).mockImplementation(() => { throw new Error(`Unexpected ${method}`); }));
-    const watcher = vi.spyOn(fs, "watch").mockImplementation(() => { throw new Error("Unexpected watch"); });
+    const watcher = vi.spyOn(credentialWatcher, "watchCredentialsFile").mockImplementation(() => { throw new Error("Unexpected watch"); });
     const provider = vi.spyOn(globalThis, "fetch").mockImplementation(() => { throw new Error("Unexpected provider call"); });
     const closed = vi.spyOn(LocalCredentialsService.prototype, "close");
     expect((await inspect()).status).toBe("ready");
