@@ -38,7 +38,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:software-agent-eval-${index}`,
     taskCategory: "software-engineering-agent-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "observed_software_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.2 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.14 : 0.01,
     toolCallCount: prefix === "live" ? 23 : 11,

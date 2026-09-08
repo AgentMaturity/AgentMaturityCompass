@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "native-conformance-preparation",
+  "description": "SOURCE-ONLY TEMPLATE. Replace zero digests, paths, runtime and AMC revision; no comparator execution is asserted.",
+  "environment": {
+    "platform": "linux",
+    "arch": "arm64",
+    "nodeVersion": "22.0.0",
+    "description": "Replace with the exact qualified local comparison environment.",
+    "variables": {"PATH": "/usr/bin:/bin"}
+  },
+  "concurrency": 1,
+  "repetitions": 1,
+  "captureBytesPerStream": 262144,
+  "lanes": [{
+    "id": "keyless",
+    "kind": "keyless-conformance",
+    "provider": null,
+    "model": null,
+    "settings": {"seed": 1},
+    "permissions": {
+      "read": ["pinned-fixture", "pinned-artifact"],
+      "write": ["trial-workspace"],
+      "network": [],
+      "sandbox": "REPLACE with the independently qualified adapter boundary and its receipt reference.",
+      "enforcement": "adapter-responsibility"
+    },
+    "budgets": {"timeoutMs": 30000, "maxTokens": null, "maxCostUsd": null},
+    "requiredSecretEnv": []
+  }],
+  "tasks": [{
+    "id": "native-success",
+    "laneId": "keyless",
+    "scenario": "success",
+    "description": "Run a real keyless native task and independently verify its expected result and session evidence. Add separately pinned tasks for the other eleven conformance scenarios.",
+    "fixture": {"path": "REPLACE/native-success.json", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+    "oracle": {
+      "executable": {"path": "REPLACE/qualified-node", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+      "inputs": [{"path": "REPLACE/independent-native-success-oracle.mjs", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}],
+      "args": ["{{input:0}}", "{{workspace}}", "{{fixture}}"]
+    }
+  }],
+  "targets": [
+    {
+      "id": "amc",
+      "label": "AMC native standalone (pin required)",
+      "source": {"url": "https://example.invalid/replace-with-amc-repository", "commit": "0000000000000000000000000000000000000000", "retrievedAt": "2026-09-08T00:00:00Z", "auditReference": "Replace with the actual AMC source/artifact build receipt; this URL and revision are placeholders."},
+      "artifact": {"path": "REPLACE/agent-maturity-compass.tgz", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+      "bindings": []
+    },
+    {
+      "id": "dsh",
+      "label": "DeepSeek Harness (optional source-only comparator)",
+      "source": {"url": "https://github.com/deepseek-ai/deepseek-harness", "commit": "c389f96bf3a9b6807cb71ed6bdad5849be0df6d8", "retrievedAt": "2026-09-08T00:00:00Z", "auditReference": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/deepseek-harness.md; source audit only."},
+      "artifact": {"path": "REPLACE/deepseek-harness-artifact", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+      "bindings": []
+    },
+    {
+      "id": "pi",
+      "label": "Pi (optional source-only comparator)",
+      "source": {"url": "https://github.com/earendil-works/pi", "commit": "b2602be77cb7b0de45dd616407fd210daa48aa75", "retrievedAt": "2026-09-08T00:00:00Z", "auditReference": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/pi.md; source audit only."},
+      "artifact": {"path": "REPLACE/pi-artifact.tgz", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"},
+      "bindings": []
+    }
+  ]
+}

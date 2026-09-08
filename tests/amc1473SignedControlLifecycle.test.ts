@@ -520,7 +520,7 @@ describe("AMC-1473 signed control version lifecycle", () => {
     const snapshot = writeEnforceResourceManifest({ workspace, agentId: "default" });
     const cli = resolve(process.cwd(), "src/cli.ts");
     const tsxLoader = resolve(process.cwd(), "node_modules/tsx/dist/loader.mjs");
-    const env = { ...process.env, AMC_VAULT_PASSPHRASE: "amc-1473-test-passphrase" };
+    const env: NodeJS.ProcessEnv = { ...process.env, AMC_VAULT_PASSPHRASE: "amc-1473-test-passphrase" };
 
     const status = spawnSync(process.execPath, [
       "--import",

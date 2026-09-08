@@ -8,7 +8,8 @@ connection. Counts depend on corpus, extraction and build stages.
 
 In a [repository checkout](https://github.com/AgentMaturity/AgentMaturityCompass)
 that includes the focused-map tooling, read `docs/ARCHITECTURE_NAVIGATION.md`
-for guided paths through native execution, evidence import and trust/publication.
+for guided paths through native execution, evidence import, trust/publication,
+SDK/MCP/provider integration and sandbox/DSH launch boundaries.
 That contributor guide and its generated maps are checkout resources rather
 than pages in this public Docs collection. The maps can also be exported to
 Obsidian.
@@ -30,7 +31,7 @@ extraction. Graphify's optional semantic features are outside this workflow.
 
 Open `graphify-out/graph.html` for the generated overview, when present.
 Large graphs use an aggregated view. `graphify-out/GRAPH_REPORT.md` describes
-that build. For a smaller starting point, open one of the three HTML maps
+that build. For a smaller starting point, open one of the focused HTML maps
 under `graphify-out/navigation/`. The HTML viewer loads vis-network from its
 pinned CDN; graph JSON and Obsidian Canvas do not need that viewer.
 

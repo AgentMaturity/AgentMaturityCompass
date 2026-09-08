@@ -15,6 +15,7 @@ import { verifyNotarySignResponse } from "../../notary/notaryVerify.js";
 import { verifySignatureEnvelope } from "./signatureEnvelope.js";
 import type { SignatureEnvelope } from "./signerTypes.js";
 import * as http from "node:http";
+import { sha256Hex } from "../../utils/hash.js";
 
 function postNotarySync(params: {
   baseUrl: string;
@@ -91,7 +92,9 @@ function signWithNotary(params: {
   const body = JSON.stringify({
     kind: params.kind,
     payloadB64: payloadBytes.toString("base64"),
-    payloadSha256: params.digestHex
+    // This field checks the transport payload. The signature still covers the
+    // original digest bytes, and SignedDigest retains the original digest.
+    payloadSha256: sha256Hex(payloadBytes)
   });
   const ts = Date.now();
   const auth = buildNotaryAuthSignature({

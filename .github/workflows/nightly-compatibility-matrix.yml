@@ -14,81 +14,31 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        node-version: ['20', '22']
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: ['22', '24']
     steps:
       - uses: actions/checkout@v6
-
+        with:
+          fetch-depth: 0
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
-
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Build
         run: npm run build
-
-      - name: Pack npm tarball
-        run: npm pack --ignore-scripts --json > /tmp/amc-pack.json
-
-      - name: Install packed CLI globally
-        shell: bash
-        run: |
-          set -euo pipefail
-          TGZ=$(node -e 'const fs=require("fs");const j=JSON.parse(fs.readFileSync("/tmp/amc-pack.json","utf8"));process.stdout.write(j[0].filename)')
-          npm i -g "./${TGZ}"
-          echo "AMC_MATRIX_PACK_INSTALL=ok" >> "$GITHUB_ENV"
-
-      - name: Verify doctor JSON
-        shell: bash
-        run: |
-          set -euo pipefail
-          amc doctor --json > /tmp/amc-doctor.json
-          echo "AMC_MATRIX_DOCTOR_JSON=ok" >> "$GITHUB_ENV"
-
-      - name: Verify full score JSON
-        shell: bash
-        run: |
-          set -euo pipefail
-          amc --json > /tmp/amc-fullscore.json
-          test -s /tmp/amc-fullscore.json
-          echo "AMC_MATRIX_FULLSCORE_JSON=ok" >> "$GITHUB_ENV"
-
-      - name: Verify lite-score help path
-        shell: bash
-        run: |
-          set -euo pipefail
-          amc lite-score --help > /tmp/amc-lite-score.txt
-          test -s /tmp/amc-lite-score.txt
-          echo "AMC_MATRIX_LITE_SCORE=ok" >> "$GITHUB_ENV"
-
-      - name: Verify comms-check help path
-        shell: bash
-        run: |
-          set -euo pipefail
-          amc comms-check --help > /tmp/amc-comms-check.txt
-          test -s /tmp/amc-comms-check.txt
-          echo "AMC_MATRIX_COMMS_CHECK=ok" >> "$GITHUB_ENV"
-
-      - name: Build compatibility report
-        run: node scripts/compat-matrix-report.mjs /tmp/compat-matrix-${{ matrix.os }}-node${{ matrix.node-version }}.json
-
-      - name: Upload compatibility artifacts
+      - name: Qualify the installed artifact and launcher recovery
+        run: npm run qualify:platform -- --out tmp/platform-qualification/report.json
+      - name: Upload actual platform receipts
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: compatibility-${{ matrix.os }}-node${{ matrix.node-version }}
-          path: |
-            /tmp/amc-doctor.json
-            /tmp/amc-fullscore.json
-            /tmp/amc-lite-score.txt
-            /tmp/amc-comms-check.txt
-            /tmp/compat-matrix-${{ matrix.os }}-node${{ matrix.node-version }}.json
+          path: tmp/platform-qualification/
+          if-no-files-found: warn

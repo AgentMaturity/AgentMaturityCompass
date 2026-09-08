@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:langwatch-production-agent-${index}`,
     taskCategory: "langwatch-production-agent-live-drift",
     domain: "agent-evaluation-observability",
-    agentEvaluationDimension: "observed_langwatch_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 18 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

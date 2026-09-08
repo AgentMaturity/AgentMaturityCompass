@@ -44,7 +44,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:game-eval-${index}`,
     taskCategory: "gaming-agent-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "gamingagent-source-context",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.22 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.18 : 0.01,
     toolCallCount: prefix === "live" ? 18 : 7,

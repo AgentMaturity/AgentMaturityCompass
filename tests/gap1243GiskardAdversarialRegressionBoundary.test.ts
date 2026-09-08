@@ -42,7 +42,7 @@ const engineEvaluation: ReplayBenchmarkAdversarialEngineEvaluationFixture = {
   explanationHash: hash("synthetic Giskard-style adversarial regression blocked through AMC receipts"),
   rerunStatus: "failed",
   guardrailRuleIds: ["guardrail:prompt-injection", "guardrail:data-leakage", "guardrail:harmful-content"],
-  guardrailRuleTypes: ["prompt_injection", "data_exfiltration", "unsafe_content"],
+  guardrailRuleTypes: ["prompt_injection", "sensitive_data", "toxicity"],
   failedGuardrailRuleCount: 3,
   promptInjectionDetected: true,
   alertRuleId: "alert:giskard-adversarial-regression",

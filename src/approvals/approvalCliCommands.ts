@@ -7,6 +7,8 @@ import {
 } from "./approvalInbox.js";
 import { parseApprovalActivityQuery, searchApprovalActivity } from "./approvalActivity.js";
 import { registerApprovalAskCommand } from "./approvalAskCommand.js";
+import { readNativeApprovalActor } from "../setup/nativeApprovalIdentity.js";
+import { registerNativeApprovalLoginCommands } from "./nativeApprovalLoginCli.js";
 import {
   parseApprovalMode,
   parseApprovalReviewerRoles
@@ -18,6 +20,22 @@ interface ApprovalReviewerOptions {
   username: string;
   roles: string;
   userId?: string;
+  sessionTokenFile?: string;
+  expectRequestDigest?: string;
+}
+
+function reviewerFor(workspace: string, approvalId: string, opts: ApprovalReviewerOptions) {
+  const roles = parseApprovalReviewerRoles(opts.roles);
+  const supplied = { userId: opts.userId ?? opts.username, username: opts.username, roles };
+  if (opts.sessionTokenFile === undefined && opts.expectRequestDigest === undefined) return supplied;
+  if (!opts.sessionTokenFile || !opts.expectRequestDigest) throw new Error("Authenticated native decisions require both --session-token-file and --expect-request-digest");
+  const actor = readNativeApprovalActor(workspace, opts.sessionTokenFile);
+  if (actor.userId !== supplied.userId || actor.username !== supplied.username || [...actor.roles].sort().join(",") !== [...roles].sort().join(",")) throw new Error("Reviewer fields do not match the authenticated workspace session");
+  const inbox = getApprovalInboxItem({ workspace, agentId: opts.agent, approvalRequestId: approvalId });
+  if (!inbox.requestIntegrity.valid || !inbox.chainIntegrity.valid || !inbox.contextIntegrity.valid || inbox.status !== "PENDING"
+    || inbox.request.approvalRequestId !== approvalId || inbox.request.agentId !== opts.agent || inbox.requestDigestSha256 !== opts.expectRequestDigest) throw new Error("Approval changed or is no longer trusted and pending; review it again");
+  if (!actor.roles.some(role => inbox.request.rolesAllowed.includes(role))) throw new Error("Authenticated reviewer has no role allowed for this request");
+  return actor;
 }
 
 export function registerApprovalCliCommands(program: Command): void {
@@ -27,6 +45,7 @@ export function registerApprovalCliCommands(program: Command): void {
   // because src/cli.ts sits at its line-ratchet baseline, and because a question
   // and its answer belong under one command group.
   registerApprovalAskCommand(approvals);
+  registerNativeApprovalLoginCommands(approvals);
 
   approvals
     .command("list")
@@ -116,9 +135,11 @@ export function registerApprovalCliCommands(program: Command): void {
     .requiredOption("--username <username>", "reviewer username")
     .requiredOption("--roles <roles>", "reviewer roles (comma-separated)")
     .option("--user-id <userId>", "stable reviewer user ID; defaults to username")
+    .option("--session-token-file <path>", "existing private tracked-session token; verifies all reviewer fields")
+    .option("--expect-request-digest <sha256>", "bind this decision to the exact request reviewed in a native prompt")
     .argument("<approvalId>")
     .action(async (approvalId: string, opts: ApprovalReviewerOptions & { mode: string }) => {
-      const reviewerRoles = parseApprovalReviewerRoles(opts.roles);
+      const reviewer = reviewerFor(process.cwd(), approvalId, opts);
       const out = decideApprovalForIntent({
         workspace: process.cwd(),
         agentId: opts.agent,
@@ -126,9 +147,10 @@ export function registerApprovalCliCommands(program: Command): void {
         decision: "APPROVED",
         mode: parseApprovalMode(opts.mode),
         reason: opts.reason,
-        username: opts.username,
-        userId: opts.userId ?? opts.username,
-        userRoles: reviewerRoles
+        username: reviewer.username,
+        userId: reviewer.userId,
+        userRoles: reviewer.roles,
+        ...(opts.expectRequestDigest === undefined ? {} : { expectedRequestDigestSha256: opts.expectRequestDigest })
       });
       const delivery = await deliverApprovalLifecycle({
         workspace: process.cwd(),
@@ -147,9 +169,11 @@ export function registerApprovalCliCommands(program: Command): void {
     .requiredOption("--username <username>", "reviewer username")
     .requiredOption("--roles <roles>", "reviewer roles (comma-separated)")
     .option("--user-id <userId>", "stable reviewer user ID; defaults to username")
+    .option("--session-token-file <path>", "existing private tracked-session token; verifies all reviewer fields")
+    .option("--expect-request-digest <sha256>", "bind this decision to the exact request reviewed in a native prompt")
     .argument("<approvalId>")
     .action(async (approvalId: string, opts: ApprovalReviewerOptions) => {
-      const reviewerRoles = parseApprovalReviewerRoles(opts.roles);
+      const reviewer = reviewerFor(process.cwd(), approvalId, opts);
       const out = decideApprovalForIntent({
         workspace: process.cwd(),
         agentId: opts.agent,
@@ -157,9 +181,10 @@ export function registerApprovalCliCommands(program: Command): void {
         decision: "DENIED",
         mode: "SIMULATE",
         reason: opts.reason,
-        username: opts.username,
-        userId: opts.userId ?? opts.username,
-        userRoles: reviewerRoles
+        username: reviewer.username,
+        userId: reviewer.userId,
+        userRoles: reviewer.roles,
+        ...(opts.expectRequestDigest === undefined ? {} : { expectedRequestDigestSha256: opts.expectRequestDigest })
       });
       const delivery = await deliverApprovalLifecycle({
         workspace: process.cwd(),

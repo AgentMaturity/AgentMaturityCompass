@@ -14,7 +14,7 @@ import {
 import { initFileSealedNotaryKey, loadNotarySigner } from "./notarySigner.js";
 import { appendNotaryLogEntry, initNotaryLog, tailNotaryLog, verifyNotaryLog } from "./notaryLog.js";
 import { exportNotaryAttestationBundle, verifyNotaryAttestationBundle } from "./notaryAttestation.js";
-import { startNotaryServer } from "./notaryServer.js";
+import { resolveNotaryBindHost, startNotaryServer } from "./notaryServer.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -90,18 +90,22 @@ export async function notaryInitCli(params: {
 export async function notaryStartCli(params: {
   notaryDir?: string;
   workspace?: string | null;
+  bindHost?: string;
 }): Promise<{
   notaryDir: string;
   url: string;
   close: () => Promise<void>;
 }> {
   const notaryDir = resolveNotaryDir(params.notaryDir);
+  const config = loadNotaryConfig(notaryDir);
+  resolveNotaryBindHost(params.bindHost, config.notary.bindHost, config.notary.unixSocketPath);
   if (!pathExists(notaryConfigPath(notaryDir))) {
     await notaryInitCli({ notaryDir });
   }
   const runtime = await startNotaryServer({
     notaryDir,
-    workspace: params.workspace ?? null
+    workspace: params.workspace ?? null,
+    bindHost: params.bindHost
   });
   return {
     notaryDir,
@@ -276,4 +280,3 @@ export async function notaryInitInteractiveCli(params: {
     notaryDir: params.notaryDir
   });
 }
-

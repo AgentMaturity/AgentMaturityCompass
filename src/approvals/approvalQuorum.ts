@@ -1,6 +1,7 @@
 import type { UserRole } from "../auth/roles.js";
 import type { ApprovalPolicy } from "./approvalPolicySchema.js";
 import type { ApprovalDecisionRecord, ApprovalRequestRecord } from "./approvalChainStore.js";
+import { approvalRequestBindingDigest } from "./approvalChainStore.js";
 
 export interface QuorumState {
   status: "PENDING" | "QUORUM_MET" | "DENIED" | "EXPIRED" | "CONSUMED" | "CANCELLED";
@@ -83,6 +84,7 @@ export function evaluateApprovalQuorum(params: {
     if (decision.approvalRequestId !== request.approvalRequestId) {
       continue;
     }
+    if (decision.requestDigestSha256 !== undefined && decision.requestDigestSha256 !== approvalRequestBindingDigest(request)) continue;
     if (!hasAllowedRole(decision.roles, allowedRoles)) {
       continue;
     }

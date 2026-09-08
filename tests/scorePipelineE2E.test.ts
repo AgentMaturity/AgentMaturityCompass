@@ -21,7 +21,8 @@ async function callScoreRoute(params: {
   method: string;
   body?: unknown;
 }): Promise<{ handled: boolean; statusCode: number; json: unknown }> {
-  const req = new PassThrough() as unknown as IncomingMessage;
+  const reqStream = new PassThrough();
+  const req = reqStream as unknown as IncomingMessage;
   req.method = params.method;
   req.headers = { "content-type": "application/json" };
 
@@ -39,9 +40,9 @@ async function callScoreRoute(params: {
 
   setImmediate(() => {
     if (params.body !== undefined) {
-      req.write(JSON.stringify(params.body));
+      reqStream.write(JSON.stringify(params.body));
     }
-    req.end();
+    reqStream.end();
   });
 
   const handled = await handleScoreRoute(params.pathname, params.method, req, res, params.workspace);

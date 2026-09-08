@@ -32,6 +32,7 @@ import { loadBlobPlaintext } from "../storage/blobs/blobStore.js";
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { join } from "node:path";
+import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
 
 const GLOBAL_GENESIS = "GENESIS";
 
@@ -269,6 +270,8 @@ export function verifyStoredSessionEvents(
   const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors);
   verifyGlobalChainAndSignatures(rows, workspace, errors);
   verifySessionEnvelopeChains(rows, errors);
+  try { validateSurfaceCompactions(workspace, rows); }
+  catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   if (options.sessionRecords !== undefined) {
     verifySessionRecords(rows, options.sessionRecords, workspace, errors);
   }

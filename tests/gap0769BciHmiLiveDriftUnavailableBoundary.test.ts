@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:human-interface-adaptation-${index}`,
     taskCategory: "bci-hmi-live-drift",
     domain: "agent-evaluation-human-interface",
-    agentEvaluationDimension: "observed_bci_hmi_human_state_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 11 + index : 5 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

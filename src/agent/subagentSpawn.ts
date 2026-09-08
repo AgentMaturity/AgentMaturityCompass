@@ -333,7 +333,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
   let result: SubagentRunResult;
   let abandoned = false;
   let gaveUpDuringRun = false;
-  init.signal?.addEventListener("abort", () => { gaveUpDuringRun = true; }, { once: true });
+  const noteAbort = (): void => { gaveUpDuringRun = true; };
+  init.signal?.addEventListener("abort", noteAbort, { once: true });
   try {
     const running = init.runner({
       continuable: init.request.continuable === true,
@@ -360,6 +361,8 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
       reason: `child threw: ${String(error)}`
     });
     return { ok: false, reason: `child threw: ${String(error)}`, packetId };
+  } finally {
+    init.signal?.removeEventListener("abort", noteAbort);
   }
 
   const account = (settledAs: DelegationSettlement, reason: string): void => {

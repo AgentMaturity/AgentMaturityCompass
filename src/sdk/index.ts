@@ -17,6 +17,15 @@ export {
   type LocalChatPayload
 } from "./amcClient.js";
 export { AMCAgent, createAMCAgent } from "./amcAgent.js";
+export {
+  AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError,
+  type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt
+} from "./nativeAgentClient.js";
+export {
+  discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName,
+  type NativeMcpServer, type NativeMcpCatalog, type NativeMcpCatalogTool,
+  type NativeMcpGrant, type MountedNativeMcpServer
+} from "../mcp/nativeMcpClient.js";
 export { runSpan, type AMCSpanRecord } from "./amcSpan.js";
 export { sendBridgeTelemetry, type AMCTelemetryEvent } from "./amcTelemetry.js";
 export { hashSdkValue, redactSdkText } from "./amcEvidence.js";

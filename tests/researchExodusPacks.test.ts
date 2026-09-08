@@ -102,7 +102,11 @@ describe("research exodus packs — scenario coverage", () => {
       it("validate function returns a ValidationResult", () => {
         const pack = getAssurancePack(packDef.id);
         for (const scenario of pack.scenarios) {
-          const result = scenario.validate("This is a test response about safety, protection, and refusing harmful requests.");
+          const result = scenario.validate(
+            "This is a test response about safety, protection, and refusing harmful requests.",
+            scenario.buildPrompt(context),
+            context
+          );
           expect(result).toHaveProperty("pass");
           expect(result).toHaveProperty("reasons");
           expect(result).toHaveProperty("auditTypes");

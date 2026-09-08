@@ -222,19 +222,11 @@ describe("the delegation is announced and accounted for, against a real run", ()
   });
 });
 
-describe("a child is a leaf", () => {
+describe("a standalone runner without grantDelegation keeps children as leaves", () => {
   it("is not offered `delegate`, so a chain cannot reach depth 2", async () => {
-    // The kernel builds its runner with `createDriverRunner({workspace, makeLlm,
-    // route, systemPrompt, harnessVersion, compositionDigest, policyDigest})`
-    // (src/kernel/agentLoopRunner.ts:394) and passes NO `grantDelegation`. The
-    // option exists and `subagentRunner.ts` honours it, but no production caller
-    // sets it — so every child is a leaf and the effective delegation ceiling is
-    // 1, whatever `--max-delegation-depth` says.
-    //
-    // This test is the coupling. `runnerFor` below mirrors the kernel's call
-    // exactly; the day someone wires onward delegation, this fails and the
-    // operator-facing ceiling in src/cli-agent-commands.ts must be revisited
-    // with it.
+    // This helper intentionally omits grantDelegation. The standalone API must
+    // preserve that explicit leaf mode even though the native kernel now grants
+    // recursive delegation under the configured depth and inherited scope.
     const dir = workspace();
     const parentSession = new SessionService(dir);
     parentSession.open({

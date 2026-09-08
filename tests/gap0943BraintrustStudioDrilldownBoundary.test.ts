@@ -151,7 +151,7 @@ function report(drilldown: QuestionScoreObsStudioDrilldownLensRef = lens()): Dia
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("e"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0943 Braintrust Studio evidence drilldown boundary", () => {

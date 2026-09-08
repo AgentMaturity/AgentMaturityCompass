@@ -6,6 +6,7 @@ import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAn
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import type { ActionClass, ExecutionMode } from "../types.js";
 import { USER_ROLES, type UserRole } from "../auth/roles.js";
 
@@ -75,6 +76,8 @@ export const approvalDecisionSchema = z.object({
   roles: z.array(roleSchema),
   decision: approvalDecisionKindSchema,
   reason: z.string().min(1),
+  // Optional for legacy compatibility. Bound decisions cannot move to changed requests.
+  requestDigestSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(),
   decisionTs: z.number().int()
 });
 
@@ -92,6 +95,11 @@ export type ApprovalDecisionRecord = z.infer<typeof approvalDecisionSchema>;
 export type ApprovalConsumedRecord = z.infer<typeof approvalConsumedSchema>;
 export type ApprovalRequestStatus = z.infer<typeof approvalRequestStatusSchema>;
 export type ApprovalDecisionKind = z.infer<typeof approvalDecisionKindSchema>;
+
+/** Status evolves; every other request field is part of the reviewed authority. */
+export function approvalRequestBindingDigest(request: ApprovalRequestRecord): string {
+  return sha256Hex(canonicalize({ ...request, status: "PENDING" }));
+}
 
 export interface ApprovalChainIntegrity {
   valid: boolean;
@@ -289,6 +297,7 @@ export function recordApprovalDecision(params: {
   roles: UserRole[];
   decision: ApprovalDecisionKind;
   reason: string;
+  expectedRequestDigestSha256?: string;
 }): { decision: ApprovalDecisionRecord; path: string; sigPath: string } {
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,
@@ -297,6 +306,10 @@ export function recordApprovalDecision(params: {
     requireValidSignature: true
   });
   const agentId = request.agentId;
+  if (params.expectedRequestDigestSha256 !== undefined &&
+    (request.status !== "PENDING" || params.expectedRequestDigestSha256 !== approvalRequestBindingDigest(request))) {
+    throw new Error("approval request changed after review; no bound decision recorded");
+  }
   ensureDirs(params.workspace, agentId);
   const decision = approvalDecisionSchema.parse({
     v: 1,
@@ -308,6 +321,7 @@ export function recordApprovalDecision(params: {
     roles: params.roles,
     decision: params.decision,
     reason: params.reason,
+    ...(params.expectedRequestDigestSha256 === undefined ? {} : { requestDigestSha256: params.expectedRequestDigestSha256 }),
     decisionTs: Date.now()
   });
   const path = decisionPath(params.workspace, agentId, decision.approvalDecisionId);
@@ -636,6 +650,12 @@ export function inspectApprovalChainIntegrity(params: {
   if (!requestVerification.valid) {
     reasonCodes.push("REQUEST_INTEGRITY_INVALID");
   }
+  let requestBinding: string | null = null;
+  try {
+    const request = loadApprovalRequestRecord({ ...params, agentId, requireValidSignature: true });
+    if (request.approvalRequestId !== params.approvalRequestId || request.agentId !== agentId) reasonCodes.push("REQUEST_BINDING_INVALID");
+    else requestBinding = approvalRequestBindingDigest(request);
+  } catch { reasonCodes.push("REQUEST_INTEGRITY_INVALID"); }
 
   const decisionRoot = decisionsDir(params.workspace, agentId);
   if (pathExists(decisionRoot)) {
@@ -650,6 +670,7 @@ export function inspectApprovalChainIntegrity(params: {
         continue;
       }
       if (decision.approvalRequestId !== params.approvalRequestId) continue;
+      if (decision.requestDigestSha256 !== undefined && decision.requestDigestSha256 !== requestBinding) reasonCodes.push("DECISION_REQUEST_BINDING_INVALID");
       if (!verifyArtifact(params.workspace, path).valid) {
         reasonCodes.push("DECISION_INTEGRITY_INVALID");
       }

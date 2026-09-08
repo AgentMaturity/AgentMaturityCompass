@@ -28,7 +28,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "typescript-agent-tool-orchestration",
     domain: "agent-development-kit-runtime",
-    agentEvaluationDimension: "typescript_deployed_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 17 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.11 : 0.015,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

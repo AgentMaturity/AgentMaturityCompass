@@ -18,6 +18,7 @@ import { initWorkspace } from "../../src/workspace.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { AdapterRegistry } from "../../src/llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "../../src/llm/adapter/adapterTypes.js";
+import { ANTHROPIC_CAPABILITIES } from "../../src/llm/adapter/providerCapabilities.js";
 import { LlmRuntime } from "../../src/llm/adapter/llmRuntime.js";
 import type { HttpResponse, HttpTransport } from "../../src/llm/adapter/transport.js";
 import { bodyFromChunks } from "../../src/llm/adapter/transport.js";
@@ -142,6 +143,10 @@ export function scriptedAdapter(scripts: readonly StreamChunk[][]): LlmAdapter {
     version: 1,
     encoderId: "anthropic-messages",
     encoderVersion: 1,
+    // The real request encoder is Anthropic, including its keyed tool-result
+    // error flag. Responses and accounting come from explicit local scripts;
+    // this fixture never claims a provider probe or provider-reported usage.
+    capabilities: { ...ANTHROPIC_CAPABILITIES, usage: "synthetic-demonstration" },
     envelope: (input) => ({
       url: `${input.baseUrl}/v1/messages`,
       method: "POST",

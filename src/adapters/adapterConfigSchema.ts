@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adapterRunModeSchema } from "./adapterTypes.js";
 import { leaseScopeSchema } from "../leases/leaseSchema.js";
+import { deepseekHarnessLaunchSchema } from "./deepseekHarnessLaunch.js";
 
 export const adapterAgentProfileSchema = z.object({
   preferredAdapter: z.string().min(1),
@@ -9,7 +10,8 @@ export const adapterAgentProfileSchema = z.object({
   runMode: adapterRunModeSchema.default("SUPERVISE"),
   leaseScopes: z.array(leaseScopeSchema).min(1),
   routeAllowlist: z.array(z.string().startsWith("/")).min(1),
-  modelAllowlist: z.array(z.string().min(1)).min(1)
+  modelAllowlist: z.array(z.string().min(1)).min(1),
+  deepseekHarnessLaunch: deepseekHarnessLaunchSchema.optional()
 });
 
 export const adapterConfigSchema = z.object({
@@ -42,4 +44,3 @@ export function defaultAdapterConfig(): AdapterConfig {
     }
   });
 }
-

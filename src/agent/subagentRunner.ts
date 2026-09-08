@@ -1,5 +1,9 @@
 import { SessionService } from "../session/sessionService.js";
-import { deniedToolNamesForScope } from "./delegationScope.js";
+import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScope } from "./delegationScope.js";
+import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
+import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
+import type { AgentLoopConfig } from "./loopTypes.js";
+import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
 import { AgentDriver } from "./agentDriver.js";
 import { readAgentRunSummary } from "./runReport.js";
@@ -68,6 +72,10 @@ export interface DriverRunnerInit {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /** Same per-turn ceilings as the parent; no independent child defaults. */
+  readonly config?: Partial<AgentLoopConfig>;
+  /** Existing policy and answerers, rebound to each actual child session. */
+  readonly approvalGate?: ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised">;
   /**
    * Lets a child delegate further.
    *
@@ -77,6 +85,8 @@ export interface DriverRunnerInit {
    */
   readonly grantDelegation?: {
     readonly runner: SubagentRunner;
+    /** Optional additional narrowing; always intersected with the child's scope. */
+    readonly delegationScope?: readonly ActionClass[];
     readonly maxDepth?: number;
     readonly mintSessionId?: () => string;
   };
@@ -90,147 +100,137 @@ export interface DriverRunnerInit {
  * the same shape `agentToolset` already uses for its registry and ledger.
  */
 export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
+  // Snapshot operator choices once; no child or subsequent caller mutation may
+  // widen an already composed run's gate, limits or descendant scope.
+  const config = init.config === undefined ? undefined : { ...init.config };
+  const gate = init.approvalGate === undefined ? undefined : { ...init.approvalGate,
+    ...(init.approvalGate.toolNames === undefined ? {} : { toolNames: [...init.approvalGate.toolNames] }),
+    ...(init.approvalGate.answerers === undefined ? {} : { answerers: [...init.approvalGate.answerers] }) };
+  const grant = init.grantDelegation === undefined ? undefined : { ...init.grantDelegation,
+    ...(init.grantDelegation.delegationScope === undefined ? {} : { delegationScope: [...init.grantDelegation.delegationScope] }) };
+
   return async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
-    const session = new SessionService(init.workspace);
-    const toolset = agentToolset({
-      workspace: init.workspace,
-      // The child's own session, so its tool evidence lands in the log its turn
-      // wrote rather than in a shared bucket named after the agent id.
-      sessionId: ctx.childSessionId,
-      recorder: session,
-      // The root's id. Never ctx.identity.runAs — see subagentSpawn.ts.
-      agentId: ctx.toolsetAgentId,
-      // A child that can itself delegate is given ITS OWN identity, so
-      // `delegateTo` sees the real depth. Handing it the parent's would make
-      // every generation look like depth 1 and turn `maxDepth` into a field
-      // nothing enforces.
-      ...(init.grantDelegation === undefined
-        ? {}
-        : {
-            subagents: {
-              identity: ctx.identity,
-              runner: init.grantDelegation.runner,
-              session,
-              ...(init.grantDelegation.maxDepth === undefined
-                ? {}
-                : { maxDepth: init.grantDelegation.maxDepth }),
-              ...(init.grantDelegation.mintSessionId === undefined
-                ? {}
-                : { mintSessionId: init.grantDelegation.mintSessionId })
-            }
-          })
-    });
-
-    // Bind the child to its declared scope, before it is offered anything.
-    //
-    // This is what turns `delegationScope` from a line in a signed packet into a
-    // constraint: it has been recorded in every handoff packet since packets
-    // existed and read back by nothing, so a packet asserting READ_ONLY was a
-    // signature over a rule that did not exist. Applied to the CHILD's own
-    // registry, which `agentToolset` creates per call, so narrowing it cannot
-    // reach the parent -- the two share `governedAs`, and a scope-keyed
-    // restriction would otherwise narrow both.
-    if (ctx.delegationScope !== undefined) {
-      toolset.registry.restrict({
-        deny: new Set(deniedToolNamesForScope(toolset.registry, ctx.delegationScope))
-      });
+    if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
+    const scope = ctx.delegationScope === undefined ? undefined : [...ctx.delegationScope];
+    if (scope !== undefined) {
+      const parsed = parseDelegationScope(scope);
+      if (!parsed.ok) return { ok: false, text: "", reason: parsed.reason };
     }
-
+    const descendantScope = intersectDelegationScopes(scope, grant?.delegationScope);
+    const session = new SessionService(init.workspace);
+    let toolset: ReturnType<typeof agentToolset> | undefined;
+    let driver: AgentDriver | undefined;
+    let opened = false;
+    let active = false;
     let keepAlive = false;
-    let released = false;
+    let releaseRequested = false;
+    let resourcesClosed = false;
+    let parentCancelled = false;
+    let releaseError: unknown;
+
+    const finalize = (): void => {
+      if (resourcesClosed || active) return;
+      resourcesClosed = true;
+      ctx.signal?.removeEventListener("abort", onParentAbort);
+      try { toolset?.close(); } catch (error) { releaseError ??= error; }
+      try {
+        if (opened) session.close({ reason: "completed" });
+        else session.disposeWithoutClosing();
+      } catch (error) {
+        // A failed writer remains visibly incomplete. Dispose its DB handle
+        // without claiming that a refused close was a successful seal.
+        releaseError ??= error;
+        try { session.disposeWithoutClosing(); } catch { /* preserve original close failure */ }
+      }
+    };
     const release = (): void => {
-      // No early return on a second call. `SessionService` already refuses one
-      // ("SessionService used after close()") and writes exactly one
-      // `session/close` row — measured, not assumed — so a guard here would be a
-      // protection sitting next to a protection that already covers the case.
-      // The flag is still set, because `drain` genuinely needs it: without that
-      // one, a caller holding the raw continuation gets an opaque failure from a
-      // closed session instead of a refusal it can act on.
-      released = true;
-      // Both, always. A leaked ledger handle outlives the delegation that opened
-      // it, and an unclosed session leaves a run that verification reads as
-      // still open.
-      try { toolset.close(); } catch { /* already closed */ }
-      try { session.close({ reason: "completed" }); } catch { /* never opened */ }
+      releaseRequested = true;
+      ctx.signal?.removeEventListener("abort", onParentAbort);
+      if (active) {
+        driver?.cancel({ kind: "disposed" }, { by: "delegation-handle-close" });
+        return; // The active drain owns settlement and closes resources afterward.
+      }
+      finalize();
+      if (releaseError !== undefined) throw releaseError;
+    };
+    const onParentAbort = (): void => {
+      if (parentCancelled || resourcesClosed) return;
+      parentCancelled = true;
+      releaseRequested = true;
+      try { driver?.cancel({ kind: "parent" }, { by: "parent-delegation" }); }
+      catch (error) { releaseError ??= error; }
+      // Never close a DB underneath a live tool/approval turn. Idle continued
+      // children can close immediately; a running drain does so in its finally.
+      if (!active) finalize();
     };
 
     try {
-      session.open({
-        sessionId: ctx.childSessionId,
-        agentId: ctx.toolsetAgentId,
-        harnessVersion: init.harnessVersion,
-        compositionDigest: init.compositionDigest,
-        policyDigest: init.policyDigest
-      });
+      session.open({ sessionId: ctx.childSessionId, agentId: ctx.toolsetAgentId,
+        harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest, policyDigest: init.policyDigest });
+      opened = true;
+      toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
+        recorder: session, agentId: ctx.toolsetAgentId,
+        ...(grant === undefined ? {} : { subagents: {
+          identity: ctx.identity, runner: grant.runner, session,
+          ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
+          ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
+          ...(descendantScope === undefined ? {} : { delegationScope: descendantScope })
+        } }) });
+      if (scope !== undefined) toolset.registry.restrict({ deny: new Set(deniedToolNamesForScope(toolset.registry, scope)) });
       const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
-
-      const driver = new AgentDriver({
-        session,
-        llm: init.makeLlm(session),
-        route: init.route,
-        systemPromptEventId,
-        tools: toolset.seam
-      });
-
-      /**
-       * How much of the child's assistant text the parent has already been told.
-       *
-       * `readAgentRunSummary` folds the WHOLE session, so without this cursor a
-       * second continuation would hand the parent everything the child has ever
-       * said — the first answer quoted again as if it were the new one.
-       */
+      const approval = gate === undefined ? undefined : new ApprovalSeam({ session, workspace: init.workspace,
+        agentId: ctx.toolsetAgentId,
+        ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
+        ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }) });
+      driver = new AgentDriver({ session, llm: init.makeLlm(session), route: init.route, systemPromptEventId,
+        tools: approval === undefined || gate === undefined ? toolset.seam : gateToolCallsOnApproval(toolset.seam, approval, gate),
+        ...(config === undefined ? {} : { config }) });
+      // Keep this subscription for the entire continuation lifetime, not just
+      // the first turn. A parent's abort permanently prevents further followups.
+      ctx.signal?.addEventListener("abort", onParentAbort, { once: true });
+      if (ctx.signal?.aborted) onParentAbort();
       let reported = 0;
-
+      let completedTurns = 0;
       const drain = async (text: string): Promise<SubagentRunResult> => {
-        if (released) {
-          return { ok: false, text: "", reason: "child has been released" };
+        if (releaseRequested || resourcesClosed || parentCancelled || ctx.signal?.aborted) {
+          return { ok: false, text: "", reason: parentCancelled || ctx.signal?.aborted ? "parent cancelled the child" : "child has been released" };
         }
-        // The only way in.
-        driver.followup(text);
-        await driver.whenIdle();
-
-        // The driver's own status goes in beside the log's counts, never instead
-        // of them — `readAgentRunSummary` is built that way on purpose.
-        const status = driver.status;
-        const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, status);
-
-        // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
-        // the child's log has an open turn nothing may build on. Its text may look
-        // complete; the run it came from is not.
-        if (status === "failed") {
-          return { ok: false, text: "", reason: "child driver failed; its log has an open turn" };
+        if (active) return { ok: false, text: "", reason: "child already has an active turn" };
+        active = true;
+        try {
+          driver!.followup(text);
+          await driver!.whenIdle();
+          const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, driver!.status);
+          const ending = summary.endings.at(-1);
+          if (parentCancelled || ctx.signal?.aborted || releaseRequested || driver!.status === "failed"
+              || summary.endings.length <= completedTurns || ending?.reason !== "complete") {
+            releaseRequested = true;
+            return { ok: false, text: "", reason: parentCancelled || ctx.signal?.aborted
+              ? "parent cancelled the child" : `child turn did not complete (${ending?.reason ?? driver!.status})` };
+          }
+          if (summary.unsignedRows > 0) {
+            releaseRequested = true;
+            return { ok: false, text: "", reason: `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance` };
+          }
+          const fresh = summary.assistantText.slice(reported);
+          reported = summary.assistantText.length;
+          completedTurns = summary.endings.length;
+          return { ok: true, text: fresh.join("\n") };
+        } catch (error) {
+          releaseRequested = true;
+          throw error;
+        } finally {
+          active = false;
+          if (releaseRequested) finalize();
+          if (releaseError !== undefined) throw releaseError;
         }
-
-        // `unsignedRows` documents itself as "zero is the only acceptable value".
-        // A child whose evidence is not signed has produced words with no
-        // provenance, and handing those back to a parent that will quote them
-        // would launder them into the parent's own signed log.
-        if (summary.unsignedRows > 0) {
-          return {
-            ok: false,
-            text: "",
-            reason: `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`
-          };
-        }
-
-        const fresh = summary.assistantText.slice(reported);
-        reported = summary.assistantText.length;
-        return { ok: true, text: fresh.join("\n") };
       };
-
       const first = await drain(ctx.goal);
-      if (!ctx.continuable || !first.ok) {
-        return first;
-      }
-
-      // The child stays alive, so the `finally` must not tear it down. Its
-      // delegation is not accounted for until the parent releases the handle.
+      if (!ctx.continuable || !first.ok || releaseRequested) return first;
       keepAlive = true;
       return { ...first, continuation: { continue: drain, close: release } };
     } finally {
-      if (!keepAlive) {
-        release();
-      }
+      if (!keepAlive) release();
     }
   };
 }

@@ -15,6 +15,7 @@ import {
 } from "./approvalPolicyEngine.js";
 import {
   approvalRequestSchema,
+  approvalRequestBindingDigest,
   cancelApprovalRequest,
   createApprovalRequestRecord,
   inspectApprovalChainIntegrity,
@@ -251,6 +252,8 @@ export function decideApprovalForIntent(params: {
   username?: string;
   userId?: string;
   userRoles?: UserRole[];
+  /** Native prompt binds its signed decision to the exact reviewed request. */
+  expectedRequestDigestSha256?: string;
 }): {
   approval: {
     approvalId: string;
@@ -267,12 +270,20 @@ export function decideApprovalForIntent(params: {
     decisionReceiptId: string | null;
   };
 } {
+  if (params.expectedRequestDigestSha256 !== undefined && (!params.userId || !params.username || !params.userRoles?.length)) {
+    throw new Error("a bound native decision requires explicit authenticated reviewer fields");
+  }
   const request = loadApprovalRequestRecord({
     workspace: params.workspace,
     agentId: params.agentId,
     approvalRequestId: params.approvalId,
     requireValidSignature: true
   });
+  if (params.expectedRequestDigestSha256 !== undefined &&
+    (request.approvalRequestId !== params.approvalId || (params.agentId !== undefined && request.agentId !== params.agentId)
+      || !/^[a-f0-9]{64}$/.test(params.expectedRequestDigestSha256) || params.expectedRequestDigestSha256 !== approvalRequestBindingDigest(request))) {
+    throw new Error("approval request changed after review");
+  }
   const chain = inspectApprovalChainIntegrity({
     workspace: params.workspace,
     agentId: request.agentId,
@@ -314,7 +325,8 @@ export function decideApprovalForIntent(params: {
     username: reviewerUsername,
     roles: params.userRoles ?? ["OWNER"],
     decision: modeDecision,
-    reason: params.reason
+    reason: params.reason,
+    ...(params.expectedRequestDigestSha256 === undefined ? {} : { expectedRequestDigestSha256: params.expectedRequestDigestSha256 })
   }).decision;
   const policy = loadApprovalPolicy(params.workspace);
   const quorum = evaluateApprovalQuorum({

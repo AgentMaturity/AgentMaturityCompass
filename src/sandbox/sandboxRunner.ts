@@ -1,4 +1,5 @@
 import { seatbeltBackend } from "./seatbeltBackend.js";
+import { bwrapBackend } from "./bwrapBackend.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
 /**
@@ -32,12 +33,10 @@ export interface SandboxRunnerInit {
 
 /** The backends AMC ships, in preference order. */
 export function defaultBackends(): readonly SandboxBackend[] {
-  // Only Seatbelt today. A Linux backend (Landlock or bwrap) belongs here and
-  // is deliberately absent rather than written blind: this machine has no
-  // bwrap, no landlock-run and no container runtime, so a Linux backend could
-  // not be executed even once before shipping — and unverified confinement
-  // code is the exact false assurance the sandbox exists to remove.
-  return [seatbeltBackend()];
+  // Availability is a prerequisite only. Linux execution requires a separate
+  // launcher status receipt; the backend never promotes binary presence to
+  // evidence that a namespace/profile was actually applied.
+  return [seatbeltBackend(), bwrapBackend()];
 }
 
 export class SandboxRunner {

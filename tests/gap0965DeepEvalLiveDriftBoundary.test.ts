@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:deepeval-production-agent-${index}`,
     taskCategory: "deepeval-production-agent-live-drift",
     domain: "agent-evaluation-observability",
-    agentEvaluationDimension: "observed_deepeval_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 19 + index : 9 + index,
     invalidActionRate0to1: prefix === "live" ? 0.13 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.09 : 0.01,

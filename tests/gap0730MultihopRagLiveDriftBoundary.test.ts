@@ -33,7 +33,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:supporting-evidence-hop-${index}`,
     taskCategory: "multi-hop-rag-evaluation-drift",
     domain: "retrieval-augmented-generation-agent-evaluation",
-    agentEvaluationDimension: "observed_multihop_retrieval_and_answer_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 9 + index : 5 + index,
     invalidActionRate0to1: prefix === "live" ? 0.14 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.1 : 0.01,

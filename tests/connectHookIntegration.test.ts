@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+import { createServer, type RequestListener } from "node:http";
 import {
   chmodSync,
   existsSync,
@@ -84,7 +84,7 @@ function decodeLease(token: string): ReturnType<typeof leasePayloadSchema.parse>
 }
 
 async function listen(
-  handler: Parameters<typeof createServer>[0]
+  handler: RequestListener
 ): Promise<{ base: string; close: () => Promise<void> }> {
   const server = createServer(handler);
   await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", resolvePromise));

@@ -45,6 +45,9 @@ describe("cliUx", () => {
     expect(footer).toContain("amc shell");
     expect(footer).toContain("NO_COLOR=1");
     expect(footer).toContain("--no-color");
+    expect(footer).toContain("amc agent-loop guide");
+    expect(footer).toContain("baseline/assessment");
+    expect(footer).not.toContain("Run AMC end to end");
   });
 
   it("builds a source-of-truth command inventory from Commander", () => {

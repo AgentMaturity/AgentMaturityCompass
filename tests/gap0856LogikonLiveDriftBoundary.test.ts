@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:logikon-reasoning-trace:${index}`,
     taskCategory: "reasoning-trace-live-drift",
     domain: "agent-evaluation-reasoning",
-    agentEvaluationDimension: "observed_reasoning_trace_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 16 + index : 7 + index,
     invalidActionRate0to1: prefix === "live" ? 0.1 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

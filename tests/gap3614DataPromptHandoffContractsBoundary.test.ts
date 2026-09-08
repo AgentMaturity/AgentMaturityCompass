@@ -81,14 +81,16 @@ describe("GAP-3614 Data-Prompt handoff contracts boundary", () => {
           ownerAgentId: "test-set-generator",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-test-set-manifest"]
+          evidenceRefs: ["receipt-test-set-manifest"],
+          refusalReason: null
         },
         {
           dependencyId: "prompt-change-review",
           ownerAgentId: "reviewer-agent",
           status: "pending",
           required: true,
-          evidenceRefs: ["review-request"]
+          evidenceRefs: ["review-request"],
+          refusalReason: null
         }
       ],
       ownershipTransfer: {
@@ -109,7 +111,8 @@ describe("GAP-3614 Data-Prompt handoff contracts boundary", () => {
           ownerAgentId: "reviewer-agent",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-prompt-change-review"]
+          evidenceRefs: ["receipt-prompt-change-review"],
+          refusalReason: null
         }
       ]
     });

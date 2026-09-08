@@ -12,7 +12,7 @@ import {
   verifyFleetConfigSignature
 } from "../src/fleet/registry.js";
 import { attestIngestSession, ingestEvidence } from "../src/ingest/ingest.js";
-import { initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
+import { gatewayConfigSchema, initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
 import { parseEvidenceEvent, evaluateGate } from "../src/diagnostic/gates.js";
 import type { Gate } from "../src/types.js";
@@ -138,7 +138,7 @@ describe("fleet mode and trust tiers", () => {
     }
 
     const proxyPort = await pickFreePort();
-    const gatewayConfig: GatewayConfig = {
+    const gatewayConfig: GatewayConfig = gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key"],
@@ -168,7 +168,7 @@ describe("fleet mode and trust tiers", () => {
         allowlistHosts: ["allowed.example"],
         denyByDefault: true
       }
-    };
+    });
     initGatewayConfig(workspace, gatewayConfig);
     const gateway = await startGateway({ workspace });
     const lease = issueLeaseForCli({

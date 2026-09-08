@@ -179,17 +179,18 @@ describe("compass canon + cgx + truthguard", () => {
       workspace,
       profile: {
         v: 1,
+        generatedTs: 1,
         agentId: "default",
         agentType: "code-agent",
         modelFamilies: ["gpt"],
         toolFamilies: ["git"],
-        riskTier: "medium",
+        riskTier: "med",
         operatingMode: "interactive",
         capabilities: {
-          notaryEnabled: false,
-          pluginsEnabled: true,
-          forecastEnabled: true,
-          benchmarksEnabled: true
+          notary: false,
+          plugins: true,
+          forecast: true,
+          benchmarks: true
         }
       }
     });

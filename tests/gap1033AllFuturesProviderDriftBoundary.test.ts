@@ -54,7 +54,7 @@ const baseRow = (side: "baseline" | "candidate", overrides: Partial<ProviderDrif
   metricCount: 12,
   evaluatorConfigHash: hash(side === "baseline" ? "a" : "b"),
   generatedTestDataHash: hash(side === "baseline" ? "c" : "d"),
-  verdictAggregation: "weighted_mean",
+  verdictAggregation: "custom",
   verdictAggregationConfigHash: hash(side === "baseline" ? "e" : "f"),
   dashboardArtifactHash: hash(side === "baseline" ? "1" : "2"),
   pipelineOrchestratorId: "amc-provider-drift-canary-runner",

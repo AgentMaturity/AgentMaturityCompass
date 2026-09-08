@@ -105,7 +105,8 @@ export const adapterDefinitionSchema = z.object({
   detection: z.object({
     commandCandidates: z.array(z.string().min(1)).min(1),
     versionArgs: z.array(z.string().min(1)).default(["--version"]),
-    parseVersionRegex: z.string().min(1)
+    parseVersionRegex: z.string().min(1),
+    requireVersionMatch: z.boolean().optional()
   }),
   providerFamily: providerFamilySchema,
   defaultRunMode: adapterRunModeSchema,

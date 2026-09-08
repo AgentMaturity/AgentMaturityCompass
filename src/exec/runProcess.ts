@@ -53,7 +53,7 @@ export function runProcess(spec: ProcessSpec): RunningProcess {
     // actually reaps a tree. It costs the terminal's foreground group, which
     // `forwardSignals` below buys back.
     detached: usesProcessGroups,
-    stdio: [spec.stdin, spec.stdout === "ignore" ? "ignore" : "pipe", spec.stderr === "ignore" ? "ignore" : "pipe"]
+    stdio: [spec.stdin, spec.stdout === "ignore" ? "ignore" : "pipe", spec.stderr === "ignore" ? "ignore" : "pipe", ...(spec.extraFds ?? [])]
   });
 
   const sink = (stream: "stdout" | "stderr", tee: boolean) => (text: string): void => {

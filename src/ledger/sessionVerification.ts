@@ -9,6 +9,7 @@
  */
 import { extractEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import type { Ledger } from "./ledger.js";
+import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
 
 /**
  * Verifies the per-session chain carried inside session events.
@@ -27,6 +28,8 @@ import type { Ledger } from "./ledger.js";
  */
 export function verifySessionChains(ledger: Ledger, errors: string[]): void {
   const events = ledger.getAllEvents();
+  try { validateSurfaceCompactions(ledger.workspace, events); }
+  catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
   const expectedSeqBySession = new Map<string, number>();
   const expectedPrevHashBySession = new Map<string, string>();
   for (const event of events) {

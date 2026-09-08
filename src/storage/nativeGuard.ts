@@ -10,7 +10,7 @@
  * so the fix always targets the correct ABI, whatever npm used.
  *
  * Normal runs pay ~no cost (the module simply loads). Opt out with
- * AMC_NO_AUTO_REBUILD=1. Skipped in CI.
+ * AMC_NO_AUTO_REBUILD=1. Skipped in CI and for explicit guide/help requests.
  */
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -63,7 +63,53 @@ function clearCache(): void {
   }
 }
 
+/** Only command shapes whose handlers cannot open a database may skip repair.
+ * Do not search for --help anywhere: it can be a required option's value on
+ * a real run, for example agent-loop run --model --help.
+ */
+function isReadOnlyCliRequest(argv: readonly string[]): boolean {
+  const args = [...argv];
+  while (args.length > 0) {
+    if (args[0] === "--no-color" || args[0] === "--json") args.shift();
+    else if (args[0] === "--agent" && args.length > 1) args.splice(0, 2);
+    else if (args[0]?.startsWith("--agent=")) args.shift();
+    else break;
+  }
+  if (args.some(arg => arg === "--help" || arg === "-h") &&
+      args.every(arg => ["--help", "-h", "--all", "--no-color"].includes(arg))) return true;
+  if (args[0] === "help" && args.slice(1).every(arg => !arg.startsWith("-") || ["--all", "--no-color"].includes(arg))) return true;
+  const helpPath = args.slice(0, -1).join(" ");
+  if (["--help", "-h"].includes(args.at(-1) ?? "") &&
+      ["agent-loop", "agent-loop run", "agent-loop chat", "agent-loop verify", "credentials", "credentials list", "credentials describe", "credentials set", "credentials unset"].includes(helpPath)) return true;
+  if (args[0] === "imports" && args[1] === "verify-profile") {
+    let positional = 0;
+    const values = ["--authorities", "--original", "--expected-digest"];
+    for (let index = 2; index < args.length; index++) {
+      const arg = args[index]!;
+      if (["--json", "--no-color", "--help", "-h"].includes(arg)) continue;
+      if (values.includes(arg)) { if (++index >= args.length) return false; continue; }
+      if (values.some(option => arg.startsWith(`${option}=`))) continue;
+      if (arg.startsWith("-") || ++positional > 1) return false;
+    }
+    return true;
+  }
+  if (args[0] !== "agent-loop" || args[1] !== "guide") return false;
+  const valueOptions = ["--provider", "--model", "--credential", "--credentials-home", "--credentials-file", "--agent"];
+  for (let index = 2; index < args.length; index++) {
+    const arg = args[index]!;
+    if (["--json", "--no-color", "--help", "-h"].includes(arg)) continue;
+    if (valueOptions.includes(arg)) {
+      if (++index >= args.length) return false;
+      continue;
+    }
+    if (valueOptions.some(option => arg.startsWith(`${option}=`))) continue;
+    return false;
+  }
+  return true;
+}
+
 function guard(): void {
+  if (isReadOnlyCliRequest(process.argv.slice(2))) return;
   if (process.env.AMC_NO_AUTO_REBUILD === "1" || process.env.CI || process.env.CONTINUOUS_INTEGRATION) {
     return;
   }

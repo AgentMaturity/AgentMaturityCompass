@@ -2,6 +2,20 @@ import { resolve } from "node:path";
 import type { Command } from "commander";
 import chalk from "chalk";
 
+function renderNormalization(plan: import("./importers/neutralImporter.js").NeutralImportPlan): void {
+  const receipt = plan.normalization;
+  if (!receipt) { console.log("  Normalization: legacy receipt; mapping losses and unknown timing were not recorded."); return; }
+  const count = receipt.counts;
+  console.log(`  Source trust: ${receipt.sourceTrust}; evaluation: ${receipt.evaluation}`);
+  console.log(`  Mapping: ${count.normalizedTraces} traces; ${count.failureTraces} reported failures`);
+  console.log(`  Files skipped: ${count.skippedFiles} (${count.malformedFiles} malformed, ${count.unsupportedFiles} unsupported, ${count.oversizedFiles} oversized)`);
+  console.log(`  Unknown timing: ${count.unknownTimestamps} event times; ${count.unknownDurations} durations`);
+  console.log(`  Normalizer: ${receipt.normalizerVersion}; semantic digest: ${receipt.semanticDigest}`);
+  for (const loss of receipt.losses) console.log(chalk.gray(`  ${loss}`));
+  for (const candidate of plan.candidates) console.log(`  Source: ${candidate.path}; SHA-256 ${candidate.digest}; format ${candidate.sourceFormat?.version ?? candidate.format}`);
+  console.log("  Next: inspect the JSON receipt before applying, or use amc imports show <import-id> after applying.");
+}
+
 export function registerNeutralImportCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
   program
     .command("import <path>")
@@ -10,7 +24,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
     .option("--dry-run", "detect and summarize without writing artifacts", false)
     .option("--validate", "validate support without writing artifacts", false)
     .option("--json", "JSON output")
-    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean }) => {
+    .option("--expected-digest <sha256>", "apply only the semantic source digest reviewed in a preview")
+    .action(async (path: string, opts: { agent?: string; dryRun?: boolean; validate?: boolean; json?: boolean; expectedDigest?: string }) => {
       try {
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
         const mode = opts.validate ? "validate" : opts.dryRun ? "dry-run" : "import";
@@ -19,7 +34,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
           workspace: process.cwd(),
           inputPath: resolve(process.cwd(), path),
           agentId,
-          mode
+          mode,
+          expectedSemanticDigest: opts.expectedDigest
         });
         if (opts.json) {
           console.log(JSON.stringify(result, null, 2));
@@ -31,6 +47,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Artifacts: ${result.plan.candidateCount}`);
         console.log(`  Categories: ${result.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${result.plan.redactionCount}`);
+        renderNormalization(result.plan);
         if (!result.applied) {
           console.log(chalk.gray("  Dry run only. Re-run without --dry-run or --validate to write AMC evidence."));
           for (const path of result.plan.wouldWrite.slice(0, 8)) {
@@ -43,6 +60,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Lifecycle: ${result.lifecycleRun?.artifact.lifecycleRunId ?? "-"}`);
         console.log(`  Trace index: ${result.traceFailureIndex?.ref.indexId ?? "-"}`);
         console.log(`  Manifest: ${result.resourceManifest?.manifest.manifestId ?? "-"}`);
+        for (const path of result.externalEvidencePaths ?? []) console.log(`  Portable evidence: ${path}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
         process.exit(1);
@@ -52,6 +70,31 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
   const imports = program
     .command("imports")
     .description("List, inspect, and roll back neutral import runs");
+
+  imports.command("verify-profile <path>")
+    .description("Independently verify an external-evidence profile without opening a workspace")
+    .option("--authorities <path>", "operator-admitted authority keys JSON; never taken from the evidence")
+    .option("--original <path>", "original source bytes to compare with the declared source digest")
+    .option("--expected-digest <sha256>", "independently received normalized semantic digest")
+    .option("--json", "JSON output")
+    .action(async (path: string, opts: { authorities?: string; original?: string; expectedDigest?: string; json?: boolean }) => {
+      try {
+        const { verifyExternalEvidenceFile } = await import("./standard/externalEvidenceFiles.js");
+        const result = verifyExternalEvidenceFile({ path: resolve(path), authoritiesPath: opts.authorities,
+          originalPath: opts.original, expectedNormalizedDigest: opts.expectedDigest });
+        if (opts.json) console.log(JSON.stringify(result, null, 2));
+        else {
+          console.log(`Profile: ${result.ok ? "valid" : "refused"}; source trust: ${result.trustTier}`);
+          console.log(`Original digest: ${result.originalDigest}; signature verified: ${result.signatureVerified}; parent session: ${result.parentSession}`);
+          for (const error of result.errors) console.error(error);
+        }
+        if (!result.ok) process.exitCode = 1;
+      } catch {
+        const result = { ok: false, errors: ["Unable to read a valid bounded profile or authority file"], trustTier: "SELF_REPORTED" };
+        if (opts.json) console.log(JSON.stringify(result)); else console.error(result.errors[0]);
+        process.exitCode = 1;
+      }
+    });
 
   imports
     .command("list")
@@ -101,6 +144,8 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Source: ${manifest.sourcePath}`);
         console.log(`  Categories: ${manifest.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${manifest.plan.redactionCount}`);
+        renderNormalization(manifest.plan);
+        for (const path of manifest.externalEvidencePaths ?? []) console.log(`  Portable evidence: ${path}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
         process.exit(1);

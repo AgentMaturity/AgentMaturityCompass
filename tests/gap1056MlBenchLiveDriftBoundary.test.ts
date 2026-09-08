@@ -43,7 +43,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:repository-ml-task-${index}`,
     taskCategory: "ml-bench-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "ml-bench-source-context",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.18 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.13 : 0.01,
     toolCallCount: prefix === "live" ? 13 : 5,

@@ -1,6 +1,7 @@
 import { UNSIGNED } from "../agent/runReport.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { EvidenceEvent } from "../types.js";
+import { sha256Hex } from "../utils/hash.js";
 
 /**
  * Turning signed session rows into ACP `session/update` notifications
@@ -51,7 +52,8 @@ export interface ProjectedUpdates {
 export function projectSessionUpdates(
   workspace: string,
   events: readonly EvidenceEvent[],
-  from: number
+  from: number,
+  options: { readonly includeUser?: boolean } = {}
 ): ProjectedUpdates {
   const updates: AcpSessionUpdate[] = [];
   let unsigned = 0;
@@ -66,11 +68,22 @@ export function projectSessionUpdates(
       unsigned += 1;
       continue;
     }
-    const update = updateFor(workspace, event);
+    if (options.includeUser && (event.event_type === "user/message" || event.event_type === "tool/result"
+      || (event.event_type === "assistant/block" && metaOf(event)["blockKind"] === "text"))
+      && readEventPayload(workspace, event).status !== "ok") {
+      throw new Error("Session history payload is unavailable; cannot faithfully replay the conversation.");
+    }
+    const update = options.includeUser && event.event_type === "user/message"
+      ? userUpdate(workspace, event) : updateFor(workspace, event);
     if (update) updates.push(update);
   }
 
   return { updates, unsigned };
+}
+
+function userUpdate(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {
+  const text = payloadText(workspace, event);
+  return text === null ? null : { sessionUpdate: "user_message_chunk", content: { type: "text", text } };
 }
 
 function updateFor(workspace: string, event: EvidenceEvent): AcpSessionUpdate | null {
@@ -133,5 +146,7 @@ function metaOf(event: EvidenceEvent): Record<string, unknown> {
  */
 function payloadText(workspace: string, event: EvidenceEvent): string | null {
   const payload = readEventPayload(workspace, event);
-  return payload.status === "ok" ? payload.bytes.toString("utf8") : null;
+  if (payload.status !== "ok") return null;
+  if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error("ACP payload does not match its committed digest.");
+  return payload.bytes.toString("utf8");
 }

@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "industrial-batch-process-decision-support",
     domain: "clean-in-place-industrial-iot",
-    agentEvaluationDimension: "safety_critical_decision_support_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 21 + index : 10 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

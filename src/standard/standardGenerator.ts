@@ -13,6 +13,7 @@ import { assuranceCertSchema } from "../assurance/assuranceSchema.js";
 import { binderJsonSchema } from "../audit/binderSchema.js";
 import { passportJsonSchema } from "../passport/passportSchema.js";
 import { domainProofArtifactSchema } from "../domainProof/domainProofArtifact.js";
+import { externalEvidenceProfileSchema, validateExternalEvidenceProfile } from "./externalEvidenceProfile.js";
 import { inspectBenchArtifact } from "../bench/benchArtifact.js";
 import { inspectPromptPackArtifact } from "../prompt/promptPackArtifact.js";
 import { verifyAssuranceCertificateFile } from "../assurance/assuranceVerifier.js";
@@ -36,6 +37,7 @@ import {
 type SchemaName = (typeof STANDARD_SCHEMA_NAMES)[number];
 
 function schemaByName(name: SchemaName): Record<string, unknown> {
+  if (name === "external-evidence.schema.json") return externalEvidenceProfileSchema;
   const common = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     // The published standard is intentionally permissive so third parties can
@@ -178,6 +180,11 @@ function resolveSchemaName(id: string): SchemaName {
 }
 
 function validateSchemaPayload(name: SchemaName, payload: unknown): void {
+  if (name === "external-evidence.schema.json") {
+    const errors = validateExternalEvidenceProfile(payload);
+    if (errors.length) throw new Error(errors.join("; "));
+    return;
+  }
   if (name === "amcbench.schema.json") {
     benchArtifactSchema.parse(payload);
     return;

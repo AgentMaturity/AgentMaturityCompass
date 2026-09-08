@@ -24,7 +24,7 @@ const implementationFiles = [
   "src/diagnostic/runner.ts",
 ];
 
-const layerName: LayerName = "Evaluation and Improvement";
+const layerName: LayerName = "Strategic Agent Operations";
 
 function score(index: number, finalLevel = 3, confidence = 0.89): QuestionScore {
   return {

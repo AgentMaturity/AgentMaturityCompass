@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v6";
+const CACHE_NAME = "amc-console-v7";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);

@@ -44,7 +44,7 @@ const engineEvaluation: ReplayBenchmarkAdversarialEngineEvaluationFixture = {
   explanationHash: hash("synthetic promptfoo-style adversarial regression blocked with no copied prompts or configs"),
   rerunStatus: "failed",
   guardrailRuleIds: ["guardrail:prompt-injection", "guardrail:tool-misuse"],
-  guardrailRuleTypes: ["prompt_injection", "tool_misuse"],
+  guardrailRuleTypes: ["prompt_injection", "custom"],
   failedGuardrailRuleCount: 2,
   promptInjectionDetected: true,
   alertRuleId: "alert:promptfoo-adversarial-regression",

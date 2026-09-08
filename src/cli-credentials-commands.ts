@@ -16,10 +16,8 @@
  * platform ships to its logging backend. The value arrives on stdin or through
  * a no-echo prompt, and nowhere else.
  *
- * Registered as a HIDDEN command group, like the session spine: hidden commands
- * are treated as internal by `buildCommandInventory`, so the published
- * command-count claim is unaffected. It lives in its own module because
- * src/cli.ts is at its line-ratchet floor.
+ * This module also serves the native first-use guide. It lives separately
+ * because src/cli.ts is at its line-ratchet floor.
  */
 import type { Command } from "commander";
 import chalk from "chalk";
@@ -189,9 +187,9 @@ async function runWithStore(
 
 export function registerCredentialsCommands(program: Command, io: CredentialsCliIo = defaultIo): void {
   const credentials = program
-    .command("credentials", { hidden: true })
+    .command("credentials")
     .description(
-      "Provider credential references — list, describe, set, unset. Never prints a value (internal)"
+      "Provider credential references — list, describe, set, unset. Never prints a value"
     );
 
   withStoreOptions(

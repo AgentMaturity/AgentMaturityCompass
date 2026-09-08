@@ -22,7 +22,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js && npm run copy-assets && node scripts/bundle-kernel.mjs",
+    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs",
     "build:pages": "node scripts/build-pages-site.mjs",
     "build:sea": "node scripts/build-sea.mjs",
     "brand:render": "node scripts/render-brand-assets.mjs",
@@ -30,11 +30,12 @@
     "package:desktop:verify": "node scripts/verify-desktop-installers.mjs",
     "release:prepare-assets": "node scripts/prepare-public-release-assets.mjs",
     "release:verify-version": "node scripts/verify-release-version.mjs",
-    "copy-assets": "rm -rf dist/console/pages dist/console/assets dist/dashboard/templates && mkdir -p dist/console dist/dashboard dist/acp && cp -r src/console/pages dist/console/pages && cp -r src/console/assets dist/console/assets && cp -r src/dashboard/templates dist/dashboard/templates && cp vendor/acp-schema/schema.json dist/acp/acp-schema.json",
+    "copy-assets": "node scripts/copy-build-assets.mjs",
     "dev": "tsx src/cli.ts",
     "api:start": "tsx api/index.ts",
     "lint": "npm run typecheck",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
     "pretest": "npm run build",
     "test": "vitest run",
     "test:e2e": "node scripts/run-e2e.mjs",
@@ -77,7 +78,8 @@
     "graph:update": "graphify update .",
     "check:clean-source": "node scripts/clean-source-check.mjs",
     "bundle:kernel": "node scripts/bundle-kernel.mjs",
-    "check:packed-install": "node scripts/packed-install-check.mjs"
+    "check:packed-install": "node scripts/packed-install-check.mjs",
+    "qualify:platform": "node scripts/qualify-platform.mjs"
   },
   "keywords": [
     "ai-agent",
@@ -122,6 +124,18 @@
     "./sdk/mobile-fetch": {
       "import": "./dist/sdk/mobileFetch.js",
       "types": "./dist/sdk/mobileFetch.d.ts"
+    },
+    "./sdk/native": {
+      "types": "./dist/sdk/nativeAgentClient.d.ts",
+      "import": "./dist/sdk/nativeAgentClient.js"
+    },
+    "./standard/external-evidence": {
+      "types": "./dist/standard/externalEvidenceProfile.d.ts",
+      "import": "./dist/standard/externalEvidenceProfile.js"
+    },
+    "./telemetry/pi": {
+      "types": "./dist/importers/piTelemetryCallbacks.d.ts",
+      "import": "./dist/importers/piTelemetryCallbacks.js"
     }
   },
   "dependencies": {

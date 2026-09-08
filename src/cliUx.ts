@@ -296,6 +296,13 @@ export function renderGroupedHelp(program: Command): string {
   lines.push("");
   lines.push("Usage: amc <command> [options]");
   lines.push("");
+  lines.push("Start with a task:");
+  if (existing.has("agent-loop guide")) lines.push(formatHelpRow("agent-loop guide", "Run a native task with explicit provider setup"));
+  if (existing.has("agent-loop chat")) lines.push(formatHelpRow("agent-loop chat", "Continue native tasks interactively"));
+  lines.push(formatHelpRow("", "Assess existing evidence (baseline/assessment)"));
+  if (existing.has("connect")) lines.push(formatHelpRow("connect", "Connect an existing agent"));
+  if (existing.has("agent-loop verify")) lines.push(formatHelpRow("agent-loop verify <sessionId>", "Verify recorded native task evidence"));
+  lines.push("");
   lines.push("Primary command groups:");
   for (const group of CLI_GROUPS) {
     lines.push(`  ${group.id.padEnd(10)}${group.summary}`);
@@ -460,8 +467,10 @@ export function cliDiscoverabilityFooter(): string {
   return [
     "",
     "Start with a task:",
-    "  • Run AMC end to end     → amc",
-    "  • First-time setup       → amc          / amc setup",
+    "  • Run a native task     → amc agent-loop guide",
+    "  • Assess evidence       → amc (baseline/assessment)",
+    "  • Connect an agent      → amc connect",
+    "  • First-time setup      → amc init --minimal",
     "  • Health check          → amc doctor",
     "  • Start services        → amc up",
     "  • Full assessment       → amc          / amc run / amc score",
@@ -472,7 +481,7 @@ export function cliDiscoverabilityFooter(): string {
     "  • Explore interactively → amc shell",
     "",
     "Quick start by role:",
-    "  Developer   → amc",
+    "  Developer   → amc agent-loop guide",
     "  DevOps      → amc ci check",
     "  Compliance  → amc comply report --framework EU_AI_ACT",
     "  Security    → amc redteam run",

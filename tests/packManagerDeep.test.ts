@@ -14,12 +14,8 @@ const TMP = join(__dirname, ".tmp-packManagerDeep");
 function makeConfig(): PackRegistryConfig {
   return {
     defaultRegistry: "https://registry.amc.example.com",
-    registries: {},
-    authTokens: {},
-    timeout: 5000,
-    retries: 2,
-    verifySignatures: false,
-    allowInsecure: false,
+    registries: [],
+    cache: { ttl: 3600, maxSize: 100 },
   };
 }
 

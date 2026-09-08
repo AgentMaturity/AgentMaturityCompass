@@ -40,7 +40,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:finsight-report-eval-${index}`,
     taskCategory: "financial-research-live-drift",
     domain: "agent-evaluation-and-benchmarks",
-    agentEvaluationDimension: "finsight-ai-source-context",
+    agentEvaluationDimension: "custom",
     invalidActionRate0to1: prefix === "live" ? 0.19 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.16 : 0.01,
     toolCallCount: prefix === "live" ? 12 : 5,

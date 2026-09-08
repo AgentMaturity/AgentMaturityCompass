@@ -1,5 +1,5 @@
 /**
- * `anthropic-messages@1` — Anthropic's Messages API as AMC stream chunks.
+ * `anthropic-messages@2` — Anthropic's Messages API as AMC stream chunks.
  *
  * TRANSLATION ONLY. This file turns one wire format into {@link StreamChunk}s
  * and builds a URL and headers around bytes it did not produce. It assembles
@@ -35,6 +35,7 @@
  * path yet, and quietly ending the turn would be a behavioural bug wearing a
  * clean stop reason.
  */
+import { ANTHROPIC_CAPABILITIES } from "../adapter/providerCapabilities.js";
 import { LLM_FAILURE_CODE, LlmError } from "../llmFailure.js";
 import { toolCallId } from "../streamChunk.js";
 import type { ContentBlock, StreamChunk, StreamTokenUsage, SuccessfulFinishKind } from "../streamChunk.js";
@@ -100,6 +101,12 @@ function text(value: unknown): string {
 function protocolFailure(detail: string): LlmError {
   return new LlmError(`${ANTHROPIC_ADAPTER_ID} stream: ${detail}`, LLM_FAILURE_CODE.TRANSPORT);
 }
+function reportedInteger(value: unknown): number | undefined {
+  if (value === undefined) return undefined;
+  const count = integer(value);
+  if (count === undefined) throw protocolFailure("reported usage is not a nonnegative integer");
+  return count;
+}
 
 function parseFrame(data: string): Record<string, unknown> {
   let parsed: unknown;
@@ -139,10 +146,11 @@ function usageChunk(counts: {
   output: number | undefined;
   cacheRead: number | undefined;
   cacheWrite: number | undefined;
-}): StreamChunk {
+}): StreamChunk | null {
+  if (counts.input === undefined || counts.output === undefined) return null;
   const usage: StreamTokenUsage = {
-    inputTokens: counts.input ?? 0,
-    outputTokens: counts.output ?? 0,
+    inputTokens: counts.input,
+    outputTokens: counts.output,
     ...(counts.cacheRead === undefined ? {} : { cacheReadTokens: counts.cacheRead }),
     ...(counts.cacheWrite === undefined ? {} : { cacheWriteTokens: counts.cacheWrite })
   };
@@ -187,10 +195,12 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
 
     if (type === "message_start") {
       const usage = record(record(frame.message)?.usage);
-      counts.input = integer(usage?.input_tokens);
-      counts.output = integer(usage?.output_tokens);
-      counts.cacheRead = integer(usage?.cache_read_input_tokens);
-      counts.cacheWrite = integer(usage?.cache_creation_input_tokens);
+      counts.input = reportedInteger(usage?.input_tokens);
+      // Start usage is a prefix, not the final output count. Only the terminal
+      // message_delta can establish what the whole response consumed.
+      counts.output = undefined;
+      counts.cacheRead = reportedInteger(usage?.cache_read_input_tokens);
+      counts.cacheWrite = reportedInteger(usage?.cache_creation_input_tokens);
       continue;
     }
 
@@ -282,7 +292,7 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
       const delta = record(frame.delta);
       const usage = record(frame.usage);
       stopReason = typeof delta?.stop_reason === "string" ? delta.stop_reason : stopReason;
-      counts.output = integer(usage?.output_tokens) ?? counts.output;
+      counts.output = reportedInteger(usage?.output_tokens) ?? counts.output;
       continue;
     }
 
@@ -297,7 +307,8 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
           LLM_FAILURE_CODE.UNKNOWN
         );
       }
-      yield usageChunk(counts);
+      const reported = usageChunk(counts);
+      if (reported !== null) yield reported;
       yield { type: "finish", reason: { kind } };
       terminated = true;
       return;
@@ -314,8 +325,9 @@ async function* decodeAnthropic(response: HttpResponse): AsyncIterable<StreamChu
 
 /** Anthropic's Messages API. */
 export const anthropicAdapter: LlmAdapter = {
+  capabilities: ANTHROPIC_CAPABILITIES,
   id: ANTHROPIC_ADAPTER_ID,
-  version: 1,
+  version: 2,
   encoderId: ANTHROPIC_MESSAGES_ENCODER_ID,
   encoderVersion: 2,
 

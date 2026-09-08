@@ -38,13 +38,15 @@ Endpoints:
 - HTTPS console/API: `https://<host>:8443/console`
 - Notary (internal to this TLS stack): `http://amc-notary:4343`
 
-## Notary qualification limit
+## Notary listener and readiness
 
-The source container repair does not qualify TLS/notary operation. The existing fresh notary configuration binds `127.0.0.1`; the peer Studio URL `http://amc-notary:4343` therefore needs an explicit notary network/listen configuration before it is reachable across containers. The shared image smoke runs Studio with notary disabled. Do not treat that receipt as acceptance of the TLS/notary stack.
+The TLS stack explicitly starts notary with `--bind 0.0.0.0` so Studio can reach it on the internal Compose network. No notary host port is published. The override applies only to this process; local `amc notary start` retains the saved listen address, initially `127.0.0.1`. A saved Unix socket and a TCP `--bind` override are rejected together.
+
+Studio waits for the notary's bounded `/readyz` healthcheck to report `READY`, including signer, log and auth-secret initialization. Readiness alone does not prove Studio holds the matching secret or can obtain a valid signature. The shared image smoke runs Studio with notary disabled. Actual authenticated signing, wrong-secret refusal, restart persistence and TLS access remain separate acceptance requirements; the source correction has not yet been verified in a Linux container.
 
 ## Notary Mode (Fail-Closed Signing Boundary)
 
-Set these in `.env` to force hardware-trust boundary mode during bootstrap:
+Set these in `.env` to require the separate software notary during bootstrap:
 
 ```bash
 AMC_ENABLE_NOTARY=1
@@ -53,6 +55,8 @@ AMC_NOTARY_REQUIRED_ATTESTATION=SOFTWARE
 ```
 
 When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOTARY` mode and stores the Studio→Notary auth secret in vault (`vault:notary/auth`). If notary is unavailable or fingerprint checks fail, Studio `/readyz` returns `503`.
+
+`SOFTWARE` does not claim hardware key protection. Requiring `HARDWARE` also requires a compatible external signer and its attestation; changing the environment setting alone does not provide it.
 
 ## Phone/LAN Access
 

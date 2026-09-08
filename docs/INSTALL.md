@@ -4,7 +4,7 @@
 
 | Component | Minimum |
 |-----------|---------|
-| Node.js | ≥ 20 (20/22 LTS recommended) |
+| Node.js | 22 or 24 LTS for production; package engine floor remains ≥ 20 |
 | RAM | 512 MB |
 | Disk | 100 MB + evidence storage |
 | OS | macOS, Linux (Ubuntu/Debian, RHEL/CentOS), Windows |
@@ -37,7 +37,7 @@ amc init            # empty production workspace
 
 `amc demo run --no-vault` uses an ephemeral demo workspace and labels its output `DEMO_ONLY`. `amc demo share --public-base-url <url>` writes a static prospect leave-behind bundle and prints a URL for the host you publish to. Both are for first-look demos, not production audit evidence.
 
-CI validates Node 20 and 22. Newer major releases can require native rebuilds for `better-sqlite3`; use Node 20 or 22 LTS.
+Use Node 22 or 24 LTS. Node 20 reached end of life on April 30, 2026; the package's minimum engine declaration is not a production support recommendation. Native dependencies such as `better-sqlite3` must match the selected Node ABI. The configured CI matrix and an actual passing platform receipt are distinct; installation and launcher qualification remain tracked under AMC-1530. See the [official Node release schedule](https://github.com/nodejs/Release/blob/main/schedule.json).
 
 ## Option B: From GitHub (Development)
 

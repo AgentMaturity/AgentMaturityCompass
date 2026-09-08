@@ -12,9 +12,9 @@ import { analyzeTimeSeries, detectRegressionAlert, type ScoreDataPoint } from ".
 
 function makeQ(id: string, level: number, confidence: number, evidenceCount: number): QuestionScore {
   return {
-    questionId: id, layerName: "Skills", rawLevel: level, finalLevel: level,
+    questionId: id, claimedLevel: level, supportedMaxLevel: level, finalLevel: level,
     confidence, evidenceEventIds: Array.from({ length: evidenceCount }, (_, i) => `ev-${id}-${i}`),
-    narrative: "", boosts: [], caps: [],
+    flags: [], narrative: "",
   };
 }
 
@@ -25,7 +25,7 @@ function makeReport(questions: QuestionScore[]): DiagnosticReport {
     layerScores: [{ layerName: "Skills", questionCount: questions.length, answeredCount: questions.length, avgFinalLevel: questions.reduce((s, q) => s + q.finalLevel, 0) / questions.length, avgConfidence: 0.8 }],
     questionScores: questions, targetDiff: [], integrityIndex: 0.8,
     trustLabel: "HIGH TRUST", evidenceCoverage: 0.9, ledgerEventCount: 100, status: "VALID",
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 // ─── MF-16: Anti-gaming ─────────────────────────────

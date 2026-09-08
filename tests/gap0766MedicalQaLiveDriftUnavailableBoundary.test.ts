@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:memory-retrieval-grounding-${index}`,
     taskCategory: "medical-qa-live-drift",
     domain: "agent-evaluation-medical-qa",
-    agentEvaluationDimension: "observed_medical_qa_memory_grounding_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 12 + index : 5 + index,
     invalidActionRate0to1: prefix === "live" ? 0.11 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.07 : 0.01,

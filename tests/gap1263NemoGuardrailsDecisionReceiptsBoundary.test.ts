@@ -113,7 +113,7 @@ describe("GAP-1263 NeMo Guardrails decision receipts boundary", () => {
       });
 
       expect(receipt).not.toBeNull();
-      receipts.push(receipt);
+      receipts.push(receipt!);
     }
 
     const publicKeys = getPublicKeyHistory(tempDir!, "monitor");

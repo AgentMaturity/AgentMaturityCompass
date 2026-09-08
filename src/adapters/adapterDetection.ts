@@ -106,7 +106,11 @@ export function detectAdapter(definition: AdapterDefinition, options?: { timeout
     }
     const parseRegex = parseRegexCache.get(definition.detection.parseVersionRegex) ?? new RegExp(definition.detection.parseVersionRegex);
     parseRegexCache.set(definition.detection.parseVersionRegex, parseRegex);
-    const version = (parseRegex.exec(probe.output)?.[1] ?? probe.output) || "unknown";
+    const match = parseRegex.exec(probe.output)?.[1];
+    if (definition.detection.requireVersionMatch && !match) {
+      return { adapterId: definition.id, installed: true, command: candidate, version: null, detail: `${candidate}: version output did not match the declared format` };
+    }
+    const version = (match ?? probe.output) || "unknown";
     return {
       adapterId: definition.id,
       installed: true,

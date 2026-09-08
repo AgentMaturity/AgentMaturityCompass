@@ -3,7 +3,7 @@ import { readFileSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 import { URL } from "node:url";
 import { randomUUID } from "node:crypto";
-import type { Socket } from "node:net";
+import { isIP, type Socket } from "node:net";
 import { loadNotaryConfig, resolveNotaryDir } from "./notaryConfigStore.js";
 import { loadNotarySigner } from "./notarySigner.js";
 import { verifyNotaryRequestAuth } from "./notaryAuth.js";
@@ -16,6 +16,17 @@ import { verifyNotarySignResponse } from "./notaryVerify.js";
 interface NotaryStartOptions {
   notaryDir?: string;
   workspace?: string | null;
+  /** An explicit TCP-only runtime override; never persisted to notary.yaml. */
+  bindHost?: string;
+}
+
+export function resolveNotaryBindHost(override: string | undefined, savedHost: string, unixSocketPath: string | null): string {
+  if (override === undefined) return savedHost;
+  if (unixSocketPath !== null) throw new Error("Notary --bind cannot be combined with a configured Unix socket.");
+  const hostname = override.length <= 253 && override.split(".").every(label =>
+    /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$/.test(label));
+  if (!isIP(override) && !hostname) throw new Error("Notary --bind requires an IP address or hostname without a port or URL scheme.");
+  return override;
 }
 
 interface NotaryRuntimeState {
@@ -117,6 +128,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
 }> {
   const notaryDir = resolveNotaryDir(options.notaryDir);
   const config = loadNotaryConfig(notaryDir);
+  // Refuse invalid/conflicting transport arguments before signer or log writes.
+  const bindHost = resolveNotaryBindHost(options.bindHost, config.notary.bindHost, config.notary.unixSocketPath);
   let signer: ReturnType<typeof loadNotarySigner> | null = null;
   const reasons: string[] = [];
   try {
@@ -395,13 +408,13 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
       server.once("error", rejectPromise);
       return;
     }
-    server.listen(config.notary.port, config.notary.bindHost, () => resolvePromise());
+    server.listen(config.notary.port, bindHost, () => resolvePromise());
     server.once("error", rejectPromise);
   });
 
   const url = listenTarget
     ? `unix://${listenTarget}`
-    : `http://${config.notary.bindHost}:${(server.address() as { port: number }).port}`;
+    : `http://${isIP(bindHost) === 6 ? `[${bindHost}]` : bindHost}:${(server.address() as { port: number }).port}`;
 
   return {
     url,

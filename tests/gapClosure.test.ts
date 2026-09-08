@@ -64,11 +64,11 @@ describe('OTELExporter', () => {
   describe('AMC trace to OTLP span conversion', () => {
     it('should convert an LLM call trace', () => {
       const span = amcTraceToOTLPSpan({
+        amc_trace_v: 1,
         ts: Date.now(),
+        agentId: 'test-agent',
         event: 'llm_call',
         model: 'gpt-4o',
-        prompt_tokens: 100,
-        prompt: 'Hello',
       }, 'test-agent', 'a'.repeat(32));
 
       expect(span.name).toContain('llm_call');
@@ -78,9 +78,11 @@ describe('OTELExporter', () => {
 
     it('should convert a tool intent trace', () => {
       const span = amcTraceToOTLPSpan({
+        amc_trace_v: 1,
         ts: Date.now(),
+        agentId: 'agent-1',
         event: 'tool_intent',
-        tool: 'search',
+        note: 'search',
       }, 'agent-1', 'b'.repeat(32));
 
       expect(span.name).toContain('tool_intent');
@@ -90,8 +92,8 @@ describe('OTELExporter', () => {
   describe('Batch export request', () => {
     it('should create a valid OTLP request from multiple traces', () => {
       const traces = [
-        { ts: Date.now(), event: 'llm_call' as const, model: 'gpt-4o', prompt_tokens: 50 },
-        { ts: Date.now(), event: 'tool_intent' as const, tool: 'search' },
+        { amc_trace_v: 1 as const, ts: Date.now(), agentId: 'agent-x', event: 'llm_call' as const, model: 'gpt-4o' },
+        { amc_trace_v: 1 as const, ts: Date.now(), agentId: 'agent-x', event: 'tool_intent' as const, note: 'search' },
       ];
       const request = amcTracesToOTLPRequest(traces, 'agent-x', {
         'service.name': 'test-service',
@@ -111,10 +113,11 @@ describe('OTELExporter', () => {
       });
 
       exporter.addTrace({
+        amc_trace_v: 1,
         ts: Date.now(),
+        agentId: 'agent-1',
         event: 'llm_call',
         model: 'claude-sonnet',
-        prompt_tokens: 200,
       }, 'agent-1');
 
       const stats = exporter.getStats();
@@ -128,8 +131,8 @@ describe('OTELExporter', () => {
         serviceName: 'test',
       });
 
-      exporter.addTrace({ ts: Date.now(), event: 'llm_call', model: 'test' }, 'a1');
-      exporter.addTrace({ ts: Date.now(), event: 'tool_intent', tool: 'calc' }, 'a1');
+      exporter.addTrace({ amc_trace_v: 1, ts: Date.now(), agentId: 'a1', event: 'llm_call', model: 'test' }, 'a1');
+      exporter.addTrace({ amc_trace_v: 1, ts: Date.now(), agentId: 'a1', event: 'tool_intent', note: 'calc' }, 'a1');
 
       const req = exporter.drain();
       expect(req.resourceSpans.length).toBe(1);
@@ -229,6 +232,7 @@ describe('LLMJudge', () => {
           { score: 5, label: 'Very professional', description: 'Perfect tone' },
         ],
       },
+      defaultModel: 'gpt-4o',
     });
     expect(judge.getTemplate('custom-tone')).toBeDefined();
   });
@@ -496,6 +500,7 @@ WHEN x == "y" THEN DENY WITH "deny"
         message: 'Cannot send email with PII',
         enabled: true,
         priority: 1,
+        tags: [],
       });
 
       const result = engine.evaluate({
@@ -517,6 +522,7 @@ WHEN x == "y" THEN DENY WITH "deny"
         message: 'No deletes',
         enabled: true,
         priority: 1,
+        tags: [],
       });
 
       const result = engine.evaluate({ 'agent.action': 'read' });
@@ -533,6 +539,7 @@ WHEN x == "y" THEN DENY WITH "deny"
         message: 'Should not fire',
         enabled: false,
         priority: 1,
+        tags: [],
       });
 
       const result = engine.evaluate({ 'x': 'y' });
@@ -560,6 +567,7 @@ WHEN agent.tool == "calculator" THEN LOG WITH "Calculator used"
         message: 'Cost exceeds $100',
         enabled: true,
         priority: 1,
+        tags: [],
       });
 
       const expensive = engine.evaluate({ 'cost': '150' });

@@ -159,6 +159,23 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && pnpm run build && n
 
 ---
 
+## Run a Native Agent Task
+
+AMC runs its own model loop, workspace tools, approvals and recorded sessions. You do not need DSH, Pi or another agent runtime. From your project directory, inspect the local setup and open an interactive session:
+
+```sh
+amc agent-loop guide
+amc agent-loop chat
+```
+
+The guide creates nothing and calls no provider. Chat asks you to choose a provider and model, then shows the local setup or credential steps still needed. Choose OpenAI Chat Completions, OpenAI Responses, or Anthropic for a real task; `stub` is an explicit local recording demonstration. Native execution currently uses agent `default`.
+
+Chat shows provisional live text and then the recorded result. Use `/inspect` to see history, `/verify` to check evidence, `/compact` to summarize a reviewed range, `/fork` to queue a new conversation with parent lineage, and `/exit` to leave. Resume eligible sessions across processes while preserving original evidence. Start with tools disabled, then enable workspace or MCP tools after reviewing their signed policy and grants. Applications can own an AMC process through the native SDK.
+
+See the [native workflow guide](docs/NATIVE_AGENT_WORKFLOW.md), [signed native extensions](docs/NATIVE_EXTENSIONS.md), [MCP setup](docs/NATIVE_MCP.md), [session handoff](docs/SESSION_RESUME.md), and [native SDK](docs/NATIVE_SDK.md). Optional external capture and portable imports are separate evidence workflows, not dependencies of native execution. These newly implemented workflows await their combined validation pass; no live-provider success, platform coverage or usability benchmark is implied.
+
+---
+
 ## How AMC Compares
 
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |

@@ -63,7 +63,7 @@ Launch the Studio app:
 
 ## Requirements
 
-- Node.js 20 or 22 LTS
+- Node.js 22 or 24 LTS
 - npm available on PATH
 
 These packages intentionally install AMC from a local npm tarball, so they work before the public AMC registry package is available. npm still needs access to AMC's public runtime dependencies unless they are already present in the user's npm cache or installed by an enterprise package mirror.

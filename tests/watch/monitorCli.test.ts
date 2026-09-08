@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { createContinuousMonitor, globalDashboardFeed, type ContinuousMonitorConfig } from "../../src/watch/continuousMonitor.js";
+import { createContinuousMonitor, type ContinuousMonitorConfig } from "../../src/watch/continuousMonitor.js";
 import { DashboardFeed } from "../../src/watch/dashboardFeed.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";

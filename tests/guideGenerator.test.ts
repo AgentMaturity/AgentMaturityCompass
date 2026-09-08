@@ -128,6 +128,7 @@ describe("guideGenerator", () => {
         agentId: "gap-0616-agent",
         runId: "run-gap-0616",
         sourceRefs: ["https://doi.org/10.1007/s10462-025-11471-9", "https://openalex.org/W7118468219"],
+        sourceRefCount: 2,
         replayable: true,
         failClosed: false,
         rows: [

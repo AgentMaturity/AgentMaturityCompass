@@ -103,3 +103,14 @@ export function deniedToolNamesForScope(
   }
   return denied;
 }
+
+/** Undefined is unrestricted; an empty intersection stays empty and is refused by spawn. */
+export function intersectDelegationScopes(
+  inherited: readonly ActionClass[] | undefined,
+  requested: readonly ActionClass[] | undefined
+): readonly ActionClass[] | undefined {
+  if (inherited === undefined) return requested === undefined ? undefined : [...new Set(requested)];
+  if (requested === undefined) return [...new Set(inherited)];
+  const allowed = new Set(inherited);
+  return [...new Set(requested)].filter(action => allowed.has(action));
+}

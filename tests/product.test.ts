@@ -34,19 +34,19 @@ describe("Product — CostLatencyRouter", () => {
 describe("Product — AutonomyDial", () => {
   test("low risk auto mode", () => {
     const dial = new AutonomyDial();
-    const result = dial.decide("send email", "low", "auto");
+    const result = dial.decide("tenant-1", "send email", 0.9);
     expect(result).toBeDefined();
   });
 
   test("high risk requires approval", () => {
     const dial = new AutonomyDial();
-    const result = dial.decide("delete database", "high", "supervised");
+    const result = dial.decide("tenant-1", "delete database", 0.2);
     expect(result).toBeDefined();
   });
 
   test("medium risk", () => {
     const dial = new AutonomyDial();
-    const result = dial.decide("update record", "medium", "auto");
+    const result = dial.decide("tenant-1", "update record", 0.5);
     expect(result).toBeDefined();
   });
 });
@@ -86,8 +86,8 @@ describe("Product — LoopDetector", () => {
 describe("Product — Metering", () => {
   test("record and get bill", () => {
     const meter = new Metering();
-    meter.record({ tenantId: "t1", type: "api-call", cost: 0.01 });
-    meter.record({ tenantId: "t1", type: "api-call", cost: 0.02 });
+    meter.record({ tenantId: "t1", eventType: "api-call", units: 1, metadata: { cost: 0.01 } });
+    meter.record({ tenantId: "t1", eventType: "api-call", units: 1, metadata: { cost: 0.02 } });
     const bill = meter.getBill("t1");
     expect(bill).toBeDefined();
   });
@@ -100,8 +100,8 @@ describe("Product — Metering", () => {
 
   test("multiple tenants", () => {
     const meter = new Metering();
-    meter.record({ tenantId: "t1", type: "call", cost: 1 });
-    meter.record({ tenantId: "t2", type: "call", cost: 2 });
+    meter.record({ tenantId: "t1", eventType: "call", units: 1 });
+    meter.record({ tenantId: "t2", eventType: "call", units: 2 });
     const b1 = meter.getBill("t1");
     const b2 = meter.getBill("t2");
     expect(b1).toBeDefined();
@@ -121,14 +121,14 @@ describe("Product — withRetry", () => {
       attempt++;
       if (attempt < 3) throw new Error("fail");
       return Promise.resolve("ok");
-    }, { maxRetries: 5 });
+    }, { maxAttempts: 5, baseDelayMs: 1, maxDelayMs: 10 });
     expect(result).toBeDefined();
   });
 
   test("exhausts retries", async () => {
     const result = await withRetry(() => {
       throw new Error("always fail");
-    }, { maxRetries: 2 }).catch((e: unknown) => e);
+    }, { maxAttempts: 2, baseDelayMs: 1, maxDelayMs: 10 }).catch((e: unknown) => e);
     expect(result).toBeDefined();
   });
 });

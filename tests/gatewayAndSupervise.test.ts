@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace, loadAMCConfig, saveAMCConfig } from "../src/workspace.js";
-import { initGatewayConfig, saveGatewayConfig, verifyGatewayConfigSignature, type GatewayConfig } from "../src/gateway/config.js";
+import { gatewayConfigSchema, initGatewayConfig, saveGatewayConfig, verifyGatewayConfigSignature, type GatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
 import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { runDiagnostic } from "../src/diagnostic/runner.js";
@@ -150,7 +150,7 @@ describe("gateway and supervise", () => {
       throw new Error("upstream failed to bind");
     }
 
-    const gatewayConfig: GatewayConfig = {
+    const gatewayConfig: GatewayConfig = gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key"],
@@ -164,8 +164,8 @@ describe("gateway and supervise", () => {
           allowLocalhost: true
         }
       },
-      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true }]
-    };
+      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true, openaiCompatible: false }]
+    });
 
     initGatewayConfig(workspace, gatewayConfig);
     const sig = verifyGatewayConfigSignature(workspace);
@@ -218,7 +218,7 @@ describe("gateway and supervise", () => {
   test("unsigned gateway config triggers audit and diagnostic trust penalty", async () => {
     const workspace = newWorkspace();
 
-    const unsignedConfig: GatewayConfig = {
+    const unsignedConfig: GatewayConfig = gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization"],
@@ -232,8 +232,8 @@ describe("gateway and supervise", () => {
           allowLocalhost: false
         }
       },
-      routes: [{ prefix: "/local", upstream: "local", stripPrefix: true }]
-    };
+      routes: [{ prefix: "/local", upstream: "local", stripPrefix: true, openaiCompatible: false }]
+    });
 
     saveGatewayConfig(workspace, unsignedConfig);
     const signatureState = verifyGatewayConfigSignature(workspace);
@@ -335,7 +335,7 @@ describe("gateway and supervise", () => {
       throw new Error("upstream failed to bind");
     }
 
-    const gatewayConfig: GatewayConfig = {
+    const gatewayConfig: GatewayConfig = gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key"],
@@ -349,9 +349,9 @@ describe("gateway and supervise", () => {
           allowLocalhost: true
         }
       },
-      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true }],
+      routes: [{ prefix: "/test", upstream: "test", stripPrefix: true, openaiCompatible: false }],
       streamPassthrough: true
-    };
+    });
 
     initGatewayConfig(workspace, gatewayConfig);
     const gateway = await startGateway({ workspace });

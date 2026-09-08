@@ -46,7 +46,7 @@ describe('Shield S3 — Signing', () => {
 
 describe('Shield S4 — SBOM', () => {
   it('generates sbom', () => {
-    const r = generateSbom('.');
+    const r = generateSbom({ lodash: '4.17.21' });
     expect(r).toHaveProperty('components');
   });
 });

@@ -16,7 +16,7 @@ const implementationFiles = [
   "docs/SCORING_METHODOLOGY.md",
 ];
 
-const layerName: LayerName = "Evaluation and Improvement";
+const layerName: LayerName = "Strategic Agent Operations";
 
 function score(index: number, finalLevel = 3, confidence = 0.91): QuestionScore {
   return {

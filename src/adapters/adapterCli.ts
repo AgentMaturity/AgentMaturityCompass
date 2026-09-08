@@ -8,6 +8,7 @@ import { runAdapterCommand, initAdapterProjectSample } from "./adapterRunner.js"
 import { assembleAdapterEnv } from "./envAssembler.js";
 import type { AdapterRunMode } from "./adapterTypes.js";
 import { issueAdapterCapabilityReceipt } from "../passport/adapterCapabilityReceipt.js";
+import { readDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
 
 export function adaptersInitCli(workspace: string): { configPath: string; sigPath: string } {
   return initAdaptersConfig(workspace);
@@ -64,11 +65,21 @@ export function adaptersConfigureCli(params: {
   route: string;
   model: string;
   mode: AdapterRunMode;
+  launchConfig?: string;
 }): { configPath: string; sigPath: string; agentId: string } {
   if (!hasAdapterDefinition(params.workspace, params.adapterId)) {
     throw new Error(`Unknown adapter: ${params.adapterId}`);
   }
   const agentId = resolveAgentId(params.workspace, params.agentId);
+  if (params.launchConfig && params.adapterId !== "deepseek-harness") throw new Error("--launch-config is currently supported only by deepseek-harness.");
+  const dshLaunch = params.adapterId === "deepseek-harness"
+    ? (params.launchConfig ? readDeepseekHarnessLaunch(resolve(params.launchConfig)) : undefined)
+    : undefined;
+  if (params.adapterId === "deepseek-harness") {
+    if (!dshLaunch) throw new Error("DSH requires --launch-config with reviewed local executable/entrypoint hashes.");
+    if (params.mode !== "SUPERVISE") throw new Error("DSH capture supports SUPERVISE only; its internal sandbox remains a separate boundary.");
+    verifyDeepseekHarnessLaunch(dshLaunch);
+  }
   const out = setAgentAdapterProfile(params.workspace, agentId, {
     preferredAdapter: params.adapterId,
     preferredProviderRoute: params.route,
@@ -76,7 +87,8 @@ export function adaptersConfigureCli(params: {
     runMode: params.mode,
     leaseScopes: ["gateway:llm", "toolhub:intent", "toolhub:execute", "proxy:connect", "governor:check", "receipt:verify"],
     routeAllowlist: [params.route],
-    modelAllowlist: ["*"]
+    modelAllowlist: params.adapterId === "deepseek-harness" ? [params.model] : ["*"],
+    ...(dshLaunch ? { deepseekHarnessLaunch: dshLaunch } : {})
   });
   return {
     ...out,
@@ -134,7 +146,9 @@ export function adaptersEnvCli(params: {
     `export AMC_AGENT_ID=${agentId}`,
     "export AMC_LEASE=<obtain-with-amc-lease-issue-or-adapters-run>",
     ...Object.entries(env)
-      .filter(([key]) => key.startsWith("OPENAI_") || key.startsWith("ANTHROPIC_") || key.startsWith("GEMINI_") || key.startsWith("GOOGLE_") || key.startsWith("XAI_") || key.startsWith("OPENROUTER_") || key.startsWith("AMC_") || key === "HTTP_PROXY" || key === "HTTPS_PROXY" || key === "NO_PROXY")
+      .filter(([key]) => adapter.id === "deepseek-harness"
+        ? ["DEEPSEEK_BASE_URL", "DEEPSEEK_API_KEY", "AMC_MODEL", "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY"].includes(key)
+        : key.startsWith("OPENAI_") || key.startsWith("ANTHROPIC_") || key.startsWith("GEMINI_") || key.startsWith("GOOGLE_") || key.startsWith("XAI_") || key.startsWith("OPENROUTER_") || key.startsWith("AMC_") || key === "HTTP_PROXY" || key === "HTTPS_PROXY" || key === "NO_PROXY")
       .map(([key, value]) => `export ${key}=${String(value)}`)
   ];
   return {

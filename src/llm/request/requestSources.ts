@@ -25,6 +25,7 @@ import type { EvidenceEvent } from "../../types.js";
 import { readEventPayload } from "../../session/eventPayload.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
 import type { SurfaceEntry } from "../../session/surfaceProjection.js";
+import { validateSurfaceCompactions } from "../../session/surfaceCompaction.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
 import type { EncodableMessage, EncodablePart, EncodableRequest, ToolSchema } from "./requestSpec.js";
@@ -236,7 +237,14 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     sourceEventIds.push(input.toolSchemaEventId);
   }
 
-  const entries = foldSurfaceEntries(input.events.slice(0, cutoffIndex + 1));
+  let entries: readonly SurfaceEntry[];
+  try {
+    const prefix = input.events.slice(0, cutoffIndex + 1);
+    validateSurfaceCompactions(input.workspace, prefix);
+    entries = foldSurfaceEntries(prefix);
+  } catch (error) {
+    return failure("unreconstructable", `invalid surface compaction: ${error instanceof Error ? error.message : "unsupported history"}`, notes);
+  }
   const parts: { role: SurfaceEntry["role"]; part: EncodablePart }[] = [];
   for (const entry of entries) {
     if (entry.role === "system") {

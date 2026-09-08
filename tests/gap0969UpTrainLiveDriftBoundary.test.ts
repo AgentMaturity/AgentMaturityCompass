@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:uptrain-production-agent-${index}`,
     taskCategory: "uptrain-production-agent-live-drift",
     domain: "agent-evaluation-observability",
-    agentEvaluationDimension: "observed_uptrain_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 20 + index : 10 + index,
     invalidActionRate0to1: prefix === "live" ? 0.14 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.1 : 0.01,

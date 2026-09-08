@@ -29,7 +29,7 @@ function obsLens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}
   return {
     drilldownId: "go-openllmetry-studio-drilldown",
     sourceRef: URL,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     openAlexWorkId: null,
     doi: null,
     publisherRef: "GitHub",
@@ -156,7 +156,7 @@ function report(lens: QuestionScoreObsStudioDrilldownLensRef = obsLens()): Diagn
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("f"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0860 go-openllmetry Studio evidence drilldown boundary", () => {
@@ -224,7 +224,7 @@ describe("GAP-0860 go-openllmetry Studio evidence drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "go-openllmetry-studio-drilldown",
       sourceRef: URL,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "GitHub",
       titleRef: TITLE,
       venueRef: "GitHub",

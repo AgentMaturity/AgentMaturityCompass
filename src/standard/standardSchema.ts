@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const STANDARD_SCHEMA_NAMES = [
+  "external-evidence.schema.json",
   "amcbench.schema.json",
   "amcprompt.schema.json",
   "amccert.schema.json",

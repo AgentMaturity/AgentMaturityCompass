@@ -135,7 +135,7 @@ describe("vibe code audit", () => {
 
     const result = await runCli(process.cwd(), ["vibe-audit", "--file", file, "--json"]);
     expect(result.code).toBe(2);
-    expect(result.stderr).toBe("") || expect(result.stderr).toContain("warning");
+    expect(result.stderr === "" || result.stderr.includes("warning")).toBe(true);
     const parsed = JSON.parse(result.stdout) as { criticalCount: number; findings: Array<{ category: string }> };
     expect(parsed.criticalCount).toBeGreaterThan(0);
     expect(parsed.findings.some((finding) => finding.category === "Code Injection")).toBe(true);

@@ -1,32 +1,34 @@
 import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
 import type { AgentSession } from "../agent/agentSession.js";
+import { SessionResumeRefused } from "../session/sessionResume.js";
 import { amcVersion } from "../version.js";
 import { createAcpConnection, type AcpConnection, type AcpSink } from "./acpConnection.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { projectSessionUpdates } from "./acpProjection.js";
 import { acpProtocolVersion, checkAcpShape } from "./acpSchema.js";
 import { acpStopReasonFor, stopReasonIsLossy } from "./acpStopReason.js";
+import { ACP_MAX_TURN_UPDATE_BYTES, validateAcpCommittedTail } from "./acpCommittedUpdates.js";
 
 /**
  * An ACP agent, over one connection (plan P7.1a).
  *
  * THE SLICE, AND WHY IT ENDS WHERE IT DOES. `initialize`, `authenticate`,
- * `session/new`, `session/prompt`, `session/cancel`, and outbound
+ * `session/new`, verified `session/load`, `session/prompt`, `session/cancel`, and outbound
  * `session/update`. Nothing else is implemented, and nothing else is STUBBED:
  * an unimplemented method answers `-32601`, which the protocol treats as a
  * legitimate answer. A stub that returned success would be the lie.
  *
  * WHAT `initialize` MUST NOT CLAIM. In ACP an absent capability is normatively
  * unsupported, so declaring less is conformant and declaring falsely is not.
- * `loadSession` is false because `openAgentSession` always opens a NEW session
- * and there is no path to re-attach a driver to a sealed one -- the rows exist,
- * the resume does not. Session list/fork/resume/close are absent for the same
- * reason: none has a handler.
+ * `loadSession` is advertised only when a verified resume factory is supplied.
+ * Explicit `_amc/session/release` leaves a signed ownership handoff; ordinary
+ * process shutdown seals sessions. A sealed session cannot be resumed.
  *
  * THE ONE KNOWING NON-CONFORMANCE. Stdio MCP is the single baseline an ACP agent
  * cannot decline by omission -- `McpCapabilities` gates only `http` and `sse`.
- * AMC is an MCP *server*, not a client for arbitrary stdio servers, so it cannot
- * honour it. `session/new` therefore REFUSES a non-empty `mcpServers` with an
+ * Client-supplied server commands cannot replace the process-bound reviewed MCP
+ * configuration. `session/new` therefore REFUSES a non-empty `mcpServers` with an
  * error naming the deviation. Accepting the array and never connecting the
  * servers is the dishonest form, and it is also the easier one to write by
  * accident.
@@ -50,7 +52,11 @@ export interface AcpAgentInit {
     readonly sessionId: string;
     readonly workspace: string;
     readonly agentId: string;
-  }) => AgentSession;
+    readonly signal: AbortSignal;
+  }) => AgentSession | Promise<AgentSession>;
+  readonly resumeSessionFactory?: AcpAgentInit["sessionFactory"];
+  readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean; readonly reviewedMcpConfigured: boolean };
+  readonly onUnusable?: () => void;
   readonly log?: (message: string) => void;
 }
 
@@ -58,7 +64,10 @@ interface Registered {
   readonly session: AgentSession;
   /** Rows already projected, so a prompt never re-sends an earlier answer. */
   projected: number;
+  projectedHash: string | null;
+  updateBytes: number;
   running: boolean;
+  releasing: boolean;
   /**
    * Whether a cancel arrived for the prompt currently running.
    *
@@ -73,35 +82,67 @@ interface Registered {
 
 export interface AcpAgent {
   readonly connection: AcpConnection;
-  close(): void;
+  close(): Promise<void>;
 }
 
 export function createAcpAgent(init: AcpAgentInit): AcpAgent {
   const log = init.log ?? ((): void => undefined);
   const sessions = new Map<string, Registered>();
   let initialized = false;
+  let closing = false;
+  let closePromise: Promise<void> | undefined;
+  const tasks = new Set<Promise<unknown>>();
+  const shutdown = new AbortController();
+  const loading = new Set<string>();
 
   const connection = createAcpConnection({
     write: init.write,
     log,
+    onUnusable: () => {
+      if (init.onUnusable) init.onUnusable();
+      else void close().catch(() => log("ACP shutdown could not seal all sessions"));
+    },
     handlers: {
-      request: (method, params, signal) => handleRequest(method, params, signal),
+      request: (method, params, signal) => {
+        const task = handleRequest(method, params, signal);
+        tasks.add(task);
+        void task.then(() => tasks.delete(task), () => tasks.delete(task));
+        return task;
+      },
       notification: (method, params) => handleNotification(method, params)
     }
   });
 
   return {
     connection,
-    close(): void {
+    close
+  };
+
+  function close(): Promise<void> {
+    if (closePromise) return closePromise;
+    closing = true;
+    shutdown.abort();
+    closePromise = (async () => {
+      const errors: unknown[] = [];
       for (const entry of sessions.values()) {
-        try { entry.session.close(); } catch { /* already closed */ }
+        if (entry.running) {
+          entry.cancelled = true;
+          try { entry.session.cancel({ kind: "disposed" }, "acp-shutdown"); } catch (error) { errors.push(error); }
+        }
+      }
+      if (tasks.size) await Promise.allSettled([...tasks]);
+      for (const entry of sessions.values()) {
+        try { await entry.session.close(); } catch (error) { errors.push(error); }
       }
       sessions.clear();
       connection.close();
-    }
-  };
+      if (errors.length) throw new Error("ACP shutdown could not cleanly seal every owned session; inspect its evidence before resuming.");
+    })();
+    return closePromise;
+  }
 
   async function handleRequest(method: string, params: unknown, signal: AbortSignal): Promise<unknown> {
+    if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
     if (method === "initialize") return initialize(params);
 
     // Every other method needs the handshake first. Reported as its own code,
@@ -113,7 +154,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
 
     switch (method) {
       case "authenticate": return authenticate(params);
-      case "session/new": return newSession(params);
+      case "session/new": return newSession(params, signal);
+      case "session/load": return loadSession(params, signal);
+      case "_amc/session/release": return releaseSession(params);
       case "session/prompt": return prompt(params, signal);
       default:
         throw new AcpFailure(ACP_ERROR.methodNotFound, `${method} is not implemented by this agent`);
@@ -136,8 +179,12 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // decided by whoever spawned the process.
       authMethods: [],
       agentCapabilities: {
-        // False, and load-bearing. See the module note.
-        loadSession: false,
+        loadSession: init.resumeSessionFactory !== undefined,
+        _meta: { "dev.agentmaturity.amc": {
+          ...(init.resumeSessionFactory === undefined ? {} : { releaseSession: true }),
+          committedUpdates: "live-completed-blocks",
+          ...(init.nativeExecution ?? {})
+        } },
         promptCapabilities: { image: false, audio: false, embeddedContext: false }
       }
     };
@@ -150,39 +197,95 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     return {};
   }
 
-  async function newSession(params: unknown): Promise<unknown> {
+  async function newSession(params: unknown, signal: AbortSignal): Promise<unknown> {
     await require_("NewSessionRequest", params);
-    const request = params as { cwd: string; mcpServers: readonly unknown[] };
+    const request = params as { cwd: string; mcpServers: readonly unknown[]; additionalDirectories?: readonly string[] };
+    assertSessionScope(request);
+    if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
+    const sessionId = randomUUID();
+    const session = await init.sessionFactory({ sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
+    if (closing || signal.aborted || session.sessionId !== sessionId) {
+      await session.close();
+      throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or returned an incompatible identity");
+    }
+    sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, running: false, releasing: false, cancelled: false });
+    return { sessionId };
+  }
 
+  function assertSessionScope(request: { cwd: string; mcpServers: readonly unknown[]; additionalDirectories?: readonly string[] }): void {
+    if (resolve(request.cwd) !== resolve(init.workspace) || (request.additionalDirectories?.length ?? 0) > 0) {
+      throw new AcpFailure(ACP_ERROR.invalidParams, "the workspace is fixed when the agent process is started; additional roots are unsupported");
+    }
     if (request.mcpServers.length > 0) {
       // Refused, not ignored. See the module note on the one non-conformance.
       throw new AcpFailure(
         ACP_ERROR.invalidParams,
-        "this agent cannot connect to MCP servers on a client's behalf; "
-        + "AMC is an MCP server, not an MCP client. Start the session with mcpServers: []"
+        "client-selected MCP commands are not authorized by this process; "
+        + "use the reviewed startup --mcp-config with signed grants and start the session with mcpServers: []"
       );
     }
 
-    const sessionId = randomUUID();
-    const session = init.sessionFactory({
-      sessionId,
-      workspace: init.workspace,
-      agentId: init.agentId
-    });
-    sessions.set(sessionId, { session, projected: 0, running: false, cancelled: false });
-    return { sessionId };
+  }
+
+  async function loadSession(params: unknown, signal: AbortSignal): Promise<unknown> {
+    if (!init.resumeSessionFactory) throw new AcpFailure(ACP_ERROR.methodNotFound, "verified session loading is unavailable");
+    await require_("LoadSessionRequest", params);
+    const request = params as { sessionId: string; cwd: string; mcpServers: readonly unknown[]; additionalDirectories?: readonly string[] };
+    assertSessionScope(request);
+    if (closing || sessions.has(request.sessionId) || loading.has(request.sessionId)) throw new AcpFailure(ACP_ERROR.invalidParams, "session is already loaded or the agent is shutting down");
+    loading.add(request.sessionId);
+    let session: AgentSession;
+    try {
+      session = await init.resumeSessionFactory({ sessionId: request.sessionId, workspace: init.workspace, agentId: init.agentId, signal: AbortSignal.any([signal, shutdown.signal]) });
+    } catch (error) {
+      loading.delete(request.sessionId);
+      if (error instanceof SessionResumeRefused) throw new AcpFailure(ACP_ERROR.invalidParams, "verified session resume was refused", { reason: error.code });
+      throw error;
+    }
+    try {
+      if (closing || signal.aborted || session.sessionId !== request.sessionId || !session.release) throw new Error("resume factory returned an incompatible or cancelled session");
+      const rows = session.readEvents();
+      const projectedHash = validateAcpCommittedTail(init.workspace, request.sessionId, rows, 0, null);
+      const history = projectSessionUpdates(init.workspace, rows, 0, { includeUser: true });
+      if (history.unsigned > 0) throw new Error("cannot replay unsigned history");
+      const entry: Registered = { session, projected: rows.length, projectedHash, updateBytes: 0, running: false, releasing: false, cancelled: false };
+      sessions.set(request.sessionId, entry);
+      // ACP loading replays historical updates before its response. These are
+      // history, not output attributed to a newly submitted prompt.
+      for (const update of history.updates) sendUpdate(entry, request.sessionId, update);
+      return {};
+    } catch (error) {
+      sessions.delete(request.sessionId);
+      try { await session.release?.(); } catch { /* retain resume/replay failure */ }
+      throw error;
+    } finally { loading.delete(request.sessionId); }
+  }
+
+  async function releaseSession(params: unknown): Promise<unknown> {
+    await require_("CancelNotification", params);
+    const sessionId = (params as { sessionId: string }).sessionId;
+    const entry = sessions.get(sessionId);
+    if (!entry || entry.running || entry.releasing || !entry.session.release) throw new AcpFailure(ACP_ERROR.invalidParams, "only an idle, owned, releasable session can be handed off");
+    // Claim the idle slot while asynchronous MCP cleanup and release settle.
+    entry.releasing = true;
+    try { await entry.session.release(); }
+    catch (error) { entry.releasing = false; throw error; }
+    sessions.delete(sessionId);
+    return {};
   }
 
   async function prompt(params: unknown, signal: AbortSignal): Promise<unknown> {
     await require_("PromptRequest", params);
+    if (closing) throw new AcpFailure(ACP_ERROR.internal, "the agent is shutting down");
     const request = params as { sessionId: string; prompt: readonly { type: string; text?: string }[] };
     const entry = sessions.get(request.sessionId);
     if (!entry) {
       throw new AcpFailure(ACP_ERROR.invalidParams, "no session with that id");
     }
-    if (entry.running) {
+    if (entry.running || entry.releasing) {
       throw new AcpFailure(ACP_ERROR.invalidParams, "a prompt is already running on this session");
     }
+    if (signal.aborted) return { stopReason: "cancelled" };
 
     const text = flattenPrompt(request.prompt);
     if (text.length === 0) {
@@ -191,8 +294,26 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
 
     entry.running = true;
     entry.cancelled = false;
+    entry.updateBytes = 0;
+    let streamFailed = false;
+    const poll = (): void => {
+      if (streamFailed) return;
+      try { flush(entry, request.sessionId); }
+      catch {
+        streamFailed = true;
+        try { entry.session.cancel({ kind: "disposed" }, "acp-committed-update-failure"); } catch { /* prompt failure remains authoritative */ }
+      }
+    };
+    const onAbort = (): void => {
+      entry.cancelled = true;
+      try { entry.session.cancel({ kind: "user" }, "acp-request-abort"); } catch { /* prompt will return its actual outcome */ }
+    };
+    signal.addEventListener("abort", onAbort, { once: true });
+    const timer = setInterval(poll, 100);
+    timer.unref();
     try {
       const outcome = await entry.session.prompt(text);
+      if (streamFailed) throw new AcpFailure(ACP_ERROR.internal, "committed update authentication or output bounds failed; inspect the session evidence");
 
       // A CANCEL OUTRANKS EVERYTHING, including the `ok: false` a cancelled turn
       // reports. ACP mandates `cancelled` when a cancel was requested, even when
@@ -204,12 +325,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         return { stopReason: "cancelled" };
       }
 
-      // A FAILED TURN FLUSHES NOTHING. `agentSession.prompt` returns `ok: false`
-      // when the driver failed or when the session wrote rows with no
-      // provenance. This used to flush FIRST and answer second, so a client
-      // rendered the model's words as the agent's own and was told afterwards
-      // that the turn had none. There is no unsend on a notification: the
-      // refusal has to come before the content, not after it.
+      // A failed turn emits no further tail. Already delivered updates were
+      // independently authenticated at their commit boundary; they do not
+      // claim that the whole turn subsequently completed or verified.
       if (!outcome.ok) {
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason });
       }
@@ -225,6 +343,8 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         ...(stopReasonIsLossy(reason) ? { _meta: { "dev.agentmaturity.amc": { turnEndReason: reason } } } : {})
       };
     } finally {
+      clearInterval(timer);
+      signal.removeEventListener("abort", onAbort);
       entry.running = false;
     }
   }
@@ -247,14 +367,22 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
   /** Send every update the session has produced since the last flush. */
   function flush(entry: Registered, sessionId: string): void {
     const events = entry.session.readEvents();
+    const head = validateAcpCommittedTail(init.workspace, sessionId, events, entry.projected, entry.projectedHash);
     const projected = projectSessionUpdates(init.workspace, events, entry.projected);
+    if (projected.unsigned > 0) throw new Error("ACP refused an unsigned committed update.");
     entry.projected = events.length;
-    if (projected.unsigned > 0) {
-      log(`skipped ${projected.unsigned} unsigned row(s) for session ${sessionId}`);
-    }
+    entry.projectedHash = head;
     for (const update of projected.updates) {
-      connection.notify("session/update", { sessionId, update });
+      sendUpdate(entry, sessionId, update);
     }
+  }
+
+  function sendUpdate(entry: Registered, sessionId: string, update: unknown): void {
+    const params = { sessionId, update };
+    const bytes = Buffer.byteLength(JSON.stringify(params), "utf8");
+    if (bytes > 900_000 || entry.updateBytes + bytes > ACP_MAX_TURN_UPDATE_BYTES) throw new Error("ACP committed output exceeds its frame or turn bound.");
+    entry.updateBytes += bytes;
+    connection.notify("session/update", params);
   }
 
   async function require_(shape: Parameters<typeof checkAcpShape>[0], params: unknown): Promise<void> {

@@ -36,6 +36,7 @@ import type { LlmCallSpec, PreparedCall } from "../../llm/adapter/llmRuntime.js"
 import type { RequestEncoderRegistry } from "../../llm/request/requestEncoder.js";
 import type { StreamChunk } from "../../llm/streamChunk.js";
 import type { HttpTransport } from "../../llm/adapter/transport.js";
+import type { LiveTextPreviewEvent } from "../../llm/adapter/liveTextPreview.js";
 
 export const LLM_SEAM = defineSeam("amcLlm");
 
@@ -50,6 +51,7 @@ export interface LlmServiceConfig {
   readonly transport?: HttpTransport;
   readonly encoders?: RequestEncoderRegistry;
   readonly now?: () => number;
+  readonly onLiveText?: (event: LiveTextPreviewEvent) => void;
 }
 
 /**
@@ -81,6 +83,7 @@ export class LlmSeamService extends AmcSeam {
       session: config.session,
       credentials: config.credentials,
       registry: this.registry,
+      ...(config.onLiveText === undefined ? {} : { onLiveText: config.onLiveText }),
       ...(config.transport !== undefined ? { transport: config.transport } : {}),
       ...(config.encoders !== undefined ? { encoders: config.encoders } : {}),
       ...(config.now !== undefined ? { now: config.now } : {})
@@ -104,6 +107,7 @@ export class LlmSeamService extends AmcSeam {
       session,
       credentials: this.config.credentials,
       registry: this.registry,
+      ...(this.config.onLiveText === undefined ? {} : { onLiveText: this.config.onLiveText }),
       ...(this.config.transport !== undefined ? { transport: this.config.transport } : {}),
       ...(this.config.encoders !== undefined ? { encoders: this.config.encoders } : {}),
       ...(this.config.now !== undefined ? { now: this.config.now } : {})

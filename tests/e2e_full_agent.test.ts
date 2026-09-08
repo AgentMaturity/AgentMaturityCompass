@@ -33,7 +33,7 @@ import { runSimulation, getBuiltinScenarios, generateSimReport } from '../src/sc
 import { KnowledgeGraph } from '../src/score/knowledgeGraph.js';
 import { ClaimProvenanceRegistry } from '../src/score/claimProvenance.js';
 import { detectModelDrift, buildSnapshot, parseModelVersion } from '../src/score/modelDrift.js';
-import { generateComplianceReport } from '../src/score/crossFrameworkMapping.js';
+import { generateFrameworkReport } from '../src/score/crossFrameworkMapping.js';
 
 /* ── Agent definition ─────────────────────────────────────────────── */
 const AGENT_ID = 'content-moderation-bot-v2';
@@ -96,10 +96,10 @@ describe('E2E: ContentModerationBot AMC Assessment', () => {
     // Score is 0–1 or 0–100 depending on implementation; just verify it's positive
     expect(result.overallScore).toBeGreaterThan(0);
     const displayScore = result.overallScore > 1 ? result.overallScore.toFixed(1) : (result.overallScore * 100).toFixed(1);
-    console.log(`\n📊 Maturity Score: ${displayScore}/100 | Level: ${result.level ?? 'computed'}`);
+    console.log(`\n📊 Maturity Score: ${displayScore}/100 | Level: ${result.overallLevel}`);
     if (result.dimensionScores) {
       for (const [dim, val] of Object.entries(result.dimensionScores)) {
-        const s = typeof val === 'number' ? val.toFixed(2) : JSON.stringify(val);
+        const s = val.score.toFixed(2);
         console.log(`   ${dim}: ${s}`);
       }
     }
@@ -187,18 +187,17 @@ describe('E2E: ContentModerationBot AMC Assessment', () => {
 
   /* ── Step 6: Compliance Mapping ──────────────────────────────── */
   it('Step 6: Compliance report maps to NIST AI RMF', async () => {
-    let report: unknown;
-    try {
-      report = generateComplianceReport('NIST_AI_RMF', evidenceSet);
-    } catch {
-      // If generateComplianceReport has a different signature, try alternate
-      report = { framework: 'NIST_AI_RMF', coveragePercent: 75, note: 'fallback' };
-    }
-    expect(report).toBeDefined();
+    const report = generateFrameworkReport('NIST_AI_RMF', {
+      passedQIDs: evidenceSet.map((e) => e.qid),
+      activeModules: [],
+    });
+    expect(report.framework).toBe('NIST_AI_RMF');
+    expect(typeof report.coveragePercent).toBe('number');
+    expect(report.coveragePercent).toBeGreaterThanOrEqual(0);
+    expect(report.coveragePercent).toBeLessThanOrEqual(100);
+    expect(Array.isArray(report.coveredControls)).toBe(true);
     console.log(`\n📜 Compliance: NIST AI RMF coverage computed`);
-    if (report && typeof report === 'object' && 'coveragePercent' in report) {
-      console.log(`   Coverage: ${(report as { coveragePercent: number }).coveragePercent}%`);
-    }
+    console.log(`   Coverage: ${report.coveragePercent}%`);
   });
 
   /* ── Step 7: Knowledge Graph ──────────────────────────────────── */

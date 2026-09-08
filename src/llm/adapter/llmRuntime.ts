@@ -55,9 +55,14 @@ import { StreamRecorder } from "./streamRecorder.js";
 import type { SettledStream } from "./streamRecorder.js";
 import { fetchTransport, readBodyText } from "./transport.js";
 import type { HttpResponse, HttpTransport } from "./transport.js";
+import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
+import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
+  /** Requirements checked locally, not serialized into provider params. */
+  readonly requiredCapabilities?: readonly string[];
+  readonly requiredProtocol?: string;
   readonly providerId: string;
   readonly model: string;
   /** Provider parameters (max_tokens, temperature, …), verbatim into the body. */
@@ -78,6 +83,7 @@ export interface LlmRuntimeInit {
   readonly transport?: HttpTransport;
   readonly encoders?: RequestEncoderRegistry;
   readonly now?: () => number;
+  readonly onLiveText?: (event: LiveTextPreviewEvent) => void;
 }
 
 /** Thrown when a call cannot be prepared or dispatched twice. */
@@ -169,6 +175,11 @@ export class LlmRuntime {
     return this.init.registry.list();
   }
 
+  /** Local protocol/capability discovery, never a claim of a live model probe. */
+  describeProviders(): ReturnType<AdapterRegistry["describe"]> {
+    return this.init.registry.describe();
+  }
+
   /**
    * Pin the route and log the request, without sending it.
    *
@@ -180,6 +191,10 @@ export class LlmRuntime {
    */
   prepare(spec: LlmCallSpec): PreparedCall {
     const route = this.init.registry.pin({ providerId: spec.providerId, model: spec.model });
+    assertRequiredCapabilities(route.capabilities, spec.requiredCapabilities);
+    if (spec.requiredProtocol !== undefined && route.capabilities?.protocol !== spec.requiredProtocol) {
+      throw new LlmCapabilityError("required-protocol", route.capabilities === null ? "unknown" : "unsupported");
+    }
     // Before anything durable: an adapter that cannot carry these params says so
     // now, rather than after a signed header row commits to bytes it will refuse.
     route.adapter.assertParams?.(spec.params);
@@ -194,6 +209,7 @@ export class LlmRuntime {
       params: spec.params,
       systemPromptEventId: spec.systemPromptEventId,
       tools: spec.tools,
+      assertRequest: (request) => assertRequestCapabilities(route.capabilities, request),
       ...(this.init.encoders !== undefined ? { encoders: this.init.encoders } : {})
     });
     return new PreparedCall(this, route, prepared, spec);
@@ -297,11 +313,14 @@ export class LlmRuntime {
     // One settlement per dispatch, and the flag is what enforces it across three
     // exits: a clean finish, a throw, and the consumer walking away mid-stream.
     let recorded = false;
+    const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
+      secret, notify: this.init.onLiveText });
     try {
       for await (const chunk of route.adapter.decode(response)) {
         // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
         // breaks the contract must not reach a caller who might act on it.
         recorder.push(chunk);
+        preview.push(chunk);
         yield chunk;
       }
       const settled = recorder.complete(response.status);
@@ -325,6 +344,7 @@ export class LlmRuntime {
       }
       throw settle(settled);
     } finally {
+      preview.finish();
       if (!recorded) {
         // The consumer stopped pulling — a `break`, a `return`, an outer throw.
         // Generators are closed by injecting a return, which no `catch` sees, so

@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { join, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
-import { pluginManifestSchema } from "../../src/plugins/pluginManifestSchema.js";
+import { pluginManifestSchema, type PluginManifest } from "../../src/plugins/pluginManifestSchema.js";
 import { assertSafePluginArchiveMember } from "../../src/plugins/pluginPackage.js";
 import {
   installedPluginsLockSchema,
@@ -28,7 +28,7 @@ afterEach(() => {
   }
 });
 
-function manifest(pluginId: string, version: string) {
+function manifest(pluginId: string, version: string): PluginManifest {
   return {
     v: 1,
     plugin: {

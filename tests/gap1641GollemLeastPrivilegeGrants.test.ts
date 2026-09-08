@@ -128,7 +128,7 @@ describe("GAP-1641 Gollem least-privilege grant boundary", () => {
     expect(receipt.allowed).toBe(true);
     expect(receipt.blockBeforeExecution).toBe(false);
     expect(receipt.signatureValid).toBe(true);
-    expect(receipt.unusedPermissionReport.resources).toEqual(["calendar:shared"]);
+    expect(receipt.unusedPermissionReport?.resources).toEqual(["calendar:shared"]);
     expect(receipt.surfaceBinding).toEqual(["Enforce", "Shield", "Vault", "Watch"]);
     expect(verifyLeastPrivilegeToolGrantReceipt({ workspace: ws, receipt })).toEqual({ valid: true, failClosedReasons: [] });
   });

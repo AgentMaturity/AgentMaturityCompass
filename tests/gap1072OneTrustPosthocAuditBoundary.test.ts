@@ -6,6 +6,7 @@ import {
   verifyPosthocAuditSamplingReceipt,
   type PosthocAuditSamplingEvidenceLink,
   type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingMethod,
 } from "../src/audit/posthocAuditSampling.js";
 
 const DOC = "docs/source-reviews/GAP-1072-onetrust-ai-governance-posthoc-audit.md";
@@ -217,7 +218,8 @@ describe("GAP-1072 OneTrust AI Governance post-hoc audit boundary", () => {
           populationId: "",
           populationSize: 0,
           sampleSize: 0,
-          samplingMethod: "",
+          samplingMethod: "" as PosthocAuditSamplingMethod, // deliberately invalid: metadata-only plan
+
           riskTier: "high",
           plannedAt: "",
           signedEvidenceRef: "",

@@ -26,6 +26,7 @@ import type { CredentialRef } from "../../credentials/credentialRef.js";
 import type { ResolvedRetryPolicy, RetryPolicyConfig } from "../retryPolicy.js";
 import { resolveRetryPolicy } from "../retryPolicy.js";
 import type { LlmAdapter } from "./adapterTypes.js";
+import { snapshotCapabilities, type ProviderCapabilities } from "./providerCapabilities.js";
 
 /** Thrown when a route cannot be registered, or cannot be resolved. */
 export class LlmRouteError extends Error {
@@ -74,6 +75,7 @@ export interface LlmRouteConfig {
  * Frozen, and holding the adapter instance itself. Nothing here is re-read.
  */
 export interface PinnedRoute {
+  readonly capabilities: ProviderCapabilities | null;
   /** Unique per `register` call — distinguishes a replacement from the original. */
   readonly registrationId: string;
   readonly providerId: string;
@@ -92,7 +94,17 @@ export interface PinnedRoute {
   readonly generation: number;
 }
 
+/** Local adapter discovery; contains no credential reference, value or endpoint. */
+export interface ProviderDescription {
+  readonly providerId: string;
+  readonly adapterId: string;
+  readonly adapterVersion: number;
+  readonly models: readonly string[] | null;
+  readonly capabilities: ProviderCapabilities | null;
+}
+
 interface Registration {
+  readonly capabilities: ProviderCapabilities | null;
   readonly registrationId: string;
   readonly config: LlmRouteConfig;
   readonly baseUrl: string;
@@ -144,6 +156,13 @@ export class AdapterRegistry {
   /** Provider ids currently registered, in registration order. */
   list(): readonly string[] {
     return [...this.routes.keys()];
+  }
+
+  describe(): readonly ProviderDescription[] {
+    return [...this.routes.values()].map(({ config, capabilities }) => Object.freeze({
+      providerId: config.providerId, adapterId: config.adapter.id, adapterVersion: config.adapter.version,
+      models: config.models === null ? null : Object.freeze([...config.models]), capabilities
+    }));
   }
 
   /**
@@ -206,6 +225,7 @@ export class AdapterRegistry {
     }
     const adapter = registration.config.adapter;
     return Object.freeze({
+      capabilities: registration.capabilities,
       registrationId: registration.registrationId,
       providerId: registration.config.providerId,
       model: input.model,
@@ -236,6 +256,7 @@ export class AdapterRegistry {
     this.generationCounter += 1;
     const registrationId = `${config.providerId}#${this.registrationCounter}`;
     this.routes.set(config.providerId, {
+      capabilities: snapshotCapabilities(config.adapter.capabilities),
       registrationId,
       config,
       baseUrl: normalizeBaseUrl(config.baseUrl, config.providerId),

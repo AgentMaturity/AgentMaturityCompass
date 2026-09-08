@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:mcp-security-analyzer:${index}`,
     taskCategory: "mcp-security-score-live-drift",
     domain: "agent-evaluation-security",
-    agentEvaluationDimension: "observed_mcp_security_score_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 18 + index : 8 + index,
     invalidActionRate0to1: prefix === "live" ? 0.12 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.09 : 0.01,

@@ -1,4 +1,4 @@
-import { createServer } from "node:http";
+import { createServer, type RequestListener } from "node:http";
 import { afterEach, describe, expect, test } from "vitest";
 import { createSteerPipeline, type SteerRequestContext, type SteerResponseContext } from "../src/steer/index.js";
 import { wrapFetch } from "../src/runtime/wrapFetch.js";
@@ -13,7 +13,7 @@ afterEach(async () => {
   }
 });
 
-async function startJsonServer(handler: Parameters<typeof createServer>[0]): Promise<number> {
+async function startJsonServer(handler: RequestListener): Promise<number> {
   const server = createServer(handler);
   servers.push(server);
   await new Promise<void>((resolvePromise) => server.listen(0, "127.0.0.1", () => resolvePromise()));

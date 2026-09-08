@@ -9,6 +9,7 @@ import {
   inspectAuditBinder,
 } from "../src/audit/binderArtifact.js";
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
+import type { AuditBinderJson } from "../src/audit/binderSchema.js";
 import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
 
 const DOC = "docs/source-reviews/GAP-1070-modelop-audit-binder.md";
@@ -193,10 +194,11 @@ describe("GAP-1070 ModelOp audit-binder boundary", () => {
       "SIGNATURE_INVALID",
     ]));
 
+    // deliberately metadata-only: the scan walks the object generically
     const metadataOnlyScan = scanBinderForPii({
       source: "ModelOp",
       reviewerNotes: "Contact auditor@example.com for a copy of the competitor evidence package.",
-    });
+    } as unknown as AuditBinderJson);
     expect(metadataOnlyScan.status).toBe("FAIL");
     expect(metadataOnlyScan.findings.some((finding) => finding.type === "EMAIL")).toBe(true);
   });

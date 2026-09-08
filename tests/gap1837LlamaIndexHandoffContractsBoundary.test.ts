@@ -85,14 +85,16 @@ describe("GAP-1837 LlamaIndex handoff contracts boundary", () => {
           ownerAgentId: "parse-agent",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-document-parse-output"]
+          evidenceRefs: ["receipt-document-parse-output"],
+          refusalReason: null
         },
         {
           dependencyId: "source-node-lineage",
           ownerAgentId: "retrieval-agent",
           status: "pending",
           required: true,
-          evidenceRefs: ["source-node-lineage-draft"]
+          evidenceRefs: ["source-node-lineage-draft"],
+          refusalReason: null
         }
       ],
       ownershipTransfer: {
@@ -113,7 +115,8 @@ describe("GAP-1837 LlamaIndex handoff contracts boundary", () => {
           ownerAgentId: "retrieval-agent",
           status: "satisfied",
           required: true,
-          evidenceRefs: ["receipt-source-node-lineage"]
+          evidenceRefs: ["receipt-source-node-lineage"],
+          refusalReason: null
         }
       ]
     });

@@ -23,6 +23,15 @@ export function registerAcpCommands(program: Command): void {
     .option("--model <model>", "Model, required for a real provider")
     .option("--base-url <url>", "Override the provider base URL")
     .option("--credential <ref>", "Credential reference to resolve per request")
+    .option("--credentials-home <dir>", "Credential home fixed for this ACP process")
+    .option("--credentials-file <path>", "Explicit credential file fixed for this ACP process")
+    .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
+    .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
+    .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
+    .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
+    .option("--mcp-config-sha256 <digest>", "Pin exact reviewed MCP configuration bytes")
+    .option("--max-tokens <n>", "Positive output-token bound per model request", "512")
+    .option("--max-steps <n>", "Positive model-step bound per turn (default 8, stub 2)")
     .option("--agent-id <id>", "Agent identity recorded in the ledger", "default")
     .option("--system-prompt <text>", "System prompt for each session", "You are a careful assistant.")
     .action((opts: {
@@ -30,6 +39,15 @@ export function registerAcpCommands(program: Command): void {
       model?: string;
       baseUrl?: string;
       credential?: string;
+      credentialsHome?: string;
+      credentialsFile?: string;
+      tools: string;
+      approveTools?: string;
+      approveRisk?: string;
+      mcpConfig?: string;
+      mcpConfigSha256?: string;
+      maxTokens: string;
+      maxSteps?: string;
       agentId: string;
       systemPrompt: string;
     }) => {
@@ -40,6 +58,15 @@ export function registerAcpCommands(program: Command): void {
           agentId: opts.agentId,
           providerId: opts.provider,
           systemPrompt: opts.systemPrompt,
+          tools: opts.tools as "none" | "workspace",
+          maxTokens: Number(opts.maxTokens),
+          ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
+          ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),
+          ...(opts.credentialsFile === undefined ? {} : { credentialsFile: opts.credentialsFile }),
+          ...(opts.approveTools === undefined ? {} : { approveTools: opts.approveTools }),
+          ...(opts.approveRisk === undefined ? {} : { approveRisk: opts.approveRisk }),
+          ...(opts.mcpConfig === undefined ? {} : { mcpConfig: opts.mcpConfig }),
+          ...(opts.mcpConfigSha256 === undefined ? {} : { mcpConfigSha256: opts.mcpConfigSha256 }),
           ...(opts.model === undefined ? {} : { model: opts.model }),
           ...(opts.baseUrl === undefined ? {} : { baseUrl: opts.baseUrl }),
           ...(opts.credential === undefined ? {} : { credential: opts.credential })
@@ -52,8 +79,10 @@ export function registerAcpCommands(program: Command): void {
       }
       for (const signal of ["SIGINT", "SIGTERM"] as const) {
         process.on(signal, () => {
-          handle.close();
-          process.exit(0);
+          void handle.close().then(() => process.exit(0), () => {
+            process.stderr.write("amc acp: shutdown could not seal every owned session\n");
+            process.exit(1);
+          });
         });
       }
     });

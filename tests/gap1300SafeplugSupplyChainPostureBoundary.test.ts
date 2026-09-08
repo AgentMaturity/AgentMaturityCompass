@@ -123,7 +123,7 @@ describe("GAP-1300 SafePLUG supply-chain posture boundary", () => {
       unknownVulnerabilityComponents: 0,
     });
     expect(report.components.every((row) => row.allowedSource)).toBe(true);
-    expect(report.components.every((row) => row.versionHash.match(/^[a-f0-9]{64}$/))).toBe(true);
+    expect(report.components.every((row) => Boolean(row.versionHash?.match(/^[a-f0-9]{64}$/)))).toBe(true);
     expect(verifySupplyChainPostureReportIntegrity(report)).toMatchObject({ ok: true, reasons: [] });
 
     const receiptInput = buildSupplyChainGuardDecisionReceiptInput({

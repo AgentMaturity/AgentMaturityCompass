@@ -7,7 +7,7 @@ import { randomUUID } from "node:crypto";
 import { afterEach, describe, expect, test } from "vitest";
 import Database from "better-sqlite3";
 import { initWorkspace } from "../src/workspace.js";
-import { initGatewayConfig } from "../src/gateway/config.js";
+import { gatewayConfigSchema, initGatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
 import { getPublicKeyHistory, getPrivateKeyPem } from "../src/crypto/keys.js";
 import { parseEvidenceEvent } from "../src/diagnostic/gates.js";
@@ -108,7 +108,7 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
       throw new Error("failed to allocate upstream address");
     }
 
-    initGatewayConfig(workspace, {
+    initGatewayConfig(workspace, gatewayConfigSchema.parse({
       listen: { host: "127.0.0.1", port: 0 },
       redaction: {
         headerKeysDenylist: ["authorization", "x-api-key", "api-key", "x-openai-key"],
@@ -125,7 +125,7 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
       },
       routes: [{ prefix: "/openai", upstream: "openai", stripPrefix: true, openaiCompatible: true }],
       proxy: { enabled: false, port: 3211, allowlistHosts: [], denyByDefault: true }
-    });
+    }));
 
     const gateway = await startGateway({ workspace });
     try {

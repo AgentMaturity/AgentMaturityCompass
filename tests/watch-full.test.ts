@@ -73,7 +73,7 @@ describe('W6 — Output Attestation', () => {
 
 describe('W7 — Explainability Packet', () => {
   it('creates and verifies packet', () => {
-    const packet = createPacket([{ step: 'reasoning', detail: 'analyzed data' }]);
+    const packet = createPacket([{ claim: 'reasoning', evidence: 'analyzed data', confidence: 0.9 }]);
     expect(packet).toHaveProperty('claims');
     const v = verifyPacket(packet);
     expect(typeof v).toBe('boolean');

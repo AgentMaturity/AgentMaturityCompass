@@ -42,7 +42,7 @@ const engineEvaluation: ReplayBenchmarkAdversarialEngineEvaluationFixture = {
   explanationHash: hash("synthetic promptfoo competitor regression blocked through existing AMC receipts"),
   rerunStatus: "failed",
   guardrailRuleIds: ["guardrail:prompt-injection", "guardrail:insecure-tool-use"],
-  guardrailRuleTypes: ["prompt_injection", "tool_misuse"],
+  guardrailRuleTypes: ["prompt_injection", "custom"],
   failedGuardrailRuleCount: 2,
   promptInjectionDetected: true,
   alertRuleId: "alert:gap-1240-promptfoo-boundary",

@@ -5,6 +5,7 @@ import { geminiCliAdapter } from "./builtins/geminiCli.js";
 import { openclawCliAdapter } from "./builtins/openclawCli.js";
 import { hermesCliAdapter } from "./builtins/hermesCli.js";
 import { openhandsCliAdapter } from "./builtins/openhandsCli.js";
+import { deepseekHarnessAdapter } from "./builtins/deepseekHarness.js";
 import { autogenCliAdapter } from "./builtins/autogenCli.js";
 import { crewaiCliAdapter } from "./builtins/crewaiCli.js";
 import { langchainNodeAdapter } from "./builtins/langchainNode.js";
@@ -23,6 +24,7 @@ const BUILTINS = [
   openclawCliAdapter,
   hermesCliAdapter,
   openhandsCliAdapter,
+  deepseekHarnessAdapter,
   autogenCliAdapter,
   crewaiCliAdapter,
   langchainNodeAdapter,

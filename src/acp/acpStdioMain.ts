@@ -1,11 +1,21 @@
 import { credentialRef } from "../credentials/credentialRef.js";
+import { hostname } from "node:os";
+import { randomUUID } from "node:crypto";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { AdapterRegistry, type LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
 import { anthropicAdapter } from "../llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "../llm/providers/openaiAdapter.js";
 import { stubProviderRoute, stubProviderTransport, STUB_PROVIDER_ID } from "../agent/stubProvider.js";
-import { openAgentSession, type AgentSession } from "../agent/agentSession.js";
+import type { AgentSessionInit } from "../agent/agentSession.js";
+import { openaiResponsesAdapter } from "../llm/providers/openaiResponsesAdapter.js";
+import { isActionClass } from "../governor/actionCatalog.js";
+import { checkToolsetReadiness } from "../agent/agentToolset.js";
+import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../setup/nativeMcpConfig.js";
+import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import { sha256Hex } from "../utils/hash.js";
+import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
+import { prepareAcpNativeSession } from "./acpNativeSession.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
 
@@ -48,6 +58,7 @@ export interface AcpInputStream {
   on(event: "data", listener: (chunk: Buffer) => void): unknown;
   once(event: "end", listener: () => void): unknown;
   off(event: "data", listener: (chunk: Buffer) => void): unknown;
+  off(event: "end", listener: () => void): unknown;
 }
 
 export interface AcpStdioInit {
@@ -58,6 +69,15 @@ export interface AcpStdioInit {
   readonly baseUrl?: string;
   readonly credential?: string;
   readonly systemPrompt: string;
+  readonly tools?: "none" | "workspace";
+  readonly approveTools?: string;
+  readonly approveRisk?: string;
+  readonly mcpConfig?: string;
+  readonly mcpConfigSha256?: string;
+  readonly credentialsHome?: string;
+  readonly credentialsFile?: string;
+  readonly maxTokens?: number;
+  readonly maxSteps?: number;
   /** Defaults to the real streams; injected by tests. */
   readonly stdin?: AcpInputStream;
   readonly stdout?: { write(chunk: Buffer): boolean };
@@ -66,17 +86,19 @@ export interface AcpStdioInit {
 
 export interface AcpStdioHandle {
   readonly agent: AcpAgent;
-  close(): void;
+  close(): Promise<void>;
 }
 
 const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = {
   anthropic: "https://api.anthropic.com",
-  openai: "https://api.openai.com/v1"
+  openai: "https://api.openai.com",
+  "openai-responses": "https://api.openai.com"
 };
 
 const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = {
   anthropic: "ANTHROPIC_API_KEY",
-  openai: "OPENAI_API_KEY"
+  openai: "OPENAI_API_KEY",
+  "openai-responses": "OPENAI_API_KEY"
 };
 
 /**
@@ -92,11 +114,12 @@ export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly err
 
   const adapter = init.providerId === "openai"
     ? openaiAdapter
-    : init.providerId === "anthropic" ? anthropicAdapter : null;
+    : init.providerId === "openai-responses" ? openaiResponsesAdapter
+      : init.providerId === "anthropic" ? anthropicAdapter : null;
   if (adapter === null) {
     return {
       error: `unknown provider ${JSON.stringify(init.providerId)}; `
-        + `this surface serves "${STUB_PROVIDER_ID}", "anthropic" and "openai"`
+        + `this surface serves "${STUB_PROVIDER_ID}", "anthropic", "openai" and "openai-responses"`
     };
   }
   if (init.model === undefined || init.model.length === 0) {
@@ -121,6 +144,27 @@ export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly err
 export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const route = acpRouteFor(init);
   if ("error" in route) throw new Error(route.error);
+  const tools = init.tools ?? "none";
+  if (tools !== "none" && tools !== "workspace") throw new Error("ACP --tools must be none or workspace.");
+  const maxTokens = init.maxTokens ?? 512;
+  const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
+  if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
+  const actionClass = init.approveTools?.trim().toUpperCase();
+  const riskTier = (init.approveRisk ?? "high").trim().toLowerCase();
+  if ((actionClass !== undefined && !isActionClass(actionClass)) || !["low", "medium", "high", "critical"].includes(riskTier) || (init.approveRisk !== undefined && actionClass === undefined)) throw new Error("ACP approval settings require a valid action class and risk tier.");
+  if (actionClass !== undefined && tools !== "workspace") throw new Error("ACP tool approvals require explicit --tools workspace.");
+  const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
+    actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
+  if (tools === "workspace") {
+    const readiness = checkToolsetReadiness(init.workspace);
+    if (!readiness.ready) throw new Error("ACP workspace tools require the existing signed native tool/firewall policies; run the native guide and configure them explicitly.");
+  }
+  if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
+  const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
+  if (mcp) {
+    if (tools !== "workspace" || !approval) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
+    requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass);
+  }
 
   const stdin: AcpInputStream = init.stdin ?? process.stdin;
   const stdout = init.stdout ?? process.stdout;
@@ -132,7 +176,9 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // whichever session built it.
   const registry = new AdapterRegistry();
   registry.register(route);
-  const credentials = new LocalCredentialsService();
+  const credentials = new LocalCredentialsService({ projectDir: init.workspace, watch: false,
+    ...(init.credentialsHome === undefined ? {} : { homeDir: init.credentialsHome }),
+    ...(init.credentialsFile === undefined ? {} : { path: init.credentialsFile }) });
 
   // The stub route answers in-process and has no server behind its base URL, so
   // it needs its own transport. Without one the default fetch transport tries to
@@ -141,8 +187,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   // caught: the conversation completed and the agent produced no text at all.
   const transport = route.providerId === STUB_PROVIDER_ID ? stubProviderTransport({}) : undefined;
 
-  const sessionFactory = (params: { sessionId: string; workspace: string; agentId: string }): AgentSession =>
-    openAgentSession({
+  const sessionOptions = (params: { sessionId: string; workspace: string; agentId: string }): AgentSessionInit & { sessionId: string } =>
+    ({
       workspace: params.workspace,
       sessionId: params.sessionId,
       agentId: params.agentId,
@@ -155,19 +201,35 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       route: {
         providerId: route.providerId,
         model: route.models?.[0] ?? "",
-        params: {}
+        params: route.providerId === "openai-responses" ? { max_output_tokens: maxTokens }
+          : route.providerId === "openai" ? { max_tokens: maxTokens, stream: true, stream_options: { include_usage: true } }
+            : { max_tokens: maxTokens, stream: true }
       },
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
-      compositionDigest: `acp:${route.providerId}`,
-      policyDigest: "acp"
+      compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null })),
+      policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null })),
+      tools, maxSteps
     });
+
+  const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
 
   const agent = createAcpAgent({
     workspace: init.workspace,
     agentId: init.agentId,
+    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined },
     write: (frame) => { stdout.write(frame); },
-    sessionFactory,
+    sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
+      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
+      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
+      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
+    resumeSessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), claimant, signal: params.signal,
+      ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
+      ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
+      ...(init.credentialsFile === undefined ? {} : { credentialsFile: init.credentialsFile }),
+      onApprovalRaised: event => { stderr.write(`amc acp: signed approval pending: ${event.approvalRequestId}\n`); } }),
+    onUnusable: () => { void close().catch(reportShutdownFailure); },
     // stderr, never stdout. See the module note.
     log: (message) => { stderr.write(`amc acp: ${message}\n`); }
   });
@@ -176,13 +238,27 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   stdin.on("data", onData);
   // A client that closes its side has ended the conversation; there is nothing
   // further to read and nothing more worth saying.
-  stdin.once("end", () => agent.close());
+  const reportShutdownFailure = (): void => {
+    stderr.write("amc acp: shutdown could not cleanly settle every owned session\n");
+    process.exitCode = 1;
+  };
+  const onEnd = (): void => { void close().catch(reportShutdownFailure); };
+  stdin.once("end", onEnd);
+  let closePromise: Promise<void> | undefined;
+
+  function close(): Promise<void> {
+    if (closePromise) return closePromise;
+    stdin.off("data", onData);
+    stdin.off("end", onEnd);
+    closePromise = (async () => {
+      try { await agent.close(); }
+      finally { await credentials.close(); }
+    })();
+    return closePromise;
+  }
 
   return {
     agent,
-    close(): void {
-      stdin.off("data", onData);
-      agent.close();
-    }
+    close
   };
 }

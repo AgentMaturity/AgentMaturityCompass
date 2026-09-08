@@ -33,7 +33,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:healthcare-agent-taxonomy-${index}`,
     taskCategory: "healthcare-agent-taxonomy-live-drift",
     domain: "healthcare-agent-evaluation",
-    agentEvaluationDimension: "observed_healthcare_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     physicianBenchBenchmarkId: "gap0991-amc-owned-healthcare-agent-taxonomy-drift",
     physicianBenchTaskSetVersion: "2026.06.24",
     physicianBenchTaskId: `gap0991-task-${index}`,

@@ -61,6 +61,8 @@ export interface ProcessSpec {
   readonly timeoutMs?: number;
   /** Aborting terminates the tree with reason "cancel". */
   readonly signal?: AbortSignal;
+  /** Explicit launcher-owned descriptors, inherited as fd 3 onward; never inferred from the environment. */
+  readonly extraFds?: readonly number[];
 }
 
 export interface CapturedStream {

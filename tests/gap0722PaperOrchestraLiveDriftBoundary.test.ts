@@ -31,7 +31,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "research-paper-writing-workflow-drift",
     domain: "automated-research-agent-evaluation",
-    agentEvaluationDimension: "observed_research_writing_agent_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 32 + index : 14 + index,
     invalidActionRate0to1: prefix === "live" ? 0.16 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.11 : 0.01,

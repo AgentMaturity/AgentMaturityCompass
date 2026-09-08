@@ -6,6 +6,7 @@ import {
   verifyPosthocAuditSamplingReceipt,
   type PosthocAuditSamplingEvidenceLink,
   type PosthocAuditSamplingSourceCitation,
+  type PosthocAuditSamplingMethod,
 } from "../src/audit/posthocAuditSampling.js";
 
 const DOC = "docs/source-reviews/GAP-1084-generative-ai-voting-posthoc-audit.md";
@@ -112,7 +113,7 @@ describe("GAP-1084 generative AI voting post-hoc audit boundary", () => {
           populationId: "collective-choice-agent-actions-june-2026",
           populationSize: 540,
           sampleSize: 27,
-          samplingMethod: "risk-stratified",
+          samplingMethod: "stratified",
           riskTier: "high",
           plannedAt: "2026-06-25T08:42:05.000+05:30",
           signedEvidenceRef: "ledger-sample-plan-collective-choice-actions-june",
@@ -227,7 +228,8 @@ describe("GAP-1084 generative AI voting post-hoc audit boundary", () => {
           populationId: "",
           populationSize: 0,
           sampleSize: 0,
-          samplingMethod: "",
+          samplingMethod: "" as PosthocAuditSamplingMethod, // deliberately invalid: metadata-only plan
+
           riskTier: "high",
           plannedAt: "",
           signedEvidenceRef: "",
@@ -278,7 +280,7 @@ describe("GAP-1084 generative AI voting post-hoc audit boundary", () => {
           populationId: "collective-choice-agent-actions-june-2026",
           populationSize: 540,
           sampleSize: 27,
-          samplingMethod: "risk-stratified",
+          samplingMethod: "stratified",
           riskTier: "high",
           plannedAt: "2026-06-25T08:42:05.000+05:30",
           signedEvidenceRef: "ledger-sample-plan-collective-choice-actions-june",

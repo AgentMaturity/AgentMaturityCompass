@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "compositional-text-to-video",
     domain: "multi-agent-generation-evaluation",
-    agentEvaluationDimension: "multi_agent_compositional_generation",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 14 + index : 7 + index,
     invalidActionRate0to1: prefix === "live" ? 0.09 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.06 : 0.01,

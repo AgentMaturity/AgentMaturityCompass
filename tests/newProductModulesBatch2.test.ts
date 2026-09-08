@@ -339,11 +339,11 @@ describe('TaskSpecBuilder', () => {
     const spec = new TaskSpecBuilder()
       .withDescription('Analyze data')
       .withConstraints(['max 10 items', 'no PII'])
-      .withPriority(8)
+      .withPriority('high')
       .build();
     expect(spec.description).toBe('Analyze data');
     expect(spec.constraints).toHaveLength(2);
-    expect(spec.priority).toBe(8);
+    expect(spec.priority).toBe('high');
     expect(spec.specId).toBeDefined();
   });
 

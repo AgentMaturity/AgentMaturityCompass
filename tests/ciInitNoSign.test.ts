@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { describe, expect, test } from "vitest";
 
 function runCli(args: string[], cwd: string = process.cwd()) {
-  const env = { ...process.env, NO_COLOR: "1" };
+  const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
   delete env.AMC_VAULT_PASSPHRASE;
   delete env.AMC_VAULT_PASSPHRASE_FILE;
   return spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), ...args], {

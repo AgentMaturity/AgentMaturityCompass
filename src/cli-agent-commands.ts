@@ -10,12 +10,6 @@ import { hostname } from "node:os";
  * claim "the run is reconstructable and signed" is something an operator can
  * check rather than something a test asserted once.
  *
- * WHY IT IS A HIDDEN GROUP. Hidden commands are internal to
- * `buildCommandInventory`, so the published command-count claim is unaffected.
- * That matters here for an honest reason as well as a bookkeeping one: this is a
- * repository-checkout surface (see the kernel note below), not a shipped product
- * command, and counting it would be counting something an npm user cannot run.
- *
  * WHY IT IS `agent-loop` AND NOT `agent`. `amc agent` is already the agent
  * REGISTRY — a different thing entirely, about records of agents rather than
  * running one. Overloading it would be the same blur ADR-0009 removed between
@@ -25,9 +19,8 @@ import { hostname } from "node:os";
  * composes `amcCredentials` → `amcLlm` → `amcAgentLoop` and drives the turn from
  * there. Building an `AgentDriver` here instead would have been one import
  * shorter and would have left three Cordis services with no caller but their own
- * tests. The cost is real and stated: the kernel is a workspace package, so this
- * command works from a repository checkout and reports plainly when it is run
- * from an npm install.
+ * tests. The packaged runtime bundles the kernel and its workspace dependencies
+ * through src/kernel/amcRuntime.ts.
  *
  * HOW A TURN IS CANCELLED. With Ctrl-C, or with `--cancel-after`. There is no
  * `agent-loop cancel <session>` because there is no cross-process control
@@ -43,6 +36,7 @@ import { readFileSync } from "node:fs";
 import type { LlmRouteConfig } from "./llm/adapter/adapterRegistry.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
+import { openaiResponsesAdapter } from "./llm/providers/openaiResponsesAdapter.js";
 import { credentialRef } from "./credentials/credentialRef.js";
 import {
   STUB_PROVIDER_ID,
@@ -52,11 +46,15 @@ import {
 } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { agentToolset } from "./agent/agentToolset.js";
+import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
+import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
+import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
-import { prepareSkillTurn } from "./skills/skillTurn.js";
+import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
+import { buildSkillCatalog } from "./skills/skillCatalog.js";
+import { loadNativeExtensions, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
@@ -66,6 +64,7 @@ import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
+import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
@@ -96,6 +95,10 @@ const defaultIo: AgentLoopCliIo = {
 };
 
 interface RunOptions {
+  extension?: string[];
+  extensionPin?: string[];
+  mcpConfig?: string;
+  mcpConfigSha256?: string;
   delegate?: boolean;
   maxDelegationDepth?: string;
   delegateScope?: string;
@@ -124,10 +127,13 @@ interface RunOptions {
   approveTools?: string;
   approveRisk?: string;
   approvalException?: string;
+  interactiveApprovals?: boolean;
   json?: boolean;
+  stream?: boolean;
 }
 
 const RISK_TIERS: readonly ApprovalRiskTier[] = ["low", "medium", "high", "critical"];
+const collectOption = (value: string, previous: string[] = []): string[] => [...previous, value];
 
 /** What the run's tool calls need before they may run, or `null` when nothing does. */
 interface ApprovalGateChoice {
@@ -221,6 +227,9 @@ function integerOption(io: AgentLoopCliIo, flag: string, raw: string | undefined
 /** The default wire params for each supported adapter, and why each one is there. */
 function paramsFor(providerId: string, maxTokens: number): Record<string, unknown> {
   switch (providerId) {
+    case "openai-responses":
+      // The Responses encoder owns stream; its output bound has a different name.
+      return { max_output_tokens: maxTokens };
     case "openai":
       // `include_usage` is not a nicety: the stream grammar refuses a successful
       // finish that emitted no usage, and OpenAI omits usage unless asked.
@@ -234,12 +243,14 @@ function paramsFor(providerId: string, maxTokens: number): Record<string, unknow
 
 const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = Object.freeze({
   anthropic: "https://api.anthropic.com",
-  openai: "https://api.openai.com"
+  openai: "https://api.openai.com",
+  "openai-responses": "https://api.openai.com"
 });
 
 const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = Object.freeze({
   anthropic: "ANTHROPIC_API_KEY",
-  openai: "OPENAI_API_KEY"
+  openai: "OPENAI_API_KEY",
+  "openai-responses": "OPENAI_API_KEY"
 });
 
 /** Build the route the operator asked for, or explain why it cannot be built. */
@@ -255,12 +266,14 @@ function routeFor(
   model: string | undefined
 ): LlmRouteConfig | null {
   if (providerId === STUB_PROVIDER_ID) return stubProviderRoute();
-  const adapter = providerId === "openai" ? openaiAdapter : providerId === "anthropic" ? anthropicAdapter : null;
+  const adapter = providerId === "openai" ? openaiAdapter
+    : providerId === "openai-responses" ? openaiResponsesAdapter
+      : providerId === "anthropic" ? anthropicAdapter : null;
   if (adapter === null) {
     io.error(
       chalk.red(
         `unknown provider ${JSON.stringify(providerId)}; this surface ships ` +
-          `"${STUB_PROVIDER_ID}", "anthropic" and "openai"`
+          `"${STUB_PROVIDER_ID}", "anthropic", "openai" (Chat Completions), and "openai-responses"`
       )
     );
     io.fail();
@@ -324,10 +337,8 @@ async function importRunner(
     if ((error as { code?: string } | null)?.code === "ERR_MODULE_NOT_FOUND") {
       io.error(
         chalk.yellow(
-          "The composition kernel (@amc/core) is not installed.\n" +
-            "`agent-loop run` drives the agent through the composed tree, and that tree lives in\n" +
-            "workspace packages this release does not publish. Run from a repository checkout\n" +
-            "(pnpm install --frozen-lockfile && pnpm run build)."
+          "The packaged native runtime could not be loaded. Reinstall AMC from a complete package.\n" +
+            "For a source checkout, install workspace dependencies and rebuild before running."
         )
       );
       io.fail();
@@ -345,19 +356,100 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
   registerPromptCommands(program, io);
 
   const group = program
-    .command("agent-loop", { hidden: true })
-    .description("Run and verify a native agent turn over the signed session spine (internal)");
+    .command("agent-loop")
+    .description("Guide, run, and verify native tasks with signed session evidence (agent default)");
+
+  group
+    .command("guide")
+    .description("Inspect local setup without writes or provider calls and show the next native task command")
+    .option("--provider <id>", "choose openai (Chat Completions), openai-responses, anthropic, or stub (local demonstration)")
+    .option("--model <model>", "your model ID; required for a real provider")
+    .option("--credential <ref>", "credential reference name, never a key value")
+    .option("--credentials-home <dir>", "same credential home as agent-loop run")
+    .option("--credentials-file <path>", "same explicit credential file as agent-loop run")
+    .option("--json", "Output local inspection status and structured next-action argv")
+    .action(async (opts: Omit<NativeFirstUseOptions, "workspace" | "env" | "userEnvPath"> & { json?: boolean }) => {
+      const guide = await inspectNativeFirstUse({ ...opts, workspace: process.cwd() });
+      io.log(opts.json ? JSON.stringify(guide, null, 2) : renderNativeFirstUseGuide(guide));
+      if (guide.status === "blocked") io.fail();
+    });
+
+  group
+    .command("mcp-catalog")
+    .description("Start an explicitly configured stdio MCP server, report its catalog, and dispose it (executes a local program)")
+    .requiredOption("--config <path>", "operator-authored MCP JSON config; envRefs holds references, never literal credentials")
+    .option("--credentials-home <dir>", "credential home used to resolve explicit server envRefs")
+    .option("--credentials-file <path>", "explicit credential file used to resolve server envRefs")
+    .option("--json", "Output the discovered catalog and exact generated allowlist names")
+    .action(async (opts: { config: string; credentialsHome?: string; credentialsFile?: string; json?: boolean }) => {
+      const controller = new AbortController();
+      const cancel = () => controller.abort();
+      process.on("SIGINT", cancel);
+      try {
+        const { loadNativeMcpConfiguration, resolveNativeMcpServer } = await import("./setup/nativeMcpConfig.js");
+        const { discoverNativeMcpCatalog, nativeMcpToolName } = await import("./mcp/nativeMcpClient.js");
+        const loaded = loadNativeMcpConfiguration(opts.config);
+        const server = await resolveNativeMcpServer(loaded.config, { ...opts, workspace: process.cwd() });
+        const catalog = await discoverNativeMcpCatalog(server, process.cwd(), controller.signal);
+        const receipt = {
+          schemaVersion: 1, serverStarted: true, configSha256: loaded.sha256,
+          ...catalog,
+          allowlistNames: catalog.tools.map(tool => ({ remoteName: tool.name, amcToolName: nativeMcpToolName(catalog.serverId, tool.name) })),
+          grantsCreated: false,
+          next: "Review every tool schema. Pin digest as expectedCatalogDigest, add explicit name/actionClass grants, and separately review and sign matching amcToolName/actionClass allowlist entries. Run requires --tools workspace and --approve-tools; no policy was changed."
+        };
+        if (!opts.json) io.log("MCP catalog discovered; the configured server has been disposed. This command executed a local program and created no tool grants.");
+        io.log(JSON.stringify(receipt, null, 2));
+      } catch (error) {
+        io.error(error instanceof NativeMcpConfigError ? error.message : "MCP discovery failed or was cancelled. Check the explicit config and credential references; no catalog or grant is accepted.");
+        io.fail();
+      } finally { process.removeListener("SIGINT", cancel); }
+    });
+
+  group
+    .command("chat")
+    .description("Interactive native tasks over the existing governed run/resume path (agent default)")
+    .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
+    .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
+    .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
+    .option("--persona <text>", "explicit native persona override")
+    .option("--delegate", "enable governed in-process child agents; requires workspace tools")
+    .option("--max-delegation-depth <n>", "maximum native child depth")
+    .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
+    .option("--provider <id>", "explicit provider; asks in a terminal when omitted")
+    .option("--model <model>", "your model ID; asks for a real provider when omitted")
+    .option("--credential <ref>", "credential reference name, never a key value")
+    .option("--credentials-home <dir>", "same credential home as agent-loop run")
+    .option("--credentials-file <path>", "same explicit credential file as agent-loop run")
+    .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
+    .option("--mcp-config-sha256 <digest>", "require these exact reviewed MCP config bytes")
+    .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
+    .option("--approve-risk <tier>", "approval risk tier (default high)")
+    .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
+    .option("--max-tokens <n>", "output-token limit per request (default 512)")
+    .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
+    .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
+    .option("--fork-from <id>", "create a child of this verified parent on the first task")
+    .action(async (opts: import("./setup/nativeInteractiveSession.js").NativeChatOptions) => {
+      const { runNativeInteractiveSession } = await import("./setup/nativeInteractiveSession.js");
+      await runNativeInteractiveSession({ ...opts, workspace: process.cwd() }, io);
+    });
 
   group
     .command("run")
     .description("Run one agent turn and report what the signed log recorded")
+    .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
+    .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
+    .option("--stream", "show provisional live text on stderr; final structured result remains on stdout")
     .argument("[prompt...]", "the prompt that opens the turn")
-    .option("--provider <id>", `provider route to send on (default "${STUB_PROVIDER_ID}")`)
+    .option("--provider <id>", `provider route to send on (default "${STUB_PROVIDER_ID}": local recording demonstration)`)
     .option("--model <model>", "model to address")
     .option("--base-url <url>", "provider origin, when it differs from the default")
     .option("--credential <ref>", "credential REFERENCE (never a value) the route authenticates with")
     .option("--credentials-home <dir>", "home directory the credentials store reads from")
     .option("--credentials-file <path>", "explicit credentials file, overriding the home layout")
+    .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
+    .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes")
     .option("--max-tokens <n>", "provider max_tokens for each request")
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
@@ -399,12 +491,19 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       "require a signed human approval before every tool call, decided under this action class"
     )
     .option("--approve-risk <tier>", "risk tier the approval is raised at (default high)")
+    .option("--interactive-approvals", "send actual queued approval IDs to the native chat parent over dedicated Node IPC")
     .option(
       "--approval-exception <file>",
       "ADR-5 exception note (JSON) that auto-allows the classes it names until it expires"
     )
     .option("--json", "Output as JSON")
     .action(async (promptParts: string[], opts: RunOptions) => {
+      if (opts.interactiveApprovals && (typeof process.send !== "function" || !process.connected)) {
+        io.error("--interactive-approvals requires an AMC parent with a dedicated IPC channel. Use native chat or the ordinary approvals CLI."); io.fail(); return;
+      }
+      if (opts.interactiveApprovals && opts.approvalException !== undefined) {
+        io.error("Interactive approvals require the signed approval engine; approval exceptions cannot be combined with this mode."); io.fail(); return;
+      }
       // Resolved FIRST, so every flag default below can fall back to it. A
       // preset is signed policy: an unverifiable one composes nothing, for the
       // same reason an unverifiable schedule runs nothing.
@@ -420,10 +519,30 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         // Said out loud. A run whose model, tool mode or approval gate came from
         // a file the operator wrote last month should say so, or the behaviour
         // has no visible cause.
-        io.log(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
+        (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
+        // Apply the remaining policy fields before approval and delegation are
+        // built. A signed preset must not merely advertise these settings.
+        opts = { ...opts,
+          approveTools: opts.approveTools ?? preset.approveTools,
+          delegate: opts.delegate ?? preset.delegate?.enabled,
+          delegateScope: opts.delegateScope ?? preset.delegate?.scope?.join(","),
+          maxDelegationDepth: opts.maxDelegationDepth ?? (preset.delegate?.maxDepth === undefined ? undefined : String(preset.delegate.maxDepth)),
+          delegateProvider: opts.delegateProvider ?? preset.delegate?.provider,
+          delegateTimeout: opts.delegateTimeout ?? (preset.delegate?.timeoutMs === undefined ? undefined : String(preset.delegate.timeoutMs))
+        };
       }
 
-      const rawPrompt = promptParts.join(" ").trim();
+      let rawPrompt = promptParts.join(" ").trim();
+      let extensionTurn: NativeExtensionTurn;
+      try {
+        const catalog = buildSkillCatalog(workspaceSkillRoots(process.cwd(), opts.credentialsHome));
+        const extensions = loadNativeExtensions({ workspace: process.cwd(), manifestPaths: opts.extension,
+          expectedDigests: opts.extensionPin, reservedCommands: [...catalog.skills, ...catalog.problems].map(skill => skill.name) });
+        extensionTurn = extensions.prepareTurn();
+        rawPrompt = extensions.expandCommand(rawPrompt)?.prompt ?? rawPrompt;
+      } catch (error) {
+        io.error(error instanceof Error ? error.message : "Native extension admission refused."); io.fail(); return;
+      }
       // `/name` is resolved BEFORE the turn is composed, because
       // `runComposedTurn` assembles the system prompt once at the top and
       // records it as a signed `system/prompt` row -- a skill discovered after
@@ -495,8 +614,32 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
+      if (opts.mcpConfigSha256 !== undefined && opts.mcpConfig === undefined) {
+        io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
+      }
+      if (opts.mcpConfig !== undefined && opts.approvalException !== undefined) {
+        io.error("MCP tools require the actual signed approval gate; approval exceptions are not accepted."); io.fail(); return;
+      }
       const gate = approvalGateFor(io, opts);
       if (gate === null) return;
+      if (opts.interactiveApprovals && gate === undefined) {
+        io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
+      }
+      let mcpConfig: LoadedNativeMcpConfiguration | null = null;
+      let mcpReview: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[] } | null = null;
+      if (opts.mcpConfig !== undefined) {
+        if (opts.tools !== "workspace" || gate === undefined) {
+          io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
+        }
+        try {
+          const { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } = await import("./setup/nativeMcpConfig.js");
+          mcpConfig = loadNativeMcpConfiguration(opts.mcpConfig, opts.mcpConfigSha256);
+          mcpReview = requireReviewedNativeMcpGrants(mcpConfig, process.cwd(), gate.actionClass);
+        } catch (error) {
+          io.error(error instanceof NativeMcpConfigError ? error.message : "MCP preflight refused. Review the config digest, catalog pin, explicit grants, matching signed allowlist and approval class; no server was started.");
+          io.fail(); return;
+        }
+      }
       const runner = await importRunner(io);
       if (runner === null) return;
 
@@ -531,6 +674,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         startedAt: Math.round(Date.now() - process.uptime() * 1000)
       };
       let toolSeam: AgentToolSeam | null = null;
+      let workspaceToolset: AgentToolset | null = null;
+      const progress = opts.json ? io.error : io.log;
       let bindToolSession: ((session: ComposedToolSession) => void) | undefined;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
@@ -541,7 +686,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           if (boundSession === null) throw new Error("workspace tools have no native session writer");
           return boundSession;
         };
-        const toolset = agentToolset({
+        const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(),
           agentId: "default",
           // Fork chooses a different ID; resume chooses the existing writer.
@@ -560,6 +705,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             io.error(chalk.yellow(
               "--delegate needs \"delegate\" in the signed tool allowlist; add it to .amc/tools.yaml and re-sign: amc tools sign"
             ));
+            toolset.close();
+            io.fail();
             return;
           }
         }
@@ -569,9 +716,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // unconfigured policy.
           io.error(chalk.yellow("the workspace toolset is not ready:"));
           for (const blocker of toolset.readiness.blockers) io.error(chalk.yellow(`  - ${blocker}`));
+          toolset.close();
+          io.fail();
           return;
         }
-        io.log(chalk.dim(
+        progress(chalk.dim(
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
           }`
@@ -609,6 +758,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             });
             if (!resolved.ok) {
               io.error(chalk.red(resolved.reason));
+              toolset.close();
               io.fail();
               return;
             }
@@ -620,7 +770,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // and hand the kernel nothing -- mutation testing found exactly that,
           // because the CLI tests can only reach the refusal paths (they have no
           // gateway to succeed against).
-          io.log(chalk.dim(
+          progress(chalk.dim(
             foreignRunner === null
               ? "delegates run in-process, under this run's own driver"
               : `delegates run out-of-process: ${foreignRunnerDescription}`
@@ -631,37 +781,40 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // place the parsed depth becomes observable, so a build that dropped
           // the operator's value and used the default would say so here.
           //
-          // The second clause is not padding. `--max-delegation-depth 3` is
-          // today behaviourally identical to 1: the kernel builds its child
-          // runner without `grantDelegation`, so no child is ever offered
-          // `delegate` and no chain reaches depth 2. Printing the configured
-          // number alone would tell an operator chains may run three deep when
-          // they cannot. Pinned by "a child is a leaf" in
-          // tests/subagentRunnerEndToEnd.test.ts, which fails the day onward
-          // delegation is wired and forces this line to be revisited with it.
-          io.log(chalk.dim(
+          progress(chalk.dim(
             `delegation is offered, chains bounded at depth ${maxDelegationDepth}`
-            + (maxDelegationDepth > 1 ? " (children cannot delegate yet, so today's ceiling is 1)" : "")
+            + (foreignRunner === null ? "; native children inherit approval, cancellation, limits and narrowed scopes" : "")
           ));
           // Named either way. The unscoped case is the one an operator is most
           // likely not to have thought about, so it gets said out loud rather
           // than being the silent default.
-          io.log(chalk.dim(
+          progress(chalk.dim(
             delegateScope === undefined
-              ? "delegates are unscoped: a child is offered every tool this run has"
+              ? "delegates have no additional action-class scope; native children use built-in workspace tools under the root's signed policy"
               : `delegates are scoped to: ${delegateScope.join(", ")}`
           ));
         }
-        // The toolset holds one evidence handle for the run; release it when
-        // the process ends rather than leaking a SQLite handle per agent.
-        process.once("exit", () => toolset.close());
+        // The run finally block releases mounts before this recorder handle.
       } else if (toolMode === "echo") {
         toolSeam = echoToolSeam();
       }
       const timers: NodeJS.Timeout[] = [];
       let onSigint: (() => void) | null = null;
+      let mcpMount: MountedNativeMcpServer | null = null;
+      const mcpAbort = new AbortController();
+      const cancelMcp = () => mcpAbort.abort();
+      if (mcpConfig !== null) process.on("SIGINT", cancelMcp);
 
       try {
+        if (mcpConfig !== null && mcpReview !== null && workspaceToolset !== null) {
+          const { resolveNativeMcpServer } = await import("./setup/nativeMcpConfig.js");
+          const { mountNativeMcpServer } = await import("./mcp/nativeMcpClient.js");
+          const server = await resolveNativeMcpServer(mcpConfig.config, { ...opts, workspace: process.cwd() });
+          mcpMount = await mountNativeMcpServer({ server, workspace: process.cwd(), agentId: "default",
+            toolset: workspaceToolset, ...mcpReview, signal: mcpAbort.signal });
+          progress(`Mounted reviewed MCP tools for this run: ${mcpMount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
+        }
+        let previewRequest: string | null = null;
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
           ...(opts.session === undefined ? {} : { resume: { claimant } }),
@@ -669,6 +822,19 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
           agentId: "default",
+          ...(opts.stream ? { onLiveText: (event: import("./llm/adapter/liveTextPreview.js").LiveTextPreviewEvent) => {
+            if (event.kind === "text") {
+              if (previewRequest !== event.headerEventId) {
+                process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
+                previewRequest = event.headerEventId;
+              }
+              process.stderr.write(event.text);
+            } else if (previewRequest !== null) {
+              process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
+                : "\n[Live preview ended; read the recorded result for the outcome.]\n");
+              previewRequest = null;
+            }
+          } } : {}),
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
           // gives the run its identity and pulls the workspace's own AGENTS.md /
           // CLAUDE.md in as runtime context. A hardcoded string here — what this
@@ -685,9 +851,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             // Contributed as plugins so `ContextPluginHost` stamps them
             // `literal` exactly as it does for AGENTS.md: one place decides that
             // workspace text is data, not two that could drift.
-            ...(skillTurn.contextPlugins.length === 0
+            ...(skillTurn.contextPlugins.length + extensionTurn.contextPlugins.length === 0
               ? {}
-              : { extraContextPlugins: [...skillTurn.contextPlugins] })
+              : { extraContextPlugins: [...skillTurn.contextPlugins, ...extensionTurn.contextPlugins] })
           },
           ...(gate === undefined
             ? {}
@@ -697,12 +863,24 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                   riskTier: gate.riskTier,
                   answerers: gate.answerers,
                   onRaised: (event) => {
+                    if (opts.interactiveApprovals) {
+                      if (typeof process.send !== "function" || !process.connected) {
+                        io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
+                      }
+                      try {
+                        process.send({ type: "amc/native-approval-raised", v: 1, agentId: "default",
+                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId }, error => {
+                          if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
+                        });
+                      } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
+                      return;
+                    }
                     // The operator cannot answer a question whose id they do not
                     // have, and it only exists once the engine has minted it.
                     io.error(
                       chalk.yellow(
                         `awaiting approval ${event.approvalRequestId} — ` +
-                          `answer it with: amc approvals approve --agent default --id ${event.approvalRequestId}`
+                          `answer it with: amc approvals approve --agent default --mode execute --reason "review reason" --username <reviewer> --roles <reviewer-roles> ${event.approvalRequestId}`
                       )
                     );
                   }
@@ -734,11 +912,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             ...(opts.credentialsHome === undefined ? {} : { homeDir: opts.credentialsHome }),
             ...(opts.credentialsFile === undefined ? {} : { path: opts.credentialsFile })
           },
-          notify: opts.json
+          notify: opts.json && !opts.stream
             ? undefined
             : (notification: LoopNotification) => {
                 const line = renderNotification(notification);
-                if (line !== null) io.log(line);
+                if (line !== null) (opts.json ? io.error : io.log)(line);
               },
           onReady: (handle) => {
             // Ctrl-C is the operator's stop button, and it must produce the same
@@ -764,10 +942,20 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
 
         const summary = readAgentRunSummary(process.cwd(), outcome.sessionId, outcome.status);
         io.log(opts.json ? JSON.stringify(summary, null, 2) : renderRunSummary(summary));
+        if (!opts.json) {
+          io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
+            renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
+        }
         if (summary.driverStatus === "failed") io.fail();
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);
+        try { await mcpMount?.close(); }
+        catch { io.error("MCP cleanup failed; this mount must not be reused."); io.fail(); }
+        finally {
+          process.removeListener("SIGINT", cancelMcp);
+          workspaceToolset?.close();
+        }
       }
     });
 

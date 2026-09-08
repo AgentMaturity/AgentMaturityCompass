@@ -35,7 +35,7 @@ function obsLens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}
   return {
     drilldownId: "top100-comet-opik-studio-drilldown",
     sourceRef: REPO,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
     openAlexWorkId: null,
     doi: null,
     publisherRef: "Comet",
@@ -162,7 +162,7 @@ function report(lens: QuestionScoreObsStudioDrilldownLensRef = obsLens()): Diagn
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("e"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
@@ -214,7 +214,7 @@ describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "top100-comet-opik-studio-drilldown",
       sourceRef: REPO,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "Comet",
       titleRef: TITLE,
       uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap3747/${QUESTION_ID}`,
@@ -244,9 +244,9 @@ describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
       evidencePreviewHash: null,
       emptyStateHash: null,
       errorStateHash: null,
-      evidencePreviewState: "blocked",
+      evidencePreviewState: "custom",
       evidencePreviewCount: 0,
-      status: "blocked",
+      status: "failed",
     });
 
     const out = buildScoreEvidenceDrilldown(report(metadataOnly), QUESTION_ID);
@@ -254,9 +254,9 @@ describe("GAP-3747 Comet Opik Studio drilldown boundary", () => {
     expect(out.failClosed).toBe(true);
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       sourceRef: REPO,
-      evidencePreviewState: "blocked",
+      evidencePreviewState: "custom",
       evidencePreviewCount: 0,
-      status: "blocked",
+      status: "failed",
     });
   });
 

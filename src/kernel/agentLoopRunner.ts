@@ -46,6 +46,7 @@ import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
+import type { LiveTextPreviewEvent } from "../llm/adapter/liveTextPreview.js";
 import {
   agentPromptProfile,
   type AgentPromptProfile,
@@ -187,6 +188,7 @@ export interface ComposedTurnOptions {
   readonly credentials?: CredentialsServiceConfig;
   /** Live-only mirror. Never load-bearing: the log is the record. */
   readonly notify?: (notification: LoopNotification) => void;
+  readonly onLiveText?: (event: LiveTextPreviewEvent) => void;
   /** Called once the driver exists and before the prompt is sent. */
   readonly onReady?: (handle: ComposedTurnHandle) => void;
   /**
@@ -407,6 +409,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       session,
       credentials: serviceOn<CredentialsSeamService>(ctx, CREDENTIALS_SEAM.name),
       routes: options.routes,
+      ...(options.onLiveText === undefined ? {} : { onLiveText: options.onLiveText }),
       ...(options.transport !== undefined ? { transport: options.transport } : {})
     });
     await llmFiber.await();
@@ -470,21 +473,31 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // the prompt this composition rendered.
     if (options.delegation !== undefined) {
       const llmSeam = serviceOn<LlmSeamService>(ctx, LLM_SEAM.name);
-      options.delegation.grant({
-        identity: rootIdentity(options.agentId),
-        session,
-        runner: options.delegation.runner ?? createDriverRunner({
+      // A recursive native closure uses each child's own identity, session and
+      // inherited scope. The existing spawn boundary enforces the real depth.
+      // An explicitly supplied foreign runner keeps its existing contract.
+      let runner = options.delegation.runner;
+      if (runner === undefined) {
+        const runNative: SubagentRunner = (child) => runner!(child);
+        runner = createDriverRunner({
           workspace: options.workspace,
-          // A child gets its OWN runtime over the parent's routes, because
-          // `LlmRuntime` binds a session at construction and a shared one would
-          // write the child's request rows into the parent's hash chain.
           makeLlm: (childSession) => llmSeam.runtimeForSession(childSession),
           route: options.route,
           systemPrompt: prompt.render(),
           harnessVersion: amcVersion,
           compositionDigest: compositionDigestOf(options, profile),
-          policyDigest: policyDigestOf(options)
-        }),
+          policyDigest: policyDigestOf(options),
+          ...(options.config === undefined ? {} : { config: options.config }),
+          ...(gate === undefined ? {} : { approvalGate: gate }),
+          grantDelegation: { runner: runNative,
+            ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
+            ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }) }
+        });
+      }
+      options.delegation.grant({
+        identity: rootIdentity(options.agentId),
+        session,
+        runner,
         ...(options.delegation.maxDepth === undefined
           ? {}
           : { maxDepth: options.delegation.maxDepth }),

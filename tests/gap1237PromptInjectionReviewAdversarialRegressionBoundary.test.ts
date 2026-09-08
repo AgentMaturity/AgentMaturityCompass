@@ -42,7 +42,7 @@ const engineEvaluation: ReplayBenchmarkAdversarialEngineEvaluationFixture = {
   explanationHash: hash("synthetic prompt-injection review regression blocked with no copied paper text or attacks"),
   rerunStatus: "failed",
   guardrailRuleIds: ["guardrail:direct-injection", "guardrail:indirect-injection", "guardrail:tool-poisoning"],
-  guardrailRuleTypes: ["prompt_injection", "indirect_prompt_injection", "tool_misuse"],
+  guardrailRuleTypes: ["prompt_injection", "prompt_injection", "custom"],
   failedGuardrailRuleCount: 3,
   promptInjectionDetected: true,
   alertRuleId: "alert:prompt-injection-review-regression",

@@ -10,6 +10,7 @@ Generated bundle location:
 
 ## Included Schemas
 
+- `external-evidence.schema.json` — [producer-neutral evidence, explicit unknowns and independent authority verification](EXTERNAL_EVIDENCE_PROFILE.md)
 - `amcbench.schema.json`
 - `amcprompt.schema.json`
 - `amccert.schema.json`

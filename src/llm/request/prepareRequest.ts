@@ -27,7 +27,7 @@
  */
 import type { PreparedRequest, SessionService } from "../../session/sessionService.js";
 import { RequestEncodingError } from "./requestSpec.js";
-import type { ToolSchema } from "./requestSpec.js";
+import type { EncodableRequest, ToolSchema } from "./requestSpec.js";
 import { canonicalToolSchemaBytes } from "./requestSpec.js";
 import { DEFAULT_REQUEST_ENCODERS } from "./deriveRequest.js";
 import type { RequestEncoderRegistry } from "./requestEncoder.js";
@@ -46,6 +46,8 @@ export interface PrepareRequestSpec {
   /** Tools to offer the model, or null. Committed before the header is written. */
   readonly tools: readonly ToolSchema[] | null;
   readonly encoders?: RequestEncoderRegistry;
+  /** Send-time admission only; never changes historical byte derivation. */
+  readonly assertRequest?: (request: EncodableRequest) => void;
 }
 
 /**
@@ -112,6 +114,7 @@ export function prepareRequest(session: SessionService, spec: PrepareRequestSpec
     throw new RequestPreparationError(`refusing to build a request over inconsistent evidence: ${resolution.notes.join("; ")}`);
   }
 
+  spec.assertRequest?.(resolution.request);
   return session.recordRequestHeader({
     model: spec.model,
     providerId: spec.providerId,

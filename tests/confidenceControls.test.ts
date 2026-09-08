@@ -46,7 +46,7 @@ function report(questionScores: QuestionScore[]): DiagnosticReport {
     integrityIndex: 0.76,
     trustLabel: "HIGH TRUST",
     targetProfileId: null,
-    layerScores: [{ layerName: "Agent Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
+    layerScores: [{ layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
     questionScores,
     inflationAttempts: [],
     unsupportedClaimCount: questionScores.filter((row) => row.flags.includes("FLAG_UNSUPPORTED_CLAIM")).length,

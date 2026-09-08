@@ -29,9 +29,9 @@ function report(): DiagnosticReport {
     trustBoundaryViolated: false,
     trustBoundaryMessage: null,
     integrityIndex: 0.72,
-    trustLabel: "MEDIUM TRUST",
+    trustLabel: "DEVELOPING — some evidence, needs more coverage",
     targetProfileId: null,
-    layerScores: [{ layerName: "Agent Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
+    layerScores: [{ layerName: "Resilience", avgFinalLevel: 2, confidenceWeightedFinalLevel: 2 }],
     questionScores: [
       {
         questionId: "AMC-1.1",

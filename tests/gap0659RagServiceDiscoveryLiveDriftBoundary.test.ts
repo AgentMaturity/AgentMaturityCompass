@@ -18,7 +18,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "rag-service-discovery",
     domain: "service-discovery-rag",
-    agentEvaluationDimension: "retrieval_behavior_regression",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 11 + index : 6 + index,
     invalidActionRate0to1: prefix === "live" ? 0.11 : 0.01,
     errorAttributionRate0to1: prefix === "live" ? 0.09 : 0.01,

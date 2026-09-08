@@ -32,9 +32,13 @@ function obsLens(overrides: Partial<QuestionScoreObsStudioDrilldownLensRef> = {}
   return {
     drilldownId: "apo-observability-studio-drilldown",
     sourceRef: SOURCE,
-    sourceKind: "github_repo",
+    sourceKind: "repository",
+    openAlexWorkId: null,
+    doi: null,
     titleRef: "APO observability source-review drilldown",
     publisherRef: "CloudDetail",
+    venueRef: null,
+    publicationDate: null,
     uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0737/${QUESTION_ID}`,
     sourceArtifactLinks: links,
     tracePreviewHash: hash("1"),
@@ -155,7 +159,7 @@ function report(lens: QuestionScoreObsStudioDrilldownLensRef = obsLens()): Diagn
       publicUrl: "/docs/SCORING_METHODOLOGY.md",
       hash: hash("f"),
     },
-  } as DiagnosticReport;
+  } as unknown as DiagnosticReport;
 }
 
 describe("GAP-0737 APO Studio evidence drilldown boundary", () => {
@@ -203,7 +207,7 @@ describe("GAP-0737 APO Studio evidence drilldown boundary", () => {
     expect(out.obsStudioDrilldownPreview[0]).toMatchObject({
       drilldownId: "apo-observability-studio-drilldown",
       sourceRef: SOURCE,
-      sourceKind: "github_repo",
+      sourceKind: "repository",
       publisherRef: "CloudDetail",
       titleRef: "APO observability source-review drilldown",
       uiRoutePath: `/api/v1/score/evidence-drilldown/run-gap0737/${QUESTION_ID}`,

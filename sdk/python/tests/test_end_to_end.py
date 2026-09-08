@@ -84,10 +84,8 @@ def _agent(workspace: str) -> AmcAgent:
 def test_drives_a_turn_and_reports_a_stop_reason(workspace):
     with _agent(workspace) as agent:
         assert agent.protocol_version == 1
-        # Declared capabilities are checked, not assumed: loadSession is false
-        # because AMC has no resume path, and a client that believed otherwise
-        # would build a feature on a promise nobody made.
-        assert agent.capabilities.get("loadSession") is False
+        # The installed runtime must expose the actual verified resume path.
+        assert agent.capabilities.get("loadSession") is True
 
         session = agent.new_session()
         result = session.prompt("hello")
@@ -161,3 +159,38 @@ def test_a_forged_fingerprint_does_not_verify(workspace):
     proof = export_proof(session_id, "run2.amcproof.json", workspace=workspace, amc_bin=BIN)
     with pytest.raises(AmcProofError):
         verify_proof(proof.path, expect_auditor_key="0" * 64, workspace=workspace, amc_bin=BIN)
+
+
+@needs_amc
+def test_explicit_handoff_replays_history_and_continues_same_session(workspace):
+    with _agent(workspace) as first:
+        session = first.new_session()
+        original = session.prompt("first committed message")
+        session_id = session.session_id
+        session.release()
+        assert session.state == "released"
+
+    with _agent(workspace) as second:
+        resumed = second.resume_session(session_id)
+        assert resumed.session_id == session_id
+        assert any(event.update.get("sessionUpdate") == "user_message_chunk"
+                   and event.update.get("content", {}).get("text") == "first committed message"
+                   for event in resumed.history)
+        historic_text = "".join(event.update["content"]["text"] for event in resumed.history
+                                if event.update.get("sessionUpdate") == "agent_message_chunk")
+        assert historic_text == original.text
+        turn = resumed.start_prompt("second committed message")
+        updates = list(turn)
+        result = turn.result()
+        assert result.session_id == session_id
+        assert updates == result.updates
+        assert result.verification == "not-verified"
+        assert result.text
+        assert all(event.update.get("sessionUpdate") != "user_message_chunk" for event in updates)
+
+    # A normal shutdown seals the continued session; loading must then refuse,
+    # not silently invent a replacement identity or another conversation.
+    with _agent(workspace) as third:
+        with pytest.raises(AmcRefusedError) as raised:
+            third.resume_session(session_id)
+        assert raised.value.data == {"reason": "SEALED"}

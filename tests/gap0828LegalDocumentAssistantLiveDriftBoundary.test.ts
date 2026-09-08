@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:legal-rag:${index}`,
     taskCategory: "legal-document-rag-live-drift",
     domain: "legal-document-assistant",
-    agentEvaluationDimension: "observed_legal_rag_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 18 + index : 9 + index,
     invalidActionRate0to1: prefix === "live" ? 0.11 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

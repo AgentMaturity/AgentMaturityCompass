@@ -11,6 +11,7 @@ import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
 import { loadAuditMapBuiltin, loadAuditMapActive, auditMapActivePath } from "../src/audit/auditMapStore.js";
 import { loadAuditPolicy, auditPolicySigPath } from "../src/audit/auditPolicyStore.js";
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
+import type { AuditBinderJson } from "../src/audit/binderSchema.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import {
@@ -128,11 +129,12 @@ describe("audit binder + compliance maps", () => {
   });
 
   test("binder privacy scanner fails on email-like free text", () => {
+    // deliberately metadata-only: the scan walks the object generically
     const pii = scanBinderForPii({
       v: 1,
       generatedTs: 1,
       suspicious: "alice@example.com"
-    });
+    } as unknown as AuditBinderJson);
     expect(pii.status).toBe("FAIL");
     expect(pii.findings.some((row) => row.type === "EMAIL")).toBe(true);
   });

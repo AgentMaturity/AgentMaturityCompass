@@ -222,11 +222,12 @@ describe("GAP-1637 Outlines tool schema contract boundary", () => {
 
     const tampered = verifyToolSchemaContractReceipt({
       workspace: ws,
+      // deliberate tampering: the receipt variant pins these values
       receipt: {
         ...receipt,
         metadataOnlyAccepted: true,
         receiptHash: "0".repeat(64)
-      }
+      } as unknown as typeof receipt
     });
     expect(tampered.valid).toBe(false);
     expect(tampered.failClosedReasons).toEqual(expect.arrayContaining([

@@ -37,7 +37,7 @@ jobs:
       
       - uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
       
       - name: Install AMC
         # Pinned + checksum-verified rather than piping a moving target into a

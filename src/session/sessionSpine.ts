@@ -288,6 +288,11 @@ export abstract class SessionEventWriter {
    * it, and its name says so.
    */
   simulateCrash(): void {
+    this.disposeWithoutClosing();
+  }
+
+  /** Dispose an unusable writer without claiming its incomplete evidence is sealed or released. */
+  disposeWithoutClosing(): void {
     this.closed = true;
     this.store.close();
   }

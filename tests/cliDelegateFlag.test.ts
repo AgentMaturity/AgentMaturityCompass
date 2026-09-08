@@ -206,13 +206,10 @@ describe("amc agent-loop run --delegate", () => {
     await run(defaulted.program, argvFor(["--delegate", "--json"]));
     expect(defaulted.captured.out.join("\n"), "and the default when none is given")
       .toContain(`bounded at depth ${DEFAULT_MAX_DELEGATION_DEPTH}`);
-    // The configured number alone would overstate: no child is offered
-    // `delegate`, so no chain reaches depth 2 whatever the flag says. Pinned by
-    // "a child is a leaf" in tests/subagentRunnerEndToEnd.test.ts.
-    expect(defaulted.captured.out.join("\n"), "and says what is actually reachable")
-      .toContain("today's ceiling is 1");
-    expect(tightened.captured.out.join("\n"), "not repeated when the bound is already 1")
-      .not.toContain("today's ceiling is 1");
+    // The composed native runner grants onward delegation and enforces this
+    // actual depth at each generation. The signed child/grandchild behavior is
+    // exercised in nativeDelegationInheritance.test.ts; there is no separate
+    // hardcoded leaf ceiling to report alongside the operator's bound.
   });
 
   it("refuses a depth that is not a number, rather than silently unbounding it", async () => {

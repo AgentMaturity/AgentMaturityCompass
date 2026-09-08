@@ -1683,8 +1683,8 @@ describe("AMC API routers", () => {
   test("export router covers export and attestation routes", async () => {
     const ws = workspace();
     const cases = [
-      ["/api/v1/export/policy", "POST", { target: "prod", outDir: "out" }, 200],
-      ["/api/v1/export/badge", "POST", { runId: "run-1", outFile: "badge.svg" }, 200],
+      ["/api/v1/export/policy", "POST", { target: "prod", outDir: "out" }, undefined, 200],
+      ["/api/v1/export/badge", "POST", { runId: "run-1", outFile: "badge.svg" }, undefined, 200],
       ["/api/v1/export/badge/url", "GET", undefined, "/api/v1/export/badge/url?level=3&label=AMC&format=url", 200],
       ["/api/v1/export/badge/generate", "GET", undefined, "/api/v1/export/badge/generate?level=4&label=AMC&format=markdown", 200],
       ["/api/v1/attest/notary", "POST", { outFile: "bundle.amcattest" }, undefined, 200],
@@ -1901,7 +1901,9 @@ describe("AMC API routers", () => {
       failClosed: true,
       summary: "blocked"
     };
-    m.runProviderDriftBenchmark.mockReturnValueOnce(report);
+    // Reduced payloads exercise router passthrough; the real builders are mocked.
+    // Keep their type views local to these mock results, not the request/assertion contract.
+    m.runProviderDriftBenchmark.mockReturnValueOnce(report as unknown as ReturnType<typeof m.runProviderDriftBenchmark>);
     m.buildProviderDriftWatchAlerts.mockReturnValueOnce([{
       id: "watch:provider-drift-observability-api",
       agentId: "agent-1",
@@ -1914,7 +1916,7 @@ describe("AMC API routers", () => {
       evidenceRefs: ["trace:candidate-football-api"],
       message: "Provider observability pipeline proof is incomplete: candidate:pipelineRunId.",
       createdAt: "2026-06-13T00:00:00.000Z"
-    }]);
+    }] as unknown as ReturnType<typeof m.buildProviderDriftWatchAlerts>);
     m.buildProviderDriftEvalPack.mockReturnValueOnce({
       packId: "provider-drift-football-content-api",
       replayable: true,
@@ -1922,7 +1924,7 @@ describe("AMC API routers", () => {
         observabilityPipelineMissingReasons: ["candidate:pipelineRunId"],
         rowHash: "b".repeat(64)
       }]
-    });
+    } as unknown as ReturnType<typeof m.buildProviderDriftEvalPack>);
     m.buildProviderDriftCiGate.mockReturnValueOnce({
       mode: "lifecycle",
       passed: false,
@@ -1930,7 +1932,7 @@ describe("AMC API routers", () => {
       failedAlertIds: ["pdrift:openai:gpt-4o-mini:football-content-observability-api:observabilityPipelineEvidence"],
       waivedAlertIds: [],
       summary: "blocked"
-    });
+    } as unknown as ReturnType<typeof m.buildProviderDriftCiGate>);
     const baseline = {
       provider: "openai",
       model: "gpt-4o-mini",

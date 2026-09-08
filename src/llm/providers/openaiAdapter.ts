@@ -44,6 +44,7 @@ import type {
 import { sseEvents } from "../adapter/sse.js";
 import type { HttpRequest, HttpResponse } from "../adapter/transport.js";
 import { OPENAI_CHAT_ENCODER_ID } from "../request/openaiChatEncoder.js";
+import { OPENAI_CHAT_CAPABILITIES } from "../adapter/providerCapabilities.js";
 
 export const OPENAI_ADAPTER_ID = "openai-chat";
 
@@ -97,18 +98,24 @@ function protocolFailure(detail: string): LlmError {
 
 /** Map the reported counts onto AMC's disjoint model. */
 function toUsage(usage: Record<string, unknown>): StreamTokenUsage | null {
+  for (const value of [usage.prompt_tokens, usage.completion_tokens,
+    record(usage.prompt_tokens_details)?.cached_tokens, record(usage.completion_tokens_details)?.reasoning_tokens]) {
+    if (value !== undefined && integer(value) === undefined) throw protocolFailure("reported usage is not a nonnegative integer");
+  }
   const prompt = integer(usage.prompt_tokens);
   const completion = integer(usage.completion_tokens);
   if (prompt === undefined || completion === undefined) return null;
   const details = record(usage.prompt_tokens_details);
   const cacheRead = integer(details?.cached_tokens);
   const reasoning = integer(record(usage.completion_tokens_details)?.reasoning_tokens);
+  if ((cacheRead ?? 0) > prompt || (reasoning ?? 0) > completion) {
+    throw protocolFailure("usage breakdown exceeds the reported total");
+  }
   return {
     // OpenAI's `prompt_tokens` INCLUDES the cached ones, while AMC's counts are
-    // disjoint. Subtracting here is the one place that conversion happens, and
-    // it is clamped at zero so a provider inconsistency cannot produce a
-    // negative count that the grammar would then reject as invalid.
-    inputTokens: cacheRead === undefined ? prompt : Math.max(0, prompt - cacheRead),
+    // disjoint. An inconsistent provider report is refused, never clamped into
+    // apparently valid accounting.
+    inputTokens: cacheRead === undefined ? prompt : prompt - cacheRead,
     outputTokens: completion,
     ...(cacheRead === undefined ? {} : { cacheReadTokens: cacheRead }),
     ...(reasoning === undefined ? {} : { reasoningTokens: reasoning })
@@ -192,7 +199,12 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
     for (const rawChoice of choices) {
       const choice = record(rawChoice);
       if (choice === null) continue;
+      if (choice.index !== undefined && choice.index !== 0) throw protocolFailure("multiple completion choices are unsupported");
       const delta = record(choice.delta);
+      if (delta?.audio != null || delta?.function_call != null || text(delta?.reasoning_content).length > 0
+          || text(delta?.refusal).length > 0 || (Array.isArray(delta?.annotations) && delta.annotations.length > 0)) {
+        throw protocolFailure("unsupported audio, reasoning, refusal, annotation or legacy function-call output");
+      }
 
       const content = text(delta?.content);
       if (content.length > 0) {
@@ -259,10 +271,18 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
 
 /** OpenAI's Chat Completions API, and the many services that speak its dialect. */
 export const openaiAdapter: LlmAdapter = {
+  capabilities: OPENAI_CHAT_CAPABILITIES,
   id: OPENAI_ADAPTER_ID,
-  version: 1,
+  version: 2,
   encoderId: OPENAI_CHAT_ENCODER_ID,
-  encoderVersion: 1,
+  encoderVersion: 2,
+
+  assertParams(params): void {
+    if ((params.n !== undefined && params.n !== 1) || params.functions !== undefined || params.function_call !== undefined
+        || params.logprobs === true || params.top_logprobs !== undefined) {
+      throw new LlmError("openai-chat supports one completion and explicit function tools; legacy functions and logprobs cannot be preserved", LLM_FAILURE_CODE.INVALID_REQUEST);
+    }
+  },
 
   envelope(input: AdapterEnvelopeInput): HttpRequest {
     return {

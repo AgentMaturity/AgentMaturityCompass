@@ -24,7 +24,7 @@ import {
   observedHookReceiptOpenApiSchema
 } from "../src/setup/integrationScaffold.js";
 import YAML from "yaml";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 
 const roots: string[] = [];
 
@@ -639,7 +639,7 @@ describe("provider-neutral observed hook ingress", () => {
     ["tool action without a tool", { tool: undefined }, "HOOK_SCHEMA_INVALID"],
     ["future timestamp", { time: "2026-07-10T18:06:00.000Z" }, "HOOK_EVENT_FUTURE"],
     ["stale timestamp", { time: "2026-07-09T17:59:59.000Z" }, "HOOK_EVENT_STALE"]
-  ])("fails closed for %s", (_label, overrides, expectedCode) => {
+  ] as const)("fails closed for %s", (_label, overrides, expectedCode) => {
     const workspace = newWorkspace();
     const now = Date.parse("2026-07-10T18:00:00.000Z");
     const rawBody = Buffer.from(JSON.stringify(actionEvent(now, overrides as Record<string, unknown>)));

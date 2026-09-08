@@ -3,6 +3,7 @@ import { defineProjection } from "./projection/projectionTypes.js";
 import type { ProjectionUnit } from "./projection/projectionTypes.js";
 import { extractEnvelope } from "./sessionTypes.js";
 import type { SurfaceOp, SurfacePartRef, SurfaceRole } from "./sessionTypes.js";
+import { applySurfaceCompaction } from "./surfaceCompactionValidation.js";
 
 // A single role-grouped message in the derived conversation. `parts` are
 // references, not bytes: each SurfacePartRef.sha256 names the payload of exactly
@@ -34,6 +35,9 @@ export interface SurfaceEntry {
   // SurfacePartRef is unchanged, and the ConversationHistory view below does not
   // expose it, so no consumer of the projection sees a different value.
   readonly sourceEventId: string;
+  /** Stable identity of the original append, retained through replacements. */
+  readonly originEventId: string;
+  readonly sourceEventHash: string;
 }
 
 // The fold state: the ordered live entries. Exported because it is the state
@@ -42,7 +46,7 @@ export interface SurfaceEntry {
 export type SurfaceProjectionState = readonly SurfaceEntry[];
 
 // Fold the ordered session events' surface ops (append / replace / retract /
-// none) into the conversation the model would see. Input is the committed rows
+// compact / none) into the conversation the model would see. Input is the committed rows
 // in chain (rowid) order; the envelope carrying each op is read out of meta_json.
 //
 // The fold is pure and deterministic: the same events always yield an identical
@@ -73,7 +77,8 @@ function applySurfaceEvent(
     // contributes nothing to the derived conversation.
     return entries;
   }
-  return applySurfaceOp(entries, envelope.surface, event.id);
+  if (envelope.surface.op === "compact") return applySurfaceCompaction(entries, event, envelope);
+  return applySurfaceOp(entries, envelope.surface, event.id, event.event_hash);
 }
 
 // The fold with no registry and no cache: the ordered live entries as of the
@@ -100,8 +105,9 @@ export const surfaceProjection: ProjectionUnit<SurfaceProjectionState, Conversat
     // different role-grouping rule, a change to which rows contribute. Cached
     // state from an older version is discarded, never migrated. Bumped to 2 when
     // SurfaceEntry gained `sourceEventId`: a v1 cached state has no such field,
-    // and reading one back would hand derivation `undefined` provenance.
-    stateVersion: 2,
+    // and reading one back would hand derivation `undefined` provenance. Version
+    // 3 adds stable origins and source hashes for authenticated range compaction.
+    stateVersion: 3,
     init: (): SurfaceProjectionState => [],
     apply: applySurfaceEvent,
     view: groupByRole
@@ -113,7 +119,8 @@ export const surfaceProjection: ProjectionUnit<SurfaceProjectionState, Conversat
 function applySurfaceOp(
   entries: SurfaceProjectionState,
   op: SurfaceOp,
-  sourceEventId: string
+  sourceEventId: string,
+  sourceEventHash: string
 ): SurfaceProjectionState {
   switch (op.op) {
     case "none":
@@ -124,11 +131,13 @@ function applySurfaceOp(
       // replace/retract targeting — never whether an append collapses into a
       // prior one. That is what keeps a multi-turn conversation from folding all
       // its user messages onto a single slot.
-      return [...entries, { slot: op.slot, role: op.role, part: op.part, sourceEventId }];
+      return [...entries, { slot: op.slot, role: op.role, part: op.part, sourceEventId, originEventId: sourceEventId, sourceEventHash }];
     case "replace":
-      return replaceLastSlot(entries, op.slot, op.part, sourceEventId);
+      return replaceLastSlot(entries, op.slot, op.part, sourceEventId, sourceEventHash);
     case "retract":
       return retractLastSlot(entries, op.slot);
+    case "compact":
+      throw new Error("compaction requires its signed receipt");
   }
 }
 
@@ -140,7 +149,8 @@ function replaceLastSlot(
   entries: SurfaceProjectionState,
   slot: string,
   part: SurfacePartRef,
-  sourceEventId: string
+  sourceEventId: string,
+  sourceEventHash: string
 ): SurfaceProjectionState {
   const targetIndex = lastIndexOfSlot(entries, slot);
   if (targetIndex === -1) {
@@ -149,7 +159,7 @@ function replaceLastSlot(
   // Provenance moves with the part: after a replace, the row that supplied the
   // new bytes is the row a reader must consult for that entry's meta.
   return entries.map((entry, index) =>
-    index === targetIndex ? { slot: entry.slot, role: entry.role, part, sourceEventId } : entry
+    index === targetIndex ? { ...entry, part, sourceEventId, sourceEventHash } : entry
   );
 }
 

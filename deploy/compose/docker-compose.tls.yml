@@ -10,8 +10,12 @@ services:
     container_name: amc-notary
     restart: unless-stopped
     healthcheck:
-      disable: true
-    command: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "/data/amc"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4343/readyz',{signal:AbortSignal.timeout(4000)}).then(async r=>{const b=await r.json();if(!r.ok||b.status!=='READY')process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    command: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "/data/amc", "--bind", "0.0.0.0"]
     environment:
       AMC_NOTARY_DIR: /data/notary
       AMC_NOTARY_PASSPHRASE_FILE: /run/secrets/amc_notary_passphrase
@@ -58,7 +62,8 @@ services:
       AMC_BOOTSTRAP_OWNER_USERNAME_FILE: /run/secrets/amc_owner_username
       AMC_BOOTSTRAP_OWNER_PASSWORD_FILE: /run/secrets/amc_owner_password
     depends_on:
-      - amc-notary
+      amc-notary:
+        condition: service_healthy
     expose:
       - "3210"
       - "3211"

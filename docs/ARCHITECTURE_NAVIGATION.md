@@ -2,6 +2,8 @@
 
 Start with the flow you need to change. The [Graphify guide](CODE_GRAPH.md) explains how to query the complete local graph. The smaller maps below reduce that graph to a few connected files so a contributor can follow an operation without opening the CLI monolith first.
 
+The September 8 implementation adds explicit maps for native integrations and sandbox/DSH launch boundaries. New code remains unverified until the combined acceptance pass. A generated map records source dependencies; it does not grant those implementations a passing runtime result.
+
 ## Native agent execution
 
 Read these files in order:
@@ -37,7 +39,26 @@ The reading order is [`cli-import-commands.ts`](../src/cli-import-commands.ts) �
 | What lifecycle state is published? | [`episodeRecord.ts`](../src/lifecycle/episodeRecord.ts) and [`lifecycleRunArtifact.ts`](../src/lifecycle/lifecycleRunArtifact.ts) |
 | Where do failed traces become Watch findings? | [`traceFailureIndex.ts`](../src/watch/traceFailureIndex.ts) |
 
-The focused map is `graphify-out/navigation/evidence-imports/graph.html`. Imported records remain self-reported and unevaluated. A signature on the generated artifact does not establish that AMC observed the original activity. The Pi v3 extension reads nested failure and identity fields, retains branch metadata, and records unknown durations as `null`; generic mapping is a separate path with its own fallbacks. Broader import-loss reporting remains tracked by AMC-1523. Follow the selected parser when interpreting an imported result.
+The focused map is `graphify-out/navigation/evidence-imports/graph.html`. Imported records remain self-reported and unevaluated. A signature on the generated artifact does not establish that AMC observed the original activity. Pi v3, DSH v2 and callback telemetry have separate strict parsers before generic mapping. Source time and durations remain unknown when missing or invalid. The reviewed semantic digest binds Studio's apply step to the source preview; follow `importerRouter.ts` for that request path.
+
+For portable evidence, follow [`externalEvidenceExport.ts`](../src/importers/externalEvidenceExport.ts) → [`externalEvidenceProfile.ts`](../src/standard/externalEvidenceProfile.ts). The first constructs an explicitly lossy operational projection; the second has no AMC service dependencies and validates the profile and independently configured authority scope. [`externalEvidenceFiles.ts`](../src/standard/externalEvidenceFiles.ts) supplies bounded file input for `imports verify-profile`. Full redacted source and the portable projection are distinct artifacts.
+
+## Native integrations
+
+The `native-integrations` map separates operator interfaces from runtime composition:
+
+- [`nativeFirstUseGuide.ts`](../src/setup/nativeFirstUseGuide.ts) inspects local configuration; [`nativeInteractiveSession.ts`](../src/setup/nativeInteractiveSession.ts) owns the interactive command lifecycle.
+- [`nativeMcpConfig.ts`](../src/setup/nativeMcpConfig.ts) resolves explicit grants and credential references; [`nativeMcpClient.ts`](../src/mcp/nativeMcpClient.ts) owns the pinned remote catalog and connection. `agentToolset.ts` and `toolPipeline.ts` still own native permission/evidence admission.
+- [`nativeAgentClient.ts`](../src/sdk/nativeAgentClient.ts) owns a local ACP child. Follow `acpAgentServer.ts` for sessions, `acpProjection.ts` for committed updates and `agentSession.ts` for verified load/release. A client's prompt result and cold verification receipt mean different things.
+- [`providerCapabilities.ts`](../src/llm/adapter/providerCapabilities.ts) admits explicit protocol/modalities. `openaiResponsesEncoder.ts` creates stateless Responses requests and `openaiResponsesAdapter.ts` decodes that protocol; historical Chat/Anthropic encoder bytes remain separate.
+
+## Sandbox and DSH launch
+
+The `sandbox-and-launch` map shows two different entry paths. Native `bashTool.ts` calls `nativeSandboxPolicy.ts`, then `sandboxRunner.ts` and `bwrapBackend.ts` on Linux. The backend returns an explicit launcher/status contract through `runProcess.ts`; command success alone is not an enforcement receipt. The Linux shell omits host home/procfs and direct socket networking, and Code Mode remains refused.
+
+External DSH starts at `adapterCli.ts` → `deepseekHarnessLaunch.ts` → `adapterRunner.ts`. The operator pins launch bytes and selects an explicit gateway route. Process output does not prove DSH's internal tool hooks or endpoint observation. Separate `dshSessionImport.ts` handles a plaintext v2 session after capture, with inherited events distinguished from child execution.
+
+For compaction, start at `sessionService.ts`, then [`surfaceCompaction.ts`](../src/session/surfaceCompaction.ts) and [`surfaceCompactionValidation.ts`](../src/session/surfaceCompactionValidation.ts). Current payload bytes are measured from authenticated origins. The original evidence remains available and reconstruction validates the signed replacement receipt. Caller-supplied savings are not measurements.
 
 ## Signing authority and exported proofs
 

@@ -84,6 +84,7 @@ export function gatewayAdapter(options: GatewayAdapterOptions): LlmAdapter {
     // untouched, so the encoder that must reconstruct it is the inner one.
     encoderId: inner.encoderId,
     encoderVersion: inner.encoderVersion,
+    ...(inner.capabilities === undefined ? {} : { capabilities: inner.capabilities }),
 
     ...(inner.assertParams === undefined
       ? {}

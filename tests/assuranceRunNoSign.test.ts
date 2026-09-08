@@ -17,7 +17,7 @@ function workspace(): string {
 function runCli(cwd: string, args: string[]) {
   // The scan invokes the real agent under test; point the child process at the
   // local endpoint started for this suite.
-  const env = {
+  const env: NodeJS.ProcessEnv = {
     ...process.env,
     NO_COLOR: "1",
     AMC_AGENT_BASE_URL: fakeAgent.baseUrl,

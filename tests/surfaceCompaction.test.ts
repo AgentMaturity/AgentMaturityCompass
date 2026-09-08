@@ -160,7 +160,7 @@ describe("a compaction replaces a tool result on the surface", () => {
     // projection.
     const dir = workspace();
     const session = openSession(dir);
-    turnWithToolResult(session, "call-1", "original output here");
+    turnWithToolResult(session, "call-1", "original output here with enough actual bytes to shrink");
 
     session.compactToolResult({
       toolCallId: "call-1",

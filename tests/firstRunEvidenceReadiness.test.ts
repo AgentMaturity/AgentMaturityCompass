@@ -74,7 +74,7 @@ describe("diagnostic evidence readiness", () => {
 
   test("bare amc fails closed on claim readiness in a clean workspace", () => {
     const dir = workspace();
-    const env = { ...process.env, NO_COLOR: "1" };
+    const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1" };
     delete env.AMC_VAULT_PASSPHRASE;
     delete env.AMC_VAULT_PASSPHRASE_FILE;
     delete env.AMC_NO_SIGN;

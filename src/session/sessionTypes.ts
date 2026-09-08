@@ -39,9 +39,8 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   "loop/inbox",
   "loop/cancel",
   "loop/veto",
-  // The exception to the comment above: `loop/compact` carries surface op
-  // `replace`, because a compaction's whole purpose is to change what the model
-  // sees without changing what the log says.
+  // `loop/compact` changes the derived surface without rewriting evidence.
+  // Historical rows use `replace`; new origin-addressed rows use `compact`.
   "loop/compact"
 ]);
 
@@ -68,13 +67,16 @@ export interface SurfacePartRef {
 
 // How a session event mutates the derived conversation surface. Slots are named
 // buckets; append adds a part to a role's slot, replace swaps a slot's part,
-// retract removes it, and none leaves the surface untouched (control events and
-// redaction-shadow events).
+// retract removes it, compact atomically edits an authenticated origin range,
+// and none leaves the surface untouched (control events and redaction shadows).
 export type SurfaceOp =
   | { readonly op: "none" }
   | { readonly op: "append"; readonly slot: string; readonly role: SurfaceRole; readonly part: SurfacePartRef }
   | { readonly op: "replace"; readonly slot: string; readonly part: SurfacePartRef }
-  | { readonly op: "retract"; readonly slot: string; readonly reason: string };
+  | { readonly op: "retract"; readonly slot: string; readonly reason: string }
+  /** One atomic edit of a contiguous, origin-addressed live range. */
+  | { readonly op: "compact"; readonly origins: readonly string[];
+      readonly replacement: { readonly role: SurfaceRole; readonly part: SurfacePartRef } | null };
 
 // The envelope embedded in meta_json on every session event. The Session
 // service is the single writer for its own session, so it holds the per-session
@@ -233,6 +235,14 @@ function isSurfaceOp(value: unknown): value is SurfaceOp {
       return typeof candidate.slot === "string" && isSurfacePartRef(candidate.part);
     case "retract":
       return typeof candidate.slot === "string" && typeof candidate.reason === "string";
+    case "compact": {
+      const replacement = candidate.replacement as Record<string, unknown> | null;
+      return Array.isArray(candidate.origins) && candidate.origins.length > 0 && candidate.origins.length <= 256
+        && candidate.origins.every(origin => typeof origin === "string" && origin.length > 0)
+        && new Set(candidate.origins).size === candidate.origins.length
+        && (replacement === null || (typeof replacement === "object" && replacement !== null
+          && typeof replacement.role === "string" && ["user", "assistant", "tool"].includes(replacement.role) && isSurfacePartRef(replacement.part)));
+    }
     default:
       return false;
   }

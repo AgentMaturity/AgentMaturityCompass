@@ -1,16 +1,22 @@
-# Quickstart — 2 Minutes to First Full Score
+# Quickstart — choose your first task
 
-Get your AI agent's trust score in under 5 minutes. No code changes needed.
+Run a bounded native task, assess your existing evidence, or connect an agent you already use. Each path has a different result; a recording demonstration and an evidence baseline do not establish a completed real-model task.
+
+| Intent | Command |
+|---|---|
+| Run a native task | `amc agent-loop guide` |
+| Assess existing evidence | `amc` |
+| Connect an existing agent | `amc connect --help` |
 
 ---
 
 ## Prerequisites
 
-- **Node.js ≥ 20** ([download](https://nodejs.org/))
+- **Node.js 22 or 24 LTS** ([download](https://nodejs.org/)). Use a supported LTS release for production; the package's minimum engine declaration is a compatibility floor.
 
 ---
 
-## 1. Install AMC (30 seconds)
+## 1. Install AMC
 
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
@@ -22,13 +28,48 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-The installer pins the GitHub release and verifies SHA-256 before execution. Node.js 20 or 22 LTS is required.
+The installer pins the GitHub release and verifies SHA-256 before execution. Use Node.js 22 or 24 LTS with npm.
 
 Verify it worked:
 
 ```bash
 amc --version
 ```
+
+## Run a native task
+
+Run the guide in the workspace where you want the session recorded:
+
+```bash
+amc agent-loop guide
+```
+
+It inspects local setup and shows the next explicit action. It does not initialize a workspace, save credentials, start services or call a provider. If setup is missing, follow the shown command and rerun the guide. Credential setup uses the existing masked prompt; never put a secret value in command arguments.
+
+For a real task, choose a provider and a model you can access. Replace `YOUR_MODEL_ID` before running this example:
+
+```bash
+amc agent-loop guide --provider openai --model YOUR_MODEL_ID
+```
+
+Anthropic is also supported with `--provider anthropic`. The guide shows a bounded task that asks for three acceptance tests, disables tools and limits the model steps and output tokens. Local credential metadata does not prove remote authentication or model access. A provider failure stays a failure; AMC does not silently substitute a demonstration.
+
+For a keyless recording demonstration:
+
+```bash
+amc agent-loop guide --provider stub
+```
+
+Follow the explicit stub/echo command it prints. This exercises local recording, not a real model or repository-editing task. Native sessions currently use the `default` agent identity, independently of the agent selected in Studio.
+
+After a run, use the reported session ID to verify its evidence separately:
+
+```bash
+amc agent-loop verify YOUR_REPORTED_SESSION_ID --json
+amc session verify --json
+```
+
+The run summary is a record of the response; verification checks evidence integrity. Neither proves the answer correct or changes an evidence baseline to `READY`. Ctrl-C cancels the active turn; incomplete or failed results remain visible. Existing session continuation is available through `amc agent-loop run --help`.
 
 ---
 

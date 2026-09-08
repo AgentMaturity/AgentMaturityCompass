@@ -3,6 +3,8 @@ import { runCodeTool } from "../codemode/runCodeTool.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
+import { nativeShellSandboxPolicy } from "../sandbox/nativeSandboxPolicy.js";
+import type { SandboxOutcome } from "../sandbox/sandboxTypes.js";
 import { processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
@@ -17,6 +19,7 @@ import {
 } from "../tools/guards/policyGuards.js";
 import { ToolPipeline } from "../tools/toolPipeline.js";
 import { ToolRegistry } from "../tools/toolRegistry.js";
+import type { ToolExecution } from "../tools/toolTypes.js";
 import { openLedger } from "../ledger/ledger.js";
 import { toolEvidenceFor } from "../tools/toolEvidence.js";
 import { delegateTool, type SubagentCapability } from "./delegateTool.js";
@@ -214,7 +217,38 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
-  registry.define(bashTool(options.scrubValues ? { scrubValues: options.scrubValues } : {}));
+  registry.define(bashTool({
+    ...(options.scrubValues ? { scrubValues: options.scrubValues } : {}),
+    ...(process.platform === "linux" ? {
+      runConfined: async (execution: ToolExecution, command: string, timeoutMs: number) => {
+        let outcome: SandboxOutcome;
+        try {
+          const policy = nativeShellSandboxPolicy(workspace, timeoutMs, execution.signal, options.scrubValues);
+          outcome = await new SandboxRunner().run(["/bin/sh", "-c", command], workspace, policy);
+        } catch {
+          outcome = { confined: false, backend: "none", failure: { kind: "runner-failure", reason: "The Linux shell policy or launcher did not finish; execution and confinement are unconfirmed." },
+            exitCode: null, timedOut: false, stdout: "", stderr: "", writableRoots: [], treeExitProven: false };
+        }
+        const receipt = {
+          schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
+          backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
+          writableRoots: outcome.confined ? outcome.writableRoots : [], enforcement: outcome.enforcement ?? null,
+          exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
+          treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
+          callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
+        };
+        const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
+        // Use the actual native session writer. An owned session refuses raw
+        // ledger appends; a receipt write failure also prevents tool success.
+        if (options.recorder) options.recorder.recordProjectedEvidence(row);
+        else {
+          ledgerHandle ??= openLedger(workspace);
+          ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
+        }
+        return outcome;
+      }
+    } : {})
+  }));
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's

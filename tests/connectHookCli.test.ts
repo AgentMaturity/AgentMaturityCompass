@@ -15,7 +15,7 @@ function workspace(): string {
   return root;
 }
 
-function run(cwd: string, args: string[], input?: string): ReturnType<typeof spawnSync> {
+function run(cwd: string, args: string[], input?: string) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",

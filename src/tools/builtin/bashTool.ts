@@ -2,7 +2,8 @@ import { z } from "zod";
 import { runProcess } from "../../exec/runProcess.js";
 import { stripProviderKeys } from "../../utils/providerKeys.js";
 import { defineTool } from "../toolRegistry.js";
-import type { ToolDefinition } from "../toolTypes.js";
+import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
+import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
 
 /**
  * The one-shot shell tool (P4.3).
@@ -40,6 +41,8 @@ const GRACE_MS = 2_000;
 export interface BashToolDeps {
   /** Values removed from output before anyone sees them, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
+  /** Native Linux composition supplies a fail-closed, receipt-recording launcher. */
+  readonly runConfined?: (execution: ToolExecution, command: string, timeoutMs: number) => Promise<SandboxOutcome>;
 }
 
 export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
@@ -61,6 +64,20 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
         return { output: `SIMULATE bash: ${args.command}`, exitCode: null };
       }
 
+      if (deps.runConfined) {
+        const outcome = await deps.runConfined(execution, args.command, args.timeoutMs);
+        const sections = [outcome.stdout, outcome.stderr].filter(Boolean);
+        if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown]`);
+        if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
+        if (outcome.cancelled) sections.push("[amc: shell cancelled]");
+        // The pipeline regards a resolved body as success. Refusal, incomplete
+        // cleanup and unsuccessful execution must instead reach its failure path.
+        if (!outcome.confined || outcome.failure || outcome.treeExitProven !== true || outcome.exitCode !== 0 || outcome.timedOut || outcome.cancelled) {
+          throw new Error([outcome.failure?.reason ?? `Confined shell did not complete successfully (exit ${outcome.exitCode ?? "unknown"}).`, ...sections].join("\n"));
+        }
+        return { output: sections.join("\n"), exitCode: outcome.exitCode, timedOut: false };
+      }
+
       const running = runProcess({
         argv: ["/bin/sh", "-c", args.command],
         cwd: execution.workspace,
@@ -74,7 +91,8 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
         maxCaptureBytes: MAX_OUTPUT_BYTES,
         scrubValues: deps.scrubValues ?? [],
         graceMs: GRACE_MS,
-        timeoutMs: args.timeoutMs
+        timeoutMs: args.timeoutMs,
+        ...(execution.signal ? { signal: execution.signal } : {})
       });
 
       const outcome = await running.done;

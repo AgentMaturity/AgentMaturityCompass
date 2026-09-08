@@ -68,7 +68,7 @@ PACKAGE="$SCRIPT_DIR/${tarballName}"
 PACKAGE_SHA256="${tarballDigest}"
 
 if ! command -v npm >/dev/null 2>&1; then
-  echo "npm is required. Install Node.js 20 or 22 LTS from https://nodejs.org and rerun this installer." >&2
+  echo "npm is required. Install Node.js 22 or 24 LTS from https://nodejs.org and rerun this installer." >&2
   exit 1
 fi
 
@@ -103,7 +103,7 @@ $Package = Join-Path $PSScriptRoot "${tarballName}"
 $PackageSha256 = "${tarballDigest}"
 
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-  Write-Error "npm is required. Install Node.js 20 or 22 LTS from https://nodejs.org and rerun this installer."
+  Write-Error "npm is required. Install Node.js 22 or 24 LTS from https://nodejs.org and rerun this installer."
 }
 
 $ActualSha256 = (Get-FileHash -Algorithm SHA256 -Path $Package).Hash.ToLowerInvariant()
@@ -353,7 +353,7 @@ fi
 
 if [ "$CURRENT_DIGEST" != "$PACKAGE_DIGEST" ] || [ ! -x "$AMC_BIN" ]; then
   if ! command -v npm >/dev/null 2>&1; then
-    osascript -e 'display dialog "Node.js 20 or 22 LTS with npm is required before launching Agent Maturity Compass Studio." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
+    osascript -e 'display dialog "Node.js 22 or 24 LTS with npm is required before launching Agent Maturity Compass Studio." buttons {"OK"} default button "OK"' >/dev/null 2>&1 || true
     exit 1
   fi
   mkdir -p "$RUNTIME_DIR"
@@ -419,7 +419,7 @@ if ($ActualPackageDigest -ne $PackageDigest.ToLowerInvariant()) {
 $CurrentDigest = if (Test-Path $DigestFile) { (Get-Content $DigestFile -Raw).Trim() } else { "" }
 if ($CurrentDigest -ne $PackageDigest -or -not (Test-Path $AmcBin)) {
   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Error "Node.js 20 or 22 LTS with npm is required before launching Agent Maturity Compass Studio."
+    Write-Error "Node.js 22 or 24 LTS with npm is required before launching Agent Maturity Compass Studio."
   }
   New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
   npm install --prefix $RuntimeDir --no-audit --no-fund $Package *>> $LogFile
@@ -474,7 +474,7 @@ Mutable demo data is stored in a separate persistent \`studio-workspace\` direct
 
 ## Requirements
 
-- Node.js 20 or 22 LTS
+- Node.js 22 or 24 LTS
 - npm available on PATH
 
 ## Install

@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
+import type { AMCSurfaceName } from "../src/types.js";
 import {
+  type ReplayBenchmarkLlmEvaluationSystemMode,
+  type ReplayBenchmarkLlmEvaluationSystemJudgeFamily,
   runReplayBenchmarkCorpus,
   verifyReplayBenchmarkCorpusReceipt,
 } from "../src/benchmarks/replayBenchmarkCorpus.js";
@@ -109,10 +112,10 @@ function langWatchReplayRow(metadataOnly = false) {
         llmEvaluationSystemCiReceiptHash: metadataOnly ? null : completeLangWatchEvalPack.ciReceiptHash,
         llmEvaluationSystemNoConfigOnlyBoundaryHash: metadataOnly ? null : completeLangWatchEvalPack.noConfigOnlyBoundaryHash,
         llmEvaluationSystemModes: metadataOnly
-          ? (["custom"] as const)
-          : (["dataset_generation", "judge_configuration", "agent_trace", "custom"] as const),
+          ? (["custom"] as ReplayBenchmarkLlmEvaluationSystemMode[])
+          : (["dataset_generation", "judge_configuration", "agent_trace", "custom"] as ReplayBenchmarkLlmEvaluationSystemMode[]),
         minLlmEvaluationSystemModeCount: 4,
-        llmEvaluationSystemJudgeFamilies: metadataOnly ? (["custom"] as const) : (["openai", "azure", "custom"] as const),
+        llmEvaluationSystemJudgeFamilies: metadataOnly ? (["custom"] as ReplayBenchmarkLlmEvaluationSystemJudgeFamily[]) : (["openai", "azure", "custom"] as ReplayBenchmarkLlmEvaluationSystemJudgeFamily[]),
         minLlmEvaluationSystemJudgeFamilyCount: 2,
         llmEvaluationSystemDatasetCount: metadataOnly ? 0 : 2,
         minLlmEvaluationSystemDatasetCount: 2,
@@ -155,7 +158,7 @@ function langWatchReplayRow(metadataOnly = false) {
       evidenceRefs: [metadataOnly ? "trace:langwatch-candidate-regressed" : "trace:langwatch-candidate"],
       signedEvidenceRefs: metadataOnly ? [] : ["ledger:sig-langwatch-candidate"],
     },
-    surfaces: ["Score", "Shield", "Watch"] as const,
+    surfaces: ["Score", "Shield", "Watch"] as AMCSurfaceName[],
   };
 }
 

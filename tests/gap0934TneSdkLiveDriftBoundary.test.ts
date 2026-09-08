@@ -30,7 +30,7 @@ function rows(prefix: "baseline" | "live", score0to1: number, behavior: string):
     behaviorSignature: `${behavior}:mcp-memory-reflection-loop:${index}`,
     taskCategory: "tne-sdk-live-score-behavior-drift",
     domain: "autonomous-agent-gameplay-benchmark",
-    agentEvaluationDimension: "observed_tne_sdk_autonomous_agent_score_behavior_drift",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: prefix === "live" ? 34 + index : 12 + index,
     invalidActionRate0to1: prefix === "live" ? 0.16 : 0.02,
     errorAttributionRate0to1: prefix === "live" ? 0.08 : 0.01,

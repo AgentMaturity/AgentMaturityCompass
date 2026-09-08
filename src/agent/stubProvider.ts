@@ -40,6 +40,7 @@
  * is a property of this stub route and unreachable from any configured provider.
  */
 import type { LlmAdapter } from "../llm/adapter/adapterTypes.js";
+import { STUB_CAPABILITIES } from "../llm/adapter/providerCapabilities.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { bodyFromChunks, readBodyText } from "../llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../llm/adapter/transport.js";
@@ -201,6 +202,7 @@ function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
 
 /** The stub adapter. Declares the same encoder the Anthropic route uses. */
 export const stubProviderAdapter: LlmAdapter = {
+  capabilities: STUB_CAPABILITIES,
   id: "amc-stub-echo",
   version: 1,
   encoderId: "anthropic-messages",

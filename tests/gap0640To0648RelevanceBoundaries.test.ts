@@ -94,7 +94,7 @@ function driftRows(prefix: string, score0to1: number, behavior: string): LiveDri
     score0to1,
     behaviorSignature: `${behavior}:${index}`,
     taskCategory: "multi-agent-task-decomposition",
-    agentEvaluationDimension: "behavioral_regression",
+    agentEvaluationDimension: "custom",
     interactionTurnCount: 8 + index,
     solutionPathCount: 4,
     offPathAttemptCount: prefix === "live" ? 3 : 1,

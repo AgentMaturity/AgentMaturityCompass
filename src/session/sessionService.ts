@@ -4,6 +4,7 @@ import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
+import { describeLiveEntries, prepareSurfaceCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
 
 import { SessionEventWriter } from "./sessionSpine.js";
@@ -116,16 +117,6 @@ export class PreparedRequest {
   // durable and signed. Returns a copy so a holder cannot mutate the logged bytes.
   toBytes(): Buffer {
     return Buffer.from(this.requestBytes);
-  }
-}
-
-/** A session row's `toolCallId`, when its meta carries one. */
-function metaToolCallId(row: EvidenceEvent): string | null {
-  try {
-    const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
-    return typeof meta["toolCallId"] === "string" ? meta["toolCallId"] : null;
-  } catch {
-    return null;
   }
 }
 
@@ -516,95 +507,64 @@ export class SessionService extends SessionEventWriter {
     });
   }
 
-  // The post-execute point: the tool has run, and its output is about to become
-  // both model-visible and logged. The spill policy runs HERE, over the full
-  // output, and what it returns is what gets recorded — so an oversized result
-  // cannot reach the model in one form and the evidence in another. The full
-  // bytes' sha256 rides in `spilled` inside meta_json, hence inside event_hash,
-  // hence under writer_sig: spilling relocates the bytes, never the commitment.
   /**
-   * Shorten a recorded tool result on the SURFACE, leaving the log untouched.
-   *
-   * The only writer of a `replace` surface op. The op has existed since the
-   * vocabulary was written and `surfaceProjection.ts` has always handled it;
-   * nothing emitted one until compaction needed it.
-   *
-   * WHY THIS DOES NOT REWRITE ANYTHING. The chain is append-only, so this is a
-   * NEW row like any other — one whose surface op happens to point the
-   * `tool_result:<id>` slot at different bytes. The original row is still there,
-   * still hashed, still in the chain. An auditor replaying the log sees the full
-   * output; the model, from here on, sees the replacement. That is the whole
-   * difference between compaction and editing history.
-   *
-   * The replacement is this event's OWN payload, because it has to be:
-   * `SurfacePartRef.sha256` equals the row's `payload_sha256` by construction,
-   * so text that existed only in the projection could not be pointed at.
+   * Stable addresses of the current conversation entries. Compaction appends a
+   * loop/compact row whose payload becomes visible; original signed rows remain
+   * untouched. Origins survive later replacements of the same live entry.
    */
-  compactToolResult(params: {
-    readonly toolCallId: string;
-    readonly replacement: string;
-    /**
-     * How many bytes the caller measured for what it is replacing.
-     *
-     * Declared rather than read here, because session payloads are blob-backed:
-     * `payload_inline` is null even for a two-byte row, so a size check against
-     * it could never fire. A check that cannot fire is worse than no check, and
-     * the pruner deciding WHAT to compact has already measured this.
-     */
-    readonly replacedBytes: number;
-    readonly reason: string;
-  }): SessionEventRef {
+  liveSurfaceEntries(): readonly LiveSurfaceEntry[] {
     this.ensureUsable();
-    const slot = `tool_result:${params.toolCallId}`;
-
-    // `replace` on a slot the projection does not hold is a silent no-op, so
-    // without this a caller would be told a compaction happened while the model
-    // saw no change. Read from this session's own rows rather than the
-    // projection handle, which exposes the rendered conversation and not the
-    // slots replace targets.
-    const rows = this.readEvents();
-    const current = [...rows]
-      .reverse()
-      .find((row) =>
-        (row.event_type === "tool/result" || row.event_type === "loop/compact")
-        && metaToolCallId(row) === params.toolCallId);
-    if (current === undefined) {
-      throw new Error(
-        `cannot compact ${params.toolCallId}: no tool result for it is on this session's surface`
-      );
-    }
-
-    const replacement = Buffer.from(params.replacement, "utf8");
-    if (replacement.byteLength >= params.replacedBytes) {
-      // Compaction that grows the surface is not compaction, and allowing it
-      // would spend a signed row and a slice of the context window making things
-      // worse.
-      throw new Error(
-        `refusing to compact ${params.toolCallId}: the replacement is ${replacement.byteLength} bytes, `
-        + `not smaller than the ${params.replacedBytes} it would replace`
-      );
-    }
-
-    const payloadSha256 = sha256Hex(replacement);
-    const turn = this.currentTurn;
-    const step = this.currentStep;
-    return this.appendSessionEvent({
-      eventType: "loop/compact",
-      typeMeta: {
-        turn,
-        step,
-        toolCallId: params.toolCallId,
-        reason: params.reason,
-        replacedBytes: params.replacedBytes,
-        replacementBytes: replacement.byteLength
-      },
-      surface: { op: "replace", slot, part: { kind: "tool_result", sha256: payloadSha256 } },
-      turn,
-      step,
-      payload: replacement
-    });
+    return describeLiveEntries(this.readEvents());
   }
 
+  /** Replace one origin without changing its role, kind or tool-result identity. */
+  compactSurfaceEntry(params: {
+    readonly originEventId: string; readonly replacement: string; readonly reason: string;
+    /** Deprecated compatibility input. Savings are always measured from stored bytes. */
+    readonly replacedBytes?: number;
+  }): SessionEventRef {
+    return this.commitSurfaceCompaction({ origins: [params.originEventId], mode: "replace", replacement: params.replacement, reason: params.reason });
+  }
+
+  /** Summarize one contiguous live range in a single append, retaining raw evidence. */
+  compactSurfaceRange(params: {
+    readonly originEventIds: readonly string[]; readonly replacement: string; readonly reason: string;
+    readonly summaryRole?: "user" | "assistant";
+  }): SessionEventRef {
+    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "summarize", replacement: params.replacement,
+      reason: params.reason, ...(params.summaryRole === undefined ? {} : { summaryRole: params.summaryRole }) });
+  }
+
+  dropSurfaceEntry(params: { readonly originEventId: string; readonly reason: string }): SessionEventRef {
+    return this.dropSurfaceRange({ originEventIds: [params.originEventId], reason: params.reason });
+  }
+
+  /** Complete tool pairs can be removed atomically; partial pairs refuse. */
+  dropSurfaceRange(params: { readonly originEventIds: readonly string[]; readonly reason: string }): SessionEventRef {
+    return this.commitSurfaceCompaction({ origins: params.originEventIds, mode: "drop", reason: params.reason });
+  }
+
+  compactToolResult(params: {
+    readonly toolCallId: string; readonly replacement: string; readonly reason: string;
+    /** Deprecated: deliberately ignored, never used to claim savings. */
+    readonly replacedBytes?: number;
+  }): SessionEventRef {
+    const entry = this.liveSurfaceEntries().find(candidate => candidate.slot === `tool_result:${params.toolCallId}` && candidate.kind === "tool_result");
+    if (!entry) throw new Error(`cannot compact ${params.toolCallId}: no live tool result is on this session's surface`);
+    return this.compactSurfaceEntry({ originEventId: entry.originEventId, replacement: params.replacement, reason: params.reason });
+  }
+
+  private commitSurfaceCompaction(params: Parameters<typeof prepareSurfaceCompaction>[2]): SessionEventRef {
+    this.ensureUsable();
+    if (this.currentStep !== null) throw new Error("compaction is allowed only between steps, never during an in-flight model/tool step");
+    const prepared = prepareSurfaceCompaction(this.workspace, this.readEvents(), params);
+    return this.appendSessionEvent({ eventType: "loop/compact", typeMeta: {
+      turn: this.currentTurn, step: this.currentStep, ...prepared.typeMeta
+    }, surface: prepared.surface, payload: prepared.payload, turn: this.currentTurn, step: this.currentStep });
+  }
+
+  // Spill oversized tool output before it becomes either model-visible or logged;
+  // the full payload commitment remains in the signed spill metadata.
   recordToolResult(result: ToolResultInput): SessionEventRef {
     this.ensureUsable();
     const turn = this.currentTurn;

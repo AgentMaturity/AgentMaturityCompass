@@ -13,11 +13,15 @@ import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/trac
 import type { ProductionTrace } from "../agents/traceIngestion.js";
 import { parseDetectedPiSession, sanitizePiSession, piSessionSummary, piSessionTraces, piSessionWarnings, type ParsedPiSession, type PiSessionFormat } from "./piSessionImport.js";
 import { tracesFromCandidate } from "./traceMapping.js";
+import { parseDetectedCallbackTelemetry, parseCallbackTelemetry, callbackTelemetryTraces, callbackTelemetryWarnings,
+  type ParsedCallbackTelemetry } from "./callbackTelemetryImport.js";
 import type { DiagnosticReport } from "../types.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { neutralExternalEvidenceProfiles } from "./externalEvidenceExport.js";
+import { parseDetectedDshSession, sanitizeDshSession, dshSessionTraces, dshSessionWarnings, type ParsedDshSession } from "./dshSessionImport.js";
 
 export const neutralImportCategorySchema = z.enum([
   "trace-jsonl",
@@ -45,12 +49,27 @@ export interface NeutralImportCandidate {
   summary: string;
   redactionCount: number;
   /** Set when a versioned source format was recognised (Pi v3 sessions today). */
-  sourceFormat?: PiSessionFormat;
+  sourceFormat?: PiSessionFormat | ParsedCallbackTelemetry["format"] | ParsedDshSession["format"];
 }
 
 export interface NeutralImportUnsupported {
   path: string;
   reason: string;
+  kind?: "unsupported-format" | "oversized" | "malformed" | "unsupported-shape";
+}
+
+export interface NeutralNormalizationReceipt {
+  normalizerVersion: "amc-neutral/2026-09-08";
+  semanticDigest: string;
+  sourceTrust: "SELF_REPORTED";
+  evaluation: "NOT_EVALUATED";
+  confidenceMeaning: "format-classification-only";
+  counts: { recognizedFiles: number; skippedFiles: number; malformedFiles: number; unsupportedFiles: number;
+    oversizedFiles: number; sourceItems: number; normalizedTraces: number; failureTraces: number;
+    unknownTimestamps: number; unknownDurations: number };
+  timing: { sourceTime: "retained-when-valid-otherwise-null"; ingestTime: "plan.detectedAt"; inferredDurations: false };
+  losses: string[];
+  nextActions: Array<{ label: string; argv: string[] }>;
 }
 
 export interface NeutralImportPlan {
@@ -69,6 +88,7 @@ export interface NeutralImportPlan {
   unsupported: NeutralImportUnsupported[];
   warnings: string[];
   wouldWrite: string[];
+  normalization?: NeutralNormalizationReceipt;
 }
 
 export interface NeutralImportRunManifest {
@@ -81,6 +101,7 @@ export interface NeutralImportRunManifest {
   mode: "import";
   plan: NeutralImportPlan;
   normalizedPath: string;
+  externalEvidencePaths?: string[];
   diagnosticReportPath: string;
   diagnosticMarkdownPath: string;
   episodePath: string | null;
@@ -98,6 +119,7 @@ export interface NeutralImportResult {
   applied: boolean;
   plan: NeutralImportPlan;
   normalizedPath: string | null;
+  externalEvidencePaths?: string[];
   importManifestPath: string | null;
   signaturePath: string | null;
   diagnosticReportPath: string | null;
@@ -227,7 +249,7 @@ function hasAnyKey(value: Record<string, unknown>, keys: string[]): boolean {
 function recordCount(value: unknown): number {
   if (Array.isArray(value)) return value.length;
   if (isRecord(value)) {
-    for (const key of ["events", "traces", "runs", "nodes", "memories", "results", "samples", "cases", "entries"]) {
+    for (const key of ["events", "traces", "spans", "runs", "nodes", "memories", "results", "samples", "cases", "entries"]) {
       const nested = value[key];
       if (Array.isArray(nested)) return nested.length;
     }
@@ -262,6 +284,10 @@ function redactDeep(value: unknown): { value: unknown; count: number } {
     let count = 0;
     const out: Record<string, unknown> = {};
     for (const [key, item] of Object.entries(value)) {
+      if (/^(?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|passwd|secret|client[_-]?secret|private[_-]?key|authorization|cookie)$/i.test(key)
+        && item !== null && item !== "") {
+        out[key] = "[REDACTED]"; count += 1; continue;
+      }
       const redacted = redactDeep(item);
       count += redacted.count;
       out[key] = redacted.value;
@@ -476,45 +502,63 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
   const unsupported: NeutralImportUnsupported[] = [];
   const warnings: string[] = [];
 
-  for (const file of scanFiles(sourcePath)) {
+  const files = scanFiles(sourcePath);
+  if (files.length >= MAX_SCAN_FILES) warnings.push(`The scan reached its ${MAX_SCAN_FILES}-file limit. Additional files may be unexamined; split the source into smaller imports for complete coverage.`);
+  for (const file of files) {
+    if (/\.jsonl\.(?:zstd|zst)$/i.test(file)) {
+      unsupported.push({ path: file, kind: "unsupported-format", reason: "Compressed session logs require a plaintext current-version export from the source runtime. AMC does not decompress or migrate DSH logs implicitly." });
+      continue;
+    }
     const format = fileFormat(file);
     if (!format) {
-      unsupported.push({ path: file, reason: "Add JSON, JSONL, YAML, or NDJSON files for AMC to import this artifact." });
+      unsupported.push({ path: file, kind: "unsupported-format", reason: "Add JSON, JSONL, YAML, or NDJSON files for AMC to import this artifact." });
       continue;
     }
     const stat = statSync(file);
     if (stat.size > MAX_FILE_BYTES) {
-      unsupported.push({ path: file, reason: `File is larger than ${MAX_FILE_BYTES} bytes; split it into smaller JSON, JSONL, or YAML artifacts.` });
+      unsupported.push({ path: file, kind: "oversized", reason: `File is larger than ${MAX_FILE_BYTES} bytes; split it into smaller JSON, JSONL, or YAML artifacts.` });
       continue;
     }
     const raw = readFileSync(file);
     const text = raw.toString("utf8");
     let piSession: ParsedPiSession | null = null;
+    let dshSession: ParsedDshSession | null = null;
+    let callbackTelemetry: ParsedCallbackTelemetry | null = null;
     let parsed: unknown;
     try {
-      piSession = format === "jsonl" ? parseDetectedPiSession(text) : null;
-      parsed = piSession ? piSession.rows : parseFile(file, format);
-    } catch (error) {
-      unsupported.push({ path: file, reason: `Could not parse ${format.toUpperCase()}: ${error instanceof Error ? error.message : String(error)}` });
+      dshSession = format === "jsonl" ? parseDetectedDshSession(text) : null;
+      piSession = !dshSession && format === "jsonl" ? parseDetectedPiSession(text) : null;
+      callbackTelemetry = format === "json" ? parseDetectedCallbackTelemetry(text) : null;
+      parsed = dshSession ? dshSession.rows : piSession ? piSession.rows : callbackTelemetry ? callbackTelemetry.document : parseFile(file, format);
+    } catch {
+      unsupported.push({ path: file, kind: "malformed", reason: `Could not parse ${format.toUpperCase()}. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.` });
       continue;
     }
-    const category = piSession ? "event-log" : detectCategory(file, format, parsed);
+    const category = dshSession || piSession || callbackTelemetry ? "event-log" : detectCategory(file, format, parsed);
     if (!category) {
-      unsupported.push({ path: file, reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
+      unsupported.push({ path: file, kind: "unsupported-shape", reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
       continue;
     }
     const redacted = redactDeep(parsed);
+    if (dshSession) {
+      dshSession = sanitizeDshSession(dshSession, redacted.value as unknown[], (value) => redactString(value).value);
+      redacted.value = dshSession.rows;
+    }
     if (piSession) {
       piSession = sanitizePiSession(piSession, redacted.value as unknown[], (value) => redactString(value).value);
       redacted.value = piSession.rows;
     }
-    const amcTraces = piSession ? [] : amcTracesFromText(file, text);
-    const traces = piSession
+    if (callbackTelemetry) callbackTelemetry = parseCallbackTelemetry(redacted.value);
+    const redactedTraceLines = Array.isArray(redacted.value) ? redacted.value.map((row) => JSON.stringify(row)).join("\n") : "";
+    const amcTraces = dshSession || piSession || callbackTelemetry ? [] : amcTracesFromText(file, redactedTraceLines);
+    const traces = dshSession ? dshSessionTraces(dshSession, { agentId, source: sourceRelative(sourcePath, file) }) : callbackTelemetry ? callbackTelemetryTraces(callbackTelemetry, agentId) : piSession
       ? piSessionTraces(redacted.value as unknown[], piSession.format, { agentId, source: sourceRelative(sourcePath, file) })
       : amcTraces.length > 0
         ? amcTraces
         : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
     if (piSession) warnings.push(...piSessionWarnings(piSession, sourceRelative(sourcePath, file)));
+    if (dshSession) warnings.push(...dshSessionWarnings(dshSession));
+    if (callbackTelemetry) warnings.push(...callbackTelemetryWarnings(callbackTelemetry));
     const collaborationTelemetry = collaborationTelemetryFromCandidate(redacted.value, agentId, sourceRelative(sourcePath, file));
     const count = recordCount(parsed);
     parsedCandidates.push({
@@ -526,11 +570,11 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         bytes: stat.size,
         recordCount: count,
         confidence: 0.9,
-        summary: piSession
+        summary: dshSession ? `DSH v2: ${dshSession.format.eventCount} events, ${dshSession.format.inheritedEventCount} inherited; SELF_REPORTED, not evaluated.` : callbackTelemetry ? `${callbackTelemetry.format.spanCount} callback spans; SELF_REPORTED, not evaluated; ${callbackTelemetry.format.pendingSpans} unresolved outcomes.` : piSession
           ? piSessionSummary(piSession.format, traces.filter((trace) => "error" in trace && trace.error === true).length)
           : categorySummary(category, count),
         redactionCount: redacted.count,
-        ...(piSession ? { sourceFormat: piSession.format } : {})
+        ...(dshSession ? { sourceFormat: dshSession.format } : piSession ? { sourceFormat: piSession.format } : callbackTelemetry ? { sourceFormat: callbackTelemetry.format } : {})
       },
       redacted: redacted.value,
       traces,
@@ -567,10 +611,13 @@ export function validateNeutralImport(input: {
   inputPath: string;
   agentId?: string;
 }): NeutralImportPlan {
+  return buildNeutralImportPlan(input, parseCandidates(input));
+}
+
+function buildNeutralImportPlan(input: { workspace: string; inputPath: string; agentId?: string }, parsed: ReturnType<typeof parseCandidates>): NeutralImportPlan {
   const workspace = resolve(input.workspace);
   const agentId = normalizeAgentId(input.agentId ?? "default");
   const sourcePath = resolve(input.inputPath);
-  const parsed = parseCandidates({ workspace, inputPath: sourcePath, agentId });
   const candidates = parsed.candidates.map((candidate) => ({
     ...candidate.candidate,
     path: sourceRelative(sourcePath, candidate.candidate.path)
@@ -580,6 +627,13 @@ export function validateNeutralImport(input: {
   const status: NeutralImportStatus = candidates.length > 0 ? "ready" : "unsupported";
   const wouldWriteBase = importRunDir(workspace, parsed.importId);
   const hasCollaborationTelemetry = parsed.candidates.some((candidate) => candidate.collaborationTelemetry.length > 0);
+  const traces = parsed.candidates.flatMap((candidate) => candidate.traces);
+  const unknownTimestamps = traces.filter((trace) => "timestamp" in trace ? trace.timestamp === null : typeof trace.ts !== "number" || !Number.isFinite(trace.ts)).length;
+  const unknownDurations = traces.filter((trace) => !("durationMs" in trace) || trace.durationMs === null).length;
+  const semanticDigest = sha256Hex(canonicalize(parsed.candidates.map((candidate) => ({
+    source: sourceRelative(sourcePath, candidate.candidate.path), digest: candidate.candidate.digest,
+    sourceFormat: candidate.candidate.sourceFormat ?? null, data: candidate.redacted, traces: candidate.traces
+  }))));
   return {
     schemaVersion: "2026-05-22",
     importId: parsed.importId,
@@ -599,13 +653,38 @@ export function validateNeutralImport(input: {
     warnings: parsed.warnings,
     wouldWrite: [
       join(wouldWriteBase, "normalized.json"),
+      join(wouldWriteBase, "external-evidence"),
       importManifestPath(workspace, parsed.importId),
       join(getAgentPaths(workspace, agentId).runsDir, "..", "imported-runs", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "episodes", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "lifecycle-runs", `${parsed.importId}.json`),
       join(getAgentPaths(workspace, agentId).rootDir, "trace-indexes", `${parsed.importId}.json`),
       ...(hasCollaborationTelemetry ? [join(getAgentPaths(workspace, agentId).rootDir, "runtime-runs", parsed.importId)] : [])
-    ].map((path) => workspaceRelative(workspace, path))
+    ].map((path) => workspaceRelative(workspace, path)),
+    normalization: {
+      normalizerVersion: "amc-neutral/2026-09-08", semanticDigest, sourceTrust: "SELF_REPORTED", evaluation: "NOT_EVALUATED",
+      confidenceMeaning: "format-classification-only",
+      counts: { recognizedFiles: candidates.length, skippedFiles: parsed.unsupported.length,
+        malformedFiles: parsed.unsupported.filter((item) => item.kind === "malformed").length,
+        unsupportedFiles: parsed.unsupported.filter((item) => item.kind === "unsupported-format" || item.kind === "unsupported-shape").length,
+        oversizedFiles: parsed.unsupported.filter((item) => item.kind === "oversized").length,
+        sourceItems: candidates.reduce((sum, candidate) => sum + candidate.recordCount, 0), normalizedTraces: traces.length,
+        failureTraces: traces.filter((trace) => "error" in trace && trace.error === true).length,
+        unknownTimestamps, unknownDurations },
+      timing: { sourceTime: "retained-when-valid-otherwise-null", ingestTime: "plan.detectedAt", inferredDurations: false },
+      losses: [
+        "Redacted source artifacts are retained; only recognized trace fields are projected into the failure index.",
+        "Source item counts include records or config fields; they are not a trace coverage percentage.",
+        ...(unknownTimestamps > 0 ? ["Missing or invalid source event times remain unknown; ingestion time is separate."] : []),
+        ...(unknownDurations > 0 ? ["Missing durations remain unknown, not zero latency. No elapsed duration is inferred between events."] : []),
+        "No cost or maturity result is inferred from import completion. Source claims remain self-reported."
+      ],
+      nextActions: [
+        { label: "Inspect supported import options", argv: ["amc", "import", "--help"] },
+        ...(status === "ready" ? [{ label: "Apply the reviewed import", argv: ["amc", "import", sourcePath, "--agent", agentId, "--expected-digest", semanticDigest] }] : []),
+        { label: "Review actual captured evidence", argv: ["amc", "evidence", "--help"] }
+      ]
+    }
   };
 }
 
@@ -766,13 +845,18 @@ export function runNeutralImport(input: {
   inputPath: string;
   agentId?: string;
   mode?: NeutralImportMode;
+  expectedSemanticDigest?: string;
 }): NeutralImportResult {
   const workspace = resolve(input.workspace);
   const agentId = normalizeAgentId(input.agentId ?? "default");
   const mode = input.mode ?? "dry-run";
   const sourcePath = resolve(input.inputPath);
   const parsed = parseCandidates({ workspace, inputPath: sourcePath, agentId });
-  const plan = validateNeutralImport({ workspace, inputPath: sourcePath, agentId });
+  const plan = buildNeutralImportPlan({ workspace, inputPath: sourcePath, agentId }, parsed);
+  if (input.expectedSemanticDigest !== undefined && (!/^[a-f0-9]{64}$/.test(input.expectedSemanticDigest)
+    || plan.normalization?.semanticDigest !== input.expectedSemanticDigest)) {
+    throw new Error("Import source changed or reviewed digest is invalid. Review the source again before applying.");
+  }
   if (mode === "dry-run" || mode === "validate") {
     return {
       schemaVersion: "2026-05-22",
@@ -795,6 +879,11 @@ export function runNeutralImport(input: {
   }
   assertReady(plan);
 
+  // Construct the portable projection before any write, so a refused profile cannot leave a partial import.
+  const externalProfiles = parsed.candidates.flatMap((item, candidateIndex) =>
+    neutralExternalEvidenceProfiles({ candidate: item.candidate, traces: item.traces, ingestedAt: plan.detectedAt })
+      .map((profile, part) => ({ profile, name: `${candidateIndex}-${part}.json` })));
+
   const paths = getAgentPaths(workspace, agentId);
   const runDir = importRunDir(workspace, plan.importId);
   const normalizedPath = join(runDir, "normalized.json");
@@ -808,6 +897,13 @@ export function runNeutralImport(input: {
   const diagnosticReportPath = join(importedRunsDir, `${plan.importId}.json`);
   const diagnosticMarkdownPath = join(importedReportsDir, `${plan.importId}.md`);
   ensureDir(runDir);
+
+  const externalEvidencePaths = externalProfiles.map(({ profile, name }) => {
+    const path = join(runDir, "external-evidence", name);
+    ensureDir(dirname(path));
+    writeFileAtomic(path, `${JSON.stringify(profile, null, 2)}\n`, 0o600);
+    return path;
+  });
 
   writeFileAtomic(normalizedPath, normalizedImportBody({ plan, parsedCandidates: parsed.candidates }), 0o600);
   const signature = trySignArtifactFile({ workspace, path: normalizedPath, artifactKind: "neutral-import-artifact" });
@@ -874,6 +970,8 @@ export function runNeutralImport(input: {
 
   const writtenPaths = [
     normalizedPath,
+    ...externalEvidencePaths,
+    join(runDir, "external-evidence"),
     ...(signature ? [signature.sigPath] : []),
     diagnosticReportPath,
     diagnosticMarkdownPath,
@@ -897,6 +995,7 @@ export function runNeutralImport(input: {
     mode: "import",
     plan,
     normalizedPath,
+    externalEvidencePaths,
     diagnosticReportPath,
     diagnosticMarkdownPath,
     episodePath: episode.episodePath,
@@ -917,6 +1016,7 @@ export function runNeutralImport(input: {
     plan,
     normalizedPath,
     importManifestPath: manifestPath,
+    externalEvidencePaths,
     signaturePath: signature?.sigPath ?? null,
     diagnosticReportPath,
     diagnosticMarkdownPath,

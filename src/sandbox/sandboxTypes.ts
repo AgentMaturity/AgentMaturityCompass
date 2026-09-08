@@ -33,6 +33,12 @@ export interface SandboxPolicy {
   readonly writableRoots: readonly string[];
   /** Wall-clock limit for the confined command. */
   readonly timeoutMs: number;
+  /** Linux native shells require all socket networking to be denied. */
+  readonly network?: "deny";
+  readonly signal?: AbortSignal;
+  readonly scrubValues?: readonly string[];
+  /** Digest of the signed tools configuration that supplied the write grant. */
+  readonly sourcePolicySha256?: string;
 }
 
 /**
@@ -52,13 +58,25 @@ export interface SandboxOutcome {
   readonly backend: SandboxBackendKind;
   /** Set when the run could not be attempted, or the runner itself broke. */
   readonly failure: SandboxFailure | null;
-  /** The command's own result. Null when it never ran. */
+  /** The command's own result. Null when it never ran or no trustworthy exit receipt exists. */
   readonly exitCode: number | null;
   readonly timedOut: boolean;
   readonly stdout: string;
   readonly stderr: string;
   /** The writable roots that were in force, as the backend saw them. */
   readonly writableRoots: readonly string[];
+  readonly treeExitProven?: boolean;
+  readonly cancelled?: boolean;
+  readonly droppedBytes?: number;
+  readonly enforcement?: {
+    readonly hostWrites: "declared-roots-only";
+    readonly network: "socket-syscalls-denied";
+    readonly readonlyRoots: readonly string[];
+    readonly privateWritableRoots: readonly string[];
+    readonly launcherStatus: "command-exited";
+    readonly sourcePolicySha256: string | null;
+    readonly limitations: readonly string[];
+  };
 }
 
 /**
@@ -70,7 +88,7 @@ export interface SandboxOutcome {
  */
 export interface SandboxBackend {
   readonly kind: SandboxBackendKind;
-  /** Whether this machine can actually enforce. Cheap; no side effects. */
+  /** Whether backend prerequisites exist. Actual enforcement is established by run(), not this check. */
   available(): { ok: true } | { ok: false; reason: string };
   run(command: readonly string[], cwd: string, policy: SandboxPolicy): Promise<SandboxOutcome>;
 }

@@ -196,6 +196,7 @@ import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
 import { registerAcpCommands } from "./acp/acpCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
+import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
 import { generateTrustCertificate } from "./cert/trustCertificate.js";
@@ -618,10 +619,10 @@ import {
   notaryLogVerifyCli,
   notaryPubkeyCli,
   notarySignCli,
-  notaryStartCli,
   notaryStatusCli,
   notaryVerifyAttestCli
 } from "./notary/notaryCli.js";
+import { registerNotaryStartCommand } from "./cli-notary-commands.js";
 import {
   checkNotaryTrust,
   enableNotaryTrust,
@@ -4552,13 +4553,15 @@ adapters
   .requiredOption("--route <route>", "gateway route prefix, e.g. /openai")
   .requiredOption("--model <model>", "preferred model id")
   .option("--mode <mode>", "SUPERVISE|SANDBOX", "SUPERVISE")
-  .action((opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX" }) => {
+  .option("--launch-config <file>", "DSH only: JSON with approved executable/entrypoint paths and SHA-256 hashes")
+  .action((opts: { agent: string; adapter: string; route: string; model: string; mode: "SUPERVISE" | "SANDBOX"; launchConfig?: string }) => {
     const out = adaptersConfigureCli({
       workspace: process.cwd(),
       agentId: opts.agent,
       adapterId: opts.adapter,
       route: opts.route,
       model: opts.model,
+      launchConfig: opts.launchConfig,
       mode: String(opts.mode).toUpperCase() === "SANDBOX" ? "SANDBOX" : "SUPERVISE"
     });
     console.log(chalk.green(`Configured adapter profile for ${out.agentId}`));
@@ -4607,7 +4610,7 @@ adapters
 
 adapters
   .command("run")
-  .description("Run an agent under full observation: mints a lease, routes through the gateway, captures OBSERVED evidence (preferred over 'amc wrap' and 'amc supervise')")
+  .description("Run an adapter with a lease and process capture; model evidence requires actual gateway traffic, and tool coverage depends on native hooks")
   .requiredOption("--agent <agentId>", "agent ID")
   .option("--adapter <adapterId>", "adapter ID")
   .option("--workorder <workOrderId>", "work order ID")
@@ -4639,6 +4642,7 @@ adapters
         console.log(`dashboard: ${out.dashboardUrl}`);
       }
       console.log(`exit code: ${out.exitCode}`);
+      if (out.captureCoverage) console.log(`Capture coverage: ${JSON.stringify(out.captureCoverage)}`);
       if (out.exitCode !== 0) {
         process.exit(out.exitCode);
       }
@@ -11640,37 +11644,7 @@ notary
     console.log(`Fingerprint: ${created.fingerprint}`);
   });
 
-notary
-  .command("start")
-  .description("Start AMC Notary service (foreground)")
-  .option("--notary-dir <dir>", "notary data directory")
-  .option("--workspace <dir>", "workspace path for attestation snapshots")
-  .action(async (opts: { notaryDir?: string; workspace?: string }) => {
-    const runtime = await notaryStartCli({
-      notaryDir: opts.notaryDir,
-      workspace: opts.workspace ?? process.cwd()
-    });
-    console.log(chalk.green(`AMC Notary running at ${runtime.url}`));
-    const stop = async (): Promise<void> => {
-      await runtime.close();
-      process.exit(0);
-    };
-    process.on("SIGINT", () => {
-      void stop().catch((error: unknown) => {
-        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
-        process.exit(1);
-      });
-    });
-    process.on("SIGTERM", () => {
-      void stop().catch((error: unknown) => {
-        console.error(chalk.red(error instanceof Error ? error.message : String(error)));
-        process.exit(1);
-      });
-    });
-    await new Promise<void>(() => {
-      // hold foreground process
-    });
-  });
+registerNotaryStartCommand(notary);
 
 notary
   .command("status")
@@ -17441,6 +17415,8 @@ audit
   });
 
 const bench = program.command("bench").description("Public benchmark registry + ecosystem comparative view");
+const { registerHarnessComparisonCommands } = await import("./benchmarks/harnessComparisonCli.js");
+registerHarnessComparisonCommands(bench);
 
 bench
   .command("init")
@@ -24497,6 +24473,7 @@ registerSessionCommands(program);
 registerWireCommands(program);
 registerAcpCommands(program);
 registerAgentCommands(program);
+registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
 
 function isTopLevelHelpRequest(argv: string[]): boolean {

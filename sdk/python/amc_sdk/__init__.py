@@ -23,6 +23,8 @@ from .client import (
     AmcRefusedError,
     RunResult,
     Session,
+    SessionUpdate,
+    Turn,
     ToolCall,
 )
 from .proof import (
@@ -38,6 +40,8 @@ __version__ = "0.2.0"
 __all__ = [
     "AmcAgent",
     "Session",
+    "SessionUpdate",
+    "Turn",
     "RunResult",
     "ToolCall",
     "AmcError",

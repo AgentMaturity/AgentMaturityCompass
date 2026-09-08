@@ -31,6 +31,7 @@
  */
 import type { StreamChunk } from "../streamChunk.js";
 import type { HttpRequest, HttpResponse } from "./transport.js";
+import type { ProviderCapabilities } from "./providerCapabilities.js";
 
 /** Everything an adapter needs to address one dispatch. */
 export interface AdapterEnvelopeInput {
@@ -96,6 +97,8 @@ export interface AdapterFailureInput {
 export interface LlmAdapter {
   readonly id: string;
   readonly version: number;
+  /** Missing metadata is unknown, never an implicit support claim. */
+  readonly capabilities?: ProviderCapabilities;
   /**
    * The encoder whose output this adapter transmits.
    *

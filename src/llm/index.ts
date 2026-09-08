@@ -103,6 +103,7 @@ export {
   anthropicMessagesEncoder
 } from "./request/anthropicMessagesEncoder.js";
 export { OPENAI_CHAT_ENCODER_ID, openaiChatEncoder } from "./request/openaiChatEncoder.js";
+export { openaiChatEncoderV2 } from "./request/openaiChatEncoderV2.js";
 export { BUILT_IN_REQUEST_ENCODERS } from "./request/builtInEncoders.js";
 export {
   DEFAULT_REQUEST_ENCODERS,
@@ -156,7 +157,8 @@ export {
   AdapterRegistry,
   type LlmRouteConfig,
   LlmRouteError,
-  type PinnedRoute
+  type PinnedRoute,
+  type ProviderDescription
 } from "./adapter/adapterRegistry.js";
 export { classifyResponseFailure } from "./adapter/responseFailure.js";
 export {
@@ -188,3 +190,11 @@ export { type GatewayAdapterOptions, gatewayAdapter } from "./providers/gatewayA
 // `assertNever` is intentionally NOT re-exported: it is the seam's own
 // discipline for its closed unions, not a general-purpose utility for the rest
 // of the repository to pick up.
+
+export { OPENAI_RESPONSES_ADAPTER_ID, openaiResponsesAdapter } from "./providers/openaiResponsesAdapter.js";
+export { OPENAI_RESPONSES_ENCODER_ID, openaiResponsesEncoder } from "./request/openaiResponsesEncoder.js";
+export {
+  CAPABILITY_NAMES, ANTHROPIC_CAPABILITIES, OPENAI_CHAT_CAPABILITIES, OPENAI_RESPONSES_CAPABILITIES, STUB_CAPABILITIES,
+  LlmCapabilityError, assertRequestCapabilities, assertRequiredCapabilities, snapshotCapabilities,
+  type ProviderCapability, type CapabilitySupport, type ProviderCapabilities
+} from "./adapter/providerCapabilities.js";

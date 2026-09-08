@@ -156,6 +156,9 @@ export async function releaseGate({
     steps.push(await step("typecheck", "npm", ["run", "typecheck"], {
       timeoutMs: 600_000, remediation: "Fix TypeScript errors."
     }));
+    steps.push(await step("typecheck-tests", "npm", ["run", "typecheck:tests"], {
+      timeoutMs: 600_000, remediation: "Fix test TypeScript contracts without bypassing assertions or suppressing type errors."
+    }));
     const build = await step("build", "npm", ["run", "build"], {
       timeoutMs: 600_000, remediation: "Fix package build and copied Studio assets."
     });

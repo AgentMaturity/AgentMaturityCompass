@@ -24,7 +24,7 @@ export async function handleImporterRoute(
 
   if ((pathname === "/api/v1/imports/dry-run" || pathname === "/api/v1/imports/validate" || pathname === "/api/v1/imports") && method === "POST") {
     try {
-      const body = await bodyJson<{ inputPath?: string; path?: string; agentId?: string }>(req);
+      const body = await bodyJson<{ inputPath?: string; path?: string; agentId?: string; expectedSemanticDigest?: string }>(req);
       const inputPath = body.inputPath ?? body.path;
       if (!inputPath) {
         apiError(res, 400, "inputPath required");
@@ -36,11 +36,11 @@ export async function handleImporterRoute(
         return true;
       }
       const mode = pathname === "/api/v1/imports/dry-run" ? "dry-run" : "import";
-      const result = runNeutralImport({ workspace, inputPath, agentId: body.agentId, mode });
+      const result = runNeutralImport({ workspace, inputPath, agentId: body.agentId, mode, expectedSemanticDigest: body.expectedSemanticDigest });
       apiSuccess(res, result, mode === "import" ? 201 : 200);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Import failed";
-      apiError(res, /unsupported import/i.test(message) ? 422 : 500, message);
+      apiError(res, /source changed|reviewed digest/i.test(message) ? 409 : /unsupported import/i.test(message) ? 422 : 500, message);
     }
     return true;
   }

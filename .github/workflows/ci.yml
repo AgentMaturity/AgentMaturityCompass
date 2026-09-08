@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ["20", "22", "24"]
+        node-version: ["22", "24"]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,6 +64,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Typecheck tests
+        run: npm run typecheck:tests
+
       - name: Test
         run: npm test
 
@@ -71,11 +74,11 @@ jobs:
         run: npm run build
 
       - name: Policy fixture regression
-        if: matrix.node-version == '20'
+        if: matrix.node-version == '24'
         run: npm run check:policy-fixtures
 
       - name: Upload policy fixture report
-        if: ${{ always() && matrix.node-version == '20' }}
+        if: ${{ always() && matrix.node-version == '24' }}
         uses: actions/upload-artifact@v7
         with:
           name: policy-fixture-report
@@ -148,7 +151,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
 
       - name: Install dependencies
@@ -180,7 +183,7 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
       - name: Clean-source check
         run: node scripts/clean-source-check.mjs
@@ -199,7 +202,7 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Packed-install check
@@ -270,7 +273,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
 
       - name: Install dependencies

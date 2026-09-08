@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import AxeBuilder from "@axe-core/playwright";
+import { AxeBuilder } from "@axe-core/playwright";
 import { expect, test } from "./fixtures.js";
 
 const comparisonUrl = `file://${resolve(process.cwd(), "website/compare.html")}`;

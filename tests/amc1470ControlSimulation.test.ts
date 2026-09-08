@@ -13,7 +13,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { Readable } from "node:stream";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import {
@@ -44,6 +44,12 @@ import {
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
 import { initWorkspace } from "../src/workspace.js";
 import { releaseNotesFor } from "./helpers/releaseNotes.js";
+
+/** A view of only the generated OpenAPI fields inspected by this fixture. */
+type OpenApiSpecView = {
+  paths: Record<string, Record<string, { responses: Record<string, unknown> }>>;
+  components: { schemas: Record<string, Record<string, unknown>> } & Record<string, unknown>;
+};
 
 const roots: string[] = [];
 const cliPath = resolve(process.cwd(), "dist/cli.js");
@@ -86,7 +92,7 @@ function fileSnapshot(root: string): Record<string, string> {
   return snapshot;
 }
 
-function runCli(cwd: string, args: string[]): ReturnType<typeof spawnSync> {
+function runCli(cwd: string, args: string[]) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd,
     encoding: "utf8",
@@ -469,7 +475,7 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
       roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"],
     });
     const published = YAML.parse(readFileSync("website/openapi.yaml", "utf8")) as any;
-    const generated = generateFullOpenApiSpec();
+    const generated = generateFullOpenApiSpec() as unknown as OpenApiSpecView;
     expect(published.paths["/v1/policy/simulate"]?.post).toBeDefined();
     expect(published.components.schemas.ControlSimulation).toBeDefined();
     expect(generated.paths["/api/v1/policy/simulate"]?.post).toBeDefined();
@@ -483,7 +489,7 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
     const response = await callSimulationApi(root, {
       controlId: "approval:WRITE_HIGH",
     });
-    expect(validateResponse(response.json), validateResponse.errors ?? []).toBe(true);
+    expect(validateResponse(response.json), JSON.stringify(validateResponse.errors ?? [])).toBe(true);
 
     const source = readFileSync("src/enforce/controlSimulation.ts", "utf8");
     expect(source).toContain("evaluateRuntimeFirewall");

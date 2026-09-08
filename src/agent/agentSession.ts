@@ -1,12 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { AgentDriver } from "./agentDriver.js";
-import { agentToolset } from "./agentToolset.js";
+import { agentToolset, type AgentToolset } from "./agentToolset.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus } from "./loopTypes.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
+import { resumeSession } from "../session/sessionResume.js";
+import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 
 /**
  * One AMC session, many prompts (plan P7.1a).
@@ -50,6 +53,11 @@ export interface AgentSessionInit {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /** ACP explicitly defaults to none; existing direct callers retain workspace tools. */
+  readonly tools?: "none" | "workspace";
+  readonly maxSteps?: number;
+  /** Bind approvals/extensions to the real owning session and its existing pipeline. */
+  readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
 }
 
 export type AgentPromptResult =
@@ -75,18 +83,35 @@ export interface AgentSession {
    */
   readEvents(): readonly EvidenceEvent[];
   /** Seals the session. Safe to call more than once. */
-  close(): void;
+  close(): void | Promise<void>;
+  /** Explicit signed handoff at an idle boundary; ordinary close still seals. */
+  release?(): void | Promise<void>;
 }
 
 export function openAgentSession(init: AgentSessionInit): AgentSession {
+  return composeAgentSession(init);
+}
+
+/** Reattach only through the native signature, ownership and crash-recovery gates. */
+export function resumeAgentSession(init: AgentSessionInit & { readonly sessionId: string; readonly claimant: RecoveryClaimant }): AgentSession {
+  return composeAgentSession(init, init.claimant);
+}
+
+function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant): AgentSession {
+  if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
+  if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
   const sessionId = init.sessionId ?? randomUUID();
-  const session = new SessionService(init.workspace);
+  const session = claimant === undefined ? new SessionService(init.workspace) : resumeSession({
+    workspace: init.workspace, sessionId, agentId: init.agentId,
+    harnessVersion: init.harnessVersion, compositionDigest: init.compositionDigest,
+    policyDigest: init.policyDigest, claimant
+  }).service;
   // The toolset writes its tool evidence into THIS session rather than into
   // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
   // so a run that actually called a tool left rows referencing a session with no
   // row of its own, and `amc verify` reported "references missing session". Tool
   // evidence also simply belongs to the session whose turn caused it.
-  const toolset = agentToolset({
+  const makeToolset = () => agentToolset({
     workspace: init.workspace,
     agentId: init.agentId,
     sessionId,
@@ -99,6 +124,7 @@ export function openAgentSession(init: AgentSessionInit): AgentSession {
 
   let closed = false;
   let running = false;
+  let toolset: ReturnType<typeof agentToolset> | undefined;
   /**
    * How much assistant text the caller has already been told.
    *
@@ -108,35 +134,49 @@ export function openAgentSession(init: AgentSessionInit): AgentSession {
    */
   let reported = 0;
 
-  const close = (): void => {
-    closed = true;
-    // Both, always. A leaked ledger handle outlives the session that opened it,
-    // and an unclosed session is read by verification as a run still going.
-    try { toolset.close(); } catch { /* already closed */ }
-    try { session.close({ reason: "completed" }); } catch { /* never opened, or already closed */ }
+  const finish = (release: boolean): void => {
+    if (closed) return;
+    if (running) throw new Error("Cancel and settle the active prompt before closing or releasing its session.");
+    try {
+      if (release) session.releaseWithoutClosing();
+      else {
+        if (driver?.status === "failed") throw new Error("Cannot seal a failed driver with incomplete evidence.");
+        session.close({ reason: "completed" });
+      }
+    } catch (error) {
+      session.disposeWithoutClosing();
+      throw error;
+    } finally {
+      closed = true;
+      toolset?.close();
+    }
   };
 
-  let driver: AgentDriver;
+  let driver!: AgentDriver;
   try {
-    session.open({
+    if (claimant !== undefined) reported = readAgentRunSummary(init.workspace, sessionId, "idle").assistantText.length;
+    if (claimant === undefined) session.open({
       sessionId,
       agentId: init.agentId,
       harnessVersion: init.harnessVersion,
       compositionDigest: init.compositionDigest,
       policyDigest: init.policyDigest
     });
+    toolset = init.tools === "none" ? undefined : makeToolset();
+    const tools = init.bindTools?.({ session, toolset: toolset ?? null }) ?? toolset?.seam ?? EMPTY_TOOL_SEAM;
     const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;
     driver = new AgentDriver({
       session,
       llm: init.makeLlm(session),
       route: init.route,
       systemPromptEventId,
-      tools: toolset.seam
+      tools,
+      ...(init.maxSteps === undefined ? {} : { config: { maxStepsPerTurn: init.maxSteps } })
     });
   } catch (error) {
     // A half-composed session would otherwise be left open and unsealed, which
     // verification reports as an interrupted run that never actually started.
-    close();
+    try { finish(claimant !== undefined); } catch { /* retain the original composition error; evidence stays unsealed on failure */ }
     throw error;
   }
 
@@ -187,6 +227,7 @@ export function openAgentSession(init: AgentSessionInit): AgentSession {
       driver.cancel(cause, { by, keepInbox: true });
     },
 
-    close
+    close: () => finish(false),
+    release: () => finish(true)
   };
 }

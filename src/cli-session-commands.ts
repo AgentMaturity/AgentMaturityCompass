@@ -3,21 +3,21 @@
  * per-session lifecycle, inspect a single session's projected conversation and
  * event spine, and recover a crashed session by appending synthetic closers.
  *
- * Registered as a HIDDEN command group. There are no other callers of the spine
- * yet, so this is an operator/debug surface rather than a product one; hiding it
- * keeps it out of `buildCommandInventory` (isInternalCommand treats a hidden
- * command as internal), so the published command-count claim is unaffected. It
- * lives in its own module because src/cli.ts is at its line-ratchet floor.
+ * Native sessions are operator-visible. Compaction extends the existing signed
+ * spine and never delegates execution or storage to another harness.
  */
 import type { Command } from "commander";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
+import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 
 export function registerSessionCommands(program: Command): void {
   const session = program
-    .command("session", { hidden: true })
-    .description("Turn-sealed session spine: verify, inspect, and recover agent sessions (internal)");
+    .command("session")
+    .description("Native signed sessions: inspect, compact, verify, replay and recover");
+
+  registerSessionCompactionCommands(session);
 
   session
     .command("verify")

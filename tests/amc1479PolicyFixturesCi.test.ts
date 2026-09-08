@@ -132,7 +132,7 @@ function fileSnapshot(root: string): Record<string, string> {
   return snapshot;
 }
 
-function runCli(root: string, args: string[]): ReturnType<typeof spawnSync> {
+function runCli(root: string, args: string[]) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd: root,
     encoding: "utf8",

@@ -130,6 +130,70 @@ nav a.active {
   border-left-color: var(--accent);
 }
 
+nav .nav-features > summary {
+  padding: 10px 12px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+nav .nav-features > summary:focus-visible,
+.first-use button:focus-visible,
+.first-use code:focus-visible,
+nav a:focus-visible,
+.mobile-nav-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.first-use-intents {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.first-use-intents button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  text-align: left;
+  white-space: normal;
+}
+
+.first-use-intents button span {
+  font-weight: normal;
+  line-height: 1.5;
+}
+
+.first-use-intents button[aria-expanded="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.first-use-panel {
+  margin-top: 20px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.first-use-panel[hidden] {
+  display: none;
+}
+
+.first-use-panel pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.first-use-copy-status {
+  display: block;
+  margin-top: 10px;
+}
+
 .mobile-nav-toggle {
   display: none;
   place-items: center;
@@ -1077,6 +1141,13 @@ a:hover {
   nav.mobile-nav-open a {
     display: block;
   }
+  nav .nav-features {
+    display: none;
+    grid-column: 1 / -1;
+  }
+  nav.mobile-nav-open .nav-features {
+    display: block;
+  }
   .grid {
     grid-template-columns: 1fr;
   }
@@ -1086,6 +1157,7 @@ a:hover {
   .api-quickstart-grid,
   .surface-rail,
   .quick-action-grid,
+  .first-use-intents,
   .onboarding-steps {
     grid-template-columns: 1fr;
   }

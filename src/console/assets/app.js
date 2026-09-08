@@ -109,6 +109,91 @@ function card(title, body) {
   return `<section class="card"><h3>${htmlEscape(title)}</h3>${body}</section>`;
 }
 
+function firstUseCard(agentId) {
+  // This is a POSIX terminal handoff, never a browser execution request.
+  const quotedAgent = `'${String(agentId).replaceAll("'", "'\\''")}'`;
+  const connectCommand = `amc connect --agent=${quotedAgent}`;
+  return `
+    <section id="firstUse" class="card first-use" aria-labelledby="firstUseTitle">
+      <div class="studio-kicker">Start here</div>
+      <h2 id="firstUseTitle">What would you like to do?</h2>
+      <div class="first-use-intents">
+        <button id="firstUseNativeButton" data-first-intent="firstUseNative" aria-controls="firstUseNative" aria-expanded="false">
+          <strong>Run a task with AMC</strong><span>Choose a model task or a local recording demonstration.</span>
+        </button>
+        <button id="firstUseBaselineButton" data-first-intent="firstUseBaseline" aria-controls="firstUseBaseline" aria-expanded="false">
+          <strong>Assess existing evidence</strong><span>Create a baseline and see what evidence is missing.</span>
+        </button>
+        <button id="firstUseConnectButton" data-first-intent="firstUseConnect" aria-controls="firstUseConnect" aria-expanded="false">
+          <strong>Connect an existing agent</strong><span>Bring an agent's actions into AMC's evidence trail.</span>
+        </button>
+      </div>
+      <div id="firstUseNative" class="first-use-panel" hidden>
+        <h3>Continue in your workspace terminal</h3>
+        <p>Run this on the machine hosting this Studio workspace. The guide checks local setup before suggesting a task; copying it does not run anything.</p>
+        <p class="muted">Native tasks currently use the <strong>default agent</strong>, even when another agent is selected in Studio. The guide distinguishes a real model task from a keyless local demonstration.</p>
+        <pre><code id="nativeGuideCommand" tabindex="0">amc agent-loop guide</code></pre>
+        <button id="copyNativeGuide" class="secondary">Copy guide command</button>
+        <span id="nativeCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
+      </div>
+      <div id="firstUseBaseline" class="first-use-panel" hidden>
+        <h3>Start an evidence baseline</h3>
+        <p>A baseline reports current evidence and gaps. It does not complete a model task or prove that an agent is connected.</p>
+        <button id="firstUseBaselineContinue" class="secondary">Open baseline setup</button>
+      </div>
+      <div id="firstUseConnect" class="first-use-panel" hidden>
+        <h3>Connect from your workspace terminal</h3>
+        <p>Run this on the machine hosting this workspace to configure a connection for <strong>${htmlEscape(agentId)}</strong>. The CLI may create a connection lease; copying the command makes no changes.</p>
+        <pre><code id="connectCommand" tabindex="0">${htmlEscape(connectCommand)}</code></pre>
+        <button id="copyConnectCommand" class="secondary">Copy connection command</button>
+        <span id="connectCopyStatus" class="muted first-use-copy-status" role="status" aria-live="polite"></span>
+        <p class="muted">Commands use macOS/Linux shell syntax. Check the Activation path below after your agent runs; setup alone does not complete it.</p>
+      </div>
+    </section>
+  `;
+}
+
+function bindFirstUse() {
+  const firstUse = document.getElementById("firstUse");
+  if (!firstUse) return;
+  firstUse.querySelectorAll("[data-first-intent]").forEach((button) => {
+    button.addEventListener("click", () => {
+      firstUse.querySelectorAll("[data-first-intent]").forEach((item) => {
+        const selected = item === button;
+        item.setAttribute("aria-expanded", String(selected));
+        document.getElementById(item.dataset.firstIntent).hidden = !selected;
+      });
+    });
+  });
+  const bindCopy = (buttonId, commandId, statusId) => {
+    document.getElementById(buttonId)?.addEventListener("click", async () => {
+      const command = document.getElementById(commandId);
+      const status = document.getElementById(statusId);
+      try {
+        await navigator.clipboard.writeText(command.textContent);
+        status.textContent = "Copied. Run it in your workspace terminal.";
+      } catch {
+        status.textContent = "Copy unavailable. Select and copy the command above.";
+        command.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(command);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+    });
+  };
+  bindCopy("copyNativeGuide", "nativeGuideCommand", "nativeCopyStatus");
+  bindCopy("copyConnectCommand", "connectCommand", "connectCopyStatus");
+  document.getElementById("firstUseBaselineContinue")?.addEventListener("click", () => {
+    const button = document.getElementById("studioRunOnboarding");
+    const setup = button?.closest("details");
+    if (setup) setup.open = true;
+    button?.scrollIntoView({ block: "center" });
+    button?.focus({ preventScroll: true });
+  });
+}
+
 function renderToolContext(projection) {
   const integrity = projection?.integrity?.status === "trusted" ? "trusted" : "untrusted";
   const groups = Array.isArray(projection?.groups) ? projection.groups : [];
@@ -718,9 +803,11 @@ async function renderEvidence() {
       ${card("Neutral Import", `
         <div class="row wrap">
           <input id="neutralImportPath" placeholder="/path/to/traces-or-run-dir" style="min-width:280px" />
-          <button id="neutralImportDryRun" class="secondary">dry run</button>
-          <button id="neutralImportApply">import</button>
+          <button id="neutralImportDryRun" class="secondary">review import</button>
+          <button id="neutralImportApply" disabled>apply reviewed import</button>
         </div>
+        <p class="muted">Imported claims remain self-reported and unevaluated. Review unknown timing, skipped files and mapping limits before applying.</p>
+        <div id="neutralImportReview" role="status" aria-live="polite"></div>
         <pre id="neutralImportOut" class="scroll">${htmlEscape(JSON.stringify({
           recent: neutralImports.map((row) => ({
             importId: row.importId,
@@ -732,7 +819,12 @@ async function renderEvidence() {
         }, null, 2))}</pre>
         <div class="scroll"><table><thead><tr><th>Import</th><th>Agent</th><th>Artifacts</th><th>Categories</th><th>Redactions</th></tr></thead><tbody>${neutralImports.map((row) => `
           <tr>
-            <td><code>${htmlEscape(shortId(row.importId, 18))}</code></td>
+            <td><details><summary><code>${htmlEscape(shortId(row.importId, 18))}</code></summary><pre class="scroll">${htmlEscape(JSON.stringify({
+              sourceTrust: "SELF_REPORTED", evaluation: "NOT_EVALUATED",
+              normalization: row.plan?.normalization ?? { status: "legacy receipt; mapping detail unavailable" },
+              sources: (row.plan?.candidates || []).map((candidate) => ({ path: candidate.path, digest: candidate.digest, sourceFormat: candidate.sourceFormat ?? candidate.format })),
+              warnings: row.plan?.warnings || []
+            }, null, 2))}</pre></details></td>
             <td>${htmlEscape(row.agentId || "-")}</td>
             <td>${Number(row.plan?.candidateCount || 0)}</td>
             <td>${htmlEscape((row.plan?.categories || []).join(", ") || "-")}</td>
@@ -911,6 +1003,13 @@ async function renderEvidence() {
     setStatus(`Rolled back to resource version ${rollbackTarget.manifestId}.`);
     await renderEvidence();
   });
+  let reviewedImport = null;
+  const importApply = document.getElementById("neutralImportApply");
+  const importPreview = document.getElementById("neutralImportDryRun");
+  document.getElementById("neutralImportPath")?.addEventListener("input", () => {
+    reviewedImport = null;
+    if (importApply) importApply.disabled = true;
+  });
   const runNeutralImport = async (dryRun) => {
     const input = document.getElementById("neutralImportPath");
     const outNode = document.getElementById("neutralImportOut");
@@ -919,14 +1018,37 @@ async function renderEvidence() {
       setStatus("Import path required.", true);
       return;
     }
-    const out = await apiPost(dryRun ? "/api/v1/imports/dry-run" : "/api/v1/imports", { inputPath, agentId });
-    const payload = apiPayload(out) || out;
-    if (outNode) {
-      outNode.textContent = JSON.stringify(payload, null, 2);
+    if (!dryRun && (!reviewedImport || reviewedImport.inputPath !== inputPath)) {
+      setStatus("Review this import before applying it.", true); return;
     }
-    setStatus(dryRun ? "Import dry run complete." : "Import written to AMC evidence.");
-    if (!dryRun) {
-      await renderEvidence();
+    if (importPreview) importPreview.disabled = true;
+    if (importApply) importApply.disabled = true;
+    try {
+      const out = await apiPost(dryRun ? "/api/v1/imports/dry-run" : "/api/v1/imports", {
+        inputPath, agentId, ...(!dryRun ? { expectedSemanticDigest: reviewedImport.digest } : {})
+      });
+      const payload = apiPayload(out) || out;
+      if (outNode) outNode.textContent = JSON.stringify(payload, null, 2);
+      const receipt = payload.plan?.normalization;
+      const count = receipt?.counts;
+      const review = document.getElementById("neutralImportReview");
+      if (review) review.textContent = count
+        ? `${count.recognizedFiles} recognized files; ${count.normalizedTraces} mapped traces; ${count.failureTraces} source-reported failures. `
+          + `${count.skippedFiles} files skipped, including ${count.malformedFiles} malformed. `
+          + `${count.unknownTimestamps} event times and ${count.unknownDurations} durations are unknown. `
+          + `${(receipt.losses || []).join(" ")}`
+        : "A normalization receipt is unavailable. Review the raw result; applying is disabled.";
+      reviewedImport = dryRun && payload.plan?.status === "ready" && /^[a-f0-9]{64}$/.test(receipt?.semanticDigest || "")
+        && input?.value?.trim() === inputPath ? { inputPath, digest: receipt.semanticDigest } : null;
+      setStatus(dryRun ? (reviewedImport ? "Import review ready. No evidence has been written." : "Import is not ready to apply.")
+        : "Import saved as self-reported evidence. No maturity evaluation was performed.", dryRun && !reviewedImport);
+      if (!dryRun) await renderEvidence();
+    } catch (error) {
+      reviewedImport = null;
+      setStatus(error instanceof Error ? error.message : "Import failed; review the source and try again.", true);
+    } finally {
+      if (importPreview) importPreview.disabled = false;
+      if (importApply) importApply.disabled = !reviewedImport;
     }
   };
   document.getElementById("neutralImportDryRun")?.addEventListener("click", () => runNeutralImport(true));
@@ -1228,6 +1350,7 @@ async function renderHome() {
     : `<span class="pill ok">workspace authenticated</span><span class="pill muted">vault ${vaultState.toLowerCase()}</span><span class="pill muted">evidence-first runtime</span>`;
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   root.innerHTML = `
+    ${firstUseCard(agentId)}
     <section class="card studio-hero studio-hero-polished">
       <div>
         <div class="studio-kicker">local command center</div>
@@ -1322,6 +1445,7 @@ async function renderHome() {
       ${card("Integrity Trend", `<canvas id="integrityTrend" width="360" height="140" role="img" aria-label="Integrity index trend chart for the selected agent."></canvas>`)}
     </div>
   `;
+  bindFirstUse();
   const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
   const latestRun = agentStatus.latestRun;
   renderLine(document.getElementById("overallTrend"), latestRun ? [latestRun.integrityIndex, latestRun.integrityIndex] : [0]);
@@ -1353,13 +1477,13 @@ async function renderHome() {
       if (out) {
         out.textContent = JSON.stringify(result?.state || result, null, 2);
       }
-      setStatus("AMC onboarding run complete.");
+      setStatus("Baseline finished.");
       await renderHome();
     } catch (error) {
       if (out) {
         out.textContent = errText(error);
       }
-      setStatus(`AMC onboarding run failed: ${errText(error)}`, true);
+      setStatus(`Baseline failed: ${errText(error)}`, true);
     } finally {
       button.disabled = false;
       button.textContent = original;

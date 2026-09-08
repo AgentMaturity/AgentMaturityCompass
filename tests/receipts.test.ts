@@ -155,8 +155,6 @@ describe("chained receipts and delegation", () => {
       bodySha256: "chain-b1",
       sessionId: "chain-sess",
       privateKeyPem: keys.privateKey,
-      delegatorAgentId: null,
-      delegatorReceiptId: null,
     });
     expect(result.receipt).toContain(".");
     expect(result.payload.receipt_id).toBeDefined();

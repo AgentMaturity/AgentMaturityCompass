@@ -1,10 +1,20 @@
 # START_HERE.md — Where to begin with AMC
 
-AMC can look broad because it is broad. This page is the shortest route to the right starting point.
+Choose what you want to do first. AMC can run a native task, assess evidence, or connect to an agent you already use.
+
+| Your intent | Start here | What happens |
+|---|---|---|
+| Run a native task | `amc agent-loop guide` | Read-only guidance for an explicit provider, model and credential reference. |
+| Assess existing evidence | `amc` | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
+| Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |
+
+The native guide does not contact a model, open a session or change configuration. Choose OpenAI or Anthropic with a model you can access for a real task. Choose `--provider stub` explicitly for a local recording demonstration; it does not produce a real model answer. Native sessions currently use AMC's `default` agent identity.
+
+See [the native task quickstart](QUICKSTART.md#run-a-native-task) for the commands and separate evidence verification step.
 
 ## What AMC is
 
-AMC is a trust score for AI agents.
+AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.
 
 If you want the repo-backed architectural version of that statement before choosing a path, read `docs/ARCHITECTURE_BRIEF.md`.
 

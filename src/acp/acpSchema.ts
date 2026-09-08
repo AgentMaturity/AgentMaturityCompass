@@ -33,6 +33,7 @@ export const ACP_INBOUND_SHAPES = [
   "InitializeRequest",
   "AuthenticateRequest",
   "NewSessionRequest",
+  "LoadSessionRequest",
   "PromptRequest",
   "CancelNotification"
 ] as const;

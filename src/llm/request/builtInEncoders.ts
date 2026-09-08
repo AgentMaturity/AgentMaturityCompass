@@ -13,10 +13,14 @@
  */
 import { anthropicMessagesEncoder, anthropicMessagesEncoderV2 } from "./anthropicMessagesEncoder.js";
 import { openaiChatEncoder } from "./openaiChatEncoder.js";
+import { openaiChatEncoderV2 } from "./openaiChatEncoderV2.js";
+import { openaiResponsesEncoder } from "./openaiResponsesEncoder.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 
 export const BUILT_IN_REQUEST_ENCODERS: readonly RequestEncoder[] = [
   anthropicMessagesEncoder,
   anthropicMessagesEncoderV2,
-  openaiChatEncoder
+  openaiChatEncoder,
+  openaiChatEncoderV2,
+  openaiResponsesEncoder
 ];

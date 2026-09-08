@@ -70,7 +70,7 @@ describe("5-minute quickstart integration", () => {
       const rawOpenAI = {
         chat: {
           completions: {
-            create: async () => ({ unreachable: true })
+            create: async (_body: unknown) => ({ unreachable: true })
           }
         }
       };

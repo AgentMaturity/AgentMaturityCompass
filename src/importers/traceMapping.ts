@@ -14,32 +14,51 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function traceTimestamp(value: unknown): number {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
+export function traceTimestamp(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 8.64e15) return value;
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) {
+    const [year, month, day] = value.slice(0, 10).split("-").map(Number) as [number, number, number];
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const monthDays = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (month < 1 || month > 12 || day < 1 || day > monthDays[month - 1]!) return null;
     const parsed = Date.parse(value);
-    if (Number.isFinite(parsed)) return parsed;
+    if (Number.isFinite(parsed) && parsed >= 0) return parsed;
   }
-  return Date.now();
+  return null;
+}
+
+function duration(value: unknown): number | null {
+  if (typeof value !== "number" && !(typeof value === "string" && /^\d+(?:\.\d+)?$/.test(value))) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
 export function toProductionTrace(row: Record<string, unknown>, fallback: { agentId: string; index: number; source: string }): ProductionTrace {
   const metadata = isRecord(row.metadata) ? row.metadata : {};
   const error = Boolean(row.error) || typeof row.errorMessage === "string" || /error|failed|timeout|denied|blocked/i.test(String(row.status ?? row.outcome ?? ""));
+  const sourceTime = row.timestamp ?? row.ts;
+  const sourceDuration = row.durationMs ?? row.duration_ms ?? row.latencyMs;
+  const timestamp = traceTimestamp(sourceTime);
+  const durationMs = duration(sourceDuration);
   return {
     traceId: String(row.traceId ?? row.id ?? row.request_id ?? `${fallback.source}:${fallback.index}`),
     agentId: String(row.agentId ?? row.agent_id ?? fallback.agentId),
     agentType: String(row.agentType ?? row.agent_type ?? row.role ?? "imported-agent"),
     input: row.input ?? row.prompt ?? row.request ?? null,
     output: row.output ?? row.response ?? row.result ?? null,
-    durationMs: Number(row.durationMs ?? row.duration_ms ?? row.latencyMs ?? 0),
-    timestamp: traceTimestamp(row.timestamp ?? row.ts),
+    durationMs,
+    timestamp,
     spanCount: typeof row.spanCount === "number" ? row.spanCount : undefined,
     sessionId: typeof row.sessionId === "string" ? row.sessionId : typeof row.session_id === "string" ? row.session_id : undefined,
     error,
     errorMessage: String(row.errorMessage ?? row.error ?? row.message ?? (error ? row.status ?? "imported trace reported failure" : "")) || undefined,
     metadata: {
       ...metadata,
+      timeProvenance: {
+        timestamp: timestamp !== null ? "source" : sourceTime == null ? "absent" : "invalid",
+        duration: durationMs !== null ? "source" : sourceDuration == null ? "absent" : "invalid",
+        inferredDuration: false
+      },
       tool: row.tool ?? row.toolName ?? metadata.tool,
       model: row.model ?? metadata.model,
       providerId: row.providerId ?? row.provider ?? metadata.providerId

@@ -9,7 +9,7 @@ const ctx: AssurancePromptContext = {
   domain: "general",
   primaryTasks: ["general assistance"],
   stakeholders: ["owner"],
-  riskTier: "medium",
+  riskTier: "med",
 };
 
 describe("pii-detection-leakage pack", () => {

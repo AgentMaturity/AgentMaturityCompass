@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { ApprovalManager } from '../src/product/approvalWorkflow.js';
 import { CallbackRegistry } from '../src/product/asyncCallback.js';
 import { CompensationLog } from '../src/product/compensation.js';
-import { assembleDocument, exportDocument } from '../src/product/documentAssembler.js';
+import { assembleDocument } from '../src/product/documentAssembler.js';
 import { translateError } from '../src/product/errorTranslator.js';
 import { EscalationManager } from '../src/product/escalation.js';
 import { EventRouter } from '../src/product/eventRouter.js';
@@ -16,12 +16,9 @@ import { correctOutput } from '../src/product/outputCorrector.js';
 import { coachReasoning } from '../src/product/reasoningCoach.js';
 import { ReplayDebugger } from '../src/product/replayDebugger.js';
 import { RolloutManager } from '../src/product/rolloutManager.js';
-import { extract as extractStructuredOutput, coerce } from '../src/product/structuredOutput.js';
 import { SyncManager } from '../src/product/syncConnector.js';
 import { splitTask } from '../src/product/taskSplitter.js';
 import { ToolChainBuilder } from '../src/product/toolChainBuilder.js';
-import { ToolFallbackManager } from '../src/product/toolFallback.js';
-import { runParallel } from '../src/product/toolParallelizer.js';
 import { RateLimiter } from '../src/product/toolRateLimiter.js';
 import { generateDocs } from '../src/product/toolSemanticDocs.js';
 import { WhiteLabelManager } from '../src/product/whiteLabel.js';
@@ -59,11 +56,11 @@ describe('Product — Compensation', () => {
 describe('Product — Knowledge Graph', () => {
   it('adds entities and finds path', () => {
     const kg = new KnowledgeGraph();
-    const a = kg.addEntity('entity', 'A');
-    const b = kg.addEntity('entity', 'B');
-    const c = kg.addEntity('entity', 'C');
-    kg.addRelationship(a.entityId, b.entityId, 'knows');
-    kg.addRelationship(b.entityId, c.entityId, 'knows');
+    const a = kg.addEntity('generic', 'A');
+    const b = kg.addEntity('generic', 'B');
+    const c = kg.addEntity('generic', 'C');
+    kg.addRelationship(a.entityId, b.entityId, 'relates_to');
+    kg.addRelationship(b.entityId, c.entityId, 'relates_to');
     const path = kg.shortestPath(a.entityId, c.entityId);
     expect(path).toBeDefined();
     expect(path!.nodes.length).toBeGreaterThanOrEqual(2);
@@ -113,4 +110,3 @@ describe('Product — Error Translator', () => {
     expect(r.userMessage).not.toContain('ECONNREFUSED');
   });
 });
-

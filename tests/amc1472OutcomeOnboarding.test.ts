@@ -469,15 +469,16 @@ describe("AMC-1472 outcome-based onboarding", () => {
     expect(commandCount).toBeGreaterThan(0);
     expect(studioSource).toContain(`${commandCount.toLocaleString("en-US")} CLI paths`);
     const worker = readFileSync("src/console/assets/sw.js", "utf8");
-    expect(worker).toContain('const CACHE_NAME = "amc-console-v6"');
+    expect(worker).toContain('const CACHE_NAME = "amc-console-v7"');
     expect(worker).toContain('if (!url.pathname.includes("/assets/"))');
     expect(worker.indexOf("fetch(req)")).toBeLessThan(worker.lastIndexOf("caches.match(req)"));
-    expect(readFileSync("src/console/pages/home.html", "utf8")).toContain("?v=20260711a");
+    expect(readFileSync("src/console/pages/home.html", "utf8")).toContain("?v=20260908a");
     for (const page of readdirSync("src/console/pages").filter((name) => name.endsWith(".html"))) {
       const html = readFileSync(join("src/console/pages", page), "utf8");
       expect(html, page).not.toContain("20260710b");
-      if (html.includes("./assets/styles.css?v=")) expect(html, page).toContain("?v=20260711a");
-      if (html.includes("./assets/app.js?v=")) expect(html, page).toContain("?v=20260711a");
+      const version = page === "home.html" ? "?v=20260908a" : "?v=20260711a";
+      if (html.includes("./assets/styles.css?v=")) expect(html, page).toContain(version);
+      if (html.includes("./assets/app.js?v=")) expect(html, page).toContain(version);
     }
 
     const docs = readFileSync("docs/GETTING_STARTED.md", "utf8");

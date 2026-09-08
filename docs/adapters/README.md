@@ -20,6 +20,7 @@ Individual setup and integration guides for each supported adapter.
 | 12 | `openhands-cli` | OpenHands | [openhands.md](openhands.md) |
 | 13 | `python-amc-sdk` | AMC Python SDK | [python-amc-sdk.md](python-amc-sdk.md) |
 | 14 | `generic-cli` | Any CLI Agent | [generic-cli.md](generic-cli.md) |
+| 15 | `deepseek-harness` | DeepSeek Harness headless capture (qualification pending) | [deepseek-harness.md](deepseek-harness.md) |
 
 ## Quick Start
 

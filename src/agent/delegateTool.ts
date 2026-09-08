@@ -145,7 +145,8 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
         session: capability.session,
         runner: capability.runner,
         mintSessionId,
-        maxDepth
+        maxDepth,
+        ...(execution.signal === undefined ? {} : { signal: execution.signal })
       });
 
       if (!outcome.ok) {

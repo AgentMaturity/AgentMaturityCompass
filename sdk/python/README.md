@@ -1,83 +1,110 @@
 # `amc-sdk`
 
-Drive a governed AMC agent from Python, and prove afterwards that it ran.
+Drive an installed AMC native agent from Python. The client uses the standard library and launches one `amc acp` process with a fixed workspace, provider and credential reference. Select the executable explicitly with `amc_bin` or `AMC_BIN` when multiple AMC installations exist.
 
 ```python
-from amc_sdk import AmcAgent, export_proof, verify_proof
+from amc_sdk import AmcAgent
 
-with AmcAgent(workspace=".", provider="stub") as agent:
+with AmcAgent(workspace=".", provider="openai", model="YOUR_MODEL_ID",
+              credential="OPENAI_API_KEY") as agent:
     session = agent.new_session()
-    result = session.prompt("summarise the changelog")
-    print(result.stop_reason)   # "end_turn"
-    print(result.text)
-    for call in result.tool_calls:
-        print(call.title, call.status)
-
-proof = export_proof(session.session_id, "run.amcproof.json")
+    result = session.prompt("Draft three acceptance tests for our JSONL importer.")
+    print(result.stop_reason, result.text)
 ```
 
-No pip dependencies — the transport is `subprocess` + `json` + `threading`.
-You need the `amc` CLI on the PATH, or `AMC_BIN` pointing at a build.
+Initialize the workspace and set the credential reference with the AMC CLI first. The client never initializes the workspace or accepts a different workspace in a session message. `credential` names a reference; do not put a key value in command arguments. `base_url`, `model` and provider selection are fixed at process launch. Supported ACP routes remain OpenAI Chat Completions, Anthropic and `stub`. Unsupported providers are refused without a fallback.
 
-## What it does
+`provider="stub"` is a local recording demonstration with a canned answer, and remains the Python compatibility default. It does not establish real provider access or successful model work.
 
-Spawns `amc acp` and speaks the Agent Client Protocol down the pipe. That is the
-only AMC surface where a message from a client causes a turn to actually execute:
-the NDJSON wire (`amc wire`) accepts work and records the acceptance, but nothing
-there ever runs it.
-
-Each session is a real, ledger-backed AMC session. Several prompts may run on one
-session, in turn, and they share a conversation.
-
-## What a result does not mean
-
-**`stop_reason == "end_turn"` is not "it worked."** ACP has five stop reasons and
-AMC has seven turn endings, so `blocked` — a governance hook vetoed the turn —
-arrives as `end_turn`, as do `error` and `interrupted`. When the mapping loses
-something the real ending is in `result.meta`; authoritatively it is in the
-signed log. Code that treats `end_turn` as success is claiming more than the
-protocol said.
-
-**`result.text` is not a token stream.** AMC records one row per completed block
-of a completed model response, and rows are the only signed artifact — a token
-stream would have to bypass the ledger. Text arrives in block-sized pieces.
-
-**Nothing the client returns is verified.** Text that came over a pipe is bytes
-from a subprocess. The proof below is the part that can be checked.
-
-## Proving a run
+## Receive committed updates and cancel
 
 ```python
-proof = export_proof(session_id, "run.amcproof.json", workspace=".")
-# Send proof.path to whoever needs it. Send proof.auditor_key_fingerprint
-# BY A DIFFERENT ROUTE — a fingerprint that travels inside the bundle it
-# authenticates proves nothing about the bundle.
+with AmcAgent(workspace=".", provider="stub") as agent:
+    session = agent.new_session()
+    turn = session.start_prompt("Show a local recording demonstration.")
+    for event in turn:
+        print(event.update)
+        # Call turn.cancel() here, or session.cancel() from another thread,
+        # to request cancellation. Breaking the iterator also requests it.
+    result = turn.result()
+    print(result.stop_reason, result.verification)
+```
 
+`Turn` supports one iterator and retains its updates in `RunResult.updates`. The result is separate from the stream. Updates are completed blocks projected from committed session rows, currently emitted when a turn finishes; they are not live provider token deltas. A cancellation request does not prove cancellation occurred: inspect the final stop reason. Closing the client cancels and settles active work before sealing owned sessions; a forced termination remains an interrupted run requiring recovery.
+
+## Explicit handoff and verified resume
+
+Ordinary client shutdown seals its sessions. A sealed session cannot be loaded for further writes. To continue a conversation in a later process, explicitly release it at an idle boundary first:
+
+```python
+with AmcAgent(workspace=".", provider="stub") as first:
+    session = first.new_session()
+    session.prompt("First part of the local demonstration.")
+    session_id = session.session_id
+    session.release()  # acknowledged signed ownership handoff, not a session seal
+
+with AmcAgent(workspace=".", provider="stub") as second:
+    continued = second.resume_session(session_id)
+    for historical_event in continued.history:
+        print(historical_event.update)
+    result = continued.prompt("Continue the previous conversation.")
+    # Normal shutdown now seals the resumed session.
+```
+
+The server advertises `loadSession` only when a verified resume factory exists. Python refuses loading when that capability is absent; it never substitutes a new session. `_amc/session/release` is an AMC extension advertised under `agentCapabilities._meta["dev.agentmaturity.amc"].releaseSession` and is also checked before use.
+
+Loading uses native signed session verification, atomic ownership admission and crash recovery. Missing, sealed, tampered, foreign-format and live-owned sessions are refused. JSONL takeover and legacy sessions without signed ownership remain unsupported. A dead-process recovery records unknown side-effect outcomes instead of repeating work. Replayed user, assistant and tool history arrives before the load response and is exposed only in `Session.history`, never as output of a newly submitted prompt. Unavailable historical payloads cause refusal rather than incomplete conversation replay.
+
+## Interpret results and verify separately
+
+`stop_reason == "end_turn"` is not a success verdict: ACP's stop reasons also encode some blocked, error and interrupted endings. Inspect `result.meta`, and use the signed record for the authoritative ending. `result.verification` is always `"not-verified"`. Received text, tool updates, local replay and protocol completion are not cryptographic verification receipts.
+
+```python
+from amc_sdk import export_proof, verify_proof
+
+# Export after normal shutdown has sealed the session.
+proof = export_proof(session_id, "run.amcproof.json", workspace=".")
 verify_proof("run.amcproof.json", expect_auditor_key=fingerprint_from_elsewhere)
 ```
 
-`verify_proof` needs no workspace: the bundle is self-contained, which is what
-makes it a proof rather than a report. `export_proof` refuses if the workspace's
-evidence ledger does not verify, so a proof cannot be cut from a broken record.
+Proof helpers invoke the installed CLI. Verify the fingerprint through an independent trusted route; a fingerprint supplied only inside its own bundle does not authenticate that bundle. Released, still-open sessions need continuation and a normal seal before the existing proof-export workflow can claim completeness.
 
-These two shell out to the `amc` CLI. ACP has no method for "prove this session
-happened", and pretending the protocol carried one would be the wrong kind of
-convenience.
+## Transport and failure limits
 
-## Not supported
+The client requires JSON-RPC 2.0 and ACP protocol version 1. It validates response IDs and outcomes, rejects duplicate/unsolicited replies and malformed updates, and reaps its owned child on fatal transport failure. Per-frame input and output are bounded to 1 MiB; each turn or replay retains at most 8 MiB and 32,768 updates. At most 32 requests and 32 queued output frames are allowed. Stderr retains at most its last 64 KiB and is never automatically added to exception text.
 
-`session/load` — AMC has no resume path, and the agent declares
-`loadSession: false` rather than claiming one. MCP servers — `new_session` sends
-an empty list, and the agent refuses a non-empty one rather than accepting
-servers it will never connect.
+Request timeout defaults to 120 seconds and is configurable with `timeout`. Transport failure is not permission to replay a task: work may already have been committed. Inspect or recover the existing session before deciding whether to submit anything again. Process cleanup is bounded and escalates from graceful EOF to termination and then kill if the child does not settle. The caller's workspace is never deleted.
 
-## Tests
+MCP client servers and additional workspace roots remain unsupported and are refused rather than silently ignored.
 
-```bash
-AMC_BIN=$(pwd)/dist/cli.js python3 -m pytest sdk/python/tests -q
-```
+## Deferred verification
 
-They spawn the real CLI and skip when they cannot find one that supports `acp`.
-A bare `amc` on the PATH is probed rather than trusted: an older AMC installed
-system-wide has no `acp` command, and driving it would fail somewhere deep in the
-protocol instead of saying so.
+The continuation and transport parity implementation has not been executed in this development pass. After the implementation batch is complete, run focused protocol regressions and actual installed CLI/Python acceptance, including explicit handoff, loaded history, cancellation, failure cleanup and independent proof verification. Existing tests that asserted `loadSession: false` need the new capability expectation when run against the updated runtime.
+# Native execution options and committed progress
+
+AMC runs its own sessions and tools; no DSH/Pi installation is required.
+`AmcAgent` now accepts `tools="none"` (the default) or explicitly
+`tools="workspace"`, `approve_tools`/`approve_risk`, reviewed
+`mcp_config`/`mcp_config_sha256`, `credentials_home`/`credentials_file`, and
+`max_tokens`/`max_steps`. `provider="openai-responses"` selects AMC's native
+Responses route; it is distinct from `provider="openai"` Chat Completions.
+These values are fixed when the AMC process starts. Session messages cannot
+change the workspace, credentials, provider or permission boundary.
+
+Workspace tools retain AMC's signed allowlist/firewall, budget, sandbox and
+owning-session evidence path. MCP requires workspace tools, an explicit signed
+approval gate, reviewed config/catalog digests and existing matching signed
+grants. No discovery or policy mutation happens automatically. Client-supplied
+ACP `mcpServers` remain refused; use the reviewed startup configuration.
+
+`Session.start_prompt()` returns an iterable `Turn`. It now receives committed
+assistant/tool updates while the native prompt is still running, in completed
+response-block units. These are authenticated session rows, not raw provisional
+provider tokens and not a full-run verification result. Iteration may produce
+committed progress before a later error; inspect `result()` and verify the final
+session separately. Output/polling bounds and cancellation cleanup fail closed.
+An MCP connection is disposed on cancellation; a subsequent explicit session
+handoff/load can mount the same reviewed configuration again.
+
+This source change has not yet been tested or run; execution qualification is
+deferred to the final implementation batch.
