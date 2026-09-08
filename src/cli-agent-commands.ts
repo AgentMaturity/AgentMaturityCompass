@@ -322,7 +322,7 @@ async function importRunner(
           "The composition kernel (@amc/core) is not installed.\n" +
             "`agent-loop run` drives the agent through the composed tree, and that tree lives in\n" +
             "workspace packages this release does not publish. Run from a repository checkout\n" +
-            "(npm install && npm run build:workspace)."
+            "(pnpm install --frozen-lockfile && pnpm run build)."
         )
       );
       io.fail();

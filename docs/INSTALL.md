@@ -44,10 +44,24 @@ CI validates Node 20 and 22. Newer major releases can require native rebuilds fo
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 npm link            # makes `amc` available globally
 ```
+
+AMC is a pnpm workspace (`packageManager` pins the version; `corepack enable` or
+`npm i -g pnpm@10` installs it). `npm ci` cannot resolve the `workspace:*`
+protocol the vendored `@amc/*` packages use, so it fails here by design.
+`pnpm run build` compiles the CLI; the vendored packages and `@amc/core` ship
+their compiled `lib/` in the tree, so no separate vendor build is needed unless
+you edit them (`npm run build:vendor`).
+
+**Source runtime vs published release.** A source checkout can run the native
+governed agent loop (`amc agent-loop run`, hidden from `--help`) because the
+composition kernel `@amc/core` is a private workspace package. The published
+npm tarball and the release installers do not include it; they ship the
+evidence, scoring and governance surfaces. `npm run check:clean-source` proves
+this whole path on a fresh clone, keyless, in an isolated workspace.
 
 Verify:
 
@@ -158,7 +172,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 
 # GitHub
-cd AgentMaturityCompass && git pull && npm ci && npm run build
+cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
 
 # Docker
 cd deploy/compose && docker compose pull && docker compose up -d --build

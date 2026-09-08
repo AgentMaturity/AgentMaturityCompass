@@ -25,9 +25,10 @@ Every contribution makes AI agent trust scoring better for everyone. Whether you
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-npm ci
-npm run build     # must compile with 0 TypeScript errors
-npm test          # 10,020 passing Vitest tests, all must pass in CI
+pnpm install --frozen-lockfile
+pnpm run build     # pnpm: the vendored @amc/* packages use the workspace protocol npm cannot resolve
+npm test          # the full Vitest suite; all must pass in CI
+npm run check:clean-source   # proves the path above on a fresh clone (slow: clones and builds)
 ```
 
 **Python platform:**

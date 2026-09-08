@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@amc/core':
-        specifier: workspace:*
-        version: link:packages/amc-core
       '@modelcontextprotocol/sdk':
         specifier: ^1.27.1
         version: 1.30.0(zod@4.4.3)
@@ -42,6 +39,9 @@ importers:
       '@amc/cordis-plugin-loader':
         specifier: workspace:*
         version: link:vendor/loader
+      '@amc/core':
+        specifier: workspace:*
+        version: link:packages/amc-core
       '@amc/schemastery':
         specifier: workspace:*
         version: link:vendor/schemastery
@@ -124,6 +124,8 @@ importers:
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
+
+  vendor/acp-schema: {}
 
   vendor/cordis:
     dependencies:

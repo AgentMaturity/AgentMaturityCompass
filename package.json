@@ -72,7 +72,9 @@
     "check:vendor-rescope": "node scripts/vendor/rescope-vendor.mjs --check",
     "gen:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs",
     "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
-    "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery"
+    "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery",
+    "graph:update": "graphify update .",
+    "check:clean-source": "node scripts/clean-source-check.mjs"
   },
   "keywords": [
     "ai-agent",
