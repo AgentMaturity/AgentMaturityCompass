@@ -1,21 +1,5 @@
-/**
- * The key-history hash chain, shared by every writer of that file.
- *
- * The key history is the root of trust for signature verification:
- * `verifyHexDigestAny` accepts a signature if ANY key listed there validates
- * it, so appending one public key forges every signature of that role. The
- * chain makes an insertion, reordering or splice detectable.
- *
- * It lives in its own module because **two** subsystems write this file — the
- * vault when it first materialises keys, and the key manager when a key is
- * rotated or imported — and `crypto/keys.ts` already imports from
- * `vault/vault.ts`, so the vault cannot import back without a cycle.
- *
- * That split is exactly how the protection was previously inert: the chain was
- * added to one writer, while the vault's writer — which runs *first*, on every
- * `amc init` — kept appending unchained entries. Every workspace's history was
- * therefore entirely "legacy", and the verifier waved all of it through.
- */
+/** Hash linkage is structural evidence only. Publicly recomputable hashes do
+ * not authorize signing keys; keyHistoryEnvelope authenticates the full list. */
 import { sha256Hex } from "../utils/hash.js";
 
 export interface KeyHistoryEntry {

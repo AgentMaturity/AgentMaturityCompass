@@ -9,7 +9,8 @@ import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadRunReport, generateReport } from "../diagnostic/runner.js";
-import { getPublicKeyHistory, getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getAuthenticatedKeyHistory, getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
@@ -36,12 +37,6 @@ interface BundleManifestSignature {
   signature: string;
   signedTs: number;
   signer: "auditor";
-}
-
-interface KeyHistoryEntry {
-  createdTs: number;
-  fingerprint: string;
-  publicKeyPem: string;
 }
 
 interface BundleContents {
@@ -80,32 +75,6 @@ function collectFiles(rootDir: string): string[] {
   };
   walk(rootDir);
   return out.sort((a, b) => a.localeCompare(b));
-}
-
-function toKeyHistoryEntries(publicKeys: string[]): KeyHistoryEntry[] {
-  return publicKeys.map((publicKeyPem) => ({
-    createdTs: 0,
-    fingerprint: sha256Hex(Buffer.from(publicKeyPem, "utf8")),
-    publicKeyPem
-  }));
-}
-
-function readKeyHistory(workspace: string, kind: "monitor" | "auditor"): KeyHistoryEntry[] {
-  const historyPath = join(workspace, ".amc", "keys", `${kind}_history.json`);
-  if (!pathExists(historyPath)) {
-    return toKeyHistoryEntries(getPublicKeyHistory(workspace, kind));
-  }
-
-  try {
-    const parsed = JSON.parse(readUtf8(historyPath)) as KeyHistoryEntry[];
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-  } catch {
-    // fall through to synthesized history
-  }
-
-  return toKeyHistoryEntries(getPublicKeyHistory(workspace, kind));
 }
 
 function dbSchemaSql(): string {
@@ -581,44 +550,33 @@ function readBundleManifestSig(root: string): BundleManifestSignature {
   return JSON.parse(readUtf8(file)) as BundleManifestSignature;
 }
 
-function collectAuditorKeysFromBundle(root: string): string[] {
-  const direct = readUtf8(join(root, "public-keys", "auditor.pub"));
+function authenticatedHistoryFromBundle(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
+  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
   const historyFile = join(root, "public-keys", "key-history.json");
-  if (!pathExists(historyFile)) {
-    return [direct];
-  }
   try {
-    const parsed = JSON.parse(readUtf8(historyFile)) as { auditor?: Array<{ publicKeyPem?: string }> };
-    const keys = new Set<string>([direct]);
-    for (const entry of parsed.auditor ?? []) {
-      if (entry.publicKeyPem) {
-        keys.add(entry.publicKeyPem);
-      }
-    }
-    return [...keys];
+    const parsed: unknown = JSON.parse(readUtf8(historyFile));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    // The history cannot choose its own anchor or gain authority merely by
+    // being copied into a manifest. Only the direct role key admits old keys.
+    const result = verifyKeyHistoryEnvelope((parsed as Record<string, unknown>)[kind], kind, direct);
+    return result.valid ? result.envelope : null;
   } catch {
-    return [direct];
+    return null;
   }
 }
 
+function collectRoleKeysFromBundle(root: string, kind: "monitor" | "auditor"): string[] {
+  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
+  const history = authenticatedHistoryFromBundle(root, kind);
+  return [...new Set([direct, ...(history?.entries.map((entry) => entry.publicKeyPem) ?? [])])];
+}
+
+function collectAuditorKeysFromBundle(root: string): string[] {
+  return collectRoleKeysFromBundle(root, "auditor");
+}
+
 function collectMonitorKeysFromBundle(root: string): string[] {
-  const direct = readUtf8(join(root, "public-keys", "monitor.pub"));
-  const historyFile = join(root, "public-keys", "key-history.json");
-  if (!pathExists(historyFile)) {
-    return [direct];
-  }
-  try {
-    const parsed = JSON.parse(readUtf8(historyFile)) as { monitor?: Array<{ publicKeyPem?: string }> };
-    const keys = new Set<string>([direct]);
-    for (const entry of parsed.monitor ?? []) {
-      if (entry.publicKeyPem) {
-        keys.add(entry.publicKeyPem);
-      }
-    }
-    return [...keys];
-  } catch {
-    return [direct];
-  }
+  return collectRoleKeysFromBundle(root, "monitor");
 }
 
 function materializeBundleWorkspace(root: string): string {
@@ -646,10 +604,12 @@ function materializeBundleWorkspace(root: string): string {
   writeFileAtomic(join(keysDir, "monitor_ed25519.pub"), readUtf8(join(root, "public-keys", "monitor.pub")), 0o644);
   writeFileAtomic(join(keysDir, "auditor_ed25519.pub"), readUtf8(join(root, "public-keys", "auditor.pub")), 0o644);
 
-  const historyRaw = readUtf8(join(root, "public-keys", "key-history.json"));
-  const history = JSON.parse(historyRaw) as { monitor?: unknown; auditor?: unknown };
-  writeFileAtomic(join(keysDir, "monitor_history.json"), JSON.stringify(history.monitor ?? [], null, 2), 0o644);
-  writeFileAtomic(join(keysDir, "auditor_history.json"), JSON.stringify(history.auditor ?? [], null, 2), 0o644);
+  for (const kind of ["monitor", "auditor"] as const) {
+    const history = authenticatedHistoryFromBundle(root, kind);
+    if (history) {
+      writeFileAtomic(join(keysDir, `${kind}_history.json`), JSON.stringify(history, null, 2), 0o644);
+    }
+  }
 
   if (pathExists(join(root, "target.json"))) {
     writeFileAtomic(join(targetsDir, "bundle.target.json"), readFileSync(join(root, "target.json")));
@@ -777,8 +737,8 @@ export function exportEvidenceBundle(params: {
     writeFileAtomic(join(root, "public-keys", "monitor.pub"), monitorPub, 0o644);
     writeFileAtomic(join(root, "public-keys", "auditor.pub"), auditorPub, 0o644);
 
-    const monitorHistory = readKeyHistory(params.workspace, "monitor");
-    const auditorHistory = readKeyHistory(params.workspace, "auditor");
+    const monitorHistory = getAuthenticatedKeyHistory(params.workspace, "monitor");
+    const auditorHistory = getAuthenticatedKeyHistory(params.workspace, "auditor");
     writeFileAtomic(
       join(root, "public-keys", "key-history.json"),
       JSON.stringify({ monitor: monitorHistory, auditor: auditorHistory }, null, 2),
@@ -831,8 +791,8 @@ export function exportEvidenceBundle(params: {
       windowStartTs: report.windowStartTs,
       windowEndTs: report.windowEndTs,
       publicKeyFingerprints: {
-        monitor: monitorHistory.map((entry) => entry.fingerprint),
-        auditor: auditorHistory.map((entry) => entry.fingerprint)
+        monitor: [...new Set([sha256Hex(monitorPub), ...(monitorHistory?.entries.map((entry) => entry.fingerprint) ?? [])])],
+        auditor: [...new Set([sha256Hex(auditorPub), ...(auditorHistory?.entries.map((entry) => entry.fingerprint) ?? [])])]
       },
       files: []
     };

@@ -150,14 +150,8 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         checks.push({
           id: `key-history-${kind}`,
           status: "FAIL",
-          message: `${kind} key history is broken at entry ${chain.brokenAtIndex}; a key may have been inserted or altered`,
-          fixHint: "Do not trust signatures from this role until the history is reviewed."
-        });
-      } else if (chain.legacyEntries > 0) {
-        checks.push({
-          id: `key-history-${kind}`,
-          status: "INFO",
-          message: `${kind} key history has ${chain.legacyEntries} entr${chain.legacyEntries === 1 ? "y" : "ies"} predating hash chaining`
+          message: `${kind} historical keys are not authenticated: ${chain.reason}`,
+          fixHint: "Current-key verification remains available. Review history and use amc vault history migrate with its SHA-256 and explicitly approved historical fingerprints."
         });
       }
     }

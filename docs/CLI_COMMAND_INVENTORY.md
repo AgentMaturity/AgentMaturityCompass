@@ -4,6 +4,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 
 | Command | Description | Options | Aliases |
 |---|---|---|---|
+| `amc acp` | Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames) | `--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--agent-id <id>`<br>`--system-prompt <text>` | - |
 | `amc action-queue` | Show prioritized actions sorted by risk-reduction-per-effort | `--limit <n>` | - |
 | `amc adapters` | Built-in adapter system for one-line agent integration | - | - |
 | `amc adapters capabilities` | Issue a signed Passport receipt for declared and effective adapter capabilities | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--out <path>`<br>`--json` | - |
@@ -598,6 +599,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc learn` | Education flow for a specific maturity question | `--question <qid>`<br>`--agent <agentId>` | - |
 | `amc lease` | Issue/verify/revoke short-lived agent leases | - | - |
 | `amc lease issue` | - | `--agent <agentId>`<br>`--ttl <ttl>`<br>`--scopes <scopes>`<br>`--routes <routes>`<br>`--models <models>`<br>`--rpm <rpm>`<br>`--tpm <tpm>`<br>`--max-cost-usd-per-day <usd>`<br>`--workorder <workOrderId>` | - |
+| `amc lease resign-revocations` | Re-sign the lease revocation store, vouching for its CURRENT content as owner | - | - |
 | `amc lease revoke` | - | `--lease-id <id>`<br>`--reason <reason>` | - |
 | `amc lease verify` | - | - | - |
 | `amc legal-hold` | Issue or manage legal holds | `--issue`<br>`--release <holdId>`<br>`--list`<br>`--tenant <id>`<br>`--reason <text>`<br>`--issued-by <name>` | - |
@@ -1043,7 +1045,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc studio lan enable` | Enable LAN mode with pairing gate | `--bind <host>`<br>`--port <port>`<br>`--cidr <cidr...>` | - |
 | `amc studio ping` | Ping local Studio API /health endpoint | - | - |
 | `amc studio start` | Start Studio in foreground (non-interactive, deployment-safe) | `--workspace <path>`<br>`--bind <host>`<br>`--port <port>`<br>`--dashboard-port <port>` | - |
-| `amc supervise` | Supervise any process and inject gateway routing env vars (no lease; for agents no adapter covers — otherwise prefer 'amc adapters run') | `--provider-route <routeBase>`<br>`--route <routeBase>`<br>`--proxy <proxyUrl>` | - |
+| `amc supervise` | DEPRECATED — use 'amc adapters run'. Supervises any process and injects gateway routing env vars, but mints no lease, so its evidence is not OBSERVED. | `--provider-route <routeBase>`<br>`--route <routeBase>`<br>`--proxy <proxyUrl>` | - |
 | `amc target` | Target profile operations | - | - |
 | `amc target diff` | Diff run against target profile | `--run <runId>`<br>`--target <name>` | - |
 | `amc target set` | Interactive equalizer wizard | `--name <name>` | - |
@@ -1139,6 +1141,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault dsar submit` | Submit a persistent DSAR request | `--subject <id>`<br>`--type <type>`<br>`--json` | - |
 | `amc vault dsar-status` | Show DSAR (Data Subject Access Request) status | `--json` | - |
 | `amc vault forget` | Remove the remembered vault passphrase for this workspace (Keychain or credentials file) | - | - |
+| `amc vault history` | Review and explicitly migrate signing-key history | - | - |
+| `amc vault history migrate` | Authenticate only current and explicitly approved keys; preserve original untrusted bytes | `--role <role>`<br>`--expected-sha256 <hash>`<br>`--approve-fingerprint <fingerprints...>` | - |
 | `amc vault init` | Initialize encrypted vault for signing keys | - | - |
 | `amc vault lock` | Lock vault and clear in-memory private keys | - | - |
 | `amc vault privacy-budget` | Check privacy budget for an agent | `--json` | - |
@@ -1171,6 +1175,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc whatif equalizer` | - | `--agent <agentId>`<br>`--set <pair...>` | - |
 | `amc whatif targets` | - | `--agent <agentId>`<br>`--in <file>`<br>`--out <file>` | - |
 | `amc why-capped` | Show why each question is capped at its current level | `--question <id>` | - |
+| `amc wire` | Serve the NDJSON JSON-RPC wire on a unix socket (accepts work; does not run it) | `--socket <path>`<br>`--max-connections <n>`<br>`--idle-timeout <ms>`<br>`--json` | - |
 | `amc wiring-status` | Show in-process production wiring counters (cannot observe other processes) | `--markdown` | - |
 | `amc workorder` | Signed work order operations | - | - |
 | `amc workorder create` | Create and sign a work order | `--title <text>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--description <text>`<br>`--allow <class...>`<br>`--agent <agentId>` | - |
@@ -1178,4 +1183,4 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc workorder list` | List work orders for agent | `--agent <agentId>` | - |
 | `amc workorder show` | Show signed work order JSON | `--agent <agentId>` | - |
 | `amc workorder verify` | Verify work order signature | `--agent <agentId>` | - |
-| `amc wrap` | Wrap runtime and capture tamper-evident evidence (legacy; prefer 'amc adapters run', which also mints a lease and routes through the gateway) | `--agent-token <file>`<br>`--name <agentName>`<br>`--provider <provider>`<br>`--bridge-url <url>` | - |
+| `amc wrap` | DEPRECATED — use 'amc adapters run', which also mints a lease and routes through the gateway. Wraps a runtime and captures tamper-evident evidence. | `--agent-token <file>`<br>`--name <agentName>`<br>`--provider <provider>`<br>`--bridge-url <url>` | - |

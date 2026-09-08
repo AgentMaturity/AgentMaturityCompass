@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { decryptVaultPayload, encryptVaultPayload, type VaultEnvelope } from "./vaultCrypto.js";
-import { buildKeyHistoryEntry, type KeyHistoryEntry } from "../crypto/keyHistoryChain.js";
+import { buildKeyHistoryEntry } from "../crypto/keyHistoryChain.js";
+import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
+import { createKeyRotationReceipt } from "../crypto/keyRotationReceipt.js";
 
 export type VaultKeyKind = "monitor" | "auditor" | "lease" | "session";
 
@@ -161,30 +163,37 @@ function readEnvelope(workspace: string): VaultEnvelope {
   return JSON.parse(readEnvelopeRaw(workspace)) as VaultEnvelope;
 }
 
-function writePublicAndHistory(file: string, historyFile: string, publicPem: string): void {
-  writeFileAtomic(file, publicPem, 0o644);
-  const existing = pathExists(historyFile)
-    ? (JSON.parse(readUtf8(historyFile)) as KeyHistoryEntry[])
-    : [];
-  const fingerprint = sha256Hex(Buffer.from(publicPem, "utf8"));
-  if (!existing.some((row) => row.fingerprint === fingerprint)) {
-    // Chained, through the shared helper. This writer runs first — on every
-    // `amc init` — and previously appended entries with no chain fields, so
-    // every workspace's history was entirely "legacy" and the chain verifier
-    // waved all of it through. The protection existed and did nothing.
-    existing.push(buildKeyHistoryEntry(publicPem, existing));
-  }
-  // 0600, not 0644: this file decides which keys may sign for this role, so it
-  // must not be readable or writable by other users on the host.
-  writeFileAtomic(historyFile, JSON.stringify(existing, null, 2), 0o600);
+const KEY_KINDS = ["monitor", "auditor", "lease", "session"] as const;
+
+interface MonitorTransition {
+  previousPrivateKeyPem: string;
+  nextHistory: KeyHistoryEnvelope;
+  recoveryDirectory: string;
 }
 
-function ensurePublicKeys(paths: ReturnType<typeof vaultPaths>, monitorPub: string, auditorPub: string, leasePub: string, sessionPub: string): void {
-  ensureDir(paths.keysDir);
-  writePublicAndHistory(paths.monitorPublic, paths.monitorHistory, monitorPub);
-  writePublicAndHistory(paths.auditorPublic, paths.auditorHistory, auditorPub);
-  writePublicAndHistory(paths.leasePublic, paths.leaseHistory, leasePub);
-  writePublicAndHistory(paths.sessionPublic, paths.sessionHistory, sessionPub);
+/** Prepare trust mutations before replacing any vault data. Never seal disk lists. */
+function preparePublicKeys(paths: ReturnType<typeof vaultPaths>, params: CreateVaultParams, transition?: MonitorTransition): Array<{ publicFile: string; publicPem: string; historyFile: string; history: string | null }> {
+  const existingVault = pathExists(paths.vaultFile);
+  return KEY_KINDS.map((kind) => {
+    const publicPem = publicKeyFromPrivate(params[`${kind}PrivateKeyPem`]);
+    if (publicPem !== params[`${kind}PublicKeyPem`]) throw new Error(`${kind} public key does not match the vault private key`);
+    const publicFile = paths[`${kind}Public`];
+    const historyFile = paths[`${kind}History`];
+    const previousPublic = pathExists(publicFile) ? readUtf8(publicFile) : null;
+    let history: string | null = null;
+    if (existingVault && previousPublic && previousPublic !== publicPem) {
+      if (kind !== "monitor" || !transition || publicKeyFromPrivate(transition.previousPrivateKeyPem) !== previousPublic
+        || !verifyKeyHistoryEnvelope(transition.nextHistory, "monitor", publicPem).valid) {
+        throw new Error(`${kind} key replacement requires an authenticated rotation`);
+      }
+      history = JSON.stringify(transition.nextHistory, null, 2);
+    } else if (!existingVault || !pathExists(historyFile)) {
+      // Only a private-key-derived current key is admitted at initialization.
+      // Existing unsigned arrays are never imported into a fresh envelope.
+      history = JSON.stringify(sealKeyHistory(kind, [buildKeyHistoryEntry(publicPem, [])], params[`${kind}PrivateKeyPem`]), null, 2);
+    }
+    return { publicFile, publicPem, historyFile, history };
+  });
 }
 
 function sessionFor(workspace: string): VaultSession {
@@ -208,7 +217,7 @@ export function vaultExists(workspace: string): boolean {
   return pathExists(vaultPaths(workspace).vaultFile);
 }
 
-export function createVault(params: {
+interface CreateVaultParams {
   workspace: string;
   passphrase?: string;
   monitorPrivateKeyPem: string;
@@ -220,13 +229,20 @@ export function createVault(params: {
   leasePublicKeyPem: string;
   sessionPublicKeyPem: string;
   secrets?: Record<string, string>;
-}): { vaultFile: string; metaFile: string } {
+}
+
+export function createVault(params: CreateVaultParams): { vaultFile: string; metaFile: string } {
+  return persistVault(params);
+}
+
+function persistVault(params: CreateVaultParams, transition?: MonitorTransition): { vaultFile: string; metaFile: string } {
   const passphrase = params.passphrase ?? defaultPassphrase();
   if (passphrase.length < 8) {
     throw new Error("Vault passphrase must be at least 8 characters.");
   }
   const paths = vaultPaths(params.workspace);
   ensureDir(join(params.workspace, ".amc"));
+  const publicWrites = preparePublicKeys(paths, params, transition);
 
   const payload: VaultPayload = {
     v: 1,
@@ -238,6 +254,9 @@ export function createVault(params: {
     secrets: toSafeSecretMap(params.secrets ?? (Object.create(null) as Record<string, string>))
   };
   const encrypted = encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase);
+  if (transition) {
+    writeFileAtomic(join(transition.recoveryDirectory, "next-vault.amcvault"), JSON.stringify(encrypted, null, 2), 0o600);
+  }
   writeFileAtomic(paths.vaultFile, JSON.stringify(encrypted, null, 2), 0o600);
   // The envelope on disk just changed, so any session opened from the previous
   // one must derive again rather than trust its cached digest.
@@ -257,7 +276,17 @@ export function createVault(params: {
   };
   writeFileAtomic(paths.metaFile, JSON.stringify(meta, null, 2), 0o644);
 
-  ensurePublicKeys(paths, params.monitorPublicKeyPem, params.auditorPublicKeyPem, params.leasePublicKeyPem, params.sessionPublicKeyPem);
+  for (const row of publicWrites) {
+    writeFileAtomic(row.publicFile, row.publicPem, 0o644);
+    if (row.history !== null) {
+      if (pathExists(row.historyFile)) {
+        const original = readUtf8(row.historyFile);
+        const backup = `${row.historyFile}.previous-${sha256Hex(Buffer.from(original, "utf8"))}`;
+        if (!pathExists(backup)) writeFileAtomic(backup, original, 0o600);
+      }
+      writeFileAtomic(row.historyFile, row.history, 0o600);
+    }
+  }
 
   // Always remove legacy unencrypted private key files.
   if (pathExists(paths.legacyMonitorPrivate)) {
@@ -422,11 +451,7 @@ export function ensureVaultAndPublicKeys(workspace: string): void {
     if (legacyAuditorPrivate && pathExists(paths.legacyAuditorPrivate)) {
       rmSync(paths.legacyAuditorPrivate, { force: true });
     }
-    if (monitorPublicExisting && auditorPublicExisting) {
-      if (leasePublicExisting && sessionPublicExisting) {
-        ensurePublicKeys(paths, monitorPublicExisting, auditorPublicExisting, leasePublicExisting, sessionPublicExisting);
-      }
-    }
+    // Reads/unlocks cannot authenticate or rewrite untrusted on-disk history.
     return;
   }
 
@@ -480,7 +505,10 @@ export function ensureVaultAndPublicKeys(workspace: string): void {
 export function rotateMonitorKeyInVault(workspace: string, passphrase?: string): {
   fingerprint: string;
   publicKeyPath: string;
+  rotationReceiptPath: string;
+  recoveryDirectory: string;
 } {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Key rotation is unavailable in no-sign mode");
   const paths = vaultPaths(workspace);
   const phrase = passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!phrase || phrase.length === 0) {
@@ -492,11 +520,46 @@ export function rotateMonitorKeyInVault(workspace: string, passphrase?: string):
     throw new Error("Vault unlock failed before rotation.");
   }
 
+  const previousPrivateKeyPem = session.payload.monitorPrivateKeyPem;
+  const previousPublicKeyPem = publicKeyFromPrivate(previousPrivateKeyPem);
+  if (readUtf8(paths.monitorPublic) !== previousPublicKeyPem) throw new Error("Monitor public key does not match the unlocked vault");
+  let prior;
+  try {
+    prior = verifyKeyHistoryEnvelope(JSON.parse(readUtf8(paths.monitorHistory)), "monitor", previousPublicKeyPem).envelope;
+  } catch { /* malformed/missing history requires explicit reviewed migration */ }
+  if (!prior) throw new Error("Monitor history is not authenticated; explicitly migrate reviewed history before rotating");
+
   const next = generateKeyPairSync("ed25519");
   const monitorPrivateKeyPem = next.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
   const monitorPublicKeyPem = next.publicKey.export({ format: "pem", type: "spki" }).toString();
 
-  createVault({
+  const nextEntries = [...prior.entries, buildKeyHistoryEntry(monitorPublicKeyPem, prior.entries)];
+  const nextHistory = sealKeyHistory("monitor", nextEntries, monitorPrivateKeyPem, prior.revision + 1);
+  const previousHistoryRaw = readUtf8(paths.monitorHistory);
+  const nextHistoryRaw = JSON.stringify(nextHistory, null, 2);
+  const receipt = createKeyRotationReceipt({
+    previousPrivateKeyPem,
+    nextPublicKeyPem: monitorPublicKeyPem,
+    previousHistorySha256: sha256Hex(Buffer.from(previousHistoryRaw, "utf8")),
+    nextHistorySha256: sha256Hex(Buffer.from(nextHistoryRaw, "utf8"))
+  });
+  const recoveryDirectory = join(paths.keysDir, "rotations", `${receipt.createdTs}-${receipt.nextFingerprint}`);
+  ensureDir(recoveryDirectory);
+  chmodSync(recoveryDirectory, 0o700);
+  const rotationReceiptPath = join(recoveryDirectory, "receipt.json");
+  // Preserve the encrypted old signing state before a multi-file transition.
+  // Partial publication fails closed; recovery is explicit, never reader-driven.
+  for (const [name, contents] of Object.entries({
+    "previous-vault.amcvault": readUtf8(paths.vaultFile),
+    "previous-vault.meta.json": readUtf8(paths.metaFile),
+    "previous-monitor.pub": previousPublicKeyPem,
+    "previous-monitor-history.json": previousHistoryRaw,
+    "next-monitor.pub": monitorPublicKeyPem,
+    "next-monitor-history.json": nextHistoryRaw,
+    "receipt.json": JSON.stringify(receipt, null, 2)
+  })) writeFileAtomic(join(recoveryDirectory, name), contents, 0o600);
+
+  persistVault({
     workspace,
     passphrase: phrase,
     monitorPrivateKeyPem,
@@ -508,12 +571,14 @@ export function rotateMonitorKeyInVault(workspace: string, passphrase?: string):
     leasePublicKeyPem: readUtf8(paths.leasePublic),
     sessionPublicKeyPem: readUtf8(paths.sessionPublic),
     secrets: session.payload.secrets
-  });
+  }, { previousPrivateKeyPem, nextHistory, recoveryDirectory });
 
   const fingerprint = sha256Hex(Buffer.from(monitorPublicKeyPem, "utf8"));
   return {
     fingerprint,
-    publicKeyPath: paths.monitorPublic
+    publicKeyPath: paths.monitorPublic,
+    rotationReceiptPath,
+    recoveryDirectory
   };
 }
 

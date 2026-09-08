@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { pathExists } from "../../utils/fs.js";
 import { signDigestWithVault } from "./signerVault.js";
-import { verifyHexDigestAny, getPublicKeyHistory, addPublicKeyToHistory } from "../keys.js";
+import { verifyHexDigestAny, getPublicKeyHistory, assertSha256HexDigest } from "../keys.js";
 import type { SignKind, SignedDigest } from "./signerTypes.js";
 import {
   trustConfigSchema,
@@ -84,6 +84,7 @@ function signWithNotary(params: {
   kind: SignKind;
   digestHex: string;
 }): SignedDigest {
+  assertSha256HexDigest(params.digestHex);
   const trust = trustConfigSchema.parse(loadTrustConfig(params.workspace));
   const secret = resolveNotaryAuthSecret(params.workspace, trust.trust.notary.auth.secretRef);
   const payloadBytes = Buffer.from(params.digestHex, "hex");
@@ -128,7 +129,6 @@ function signWithNotary(params: {
   if (signedSkewMs > trust.trust.enforcement.notaryMaxClockSkewSeconds * 1000) {
     throw new Error("notary signed timestamp outside allowed clock skew");
   }
-  addPublicKeyToHistory(params.workspace, "auditor", verified.parsed.pubkeyPem, "notary");
   return {
     digestSha256: params.digestHex,
     signature: verified.parsed.signatureB64,
@@ -155,6 +155,7 @@ export function signDigestWithPolicy(params: {
   kind: SignKind;
   digestHex: string;
 }): SignedDigest {
+  assertSha256HexDigest(params.digestHex);
   const trustSig = verifyTrustConfigSignature(params.workspace);
   if (!trustSig.valid) {
     const trustPath = trustConfigPath(params.workspace);

@@ -44,7 +44,7 @@ export class SqliteSessionEventStore implements SessionEventStore {
   constructor(workspace: string, options: SessionStoreOpenOptions = {}) {
     this.workspace = workspace;
     this.readOnly = options.readOnly ?? false;
-    this.ledger = openLedger(workspace);
+    this.ledger = openLedger(workspace, { readonly: this.readOnly });
     this.capabilities = {
       // Resolved at open, from the same knob the ledger's own pragma reads, so
       // the declared capability cannot drift from the pragma actually applied.

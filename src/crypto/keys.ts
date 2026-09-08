@@ -5,56 +5,24 @@ import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureVaultAndPublicKeys, getVaultPrivateKeyPem, vaultPaths } from "../vault/vault.js";
 import {
-  buildKeyHistoryEntry,
-  verifyKeyHistoryEntries
+  buildKeyHistoryEntry
 } from "./keyHistoryChain.js";
+import { publicKeyFromPrivate, sealKeyHistory, validHistoryEntry, verifyKeyHistoryEnvelope, type KeyHistoryEnvelope, type KeyHistoryRole } from "./keyHistoryEnvelope.js";
 
-interface KeyHistoryItem {
-  createdTs: number;
-  fingerprint: string;
-  publicKeyPem: string;
-  /**
-   * sha256 over the previous entry's hash plus this entry's own fields.
-   *
-   * The key history is the root of trust for signature verification:
-   * verifyHexDigestAny accepts a signature if ANY listed key validates it, so
-   * writing one public key into this file forges every signature of that role.
-   * Chaining makes a silent insertion or reordering detectable — an attacker
-   * must rewrite every later entry, not just append one.
-   *
-   * Optional so histories written before chaining still load; those entries
-   * verify as "legacy" rather than failing closed on data that predates the
-   * mechanism.
-   */
-  entryHash?: string;
-  prevHash?: string;
-  /**
-   * How this key entered the trust set.
-   *
-   * "local" keys were generated in this workspace's vault. "notary" keys were
-   * admitted because a notary response passed fingerprint pinning — a real but
-   * permanent expansion of who can sign for this role, which was previously
-   * silent. Recording the source lets an auditor see at a glance whether a role
-   * gained keys from outside.
-   */
-  source?: "local" | "notary" | "imported";
-}
-
-/** Computes the chain hash for an entry. */
-
-/**
- * Verifies the key-history chain for a role.
- *
- * Returns the index of the first broken link, or null when the chain is intact.
- * Entries without a hash are treated as legacy and skipped rather than failed.
- */
+/** Admission verification is independent of an unlocked vault. */
 export function verifyKeyHistoryChain(
   workspace: string,
-  kind: "monitor" | "auditor" | "lease" | "session"
-): { ok: boolean; brokenAtIndex: number | null; legacyEntries: number } {
+  kind: KeyHistoryRole
+): { ok: boolean; brokenAtIndex: number | null; legacyEntries: number; reason: string | null } {
   const file = historyPath(workspace, kind);
-  if (!pathExists(file)) return { ok: true, brokenAtIndex: null, legacyEntries: 0 };
-  return verifyKeyHistoryEntries(JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[]);
+  if (!pathExists(file)) return { ok: false, brokenAtIndex: null, legacyEntries: 0, reason: "history admission envelope is missing" };
+  try {
+    const value: unknown = JSON.parse(readFileSync(file, "utf8"));
+    const result = verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind));
+    return { ok: result.valid, brokenAtIndex: result.valid ? null : 0, legacyEntries: Array.isArray(value) ? value.length : 0, reason: result.reason };
+  } catch {
+    return { ok: false, brokenAtIndex: 0, legacyEntries: 0, reason: "history or current key could not be read" };
+  }
 }
 
 function keyDir(workspace: string): string {
@@ -69,76 +37,77 @@ function publicPath(workspace: string, kind: "monitor" | "auditor" | "lease" | "
   return join(keyDir(workspace), `${kind}_ed25519.pub`);
 }
 
-function ensureHistoryEntry(
-  workspace: string,
-  kind: "monitor" | "auditor" | "lease" | "session",
-  publicPem: string,
-  source: "local" | "notary" | "imported" = "local"
-): void {
-  const file = historyPath(workspace, kind);
-  const existing: KeyHistoryItem[] = pathExists(file) ? JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[] : [];
-  if (!existing.some((item) => item.publicKeyPem === publicPem)) {
-    const entry = buildKeyHistoryEntry(publicPem, existing, source);
-    existing.push(entry);
-    const base = { fingerprint: entry.fingerprint };
-    if (source !== "local") {
-      // Admitting an external key permanently widens who can sign for this
-      // role; say so rather than doing it silently.
-      console.warn(
-        `[amc] ${kind} trust set expanded with a ${source} key (${base.fingerprint.slice(0, 16)}...). ` +
-          `Review with: amc doctor`
-      );
-    }
-    // 0600: this file decides which keys can sign as this role, so it must not
-    // be writable (or readable) by other users on the host.
-    writeFileAtomic(file, JSON.stringify(existing, null, 2), 0o600);
+export function getAuthenticatedKeyHistory(workspace: string, kind: KeyHistoryRole): KeyHistoryEnvelope | null {
+  try {
+    const value: unknown = JSON.parse(readFileSync(historyPath(workspace, kind), "utf8"));
+    return verifyKeyHistoryEnvelope(value, kind, getPublicKeyPem(workspace, kind)).envelope;
+  } catch {
+    return null;
   }
 }
 
 export function addPublicKeyToHistory(
   workspace: string,
-  kind: "monitor" | "auditor" | "lease" | "session",
+  kind: KeyHistoryRole,
   publicPem: string,
   source: "local" | "notary" | "imported" = "local"
 ): void {
-  ensureDir(keyDir(workspace));
-  const file = historyPath(workspace, kind);
-  if (!pathExists(file)) {
-    writeFileAtomic(file, "[]", 0o600);
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("Key admission is unavailable in no-sign mode");
+  const current = getPublicKeyPem(workspace, kind);
+  const privateKey = getVaultPrivateKeyPem(workspace, kind);
+  if (publicKeyFromPrivate(privateKey) !== current) {
+    throw new Error("Key admission requires the active vault role key; no-sign or mismatched keys cannot authorize history");
   }
-  ensureHistoryEntry(workspace, kind, publicPem, source);
+  const prior = getAuthenticatedKeyHistory(workspace, kind);
+  if (!prior) throw new Error(`${kind} key history is not authenticated; explicitly migrate reviewed history before admitting keys`);
+  if (prior.entries.some((entry) => entry.publicKeyPem === publicPem)) return;
+  const next = [...prior.entries, buildKeyHistoryEntry(publicPem, prior.entries, source)];
+  const envelope = sealKeyHistory(kind, next, privateKey, prior.revision + 1);
+  writeFileAtomic(historyPath(workspace, kind), JSON.stringify(envelope, null, 2), 0o600);
+  if (source !== "local") console.warn(`[amc] Explicit ${source} admission expanded the ${kind} signing role (${next[next.length - 1]!.fingerprint}).`);
+}
+
+/** Explicit recovery of reviewed legacy keys; a hash binds approval to exact bytes. */
+export function migratePublicKeyHistory(params: {
+  workspace: string;
+  kind: KeyHistoryRole;
+  expectedSha256: string;
+  approvedFingerprints: readonly string[];
+}): { path: string; backupPath: string; admittedFingerprints: string[] } {
+  if (process.env.AMC_NO_SIGN === "1") throw new Error("History migration is unavailable in no-sign mode");
+  const file = historyPath(params.workspace, params.kind);
+  const original = readFileSync(file, "utf8");
+  const digest = sha256Hex(Buffer.from(original, "utf8"));
+  if (digest !== params.expectedSha256) throw new Error("History changed since review; expected SHA-256 does not match");
+  const current = getPublicKeyPem(params.workspace, params.kind);
+  const privateKey = getVaultPrivateKeyPem(params.workspace, params.kind);
+  if (publicKeyFromPrivate(privateKey) !== current) throw new Error("Migration requires the active vault role key");
+  if (getAuthenticatedKeyHistory(params.workspace, params.kind)) throw new Error("History is already authenticated; migration is for untrusted legacy or damaged history only");
+  let candidates: unknown[] = [];
+  try {
+    const parsed: unknown = JSON.parse(original);
+    if (Array.isArray(parsed)) candidates = parsed;
+    else if (parsed && typeof parsed === "object" && "entries" in parsed && Array.isArray(parsed.entries)) candidates = parsed.entries;
+  } catch { /* explicit current-only reset may discard malformed bytes */ }
+  if (candidates.length > 10000) throw new Error("History exceeds migration entry limit");
+  const entries = [buildKeyHistoryEntry(current, [])];
+  for (const fingerprint of new Set(params.approvedFingerprints)) {
+    if (!/^[a-f0-9]{64}$/.test(fingerprint)) throw new Error("Approved fingerprints must be exact lowercase SHA-256 values");
+    if (fingerprint === entries[0]!.fingerprint) continue;
+    const matching = candidates.filter((entry) => validHistoryEntry(entry) && entry.fingerprint === fingerprint);
+    if (matching.length !== 1 || !validHistoryEntry(matching[0])) throw new Error(`Approved fingerprint is missing, invalid or duplicated: ${fingerprint}`);
+    entries.push(buildKeyHistoryEntry(matching[0].publicKeyPem, entries, "imported"));
+  }
+  const envelope = sealKeyHistory(params.kind, entries, privateKey);
+  const backupPath = `${file}.untrusted-${digest}`;
+  writeFileAtomic(backupPath, original, 0o600);
+  writeFileAtomic(file, JSON.stringify(envelope, null, 2), 0o600);
+  return { path: file, backupPath, admittedFingerprints: entries.map((entry) => entry.fingerprint) };
 }
 
 export function ensureSigningKeys(workspace: string): void {
   ensureDir(keyDir(workspace));
   ensureVaultAndPublicKeys(workspace);
-
-  // keep key history compatible with existing verify logic
-  const monitorPub = getPublicKeyPem(workspace, "monitor");
-  const auditorPub = getPublicKeyPem(workspace, "auditor");
-  const leasePub = getPublicKeyPem(workspace, "lease");
-  const sessionPub = getPublicKeyPem(workspace, "session");
-  const monitorHistoryFile = historyPath(workspace, "monitor");
-  const auditorHistoryFile = historyPath(workspace, "auditor");
-  const leaseHistoryFile = historyPath(workspace, "lease");
-  const sessionHistoryFile = historyPath(workspace, "session");
-
-  if (!pathExists(monitorHistoryFile)) {
-    writeFileAtomic(monitorHistoryFile, "[]", 0o644);
-  }
-  if (!pathExists(auditorHistoryFile)) {
-    writeFileAtomic(auditorHistoryFile, "[]", 0o644);
-  }
-  if (!pathExists(leaseHistoryFile)) {
-    writeFileAtomic(leaseHistoryFile, "[]", 0o644);
-  }
-  if (!pathExists(sessionHistoryFile)) {
-    writeFileAtomic(sessionHistoryFile, "[]", 0o644);
-  }
-  ensureHistoryEntry(workspace, "monitor", monitorPub);
-  ensureHistoryEntry(workspace, "auditor", auditorPub);
-  ensureHistoryEntry(workspace, "lease", leasePub);
-  ensureHistoryEntry(workspace, "session", sessionPub);
 }
 
 export function getPrivateKeyPem(workspace: string, kind: "monitor" | "auditor" | "lease" | "session"): string {
@@ -153,39 +122,22 @@ export function getPublicKeyPem(workspace: string, kind: "monitor" | "auditor" |
   return readFileSync(p, "utf8");
 }
 
-export function getPublicKeyHistory(workspace: string, kind: "monitor" | "auditor" | "lease" | "session"): string[] {
-  const file = historyPath(workspace, kind);
-  if (!pathExists(file)) {
-    return [getPublicKeyPem(workspace, kind)];
-  }
-  const entries: KeyHistoryItem[] = JSON.parse(readFileSync(file, "utf8")) as KeyHistoryItem[];
+export function getPublicKeyHistory(workspace: string, kind: KeyHistoryRole): string[] {
+  const current = getPublicKeyPem(workspace, kind);
+  const history = getAuthenticatedKeyHistory(workspace, kind);
+  return [...new Set([...(history?.entries.map((entry) => entry.publicKeyPem) ?? []), current])];
+}
 
-  // Fail closed on a broken chain.
-  //
-  // verifyHexDigestAny accepts a signature if ANY key returned here validates
-  // it, so returning the history without checking its integrity is what makes
-  // an appended key a trusted signer. Chaining the file detected tampering but
-  // nothing consulted the chain — the protection was built and never wired in.
-  //
-  // Refusing here covers every consumer at once, rather than asking twenty
-  // call sites to remember. The workspace's own current public key is still
-  // returned, so a tampered history degrades to "only the live key is
-  // trusted" rather than failing every operation outright.
-  const chain = verifyKeyHistoryEntries(entries);
-  if (!chain.ok) {
-    console.warn(
-      `[amc] ${kind} key history failed its integrity chain at entry ${chain.brokenAtIndex}. ` +
-        `Historical keys are not trusted until this is resolved. Review with: amc doctor`
-    );
-    return [getPublicKeyPem(workspace, kind)];
-  }
+export function isSha256HexDigest(value: string): boolean {
+  return /^[a-f0-9]{64}$/.test(value);
+}
 
-  const out = new Set<string>(entries.map((entry) => entry.publicKeyPem));
-  out.add(getPublicKeyPem(workspace, kind));
-  return [...out];
+export function assertSha256HexDigest(value: string): void {
+  if (!isSha256HexDigest(value)) throw new Error("Signing requires exactly 64 lowercase hexadecimal SHA-256 characters");
 }
 
 export function signHexDigest(digestHex: string, privateKeyPem: string): string {
+  assertSha256HexDigest(digestHex);
   const signature = sign(null, Buffer.from(digestHex, "hex"), privateKeyPem);
   return signature.toString("base64");
 }
@@ -200,11 +152,13 @@ export function signHexDigest(digestHex: string, privateKeyPem: string): string 
  * signature is byte-identical to signHexDigest's, so verification is unaffected.
  */
 export function signHexDigestWith(privateKey: KeyObject, digestHex: string): string {
+  assertSha256HexDigest(digestHex);
   const signature = sign(null, Buffer.from(digestHex, "hex"), privateKey);
   return signature.toString("base64");
 }
 
 export function verifyHexDigest(digestHex: string, signatureB64: string, publicKeyPem: string): boolean {
+  if (!isSha256HexDigest(digestHex)) return false;
   try {
     return verify(null, Buffer.from(digestHex, "hex"), publicKeyPem, Buffer.from(signatureB64, "base64"));
   } catch {

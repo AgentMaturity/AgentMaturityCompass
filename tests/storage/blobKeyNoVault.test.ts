@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, existsSync, statSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, statSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { readBlobKeyMaterial, ensureBlobKey, blobsRoot } from "../../src/storage/blobs/blobKeys.js";
@@ -32,6 +32,7 @@ describe("blob keys without a vault", () => {
   const LEGACY = Buffer.from("amc-no-sign-fallback-key-32bytes!", "utf8").subarray(0, 32);
 
   it("never uses the published constant for a new workspace", () => {
+    ensureBlobKey(workspace);
     const key = readBlobKeyMaterial(workspace, 0);
     expect(key.length).toBe(32);
     expect(key.equals(LEGACY), "a key printed in the source is not a key").toBe(false);
@@ -40,6 +41,8 @@ describe("blob keys without a vault", () => {
   it("generates a different key per workspace", () => {
     const other = mkdtempSync(join(tmpdir(), "amc-blobkey-b-"));
     try {
+      ensureBlobKey(workspace);
+      ensureBlobKey(other);
       const a = readBlobKeyMaterial(workspace, 0);
       const b = readBlobKeyMaterial(other, 0);
       // A shared key means one compromised workspace reads every other.
@@ -50,13 +53,14 @@ describe("blob keys without a vault", () => {
   });
 
   it("is stable across calls, so blobs stay readable", () => {
+    ensureBlobKey(workspace);
     const first = readBlobKeyMaterial(workspace, 0);
     const second = readBlobKeyMaterial(workspace, 0);
     expect(first.equals(second)).toBe(true);
   });
 
   it("stores the key 0600 — it is the only thing protecting these blobs", () => {
-    readBlobKeyMaterial(workspace, 0);
+    ensureBlobKey(workspace);
     const path = join(blobsRoot(workspace), "unvaulted.key");
     expect(existsSync(path)).toBe(true);
     expect(statSync(path).mode & 0o777).toBe(0o600);
@@ -74,6 +78,21 @@ describe("blob keys without a vault", () => {
     const key = readBlobKeyMaterial(workspace, 1);
     expect(key.equals(LEGACY), "old no-sign blobs must stay readable").toBe(true);
   });
+
+  it("does not initialize directories or a key when a reader finds version 0 missing", () => {
+    expect(() => readBlobKeyMaterial(workspace, 0)).toThrow(/unvaulted.*missing/i);
+    expect(existsSync(join(workspace, ".amc"))).toBe(false);
+  });
+
+  it.each(["not-base64", Buffer.alloc(31).toString("base64"), `!${Buffer.alloc(32).toString("base64")}`])(
+    "does not replace malformed version 0 key material %s", (content) => {
+      mkdirSync(blobsRoot(workspace), { recursive: true });
+      const path = join(blobsRoot(workspace), "unvaulted.key");
+      writeFileSync(path, content);
+      expect(() => readBlobKeyMaterial(workspace, 0)).toThrow(/invalid.*unvaulted/i);
+      expect(readFileSync(path, "utf8")).toBe(content);
+    }
+  );
 });
 
 describe("blob round trip without a vault", () => {
@@ -123,5 +142,16 @@ describe("blob round trip without a vault", () => {
     // A rotation here would mint a version whose reads resolve to the legacy
     // constant — every later blob would be unrecoverable.
     expect(() => rotateBlobKey(workspace)).toThrow(/without a vault/);
+  });
+
+  it("reports a missing encryption key without minting a replacement during payload verification", async () => {
+    const { storeEncryptedBlob, loadBlobPlaintext } = await import("../../src/storage/blobs/blobStore.js");
+    const stored = storeEncryptedBlob(workspace, Buffer.from("existing evidence"));
+    const keyPath = join(blobsRoot(workspace), "unvaulted.key");
+    rmSync(keyPath);
+    const blobBefore = readFileSync(join(workspace, stored.path));
+    expect(() => loadBlobPlaintext(workspace, stored.path)).toThrow(/unvaulted.*missing/i);
+    expect(existsSync(keyPath)).toBe(false);
+    expect(readFileSync(join(workspace, stored.path))).toEqual(blobBefore);
   });
 });

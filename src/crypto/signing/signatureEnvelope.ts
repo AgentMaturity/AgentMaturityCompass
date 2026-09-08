@@ -1,3 +1,4 @@
+import { isSha256HexDigest } from "../keys.js";
 import { z } from "zod";
 import { verify } from "node:crypto";
 import type { SignatureEnvelope } from "./signerTypes.js";
@@ -33,6 +34,7 @@ export function verifySignatureEnvelope(
   envelope: SignatureEnvelope,
   options: VerifySignatureEnvelopeOptions = {}
 ): boolean {
+  if (!isSha256HexDigest(digestHex)) return false;
   try {
     const parsed = signatureEnvelopeSchema.parse(envelope);
     const pubPem = Buffer.from(parsed.pubkeyB64, "base64").toString("utf8");

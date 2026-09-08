@@ -1,4 +1,4 @@
-import Database from "better-sqlite3";
+import type Database from "better-sqlite3";
 import { assertValidTrustTier } from "./trustTierValidation.js";
 import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
@@ -15,7 +15,7 @@ import type {
   RuntimeName,
   SessionRecord
 } from "../types.js";
-import { ensureSigningKeys, getPrivateKeyPem, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, signHexDigestWith, verifyHexDigestAny } from "../crypto/keys.js";
 import { verifyGatewayConfigSignature } from "../gateway/config.js";
 import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
@@ -27,7 +27,7 @@ import { canonicalize } from "../utils/json.js";
 import { mintReceipt, verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
 import { loadOpsPolicy } from "../ops/policy.js";
 import { loadBlobPlaintext, storeEncryptedBlob } from "../storage/blobs/blobStore.js";
-import { getOrCreateSqlitePool, type SqliteConnectionLease } from "../storage/sqlitePool.js";
+import type { SqliteConnectionLease } from "../storage/sqlitePool.js";
 import { createIncidentStore } from "../incidents/incidentStore.js";
 import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js";
 import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
@@ -88,12 +88,9 @@ export interface AppendOutcomeEventInput {
   sessionId?: string;
 }
 
-import { hasTable, runMigrations, reconcileLegacyMigrationState } from "./ledgerSchema.js";
+import { hasTable } from "./ledgerSchema.js";
+import { openLedgerConnection } from "./ledgerConnection.js";
 import { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
-
-function ledgerPath(workspace: string): string {
-  return join(workspace, ".amc", "evidence.sqlite");
-}
 
 function blobDir(workspace: string): string {
   return join(workspace, ".amc", "blobs");
@@ -104,33 +101,6 @@ export { canonicalMetadataForHash, sanitizeMetaForHash } from "./eventHash.js";
 export function targetsDir(workspace: string): string {
   return join(workspace, ".amc", "targets");
 }
-
-function runsDir(workspace: string): string {
-  return join(workspace, ".amc", "runs");
-}
-
-function parsePoolSize(raw: string | undefined, fallback: number): number {
-  if (!raw) {
-    return fallback;
-  }
-  const parsed = Number.parseInt(raw, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return fallback;
-  }
-  return parsed;
-}
-
-function ledgerPoolSize(): number {
-  return parsePoolSize(process.env.AMC_LEDGER_SQLITE_POOL_SIZE ?? process.env.AMC_SQLITE_POOL_SIZE, 4);
-}
-
-import { ledgerSynchronousMode, ledgerFullFsync } from "./ledgerDurability.js";
-
-function ledgerPoolKey(workspace: string): string {
-  return `ledger:${resolve(workspace)}:${ledgerPath(workspace)}`;
-}
-
-
 
 function firstString(
   source: Record<string, unknown>,
@@ -209,7 +179,7 @@ const EVIDENCE_EVENT_INSERT_SQL = `
 export class Ledger {
   readonly workspace: string;
   readonly db: Database.Database;
-  private readonly dbLease: SqliteConnectionLease;
+  private readonly dbLease: SqliteConnectionLease | null;
   private readonly unsignedSignatures: boolean;
   private incidentStoreInitialized = false;
 
@@ -225,46 +195,20 @@ export class Ledger {
   // alongside the already-unlocked vault payload the PEM itself came from.
   private monitorKeyObjectCache: KeyObject | null = null;
 
-  constructor(workspace: string) {
+  constructor(workspace: string, options: { readonly?: boolean } = {}) {
     this.workspace = workspace;
     this.unsignedSignatures = process.env.AMC_NO_SIGN === "1";
-    ensureDir(join(workspace, ".amc"));
-    ensureDir(blobDir(workspace));
-    ensureDir(targetsDir(workspace));
-    ensureDir(runsDir(workspace));
-    if (!this.unsignedSignatures) {
-      ensureSigningKeys(workspace);
-    }
-
-    const pool = getOrCreateSqlitePool({
-      key: ledgerPoolKey(workspace),
-      dbPath: ledgerPath(workspace),
-      maxSize: ledgerPoolSize(),
-      configureConnection: (db) => {
-        db.pragma("journal_mode = WAL");
-        db.pragma("foreign_keys = ON");
-        db.pragma("busy_timeout = 5000");
-        db.pragma(`synchronous = ${ledgerSynchronousMode()}`);
-        // Real (power-loss) durability only when opted in — see ledgerFullFsync.
-        db.pragma(`fullfsync = ${ledgerFullFsync(workspace) ? 1 : 0}`);
-      },
-      initialize: (db) => {
-        runMigrations(db);
-      }
+    const connection = openLedgerConnection(workspace, {
+      ...options,
+      unsignedSignatures: this.unsignedSignatures
     });
-
-    this.dbLease = pool.acquire();
-    this.db = this.dbLease.db;
-    try {
-      reconcileLegacyMigrationState(this.db);
-    } catch (error) {
-      this.dbLease.release();
-      throw error;
-    }
+    this.dbLease = connection.lease;
+    this.db = connection.db;
   }
 
   close(): void {
-    this.dbLease.release();
+    if (this.dbLease) this.dbLease.release();
+    else this.db.close();
   }
 
   private monitorPrivateKey(): string {
@@ -1247,7 +1191,24 @@ export class Ledger {
     return this.db.prepare("SELECT * FROM runs ORDER BY ts ASC").all() as RunRecord[];
   }
 
+  private hasOptionalLegacyTable(table: "assurance_runs" | "outcome_events", introducedVersion: number): boolean {
+    if (hasTable(this.db, table)) return true;
+    // A verifier cannot migrate a snapshot. Only a known, contiguous schema
+    // prefix predating this table means it never existed; a missing table in
+    // a current or unknown schema must not silently become an empty history.
+    if (hasTable(this.db, "schema_migrations")) {
+      const versions = this.db.prepare("SELECT version FROM schema_migrations ORDER BY version ASC").all() as Array<{ version: number }>;
+      if (
+        versions.length > 0 &&
+        versions.length < introducedVersion &&
+        versions.every((row, index) => row.version === index + 1)
+      ) return false;
+    }
+    throw new Error(`Ledger table ${table} is missing from an unknown or already-migrated schema`);
+  }
+
   getAllAssuranceRuns(): AssuranceRunRecord[] {
+    if (!this.hasOptionalLegacyTable("assurance_runs", 3)) return [];
     return this.db
       .prepare("SELECT * FROM assurance_runs ORDER BY ts ASC")
       .all() as AssuranceRunRecord[];
@@ -1273,6 +1234,7 @@ export class Ledger {
   }
 
   getAllOutcomeEvents(): OutcomeEvent[] {
+    if (!this.hasOptionalLegacyTable("outcome_events", 4)) return [];
     return this.db
       .prepare("SELECT * FROM outcome_events ORDER BY rowid ASC")
       .all() as OutcomeEvent[];
@@ -1300,8 +1262,8 @@ export {
   type LedgerVerifyOptions
 } from "./ledgerVerification.js";
 
-export function openLedger(workspacePath: string): Ledger {
-  return new Ledger(workspacePath);
+export function openLedger(workspacePath: string, options: { readonly?: boolean } = {}): Ledger {
+  return new Ledger(workspacePath, options);
 }
 
 

@@ -1,4 +1,6 @@
 import { mkdtempSync, rmSync, readFileSync, writeFileSync, statSync } from "node:fs";
+import { generateKeyPairSync } from "node:crypto";
+import { ensureSigningKeys } from "../src/crypto/keys.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -15,6 +17,7 @@ const dirs: string[] = [];
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-trust-"));
   dirs.push(dir);
+  ensureSigningKeys(dir);
   return dir;
 }
 afterEach(() => {
@@ -24,8 +27,8 @@ afterEach(() => {
   }
 });
 
-const PEM_A = "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n";
-const PEM_B = "-----BEGIN PUBLIC KEY-----\nBBBB\n-----END PUBLIC KEY-----\n";
+const PEM_A = generateKeyPairSync("ed25519").publicKey.export({ type: "spki", format: "pem" }).toString();
+const PEM_B = generateKeyPairSync("ed25519").publicKey.export({ type: "spki", format: "pem" }).toString();
 
 describe("key history is tamper-evident", () => {
   it("appends form an intact chain", () => {
@@ -36,8 +39,8 @@ describe("key history is tamper-evident", () => {
 
     const entries = JSON.parse(
       readFileSync(join(ws, ".amc", "keys", "auditor_history.json"), "utf8")
-    ) as Array<{ entryHash?: string; prevHash?: string }>;
-    expect(entries).toHaveLength(2);
+    ).entries as Array<{ entryHash?: string; prevHash?: string }>;
+    expect(entries).toHaveLength(3);
     // Each entry commits to the one before it.
     expect(entries[1]?.prevHash).toBe(entries[0]?.entryHash);
   });
@@ -48,7 +51,8 @@ describe("key history is tamper-evident", () => {
 
     // The attack: write a public key straight into the trust set.
     const file = join(ws, ".amc", "keys", "auditor_history.json");
-    const entries = JSON.parse(readFileSync(file, "utf8")) as unknown[];
+    const envelope = JSON.parse(readFileSync(file, "utf8"));
+    const entries = envelope.entries;
     entries.push({
       createdTs: Date.now(),
       fingerprint: "planted",
@@ -56,20 +60,21 @@ describe("key history is tamper-evident", () => {
       entryHash: "forged",
       prevHash: "forged"
     });
-    writeFileSync(file, JSON.stringify(entries, null, 2));
+    writeFileSync(file, JSON.stringify(envelope, null, 2));
 
     const chain = verifyKeyHistoryChain(ws, "auditor");
     expect(chain.ok).toBe(false);
-    expect(chain.brokenAtIndex).toBe(1);
+    expect(chain.reason).toBeTruthy();
   });
 
   it("detects an altered existing entry", () => {
     const ws = workspace();
     addPublicKeyToHistory(ws, "auditor", PEM_A);
     const file = join(ws, ".amc", "keys", "auditor_history.json");
-    const entries = JSON.parse(readFileSync(file, "utf8")) as Array<{ publicKeyPem: string }>;
+    const envelope = JSON.parse(readFileSync(file, "utf8"));
+    const entries = envelope.entries as Array<{ publicKeyPem: string }>;
     entries[0]!.publicKeyPem = PEM_B;
-    writeFileSync(file, JSON.stringify(entries, null, 2));
+    writeFileSync(file, JSON.stringify(envelope, null, 2));
     expect(verifyKeyHistoryChain(ws, "auditor").ok).toBe(false);
   });
 
@@ -77,7 +82,7 @@ describe("key history is tamper-evident", () => {
     const ws = workspace();
     addPublicKeyToHistory(ws, "auditor", PEM_A);
     const file = join(ws, ".amc", "keys", "auditor_history.json");
-    // 0644 let any local user rewrite which keys can sign as auditor.
+    // Trust metadata is created with owner-only permissions.
     expect(statSync(file).mode & 0o077).toBe(0);
   });
 
@@ -85,7 +90,7 @@ describe("key history is tamper-evident", () => {
     const ws = workspace();
     addPublicKeyToHistory(ws, "auditor", PEM_A, "notary");
     const file = join(ws, ".amc", "keys", "auditor_history.json");
-    const entries = JSON.parse(readFileSync(file, "utf8")) as Array<{ source?: string }>;
-    expect(entries[0]?.source).toBe("notary");
+    const entries = JSON.parse(readFileSync(file, "utf8")).entries as Array<{ source?: string }>;
+    expect(entries[1]?.source).toBe("notary");
   });
 });

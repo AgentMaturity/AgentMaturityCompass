@@ -12,8 +12,9 @@
  * reach the same chain errors as the SQLite path.
  */
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
-import { readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
+import { jsonlEventsPath, readEventRows } from "../persistence/jsonl/jsonlEventLog.js";
 import { verifyStoredSessionEvents } from "../persistence/sessionStoreVerification.js";
+import { pathExists } from "../utils/fs.js";
 
 export function verifyAlternateBackendEvidence(
   workspace: string,
@@ -23,6 +24,9 @@ export function verifyAlternateBackendEvidence(
     return [];
   }
   try {
+    if (!pathExists(jsonlEventsPath(workspace))) {
+      return ["jsonl session event log is missing; a backend marker is not evidence"];
+    }
     const rows = readEventRows(workspace);
     const stored = verifyStoredSessionEvents(workspace, rows, {
       ...(expectedMonitorFingerprint ? { expectedMonitorFingerprint } : {})

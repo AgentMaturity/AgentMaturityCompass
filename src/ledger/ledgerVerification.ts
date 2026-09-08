@@ -12,8 +12,9 @@
  * as well as the conjoined verdict, so no caller gets a weaker answer than it
  * had while every caller can tell the two apart.
  *
- * Nothing here writes. A verifier that can mutate what it verifies is not a
- * verifier, and keeping the boundary at the module edge makes that checkable.
+ * Verification does not initialize trust keys, migrate the schema, or rewrite
+ * evidence data. SQLite may create WAL coordination sidecars while opening a
+ * read-only connection; live WAL contents must remain visible to verification.
  */
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -33,6 +34,7 @@ import { openLedger, targetsDir, canonicalMetadataForHash, type Ledger, type Evi
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { verifySessionChains } from "./sessionVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
+import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
 
 /**
@@ -571,7 +573,7 @@ export function verifyLedgerIntegrity(
   workspacePath: string,
   options: LedgerVerifyOptions = {}
 ): VerifyResult {
-  const ledger = openLedger(workspacePath);
+  let ledger: Ledger | null = null;
   const chainErrors: string[] = [];
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
@@ -610,22 +612,37 @@ export function verifyLedgerIntegrity(
   // returned chain.ok = true with no errors. A verifier that cannot see the
   // evidence must never call it verified, so the JSONL rows are verified
   // through the backend-independent verifier and their failures land here.
-  chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint));
-
   try {
-    verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
-    verifySessionChains(ledger, chainErrors);
-    sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs);
-    verifyRuns(ledger, workspacePath, chainErrors);
-    verifyOutcomeEvents(ledger, workspacePath, chainErrors);
-    verifyTargets(workspacePath, governanceErrors);
-    verifyFleetAndAgents(workspacePath, governanceErrors);
-    const gatewaySig = verifyGatewayConfigSignature(workspacePath);
-    if (gatewaySig.signatureExists && !gatewaySig.valid) {
-      governanceErrors.push(`Gateway config signature invalid: ${gatewaySig.reason ?? "unknown reason"}`);
+    const jsonlBackend = readSessionStoreMarker(workspacePath) === "jsonl";
+    if (pathExists(join(workspacePath, ".amc", "evidence.sqlite"))) {
+      ledger = openLedger(workspacePath, { readonly: true });
+    } else if (!jsonlBackend) {
+      chainErrors.push("Evidence ledger is missing; verification does not initialize a workspace");
     }
+    chainErrors.push(...verifyAlternateBackendEvidence(workspacePath, expectedFingerprint));
+    if (ledger) {
+      verifyEvents(ledger, workspacePath, chainErrors, options.externallyAuthenticatedPayloads);
+      verifySessionChains(ledger, chainErrors);
+      sessionLifecycle = verifySessions(ledger, workspacePath, chainErrors, staleAfterMs);
+      verifyRuns(ledger, workspacePath, chainErrors);
+      verifyOutcomeEvents(ledger, workspacePath, chainErrors);
+    }
+    if (ledger || jsonlBackend) {
+      try {
+        verifyTargets(workspacePath, governanceErrors);
+        verifyFleetAndAgents(workspacePath, governanceErrors);
+        const gatewaySig = verifyGatewayConfigSignature(workspacePath);
+        if (gatewaySig.signatureExists && !gatewaySig.valid) {
+          governanceErrors.push(`Gateway config signature invalid: ${gatewaySig.reason ?? "unknown reason"}`);
+        }
+      } catch (error) {
+        governanceErrors.push(`Governance verification could not complete: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  } catch (error) {
+    chainErrors.push(`Evidence verification could not complete: ${error instanceof Error ? error.message : String(error)}`);
   } finally {
-    ledger.close();
+    ledger?.close();
   }
 
   const errors = [...chainErrors, ...governanceErrors];

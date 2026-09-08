@@ -33,3 +33,5 @@ AMC never writes the passphrase to disk and never prints it.
 ## Rotation
 
 `amc vault rotate-keys` rotates monitor signing key and updates public-key history so old artifacts remain verifiable.
+
+Rotation now requires authenticated history. Existing unsigned histories need explicit reviewed migration before historical keys are admitted. See [authenticated key history](KEY_HISTORY.md) for the public format, migration commands, external pin behavior, and rotation recovery files.

@@ -62,7 +62,7 @@ export function vaultStatusNow(workspace: string): ReturnType<typeof vaultStatus
   return vaultStatus(workspace);
 }
 
-export async function rotateVaultKeysInteractive(workspace: string): Promise<{ fingerprint: string; publicKeyPath: string }> {
+export async function rotateVaultKeysInteractive(workspace: string): Promise<ReturnType<typeof rotateMonitorKeyInVault>> {
   const passphrase = process.env.AMC_VAULT_PASSPHRASE ?? (await promptPassphrase("Passphrase for key rotation:"));
   return rotateMonitorKeyInVault(workspace, passphrase);
 }

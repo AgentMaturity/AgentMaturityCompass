@@ -163,8 +163,9 @@ function unvaultedKeyPath(workspace: string): string {
 function ensureUnvaultedKeyMaterial(workspace: string): Buffer {
   const path = unvaultedKeyPath(workspace);
   if (pathExists(path)) {
-    const key = Buffer.from(readUtf8(path).trim(), "base64");
-    if (key.length === 32) return key;
+    const encoded = readUtf8(path).trim();
+    const key = Buffer.from(encoded, "base64");
+    if (key.length === 32 && key.toString("base64") === encoded) return key;
   }
   ensureDir(blobsRoot(workspace));
   const material = randomBytes(32).toString("base64");
@@ -218,7 +219,16 @@ export function readBlobKeyMaterial(workspace: string, keyVersion: number): Buff
   // Version 0 is issued only by this code path, so it unambiguously means a
   // real random key held beside the blobs.
   if (keyVersion === UNVAULTED_KEY_VERSION) {
-    return ensureUnvaultedKeyMaterial(workspace);
+    // Verification is a read: missing/corrupt key material must not create a
+    // replacement key and mutate the workspace under inspection.
+    const path = unvaultedKeyPath(workspace);
+    if (!pathExists(path)) throw new Error(`unvaulted blob key missing: ${path}`);
+    const encoded = readUtf8(path).trim();
+    const key = Buffer.from(encoded, "base64");
+    if (key.length !== 32 || key.toString("base64") !== encoded) {
+      throw new Error(`invalid unvaulted blob key material: ${path}`);
+    }
+    return key;
   }
   if (process.env.AMC_NO_SIGN === "1") {
     // A versioned blob read without a vault: written before this change, when

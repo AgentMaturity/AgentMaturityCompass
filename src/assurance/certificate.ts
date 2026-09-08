@@ -13,6 +13,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { computeFailureRiskIndices } from "./indices.js";
 import { latestAssuranceReports } from "./assuranceRunner.js";
@@ -178,12 +179,12 @@ function materializeCertWorkspace(root: string): string {
 
   writeFileAtomic(join(keysDir, "monitor_ed25519.pub"), readFileSync(join(root, "public-keys", "monitor.pub")));
   writeFileAtomic(join(keysDir, "auditor_ed25519.pub"), readFileSync(join(root, "public-keys", "auditor.pub")));
-  const history = JSON.parse(readUtf8(join(root, "public-keys", "key-history.json"))) as {
-    monitor?: unknown;
-    auditor?: unknown;
-  };
-  writeFileAtomic(join(keysDir, "monitor_history.json"), JSON.stringify(history.monitor ?? [], null, 2), 0o644);
-  writeFileAtomic(join(keysDir, "auditor_history.json"), JSON.stringify(history.auditor ?? [], null, 2), 0o644);
+  for (const kind of ["monitor", "auditor"] as const) {
+    const history = authenticatedHistoryFromCert(root, kind);
+    if (history) {
+      writeFileAtomic(join(keysDir, `${kind}_history.json`), JSON.stringify(history, null, 2), 0o644);
+    }
+  }
 
   if (pathExists(join(root, "target.json"))) {
     writeFileAtomic(join(targetsDir, "bundle.target.json"), readFileSync(join(root, "target.json")));
@@ -285,7 +286,13 @@ export async function issueCertificate(params: {
     }
     writeFileAtomic(join(certRoot, "public-keys", "monitor.pub"), readFileSync(join(extractedBundleDir, "public-keys", "monitor.pub")));
     writeFileAtomic(join(certRoot, "public-keys", "auditor.pub"), readFileSync(join(extractedBundleDir, "public-keys", "auditor.pub")));
-    writeFileAtomic(join(certRoot, "public-keys", "key-history.json"), readFileSync(join(extractedBundleDir, "public-keys", "key-history.json")));
+    writeFileAtomic(
+      join(certRoot, "public-keys", "key-history.json"),
+      JSON.stringify({
+        monitor: authenticatedHistoryFromCert(extractedBundleDir, "monitor"),
+        auditor: authenticatedHistoryFromCert(extractedBundleDir, "auditor")
+      }, null, 2)
+    );
 
     writeFileAtomic(join(certRoot, "gatePolicy.json"), readFileSync(policyAbs));
     writeFileAtomic(join(certRoot, "gatePolicy.json.sig"), readFileSync(policySigAbs));
@@ -582,23 +589,23 @@ export async function verifyCertificate(params: {
   }
 }
 
+function authenticatedHistoryFromCert(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
+  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
+  const historyFile = join(root, "public-keys", "key-history.json");
+  try {
+    const parsed: unknown = JSON.parse(readUtf8(historyFile));
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+    const result = verifyKeyHistoryEnvelope((parsed as Record<string, unknown>)[kind], kind, direct);
+    return result.valid ? result.envelope : null;
+  } catch {
+    return null;
+  }
+}
+
 function getPublicKeyHistoryFromCert(root: string, kind: "monitor" | "auditor"): string[] {
   const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
-  const keys = new Set<string>([direct]);
-  const historyFile = join(root, "public-keys", "key-history.json");
-  if (pathExists(historyFile)) {
-    try {
-      const parsed = JSON.parse(readUtf8(historyFile)) as Record<string, Array<{ publicKeyPem?: string }>>;
-      for (const item of parsed[kind] ?? []) {
-        if (item.publicKeyPem) {
-          keys.add(item.publicKeyPem);
-        }
-      }
-    } catch {
-      // keep direct key.
-    }
-  }
-  return [...keys];
+  const history = authenticatedHistoryFromCert(root, kind);
+  return [...new Set([direct, ...(history?.entries.map((entry) => entry.publicKeyPem) ?? [])])];
 }
 
 export function revokeCertificate(params: {

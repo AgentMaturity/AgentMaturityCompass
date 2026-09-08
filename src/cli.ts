@@ -190,6 +190,7 @@ import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js
 import { registerMirofishCommands } from "./mirofish/cli.js";
 import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
+import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
@@ -252,7 +253,7 @@ import { serveDashboard } from "./dashboard/serve.js";
 import { assignOwnership, createCommitmentPlan, learnQuestion } from "./eoc/flows.js";
 import inquirer from "inquirer";
 import { assertOwnerMode, getMode, setMode, type AMCMode } from "./mode/mode.js";
-import { initVaultInteractive, lockVaultNow, rotateVaultKeysInteractive, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
+import { initVaultInteractive, lockVaultNow, unlockVaultInteractive, vaultStatusNow } from "./vault/vaultCli.js";
 import { forgetVaultPassphrase } from "./vault/passphraseStore.js";
 import { ensureUpVaultPassphrase, runFirstBaselineIfNeeded } from "./studio/oneCommandUp.js";
 import { buildConnectInstructions } from "./studio/connectWizard.js";
@@ -6996,6 +6997,7 @@ vault
       ? chalk.green("Remembered vault passphrase removed.")
       : "No remembered vault passphrase found for this workspace.");
   });
+registerVaultHistoryCommands(vault);
 const dlp = program.command("dlp").description("DLP scanner for PII and secrets");
 const notary = program.command("notary").description("AMC Notary signing boundary operations");
 const trust = program.command("trust").description("Trust mode and Notary enforcement configuration");
@@ -11610,14 +11612,7 @@ vault
     }
   });
 
-vault
-  .command("rotate-keys")
-  .description("Rotate monitor signing key and append to public key history")
-  .action(async () => {
-    const rotated = await rotateVaultKeysInteractive(process.cwd());
-    console.log(chalk.green(`Monitor key rotated: ${rotated.fingerprint}`));
-    console.log(`Public key path: ${rotated.publicKeyPath}`);
-  });
+registerVaultRotationCommand(vault);
 
 notary
   .command("init")
