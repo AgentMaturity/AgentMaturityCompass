@@ -32,7 +32,7 @@ MAPS = {
         "src/acp/acpAgentServer.ts", "src/acp/acpNativeSession.ts",
         "src/session/sessionResume.ts", "src/session/sessionRecovery.ts",
         "src/ledger/ledgerVerification.ts", "src/ledger/ledgerSessionTransactions.ts",
-        "src/agent/agentSession.ts", "src/agent/agentToolset.ts",
+        "src/agent/agentSession.ts", "src/agent/agentToolset.ts", "src/agent/nativeToolCapabilities.ts",
         "src/tools/guards/policyGuards.ts", "src/toolhub/toolhubValidators.ts",
         "src/workspaces/workspaceRuntimeRegistry.ts", "src/workspaces/workspaceStudioProxy.ts",
         "src/workspaces/workspaceRouter.ts", "src/studio/studioServer.ts",
@@ -44,6 +44,7 @@ MAPS = {
         "src/kernel/services/promptServices.ts", "src/kernel/services/approvalServices.ts",
         "src/agent/agentDriver.ts", "src/agent/stepRunner.ts", "src/agent/approvalGate.ts",
         "src/agent/pipelineToolSeam.ts", "src/agent/agentToolset.ts", "src/agent/subagentRunner.ts",
+        "src/agent/nativeToolCapabilities.ts",
         "src/agent/delegateTool.ts", "src/agent/subagentSpawn.ts",
         "src/agent/delegationIdentity.ts", "src/agent/delegationScope.ts",
         "src/agent/delegationEvidenceWriter.ts", "src/fleet/delegationPacket.ts",
@@ -140,6 +141,10 @@ MAPS = {
         "src/adapters/adapterConfigSchema.ts", "src/adapters/registry.ts",
         "src/gateway/server.ts", "src/gateway/streamPassthrough.ts",
     ],
+}
+READING_PATHS = {
+    "native-runtime": [["src/agent/agentToolset.ts", "src/agent/nativeToolCapabilities.ts"]],
+    "native-studio": [["src/studio/nativeTaskService.ts", "src/agent/nativeToolCapabilities.ts"]],
 }
 RELATIONS = {"calls", "imports", "imports_from", "re_exports", "dynamic_import"}
 
@@ -256,8 +261,17 @@ def main() -> None:
         summary["maps"][name] = {
             "files": len(present), "edges": focused.number_of_edges(), "boundary_edges_omitted": cut,
             "missing_requested_files": missing, "source_sha256": {p: digest(root / p) for p in present},
+            "reading_paths": [{
+                "files": path,
+                "missing_extracted_hops": [[source, target] for source, target in zip(path, path[1:])
+                                           if not focused.has_edge(source, target)],
+            } for path in READING_PATHS.get(name, [])],
         }
         lines += [f"- [{name}]({name}/graph.html): {len(present)} files, {focused.number_of_edges()} directed pairs; {cut} edges cross this focused boundary."]
+        for path in summary["maps"][name]["reading_paths"]:
+            route = " → ".join(f"`{file}`" for file in path["files"])
+            evidence = "all hops extracted" if not path["missing_extracted_hops"] else "missing extracted hops; inspect the source"
+            lines.append(f"  - Signed native tool selection: {route} ({evidence}).")
         if args.obsidian_dir:
             vault = args.obsidian_dir / name
             # Prefix filenames across views so shared files do not produce

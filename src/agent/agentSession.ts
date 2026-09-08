@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { AgentDriver } from "./agentDriver.js";
 import { agentToolset, type AgentToolset } from "./agentToolset.js";
+import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus } from "./loopTypes.js";
 import { readAgentRunSummary } from "./runReport.js";
@@ -56,6 +57,8 @@ export interface AgentSessionInit {
   /** ACP explicitly defaults to none; existing direct callers retain workspace tools. */
   readonly tools?: "none" | "workspace";
   readonly expectedToolsDigest?: string;
+  /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
+  readonly additionalCapabilities?: readonly NativeToolCapability[];
   readonly maxSteps?: number;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
@@ -117,6 +120,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     workspace: init.workspace,
     agentId: init.agentId,
     sessionId,
+    ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
     ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
     // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
     // rows at the right session id was only half of it: written through the raw

@@ -20,9 +20,15 @@ export async function prepareAcpNativeSession(options: {
   readonly onApprovalRaised: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
 }): Promise<AgentSession> {
   if (options.signal.aborted) throw new Error("Native session preparation was cancelled.");
+  // Re-read before composing readiness. No process or session is created merely
+  // to discover whether the caller's reviewed MCP-only subset is supported.
+  const reviewed = options.mcp ? loadNativeMcpConfiguration(options.mcp.path, options.mcp.sha256) : undefined;
+  if (reviewed && (!options.approval || options.session.tools !== "workspace")) throw new Error("Native MCP requires explicit workspace tools and signed approvals.");
+  const grants = reviewed && options.approval ? requireReviewedNativeMcpGrants(reviewed, options.session.workspace, options.approval.actionClass) : undefined;
   const binding: { value?: { readonly session: SessionService; readonly toolset: AgentToolset | null } } = {};
   const init: AgentSessionInit & { sessionId: string } = {
     ...options.session,
+    ...(grants ? { additionalCapabilities: grants.capabilities } : {}),
     bindTools: context => {
       binding.value = context;
       const inner = context.toolset?.seam ?? EMPTY_TOOL_SEAM;
@@ -38,13 +44,9 @@ export async function prepareAcpNativeSession(options: {
   options.signal.addEventListener("abort", abortPreparation, { once: true });
   let mount: MountedNativeMcpServer | undefined;
   try {
-    if (options.mcp) {
+    if (reviewed && grants) {
       const toolset = binding.value?.toolset;
       if (!toolset || !options.approval || options.session.tools !== "workspace") throw new Error("Native MCP requires explicit workspace tools and signed approvals.");
-      // Re-read exact reviewed bytes before every new/resumed session. A stale
-      // startup object cannot authorize a changed config or catalog.
-      const reviewed = loadNativeMcpConfiguration(options.mcp.path, options.mcp.sha256);
-      const grants = requireReviewedNativeMcpGrants(reviewed, options.session.workspace, options.approval.actionClass);
       const server = await resolveNativeMcpServer(reviewed.config, { workspace: options.session.workspace,
         ...(options.credentialsHome === undefined ? {} : { credentialsHome: options.credentialsHome }),
         ...(options.credentialsFile === undefined ? {} : { credentialsFile: options.credentialsFile }) });

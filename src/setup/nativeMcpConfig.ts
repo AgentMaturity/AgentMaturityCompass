@@ -5,6 +5,7 @@ import { credentialRef } from "../credentials/credentialRef.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import type { NativeToolCapability } from "../agent/nativeToolCapabilities.js";
 import { nativeMcpToolName, type NativeMcpGrant, type NativeMcpServer } from "../mcp/nativeMcpClient.js";
 import type { ActionClass } from "../types.js";
 import { nativeMcpHttpEndpoint, nativeMcpNotificationLifetime, validateNativeMcpHeaderNames } from "../mcp/nativeMcpHttpTransport.js";
@@ -134,18 +135,28 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
 export function requireReviewedNativeMcpGrants(loaded: LoadedNativeMcpConfiguration, workspace: string, approvalClass: ActionClass): {
   readonly expectedCatalogDigest: string;
   readonly grants: readonly NativeMcpGrant[];
+  readonly capabilities: readonly NativeToolCapability[];
 } {
   const { expectedCatalogDigest, grants } = loaded.config;
   if (!expectedCatalogDigest || !grants?.length) return refuse("Discover and review the MCP catalog, then add its expectedCatalogDigest and explicit grants before running tools.");
   if (grants.some(grant => grant.actionClass !== approvalClass)) return refuse("Every MCP grant must match --approve-tools. Use separate runs for different approval action classes.");
   const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
   if (!snapshot.signatureValid || !snapshot.config) return refuse("MCP mounting requires a verifiable signed tool allowlist; no policy was changed.");
+  const capabilities: NativeToolCapability[] = [];
   for (const grant of grants) {
     const name = nativeMcpToolName(loaded.config.server.id, grant.name);
-    const allowed = snapshot.config.tools.allowedTools.find(tool => tool.name === name);
+    const matches = snapshot.config.tools.allowedTools.filter(tool => tool.name === name);
+    const allowed = matches.length === 1 ? matches[0] : undefined;
     if (!allowed || allowed.actionClass !== grant.actionClass) return refuse("Each granted MCP tool must already appear under its exact generated name and action class in the signed allowlist. Review mcp-catalog output and update policy explicitly.");
+    // Older reviewed MCP grants omitted context. Preserve that format, but an
+    // explicit identity must describe this server and transport, never native.
+    if (allowed.context && (allowed.context.kind !== "mcp" || allowed.context.server.id !== loaded.config.server.id
+      || (allowed.context.server.transport !== undefined && allowed.context.server.transport !== (loaded.config.server.transport ?? "stdio")))) {
+      return refuse("The signed MCP context must match the reviewed server identity and transport.");
+    }
+    capabilities.push({ name, actionClass: grant.actionClass, ...(allowed.context ? { context: allowed.context } : {}) });
   }
-  return { expectedCatalogDigest, grants };
+  return { expectedCatalogDigest, grants, capabilities };
 }
 
 /** Values exist only in the private server launch object, never the config/receipt. */

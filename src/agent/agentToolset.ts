@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { runCodeTool } from "../codemode/runCodeTool.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
-import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
+import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
 import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
 import { processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
@@ -24,6 +24,7 @@ import { delegateTool, type SubagentCapability } from "./delegateTool.js";
 import { workflowTool } from "../workflow/workflowTool.js";
 import { pipelineToolSeam } from "./pipelineToolSeam.js";
 import type { AgentToolSeam } from "./toolSeam.js";
+import { NATIVE_BUILTIN_CAPABILITIES, NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools, type NativeToolCapability } from "./nativeToolCapabilities.js";
 
 /**
  * Everything Phase 4 built, composed for one agent (P4 wiring).
@@ -40,6 +41,8 @@ export interface AgentToolsetOptions {
   readonly agentId: string;
   /** Immutable reviewed tool scope, enforced on the execution guard's exact signed snapshot. */
   readonly expectedToolsDigest?: string;
+  /** Reviewed implementations mounted by this caller after composition; never inferred from arbitrary policy names. */
+  readonly additionalCapabilities?: readonly NativeToolCapability[];
   /** `code` collapses every direct call onto `run_code`. */
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
@@ -88,15 +91,6 @@ export interface AgentToolsetOptions {
   };
 }
 
-/**
- * The tools this composition registers, by name.
- *
- * Listed rather than derived from the registry, because readiness is checked
- * BEFORE the registry is built — a caller needs to know whether to proceed,
- * not to be told after assembling something that cannot run.
- */
-const BUILTIN_TOOL_NAMES = ["fs.read", "fs.write", "fs.edit", "glob", "grep", "bash"] as const;
-
 /** What a workspace still needs before a governed agent can do anything. */
 export interface ToolsetReadiness {
   readonly ready: boolean;
@@ -134,7 +128,10 @@ export interface ToolsetReadiness {
  * for a regulated deployment; hostile as a first run. The fix is to say so
  * once, up front, naming the commands.
  */
-export function checkToolsetReadiness(workspace: string): ToolsetReadiness {
+export function checkToolsetReadiness(workspace: string, options: {
+  readonly snapshot?: VerifiedToolsConfigSnapshot;
+  readonly additionalCapabilities?: readonly NativeToolCapability[];
+} = {}): ToolsetReadiness {
   const blockers: string[] = [];
 
   // The path helper, not a string literal: a check that drifts from the thing
@@ -143,31 +140,16 @@ export function checkToolsetReadiness(workspace: string): ToolsetReadiness {
     blockers.push("no signed runtime firewall policy — run: amc firewall enable");
   }
 
-  // `amc init` already writes and signs tools.yaml, so a MISSING allowlist is
-  // not the usual first-run problem. The usual one is an allowlist signed by
-  // an older init that predates these tools: the config verifies, the guard
-  // consults it, and every built-in is denied for not being listed.
-  const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+  const snapshot = options.snapshot ?? loadVerifiedToolsConfigSnapshot(workspace);
+  const selected = selectSupportedNativeTools(snapshot, options.additionalCapabilities);
   if (!snapshot.signatureValid || !snapshot.config) {
-    blockers.push(`tool allowlist is not verifiable (${snapshot.reason ?? "unknown reason"}) — run: amc tools init`);
-  } else {
-    const config = snapshot.config;
-    const missing = BUILTIN_TOOL_NAMES.filter((name) => findToolDefinition(config, name) === null);
-    if (missing.length > 0) {
-      blockers.push(
-        `the signed tool allowlist does not name ${missing.join(", ")} — ` +
-        "re-run: amc tools init (this overwrites .amc/tools.yaml)"
-      );
-    }
+    blockers.push(`tool allowlist is not verifiable (${snapshot.reason ?? "unknown reason"}) — inspect: amc tools verify`);
+  } else if (selected.length === 0) {
+    blockers.push("the signed tool allowlist grants no supported native capability with its exact name, action class and context — review .amc/tools.yaml, then run: amc tools sign");
   }
 
-  const writeScope = snapshot.config
-    ? [...new Set(
-        ["fs.write", "fs.edit"]
-          .map((name) => findToolDefinition(snapshot.config as NonNullable<typeof snapshot.config>, name))
-          .flatMap((definition) => definition?.allow?.paths ?? [])
-      )]
-    : [];
+  const writeScope = [...new Set(selected.filter(tool => tool.name === "fs.write" || tool.name === "fs.edit")
+    .flatMap(tool => tool.allow?.paths ?? []))];
 
   const sandbox = new SandboxRunner();
   const backend = sandbox.select();
@@ -212,8 +194,12 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // is the escape; tests/subagentSpawn.test.ts turns red if it happens.
   const { workspace, agentId } = options;
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
-  const readiness = checkToolsetReadiness(workspace);
+  const readiness = checkToolsetReadiness(workspace, { additionalCapabilities: [
+    ...(options.additionalCapabilities ?? []), ...(options.subagents ? NATIVE_DELEGATION_CAPABILITIES : [])
+  ] });
   const registry = new ToolRegistry();
+  const nativeIdentities = new Map([...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES]
+    .map(capability => [capability.name, capability]));
 
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
@@ -260,6 +246,13 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
   registry.guard("network-egress", networkEgressGuard(workspace));
   registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest));
+  registry.guard("native-tool-identity", execution => {
+    const identity = nativeIdentities.get(execution.name);
+    if (!identity) return undefined; // Late reviewed extensions retain their own mount and policy guards.
+    const selected = selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(workspace), NATIVE_DELEGATION_CAPABILITIES);
+    return execution.actionClass === identity.actionClass && selected.some(tool => tool.name === execution.name)
+      ? undefined : "native tool is absent or its signed action class/context does not match the implementation";
+  });
 
   const pipeline = new ToolPipeline({
     registry,
@@ -319,8 +312,16 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     }));
   }
 
+  const seam = pipelineToolSeam({ registry, pipeline, agentId });
   return {
-    seam: pipelineToolSeam({ registry, pipeline, agentId }),
+    seam: { ...seam, schemas: () => {
+      const selected = new Set(selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(workspace), NATIVE_DELEGATION_CAPABILITIES).map(tool => tool.name));
+      // Keep bodies registered for recorded refusals of guessed built-in calls.
+      // Visibility still honors registry restrictions, late mounts and run_code.
+      const schemas = seam.schemas()?.filter(schema => !nativeIdentities.has(schema.name)
+        || (selected.has(schema.name) && registry.visible(agentId).get(schema.name)?.actionClass === nativeIdentities.get(schema.name)?.actionClass));
+      return schemas?.length ? schemas : null;
+    } },
     registry,
     pipeline,
     readiness,

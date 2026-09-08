@@ -7,6 +7,7 @@ import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { credentialRef } from "../credentials/credentialRef.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
+import { selectSupportedNativeTools } from "../agent/nativeToolCapabilities.js";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyAgentRun } from "../agent/runReport.js";
@@ -150,10 +151,14 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   async function configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration> {
     assertActor(actor);
     const tools = loadVerifiedToolsConfigSnapshot(workspace);
+    const supportedTools = selectSupportedNativeTools(tools);
+    let toolBlockers: readonly string[] = [];
     let ready = false;
     try {
+      const readiness = checkToolsetReadiness(workspace, { snapshot: tools });
+      toolBlockers = readiness.blockers;
       const policy = loadApprovalPolicy(workspace).approvalPolicy.actionClasses.WRITE_HIGH;
-      ready = tools.signatureValid && checkToolsetReadiness(workspace).ready && verifyApprovalPolicySignature(workspace).valid
+      ready = tools.signatureValid && readiness.ready && verifyApprovalPolicySignature(workspace).valid
         && inspectRuntimeFirewallPolicy(workspace).integrity === "trusted"
         && verifyBudgetsConfigSignature(workspace).valid && !!policy && policy.requiredApprovals > 0;
     } catch { /* Explicitly unavailable, never initialize policies in a read. */ }
@@ -168,12 +173,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       }
       return { schemaVersion: "2026-09-08", agentId: actor.agentId, demo: actor.demo, providers, limits: LIMITS,
         scope: { ready: ready && !actor.demo, digest: tools.digestSha256, approvalRequired: true,
-          tools: tools.config?.tools.allowedTools.filter(t => t.context?.kind !== "mcp").map(t => ({ name: t.name, actionClass: t.actionClass,
+          tools: supportedTools.map(t => ({ name: t.name, actionClass: t.actionClass,
             paths: t.allow?.paths ?? [], deniedPaths: t.deny?.paths ?? [], hosts: t.allow?.hostAllowlist ?? [], binaries: t.allow?.binariesAllowlist ?? [],
-            nativeSandbox: t.nativeSandbox ?? null })) ?? [],
+            nativeSandbox: t.nativeSandbox ?? null })),
           message: actor.demo ? "Demo authentication permits local stub recording with no workspace tools."
-            : ready ? "Existing signed tool grants apply. Every workspace tool call also requires the signed WRITE_HIGH approval quorum."
-              : "Workspace tools require signed tools, firewall, budgets and a WRITE_HIGH approval policy with a nonzero reviewer quorum." },
+            : ready ? (supportedTools.every(tool => tool.actionClass === "READ_ONLY")
+              ? "Read-only tools are available; editing and shell are not granted. Every workspace tool call still requires the signed WRITE_HIGH approval quorum."
+              : "Existing signed tool grants apply. Every workspace tool call also requires the signed WRITE_HIGH approval quorum.")
+              : toolBlockers.length ? `Workspace tools are unavailable: ${toolBlockers.join("; ")}`
+                : "Workspace tools require signed tools, firewall, budgets and a WRITE_HIGH approval policy with a nonzero reviewer quorum." },
         boundary: "Provider access is not pre-tested. Stub records a canned local demonstration, not a model answer. Limits apply per native turn; existing signed budgets govern aggregate spending. No custom origins, commands, MCP mounts or grants can be supplied by the browser." };
   }
   async function prepare(actor: NativeTaskActor, entry: Entry, resume: boolean): Promise<void> {

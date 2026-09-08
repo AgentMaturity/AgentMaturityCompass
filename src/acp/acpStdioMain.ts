@@ -159,16 +159,16 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   if (actionClass !== undefined && tools !== "workspace") throw new Error("ACP tool approvals require explicit --tools workspace.");
   const approval: ToolApprovalGateOptions | undefined = actionClass === undefined ? undefined : {
     actionClass: actionClass as ToolApprovalGateOptions["actionClass"], riskTier: riskTier as ToolApprovalGateOptions["riskTier"] };
-  if (tools === "workspace") {
-    const readiness = checkToolsetReadiness(init.workspace);
-    if (!readiness.ready) throw new Error("ACP workspace tools require the existing signed native tool/firewall policies; run the native guide and configure them explicitly.");
-    if (init.expectedToolsDigest !== undefined && loadVerifiedToolsConfigSnapshot(init.workspace).digestSha256 !== init.expectedToolsDigest) throw new Error("The signed workspace tool policy changed before native startup.");
-  }
   if (init.mcpConfigSha256 !== undefined && init.mcpConfig === undefined) throw new Error("ACP MCP digest pin requires an explicit config path.");
   const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
-  if (mcp) {
-    if (tools !== "workspace" || !approval) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
-    requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass);
+  if (mcp && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
+  const mcpReview = mcp && approval ? requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass) : undefined;
+  if (tools === "workspace") {
+    const snapshot = loadVerifiedToolsConfigSnapshot(init.workspace);
+    const additionalCapabilities = mcpReview?.capabilities ?? [];
+    const readiness = checkToolsetReadiness(init.workspace, { snapshot, additionalCapabilities });
+    if (!readiness.ready) throw new Error("ACP workspace tools require a supported signed tool subset and the existing firewall policy; run the native guide and configure them explicitly.");
+    if (init.expectedToolsDigest !== undefined && snapshot.digestSha256 !== init.expectedToolsDigest) throw new Error("The signed workspace tool policy changed before native startup.");
   }
 
   const stdin: AcpInputStream = init.stdin ?? process.stdin;

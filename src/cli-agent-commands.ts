@@ -41,6 +41,7 @@ import {
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
+import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
 import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
@@ -52,7 +53,7 @@ import { loadNativeExtensions, type NativeExtensionTurn } from "./extensions/nat
 import { resolvePreset, type AgentPreset } from "./presets/agentPresets.js";
 import { IN_PROCESS_PROVIDER, delegationTurnOptions, resolveForeignRunner } from "./agent/providers/delegationProviders.js";
 import type { SubagentRunner } from "./agent/subagentSpawn.js";
-import { listAllowedTools } from "./toolhub/toolhubValidators.js";
+import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
@@ -388,7 +389,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         io.error("--interactive-approvals requires --approve-tools to raise actual signed requests."); io.fail(); return;
       }
       let mcpConfig: LoadedNativeMcpConfiguration | null = null;
-      let mcpReview: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[] } | null = null;
+      let mcpReview: { expectedCatalogDigest: string; grants: readonly NativeMcpGrant[]; capabilities: readonly NativeToolCapability[] } | null = null;
       if (opts.mcpConfig !== undefined) {
         if (opts.tools !== "workspace" || gate === undefined) {
           io.error("--mcp-config requires explicit --tools workspace and --approve-tools with matching grant action classes."); io.fail(); return;
@@ -457,6 +458,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = workspaceToolset = agentToolset({
           workspace: process.cwd(),
           agentId,
+          additionalCapabilities: [...(mcpReview?.capabilities ?? []), ...(wantsDelegation ? [{ name: "delegate", actionClass: "READ_ONLY" as const }] : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row) },
@@ -468,7 +470,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // allowlist are granted by different parties, so an operator who
           // passed --delegate without permitting the tool would otherwise watch
           // the agent call it and be denied, once per turn.
-          const permitted = listAllowedTools(process.cwd()).some((tool) => tool.name === "delegate");
+          const permitted = selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(process.cwd()), [{ name: "delegate", actionClass: "READ_ONLY" }]).some(tool => tool.name === "delegate");
           if (!permitted) {
             io.error(chalk.yellow(
               "--delegate needs \"delegate\" in the signed tool allowlist; add it to .amc/tools.yaml and re-sign: amc tools sign"

@@ -8,6 +8,10 @@ Make AMC an installable, usable standalone governed agent runtime. Its model loo
 
 The August superharness plan and state ledger are historical snapshots. Current source already has Cordis composition, a native agent loop, signed JSONL/SQLite sessions, guarded tool execution, approvals, provider streaming, delegation, prompt caching and score-input verification. Do not recreate these or repeat old verified-absence claims. At the initial audit the native `agent-loop` command was hidden and checkout-only because `@amc/core` was private/workspace-backed. Commit `616b7a6b` bundled that closure into the local package, and later dated installed-artifact receipts exercised it. Those receipts do not qualify the current implementation batch. A local bundle does not establish a public release.
 
+## Active implementation — signed native tool subsets
+
+[AMC-1537](https://linear.app/agentmaturitycompass/issue/AMC-1537) enables least-privilege code review with a supported signed subset and matching model-visible tool schemas. No write/shell grants are required for read-only work. Windows direct installer failure propagation is implemented under AMC1530 (fda6e7ff). Validation is deferred until the batch is complete. Current queue:32 children,28 In Review,4 In Progress. [Current scope](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-readonly-subsets.md).
+
 ## Native Tasks in Studio — local acceptance, September 9
 
 AMC-1536 implements a standalone native task workspace in Studio: selected-agent tasks, committed conversation and tool activity, actual signed approvals, cancellation, release/resume and separate evidence verification. It uses AMC's native SDK/ACP, signed descriptors and execution controls; no DSH or Pi runtime is required. Scope changes during approval/model waits cannot widen an accepted task. Cookie origin/CSRF checks, demo limits, owner binding, idempotency and bounded lifecycle are enforced.

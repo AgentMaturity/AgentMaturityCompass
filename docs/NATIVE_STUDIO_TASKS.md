@@ -20,6 +20,8 @@ Workspace tools require valid signed configuration and an approval policy with a
 
 The browser cannot create grants, change budgets, load arbitrary plugins or install MCP servers. Native CLI and SDK configuration remain available to operators for those capabilities. See [native shell confinement](NATIVE_SANDBOX_UBUNTU.md) before enabling shell execution.
 
+You can use a read-only workspace policy for repository review. The native runtime accepts a signed subset such as `fs.read`, `glob` and `grep` with matching `READ_ONLY` action classes; editing and shell tools need not be granted. **Check setup** shows the supported tools from the signed policy, and explicitly identifies a read-only subset. Studio still requires its configured approval quorum for each workspace tool call. To change an existing policy, review its entries and path restrictions on the host, then use `amc tools sign`; resetting all tool defaults is unnecessary.
+
 ## Continue, cancel and recover
 
 | Control | What happens |
