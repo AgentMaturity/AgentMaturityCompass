@@ -44,10 +44,10 @@ AMC provides 1,209 public CLI command paths in the live command inventory.
 | 25 | `amc agent remove` | Remove an agent from the fleet |
 | 26 | `amc agent run` | Run an AMC-governed agent (content-moderation, data-pipeline, legal-contract) |
 | 27 | `amc agent use` | Set current agent |
-| 28 | `amc agent-loop` | Guide, run, and verify native tasks with signed session evidence (agent default) |
-| 29 | `amc agent-loop chat` | Interactive native tasks over the existing governed run/resume path (agent default) |
+| 28 | `amc agent-loop` | Guide, run, and verify native tasks with signed session evidence for the selected agent |
+| 29 | `amc agent-loop chat` | Interactive native tasks over the existing governed run/resume path for the selected agent |
 | 30 | `amc agent-loop guide` | Inspect local setup without writes or provider calls and show the next native task command |
-| 31 | `amc agent-loop mcp-catalog` | Start an explicitly configured stdio MCP server, report its catalog, and dispose it (executes a local program) |
+| 31 | `amc agent-loop mcp-catalog` | Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect |
 | 32 | `amc agent-loop run` | Run one agent turn and report what the signed log recorded |
 | 33 | `amc agent-loop verify` | Re-derive every model request in a session from the log and check the chains |
 | 34 | `amc alert` | SIEM/webhook alerting — configure and send alerts from anomalies |
@@ -1372,11 +1372,12 @@ Run an AMC-governed agent (content-moderation, data-pipeline, legal-contract)
 
 #### `amc agent-loop chat`
 
-Interactive native tasks over the existing governed run/resume path (agent default)
+Interactive native tasks over the existing governed run/resume path for the selected agent
 
 
 | Option | Description |
 |--------|-------------|
+| `--agent <id>` | - |
 | `--extension <manifest>` | - |
 | `--extension-pin <sha256>` | - |
 | `--preset <id>` | - |
@@ -1386,6 +1387,7 @@ Interactive native tasks over the existing governed run/resume path (agent defau
 | `--delegate-scope <classes>` | - |
 | `--provider <id>` | - |
 | `--model <model>` | - |
+| `--base-url <origin>` | - |
 | `--credential <ref>` | - |
 | `--credentials-home <dir>` | - |
 | `--credentials-file <path>` | - |
@@ -1406,8 +1408,10 @@ Inspect local setup without writes or provider calls and show the next native ta
 
 | Option | Description |
 |--------|-------------|
+| `--agent <id>` | - |
 | `--provider <id>` | - |
 | `--model <model>` | - |
+| `--base-url <origin>` | - |
 | `--credential <ref>` | - |
 | `--credentials-home <dir>` | - |
 | `--credentials-file <path>` | - |
@@ -1415,7 +1419,7 @@ Inspect local setup without writes or provider calls and show the next native ta
 
 #### `amc agent-loop mcp-catalog`
 
-Start an explicitly configured stdio MCP server, report its catalog, and dispose it (executes a local program)
+Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect
 
 
 | Option | Description |
@@ -1432,6 +1436,7 @@ Run one agent turn and report what the signed log recorded
 
 | Option | Description |
 |--------|-------------|
+| `--agent <id>` | - |
 | `--extension <manifest>` | - |
 | `--extension-pin <sha256>` | - |
 | `--stream` | - |

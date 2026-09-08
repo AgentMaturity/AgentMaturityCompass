@@ -379,54 +379,42 @@ describe("5. Rate limiting structure", () => {
    ═══════════════════════════════════════════════════════════════════ */
 
 describe("6. CORS headers", () => {
-  test("studioServer sets required CORS headers", async () => {
-    const fs = await import("node:fs");
-    const src = fs.readFileSync(
-      new URL("../src/studio/studioServer.ts", import.meta.url), "utf8"
-    );
-
-    expect(src).toContain("Access-Control-Allow-Origin");
-    expect(src).toContain("Access-Control-Allow-Credentials");
-    expect(src).toContain("Access-Control-Allow-Headers");
-    expect(src).toContain("Access-Control-Allow-Methods");
+  let server: http.Server;
+  let origin: string;
+  beforeAll(async () => {
+    const { allowStudioCors } = await import("../src/studio/studioCors.js");
+    server = createServer((req, res) => {
+      const address = server.address() as import("node:net").AddressInfo;
+      if (allowStudioCors(req, res, { host: "127.0.0.1", port: address.port })) {
+        res.setHeader("content-type", "application/json"); res.end(JSON.stringify({ ok: true }));
+      }
+    });
+    await new Promise<void>(done => server.listen(0, "127.0.0.1", done));
+    origin = `http://127.0.0.1:${(server.address() as import("node:net").AddressInfo).port}`;
   });
+  afterAll(async () => { await new Promise<void>(done => server.close(() => done())); });
 
-  test("CORS allows required HTTP methods", async () => {
-    const fs = await import("node:fs");
-    const src = fs.readFileSync(
-      new URL("../src/studio/studioServer.ts", import.meta.url), "utf8"
-    );
-
-    // Extract the Allow-Methods line
-    const methodsLine = src.split("\n").find(l => l.includes("Access-Control-Allow-Methods"));
-    expect(methodsLine).toBeDefined();
-    expect(methodsLine).toContain("GET");
-    expect(methodsLine).toContain("POST");
-    expect(methodsLine).toContain("PUT");
-    expect(methodsLine).toContain("DELETE");
-    expect(methodsLine).toContain("OPTIONS");
+  test("Studio sets required CORS headers on an allowed response", async () => {
+    const response = await fetchJson(origin, { headers: { origin } });
+    expect(response.status).toBe(200);
+    expect(response.headers["access-control-allow-origin"]).toBe(origin);
+    expect(response.headers["access-control-allow-credentials"]).toBe("true");
+    expect(response.headers.vary).toContain("Origin");
   });
-
+  test("CORS preflight allows required HTTP methods", async () => {
+    const response = await fetchJson(origin, { method: "OPTIONS", headers: { origin } });
+    expect(response.status).toBe(204);
+    expect(response.headers["access-control-allow-methods"].split(",")).toEqual(expect.arrayContaining(["GET", "POST", "PUT", "DELETE", "OPTIONS"]));
+  });
   test("CORS allows required auth headers", async () => {
-    const fs = await import("node:fs");
-    const src = fs.readFileSync(
-      new URL("../src/studio/studioServer.ts", import.meta.url), "utf8"
-    );
-
-    const headersLine = src.split("\n").find(l => l.includes("Access-Control-Allow-Headers"));
-    expect(headersLine).toBeDefined();
-    expect(headersLine!.toLowerCase()).toContain("content-type");
-    expect(headersLine!.toLowerCase()).toContain("authorization");
-    expect(headersLine!.toLowerCase()).toContain("x-amc-admin-token");
+    const response = await fetchJson(origin, { headers: { origin } });
+    expect(response.headers["access-control-allow-headers"].split(", ")).toEqual(expect.arrayContaining(["content-type", "authorization", "x-amc-admin-token"]));
   });
-
   test("CORS denies unrecognized origins", async () => {
-    const fs = await import("node:fs");
-    const src = fs.readFileSync(
-      new URL("../src/studio/studioServer.ts", import.meta.url), "utf8"
-    );
-
-    expect(src).toContain("CORS origin denied");
+    const response = await fetchJson(origin, { headers: { origin: "https://unrecognized.invalid" } });
+    expect(response.status).toBe(403);
+    expect(response.body).toBe("CORS origin denied");
+    expect(response.headers["access-control-allow-origin"]).toBeUndefined();
   });
 });
 

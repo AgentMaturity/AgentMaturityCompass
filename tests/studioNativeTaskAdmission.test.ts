@@ -1,4 +1,4 @@
-import { createServer, type ServerResponse } from "node:http";
+import { createServer, request as httpRequest, type ServerResponse } from "node:http";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -24,6 +24,24 @@ const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", ag
     maxEvents: 512, maxEventBytes: 2_097_152, maxPromptBytes: 16_384 }, boundary: "Native governed execution." };
 const cleanups: Array<() => Promise<void>> = [];
 afterEach(async () => { for (const close of cleanups.splice(0).reverse()) await close(); });
+
+// Node's fetch rewrites Host to its URL authority. A rebind probe must transmit
+// the hostile Host on the wire, rather than merely place it in fetch options.
+async function rawHttpResponse(url: string, method: "GET" | "POST", headers: Record<string, string>, body?: string): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const request = httpRequest(url, { method, headers }, response => {
+      const chunks: Buffer[] = [];
+      response.on("data", (chunk: Buffer) => chunks.push(chunk));
+      response.on("error", reject);
+      response.on("end", () => {
+        const receivedHeaders = new Headers();
+        for (let i = 0; i < response.rawHeaders.length; i += 2) receivedHeaders.append(response.rawHeaders[i]!, response.rawHeaders[i + 1]!);
+        resolve(new Response(Buffer.concat(chunks).toString("utf8"), { status: response.statusCode ?? 500, headers: receivedHeaders }));
+      });
+    });
+    request.on("error", reject); request.end(body);
+  });
+}
 
 function fakeService() {
   // Only the process-owning service is replaced. HTTP parsing, role policy, admission and API dispatch are real.
@@ -74,6 +92,7 @@ async function fixture(options: { auth?: StudioApiAuthContext | null; executionA
   const post = (path: string, body: unknown, overrides: Record<string, string | undefined> = {}) => {
     const selected: Record<string, string> = { "content-type": "application/json", ...headers };
     for (const [key, value] of Object.entries(overrides)) { if (value === undefined) delete selected[key]; else selected[key] = value; }
+    if (Object.hasOwn(selected, "host")) return rawHttpResponse(origin + path, "POST", selected, JSON.stringify(body));
     return fetch(origin + path, { method: "POST", headers: selected, body: JSON.stringify(body) });
   };
   return { origin, service, headers, post, setReadOnly: () => { executionAllowed = false; } };
@@ -110,7 +129,7 @@ describe("native Studio authenticated API admission", () => {
     const response = await fetch(`${f.origin}/api/v1/native-tasks/options?agentId=reviewer`);
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ data: { nativeCsrfToken: proof, executionBlocked: false } });
-    const denied = await fetch(`${f.origin}/api/v1/native-tasks/options`, { headers: { host: "attacker.invalid", "x-forwarded-host": new URL(f.origin).host } });
+    const denied = await rawHttpResponse(`${f.origin}/api/v1/native-tasks/options`, "GET", { host: "attacker.invalid", "x-forwarded-host": new URL(f.origin).host });
     expect(denied.status).toBe(403); expect(f.service.configuration).toHaveBeenCalledTimes(1);
   });
 

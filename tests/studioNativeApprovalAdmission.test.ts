@@ -123,7 +123,7 @@ describe("actual Studio approval signing requires authenticated browser authorit
     try {
       writeFileSync(path, Buffer.concat([original, Buffer.from("\n# unsigned change\n")]));
       const response = await fetch(`${origin}/approvals/${p.approvalRequestId}/approve`, { method: "POST",
-        headers: { "content-type": "application/json", "x-amc-token": "approval-fixture-admin", [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE },
+        headers: { "content-type": "application/json", "x-amc-admin-token": "approval-fixture-admin", [NATIVE_INTENT_HEADER]: NATIVE_INTENT_VALUE },
         body: JSON.stringify({ decision: "APPROVE_EXECUTE" }) });
       expect(response.status).toBe(403); expect(await response.json()).toMatchObject({ code: "NATIVE_READ_ONLY" });
       expect(listApprovalDecisions(p.selection)).toEqual([]);
