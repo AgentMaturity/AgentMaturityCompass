@@ -38,6 +38,8 @@ export const NATIVE_TRUST_TIER = "OBSERVED" as const;
  * through `appendSessionEvent` like any other caller and cannot move the head.
  */
 export abstract class SessionEventWriter {
+  readonly workspace: string;
+
   // The service owns one store for the life of the session — it is the single
   // writer for its own spine — and releases it at close(). Which backend that
   // is (SQLite ledger or signed JSONL) is the workspace's choice, made in
@@ -77,7 +79,8 @@ export abstract class SessionEventWriter {
   protected spill: SessionSpillPolicy | null = null;
   protected readonly spillConfig: Partial<SpillPolicyConfig>;
 
-  protected constructor(store: SessionEventStore, spillConfig: Partial<SpillPolicyConfig>) {
+  protected constructor(workspace: string, store: SessionEventStore, spillConfig: Partial<SpillPolicyConfig>) {
+    this.workspace = workspace;
     this.store = store;
     this.spillConfig = spillConfig;
   }

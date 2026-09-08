@@ -130,7 +130,6 @@ function metaToolCallId(row: EvidenceEvent): string | null {
 }
 
 export class SessionService extends SessionEventWriter {
-  readonly workspace: string;
 
   // The surface fold runs through the projection registry rather than direct
   // calls, so repeated projectHistory() resumes from the cached prefix instead
@@ -142,8 +141,7 @@ export class SessionService extends SessionEventWriter {
   // service) can pin a backend without going through workspace configuration.
   // Left absent, the workspace's own pinned backend is opened.
   constructor(workspace: string, store?: SessionEventStore, spillConfig: Partial<SpillPolicyConfig> = {}) {
-    super(store ?? openSessionEventStore(workspace), spillConfig);
-    this.workspace = workspace;
+    super(workspace, store ?? openSessionEventStore(workspace), spillConfig);
   }
 
   open(params: SessionOpenParams): SessionEventRef {
