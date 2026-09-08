@@ -19,7 +19,8 @@
 </p>
 
 <p align="center">
-  <a href="#60-seconds-to-your-first-score">Quick Start</a> ·
+  <a href="#run-a-native-agent-task">Native Tasks</a> ·
+  <a href="#60-seconds-to-your-first-score">First Score</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="#recipes--copy-paste-examples">Recipes</a> ·
@@ -31,11 +32,23 @@
 
 ## What is this?
 
-AMC gives your AI agent a score, from L0 to L5.
-Think of it like a credit score — but for agents.
+AMC provides a standalone agent runtime and evidence-based maturity assessment.
 
-It scores what your agent **actually does**, not what its docs say.
-Every point is backed by evidence you can verify. No evidence, no points.
+Its native runtime owns the model loop, workspace tools, approvals, streaming chat, signed sessions, continuation, compaction, delegation, extensions and stdio/HTTP MCP connections. TypeScript and Python applications can embed it through the native SDKs. DSH and Pi are optional interoperability; neither is required to run a native AMC task.
+
+## Run a native agent task
+
+For the native workflow in this checkout, start by inspecting your setup:
+
+```bash
+amc agent-loop guide
+```
+
+The guide reports the next setup or task command without changing the workspace or calling a model. Follow [Your first native AMC workflow](docs/NATIVE_AGENT_WORKFLOW.md) for provider credentials, interactive tasks, reviewed file permissions and approvals. [Native SDK](docs/NATIVE_SDK.md) covers application integration; [code navigation](docs/ARCHITECTURE_NAVIGATION.md) follows the implementation through Graphify's focused maps. Local source and installed-package acceptance do not imply a public release or measured superiority over another harness.
+
+## Assess agent maturity
+
+AMC also assesses an agent from L0 to L5 using attributable evidence. An imported claim, an execution outcome and an independently verified record carry different authority. A score is an assessment of the available evidence; signing the report does not make every underlying claim true.
 
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
@@ -52,7 +65,7 @@ Run it again tomorrow — it remembers your setup and just starts.
 
 **What you get:**
 
-1. **A score you can trust.** L0 (no evidence) to L5 (fully proven). Signed, so nobody can fake it.
+1. **An evidence-backed assessment.** L0 to L5 with traceable sources. Signatures expose changes to the signed report; the assessment still depends on the underlying evidence.
 2. **A fix list.** Exactly what's weak, and generated fixes: guardrails, config patches, CI gates.
 3. **Proof you can hand to anyone.** Auditors, customers, your boss. They can verify it without trusting you.
 
