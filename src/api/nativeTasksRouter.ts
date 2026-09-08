@@ -1,3 +1,4 @@
+import { nativeTaskValidationSelectionSchema } from "../studio/nativeTaskValidation.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -26,6 +27,7 @@ const startSchema = z.object({
   model: plainText(200).optional(),
   tools: z.enum(["none", "workspace"]),
   toolsDigest: z.string().regex(/^[a-f0-9]{64}$/, "Use the displayed tool-scope digest.").optional(),
+  validation: nativeTaskValidationSelectionSchema.optional(),
   prompt: promptSchema,
   maxSteps: z.number().int().min(1).max(8).optional(),
   maxTokens: z.number().int().min(1).max(1024).optional()
@@ -33,6 +35,7 @@ const startSchema = z.object({
   if ((value.tools === "workspace") !== (value.toolsDigest !== undefined)) {
     context.addIssue({ code: "custom", message: "Workspace tools require the displayed scope digest; no-tools tasks must omit it." });
   }
+  if (value.validation && value.tools !== "workspace") context.addIssue({ code: "custom", message: "Public checks require signed workspace tools." });
 });
 const turnSchema = z.object({
   clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(0), prompt: promptSchema

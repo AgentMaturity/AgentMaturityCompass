@@ -1,3 +1,4 @@
+import { assertNativeTaskValidationPin, inspectNativeTaskValidation, nativeTaskValidationSelectionSchema, nativeTaskValidationView } from "./nativeTaskValidation.js";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
@@ -23,19 +24,21 @@ const REFS = { openai: "OPENAI_API_KEY", "openai-responses": "OPENAI_API_KEY", a
 const startSchema = z.object({ clientRequestId: z.string().uuid(), agentId: z.string().min(1).max(128),
   provider: z.enum(["stub", "openai", "openai-responses", "anthropic"]), model: z.string().min(1).max(200).optional(),
   tools: z.enum(["none", "workspace"]), prompt: z.string().min(1), maxSteps: z.number().int().min(1).max(8).optional(),
-  toolsDigest: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+  toolsDigest: z.string().regex(/^[a-f0-9]{64}$/).optional(), validation: nativeTaskValidationSelectionSchema.optional(),
   maxTokens: z.number().int().min(1).max(1024).optional() }).strict();
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
   client?: AMCNativeClient; session?: AMCNativeSession; turn?: AMCNativeTurn; work?: Promise<void>;
   preparation?: Promise<void>; runtimeStartedAt: number;
   startupCancelled: boolean; startupAbort: AbortController;
+  validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionAt: number; touchedAt: number;
   verification: NativeTaskView["verification"]; finishing?: Promise<void>;
 }
 export interface NativeTaskServiceOptions {
   readonly workspace: string;
   /** Operator configuration only. Never populated from HTTP input. */
+  readonly validationConfig?: string;
   readonly credentialsHome?: string; readonly credentialsFile?: string;
   readonly environment?: NodeJS.ProcessEnv;
 }
@@ -44,6 +47,7 @@ export interface NativeTaskServiceOptions {
 export function createNativeTaskService(options: NativeTaskServiceOptions): NativeTaskService {
   const workspace = resolve(options.workspace), descriptors = new NativeTaskDescriptors(workspace);
   const environment = { ...(options.environment ?? process.env) };
+  const validationConfig = options.validationConfig ?? environment.AMC_NATIVE_VALIDATION_CONFIG;
   const paths = resolveCredentialsPaths({ env: environment, ...(options.credentialsHome ? { homeDir: options.credentialsHome } : {}),
     ...(options.credentialsFile ? { path: options.credentialsFile } : {}) });
   const command = [process.execPath, fileURLToPath(new URL("../cli.js", import.meta.url))] as const;
@@ -101,6 +105,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already belongs to another native task.");
   }
   function assertToolPin(d: NativeTaskDescriptor): void {
+    assertNativeTaskValidationPin(validationConfig, d.validation);
     if (d.tools === "workspace") {
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       if (!snapshot.signatureValid || snapshot.digestSha256 !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
@@ -127,10 +132,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   function view(entry: Entry, retainProjection = false): NativeTaskView {
     refresh(entry);
     const d = entry.descriptor, p = entry.projection;
+    const validation = nativeTaskValidationView(d.validation, p?.validation,
+        !!d.validation && d.pendingTurn && (entry.state === "starting" || (["running", "cancel-requested"].includes(entry.state) && (p?.validation.turn ?? null) === entry.validationPriorTurn)),
+        d.pendingTurn && (!entry.client || (p?.validation.turn ?? null) === entry.validationPriorTurn));
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, revision: d.revision, clientRequestId: d.submissions[0]!.clientRequestId,
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
       createdAt: d.createdAt, updatedAt: d.updatedAt, turnEndReason: p?.ending ?? null, error: entry.error,
+      validationSelection: d.validation ?? null,
+      validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
       verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       canResume: !!d.sessionId && !d.closed && !p?.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
@@ -182,6 +192,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
               : "Existing signed tool grants apply. Every workspace tool call also requires the signed WRITE_HIGH approval quorum.")
               : toolBlockers.length ? `Workspace tools are unavailable: ${toolBlockers.join("; ")}`
                 : "Workspace tools require signed tools, firewall, budgets and a WRITE_HIGH approval policy with a nonzero reviewer quorum." },
+        validation: inspectNativeTaskValidation(validationConfig, actor.demo),
         boundary: "Provider access is not pre-tested. Stub records a canned local demonstration, not a model answer. Limits apply per native turn; existing signed budgets govern aggregate spending. No custom origins, commands, MCP mounts or grants can be supplied by the browser." };
   }
   async function prepare(actor: NativeTaskActor, entry: Entry, resume: boolean): Promise<void> {
@@ -197,6 +208,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       ...(d.provider === "stub" ? {} : { credential: REFS[d.provider] }),
       ...(d.tools === "workspace" ? { approveTools: "WRITE_HIGH", approveRisk: "high" as const } : {}),
       ...(d.toolsDigest === null ? {} : { expectedToolsDigest: d.toolsDigest }),
+      ...(entry.descriptor.validation ? { validationConfig, validationConfigSha256: entry.descriptor.validation.configSha256, validate: entry.descriptor.validation.checkIds } : {}),
       credentialsMode: "operator-only", credentialsHome: paths.homeDir, credentialsFile: paths.file,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, timeoutMs: LIMITS.turnTimeoutMs, startupSignal: entry.startupAbort.signal });
     if (shuttingDown || entry.startupCancelled) throw new NativeTaskServiceError("START_CANCELLED", 409, "Native startup was cancelled before dispatch.");
@@ -235,6 +247,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     entry.projectionAt = 0; refresh(entry);
     if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "The native session did not authenticate before dispatch. No provider request was submitted.");
     const precedingEndingId = entry.projection.endingId;
+    entry.validationPriorTurn = entry.projection.validation.turn;
     entry.state = "running"; entry.error = null; entry.verification = "not-verified"; entry.touchedAt = Date.now();
     try { entry.turn = entry.session.prompt(prompt); }
     catch { entry.state = "failed"; entry.error = "Prompt submission was not confirmed. It was not automatically retried."; void stop(entry); return; }
@@ -266,6 +279,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       assertActor(actor);
       const parsed = startSchema.safeParse(input);
       if (!parsed.success) throw new NativeTaskServiceError("INPUT_INVALID", 400, "Invalid native task input.");
+      input = parsed.data; // Own the parsed check-ID array before any asynchronous startup.
       assertPrompt(input.prompt);
       if (input.agentId !== actor.agentId || (actor.demo && (input.provider !== "stub" || input.tools !== "none"))) throw new NativeTaskServiceError("SCOPE_REFUSED", 403, "The selected identity or demo execution scope was not authorized.");
       if (input.provider !== "stub" && (!input.model?.trim() || /[\x00-\x1f\x7f]/.test(input.model))) throw new NativeTaskServiceError("MODEL_REQUIRED", 400, "Choose an accessible model ID for the selected provider.");
@@ -277,11 +291,19 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         assertUniqueSubmission(actor, taskId, input.clientRequestId);
         const existing = descriptors.read(taskId);
         if (existing) { assertOwner(actor, existing); if (existing.submissions[0]!.bodyHash !== bodyHash) throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already names a different task."); return existing; }
+        assertNativeTaskValidationPin(validationConfig, input.validation);
+        if (input.validation) {
+          const tools = loadVerifiedToolsConfigSnapshot(workspace);
+          if (actor.demo || input.tools !== "workspace" || !tools.signatureValid || tools.digestSha256 !== input.toolsDigest
+            || !selectSupportedNativeTools(tools).some(tool => tool.name === "bash"))
+            throw new NativeTaskServiceError("VALIDATION_SCOPE_REQUIRED", 403, "Public checks require signed workspace bash and an authenticated operator; selecting a check creates no grant.");
+        }
         capacity();
         if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "Archive reviewed task descriptors before creating more tasks.");
         const now = Date.now();
         const descriptor: NativeTaskDescriptor = { kind: "amc/studio-native-task/v1", taskId, principalId: actor.principalId, agentId: actor.agentId,
           demo: actor.demo, sessionId: null, provider: input.provider, model: input.model ?? null, tools: input.tools, toolsDigest: input.toolsDigest ?? null,
+          ...(parsed.data.validation ? { validation: parsed.data.validation } : {}),
           maxSteps: input.maxSteps ?? LIMITS.maxSteps, maxTokens: input.maxTokens ?? LIMITS.maxTokens,
           createdAt: now, updatedAt: now, revision: 1, pendingTurn: true, closed: false,
           submissions: [{ clientRequestId: input.clientRequestId, bodyHash, revision: 1 }] };

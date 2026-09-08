@@ -47,6 +47,7 @@ import type {
 } from "../../agent/loopTypes.js";
 import type { LoopLlm, LoopRoute } from "../../agent/stepRunner.js";
 import type { AgentToolSeam } from "../../agent/toolSeam.js";
+import type { NativeValidationPlan } from "../../agent/nativeValidation.js";
 import type { SessionService } from "../../session/sessionService.js";
 import type { TurnCancelCause } from "../../session/sessionTypes.js";
 
@@ -76,6 +77,7 @@ export interface AgentLoopServiceConfig {
    */
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
+  readonly validation?: NativeValidationPlan;
   readonly hooks?: LoopHooks;
   readonly config?: Partial<AgentLoopConfig>;
   /** Injected so a test can pin the retry wait and jitter. */
@@ -103,6 +105,7 @@ export class AgentLoopSeamService extends AmcSeam {
       route: config.route,
       systemPromptEventId: config.systemPromptEventId,
       ...(config.tools !== undefined ? { tools: config.tools } : {}),
+      ...(config.validation !== undefined ? { validation: config.validation } : {}),
       ...(config.hooks !== undefined ? { hooks: config.hooks } : {}),
       ...(config.config !== undefined ? { config: config.config } : {}),
       ...(config.retryRuntime !== undefined ? { retryRuntime: config.retryRuntime } : {})

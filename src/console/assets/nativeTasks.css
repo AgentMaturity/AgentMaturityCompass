@@ -27,6 +27,12 @@
 .native-task-list-item { display:flex; flex-direction:column; text-align:left; gap:6px; width:100%; margin-bottom:8px; overflow-wrap:anywhere; }
 .native-task-list-item span { font-size:.75rem; }
 .native-task-list-item[aria-current] { border-color:var(--accent); }
+.native-task-validation-selection { border:1px solid var(--border); border-radius:8px; margin:16px 0; padding:12px; min-width:0; }
+.native-task-validation-selection label { display:flex; align-items:start; gap:10px; margin:10px 0; }
+.native-task-validation-selection input { flex:none; width:auto; margin-top:4px; }
+.native-task-validation-selection code, .native-task-validation-result code { overflow-wrap:anywhere; word-break:break-word; }
+.native-task-validation-result { border-top:1px solid var(--border); padding-top:10px; margin-top:12px; }
+.native-task-validation-result pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:280px; overflow:auto; font:inherit; }
 #nativeTaskPromptForm label { display:block; margin:16px 0 8px; }
 #nativeTaskPrompt { resize:vertical; min-height:110px; }
 .native-tasks [hidden] { display:none !important; }

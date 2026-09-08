@@ -193,7 +193,7 @@ describe("session/prompt and cancellation", () => {
       params: { sessionId, prompt: [{ type: "text", text: "hello" }] }
     });
     await settle();
-    h.finish({ ok: true, text: "hi", status: "idle" });
+    h.finish({ ok: true, text: "hi", status: "idle", validation: { status: "not-requested", turn: null, configSha256: null, checks: [] } });
     await settle();
     expect(resultOf(replyTo(h.sent, 2))["stopReason"]).toBe("end_turn");
   });
@@ -265,7 +265,7 @@ describe("the frames it emits", () => {
       params: { sessionId, prompt: [{ type: "text", text: "hello" }] }
     });
     await settle();
-    h.finish({ ok: true, text: "hi", status: "idle" });
+    h.finish({ ok: true, text: "hi", status: "idle", validation: { status: "not-requested", turn: null, configSha256: null, checks: [] } });
     await settle();
 
     // The test that keeps the others honest: a hand-built response that merely

@@ -43,6 +43,7 @@ import { echoToolSeam } from "./agent/echoTool.js";
 import { agentToolset, type AgentToolset } from "./agent/agentToolset.js";
 import { selectSupportedNativeTools, type NativeToolCapability } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer, NativeMcpGrant } from "./mcp/nativeMcpClient.js";
+import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
 import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup/nativeMcpConfig.js";
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
@@ -169,6 +170,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .command("chat")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Interactive native tasks over the existing governed run/resume path for the selected agent")
+    .option("--validation-config <path>", "operator JSON containing named public checks")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
     .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
@@ -200,6 +204,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .command("run")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Run one agent turn and report what the signed log recorded")
+    .option("--validation-config <path>", "operator JSON containing named public checks")
+    .option("--validation-config-sha256 <digest>", "pin exact reviewed validation config bytes")
+    .option("--validate <id>", "run this public check after the turn completes; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
     .option("--stream", "show provisional live text on stderr; final structured result remains on stdout")
@@ -261,6 +268,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--json", "Output as JSON")
     .action(async (promptParts: string[], opts: RunOptions, command: Command) => {
       const agentId = resolveAgentId(process.cwd(), selectedAgentOption(command));
+      let validation: ReturnType<typeof resolveNativeValidationSelection>;
+      try { validation = resolveNativeValidationSelection(opts); }
+      catch (error) { io.error(error instanceof Error ? error.message : "Validation selection could not be read."); io.fail(); return; }
       if (opts.interactiveApprovals && (typeof process.send !== "function" || !process.connected)) {
         io.error("--interactive-approvals requires an AMC parent with a dedicated IPC channel. Use native chat or the ordinary approvals CLI."); io.fail(); return;
       }
@@ -676,6 +686,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 })
               }),
           config: { maxStepsPerTurn: maxSteps },
+          ...(validation === undefined ? {} : { validation }),
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a
             // single-turn command would only be opening and closing a watcher.
@@ -722,7 +733,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
         }
         const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
-        if (summary.driverStatus === "failed" || ending?.reason === "error") io.fail();
+        if (summary.driverStatus === "failed" || ending?.reason === "error"
+          || (validation !== undefined && summary.validation.status !== "passed")) io.fail();
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);

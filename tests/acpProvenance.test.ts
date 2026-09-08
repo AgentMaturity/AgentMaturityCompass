@@ -172,7 +172,7 @@ describe("a failed turn sends no content", () => {
 
   it("still sends content for a turn that succeeded", async () => {
     const { h } = await promptingHarness(true);
-    h.finish({ ok: true, text: "hi", status: "idle" });
+    h.finish({ ok: true, text: "hi", status: "idle", validation: { status: "not-requested", turn: null, configSha256: null, checks: [] } });
     await settle();
     expect(h.sent.filter((m) => m["method"] === "session/update")).toHaveLength(1);
   });
@@ -180,7 +180,7 @@ describe("a failed turn sends no content", () => {
   it("does not emit an apparently successful tail whose signature was forged", async () => {
     const { h } = await promptingHarness(true, events => events.map(event => event.event_type === "assistant/block"
       ? { ...event, writer_sig: "not-a-monitor-signature" } : event));
-    h.finish({ ok: true, text: "untrusted claim of success", status: "idle" });
+    h.finish({ ok: true, text: "untrusted claim of success", status: "idle", validation: { status: "not-requested", turn: null, configSha256: null, checks: [] } });
     await settle();
     expect(replyTo(h.sent, 2)?.["error"]).toMatchObject({ code: -32603 });
     expect(h.sent.filter(message => message["method"] === "session/update")).toEqual([]);

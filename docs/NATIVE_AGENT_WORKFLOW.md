@@ -130,6 +130,33 @@ The [native SDK](NATIVE_SDK.md) lets Node and Python applications own a local AM
 
 SDK updates are committed response blocks, not a claim that every provider token is already verified. The SDK's ACP configuration is its own supported surface: consult its guide for provider and tool options rather than assuming every `agent-loop run` flag exists there. Closing, releasing and verifying have different effects; choose the operation that matches the application's intended session lifecycle.
 
+## Public task validation
+
+A completed model turn does not establish that its result works. AMC can run explicitly selected public checks after a normal turn, using its existing signed `bash` tool pipeline, budgets, approval gate, timeout and cancellation controls. Check results are separate from both the turn ending and cryptographic evidence verification. These are AMC-native functions and require no DSH or Pi runtime.
+
+Create an operator-owned JSON file containing the checks you intend to run:
+
+```json
+{
+  "schemaVersion": 1,
+  "checks": [
+    { "id": "unit", "title": "Public unit tests", "command": "npm test", "timeoutMs": 120000 }
+  ]
+}
+```
+
+Select checks explicitly; merely providing the file does not select every command:
+
+```sh
+amc agent-loop run "Implement the requested change" --provider PROVIDER --model MODEL --tools workspace --validation-config ./public-checks.json --validate unit --json
+```
+
+Repeat `--validate ID` to select up to eight checks. Use `--validation-config-sha256 DIGEST` to pin the reviewed file bytes. Interactive `agent-loop chat` supports the same options and keeps the digest pinned across its child turns. The native SDK accepts `validationConfig`, `validationConfigSha256` and `validate: ["unit"]`; its result exposes `validation`. ACP returns the same result under `_meta["dev.agentmaturity.amc"].validation` and advertises `taskValidation` support. Missing metadata from an older peer is unavailable, never a validation pass.
+
+The separate states are **not-requested**, **pending**, **passed**, **failed** and **unavailable**. A known nonzero check exit fails validation; denied execution, cancellation, timeout, missing confinement or an unknown outcome remain unavailable. Selecting a check grants no shell authority. Native Linux shell confinement and all existing signed policy checks still apply. The CLI returns a nonzero exit when requested validation does not pass, even if the model turn ended `complete`.
+
+Validation records bind the current turn, selected IDs, configuration digest, actual call identity and output event. They do not insert synthetic model calls into the conversation or send hidden evaluator answers to the model. This version performs no automatic repair continuation. Passing the operator's public checks establishes only those checks' outcomes, not general correctness.
+
 ## Optional: bring external history and share portable evidence
 
 External capture and imports supplement AMC evidence; they do not supply AMC's native execution features. Skip this section when you only need the standalone runtime.

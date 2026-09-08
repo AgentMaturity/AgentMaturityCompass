@@ -70,12 +70,13 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
         if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown]`);
         if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
         if (outcome.cancelled) sections.push("[amc: shell cancelled]");
-        // The pipeline regards a resolved body as success. Refusal, incomplete
-        // cleanup and unsuccessful execution must instead reach its failure path.
-        if (!outcome.confined || outcome.failure || outcome.treeExitProven !== true || outcome.exitCode !== 0 || outcome.timedOut || outcome.cancelled) {
+        // No trustworthy command exit exists on refusal, cancellation or
+        // incomplete cleanup. Proven command exits retain their orthogonal
+        // exit/timeout facts; ok:false keeps nonzero exits on the failure path.
+        if (!outcome.confined || outcome.failure || outcome.treeExitProven !== true || outcome.cancelled) {
           throw new Error([outcome.failure?.reason ?? `Confined shell did not complete successfully (exit ${outcome.exitCode ?? "unknown"}).`, ...sections].join("\n"));
         }
-        return { output: sections.join("\n"), exitCode: outcome.exitCode, timedOut: false };
+        return { ok: outcome.exitCode === 0 && !outcome.timedOut, output: sections.join("\n"), exitCode: outcome.exitCode, timedOut: outcome.timedOut };
       }
 
       const running = runProcess({

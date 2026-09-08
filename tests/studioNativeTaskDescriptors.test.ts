@@ -32,6 +32,21 @@ test("signed descriptor survives restart without copying prompt text or relaxing
   writeFileSync(path, JSON.stringify(tampered));
   expect(() => store.read(d.taskId)).toThrow("did not verify");
 });
+test("optional public-check pins preserve legacy signatures and bind new task check identities", () => {
+  const legacy = descriptor(); store.lock(() => store.write(legacy));
+  const legacyPath = join(store.directory, `${legacy.taskId}.json`), legacyBytes = readFileSync(legacyPath);
+  expect(store.read(legacy.taskId)).not.toHaveProperty("validation");
+  expect(readFileSync(legacyPath)).toEqual(legacyBytes);
+  const selected: NativeTaskDescriptor = { ...descriptor(), demo: false, tools: "workspace", toolsDigest: "a".repeat(64),
+    validation: { configSha256: "b".repeat(64), checkIds: ["public_unit", "types"] } };
+  store.lock(() => store.write(selected));
+  expect(new NativeTaskDescriptors(root).read(selected.taskId)?.validation).toEqual(selected.validation);
+  const path = join(store.directory, `${selected.taskId}.json`), envelope = JSON.parse(readFileSync(path, "utf8"));
+  envelope.descriptor.validation.checkIds.reverse(); writeFileSync(path, JSON.stringify(envelope));
+  expect(() => store.read(selected.taskId)).toThrow("did not verify");
+  expect(() => store.write({ ...selected, demo: true })).toThrow();
+  expect(() => store.write({ ...selected, tools: "none", toolsDigest: null })).toThrow();
+});
 test("a forged signature cannot be admitted by planting a legacy auditor history array", () => {
   const d = descriptor(); store.lock(() => store.write(d));
   const attacker = generateKeyPairSync("ed25519");

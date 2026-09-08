@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { AgentDriver } from "./agentDriver.js";
 import { agentToolset, type AgentToolset } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
+import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus } from "./loopTypes.js";
 import { readAgentRunSummary } from "./runReport.js";
@@ -60,6 +61,7 @@ export interface AgentSessionInit {
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
   readonly maxSteps?: number;
+  readonly validation?: NativeValidationPlan;
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
   readonly bindTools?: (context: { readonly session: SessionService; readonly toolset: AgentToolset | null }) => AgentToolSeam;
 }
@@ -70,6 +72,7 @@ export type AgentPromptResult =
       /** Only what this prompt produced, never the whole conversation. */
       readonly text: string;
       readonly status: AgentStatus;
+      readonly validation: NativeValidationResult;
     }
   | { readonly ok: false; readonly reason: string };
 
@@ -178,6 +181,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
       route: init.route,
       systemPromptEventId,
       tools,
+      ...(init.validation === undefined ? {} : { validation: init.validation }),
       ...(init.maxSteps === undefined ? {} : { config: { maxStepsPerTurn: init.maxSteps } })
     });
   } catch (error) {
@@ -220,7 +224,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
         const fresh = summary.assistantText.slice(reported);
         reported = summary.assistantText.length;
-        return { ok: true, text: fresh.join("\n"), status };
+        return { ok: true, text: fresh.join("\n"), status, validation: summary.validation };
       } finally {
         running = false;
       }

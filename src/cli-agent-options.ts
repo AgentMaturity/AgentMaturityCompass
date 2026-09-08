@@ -26,6 +26,9 @@ export interface AgentLoopCliIo {
 }
 
 export interface RunOptions {
+  validationConfig?: string;
+  validationConfigSha256?: string;
+  validate?: string[];
   extension?: string[];
   extensionPin?: string[];
   mcpConfig?: string;

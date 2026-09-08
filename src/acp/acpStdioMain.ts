@@ -16,6 +16,7 @@ import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js
 import { sha256Hex } from "../utils/hash.js";
 import type { ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import { prepareAcpNativeSession } from "./acpNativeSession.js";
+import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
 
@@ -71,6 +72,9 @@ export interface AcpStdioInit {
   readonly systemPrompt: string;
   readonly tools?: "none" | "workspace";
   readonly expectedToolsDigest?: string;
+  readonly validationConfig?: string;
+  readonly validationConfigSha256?: string;
+  readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly mcpConfig?: string;
@@ -144,6 +148,8 @@ export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly err
 }
 
 export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
+  // Capture the operator's bytes once. Wire prompts cannot select commands or widen this plan.
+  const validation = resolveNativeValidationSelection(init);
   if (init.credentialsMode !== undefined && init.credentialsMode !== "layered" && init.credentialsMode !== "operator-only") throw new Error("ACP credentials mode must be layered or operator-only.");
   const route = acpRouteFor(init);
   if ("error" in route) throw new Error(route.error);
@@ -214,10 +220,13 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
       compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+        ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
+        ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      tools, maxSteps, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest })
+      tools, maxSteps, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      ...(validation === undefined ? {} : { validation })
     });
 
   const claimant = { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() };
@@ -225,7 +234,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const agent = createAcpAgent({
     workspace: init.workspace,
     agentId: init.agentId,
-    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined },
+    nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined, taskValidation: true },
     write: (frame) => { stdout.write(frame); },
     sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),

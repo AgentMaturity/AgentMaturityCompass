@@ -16,9 +16,11 @@ const human: StudioApiAuthContext = { isAdmin: false, agentId: null, username: "
 const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewer", revision: 3,
   clientRequestId: requestId, lastClientRequestId: requestId, provider: "stub", model: null, tools: "none", toolsDigest: null,
   maxSteps: 2, maxTokens: 64, state: "idle", createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
+  validationOutputs: [], validationSelection: null, validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
   providers: [{ id: "stub", local: true, credential: null }],
+  validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },
   scope: { ready: false, digest: null, approvalRequired: true, tools: [], message: "Review signed tools first." },
   limits: { maxActive: 4, maxSteps: 8, maxTokens: 1024, turnTimeoutMs: 1000, idleTimeoutMs: 1000, lifetimeMs: 5000,
     maxEvents: 512, maxEventBytes: 2_097_152, maxPromptBytes: 16_384 }, boundary: "Native governed execution." };
@@ -100,6 +102,24 @@ async function fixture(options: { auth?: StudioApiAuthContext | null; executionA
 const startBody = { clientRequestId: requestId, agentId: "reviewer", provider: "stub", tools: "none", prompt: "Summarize this task." };
 
 describe("native Studio authenticated API admission", () => {
+  it("accepts only named public-check IDs and a reviewed digest, never browser commands or config paths", async () => {
+    const f = await fixture();
+    const selected = { ...startBody, tools: "workspace", toolsDigest: "a".repeat(64),
+      validation: { configSha256: "b".repeat(64), checkIds: ["public_unit", "types"] } };
+    expect((await f.post("/api/v1/native-tasks", selected)).status).toBe(202);
+    expect(f.service.start).toHaveBeenLastCalledWith(expect.anything(), selected);
+    f.service.start.mockClear();
+    for (const validation of [
+      { ...selected.validation, command: "browser-command-must-never-run" },
+      { ...selected.validation, configPath: "/browser/chosen/file" },
+      { ...selected.validation, checkIds: ["public_unit", "public_unit"] },
+      { ...selected.validation, checkIds: [] },
+      { ...selected.validation, checkIds: ["bad id"] },
+      { ...selected.validation, configSha256: "not-a-digest" }
+    ]) expect((await f.post("/api/v1/native-tasks", { ...selected, validation })).status).toBe(400);
+    expect((await f.post("/api/v1/native-tasks", { ...startBody, validation: selected.validation })).status).toBe(400);
+    expect(f.service.start).not.toHaveBeenCalled();
+  });
   it("carries stable verified principal and explicit agent, without trusting a display name", async () => {
     const f = await fixture();
     const response = await f.post("/api/v1/native-tasks", startBody);

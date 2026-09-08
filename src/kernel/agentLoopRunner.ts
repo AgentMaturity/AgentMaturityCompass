@@ -43,6 +43,8 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/
 import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
+import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
+import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
 import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import type { HttpTransport } from "../llm/adapter/transport.js";
@@ -182,6 +184,7 @@ export interface ComposedTurnOptions {
   /** Replaces the platform `fetch` — the stub provider answers in-process. */
   readonly transport?: HttpTransport;
   readonly tools?: AgentToolSeam;
+  readonly validation?: NativeValidationPlan;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
   readonly bindToolSession?: (session: ComposedToolSession) => void;
   readonly config?: Partial<AgentLoopConfig>;
@@ -244,6 +247,7 @@ export interface ComposedTurnOutcome {
   readonly sessionId: string;
   /** The driver's terminal state. `failed` means the spine refused a closer. */
   readonly status: AgentStatus;
+  readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
    *
@@ -515,6 +519,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       route: options.route,
       systemPromptEventId: systemPromptRef.eventId,
       ...(tools !== undefined ? { tools } : {}),
+      ...(options.validation !== undefined ? { validation: options.validation } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
       hooks
     });
@@ -546,6 +551,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     return {
       sessionId,
       status: loop.status,
+      validation: projectNativeValidation(options.workspace, session.readEvents()),
       systemPromptEventId: systemPromptRef.eventId,
       // From the ASSEMBLY, not from `sectionNames()`: a `complete` section
       // replaces the section list, and reporting the registered names there

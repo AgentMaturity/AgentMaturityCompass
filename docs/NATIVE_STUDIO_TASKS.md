@@ -22,6 +22,18 @@ The browser cannot create grants, change budgets, load arbitrary plugins or inst
 
 You can use a read-only workspace policy for repository review. The native runtime accepts a signed subset such as `fs.read`, `glob` and `grep` with matching `READ_ONLY` action classes; editing and shell tools need not be granted. **Check setup** shows the supported tools from the signed policy, and explicitly identifies a read-only subset. Studio still requires its configured approval quorum for each workspace tool call. To change an existing policy, review its entries and path restrictions on the host, then use `amc tools sign`; resetting all tool defaults is unnecessary.
 
+## Select public validation checks
+
+An operator can make named checks available through `AMC_NATIVE_VALIDATION_CONFIG`, pointing to an explicit host JSON file. Programmatic Studio service composition can set `validationConfig` instead. Use the [native public-check configuration](NATIVE_AGENT_WORKFLOW.md#public-task-validation): schema version 1, one through eight checks, each with an ID, public title, command and bounded timeout. This configuration is operator input, not model-generated instructions or a hidden benchmark oracle. Its file path and commands are not returned to the browser.
+
+After **Check setup**, select the checks you want before starting a task. None are selected automatically. Checks require signed workspace `bash`, the existing approval quorum and a signed tool-scope digest. Demo and no-tools tasks cannot select them. Check selection creates no tool grant, and checks use the same policy, budget, sandbox and approval pipeline as native tool execution. They run sequentially after a normally completed model turn, without an automatic repair loop. A check's timeout cannot extend Studio's two-minute turn deadline.
+
+Studio pins the exact configuration-file digest and ordered check IDs in the signed task descriptor. Every follow-up and resume keeps that selection; a changed or unavailable configuration requires a new reviewed task. The browser accepts IDs and the displayed digest, never commands, config paths or environment overrides. Existing tasks created without validation retain **Not requested**, including after restart.
+
+The **Public validation** panel reports **Not requested**, **Pending**, **Selected checks passed**, **Selected checks failed** or **Validation unavailable** independently of model completion and evidence verification. It shows each check's title, actual exit code when known, timeout and recorded reason. A model ending `complete` can still have failed checks. Denied, canceled, timed-out, missing or unauthenticated check results never become a pass; an earlier turn's pass is not reused while a new admission awaits evidence.
+
+Open **View check output** for the exact authenticated check-result payload. AMC checks its complete bytes against the signed digest before decoding or redacting the display. Displayed output is escaped, secret-redacted and capped at 16 KiB per check; shortened output is labeled. Pruned, unreadable, non-text, mismatched or over-2-MiB payloads are withheld with an explicit message and event reference. The displayed digest identifies original payload bytes, not redacted text. Use runtime records for evidence beyond this display bound. Passing the selected public checks establishes only their assertions, not general coding quality or full task correctness.
+
 ## Continue, cancel and recover
 
 | Control | What happens |
@@ -49,6 +61,8 @@ The service retains at most 512 displayed events and 2 MiB of event text, 32 adm
 ## API clients and hosted workspaces
 
 The typed API is `/api/v1/native-tasks`; Studio's `/openapi.yaml` reference documents options, listing, committed updates, submissions and revision-bound controls. See [API surfaces](API_SURFACES.md) for the public reference. Responses use `{ok: true, data: ...}` and `Cache-Control: no-store`. A `202` means admission or cancellation was recorded, not that a task succeeded.
+
+Options includes the public `validation` catalogue. Creation may include `validation: {configSha256, checkIds}`; follow-up and control requests cannot change it. Task views expose `validationSelection`, the authenticated `validation` result and bounded `validationOutputs` separately. An absent selection is not an empty passing check set.
 
 Mutations require `x-amc-native-intent: task-workspace-v1`. Human session-cookie clients must also send `x-amc-native-csrf` from the options response or `/auth/me`, plus an `Origin` matching the configured browser origin and request host. Keep the proof out of URLs. Bootstrap admin-token clients may omit Origin and CSRF, but must send the intent header; supplied origins are still validated. Agent tokens and leases cannot act as human task owners.
 

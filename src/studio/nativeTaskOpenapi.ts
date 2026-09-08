@@ -85,7 +85,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       ok: { type: "boolean", const: false }, error: string, code: string
     } },
     NativeTaskStart: { ...object({ clientRequestId: uuid, agentId: agent, provider, model: { ...string, minLength: 1, maxLength: 200 },
-      tools, toolsDigest: digest, prompt, maxSteps: { type: "integer", minimum: 1, maximum: 8 },
+      tools, toolsDigest: digest, validation: ref("NativeTaskValidationSelection"), prompt, maxSteps: { type: "integer", minimum: 1, maximum: 8 },
       maxTokens: { type: "integer", minimum: 1, maximum: 1024 }
     }, ["clientRequestId", "agentId", "provider", "tools", "prompt"]),
       description: "Workspace tools require toolsDigest from the inspected signed scope; no-tools requests must omit it. Real providers require an explicit model and a server-owned credential. Exact request replay returns the recorded admission; a conflicting reuse is refused." },
@@ -93,7 +93,10 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     NativeTaskControl: object({ expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
     NativeTask: object({ taskId: digest, sessionId: nullableString, agentId: agent, revision: integer,
       clientRequestId: uuid, lastClientRequestId: uuid, provider, model: nullableString, tools,
-      toolsDigest: { ...digest, type: ["string", "null"] }, maxSteps: integer, maxTokens: integer,
+      toolsDigest: { ...digest, type: ["string", "null"] },
+      validationSelection: { oneOf: [{ type: "null" }, ref("NativeTaskValidationSelection")] }, validation: ref("NativeTaskValidationResult"),
+      validationOutputs: { type: "array", maxItems: 8, items: ref("NativeTaskValidationOutput") },
+      maxSteps: integer, maxTokens: integer,
       state: { type: "string", enum: ["starting", "idle", "running", "cancel-requested", "releasing", "released", "failed", "verifying", "closed"] },
       createdAt: integer, updatedAt: integer, turnEndReason: nullableString, error: nullableString,
       verification: { type: "string", enum: ["not-verified", "workspace-key-consistency", "externally-anchored", "failed"],
@@ -103,6 +106,20 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     }),
     NativeTaskApproval: object({ approvalRequestId: string, requestDigestSha256: digest, toolName: string,
       actionClass: string, riskTier: string, status: string, required: integer, received: integer, expiresTs: integer }),
+    NativeTaskValidationSelection: { ...object({ configSha256: digest, checkIds: { type: "array", minItems: 1, maxItems: 8, uniqueItems: true,
+      items: { type: "string", pattern: "^[a-zA-Z0-9_-]{1,64}$" } } }),
+      description: "Creation-only selection from the operator's public check catalogue. The digest and ordered IDs stay pinned across follow-up and resume; no commands, paths or grants are accepted." },
+    NativeTaskValidationResult: object({ status: { type: "string", enum: ["not-requested", "pending", "passed", "failed", "unavailable"] },
+      turn: { type: ["integer", "null"], minimum: 0 }, configSha256: { ...digest, type: ["string", "null"] },
+      checks: { type: "array", maxItems: 8, items: object({ id: string, title: string,
+        status: { type: "string", enum: ["pending", "passed", "failed", "unavailable"] }, callId: nullableString,
+        exitCode: { type: ["integer", "null"] }, timedOut: bool, reason: nullableString, outputEventId: nullableString }) } }),
+    NativeTaskValidationConfiguration: object({ ready: bool, configSha256: { ...digest, type: ["string", "null"] },
+      checks: { type: "array", maxItems: 8, items: object({ id: string, title: string }) }, message: string }),
+    NativeTaskValidationOutput: { ...object({ checkId: string, outputEventId: string, payloadSha256: digest,
+      status: { type: "string", enum: ["available", "unavailable", "pruned"] }, text: nullableString,
+      truncated: bool, redacted: bool, bytes: { type: ["integer", "null"], minimum: 0 } }),
+      description: "Text from the exact authenticated check-result payload after its complete bytes match payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes, not transformed display text. Reads over 2 MiB are withheld." },
     NativeTaskEvent: object({ cursor: integer, kind: { type: "string", enum: ["user", "assistant", "tool", "tool-update", "plan"] },
       text: string, toolCallId: string, status: string, evidence: { type: "string", const: "committed" }
     }, ["cursor", "kind", "text", "evidence"]),
@@ -113,7 +130,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
     NativeTaskOptions: object({ schemaVersion: { type: "string", const: "2026-09-08" }, agentId: agent, demo: bool,
       providers: { type: "array", items: object({ id: provider, local: bool, credential: { oneOf: [
         { type: "null" }, object({ ref: string, configured: bool, source: { type: ["string", "null"], enum: ["env", "file", null] } })
-      ] } }) }, scope: ref("NativeTaskToolScope"),
+      ] } }) }, scope: ref("NativeTaskToolScope"), validation: ref("NativeTaskValidationConfiguration"),
       limits: object(Object.fromEntries(["maxActive", "maxSteps", "maxTokens", "turnTimeoutMs", "idleTimeoutMs", "lifetimeMs", "maxEvents", "maxEventBytes", "maxPromptBytes"].map(key => [key, integer]))),
       boundary: string, nativeCsrfToken: nullableString, executionBlocked: bool
     }),

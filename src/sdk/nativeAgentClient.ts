@@ -3,6 +3,8 @@ import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 import type { AgentRunVerification } from "../agent/runReport.js";
+import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import { parseNativeValidationResult } from "../agent/nativeValidationResult.js";
 
 type JsonObject = Record<string, unknown>;
 const object = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -32,6 +34,10 @@ export interface AMCNativeClientOptions {
   readonly tools?: "none" | "workspace";
   /** Pin the signed workspace tool policy for every native tool dispatch. */
   readonly expectedToolsDigest?: string;
+  /** Operator-owned file and explicit check IDs; ACP prompts cannot supply commands. */
+  readonly validationConfig?: string;
+  readonly validationConfigSha256?: string;
+  readonly validate?: readonly string[];
   readonly approveTools?: string;
   readonly approveRisk?: "low" | "medium" | "high" | "critical";
   readonly mcpConfig?: string;
@@ -65,6 +71,8 @@ export interface AMCNativeRunResult {
   readonly updates: readonly AMCNativeUpdate[];
   readonly meta: Readonly<JsonObject>;
   readonly verification: "not-verified";
+  /** Public operator checks only; independent from turn completion and evidence verification. */
+  readonly validation: NativeValidationResult;
 }
 
 export interface AMCNativeReceipt {
@@ -117,13 +125,19 @@ export class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
     if (value._meta !== undefined && !object(value._meta)) {
       this.fail(new AMCNativeProtocolError("native prompt returned invalid metadata")); return;
     }
+    const extension = object(value._meta) ? value._meta["dev.agentmaturity.amc"] : undefined;
+    const rawValidation = object(extension) ? extension.validation : undefined;
+    const validation = rawValidation === undefined
+      ? { status: "unavailable" as const, turn: null, configSha256: null, checks: [] }
+      : parseNativeValidationResult(rawValidation);
+    if (validation === null) { this.fail(new AMCNativeProtocolError("native prompt returned invalid validation metadata")); return; }
     this.done = true; this.state = "completed";
     const text = this.updates.flatMap(({ update }) => {
       if (update.sessionUpdate !== "agent_message_chunk" || !object(update.content)) return [];
       return update.content.type === "text" && typeof update.content.text === "string" ? [update.content.text] : [];
     }).join("");
     this.resolveResult({ sessionId: this.sessionId, state: "completed", stopReason: value.stopReason,
-      text, updates: [...this.updates], meta: object(value._meta) ? value._meta : {}, verification: "not-verified" });
+      text, updates: [...this.updates], meta: object(value._meta) ? value._meta : {}, verification: "not-verified", validation });
     this.wake?.();
   }
 
@@ -215,6 +229,7 @@ export class AMCNativeClient {
     for (const [flag, value] of [["--model", options.model], ["--credential", options.credential],
       ["--base-url", options.baseUrl], ["--agent-id", options.agentId], ["--tools", options.tools],
       ["--expected-tools-digest", options.expectedToolsDigest],
+      ["--validation-config", options.validationConfig], ["--validation-config-sha256", options.validationConfigSha256],
       ["--approve-tools", options.approveTools], ["--approve-risk", options.approveRisk],
       ["--mcp-config", options.mcpConfig], ["--mcp-config-sha256", options.mcpConfigSha256],
       ["--credentials-home", options.credentialsHome], ["--credentials-file", options.credentialsFile],
@@ -222,6 +237,14 @@ export class AMCNativeClient {
       ["--max-tokens", options.maxTokens], ["--max-steps", options.maxSteps]] as const) {
       if (value !== undefined) args.push(flag, String(value));
     }
+    if (options.validate !== undefined) {
+      if (!Array.isArray(options.validate) || options.validate.length < 1 || options.validate.length > 8
+        || new Set(options.validate).size !== options.validate.length
+        || options.validate.some(id => !/^[a-zA-Z0-9_-]{1,64}$/.test(id))) throw new Error("Select one through eight distinct public validation check IDs.");
+      for (const id of options.validate) args.push("--validate", id);
+    }
+    if ((options.validate !== undefined || options.validationConfigSha256 !== undefined) && !options.validationConfig)
+      throw new Error("Public validation requires an explicit operator config file.");
     this.child = spawn(this.command[0], args, { cwd: this.workspace, env: this.env, stdio: "pipe", shell: false });
     this.childClosed = new Promise((resolve_) => {
       this.child.once("close", () => { this.closed = true; resolve_();

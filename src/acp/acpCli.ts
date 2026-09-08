@@ -28,6 +28,9 @@ export function registerAcpCommands(program: Command): void {
     .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
+    .option("--validation-config <path>", "Operator JSON containing named public checks")
+    .option("--validation-config-sha256 <digest>", "Pin exact reviewed validation configuration bytes")
+    .option("--validate <id>", "Run this public check after each completed turn; repeat to select more", (id: string, previous: string[] = []) => [...previous, id])
     .option("--approve-tools <actionClass>", "Require the existing signed approval gate for tool calls")
     .option("--approve-risk <tier>", "Signed approval risk tier; requires --approve-tools")
     .option("--mcp-config <path>", "Reviewed native MCP config; requires workspace tools and signed approvals")
@@ -46,6 +49,9 @@ export function registerAcpCommands(program: Command): void {
       credentialsMode: string;
       tools: string;
       expectedToolsDigest?: string;
+      validationConfig?: string;
+      validationConfigSha256?: string;
+      validate?: string[];
       approveTools?: string;
       approveRisk?: string;
       mcpConfig?: string;
@@ -64,6 +70,9 @@ export function registerAcpCommands(program: Command): void {
           systemPrompt: opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),
+          ...(opts.validationConfig === undefined ? {} : { validationConfig: opts.validationConfig }),
+          ...(opts.validationConfigSha256 === undefined ? {} : { validationConfigSha256: opts.validationConfigSha256 }),
+          ...(opts.validate === undefined ? {} : { validate: opts.validate }),
           maxTokens: Number(opts.maxTokens),
           ...(opts.maxSteps === undefined ? {} : { maxSteps: Number(opts.maxSteps) }),
           ...(opts.credentialsHome === undefined ? {} : { credentialsHome: opts.credentialsHome }),

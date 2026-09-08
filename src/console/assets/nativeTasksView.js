@@ -13,6 +13,7 @@ export function nativeTasksShell(agentId) {
       <label>Provider<select id="nativeTaskProvider" disabled><option value="">Choose a provider</option></select></label><label>Model<input id="nativeTaskModel" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Enter the model name" disabled></label>
       <label>Tools<select id="nativeTaskTools" disabled><option value="none">No tools</option><option value="workspace">Signed workspace tools</option></select></label></div></form>
       <p id="nativeTaskCredential" class="muted"></p><div id="nativeTaskScope"></div>
+      <div id="nativeTaskValidationSetup"></div>
       <details><summary>Run limits</summary><div class="native-task-fields"><label>Maximum steps<input id="nativeTaskMaxSteps" type="number" min="1" step="1" disabled></label><label>Maximum output tokens<input id="nativeTaskMaxTokens" type="number" min="1" step="1" disabled></label></div><p id="nativeTaskLimits" class="muted"></p></details>
       <p id="nativeTaskBoundary" class="muted"></p>
     </section>
@@ -25,6 +26,7 @@ export function nativeTasksShell(agentId) {
     </section><aside class="native-task-sidebar">
       <section class="card"><h3>Session</h3><div id="nativeTaskIdentity"><p class="muted">No task has been started.</p></div><div class="native-task-actions"><button id="nativeTaskRefresh" class="secondary" disabled>Refresh status</button><button id="nativeTaskRelease" class="secondary" hidden>Release for later</button><button id="nativeTaskResume" hidden>Resume session</button><button id="nativeTaskVerify" class="secondary" hidden>Close and verify</button><button id="nativeTaskNew" class="secondary" disabled>New task</button></div></section>
       <section class="card"><h3>Approvals</h3><div id="nativeTaskApprovals"><p class="muted">No pending requests.</p></div></section>
+      <section class="card"><h3>Public validation</h3><div id="nativeTaskValidation"><p class="muted">No checks requested.</p></div></section>
       <section class="card"><h3>Evidence</h3><div id="nativeTaskVerification"><p class="muted">No verification has been requested.</p></div></section>
       <section class="card"><h3>Your tasks</h3><div id="nativeTaskList"><p class="muted">Loading…</p></div></section>
     </aside></div></section>`;
@@ -41,6 +43,34 @@ export function renderTaskScope(config, toolsMode, task = null) {
 export function renderTaskIdentity(task) {
   if (!task) return '<p class="muted">No task has been started.</p>';
   return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "local stub")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Last confirmed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}`;
+}
+export function renderTaskValidationSetup(config, selectedIds, task) {
+  const catalogue = config.validation;
+  const pinned = task?.validationSelection;
+  const changed = pinned && pinned.configSha256 !== catalogue.configSha256;
+  return `<fieldset class="native-task-validation-selection"><legend>Public validation checks (optional)</legend>
+    <p class="muted">${esc(catalogue.message)}</p>
+    ${catalogue.checks.map(check => `<label><input type="checkbox" data-native-validation-id="${esc(check.id)}" ${selectedIds.includes(check.id) ? "checked" : ""}><span>${esc(check.title)} <code>${esc(check.id)}</code></span></label>`).join("")}
+    <p class="muted">Checks use the existing bash grant and approval inbox. They run only after a completed turn. A read-only or no-tools task cannot select them.</p>
+    ${pinned ? `<p>Pinned checks: ${pinned.checkIds.map(id => `<code>${esc(id)}</code>`).join(", ")}</p><details><summary>Accepted configuration</summary><code>${esc(pinned.configSha256)}</code></details>` : ""}
+    ${changed ? '<p class="status-bad">The operator configuration changed. Review setup and create a new task; this task cannot silently run replacement checks.</p>' : ""}
+    </fieldset>`;
+}
+export function renderTaskValidation(task) {
+  if (!task) return '<p class="muted">No checks requested.</p>';
+  const result = task.validation;
+  const labels = { "not-requested": "Not requested", pending: "Pending", passed: "Selected checks passed", failed: "Selected checks failed", unavailable: "Validation unavailable" };
+  return `<p class="${result.status === "failed" || result.status === "unavailable" ? "status-bad" : ""}"><strong>${esc(labels[result.status])}</strong></p>
+    ${result.turn === null ? "" : `<p>Recorded turn: ${esc(result.turn)}</p>`}
+    ${result.checks.map(check => `<article class="native-task-validation-result"><strong>${esc(check.title)}</strong><p>${esc(labels[check.status])}${check.exitCode === null ? "" : ` · exit ${esc(check.exitCode)}`}${check.timedOut ? " · timed out" : ""}</p>${check.reason ? `<p>${esc(check.reason)}</p>` : ""}${check.outputEventId ? renderValidationOutput(check, task.validationOutputs || []) : ""}</article>`).join("")}
+    <p class="muted">Public checks assess only their configured assertions. Model completion, these results and evidence verification are separate; no hidden benchmark oracle is used.</p>`;
+}
+function renderValidationOutput(check, outputs) {
+  const output = outputs.find(item => item.checkId === check.id && item.outputEventId === check.outputEventId);
+  return `<details><summary>View check output</summary>${output?.status === "available" ?
+    `<p class="muted">Authenticated payload display${output.redacted ? "; secret values redacted" : ""}${output.truncated ? "; shortened to 16 KiB" : ""}. The digest below identifies original payload bytes, not this display.</p><pre tabindex="0">${esc(output.text || "(empty output)")}</pre>` :
+    `<p class="muted">${output?.status === "pruned" ? "This output was pruned under retention policy." : "Output is unavailable, too large, or could not be authenticated for display. Inspect runtime records; no output text is inferred."}</p>`}
+    <p>Event: <code>${esc(check.outputEventId)}</code></p>${output ? `<p>Original payload digest: <code>${esc(output.payloadSha256)}</code></p>` : ""}</details>`;
 }
 export function taskStateLabel(task) { return task ? labels[task.state] || "Unknown task state" : "No task selected"; }
 export function renderTaskApprovals(task) {

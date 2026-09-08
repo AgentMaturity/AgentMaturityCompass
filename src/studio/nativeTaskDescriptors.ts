@@ -6,6 +6,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { nativeTaskValidationSelectionSchema } from "./nativeTaskValidation.js";
 import { NativeTaskServiceError } from "./nativeTaskTypes.js";
 
 const id = z.string().uuid();
@@ -15,6 +16,8 @@ export const taskDescriptorSchema = z.object({
   sessionId: z.string().min(1).max(200).nullable(), provider: z.enum(["stub", "openai", "openai-responses", "anthropic"]),
   model: z.string().min(1).max(200).nullable(), tools: z.enum(["none", "workspace"]),
   toolsDigest: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+  // Optional without a default: parsing old signed v1 descriptors must preserve their exact body.
+  validation: nativeTaskValidationSelectionSchema.optional(),
   maxSteps: z.number().int().min(1).max(8), maxTokens: z.number().int().min(1).max(1024),
   createdAt: z.number().int().nonnegative(), updatedAt: z.number().int().nonnegative(),
   revision: z.number().int().min(1).max(32), pendingTurn: z.boolean(), closed: z.boolean(),
@@ -24,6 +27,7 @@ export const taskDescriptorSchema = z.object({
     || new Set(value.submissions.map(s => s.clientRequestId)).size !== value.submissions.length
     || value.taskId !== nativeTaskId(value.principalId, value.submissions[0]!.clientRequestId)
     || (value.tools === "workspace") !== (value.toolsDigest !== null)
+    || (value.validation !== undefined && (value.demo || value.tools !== "workspace"))
     || (value.demo && (value.provider !== "stub" || value.tools !== "none"))) ctx.addIssue({ code: "custom", message: "Descriptor identity or revision is inconsistent" });
 });
 export type NativeTaskDescriptor = z.infer<typeof taskDescriptorSchema>;

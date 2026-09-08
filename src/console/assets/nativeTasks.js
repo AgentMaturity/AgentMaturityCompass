@@ -1,17 +1,19 @@
 import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
-  renderTaskVerification, renderTaskList, taskStateLabel, appendTaskEvent } from "./nativeTasksView.js";
+  renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent } from "./nativeTasksView.js";
 
 const API = "/api/v1/native-tasks";
 const mounts = new WeakMap();
 const STATES = new Set(["starting","idle","running","cancel-requested","releasing","released","failed","verifying","closed"]);
 const EVENT_KINDS = new Set(["user","assistant","tool","tool-update","plan"]);
+const VALIDATION_STATES = new Set(["not-requested","pending","passed","failed","unavailable"]);
 const ACTIVE = new Set(["starting","running","cancel-requested","releasing","verifying"]);
 const object = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const integer = value => Number.isSafeInteger(value) && value >= 0;
 function taskView(value) {
   if (!object(value) || typeof value.taskId !== "string" || typeof value.agentId !== "string" || !STATES.has(value.state)
     || !integer(value.revision) || !integer(value.nextCursor) || !integer(value.firstCursor) || !integer(value.droppedEvents)
+    || !object(value.validation) || !VALIDATION_STATES.has(value.validation.status) || !Array.isArray(value.validation.checks) || !Array.isArray(value.validationOutputs)
     || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean"
     || !["not-verified","workspace-key-consistency","externally-anchored","failed"].includes(value.verification)) {
     throw new Error("Studio returned an unsupported task state. Refresh this page after updating Studio.");
@@ -21,6 +23,7 @@ function taskView(value) {
 function configuration(value) {
   if (!object(value) || value.schemaVersion !== "2026-09-08" || typeof value.agentId !== "string"
     || typeof value.demo !== "boolean" || typeof value.executionBlocked !== "boolean" || !Array.isArray(value.providers) || !object(value.scope)
+    || !object(value.validation) || typeof value.validation.ready !== "boolean" || !Array.isArray(value.validation.checks)
     || !Array.isArray(value.scope.tools) || !object(value.limits)
     || !(typeof value.nativeCsrfToken === "string" && value.nativeCsrfToken || value.nativeCsrfToken === null && getAdminToken())
     || !integer(value.limits.maxPromptBytes) || !integer(value.limits.maxEvents)) {
@@ -35,6 +38,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   const lifetime = new AbortController();
   let disposed = false, config = null, task = null, tasks = [], cursor = 0, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
+  let selectedChecks = [], selectedChecksDigest = null;
   let notice = "", selectedAgent = initialAgent, taskRead = null;
   root.innerHTML = nativeTasksShell(initialAgent);
   const el = id => root.querySelector(`#${id}`);
@@ -68,6 +72,14 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if(el("nativeTaskScope").dataset.rendered !== scopeHtml) {
       el("nativeTaskScope").innerHTML=scopeHtml; el("nativeTaskScope").dataset.rendered=scopeHtml;
     }
+    const validationHtml=renderTaskValidationSetup(config, task?.validationSelection?.checkIds || selectedChecks, task);
+    if(el("nativeTaskValidationSetup").dataset.rendered !== validationHtml) {
+      el("nativeTaskValidationSetup").innerHTML=validationHtml;el("nativeTaskValidationSetup").dataset.rendered=validationHtml;
+    }
+    for(const check of el("nativeTaskValidationSetup").querySelectorAll("[data-native-validation-id]")) {
+      check.disabled = Boolean(task) || mutation || inspecting || Boolean(pending) || config.demo || !config.validation.ready
+        || el("nativeTaskTools").value !== "workspace" || !config.scope.ready || !config.scope.tools.some(tool => tool.name === "bash");
+    }
     el("nativeTaskModel").disabled = Boolean(task) || !chosen || chosen.local || mutation || Boolean(pending);
     el("nativeTaskTools").querySelector('option[value="workspace"]').disabled = config.demo || !config.scope.ready;
   }
@@ -77,7 +89,10 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     const setupReady = config && !config.executionBlocked && chosen && (chosen.local || chosen.credential?.configured === true)
       && (chosen.local || el("nativeTaskModel").value.trim())
       && (el("nativeTaskTools").value === "none" || (config.scope.ready && !config.demo && typeof config.scope.digest === "string"
-        && (!task || task.toolsDigest === config.scope.digest)));
+        && (!task || task.toolsDigest === config.scope.digest)))
+      && (!(task?.validationSelection || selectedChecks.length) || (config.validation.ready
+        && (task?.validationSelection?.configSha256 || selectedChecksDigest) === config.validation.configSha256
+        && el("nativeTaskTools").value === "workspace" && config.scope.tools.some(tool => tool.name === "bash")));
     const canPrompt = setupReady && (!task || task.state === "idle");
     el("nativeTaskSubmit").disabled = !canPrompt || mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskSubmit").textContent = task ? "Send follow-up" : "Run task";
@@ -104,7 +119,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   function project() {
     // Preserve keyboard focus and expanded details when a poll has no visible change.
     for (const [id,html] of [["nativeTaskIdentity",renderTaskIdentity(task)], ["nativeTaskApprovals",renderTaskApprovals(task)],
-      ["nativeTaskVerification",renderTaskVerification(task)], ["nativeTaskList",renderTaskList(tasks, task?.taskId)]]) {
+      ["nativeTaskVerification",renderTaskVerification(task)], ["nativeTaskValidation",renderTaskValidation(task)], ["nativeTaskList",renderTaskList(tasks, task?.taskId)]]) {
       const node=el(id); if(node.dataset.rendered !== html) { node.innerHTML=html; node.dataset.rendered=html; }
     }
     const shown=el("nativeTaskTranscript").querySelectorAll(".native-task-event").length;
@@ -177,6 +192,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     catch(error) { if(generation===setupGeneration) config=null; throw error; }
     finally { if(generation===setupGeneration) { inspecting=false; controls(); } }
     if (disposed || generation!==setupGeneration) return;
+    if(!task && selectedChecksDigest !== value.validation.configSha256) { selectedChecks=[];selectedChecksDigest=value.validation.configSha256; }
     config = value; selectedAgent = value.agentId; el("nativeTaskAgent").value = selectedAgent;
     const select = el("nativeTaskProvider"), previous = task?.provider || select.value;
     select.replaceChildren(new Option("Choose a provider", ""));
@@ -226,7 +242,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (typeof crypto.randomUUID !== "function") { showError(new Error("Open Studio over HTTPS or localhost before submitting a native task."));return; }
     if (new TextEncoder().encode(prompt).length>config.limits.maxPromptBytes) { showError(new Error("This prompt exceeds the configured byte limit. Shorten it before submitting."));return; }
     const id=crypto.randomUUID();
-    const body=task ? {prompt,clientRequestId:id,expectedRevision:task.revision} : {agentId:selectedAgent,provider:provider().id,...(provider().local?{}:{model:el("nativeTaskModel").value.trim()}),tools:el("nativeTaskTools").value,...(el("nativeTaskTools").value === "workspace" ? {toolsDigest:config.scope.digest} : {}),prompt,clientRequestId:id,maxSteps:Number(el("nativeTaskMaxSteps").value),maxTokens:Number(el("nativeTaskMaxTokens").value)};
+    const body=task ? {prompt,clientRequestId:id,expectedRevision:task.revision} : {agentId:selectedAgent,provider:provider().id,...(provider().local?{}:{model:el("nativeTaskModel").value.trim()}),tools:el("nativeTaskTools").value,...(el("nativeTaskTools").value === "workspace" ? {toolsDigest:config.scope.digest} : {}),...(selectedChecks.length ? {validation:{configSha256:selectedChecksDigest,checkIds:[...selectedChecks]}} : {}),prompt,clientRequestId:id,maxSteps:Number(el("nativeTaskMaxSteps").value),maxTokens:Number(el("nativeTaskMaxTokens").value)};
     pending={id,prompt,body,kind:task?"turn":"create"};mutation=true;readGeneration++;taskRead?.abort();clearTimer();clearError();controls();tell("Submitting once. Your draft stays here until Studio acknowledges it.");
     let acknowledged=false;
     try {
@@ -245,12 +261,18 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   }
   listen(el("nativeTaskSetup"),"submit",event=>{event.preventDefault();clearError();if(task){void refresh().catch(showError);return;}selectedAgent=el("nativeTaskAgent").value.trim()||"default";void inspect(selectedAgent).then(list).then(()=>tell("Setup checked. Choose your provider and task.")).catch(showError);});
   for (const id of ["nativeTaskProvider","nativeTaskModel","nativeTaskTools"]) listen(el(id),"input",controls);
+  listen(el("nativeTaskValidationSetup"),"change",event=>{
+    const checkbox=event.target.closest("[data-native-validation-id]");if(!checkbox || task || mutation || pending || checkbox.disabled)return;
+    selectedChecks=[...el("nativeTaskValidationSetup").querySelectorAll("[data-native-validation-id]:checked")].map(node=>node.dataset.nativeValidationId);
+    selectedChecksDigest=config.validation.configSha256;controls();
+  });
+  listen(el("nativeTaskTools"),"change",()=>{if(!task && el("nativeTaskTools").value === "none") { selectedChecks=[];controls(); }});
   listen(el("nativeTaskPromptForm"),"submit",event=>{event.preventDefault();void submit();});
   listen(el("nativeTaskPrompt"),"keydown",event=>{if(event.key==="Enter"&&(event.ctrlKey||event.metaKey)){event.preventDefault();void submit();}});
   listen(el("nativeTaskRefresh"),"click",()=>{void refresh().catch(showError);});
   for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"]]) listen(el(id),"click",()=>{void mutate(action);});
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
-  listen(el("nativeTaskNew"),"click",()=>{if(pending||mutation||ACTIVE.has(task?.state))return;clearTimer();readGeneration++;taskRead?.abort();task=null;cursor=0;readPaused=false;el("nativeTaskTranscript").replaceChildren();updateUrl(null);project();tell("Choose the next task. Previous tasks remain available in Your tasks.");});
+  listen(el("nativeTaskNew"),"click",()=>{if(pending||mutation||ACTIVE.has(task?.state))return;clearTimer();readGeneration++;taskRead?.abort();task=null;selectedChecks=[];selectedChecksDigest=config?.validation.configSha256 ?? null;cursor=0;readPaused=false;el("nativeTaskTranscript").replaceChildren();updateUrl(null);project();tell("Choose the next task. Previous tasks remain available in Your tasks.");});
   listen(el("nativeTaskList"),"click",event=>{const button=event.target.closest("[data-native-task-id]");if(!button||mutation||pending)return;const view=tasks.find(item=>item.taskId===button.dataset.nativeTaskId);if(view)void selectTask(view).catch(showError);});
   const dispose=()=>{if(disposed)return;disposed=true;clearTimer();taskRead?.abort();lifetime.abort();mounts.delete(root);};mounts.set(root,dispose);listen(window,"pagehide",dispose);
   listen(window,"offline",()=>{clearTimer();tell("Connection lost. Task outcome is unknown until Studio confirms it; this view does not stop the task.");controls();});

@@ -1,3 +1,5 @@
+import type { NativeValidationResult } from "../agent/nativeValidation.js";
+
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
 export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic";
 export class NativeTaskServiceError extends Error {
@@ -15,9 +17,20 @@ export interface NativeTaskStart {
   readonly model?: string;
   readonly tools: "none" | "workspace";
   readonly toolsDigest?: string;
+  readonly validation?: NativeTaskValidationSelection;
   readonly prompt: string;
   readonly maxSteps?: number;
   readonly maxTokens?: number;
+}
+export interface NativeTaskValidationSelection { readonly configSha256: string; readonly checkIds: readonly string[] }
+export interface NativeTaskValidationConfiguration {
+  readonly ready: boolean; readonly configSha256: string | null;
+  readonly checks: readonly { readonly id: string; readonly title: string }[]; readonly message: string;
+}
+export interface NativeTaskValidationOutput {
+  readonly checkId: string; readonly outputEventId: string; readonly payloadSha256: string;
+  readonly status: "available" | "unavailable" | "pruned"; readonly text: string | null;
+  readonly truncated: boolean; readonly redacted: boolean; readonly bytes: number | null;
 }
 export interface NativeTaskLimits {
   readonly maxActive: number; readonly maxSteps: number; readonly maxTokens: number;
@@ -36,6 +49,7 @@ export interface NativeTaskConfiguration {
   readonly providers: readonly { readonly id: NativeTaskProvider; readonly local: boolean;
     readonly credential: { readonly ref: string; readonly configured: boolean; readonly source: "env" | "file" | null } | null }[];
   readonly scope: NativeTaskToolScope; readonly limits: NativeTaskLimits;
+  readonly validation: NativeTaskValidationConfiguration;
   readonly boundary: string;
 }
 export interface NativeTaskApproval {
@@ -54,6 +68,9 @@ export interface NativeTaskView {
   readonly revision: number; readonly clientRequestId: string; readonly lastClientRequestId: string;
   readonly provider: NativeTaskProvider; readonly model: string | null; readonly tools: "none" | "workspace";
   readonly toolsDigest: string | null;
+  readonly validationSelection: NativeTaskValidationSelection | null;
+  readonly validation: NativeValidationResult;
+  readonly validationOutputs: readonly NativeTaskValidationOutput[];
   readonly maxSteps: number; readonly maxTokens: number;
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
   readonly turnEndReason: string | null; readonly error: string | null;

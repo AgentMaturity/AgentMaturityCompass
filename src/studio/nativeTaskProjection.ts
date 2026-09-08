@@ -1,3 +1,6 @@
+import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
+import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import { readNativeTaskValidationOutputs } from "./nativeTaskValidation.js";
 import { openLedger } from "../ledger/ledger.js";
 import { validateAcpCommittedTail } from "../acp/acpCommittedUpdates.js";
 import { projectSessionUpdates, type AcpSessionUpdate } from "../acp/acpProjection.js";
@@ -7,7 +10,7 @@ import { listApprovalRequests } from "../approvals/approvalChainStore.js";
 import { getApprovalInboxItem } from "../approvals/approvalInbox.js";
 import { redactSdkText } from "../sdk/amcEvidence.js";
 import type { EvidenceEvent } from "../types.js";
-import type { NativeTaskApproval, NativeTaskEvent } from "./nativeTaskTypes.js";
+import type { NativeTaskApproval, NativeTaskEvent, NativeTaskValidationOutput } from "./nativeTaskTypes.js";
 import { opendirSync, lstatSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -44,6 +47,8 @@ function project(update: AcpSessionUpdate, cursor: number): NativeTaskEvent | nu
     ...(typeof update.status === "string" ? { status: update.status } : {}) };
 }
 export interface NativeTaskProjection {
+  readonly validation: NativeValidationResult;
+  readonly validationOutputs: readonly NativeTaskValidationOutput[];
   readonly events: readonly NativeTaskEvent[]; readonly nextCursor: number; readonly firstCursor: number;
   readonly droppedEvents: number; readonly ending: string | null; readonly closed: boolean;
   readonly endingId: string | null;
@@ -100,5 +105,7 @@ export function readNativeTaskProjection(workspace: string, sessionId: string, a
       }
     } catch { approvals.length = 0; approvalError = "Pending approval records could not be authenticated; use the signed approval inbox before deciding."; }
   }
-  return { events, nextCursor: cursor, firstCursor: events[0]?.cursor ?? cursor + 1, droppedEvents, ending, endingId, closed, approvals, approvalError };
+  const validation = projectNativeValidation(workspace, rows);
+  return { validation, validationOutputs: readNativeTaskValidationOutputs(workspace, rows, validation),
+    events, nextCursor: cursor, firstCursor: events[0]?.cursor ?? cursor + 1, droppedEvents, ending, endingId, closed, approvals, approvalError };
 }

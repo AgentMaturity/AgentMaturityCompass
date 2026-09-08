@@ -21,6 +21,7 @@ export {
   AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError,
   type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt
 } from "./nativeAgentClient.js";
+export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
 export {
   discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName,
   type NativeMcpServer, type NativeMcpCatalog, type NativeMcpCatalogTool,

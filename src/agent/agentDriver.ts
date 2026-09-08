@@ -62,6 +62,7 @@ import {
 } from "./loopTypes.js";
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
+import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -70,6 +71,7 @@ export interface AgentDriverInit {
   /** The `system/prompt` row this run cites. P3.3 replaces it with an assembly seam. */
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
+  readonly validation?: NativeValidationPlan;
   readonly hooks?: LoopHooks;
   readonly config?: Partial<AgentLoopConfig>;
   /**
@@ -101,6 +103,7 @@ export class AgentDriver {
   private readonly config: AgentLoopConfig;
 
   private readonly stepInit: StepRunnerInit;
+  private readonly validation: NativeValidationPlan | undefined;
 
   private phase: Phase = { kind: "idle", lastTurn: 0 };
 
@@ -111,6 +114,7 @@ export class AgentDriver {
 
   constructor(init: AgentDriverInit) {
     this.session = init.session;
+    this.validation = init.validation === undefined ? undefined : freezeNativeValidationPlan(init.validation);
     this.hooks = init.hooks ?? NO_HOOKS;
     this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config };
     this.inbox = new LoopInbox(init.session, (notification) => {
@@ -326,7 +330,10 @@ export class AgentDriver {
     phase.turn = turnRef.turn;
     let ending: TurnEnding | null = null;
     let target: InboxTarget = "next-turn";
+    let validation: NativeValidationTurn | undefined;
     try {
+      if (this.validation) validation = new NativeValidationTurn({ session: this.session, tools: this.stepInit.tools,
+        plan: this.validation, turn: turnRef.turn, signal, abandonGraceMs: this.config.toolAbandonGraceMs });
       // Inside the try, NOT between startTurn and it. The turn/start row is
       // already durable at this point, so an observer that throws here would
       // otherwise leave a turn/start with no turn/end — the truncated turn this
@@ -395,6 +402,7 @@ export class AgentDriver {
         if (ending !== null && this.inbox.nextStep.length === 0) break;
         target = "next-step";
       }
+      if (ending?.reason === "complete") await validation?.run(phase.step);
     } catch (error: unknown) {
       if (signal.aborted) {
         ending = { reason: "cancelled", cause: cancelCauseOf(signal) };
@@ -404,6 +412,8 @@ export class AgentDriver {
       this.notifyError(error);
       throw error;
     } finally {
+      try { validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
+      catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       this.closeTurn(turnRef.turn, ending);
     }
 

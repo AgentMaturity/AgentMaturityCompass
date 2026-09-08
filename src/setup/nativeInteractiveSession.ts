@@ -10,8 +10,12 @@ import { createNativeInteractiveApprovals } from "./nativeInteractiveApprovals.j
 import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManager } from "../extensions/nativeExtensionRuntime.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
+import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
+  readonly validationConfig?: string;
+  readonly validationConfigSha256?: string;
+  readonly validate?: readonly string[];
   readonly extension?: readonly string[];
   readonly extensionPin?: readonly string[];
   readonly mcpConfig?: string;
@@ -41,9 +45,11 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     io.error("Choose --session or --fork-from, not both."); io.fail(); return;
   }
   let profile: ReturnType<typeof resolveNativeChatProfile>;
+  let validation: ReturnType<typeof resolveNativeValidationSelection>;
   try {
     profile = resolveNativeChatProfile(options);
     options = { ...options, ...profile.effectiveOptions };
+    validation = resolveNativeValidationSelection(options);
   } catch (error) {
     io.error(error instanceof Error ? error.message : "Native chat composition could not be resolved."); io.fail(); return;
   }
@@ -201,7 +207,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const routeBaseArgs = ["--agent", guide.agentId, "--provider", provider!, ...(guide.baseUrl === null ? [] : ["--base-url", guide.baseUrl]), "--model", guide.model!, "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens,
-      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs];
+      ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
+      ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
+        ...validation.checks.flatMap(check => ["--validate", check.id])])];
     const routeArgs = [...routeBaseArgs, ...nativeChatProfileArgv(profile)];
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
@@ -216,6 +224,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (approvalClass !== undefined) io.log(`Tool approval gate: ${approvalClass}, risk ${approvalRisk}. This terminal asks you to review actual queued requests using an existing authenticated reviewer session; quorum still applies.`);
       if (mcpArgs.length > 0) io.log("MCP tools use the reviewed catalog and pinned config. Each turn starts and disposes its own configured server; changed catalogs or config refuse the run.");
       if (extensions.list().length > 0) io.log(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
+      if (validation) io.log(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
       io.log(`Every turn writes AMC session evidence. Limit: ${maxSteps} model steps per turn, ${maxTokens} output tokens per request.`);
       io.log(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
     };
@@ -334,6 +343,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       assistantBlocks = summary.assistantText.length;
       const ending = Array.isArray(summary.endings) ? summary.endings.at(-1) : undefined;
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
+      io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");
         io.fail();

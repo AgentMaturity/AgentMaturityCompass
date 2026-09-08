@@ -20,6 +20,22 @@ from graphify.export import to_canvas, to_html, to_json, to_obsidian
 
 
 MAPS = {
+    "native-validation": [
+        "src/setup/nativeValidationConfig.ts", "src/agent/nativeValidation.ts",
+        "src/agent/nativeValidationResult.ts", "src/agent/nativeValidationProjection.ts",
+        "src/agent/agentDriver.ts", "src/agent/agentSession.ts", "src/agent/runReport.ts",
+        "src/cli-agent-commands.ts", "src/setup/nativeInteractiveSession.ts",
+        "src/kernel/agentLoopRunner.ts", "src/kernel/services/agentLoopServices.ts",
+        "src/sdk/nativeAgentClient.ts", "src/acp/acpAgentServer.ts", "src/acp/acpStdioMain.ts",
+        "src/acp/acpCommittedUpdates.ts", "src/studio/nativeTaskService.ts",
+        "src/studio/nativeTaskTypes.ts", "src/studio/nativeTaskDescriptors.ts",
+        "src/studio/nativeTaskProjection.ts", "src/studio/nativeTaskValidation.ts",
+        "src/api/nativeTasksRouter.ts", "src/console/assets/nativeTasks.js",
+        "src/console/assets/nativeTasksView.js", "src/agent/approvalGate.ts",
+        "src/agent/pipelineToolSeam.ts", "src/tools/toolPipeline.ts",
+        "src/tools/builtin/bashTool.ts", "src/tools/guards/policyGuards.ts",
+        "src/budgets/nativeBudgetAdmission.ts", "src/session/sessionService.ts",
+    ],
     "native-provider-names": [
         "src/llm/adapter/llmRuntime.ts", "src/llm/adapter/providerToolBinding.ts",
         "src/llm/adapter/streamRecorder.ts", "src/llm/blockAssembler.ts",
@@ -157,6 +173,13 @@ MAPS = {
     ],
 }
 READING_PATHS = {
+    "native-validation": [
+        ["src/cli-agent-commands.ts", "src/setup/nativeValidationConfig.ts", "src/agent/nativeValidation.ts"],
+        ["src/kernel/agentLoopRunner.ts", "src/kernel/services/agentLoopServices.ts", "src/agent/agentDriver.ts", "src/agent/nativeValidation.ts"],
+        ["src/acp/acpAgentServer.ts", "src/agent/agentSession.ts", "src/agent/agentDriver.ts", "src/agent/nativeValidation.ts"],
+        ["src/studio/nativeTaskProjection.ts", "src/agent/nativeValidationProjection.ts", "src/acp/acpCommittedUpdates.ts"],
+        ["src/sdk/nativeAgentClient.ts", "src/agent/nativeValidationResult.ts"],
+    ],
     "native-provider-names": [
         ["src/llm/adapter/llmRuntime.ts", "src/llm/request/providerToolNames.ts"],
         ["src/llm/adapter/llmRuntime.ts", "src/llm/adapter/providerToolBinding.ts"],

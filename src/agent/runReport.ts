@@ -31,6 +31,8 @@ import { readLoopRetryMeta } from "../session/loopEventMeta.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import type { EvidenceEvent } from "../types.js";
 import type { AgentStatus } from "./loopTypes.js";
+import type { NativeValidationResult } from "./nativeValidation.js";
+import { projectNativeValidation } from "./nativeValidationProjection.js";
 
 /** The literal a ledger writes in place of a signature under `AMC_NO_SIGN=1`. */
 /** The marker a row carries instead of a signature when signing is off. */
@@ -67,6 +69,8 @@ export interface AgentRunSummary {
   readonly assistantText: readonly string[];
   /** Rows whose `writer_sig` is the literal "unsigned". Zero is the only acceptable value. */
   readonly unsignedRows: number;
+  /** Public operator checks for the latest turn, independent of model completion. */
+  readonly validation: NativeValidationResult;
 }
 
 /** Read one session's committed rows in commit order. */
@@ -139,7 +143,8 @@ export function readAgentRunSummary(
     toolCalls: count("tool/call"),
     endings,
     assistantText: assistantTextOf(workspace, events),
-    unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length
+    unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length,
+    validation: projectNativeValidation(workspace, events)
   };
 }
 
@@ -251,6 +256,8 @@ export function renderRunSummary(summary: AgentRunSummary): string {
   for (const text of summary.assistantText) {
     lines.push(`  assistant: ${text}`);
   }
+  lines.push(`  validation ${summary.validation.status}${summary.validation.turn === null ? "" : ` (turn ${summary.validation.turn})`}`);
+  for (const check of summary.validation.checks) lines.push(`    ${check.id}: ${check.status}${check.exitCode === null ? "" : ` (exit ${check.exitCode})`}${check.reason === null ? "" : ` — ${check.reason}`}`);
   if (summary.unsignedRows > 0) {
     lines.push(
       `  WARNING: ${summary.unsignedRows} row(s) carry the literal "unsigned" signature; ` +

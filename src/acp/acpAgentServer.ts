@@ -9,6 +9,7 @@ import { projectSessionUpdates } from "./acpProjection.js";
 import { acpProtocolVersion, checkAcpShape } from "./acpSchema.js";
 import { acpStopReasonFor, stopReasonIsLossy } from "./acpStopReason.js";
 import { ACP_MAX_TURN_UPDATE_BYTES, validateAcpCommittedTail } from "./acpCommittedUpdates.js";
+import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 
 /**
  * An ACP agent, over one connection (plan P7.1a).
@@ -55,7 +56,7 @@ export interface AcpAgentInit {
     readonly signal: AbortSignal;
   }) => AgentSession | Promise<AgentSession>;
   readonly resumeSessionFactory?: AcpAgentInit["sessionFactory"];
-  readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean; readonly reviewedMcpConfigured: boolean };
+  readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean; readonly reviewedMcpConfigured: boolean; readonly taskValidation?: boolean };
   readonly onUnusable?: () => void;
   readonly log?: (message: string) => void;
 }
@@ -322,7 +323,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       // is flushed -- `flush` skips unprovenanced rows on its own.
       if (entry.cancelled || signal.aborted) {
         flush(entry, request.sessionId);
-        return { stopReason: "cancelled" };
+        return { stopReason: "cancelled", ...(init.nativeExecution?.taskValidation ? {
+          _meta: { "dev.agentmaturity.amc": { validation: projectNativeValidation(init.workspace, entry.session.readEvents()) } }
+        } : {}) };
       }
 
       // A failed turn emits no further tail. Already delivered updates were
@@ -338,9 +341,11 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       const reason = turnEndOf(outcome.status);
       return {
         stopReason: acpStopReasonFor(reason),
-        // Attached only when the mapping lost something, so `_meta` means "there
-        // is more here than the stop reason says" rather than being noise.
-        ...(stopReasonIsLossy(reason) ? { _meta: { "dev.agentmaturity.amc": { turnEndReason: reason } } } : {})
+        // Turn completion and selected public checks are independent outcomes.
+        ...(stopReasonIsLossy(reason) || init.nativeExecution?.taskValidation ? { _meta: { "dev.agentmaturity.amc": {
+          ...(stopReasonIsLossy(reason) ? { turnEndReason: reason } : {}),
+          ...(init.nativeExecution?.taskValidation ? { validation: outcome.validation } : {})
+        } } } : {})
       };
     } finally {
       clearInterval(timer);
