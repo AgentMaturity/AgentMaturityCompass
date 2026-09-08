@@ -11,6 +11,7 @@ import { writeLifecycleRunArtifact, type WriteLifecycleRunArtifactResult } from 
 import { appendRuntimeRunEvent } from "../runtime/runManager.js";
 import { writeTraceFailureIndex, type TraceFailureIndexRef } from "../watch/traceFailureIndex.js";
 import type { ProductionTrace } from "../agents/traceIngestion.js";
+import { detectPiSession, parsePiSession, piSessionSummary, piSessionTraces, type PiSessionFormat } from "./piSessionImport.js";
 import type { DiagnosticReport } from "../types.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -42,6 +43,8 @@ export interface NeutralImportCandidate {
   confidence: number;
   summary: string;
   redactionCount: number;
+  /** Set when a versioned source format was recognised (Pi v3 sessions today). */
+  sourceFormat?: PiSessionFormat;
 }
 
 export interface NeutralImportUnsupported {
@@ -538,23 +541,36 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
     }
     const raw = readFileSync(file);
     const text = raw.toString("utf8");
+    // A versioned format is recognised BEFORE the generic parse: an unsupported
+    // version is refused by name, never fed to the generic path as a success.
+    const pi = format === "jsonl" ? detectPiSession(text) : null;
+    if (pi?.kind === "unsupported") {
+      unsupported.push({ path: file, reason: pi.reason });
+      continue;
+    }
+    const piSession = pi ? parsePiSession(text) : null;
     let parsed: unknown;
     try {
-      parsed = parseFile(file, format);
+      parsed = piSession ? piSession.rows : parseFile(file, format);
     } catch (error) {
       unsupported.push({ path: file, reason: `Could not parse ${format.toUpperCase()}: ${error instanceof Error ? error.message : String(error)}` });
       continue;
     }
-    const category = detectCategory(file, format, parsed);
+    const category = piSession ? "event-log" : detectCategory(file, format, parsed);
     if (!category) {
       unsupported.push({ path: file, reason: "Unsupported shape. Add traces, event logs, run artifacts, workflow graphs, configs, memory stores, evaluator outputs, or benchmark results." });
       continue;
     }
     const redacted = redactDeep(parsed);
-    const amcTraces = amcTracesFromText(file, text);
-    const traces = amcTraces.length > 0
-      ? amcTraces
-      : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
+    const amcTraces = piSession ? [] : amcTracesFromText(file, text);
+    const traces = piSession
+      ? piSessionTraces(redacted.value as unknown[], piSession.format, { agentId, source: sourceRelative(sourcePath, file) })
+      : amcTraces.length > 0
+        ? amcTraces
+        : tracesFromCandidate(category, redacted.value, agentId, sourceRelative(sourcePath, file));
+    if (piSession && piSession.malformedLines.length > 0) {
+      warnings.push(`${piSession.malformedLines.length} malformed entr${piSession.malformedLines.length === 1 ? "y" : "ies"} in ${sourceRelative(sourcePath, file)} (line${piSession.malformedLines.length === 1 ? "" : "s"} ${piSession.malformedLines.join(", ")}) were counted and produced no evidence.`);
+    }
     const collaborationTelemetry = collaborationTelemetryFromCandidate(redacted.value, agentId, sourceRelative(sourcePath, file));
     const count = recordCount(parsed);
     parsedCandidates.push({
@@ -566,8 +582,11 @@ function parseCandidates(input: { workspace: string; inputPath: string; agentId?
         bytes: stat.size,
         recordCount: count,
         confidence: 0.9,
-        summary: categorySummary(category, count),
-        redactionCount: redacted.count
+        summary: piSession
+          ? piSessionSummary(piSession.format, traces.filter((trace) => "error" in trace && trace.error === true).length)
+          : categorySummary(category, count),
+        redactionCount: redacted.count,
+        ...(piSession ? { sourceFormat: piSession.format } : {})
       },
       redacted: redacted.value,
       traces,
@@ -738,7 +757,9 @@ function normalizedImportBody(input: {
     digest: candidate.candidate.digest,
     redactionCount: candidate.candidate.redactionCount,
     recordCount: candidate.candidate.recordCount,
-    data: candidate.redacted
+    data: candidate.redacted,
+    // Derived from the redacted rows above, so the mapping is auditable in place.
+    traces: candidate.traces
   }));
   return `${JSON.stringify({
     schemaVersion: "2026-05-22",

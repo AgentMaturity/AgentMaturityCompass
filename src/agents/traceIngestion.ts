@@ -27,8 +27,8 @@ export interface ProductionTrace {
   input: unknown;
   /** The agent output */
   output: unknown;
-  /** Duration of the agent run in ms */
-  durationMs: number;
+  /** Duration of the agent run in ms, or null when the source recorded none. Never a fabricated 0. */
+  durationMs: number | null;
   /** Timestamp of trace creation */
   timestamp: number;
   /** Span count in the trace */
@@ -222,7 +222,11 @@ export class TraceIngestionPipeline {
     // Update running averages
     const totalScores = this.scoredTraces.reduce((s, t) => s + t.metrics.overallScore, 0) + metrics.overallScore;
     this.stats.avgScoreOverall = totalScores / (this.stats.totalScored);
-    const totalLatency = this.scoredTraces.reduce((s, t) => s + t.trace.durationMs, 0) + trace.durationMs;
+    // Traces with unknown timing (imported sources record none) are left out
+    // of the average rather than counted as 0 ms.
+    const timed = [...this.scoredTraces.map((s) => s.trace.durationMs), trace.durationMs]
+      .filter((ms): ms is number => typeof ms === "number");
+    const totalLatency = timed.reduce((sum, ms) => sum + ms, 0);
     this.stats.avgLatencyMs = totalLatency / this.stats.totalIngested;
     this.stats.flagRate = this.stats.totalFlagged / Math.max(this.stats.totalScored, 1);
 
