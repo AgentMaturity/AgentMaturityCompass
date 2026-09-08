@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { lstatSync, mkdirSync, realpathSync, renameSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, mkdtempSync, realpathSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { VERSION, invoke, putJson, readJson, seedRepository } from "./codingCommon.mjs";
@@ -150,8 +150,12 @@ try {
   if (!cli.startsWith(root + sep)) throw new Error("CLI is outside the verified installed package root");
   receipt.inventory.beforeVerified = true;
   seedRepository(workspace, fixture);
-  const control = join(workspace, ".coding-control"), home = join(control, "home"), temp = join(control, "tmp");
-  mkdirSync(control, { mode: 0o700 }); mkdirSync(home, { mode: 0o700 }); mkdirSync(temp, { mode: 0o700 });
+  // Control checkpoints must be outside the governed project. The runner owns
+  // the enclosing trial directory and retains this sibling through its oracle.
+  const control = mkdtempSync(join(dirname(workspace), ".coding-control-"));
+  const home = join(control, "home"), temp = join(control, "tmp");
+  mkdirSync(home, { mode: 0o700 }); mkdirSync(temp, { mode: 0o700 });
+  receipt.control = { path: control, lifetime: "retained under the runner-owned trial parent until oracle and cleanup complete" };
   const env = isolatedEnvironment(home, temp);
   const deadline = Date.now() + lane.budgets.timeoutMs - 2500;
   const remaining = () => { const value = deadline - Date.now(); if (value < 1 || cancellation.signal.aborted) throw new Error("Coding trial deadline or cancellation reached"); return value; };

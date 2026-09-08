@@ -97,7 +97,9 @@ function context(id = "coding-range-normalization", source?: string) {
       input: JSON.stringify(envelope), encoding: "utf8", timeout: 10_000, maxBuffer: 512 * 1024,
       env: { LANG: "C.UTF-8", TZ: "UTC" }
     });
-    expect(result.error).toBeUndefined(); expect(result.signal).toBeNull(); expect(result.status).toBe(0);
+    const diagnostic = JSON.stringify({ status: result.status, signal: result.signal, error: result.error?.message,
+      stderr: result.stderr.slice(0, 4096), stdout: result.stdout.slice(0, 2048) });
+    expect(result.error, diagnostic).toBeUndefined(); expect(result.signal, diagnostic).toBeNull(); expect(result.status, diagnostic).toBe(0);
     return comparisonOracleSchema.parse(JSON.parse(result.stdout));
   }
   return { workspace, fixture, fixturePath, solution, receipt, envelope, run };

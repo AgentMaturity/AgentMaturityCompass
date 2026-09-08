@@ -285,3 +285,4 @@ if (process.argv[2] === "--probe") {
   runOracle().catch(() => {
     process.stdout.write(JSON.stringify({ schemaVersion: VERSION, verdict: "fail", checks: [{ id: "oracle-error", passed: false, evidence: "The coding oracle could not complete; no successful behavior is inferred." }] }) + "\n");
   });
+}

@@ -12,6 +12,7 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
+import { readEventPayload } from "../src/session/eventPayload.js";
 import { readAgentRunSummary, type AgentRunSummary } from "../src/agent/runReport.js";
 
 interface ModelRequest {
@@ -36,7 +37,11 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
   const pass = "synthetic-cli-subset-vault", credential = "synthetic-loopback-subset-key";
   vi.stubEnv("AMC_VAULT_PASSPHRASE", pass);
   workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-cli-subset-")));
-  const root = workspace, home = join(root, "isolated-home"); mkdirSync(home, { mode: 0o700 });
+  const root = join(workspace, "project"), home = join(workspace, "isolated-home");
+  mkdirSync(root, { mode: 0o700 }); mkdirSync(home, { mode: 0o700 });
+  // Independent control checkpoints must remain outside the governed project.
+  const checkpointRoot = join(workspace, "control-checkpoints");
+  vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpointRoot);
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
   initBudgets(root, "default"); writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
   mkdirSync(join(root, "workspace"), { recursive: true });
@@ -48,7 +53,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
   const policyPath = join(root, ".amc", "tools.yaml"); writeFileSync(policyPath, YAML.stringify(config));
   const originalPolicy = readFileSync(policyPath);
   const env: NodeJS.ProcessEnv = { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass,
-    AMC_SUBSET_LOOPBACK_KEY: credential, NO_COLOR: "1" };
+    AMC_SUBSET_LOOPBACK_KEY: credential, AMC_CONTROL_CHECKPOINT_DIR: checkpointRoot, NO_COLOR: "1" };
   async function run(args: string[]) {
     return new Promise<{ code: number | null; stdout: string; stderr: string }>((done, reject) => {
       const child = spawn(process.execPath, [cli, ...args], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
@@ -66,6 +71,10 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
   const signed = await run(["tools", "sign", "--json"]);
   expect(signed.code, signed.stderr).toBe(0); expect(JSON.parse(signed.stdout).ok).toBe(true);
   const requests: ModelRequest[] = [], auth: boolean[] = [], fixtureErrors: string[] = [];
+  const diagnostics = () => JSON.stringify({ surface, fixtureErrors, requests: requests.map(request => ({
+    tools: request.tools?.map(tool => tool.function.name), messages: request.messages.filter(message => message.role !== "system")
+      .map(message => ({ role: message.role, toolCallId: message.tool_call_id, content: String(message.content).slice(0, 768) }))
+  })) }).split(credential).join("[REDACTED]").split(pass).join("[REDACTED]").slice(0, 16000);
   const calls = [
     { name: "fs.read", arguments: { path: "workspace/review.txt" } },
     { name: "fs.write", arguments: { path: "workspace/forbidden.txt", content: "must not write" } },
@@ -98,8 +107,9 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     const result = await run(["agent-loop", "run", prompt, "--provider", "openai", "--model", "subset-fixture",
       "--base-url", `http://127.0.0.1:${address.port}`, "--credential", "AMC_SUBSET_LOOPBACK_KEY", "--credentials-home", home,
       "--tools", "workspace", "--max-steps", "6", "--max-tokens", "64", "--json"]);
-    const diagnostics = JSON.stringify({ stderr: result.stderr, stdout: result.stdout, fixtureErrors, requests: requests.length }).split(credential).join("[REDACTED]");
-    expect(result.code, diagnostics).toBe(0);
+    const childDiagnostics = JSON.stringify({ stderr: result.stderr.slice(0, 2000), stdout: result.stdout.slice(0, 2000) })
+      .split(credential).join("[REDACTED]").split(pass).join("[REDACTED]");
+    expect(result.code, `${childDiagnostics}\n${diagnostics()}`).toBe(0);
     summary = JSON.parse(result.stdout) as AgentRunSummary; displayed = JSON.stringify(result);
   } else {
     const { AMCNativeClient } = await import(pathToFileURL(resolve("dist/sdk/nativeAgentClient.js")).href) as typeof import("../src/sdk/nativeAgentClient.js");
@@ -122,16 +132,34 @@ test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes 
     // Encoder-owned streaming/usage fields must still be sent, without caller collisions.
     expect(request.stream).toBe(true); expect(request.stream_options).toEqual({ include_usage: true }); expect(request.max_tokens).toBe(64);
   }
-  expect(requests[0]!.messages.some(message => message.role === "user" && message.content === prompt)).toBe(true);
-  expect(requests[1]!.messages.find(message => message.tool_call_id === "subset-call-0")?.content).toBe(fixtureText);
-  expect(String(requests[2]!.messages.find(message => message.tool_call_id === "subset-call-1")?.content)).toContain("denied");
-  expect(String(requests[3]!.messages.find(message => message.tool_call_id === "subset-call-2")?.content)).toContain("denied");
+  // CLI composition appends independently committed runtime context to this
+  // wire message. The original input bytes are checked in the signed log below.
+  expect(requests[0]!.messages.some(message => message.role === "user" && typeof message.content === "string"
+    && message.content.slice(0, prompt.length) === prompt), diagnostics()).toBe(true);
+  const toolResult = (request: number, call: number): unknown => {
+    const content = requests[request]!.messages.find(message => message.tool_call_id === `subset-call-${call}`)?.content;
+    expect(typeof content, diagnostics()).toBe("string");
+    try { return JSON.parse(String(content)); } catch { throw new Error(`Invalid committed tool result: ${diagnostics()}`); }
+  };
+  expect(toolResult(1, 0), diagnostics()).toEqual({ type: "amc.tool-result", version: 1, isError: false, output: fixtureText });
+  for (const [request, call] of [[2, 1], [3, 2]] as const) {
+    expect(toolResult(request, call), diagnostics()).toEqual({ type: "amc.tool-result", version: 1,
+      isError: true, output: expect.stringContaining("denied") });
+  }
   expect(existsSync(join(root, "workspace", "forbidden.txt"))).toBe(false);
   expect(existsSync(join(root, "workspace", "forbidden-shell.txt"))).toBe(false);
   expect(readFileSync(policyPath)).toEqual(originalPolicy);
   const ledger = openLedger(root, { readonly: true });
   try {
-    const audits = ledger.getAllEvents().filter(row => row.session_id === summary.sessionId && String(JSON.parse(row.meta_json).auditType).startsWith("TOOL_CALL_"));
+    const rows = ledger.getAllEvents().filter(row => row.session_id === summary.sessionId);
+    const originalInputs = rows.filter(row => row.event_type === "user/message").filter(row => {
+      const payload = readEventPayload(root, row);
+      return payload.status === "ok" && payload.bytes.toString("utf8") === prompt;
+    });
+    expect(originalInputs, diagnostics()).toHaveLength(1);
+    expect(originalInputs[0]!.writer_sig).not.toBe("unsigned");
+    expect(extractEnvelope(originalInputs[0]!.meta_json)?.sessionId).toBe(summary.sessionId);
+    const audits = rows.filter(row => String(JSON.parse(row.meta_json).auditType).startsWith("TOOL_CALL_"));
     expect(audits.map(row => ({ name: JSON.parse(row.meta_json).toolName, type: JSON.parse(row.meta_json).auditType })))
       .toEqual([{ name: "fs.read", type: "TOOL_CALL_ALLOWED" }, { name: "fs.write", type: "TOOL_CALL_DENIED" }, { name: "bash", type: "TOOL_CALL_DENIED" }]);
     for (const row of audits) { expect(row.writer_sig).not.toBe("unsigned"); expect(extractEnvelope(row.meta_json)?.sessionId).toBe(summary.sessionId); }
