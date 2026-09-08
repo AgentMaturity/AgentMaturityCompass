@@ -77,7 +77,8 @@ function rowsOf(dir: string, sessionId: string): readonly EvidenceEvent[] {
 describe("AMC-1511 — resume across processes", () => {
   test("a different agent cannot take over or recover a signed session", () => {
     const dir = workspace();
-    const a = new SessionService(dir);
+    const store = openSessionEventStore(dir);
+    const a = new SessionService(dir, store);
     a.open({ ...OPEN, agentId: "reviewer" });
     a.startTurn({ trigger: "user" });
     a.recordUserMessage("unclosed turn must not be recovered by another identity");
@@ -86,7 +87,7 @@ describe("AMC-1511 — resume across processes", () => {
       expect(() => assertSessionResumeAgent({ workspace: dir, sessionId: a.sessionId, agentId: "default" })).toThrow(/AGENT_MISMATCH/);
       expect(() => resumeSession({ workspace: dir, sessionId: a.sessionId, claimant: B, ...OPEN })).toThrow(/AGENT_MISMATCH/);
       expect(rowsOf(dir, a.sessionId)).toEqual(before);
-    } finally { a.releaseWithoutClosing(); }
+    } finally { store.close(); }
   });
 
   test("B verifies and resumes A's session: byte-consistent history, old signatures kept, new evidence appended", () => {
