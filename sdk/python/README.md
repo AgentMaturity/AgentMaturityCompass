@@ -12,7 +12,13 @@ with AmcAgent(workspace=".", provider="openai", model="YOUR_MODEL_ID",
     print(result.stop_reason, result.text)
 ```
 
-Initialize the workspace and set the credential reference with the AMC CLI first. The client never initializes the workspace or accepts a different workspace in a session message. `credential` names a reference; do not put a key value in command arguments. `base_url`, `model` and provider selection are fixed at process launch. Supported ACP routes remain OpenAI Chat Completions, Anthropic and `stub`. Unsupported providers are refused without a fallback.
+Initialize the workspace and set the credential reference with the AMC CLI first. The client never initializes the workspace or accepts a different workspace in a session message. `credential` names a reference; do not put a key value in command arguments. `base_url`, `model` and provider selection are fixed at process launch. Supported ACP routes are OpenAI Chat Completions (`openai`), OpenAI Responses (`openai-responses`), Anthropic and `stub`. Unsupported providers are refused without a fallback.
+
+For `provider="openai-responses"`, `base_url` is the server origin: AMC appends
+`/v1/responses`. For example, a loopback fixture listening on port 8765 uses
+`base_url="http://127.0.0.1:8765"`, **not** `"http://127.0.0.1:8765/v1"`.
+The example address is a placeholder for your own local fixture; it does not
+start a provider server.
 
 `provider="stub"` is a local recording demonstration with a canned answer, and remains the Python compatibility default. It does not establish real provider access or successful model work.
 
@@ -30,7 +36,7 @@ with AmcAgent(workspace=".", provider="stub") as agent:
     print(result.stop_reason, result.verification)
 ```
 
-`Turn` supports one iterator and retains its updates in `RunResult.updates`. The result is separate from the stream. Updates are completed blocks projected from committed session rows, currently emitted when a turn finishes; they are not live provider token deltas. A cancellation request does not prove cancellation occurred: inspect the final stop reason. Closing the client cancels and settles active work before sealing owned sessions; a forced termination remains an interrupted run requiring recovery.
+`Turn` supports one iterator and retains its updates in `RunResult.updates`. The result is separate from the stream. Updates are completed blocks projected from committed session rows and may arrive while a turn is still running; they are not raw provider token deltas. A cancellation request does not prove cancellation occurred: inspect the final stop reason. Closing the client cancels and settles active work before sealing owned sessions; a forced termination remains an interrupted run requiring recovery.
 
 ## Explicit handoff and verified resume
 
@@ -77,9 +83,9 @@ Request timeout defaults to 120 seconds and is configurable with `timeout`. Tran
 
 MCP client servers and additional workspace roots remain unsupported and are refused rather than silently ignored.
 
-## Deferred verification
+## Verification scope
 
-The continuation and transport parity implementation has not been executed in this development pass. After the implementation batch is complete, run focused protocol regressions and actual installed CLI/Python acceptance, including explicit handoff, loaded history, cancellation, failure cleanup and independent proof verification. Existing tests that asserted `loadSession: false` need the new capability expectation when run against the updated runtime.
+Protocol completion is not an installed-client or platform qualification. Acceptance must identify the Python wheel and AMC executable and exercise explicit handoff, loaded history, cancellation, child cleanup and independent proof verification. A local scripted provider establishes transport and lifecycle behavior, not real-provider access or answer quality.
 # Native execution options and committed progress
 
 AMC runs its own sessions and tools; no DSH/Pi installation is required.
@@ -106,5 +112,5 @@ session separately. Output/polling bounds and cancellation cleanup fail closed.
 An MCP connection is disposed on cancellation; a subsequent explicit session
 handoff/load can mount the same reviewed configuration again.
 
-This source change has not yet been tested or run; execution qualification is
-deferred to the final implementation batch.
+Qualification receipts apply only to their recorded source, installed artifacts,
+platforms and exercised behavior. These API descriptions do not extend that scope.

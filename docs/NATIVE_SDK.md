@@ -32,6 +32,8 @@ try {
 
 For a real provider, select `provider: "openai"`, `"openai-responses"` or `"anthropic"`, supply an accessible `model`, and configure a credential reference. Secrets remain in the local credential environment or store; `credential` names a reference, not a value. No provider failure falls back to the stub.
 
+For a custom Responses server, supply its origin as `baseUrl`, for example `"http://127.0.0.1:8080"`. AMC appends `/v1/responses`; omit `/v1` and `/responses` from the supplied value. Python uses the equivalent `base_url` option.
+
 The process startup options include `tools: "workspace"`, `approveTools`, `approveRisk`, `mcpConfig`, `mcpConfigSha256`, `credentialsHome`, `credentialsFile`, `maxTokens` and `maxSteps`. These are explicit operator choices for the spawned runtime; a later session request cannot silently widen them. Workspace tools still require signed policy and exact recorder binding. MCP uses the same [reviewed native configuration](NATIVE_MCP.md); server connections are owned and disposed by the runtime. This ACP alignment is being integrated in the current batch and is not yet qualified.
 
 `newSession()` establishes an accepted conversation. A turn starts `submitted`, becomes `receiving` if committed updates arrive, and produces a `completed` result or a failure. Submission is not an acknowledgement that a model request has started. ACP `end_turn` is not a task-success verdict: read metadata for lossy mappings. Every response remains `not-verified` until a separate cold verifier returns a consistent receipt. `workspace-key-consistency` proves consistency against the workspace's own key; only `externally-anchored` includes an expected external fingerprint. Neither proves the answer correct.

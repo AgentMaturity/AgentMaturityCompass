@@ -1,4 +1,5 @@
-import { rmSync } from "node:fs";
+import { rmSync, writeFileSync } from "node:fs";
+import YAML from "yaml";
 import { afterEach, describe, expect, test } from "vitest";
 import { buildLoopEventRow, readLoopRetryMeta } from "../src/session/loopEventMeta.js";
 import type { LoopEventRecord } from "../src/session/loopEventMeta.js";
@@ -11,6 +12,7 @@ import { resolveRetryPolicy } from "../src/llm/retryPolicy.js";
 import { bodyFromChunks } from "../src/llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../src/llm/adapter/transport.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { budgetUsageSnapshot, budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 import {
   loopHarness,
   LOOP_MODEL,
@@ -203,12 +205,21 @@ describe("P3.2 — request-boundary retry inside one step", () => {
 
   test("the retry budget is finite and its exhaustion is a distinct recorded reason", async () => {
     const retry = recordingRetryRuntime();
+    let dispatched = 0;
+    const transport = failingTransport(9, { status: 503, body: "upstream down" });
     const harness = harnessFor({
       scripts: [textStep("never reached")],
-      transport: failingTransport(9, { status: 503, body: "upstream down" }),
+      transport: request => { dispatched++; return transport(request); },
       retry: { mode: "normal", maxRetries: 2, backoff: { initialDelayMs: 10, maxDelayMs: 20 } },
       retryRuntime: retry
     });
+    // This case isolates retry-count exhaustion. A 503 reports no usage, so
+    // the default native budget policy would correctly stop the next spend.
+    // Explicitly review/sign uncertainty here; never weaken the default guard.
+    const budget = loadBudgetsConfig(harness.dir);
+    budget.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING";
+    writeFileSync(budgetsPath(harness.dir), YAML.stringify(budget));
+    signBudgetsConfig(harness.dir);
 
     harness.driver.followup("hello");
     await harness.driver.whenIdle();
@@ -217,6 +228,11 @@ describe("P3.2 — request-boundary retry inside one step", () => {
 
     // maxRetries: 2 means three dispatches total, and no more.
     expect(rowsOf(events, "request/header")).toHaveLength(3);
+    expect(dispatched).toBe(3);
+    const usage = budgetUsageSnapshot(harness.dir, "default");
+    expect(usage.daily.llmRequests).toBe(3);
+    expect(usage.daily.unknownLlmTokenRequests).toBe(3);
+    expect(usage.daily.llmTokenUsageComplete).toBe(false);
     expect(rowsOf(events, "step/start")).toHaveLength(1);
     const decisions = retryRows(events).map((row) => row.meta.decision);
     expect(decisions).toEqual(["retry", "retry", "give-up"]);

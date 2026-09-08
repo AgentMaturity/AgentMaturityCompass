@@ -25,6 +25,8 @@ If the guide reports a missing workspace, initialize explicitly with `amc init -
 
 Real providers require a model ID you choose and can access. Responses currently supports text and function-tool exchanges; unsupported reasoning replay, media and hosted-tool output are refused. Selecting another provider does not silently fall back to `stub`.
 
+For a custom Responses server, `--base-url` is the server origin, for example `http://127.0.0.1:8080`. AMC appends `/v1/responses`; do not include `/v1` or `/responses` in that option. The server must implement the supported Responses contract; an OpenAI-compatible Chat endpoint alone is insufficient.
+
 Store a credential using its reference name, with the value entered at the masked prompt or through stdin:
 
 ```sh

@@ -10,6 +10,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { ToolRegistry, defineTool } from "../src/tools/toolRegistry.js";
 import { ToolPipeline } from "../src/tools/toolPipeline.js";
 import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
+import { NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
 
 /**
  * Every governed tool call lands in the signed spine (P5.1 remainder).
@@ -106,11 +107,23 @@ describe("a governed call leaves evidence", () => {
     const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
-    await toolset.seam.execute(call("fs.read", { path: "workspace/n.txt" }));
+    const request = call("fs.read", { path: "workspace/n.txt" });
+    expect((await toolset.seam.execute(request)).outcome).toBe("OK");
 
     const written = rows(workspace);
-    expect(written.filter((row) => row.event_type === "audit")).toHaveLength(1);
-    expect(written.filter((row) => row.event_type === "metric")).toHaveLength(1);
+    const audits = written.filter(row => row.event_type === "audit");
+    // Admission and disposition are separate facts. Exact types/counts keep
+    // duplicate tool evidence visible instead of counting every audit as a call.
+    expect(audits.map(row => row.meta.auditType).sort()).toEqual([NATIVE_BUDGET_RESERVATION, "TOOL_CALL_ALLOWED"]);
+    const disposition = audits.find(row => row.meta.auditType === "TOOL_CALL_ALLOWED")!;
+    expect(disposition.meta).toMatchObject({ callId: request.callId, actionClass: "READ_ONLY", effectiveMode: "EXECUTE" });
+    expect(audits.find(row => row.meta.auditType === NATIVE_BUDGET_RESERVATION)?.meta).toMatchObject({
+      kind: "tool", nativeSessionId: "toolset-test-session", agentId: "default", callId: request.callId,
+      toolToken: disposition.meta.toolToken, actionClass: "READ_ONLY"
+    });
+    const metrics = written.filter(row => row.event_type === "metric");
+    expect(metrics).toHaveLength(1);
+    expect(metrics[0]?.meta).toMatchObject({ metricKey: "tool_call_outcome", callId: request.callId, toolToken: disposition.meta.toolToken });
   });
 
   it("correlates a call to its token, so a denial can be traced", async () => {
@@ -118,11 +131,12 @@ describe("a governed call leaves evidence", () => {
     const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
     open.push(toolset);
 
-    await toolset.seam.execute(call("bash", { command: "sudo ls" }));
-    const audit = rows(workspace).find((row) => row.event_type === "audit");
+    const request = call("bash", { command: "sudo ls" });
+    await toolset.seam.execute(request);
+    const audit = rows(workspace).find((row) => row.event_type === "audit" && row.meta.auditType === "TOOL_CALL_DENIED");
 
     expect(String(audit?.meta["toolToken"] ?? "")).toMatch(/^tok_/);
-    expect(audit?.meta).toHaveProperty("callId");
+    expect(audit?.meta.callId).toBe(request.callId);
   });
 
   it("does NOT copy the arguments into the audit row", async () => {
