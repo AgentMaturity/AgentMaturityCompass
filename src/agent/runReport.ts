@@ -194,6 +194,11 @@ export async function verifyAgentRun(workspace: string, sessionId: string): Prom
   const ledger = openLedger(workspace, { readonly: true });
   let unsignedRowIds: string[];
   try {
+    // No requests is valid for a recorded empty session, but cannot prove that
+    // an unrecorded session ever existed.
+    if (!ledger.getAllSessions().some((session) => session.session_id === sessionId)) {
+      sessionChainErrors.push(`Session ${sessionId} not found`);
+    }
     verifySessionChains(ledger, sessionChainErrors);
     unsignedRowIds = ledger
       .getAllEvents()

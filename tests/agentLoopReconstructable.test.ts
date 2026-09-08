@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
@@ -7,7 +7,7 @@ import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { verifySessionChains } from "../src/ledger/sessionVerification.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { deriveRecordedRequest } from "../src/llm/request/deriveRequest.js";
-import { readAgentRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
+import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "../src/agent/runReport.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -190,7 +190,7 @@ describe("P3.2 — the run reconstructs and is signed", () => {
     expect(report.ok).toBe(true);
   });
 
-  test.each(["summary", "verification"] as const)("public-only %s reads preserve the supplied keys without creating a vault", async (reader) => {
+  test.each(["summary", "verification", "missing-session verification", "empty-session verification"] as const)("public-only %s reads preserve the supplied keys without creating a vault", async (reader) => {
     const source = mkdtempSync(join(tmpdir(), "amc-run-report-source-"));
     const snapshot = mkdtempSync(join(tmpdir(), "amc-run-report-public-"));
     try {
@@ -202,20 +202,38 @@ describe("P3.2 — the run reconstructs and is signed", () => {
         ledger.startSession({ sessionId: "public-run", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
         ledger.appendEvidence({ sessionId: "public-run", runtime: "unknown", eventType: "stdout", payload: "signed snapshot event", inline: true });
         ledger.sealSession("public-run");
+        ledger.startSession({ sessionId: "empty-run", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+        ledger.sealSession("empty-run");
         await ledger.db.backup(join(snapshot, ".amc", "evidence.sqlite"));
       } finally {
         ledger.close();
       }
       const keys = join(snapshot, ".amc", "keys");
-      const keyBytes = () => Object.fromEntries(readdirSync(keys).sort().map((file) => [file, sha256Hex(readFileSync(join(keys, file)))]));
+      const keyBytes = () => Object.fromEntries(readdirSync(keys).sort().map((file) => [file, {
+        sha256: sha256Hex(readFileSync(join(keys, file))),
+        mtimeMs: statSync(join(keys, file)).mtimeMs
+      }]));
       const before = keyBytes();
+      const dbPath = join(snapshot, ".amc", "evidence.sqlite");
+      const dbBefore = { sha256: sha256Hex(readFileSync(dbPath)), mtimeMs: statSync(dbPath).mtimeMs };
       if (reader === "summary") {
         expect(readAgentRunSummary(snapshot, "public-run", "idle").events).toBe(1);
       } else {
-        // This fixture checks reader side effects, not request reconstruction.
-        expect((await verifyAgentRun(snapshot, "public-run")).ledgerOk).toBe(true);
+        const sessionId = reader === "missing-session verification" ? "missing-run" : reader === "empty-session verification" ? "empty-run" : "public-run";
+        const report = await verifyAgentRun(snapshot, sessionId);
+        expect(report.ledgerOk).toBe(true);
+        expect(report.requests).toEqual([]);
+        if (reader === "missing-session verification") {
+          expect(report.ok).toBe(false);
+          expect(report.sessionChainErrors).toEqual(["Session missing-run not found"]);
+          expect(renderVerifyReport(report)).toContain("session missing-run: NOT VERIFIED");
+        } else {
+          expect(report.ok).toBe(true);
+          expect(report.sessionChainErrors).toEqual([]);
+        }
       }
       expect(keyBytes()).toEqual(before);
+      expect({ sha256: sha256Hex(readFileSync(dbPath)), mtimeMs: statSync(dbPath).mtimeMs }).toEqual(dbBefore);
       expect(existsSync(join(snapshot, ".amc", "vault.amcvault"))).toBe(false);
       expect(existsSync(join(snapshot, ".amc", "vault.amcvault.meta.json"))).toBe(false);
     } finally {
