@@ -32,6 +32,7 @@ import { verifyReceipt } from "../receipts/receipt.js";
 import { verifyEvidencePayload } from "./retentionVerification.js";
 import { openLedger, targetsDir, canonicalMetadataForHash, type Ledger, type EvidenceLedgerReader } from "./ledger.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
+import { readSessionWriter } from "../session/sessionOwnership.js";
 import { verifySessionChains } from "./sessionVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
@@ -39,8 +40,8 @@ import type { EvidenceEvent } from "../types.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
- * unclosed agent session. 60s: long enough that a slow turn is not misread as a
- * crash, short enough that a genuinely dead session is surfaced promptly. A
+ * unclosed agent session without a completed signed handoff. 60s: long enough
+ * that a slow turn is not misread as a crash, short enough to surface a stale tail. A
  * caller can override it per verification via LedgerVerifyOptions.
  */
 export const SESSION_STALE_AFTER_MS = 60_000;
@@ -86,7 +87,8 @@ export interface VerifyResult {
    *
    * Openness is derived from the ABSENCE of a chained, signed `session/close`
    * event, not from a nullable seal column, so it cannot be manufactured by
-   * NULLing a field. OPEN and INTERRUPTED are surfaced here rather than pushed to
+   * NULLing a field. RELEASED identifies a verified explicit handoff with no unsealed turn.
+   * OPEN and INTERRUPTED are surfaced here rather than pushed to
    * `chain.errors`: a running or crashed agent must not make its own workspace
    * fail verification, yet an interrupted session must never be laundered into a
    * clean seal — the two are reported distinctly. Legacy (non-agent) sessions
@@ -94,9 +96,11 @@ export interface VerifyResult {
    * is a `chain` error exactly as before.
    */
   sessions: {
-    /** Agent sessions with no `session/close` whose last event is within the staleness window. Not an error. */
+    /** Unclosed agent sessions without an accepted handoff, within the staleness window. Not an error. */
     open: readonly string[];
-    /** Agent sessions with no `session/close` whose last event is older than the staleness window. */
+    /** Verified terminal signed handoff with a released owner and no unsealed turn; remains resumable regardless of age. */
+    released: readonly string[];
+    /** Agent sessions with no `session/close` without an accepted handoff whose last event is older than the staleness window. */
     interrupted: readonly string[];
     /** Agent sessions closed by a `session/close` event and carrying a valid row seal. */
     closed: readonly string[];
@@ -121,8 +125,8 @@ export interface LedgerVerifyOptions {
   expectedMonitorFingerprint?: string;
   /**
    * How long an agent session may go without a new event before an unsealed,
-   * unclosed session is judged INTERRUPTED rather than OPEN. Defaults to
-   * SESSION_STALE_AFTER_MS. Exposed so a caller — or a test — can pin the window
+   * unclosed session without an accepted handoff is judged INTERRUPTED rather
+   * than OPEN. Defaults to SESSION_STALE_AFTER_MS. Exposed so a caller — or a test — can pin the window
    * instead of depending on wall-clock timing.
    */
   sessionStaleAfterMs?: number;
@@ -241,7 +245,7 @@ function chainOnlyResult(errors: string[]): VerifyResult {
     trustRoot: { anchored: false, monitorFingerprint: null, expectedFingerprint: null },
     // This check inspects a single event, not the whole session population, so it
     // makes no lifecycle claim about any session.
-    sessions: { open: [], interrupted: [], closed: [] }
+    sessions: { open: [], released: [], interrupted: [], closed: [] }
   };
 }
 
@@ -340,6 +344,7 @@ function verifyEvents(
  */
 interface SessionLifecycle {
   open: string[];
+  released: string[];
   interrupted: string[];
   closed: string[];
 }
@@ -357,12 +362,17 @@ function verifySessions(
 
   // One pass gathers the per-session facts. lastEvent* take the final value
   // because events arrive in rowid (append) order, so the last write wins.
+  const lastEventBySession = new Map<string, EvidenceEvent>();
+  const unsealedTurns = new Set<string>();
   const lastEventHashBySession = new Map<string, string>();
   const lastEventTsBySession = new Map<string, number>();
   const openedSessions = new Set<string>();
   const closedSessions = new Set<string>();
   const agentSessions = new Set<string>();
   for (const event of events) {
+    lastEventBySession.set(event.session_id, event);
+    if (event.event_type === "turn/start") unsealedTurns.add(event.session_id);
+    if (event.event_type === "turn/seal") unsealedTurns.delete(event.session_id);
     lastEventHashBySession.set(event.session_id, event.event_hash);
     lastEventTsBySession.set(event.session_id, event.ts);
     if (event.event_type === "session/open") openedSessions.add(event.session_id);
@@ -377,7 +387,10 @@ function verifySessions(
     }
   }
 
-  const lifecycle: SessionLifecycle = { open: [], interrupted: [], closed: [] };
+  const lifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
+  // verifyEvents and verifySessionChains ran first. Never accept a handoff
+  // from unauthenticated evidence; lifecycle labels do not suppress their errors.
+  const authenticatedEvidence = errors.length === 0;
   const now = Date.now();
 
   for (const session of sessions) {
@@ -392,10 +405,18 @@ function verifySessions(
     // An agent session with no chained, signed session/close is live, not broken.
     // Its openness is read from the ABSENCE of that event — not from a nullable
     // seal column an attacker could NULL — so it cannot be manufactured. A recent
-    // heartbeat reads as OPEN; a stale tail as INTERRUPTED. Neither is an error,
+    // heartbeat reads as OPEN; a stale tail as INTERRUPTED, unless an explicit
+    // verified handoff ended ownership after sealing the turn. Neither is an error,
     // and the two are kept distinct so an interruption is never mistaken for a
     // clean seal.
     if (isAgentSession && !isClosed) {
+      const tail = lastEventBySession.get(session.session_id) ?? null;
+      if (authenticatedEvidence && tail?.event_type === "session/release"
+        && extractEnvelope(tail.meta_json) !== null && readSessionWriter(tail)?.state === "released"
+        && !unsealedTurns.has(session.session_id)) {
+        lifecycle.released.push(session.session_id);
+        continue;
+      }
       const lastTs = lastEventTsBySession.get(session.session_id) ?? session.started_ts;
       if (now - lastTs <= staleAfterMs) lifecycle.open.push(session.session_id);
       else lifecycle.interrupted.push(session.session_id);
@@ -577,7 +598,7 @@ export function verifyLedgerIntegrity(
   const chainErrors: string[] = [];
   const governanceErrors: string[] = [];
   const staleAfterMs = options.sessionStaleAfterMs ?? SESSION_STALE_AFTER_MS;
-  let sessionLifecycle: SessionLifecycle = { open: [], interrupted: [], closed: [] };
+  let sessionLifecycle: SessionLifecycle = { open: [], released: [], interrupted: [], closed: [] };
 
   // The trust root comes first: if the key every signature is checked against
   // is not the key the operator expects, nothing below this line means
@@ -658,6 +679,7 @@ export function verifyLedgerIntegrity(
     },
     sessions: {
       open: sessionLifecycle.open,
+      released: sessionLifecycle.released,
       interrupted: sessionLifecycle.interrupted,
       closed: sessionLifecycle.closed
     }

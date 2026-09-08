@@ -21,7 +21,7 @@ export function registerSessionCommands(program: Command): void {
 
   session
     .command("verify")
-    .description("Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed)")
+    .description("Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed)")
     .option("--json", "Output as JSON")
     .option(
       "--expect-monitor <fingerprint>",
@@ -39,11 +39,12 @@ export function registerSessionCommands(program: Command): void {
         return;
       }
       console.log(renderLedgerVerdict(result));
-      const { open, interrupted, closed } = result.sessions;
+      const { open, released, interrupted, closed } = result.sessions;
       console.log("");
       console.log(chalk.bold("Agent sessions"));
       console.log(`  ${chalk.green("closed")}      ${closed.length}`);
       console.log(`  ${chalk.cyan("open")}        ${open.length}`);
+      console.log(`  ${chalk.cyan("released")}    ${released.length} (handed off; resumable)`);
       console.log(`  ${chalk.yellow("interrupted")} ${interrupted.length}`);
       for (const id of interrupted) {
         // Surfaced, never laundered: an interrupted session is reported distinctly
