@@ -11,6 +11,8 @@
     "scripts/postinstall.js",
     "scripts/run-policy-fixtures-ci.mjs",
     "fixtures/policy/amc-ci-policy-fixtures.yaml",
+    "deploy/apparmor/**",
+    "docs/NATIVE_SANDBOX_UBUNTU.md",
     "README.md",
     "THIRD_PARTY_NOTICES",
     "LICENSE"

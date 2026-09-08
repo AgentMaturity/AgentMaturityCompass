@@ -67,7 +67,10 @@ export function signToolsConfig(workspace: string, explicitPath?: string): strin
   if (!pathExists(file)) {
     throw new Error(`Tools config not found: ${file}`);
   }
-  const digest = sha256Hex(readFileSync(file));
+  const bytes = readFileSync(file);
+  // Validate and sign the same snapshot; never endorse malformed edited grants.
+  toolsConfigSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const digest = sha256Hex(bytes);
   const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
   const payload: SignedDigest = {
     digestSha256: digest,

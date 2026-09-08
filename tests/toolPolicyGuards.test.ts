@@ -111,14 +111,14 @@ describe("the runtime firewall as a tool guard", () => {
 });
 
 describe("budgets as a tool guard", () => {
-  it("permits up to the limit and denies past it, on the class that ran out", async () => {
+  it("denies the next execute at the limit, on the class that ran out", async () => {
     await withWorkspace(async (workspace) => {
       writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
       const pipeline = pipelineWith(workspace, "both");
 
       // Default DEPLOY limit is 3.
       spendDeployBudget(workspace, 3);
-      expect((await pipeline.execute(call("deploy"))).ok, "at the limit").toBe(true);
+      expect((await pipeline.execute(call("deploy"))).ok, "the next call would exceed the limit").toBe(false);
 
       spendDeployBudget(workspace, 1);
       const denied = await pipeline.execute(call("deploy"));

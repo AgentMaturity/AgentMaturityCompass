@@ -7,6 +7,7 @@ import { openLedger } from "../ledger/ledger.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass } from "../types.js";
+import { projectBudgetUsage, readBudgetEvents, type BudgetUsage } from "./nativeBudgetUsage.js";
 
 const actionClassSchema = z.enum([
   "READ_ONLY",
@@ -25,6 +26,7 @@ const budgetsSchema = z.object({
     version: z.literal(1),
     perAgent: z.record(z.string(), 
       z.object({
+        unknownTokenUsage: z.enum(["BLOCK", "ALLOW_WITH_WARNING"]).optional(),
         daily: z.object({
           maxLlmRequests: z.number().int().positive(),
           maxLlmTokens: z.number().int().positive(),
@@ -55,16 +57,6 @@ interface SignedDigest {
   signature: string;
   signedTs: number;
   signer: "auditor";
-}
-
-function todayBounds(now = Date.now()): { start: number; end: number } {
-  const date = new Date(now);
-  date.setHours(0, 0, 0, 0);
-  const start = date.getTime();
-  return {
-    start,
-    end: start + 24 * 60 * 60 * 1000 - 1
-  };
 }
 
 export function budgetsPath(workspace: string): string {
@@ -124,7 +116,9 @@ export function loadBudgetsConfig(workspace: string): BudgetsConfig {
 
 export function signBudgetsConfig(workspace: string): string {
   const path = budgetsPath(workspace);
-  const digest = sha256Hex(readFileSync(path));
+  const bytes = readFileSync(path);
+  budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+  const digest = sha256Hex(bytes);
   const sig = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
   const payload: SignedDigest = {
     digestSha256: digest,
@@ -137,7 +131,7 @@ export function signBudgetsConfig(workspace: string): string {
   return sigPath;
 }
 
-export function verifyBudgetsConfigSignature(workspace: string): {
+export function verifyBudgetsConfigSignature(workspace: string, content?: Buffer): {
   valid: boolean;
   signatureExists: boolean;
   reason: string | null;
@@ -154,7 +148,7 @@ export function verifyBudgetsConfigSignature(workspace: string): {
   }
   try {
     const payload = JSON.parse(readFileSync(sigPath, "utf8")) as SignedDigest;
-    const digest = sha256Hex(readFileSync(path));
+    const digest = sha256Hex(content ?? readFileSync(path));
     if (digest !== payload.digestSha256) {
       return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
     }
@@ -177,6 +171,13 @@ export function verifyBudgetsConfigSignature(workspace: string): {
   }
 }
 
+/** Admission parses the exact bytes whose signature it verified. */
+export function loadVerifiedBudgetsConfig(workspace: string): BudgetsConfig {
+  const bytes = readFileSync(budgetsPath(workspace));
+  if (!verifyBudgetsConfigSignature(workspace, bytes).valid) throw new Error("budgets config is not verifiable");
+  return budgetsSchema.parse(YAML.parse(bytes.toString("utf8")) as unknown);
+}
+
 export function initBudgets(workspace: string, agentId = "default"): { configPath: string; sigPath: string } {
   ensureDir(join(workspace, ".amc"));
   const configPath = budgetsPath(workspace);
@@ -197,129 +198,9 @@ export function budgetForAgent(config: BudgetsConfig, agentId: string): BudgetsC
   return fallback ?? null;
 }
 
-function numericUsageTokens(usage: unknown): number {
-  if (!usage || typeof usage !== "object") {
-    return 0;
-  }
-  const row = usage as Record<string, unknown>;
-  const candidates = [
-    row.total_tokens,
-    row.totalTokens,
-    row.input_tokens,
-    row.inputTokens,
-    row.output_tokens,
-    row.outputTokens
-  ].filter((value) => typeof value === "number") as number[];
-  return candidates.length > 0 ? candidates.reduce((sum, value) => sum + value, 0) : 0;
-}
-
-function numericUsageCost(usage: unknown): number {
-  if (!usage || typeof usage !== "object") {
-    return 0;
-  }
-  const row = usage as Record<string, unknown>;
-  const candidates = [row.cost_usd, row.costUsd, row.total_cost_usd, row.totalCostUsd].filter((value) => typeof value === "number") as number[];
-  return candidates.length > 0 ? (candidates[0] ?? 0) : 0;
-}
-
-export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now()): {
-  daily: {
-    llmRequests: number;
-    llmTokens: number;
-    llmCostUsd: number;
-    toolExecutes: Record<ActionClass, number>;
-  };
-  minute: {
-    llmRequests: number;
-    llmTokens: number;
-  };
-} {
-  const day = todayBounds(now);
-  const minuteStart = now - 60_000;
-  const ledger = openLedger(workspace);
-  const toolTemplate: Record<ActionClass, number> = {
-    READ_ONLY: 0,
-    WRITE_LOW: 0,
-    WRITE_HIGH: 0,
-    DEPLOY: 0,
-    SECURITY: 0,
-    FINANCIAL: 0,
-    NETWORK_EXTERNAL: 0,
-    DATA_EXPORT: 0,
-    IDENTITY: 0
-  };
-  try {
-    const eventsDay = ledger.getEventsBetween(day.start, day.end).filter((event) => {
-      try {
-        const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
-        return (meta.agentId ?? "default") === agentId;
-      } catch {
-        return false;
-      }
-    });
-    const eventsMinute = ledger.getEventsBetween(minuteStart, now).filter((event) => {
-      try {
-        const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
-        return (meta.agentId ?? "default") === agentId;
-      } catch {
-        return false;
-      }
-    });
-
-    let llmTokensDay = 0;
-    let llmCostDay = 0;
-    for (const event of eventsDay) {
-      if (event.event_type === "llm_response") {
-        try {
-          const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
-          llmTokensDay += numericUsageTokens(meta.usage);
-          llmCostDay += numericUsageCost(meta.usage);
-        } catch {
-          // ignore malformed
-        }
-      }
-      if (event.event_type === "tool_action") {
-        try {
-          const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
-          const payload = event.payload_inline ? (JSON.parse(event.payload_inline) as Record<string, unknown>) : {};
-          const effectiveMode = (payload.effectiveMode ?? meta.effectiveMode) as unknown;
-          const actionClass = (payload.actionClass ?? meta.actionClass) as unknown;
-          if (effectiveMode === "EXECUTE" && typeof actionClass === "string" && actionClass in toolTemplate) {
-            toolTemplate[actionClass as ActionClass] += 1;
-          }
-        } catch {
-          // ignore malformed
-        }
-      }
-    }
-
-    let llmTokensMinute = 0;
-    for (const event of eventsMinute) {
-      if (event.event_type === "llm_response") {
-        try {
-          const meta = JSON.parse(event.meta_json) as Record<string, unknown>;
-          llmTokensMinute += numericUsageTokens(meta.usage);
-        } catch {
-          // ignore malformed
-        }
-      }
-    }
-
-    return {
-      daily: {
-        llmRequests: eventsDay.filter((event) => event.event_type === "llm_request").length,
-        llmTokens: llmTokensDay,
-        llmCostUsd: Number(llmCostDay.toFixed(6)),
-        toolExecutes: toolTemplate
-      },
-      minute: {
-        llmRequests: eventsMinute.filter((event) => event.event_type === "llm_request").length,
-        llmTokens: llmTokensMinute
-      }
-    };
-  } finally {
-    ledger.close();
-  }
+/** Counters combine verified native and legacy evidence; numeric usage is a known subtotal. */
+export function budgetUsageSnapshot(workspace: string, agentId: string, now = Date.now()): BudgetUsage {
+  return projectBudgetUsage(readBudgetEvents(workspace), agentId, now);
 }
 
 export function evaluateBudgetStatus(workspace: string, agentId: string, now = Date.now()): {
@@ -328,7 +209,9 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
   exceededActionClasses: ActionClass[];
   usage: ReturnType<typeof budgetUsageSnapshot>;
   budgetConfigValid: boolean;
+  nativeAdmissionPolicy: { unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING"; tokenLimit: "between-dispatch-threshold"; costLimit: "known-subtotal-threshold" };
 } {
+  const nativeAdmissionPolicy = (unknownTokenUsage: "BLOCK" | "ALLOW_WITH_WARNING" = "BLOCK") => ({ unknownTokenUsage, tokenLimit: "between-dispatch-threshold" as const, costLimit: "known-subtotal-threshold" as const });
   const signature = verifyBudgetsConfigSignature(workspace);
   if (!signature.valid) {
     return {
@@ -336,7 +219,8 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
       reasons: ["budgets config signature invalid"],
       exceededActionClasses: ["DEPLOY", "WRITE_HIGH", "SECURITY"],
       usage: budgetUsageSnapshot(workspace, agentId, now),
-      budgetConfigValid: false
+      budgetConfigValid: false,
+      nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
   }
 
@@ -348,7 +232,8 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
       reasons: [],
       exceededActionClasses: [],
       usage: budgetUsageSnapshot(workspace, agentId, now),
-      budgetConfigValid: true
+      budgetConfigValid: true,
+      nativeAdmissionPolicy: nativeAdmissionPolicy()
     };
   }
   const usage = budgetUsageSnapshot(workspace, agentId, now);
@@ -383,7 +268,8 @@ export function evaluateBudgetStatus(workspace: string, agentId: string, now = D
     reasons,
     exceededActionClasses: [...new Set(exceededActionClasses)],
     usage,
-    budgetConfigValid: true
+    budgetConfigValid: true,
+    nativeAdmissionPolicy: nativeAdmissionPolicy(budget.unknownTokenUsage)
   };
 }
 

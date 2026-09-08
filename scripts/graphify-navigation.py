@@ -97,6 +97,18 @@ MAPS = {
         "src/llm/request/openaiResponsesEncoder.ts", "src/llm/request/prepareRequest.ts",
         "src/credentials/localCredentialsService.ts", "src/tools/toolPipeline.ts",
     ],
+    "native-budgets": [
+        "src/cli-budget-commands.ts", "src/budgets/budgets.ts", "src/budgets/nativeBudgetUsage.ts",
+        "src/budgets/nativeBudgetAdmission.ts", "src/tools/guards/policyGuards.ts",
+        "src/cli-tools-commands.ts", "src/toolhub/toolhubValidators.ts",
+        "src/tools/toolPipeline.ts", "src/agent/agentToolset.ts",
+        "src/agent/delegationIdentity.ts", "src/agent/subagentRunner.ts",
+        "src/llm/adapter/llmRuntime.ts", "src/llm/adapter/streamRecorder.ts",
+        "src/session/requestOutcomeMeta.ts", "src/session/sessionService.ts",
+        "src/session/sessionOwnership.ts", "src/ledger/ledger.ts",
+        "src/ledger/ledgerConnection.ts", "src/ledger/ledgerSessionTransactions.ts",
+        "src/acp/acpNativeSession.ts", "src/kernel/services/llmServices.ts",
+    ],
     "sandbox-and-launch": [
         "src/tools/builtin/bashTool.ts", "src/agent/agentToolset.ts",
         "src/sandbox/nativeSandboxPolicy.ts", "src/sandbox/bwrapBackend.ts",

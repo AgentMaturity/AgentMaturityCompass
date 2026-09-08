@@ -25,11 +25,14 @@ If signature verification fails, ToolHub denies execution and writes `CONFIG_SIG
 ```bash
 amc tools init
 amc tools verify
+amc tools sign
 amc tools list
 amc tools list --json
 ```
 
 `amc tools list` verifies the complete signed allowlist, derives stable tool and server identities, and groups MCP tools under their declared server. Omitted context remains native, so existing version 1 configs stay valid.
+
+After reviewing intentional edits, `amc tools sign` validates and signs the existing YAML without replacing its grants or comments. Missing or malformed policy is refused without replacing its signature. `--json` returns signature metadata. Use `tools init` only when you intend to create the default policy.
 
 ## MCP Tool Context
 

@@ -1,4 +1,4 @@
-import { evaluateBudgetStatus } from "../../budgets/budgets.js";
+import { reserveNativeToolBudget } from "../../budgets/nativeBudgetAdmission.js";
 import { evaluateRuntimeFirewall } from "../../runtime/firewall.js";
 import {
   findToolDefinition,
@@ -63,17 +63,9 @@ export function runtimeFirewallGuard(workspace: string): ToolGuard {
  *   does not verify is tampering or a broken deployment, and "we cannot tell
  *   what the limits are" is not a reason to permit reads either.
  */
-export function budgetGuard(workspace: string): ToolGuard {
+export function budgetGuard(workspace: string, sessionId?: string): ToolGuard {
   return (execution) => {
-    if (execution.effectiveMode !== "EXECUTE") return undefined;
-    const status = evaluateBudgetStatus(workspace, execution.agentId);
-    if (status.ok) return undefined;
-    if (!status.budgetConfigValid) {
-      return `budgets config is not verifiable: ${status.reasons.join("; ")}`;
-    }
-    return status.exceededActionClasses.includes(execution.actionClass)
-      ? `daily budget exceeded for ${execution.actionClass}`
-      : undefined;
+    return reserveNativeToolBudget({ ...execution, workspace }, sessionId ?? `tool-guard-${execution.agentId}`);
   };
 }
 

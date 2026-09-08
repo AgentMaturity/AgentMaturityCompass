@@ -63,8 +63,13 @@ export interface RecordedFailure {
   readonly requestId: string | null;
 }
 
-/** Token accounting as recorded. Absent counts stay null — never a fabricated 0. */
+/** Numeric compatibility fields plus explicit report/completeness provenance.
+ * Missing reports are unknown; their zero fields are not measured totals. */
 export interface RecordedUsage {
+  /** Added provenance; omitted on historical rows. No provider report is not measured zero. */
+  readonly reported?: boolean;
+  /** A failed stream may retain a reported subtotal without claiming final usage. */
+  readonly complete?: boolean;
   readonly inputTokens: number;
   readonly outputTokens: number;
   readonly cacheReadTokens: number | null;
@@ -100,6 +105,8 @@ export interface RecordedBlockRef {
 
 /** Fields both settlement rows carry. */
 export interface RequestOutcomeMetaBase {
+  /** New runtime provenance; omitted on historical rows. An admitted attempt may still fail before any bytes reach the provider. */
+  readonly dispatchAttempted?: boolean;
   readonly turn: number | null;
   readonly step: number | null;
   /** The `request/header` row this settles. */
@@ -137,6 +144,7 @@ export interface RequestFailureMeta extends RequestOutcomeMetaBase {
   readonly outcome: "failed";
   readonly finishReason: FailedFinishKind;
   readonly failure: RecordedFailure;
+  readonly usage?: RecordedUsage;
   /** AMC's decision at dispatch time — not a property of the failure. */
   readonly policy: { readonly mode: "normal" | "always"; readonly retryable: boolean };
   readonly credential: RecordedCredential;
@@ -184,7 +192,8 @@ export function buildRequestOutcomeMeta(
     adapterVersion: params.adapterVersion,
     httpStatus: params.httpStatus,
     durationMs: params.durationMs,
-    blocks: [...params.blocks]
+    blocks: [...params.blocks],
+    ...(params.dispatchAttempted === undefined ? {} : { dispatchAttempted: params.dispatchAttempted })
   };
   if (params.outcome === "completed") {
     return { ...base, outcome: "completed", finishReason: params.finishReason, usage: params.usage };
@@ -194,6 +203,7 @@ export function buildRequestOutcomeMeta(
     outcome: "failed",
     finishReason: params.finishReason,
     failure: params.failure,
+    ...(params.usage === undefined ? {} : { usage: params.usage }),
     policy: params.policy,
     credential: params.credential
   };

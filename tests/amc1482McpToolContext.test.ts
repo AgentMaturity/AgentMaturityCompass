@@ -21,6 +21,8 @@ import { cgxBuildCli } from "../src/cgx/cgxCli.js";
 import { cgxLatestGraphPath } from "../src/cgx/cgxStore.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { generateFullOpenApiSpec } from "../src/studio/openapi.js";
+import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 const roots: string[] = [];
 
@@ -262,7 +264,14 @@ describe("AMC-1482 fail-closed MCP server and tool context", () => {
       "    actionClass: READ_ONLY\n    context:\n      kind: mcp"
     );
     writeFileSync(toolsConfigPath(malformed), malformedText);
-    signToolsConfig(malformed);
+    expect(() => signToolsConfig(malformed)).toThrow();
+    // Deliberately bypass the operator's schema admission in this hostile fixture:
+    // valid cryptography must not make malformed policy usable by a reader.
+    const digest = sha256Hex(readFileSync(toolsConfigPath(malformed)));
+    writeFileSync(`${toolsConfigPath(malformed)}.sig`, JSON.stringify({
+      digestSha256: digest, signature: signHexDigest(digest, getPrivateKeyPem(malformed, "auditor")),
+      signedTs: Date.now(), signer: "auditor"
+    }));
     const malformedProjection = inspectToolhubContext(malformed);
     expect(malformedProjection.tools).toEqual([]);
     expect(malformedProjection.integrity.reasonCodes).toEqual(["TOOL_CONTEXT_SCHEMA_INVALID"]);
@@ -321,7 +330,7 @@ describe("AMC-1482 fail-closed MCP server and tool context", () => {
     );
     expect(published.components.schemas.ToolContextProjection.properties.schemaVersion.enum).toEqual(["2026-07-13"]);
 
-    const cli = readFileSync(resolve(process.cwd(), "src/cli.ts"), "utf8");
+    const cli = readFileSync(resolve(process.cwd(), "src/cli-tools-commands.ts"), "utf8");
     const studio = readFileSync(resolve(process.cwd(), "src/console/assets/app.js"), "utf8");
     const toolhub = readFileSync(resolve(process.cwd(), "docs/TOOLHUB.md"), "utf8");
     const readme = readFileSync(resolve(process.cwd(), "README.md"), "utf8");

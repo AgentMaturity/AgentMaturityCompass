@@ -64,7 +64,7 @@ command -v curl >/dev/null 2>&1 || fail "curl is required"
 command -v tar >/dev/null 2>&1 || fail "tar is required"
 
 if [ "${AMC_INSTALL_TEST_MODE:-0}" != "1" ]; then
-  command -v node >/dev/null 2>&1 || fail "Node.js 20 or 22 LTS is required: https://nodejs.org"
+  command -v node >/dev/null 2>&1 || fail "Node.js is required; use Node 22 or 24 for production: https://nodejs.org"
   command -v npm >/dev/null 2>&1 || fail "npm is required"
   node_major=$(node -p 'Number(process.versions.node.split(".")[0])')
   [ "$node_major" -ge 20 ] || fail "Node.js 20 or newer is required; found $(node --version)"

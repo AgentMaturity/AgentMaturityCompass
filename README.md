@@ -130,7 +130,7 @@ amc quickscore --answers answers.json --json  # non-interactive answer-based sco
 <details>
 <summary><strong>More install methods</strong></summary>
 
-**Verified release installer (Node.js 20 or 22 LTS required)**
+**Verified release installer (Node.js 22 or 24 recommended)**
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
@@ -698,7 +698,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both scripts install a pinned GitHub release only after SHA-256 verification. They require Node.js 20 or 22 LTS. The npm registry and Homebrew tap are not public yet, so AMC does not present those channels as available.
+Both scripts install a pinned GitHub release only after SHA-256 verification. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) for exercised environments. The npm registry and Homebrew tap are not public yet, so AMC does not present those channels as available.
 
 ### Docker
 ```bash

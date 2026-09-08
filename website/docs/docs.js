@@ -5,6 +5,11 @@ const DOCS_CONTENT_BASE = globalThis.AMC_DOCS_CONTENT_BASE || './content/';
 const DOCS_MANIFEST_URL = globalThis.AMC_DOCS_MANIFEST_URL || './content-manifest.json';
 const DOCS_MANIFEST_SCHEMA_VERSION = '2026-07-10';
 
+const NATIVE_DOCS = [
+  'NATIVE_AGENT_WORKFLOW', 'NATIVE_SDK', 'NATIVE_MCP', 'NATIVE_EXTENSIONS',
+  'SESSION_RESUME', 'PLATFORM_QUALIFICATION', 'NATIVE_SANDBOX_UBUNTU'
+];
+
 // ─── Category Mapping ───
 const CATEGORIES = [
   {
@@ -13,79 +18,85 @@ const CATEGORIES = [
     docs: ['INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART', 'INSTALL', 'AGENT_GUIDE', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'TROUBLESHOOTING']
   },
   {
-    name: 'Architecture',
+    name: 'Native Runtime',
     icon: '02',
-    docs: ['ARCHITECTURE_BRIEF', 'CODE_GRAPH', 'IMPLEMENTATION_REALITY_MAP', 'DOCS_DRIFT_CLEANUP_PLAN', 'ARCHITECTURE_MAP', 'API_SURFACES', 'CHAIN_ARCHITECTURE', 'CONTEXT_GRAPH', 'SYSTEM_CAPABILITIES', 'MODES', 'RUNTIMES', 'RUNTIME_SDK', 'PYTHON_MODULE_MAPPING', 'BOM']
+    docs: NATIVE_DOCS
+  },
+  {
+    name: 'Architecture',
+    icon: '03',
+    docs: ['ARCHITECTURE_BRIEF', 'CODE_GRAPH', 'ARCHITECTURE_NAVIGATION', 'IMPLEMENTATION_REALITY_MAP', 'DOCS_DRIFT_CLEANUP_PLAN', 'ARCHITECTURE_MAP', 'API_SURFACES', 'CHAIN_ARCHITECTURE', 'CONTEXT_GRAPH', 'SYSTEM_CAPABILITIES', 'MODES', 'RUNTIMES', 'RUNTIME_SDK', 'PYTHON_MODULE_MAPPING', 'BOM']
   },
   {
     name: 'Deep Dives',
-    icon: '03',
+    icon: '04',
     docs: ['deep-dive/INDEX', 'deep-dive/runtime-control-plane', 'deep-dive/trust-evidence-plane', 'deep-dive/governance-execution-plane', 'deep-dive/evaluation-assurance-plane', 'deep-dive/operations-ecosystem-plane']
   },
   {
     name: 'Adapters & Integration',
-    icon: '04',
+    icon: '05',
     docs: ['ADAPTERS', 'ADAPTER_COMPATIBILITY', 'CUSTOM_ADAPTER', 'agent-framework-compatibility', 'adapters/LANDING_LANGCHAIN', 'adapters/LANDING_OPENAI', 'adapters/LANDING_CREWAI', 'adapters/LANDING_CLAUDE_CODE', 'adapters/LANDING_GENERIC_CLI', 'adapters/langchain-python', 'adapters/langchain-node', 'adapters/langgraph-python', 'adapters/crewai', 'adapters/autogen', 'adapters/openai-agents-sdk', 'adapters/llamaindex', 'adapters/semantic-kernel', 'adapters/claude-code', 'adapters/gemini', 'adapters/openclaw', 'adapters/openhands', 'adapters/python-amc-sdk', 'adapters/generic-cli', 'BRIDGE', 'BRIDGE_PROMPT_ENFORCEMENT', 'CONNECT', 'INTEGRATIONS', 'integrations/ci-cd', 'MCP_SERVER', 'PAIRING', 'PAIRING_LAN_PWA', 'PROVIDERS', 'SDK', 'SDK_VERSIONING', 'CLI_WRAPPERS', 'VSCODE_EXTENSION']
   },
   {
     name: 'Scoring & Dimensions',
-    icon: '05',
+    icon: '06',
     docs: ['DIAGNOSTIC_BANK', 'QUESTION_BANK', 'SCORING_METHODOLOGY', 'EVALUATOR_REGISTRY', 'AMC_QUESTIONS_IN_DEPTH', 'AMC_MASTER_REFERENCE', 'ARCHETYPES', 'BENCHMARKS', 'BENCHMARKING', 'BENCH_REGISTRY', 'EQUALIZER_TARGETS', 'METRICS', 'OUTCOMES', 'FORECASTING', 'PREDICTION_LOG', 'PREDICTIVE_MAINTENANCE', 'self-calibration', 'VALIDITY_FRAMEWORK', 'score-history']
   },
   {
     name: 'Compliance & Regulatory',
-    icon: '06',
+    icon: '07',
     docs: ['EU_AI_ACT_COMPLIANCE', 'COMPLIANCE', 'COMPLIANCE_FRAMEWORKS', 'COMPLIANCE_MAPS', 'CERTIFICATION', 'ISO_42001_ALIGNMENT', 'GDPR_ARTICLE_COMPLIANCE', 'MITRE_ATLAS_MAPPING', 'STANDARDS_MAPPING', 'ASSURANCE_CERTS', 'ASSURANCE_LAB', 'AUDIT_BINDER', 'enterprise-readiness-checklist', 'compliance/eu-ai-act-checklist', 'compliance/iso-42001-aims-manual', 'compliance/nist-rmf-profile', 'compliance/SOC2_TYPE_II_CONTROLS_MAPPING']
   },
   {
     name: 'Security',
-    icon: '07',
+    icon: '08',
     docs: ['SECURITY', 'SECURITY_ARCHITECTURE_OVERVIEW', 'SECURITY_DEPLOYMENT', 'THREAT_MODEL', 'HARDENING', 'RED_TEAMING_GUIDE', 'ANTI_HALLUCINATION', 'TRUTHGUARD', 'SHIELD_ENFORCE_REFERENCE', 'ENCRYPTION_AT_REST', 'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'KEY_HISTORY', 'RBAC', 'SSO_OIDC', 'SSO_SAML', 'SCIM', 'IDENTITY', 'IDENTITY_STABILITY', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN', 'sbom']
   },
   {
     name: 'Governance & Policy',
-    icon: '08',
+    icon: '09',
     docs: ['GOVERNANCE', 'COMMUNITY', 'SUPPORT_POLICY', 'MODEL_GOVERNANCE', 'GOVERNOR', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'ACTION_EVIDENCE_LOGIC', 'SCOPE_TEMPLATES', 'POLICY_EXPORT', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS', 'DUAL_CONTROL_APPROVALS', 'WAIVERS', 'LEASES', 'BUDGETS', 'NO_CODE_GOVERNANCE', 'VALUE_CONTRACTS', 'VALUE_GATES', 'VALUE_INGESTION', 'VALUE_REALIZATION']
   },
   {
     name: 'Operations',
-    icon: '09',
+    icon: '10',
     docs: ['OPERATIONS', 'OPS_HARDENING', 'BACKUPS', 'DEPLOYMENT', 'DEPLOYMENT_OPTIONS', 'DEPLOYMENT_CHECKLIST', 'CLOUD_REFERENCE_ARCHITECTURES', 'MIGRATION_RUNBOOK', 'RELEASE_RUNBOOK', 'RELEASING', 'RELEASE_CADENCE', 'CI_TEMPLATES', 'SINGLE_BINARY', 'PUBLISHING', 'UPGRADE_AUTOPILOT', 'INCIDENT_RESPONSE_READINESS', 'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'CONTINUOUS_RECURRENCE', 'DOCTOR', 'MECHANIC_MODE', 'MECHANIC_WORKBENCH', 'CI', 'runbooks/amc-service-down', 'runbooks/evidence-corruption', 'runbooks/score-dispute']
   },
   {
     name: 'Trust & Evidence',
-    icon: '10',
+    icon: '11',
     docs: ['EVIDENCE_TRUST', 'EVIDENCE_REQUESTS', 'ATTESTATION_EVIDENCE_PATHS', 'CLAIM_PROVENANCE', 'NOTARY', 'TRANSPARENCY', 'TRANSPARENCY_MERKLE', 'TRANSPARENCY_REPORT', 'RECEIPTS', 'OPEN_RUBRIC_STANDARD', 'OPEN_STANDARD', 'EXTERNAL_EVIDENCE_PROFILE', 'AGENT_PASSPORT']
   },
   {
     name: 'Product & UX',
-    icon: '11',
+    icon: '12',
     docs: ['CONSOLE', 'DASHBOARD', 'STUDIO', 'TOOLHUB', 'PLUGINS', 'SANDBOX', 'BROWSER_SANDBOX', 'WHATIF', 'PLAYGROUND', 'ACCESSIBILITY', 'DOMAIN_PACKS', 'DOMAIN_PROOF_LANE', 'SECTOR_PACKS', 'BUNDLES', 'CASEBOOKS', 'ORG_COMPASS', 'ORG_EOC', 'REAL_PEOPLE_COUNCIL', 'NORTHSTAR_PROMPTS', 'PRODUCT_EDITIONS', 'PRICING', 'BUYER_PACKAGES', 'SERVICES_AND_SUPPORT', 'BENCHMARK_GALLERY', 'COMMUNITY_SHOWCASE', 'RELEASE_HIGHLIGHTS', 'USE_CASES', 'PERSONAS', 'WHY_AMC', 'EXAMPLES_INDEX', 'SOLO_DEV_QUICKSTART', 'SOLO_DEV_PATH', 'PLATFORM_ENGINEER_QUICKSTART', 'PLATFORM_PATH', 'SECURITY_COMPLIANCE_QUICKSTART', 'SECURITY_PATH', 'EXECUTIVE_OVERVIEW', 'BOARD_RISK_L3_MEMO']
   },
   {
     name: 'API Reference',
-    icon: '12',
+    icon: '13',
     docs: ['API_REFERENCE', 'CLI_COMMAND_INVENTORY', 'REALTIME', 'REGISTRY', 'FLEET', 'LOOP', 'TICKETS', 'WORK_ORDERS', 'EXPERIMENTS', 'FEDERATION', 'ENTERPRISE', 'ECOSYSTEM', 'ECOSYSTEM_VIEW', 'ECOSYSTEM_COMPARATIVE_VIEW', 'ECONOMIC_SIGNIFICANCE', 'db-schemas']
   },
   {
     name: 'Multi-Agent & Advanced',
-    icon: '13',
+    icon: '14',
     docs: ['MULTI_AGENT_TRUST', 'MULTI_MODEL_VALIDATION', 'AGENT_VS_WORKFLOW', 'MEMORY_MATURITY', 'CANON', 'FULL_MODULE_ROADMAP', 'INNOVATION_THESIS', 'GO_TO_MARKET_PACK', 'LAUNCH']
   },
   {
     name: 'Research',
-    icon: '14',
+    icon: '15',
     docs: ['wave4-agentic-ecosystem-audit', 'wave4-ai-safety-audit', 'wave4-documentation-audit', 'wave4-integration-audit', 'wave4-product-readiness-audit', 'wave4-regulatory-audit', 'wave4-supply-chain-audit', 'wave4-test-coverage-audit', 'RESEARCH_PAPERS_2026', 'NEW_GAPS_RESEARCH']
   },
   {
     name: 'Migration',
-    icon: '15',
+    icon: '16',
     docs: ['MIGRATION_FROM_PROMPTFOO_DEEPEVAL']
   }
 ];
 
 // All known doc filenames (without .md)
 const ALL_DOCS = [
+  ...NATIVE_DOCS, 'ARCHITECTURE_NAVIGATION',
   'ACCESSIBILITY','ACTION_EVIDENCE_LOGIC','ADAPTERS','ADAPTER_COMPATIBILITY','AGENT_GUIDE','AGENT_PASSPORT','AGENT_VS_WORKFLOW',
   'AMC_MASTER_REFERENCE','AMC_QUESTIONS_IN_DEPTH','ANTI_HALLUCINATION','API_REFERENCE','API_SURFACES',
   'APPROVALS','ARCHETYPES','ARCHITECTURE_BRIEF','ARCHITECTURE_MAP','ASSURANCE_CERTS','ASSURANCE_LAB','CODE_GRAPH',
@@ -161,6 +172,7 @@ const INTERNAL_DOCS = new Set([
   'wave4-test-coverage-audit'
 ]);
 const PUBLIC_DOC_IDS = new Set([
+  ...NATIVE_DOCS, 'ARCHITECTURE_NAVIGATION',
   // First score and adoption
   'INDEX', 'START_HERE', 'AFTER_FIRST_SCORE', 'GETTING_STARTED', 'QUICKSTART', 'AGENT_GUIDE',
   'INSTALL', 'COMPATIBILITY_MATRIX', 'STARTER_BLUEPRINTS', 'BROWSER_SANDBOX', 'TROUBLESHOOTING',
@@ -674,7 +686,7 @@ function showWelcome() {
         <a href="#GETTING_STARTED" onclick="event.preventDefault();loadDoc('GETTING_STARTED')"><span>01</span> Getting Started</a>
         <a href="#QUICKSTART" onclick="event.preventDefault();loadDoc('QUICKSTART')"><span>02</span> Quick Start Guide</a>
         <a href="#INSTALL" onclick="event.preventDefault();loadDoc('INSTALL')"><span>03</span> Installation</a>
-        <a href="#ADAPTERS" onclick="event.preventDefault();loadDoc('ADAPTERS')"><span>04</span> Adapters</a>
+        <a href="#NATIVE_AGENT_WORKFLOW" onclick="event.preventDefault();loadDoc('NATIVE_AGENT_WORKFLOW')"><span>04</span> Run a Native Agent</a>
         <a href="#SECURITY" onclick="event.preventDefault();loadDoc('SECURITY')"><span>05</span> Security</a>
         <a href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')"><span>06</span> Compliance</a>
       </div>

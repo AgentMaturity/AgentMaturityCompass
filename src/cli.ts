@@ -285,12 +285,8 @@ import {
   initActionPolicy,
   verifyActionPolicySignature
 } from "./governor/actionPolicyEngine.js";
-import {
-  formatToolhubContextText,
-  initToolhubConfig,
-  inspectToolhubContextForCli,
-  verifyToolhubConfig
-} from "./toolhub/toolhubCli.js";
+import { initToolhubConfig } from "./toolhub/toolhubCli.js";
+import { registerToolsCommands } from "./cli-tools-commands.js";
 import { parseActionClasses, parseRiskTier } from "./workorders/workorderCli.js";
 import {
   createWorkOrder,
@@ -301,7 +297,7 @@ import {
 } from "./workorders/workorderEngine.js";
 import { issueExecTicket, verifyExecTicket } from "./tickets/execTicketVerify.js";
 import { normalizeActionClass, parseTtlToMs } from "./tickets/execTicketCli.js";
-import { evaluateBudgetStatus, initBudgets, resetBudgetDay, verifyBudgetsConfigSignature } from "./budgets/budgets.js";
+import { registerBudgetCommands } from "./cli-budget-commands.js";
 import { driftCheckCli, driftReportCli, freezeLiftCli, freezeStatusCli } from "./drift/driftCli.js";
 import { initAlertsConfig, sendTestAlert, verifyAlertsConfigSignature } from "./drift/alerts.js";
 import { startTrustDriftMonitor } from "./monitor/trustDriftMonitor.js";
@@ -6384,7 +6380,7 @@ const evidence = program.command("evidence").description("Evidence lifecycle wor
 const incidents = program.command("incidents").description("Incident operations and dispatch workflows");
 const policy = program.command("policy").description("Policy-as-code operations");
 const governor = program.command("governor").description("Autonomy Governor checks");
-const tools = program.command("tools").description("ToolHub tools config");
+registerToolsCommands(program);
 const workorder = program.command("workorder").description("Signed work order operations");
 const ticket = program.command("ticket").description("Execution ticket operations");
 const gateway = program.command("gateway").description("AMC universal LLM proxy gateway");
@@ -9422,40 +9418,6 @@ governor
       return;
     }
     console.log(report.markdown);
-  });
-
-tools
-  .command("init")
-  .description("Create and sign .amc/tools.yaml")
-  .action(() => {
-    const created = initToolhubConfig(process.cwd());
-    console.log(chalk.green(`Tools config created: ${created.configPath}`));
-    console.log(`Signature: ${created.sigPath}`);
-  });
-
-tools
-  .command("verify")
-  .description("Verify tools.yaml signature")
-  .action(() => {
-    const verify = verifyToolhubConfig(process.cwd());
-    if (verify.valid) {
-      console.log(chalk.green(`Tools config signature valid: ${verify.sigPath}`));
-      return;
-    }
-    console.log(chalk.red(`Tools config signature invalid: ${verify.reason ?? "unknown reason"}`));
-    process.exit(1);
-  });
-
-tools
-  .command("list")
-  .description("List signed ToolHub tools grouped by provider context")
-  .option("--json", "emit the complete tool context projection as JSON", false)
-  .action((opts: { json?: boolean }) => {
-    const projection = inspectToolhubContextForCli(process.cwd());
-    console.log(opts.json ? JSON.stringify(projection, null, 2) : formatToolhubContextText(projection));
-    if (projection.integrity.status !== "trusted") {
-      process.exitCode = 1;
-    }
   });
 
 workorder
@@ -16286,51 +16248,7 @@ program
 
 registerLeaseCliCommands(program);
 
-const budgets = program.command("budgets").description("Signed autonomy and usage budgets");
-
-budgets
-  .command("init")
-  .option("--agent <agentId>", "agent ID", "default")
-  .action((opts: { agent: string }) => {
-    const out = initBudgets(process.cwd(), opts.agent);
-    console.log(chalk.green(`Budgets initialized: ${out.configPath}`));
-    console.log(`Signature: ${out.sigPath}`);
-  });
-
-budgets
-  .command("verify")
-  .action(() => {
-    const verify = verifyBudgetsConfigSignature(process.cwd());
-    if (!verify.valid) {
-      console.log(chalk.red(`Invalid budgets signature: ${verify.reason ?? "unknown"}`));
-      process.exit(1);
-    }
-    console.log(chalk.green("Budgets signature valid"));
-  });
-
-budgets
-  .command("status")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .action((opts: { agent: string }) => {
-    const status = evaluateBudgetStatus(process.cwd(), opts.agent);
-    console.log(JSON.stringify(status, null, 2));
-    if (!status.ok) {
-      process.exit(1);
-    }
-  });
-
-budgets
-  .command("reset")
-  .requiredOption("--agent <agentId>", "agent ID")
-  .requiredOption("--day <yyyy-mm-dd>", "budget day to reset")
-  .action((opts: { agent: string; day: string }) => {
-    const eventId = resetBudgetDay({
-      workspace: process.cwd(),
-      agentId: opts.agent,
-      day: opts.day
-    });
-    console.log(chalk.green(`Budget reset logged: ${eventId}`));
-  });
+registerBudgetCommands(program);
 
 const drift = program.command("drift").description("Drift/regression detection and reporting");
 

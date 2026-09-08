@@ -75,6 +75,7 @@ export interface StreamRecorderInit {
   readonly secret: string | null;
   /** Injectable clock, so a duration in a signed row is testable. */
   readonly now: () => number;
+  readonly dispatchAttempted?: () => boolean;
 }
 
 /** A settled dispatch: the full assembly, and the row that closed it. */
@@ -86,9 +87,12 @@ export interface SettledStream {
   readonly failure: LlmFailure | null;
 }
 
-/** Token accounting for a signed row: absent counts stay null, never a made-up 0. */
-function recordUsage(usage: StreamTokenUsage | null): RecordedUsage {
+/** Keep numeric fields for compatibility; provenance distinguishes missing
+ * reports from measured zero, and a failed stream retains its known subtotal. */
+function recordUsage(usage: StreamTokenUsage | null, complete = true): RecordedUsage {
   return {
+    reported: usage !== null,
+    complete: usage !== null && complete,
     inputTokens: usage?.inputTokens ?? 0,
     outputTokens: usage?.outputTokens ?? 0,
     cacheReadTokens: usage?.cacheReadTokens ?? null,
@@ -184,7 +188,8 @@ export class StreamRecorder {
       adapterId: this.init.pinned.adapterId,
       adapterVersion: this.init.pinned.adapterVersion,
       durationMs: this.init.now() - this.startedAtMs,
-      blocks
+      blocks,
+      ...(this.init.dispatchAttempted === undefined ? {} : { dispatchAttempted: this.init.dispatchAttempted() })
     };
 
     const params: RequestOutcomeParams =
@@ -207,6 +212,7 @@ export class StreamRecorder {
             outcome: "failed",
             finishReason: failed.kind,
             failure: this.recordFailure(failed.failure),
+            usage: recordUsage(assembly.usage, false),
             // AMC's decision at dispatch time, under the policy this route
             // froze when it registered — recorded beside the provider's facts
             // and never inside them. See ../retryPolicy.ts.

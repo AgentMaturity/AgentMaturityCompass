@@ -57,6 +57,16 @@ The `native-integrations` map separates operator interfaces from runtime composi
 - [`nativeAgentClient.ts`](../src/sdk/nativeAgentClient.ts) owns a local ACP child. Follow `acpAgentServer.ts` for sessions, `acpProjection.ts` for committed updates and `agentSession.ts` for verified load/release. A client's prompt result and cold verification receipt mean different things.
 - [`providerCapabilities.ts`](../src/llm/adapter/providerCapabilities.ts) admits explicit protocol/modalities. `openaiResponsesEncoder.ts` creates stateless Responses requests and `openaiResponsesAdapter.ts` decodes that protocol; historical Chat/Anthropic encoder bytes remain separate.
 
+## Native budget admission
+
+The `native-budgets` selection separates operator policy, pre-dispatch admission and usage reconstruction. Rebuild the maps after the budget implementation settles; earlier five-map extractions do not contain this new selection.
+
+1. [`cli-budget-commands.ts`](../src/cli-budget-commands.ts) exposes reviewed budget signing and status. [`cli-tools-commands.ts`](../src/cli-tools-commands.ts) exposes reviewed tool grants separately. Signing validates the existing bytes instead of replacing the policy with defaults.
+2. [`llmRuntime.ts`](../src/llm/adapter/llmRuntime.ts) admits a model dispatch after request preparation and before transport. [`policyGuards.ts`](../src/tools/guards/policyGuards.ts) admits a native tool before its body executes.
+3. [`nativeBudgetAdmission.ts`](../src/budgets/nativeBudgetAdmission.ts) checks the signed per-agent policy and writes a signed reservation inside one workspace transaction. [`ledgerSessionTransactions.ts`](../src/ledger/ledgerSessionTransactions.ts) keeps nested evidence writes inside the caller's transaction.
+4. [`nativeBudgetUsage.ts`](../src/budgets/nativeBudgetUsage.ts) reads authenticated event history, derives the root agent from the native session, and joins reservations to recorded outcomes. Follow request/header references and tool tokens; counting every audit and result row would count a call more than once.
+5. [`streamRecorder.ts`](../src/llm/adapter/streamRecorder.ts) retains usage provenance in [`requestOutcomeMeta.ts`](../src/session/requestOutcomeMeta.ts). Known subtotals, unavailable usage, denied tools and unresolved execution are separate values. A configured threshold does not supply an exact tokenizer or provider price.
+
 ## Sandbox and DSH launch
 
 The `sandbox-and-launch` map shows two different entry paths. Native `bashTool.ts` calls `nativeSandboxPolicy.ts`, then `sandboxRunner.ts` and `bwrapBackend.ts` on Linux. The backend returns an explicit launcher/status contract through `runProcess.ts`; command success alone is not an enforcement receipt. The Linux shell omits host home/procfs and direct socket networking, and Code Mode remains refused.

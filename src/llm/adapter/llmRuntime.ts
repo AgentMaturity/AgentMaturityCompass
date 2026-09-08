@@ -57,6 +57,7 @@ import { fetchTransport, readBodyText } from "./transport.js";
 import type { HttpResponse, HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
+import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -238,6 +239,7 @@ export class LlmRuntime {
     // Resolved HERE, per request, and never hoisted: a key rotated between two
     // steps of the same turn applies to the second one.
     const secret = route.credentialRef === null ? null : this.init.credentials.resolve(route.credentialRef);
+    let dispatchAttempted = false;
     const recorder = new StreamRecorder({
       session: this.init.session,
       pinned: route,
@@ -245,7 +247,8 @@ export class LlmRuntime {
       requestDigest: prepared.requestDigest,
       credential: this.describeCredential(route),
       secret,
-      now: this.now
+      now: this.now,
+      dispatchAttempted: () => dispatchAttempted
     });
 
     // Explicitly typed so TypeScript treats a call as a never-return and every
@@ -290,8 +293,18 @@ export class LlmRuntime {
       ...(spec.signal !== undefined ? { signal: spec.signal } : {})
     });
 
+    if (spec.signal?.aborted) {
+      throw settle(recorder.fail({ failure: { message: "request cancelled before budget admission", code: LLM_FAILURE_CODE.ABORTED }, kind: "aborted", httpStatus: null, cause: "aborted_before_dispatch" }));
+    }
+    try {
+      reserveNativeModelBudget(this.init.session, prepared.headerEventId);
+    } catch (error) {
+      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: LLM_FAILURE_CODE.QUOTA }, kind: "error", httpStatus: null, cause: "budget_refused" }));
+    }
+
     let response: HttpResponse;
     try {
+      dispatchAttempted = true;
       response = await this.transport(request);
     } catch (error: unknown) {
       throw settle(recorder.fail(this.transportFailure(error, spec.signal)));

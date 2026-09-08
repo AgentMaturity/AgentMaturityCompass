@@ -264,7 +264,9 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   // "this tool is not listed", which is the more actionable of two true answers.
   registry.guard("prompt-injection", promptInjectionGuard());
   registry.guard("runtime-firewall", runtimeFirewallGuard(workspace));
-  registry.guard("budgets", budgetGuard(workspace));
+  // CLI binds the native writer after constructing the toolset; forks can
+  // replace it. Resolve the current session only when the guard executes.
+  registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
   registry.guard("network-egress", networkEgressGuard(workspace));
   registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace));
 

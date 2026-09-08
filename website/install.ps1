@@ -27,7 +27,7 @@ Write-Host ""
 
 if ($env:AMC_INSTALL_TEST_MODE -ne "1") {
   if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Fail-AmcInstall "Node.js 20 or 22 LTS is required: https://nodejs.org"
+    Fail-AmcInstall "Node.js is required; use Node 22 or 24 for production: https://nodejs.org"
   }
   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     Fail-AmcInstall "npm is required"

@@ -1033,7 +1033,7 @@ AMC provides 1,207 public CLI command paths in the live command inventory.
 | 1014 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) |
 | 1015 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest |
 | 1016 | `amc session show` | Show a session's projected conversation and its event spine |
-| 1017 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed) |
+| 1017 | `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) |
 | 1018 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint |
 | 1019 | `amc sessions` | View and analyze user sessions |
 | 1020 | `amc sessions list` | List tracked sessions |
@@ -8684,7 +8684,7 @@ Show a session's projected conversation and its event spine
 
 #### `amc session verify`
 
-Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed)
+Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed)
 
 
 | Option | Description |

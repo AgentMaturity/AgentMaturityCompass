@@ -28,7 +28,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh && amc
 
 ### Install fails on Node version / native module issues
 
-Use Node 20 or 22 LTS.
+Use Node 22 or 24, AMC's production qualification targets. The Node 20 package floor indicates compatibility only; see [platform qualification](PLATFORM_QUALIFICATION.md) for actual environment receipts.
 
 AMC is happiest on LTS runtimes.
 

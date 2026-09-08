@@ -4,6 +4,9 @@ import type { AppendEvidenceInput } from "./ledger.js";
 import { assertSessionWriteAllowed, hasSessionWriter, SESSION_WRITER_META, SessionWriterRefused } from "../session/sessionOwnership.js";
 
 export function runImmediateTransaction<T>(db: Database.Database, fn: () => T): T {
+  // Preserve an admission transaction's immediate lock. A nested ledger append
+  // owns only its savepoint; it must never commit or roll back its caller.
+  if (db.inTransaction) return db.transaction(fn)();
   db.exec("BEGIN IMMEDIATE");
   try {
     const result = fn(); db.exec("COMMIT"); return result;

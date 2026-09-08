@@ -1020,7 +1020,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
 | `amc session show` | Show a session's projected conversation and its event spine | `--json` | - |
-| `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / interrupted / closed) | `--json`<br>`--expect-monitor <fingerprint>` | - |
+| `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <fingerprint>` | - |
 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
 | `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
