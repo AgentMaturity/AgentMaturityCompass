@@ -587,6 +587,25 @@ function requireUnlockedPayload(workspace: string): VaultPayload {
   if (!session.unlocked || !session.payload) {
     throw new Error("🔐 Vault locked. Run `amc vault unlock` first, or `amc setup` for first-time setup.");
   }
+  try {
+    // Another process may have added a blob key since this session unlocked.
+    // Refresh authenticated data in memory only: unlockVault can migrate legacy
+    // lease/session keys and write trust files, which a secret read must not do.
+    if (!session.passphrase) throw new Error("Unlocked vault passphrase is unavailable");
+    const envelopeRaw = readEnvelopeRaw(workspace);
+    const envelopeDigest = sha256Hex(Buffer.from(envelopeRaw, "utf8"));
+    if (session.envelopeDigest !== envelopeDigest) {
+      const payload = parseVaultPayload(
+        decryptVaultPayload(JSON.parse(envelopeRaw) as VaultEnvelope, session.passphrase).toString("utf8")
+      );
+      session.payload = payload;
+      session.envelopeDigest = envelopeDigest;
+    }
+  } catch {
+    // Stale secrets and private keys must not survive an unauthenticated refresh.
+    lockVault(workspace);
+    throw new Error("Vault refresh failed: missing vault, changed passphrase, or corrupted vault.");
+  }
   return session.payload;
 }
 
