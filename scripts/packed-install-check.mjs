@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Packed-install check (AMC-1510): prove the PUBLISHED artifact delivers the
+ * Packed-install check (AMC-1510): verify that the locally packed artifact delivers the
  * governed native runtime.
  *
- * Packs the tarball exactly as `npm publish` would, installs it into a fresh
+ * Packs the publish file set without running the separate release gate, installs it into a fresh
  * directory OUTSIDE the checkout with an empty HOME and its own npm cache, and
  * runs a keyless native turn there. Two things must hold at once:
  *
@@ -11,22 +11,19 @@
  *     private workspace packages are not published, and a check that passed
  *     because it quietly found them through the checkout's node_modules would
  *     prove nothing about a user's machine;
- *   - the turn must complete over the signed session anyway.
- *
- * Today the second step fails with "The composition kernel (@amc/core) is not
- * installed" — the engine exists in source and public installation does not
- * deliver it. This script is the reproduction and, once the kernel closure is
- * bundled into dist, the proof.
+ *   - the tool turn must complete and both installed verification commands must
+ *     authenticate its evidence and reconstruct every recorded request.
  *
  * A configured real provider is exercised only when AMC_PACKED_SMOKE_PROVIDER
  * (and its credential env) is set; otherwise that step is reported as skipped,
  * never as passed.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
 function run(label, cmd, args, opts) {
   const started = Date.now();
@@ -34,7 +31,7 @@ function run(label, cmd, args, opts) {
   const ok = result.status === 0;
   console.log(`${ok ? "ok  " : "FAIL"} ${label} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
   if (!ok) console.error(`${result.stdout ?? ""}\n${result.stderr ?? ""}`.trim().split("\n").slice(-25).join("\n"));
-  return { ok, out: `${result.stdout ?? ""}${result.stderr ?? ""}` };
+  return { ok, stdout: result.stdout ?? "", out: `${result.stdout ?? ""}${result.stderr ?? ""}` };
 }
 
 export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
@@ -46,8 +43,25 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
 
   const env = { ...process.env, CI: "1" };
   // Nothing from this machine: no ~/.amc, no ~/.npmrc, no shared npm cache.
-  const isolated = { ...env, HOME: home, npm_config_cache: join(home, ".npm"), AMC_VAULT_PASSPHRASE: "packed-install-check" };
+  const isolated = { ...env, HOME: home, npm_config_cache: join(home, ".npm") };
+  for (const key of Object.keys(isolated)) if (key.startsWith("AMC_")) delete isolated[key];
+  isolated.AMC_VAULT_PASSPHRASE = "packed-install-check";
+  isolated.npm_config_userconfig = join(home, ".npmrc");
+  isolated.npm_config_globalconfig = join(home, ".npmrc-global");
+  writeFileSync(isolated.npm_config_userconfig, "");
+  writeFileSync(isolated.npm_config_globalconfig, "");
   delete isolated.NODE_PATH;
+  delete isolated.NODE_OPTIONS;
+  const amc = join(consumer, "node_modules", ".bin", "amc");
+  const verifyRun = (r, requireTool = true) => {
+    if (!r.ok) return false;
+    let summary;
+    try { summary = JSON.parse(r.stdout); } catch { console.error("FAIL native run did not return a JSON summary"); return false; }
+    const verified = verifyPackedRun({ summary, requireTool,
+      runCommand: (label, args) => run(label, amc, args, { cwd: workspace, env: isolated }) });
+    console.log(`${verified ? "ok  " : "FAIL"} installed evidence and request reconstruction`);
+    return verified;
+  };
 
   let tarball = null;
   const steps = [
@@ -60,7 +74,7 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       console.log("note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here");
       const r = run("npm pack --ignore-scripts (same files as publish)", "npm", ["pack", "--ignore-scripts", "--pack-destination", work, "--json"], { cwd: root, env });
       if (!r.ok) return false;
-      tarball = join(work, JSON.parse(r.out)[0].filename);
+      tarball = join(work, JSON.parse(r.stdout)[0].filename);
       return existsSync(tarball) || (console.error(`FAIL tarball not found at ${tarball}`), false);
     },
     () => run("npm install <tarball> (fresh dir, empty HOME)", "npm", ["install", "--no-audit", "--no-fund", "--omit=dev", tarball], { cwd: consumer, env: isolated }).ok,
@@ -74,19 +88,17 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
     () => run("amc doctor", join(consumer, "node_modules", ".bin", "amc"), ["doctor"], { cwd: workspace, env: isolated }).ok,
     () => run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok,
     () => {
-      const r = run("amc agent-loop run \"say hello\" (stub provider, keyless)", join(consumer, "node_modules", ".bin", "amc"), ["agent-loop", "run", "say hello"], { cwd: workspace, env: isolated });
-      if (!r.ok) return false;
-      const signed = /unsigned\s+0\b/.test(r.out) && /turn 1 ended: complete/.test(r.out);
-      console.log(`${signed ? "ok  " : "FAIL"} the turn completed over a fully signed session`);
-      return signed;
+      const r = run("amc agent-loop run (stub provider, keyless)", amc,
+        ["agent-loop", "run", "--provider", "stub", "--json", "say hello"], { cwd: workspace, env: isolated });
+      return verifyRun(r);
     },
     () => {
       const provider = process.env.AMC_PACKED_SMOKE_PROVIDER;
       if (!provider) { console.log("skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)"); return true; }
       const model = process.env.AMC_PACKED_SMOKE_MODEL;
       const r = run(`amc agent-loop run --provider ${provider} (real provider; key stays in env)`, join(consumer, "node_modules", ".bin", "amc"),
-        ["agent-loop", "run", "--provider", provider, ...(model ? ["--model", model] : []), "reply with the single word ok"], { cwd: workspace, env: isolated });
-      return r.ok && !/sk-[A-Za-z0-9]{8,}/.test(r.out);
+        ["agent-loop", "run", "--json", "--provider", provider, ...(model ? ["--model", model] : []), "reply with the single word ok"], { cwd: workspace, env: isolated });
+      return r.ok && !/sk-[A-Za-z0-9]{8,}/.test(r.out) && verifyRun(r, false);
     }
   ];
   let ok = true;

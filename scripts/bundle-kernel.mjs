@@ -5,8 +5,10 @@
  * `src/kernel/amcRuntime.ts` is the only module that imports `@amc/core` and
  * the vendored `@amc/cordis` family. Those are workspace packages the tarball
  * never contained, which is why `amc agent-loop run` worked only from a
- * checkout. This step replaces tsc's thin re-export at dist/kernel/amcRuntime.js
- * with a self-contained esbuild bundle of that closure.
+ * checkout. This step builds the source wrapper into a self-contained bundle
+ * at dist/kernel/amcRuntime.js. It never uses that output as its next input,
+ * so repeated bundling preserves the dependency inventory and licence texts.
+ * Workspace packages must have their compiled entry points available first.
  *
  * The inline rule, stated once: everything reachable is inlined EXCEPT Node
  * builtins and packages the root package.json declares as `dependencies`
@@ -27,9 +29,10 @@ import { dirname, join, relative, resolve } from "node:path";
 const root = process.cwd();
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const rootDeps = new Set(Object.keys(pkg.dependencies ?? {}));
-const entry = join(root, "dist", "kernel", "amcRuntime.js");
+const entry = join(root, "src", "kernel", "amcRuntime.ts");
+const output = join(root, "dist", "kernel", "amcRuntime.js");
 if (!existsSync(entry)) {
-  console.error(`bundle-kernel: ${entry} is missing — run tsc first`);
+  console.error(`bundle-kernel: source wrapper ${entry} is missing`);
   process.exit(1);
 }
 const builtins = new Set(builtinModules);
@@ -54,8 +57,7 @@ function packageOf(file) {
 
 const result = await build({
   entryPoints: [entry],
-  outfile: entry,
-  allowOverwrite: true,
+  outfile: output,
   bundle: true,
   format: "esm",
   platform: "node",
@@ -84,17 +86,18 @@ const result = await build({
 
 const inlined = new Map();
 for (const input of Object.keys(result.metafile.inputs)) {
-  if (input.startsWith("dist/")) continue;
   const p = packageOf(input);
-  if (p && !inlined.has(p.name)) inlined.set(p.name, p);
+  // Exclude AMC's own wrapper by package identity, not a directory prefix:
+  // compiled third-party packages can legitimately live beneath dist.
+  if (p && p.from !== "" && !inlined.has(p.name)) inlined.set(p.name, p);
 }
 const manifest = {
   schemaVersion: "2026-09-08",
-  entry: relative(root, entry),
+  entry: relative(root, output),
   rule: "inline everything except Node builtins and root package.json dependencies",
   packages: [...inlined.values()].sort((a, b) => a.name.localeCompare(b.name))
 };
-writeFileSync(`${entry.replace(/\.js$/, "")}.bundle.json`, `${JSON.stringify(manifest, null, 2)}\n`);
+writeFileSync(`${output.replace(/\.js$/, "")}.bundle.json`, `${JSON.stringify(manifest, null, 2)}\n`);
 // Licence texts of everything inlined, so the tarball attributes what it
 // ships. esbuild's LEGAL.txt only lifts comments that were in the code.
 const notices = [];
@@ -104,9 +107,9 @@ for (const p of manifest.packages) {
   notices.push(`## ${p.name}@${p.version ?? "unknown"} (${p.license ?? "licence not declared"})\n\n` +
     (licenseFile ? readFileSync(join(dir, licenseFile), "utf8").trim() : "(no licence file in the package; see its package.json)") + "\n");
 }
-writeFileSync(`${entry}.NOTICES.md`, `# Third-party notices for dist/kernel/amcRuntime.js\n\nPackages inlined into the runtime bundle by scripts/bundle-kernel.mjs.\n\n${notices.join("\n")}`);
-const bytes = readFileSync(entry).length;
-console.log(`bundle-kernel: ${relative(root, entry)} ${(bytes / 1024).toFixed(0)} KB, ${manifest.packages.length} packages inlined: ${manifest.packages.map((p) => p.name).join(", ")}`);
+writeFileSync(`${output}.NOTICES.md`, `# Third-party notices for dist/kernel/amcRuntime.js\n\nPackages inlined into the runtime bundle by scripts/bundle-kernel.mjs.\n\n${notices.join("\n")}`);
+const bytes = readFileSync(output).length;
+console.log(`bundle-kernel: ${relative(root, output)} ${(bytes / 1024).toFixed(0)} KB, ${manifest.packages.length} packages inlined: ${manifest.packages.map((p) => p.name).join(", ")}`);
 for (const p of manifest.packages) {
   if (!p.license) console.warn(`bundle-kernel: ${p.name} declares no licence — check THIRD_PARTY_NOTICES`);
 }
