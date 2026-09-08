@@ -61,6 +61,7 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
   // ~/.amc would prove nothing about a new contributor's experience.
   const isolated = { ...env, HOME: home, AMC_VAULT_PASSPHRASE: "clean-source-check" };
   const cli = join(clone, "dist", "cli.js");
+  const handover = { sessionId: "" };
 
   const steps = [
     () => run("git clone (committed tree only)", "git", ["clone", "-q", "--no-hardlinks", root, clone], { env })
@@ -72,7 +73,20 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
     () => existsSync(cli) || (console.error(`FAIL build produced no ${cli}`), false),
     () => run("amc doctor", "node", [cli, "doctor"], { cwd: workspace, env: isolated }),
     () => run("amc init (isolated workspace)", "node", [cli, "init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }),
-    () => run(`amc agent-loop run "${SMOKE_PROMPT}" (stub provider, keyless)`, "node", [cli, "agent-loop", "run", SMOKE_PROMPT], { cwd: workspace, env: isolated })
+    () => run(`amc agent-loop run "${SMOKE_PROMPT}" (stub provider, keyless)`, "node", [cli, "agent-loop", "run", SMOKE_PROMPT], { cwd: workspace, env: isolated }),
+    // AMC-1511, across REAL processes: A leaves the session unsealed, B resumes
+    // it by id, and the verifier re-derives every request from the log.
+    () => {
+      const a = spawnSync("node", [cli, "agent-loop", "run", "--keep-open", "first of two"], { cwd: workspace, env: isolated, encoding: "utf8" });
+      const sessionId = /session ([0-9a-f-]{36})/.exec(`${a.stdout}${a.stderr}`)?.[1] ?? null;
+      const ok = a.status === 0 && sessionId !== null;
+      console.log(`${ok ? "ok  " : "FAIL"} process A: agent-loop run --keep-open (session ${sessionId ?? "?"})`);
+      if (!ok) { console.error(`${a.stdout}\n${a.stderr}`.trim().split("\n").slice(-15).join("\n")); return false; }
+      handover.sessionId = sessionId;
+      return true;
+    },
+    () => run("process B: agent-loop run --session <id> (verified resume)", "node", [cli, "agent-loop", "run", "--session", handover.sessionId, "second of two"], { cwd: workspace, env: isolated }),
+    () => run("agent-loop verify <id> (both turns, one chain)", "node", [cli, "agent-loop", "verify", handover.sessionId], { cwd: workspace, env: isolated })
   ];
 
   let ok = true;

@@ -178,7 +178,8 @@ export class SessionService extends SessionEventWriter {
         agentId: params.agentId,
         harnessVersion: params.harnessVersion,
         compositionDigest: params.compositionDigest,
-        policyDigest: params.policyDigest
+        policyDigest: params.policyDigest,
+        ...(params.parent === undefined ? {} : { parentSession: { ...params.parent } })
       },
       surface: { op: "none" },
       turn: null,

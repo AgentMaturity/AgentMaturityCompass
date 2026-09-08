@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { hostname } from "node:os";
 /**
  * The operator surface for the agent loop (plan P3.2 stage 4).
  *
@@ -114,6 +115,9 @@ interface RunOptions {
   thinkMs?: string;
   cancelAfter?: string;
   steer?: string;
+  session?: string;
+  forkFrom?: string;
+  keepOpen?: boolean;
   steerAfter?: string;
   persona?: string;
   approveTools?: string;
@@ -357,6 +361,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
+    .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
+    .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
+    .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
     .option(
       "--delegate",
       "offer the `delegate` tool so this run can hand work to in-process children. "
@@ -516,7 +523,13 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // turn and its tool evidence has to name the session those calls ran in.
       // It previously named `toolset-default`, a session nothing ever created,
       // so any run that actually called a tool left the ledger unverifiable.
-      const turnSessionId = randomUUID();
+      const turnSessionId = opts.session ?? randomUUID();
+      const claimant = {
+        pid: process.pid,
+        hostId: hostname(),
+        bootId: process.env.AMC_BOOT_ID ?? randomUUID(),
+        startedAt: Math.round(Date.now() - process.uptime() * 1000)
+      };
       let toolSeam: AgentToolSeam | null = null;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
@@ -642,6 +655,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       try {
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
+          ...(opts.session === undefined ? {} : { resume: { claimant } }),
+          ...(opts.forkFrom === undefined ? {} : { forkFrom: { parentSessionId: opts.forkFrom, claimant } }),
+          ...(opts.keepOpen ? { keepOpen: true } : {}),
           workspace: process.cwd(),
           agentId: "default",
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what

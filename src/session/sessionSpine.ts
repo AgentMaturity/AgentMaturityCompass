@@ -1,4 +1,4 @@
-import type { EvidenceEventType, RuntimeName } from "../types.js";
+import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -12,8 +12,9 @@ import {
 } from "./sessionTypes.js";
 import { TurnWindow } from "./turnWindow.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
+import { SessionSpillStore } from "./spill/spillStore.js";
 import type { SpillPolicyConfig } from "./spill/spillTypes.js";
-import type { SessionEventRef } from "./sessionApiTypes.js";
+import type { SessionAttachParams, SessionEventRef } from "./sessionApiTypes.js";
 
 /**
  * The tier every natively-executed row carries.
@@ -195,6 +196,87 @@ export abstract class SessionEventWriter {
       seq,
       payloadSha256: result.payloadSha256
     };
+  }
+
+  /**
+   * Re-open an EXISTING, unsealed session as its next writer (AMC-1511).
+   *
+   * No sessions row is inserted — it exists — and the first row this writer
+   * appends is `session/resume`, naming who resumed and the head they observed,
+   * so the handover is itself signed evidence. The caller (sessionResume.ts)
+   * has already verified the chain, refused sealed/foreign-format/live
+   * sessions, and run crash recovery if the tail needed it; this method only
+   * positions the writer. Turn numbering and the seal chain continue from the
+   * rows, never restart.
+   */
+  attach(params: SessionAttachParams): SessionEventRef {
+    if (this.sessionIdValue !== null) {
+      throw new Error("SessionService.attach called on an opened service");
+    }
+    this.sessionIdValue = params.sessionId;
+    this.runtime = params.runtime ?? "amc";
+    this.spill = new SessionSpillPolicy(new SessionSpillStore(this.workspace, params.sessionId), this.spillConfig);
+    const rows = this.store.readSessionEvents(params.sessionId);
+    this.seedHead(params.sessionId);
+    this.seedTurnChain(rows);
+    return this.appendSessionEvent({
+      eventType: "session/resume",
+      typeMeta: {
+        runtime: this.runtime,
+        agentId: params.agentId,
+        harnessVersion: params.harnessVersion,
+        compositionDigest: params.compositionDigest,
+        policyDigest: params.policyDigest,
+        claimant: { ...params.claimant },
+        observedHeadEventId: params.observedHeadEventId
+      },
+      surface: { op: "none" },
+      turn: null,
+      step: null
+    });
+  }
+
+  /**
+   * Seed the turn counter and the seal chain from the session's rows, so a
+   * resumed writer's next `turn/start` and `turn/seal` continue the numbering
+   * and the seal chain instead of restarting them (AMC-1511).
+   */
+  protected seedTurnChain(rows: readonly EvidenceEvent[]): void {
+    for (const row of rows) {
+      if (extractEnvelope(row.meta_json) === null) continue;
+      const meta = JSON.parse(row.meta_json) as Record<string, unknown>;
+      if (row.event_type === "turn/start" && typeof meta.turn === "number") {
+        this.turnNo = Math.max(this.turnNo, meta.turn);
+      }
+      if (row.event_type === "turn/seal" && typeof meta.window_merkle_root === "string") {
+        this.window.recordSeal(row.id, row.event_hash, meta.window_merkle_root);
+      }
+    }
+  }
+
+  /**
+   * Let go of the store WITHOUT sealing: the session stays resumable by a later
+   * process. The turn must already be sealed — an open turn is a crash, and a
+   * process that means to hand over must not leave one.
+   */
+  releaseWithoutClosing(): void {
+    this.ensureUsable();
+    if (this.currentTurn !== null) {
+      throw new Error("SessionService.releaseWithoutClosing: a turn is still open; seal it first");
+    }
+    this.closed = true;
+    this.store.close();
+  }
+
+  /**
+   * Drop the store handle as a dying process would: no seal, no check, no
+   * `session/close`. Exists so a test can stage the crash that
+   * `resumeSession` must recover from; production code has no reason to call
+   * it, and its name says so.
+   */
+  simulateCrash(): void {
+    this.closed = true;
+    this.store.close();
   }
 
   protected seedHead(sessionId: string): void {

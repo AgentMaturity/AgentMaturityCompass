@@ -52,6 +52,9 @@ import {
   type AgentPromptProfileOptions
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
+import { forkSession, resumeSession, type ResumeReport } from "../session/sessionResume.js";
+import type { RecoveryClaimant } from "../session/sessionRecovery.js";
+import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
 import type { SubagentRunner } from "../agent/subagentSpawn.js";
 import type { ActionClass } from "../types.js";
@@ -123,6 +126,21 @@ export interface ComposedTurnOptions {
    * existed and had nothing truthful to name.
    */
   readonly sessionId?: string;
+  /**
+   * Continue an EXISTING, unsealed session as its next writer (AMC-1511).
+   * Requires `sessionId`. Verification, liveness and crash recovery happen in
+   * sessionResume.ts before anything is dispatched; a refusal throws
+   * SessionResumeRefused and this turn never starts.
+   */
+  readonly resume?: { readonly claimant: RecoveryClaimant; readonly staleAfterMs?: number };
+  /** Open a NEW session whose open row names this parent's verified final row. */
+  readonly forkFrom?: { readonly parentSessionId: string; readonly claimant: RecoveryClaimant };
+  /**
+   * Leave the session unsealed at exit so another process can resume it. The
+   * turn is still sealed; only the session-level seal is deferred. Default
+   * false: a run seals its session, as it always has.
+   */
+  readonly keepOpen?: boolean;
   /**
    * Pins the exact `system/prompt` text, bypassing assembly.
    *
@@ -226,6 +244,12 @@ export interface ComposedTurnOutcome {
   readonly systemPromptEventId: string;
   /** The section names in the order they assembled, for an operator summary. */
   readonly promptSections: readonly string[];
+  /** Set when this turn continued an existing session (AMC-1511). */
+  readonly resumed?: ResumeReport | null;
+  /** Set when this session was forked from a verified parent. */
+  readonly parent?: SessionLineage | null;
+  /** True when the session was left unsealed for a later process. */
+  readonly keptOpen?: boolean;
 }
 
 /** Read a composed service off the tree by the name its seam declares. */
@@ -335,14 +359,28 @@ function policyDigestOf(options: ComposedTurnOptions): string {
  */
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
   const profile = promptProfileFor(options);
-  const session = new SessionService(options.workspace);
-  session.open({
-    ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }),
+  const identity = {
     agentId: options.agentId,
     harnessVersion: amcVersion,
     compositionDigest: compositionDigestOf(options, profile),
     policyDigest: policyDigestOf(options)
-  });
+  };
+  let session: SessionService;
+  let resumed: ResumeReport | null = null;
+  let parent: SessionLineage | null = null;
+  if (options.resume !== undefined) {
+    if (options.sessionId === undefined) throw new Error("runComposedTurn: resume requires sessionId");
+    const opened = resumeSession({ workspace: options.workspace, sessionId: options.sessionId, ...options.resume, ...identity });
+    session = opened.service;
+    resumed = opened.report;
+  } else if (options.forkFrom !== undefined) {
+    const opened = forkSession({ workspace: options.workspace, ...options.forkFrom, ...identity });
+    session = opened.service;
+    parent = opened.parent;
+  } else {
+    session = new SessionService(options.workspace);
+    session.open({ ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }), ...identity });
+  }
   const sessionId = session.sessionId;
   const ctx = new Context();
   const fibers: { dispose(): Promise<void> }[] = [];
@@ -497,7 +535,13 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       await fiber.dispose();
     }
     try {
-      session.close({ reason: "completed" });
+      if (options.keepOpen) {
+        // Hand-over point: the turn is sealed, the session is not. A later
+        // process resumes it through sessionResume.ts, which re-verifies first.
+        session.releaseWithoutClosing();
+      } else {
+        session.close({ reason: "completed" });
+      }
     } catch {
       // A driver that entered `failed` left an open turn only recovery may
       // close, and the spine refuses a close over it. Swallowed HERE and only

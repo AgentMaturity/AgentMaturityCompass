@@ -66,6 +66,31 @@ export interface SessionOpenParams {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /**
+   * Set when this session is a FORK: the parent's verified final row. Recorded
+   * in the `session/open` row so lineage is a signed claim, not a filename.
+   */
+  readonly parent?: SessionLineage;
+}
+
+/** A verified pointer at another session's last enveloped row. */
+export interface SessionLineage {
+  readonly sessionId: string;
+  readonly finalEventHash: string;
+  readonly seq: number;
+}
+
+/** Re-open an existing, unsealed session from another process (AMC-1511). */
+export interface SessionAttachParams {
+  readonly sessionId: string;
+  readonly runtime?: RuntimeName;
+  readonly agentId: string;
+  readonly harnessVersion: string;
+  readonly compositionDigest: string;
+  readonly policyDigest: string;
+  readonly claimant: { readonly pid: number; readonly hostId: string; readonly bootId: string; readonly startedAt: number };
+  /** The last enveloped row the resumer observed before claiming. */
+  readonly observedHeadEventId: string;
 }
 
 export interface TurnStartParams {

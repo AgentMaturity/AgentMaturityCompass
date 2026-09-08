@@ -58,6 +58,7 @@ export type EvidenceEventType =
   | "approval/answer"
   | "sandbox/mode"
   | "session/recovery-claim"
+  | "session/resume"
   | "session/recovered"
   // The agent loop's own control rows (plan P3.2). Namespaced `loop/`, NOT
   // `agent/`: `agent_process_started` and friends above already mean "AMC
