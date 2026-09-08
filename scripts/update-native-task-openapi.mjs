@@ -67,6 +67,19 @@ output = publishBlock(output, "PATHS", paths, 2, (source, block) => {
   if (Object.keys(document).at(-1) !== "paths") throw new Error("Public paths must be the final section");
   return source.trimEnd() + "\n" + block;
 });
+const proofHeaders = paths["/v1/native-tasks"].post.parameters.filter(parameter => parameter.in === "header");
+for (const action of ["decide", "cancel"]) {
+  output = publishBlock(output, `APPROVAL ${action.toUpperCase()} HEADERS`, proofHeaders, 8, (source, block) => {
+    const boundary = `\n  /approvals/requests/{id}/${action}:\n`;
+    const start = source.indexOf(boundary);
+    if (start < 0) throw new Error(`Missing approval ${action} operation`);
+    const end = source.indexOf("\n  /", start + boundary.length);
+    const section = source.slice(start, end < 0 ? undefined : end);
+    const id = "        - { name: id, in: path, required: true, schema: { type: string } }\n";
+    if (!section.includes(id)) throw new Error(`Missing approval ${action} parameter insertion boundary`);
+    return source.slice(0, start) + section.replace(id, id + block) + (end < 0 ? "" : source.slice(end));
+  });
+}
 if (process.argv.includes("--check")) {
   if (output !== original) throw new Error("Public native task contract is stale; run the publisher after building");
 } else if (output !== original) {

@@ -49,6 +49,16 @@ describe("full OpenAPI contract", () => {
     expect(spec.components.schemas.NativeTask.properties.sessionId).toMatchObject({ type: "string", nullable: true });
     expect(spec.components.schemas.NativeTaskOptions.properties.providers.items.properties.credential)
       .toMatchObject({ type: "object", nullable: true });
+    for (const contract of [spec, generateFullOpenApiSpec()]) {
+      for (const action of ["decide", "cancel"]) {
+        const parameters = contract.paths[`/approvals/requests/{id}/${action}`].post.parameters;
+        expect(parameters).toEqual(expect.arrayContaining([
+          expect.objectContaining({ name: "x-amc-native-intent", in: "header", required: true }),
+          expect.objectContaining({ name: "x-amc-native-csrf", in: "header", description: expect.stringContaining("Required with a human session cookie") }),
+          expect.objectContaining({ name: "Origin", in: "header", description: expect.stringContaining("Required for cookie mutations") })
+        ]));
+      }
+    }
   });
   test("includes studio + bridge + gateway endpoints", () => {
     const spec = generateFullOpenApiSpec();

@@ -3007,6 +3007,29 @@ paths:
             host: { default: amc.example.com }
       parameters:
         - { name: id, in: path, required: true, schema: { type: string } }
+        # BEGIN GENERATED NATIVE TASK APPROVAL DECIDE HEADERS
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native task/approval mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain from options or /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+            Admin-token clients may omit it.
+        # END GENERATED NATIVE TASK APPROVAL DECIDE HEADERS
       requestBody:
         required: true
         content:
@@ -3017,7 +3040,7 @@ paths:
           description: Decision and bounded non-authoritative delivery summary
         '400': { description: Invalid decision }
         '401': { description: Unauthorized }
-        '403': { description: Reviewer role is not allowed }
+        '403': { description: 'Reviewer role, browser proof, demo or read-only policy refused the decision' }
         '409': { description: Request is no longer pending }
 
   /approvals/requests/{id}/cancel:
@@ -3033,10 +3056,33 @@ paths:
             host: { default: amc.example.com }
       parameters:
         - { name: id, in: path, required: true, schema: { type: string } }
+        # BEGIN GENERATED NATIVE TASK APPROVAL CANCEL HEADERS
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native task/approval mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain from options or /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+            Admin-token clients may omit it.
+        # END GENERATED NATIVE TASK APPROVAL CANCEL HEADERS
       responses:
         '200': { description: Cancelled request and bounded delivery summary }
         '401': { description: Unauthorized }
-        '403': { description: Owner role required }
+        '403': { description: 'Owner role, browser proof, demo or read-only policy refused cancellation' }
         '404': { description: Approval request not found }
         '409': { description: Request is no longer pending }
 

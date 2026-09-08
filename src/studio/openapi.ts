@@ -15,6 +15,7 @@ import { dirname } from "node:path";
 import YAML from "yaml";
 import type { OpenApiOperation } from "./openapiTypes.js";
 import { nativeTaskEndpoints, nativeTaskSchemas } from "./nativeTaskOpenapi.js";
+const nativeMutationParameters = nativeTaskEndpoints()["/api/v1/native-tasks"]!.post!.parameters!.filter(parameter => parameter.in === "header");
 
 export interface OpenApiContractIssue {
   severity: "error" | "warning";
@@ -311,7 +312,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
       post: {
         summary: "Record a canonical approval decision",
         tags: ["Studio", "Approvals", "Enforce"],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }, ...nativeMutationParameters],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
         requestBody: {
           required: true,
@@ -334,7 +335,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
           "200": okJson("Decision recorded", "#/components/schemas/DecisionResponse"),
           "400": errJson("Invalid decision"),
           "401": errJson("Unauthorized"),
-          "403": errJson("Reviewer role is not allowed"),
+          "403": errJson("Reviewer role, browser proof, demo or read-only policy refused the decision"),
           "409": errJson("Approval request is no longer pending")
         },
       },
@@ -343,12 +344,12 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
       post: {
         summary: "Cancel a pending canonical approval request",
         tags: ["Studio", "Approvals", "Enforce"],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }, ...nativeMutationParameters],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
         responses: {
           "200": okJson("Approval request cancelled", "#/components/schemas/ApprovalCancelResponse"),
           "401": errJson("Unauthorized"),
-          "403": errJson("Owner role required"),
+          "403": errJson("Owner role, browser proof, demo or read-only policy refused cancellation"),
           "404": errJson("Approval request not found"),
           "409": errJson("Approval request is no longer pending")
         }
