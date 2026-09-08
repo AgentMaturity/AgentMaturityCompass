@@ -34,7 +34,7 @@ afterAll(async () => {
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-v1chain-"));
   dirs.push(dir);
-  initWorkspace(dir);
+  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
   return dir;
 }
 

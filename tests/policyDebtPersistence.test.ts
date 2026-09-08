@@ -19,7 +19,7 @@ const dirs: string[] = [];
 function workspace(): string {
   const dir = mkdtempSync(join(tmpdir(), "amc-debt-"));
   dirs.push(dir);
-  initWorkspace(dir);
+  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
   return dir;
 }
 afterEach(() => {
