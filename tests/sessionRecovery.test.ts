@@ -1,3 +1,5 @@
+import Database from "better-sqlite3";
+import { startOwnerProcess, type OwnerProcess } from "./helpers/sessionOwnerProcess.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -21,48 +23,26 @@ import type { EvidenceEvent } from "../src/types.js";
 
 describe("recoverSession — turn-sealed session crash recovery", () => {
   let dir: string;
+  const children: OwnerProcess[] = [];
 
   const claimant: RecoveryClaimant = { pid: 4242, hostId: "host-a", bootId: "boot-1", startedAt: 1_600_000_000 };
 
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "amc-session-recover-"));
+    process.env.AMC_VAULT_PASSPHRASE = "recovery-test-passphrase";
     initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    for (const child of children.splice(0)) await child.kill();
     rmSync(dir, { recursive: true, force: true });
   });
 
-  // Drives a session up to a crash and then ABANDONS the service (never closes
-  // it), leaving an open turn with a tool/call that has no tool/result — the
-  // shape a process death leaves: an unsealed, unclosed tail.
-  function buildCrashedSession(): { sessionId: string; toolCallId: string } {
-    const service = new SessionService(dir);
-    service.open({
-      runtime: "claude",
-      agentId: "default",
-      harnessVersion: "2.2.0",
-      compositionDigest: sha256Hex("composition"),
-      policyDigest: sha256Hex("policy")
-    });
-    const sessionId = service.sessionId;
-
-    service.recordSystemPrompt("You are a careful assistant.");
-    service.startTurn({ trigger: "user" });
-    service.recordUserMessage("List the files, then read the first one.");
-    service.startStep();
-    service.recordAssistantBlock({ blockIndex: 0, blockKind: "text", stopReason: null, content: "I'll list them." });
-    const toolCallId = "call-crash-1";
-    service.recordToolCall({
-      toolCallId,
-      toolName: "shell",
-      dispatch: "native",
-      parentToken: null,
-      args: JSON.stringify({ command: "ls" })
-    });
-    // CRASH here: no tool result, no step/end, no turn/end, no seal, no close.
-    // The service is deliberately not closed — that is the crash.
-    return { sessionId, toolCallId };
+  // A crash is a genuinely terminated OS process, not an abandoned object.
+  async function buildCrashedSession(mode = "tool"): Promise<{ sessionId: string; toolCallId: string }> {
+    const child = await startOwnerProcess(dir, mode); children.push(child);
+    const sessionId = String(child.ready.sessionId); await child.kill();
+    return { sessionId, toolCallId: "call-crash-1" };
   }
 
   function sessionEvents(sessionId: string): EvidenceEvent[] {
@@ -81,7 +61,7 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
   const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
   test("(a) a stale crashed session recovers to RECOVERED, marked interrupted and synthetic", async () => {
-    const { sessionId, toolCallId } = buildCrashedSession();
+    const { sessionId, toolCallId } = await buildCrashedSession();
     const crashTail = sessionEvents(sessionId).map((event) => event.id);
 
     // staleAfterMs:0 plus a real elapsed gap makes the crash unambiguously stale
@@ -186,7 +166,7 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
   });
 
   test("(a2) recovery with close seals a synthetic session/close that verifies as CLOSED", async () => {
-    const { sessionId } = buildCrashedSession();
+    const { sessionId } = await buildCrashedSession();
     await delay(25);
 
     const report = recoverSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0, close: true });
@@ -213,31 +193,7 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
   // the way crash repair spells a death would make this test fail at the
   // `reason` assertion; one that dropped the cause would fail at `cancelCause`.
   test("(a3) a live cancel and a crash repair are DISTINGUISHABLE by projecting both turn/end rows", async () => {
-    const service = new SessionService(dir);
-    service.open({
-      agentId: "default",
-      harnessVersion: "3.2.0",
-      compositionDigest: sha256Hex("composition"),
-      policyDigest: sha256Hex("policy")
-    });
-    const sessionId = service.sessionId;
-
-    // Turn 1 — stopped by a hook while the agent was very much alive. The step
-    // ends with no usage at all, because the stream was cut off before any
-    // arrived; that is recorded as null rather than as four zeroes.
-    service.startTurn({ trigger: "user" });
-    service.startStep();
-    service.recordUserMessage("do the risky thing");
-    service.endStep({ stopReason: null, usage: null });
-    service.endTurn({ reason: "cancelled", cause: { kind: "hook", reason: "egress-guard" } });
-    service.sealTurn();
-
-    // Turn 2 — the process dies mid-step. No endStep, no endTurn, no close.
-    service.startTurn({ trigger: "user" });
-    service.startStep();
-    service.recordUserMessage("and now the safe thing");
-
-    await delay(25);
+    const { sessionId } = await buildCrashedSession("cancel-then-crash");
     const report = recoverSession({ workspace: dir, sessionId, claimant, staleAfterMs: 0 });
     expect(report.verdict).toBe("RECOVERED");
     // Only the crashed turn and its step are closed synthetically; the cancelled
@@ -276,36 +232,16 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
   });
 
-  test("(b) a broken per-session chain is TAMPERED and is never appended to", () => {
-    const { sessionId } = buildCrashedSession();
+  test("(b) a broken per-session chain is TAMPERED and is never appended to", async () => {
+    const { sessionId } = await buildCrashedSession();
 
-    // Forge an event with a wrong per-session seq — a genuine chain break, the
-    // signature of a rewritten history rather than a crash. Appended raw so the
-    // GLOBAL chain stays valid while the per-session envelope does not.
-    const existing = sessionEvents(sessionId);
-    const last = existing[existing.length - 1]!;
-    const lastEnvelope = extractEnvelope(last.meta_json)!;
-    const brokenEnvelope: SessionEnvelope = {
-      v: 1,
-      sessionId,
-      seq: lastEnvelope.seq + 5, // skips ahead: the break
-      prevSessionEventHash: last.event_hash,
-      turn: null,
-      step: null,
-      surface: { op: "none" },
-      synthetic: false
-    };
-    const forger = openLedger(dir);
-    try {
-      forger.appendEvidenceDetailed({
-        sessionId,
-        runtime: "claude",
-        eventType: "user/message",
-        meta: embedEnvelope({}, brokenEnvelope)
-      });
-    } finally {
-      forger.close();
-    }
+    // Deliberately bypass immutability at the raw database: the guarded native
+    // append now rejects this corruption before it could create a row or blob.
+    const db = new Database(join(dir, ".amc", "evidence.sqlite"));
+    for (const row of db.prepare("SELECT name FROM sqlite_master WHERE type='trigger' AND tbl_name='evidence_events'").all() as Array<{name:string}>) db.exec(`DROP TRIGGER "${row.name.replace(/"/g, '""')}"`);
+    const row = db.prepare("SELECT id,meta_json FROM evidence_events WHERE session_id=? ORDER BY rowid DESC LIMIT 1").get(sessionId) as {id:string;meta_json:string};
+    const broken = JSON.parse(row.meta_json); broken.amcSession.seq += 5;
+    db.prepare("UPDATE evidence_events SET meta_json=? WHERE id=?").run(JSON.stringify(broken), row.id); db.close();
 
     const beforeCount = sessionEvents(sessionId).length;
     const report = recoverSession({ workspace: dir, sessionId, claimant, force: true });
@@ -321,27 +257,18 @@ describe("recoverSession — turn-sealed session crash recovery", () => {
     expect(after.some((event) => event.event_type === "session/recovery-claim")).toBe(false);
   });
 
-  test("(c) a fresh (non-stale) session is refused without force, then recovers with it", () => {
-    const { sessionId } = buildCrashedSession();
-
-    // Default staleness window (60s) and no force: a just-crashed session is
-    // indistinguishable from a slow one, so recovery refuses and changes nothing.
-    const before = sessionEvents(sessionId).length;
-    const refused = recoverSession({ workspace: dir, sessionId, claimant });
-
+  test("(c) force and zero staleness cannot steal a live writer; a dead owner can recover", async () => {
+    const child = await startOwnerProcess(dir, "tool"); children.push(child);
+    const sessionId = String(child.ready.sessionId);
+    const before = sessionEvents(sessionId);
+    const refused = recoverSession({ workspace: dir, sessionId, claimant, force: true, staleAfterMs: 0 });
     expect(refused.verdict).toBe("INDETERMINATE");
-    expect(refused.wonClaim).toBe(false);
+    expect(refused.reason).toMatch(/still alive/);
     expect(refused.claimEventId).toBeNull();
-    expect(refused.reason).toMatch(/not stale/);
-
-    const after = sessionEvents(sessionId);
-    expect(after.length).toBe(before);
-    expect(after.some((event) => event.event_type === "session/recovery-claim")).toBe(false);
-
-    // The operator override is the only thing that was missing.
+    expect(sessionEvents(sessionId)).toEqual(before);
+    await child.kill();
     const forced = recoverSession({ workspace: dir, sessionId, claimant, force: true });
     expect(forced.verdict).toBe("RECOVERED");
     expect(forced.wonClaim).toBe(true);
-    expect(sessionEvents(sessionId).some((event) => event.event_type === "session/recovery-claim")).toBe(true);
   });
 });

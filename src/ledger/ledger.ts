@@ -33,6 +33,8 @@ import type { Incident, CausalRelationship } from "../incidents/incidentTypes.js
 import { queueEvidenceEventSpan } from "../observability/otelExporter.js";
 import { buildRetentionProofIndex, type RetentionProofIndex } from "../ops/retention/retentionArchive.js";
 import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
+import type { SessionWriteFence } from "../session/sessionOwnership.js";
+import { assertLedgerSessionAppend, assertLedgerSessionBatch, runImmediateTransaction } from "./ledgerSessionTransactions.js";
 
 
 export interface AppendEvidenceInput {
@@ -46,6 +48,7 @@ export interface AppendEvidenceInput {
   meta?: Record<string, unknown>;
   id?: string;
   ts?: number;
+  sessionWriteFence?: SessionWriteFence;
 }
 
 export interface AppendEvidenceResult {
@@ -253,19 +256,7 @@ export class Ledger {
   }
 
   private runImmediateTransaction<T>(fn: () => T): T {
-    this.db.exec("BEGIN IMMEDIATE");
-    try {
-      const result = fn();
-      this.db.exec("COMMIT");
-      return result;
-    } catch (error) {
-      try {
-        this.db.exec("ROLLBACK");
-      } catch {
-        // no-op: rollback best effort
-      }
-      throw error;
-    }
+    return runImmediateTransaction(this.db, fn);
   }
 
   private latestEventHash(): string {
@@ -511,6 +502,7 @@ export class Ledger {
     result: AppendEvidenceResult;
   } {
     const { input, id, ts, prevHash } = params;
+    assertLedgerSessionAppend(this.db, input);
     const policy = params.policy ?? this.getOpsPolicy();
     const payload = input.payload;
     let payloadPath: string | null = null;
@@ -637,6 +629,7 @@ export class Ledger {
     const spanRows: EvidenceEvent[] = [];
     const policy = this.getOpsPolicy();
     this.runImmediateTransaction(() => {
+      assertLedgerSessionBatch(this.db, inputs);
       let previousHash = this.latestEventHash();
       for (const input of inputs) {
         const id = input.id ?? randomUUID();

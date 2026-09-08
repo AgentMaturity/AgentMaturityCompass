@@ -1,3 +1,5 @@
+import { openLedger } from "../src/ledger/ledger.js";
+import { startOwnerProcess } from "./helpers/sessionOwnerProcess.js";
 import { rmSync } from "node:fs";
 import { afterEach, describe, expect, test } from "vitest";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
@@ -481,12 +483,13 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
     const dead = hangingTurn();
     await dead.dispatched;
     dead.harness.abandon();
-    const report = recoverSession({
-      workspace: dead.harness.dir,
-      sessionId: dead.harness.sessionId,
-      claimant,
-      force: true
-    });
+    // Abandoning an object in this still-live process is not death. Even force
+    // must refuse its owner. Stage the actual interrupted log in a child.
+    const refused = recoverSession({ workspace: dead.harness.dir, sessionId: dead.harness.sessionId, claimant, force: true });
+    expect(refused.verdict).toBe("INDETERMINATE"); expect(refused.reason).toMatch(/still alive/);
+    const process = await startOwnerProcess(dead.harness.dir, "tool");
+    const crashedSessionId = String(process.ready.sessionId); await process.kill();
+    const report = recoverSession({ workspace: dead.harness.dir, sessionId: crashedSessionId, claimant, force: true });
     expect(report.verdict).toBe("RECOVERED");
     expect(report.syntheticTurnEnds).toBe(1);
     expect(report.syntheticStepEnds).toBe(1);
@@ -495,7 +498,10 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
     expect(report.unknownToolOutcomes).toBe(1);
 
     const liveClosure = projectClosure(only(live.harness.events(), "turn/end"));
-    const repairedClosure = projectClosure(only(dead.harness.events(), "turn/end"));
+    const reader = openLedger(dead.harness.dir, { readonly: true });
+    let repairedEvents: EvidenceEvent[];
+    try { repairedEvents = reader.getAllEvents().filter((event) => event.session_id === crashedSessionId); } finally { reader.close(); }
+    const repairedClosure = projectClosure(only(repairedEvents, "turn/end"));
 
     // Deep equality on BOTH, so a change that spells either one like the other
     // fails here rather than quietly laundering a stop into a death.

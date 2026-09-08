@@ -91,6 +91,7 @@ export interface SessionAttachParams {
   readonly claimant: { readonly pid: number; readonly hostId: string; readonly bootId: string; readonly startedAt: number };
   /** The last enveloped row the resumer observed before claiming. */
   readonly observedHeadEventId: string;
+  readonly observedHeadEventHash: string;
 }
 
 export interface TurnStartParams {

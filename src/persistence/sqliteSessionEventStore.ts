@@ -73,6 +73,7 @@ export class SqliteSessionEventStore implements SessionEventStore {
       runtime: input.runtime,
       eventType: input.eventType,
       meta: input.meta,
+      ...(input.sessionWriteFence ? { sessionWriteFence: input.sessionWriteFence } : {}),
       ...(input.id !== undefined ? { id: input.id } : {}),
       ...(input.ts !== undefined ? { ts: input.ts } : {}),
       ...(input.payload !== undefined

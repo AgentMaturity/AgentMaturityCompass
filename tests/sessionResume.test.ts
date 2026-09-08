@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { startOwnerProcess } from "./helpers/sessionOwnerProcess.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -57,9 +58,8 @@ function processA(dir: string): { sessionId: string; rows: readonly EvidenceEven
   a.open(OPEN);
   a.recordSystemPrompt("You are the agent under test.");
   turnWithTool(a, "first", "call-1");
-  const rows = a.readEvents();
   a.releaseWithoutClosing();
-  return { sessionId: a.sessionId, rows };
+  return { sessionId: a.sessionId, rows: rowsOf(dir, a.sessionId) };
 }
 
 /** Reach under the ledger's immutability triggers — deliberately, to stage tampering. */
@@ -159,18 +159,16 @@ describe("AMC-1511 — resume across processes", () => {
     expect(verifyLedgerIntegrity(dir).errors).toEqual([]);
   });
 
-  test("a crash after a side effect is recovered, never replayed", () => {
+  test("a crash after a side effect is recovered, never replayed", async () => {
     const dir = workspace();
-    const a = new SessionService(dir); a.open(OPEN);
-    a.startTurn({ trigger: "user" }); a.startStep();
-    a.recordToolCall({ toolCallId: "call-crash", toolName: "bash", dispatch: "native", parentToken: null, args: "{}" });
-    const sessionId = a.sessionId; a.simulateCrash();           // died after the side effect
+    const a = await startOwnerProcess(dir, "tool");
+    const sessionId = String(a.ready.sessionId); await a.kill();
 
     const { service: b, report } = resumeSession({ workspace: dir, sessionId, claimant: B, staleAfterMs: 0, ...OPEN });
     expect(report.recovery?.verdict).toBe("RECOVERED");
     turnWithTool(b, "after the crash", "call-new"); b.close({ reason: "completed" });
     const calls = rowsOf(dir, sessionId).filter((r) => r.event_type === "tool/call");
-    expect(calls.map((r) => JSON.parse(r.meta_json).toolCallId)).toEqual(["call-crash", "call-new"]);
+    expect(calls.map((r) => JSON.parse(r.meta_json).toolCallId)).toEqual(["call-crash-1", "call-new"]);
   });
 
   test("a missing session is refused", () => {

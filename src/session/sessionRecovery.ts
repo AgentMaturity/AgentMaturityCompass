@@ -2,11 +2,13 @@
 // it never updates, deletes, or truncates. A crashed session's partial turn
 // stays in the log exactly as the crash left it; synthetic, signed, chained
 // events are added after it (each carrying synthetic:true inside the hash) to
-// make the sequence well-formed. A recovery-claim event fences concurrent
-// recoverers via chain order rather than a lockfile.
+// make the sequence well-formed. SQLite compares the verified head and claims
+// signed writer ownership atomically; JSONL takeover currently fails closed.
 
 import { createHash, randomUUID } from "node:crypto";
 import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js";
+import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused } from "./sessionOwnership.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -46,7 +48,7 @@ export interface RecoverSessionParams {
   readonly sessionId: string;
   readonly claimant: RecoveryClaimant;
   readonly staleAfterMs?: number; // liveness gate; default 60_000
-  readonly force?: boolean; // bypass the liveness gate
+  readonly force?: boolean; // bypass only the age wait; never a live-owner check
   readonly close?: boolean; // also append session/close and seal the row
   /**
    * Store to recover through. Absent, the workspace's pinned backend is opened.
@@ -104,24 +106,34 @@ interface SyntheticRef {
 class SyntheticAppender {
   private seqCounter: number;
   private prevHash: string;
+  private headEventId: string | null;
+  private readonly writerOwner = newSessionWriterOwner();
 
   constructor(
     private readonly store: SessionEventStore,
     private readonly sessionId: string,
     private readonly runtime: RuntimeName,
     seq: number,
-    prevHash: string
+    prevHash: string,
+    headEventId: string | null
   ) {
     this.seqCounter = seq;
     this.prevHash = prevHash;
+    this.headEventId = headEventId;
   }
 
-  // Re-point the head at the actual current tail. Called once after winning the
-  // fence, so that any losing claim that landed between our claim and our win is
-  // chained past rather than forked from.
-  reseed(seq: number, prevHash: string): void {
-    this.seqCounter = seq;
-    this.prevHash = prevHash;
+  /** Release only OUR current claim after a partial recovery failed. */
+  releaseForRetry(claimEventId: string): void {
+    const events = this.store.readSessionEvents(this.sessionId);
+    const last = events[events.length - 1];
+    const owner = readSessionWriter(last ?? null);
+    if (!last || owner?.token !== this.writerOwner.token || owner.state !== "active") return;
+    const envelope = extractEnvelope(last.meta_json);
+    if (!envelope) throw new Error("recovery head no longer has a supported envelope");
+    // A backend may have committed before throwing; re-read only our own head.
+    // The normal atomic check still prevents releasing a replacement owner.
+    this.seqCounter = envelope.seq + 1; this.prevHash = last.event_hash; this.headEventId = last.id;
+    this.append({ eventType: "session/release", typeMeta: { reason: "recovery-failed", claimEventId }, surface: { op: "none" }, turn: null, step: null });
   }
 
   append(spec: {
@@ -147,11 +159,14 @@ class SyntheticAppender {
     // Content is blob-backed, never inline: retention can physically unlink a
     // blob but cannot touch canonical_payload_inline. The seam makes that the
     // only expressible option rather than a convention.
+    const released = spec.eventType === "session/release" || spec.eventType === "session/close";
     const input: SessionStoreAppendInput = {
       sessionId: this.sessionId,
       runtime: this.runtime,
       eventType: spec.eventType,
-      meta: embedEnvelope(spec.typeMeta, envelope),
+      meta: embedEnvelope({ ...spec.typeMeta, [SESSION_WRITER_META]: sessionWriterMeta(this.writerOwner, released) }, envelope),
+      sessionWriteFence: { owner: this.writerOwner, mode: spec.eventType === "session/recovery-claim" ? "claim" : released ? "release" : "append",
+        head: { eventId: this.headEventId, eventHash: this.prevHash, seq: seq - 1 } },
       ...(spec.id !== undefined ? { id: spec.id } : {}),
       ...(spec.payload !== undefined ? { payload: spec.payload } : {})
     };
@@ -162,6 +177,7 @@ class SyntheticAppender {
     // the last durable event.
     this.seqCounter = seq + 1;
     this.prevHash = result.eventHash;
+    this.headEventId = result.id;
 
     return { eventId: result.id, eventHash: result.eventHash, payloadSha256: result.payloadSha256 };
   }
@@ -238,30 +254,6 @@ function sessionRuntime(store: SessionEventStore, sessionId: string, events: rea
   }
   const last = events[events.length - 1];
   return last ? last.runtime : "unknown";
-}
-
-// The winner is the FIRST recovery-claim in chain order whose observedHeadEventId
-// equals the event that actually precedes it in the session chain — i.e. the
-// claim that physically landed on the head it observed. A claim that raced and
-// landed on top of another claim names an earlier head than its true predecessor
-// and loses. The chain totally orders claims, so this tie-break needs no lock.
-function firstValidClaim(events: readonly EvidenceEvent[]): string | null {
-  let lastEnvelopedId: string | null = null;
-  let winner: string | null = null;
-  for (const event of events) {
-    const envelope = extractEnvelope(event.meta_json);
-    if (envelope === null) {
-      continue;
-    }
-    if (winner === null && event.event_type === "session/recovery-claim") {
-      const observed = parseMeta(event.meta_json)?.observedHeadEventId;
-      if (typeof observed === "string" && observed === lastEnvelopedId) {
-        winner = event.id;
-      }
-    }
-    lastEnvelopedId = event.id;
-  }
-  return winner;
 }
 
 interface PriorSeal {
@@ -418,9 +410,9 @@ function report(partial: RecoveryReport): RecoveryReport {
  * Only ever appends. The partial turn stays exactly as the crash left it; a
  * broken per-session chain is a tamper finding (TAMPERED, nothing appended); an
  * already-closed session needs nothing (RECOVERED); a session that is not stale
- * is refused unless `force` is set (INDETERMINATE). Otherwise it fences with a
- * `session/recovery-claim`, and only if that claim wins the chain-ordered
- * tie-break does it append: synthetic tool/result rows (outcome UNKNOWN) for
+ * is refused unless `force` is set (INDETERMINATE). A live or unknown owner is
+ * always refused. Otherwise an atomic `session/recovery-claim` acquires the
+ * verified head before appending: synthetic tool/result rows (outcome UNKNOWN) for
  * unanswered tool/call rows, a synthetic step/end (no stop reason, no usage) for
  * each open step, a synthetic turn/end (reason "interrupted") for each open
  * turn, a session/recovered summary, and a turn/seal closing the recovery
@@ -435,10 +427,26 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   const force = params.force ?? false;
   const close = params.close ?? false;
-  const store = params.store ?? openSessionEventStore(params.workspace);
+  // Verification and unsupported-backend refusals must precede any writer open.
+  const readStore = params.store ?? openSessionEventStore(params.workspace, undefined, { readOnly: true });
+  let preflightEvents: EvidenceEvent[];
+  try {
+    if (readStore.backendId !== "sqlite") return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+      syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: 0, closed: false,
+      reason: "JSONL recovery requires atomic ownership takeover; no recovery was attempted" });
+    preflightEvents = readSessionEvents(readStore, params.sessionId);
+    const verification = verifyLedgerIntegrity(params.workspace);
+    if (!verification.chain.ok) return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+      syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false,
+      reason: verification.chain.errors.join("; ") });
+  } finally { if (params.store === undefined) readStore.close(); }
+  let store = params.store;
+  let acquiredClaim: string | null = null;
+  let attemptedClaim: string | null = null;
+  let recoveryAppender: SyntheticAppender | null = null;
 
   try {
-    const events = readSessionEvents(store, params.sessionId);
+    const events = preflightEvents;
     if (events.length === 0) {
       return report({
         verdict: "INDETERMINATE",
@@ -507,20 +515,35 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       });
     }
 
+    // A handle drop is not process death, and force only bypasses the age wait.
+    try { assertSessionOwnerAvailable(lastEvent); }
+    catch (error) {
+      if (!(error instanceof SessionWriterRefused)) throw error;
+      return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+        syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore, closed: false, reason: error.message });
+    }
+    if (!events.slice(events.length - countUnsealedTail(events)).some((event) => event.event_type === "turn/start")) {
+      return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+        syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore, closed: false, reason: "no unsealed turn requires recovery" });
+    }
+    store ??= openSessionEventStore(params.workspace);
     const seed = seedHead(events);
     const appender = new SyntheticAppender(
       store,
       params.sessionId,
       sessionRuntime(store, params.sessionId, events),
       seed.seq,
-      seed.prevHash
+      seed.prevHash,
+      lastEvent.id
     );
+    recoveryAppender = appender;
 
-    // 4. Owner fence. Append the claim, then re-read: the winner is the first
-    //    claim that landed on the head it observed. If ours did not win, another
-    //    recoverer owns this session — abort, having added only an audit trail.
+    // 4. The backend atomically compares the verified head and acquires ownership.
+    // A losing claim adds neither a row nor a blob; historical claims cannot win again.
     const observedHeadEventId = lastEvent.id;
+    attemptedClaim = randomUUID();
     const claim = appender.append({
+      id: attemptedClaim,
       eventType: "session/recovery-claim",
       typeMeta: {
         claimant: {
@@ -536,26 +559,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       step: null
     });
 
+    acquiredClaim = claim.eventId;
     const contested = readSessionEvents(store, params.sessionId);
-    if (firstValidClaim(contested) !== claim.eventId) {
-      return report({
-        verdict: "INDETERMINATE",
-        sessionId: params.sessionId,
-        claimEventId: claim.eventId,
-        wonClaim: false,
-        syntheticTurnEnds: 0,
-        syntheticStepEnds: 0,
-        unknownToolOutcomes: 0,
-        unsealedTailCountBefore,
-        closed: false,
-        reason: "lost recovery claim to a concurrent recoverer"
-      });
-    }
-
-    // Re-seed onto the true tail in case a losing claim landed after ours.
-    const afterClaim = seedHead(contested);
-    appender.reseed(afterClaim.seq, afterClaim.prevHash);
-
     // 5. Unknown tool outcomes FIRST, so the projection is well-formed (each
     //    tool_use is followed by its tool_result before the turn closes).
     const resultBytes = Buffer.from(SYNTHETIC_TOOL_RESULT_BODY, "utf8");
@@ -684,6 +689,8 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
     let closed = false;
     if (close) {
       closed = closeRecoveredSession(store, appender, params.sessionId);
+    } else {
+      appender.append({ eventType: "session/release", typeMeta: { reason: "recovery-complete", claimEventId: claim.eventId }, surface: { op: "none" }, turn: null, step: null });
     }
 
     return report({
@@ -697,8 +704,18 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       unsealedTailCountBefore,
       closed
     });
+  } catch (error) {
+    if (attemptedClaim !== null) {
+      // The store can commit a claim and then throw in post-commit work.
+      // A preallocated ID plus token check also handles that uncertain return.
+      try { recoveryAppender?.releaseForRetry(attemptedClaim); }
+      catch (releaseError) { throw new AggregateError([error, releaseError], "Recovery failed and its writer claim could not be released"); }
+    }
+    if (!(error instanceof SessionWriterRefused) || acquiredClaim !== null) throw error;
+    return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
+      syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false, reason: error.message });
   } finally {
-    store.close();
+    if (params.store === undefined) store?.close();
   }
 }
 

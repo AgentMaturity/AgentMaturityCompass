@@ -28,6 +28,7 @@
  * that claim checkable rather than aspirational.
  */
 import type { EvidenceEvent, EvidenceEventType, RuntimeName, SessionRecord } from "../types.js";
+import type { SessionWriteFence } from "../session/sessionOwnership.js";
 
 /** Backends shipped in-tree. A new backend adds a member and a conformance run. */
 export type SessionStoreBackendId = "sqlite" | "jsonl";
@@ -52,6 +53,8 @@ export interface SessionStoreAppendInput {
   /** Supplied only when the caller must commit to the id inside the meta it is hashing. */
   readonly id?: string;
   readonly ts?: number;
+  /** Checked atomically with append, before payload writes. Native sessions require it. */
+  readonly sessionWriteFence?: SessionWriteFence;
 }
 
 /** Mirrors the ledger's `AppendEvidenceResult`, which callers already depend on. */

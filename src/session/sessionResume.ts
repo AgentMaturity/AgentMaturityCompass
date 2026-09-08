@@ -2,7 +2,7 @@
  * Resume and fork signed native sessions across processes (AMC-1511).
  *
  * A session written by process A can be continued by process B only through
- * this module. Before B appends anything it must know four things, in this
+ * this module. Before B appends anything it checks the following, in this
  * order, and each refusal happens BEFORE any model or tool dispatch:
  *
  *   MISSING             no sessions row for that id
@@ -12,15 +12,13 @@
  *                       speak. Formats evolve by REFUSING the unknown and, when
  *                       a migration exists, by appending a `session/migration`
  *                       receipt that names the source rows — signed bytes are
- *                       never rewritten in place
+ *                       never rewritten in place. JSONL takeover and legacy
+ *                       sessions without signed ownership are also refused.
  *   TAMPERED            the per-session chain (seq / prevSessionEventHash) or
  *                       the ledger's own hash/signature verification fails
- *   LIVE_WRITER         the rows after the last seal show an open turn or a
- *                       fresh resume by another claimant: someone may still
- *                       be writing. Only a STALE tail is taken over, and then
- *                       through crash recovery, which closes the interrupted
- *                       turn synthetically — the side effect it left is
- *                       recorded once and never re-executed
+ *   LIVE_WRITER         signed ownership still belongs to a live local process,
+ *                       or a remote/unknown process whose death cannot be proved.
+ *                       A turn seal and an elapsed timeout never release a writer.
  *   UNRECOVERED         recovery ran and did not reach RECOVERED
  *
  * What resumes is the SAME session: B's first row is `session/resume`, chained
@@ -35,6 +33,7 @@ import type { EvidenceEvent, RuntimeName } from "../types.js";
 import { recoverSession, type RecoveryClaimant, type RecoveryReport } from "./sessionRecovery.js";
 import { SessionService } from "./sessionService.js";
 import type { SessionLineage } from "./sessionApiTypes.js";
+import { assertSessionOwnerAvailable, SessionWriterRefused } from "./sessionOwnership.js";
 import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./sessionTypes.js";
 
 export const SESSION_ENVELOPE_VERSION = 1;
@@ -149,27 +148,6 @@ function unsealedTail(rows: readonly EvidenceEvent[]): EvidenceEvent[] {
   return rows.slice(lastSeal + 1);
 }
 
-function sameClaimant(a: Record<string, unknown> | undefined, b: RecoveryClaimant): boolean {
-  return !!a && a.pid === b.pid && a.hostId === b.hostId && a.bootId === b.bootId;
-}
-
-/**
- * Does the tail belong to someone who may still be writing? An open turn, or a
- * resume/recovery claim by another claimant with no seal after it, counts —
- * unless it is stale.
- */
-function tailIsLive(tail: readonly EvidenceEvent[], claimant: RecoveryClaimant, staleAfterMs: number): boolean {
-  if (tail.length === 0) return false;
-  const last = tail[tail.length - 1]!;
-  if (Date.now() - last.ts > staleAfterMs) return false;
-  const openTurn = tail.some((row) => row.event_type === "turn/start")
-    && !tail.some((row) => row.event_type === "turn/end");
-  const foreignClaim = tail.some((row) =>
-    (row.event_type === "session/resume" || row.event_type === "session/recovery-claim")
-    && !sameClaimant(meta(row).claimant as Record<string, unknown> | undefined, claimant));
-  return openTurn || foreignClaim;
-}
-
 /** Read-only view for the checks; the writer store opens only once they pass. */
 function withReadOnlyStore<T>(params: { workspace: string; store?: SessionEventStore }, use: (store: SessionEventStore) => T): T {
   if (params.store) return use(params.store);
@@ -183,12 +161,18 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
 
   // 1. Verify and classify through a read-only handle: no writer lock is held
   //    while the answer may still be "refuse".
-  let rows = withReadOnlyStore(params, (store) => verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false));
-  const tail = unsealedTail(rows);
-  if (tailIsLive(tail, params.claimant, staleAfterMs)) {
-    throw new SessionResumeRefused("LIVE_WRITER", `session ${params.sessionId} has an unsealed tail newer than ${staleAfterMs}ms; another writer may be live`);
+  let rows = withReadOnlyStore(params, (store) => {
+    if (store.backendId !== "sqlite") throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "JSONL resume requires atomic ownership takeover; read or fork this session instead");
+    return verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false);
+  });
+  try { assertSessionOwnerAvailable(rows[rows.length - 1]!); }
+  catch (error) {
+    if (error instanceof SessionWriterRefused) throw new SessionResumeRefused(error.code === "LIVE_WRITER" ? "LIVE_WRITER" : "UNSUPPORTED_FORMAT", error.message);
+    throw error;
   }
-  const openTurn = tail.some((row) => row.event_type === "turn/start") && !tail.some((row) => row.event_type === "turn/end");
+  const tail = unsealedTail(rows);
+  // endTurn is not a seal: a crash between them still needs a recovery receipt.
+  const openTurn = tail.some((row) => row.event_type === "turn/start");
   if (openTurn) {
     // 2. A crash after a side effect: recovery (its own writer, released when
     //    it returns) closes the turn synthetically and records what is unknown.
@@ -197,11 +181,11 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
     if (recovery.verdict !== "RECOVERED") {
       throw new SessionResumeRefused("UNRECOVERED", `crash recovery ended ${recovery.verdict}${recovery.reason ? `: ${recovery.reason}` : ""}`);
     }
-    rows = withReadOnlyStore(params, (store) => envelopedRows(store.readSessionEvents(params.sessionId)));
+    rows = withReadOnlyStore(params, (store) => verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false));
   }
   const head = rows[rows.length - 1]!;
 
-  // 3. Only now take the writer lock and claim the session.
+  // 3. The backend atomically claims this verified head inside its append transaction.
   const store = params.store ?? openSessionEventStore(params.workspace);
   try {
     const service = new SessionService(params.workspace, store);
@@ -213,7 +197,8 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
       compositionDigest: params.compositionDigest,
       policyDigest: params.policyDigest,
       claimant: params.claimant,
-      observedHeadEventId: head.id
+      observedHeadEventId: head.id,
+      observedHeadEventHash: head.event_hash
     });
     return {
       service,
@@ -227,6 +212,7 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
     };
   } catch (error) {
     if (params.store === undefined) store.close();
+    if (error instanceof SessionWriterRefused) throw new SessionResumeRefused(error.code === "LIVE_WRITER" ? "LIVE_WRITER" : "UNRECOVERED", error.message);
     throw error;
   }
 }

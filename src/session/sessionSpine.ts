@@ -15,6 +15,7 @@ import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
 import type { SpillPolicyConfig } from "./spill/spillTypes.js";
 import type { SessionAttachParams, SessionEventRef } from "./sessionApiTypes.js";
+import { newSessionWriterOwner, sessionWriterMeta, SESSION_WRITER_META } from "./sessionOwnership.js";
 
 /**
  * The tier every natively-executed row carries.
@@ -58,6 +59,8 @@ export abstract class SessionEventWriter {
   // the true head instead of a phantom one.
   private seqCounter = 0;
   private prevHash: string = SESSION_GENESIS;
+  private headEventId: string | null = null;
+  private readonly writerOwner = newSessionWriterOwner();
 
   // Turn / step labels. `seq` is the cryptographic order; turn and step are the
   // human-facing counters carried in the envelope for projection and reporting.
@@ -170,12 +173,16 @@ export abstract class SessionEventWriter {
     // cryptographic attestation. The attestation is real; the sandbox is not
     // (`SandboxRunner.run()` has no production call site), and awarding ourselves
     // the top tier would trade one dishonest label for another.
-    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta }, envelope);
+    const released = spec.eventType === "session/release" || spec.eventType === "session/close";
+    const claim = spec.eventType === "session/open" || spec.eventType === "session/resume";
+    const meta = embedEnvelope({ trustTier: NATIVE_TRUST_TIER, ...spec.typeMeta, [SESSION_WRITER_META]: sessionWriterMeta(this.writerOwner, released) }, envelope);
     const input: SessionStoreAppendInput = {
       sessionId,
       runtime: this.runtime,
       eventType: spec.eventType,
       meta,
+      sessionWriteFence: { owner: this.writerOwner, mode: claim ? "claim" : released ? "release" : "append",
+        head: { eventId: this.headEventId, eventHash: this.prevHash, seq: seq - 1 } },
       ...(spec.id !== undefined ? { id: spec.id } : {}),
       ...(spec.payload !== undefined ? { payload: spec.payload } : {})
     };
@@ -186,6 +193,7 @@ export abstract class SessionEventWriter {
     // untouched, so the head still points at the last durable event.
     this.seqCounter = seq + 1;
     this.prevHash = result.eventHash;
+    this.headEventId = result.id;
 
     // Every event of the current turn — except the turn's own seal — is a leaf of
     // that turn's window root and lies within its id bounds.
@@ -220,7 +228,8 @@ export abstract class SessionEventWriter {
     this.runtime = params.runtime ?? "amc";
     this.spill = new SessionSpillPolicy(new SessionSpillStore(this.workspace, params.sessionId), this.spillConfig);
     const rows = this.store.readSessionEvents(params.sessionId);
-    this.seedHead(params.sessionId);
+    if (rows[rows.length - 1]?.id !== params.observedHeadEventId || rows[rows.length - 1]?.event_hash !== params.observedHeadEventHash) throw new Error("STALE_HEAD: verified session head changed before attach");
+    this.seedHead(params.sessionId, rows);
     this.seedTurnChain(rows);
     return this.appendSessionEvent({
       eventType: "session/resume",
@@ -267,6 +276,7 @@ export abstract class SessionEventWriter {
     if (this.currentTurn !== null) {
       throw new Error("SessionService.releaseWithoutClosing: a turn is still open; seal it first");
     }
+    this.appendSessionEvent({ eventType: "session/release", typeMeta: { reason: "handover" }, surface: { op: "none" }, turn: null, step: null });
     this.closed = true;
     this.store.close();
   }
@@ -282,14 +292,15 @@ export abstract class SessionEventWriter {
     this.store.close();
   }
 
-  protected seedHead(sessionId: string): void {
-    for (const row of this.store.readSessionEvents(sessionId)) {
+  protected seedHead(sessionId: string, rows = this.store.readSessionEvents(sessionId)): void {
+    for (const row of rows) {
       const envelope = extractEnvelope(row.meta_json);
       if (envelope === null) {
         continue;
       }
       this.seqCounter = envelope.seq + 1;
       this.prevHash = row.event_hash;
+      this.headEventId = row.id;
     }
   }
 

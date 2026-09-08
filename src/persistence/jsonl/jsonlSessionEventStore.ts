@@ -39,6 +39,7 @@
 import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { join } from "node:path";
 import type { EvidenceEvent, SessionRecord } from "../../types.js";
+import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
 import { ensureSigningKeys, getPrivateKeyPem, signHexDigestWith } from "../../crypto/keys.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
@@ -233,6 +234,8 @@ export class JsonlSessionEventStore implements SessionEventStore {
 
   appendSessionEvent(input: SessionStoreAppendInput): SessionStoreAppendResult {
     this.assertWritable();
+    const sessionRows = this.readSessionEvents(input.sessionId);
+    assertSessionWriteAllowed(input, sessionRows[sessionRows.length - 1] ?? null, this.readSessionRecord(input.sessionId));
     const id = input.id ?? randomUUID();
     if (this.knownEventIds.has(id)) {
       throw new Error(`duplicate event id: ${id}`);

@@ -450,7 +450,7 @@ describe("JSONL verification rules, one broken property at a time", () => {
 });
 
 describe("crash recovery on the JSONL backend", () => {
-  it("recovers an abandoned session once the crashed writer is gone", async () => {
+  it("refuses recovery before mutation until JSONL atomic ownership takeover is supported", async () => {
     const store = openSessionEventStore(workspace, "jsonl");
     const service = new SessionService(workspace, store);
     service.open({
@@ -475,6 +475,7 @@ describe("crash recovery on the JSONL backend", () => {
     store.close();
     await new Promise((resolve) => setTimeout(resolve, 25));
 
+    const before = readRows();
     const report = recoverSession({
       workspace,
       sessionId: "crashed-session",
@@ -482,10 +483,12 @@ describe("crash recovery on the JSONL backend", () => {
       staleAfterMs: 0,
       close: true
     });
-    expect(report.verdict).toBe("RECOVERED");
-    expect(report.unknownToolOutcomes).toBe(1);
-    expect(report.syntheticTurnEnds).toBe(1);
-    expect(report.closed).toBe(true);
+    expect(report.verdict).toBe("INDETERMINATE");
+    expect(report.reason).toMatch(/JSONL recovery requires atomic ownership/);
+    expect(report.unknownToolOutcomes).toBe(0);
+    expect(report.syntheticTurnEnds).toBe(0);
+    expect(report.closed).toBe(false);
+    expect(readRows()).toEqual(before);
 
     const result = verifyStoredSessionEvents(workspace, readRows(), {
       sessionRecords: readRecords("crashed-session"),
