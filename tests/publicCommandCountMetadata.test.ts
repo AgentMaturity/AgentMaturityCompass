@@ -2,33 +2,6 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
-const CURRENT_COMMAND_COUNT = "1,180";
-const CURRENT_COMMAND_COUNT_RAW = 1180;
-const STALE_COMMAND_COUNT_PATTERNS = [
-  /\b481 CLI commands\b/,
-  /CLI \(481 commands\)/,
-  /\b376 CLI commands\b/,
-  /\b842 commands\b/,
-  /\b1,084\b/,
-  /\b1036 CLI commands\b/,
-  /\b1,145\b/,
-  /\b1,150\b/,
-  /\b1,151\b/,
-  /\b1,152\b/,
-  /\b1,153\b/,
-  /\b1,155\b/,
-  /\b1,159\b/,
-  /\b1,163\b/,
-  /\b1,164\b/,
-  /\b1,165\b/,
-  /\b1,166\b/,
-  /\b1,169\b/,
-  /\b1,170\b/,
-  /\b1,171\b/,
-  /\b1,172\b/,
-  /\b1,175\b/,
-];
-
 const CURRENT_COMMAND_COUNT_FILES = [
   "README.md",
   "docs/API_REFERENCE.md",
@@ -40,6 +13,8 @@ const CURRENT_COMMAND_COUNT_FILES = [
   "website/docs/competitive-analysis.md",
   "docs/BENCHMARK_GALLERY.md",
   "src/console/assets/app.js",
+  "website/index.html",
+  "website/i18n.js",
 ];
 
 const HISTORICAL_COMMAND_COUNT_RECEIPTS = [
@@ -60,35 +35,41 @@ const REQUIRED_NPM_KEYWORDS = [
 ];
 
 const readProjectFile = (path: string): string => readFileSync(join(process.cwd(), path), "utf8");
+const inventoryPaths = [...readProjectFile("docs/CLI_COMMAND_INVENTORY.md")
+  .matchAll(/^\| `(amc [^`]+)` \|/gm)].map((match) => match[1]);
 
 describe("public command-count and npm metadata claims", () => {
   test("CLI inventory exposes the canonical public command-path count", () => {
-    const inventory = readProjectFile("docs/CLI_COMMAND_INVENTORY.md");
-    const commandRows = [...inventory.matchAll(/^\| `amc /gm)];
-
-    expect(commandRows).toHaveLength(CURRENT_COMMAND_COUNT_RAW);
-    expect(inventory).toContain("comply risk-classify");
+    expect(inventoryPaths.length).toBeGreaterThan(0);
+    expect(new Set(inventoryPaths).size).toBe(inventoryPaths.length);
+    expect(inventoryPaths).toEqual(expect.arrayContaining([
+      "amc compliance risk-classify",
+      "amc agent-loop guide",
+      "amc agent-loop chat",
+      "amc agent-loop run",
+      "amc agent-loop mcp-catalog",
+      "amc approvals login",
+      "amc session compact",
+      "amc native-extension inspect",
+      "amc native-extension install",
+      "amc native-extension sign"
+    ]));
   });
 
   test("current-facing public docs use the canonical command-path count", () => {
     for (const path of CURRENT_COMMAND_COUNT_FILES) {
-      const body = readProjectFile(path);
-      expect(body, path).toContain(CURRENT_COMMAND_COUNT);
-
-      // A stale command count only matters where the number is presented AS a
-      // command count. Matching the bare digits collided with an unrelated
-      // measurement: the test-file count reached 1,150, which was on this list
-      // as an old command count, so a true statement failed the check. Same
-      // shape as the 8,538 collision fixed in publicStatsDrift.
-      for (const pattern of STALE_COMMAND_COUNT_PATTERNS) {
-        const inCommandContext = new RegExp(
-          `${pattern.source}[^.\\n]{0,40}(?:CLI )?commands?(?: paths?)?\\b|` +
-            `\\b(?:CLI |command )[^.\\n]{0,40}${pattern.source}`,
-          "i"
-        );
-        expect(body, `${path} contains stale command count ${pattern}`).not.toMatch(
-          inCommandContext
-        );
+      // Interpret only claims labelled as CLI inventory. API table row IDs,
+      // dates and independent test-file counts are unrelated measurements.
+      const body = readProjectFile(path).replace(/<!--[\s\S]*?-->|<\/?[a-z][^>\n]*>/gi, " ");
+      const claims = [
+        ...body.matchAll(/\b(\d[\d,]*)\s+(?:(?:registered|public)\s+)?CLI\s+(?:command paths|paths|commands)\b/gi),
+        ...body.matchAll(/\bCLI (?:Reference )?\((\d[\d,]*) command paths\)/g),
+        ...body.matchAll(/AMC CLI currently registers (\d[\d,]*) command paths\b/g),
+        ...body.matchAll(/\| CLI command paths \| (\d[\d,]*) \|/g)
+      ];
+      expect(claims.length, `${path} has an explicit command-path claim`).toBeGreaterThan(0);
+      for (const claim of claims) {
+        expect(Number(claim[1].replaceAll(",", "")), `${path}: ${claim[0]}`).toBe(inventoryPaths.length);
       }
     }
   });

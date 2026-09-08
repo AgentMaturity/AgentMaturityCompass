@@ -34,6 +34,64 @@ beforeEach(() => {
   write("tests/helper.ts", "// Helpers are not test source files.\n");
 });
 
+describe("current CLI and adapter inventories", () => {
+  const inventory = "| Command | Description |\n| `amc agent-loop guide` | Guide |\n| `amc agent-loop chat` | Chat |\n| `amc approvals login` | Login |\n";
+
+  test("refreshes curated CLI templates from unique inventory rows without rewriting unrelated numbers", () => {
+    write("docs/CLI_COMMAND_INVENTORY.md", inventory);
+    write("src/adapters/builtins/one.ts", "export {};\n");
+    write("src/adapters/builtins/two.ts", "export {};\n");
+    write("README.md", "99 registered CLI command paths; [CLI Reference (99 command paths)](docs/CLI_COMMAND_INVENTORY.md); 99 adapters; issue #99; 99 ms; 2 test source files\n");
+    write("docs/API_REFERENCE.md", "99 public CLI command paths\n| 99 | `amc wrap` | unchanged row ID |\n");
+    write("docs/PRICING.md", "All 99 framework adapters; 99 CLI command paths\n");
+    write("docs/PRICING_FAQ.md", "all 99 adapters; 99 CLI command paths\n");
+    write("docs/PRODUCT_EDITIONS.md", "99 CLI command paths\n");
+    write("docs/ENTERPRISE.md", "99 CLI command paths\n");
+    write("docs/BENCHMARK_GALLERY.md", "| CLI command paths | 99 |\n");
+    write("website/index.html", '<span class="stat-value">99</span><span class="stat-label">CLI commands</span> 99 built-in adapters');
+    write("website/i18n.js", "'99 CLI Paths'");
+    write("website/docs/cli.html", "The AMC CLI currently registers 99 command paths.");
+    write("website/docs/competitive-analysis.md", "CLI (99 command paths)");
+    write("src/console/assets/app.js", "'99 CLI paths; 142 assurance packs'");
+    const historical = "99 CLI command paths, 99 adapters at a dated source revision.\n";
+    write("docs/source-reviews/old-audit.md", historical);
+
+    const counts = JSON.parse(run("--json").stdout);
+    expect(counts.cliCommandPaths).toBe(3);
+    expect(counts.adapters).toBe(2);
+    expect(run("--check").status).toBe(1);
+    const result = run("--write");
+    expect(result.status, result.stderr).toBe(0);
+    expect(readFileSync(join(fixture, "README.md"), "utf8")).toBe("3 registered CLI command paths; [CLI Reference (3 command paths)](docs/CLI_COMMAND_INVENTORY.md); 2 adapters; issue #99; 99 ms; 2 test source files\n");
+    expect(readFileSync(join(fixture, "docs/API_REFERENCE.md"), "utf8")).toContain("3 public CLI command paths\n| 99 |");
+    expect(readFileSync(join(fixture, "src/console/assets/app.js"), "utf8")).toBe("'3 CLI paths; 142 assurance packs'");
+    expect(readFileSync(join(fixture, "website/index.html"), "utf8")).toContain('stat-value">3</span>');
+    expect(readFileSync(join(fixture, "website/docs/cli.html"), "utf8")).toContain("registers 3 command paths");
+    expect(readFileSync(join(fixture, "docs/BENCHMARK_GALLERY.md"), "utf8")).toBe("| CLI command paths | 3 |\n");
+    expect(readFileSync(join(fixture, "docs/source-reviews/old-audit.md"), "utf8")).toBe(historical);
+    expect(readFileSync(join(fixture, "docs/CLI_COMMAND_INVENTORY.md"), "utf8")).toBe(inventory);
+    expect(run("--check").status).toBe(0);
+    expect(run("--write").stdout).toContain("No changes needed.");
+  });
+
+  test.each(["", "| `amc guide` | Guide |\n| `amc guide` | Duplicate |\n"])("refuses empty or duplicate inventory without modifying public claims", (body) => {
+    write("docs/CLI_COMMAND_INVENTORY.md", body);
+    write("README.md", "99 CLI command paths\n");
+    const result = run("--write");
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("nonempty, unique command paths");
+    expect(readFileSync(join(fixture, "README.md"), "utf8")).toBe("99 CLI command paths\n");
+  });
+
+  test("refuses CLI claims when their inventory is missing without substituting a count", () => {
+    write("README.md", "99 CLI command paths; 99 test source files\n");
+    const result = run("--write");
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("CLI command inventory is unavailable");
+    expect(readFileSync(join(fixture, "README.md"), "utf8")).toBe("99 CLI command paths; 99 test source files\n");
+  });
+});
+
 afterEach(() => rmSync(fixture, { recursive: true, force: true }));
 
 describe("AMC-1526 — test inventory does not attest execution outcomes", () => {

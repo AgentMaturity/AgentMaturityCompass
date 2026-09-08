@@ -51,6 +51,17 @@ async function registered(modulePath, fn) {
 
 const isTs = (n) => n.endsWith(".ts");
 
+function cliCommandPaths() {
+  const inventory = join(root, "docs/CLI_COMMAND_INVENTORY.md");
+  if (!existsSync(inventory)) return null;
+  const paths = [...readFileSync(inventory, "utf8").matchAll(/^\| `(amc [^`]+)` \|/gm)]
+    .map((match) => match[1]);
+  if (paths.length === 0 || new Set(paths).size !== paths.length) {
+    throw new Error("CLI command inventory must contain nonempty, unique command paths.");
+  }
+  return paths.length;
+}
+
 export async function collectCounts() {
   const testFiles = walk(join(root, "tests"), (n) => n.endsWith(".test.ts")).length;
   // Retained for inventory consumers: lexical matches, not discovered cases
@@ -65,6 +76,7 @@ export async function collectCounts() {
 
   return {
     adapters: countFiles("src/adapters/builtins", isTs),
+    cliCommandPaths: cliCommandPaths(),
     assurancePackFiles: countFiles("src/assurance/packs", (n) => isTs(n) && n !== "index.ts"),
     assurancePacksRegistered: await registered("assurance/packs/index.js", "listAssurancePacks"),
     scoreModules: countFiles("src/score", (n) => isTs(n) && n !== "index.ts"),
@@ -92,7 +104,24 @@ if (mode === "json") {
 
 // Only current-facing surfaces are managed. Dated audit/source-review records
 // remain historical evidence and are deliberately outside this allowlist.
-const PUBLIC_SURFACES = [
+const CLI_COUNT_SURFACES = new Set([
+  "README.md",
+  "docs/API_REFERENCE.md",
+  "docs/PRICING.md",
+  "docs/PRICING_FAQ.md",
+  "docs/PRODUCT_EDITIONS.md",
+  "docs/ENTERPRISE.md",
+  "docs/BENCHMARK_GALLERY.md",
+  "website/index.html",
+  "website/i18n.js",
+  "website/docs/cli.html",
+  "website/docs/competitive-analysis.md",
+  "src/console/assets/app.js"
+]);
+const ADAPTER_COUNT_SURFACES = new Set([
+  "README.md", "website/index.html", "docs/PRICING.md", "docs/PRICING_FAQ.md"
+]);
+const PUBLIC_SURFACES = new Set([
   "README.md",
   "CONTRIBUTING.md",
   "website/index.html",
@@ -102,8 +131,9 @@ const PUBLIC_SURFACES = [
   "docs/content/reddit-launch-drafts.md",
   "docs/internal/competitive-landscape.md",
   "docs/internal/mirofish-simulation-council.md",
-  "whitepaper/AMC_WHITEPAPER_v1.md"
-];
+  "whitepaper/AMC_WHITEPAPER_v1.md",
+  ...CLI_COUNT_SURFACES
+]);
 const failures = [];
 const updates = new Map();
 const marker = /<!-- amc:count:(\w+) -->(.*?)<!-- \/amc:count -->/g;
@@ -155,6 +185,29 @@ for (const rel of PUBLIC_SURFACES) {
     .replace(/\b\d[\d,]*(?= (?:Vitest )?test source files\b)/gi, fileCount)
     .replace(/(?<=stat-value">)[\d,]+(?=<\/span><span class="stat-label">test source files)/g, fileCount)
     .replace(/(?<=<b>)[\d,]+(?=<\/b><span>Test source<br>files)/g, fileCount);
+
+  if (CLI_COUNT_SURFACES.has(rel)) {
+    const templates = [
+      /\b\d[\d,]*(?= (?:(?:registered|public) )?CLI (?:command paths|paths)\b)/gi,
+      /(?<=CLI \()[\d,]+(?= command paths\))/g,
+      /(?<=CLI Reference \()[\d,]+(?= command paths\))/g,
+      /(?<=AMC CLI currently registers )[\d,]+(?= command paths\b)/g,
+      /(?<=stat-value">)[\d,]+(?=<\/span><span class="stat-label">CLI commands)/g,
+      /(?<=\| CLI command paths \| )[\d,]+(?= \|)/g
+    ];
+    for (const template of templates) {
+      updated = updated.replace(template, (current) => {
+        if (counts.cliCommandPaths === null) {
+          failures.push(`${rel}: CLI command inventory is unavailable; cannot verify command-path claims.`);
+          return current;
+        }
+        return counts.cliCommandPaths.toLocaleString("en-US");
+      });
+    }
+  }
+  if (ADAPTER_COUNT_SURFACES.has(rel)) {
+    updated = updated.replace(/\b\d[\d,]*(?= (?:built-in |framework )?adapters\b)/gi, String(counts.adapters));
+  }
 
   if (updated !== original) {
     if (mode === "check") {

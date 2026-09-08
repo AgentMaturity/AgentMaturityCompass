@@ -83,10 +83,12 @@ describe("public Docs Pages artifact", () => {
     expect(firstManifestRaw).toBe(secondManifestRaw);
     expect(manifest.schemaVersion).toBe("2026-07-10");
     expect(manifest.sourceRevision).toBe(revision);
-    // 175 promoted guides: CODE_GRAPH plus the KEY_HISTORY operator migration guide.
-    expect(manifest.guideCount).toBe(175);
+    // The promotion allowlist owns the count; exact IDs and bytes remain checked.
+    expect(publicDocs.length).toBeGreaterThan(0);
+    expect(new Set(publicDocs).size).toBe(publicDocs.length);
+    expect(manifest.guideCount).toBe(publicDocs.length);
     expect(manifest.guides.map((guide: { id: string }) => guide.id)).toEqual(publicDocs);
-    expect(new Set(manifest.guides.map((guide: { id: string }) => guide.id)).size).toBe(175);
+    expect(new Set(manifest.guides.map((guide: { id: string }) => guide.id)).size).toBe(publicDocs.length);
 
     for (const guide of manifest.guides as Array<{ id: string; source: string; asset: string; bytes: number; sha256: string }>) {
       const sourcePath = resolve(root, guide.source);
@@ -107,7 +109,7 @@ describe("public Docs Pages artifact", () => {
     expect(statSync(rendererPath).isFile()).toBe(true);
 
     const deployedMarkdown = filesUnder(resolve(first, "docs/content")).filter(path => path.endsWith(".md"));
-    expect(deployedMarkdown).toHaveLength(175);
+    expect(deployedMarkdown).toHaveLength(publicDocs.length);
     expect(deployedMarkdown).not.toContain("FULL_MODULE_ROADMAP.md");
     expect(deployedMarkdown).not.toContain("IMPLEMENTATION_REALITY_MAP.md");
     expect(deployedMarkdown).not.toContain("OSS_ADOPTION_ROADMAP.md");
