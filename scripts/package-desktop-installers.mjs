@@ -116,6 +116,10 @@ if (-not [string]::IsNullOrWhiteSpace($env:AMC_INSTALL_PREFIX)) {
 } else {
   npm install -g --no-audit --no-fund $Package
 }
+$InstallExitCode = $LASTEXITCODE
+if ($InstallExitCode -ne 0) {
+  throw "AMC installation failed (npm exit code $InstallExitCode). Resolve the npm error above and rerun this installer."
+}
 Write-Host "AMC installed. Run: amc --version; amc doctor"
 `;
   writeFileSync(join(targetDir, "install.ps1"), script);
