@@ -50,10 +50,15 @@ function definitionFor(command: string): AdapterDefinition {
     },
     providerFamily: "OPENAI_COMPAT",
     defaultRunMode: "SUPERVISE",
-    envStrategy: { leaseCarrier: "ENV_API_KEY" },
+    envStrategy: {
+      leaseCarrier: "ENV_API_KEY",
+      baseUrlEnv: { keys: [], valueTemplate: "{{gatewayBase}}{{providerRoute}}" },
+      apiKeyEnv: { keys: [], valueTemplate: "{{lease}}" },
+      proxyEnv: { setHttpProxy: false, setHttpsProxy: false, noProxy: "localhost,127.0.0.1,::1" }
+    },
     commandTemplate: { executable: command, args: [], supportsStdin: false },
     capabilities: builtInAdapterCapabilities({ versionSource: "shell_runtime", evidenceRefs: [] })
-  } as AdapterDefinition;
+  };
 }
 
 describe("the adapter version probe is fenced", () => {

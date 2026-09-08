@@ -19,7 +19,7 @@ export const CALLBACK_TELEMETRY_FORMAT = "amc-callback-telemetry";
 export const CALLBACK_TELEMETRY_VERSION = 1;
 const valueSchema = z.union([z.string().max(4096), z.number().finite(), z.boolean(),
   z.array(z.string().max(4096)).max(64), z.array(z.number().finite()).max(64), z.array(z.boolean()).max(64)]);
-const attributesSchema = z.record(valueSchema).refine(value => Object.keys(value).length <= 128, "too many attributes");
+const attributesSchema = z.record(z.string(), valueSchema).refine(value => Object.keys(value).length <= 128, "too many attributes");
 const timeSchema = z.number().finite().nonnegative().max(8.64e15).nullable();
 const statusSchema = z.union([z.object({ status: z.literal("ok") }).strict(), z.object({
   status: z.literal("error"), error: z.object({ name: z.string().max(4096), message: z.string().max(4096) }).strict().optional()

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { sha256Hex } from "../src/utils/hash.js";
 
 /**
  * A tier nobody recognises must be refused, not quietly downgraded.
@@ -99,7 +100,9 @@ describe("the receipt-bearing writer is guarded too", () => {
         payload: JSON.stringify({ n: 1 }),
         payloadExt: "json",
         inline: true,
-        meta: { metricKey: "k", value: 1, trustTier: "observed" }
+        meta: { metricKey: "k", value: 1, trustTier: "observed" },
+        receipt: { kind: "tool_result", agentId: "payments-agent", providerId: "fixture", model: null,
+          bodySha256: sha256Hex(JSON.stringify({ n: 1 })) }
       })
     ).toThrow(/trustTier/i);
   });

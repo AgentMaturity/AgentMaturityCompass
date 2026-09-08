@@ -78,14 +78,17 @@ describe("settling exactly once", () => {
     // A job killed while finishing was killed. Taking the later cause would
     // report a clean completion for work someone stopped.
     const jobs = new JobRegistry();
-    let finish: ((r: { ok: boolean; summary: string }) => void) | null = null;
+    const completion: { finish?: (r: { ok: boolean; summary: string }) => void } = {};
+    let entered!: () => void;
+    const started = new Promise<void>(resolve => { entered = resolve; });
     const id = jobs.start({
       kind: "bash", owner: ALICE, label: "racy",
-      run: () => new Promise((resolve) => { finish = resolve; })
+      run: () => new Promise((resolve) => { completion.finish = resolve; entered(); })
     });
 
+    await started;
     jobs.kill(id, ALICE);
-    finish?.({ ok: true, summary: "finished anyway" });
+    completion.finish!({ ok: true, summary: "finished anyway" });
 
     const outcome = await jobs.wait(id, ALICE);
     expect(outcome.cause).toBe("killed");

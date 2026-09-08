@@ -36,7 +36,7 @@ describe("delegation chains survive the process that minted them", () => {
 
   const mint = (receiptId: string, parentReceiptId: string | null) =>
     mintChainedReceipt({
-      kind: "TOOL_CALL",
+      kind: "tool_action",
       ts: 1_700_000_000_000,
       agentId: "agent-a",
       providerId: "provider-a",
@@ -103,7 +103,7 @@ describe("delegation chains survive the process that minted them", () => {
   it("does not persist when no workspace is given", () => {
     // Callers without a workspace keep the previous in-process behaviour.
     mintChainedReceipt({
-      kind: "TOOL_CALL",
+      kind: "tool_action",
       ts: 1_700_000_000_000,
       agentId: "agent-a",
       providerId: "provider-a",

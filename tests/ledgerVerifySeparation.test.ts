@@ -64,13 +64,18 @@ describe("evidence-chain verification is separate from config governance", () =>
     // because chain.ok is never false.
     await withWorkspace(async (workspace) => {
       const ledger = openLedger(workspace);
+      ledger.startSession({ sessionId: "session-1", runtime: "unknown", binaryPath: "/bin/true", binarySha256: "0".repeat(64) });
       const id = ledger.appendEvidence({
         sessionId: "session-1",
-        runtime: "generic",
-        eventType: "TOOL_CALL",
+        runtime: "unknown",
+        eventType: "tool_action",
         payload: "original payload",
         inline: true
       });
+      ledger.sealSession("session-1");
+      // A valid baseline ensures the failure below comes from the mutation,
+      // rather than from a missing session or seal unrelated to the attack.
+      expect((await verifyLedgerIntegrity(workspace)).chain.ok).toBe(true);
       // The immutability trigger is the first line of defence; verification is
       // the second, and it is the one under test here.
       ledger.db.exec("DROP TRIGGER IF EXISTS protect_evidence_immutable");

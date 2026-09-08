@@ -262,8 +262,8 @@ describe("session lifecycle — the three-way verdict is real in both directions
       // A raw session with no session/open and no SessionEnvelope — the legacy
       // audit shape. It must still fail if left unsealed, unchanged from before.
       const ledger = openLedger(workspace);
-      ledger.startSession({ sessionId: "legacy", runtime: "generic", binaryPath: "b", binarySha256: "0".repeat(64) });
-      ledger.appendEvidence({ sessionId: "legacy", runtime: "generic", eventType: "stdout", payload: "x", inline: true });
+      ledger.startSession({ sessionId: "legacy", runtime: "unknown", binaryPath: "b", binarySha256: "0".repeat(64) });
+      ledger.appendEvidence({ sessionId: "legacy", runtime: "unknown", eventType: "stdout", payload: "x", inline: true });
       ledger.close();
 
       const v = await verifyLedgerIntegrity(workspace);

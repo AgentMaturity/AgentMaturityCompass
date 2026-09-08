@@ -10,6 +10,12 @@ The August superharness plan and state ledger are historical snapshots. Current 
 
 ## Current checkpoint
 
+## Native source checkpoint — final validation started
+
+Source batch is committed as `bda990ac032c1858b7dee1a9ed25d967ac556aa6`. It includes standalone native streaming, approvals with local authenticated login, signed extensions/profiles, bounded recursive delegation, compaction, ACP/SDK tools/providers, portable evidence, and a concrete 12-case AMC-only corpus. DSH/Pi remain optional interoperability.
+
+Final combined validation has started in an owned isolated checkout on macOS ARM64 with Node 22.22.0. Production and test TypeScript checks are running; no passing result is claimed yet. Follow-on build, runtime/corpus, platform and Graphify acceptance will report actual outcomes. The queue remains 28 children: 11 In Review and 17 In Progress. Historical 33b results do not qualify this checkpoint.
+
 **SOURCE IMPLEMENTED UNVERIFIED:** per user direction, complete the native implementation batch before tests, typechecks, builds, graph regeneration and acceptance. Root reports 28 children under AMC-1505: 11 In Review, 17 In Progress and 0 Backlog. AMC-1531 tracks standalone native integration, AMC-1532 ACP/SDK execution alignment and AMC-1533 signed native extensions. Live preview, `/compact`, signed chat profiles, in-process delegation, authenticated approval configuration, signature-bound extensions and ACP committed response blocks are source implementations awaiting combined acceptance. DSH/Pi capture/imports remain optional. See `AMC_OS/RESEARCH/2026-09-08-dsh-pi/implementation-batch.md` and `docs/NATIVE_AGENT_WORKFLOW.md`.
 
 ## Historical accepted checkpoint — 33b24725

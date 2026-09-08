@@ -492,7 +492,7 @@ describe("P3.3 — the audit pair", () => {
     // Signed, and provably so: the whole chain verifies, which is what makes
     // "two signed rows" a claim rather than a comment.
     const verdict = await verifyLedgerIntegrity(fixture.workspace);
-    expect(verdict.ok, JSON.stringify(verdict.issues ?? verdict)).toBe(true);
+    expect(verdict.ok, JSON.stringify(verdict.errors)).toBe(true);
 
     // And the ids the caller was handed are the rows that exist.
     expect(requestRow.id).toBe(decision.requestEventId);

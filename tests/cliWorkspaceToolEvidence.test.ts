@@ -68,7 +68,7 @@ async function runCli(extra: string[]): Promise<AgentRunSummary> {
 }
 
 function rows(sessionId: string) {
-  const ledger = openLedger(workspace, { readOnly: true });
+  const ledger = openLedger(workspace, { readonly: true });
   try { return ledger.getAllEvents().filter((row) => row.session_id === sessionId); }
   finally { ledger.close(); }
 }

@@ -377,7 +377,6 @@ describe("analyzeArchitectureExperiment", () => {
 // Markdown rendering
 // ---------------------------------------------------------------------------
 describe("renderArchitectureComparisonMarkdown", () => {
-      probeRunner: simulateProbeOutcomes,
   test("renders all sections", () => {
     const baseline = makeSpec({ artifactSha256: "a".repeat(64) });
     const candidate = makeSpec({ artifactSha256: "b".repeat(64) });

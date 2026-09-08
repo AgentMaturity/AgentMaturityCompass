@@ -1,13 +1,14 @@
 import { mkdtempSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { generateKeyPairSync, sign } from "node:crypto";
+import { generateKeyPairSync, sign, type KeyObject } from "node:crypto";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger, canonicalMetadataForHash } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import type { EvidenceEvent } from "../src/types.js";
 
 /**
  * Local verification cannot detect an attacker who can write to the workspace.
@@ -28,13 +29,13 @@ function buildWorkspace(): string {
   const ledger = openLedger(workspace);
   ledger.startSession({
     sessionId: "s",
-    runtime: "generic",
+    runtime: "unknown",
     binaryPath: "/usr/bin/true",
     binarySha256: "0".repeat(64)
   });
   ledger.appendEvidence({
     sessionId: "s",
-    runtime: "generic",
+    runtime: "unknown",
     eventType: "stdout",
     payload: "the agent deleted the production database",
     inline: true
@@ -49,7 +50,7 @@ function monitorFingerprintOf(workspace: string): string {
 }
 
 /** Rewrites every event, re-chains and re-signs with `privateKey`, re-seals. */
-function forgeLedger(workspace: string, privateKey: ReturnType<typeof generateKeyPairSync>["privateKey"]): void {
+function forgeLedger(workspace: string, privateKey: KeyObject): void {
   const db = new Database(join(workspace, ".amc", "evidence.sqlite"));
   for (const trigger of [
     "protect_evidence_immutable",
@@ -61,7 +62,7 @@ function forgeLedger(workspace: string, privateKey: ReturnType<typeof generateKe
   }
 
   const rows = db.prepare("SELECT rowid AS rid, * FROM evidence_events ORDER BY rowid ASC").all() as Array<
-    Record<string, string | number | null> & { rid: number }
+    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json"> & { rid: number }
   >;
   const update = db.prepare(
     `UPDATE evidence_events SET payload_inline=?, canonical_payload_inline=?, payload_sha256=?,
@@ -72,14 +73,14 @@ function forgeLedger(workspace: string, privateKey: ReturnType<typeof generateKe
     const forged = "the agent behaved impeccably";
     const payloadSha = sha256Hex(forged);
     const canonical = canonicalMetadataForHash({
-      id: row.id as string,
-      ts: row.ts as number,
-      sessionId: row.session_id as string,
-      runtime: row.runtime as never,
-      eventType: row.event_type as never,
+      id: row.id,
+      ts: row.ts,
+      sessionId: row.session_id,
+      runtime: row.runtime,
+      eventType: row.event_type,
       payloadPath: null,
       payloadInline: forged,
-      metaJson: row.meta_json as string
+      metaJson: row.meta_json
     });
     const eventHash = sha256Hex(`${prev}${canonical}${payloadSha}`);
     const sig = sign(null, Buffer.from(eventHash, "hex"), privateKey).toString("base64");

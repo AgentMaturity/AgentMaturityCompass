@@ -141,7 +141,7 @@ export async function loginNativeApprovals(
     if (rollbackFailed) fail("LOGIN_ROLLBACK_INCOMPLETE", "Login failed and cleanup could not be fully confirmed. Review the workspace's tracked sessions and selected output path; no token or successful login is being reported.");
     if (error instanceof NativeApprovalLoginError) throw error;
     if ((error as NodeJS.ErrnoException | null)?.code === "EEXIST") fail("TOKEN_FILE_EXISTS", "The token file already exists. Choose a new path; existing files are never overwritten.");
-    fail("LOGIN_FAILED", "Approval login failed. Check local authentication, signing access and the new private file destination; secret and filesystem diagnostics are withheld.");
+    return fail("LOGIN_FAILED", "Approval login failed. Check local authentication, signing access and the new private file destination; secret and filesystem diagnostics are withheld.");
   } finally {
     password = ""; token = undefined;
     bytes?.fill(0);

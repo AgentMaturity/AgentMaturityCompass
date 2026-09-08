@@ -179,7 +179,7 @@ describe("the approval seam on the composed tree", () => {
     expect(rows.some((row) => row.event_type === "session/close")).toBe(true);
 
     const verdict = await verifyLedgerIntegrity(workspace);
-    expect(verdict.ok, JSON.stringify(verdict.issues ?? verdict)).toBe(true);
+    expect(verdict.ok, JSON.stringify(verdict.errors)).toBe(true);
   });
 
   it("ends the turn blocked when nobody grants the question", async () => {

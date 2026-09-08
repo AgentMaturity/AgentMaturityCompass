@@ -133,7 +133,7 @@ describe("refuse, authorise, announce, run — in that order", () => {
     const dir = workspace();
     const order: string[] = [];
     const session = {
-      rows: [] as LoopEventRecord[],
+      ...recorder(),
       recordLoopEvent(record: LoopEventRecord) { order.push(record.kind); this.rows.push(record); return null; }
     };
     await spawnSubagent({

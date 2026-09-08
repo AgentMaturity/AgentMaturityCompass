@@ -2078,11 +2078,9 @@ describe("the release a bump supersedes stays verifiable", () => {
     const result = verifyPublicMethodologyReference({
       id: AMC_PUBLIC_METHODOLOGY_ID,
       version: previous ?? "",
-      releaseDate: "",
-      methodologyDoc: "",
-      publicUrl: "",
-      hash: "",
-      versioningAssuranceHash: ""
+      // Keep the hash deliberately unmatched: this checks whether the prior
+      // version is known, not whether a made-up reference is authentic.
+      hash: ""
     });
 
     expect(result.reason, `${previous} must stay verifiable after being superseded`)

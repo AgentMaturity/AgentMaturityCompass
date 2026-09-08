@@ -11,6 +11,7 @@ import {
 } from "../src/diagnostic/liveEvidenceProjection.js";
 import { toolEvidenceFor } from "../src/tools/toolEvidence.js";
 import type { ToolExecution, ToolOutcome } from "../src/tools/toolTypes.js";
+import type { EvidenceEventType } from "../src/types.js";
 
 /**
  * P5.2a — which harness facts evidence which questions.
@@ -84,7 +85,7 @@ describe("the projection is not decoration", () => {
       const result = outcome({ output: "produced", bytes: 8 });
       expect(ruleMatches(rule, call, result), `${rule.id} must match its own representative call`).toBe(true);
 
-      const emitted = new Set(toolEvidenceFor(call, result).map((row) => row.eventType));
+      const emitted = new Set<EvidenceEventType>(toolEvidenceFor(call, result).map((row) => row.eventType));
       for (const id of rule.questionIds) {
         const question = questionBank.find((q) => q.id === id)!;
         const clears = question.gates.some(

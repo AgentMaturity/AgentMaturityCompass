@@ -31,13 +31,13 @@ describe("zkPrivacy claims match what the code does", () => {
   });
 
   it("an honest in-range claim does not verify", () => {
-    expect(verifyZKRangeProof(createZKRangeProof(72, 50))).toBe(false);
+    expect(verifyZKRangeProof(createZKRangeProof(72, 50, "range-claims-fixture"))).toBe(false);
   });
 
   it("a forged 'verified' flag does not make a proof verify", () => {
     // Verification used to begin `if (!proof.verified) return false`, trusting
     // a boolean the prover writes into the object.
-    const forged = { ...createZKRangeProof(30, 50), verified: true };
+    const forged = { ...createZKRangeProof(30, 50, "forged-range-fixture"), verified: true };
     expect(verifyZKRangeProof(forged), "the prover must not decide the verdict").toBe(false);
   });
 

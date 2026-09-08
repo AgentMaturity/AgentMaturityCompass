@@ -67,14 +67,14 @@ describe("evidence services on the composed tree", () => {
       // "references missing session", so the session comes first.
       ledger.startSession({
         sessionId: "session-1",
-        runtime: "generic",
+        runtime: "unknown",
         binaryPath: "/usr/bin/true",
         binarySha256: "0".repeat(64)
       });
       const appended = ledger.append({
         sessionId: "session-1",
-        runtime: "generic",
-        eventType: "TOOL_CALL",
+        runtime: "unknown",
+        eventType: "tool_action",
         payload: "hello",
         inline: true
       });

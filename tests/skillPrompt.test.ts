@@ -40,7 +40,7 @@ async function assembleWith(one: Skill) {
   const registry = new PromptAssemblyRegistry();
   registry.section({ name: "persona", order: 0, text: "You are a careful agent." });
   const host = new ContextPluginHost([skillContextPlugin(one)]);
-  await host.refresh({});
+  await host.refresh({ turn: 1, step: 1 });
   host.register(registry);
   return registry.assemble({});
 }

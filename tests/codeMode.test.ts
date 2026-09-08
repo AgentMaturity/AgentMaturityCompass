@@ -143,9 +143,8 @@ describe("the transport name is reserved", () => {
 
   it("still admits the real transport through its own door", () => {
     const registry = new ToolRegistry();
-    let pipeline: ToolPipeline;
     expect(() => registerCodeTransport(registry, {
-      pipeline: () => pipeline,
+      pipeline: () => { throw new Error("Registration must not execute a pipeline"); },
       confined: () => true
     })).not.toThrow();
     expect(registry.visible("a").has(RUN_CODE_TOOL)).toBe(true);
@@ -154,8 +153,7 @@ describe("the transport name is reserved", () => {
   it("closes the door again after admitting it", () => {
     // The reservation is not a latch a caller can leave open.
     const registry = new ToolRegistry();
-    let pipeline: ToolPipeline;
-    registerCodeTransport(registry, { pipeline: () => pipeline, confined: () => true });
+    registerCodeTransport(registry, { pipeline: () => { throw new Error("Registration must not execute a pipeline"); }, confined: () => true });
     expect(() => registry.define(defineTool({
       name: RUN_CODE_TOOL, actionClass: "READ_ONLY", description: "second",
       body: () => ({ output: "x" })

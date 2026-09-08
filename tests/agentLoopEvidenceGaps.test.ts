@@ -64,7 +64,7 @@ describe("P3.2 evidence gaps found by review", () => {
           arguments: '{"query":"incident report"}'
         }
       },
-      { type: "usage", usage: { inputTokens: 4, outputTokens: 8, cacheRead: 0, cacheWrite: 0 } },
+      { type: "usage", usage: { inputTokens: 4, outputTokens: 8, cacheReadTokens: 0, cacheWriteTokens: 0 } },
       // ...and dropped anyway, because a truncated tool call is unsafe to run.
       { type: "finish", reason: { kind: "max_tokens" } }
     ];

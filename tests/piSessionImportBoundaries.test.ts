@@ -78,7 +78,10 @@ test("sanitized header, entry and tool IDs preserve unique ancestry without leak
   expect(tool.metadata.tool).toBe("bash");
   expect(tool.metadata.toolCallId).toBe(data[4].message.toolCallId);
   expect(tool.input).toEqual({ command: "echo safe" });
-  expect(result.plan.candidates[0]?.sourceFormat?.branch.currentPathLength).toBe(4);
+  const format = result.plan.candidates[0]?.sourceFormat;
+  expect(format?.name).toBe("pi-session");
+  if (format?.name !== "pi-session") throw new Error("Expected the Pi parser's source format for this fixture");
+  expect(format.branch.currentPathLength).toBe(4);
 });
 
 test("reserved safe-ID collisions and structural references preserve identity while malformed fields stay redacted", () => {
@@ -99,7 +102,10 @@ test("reserved safe-ID collisions and structural references preserve identity wh
   expect(rows[5].targetId).toBe(rows[1].id);
   expect(JSON.stringify({ normalized, plan: result.plan })).not.toContain(secret);
   expect(JSON.stringify(normalized)).not.toContain("sk-malformedsecret123456");
-  expect(result.plan.candidates[0]?.sourceFormat?.branch.branchPoints).toEqual([rows[1].id]);
+  const format = result.plan.candidates[0]?.sourceFormat;
+  expect(format?.name).toBe("pi-session");
+  if (format?.name !== "pi-session") throw new Error("Expected the Pi parser's source format for this fixture");
+  expect(format.branch.branchPoints).toEqual([rows[1].id]);
 });
 
 test.each([undefined, "not-a-time", "2026-02-30T00:00:00.000Z", "2026-09-08T24:00:00.000Z", 1e100])("unknown/invalid source time %s preserves the failure without invented chronology", (timestamp) => {
