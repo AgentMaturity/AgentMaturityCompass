@@ -63,6 +63,7 @@ import type { SubagentRunner } from "./agent/subagentSpawn.js";
 import { listAllowedTools } from "./toolhub/toolhubValidators.js";
 import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
+import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { isActionClass } from "./governor/actionCatalog.js";
@@ -519,10 +520,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
-      // Minted here, not by the turn, because the toolset is built BEFORE the
-      // turn and its tool evidence has to name the session those calls ran in.
-      // It previously named `toolset-default`, a session nothing ever created,
-      // so any run that actually called a tool left the ledger unverifiable.
+      // Resume names its existing session; a fresh run supplies a new ID. Fork
+      // selects its own ID inside composition, which binds the actual writer
+      // to the prebuilt toolset before dispatch.
       const turnSessionId = opts.session ?? randomUUID();
       const claimant = {
         pid: process.pid,
@@ -531,16 +531,25 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         startedAt: Math.round(Date.now() - process.uptime() * 1000)
       };
       let toolSeam: AgentToolSeam | null = null;
+      let bindToolSession: ((session: ComposedToolSession) => void) | undefined;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
       let foreignRunnerDescription = "";
       if (toolMode === "workspace") {
+        let boundSession: ComposedToolSession | null = null;
+        const actualSession = (): ComposedToolSession => {
+          if (boundSession === null) throw new Error("workspace tools have no native session writer");
+          return boundSession;
+        };
         const toolset = agentToolset({
           workspace: process.cwd(),
           agentId: "default",
-          sessionId: turnSessionId,
+          // Fork chooses a different ID; resume chooses the existing writer.
+          get sessionId() { return actualSession().sessionId; },
+          recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row) },
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
         });
+        bindToolSession = (session) => { boundSession = session; };
         if (wantsDelegation) {
           // Said up front, not discovered mid-run. The capability and the signed
           // allowlist are granted by different parties, so an operator who
@@ -706,6 +715,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),
           ...(toolSeam === null ? {} : { tools: toolSeam }),
+          ...(bindToolSession === undefined ? {} : { bindToolSession }),
           ...(grantDelegation === null
             ? {}
             : {

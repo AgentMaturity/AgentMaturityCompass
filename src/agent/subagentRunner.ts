@@ -97,6 +97,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       // The child's own session, so its tool evidence lands in the log its turn
       // wrote rather than in a shared bucket named after the agent id.
       sessionId: ctx.childSessionId,
+      recorder: session,
       // The root's id. Never ctx.identity.runAs — see subagentSpawn.ts.
       agentId: ctx.toolsetAgentId,
       // A child that can itself delegate is given ITS OWN identity, so

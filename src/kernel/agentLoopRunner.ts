@@ -114,6 +114,12 @@ export interface ComposedTurnHandle {
   cancel(cause: TurnCancelCause): void;
 }
 
+/** Narrow evidence capability for tools, bound to the actual selected session. */
+export interface ComposedToolSession {
+  readonly sessionId: string;
+  readonly recordProjectedEvidence: SessionService["recordProjectedEvidence"];
+}
+
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
@@ -175,6 +181,8 @@ export interface ComposedTurnOptions {
   /** Replaces the platform `fetch` — the stub provider answers in-process. */
   readonly transport?: HttpTransport;
   readonly tools?: AgentToolSeam;
+  /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
+  readonly bindToolSession?: (session: ComposedToolSession) => void;
   readonly config?: Partial<AgentLoopConfig>;
   readonly credentials?: CredentialsServiceConfig;
   /** Live-only mirror. Never load-bearing: the log is the record. */
@@ -387,6 +395,10 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let steerTimer: NodeJS.Timeout | null = null;
 
   try {
+    options.bindToolSession?.({
+      sessionId,
+      recordProjectedEvidence: (row) => session.recordProjectedEvidence(row)
+    });
     const credentialsFiber = ctx.plugin(credentialsServices, options.credentials ?? {});
     await credentialsFiber.await();
     fibers.push(credentialsFiber);

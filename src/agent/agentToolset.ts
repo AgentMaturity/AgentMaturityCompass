@@ -67,10 +67,10 @@ export interface AgentToolsetOptions {
    * The live session writer, when the caller has one.
    *
    * Supplied, tool evidence joins the session SPINE and the session stays
-   * anchorable. Omitted, the rows go through the raw ledger as before: they land
-   * in the right session but carry no envelope, and
-   * `sessionRootDescriptor` will refuse to anchor it -- correctly, since the
-   * root would then cover less than the session does.
+   * anchorable. It is required for an owned native session: the raw ledger
+   * correctly refuses unfenced writes to that session. Without a native
+   * session, legacy callers can still record through the raw ledger; those
+   * rows do not establish an anchorable native session.
    *
    * Optional rather than required because a toolset is legitimately built
    * without a session in tests and in the code-mode confinement probes, and a

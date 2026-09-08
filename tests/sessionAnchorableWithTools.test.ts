@@ -6,6 +6,7 @@ import { agentToolset } from "../src/agent/agentToolset.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { SessionService } from "../src/session/sessionService.js";
+import { SESSION_ENVELOPE_META_KEY } from "../src/session/sessionTypes.js";
 import {
   readSessionRootDescriptor,
   SessionAnchorError
@@ -22,8 +23,9 @@ import { initWorkspace } from "../src/workspace.js";
  * the root would then cover less than the session does. That refusal is right.
  * The rows had to move into the spine, not the refusal be relaxed.
  *
- * The pair below is the point: with the session's own writer the root covers
- * every row, and without it the anchor refuses. A test for only the first half
+ * With the session's own writer the root covers every row. The owned write API
+ * now refuses a bypass before storage; a persisted tamper fixture separately
+ * proves that anchoring still rejects a row with no envelope. Only the first half
  * would pass just as well on a build where anchoring never refused anything.
  */
 
@@ -53,8 +55,8 @@ const call = (sessionId: string) => ({
   signal: new AbortController().signal
 });
 
-/** Run one governed tool call in a session, with or without the writer. */
-async function sessionThatCalledATool(dir: string, handOverWriter: boolean): Promise<string> {
+/** Run one governed tool call through the owning session writer. */
+async function sessionThatCalledATool(dir: string): Promise<string> {
   const session = new SessionService(dir);
   session.open({
     agentId: "default", harnessVersion: "3.2.0",
@@ -67,7 +69,7 @@ async function sessionThatCalledATool(dir: string, handOverWriter: boolean): Pro
     workspace: dir,
     agentId: "default",
     sessionId: session.sessionId,
-    ...(handOverWriter ? { recorder: session } : {})
+    recorder: session
   });
   open.push(toolset);
   await toolset.seam.execute(call(session.sessionId));
@@ -88,25 +90,38 @@ afterEach(() => {
 describe("a session that called a tool", () => {
   it("anchors when its tool evidence went through the session writer", async () => {
     const dir = workspace();
-    const sessionId = await sessionThatCalledATool(dir, true);
+    const sessionId = await sessionThatCalledATool(dir);
 
     // Throws rather than returning errors, so the assertion is that it does not.
     const root = readSessionRootDescriptor(dir, sessionId);
     // Non-vacuity: the tool evidence is IN the root, not merely absent from the
     // complaint. A root that covered only spine rows would also report no error.
-    const rows = openLedger(dir).db
-      .prepare("SELECT COUNT(*) AS n FROM evidence_events WHERE session_id = ?")
-      .get(sessionId) as { n: number };
+    const ledger = openLedger(dir);
+    let rows: { n: number };
+    try {
+      rows = ledger.db.prepare("SELECT COUNT(*) AS n FROM evidence_events WHERE session_id = ?").get(sessionId) as { n: number };
+    } finally { ledger.close(); }
     expect(root.eventCount).toBe(rows.n);
     expect(rows.n).toBeGreaterThan(5);
   });
 
-  it("refuses to anchor when the evidence bypassed the writer", async () => {
+  it("refuses to anchor persisted tool evidence without a session envelope", async () => {
     const dir = workspace();
-    // The shipped behaviour, kept as a test so the refusal stays visible: a
-    // future change that stopped handing over the writer would otherwise look
-    // fine, and the loss would be a capability nobody notices going missing.
-    const sessionId = await sessionThatCalledATool(dir, false);
+    const sessionId = await sessionThatCalledATool(dir);
+    // Deliberately bypass the write API to model tampered persisted bytes.
+    // The API itself now rejects an unfenced append before it reaches storage.
+    const ledger = openLedger(dir);
+    try {
+      const audit = ledger.db.prepare("SELECT id, meta_json FROM evidence_events WHERE session_id = ? AND event_type = 'audit' LIMIT 1").get(sessionId) as { id: string; meta_json: string } | undefined;
+      expect(audit, "a governed tool audit must exist before tampering").toBeDefined();
+      const metadata = JSON.parse(audit!.meta_json) as Record<string, unknown>;
+      expect(metadata[SESSION_ENVELOPE_META_KEY]).toBeDefined();
+      delete metadata[SESSION_ENVELOPE_META_KEY];
+      // This disposable fixture models direct file tampering, beyond SQLite's
+      // ordinary immutable-row guard. Production admission remains enabled.
+      ledger.db.exec("DROP TRIGGER protect_evidence_immutable");
+      ledger.db.prepare("UPDATE evidence_events SET meta_json = ? WHERE id = ?").run(JSON.stringify(metadata), audit!.id);
+    } finally { ledger.close(); }
 
     const failure = ((): SessionAnchorError | null => {
       try {
