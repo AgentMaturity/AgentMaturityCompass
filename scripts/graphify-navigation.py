@@ -22,19 +22,25 @@ from graphify.export import to_canvas, to_html, to_json, to_obsidian
 MAPS = {
     "native-runtime": [
         "src/cli-agent-commands.ts", "src/kernel/agentLoopRunner.ts",
+        "src/kernel/amcRuntime.ts",
         "src/kernel/services/agentLoopServices.ts", "src/kernel/services/llmServices.ts",
         "src/kernel/services/promptServices.ts", "src/kernel/services/approvalServices.ts",
         "src/agent/agentDriver.ts", "src/agent/stepRunner.ts", "src/agent/approvalGate.ts",
         "src/agent/pipelineToolSeam.ts", "src/agent/subagentRunner.ts",
+        "src/agent/runReport.ts",
         "src/tools/toolPipeline.ts", "src/llm/adapter/llmRuntime.ts",
         "src/session/sessionService.ts", "src/session/sessionSpine.ts",
-        "src/session/sessionRecovery.ts", "src/persistence/openSessionEventStore.ts",
+        "src/session/sessionRecovery.ts", "src/session/sessionResume.ts",
+        "src/persistence/openSessionEventStore.ts",
         "src/persistence/sqliteSessionEventStore.ts", "src/persistence/jsonl/jsonlSessionEventStore.ts",
         "packages/amc-core/src/composition.ts",
+        "scripts/bundle-kernel.mjs", "scripts/packed-install-check.mjs",
+        "scripts/packed-evidence-verification.mjs",
     ],
     "evidence-imports": [
         "src/cli-import-commands.ts", "src/importers/neutralImporter.ts",
-        "src/correlation/traceSchema.ts",
+        "src/importers/traceMapping.ts", "src/importers/piSessionImport.ts",
+        "src/agents/traceIngestion.ts", "src/correlation/traceSchema.ts",
         "src/diagnostic/evidenceReadiness.ts", "src/lifecycle/artifactSignature.ts",
         "src/lifecycle/episodeRecord.ts", "src/lifecycle/lifecycleRunArtifact.ts",
         "src/enforce/resourceManifest.ts", "src/runtime/runManager.ts",
@@ -47,6 +53,9 @@ MAPS = {
         "src/bundles/bundle.ts", "src/assurance/certificate.ts",
         "src/ledger/ledger.ts", "src/ledger/ledgerConnection.ts", "src/ledger/ledgerVerification.ts",
         "src/ledger/alternateBackendVerification.ts", "src/storage/blobs/blobKeys.ts",
+        "src/agent/runReport.ts", "src/cli-session-commands.ts",
+        "src/ledger/sessionVerification.ts", "src/llm/request/deriveRequest.ts",
+        "src/session/eventPayload.ts",
         "src/receipts/receipt.ts", "src/verify/verifyAll.ts",
         "src/lifecycle/artifactSignature.ts", "src/session/sessionSpine.ts",
     ],
@@ -76,6 +85,14 @@ def main() -> None:
     parser.add_argument("--obsidian-dir", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
+    obsidian_root = None
+    if args.obsidian_dir:
+        args.obsidian_dir = args.obsidian_dir.resolve()
+        # Canvas file cards resolve from the containing Obsidian vault, unlike
+        # basename wiki-links. A new standalone export uses its output root.
+        obsidian_root = next((parent for parent in (
+            args.obsidian_dir, *args.obsidian_dir.parents
+        ) if (parent / ".obsidian").is_dir()), args.obsidian_dir)
     version = importlib.metadata.version("graphifyy")
     if version != "0.9.56":
         parser.error(f"Reviewed Graphify version is 0.9.56; found {version}. Review before upgrading.")
@@ -137,7 +154,7 @@ def main() -> None:
              "Local AST analysis only. Edges describe source dependencies, not observed execution or security guarantees.", "",
              f"Raw extraction: {len(raw['nodes']):,} symbols; {len(raw['edges']):,} relationships.",
              f"Reduced local file graph: {graph.number_of_nodes():,} files; {graph.number_of_edges():,} directed file pairs.", "",
-             "Four Terraform files had no parser in the initial extraction. Tests, vendor trees and archived Python are excluded by `.graphifyignore`.", "",
+             "Check the extraction receipt for parser coverage and failures. Tests, vendor trees and archived Python are excluded by `.graphifyignore`.", "",
              "## Focus maps", ""]
     for name, requested in MAPS.items():
         present = [p for p in requested if p in graph]
@@ -171,6 +188,18 @@ def main() -> None:
             to_obsidian(notes, communities, str(vault), community_labels=note_labels)
             to_canvas(notes, communities, str(vault / "graph.canvas"), community_labels=note_labels)
             owned = json.loads((vault / ".graphify_obsidian_manifest.json").read_text())["files"]
+            canvas_path = vault / "graph.canvas"
+            canvas = json.loads(canvas_path.read_text())
+            for card in canvas["nodes"]:
+                if card["type"] != "file":
+                    continue
+                if card["file"] not in owned:
+                    raise ValueError(f"Canvas references an unowned note: {card['file']}")
+                note_path = (vault / card["file"]).resolve()
+                if not note_path.is_file() or not note_path.is_relative_to(vault):
+                    raise ValueError(f"Canvas references a missing or nonlocal note: {note_path}")
+                card["file"] = note_path.relative_to(obsidian_root).as_posix()
+            canvas_path.write_text(json.dumps(canvas, indent=2) + "\n")
             today = datetime.now(timezone.utc).date().isoformat()
             for filename in owned:
                 note = vault / filename
