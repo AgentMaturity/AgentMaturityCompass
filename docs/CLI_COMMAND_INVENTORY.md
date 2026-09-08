@@ -181,6 +181,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc budgets` | Signed autonomy and usage budgets | - | - |
 | `amc budgets init` | - | `--agent <agentId>` | - |
 | `amc budgets reset` | - | `--agent <agentId>`<br>`--day <yyyy-mm-dd>` | - |
+| `amc budgets sign` | Validate and sign the existing reviewed budget limits without changing the policy | `--json` | - |
 | `amc budgets status` | - | `--agent <agentId>` | - |
 | `amc budgets verify` | - | - | - |
 | `amc bundle` | Portable evidence bundle operations | - | - |
@@ -1085,6 +1086,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc tools` | ToolHub tools config | - | - |
 | `amc tools init` | Create and sign .amc/tools.yaml | - | - |
 | `amc tools list` | List signed ToolHub tools grouped by provider context | `--json` | - |
+| `amc tools sign` | Validate and sign the existing reviewed tool policy without changing its grants | `--json` | - |
 | `amc tools verify` | Verify tools.yaml signature | - | - |
 | `amc trace` | Trace explorer — inspect agent execution traces, sessions, and tool calls | - | - |
 | `amc trace failures` | Show top recurring failure clusters mined from trace indexes | `--agent <agentId>`<br>`--limit <n>`<br>`--redacted`<br>`--json` | - |

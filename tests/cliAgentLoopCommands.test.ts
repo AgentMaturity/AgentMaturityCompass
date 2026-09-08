@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -20,6 +20,8 @@ import { verifyAgentRun } from "../src/agent/runReport.js";
 import { registerAgentCommands, type AgentLoopCliIo } from "../src/cli-agent-commands.js";
 import type { AgentRunSummary } from "../src/agent/runReport.js";
 import type { EvidenceEvent } from "../src/types.js";
+import YAML from "yaml";
+import { budgetUsageSnapshot, budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 
 /**
  * P3.2 stage 4 — the operator surface, and the composed path it runs on.
@@ -272,6 +274,38 @@ describe("amc agent-loop — the operator surface", () => {
         { turn: 1, reason: "cancelled", cancelCause: "user", interrupted: false }
       ]);
       expect(summary.unsignedRows).toBe(0);
+      expect(captured.failures).toEqual([]);
+    });
+
+    it("fails the CLI for a recorded budget error without changing idle driver semantics or poisoning a later successful resume", async () => {
+      process.chdir(dir);
+      const invoke = async (extra: string[] = []) => {
+        const { program, captured } = programWith();
+        await run(program, ["agent-loop", "run", "hello", "--credentials-home", home, "--json", ...extra]);
+        return { captured, summary: JSON.parse(captured.out.at(-1)!) as AgentRunSummary };
+      };
+      // Consume real keyless model admissions first, then sign an exact cap.
+      // The next fresh CLI invocation must fail before another dispatch.
+      expect((await invoke()).captured.failures).toEqual([]);
+      const spent = budgetUsageSnapshot(dir, "default").daily.llmRequests;
+      const config = loadBudgetsConfig(dir);
+      config.budgets.perAgent.default!.daily.maxLlmRequests = spent;
+      writeFileSync(budgetsPath(dir), YAML.stringify(config)); signBudgetsConfig(dir);
+      const denied = await invoke(["--keep-open"]);
+      expect(denied.captured.failures).toEqual([1]);
+      expect(denied.summary.driverStatus).toBe("idle");
+      expect(denied.summary.endings.map(ending => ending.reason)).toEqual(["error"]);
+      expect(denied.summary.retriesAbandoned).toBe(1);
+      expect(denied.summary.assistantText).toEqual([]);
+      expect(budgetUsageSnapshot(dir, "default").daily.llmRequests).toBe(spent);
+
+      config.budgets.perAgent.default!.daily.maxLlmRequests = spent + 10;
+      writeFileSync(budgetsPath(dir), YAML.stringify(config)); signBudgetsConfig(dir);
+      const resumed = await invoke(["--session", denied.summary.sessionId]);
+      expect(resumed.captured.failures).toEqual([]);
+      expect(resumed.summary.driverStatus).toBe("idle");
+      expect(resumed.summary.endings.map(ending => ending.reason)).toEqual(["error", "complete"]);
+      expect(resumed.summary.assistantText.join(" ")).toContain("stub provider");
     });
 
     it("refuses a run it cannot compose, and names the flag that was wrong", async () => {

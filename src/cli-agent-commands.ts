@@ -566,6 +566,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           progress(`Mounted reviewed MCP tools for this run: ${mcpMount.toolNames.join(", ")}. Signed allowlist, approval gate and budgets remain in force.`);
         }
         let previewRequest: string | null = null;
+        let priorTurnEndings = 0;
         const outcome = await runner.runComposedTurn({
           sessionId: turnSessionId,
           ...(opts.session === undefined ? {} : { resume: { claimant } }),
@@ -670,6 +671,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 if (line !== null) (opts.json ? io.error : io.log)(line);
               },
           onReady: (handle) => {
+            // A resumed session may contain an earlier failed turn. This CLI
+            // invocation reports only its newly recorded ending as its exit
+            // outcome; the driver's idle state means it can accept more work.
+            priorTurnEndings = readAgentRunSummary(process.cwd(), handle.sessionId, "idle").endings.length;
             // Ctrl-C is the operator's stop button, and it must produce the same
             // signed cancellation `--cancel-after` does — not a killed process
             // whose turn a later recovery has to close as `interrupted`.
@@ -697,7 +702,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " +
             renderNativeGuideCommand({ cwd: process.cwd(), argv: ["amc", "agent-loop", "verify", summary.sessionId] }));
         }
-        if (summary.driverStatus === "failed") io.fail();
+        const ending = summary.endings.length > priorTurnEndings ? summary.endings.at(-1) : undefined;
+        if (summary.driverStatus === "failed" || ending?.reason === "error") io.fail();
       } finally {
         for (const timer of timers) clearTimeout(timer);
         if (onSigint !== null) process.removeListener("SIGINT", onSigint);

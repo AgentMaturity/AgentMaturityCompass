@@ -6,7 +6,7 @@ On Ubuntu 24.04, the failure `bwrap: loopback: Failed RTM_NEWADDR: Operation not
 
 ## Qualified configuration
 
-The repository includes the exact, unmodified distro profile at [deploy/apparmor/bwrap-userns-restrict](../deploy/apparmor/bwrap-userns-restrict), with its [GPL-2.0-or-later notices and provenance](../deploy/apparmor/README.md). The following combination was exercised on 2026-09-08:
+The repository includes the exact, unmodified distro profile at `deploy/apparmor/bwrap-userns-restrict`, with its GPL-2.0-or-later notices and provenance in `deploy/apparmor/README.md`. The following combination was exercised on 2026-09-08:
 
 | Component | Exercised value |
 | --- | --- |
@@ -75,7 +75,7 @@ The qualified configuration returned `bwrap//&unpriv_bwrap (enforce)`. A separat
 
 The actual compiled AMC backend then passed **36/36 fixture checks**: exact workspace read, granted write, denial of outside/home/authority/symlink reads, empty procfs, denial of ungranted writes and INET/Unix sockets, invalid-grant refusal, cancellation and timeout with no marked child-process survivors. Cancellation and timeout correctly returned an incomplete command-exit receipt (`confined: false`, `exitCode: null`) with the relevant termination flag and confirmed process cleanup; they were not reported as successful commands.
 
-This receipt exercises the compiled backend with explicit fixture grants. **Full signed native CLI sandbox acceptance remains open.** It does not establish model quality, all-system-call confinement, compatibility with other Bubblewrap consumers, or another host configuration. Exact backend/source hashes, raw outcomes and restoration evidence are in the [qualification receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-bwrap-apparmor-acceptance/README.md).
+This receipt exercises the compiled backend with explicit fixture grants. **Full signed native CLI sandbox acceptance remains open.** It does not establish model quality, all-system-call confinement, compatibility with other Bubblewrap consumers, or another host configuration. Exact backend/source hashes, raw outcomes and restoration evidence are in the checkout qualification receipt at `AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-bwrap-apparmor-acceptance/README.md`.
 
 ## Roll back this installation
 

@@ -107,6 +107,16 @@ ${entry.licenseText}
 sandbox work in Phase 4.4. Its notice must be added here when it lands: clause 2
 requires the copyright notice and disclaimer to accompany binary
 redistribution, which a packaged AMC release performs.
+
+
+Ubuntu Bubblewrap AppArmor profile (optional operator configuration)
+-----------------------------------------------------------------
+The unmodified deploy/apparmor/bwrap-userns-restrict file comes from Ubuntu
+apparmor-profiles 4.0.1really4.0.1-0ubuntu0.24.04.7 and is licensed separately
+under GPL-2.0-or-later. Its complete package notices, license text, source
+package link and exact file/package hashes are distributed alongside it in
+deploy/apparmor/COPYRIGHT.upstream, GPL-2.0.txt and README.md. AMC does not
+install or load this system policy automatically.
 `;
 
 if (check) {

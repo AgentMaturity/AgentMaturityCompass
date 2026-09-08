@@ -128,7 +128,7 @@ SDK updates are committed response blocks, not a claim that every provider token
 
 External capture and imports supplement AMC evidence; they do not supply AMC's native execution features. Skip this section when you only need the standalone runtime.
 
-[DSH capture](adapters/deepseek-harness.md) uses an operator-installed, signed hash-pinned launcher in headless mode. Configure its gateway route/model and approved launch file explicitly. Process output is not native tool evidence; private reasoning stderr is omitted, and only actual gateway receipts establish observed model traffic. The adapter preserves DSH authentication boundaries and makes no claim to control its internal tools.
+Optional DSH capture (`docs/adapters/deepseek-harness.md` in the source checkout) uses an operator-installed, signed hash-pinned launcher in headless mode. Configure its gateway route/model and approved launch file explicitly. Process output is not native tool evidence; private reasoning stderr is omitted, and only actual gateway receipts establish observed model traffic. The adapter preserves DSH authentication boundaries and makes no claim to control its internal tools.
 
 For an existing plaintext DSH v2 session export, preview the import before applying:
 

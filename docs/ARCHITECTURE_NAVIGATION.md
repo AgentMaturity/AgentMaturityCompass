@@ -2,7 +2,7 @@
 
 Start with the flow you need to change. The [Graphify guide](CODE_GRAPH.md) explains how to query the complete local graph. The smaller maps below reduce that graph to a few connected files so a contributor can follow an operation without opening the CLI monolith first.
 
-The September 8 maps use the clean source checkpoint `d3cae5633b21198b97b50856d395ad2953bc80e0`, including the native workflow and the subsequent MCP schema/task admission, explicit tool-result status and bounded Pi format diagnostics corrections. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-batch-graphify-d3cae563/README.md) pins the exact graph and source hashes. The five views separate native execution, imports, trust, native integrations and sandbox/optional DSH launch boundaries. New code remains unverified until the combined acceptance pass. A generated map records source dependencies; it does not grant those implementations a passing runtime result. Earlier qualification receipts below apply only to their named historical revisions.
+The September 8 maps use the clean source checkpoint `08829be50e4272dea48634248973e3f7fb874e34`, including the standalone native workflow, MCP corrections and native budget accounting/admission. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-batch-graphify-08829be5/README.md) pins the exact source, tool and raw graph hashes. Six views cover native execution, imports, trust, native integrations, native budgets and sandbox/optional DSH launch boundaries. The extraction contains 25,203 symbols/75,605 relationships; the reduced local graph contains 2,075 files/7,479 directed file pairs. A generated map records source dependencies and supplies no runtime acceptance claim. Earlier qualification receipts below apply only to their named historical revisions.
 
 ## Native agent execution
 
@@ -59,7 +59,7 @@ The `native-integrations` map separates operator interfaces from runtime composi
 
 ## Native budget admission
 
-The `native-budgets` selection separates operator policy, pre-dispatch admission and usage reconstruction. Rebuild the maps after the budget implementation settles; earlier five-map extractions do not contain this new selection.
+The `native-budgets` map separates operator policy, pre-dispatch admission and usage reconstruction. At `08829be5` it contains 21 files and 35 directed source pairs; open `graphify-out/navigation/native-budgets/graph.html`. The older five-map receipts remain historical snapshots.
 
 1. [`cli-budget-commands.ts`](../src/cli-budget-commands.ts) exposes reviewed budget signing and status. [`cli-tools-commands.ts`](../src/cli-tools-commands.ts) exposes reviewed tool grants separately. Signing validates the existing bytes instead of replacing the policy with defaults.
 2. [`llmRuntime.ts`](../src/llm/adapter/llmRuntime.ts) admits a model dispatch after request preparation and before transport. [`policyGuards.ts`](../src/tools/guards/policyGuards.ts) admits a native tool before its body executes.
