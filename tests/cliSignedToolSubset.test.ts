@@ -3,6 +3,7 @@ import { createServer, type Server } from "node:http";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { afterEach, expect, test, vi } from "vitest";
 import YAML from "yaml";
 import { initWorkspace } from "../src/workspace.js";
@@ -11,9 +12,12 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
-import type { AgentRunSummary } from "../src/agent/runReport.js";
+import { readAgentRunSummary, type AgentRunSummary } from "../src/agent/runReport.js";
 
 interface ModelRequest {
+  stream: boolean;
+  stream_options: { include_usage: boolean };
+  max_tokens: number;
   tools?: Array<{ type: string; function: { name: string } }>;
   messages: Array<{ role: string; content?: unknown; tool_call_id?: string }>;
 }
@@ -26,7 +30,7 @@ afterEach(async () => {
   vi.unstubAllEnvs();
 });
 
-test("the built native CLI advertises and executes only the signed read subset; guessed write/shell calls are recorded denials", async () => {
+test.each(["CLI", "ACP"] as const)("the built native %s advertises and executes only the signed read subset; guessed write/shell calls are recorded denials", async surface => {
   const cli = resolve("dist/cli.js");
   if (!existsSync(cli)) throw new Error("Build the coordinated candidate before the native subset CLI regression.");
   const pass = "synthetic-cli-subset-vault", credential = "synthetic-loopback-subset-key";
@@ -89,14 +93,35 @@ test("the built native CLI advertises and executes only the signed read subset; 
   await new Promise<void>(done => server!.listen(0, "127.0.0.1", done));
   const address = server.address(); if (!address || typeof address === "string") throw new Error("No fixture port.");
   const prompt = "Read the signed-scope fixture; synthetic requests will also probe ungranted tools.";
-  const result = await run(["agent-loop", "run", prompt, "--provider", "openai", "--model", "subset-fixture",
-    "--base-url", `http://127.0.0.1:${address.port}`, "--credential", "AMC_SUBSET_LOOPBACK_KEY", "--credentials-home", home,
-    "--tools", "workspace", "--max-steps", "6", "--max-tokens", "64", "--json"]);
-  expect(result.code, result.stderr).toBe(0); expect(fixtureErrors).toEqual([]);
-  const summary = JSON.parse(result.stdout) as AgentRunSummary;
+  let summary: AgentRunSummary, displayed: string;
+  if (surface === "CLI") {
+    const result = await run(["agent-loop", "run", prompt, "--provider", "openai", "--model", "subset-fixture",
+      "--base-url", `http://127.0.0.1:${address.port}`, "--credential", "AMC_SUBSET_LOOPBACK_KEY", "--credentials-home", home,
+      "--tools", "workspace", "--max-steps", "6", "--max-tokens", "64", "--json"]);
+    const diagnostics = JSON.stringify({ stderr: result.stderr, stdout: result.stdout, fixtureErrors, requests: requests.length }).split(credential).join("[REDACTED]");
+    expect(result.code, diagnostics).toBe(0);
+    summary = JSON.parse(result.stdout) as AgentRunSummary; displayed = JSON.stringify(result);
+  } else {
+    const { AMCNativeClient } = await import(pathToFileURL(resolve("dist/sdk/nativeAgentClient.js")).href) as typeof import("../src/sdk/nativeAgentClient.js");
+    const client = await AMCNativeClient.start({ workspace: root, provider: "openai", model: "subset-fixture",
+      baseUrl: `http://127.0.0.1:${address.port}`, credential: "AMC_SUBSET_LOOPBACK_KEY", credentialsHome: home,
+      tools: "workspace", maxSteps: 6, maxTokens: 64, env, timeoutMs: 30_000 });
+    try {
+      const session = await client.newSession();
+      const result = await session.prompt(prompt).result;
+      expect(result.text).toBe("Synthetic subset conformance complete.");
+      await client.close();
+      summary = readAgentRunSummary(root, session.sessionId, "idle"); displayed = JSON.stringify(result);
+    } finally { await client.close(); }
+  }
+  expect(fixtureErrors).toEqual([]);
   expect(summary.requests).toBe(4); expect(summary.toolCalls).toBe(3); expect(summary.unsignedRows).toBe(0);
   expect(requests).toHaveLength(4); expect(auth).toEqual([true, true, true, true]);
-  for (const request of requests) expect(request.tools?.map(tool => tool.function.name).sort()).toEqual(["fs.read", "glob", "grep"]);
+  for (const request of requests) {
+    expect(request.tools?.map(tool => tool.function.name).sort()).toEqual(["fs.read", "glob", "grep"]);
+    // Encoder-owned streaming/usage fields must still be sent, without caller collisions.
+    expect(request.stream).toBe(true); expect(request.stream_options).toEqual({ include_usage: true }); expect(request.max_tokens).toBe(64);
+  }
   expect(requests[0]!.messages.some(message => message.role === "user" && message.content === prompt)).toBe(true);
   expect(requests[1]!.messages.find(message => message.tool_call_id === "subset-call-0")?.content).toBe(fixtureText);
   expect(String(requests[2]!.messages.find(message => message.tool_call_id === "subset-call-1")?.content)).toContain("denied");
@@ -115,5 +140,5 @@ test("the built native CLI advertises and executes only the signed read subset; 
     const verification = await run(args); expect(verification.code, verification.stderr).toBe(0);
     expect(JSON.parse(verification.stdout).ok).toBe(true);
   }
-  expect(JSON.stringify({ stdout: result.stdout, stderr: result.stderr })).not.toContain(credential);
+  expect(displayed).not.toContain(credential);
 }, 90_000);

@@ -90,7 +90,7 @@ function spyRunner(answer = "the delegate's own answer") {
 }
 
 describe("an agent can delegate from inside its own toolset", () => {
-  it("offers `delegate` only when the capability is granted", () => {
+  it("offers `delegate` only when both its implementation capability and signed grant are present", () => {
     const dir = workspace();
 
     const without = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session"});
@@ -104,6 +104,9 @@ describe("an agent can delegate from inside its own toolset", () => {
     const names = (t: ReturnType<typeof agentToolset>) =>
       (t.seam.schemas() ?? []).map((s) => s.name);
     expect(names(without), "delegation is granted, not assumed").not.toContain("delegate");
+    expect(names(withCap), "composition alone does not grant signed authority").not.toContain("delegate");
+    allowDelegate(dir);
+    expect(names(without), "policy alone does not provide an implementation").not.toContain("delegate");
     expect(names(withCap)).toContain("delegate");
     without.close();
     withCap.close();

@@ -162,9 +162,9 @@ export function paramsFor(providerId: string, maxTokens: number): Record<string,
       // The Responses encoder owns stream; its output bound has a different name.
       return { max_output_tokens: maxTokens };
     case "openai":
-      // `include_usage` is not a nicety: the stream grammar refuses a successful
-      // finish that emitted no usage, and OpenAI omits usage unless asked.
-      return { max_tokens: maxTokens, stream: true, stream_options: { include_usage: true } };
+      // The Chat encoder owns stream/include_usage and rejects collisions.
+      // Keeping those fields there also guarantees usage on every native surface.
+      return { max_tokens: maxTokens };
     default:
       // `anthropic-messages@1` does not own `stream`, so the caller supplies it;
       // the stub route shares the encoder and is happy with the same shape.
@@ -257,4 +257,3 @@ export function renderNotification(notification: LoopNotification): string | nul
       return null;
   }
 }
-

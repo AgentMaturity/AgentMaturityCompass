@@ -208,7 +208,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
         providerId: route.providerId,
         model: route.models?.[0] ?? "",
         params: route.providerId === "openai-responses" ? { max_output_tokens: maxTokens }
-          : route.providerId === "openai" ? { max_tokens: maxTokens, stream: true, stream_options: { include_usage: true } }
+          : route.providerId === "openai" ? { max_tokens: maxTokens }
             : { max_tokens: maxTokens, stream: true }
       },
       systemPrompt: init.systemPrompt,
