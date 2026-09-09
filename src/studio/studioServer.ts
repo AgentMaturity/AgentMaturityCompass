@@ -90,7 +90,6 @@ import { verifyReceipt } from "../receipts/receipt.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import {
   ensureAgentToken,
-  findAgentByToken,
   readStudioState,
   updateStudioLastLease
 } from "./studioState.js";
@@ -105,6 +104,7 @@ import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { serveConsolePath } from "../console/consoleServer.js";
 import { handleStudioApiDelegation } from "./apiDelegation.js";
+import { authenticateStudioAgent } from "./agentCredentialAuth.js";
 import { allowStudioCors as allowCors } from "./studioCors.js";
 import { createNativeTaskService } from "./nativeTaskService.js";
 import { isNativeApprovalMutationPath, isNativeStudioPath, nativeAllowedBrowserOrigins, nativeCsrfTokenForSession } from "./nativeAdmission.js";
@@ -1023,68 +1023,16 @@ function authenticate(req: IncomingMessage, workspace: string, adminToken: strin
     };
   }
 
-  const suppliedAgent = req.headers["x-amc-agent-token"];
-  if (typeof suppliedAgent === "string" && suppliedAgent.length > 0) {
-    const resolved = findAgentByToken(workspace, suppliedAgent);
-    if (resolved) {
-      return {
-        isAdmin: false,
-        agentId: resolved.agentId,
-        scopes: new Set(resolved.scopes),
-        roles: new Set(["AGENT"]),
-        username: "agent-token", userId: null, nativeCsrfToken: null
-      };
-    }
-  }
-
-  const authHeader = req.headers.authorization;
-  if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
-    const token = authHeader.slice("Bearer ".length).trim();
-    if (token.length > 0) {
-      const resolved = findAgentByToken(workspace, token);
-      if (resolved) {
-        return {
-          isAdmin: false,
-          agentId: resolved.agentId,
-          scopes: new Set(resolved.scopes),
-          roles: new Set(["AGENT"]),
-          username: "agent-token", userId: null, nativeCsrfToken: null
-        };
-      }
-    }
-  }
-
-  const requestUrl = new URL(req.url ?? "/", `http://${req.headers.host ?? "127.0.0.1"}`);
-  const leaseCarrier = extractLeaseCarrier({
-    headers: req.headers,
-    url: requestUrl,
+  const agent = authenticateStudioAgent({
+    workspace, headers: req.headers, rawHeaders: req.rawHeaders,
+    url: new URL(req.url ?? "/", `http://${req.headers.host ?? "127.0.0.1"}`),
     allowQueryCarrier: leaseQueryCarrierEnabled(workspace)
   });
-  const leaseToken = leaseCarrier.leaseToken;
-  if (typeof leaseToken === "string" && leaseToken.length > 0) {
-    const revocationSig = verifyLeaseRevocationsSignature(workspace);
-    if (revocationSig.valid) {
-      const revoked = new Set(loadLeaseRevocations(workspace).revocations.map((row) => row.leaseId));
-      const expectedWorkspaceId = workspaceIdFromDirectory(workspace);
-      const verification = verifyLeaseToken({
-        workspace,
-        token: leaseToken,
-        expectedWorkspaceId,
-        revokedLeaseIds: revoked
-      });
-      if (verification.ok && verification.payload) {
-      return {
-        isAdmin: false,
-        agentId: verification.payload.agentId,
-        scopes: new Set(verification.payload.scopes),
-        roles: new Set(["AGENT"]),
-        username: "agent-lease", userId: null, nativeCsrfToken: null
-      };
-    }
-  }
-  }
-
-  return null;
+  return agent === null ? null : {
+    isAdmin: false, agentId: agent.agentId, scopes: agent.scopes,
+    roles: new Set(["AGENT"]), username: agent.username,
+    userId: null, nativeCsrfToken: null
+  };
 }
 
 function hasScope(auth: AuthContext, scope: string): boolean {
@@ -6439,6 +6387,11 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "intent not found" });
           return;
         }
+        // Refuse before an execution can consume its intent, ticket or approval.
+        if (!auth.isAdmin && auth.agentId !== null && intentAgent !== auth.agentId) {
+          json(res, 403, { error: "scope does not include this agent" });
+          return;
+        }
         const leaseCheck = verifyLeaseForScope({
           workspace: options.workspace,
           req,
@@ -6462,10 +6415,6 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           intentRecord?.actionClass ?? "READ_ONLY",
           response.allowed ? "ok" : "denied"
         );
-        if (!auth.isAdmin && auth.agentId !== null && response.agentId !== auth.agentId) {
-          json(res, 403, { error: "scope does not include this agent" });
-          return;
-        }
         const consumedApprovalId = intentRecord?.approvalRequestId;
         const approvalDelivery = response.allowed && consumedApprovalId && getApprovalInboxItem({
           workspace: options.workspace,
