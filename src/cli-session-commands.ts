@@ -11,6 +11,7 @@ import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
+import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
 
 export function registerSessionCommands(program: Command): void {
   const session = program
@@ -18,6 +19,7 @@ export function registerSessionCommands(program: Command): void {
     .description("Native signed sessions: inspect, compact, verify, replay and recover");
 
   registerSessionCompactionCommands(session);
+  registerSessionSpillReadCommand(session);
 
   session
     .command("verify")

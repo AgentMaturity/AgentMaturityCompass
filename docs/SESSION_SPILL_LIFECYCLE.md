@@ -16,9 +16,22 @@ Objects use exclusive private-file creation and full-write/fsync handling. Retri
 
 ## Inventory
 
+To read an omitted section, copy its complete locator from the preview or inventory:
+
+```text
+amc session spill-read <locator> --offset 0 --limit 4096
+amc session spill-read <locator> --offset 4096 --limit 4096 --json
+```
+
+Use `--workspace <path>` for the originating workspace and `--expect-monitor <sha256>` to pin a fingerprint obtained independently. The command opens the selected SQLite or JSONL session store read-only, authenticates the supplied history's spill references, and verifies and decrypts the complete selected object before returning a bounded byte range. Missing history, missing objects, tampering and unavailable keys refuse the read. A conflicting backend environment or malformed backend marker is refused. It never initializes a workspace, provisions a key, or writes a plaintext copy.
+
+The public `readSessionSpillRange` API returns exact range bytes as base64, the signed full-content digest, origin IDs, total/returned byte counts and the next offset. One read returns at most 16,384 bytes; the default is 4,096. These are configured limits, not performance measurements. Offsets are bytes, so a range may split a UTF-8 character. The human display decodes text with escaped terminal controls; JSON base64 preserves exact bytes. The implementation decrypts the full object in memory; it is not streaming decryption. Reading through this operator command does not add an automatic model retrieval tool or replace whole-session verification. Locally consistent, unpinned monitor identity remains explicitly unanchored.
+
 `inventorySessionSpills({ workspace, events, options? })` accepts evidence rows and returns `ok`, `entries`, `errors`, and `contentVerification: "not-decrypted"`. Supply the complete applicable history, including both `tool/spill-commitment` and `tool/result` rows. Do not filter away references before asking about erasure.
 
 Every declared reference must authenticate under the workspace's monitor trust root. The locator must identify the signed event's session and reference format. Inventory uses one lazy trust snapshot, deduplicates identical references to the same object, and refuses conflicting references or conflicting event identities. Signature/reference errors stop file inspection. Modified objects make the inventory unsuccessful.
+
+`inventorySessionSpillReferences` exposes that same authentication and conflict collection without opening any retained object. The bounded reader uses it to authenticate all supplied references, then reads only the selected object. A corrupt unrelated object does not cause an unrelated page read to scan or fail on its ciphertext; an unauthentic supplied reference still refuses the operation. Full lifecycle inventory continues to inspect all its referenced objects.
 
 Each entry includes its signed reference, locator, referring event/session IDs, and a status: `retained`, `missing`, `unretrievable`, `legacy-plaintext`, or `tampered`. A commitment whose materialization never finished remains visible as a gap. A completed materialization whose final result append failed remains visible through its earlier signed commitment.
 

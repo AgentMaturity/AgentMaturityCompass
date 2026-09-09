@@ -28,8 +28,10 @@ export {
 } from "./security/index.js";
 
 export { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
-export { inventorySessionSpills, eraseSessionSpills, exportSessionSpills, restoreSessionSpills } from "./session/spill/spillLifecycle.js";
+export { inventorySessionSpills, inventorySessionSpillReferences, eraseSessionSpills, exportSessionSpills, restoreSessionSpills } from "./session/spill/spillLifecycle.js";
 export { inspectSpilledEvent, retrieveSpilledContent, verifySpilledContent } from "./session/spill/spillEvidence.js";
+export { readSessionSpillRange, MAX_SPILL_READ_BYTES } from "./session/spill/spillRead.js";
+export type { SessionSpillRange } from "./session/spill/spillRead.js";
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
 
 export {

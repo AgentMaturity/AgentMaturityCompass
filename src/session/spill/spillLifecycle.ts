@@ -32,12 +32,17 @@ export interface SpillLifecycleInput {
   readonly events: readonly EvidenceEvent[];
   readonly options?: SpillRetrievalOptions;
 }
+export interface SpillReferenceInventory {
+  readonly ok: boolean;
+  readonly entries: readonly Omit<SpillInventoryEntry, "status" | "detail">[];
+  readonly errors: readonly string[];
+}
 interface PendingEntry { ref: SpillRef; eventIds: Set<string>; sessionIds: Set<string> }
 function entryKey(ref: SpillRef, eventId: string): string { return ref.locator ?? `event:${eventId}`; }
 function freezeRef(ref: SpillRef): SpillRef { return Object.freeze(JSON.parse(JSON.stringify(ref)) as SpillRef); }
 
-/** Authenticate every candidate before allowing a selection to hide conflicts. No plaintext is read. */
-export function inventorySessionSpills(input: SpillLifecycleInput): SpillInventory {
+/** Authenticate and reconcile every supplied reference without reading object files. */
+export function inventorySessionSpillReferences(input: SpillLifecycleInput): SpillReferenceInventory {
   const pending = new Map<string, PendingEntry>(), errors: string[] = [], seenRows = new Map<string, string>();
   const authenticate = createSpillReferenceAuthenticator(input.workspace, input.options);
   for (const event of input.events) {
@@ -61,10 +66,21 @@ export function inventorySessionSpills(input: SpillLifecycleInput): SpillInvento
     const entry = existing ?? { ref, eventIds: new Set<string>(), sessionIds: new Set<string>() };
     entry.eventIds.add(event.id); entry.sessionIds.add(event.session_id); pending.set(key, entry);
   }
+  const entries = errors.length > 0 ? [] : [...pending.values()].map(entry => Object.freeze({
+    locator: entry.ref.locator, ref: entry.ref,
+    eventIds: Object.freeze([...entry.eventIds].sort()), sessionIds: Object.freeze([...entry.sessionIds].sort())
+  }));
+  return Object.freeze({ ok: errors.length === 0, entries: Object.freeze(entries), errors: Object.freeze(errors) });
+}
+
+/** Authenticate every candidate before allowing a selection to hide conflicts. No plaintext is read. */
+export function inventorySessionSpills(input: SpillLifecycleInput): SpillInventory {
+  const references = inventorySessionSpillReferences(input);
+  const errors = [...references.errors];
   const entries: SpillInventoryEntry[] = [];
   // Do not even inspect files when row authentication or conflict detection failed.
   if (errors.length === 0) {
-    for (const entry of pending.values()) {
+    for (const entry of references.entries) {
       const inspected = inspectSpillObject(input.workspace, entry.ref, input.options?.root);
       const status: SpillInventoryStatus = inspected.status === "ok" ? "retained"
         : inspected.status === "invalid-locator" ? "tampered" : inspected.status;
