@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 import { resolve, join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runNativeStudioScenarios } from "../tests/e2e/native-tasks-page.mjs";
+import { NATIVE_STUDIO_SCENARIOS, nativeStudioBrowserReceiptPassed } from "./lib/nativeStudioBrowserReceipt.mjs";
 
 const argv=process.argv.slice(2);
 const option=name=>{const i=argv.indexOf(name);return i>=0?argv[i+1]:undefined;};
@@ -21,7 +22,7 @@ const secret=path=>{const st=statSync(path);if(!st.isFile()||(process.platform!=
 const credentials={username:secret(fixture.ownerUsernameFile),password:secret(fixture.ownerPasswordFile)};
 const scrub=text=>[credentials.password,credentials.username].filter(Boolean).reduce((value,s)=>value.replaceAll(s,"[fixture-credential]"),String(text));
 const out=resolve(outputPath);mkdirSync(out,{recursive:false,mode:0o700});
-const planned=["owner-login-and-missing-credential","rendered-layout-keyboard-and-home-handoff","selected-agent-committed-task-and-follow-up","release-reload-explicit-resume","lost-create-acknowledgement-never-replayed","real-pending-approval-link-and-denial","cancel-actual-turn-waiting-for-approval","browser-verification-control-reports-actual-verdict","native-write-browser-proof-and-agent-binding","demo-stub-only-and-approval-refusal"];
+const planned=[...NATIVE_STUDIO_SCENARIOS];
 const receipt={schemaVersion:"2026-09-08",startedAt:new Date().toISOString(),sourceCommit:fixture.sourceCommit,artifactSha256:fixture.artifactSha256,artifactPath:resolve(fixture.artifactPath),installedCli:realpathSync(fixture.installedCli),installedCliSha256:hash(fixture.installedCli),node:{version:process.version,platform:process.platform,arch:process.arch},browser:null,planned,checks:[],notes:[],requests:[],sessionIds:[],cleanup:[],ok:false,qualification:"not-started",limits:["Actual browser with installed AMC server; provider is the explicit local deterministic stub.","No real model coding-quality claim. Workspace stub tool arguments are synthetic; denial/cancellation are the exercised tool behaviors.","Browser service workers are blocked for deterministic lost-response interception; offline/service-worker behavior is not qualified.","Cold cryptographic verification must be run separately after orderly Studio shutdown; a live gateway can make whole-workspace verification refuse.","No HAR/trace or credential values are retained."]};
 const self=fileURLToPath(import.meta.url), pageModule=fileURLToPath(new URL("../tests/e2e/native-tasks-page.mjs",import.meta.url));
 receipt.harness={scriptSha256:hash(self),pageModuleSha256:hash(pageModule)};
@@ -53,7 +54,7 @@ finally{
   for(const name of planned)if(!receipt.checks.some(check=>check.name===name))receipt.checks.push({name,status:"not-exercised",reason:"An earlier prerequisite or scenario stopped the run."});
   receipt.sessionIds=[...sessions].filter(Boolean);receipt.finishedAt=new Date().toISOString();
   receipt.counts={planned:planned.length,passed:receipt.checks.filter(c=>c.status==="passed").length,failed:receipt.checks.filter(c=>c.status==="failed").length,notExercised:receipt.checks.filter(c=>c.status==="not-exercised").length};
-  receipt.ok=receipt.counts.passed===planned.length&&receipt.cleanup.every(c=>c.ok)&&!receipt.notes.some(n=>n.kind==="page-error");
+  receipt.ok=nativeStudioBrowserReceiptPassed(receipt);
   receipt.qualification=receipt.ok?"browser-slice-passed":"failed-or-incomplete";
   writeFileSync(join(out,"receipt.json"),JSON.stringify(receipt,null,2)+"\n",{mode:0o600});
   console.log(JSON.stringify({ok:receipt.ok,qualification:receipt.qualification,counts:receipt.counts,receipt:join(out,"receipt.json")}));

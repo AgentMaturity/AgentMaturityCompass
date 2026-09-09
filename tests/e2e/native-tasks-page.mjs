@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID, createHash } from "node:crypto";
 import { join } from "node:path";
+import { NATIVE_STUDIO_SCENARIOS } from "../../scripts/lib/nativeStudioBrowserReceipt.mjs";
 
 const digest = text => createHash("sha256").update(text).digest("hex");
 const NATIVE = "/api/v1/native-tasks";
@@ -72,6 +73,14 @@ export class NativeTasksPage {
 }
 
 export async function runNativeStudioScenarios({ browser, expect, fixture, credentials, out, step, note, requests, sessions }) {
+  const recordStep = step;
+  const startedScenarios = new Set();
+  step = async (name, run) => {
+    assert.ok(NATIVE_STUDIO_SCENARIOS.includes(name), `Undeclared native browser scenario: ${name}`);
+    assert.ok(!startedScenarios.has(name), `Duplicate native browser scenario: ${name}`);
+    startedScenarios.add(name);
+    return recordStep(name, run);
+  };
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: "block", permissions: ["clipboard-read", "clipboard-write"] });
   const allowed = new Set([new URL(fixture.ownerBase).origin, new URL(fixture.demoBase).origin]);
   await context.route("**/*", route => allowed.has(new URL(route.request().url()).origin) ? route.continue() : route.abort("blockedbyclient"));
