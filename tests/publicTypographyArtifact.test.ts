@@ -144,7 +144,8 @@ describe("AMC first-party typography artifact", () => {
     expect(readdirSync(resolve(first, "fonts")).sort()).toEqual([...expectedFontAssets].sort());
     expect(existsSync(resolve(root, "website/fonts"))).toBe(false);
     expect(readFileSync(resolve(first, "brand.css"), "utf8")).not.toMatch(/fonts\.(?:googleapis|gstatic)\.com/);
-  });
+  // The staged artifact now includes a complete TypeScript API reference.
+  }, 300_000);
 
   test("fails closed on package-version drift and keeps font assets network-first", async () => {
     const { validatePinnedPackageVersion } = await import("../scripts/build-pages-site.mjs") as {

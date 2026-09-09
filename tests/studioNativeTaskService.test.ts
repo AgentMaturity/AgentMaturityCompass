@@ -232,13 +232,38 @@ test("archive authenticates evidence again and hidden archived descriptors still
   task = await s.verify(actor, task.taskId, task.revision); expect(task.state).toBe("closed");
   const store = new NativeTaskDescriptors(root), path = join(store.directory, `${task.taskId}.json`), before = readFileSync(path);
   const ledger = openLedger(root);
-  const close = ledger.db.prepare("SELECT id, writer_sig FROM evidence_events WHERE session_id = ? AND event_type = 'session/close'").get(task.sessionId) as { id: string; writer_sig: string };
-  expect(close).toBeDefined();
   try {
-    ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("tampered-archive-close", close.id);
-    expect(() => s.archive(actor, task.taskId, task.revision)).toThrow("evidence did not authenticate");
-    expect(readFileSync(path)).toEqual(before);
-  } finally { ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run(close.writer_sig, close.id); ledger.close(); }
+    const close = ledger.db.prepare("SELECT id, writer_sig FROM evidence_events WHERE session_id = ? AND event_type = 'session/close'").get(task.sessionId) as { id: string; writer_sig: string } | undefined;
+    expect(close).toBeDefined();
+    if (!close) throw new Error("Fixture requires an authenticated session/close row before tampering");
+    const trigger = ledger.db.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name = 'protect_evidence_immutable'").get() as { sql: string } | undefined;
+    expect(trigger).toBeDefined();
+    if (!trigger) throw new Error("Fixture requires the production immutable-evidence trigger");
+    const readClose = () => ledger.db.prepare("SELECT * FROM evidence_events WHERE id = ?").get(close.id);
+    const original = readClose();
+    const updateSignature = (signature: string) => ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run(signature, close.id);
+    // Ordinary SQL mutation must remain blocked. The attack below models a
+    // hostile owner rewriting this disposable database beyond that storage guard.
+    expect(() => updateSignature("tampered-archive-close")).toThrow("evidence immutable fields changed");
+    expect(readClose()).toEqual(original);
+    const rewriteFixtureSignature = (signature: string) => ledger.db.transaction(() => {
+      ledger.db.exec("DROP TRIGGER protect_evidence_immutable");
+      expect(updateSignature(signature).changes).toBe(1);
+      // Restore the exact production guard before any archive/verifier call.
+      ledger.db.exec(trigger.sql);
+    }).immediate();
+    try {
+      rewriteFixtureSignature("tampered-archive-close");
+      expect(readClose()).toEqual({ ...(original as Record<string, unknown>), writer_sig: "tampered-archive-close" });
+      expect(ledger.db.prepare("SELECT sql FROM sqlite_master WHERE type = 'trigger' AND name = 'protect_evidence_immutable'").get()).toEqual(trigger);
+      expect(() => updateSignature("another-forgery")).toThrow("evidence immutable fields changed");
+      expect(() => s.archive(actor, task.taskId, task.revision)).toThrow("evidence did not authenticate");
+      expect(readFileSync(path)).toEqual(before);
+    } finally {
+      rewriteFixtureSignature(close.writer_sig);
+      expect(readClose()).toEqual(original);
+    }
+  } finally { ledger.close(); }
   s.archive(actor, task.taskId, task.revision);
   const authentic = readFileSync(path), envelope = JSON.parse(authentic.toString("utf8"));
   delete envelope.descriptor.archivedAt; writeFileSync(path, JSON.stringify(envelope));

@@ -3,6 +3,7 @@ import {
   anthropicMessagesEncoder,
   anthropicMessagesEncoderV2
 } from "../src/llm/request/anthropicMessagesEncoder.js";
+import { anthropicMessagesEncoderV3 } from "../src/llm/request/anthropicMessagesEncoderV3.js";
 import { DEFAULT_REQUEST_ENCODERS } from "../src/llm/request/deriveRequest.js";
 import { anthropicAdapter } from "../src/llm/providers/anthropicAdapter.js";
 import type { EncodableRequest } from "../src/llm/request/requestSpec.js";
@@ -19,7 +20,8 @@ import type { EncodableRequest } from "../src/llm/request/requestSpec.js";
  * and the last content block of the last message — so each turn's request seeds
  * the cache the next turn's shared prefix reads. v1 stays registered and
  * byte-stable: recorded requests must reconstruct under the encoder that wrote
- * them, forever.
+ * them, forever. v3 maps provider-safe tool names while preserving v2 caching;
+ * both historical encoders remain registered for cold reconstruction.
  */
 
 const REQUEST: EncodableRequest = {
@@ -41,9 +43,9 @@ function decode(buffer: Buffer): Record<string, any> {
   return JSON.parse(buffer.toString("utf8"));
 }
 
-describe("anthropic-messages@2 cache breakpoints", () => {
-  test("marks system, last tool, and the last block of the last message", () => {
-    const body = decode(anthropicMessagesEncoderV2.encode(REQUEST));
+describe("Anthropic versioned cache breakpoints", () => {
+  test.each([anthropicMessagesEncoderV2, anthropicMessagesEncoderV3])("v$version marks system, last tool, and the last block of the last message", (encoder) => {
+    const body = decode(encoder.encode(REQUEST));
     expect(body.system).toEqual([
       { type: "text", text: "You are the agent under test.", cache_control: { type: "ephemeral" } }
     ]);
@@ -58,9 +60,9 @@ describe("anthropic-messages@2 cache breakpoints", () => {
     expect(markers).toHaveLength(3);
   });
 
-  test("no system and no tools means no markers there, and no crash", () => {
+  test.each([anthropicMessagesEncoderV2, anthropicMessagesEncoderV3])("v$version omits absent system/tool markers without crashing", (encoder) => {
     const body = decode(
-      anthropicMessagesEncoderV2.encode({ ...REQUEST, system: null, tools: null })
+      encoder.encode({ ...REQUEST, system: null, tools: null })
     );
     expect(body.system).toBeUndefined();
     expect(body.tools).toBeUndefined();
@@ -68,9 +70,9 @@ describe("anthropic-messages@2 cache breakpoints", () => {
     expect(markers).toHaveLength(1);
   });
 
-  test("is deterministic", () => {
-    const first = anthropicMessagesEncoderV2.encode(REQUEST);
-    const second = anthropicMessagesEncoderV2.encode(REQUEST);
+  test.each([anthropicMessagesEncoderV2, anthropicMessagesEncoderV3])("v$version is deterministic", (encoder) => {
+    const first = encoder.encode(REQUEST);
+    const second = encoder.encode(REQUEST);
     expect(first.equals(second)).toBe(true);
   });
 
@@ -81,9 +83,11 @@ describe("anthropic-messages@2 cache breakpoints", () => {
     expect(body.system).toBe("You are the agent under test.");
   });
 
-  test("both versions are registered; the adapter now writes v2", () => {
-    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 1)).not.toBeNull();
-    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 2)).not.toBeNull();
-    expect(anthropicAdapter.encoderVersion).toBe(2);
+  test("frozen v1/v2 and active v3 are registered; the adapter writes v3", () => {
+    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 1)).toBe(anthropicMessagesEncoder);
+    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 2)).toBe(anthropicMessagesEncoderV2);
+    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 3)).toBe(anthropicMessagesEncoderV3);
+    expect(anthropicAdapter.encoderId).toBe("anthropic-messages");
+    expect(anthropicAdapter.encoderVersion).toBe(3);
   });
 });

@@ -1,20 +1,10 @@
 /**
  * Public package API for `agent-maturity-compass`.
  *
- * This barrel is the contract for callers importing AMC as a library. It is
- * deliberately NOT imported by AMC's own CLI, API routers or studio server,
- * which import the modules they need directly.
- *
- * Two consequences worth stating, because both have caused confusion:
- *
- *  1. A module being exported here does not mean AMC runs it. Several exports
- *     are toolkits for embedders (for example auth/enterpriseIam) that AMC
- *     itself never calls; presence in this file is not evidence of a capability
- *     being active in a deployment.
- *
- *  2. Because nothing internal imports this barrel, drift between it and the
- *     modules it re-exports will not break the build. tests/publicApiSurface
- *     guards the surface instead.
+ * Library callers use this barrel; AMC's CLI, routers and Studio import their
+ * modules directly. Exported embedding toolkits do not establish that a feature
+ * runs in a deployment. tests/publicApiSurface guards this external contract,
+ * which internal builds alone cannot exercise. See docs/API_SURFACES.md.
  *
  * @packageDocumentation
  */

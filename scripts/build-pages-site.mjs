@@ -159,7 +159,7 @@ function copyRenderer(output) {
   const packagePath = resolve(repositoryRoot, "node_modules/marked/package.json");
   const sourcePath = resolve(repositoryRoot, "node_modules/marked/lib/marked.umd.js");
   if (!existsSync(packagePath) || !existsSync(sourcePath)) {
-    throw new Error("Pinned marked renderer is missing; run npm ci before build:pages");
+    throw new Error("Pinned marked renderer is missing; run pnpm install --frozen-lockfile before build:pages");
   }
   const pkg = JSON.parse(readFileSync(packagePath, "utf8"));
   const asset = "vendor/marked.min.js";
@@ -246,7 +246,7 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/bin/typedoc"),
     "--options", resolve(repositoryRoot, "typedoc.json"), "--out", apiOutput,
     "--json", resolve(apiOutput, "reflection.json"), ...(revision ? ["--gitRevision", revision] : [])],
-  { cwd: repositoryRoot, stdio: "inherit" });
+  { cwd: repositoryRoot, stdio: "inherit", timeout: 120_000 });
 
   return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };
 }

@@ -139,7 +139,8 @@ describe("public Docs Pages artifact", () => {
     expect(initPage).not.toContain("This barrel is the contract");
     expect(readFileSync(resolve(first, "docs/content/PACKAGE_API_REFERENCE.md"), "utf8"))
       .toContain("[open the generated package reference](../api/)");
-  });
+  // Two complete TypeScript/API builds also run under the full suite's load.
+  }, 300_000);
 
   test("rejects unsafe, duplicate, internal, and destructive build inputs", async () => {
     const { validateGuideSets } = await import("../scripts/build-pages-site.mjs") as {

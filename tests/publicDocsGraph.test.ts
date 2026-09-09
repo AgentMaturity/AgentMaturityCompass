@@ -28,6 +28,9 @@ function localMarkdownLinks(markdown: string): string[] {
 
 function resolveGuideLink(sourceDoc: string, href: string): string | null {
   if (/^(?:https?:|mailto:|tel:|data:)/i.test(href) || href.startsWith("#")) return null;
+  // This generated site entry is verified by publicDocsArtifact, including its
+  // real index and declarations. Other relative non-guide paths still fail.
+  if (href === "../api/") return null;
   const path = decodeURIComponent(href.split("#", 1)[0].split("?", 1)[0]).replaceAll("\\", "/");
   if (!path) return null;
   const resolved = posix.normalize(posix.join(posix.dirname(`${sourceDoc}.md`), path));
@@ -36,6 +39,11 @@ function resolveGuideLink(sourceDoc: string, href: string): string | null {
 }
 
 describe("AMC public Docs graph", () => {
+  test("allows the generated API entry without admitting arbitrary non-guide paths", () => {
+    expect(resolveGuideLink("PACKAGE_API_REFERENCE", "../api/")).toBeNull();
+    for (const path of ["../private/", "../api/private.md", "../api/../private/", "../API/"])
+      expect(resolveGuideLink("PACKAGE_API_REFERENCE", path)).toMatch(/^INVALID:/);
+  });
   test("every promoted guide has a repository Markdown source", () => {
     expect(Array.from(publicDocs).filter(doc => !allDocs.has(doc))).toEqual([]);
     expect(Array.from(publicDocs).filter(doc => internalDocs.has(doc))).toEqual([]);
