@@ -29,7 +29,7 @@
     "@amc/cordis-plugin-timer": "workspace:^",
     "@amc/cosmokit": "workspace:^",
     "@amc/schemastery": "workspace:^",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.3.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9"
