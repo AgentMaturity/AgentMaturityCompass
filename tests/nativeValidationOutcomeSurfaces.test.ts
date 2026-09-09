@@ -23,7 +23,7 @@ const cases = (["CLI", "SDK", "Studio"] as const).flatMap(surface =>
 // permit or successful fallback is introduced by this fixture.
 test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public validation reports $mode, preserves its actual output reference and survives cold inspection", async ({ surface, mode }) => {
   const base = realpathSync(mkdtempSync(join(tmpdir(), "amc-validation-outcome-"))); roots.push(base);
-  const workspace = join(base, "workspace"), home = join(base, "home"); mkdirSync(home);
+  const workspace = join(base, "workspace"), home = join(base, "home"); mkdirSync(home, { mode: 0o700 });
   const pass = "synthetic-public-validation-outcome-vault";
   vi.stubEnv("AMC_VAULT_PASSPHRASE", pass); vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(base, "checkpoints"));
   for (const key of ["AMC_SESSION_STORE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_NO_SIGN"]) vi.stubEnv(key, undefined);
@@ -106,3 +106,23 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
   expect(renderTaskValidation({ validation: projection.validation })).toContain(status === "passed" ? "Selected checks passed" : status === "failed" ? "Selected checks failed" : "Validation unavailable");
   const verified = await verifyAgentRun(workspace, summary.sessionId); expect(verified.ok, JSON.stringify(verified)).toBe(true);
 }, 45000);
+
+test.runIf(process.platform === "darwin")("Studio refuses a non-private operator credential directory before opening a native session", async () => {
+  const base = realpathSync(mkdtempSync(join(tmpdir(), "amc-validation-unsafe-home-"))); roots.push(base);
+  const workspace = join(base, "workspace"), home = join(base, "home"); mkdirSync(home, { mode: 0o755 });
+  const pass = "synthetic-public-validation-unsafe-home";
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", pass); vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(base, "checkpoints"));
+  const f = validationOperatorFixture(workspace, "success");
+  const { createNativeTaskService } = await import(pathToFileURL(resolve("dist/studio/nativeTaskService.js")).href) as typeof import("../src/studio/nativeTaskService.js");
+  const service = createNativeTaskService({ workspace, validationConfig: f.checks, credentialsHome: home,
+    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_CONTROL_CHECKPOINT_DIR: join(base, "checkpoints") } });
+  const actor = { principalId: "unsafe-home-fixture", agentId: "default", demo: false };
+  try {
+    await expect(service.configuration(actor)).rejects.toMatchObject({ name: "CredentialsFilePermissionsError", kind: "directory", mode: 0o755 });
+    const task = await service.start(actor, { clientRequestId: randomUUID(), agentId: "default", provider: "stub", tools: "workspace",
+      toolsDigest: f.toolsDigest, validation: { configSha256: f.sha256, checkIds: ["public"] }, prompt: "Do not start with unsafe credentials." });
+    expect(task).toMatchObject({ state: "failed", sessionId: null, verification: "not-verified" });
+    expect(task.error).toContain("No model request was automatically retried");
+    expect(f.effect()).toBeNull();
+  } finally { await service.close(); }
+}, 15000);
