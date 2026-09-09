@@ -16,7 +16,14 @@ describe("full OpenAPI contract", () => {
     const spec = YAML.parse(readFileSync(new URL("../website/openapi.yaml", import.meta.url), "utf8"));
     expect(spec.openapi).toBe("3.0.3");
     const endpoints = Object.entries(spec.paths).filter(([path]) => path.includes("native-tasks"));
-    expect(endpoints).toHaveLength(8);
+    expect(endpoints.map(([path]) => path).sort()).toEqual([
+      "/v1/native-tasks", "/v1/native-tasks/options", "/v1/native-tasks/{taskId}",
+      ...["archive", "cancel", "release", "resume", "turn", "verify"].map(action => `/v1/native-tasks/{taskId}/${action}`)
+    ].sort());
+    expect(spec.paths["/v1/native-tasks"].get.parameters).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "includeArchived", in: "query", schema: { type: "boolean", default: false } })
+    ]));
+    expect(spec.components.schemas.NativeTask.properties.archived).toEqual({ type: "boolean" });
     for (const [path, methods] of endpoints) {
       expect(path.startsWith("/v1/native-tasks")).toBe(true);
       for (const server of spec.servers) {

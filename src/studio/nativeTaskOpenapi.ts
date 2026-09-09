@@ -58,7 +58,9 @@ export function nativeTaskEndpoints(): Record<string, Record<string, OpenApiOper
   const paths: Record<string, Record<string, OpenApiOperation>> = {
     [`${prefix}/options`]: { get: operation("Inspect native task setup without executing a model or tool", "NativeTaskOptionsResponse", false, undefined, "200", [agentParameter]) },
     [prefix]: {
-      get: operation("List native tasks owned by the caller and selected agent", "NativeTaskListResponse", false, undefined, "200", [agentParameter]),
+      get: operation("List native tasks owned by the caller and selected agent", "NativeTaskListResponse", false, undefined, "200", [agentParameter,
+        { name: "includeArchived", in: "query", required: false, schema: { type: "boolean", default: false },
+          description: "Set to true to inspect archived closed tasks as well. Only the literal true or false is accepted; archived history keeps its request identities and cannot resume." }]),
       post: operation("Admit a bounded native AMC task using an owner-scoped request ID", "NativeTaskResponse", true, "NativeTaskStart", "202")
     },
     [`${prefix}/{taskId}`]: { get: operation("Read committed native updates and actual task state", "NativeTaskPollResponse", false, undefined, "200", [
@@ -71,7 +73,8 @@ export function nativeTaskEndpoints(): Record<string, Record<string, OpenApiOper
     ["cancel", "Request cancellation of this task revision; cancellation is not successful completion"],
     ["release", "Release the native writer while keeping an eligible session resumable"],
     ["resume", "Resume an owned signed session without replaying a pending prompt"],
-    ["verify", "Close an active idle writer and verify native evidence; a sealed session cannot resume"]
+    ["verify", "Close an active idle writer and verify native evidence; a sealed session cannot resume"],
+    ["archive", "Archive an owned closed task after authenticating its sealed history; retain evidence and request identities"]
   ]) {
     paths[`${prefix}/{taskId}/${action}`] = { post: operation(summary!, "NativeTaskResponse", true, "NativeTaskControl",
       action === "cancel" ? "202" : "200", [taskParameter, agentParameter]) };
@@ -98,7 +101,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       validationOutputs: { type: "array", maxItems: 8, items: ref("NativeTaskValidationOutput") },
       maxSteps: integer, maxTokens: integer,
       state: { type: "string", enum: ["starting", "idle", "running", "cancel-requested", "releasing", "released", "failed", "verifying", "closed"] },
-      createdAt: integer, updatedAt: integer, turnEndReason: nullableString, error: nullableString,
+      createdAt: integer, updatedAt: integer, archived: bool, turnEndReason: nullableString, error: nullableString,
       verification: { type: "string", enum: ["not-verified", "workspace-key-consistency", "externally-anchored", "failed"],
         description: "Evidence integrity result, separate from task success. Other open ledger writers can prevent a complete verification." },
       approvals: { type: "array", items: ref("NativeTaskApproval") }, approvalError: nullableString,

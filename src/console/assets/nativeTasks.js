@@ -16,7 +16,7 @@ function taskView(value) {
   if (!object(value) || typeof value.taskId !== "string" || typeof value.agentId !== "string" || !STATES.has(value.state)
     || !integer(value.revision) || !integer(value.nextCursor) || !integer(value.firstCursor) || !integer(value.droppedEvents)
     || !object(value.validation) || !VALIDATION_STATES.has(value.validation.status) || !Array.isArray(value.validation.checks) || !Array.isArray(value.validationOutputs)
-    || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean"
+    || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean" || typeof value.archived !== "boolean"
     || !["not-verified","workspace-key-consistency","externally-anchored","failed"].includes(value.verification)) {
     throw new Error("Studio returned an unsupported task state. Refresh this page after updating Studio.");
   }
@@ -128,6 +128,10 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     for (const action of ["Release","Resume","Verify"]) el(`nativeTask${action}`).disabled = mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskResume").disabled ||= !setupReady;
     el("nativeTaskVerify").textContent = task && ["released","closed","failed"].includes(task.state) ? "Verify evidence" : "Close and verify";
+    el("nativeTaskArchive").hidden = !task || task.state !== "closed" || task.archived || !task.sessionId;
+    el("nativeTaskArchive").disabled = mutation || inspecting || Boolean(pending) || !navigator.onLine;
+    el("nativeTaskArchiveHelp").hidden = el("nativeTaskArchive").hidden;
+    el("nativeTaskIncludeArchived").disabled = !config || mutation || inspecting || Boolean(pending);
     el("nativeTaskRefresh").disabled = (!config && !pending) || mutation || inspecting || polling || reconciling || !navigator.onLine;
     el("nativeTaskNew").disabled = !task || ACTIVE.has(task.state) || mutation || Boolean(pending);
     el("nativeTaskState").textContent = taskStateLabel(task);
@@ -155,7 +159,9 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   function receive(view) {
     task = taskView(view); selectedAgent = task.agentId; updateUrl(task.taskId);
     const index = tasks.findIndex(item=>item.taskId===task.taskId);
-    if (index < 0) tasks.unshift(task); else tasks[index] = task;
+    if (task.archived && !el("nativeTaskIncludeArchived").checked) {
+      if (index >= 0) tasks.splice(index,1);
+    } else if (index < 0) tasks.unshift(task); else tasks[index] = task;
     confirmSubmission(task); project();
   }
   function schedule() {
@@ -226,7 +232,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     updateUrl(task?.taskId || new URL(window.location.href).searchParams.get("task")); controls();
   }
   async function list() {
-    const value=await request(`${API}?agentId=${encodeURIComponent(selectedAgent)}`, {signal:lifetime.signal});
+    const value=await request(`${API}?agentId=${encodeURIComponent(selectedAgent)}&includeArchived=${el("nativeTaskIncludeArchived").checked}`, {signal:lifetime.signal});
     if (disposed) return;
     if (!object(value) || !Array.isArray(value.tasks)) throw new Error("Task list is unavailable.");
     tasks=value.tasks.map(taskView); project();
@@ -256,7 +262,13 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (!task || mutation || pending) return;
     const body={expectedRevision:task.revision};
     mutation=true;readGeneration++;taskRead?.abort();clearTimer();clearError();controls();
-    try { const view=await request(endpoint(task.taskId,`/${action}`),{method:"POST",body}); if (!disposed) { receive(view); await poll(); } }
+    try {
+      const view=await request(endpoint(task.taskId,`/${action}`),{method:"POST",body,signal:lifetime.signal});
+      if (!disposed) {
+        receive(view); await poll();
+        if (action === "archive") { await list(); tell("Task archived. Its signed history is retained; use Show archived tasks to inspect it."); }
+      }
+    }
     catch(error) { showError(error); tell("Action outcome may need confirmation. Refresh status before trying another action."); }
     finally { mutation=false;controls();schedule(); }
   }
@@ -309,7 +321,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   listen(el("nativeTaskRetry"),"click",()=>{void sendSubmission(true);});
   listen(el("nativeTaskPrompt"),"keydown",event=>{if(event.key==="Enter"&&(event.ctrlKey||event.metaKey)){event.preventDefault();void submit();}});
   listen(el("nativeTaskRefresh"),"click",()=>{void refresh().catch(showError);});
-  for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"]]) listen(el(id),"click",()=>{void mutate(action);});
+  for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"],["nativeTaskArchive","archive"]]) listen(el(id),"click",()=>{void mutate(action);});
+  listen(el("nativeTaskIncludeArchived"),"change",()=>{if(!mutation&&!pending&&!inspecting)void list().catch(showError);});
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
   listen(el("nativeTaskNew"),"click",()=>{if(pending||mutation||ACTIVE.has(task?.state))return;clearTimer();readGeneration++;taskRead?.abort();task=null;selectedChecks=[];selectedChecksDigest=config?.validation.configSha256 ?? null;cursor=0;readPaused=false;el("nativeTaskTranscript").replaceChildren();updateUrl(null);project();tell("Choose the next task. Previous tasks remain available in Your tasks.");});
   listen(el("nativeTaskList"),"click",event=>{const button=event.target.closest("[data-native-task-id]");if(!button||mutation||pending)return;const view=tasks.find(item=>item.taskId===button.dataset.nativeTaskId);if(view)void selectTask(view).catch(showError);});

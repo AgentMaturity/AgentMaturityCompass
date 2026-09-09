@@ -56,7 +56,7 @@ export class NativeTasksPage {
     const task = await this.task(); assert.equal(task.state, "idle"); assert.ok(task.sessionId); return task;
   }
   async control(action) {
-    const name = { release: "Release", resume: "Resume", cancel: "Cancel", verify: "Verify" }[action];
+    const name = { release: "Release", resume: "Resume", cancel: "Cancel", verify: "Verify", archive: "Archive" }[action];
     const before = await this.task();
     const response = this.page.waitForResponse(r => r.request().method() === "POST" && new URL(r.url()).pathname.endsWith(`/${before.taskId}/${action}`));
     await this.page.locator(`#nativeTask${name}`).click();
@@ -301,6 +301,40 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       const text={"workspace-key-consistency":"Verified against workspace keys","externally-anchored":"Verified against an independent trust anchor",failed:"Evidence verification failed"}[verified.verification];
       await expect(page.locator("#nativeTaskVerification")).toContainText(text);
       return {sessionId:before.sessionId,verification:verified.verification,note:"Checks faithful presentation of the actual verifier result; cold cryptographic acceptance is independently required after shutdown."};
+    });
+    await step("explicit-closed-task-archive-retains-inspection", async () => {
+      await ui.newTask();
+      const prompt = `Archived retained conversation ${randomUUID()}`;
+      await ui.create(prompt); const ready = await ui.ready(); sessions.add(ready.sessionId);
+      await expect(page.locator("#nativeTaskArchive")).toBeHidden();
+      const closed = await ui.control("verify");
+      assert.equal(closed.state, "closed"); assert.equal(closed.archived, false);
+      await expect(page.locator("#nativeTaskArchive")).toBeVisible();
+      const archived = await ui.control("archive");
+      assert.equal(archived.archived, true); assert.equal(archived.state, "closed");
+      assert.equal(archived.sessionId, ready.sessionId); assert.equal(archived.revision, ready.revision);
+      assert.equal(archived.clientRequestId, ready.clientRequestId);
+      await expect(page.locator("#nativeTaskState")).toHaveText("Archived");
+      await expect(page.locator("#nativeTaskArchive")).toBeHidden();
+      await expect(page.locator("#nativeTaskResume")).toBeHidden();
+      await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
+      const item = page.locator(`[data-native-task-id="${ready.taskId}"]`);
+      await expect(item).toHaveCount(0);
+      await page.locator("#nativeTaskIncludeArchived").check();
+      await expect(item).toHaveCount(1); await expect(item).toContainText("Archived");
+      await ui.newTask(); await item.click();
+      await expect(page.locator("#nativeTaskState")).toHaveText("Archived");
+      await expect(page.locator("#nativeTaskTranscript")).toContainText(prompt);
+      const postCount = requests.length;
+      await page.reload();
+      await expect(page.locator("#nativeTaskState")).toHaveText("Archived");
+      await expect(page.locator("#nativeTaskTranscript")).toContainText(prompt);
+      assert.equal(requests.length, postCount, "Archived reload must not resume or dispatch");
+      assert.equal((await ui.task()).sessionId, ready.sessionId);
+      await ui.newTask();
+      return { taskId: ready.taskId, sessionId: ready.sessionId, revision: ready.revision,
+        signedHistoryRetained: true, defaultListExcluded: true, explicitArchivedInspection: true,
+        reloadMutationCount: 0, evidenceVerification: closed.verification };
     });
     await step("native-write-browser-proof-and-agent-binding", async () => {
       assert.ok(requests.length>0);

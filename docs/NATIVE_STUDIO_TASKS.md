@@ -44,6 +44,8 @@ Open **View check output** for the exact authenticated check-result payload. AMC
 | Resume | Reopens your signed, unsealed session under the same agent and scope. It never replays an uncertain prompt automatically. |
 | Close and verify | Seals an idle session and checks native evidence. A sealed session cannot resume. |
 | Verify evidence | Checks released/closed evidence without creating a new model turn. Other open ledger writers can prevent complete verification. |
+| Archive closed task | Removes an eligible closed task from the current list while retaining its signed descriptor, request identities and native evidence. Active, uncertain or unsealed tasks cannot be archived. |
+| Show archived tasks | Includes retained archived tasks in the list for inspection. Archiving does not make a sealed session resumable. |
 | Refresh status | Reconciles the displayed state after a disconnected or uncertain request, without resubmitting it. |
 | Retry original submission | After a successful status refresh leaves admission unconfirmed, explicitly resends the original request and identity. Edited draft text is preserved for a later submission. |
 
@@ -63,13 +65,17 @@ Resume checks the signed native session and recorded ledger prefix even while St
 
 Studio admits at most four active native tasks per workspace, one turn per task, eight steps and 1,024 output tokens per turn. The page can reduce those step/token limits. A turn times out after two minutes; idle native writers release after 15 minutes, and a live task process is limited to one hour. Prompts are limited to 16 KiB UTF-8.
 
-The service retains at most 512 displayed events and 2 MiB of event text, 32 admitted submissions per task and 256 signed task descriptors. The browser labels a partial transcript when earlier updates are missing. Display retention does not replace or weaken the native evidence verifier. Reaching capacity refuses new admissions; it does not silently delete signed history.
+The service retains at most 512 displayed events and 2 MiB of event text, 32 admitted submissions per task and 256 unarchived task descriptors. The browser labels a partial transcript when earlier updates are missing. Display retention does not replace or weaken the native evidence verifier. Reaching capacity refuses new admissions; it does not silently delete signed history.
+
+Use **Close and verify**, then **Archive closed task** to free a current-history slot. Archival authenticates the sealed native history and keeps the signed descriptor and every admitted request identity. It does not delete evidence, change a verification verdict, replay a turn or make the closed session resumable. Active operations, uncertain admissions, unsealed sessions and untrusted history must be resolved before archival. Choose **Show archived tasks** to inspect retained history. A damaged archived descriptor still causes a trust refusal; hiding it from the current list does not bypass authentication. History lookup and duplicate detection scan retained signed descriptors, so their cost grows with the archive.
 
 ## API clients and hosted workspaces
 
 The typed API is `/api/v1/native-tasks`; Studio's `/openapi.yaml` reference documents options, listing, committed updates, submissions and revision-bound controls. See [API surfaces](API_SURFACES.md) for the public reference. Responses use `{ok: true, data: ...}` and `Cache-Control: no-store`. A `202` means admission or cancellation was recorded, not that a task succeeded.
 
 Options includes the public `validation` catalogue. Creation may include `validation: {configSha256, checkIds}`; follow-up and control requests cannot change it. Task views expose `validationSelection`, the authenticated `validation` result and bounded `validationOutputs` separately. An absent selection is not an empty passing check set.
+
+`POST /api/v1/native-tasks/:taskId/archive?agentId=...` accepts only `{expectedRevision}` through the same owner, origin and CSRF controls as other mutations. `GET /api/v1/native-tasks?agentId=...&includeArchived=true` includes archived tasks; omitting the flag or using `false` returns the current list. Task views expose `archived` separately from the closed lifecycle state. Exact previously admitted submissions still resolve to their retained task without executing again, including after a Studio restart.
 
 Mutations require `x-amc-native-intent: task-workspace-v1`. Human session-cookie clients must also send `x-amc-native-csrf` from the options response or `/auth/me`, plus an `Origin` matching the configured browser origin and request host. Keep the proof out of URLs. Bootstrap admin-token clients may omit Origin and CSRF, but must send the intent header; supplied origins are still validated. Agent tokens and leases cannot act as human task owners.
 
