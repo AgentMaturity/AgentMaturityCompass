@@ -96,7 +96,8 @@ describe("fresh-install doctor boundary", () => {
       ok: true,
       mode: "INSTALL",
       workspaceInitialized: false,
-      strict: false
+      strict: false,
+      liveProbes: false
     });
 
     const strict = runCli(workspace, ["doctor", "--strict", "--json"]);
@@ -105,7 +106,8 @@ describe("fresh-install doctor boundary", () => {
       ok: false,
       mode: "INSTALL",
       workspaceInitialized: false,
-      strict: true
+      strict: true,
+      liveProbes: false
     });
     expect(strict.stdout).not.toContain(workspace);
     expect(existsSync(join(workspace, ".amc"))).toBe(false);
@@ -122,5 +124,15 @@ describe("fresh-install doctor boundary", () => {
     expect(doctor).toContain("Install readiness");
     expect(doctor).toContain("amc doctor --strict");
     expect(deployment).toContain("amc doctor --strict");
+  });
+
+  test("the public live-probe flag is explicit and does not fabricate workspace probes in an empty directory", () => {
+    const workspace = freshWorkspace();
+    const explicit = runCli(workspace, ["doctor", "--live-probes", "--json"]);
+    expect(explicit.status).toBe(0);
+    const report = JSON.parse(explicit.stdout);
+    expect(report).toMatchObject({ mode: "INSTALL", liveProbes: true, workspaceInitialized: false });
+    expect(report.checks.some((row: { id: string }) => row.id.startsWith("lease-carrier-") || row.id.startsWith("notary-"))).toBe(false);
+    expect(existsSync(join(workspace, ".amc"))).toBe(false);
   });
 });

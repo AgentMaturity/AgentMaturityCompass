@@ -1,5 +1,3 @@
-import { request as httpRequest } from "node:http";
-import { createRequire } from "node:module";
 import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -19,6 +17,8 @@ import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
+import { nativeModuleCheck } from "./nativeModuleProbe.js";
+import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
 
 export type DoctorStatus = "PASS" | "FAIL" | "WARN" | "INFO";
 
@@ -35,34 +35,13 @@ export interface DoctorReport {
   mode: "INSTALL" | "WORKSPACE";
   workspaceInitialized: boolean;
   strict: boolean;
+  liveProbes?: boolean;
 }
 
 export interface DoctorOptions {
   strict?: boolean;
-}
-
-async function httpJsonStatus(url: string, method: "GET" | "POST", headers: Record<string, string>, body?: string): Promise<number> {
-  return new Promise((resolvePromise) => {
-    const req = httpRequest(
-      url,
-      {
-        method,
-        headers: {
-          ...(body ? { "content-type": "application/json", "content-length": Buffer.byteLength(body).toString() } : {}),
-          ...headers
-        }
-      },
-      (res) => {
-        res.resume();
-        res.on("end", () => resolvePromise(res.statusCode ?? 0));
-      }
-    );
-    req.on("error", () => resolvePromise(0));
-    if (body) {
-      req.write(body);
-    }
-    req.end();
-  });
+  /** Explicit consent to existing live notary signing and gateway model probes. */
+  liveProbes?: boolean;
 }
 
 function pushSignatureCheck(checks: DoctorCheck[], id: string, label: string, verify: { valid: boolean; signatureExists: boolean; reason: string | null }): void {
@@ -83,7 +62,7 @@ function pushSignatureCheck(checks: DoctorCheck[], id: string, label: string, ve
     id,
     status: "FAIL",
     message: `${label} signature invalid (${verify.reason ?? "unknown"})`,
-    fixHint: "Unlock vault and re-sign with: amc fix-signatures"
+    fixHint: "Review the named policy and restore its approved contents first. Unlock the vault, then deliberately re-sign only approved configuration with: amc fix-signatures"
   });
 }
 
@@ -98,30 +77,6 @@ function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlug
   }
 }
 
-function nativeModuleCheck(): DoctorCheck {
-  try {
-    const requireModule = createRequire(import.meta.url);
-    requireModule("better-sqlite3");
-    return { id: "native-modules", status: "PASS", message: "better-sqlite3 native module loads (Node ABI matches)" };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (message.includes("NODE_MODULE_VERSION")) {
-      return {
-        id: "native-modules",
-        status: "FAIL",
-        message: `better-sqlite3 was compiled for a different Node version (running Node ${versions.node})`,
-        fixHint: "Run: npm rebuild better-sqlite3 in the AMC package directory, or reinstall AMC with this Node version active"
-      };
-    }
-    return {
-      id: "native-modules",
-      status: "FAIL",
-      message: `better-sqlite3 failed to load: ${message.replace(/\s+/g, " ").slice(0, 160)}`,
-      fixHint: "Reinstall AMC dependencies with the Node version you run AMC with"
-    };
-  }
-}
-
 function safeDoctorError(error: unknown, workspace: string): string {
   const raw = error instanceof Error ? error.message : String(error);
   return raw.replaceAll(workspace, ".").replace(/\s+/g, " ").trim().slice(0, 240) || "unknown error";
@@ -130,6 +85,7 @@ function safeDoctorError(error: unknown, workspace: string): string {
 export async function runDoctorRules(workspace: string, options: DoctorOptions = {}): Promise<DoctorReport> {
   const checks: DoctorCheck[] = [];
   const strict = options.strict ?? false;
+  const liveProbes = options.liveProbes === true;
   const workspaceInitialized = existsSync(join(workspace, ".amc", "amc.config.yaml"));
   const mode: DoctorReport["mode"] = workspaceInitialized ? "WORKSPACE" : "INSTALL";
   const nodeMajor = Number((versions.node ?? "0").split(".")[0] ?? "0");
@@ -172,7 +128,8 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       checks,
       mode,
       workspaceInitialized,
-      strict
+      strict,
+      liveProbes
     };
   }
 
@@ -209,7 +166,11 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   } catch {
     trustMode = "LOCAL_VAULT";
   }
-  if (trustSig.valid && trustMode === "NOTARY") {
+  if (trustSig.valid && trustMode === "NOTARY" && !liveProbes) checks.push({
+    id: "notary-live-probes", status: "INFO", message: "Notary health and signing probes not run (local diagnostic mode)",
+    fixHint: "To deliberately contact the configured notary and sign a diagnostic digest, run: amc doctor --live-probes"
+  });
+  if (trustSig.valid && trustMode === "NOTARY" && liveProbes) {
     const trust = await checkNotaryTrust(workspace).catch((error) => ({
       ok: false,
       reasons: [String(error)]
@@ -272,7 +233,10 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
           : { id: "toolhub-denylist", status: "FAIL", message: "ToolHub denylist check failed", fixHint: "Run: amc tools verify" }
       );
 
-      if (studio.running && studio.state) {
+      if (!liveProbes) {
+        checks.push({ id: "lease-carriers-live", status: "INFO", message: "Live gateway model requests and diagnostic lease issuance not run (local diagnostic mode)",
+          fixHint: "To deliberately issue a lease and send gateway model requests that may incur provider charges, run: amc doctor --live-probes" });
+      } else if (studio.running && studio.state) {
         const studioHost = studio.state.host === "0.0.0.0" || studio.state.host === "::" ? "127.0.0.1" : studio.state.host;
         const gatewayBase = `http://${studioHost}:${studio.state.gatewayPort}`;
         const route = routes[0]?.prefix ?? "/openai";
@@ -292,26 +256,16 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
           model: "gpt-4o-mini",
           messages: [{ role: "user", content: "doctor" }]
         });
-        const statusAuth = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload);
-        checks.push({
-          id: "lease-carrier-authorization",
-          status: statusAuth === 0 || statusAuth === 401 ? "FAIL" : "PASS",
-          message: statusAuth === 0 ? "Gateway request failed" : `Authorization carrier status ${statusAuth}`,
-          fixHint: statusAuth === 0 || statusAuth === 401 ? "Check gateway route and lease verification." : undefined
-        });
-        const statusXApi = await httpJsonStatus(`${gatewayBase}${route}/v1/chat/completions`, "POST", { "x-amc-agent-id": "default", "x-api-key": lease }, payload);
-        checks.push({
-          id: "lease-carrier-x-api-key",
-          status: statusXApi === 0 || statusXApi === 401 ? "FAIL" : "PASS",
-          message: statusXApi === 0 ? "Gateway request failed" : `x-api-key carrier status ${statusXApi}`,
-          fixHint: statusXApi === 0 || statusXApi === 401 ? "Check gateway route and lease verification." : undefined
-        });
+        const statusAuth = await requestDoctorStatus(`${gatewayBase}${route}/v1/chat/completions`, { "x-amc-agent-id": "default", authorization: `Bearer ${lease}` }, payload);
+        checks.push(doctorCarrierCheck("lease-carrier-authorization", "Authorization carrier", statusAuth));
+        const statusXApi = await requestDoctorStatus(`${gatewayBase}${route}/v1/chat/completions`, { "x-amc-agent-id": "default", "x-api-key": lease }, payload);
+        checks.push(doctorCarrierCheck("lease-carrier-x-api-key", "x-api-key carrier", statusXApi));
       } else {
         checks.push({
           id: "lease-carriers-live",
           status: "WARN",
           message: "Skipped live lease carrier checks (Studio not running)",
-          fixHint: "Run: amc up"
+          fixHint: "Run: amc up, then deliberately rerun amc doctor --live-probes (gateway model requests may incur charges)"
         });
       }
     } catch (error) {
@@ -327,5 +281,5 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   pushAdapterChecks(checks, workspace, true);
 
   const ok = checks.every((row) => row.status !== "FAIL");
-  return { ok, checks, mode, workspaceInitialized, strict };
+  return { ok, checks, mode, workspaceInitialized, strict, liveProbes };
 }

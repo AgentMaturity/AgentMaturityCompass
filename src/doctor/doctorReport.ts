@@ -10,14 +10,17 @@ export function renderDoctorText(report: DoctorReport): string {
     ? "INSTALL READY ✅"
     : report.ok
       ? "PASS ✅"
-      : (failCount === 0 ? "READY ✅" : failCount <= 2 ? "MOSTLY READY ⚙️" : "NEEDS SETUP ⚠️");
+      : "NEEDS ATTENTION ⚠️";
   lines.push(`Doctor mode: ${report.mode}${report.strict ? " (strict)" : ""}`);
+  lines.push(report.liveProbes
+    ? "Probe scope: live notary/gateway probes explicitly requested; provider charges may apply. Skipped probes are not passed."
+    : "Probe scope: local diagnostics; no live notary signing, gateway model requests or diagnostic lease issuance. Local adapter version probes may run.");
   lines.push(`Doctor result: ${label} (${passCount} pass, ${failCount} fail, ${warnCount} warn, ${infoCount} info)`);
   if (report.mode === "INSTALL" && report.ok) {
     lines.push("  CLI installation is ready. Run `amc` to initialize this workspace and generate its first evidence result.");
   }
   if (failCount > 0) {
-    lines.push(`  💡 ${failCount <= 2 ? "Almost there! Just a few items to configure:" : "This is normal for a fresh install. Fix the items below to get to PASS:"}`);
+    lines.push("  Review each failure below. A small failure count does not make an invalid trust policy or unavailable runtime safe.");
   } else if (infoCount > 0) {
     lines.push(`  💡 All critical checks pass. Info items are optional enhancements.`);
   }
@@ -27,5 +30,6 @@ export function renderDoctorText(report: DoctorReport): string {
       lines.push(`  fix: ${row.fixHint}`);
     }
   }
+  lines.push("Doctor readiness covers only the checks listed here; it is not a governed-turn receipt, remote authentication proof, platform qualification or release gate.");
   return lines.join("\n");
 }

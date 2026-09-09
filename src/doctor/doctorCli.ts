@@ -8,6 +8,7 @@ export async function runDoctorCli(workspace: string, options: DoctorOptions = {
   mode: Awaited<ReturnType<typeof runDoctorRules>>["mode"];
   workspaceInitialized: boolean;
   strict: boolean;
+  liveProbes: boolean;
 }> {
   const report = await runDoctorRules(workspace, options);
   return {
@@ -16,6 +17,7 @@ export async function runDoctorCli(workspace: string, options: DoctorOptions = {
     text: renderDoctorText(report),
     mode: report.mode,
     workspaceInitialized: report.workspaceInitialized,
-    strict: report.strict
+    strict: report.strict,
+    liveProbes: report.liveProbes ?? false
   };
 }

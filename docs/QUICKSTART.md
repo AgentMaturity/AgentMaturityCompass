@@ -60,7 +60,14 @@ For a keyless recording demonstration:
 amc agent-loop guide --provider stub
 ```
 
-Follow the explicit stub/echo command it prints. This exercises local recording, not a real model or repository-editing task. Native sessions currently use the `default` agent identity, independently of the agent selected in Studio.
+Follow the explicit stub/echo command it prints. This exercises local recording, not a real model or repository-editing task. Native commands pin the selected agent: explicit `--agent`, then `AMC_AGENT_ID`, the workspace's current agent, and finally `default`. See [Start here](START_HERE.md) for shared skills, credential-home/file selection and cumulative recorded usage.
+
+For a setup problem, `amc doctor` runs local diagnostics without issuing a
+diagnostic lease, contacting the notary or sending gateway model requests. Its
+native SQLite probe uses only an in-memory database. `--strict` requires an
+initialized workspace but does not opt into live probes. `amc doctor --live-probes`
+explicitly permits the existing notary signing and gateway requests, which may
+incur provider charges. See [Doctor](DOCTOR.md) for exact scope and fix hints.
 
 After a run, use the reported session ID to verify its evidence separately:
 

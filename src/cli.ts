@@ -2287,14 +2287,16 @@ program
   .description("Check runtime availability and wrap readiness")
   .option("--json", "emit structured JSON output", false)
   .option("--strict", "require an initialized, healthy AMC workspace", false)
-  .action(async (opts: { json: boolean; strict: boolean }) => {
+  .option("--live-probes", "explicitly allow notary signing and gateway model requests; provider charges may apply", false)
+  .action(async (opts: { json: boolean; strict: boolean; liveProbes: boolean }) => {
     const runtimeConfig = loadStudioRuntimeConfig(process.env, {
       workspaceDir: process.cwd()
     });
     if (runtimeConfig.vaultPassphrase) {
       process.env.AMC_VAULT_PASSPHRASE = runtimeConfig.vaultPassphrase;
     }
-    const result = await runDoctorCli(process.cwd(), { strict: opts.strict });
+    if (opts.liveProbes && !opts.json) console.log("Live probes explicitly requested: configured notary signing and gateway model requests may run and incur provider charges.");
+    const result = await runDoctorCli(process.cwd(), { strict: opts.strict, liveProbes: opts.liveProbes });
     if (opts.json) {
       console.log(
         JSON.stringify(
@@ -2303,6 +2305,7 @@ program
             mode: result.mode,
             workspaceInitialized: result.workspaceInitialized,
             strict: result.strict,
+            liveProbes: result.liveProbes,
             checks: result.checks,
           },
           null,
@@ -2323,7 +2326,7 @@ program
         { cmd: "amc help", desc: "All available commands" },
       ]));
     } else {
-      console.log(fmt.pass(result.workspaceInitialized ? "All required checks passed. Your workspace is ready." : "CLI install checks passed."));
+      console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
       console.log(fmt.nextSteps([
         { cmd: "amc", desc: "Get your first full maturity score" },
       ]));
