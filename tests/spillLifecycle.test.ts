@@ -40,7 +40,7 @@ function appendReference(sessionId: string, ref: SpillRef, eventType: EvidenceEv
     return ledger.getAllEvents().find(row => row.id === result.id)!;
   } finally { ledger.close(); }
 }
-function object(sessionId = randomUUID(), materialize = true) {
+function object(sessionId: string = randomUUID(), materialize = true) {
   const plaintext = Buffer.from("synthetic retained tool output\n".repeat(128));
   const locator = formatSpillLocator({ version: 2, sessionHash: sha256Hex(sessionId), objectName: `${randomUUID().replaceAll("-", "")}-result` });
   const encoded = encodeBlobV1(encryptBlobV1({ blobId: locator, keyVersion: 1, key: Buffer.alloc(32, 7), plaintext }));
@@ -126,7 +126,14 @@ describe("explicit local spill erasure", () => {
     expect(existsSync(selected.path)).toBe(false); expect(readFileSync(other.path)).toEqual(other.encoded);
     const finished = auditRows("SESSION_SPILL_ERASURE_FINISHED")[0]!;
     expect(JSON.parse(finished.payload_inline!)).toMatchObject({ outcomes: result.entries, scope: "local-referenced-spill-objects-only" });
-    expect(verifyLedgerIntegrity(workspace).chain.ok).toBe(true);
+    // Raw legacy fixture sessions require seals before whole-ledger verification.
+    const ledger = openLedger(workspace);
+    try {
+      ledger.sealSession(selected.sessionId);
+      ledger.sealSession(other.sessionId);
+    } finally { ledger.close(); }
+    const verification = verifyLedgerIntegrity(workspace);
+    expect(verification.chain.ok, verification.chain.errors.join("; ")).toBe(true);
   });
 
   it("leaves bytes untouched when the signed intention cannot be written", () => {

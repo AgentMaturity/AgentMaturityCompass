@@ -13,6 +13,17 @@ const publicDocs = Array.from(publicBlock.matchAll(/'([^']+)'/g), match => match
 const buildScript = resolve(root, "scripts/build-pages-site.mjs");
 const temporaryRoots: string[] = [];
 const revision = "0123456789abcdef0123456789abcdef01234567";
+const expectedFontAssets = [
+  "inter-latin-400-normal.woff2",
+  "inter-latin-500-normal.woff2",
+  "inter-latin-600-normal.woff2",
+  "inter-latin-700-normal.woff2",
+  "inter-latin-800-normal.woff2",
+  "inter-OFL-1.1.txt",
+  "space-mono-latin-400-normal.woff2",
+  "space-mono-latin-700-normal.woff2",
+  "space-mono-OFL-1.1.txt",
+];
 
 function sha256(value: Buffer | string): string {
   return createHash("sha256").update(value).digest("hex");
@@ -70,7 +81,7 @@ describe("public Docs Pages artifact", () => {
     ).not.toBeNull();
   });
 
-  test("builds a deterministic allowlisted artifact with source and renderer hashes", () => {
+  test("builds a deterministic allowlisted artifact with source, renderer, and font hashes", () => {
     expect(existsSync(buildScript)).toBe(true);
     const first = buildArtifact();
     const second = buildArtifact();
@@ -139,7 +150,42 @@ describe("public Docs Pages artifact", () => {
     expect(initPage).not.toContain("This barrel is the contract");
     expect(readFileSync(resolve(first, "docs/content/PACKAGE_API_REFERENCE.md"), "utf8"))
       .toContain("[open the generated package reference](../api/)");
-  // Two complete TypeScript/API builds also run under the full suite's load.
+
+    // The same pair of complete builds owns both Docs and font artifact checks.
+    const firstBrandRaw = readFileSync(resolve(first, "brand-assets.json"));
+    const secondBrandRaw = readFileSync(resolve(second, "brand-assets.json"));
+    const brandManifest = JSON.parse(firstBrandRaw.toString("utf8"));
+
+    expect(firstBrandRaw.equals(secondBrandRaw)).toBe(true);
+    expect(brandManifest.schemaVersion).toBe("2026-07-10");
+    expect(brandManifest.sourceRevision).toBe(revision);
+    expect(brandManifest.assetCount).toBe(9);
+    expect(brandManifest.assets.map((asset: { asset: string }) => asset.asset)).toEqual(
+      expectedFontAssets.map(asset => `fonts/${asset}`),
+    );
+
+    for (const asset of brandManifest.assets as Array<{
+      asset: string;
+      bytes: number;
+      kind: "font" | "license";
+      package: string;
+      sha256: string;
+      source: string;
+      version: string;
+    }>) {
+      const source = readFileSync(resolve(root, asset.source));
+      const staged = readFileSync(resolve(first, asset.asset));
+      expect(staged.equals(source), asset.asset).toBe(true);
+      expect(asset.bytes, asset.asset).toBe(source.byteLength);
+      expect(asset.sha256, asset.asset).toBe(sha256(source));
+      expect(asset.package).toMatch(/^@fontsource\/(?:inter|space-mono)$/);
+      expect(asset.version).toMatch(/^5\.2\.(?:8|9)$/);
+      expect(asset.kind).toBe(asset.asset.endsWith(".woff2") ? "font" : "license");
+    }
+
+    expect(readdirSync(resolve(first, "fonts")).sort()).toEqual([...expectedFontAssets].sort());
+    expect(existsSync(resolve(root, "website/fonts"))).toBe(false);
+    expect(readFileSync(resolve(first, "brand.css"), "utf8")).not.toMatch(/fonts\.(?:googleapis|gstatic)\.com/);
   }, 300_000);
 
   test("rejects unsafe, duplicate, internal, and destructive build inputs", async () => {

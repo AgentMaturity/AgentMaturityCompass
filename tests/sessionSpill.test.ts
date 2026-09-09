@@ -469,8 +469,22 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
 
     expect(inspectSpilledEvent(dir, event).status).toBe("unretrievable");
     const sweep = verifySpilledContent(dir, allEvents());
-    expect(sweep.ok, "an unretrievable spill is a gap, not a forgery").toBe(true);
+    // The signed intention still names the attempted locator. Its planted
+    // non-directory parent is unsafe, even though the final result reports
+    // that publication failed; that result must not hide a bad retained path.
+    const commitment = allEvents().find(row => row.event_type === "tool/spill-commitment")!;
+    expect(inspectSpilledEvent(dir, commitment).status).toBe("tampered");
+    expect(sweep.ok, "an unavailable result cannot excuse an unsafe commitment path").toBe(false);
+    expect(sweep.errors.join("; ")).toContain(commitment.id);
     expect(sweep.missing.join("; ")).toContain(event.id);
+
+    // Removing this test's obstruction leaves actual absence, which is a gap
+    // for both the failed publication's intention and its unavailable result.
+    unlinkSync(spillRoot(dir));
+    const absent = verifySpilledContent(dir, allEvents());
+    expect(absent.ok, absent.errors.join("; ")).toBe(true);
+    expect(absent.missing.join("; ")).toContain(commitment.id);
+    expect(absent.missing.join("; ")).toContain(event.id);
 
     // A tool call whose output could not be spilled is still a recorded,
     // verifiable outcome — the failure did not cost the event.

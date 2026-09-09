@@ -4,7 +4,8 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:f
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { BundleManifest, DiagnosticReport, EvidenceEvent } from "../types.js";
-import { exportSessionSpills, inventorySessionSpills, restoreSessionSpills } from "../session/spill/spillLifecycle.js";
+import { exportSessionSpills } from "../session/spill/spillLifecycle.js";
+import { restoreBundleSpills, trustTierByEventIdFromBundle } from "./bundleEvidence.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -583,7 +584,6 @@ function collectMonitorKeysFromBundle(root: string): string[] {
 
 function materializeBundleWorkspace(root: string): { workspace: string; spillGaps: string[] } {
   const workspace = mkTmp("amc-bundle-verify-");
-  const spillGaps: string[] = [];
   try {
     const amc = join(workspace, ".amc");
     const keysDir = join(amc, "keys");
@@ -615,26 +615,7 @@ function materializeBundleWorkspace(root: string): { workspace: string; spillGap
       }
     }
 
-    const spillSource = join(root, "evidence", "spill");
-    const spillDb = new Database(join(amc, "evidence.sqlite"), { readonly: true });
-    try {
-      const events = spillDb.prepare("SELECT * FROM evidence_events ORDER BY rowid ASC").all() as EvidenceEvent[];
-      if (pathExists(spillSource)) {
-        const restored = restoreSessionSpills({ workspace, events, source: spillSource });
-        const failed = restored.entries.filter((entry) => entry.status === "failed");
-        if (failed.length > 0) {
-          throw new Error(`Bundle spill restore refused: ${failed.map((entry) => entry.detail).join("; ")}`);
-        }
-        spillGaps.push(...restored.entries.filter((entry) => entry.status !== "restored")
-          .map((entry) => `${entry.locator ?? "unretrievable output"}: ${entry.status}: ${entry.detail ?? ""}`));
-      } else {
-        const inventory = inventorySessionSpills({ workspace, events });
-        if (!inventory.ok) throw new Error(`Bundle spill references invalid: ${inventory.errors.join("; ")}`);
-        spillGaps.push(...inventory.entries.map((entry) => `${entry.locator ?? "unretrievable output"}: historical bundle has no spill transport index`));
-      }
-    } finally {
-      spillDb.close();
-    }
+    const spillGaps = restoreBundleSpills(root, workspace);
 
     if (pathExists(join(root, "target.json"))) {
       writeFileAtomic(join(targetsDir, "bundle.target.json"), readFileSync(join(root, "target.json")));
@@ -644,44 +625,6 @@ function materializeBundleWorkspace(root: string): { workspace: string; spillGap
   } catch (error) {
     rmSync(workspace, { recursive: true, force: true });
     throw error;
-  }
-}
-
-function trustTierByEventIdFromBundle(root: string): Map<string, string> {
-  const db = new Database(join(root, "evidence", "evidence.sqlite"), { readonly: true });
-  try {
-    const rows = db.prepare("SELECT id, meta_json, event_type FROM evidence_events").all() as Array<{
-      id: string;
-      meta_json: string;
-      event_type: string;
-    }>;
-
-    const out = new Map<string, string>();
-    for (const row of rows) {
-      let trustTier = "OBSERVED";
-      try {
-        const parsed = JSON.parse(row.meta_json) as Record<string, unknown>;
-        if (
-          parsed.trustTier === "OBSERVED" ||
-          parsed.trustTier === "OBSERVED_HARDENED" ||
-          parsed.trustTier === "ATTESTED" ||
-          parsed.trustTier === "SELF_REPORTED"
-        ) {
-          trustTier = parsed.trustTier;
-        } else if (row.event_type === "review") {
-          trustTier = "SELF_REPORTED";
-        }
-      } catch {
-        if (row.event_type === "review") {
-          trustTier = "SELF_REPORTED";
-        }
-      }
-      out.set(row.id, trustTier);
-    }
-
-    return out;
-  } finally {
-    db.close();
   }
 }
 

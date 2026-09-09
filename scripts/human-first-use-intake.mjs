@@ -324,6 +324,57 @@ function publicMetadata(value) {
   return result;
 }
 
+/**
+ * Public projection contracts describe the validated blocks below. A rejected
+ * block is null; private narratives become presence flags, never public text.
+ *
+ * @typedef {{path: string, code: string, message: string, kind: 'invalid' | 'missing-evidence'}} IntakeIssue
+ * @typedef {{status: 'not-checked' | 'hash-matched' | 'invalid' | 'missing-evidence', sha256: string | null, bytes: number | null, error: IntakeIssue | null}} RecordingCheck
+ * @typedef {{id: string, humanPresent: boolean, independent: boolean, consentRecorded: boolean, firstUse: boolean, statementRecorded: boolean, recordedAt: string}} ProjectedObserver
+ * @typedef {{name: 'amc' | 'dsh' | 'pi', version: string, sourceCommit: string | null, artifactSha256: string | null}} ProjectedHarness
+ * @typedef {{machineClass: string, os: 'darwin' | 'linux' | 'win32', osVersion: string, arch: string, nodeVersion: string, installState: 'clean' | 'preinstalled' | 'unknown'}} ProjectedEnvironment
+ * @typedef {{id: string, version: string, taskId: string, taskVersion: string, taskSha256: string}} ProjectedProtocol
+ * @typedef {{kind: 'live-provider' | 'local-provider' | 'keyless-demo', used: boolean, provider: string | null, id: string | null, revision: string | null, settingsSha256: string | null, credentialState: 'configured' | 'not-required' | 'missing' | 'unknown'}} ProjectedModel
+ * @typedef {{at: string | null, resumedAt: string | null, resumeOutcome: 'succeeded' | 'failed' | 'not-attempted' | 'not-observed', reasonRecorded: boolean}} ProjectedInterruption
+ * @typedef {{outcome: 'returned' | 'did-not-return' | 'not-observed', at: string | null, reasonRecorded: boolean}} ProjectedSecondTask
+ *
+ * @typedef {Object} ProjectedMeasurements
+ * @property {string} startedAt
+ * @property {string} endedAt
+ * @property {'completed' | 'failed' | 'incomplete'} outcome
+ * @property {string | null} firstUsefulResultAt
+ * @property {number | null} actionsToFirstUsefulResult
+ * @property {boolean} noResultReasonRecorded
+ * @property {number | null} assistanceCount
+ * @property {Array<{at: string, code: string, detailRecorded: boolean}>} setupFailures
+ * @property {Array<{at: string, code: string, namedFix: boolean | null}>} refusals
+ * @property {ProjectedInterruption} interruption
+ * @property {ProjectedSecondTask} secondTask
+ *
+ * @typedef {Object} IntakeRecord
+ * @property {number} index
+ * @property {string | null} sessionId
+ * @property {string | null} participantId
+ * @property {'human-declared' | 'automated-fixture' | null} participation
+ * @property {'human-declared' | 'automated-fixture' | 'invalid' | 'missing-evidence'} status
+ * @property {IntakeIssue[]} errors
+ * @property {'completed' | 'failed' | 'incomplete' | null} declaredOutcome
+ * @property {ProjectedObserver | null} observer
+ * @property {ProjectedHarness | null} harness
+ * @property {ProjectedEnvironment | null} environment
+ * @property {ProjectedProtocol | null} protocol
+ * @property {ProjectedModel | null} model
+ * @property {ProjectedMeasurements | null} measurements
+ * @property {{path: string, sha256: string} | null} recording
+ * @property {RecordingCheck} recordingCheck
+ */
+
+/**
+ * @param {unknown} session
+ * @param {{index: number, errors: IntakeIssue[]}} entry
+ * @param {RecordingCheck} recordingCheck
+ * @returns {IntakeRecord}
+ */
 function projectRecord(session, entry, recordingCheck) {
   const path = `sessions[${entry.index}]`;
   const cleanBlock = key => !entry.errors.some(error => error.path === path || error.path === `${path}.${key}` || error.path.startsWith(`${path}.${key}.`) || error.path.startsWith(`${path}.${key}[`));
@@ -416,7 +467,11 @@ function aggregateHumanCohorts(records, studyErrors) {
     humanParticipationAuthenticated: false, ranking: null, superiorityClaim: null, cohorts };
 }
 
-/** Filesystem orchestration. A schema-valid failed session is not an invalid record. */
+/**
+ * Filesystem orchestration. A schema-valid failed session is not an invalid record.
+ * @param {unknown} study Untrusted input remains subject to runtime validation.
+ * @param {{evidenceRoot?: string, generatedAt?: string}} [options]
+ */
 export async function intakeStudy(study, { evidenceRoot, generatedAt = new Date().toISOString() } = {}) {
   if (typeof evidenceRoot !== "string" || !evidenceRoot.trim()) throw new IntakeError("evidence-root-required", "An explicit local evidence root is required.");
   const validated = validateStudy(study);
@@ -480,7 +535,11 @@ export function parseStudyJson(text) {
   return study;
 }
 
-/** Returns 0 for sufficient declared cohorts, 2 for insufficient/invalid intake, 1 for CLI/I/O failure. */
+/**
+ * Returns 0 for sufficient declared cohorts, 2 for insufficient/invalid intake, 1 for CLI/I/O failure.
+ * @param {string[]} [args]
+ * @param {{stdout: {write(text: string): unknown}, stderr: {write(text: string): unknown}}} [io]
+ */
 export async function runCli(args = process.argv.slice(2), io = process) {
   try {
     if (args.length === 1 && args[0] === "--help") { io.stdout.write(`${USAGE}\n`); return 0; }

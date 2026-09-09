@@ -9,7 +9,7 @@ study containing session records, checks their schema and local recording bytes,
 and writes a new JSON report. It does not run AMC, DSH, Pi, models, installers,
 automated personas, recording software, or an actual study. It does not upload
 anything. It is independent of `scripts/install-persona-qa.mjs` and the automated
-runner documented in [HARNESS_COMPARISON.md](HARNESS_COMPARISON.md).
+`amc bench harness-compare` runner listed in the [CLI command inventory](CLI_COMMAND_INVENTORY.md).
 
 ### Optional preregistered observer capture
 

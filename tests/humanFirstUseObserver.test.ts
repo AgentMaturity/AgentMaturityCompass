@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { EventEmitter } from "node:events";
@@ -210,7 +211,9 @@ describe("explicit resumable observations and unknowns", () => {
     const state = await loadCapture(store), view = sessionView(state, "amc-synthetic");
     expect(view.projection.status).toBe("closed"); expect(view.recovery).toBe("succeeded"); expect(view.secondTask).toBe("returned");
     expect(view.projection.measurements).toMatchObject({ actionsToFirstUsefulResult: 1, assistanceCount: 1, outcome: "completed" });
+    assert(view.projection.measurements !== null, "Closed guided synthetic session must retain measurements");
     expect(view.projection.measurements.setupFailures).toHaveLength(1);
+    assert(view.projection.measurements.refusals !== null, "Explicitly observed synthetic refusals must be present");
     expect(view.projection.measurements.refusals[0].namedFix).toBeNull();
     expect(view.projection.observer.humanPresent).toBe(false); expect(view.plan.participation).toBe("automated-fixture");
     const menus = s.captured.questions.filter(q => q.id === "observe.next");

@@ -243,7 +243,9 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   // The reference is built from the public source entries into this same staged
   // artifact, never copied from a possibly stale website/api directory.
   const apiOutput = resolve(resolvedOutput, "api");
-  execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/bin/typedoc"),
+  // Invoke the pinned renderer directly so the timeout owns it, rather than
+  // TypeDoc's bin launcher which forks another process.
+  execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/dist/cli.js"),
     "--options", resolve(repositoryRoot, "typedoc.json"), "--out", apiOutput,
     "--json", resolve(apiOutput, "reflection.json"), ...(revision ? ["--gitRevision", revision] : [])],
   { cwd: repositoryRoot, stdio: "inherit", timeout: 120_000 });

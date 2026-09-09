@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, existsSync, writeFileSync, readFileSync, realpathSync } from "node:fs";
+import { mkdtempSync, rmSync, existsSync, writeFileSync, readFileSync, realpathSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -95,13 +95,12 @@ describe.runIf(onDarwin)("the kernel actually refuses the write", () => {
   });
 
   it("resolves a symlinked workspace path before writing the profile", async () => {
-    // The single easiest way to ship a sandbox that does nothing. On darwin
-    // `mkdtemp` hands back `/var/folders/...`, `/var` is a link to
-    // `/private/var`, and Seatbelt matches the RESOLVED path -- so a profile
-    // naming the unresolved form matches nothing, silently, and the workspace
-    // is not writable even though the operator granted it.
-    const unresolved = mkdtempSync(join(tmpdir(), "amc-sbx-link-"));
-    dirs.push(realpathSync(unresolved));
+    // Make the alias explicit: a caller's TMPDIR may already be canonical.
+    // Seatbelt matches the resolved target even when policy names the alias.
+    const workspace = tempDir("amc-sbx-link-target-");
+    const aliases = tempDir("amc-sbx-aliases-");
+    const unresolved = join(aliases, "workspace");
+    symlinkSync(workspace, unresolved, "dir");
     expect(realpathSync(unresolved), "precondition: this path really is a link")
       .not.toBe(unresolved);
 

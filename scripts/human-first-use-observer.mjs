@@ -45,7 +45,17 @@ const json = value => JSON.stringify(value, null, 2);
 const safe = value => String(value).replace(/[\x00-\x08\x0b-\x1f\x7f-\x9f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g,
   character => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
-/** Created only for an explicit interactive invocation. No history or queued pasted approvals. */
+/**
+ * @typedef {Object} TerminalPromptDependencies
+ * @property {NodeJS.ReadableStream & { isTTY?: boolean }} [input]
+ * @property {NodeJS.WritableStream & { isTTY?: boolean }} [output]
+ * @property {{ on: (event: "SIGINT", listener: () => void) => unknown, removeListener: (event: "SIGINT", listener: () => void) => unknown }} [signals]
+ */
+
+/**
+ * Created only for an explicit interactive invocation. No history or queued pasted approvals.
+ * @param {TerminalPromptDependencies} [options]
+ */
 export function createTerminalPrompt({ input = process.stdin, output = process.stdout, signals = process } = {}) {
   const terminal = createInterface({ input, output, terminal: Boolean(input.isTTY && output.isTTY), historySize: 0 });
   let pending = null, stopped = null;

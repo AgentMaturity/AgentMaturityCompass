@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { link, lstat, mkdir, mkdtemp, readFile, rm, stat, symlink, writeFile } from "node:fs/promises";
@@ -20,6 +21,8 @@ let root: string;
 let evidenceRoot: string;
 
 function sessionFixture(id = "amc-01", harness = "amc") {
+  // Protocol values remain mutable input so mismatched versions reach validation.
+  const protocol: { -readonly [Field in keyof typeof COMMON_PROTOCOL]: string } = { ...COMMON_PROTOCOL };
   return {
     sessionId: id, participation: "human-declared", participantId: `p-${id}`,
     observer: { id: "o-fixture", humanPresent: true, independent: true, consentRecorded: true, firstUse: true,
@@ -28,7 +31,7 @@ function sessionFixture(id = "amc-01", harness = "amc") {
       artifactSha256: hash(`synthetic artifact ${harness}`) as string | null },
     environment: { machineClass: "synthetic-arm-laptop", os: "darwin", osVersion: "synthetic-os-version",
       arch: "arm64", nodeVersion: "22.0.0", installState: "clean" },
-    protocol: { ...COMMON_PROTOCOL },
+    protocol,
     model: { kind: "local-provider", used: true, provider: "synthetic-provider" as string | null,
       id: "synthetic-model" as string | null, revision: "synthetic-model-revision" as string | null,
       settingsSha256: hash("synthetic settings") as string | null, credentialState: "not-required" },
@@ -111,7 +114,9 @@ describe("independent human first-use intake: synthetic contract fixtures", () =
     expect(result.intakeStatus).toBe("valid-records");
     expect(result.records[0].status).toBe("human-declared");
     expect(result.records[0].recordingCheck).toMatchObject({ status: "hash-matched", sha256: session.recording.sha256 });
-    expect(result.records[0].observer.statementRecorded).toBe(true);
+    const observer = result.records[0].observer;
+    assert.ok(observer, "A valid declaration must preserve the public observer block");
+    expect(observer.statementRecorded).toBe(true);
     expect(result.comparative).toMatchObject({ status: "insufficient-evidence", minimumPerHarness: 5,
       humanParticipationAuthenticated: false, ranking: null, superiorityClaim: null });
     expect(result.comparative.cohorts[0].summaries).toBeNull();
@@ -280,7 +285,9 @@ describe("independent human first-use intake: synthetic contract fixtures", () =
     expect(result.comparative.status).toBe("matched-declared-cohorts");
     expect(result.comparative.ranking).toBeNull();
     expect(result.comparative.superiorityClaim).toBeNull();
-    const amc = result.comparative.cohorts[0].summaries.amc;
+    const summaries = result.comparative.cohorts[0].summaries;
+    assert.ok(summaries, "Matched declared cohorts must include descriptive summaries");
+    const amc = summaries.amc;
     expect(amc.humanDeclaredSessions).toBe(MIN_HUMAN_SESSIONS_PER_HARNESS);
     expect(amc.outcomes).toEqual({ completed: 4, failed: 1, incomplete: 0 });
     expect(amc.usefulResultOnly.withoutUsefulResult).toBe(1);
@@ -296,7 +303,9 @@ describe("independent human first-use intake: synthetic contract fixtures", () =
     const study = await cohort(); study.sessions.forEach(session => noUsefulResult(session));
     const result = await intakeStudy(study, { evidenceRoot });
     expect(result.comparative.status).toBe("matched-declared-cohorts");
-    const summary = result.comparative.cohorts[0].summaries.amc;
+    const summaries = result.comparative.cohorts[0].summaries;
+    assert.ok(summaries, "All-failed matched cohorts must retain descriptive summaries");
+    const summary = summaries.amc;
     expect(summary.outcomes.failed).toBe(5);
     expect(summary.usefulResultOnly.actions).toEqual({ observedSamples: 0, values: [], median: null });
     expect(summary.usefulResultOnly.elapsedMs.median).toBeNull();
@@ -339,8 +348,10 @@ describe("independent human first-use intake: synthetic contract fixtures", () =
     const study = await cohort();
     study.sessions.push(noUsefulResult(sessionFixture("amc-missing")));
     const result = await intakeStudy(study, { evidenceRoot });
-    expect(result.records.at(-1).declaredOutcome).toBe("failed");
-    expect(result.records.at(-1).status).toBe("missing-evidence");
+    const appended = result.records.at(-1);
+    assert.ok(appended, "The added record must remain represented in the report");
+    expect(appended.declaredOutcome).toBe("failed");
+    expect(appended.status).toBe("missing-evidence");
     expect(result.comparative.status).toBe("insufficient-evidence");
     expect(result.comparative.cohorts[0].summaries).toBeNull();
   });

@@ -41,6 +41,9 @@ describe("native first-use local inspection", () => {
   function ownedStore(raw = `OPENAI_API_KEY: ${SECRET}\n`, mode = 0o600, dirMode = 0o700) {
     fs.mkdirSync(home, { mode: dirMode });
     fs.writeFileSync(join(home, ".credentials.yaml"), raw, { mode });
+    // Host umask must not turn an intentionally unsafe fixture into a safe store.
+    fs.chmodSync(home, dirMode);
+    fs.chmodSync(join(home, ".credentials.yaml"), mode);
   }
   async function inspect(extra: Partial<NativeFirstUseOptions> = {}) {
     const before = snapshot(root);
@@ -169,6 +172,7 @@ describe("native first-use local inspection", () => {
   });
   it.skipIf(process.platform === "win32")("blocks an insecure empty credentials directory", async () => {
     workspaceMarker(); fs.mkdirSync(home, { mode: 0o755 });
+    fs.chmodSync(home, 0o755);
     const result = await inspect();
     expect(result.code).toBe("AMC_CREDENTIAL_FILE_PERMISSIONS");
     expect(result.nextAction?.argv).toEqual(["chmod", "700", home]);

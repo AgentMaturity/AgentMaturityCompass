@@ -12,7 +12,7 @@ import { initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { getApprovalInboxItem } from "../src/approvals/approvalInbox.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { initUsersConfig, createSession } from "../src/auth/authApi.js";
-import { scaffoldAgent, loadAgentConfig } from "../src/fleet/registry.js";
+import { buildAgentConfig, initFleet, scaffoldAgent } from "../src/fleet/registry.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { issueLeaseToken } from "../src/leases/leaseSigner.js";
@@ -51,7 +51,17 @@ async function fixture() {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-agent-credential-binding-")));
   roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: A, trustBoundaryMode: "isolated" });
-  scaffoldAgent(workspace, { ...loadAgentConfig(workspace, A), id: B, agentName: "Credential binding fixture B" });
+  // Workspace initialization does not create fleet agent configurations.
+  // Both identities use native signed configs; this fixture never invokes a provider.
+  initFleet(workspace, { orgName: "Credential binding fixture" });
+  for (const agentId of [A, B]) {
+    scaffoldAgent(workspace, buildAgentConfig({
+      agentId, agentName: `Credential binding fixture ${agentId}`, role: "fixture",
+      domain: "credential authorization", primaryTasks: ["local governed file operations"],
+      stakeholders: ["fixture-owner"], riskTier: "med", templateId: "openai",
+      baseUrl: "http://127.0.0.1:1", routePrefix: "/fixture", auth: { type: "none" }
+    }));
+  }
   // The signed default budget also covers B through budgetForAgent's fallback.
   initBudgets(workspace, A);
   initToolsConfig(workspace); initApprovalPolicy(workspace);
@@ -80,8 +90,8 @@ function lease(f: Fixture, agentId: string, scopes: LeaseScope[] = ALL_SCOPES) {
     ttlMs: 60_000, scopes, routeAllowlist: ["/"], modelAllowlist: ["*"],
     maxRequestsPerMinute: 1000, maxTokensPerMinute: 1_000_000, maxCostUsdPerDay: null });
 }
-function credentials(f: Fixture, agentId: string, token: string): Record<string, string> {
-  return { "x-amc-agent-token": f.tokens[agentId]!, "x-amc-lease": token };
+function credentials(f: Fixture, agentId: keyof Fixture["tokens"], token: string): Record<string, string> {
+  return { "x-amc-agent-token": f.tokens[agentId], "x-amc-lease": token };
 }
 interface Response { status: number; body: string }
 function request(f: Fixture, path: string, method: "GET" | "POST", headers: Record<string, string> = {}, body?: unknown,

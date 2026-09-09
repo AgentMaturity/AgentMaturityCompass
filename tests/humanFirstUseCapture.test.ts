@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { link, lstat, mkdir, mkdtemp, open, readFile, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
@@ -138,6 +139,7 @@ describe("pure preregistration and explicit observer transitions", () => {
     const result = projectSession(planFixture(), events, stamp(0));
     expect(result.status).toBe("closed");
     expect(result.measurements).toMatchObject({ outcome: "completed", actionsToFirstUsefulResult: 2, firstUsefulResultAt: stamp(4), assistanceCount: 1, endedAt: stamp(8) });
+    assert(result.measurements !== null, "Closed synthetic session must retain measurements");
     expect(result.measurements.refusals).toEqual([{ at: stamp(2), code: "synthetic-refusal", namedFix: null }]);
     expect(result.measurements.interruption).toMatchObject({ resumeOutcome: "succeeded", resumedAt: stamp(6) });
     expect(result.measurements.secondTask).toMatchObject({ outcome: "returned", at: stamp(7) });
@@ -148,6 +150,8 @@ describe("pure preregistration and explicit observer transitions", () => {
     const result = projectSession(planFixture(), sessionEvents("amc-01", outcome), stamp(0));
     expect(result.status).toBe("closed");
     expect(result.measurements).toMatchObject({ outcome, firstUsefulResultAt: null, actionsToFirstUsefulResult: null });
+    assert(result.measurements !== null, "Closed synthetic attempt must retain measurements");
+    assert(result.measurements.interruption !== null, "Synthetic recovery disposition must be present");
     expect(result.model.used).toBe(false); expect(result.measurements.interruption.resumeOutcome).toBe("succeeded");
   });
 
@@ -167,6 +171,7 @@ describe("pure preregistration and explicit observer transitions", () => {
       event("second-task", 7, { outcome: "not-observed", reason: "Synthetic observation gap, not a refusal to return" }));
     const result = projectSession(planFixture(), events, stamp(0));
     expect(result.status).toBe("closed");
+    assert(result.measurements !== null, "Closed synthetic session must retain explicit unknown dispositions");
     expect(result.measurements.interruption).toMatchObject({ at: null, resumedAt: null, resumeOutcome: "not-observed" });
     expect(result.measurements.secondTask).toMatchObject({ at: null, outcome: "not-observed" });
   });

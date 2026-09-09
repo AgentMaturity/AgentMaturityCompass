@@ -673,7 +673,11 @@ function argumentsFor(args) {
   return { command, flags };
 }
 
-/** Import-safe command boundary. Persistence clocks never fill undeclared observation fields. */
+/**
+ * Import-safe command boundary. Persistence clocks never fill undeclared observation fields.
+ * @param {string[]} [args]
+ * @param {{ stdout: { write: (text: string) => unknown }, stderr: { write: (text: string) => unknown } }} [io]
+ */
 export async function runCli(args = process.argv.slice(2), io = process) {
   try {
     if ((args.length === 1 && args[0] === "--help") || (args.length === 2 && args[1] === "--help")) {
