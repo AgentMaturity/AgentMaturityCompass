@@ -91,7 +91,15 @@ test.each(["sqlite", "jsonl"] as const)("reattached %s native controller retains
   expect(f.history(id).events).toEqual(original);
   const checkBytes = readFileSync(f.operator.checks);
   writeFileSync(f.operator.checks, Buffer.concat([checkBytes, Buffer.from("\n")]));
-  try { expect((await f.control(first.taskId, "resume", 1)).status).toBe(409); expect(f.history(id).events).toEqual(original); }
+  try {
+    // The existing managed-control API returns the failed task view for an
+    // asynchronous preparation refusal; HTTP 200 is not a successful resume.
+    const refused = await f.control(first.taskId, "resume", 1);
+    expect(refused.status).toBe(200);
+    expect(refused.body.data).toMatchObject({ state: "failed", sessionId: id, revision: 1 });
+    expect(refused.body.data.error).toContain("Native resume was refused");
+    expect(f.history(id).events).toEqual(original); expect(budgets(f)).toEqual(oldBudgets);
+  }
   finally { writeFileSync(f.operator.checks, checkBytes); }
   expect((await f.control(first.taskId, "resume", 1)).body.data).toMatchObject({ state: "idle", sessionId: id, revision: 1 });
   expect(headers(f, id)).toHaveLength(beforeHeaders); expect(budgets(f)).toEqual(oldBudgets);
