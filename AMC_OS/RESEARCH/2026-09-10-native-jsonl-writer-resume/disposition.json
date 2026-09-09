@@ -1,0 +1,113 @@
+{
+  "taskId": "native-jsonl-writer-resume-batch",
+  "state": "bounded-implemented-scoped-qualified",
+  "runtimeSource": "b516869eeaa275fe31248024a02596d71255add0",
+  "implementationCommit": "96accade0821eaf730d30218dfc5851b667f98f0",
+  "branch": "amc/gap-register-execution",
+  "executorReviewer": "cos-native-jsonl-writer-resume-prime",
+  "workers": [],
+  "newSourceScope": {
+    "passed": 23,
+    "total": 23,
+    "environment": {
+      "system": "Darwin",
+      "release": "25.6.0",
+      "machine": "arm64",
+      "node": "v25.5.0",
+      "pnpm": "10.33.0",
+      "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
+      "browserVersion": "Google Chrome for Testing 147.0.7727.15"
+    },
+    "receipt": "tmp/cos-native-jsonl-writer-resume-01/candidate02/receipts/receipt.json"
+  },
+  "changedSecurityScope": {
+    "detected": 4,
+    "total": 4,
+    "restoredCorePassed": 20,
+    "restoredCoreTotal": 20,
+    "receipt": "tmp/cos-native-jsonl-writer-resume-01/shipping01/receipts/receipt.json",
+    "duplicateScenarioWarning": "The 20 core positives repeat the core portion of the new 23-test scope after exact mutation restoration; not 43 unique scenarios."
+  },
+  "installedScope": {
+    "qualified": true,
+    "publicExportsOnly": true,
+    "surfaces": [
+      "native SDK",
+      "actual packaged ACP CLI",
+      "admin-authenticated HTTP"
+    ],
+    "artifact": {
+      "path": "/Users/sid/AgentMaturityCompass/tmp/cos-native-jsonl-writer-resume-01/shipping03/artifact/agent-maturity-compass-1.2.0.tgz",
+      "sha256": "28990ad17b8b7f1b8d0fc6c6f5e47795ceb4dde8a5308be740b17a4186249ec8",
+      "bytes": 6023292,
+      "packMode": "--ignore-scripts; prepack/release deliberately not run"
+    },
+    "consumerLockSha256": "5db579b954a41240845fc5e7ecdd6532998cb4ba7e4e186877d04ab2c7265af2",
+    "receipt": "tmp/cos-native-jsonl-writer-resume-01/shipping03/receipts/receipt.json",
+    "browserInstalled": false,
+    "toolApprovalScenariosInstalled": false
+  },
+  "browserScope": {
+    "qualified": true,
+    "boundary": "fresh built source, real Chromium 147.0.7727.15, automated fixture identity and local stub",
+    "receipt": "tmp/cos-native-jsonl-writer-resume-01/candidate02/public-fixtures/public-task-jsonl-success-LUdHq4/new-browser-resume-receipt.json"
+  },
+  "retainedFailedAttempts": [
+    "candidate01: built, 19/23 initial tests; corrected real Studio bug, two fixture errors and explicit browser selection",
+    "shipping01: unsupported pnpm pack option; independent mutations passed",
+    "shipping02: artifact created, offline dependency cache incomplete"
+  ],
+  "allObservedProcessesClosed": true,
+  "closureReceipt": "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/process-closure.json",
+  "linear": {
+    "issue": "AMC-1511",
+    "parent": "AMC-1505",
+    "existingCoverageRead": true,
+    "newIssueCreated": false,
+    "issueStateChanged": false,
+    "deliveredComments": [
+      {
+        "id": "aadf417f-baba-44e4-94da-b05d0ee4c0c5",
+        "scope": "initial implementation ownership"
+      },
+      {
+        "id": "dc09e443-ea36-4f54-8dbe-d9f29006b14d",
+        "scope": "initial committed candidate and then-running validation"
+      },
+      {
+        "id": "07dba626-264f-4a7c-9739-14868149fd42",
+        "scope": "final scoped source/mutation/installed results and closure"
+      }
+    ],
+    "pendingNewBatchBody": null,
+    "oldPendingBodies": "Preserved unchanged at paths in TRACKER_PENDING.md; no uncertain AMC-1547 repost or old body replay."
+  },
+  "vaultNote": "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md",
+  "centralStatusUpdated": false,
+  "centralStatusReason": "Both later central update proposals blocked by normal review. Old central timestamp is not current; exact bodies retained in REVIEW_BLOCKERS.md and not replayed.",
+  "scopeLimits": [
+    "Local filesystem/current writer protocol only",
+    "Controller-dependent unsafe recovery remains explicitly refused",
+    "No automatic side-effect or prompt replay",
+    "Independent whole-store rollback evidence still required",
+    "Retained-output decryption separate"
+  ],
+  "openGates": [
+    "AMC-1512",
+    "AMC-1518",
+    "AMC-1530",
+    "Phase A/B/C full program",
+    "measured10x",
+    "real provider/human evidence",
+    "full-suite",
+    "prepack/release",
+    "platform matrix",
+    "production secrets/key rotation",
+    "publication/deployment explicit approval"
+  ],
+  "aggregatePriorRetainedOutputInstalledQualification": false,
+  "published": false,
+  "deployed": false,
+  "nextAction": "Read NEXT_ACTION.md; monitor selects next existing bounded implementation gap only after this turn ends. Do not rerun audits/old historical lanes or replay denied operations."
+}

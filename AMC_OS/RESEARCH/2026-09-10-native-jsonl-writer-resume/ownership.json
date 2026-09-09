@@ -1,0 +1,22 @@
+{
+  "taskId": "native-jsonl-writer-resume-batch",
+  "owner": "cos-native-jsonl-writer-resume-prime",
+  "state": "completed-scoped-qualified-ownership-released",
+  "updatedAt": "2026-09-09T20:22:13.268628+00:00",
+  "timeoutReviewAt": "2026-09-09T20:47:13.268628+00:00",
+  "sourceCandidate": "b516869eeaa275fe31248024a02596d71255add0",
+  "activeOwnedExecution": null,
+  "ownedProcessGroups": [],
+  "workers": [],
+  "runtimeOwnershipReleased": true,
+  "ownershipReleased": true,
+  "remainingOperation": null,
+  "nextAction": "Normal final after saving this exact-path handoff and confirming its runtime tree. The monitor selects the next bounded batch only after this turn ends; no automatic continuation.",
+  "instructionNeeded": false,
+  "receiptPaths": [
+    "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/NEXT_ACTION.md",
+    "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/disposition.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/process-closure.json"
+  ],
+  "centralStatus": "Old central record is stale; later proposals were denied and are not replayed."
+}

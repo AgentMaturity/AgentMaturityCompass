@@ -1,0 +1,23 @@
+{
+  "issue": "AMC-1511",
+  "parent": "AMC-1505",
+  "existingCoverageRead": true,
+  "newIssueCreated": false,
+  "issueStateChanged": false,
+  "deliveredComments": [
+    {
+      "id": "aadf417f-baba-44e4-94da-b05d0ee4c0c5",
+      "scope": "initial implementation ownership"
+    },
+    {
+      "id": "dc09e443-ea36-4f54-8dbe-d9f29006b14d",
+      "scope": "initial committed candidate and then-running validation"
+    },
+    {
+      "id": "07dba626-264f-4a7c-9739-14868149fd42",
+      "scope": "final scoped source/mutation/installed results and closure"
+    }
+  ],
+  "pendingNewBatchBody": null,
+  "oldPendingBodies": "Preserved unchanged at paths in TRACKER_PENDING.md; no uncertain AMC-1547 repost or old body replay."
+}

@@ -1,0 +1,68 @@
+{
+  "taskId": "native-jsonl-writer-resume-batch",
+  "reviewer": "cos-native-jsonl-writer-resume-prime",
+  "reviewBoundary": "CoS serial source review plus actual candidate01 failure review, final candidate02 scoped source execution, four changed-guard negatives and newly installed public export boundary",
+  "candidateCommit": "b516869eeaa275fe31248024a02596d71255add0",
+  "sourceInspected": [
+    "src/persistence/jsonl/jsonlWriterLock.ts",
+    "src/persistence/jsonl/jsonlEventLog.ts",
+    "src/persistence/jsonl/jsonlSessionEventStore.ts",
+    "src/persistence/sessionEventStore.ts",
+    "src/session/jsonlContinuation.ts",
+    "src/session/sessionResume.ts",
+    "src/session/sessionRecovery.ts",
+    "src/session/sessionOwnership.ts",
+    "src/session/sessionService.ts",
+    "src/session/sessionSpine.ts",
+    "src/session/sessionHistoryReader.ts",
+    "src/session/sessionEventHistory.ts",
+    "src/budgets/nativeBudgetUsage.ts",
+    "src/budgets/nativeBudgetAdmission.ts",
+    "src/acp/acpNativeSession.ts",
+    "src/acp/acpStdioMain.ts",
+    "src/sdk/nativeAgentClient.ts",
+    "src/studio/nativeTaskService.ts",
+    "src/studio/nativeTaskTypes.ts",
+    "src/studio/nativeTaskOpenapi.ts",
+    "src/console/assets/nativeTasks.js",
+    "src/console/assets/nativeTasksView.js"
+  ],
+  "findingsFixedDuringSourceReview": [
+    "Non-atomic stale PID-file overwrite replaced with a process-lifetime exclusive kernel mutex plus strict advisory identity; unreadable/foreign/live owners refuse.",
+    "Generic JSONL store reopen must verify the generic persistence contract, not require native session/open fields from every generic producer. Native continuation still requires the full strict native history and identity callback under the mutex.",
+    "Unterminated and externally replaced append targets cannot silently glue, truncate or rewrite original rows; short/uncertain writes poison the append handle.",
+    "Synthetic UNKNOWN outcomes need a separate seen-result set so UNKNOWN does not count as settled, but duplicate results still refuse.",
+    "An in-process handle drop is not process death; the old JSONL refusal regression now asserts the actual live-owner boundary rather than unsupported functionality.",
+    "Cancellation fixture must use the real endTurn cause parameter, not an ignored cancelCause input.",
+    "Original budget journal and pending dispatch reservations are required; new fixtures initialize real isolated signed budgets and retain an empty-journal negative without erasing older evidence.",
+    "Studio advisory recovery shape is declared in OpenAPI and browser validation. No stale-observation bypass or automatic prompt replay was added."
+  ],
+  "executionStatus": "Final fresh source 23/23; four changed guards detected; exact source restored and 20/20 core positives; new installed SDK/packaged ACP/admin HTTP passed. All owned process closure checks passed.",
+  "firstRunCorrections": [
+    "Real Studio cleanup bug: a failed signed handover after actual child death was conflated with failed process cleanup, preventing managed restart. Track successful awaited child closure separately, keep failed task state/error, and fail shutdown only for unconfirmed process cleanup.",
+    "New test accidentally called nonexistent createAMCNativeClient; use the supported AMCNativeClient.start entry point.",
+    "Accounting refusal correctly preserved the original dead-owner advisory record; test must assert identical abandoned lock bytes rather than its deletion.",
+    "Fresh Playwright expected an uninstalled default browser. Pin the existing Chromium executable explicitly and record its own version/hash; do not claim a browser run occurred in candidate01."
+  ],
+  "qualification": true,
+  "nextAction": "Handoff only; no further runtime changes or automatic continuation. Full program gates remain open.",
+  "scopeLimits": [
+    "Local filesystem, current writer protocol; no distributed takeover or mixed old live writers",
+    "Explicit new turn after recovery; no unattended side-effect replay",
+    "Controller-dependent or incompatible states refuse rather than lose their original controls",
+    "Independent checkpoint evidence required for whole-snapshot rollback claims",
+    "No power-loss, platform-breadth, human/provider, full-suite, prepack/release, publication or deployment qualification"
+  ],
+  "qualificationScope": "Only scopes explicitly recorded in disposition.json and NEXT_ACTION.md",
+  "validationReceipts": [
+    "tmp/cos-native-jsonl-writer-resume-01/candidate02/receipts/receipt.json",
+    "tmp/cos-native-jsonl-writer-resume-01/shipping01/receipts/receipt.json",
+    "tmp/cos-native-jsonl-writer-resume-01/shipping03/receipts/receipt.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/process-closure.json"
+  ],
+  "helperReview": {
+    "run.py": "Create-only fresh pinned source, recorded versions and process groups; no denied dirty-root replay.",
+    "qualify.py": "Installed payload hashes checked against fresh build; exact source restored after isolated negative guards; no broad suite or old consumer.",
+    "installed-case.mjs": "Only public root/native SDK imports; actual packaged ACP CLI, real local HTTP and authenticated fixture-owner PID death; no source-private import."
+  }
+}

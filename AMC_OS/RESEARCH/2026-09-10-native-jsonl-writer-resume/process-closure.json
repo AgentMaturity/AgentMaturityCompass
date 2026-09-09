@@ -1,0 +1,337 @@
+{
+  "taskId": "native-jsonl-writer-resume-batch",
+  "sourceCommit": "b516869eeaa275fe31248024a02596d71255add0",
+  "checkedAt": "2026-09-09T20:18:39.371661+00:00",
+  "processGroups": [
+    {
+      "pgid": 84759,
+      "closed": true
+    },
+    {
+      "pgid": 84779,
+      "closed": true
+    },
+    {
+      "pgid": 84780,
+      "closed": true
+    },
+    {
+      "pgid": 84781,
+      "closed": true
+    },
+    {
+      "pgid": 84782,
+      "closed": true
+    },
+    {
+      "pgid": 84789,
+      "closed": true
+    },
+    {
+      "pgid": 84812,
+      "closed": true
+    },
+    {
+      "pgid": 84831,
+      "closed": true
+    },
+    {
+      "pgid": 84967,
+      "closed": true
+    },
+    {
+      "pgid": 85436,
+      "closed": true
+    },
+    {
+      "pgid": 85450,
+      "closed": true
+    },
+    {
+      "pgid": 85453,
+      "closed": true
+    },
+    {
+      "pgid": 85454,
+      "closed": true
+    },
+    {
+      "pgid": 85455,
+      "closed": true
+    },
+    {
+      "pgid": 85464,
+      "closed": true
+    },
+    {
+      "pgid": 85465,
+      "closed": true
+    },
+    {
+      "pgid": 85485,
+      "closed": true
+    },
+    {
+      "pgid": 85499,
+      "closed": true
+    },
+    {
+      "pgid": 85647,
+      "closed": true
+    },
+    {
+      "pgid": 86385,
+      "closed": true
+    },
+    {
+      "pgid": 86386,
+      "closed": true
+    },
+    {
+      "pgid": 86387,
+      "closed": true
+    },
+    {
+      "pgid": 86388,
+      "closed": true
+    },
+    {
+      "pgid": 86401,
+      "closed": true
+    },
+    {
+      "pgid": 86406,
+      "closed": true
+    },
+    {
+      "pgid": 86413,
+      "closed": true
+    },
+    {
+      "pgid": 86419,
+      "closed": true
+    },
+    {
+      "pgid": 86420,
+      "closed": true
+    },
+    {
+      "pgid": 86474,
+      "closed": true
+    },
+    {
+      "pgid": 86475,
+      "closed": true
+    },
+    {
+      "pgid": 86476,
+      "closed": true
+    },
+    {
+      "pgid": 86480,
+      "closed": true
+    },
+    {
+      "pgid": 86489,
+      "closed": true
+    },
+    {
+      "pgid": 86518,
+      "closed": true
+    },
+    {
+      "pgid": 86519,
+      "closed": true
+    },
+    {
+      "pgid": 86520,
+      "closed": true
+    },
+    {
+      "pgid": 86524,
+      "closed": true
+    },
+    {
+      "pgid": 86559,
+      "closed": true
+    },
+    {
+      "pgid": 86560,
+      "closed": true
+    },
+    {
+      "pgid": 86576,
+      "closed": true
+    }
+  ],
+  "signedFixtureOwnerPids": [
+    {
+      "pid": 84969,
+      "closed": true
+    },
+    {
+      "pid": 84983,
+      "closed": true
+    },
+    {
+      "pid": 85001,
+      "closed": true
+    },
+    {
+      "pid": 85008,
+      "closed": true
+    },
+    {
+      "pid": 85009,
+      "closed": true
+    },
+    {
+      "pid": 85069,
+      "closed": true
+    },
+    {
+      "pid": 85650,
+      "closed": true
+    },
+    {
+      "pid": 85652,
+      "closed": true
+    },
+    {
+      "pid": 85663,
+      "closed": true
+    },
+    {
+      "pid": 85670,
+      "closed": true
+    },
+    {
+      "pid": 85680,
+      "closed": true
+    },
+    {
+      "pid": 85719,
+      "closed": true
+    },
+    {
+      "pid": 85743,
+      "closed": true
+    },
+    {
+      "pid": 85775,
+      "closed": true
+    },
+    {
+      "pid": 85782,
+      "closed": true
+    },
+    {
+      "pid": 85806,
+      "closed": true
+    },
+    {
+      "pid": 85809,
+      "closed": true
+    },
+    {
+      "pid": 86403,
+      "closed": true
+    },
+    {
+      "pid": 86408,
+      "closed": true
+    },
+    {
+      "pid": 86410,
+      "closed": true
+    },
+    {
+      "pid": 86415,
+      "closed": true
+    },
+    {
+      "pid": 86422,
+      "closed": true
+    },
+    {
+      "pid": 86426,
+      "closed": true
+    },
+    {
+      "pid": 86428,
+      "closed": true
+    },
+    {
+      "pid": 86429,
+      "closed": true
+    },
+    {
+      "pid": 86431,
+      "closed": true
+    },
+    {
+      "pid": 86562,
+      "closed": true
+    },
+    {
+      "pid": 86568,
+      "closed": true
+    },
+    {
+      "pid": 86572,
+      "closed": true
+    },
+    {
+      "pid": 86573,
+      "closed": true
+    },
+    {
+      "pid": 86574,
+      "closed": true
+    }
+  ],
+  "ports": [
+    {
+      "host": "127.0.0.1",
+      "port": 60038,
+      "notListening": true
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 60058,
+      "notListening": true
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 60248,
+      "notListening": true
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 60253,
+      "notListening": true
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 60284,
+      "notListening": true
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 60953,
+      "notListening": true
+    }
+  ],
+  "browserReceipts": [
+    {
+      "path": "tmp/cos-native-jsonl-writer-resume-01/candidate02/public-fixtures/public-task-jsonl-success-LUdHq4/new-browser-resume-receipt.json",
+      "browserClosed": true,
+      "scenarioPassed": true
+    }
+  ],
+  "scope": "Only actual command groups and new isolated fixture owners/ports from this batch; no unrelated process scan or termination.",
+  "allObservedProcessesClosed": true,
+  "workers": [],
+  "activeOwnedExecution": null,
+  "closureActions": "All processes had already exited or were awaited/closed by their owning runner. This check terminated no process."
+}
