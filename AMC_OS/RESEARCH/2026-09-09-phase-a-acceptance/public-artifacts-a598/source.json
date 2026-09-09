@@ -1,0 +1,170 @@
+{
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "clone": "/private/tmp/amc-a5987643-package-01/checkout",
+  "output": "/private/tmp/amc-a5987643-public-artifacts-01",
+  "commands": [
+    {
+      "label": "publisher",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/update-native-task-openapi.mjs",
+        "--check"
+      ],
+      "startedAt": "2026-09-09T12:03:05.228929+00:00",
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          32170,
+          501,
+          "Wed Sep 9 17:33:05 2026"
+        ],
+        "rootReaped": true,
+        "observations": 8,
+        "ownedProcesses": [
+          {
+            "pid": 32170,
+            "ppid": 32165,
+            "pgid": 32170,
+            "uid": 501,
+            "started": "Wed Sep 9 17:33:05 2026",
+            "firstObservedAt": "2026-09-09T12:03:05.246787+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          32170
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.7616866669995943,
+      "endedAt": "2026-09-09T12:03:05.990613+00:00"
+    },
+    {
+      "label": "counts",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/gen-counts.mjs",
+        "--check"
+      ],
+      "startedAt": "2026-09-09T12:03:06.061547+00:00",
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          32184,
+          501,
+          "Wed Sep 9 17:33:06 2026"
+        ],
+        "rootReaped": true,
+        "observations": 8,
+        "ownedProcesses": [
+          {
+            "pid": 32184,
+            "ppid": 32165,
+            "pgid": 32184,
+            "uid": 501,
+            "started": "Wed Sep 9 17:33:06 2026",
+            "firstObservedAt": "2026-09-09T12:03:06.079459+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          32184
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.75126283300051,
+      "endedAt": "2026-09-09T12:03:06.812817+00:00"
+    },
+    {
+      "label": "pages",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/build-pages-site.mjs",
+        "--out",
+        "/private/tmp/amc-a5987643-public-artifacts-01/pages"
+      ],
+      "startedAt": "2026-09-09T12:03:06.882821+00:00",
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          32214,
+          501,
+          "Wed Sep 9 17:33:06 2026"
+        ],
+        "rootReaped": true,
+        "observations": 151,
+        "ownedProcesses": [
+          {
+            "pid": 32214,
+            "ppid": 32165,
+            "pgid": 32214,
+            "uid": 501,
+            "started": "Wed Sep 9 17:33:06 2026",
+            "firstObservedAt": "2026-09-09T12:03:06.900593+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 32217,
+            "ppid": 32214,
+            "pgid": 32214,
+            "uid": 501,
+            "started": "Wed Sep 9 17:33:07 2026",
+            "firstObservedAt": "2026-09-09T12:03:07.117632+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          32214
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 32.835858667007415,
+      "endedAt": "2026-09-09T12:03:39.719005+00:00"
+    }
+  ],
+  "status": "generation-and-consistency-passed-inspection-pending",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0",
+    "pnpm": "10.33.0"
+  },
+  "helperSha256": "890f4949157114cde889b3518c63d758c585a3896d852c9f6c469c4ae51025a0",
+  "supervisorSha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d",
+  "preparationReceipt": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/installed-candidate-a598/source.json",
+  "preparationReceiptSha256": "8a9f100998949288f5c7e5a81aa4f34a08e2b1c4e8a935f74b050f60dd48fefd",
+  "startedAt": "2026-09-09T12:03:05.153147+00:00",
+  "sourceCleanBefore": true,
+  "active": null,
+  "sourceCleanAfter": true,
+  "endedAt": "2026-09-09T12:03:39.777318+00:00",
+  "allObservedCommandProcessesClosed": true
+}

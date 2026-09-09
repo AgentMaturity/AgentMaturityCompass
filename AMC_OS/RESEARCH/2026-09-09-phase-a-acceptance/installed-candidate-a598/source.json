@@ -1,0 +1,509 @@
+{
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "clone": "/private/tmp/amc-a5987643-package-01/checkout",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0",
+    "pnpm": "10.33.0"
+  },
+  "commands": [
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--quiet",
+        "--no-local",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/sid/AgentMaturityCompass",
+        "/private/tmp/amc-a5987643-package-01/checkout"
+      ],
+      "startedAt": "2026-09-09T11:51:51.498006+00:00",
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          29803,
+          501,
+          "Wed Sep 9 17:21:51 2026"
+        ],
+        "rootReaped": true,
+        "observations": 18,
+        "ownedProcesses": [
+          {
+            "pid": 29803,
+            "ppid": 29794,
+            "pgid": 29803,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:51 2026",
+            "firstObservedAt": "2026-09-09T11:51:51.519262+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 29805,
+            "ppid": 29803,
+            "pgid": 29803,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:51 2026",
+            "firstObservedAt": "2026-09-09T11:51:51.739833+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29806,
+            "ppid": 29803,
+            "pgid": 29803,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:51 2026",
+            "firstObservedAt": "2026-09-09T11:51:51.739867+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29807,
+            "ppid": 29805,
+            "pgid": 29803,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:51 2026",
+            "firstObservedAt": "2026-09-09T11:51:51.739869+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 29878,
+            "ppid": 29803,
+            "pgid": 29803,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:53 2026",
+            "firstObservedAt": "2026-09-09T11:51:53.975921+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          29803
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 2.995624333998421,
+      "endedAt": "2026-09-09T11:51:54.493658+00:00"
+    },
+    {
+      "label": "checkout",
+      "command": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "checkout",
+        "--quiet",
+        "--detach",
+        "a5987643ef6c26b01f687226fbc6a6709fc182cb"
+      ],
+      "startedAt": "2026-09-09T11:51:54.511544+00:00",
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          29890,
+          501,
+          "Wed Sep 9 17:21:54 2026"
+        ],
+        "rootReaped": true,
+        "observations": 9,
+        "ownedProcesses": [
+          {
+            "pid": 29890,
+            "ppid": 29794,
+            "pgid": 29890,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:54 2026",
+            "firstObservedAt": "2026-09-09T11:51:54.533708+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          29890
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.9816349169996101,
+      "endedAt": "2026-09-09T11:51:55.493191+00:00"
+    },
+    {
+      "label": "install",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "startedAt": "2026-09-09T11:51:55.621648+00:00",
+      "timeoutSeconds": 900,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          29904,
+          501,
+          "Wed Sep 9 17:21:55 2026"
+        ],
+        "rootReaped": true,
+        "observations": 26,
+        "ownedProcesses": [
+          {
+            "pid": 29904,
+            "ppid": 29794,
+            "pgid": 29904,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:55 2026",
+            "firstObservedAt": "2026-09-09T11:51:55.640729+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 29932,
+            "ppid": 29904,
+            "pgid": 29904,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:58 2026",
+            "firstObservedAt": "2026-09-09T11:51:58.890067+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29941,
+            "ppid": 29904,
+            "pgid": 29904,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:58 2026",
+            "firstObservedAt": "2026-09-09T11:51:58.890094+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29942,
+            "ppid": 29941,
+            "pgid": 29904,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:58 2026",
+            "firstObservedAt": "2026-09-09T11:51:59.113015+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29943,
+            "ppid": 29932,
+            "pgid": 29904,
+            "uid": 501,
+            "started": "Wed Sep 9 17:21:58 2026",
+            "firstObservedAt": "2026-09-09T11:51:59.113062+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          29904
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 4.888881958002457,
+      "endedAt": "2026-09-09T11:52:00.510580+00:00"
+    },
+    {
+      "label": "packed-install",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/packed-install-check.mjs",
+        "--keep"
+      ],
+      "startedAt": "2026-09-09T11:52:00.654876+00:00",
+      "timeoutSeconds": 1800,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          29975,
+          501,
+          "Wed Sep 9 17:22:00 2026"
+        ],
+        "rootReaped": true,
+        "observations": 230,
+        "ownedProcesses": [
+          {
+            "pid": 29975,
+            "ppid": 29794,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:00 2026",
+            "firstObservedAt": "2026-09-09T11:52:00.672787+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 29978,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:00 2026",
+            "firstObservedAt": "2026-09-09T11:52:00.899049+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29986,
+            "ppid": 29978,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:00 2026",
+            "firstObservedAt": "2026-09-09T11:52:01.128578+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 29999,
+            "ppid": 29986,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:01 2026",
+            "firstObservedAt": "2026-09-09T11:52:01.128631+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 30007,
+            "ppid": 29978,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:01 2026",
+            "firstObservedAt": "2026-09-09T11:52:01.348124+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30008,
+            "ppid": 30007,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:01 2026",
+            "firstObservedAt": "2026-09-09T11:52:01.348148+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 30253,
+            "ppid": 30007,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:35 2026",
+            "firstObservedAt": "2026-09-09T11:52:35.610748+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30266,
+            "ppid": 30253,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:35 2026",
+            "firstObservedAt": "2026-09-09T11:52:35.610776+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 30268,
+            "ppid": 30007,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:35 2026",
+            "firstObservedAt": "2026-09-09T11:52:35.833641+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30269,
+            "ppid": 30268,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:35 2026",
+            "firstObservedAt": "2026-09-09T11:52:35.833666+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 30271,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:35 2026",
+            "firstObservedAt": "2026-09-09T11:52:36.061051+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30285,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:38 2026",
+            "firstObservedAt": "2026-09-09T11:52:38.743985+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30334,
+            "ppid": 30285,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:44 2026",
+            "firstObservedAt": "2026-09-09T11:52:44.306722+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30335,
+            "ppid": 30334,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:44 2026",
+            "firstObservedAt": "2026-09-09T11:52:44.306742+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 30363,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:45 2026",
+            "firstObservedAt": "2026-09-09T11:52:45.411047+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30365,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:45 2026",
+            "firstObservedAt": "2026-09-09T11:52:45.637811+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30376,
+            "ppid": 30365,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:46 2026",
+            "firstObservedAt": "2026-09-09T11:52:46.756941+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30380,
+            "ppid": 30365,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:46 2026",
+            "firstObservedAt": "2026-09-09T11:52:46.978939+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30391,
+            "ppid": 30365,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:47 2026",
+            "firstObservedAt": "2026-09-09T11:52:47.200018+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30399,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:47 2026",
+            "firstObservedAt": "2026-09-09T11:52:47.420380+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30404,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:48 2026",
+            "firstObservedAt": "2026-09-09T11:52:48.311220+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30413,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:49 2026",
+            "firstObservedAt": "2026-09-09T11:52:49.197961+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 30420,
+            "ppid": 29975,
+            "pgid": 29975,
+            "uid": 501,
+            "started": "Wed Sep 9 17:22:49 2026",
+            "firstObservedAt": "2026-09-09T11:52:50.097369+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          29975
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 50.3956671670021,
+      "endedAt": "2026-09-09T11:52:51.051021+00:00"
+    }
+  ],
+  "status": "private-artifact-and-keyless-smoke-passed",
+  "startedAt": "2026-09-09T11:51:51.157813+00:00",
+  "helperSha256": "6a28ee227d269f56c4dbd79999ad3bc7f22678ad5c406dfc58a540f9ef748f78",
+  "supervisorSha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d",
+  "boundary": "Private source build, retained tarball and keyless installed smoke; no publish/deploy or live provider",
+  "executables": {
+    "node": {
+      "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
+    },
+    "pnpm": {
+      "path": "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+      "sha256": "b276da51dc8ca5b0d3ee3371695b50fc8b3244b281b091c63a3f082a88dadeb9"
+    },
+    "npm": {
+      "path": "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    }
+  },
+  "active": null,
+  "artifact": {
+    "path": "/private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z/agent-maturity-compass-1.2.0.tgz",
+    "sha256": "d0391019fb9e0b39c0f624657efab9f1a03e53b01b45fced04ea4d7cc980d1c9",
+    "bytes": 6008285,
+    "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
+    "installedCli": "/private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "retainedWorkspace": "/private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z",
+    "format": "private-npm-tarball"
+  },
+  "trackedDeltaAfter": "",
+  "finalHead": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "skips": [
+    "Real-provider smoke: AMC_PACKED_SMOKE_PROVIDER intentionally absent"
+  ],
+  "endedAt": "2026-09-09T11:52:51.167771+00:00",
+  "allObservedCommandProcessesClosed": true
+}

@@ -1,0 +1,77 @@
+{
+  "label": "clone",
+  "command": [
+    "git",
+    "clone",
+    "--quiet",
+    "--no-local",
+    "--no-hardlinks",
+    "--no-checkout",
+    "/Users/sid/AgentMaturityCompass",
+    "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout"
+  ],
+  "startedAt": "2026-09-09T11:38:12.266632+00:00",
+  "timeoutSeconds": 300,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      7644,
+      501,
+      "Wed Sep 9 17:08:12 2026"
+    ],
+    "rootReaped": true,
+    "observations": 17,
+    "ownedProcesses": [
+      {
+        "pid": 7644,
+        "ppid": 7640,
+        "pgid": 7644,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:12 2026",
+        "firstObservedAt": "2026-09-09T11:38:12.283603+00:00",
+        "via": "spawned-child"
+      },
+      {
+        "pid": 7646,
+        "ppid": 7644,
+        "pgid": 7644,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:12 2026",
+        "firstObservedAt": "2026-09-09T11:38:12.510257+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 7647,
+        "ppid": 7646,
+        "pgid": 7644,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:12 2026",
+        "firstObservedAt": "2026-09-09T11:38:12.510348+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 7648,
+        "ppid": 7644,
+        "pgid": 7644,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:12 2026",
+        "firstObservedAt": "2026-09-09T11:38:12.510350+00:00",
+        "via": "observed-parent"
+      }
+    ],
+    "ownedGroups": [
+      7644
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 2.8149371659965254,
+  "endedAt": "2026-09-09T11:38:15.081598+00:00"
+}

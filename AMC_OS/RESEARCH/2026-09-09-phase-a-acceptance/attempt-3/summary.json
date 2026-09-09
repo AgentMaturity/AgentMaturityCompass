@@ -1,0 +1,71 @@
+{
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0"
+  },
+  "clone": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout",
+  "sourceCleanBeforeInstall": true,
+  "tests": {
+    "numTotalTests": 12262,
+    "numPassedTests": 12262,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "releaseGate": {
+    "status": "passed",
+    "counts": {
+      "executed": 14,
+      "passed": 14,
+      "failed": 0,
+      "skipped": 1,
+      "total": 15
+    },
+    "skips": [
+      {
+        "id": "live-deploy-health",
+        "reason": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+      }
+    ]
+  },
+  "commands": [
+    {
+      "label": "clone",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "label": "checkout",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "label": "install",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "label": "release-gate",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    },
+    {
+      "label": "clean-source",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false
+    }
+  ],
+  "allObservedCommandProcessesClosed": true,
+  "trackedDeltaAfter": ".amc/keys/auditor_ed25519.pub  |  2 +-\n .amc/keys/auditor_history.json | 25 ++++++++++++++++++-------\n .amc/keys/lease_ed25519.pub    |  2 +-\n .amc/keys/lease_history.json   | 25 ++++++++++++++++++-------\n .amc/keys/monitor_ed25519.pub  |  2 +-\n .amc/keys/monitor_history.json | 25 ++++++++++++++++++-------\n .amc/keys/session_ed25519.pub  |  2 +-\n .amc/keys/session_history.json | 25 ++++++++++++++++++-------\n 8 files changed, 76 insertions(+), 32 deletions(-)",
+  "fullSuiteSha256": "790bf8582f8459488fc6d6f193944f2b9f3abde1ed0d7c9c5e81e295660bb557",
+  "gateSha256": "5fbd17a3c8d0ca236e5f11d998523e37cf31592f49d154ab159c47bfcf5f84f2",
+  "boundary": "Complete source suite/release gate plus clean-source and keyless packed smoke; live deployment, broader installed operator/platform/security mutation/human/comparative acceptance remain separate"
+}

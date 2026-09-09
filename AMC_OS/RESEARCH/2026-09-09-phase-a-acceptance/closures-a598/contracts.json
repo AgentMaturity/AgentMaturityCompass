@@ -1,0 +1,245 @@
+{
+  "retrievedAt": "2026-09-09T12:54:01.023094+00:00",
+  "issues": [
+    {
+      "id": "AMC-1544",
+      "uuid": "1e4f8408-9dc6-449e-b216-946b5d39e5d5",
+      "title": "P1: Publish nullable native validation references in the OpenAPI 3.0 artifact",
+      "description": "Candidate artifact preparation at `79f36cfd4d0d33af34ce4a07979c5195b149ba99` found `scripts/update-native-task-openapi.mjs` rejects the native task validationSelection schema's `oneOf: [null, $ref]` with Unsupported nullable OpenAPI union. This prevents generating the current public contract, including closed-task archival. Fresh Node22 clone build succeeded; generation failed before writing any artifact. No earlier acceptance is declared false by this preparation result.\n\nImplement a valid OpenAPI 3.0 representation preserving referenced object constraints and nullability, regenerate only in a candidate clone, and cover null/non-null shapes without loosening runtime validation. Link to <issue id=\"3d3b9f2d-2301-4637-a66c-8a13bec5120f\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1538/p1-distinguish-native-task-completion-from-operator-defined-validation\">AMC-1538</issue> and <issue id=\"0ab82ae7-e254-44bf-ab52-114248425567\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1541/p1-archive-closed-native-studio-task-descriptors-without-deleting\">AMC-1541</issue>. Done requires the standing fresh merged-candidate acceptance/full suite/release-gate/record requirements. Failure log: `AMC_OS/RESEARCH/2026-09-09-api-reference-recovery/candidate-generation.log`.",
+      "priority": {
+        "value": 2,
+        "name": "High"
+      },
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1544/p1-publish-nullable-native-validation-references-in-the-openapi-30",
+      "gitBranchName": "siddarthpatel96/amc-1544-p1-publish-nullable-native-validation-references-in-the",
+      "createdAt": "2026-09-09T07:56:29.322Z",
+      "updatedAt": "2026-09-09T08:00:27.194Z",
+      "archivedAt": null,
+      "completedAt": null,
+      "startedAt": "2026-09-09T07:57:37.891Z",
+      "canceledAt": null,
+      "dueDate": null,
+      "slaStartedAt": null,
+      "slaMediumRiskAt": null,
+      "slaHighRiskAt": null,
+      "slaBreachesAt": null,
+      "status": "In Progress",
+      "statusType": "started",
+      "labels": [],
+      "attachments": [],
+      "documents": [],
+      "stateHistory": [
+        {
+          "state": {
+            "id": "e5d664d1-c86f-4c89-a1e3-3554c06cd4f9",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "startedAt": "2026-09-09T07:56:29.322Z",
+          "endedAt": "2026-09-09T07:57:37.911Z"
+        },
+        {
+          "state": {
+            "id": "4c8f254e-2fb2-4c09-a894-af5fb58ce2ad",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "startedAt": "2026-09-09T07:57:37.911Z",
+          "endedAt": null
+        }
+      ],
+      "createdBy": "Siddharth Patel",
+      "createdById": "1b3158bb-f62d-4e84-9898-e6a6ea40b703",
+      "parentId": "AMC-1505",
+      "team": "Amc",
+      "teamId": "9cee9981-00cf-40b2-8b48-2a1b588bfb43",
+      "cycleId": "cfc5753c-38e0-4186-8d6c-8200c2ee0481",
+      "relations": {
+        "blocks": [],
+        "blockedBy": [],
+        "relatedTo": [
+          {
+            "id": "AMC-1541",
+            "title": "P1: Archive closed native Studio task descriptors without deleting signed session evidence"
+          },
+          {
+            "id": "AMC-1538",
+            "title": "P1: Distinguish native task completion from operator-defined validation"
+          }
+        ],
+        "duplicateOf": null
+      }
+    },
+    {
+      "id": "AMC-1526",
+      "uuid": "3771e45f-64b9-4e9d-a417-d816609374bf",
+      "title": "P1: Stop publishing source test inventory as passing execution results",
+      "description": "Current scripts/gen-counts.mjs converts regex matches of direct it()/test() calls into public 'passing tests' claims across10 prose/website surfaces. This is source inventory, not an executed result. Disposable reproduction: generator --check passes before any tests, then also passes after Vitest reports2 passed/1failed/1skipped while README claims1passing test. Full AMC baseline independently ran10,932 passing tests at4247e610; those are distinct metrics.\n\nAcceptance: publish the existing testFiles metric as test source files (or remove numeric outcome wording), keep regex testBlocks only as described internal inventory, retain CI result links, and make --check reject unqualified numerical passing labels even when numbers match. Update generator/templates/consumer prose and publicStatsDrift expectations; preserve historical audit snapshots. Meaningful fixture: correct numeric passing badge must fail; correct source inventory passes without running tests; --write repairs stale inventory and is idempotent. Focused counts suites and built count check pass. Do not replace static metrics with an unbound/stale passing number or invent coverage.\n\nScope/plan: AMC_OS/RESEARCH/2026-09-08-dsh-pi/test-count-claim-plan.md. Documentation and count tooling follow-through during AMC1525 final qualification; product runtime remains one implementation issue at a time.\n\n2026-09-08 implementation checkpoint: ten public surfaces now report test source-file inventory, not passing execution results. Generator retains explicitly labeled regex inventory only for compatibility and rejects unsupported passing labels, badges, split HTML and public testBlocks markers before writing anything. Historical run receipts are preserved. Eleven semantic fixture regressions and 22 total focused tests across four suites pass; real regeneration is idempotent and count check passes. Full current-branch suite is running with <issue id=\"55c2f5dc-23a2-4285-b1e8-8677b207cf1f\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1525/p0-require-authenticated-key-history-admission-before-trusting\">AMC-1525</issue>; commit and final qualification pending. Evidence: AMC_OS/RESEARCH/2026-09-08-dsh-pi/test-count-claim-implementation.md.\n\nCommitted public test-inventory correction: 05893b67. The committed source contains 1,314 test source files; the isolated committed clone passes gen-counts --check. The active shared checkout now also contains an unrelated uncommitted packaging test, so its inventory will need regeneration when that change lands. This does not turn either number into a passing-test result.\n\nFull-suite follow-through also corrected command metadata to 1,180 paths, regenerated the API reference, routed public architecture links through CODE_GRAPH, and promoted the KEY_HISTORY operator guide (175 public guides). Thirteen focused docs/metadata/artifact tests and generated API check pass. Historical records remain unchanged. Evidence: public-docs-qualification-repair.md under the dated research directory. Whole-suite qualification remains open pending the isolated ACP vault-cache fix and rerun.\n\n2026-09-08 independent qualification checkpoint: exact d1f2ee8423446303f397f28aafdd886fd7b4a961 completed the isolated full suite with 11,092 passed / 0 failed / 0 pending across 1,321 test files. Receipt and raw-report digest: AMC_OS/RESEARCH/2026-09-08-dsh-pi/full-suite-qualified-d1f2ee84.{md,json}. Build/source equivalence and temporary-clone fixture side effects are recorded. In-flight <issue id=\"75424cba-5b6f-44ea-aa28-70b8365b96f9\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1511/p1-resume-and-fork-signed-native-sessions-across-processes\">AMC-1511</issue> ownership changes are excluded. This is local source qualification; release/platform/public-install acceptance remains separate. Issue remains In Review.",
+      "priority": {
+        "value": 2,
+        "name": "High"
+      },
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1526/p1-stop-publishing-source-test-inventory-as-passing-execution-results",
+      "gitBranchName": "siddarthpatel96/amc-1526-p1-stop-publishing-source-test-inventory-as-passing",
+      "createdAt": "2026-09-08T07:47:09.239Z",
+      "updatedAt": "2026-09-09T07:18:13.103Z",
+      "archivedAt": null,
+      "completedAt": null,
+      "startedAt": "2026-09-08T07:47:09.281Z",
+      "canceledAt": null,
+      "dueDate": null,
+      "slaStartedAt": null,
+      "slaMediumRiskAt": null,
+      "slaHighRiskAt": null,
+      "slaBreachesAt": null,
+      "status": "In Review",
+      "statusType": "started",
+      "labels": [],
+      "attachments": [],
+      "documents": [],
+      "stateHistory": [
+        {
+          "state": {
+            "id": "4c8f254e-2fb2-4c09-a894-af5fb58ce2ad",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "startedAt": "2026-09-08T07:47:09.239Z",
+          "endedAt": "2026-09-08T08:14:28.788Z"
+        },
+        {
+          "state": {
+            "id": "80b16120-8f2d-43ab-b543-05338e8ca754",
+            "name": "In Review",
+            "type": "started"
+          },
+          "startedAt": "2026-09-08T08:14:28.788Z",
+          "endedAt": null
+        }
+      ],
+      "createdBy": "Siddharth Patel",
+      "createdById": "1b3158bb-f62d-4e84-9898-e6a6ea40b703",
+      "project": "AMC Lifecycle Completion",
+      "projectId": "af53da42-e4af-4e89-a37c-bede6a33ef8b",
+      "parentId": "AMC-1505",
+      "team": "Amc",
+      "teamId": "9cee9981-00cf-40b2-8b48-2a1b588bfb43",
+      "cycleId": "cfc5753c-38e0-4186-8d6c-8200c2ee0481",
+      "relations": {
+        "blocks": [],
+        "blockedBy": [],
+        "relatedTo": [
+          {
+            "id": "AMC-1511",
+            "title": "P1: Resume and fork signed native sessions across processes"
+          },
+          {
+            "id": "AMC-1525",
+            "title": "P0: Require authenticated key-history admission before trusting historical signing keys"
+          },
+          {
+            "id": "AMC-1501",
+            "title": "G5 \u2014 Claim, number & documentation drift (37 gaps \u00b7 5 CRITICAL)"
+          },
+          {
+            "id": "AMC-1524",
+            "title": "P1: Map AMC with Graphify and publish readable architecture navigation"
+          },
+          {
+            "id": "AMC-1528",
+            "title": "P1: Report persona QA as automated contract evidence with truthful failed-check feedback"
+          }
+        ],
+        "duplicateOf": null
+      }
+    },
+    {
+      "id": "AMC-1528",
+      "uuid": "4e732ec2-1ed4-481f-a5c0-b45967b8d9a9",
+      "title": "P1: Report persona QA as automated contract evidence with truthful failed-check feedback",
+      "description": "At bd781be5, scripts/install-persona-qa.mjs computes rating as passed checks / total *10 and presents it as an ease-of-use rating. personaFeedback only reads command steps, not contract assertions: an install with missing full-score output can be described as 'acceptable first score' even when the score-contract assertion fails. Pure-function reproduction is recorded in the September harness usability audit. This is misleading qualification evidence, not a measured human usability result.\n\nAcceptance:\n\n* Replace ambiguous UX rating/claims with labeled automated contract pass counts, measured timings, explicit unknowns and failed assertions.\n* Failed required assertions appear in the persona summary, even when the command exited zero; missing score data never implies acceptable first use.\n* Separate actual human/paired-task usability measurements tracked under <issue id=\"42ff0b98-0548-4d3d-b404-f0b58850ad97\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1518/p1-measure-amc-dsh-and-pi-on-reproducible-task-and-governance\">AMC-1518</issue> from automated checks.\n* Preserve structured report consumers through explicit schema evolution or documented backward-compatible deprecation.\n* Verify malformed/missing score, assertion-only failure, slow install and all-pass cases; review emitted Markdown/JSON.\n\nReuse <issue id=\"6683c98e-618b-407d-894c-8cd71b53ad20\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-483/audit-align-release-gate-ci-bundle-scan-and-clean-install-qa\">AMC-483</issue> for environment isolation and release-gate integration; do not duplicate it here. Current automated checks are valuable contract smoke tests once labeled correctly.\n\nImplementation started after release script review. Read-only design at 6553906e reproduces null strategy/import output silently removing required assertions and still reporting 10/10. Plan registers mandatory checks before execution, records skipped dependencies without shrinking totals, validates required output, separates command wall time from CLI-reported diagnostic elapsed, and replaces ratings with versioned automated-contract-checks counts. Independent consumer inventory found only the producer/renderer reading rating fields; release gate consumes process status. Historical dated ratings remain unchanged. Design: AMC_OS/RESEARCH/2026-09-08-dsh-pi/persona-contract-result-design.md. Current 103 planned checks is a computed design inventory, not a passing result.\n\nLocal implementation committed95aa5e80. Final four-file aggregate e8227d5c9b230813a714084f1dd498e0707cd602aedf90c8df02990ee43f9eed; owner35/35 focused and independent24/24 affected results pass (overlapping, not additive). Root actual corrected main performs ten real npm installs and fixture CLI workflows against pinned6553906e package:103/103 persona checks +2/2 setup, zero failed/skipped, exit0. Final script hashc1f410b3a8fe9e04e10b5eb5794adf0de423dff683aa260c028dfe1ed1eb12c9 unchanged. All ten results distinguish artifactVALID, evidenceINSUFFICIENT_EVIDENCE and claimEligible=false. Root initial actual report caught a mislabeled validity column; corrected producer-shaped regression and both historical/updated receipts are preserved. New2026-09-08 schema removes human ratings/feedback, keeps missing data explicit and wall/internal timing separate. Receipt: persona-contract-results/actual-6553906e-corrected/README.md. Combined full candidate gate remains pending; In Review is local acceptance, not publication or human usability validation.",
+      "priority": {
+        "value": 2,
+        "name": "High"
+      },
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1528/p1-report-persona-qa-as-automated-contract-evidence-with-truthful",
+      "gitBranchName": "siddarthpatel96/amc-1528-p1-report-persona-qa-as-automated-contract-evidence-with",
+      "createdAt": "2026-09-08T09:34:04.651Z",
+      "updatedAt": "2026-09-09T07:18:15.879Z",
+      "archivedAt": null,
+      "completedAt": null,
+      "startedAt": "2026-09-08T10:50:38.238Z",
+      "canceledAt": null,
+      "dueDate": null,
+      "slaStartedAt": null,
+      "slaMediumRiskAt": null,
+      "slaHighRiskAt": null,
+      "slaBreachesAt": null,
+      "status": "In Review",
+      "statusType": "started",
+      "labels": [],
+      "attachments": [],
+      "documents": [],
+      "stateHistory": [
+        {
+          "state": {
+            "id": "e5d664d1-c86f-4c89-a1e3-3554c06cd4f9",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          "startedAt": "2026-09-08T09:34:04.651Z",
+          "endedAt": "2026-09-08T10:50:38.248Z"
+        },
+        {
+          "state": {
+            "id": "4c8f254e-2fb2-4c09-a894-af5fb58ce2ad",
+            "name": "In Progress",
+            "type": "started"
+          },
+          "startedAt": "2026-09-08T10:50:38.248Z",
+          "endedAt": "2026-09-08T11:09:30.803Z"
+        },
+        {
+          "state": {
+            "id": "80b16120-8f2d-43ab-b543-05338e8ca754",
+            "name": "In Review",
+            "type": "started"
+          },
+          "startedAt": "2026-09-08T11:09:30.803Z",
+          "endedAt": null
+        }
+      ],
+      "createdBy": "Siddharth Patel",
+      "createdById": "1b3158bb-f62d-4e84-9898-e6a6ea40b703",
+      "project": "AMC Lifecycle Completion",
+      "projectId": "af53da42-e4af-4e89-a37c-bede6a33ef8b",
+      "parentId": "AMC-1505",
+      "team": "Amc",
+      "teamId": "9cee9981-00cf-40b2-8b48-2a1b588bfb43",
+      "cycleId": "cfc5753c-38e0-4186-8d6c-8200c2ee0481",
+      "relations": {
+        "blocks": [],
+        "blockedBy": [],
+        "relatedTo": [
+          {
+            "id": "AMC-1526",
+            "title": "P1: Stop publishing source test inventory as passing execution results"
+          },
+          {
+            "id": "AMC-1518",
+            "title": "P1: Measure AMC, DSH and Pi on reproducible task and governance scenarios"
+          },
+          {
+            "id": "AMC-483",
+            "title": "Audit: Align release gate, CI bundle scan, and clean install QA"
+          },
+          {
+            "id": "AMC-1529",
+            "title": "P1: Restore authenticated signing through the optional Compose notary service"
+          }
+        ],
+        "duplicateOf": null
+      }
+    }
+  ]
+}

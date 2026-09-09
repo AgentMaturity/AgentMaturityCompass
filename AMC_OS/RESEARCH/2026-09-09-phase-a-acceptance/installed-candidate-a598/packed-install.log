@@ -1,0 +1,14 @@
+packed-install check of agent-maturity-compass@1.2.0 in /private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z
+ok   pnpm run build (35.2s)
+note: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here
+ok   npm pack --ignore-scripts (same files as publish) (2.7s)
+ok   npm install <tarball> (fresh dir, empty HOME) (6.8s)
+ok   @amc/core is not resolvable from the consumer directory
+ok   amc doctor (1.9s)
+ok   amc init (isolated workspace) (1.0s)
+ok   amc agent-loop run (stub provider, keyless) (0.9s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   installed evidence and request reconstruction
+skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)
+kept: /private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z

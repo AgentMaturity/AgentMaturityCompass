@@ -1,0 +1,770 @@
+{
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "report": "../attempt-3/full-suite.json",
+  "sha256": "790bf8582f8459488fc6d6f193944f2b9f3abde1ed0d7c9c5e81e295660bb557",
+  "boundary": "Exact case extraction from one completed full suite, not a new run or additive qualification",
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "current CLI and adapter inventories"
+          ],
+          "fullName": "current CLI and adapter inventories refreshes curated CLI templates from unique inventory rows without rewriting unrelated numbers",
+          "status": "passed",
+          "title": "refreshes curated CLI templates from unique inventory rows without rewriting unrelated numbers",
+          "duration": 701.723709,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "current CLI and adapter inventories"
+          ],
+          "fullName": "current CLI and adapter inventories refuses empty or duplicate inventory without modifying public claims",
+          "status": "passed",
+          "title": "refuses empty or duplicate inventory without modifying public claims",
+          "duration": 135.22070799999995,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "current CLI and adapter inventories"
+          ],
+          "fullName": "current CLI and adapter inventories refuses empty or duplicate inventory without modifying public claims",
+          "status": "passed",
+          "title": "refuses empty or duplicate inventory without modifying public claims",
+          "duration": 133.7304590000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "current CLI and adapter inventories"
+          ],
+          "fullName": "current CLI and adapter inventories refuses CLI claims when their inventory is missing without substituting a count",
+          "status": "passed",
+          "title": "refuses CLI claims when their inventory is missing without substituting a count",
+          "duration": 122.57683399999996,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes reports file inventory without executing or expanding source declarations",
+          "status": "passed",
+          "title": "reports file inventory without executing or expanding source declarations",
+          "duration": 228.1334999999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: 2 passing Vitest tests",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: 2 passing Vitest tests",
+          "duration": 144.22791700000016,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: 2 passing tests",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: 2 passing tests",
+          "duration": 136.0228340000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: 2 Passing Tests",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: 2 Passing Tests",
+          "duration": 132.0060840000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: <span class=\"stat-value\">2</span><span class=\"stat-label\">passing tests</span>",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: <span class=\"stat-value\">2</span><span class=\"stat-label\">passing tests</span>",
+          "duration": 133.1211249999999,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: <b>2</b><span>Tests<br>passing</span>",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: <b>2</b><span>Tests<br>passing</span>",
+          "duration": 137.70316700000012,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: ![tests](https://img.shields.io/badge/tests-2%20passing-green)",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: ![tests](https://img.shields.io/badge/tests-2%20passing-green)",
+          "duration": 153.18679199999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a numerically matching but unbacked passing claim: <!-- amc:count:testFiles -->2<!-- /amc:count --> passing Vitest tests",
+          "status": "passed",
+          "title": "rejects a numerically matching but unbacked passing claim: <!-- amc:count:testFiles -->2<!-- /amc:count --> passing Vitest tests",
+          "duration": 130.801833,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes rejects a public regex-count marker even when its value matches",
+          "status": "passed",
+          "title": "rejects a public regex-count marker even when its value matches",
+          "duration": 151.16229199999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes refreshes source-file templates and markers idempotently while preserving historical results",
+          "status": "passed",
+          "title": "refreshes source-file templates and markers idempotently while preserving historical results",
+          "duration": 530.5053749999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "AMC-1526 \u2014 test inventory does not attest execution outcomes"
+          ],
+          "fullName": "AMC-1526 \u2014 test inventory does not attest execution outcomes refuses to rewrite any surface while an unsupported outcome claim remains",
+          "status": "passed",
+          "title": "refuses to rewrite any surface while an unsupported outcome claim remains",
+          "duration": 138.07720900000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954176745,
+      "endTime": 1788954179854.0771,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/genCountsSemantics.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments reuses the packed-install scrubber with empty npm configs and fresh platform-specific homes",
+          "status": "passed",
+          "title": "reuses the packed-install scrubber with empty npm configs and fresh platform-specific homes",
+          "duration": 6.658665999999982,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments uses a different HOME for packing and each actual persona workflow, with no prior-persona marker",
+          "status": "passed",
+          "title": "uses a different HOME for packing and each actual persona workflow, with no prior-persona marker",
+          "duration": 36.74008299999997,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments refuses to execute a bin left behind by a failed package install",
+          "status": "passed",
+          "title": "refuses to execute a bin left behind by a failed package install",
+          "duration": 10.208125000000052,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments also isolates the clean-source runtime while retaining its documented source build commands",
+          "status": "passed",
+          "title": "also isolates the clean-source runtime while retaining its documented source build commands",
+          "duration": 2.4955830000000105,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments preserves a failed CLI result and respects --keep=false during cleanup",
+          "status": "passed",
+          "title": "preserves a failed CLI result and respects --keep=false during cleanup",
+          "duration": 165.582083,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "fresh persona environments"
+          ],
+          "fullName": "fresh persona environments preserves a failed CLI result and respects --keep=true during cleanup",
+          "status": "passed",
+          "title": "preserves a failed CLI result and respects --keep=true during cleanup",
+          "duration": 209.154625,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954192413,
+      "endTime": 1788954192844.1545,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/installPersonaIsolation.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results reports exact planned checks for solo without human ratings",
+          "status": "passed",
+          "title": "reports exact planned checks for solo without human ratings",
+          "duration": 12.190458000000035,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results reports exact planned checks for strategy without human ratings",
+          "status": "passed",
+          "title": "reports exact planned checks for strategy without human ratings",
+          "duration": 3.968915999999979,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results reports exact planned checks for import without human ratings",
+          "status": "passed",
+          "title": "reports exact planned checks for import without human ratings",
+          "duration": 2.762707999999975,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results reports exact planned checks for fleet without human ratings",
+          "status": "passed",
+          "title": "reports exact planned checks for fleet without human ratings",
+          "duration": 7.237707999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results requires strategy evidence even when JSON is null or missing",
+          "status": "passed",
+          "title": "requires strategy evidence even when JSON is null or missing",
+          "duration": 77.82287500000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results requires import evidence even when JSON is null or missing",
+          "status": "passed",
+          "title": "requires import evidence even when JSON is null or missing",
+          "duration": 46.783916999999974,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results includes a failed full-score assertion in the result summary",
+          "status": "passed",
+          "title": "includes a failed full-score assertion in the result summary",
+          "duration": 6.6843339999999785,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results includes a failed domain-packs assertion in the result summary",
+          "status": "passed",
+          "title": "includes a failed domain-packs assertion in the result summary",
+          "duration": 7.154458999999974,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results rejects empty recommendations and unrelated top-level fallback fields",
+          "status": "passed",
+          "title": "rejects empty recommendations and unrelated top-level fallback fields",
+          "duration": 16.498374999999953,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results retains unrun checks after a failed installation and never executes a leftover bin",
+          "status": "passed",
+          "title": "retains unrun checks after a failed installation and never executes a leftover bin",
+          "duration": 3.57650000000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results records a missing installed bin and skips all CLI consumers",
+          "status": "passed",
+          "title": "records a missing installed bin and skips all CLI consumers",
+          "duration": 4.789833000000044,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "automated installation contract results"
+          ],
+          "fullName": "automated installation contract results does not accept a failed command's apparently valid JSON",
+          "status": "passed",
+          "title": "does not accept a failed command's apparently valid JSON",
+          "duration": 6.754542000000015,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports separates command wall time from CLI-reported diagnostic elapsed after JSON serialization",
+          "status": "passed",
+          "title": "separates command wall time from CLI-reported diagnostic elapsed after JSON serialization",
+          "duration": 3.879833000000019,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports never presents artifact validity as evidence readiness or fills absent status evidence",
+          "status": "passed",
+          "title": "never presents artifact validity as evidence readiness or fills absent status evidence",
+          "duration": 29.776166999999987,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports does not invent a duration for invalid CLI elapsed undefined",
+          "status": "passed",
+          "title": "does not invent a duration for invalid CLI elapsed undefined",
+          "duration": 2.7169169999999667,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports does not invent a duration for invalid CLI elapsed null",
+          "status": "passed",
+          "title": "does not invent a duration for invalid CLI elapsed null",
+          "duration": 5.660082999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports does not invent a duration for invalid CLI elapsed -1",
+          "status": "passed",
+          "title": "does not invent a duration for invalid CLI elapsed -1",
+          "duration": 6.69033300000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports does not invent a duration for invalid CLI elapsed 123",
+          "status": "passed",
+          "title": "does not invent a duration for invalid CLI elapsed 123",
+          "duration": 3.346291000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports does not invent a duration for invalid CLI elapsed Infinity",
+          "status": "passed",
+          "title": "does not invent a duration for invalid CLI elapsed Infinity",
+          "duration": 4.66700000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "persona measurements and serialized reports"
+          ],
+          "fullName": "persona measurements and serialized reports rejects incoherent declared SLA and nonnumeric question counts",
+          "status": "passed",
+          "title": "rejects incoherent declared SLA and nonnumeric question counts",
+          "duration": 12.091791000000057,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "versioned persona CLI receipts"
+          ],
+          "fullName": "versioned persona CLI receipts emits consistent JSON/Markdown and cleans up for all-valid",
+          "status": "passed",
+          "title": "emits consistent JSON/Markdown and cleans up for all-valid",
+          "duration": 206.52250000000004,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "versioned persona CLI receipts"
+          ],
+          "fullName": "versioned persona CLI receipts emits consistent JSON/Markdown and cleans up for strategy-missing",
+          "status": "passed",
+          "title": "emits consistent JSON/Markdown and cleans up for strategy-missing",
+          "duration": 349.90470900000014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "versioned persona CLI receipts"
+          ],
+          "fullName": "versioned persona CLI receipts emits consistent JSON/Markdown and cleans up for pack-failed",
+          "status": "passed",
+          "title": "emits consistent JSON/Markdown and cleans up for pack-failed",
+          "duration": 166.335417,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "versioned persona CLI receipts"
+          ],
+          "fullName": "versioned persona CLI receipts emits consistent JSON/Markdown and cleans up for tarball-missing",
+          "status": "passed",
+          "title": "emits consistent JSON/Markdown and cleans up for tarball-missing",
+          "duration": 197.10354200000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954105316,
+      "endTime": 1788954106505.1035,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/installPersonaResults.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract publishes native routes with the public server prefix, declared auth and OpenAPI 3.0 schemas",
+          "status": "passed",
+          "title": "publishes native routes with the public server prefix, declared auth and OpenAPI 3.0 schemas",
+          "duration": 373.9418750000001,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract includes studio + bridge + gateway endpoints",
+          "status": "passed",
+          "title": "includes studio + bridge + gateway endpoints",
+          "duration": 2.653500000000122,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract documents schemas for key endpoint responses",
+          "status": "passed",
+          "title": "documents schemas for key endpoint responses",
+          "duration": 3.038250000000062,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract provides reusable error schema",
+          "status": "passed",
+          "title": "provides reusable error schema",
+          "duration": 1.6926670000000286,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract passes contract consistency checks with no errors",
+          "status": "passed",
+          "title": "passes contract consistency checks with no errors",
+          "duration": 21.120584000000008,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract renders YAML containing title and auth schemes",
+          "status": "passed",
+          "title": "renders YAML containing title and auth schemes",
+          "duration": 93.17704200000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "full OpenAPI contract"
+          ],
+          "fullName": "full OpenAPI contract writes YAML from the ESM CLI handler",
+          "status": "passed",
+          "title": "writes YAML from the ESM CLI handler",
+          "duration": 64.27483299999994,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954230140,
+      "endTime": 1788954230704.275,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/openapiContracts.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "public test-count claims"
+          ],
+          "fullName": "public test-count claims current-facing public surfaces identify test source files as inventory",
+          "status": "passed",
+          "title": "current-facing public surfaces identify test source files as inventory",
+          "duration": 6.923291000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "public test-count claims"
+          ],
+          "fullName": "public test-count claims historical audit results retain their dated source context",
+          "status": "passed",
+          "title": "historical audit results retain their dated source context",
+          "duration": 0.38316699999998605,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "public test-count claims"
+          ],
+          "fullName": "public test-count claims README badge labels a source-file inventory and links to CI outcomes",
+          "status": "passed",
+          "title": "README badge labels a source-file inventory and links to CI outcomes",
+          "duration": 0.6841669999999738,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954307559,
+      "endTime": 1788954307566.684,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/publicStatsDrift.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "published counts"
+          ],
+          "fullName": "published counts README no longer contradicts itself about adapters",
+          "status": "passed",
+          "title": "README no longer contradicts itself about adapters",
+          "duration": 1.2037919999999929,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "published counts"
+          ],
+          "fullName": "published counts marked counts are machine-checkable, not prose",
+          "status": "passed",
+          "title": "marked counts are machine-checkable, not prose",
+          "duration": 0.45487500000001546,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "published counts"
+          ],
+          "fullName": "published counts the question-bank export is complete",
+          "status": "passed",
+          "title": "the question-bank export is complete",
+          "duration": 22.823166000000015,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "published counts"
+          ],
+          "fullName": "published counts the licence contradiction is surfaced rather than hidden",
+          "status": "passed",
+          "title": "the licence contradiction is surfaced rather than hidden",
+          "duration": 0.3303340000000219,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1788954317700,
+      "endTime": 1788954317725.3303,
+      "status": "passed",
+      "message": "",
+      "name": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tests/publishedCountsAccuracy.test.ts"
+    }
+  ]
+}

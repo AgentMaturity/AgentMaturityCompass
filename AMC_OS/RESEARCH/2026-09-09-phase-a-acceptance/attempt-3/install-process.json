@@ -1,0 +1,82 @@
+{
+  "label": "install",
+  "command": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+    "install",
+    "--frozen-lockfile"
+  ],
+  "startedAt": "2026-09-09T11:38:16.604392+00:00",
+  "timeoutSeconds": 900,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      7697,
+      501,
+      "Wed Sep 9 17:08:16 2026"
+    ],
+    "rootReaped": true,
+    "observations": 32,
+    "ownedProcesses": [
+      {
+        "pid": 7697,
+        "ppid": 7640,
+        "pgid": 7697,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:16 2026",
+        "firstObservedAt": "2026-09-09T11:38:16.621374+00:00",
+        "via": "spawned-child"
+      },
+      {
+        "pid": 7733,
+        "ppid": 7697,
+        "pgid": 7697,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:20 2026",
+        "firstObservedAt": "2026-09-09T11:38:20.699147+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 7742,
+        "ppid": 7697,
+        "pgid": 7697,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:20 2026",
+        "firstObservedAt": "2026-09-09T11:38:20.699191+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 7743,
+        "ppid": 7733,
+        "pgid": 7697,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:20 2026",
+        "firstObservedAt": "2026-09-09T11:38:20.699192+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 7744,
+        "ppid": 7742,
+        "pgid": 7697,
+        "uid": 501,
+        "started": "Wed Sep 9 17:08:20 2026",
+        "firstObservedAt": "2026-09-09T11:38:20.699194+00:00",
+        "via": "live-owned-group"
+      }
+    ],
+    "ownedGroups": [
+      7697
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 6.181657667009858,
+  "endedAt": "2026-09-09T11:38:22.786093+00:00"
+}

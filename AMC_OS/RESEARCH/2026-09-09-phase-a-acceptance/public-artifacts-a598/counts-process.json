@@ -1,0 +1,45 @@
+{
+  "label": "counts",
+  "command": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/gen-counts.mjs",
+    "--check"
+  ],
+  "startedAt": "2026-09-09T12:03:06.061547+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      32184,
+      501,
+      "Wed Sep 9 17:33:06 2026"
+    ],
+    "rootReaped": true,
+    "observations": 8,
+    "ownedProcesses": [
+      {
+        "pid": 32184,
+        "ppid": 32165,
+        "pgid": 32184,
+        "uid": 501,
+        "started": "Wed Sep 9 17:33:06 2026",
+        "firstObservedAt": "2026-09-09T12:03:06.079459+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      32184
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 0.75126283300051,
+  "endedAt": "2026-09-09T12:03:06.812817+00:00"
+}

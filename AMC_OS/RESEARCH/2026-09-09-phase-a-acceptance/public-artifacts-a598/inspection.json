@@ -1,0 +1,82 @@
+{
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "artifact": "/private/tmp/amc-a5987643-public-artifacts-01/pages",
+  "apiHtmlFiles": 3363,
+  "checkedLocalLinks": 251484,
+  "brokenLocalLinks": [
+    {
+      "page": "api/index.html",
+      "href": "media/api",
+      "reason": "missing file"
+    },
+    {
+      "page": "api/interfaces/index.AnthropicMessagesPayload.html",
+      "href": "../hierarchy.html#index.AnthropicMessagesPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.GeminiGenerateContentPayload.html",
+      "href": "../hierarchy.html#index.GeminiGenerateContentPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.LocalChatPayload.html",
+      "href": "../hierarchy.html#index.LocalChatPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenAIAudioSpeechPayload.html",
+      "href": "../hierarchy.html#index.OpenAIAudioSpeechPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenAIChatPayload.html",
+      "href": "../hierarchy.html#index.OpenAIChatPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenAIEmbeddingsPayload.html",
+      "href": "../hierarchy.html#index.OpenAIEmbeddingsPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenAIImagesPayload.html",
+      "href": "../hierarchy.html#index.OpenAIImagesPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenAIResponsesPayload.html",
+      "href": "../hierarchy.html#index.OpenAIResponsesPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.OpenRouterChatPayload.html",
+      "href": "../hierarchy.html#index.OpenRouterChatPayload",
+      "reason": "missing anchor"
+    },
+    {
+      "page": "api/interfaces/index.XAIChatPayload.html",
+      "href": "../hierarchy.html#index.XAIChatPayload",
+      "reason": "missing anchor"
+    }
+  ],
+  "sourceLinkCount": 26272,
+  "sourceLinksAtPin": true,
+  "manifestSource": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "guideCount": 192,
+  "modules": [
+    "importers/piTelemetryCallbacks",
+    "index",
+    "sdk/mobileFetch",
+    "sdk/nativeAgentClient",
+    "standard/externalEvidenceProfile"
+  ],
+  "diagnostics": [
+    [
+      "0",
+      "405"
+    ]
+  ],
+  "reflectionSha256": "7443a40a8205ac8c0e4a2a8e1ac5cff3a4bca62edc2f916fb9c109cf5ed8e8b9",
+  "status": "inspection-failed"
+}

@@ -1,0 +1,48 @@
+{
+  "date": "2026-09-09T12:54:01.049018+00:00",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "integrationBranch": "amc/gap-register-execution",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "22.22.0",
+    "pnpm": "10.33.0"
+  },
+  "implementationCommits": {
+    "AMC-1544": "ba54422da1f6729e843618d68b0426e2bb7e17a6",
+    "AMC-1526": "05893b6757a220a40c34c58a4b3745888c9cbf00",
+    "AMC-1528": "95aa5e8018ef574414beaa1fd46f073fd733ae49"
+  },
+  "implementationAncestors": {
+    "AMC-1544": true,
+    "AMC-1526": true,
+    "AMC-1528": true
+  },
+  "sourceClone": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout",
+  "publisherClone": "/private/tmp/amc-a5987643-package-01/checkout",
+  "receipts": {
+    "attempt-3/full-suite.json": "790bf8582f8459488fc6d6f193944f2b9f3abde1ed0d7c9c5e81e295660bb557",
+    "attempt-3/release-gate.json": "5fbd17a3c8d0ca236e5f11d998523e37cf31592f49d154ab159c47bfcf5f84f2",
+    "attempt-3/source.json": "5b6202a8809ab9149a21cfaf7454c314a00e8fb2b13fd0072fd00b9e51039382",
+    "attempt-3/result.md": "98b7980ce41f522353a7ab372037678ca2d54f7e58fba7fb59cd9aee173c9cbb",
+    "public-artifacts-a598/source.json": "5e9afd6c86beaa00669a731db169e71e3efcd58bcfd7fb9204461a010b0d6ae0",
+    "public-artifacts-a598/publisher.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public-artifacts-a598/counts.log": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+    "persona-a598/latest.json": "ae38a146acd1e5949b49f30efa394a3b301dfd82f8ec655d2fd650faf29cfd5f",
+    "persona-a598/latest.md": "312acdf10b11c6f08ee88d4c16801e754b961f67ee3fefa7a6a688e952666145"
+  },
+  "fullSuite": {
+    "numTotalTests": 12262,
+    "numPassedTests": 12262,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "review": "Root and independent native source/contract/receipt review found no concrete D1-D5 blocker for these three bounded issues. Linear transition and vault update are separate recorded actions.",
+  "nonClaims": [
+    "No closure of AMC-1543 TypeDoc links",
+    "No human or speed qualification",
+    "No published package, full platform matrix, live deployment or comparative ranking"
+  ]
+}

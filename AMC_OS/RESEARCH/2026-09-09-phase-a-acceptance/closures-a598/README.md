@@ -1,0 +1,21 @@
+# Source contract closure review — September 9
+
+Qualified source `a5987643ef6c26b01f687226fbc6a6709fc182cb`, integration branch `amc/gap-register-execution`, Darwin 25.6.0 ARM64 / Node 22.22.0 / pnpm 10.33.0. The exact live issue contracts, measured assertion results and source/artifact hashes are retained alongside this review. Root and an independent native reviewer inspected the source, contract and actual receipts.
+
+The independent clone `/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout` completed one full suite: **12,262 passed, 0 failed, 0 pending/todo**. Its release gate passed **14 executed checks**, with `live-deploy-health` skipped because `AMC_RELEASE_GATE_LIVE_URL` was absent. The subsequent clean-source check passed. All observed command groups closed; eight tracked test-key/history changes remain preserved after the suite. This is not a clean-after-suite claim. See `../attempt-3/result.md` and raw reports. The separately fresh, frozen-installed and built package clone `/private/tmp/amc-a5987643-package-01/checkout` remained clean at the same source before and after actual publisher/count checks.
+
+## AMC-1544 — nullable referenced objects in OpenAPI
+
+Fix `ba54422da1f6729e843618d68b0426e2bb7e17a6` is an ancestor of the qualified integration candidate. The publisher emits a constrained reference alternative and a distinct nullable object alternative (`nullable: true`, `enum: [null]`) under OpenAPI 3.0. Runtime validation is unchanged. Seven `openapiContracts` assertions passed in the full suite, including null and referenced-object shape handling, and the actual built publisher `--check` passed against `website/openapi.yaml`. The TypeDoc HTML link defect remains AMC-1543 and does not invalidate this separate OpenAPI publication contract. No live website deployment is claimed.
+
+## AMC-1526 — source inventory does not claim passing tests
+
+Fix `05893b6757a220a40c34c58a4b3745888c9cbf00` and later inventory alignment are integrated ancestors. The full suite passed 15 generator semantics, three public drift and four published-accuracy cases: **22 distinct assertions**. Matching-number passing badges, split HTML and public regex markers are rejected; source inventory works without executing tests; write repair, idempotence and historical preservation are exercised. Actual `gen-counts --check` passed in the clean built clone. The published 1,389 test source files are inventory, separate from the 12,262 executed tests above. Historical execution receipts remain dated and unchanged.
+
+## AMC-1528 — truthful automated persona reports
+
+Fix `95aa5e8018ef574414beaa1fd46f073fd733ae49` is integrated. The full suite passed 24 result/report and six isolation cases: **30 distinct assertions**. Required failures remain visible after successful command exits; absent/malformed data and skipped dependencies cannot become positive evidence. JSON/Markdown schema `2026-09-08` explicitly labels `automated-contract-checks`; obsolete human ratings are absent.
+
+The actual release-gate producer performed ten private npm installations and fixture CLI workflows at this candidate: **103/103 persona checks and 2/2 setup checks passed, zero failed/skipped**. Exact output is retained in `../persona-a598/latest.json` and `.md`, matching the original gate output byte for byte. All ten distinguish artifact `VALID`, evidence `INSUFFICIENT_EVIDENCE`, and `claimEligible: false`. Wall time and CLI-reported diagnostic time remain separate, with invalid timing inputs rejected in the full-suite cases. The original acceptance's slow-install concern is addressed as truthful timing semantics, not an install-speed guarantee; no deliberately prolonged installation or human session is claimed. The gate's temporary tarball path is recorded, but its artifact digest was not retained; it must not be equated to the separate immutable installed-candidate tarball.
+
+These three issues meet their bounded D1–D5 requirements. D6 and D7 are the subsequent explicit Linear state/comment and dated Obsidian update, not inferred from this document. No other issue, public release, deployment, human usability result, platform matrix or comparison is closed by this review.

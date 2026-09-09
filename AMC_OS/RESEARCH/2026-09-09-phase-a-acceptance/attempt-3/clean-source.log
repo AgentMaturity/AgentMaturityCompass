@@ -1,0 +1,17 @@
+clean-source check of a5987643 in /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-clean-source-N2VuhH
+ok   git clone (committed tree only) (0.6s)
+ok   git checkout pinned commit (0.1s)
+ok   pnpm install --frozen-lockfile (4.0s)
+ok   pnpm run build (31.5s)
+ok   amc doctor (1.4s)
+ok   amc init (isolated workspace) (1.0s)
+ok   keyless native tool turn (0.9s)
+ok   amc session verify --json (0.7s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (1 expected turns)
+ok   process A: leave a completed turn open for resume (0.9s)
+ok   process B: resume and seal the same session (0.8s)
+ok   amc session verify --json (0.7s)
+ok   amc agent-loop verify --json (0.7s)
+ok   signed evidence and request reconstruction (2 expected turns)
+kept: /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-clean-source-N2VuhH

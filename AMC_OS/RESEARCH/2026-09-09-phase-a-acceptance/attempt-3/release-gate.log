@@ -1,0 +1,21 @@
+
+> agent-maturity-compass@1.2.0 release:gate /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout
+> node scripts/release-gate.mjs --out /Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/release-gate.json
+
+PARTIAL 14/14 executed checks passed; 0 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.
+Receipt: /Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/release-gate.json
+- PASSED console-js-syntax
+- PASSED openapi-parse
+- PASSED typecheck
+- PASSED typecheck-tests
+- PASSED build
+- PASSED packed-install
+- PASSED gap-0626-adversarial-regression
+- PASSED full-test-suite
+- PASSED command-inventory
+- PASSED architecture-boundaries
+- PASSED docs-drift-public-naming
+- PASSED runtime-dependency-audit
+- PASSED cli-and-domain-smoke
+- PASSED install-persona-qa
+- SKIPPED live-deploy-health

@@ -1,0 +1,270 @@
+{
+  "label": "clean-source",
+  "command": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/clean-source-check.mjs",
+    "--keep"
+  ],
+  "startedAt": "2026-09-09T11:47:45.423667+00:00",
+  "timeoutSeconds": 1800,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      28706,
+      501,
+      "Wed Sep 9 17:17:45 2026"
+    ],
+    "rootReaped": true,
+    "observations": 206,
+    "ownedProcesses": [
+      {
+        "pid": 28706,
+        "ppid": 7640,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:45 2026",
+        "firstObservedAt": "2026-09-09T11:47:45.443320+00:00",
+        "via": "spawned-child"
+      },
+      {
+        "pid": 28714,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:45 2026",
+        "firstObservedAt": "2026-09-09T11:47:45.664807+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28733,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:46 2026",
+        "firstObservedAt": "2026-09-09T11:47:46.330471+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28762,
+        "ppid": 28733,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:49 2026",
+        "firstObservedAt": "2026-09-09T11:47:49.270978+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28772,
+        "ppid": 28733,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:49 2026",
+        "firstObservedAt": "2026-09-09T11:47:49.271011+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28773,
+        "ppid": 28762,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:49 2026",
+        "firstObservedAt": "2026-09-09T11:47:49.271013+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 28774,
+        "ppid": 28772,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:49 2026",
+        "firstObservedAt": "2026-09-09T11:47:49.271015+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 28791,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:50 2026",
+        "firstObservedAt": "2026-09-09T11:47:50.372995+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28801,
+        "ppid": 28791,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:50 2026",
+        "firstObservedAt": "2026-09-09T11:47:50.594100+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28817,
+        "ppid": 28801,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:50 2026",
+        "firstObservedAt": "2026-09-09T11:47:50.594132+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 28826,
+        "ppid": 28791,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:50 2026",
+        "firstObservedAt": "2026-09-09T11:47:50.811503+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 28827,
+        "ppid": 28826,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:17:50 2026",
+        "firstObservedAt": "2026-09-09T11:47:50.811537+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 28995,
+        "ppid": 28826,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:21 2026",
+        "firstObservedAt": "2026-09-09T11:48:21.397894+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29013,
+        "ppid": 28826,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:21 2026",
+        "firstObservedAt": "2026-09-09T11:48:21.620300+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29016,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:21 2026",
+        "firstObservedAt": "2026-09-09T11:48:21.841747+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29030,
+        "ppid": 29016,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:22 2026",
+        "firstObservedAt": "2026-09-09T11:48:22.726657+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29035,
+        "ppid": 29016,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:22 2026",
+        "firstObservedAt": "2026-09-09T11:48:22.946255+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29057,
+        "ppid": 29016,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:23 2026",
+        "firstObservedAt": "2026-09-09T11:48:23.164042+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29059,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:23 2026",
+        "firstObservedAt": "2026-09-09T11:48:23.385581+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29064,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:24 2026",
+        "firstObservedAt": "2026-09-09T11:48:24.277657+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29071,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:25 2026",
+        "firstObservedAt": "2026-09-09T11:48:25.156316+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29075,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:25 2026",
+        "firstObservedAt": "2026-09-09T11:48:25.814010+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29080,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:26 2026",
+        "firstObservedAt": "2026-09-09T11:48:26.701942+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29086,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:27 2026",
+        "firstObservedAt": "2026-09-09T11:48:27.586656+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29093,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:28 2026",
+        "firstObservedAt": "2026-09-09T11:48:28.246144+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 29099,
+        "ppid": 28706,
+        "pgid": 28706,
+        "uid": 501,
+        "started": "Wed Sep 9 17:18:28 2026",
+        "firstObservedAt": "2026-09-09T11:48:29.131292+00:00",
+        "via": "observed-parent"
+      }
+    ],
+    "ownedGroups": [
+      28706
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 44.650529332997394,
+  "endedAt": "2026-09-09T11:48:30.074602+00:00"
+}

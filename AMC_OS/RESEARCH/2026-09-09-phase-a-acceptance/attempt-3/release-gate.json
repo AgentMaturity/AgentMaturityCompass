@@ -1,0 +1,202 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "release-gate",
+  "createdAt": "2026-09-09T11:47:44.898Z",
+  "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout",
+  "quick": false,
+  "status": "passed",
+  "qualification": "partial",
+  "partial": true,
+  "counts": {
+    "executed": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 1,
+    "total": 15
+  },
+  "summary": "14/14 executed checks passed; 0 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:38:23.057Z",
+      "endedAt": "2026-09-09T11:38:23.108Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:38:23.108Z",
+      "endedAt": "2026-09-09T11:38:23.304Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:38:23.304Z",
+      "endedAt": "2026-09-09T11:38:50.043Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:38:50.043Z",
+      "endedAt": "2026-09-09T11:39:26.839Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck:tests\n> tsc -p tsconfig.tests.json --noEmit\n\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:39:26.839Z",
+      "endedAt": "2026-09-09T11:39:58.180Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 prebuild\n> npm run clean\n\n\n> agent-maturity-compass@1.2.0 clean\n> node scripts/clean-dist.mjs\n\n\n> agent-maturity-compass@1.2.0 build\n> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs\n\n\n> agent-maturity-compass@1.2.0 copy-assets\n> node scripts/copy-build-assets.mjs\n\nbundle-kernel: dist/kernel/amcRuntime.js 381 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:39:58.180Z",
+      "endedAt": "2026-09-09T11:40:13.075Z",
+      "stdout": "packed-install check of agent-maturity-compass@1.2.0 in /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-packed-install-kmCFHt\nnote: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here\nok   npm pack --ignore-scripts (same files as publish) (2.6s)\nok   npm install <tarball> (fresh dir, empty HOME) (6.4s)\nok   @amc/core is not resolvable from the consumer directory\nok   amc doctor (1.8s)\nok   amc init (isolated workspace) (0.9s)\nok   amc agent-loop run (stub provider, keyless) (0.8s)\nok   amc session verify --json (0.8s)\nok   amc agent-loop verify --json (0.7s)\nok   installed evidence and request reconstruction\nskip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:40:13.075Z",
+      "endedAt": "2026-09-09T11:40:18.228Z",
+      "stdout": "\n\u001b[1m\u001b[30m\u001b[46m RUN \u001b[49m\u001b[39m\u001b[22m \u001b[36mv4.1.11 \u001b[39m\u001b[90m/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/gap0626AdversarialRegression.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 415\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m produces Score, Shield, Watch rerun output and receipt hashes \u001b[33m 407\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m   Start at \u001b[22m 17:10:14\n\u001b[2m   Duration \u001b[22m 3.70s\u001b[2m (transform 2.29s, setup 0ms, import 3.14s, tests 415ms, environment 0ms)\u001b[22m\n\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --reporter=dot --reporter=json --outputFile.json=/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tmp/release-gate/vitest-lTzCQw/results.json",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:40:18.229Z",
+      "endedAt": "2026-09-09T11:45:31.707Z",
+      "stdout": "[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1389 passed\u001b[39m\u001b[22m\u001b[90m (1389)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m12262 passed\u001b[39m\u001b[22m\u001b[90m (12262)\u001b[39m\n\u001b[2m   Start at \u001b[22m 17:10:18\n\u001b[2m   Duration \u001b[22m 312.72s\u001b[2m (transform 86.37s, setup 0ms, import 776.44s, tests 2292.57s, environment 168ms)\u001b[22m\n\nJSON report written to /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tmp/release-gate/vitest-lTzCQw/results.json\n",
+      "stderr": "2m\u001b[2mdoes not lend it at L3+ either, which was already true\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).\n\n\u001b[90mstderr\u001b[2m | tests/evidenceGatingCorrection.test.ts\u001b[2m > \u001b[22m\u001b[2mevidence counts only toward its own question\u001b[2m > \u001b[22m\u001b[2mcan be turned off for local diagnosis, and says so\n\u001b[22m\u001b[39m[diagnostic] Falling back to unbound evidence for untagged events at L2; add meta.questionId tagging to avoid score inflation (example question: AMC-1.1).\n\nerror: too many arguments for 'set'. Expected 1 argument but got 2.\n\u001b[90mstderr\u001b[2m | tests/fleetScoring.test.ts\u001b[2m > \u001b[22m\u001b[2mFleet Scoring\u001b[2m > \u001b[22m\u001b[2mevaluateFleet with single default agent\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n\u001b[90mstderr\u001b[2m | tests/fleetScoring.test.ts\u001b[2m > \u001b[22m\u001b[2mFleet Scoring\u001b[2m > \u001b[22m\u001b[2mevaluateFleet with multiple agents detects weak links\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n\u001b[90mstderr\u001b[2m | tests/fleetScoring.test.ts\u001b[2m > \u001b[22m\u001b[2mFleet Scoring\u001b[2m > \u001b[22m\u001b[2mevaluateFleet emits progress, SLA metadata, and lifecycle refs per agent\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n\u001b[90mstderr\u001b[2m | tests/fleetScoring.test.ts\u001b[2m > \u001b[22m\u001b[2mFleet Scoring\u001b[2m > \u001b[22m\u001b[2mrenderFleetScoringMarkdown produces valid markdown\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n\u001b[90mstderr\u001b[2m | tests/fleetScoring.test.ts\u001b[2m > \u001b[22m\u001b[2mFleet Scoring\u001b[2m > \u001b[22m\u001b[2magent summary includes strongest and weakest questions\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n\u001b[90mstderr\u001b[2m | tests/nativeEvidenceTrustTier.test.ts\u001b[2m > \u001b[22m\u001b[2mthe tier was only one of two gates\u001b[2m > \u001b[22m\u001b[2mstill counts toward no question, because the spine tags none\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L5).\n\noops\n\u001b[90mstderr\u001b[2m | tests/spineProjectionEndToEnd.test.ts\u001b[2m > \u001b[22m\u001b[2ma scope-verified delegation scores\u001b[2m > \u001b[22m\u001b[2mcounts toward nothing when no scope was declared\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-2.15, seen at L1).\n\n\u001b[90mstderr\u001b[2m | tests/trustAnchorIntegrity.test.ts\u001b[2m > \u001b[22m\u001b[2mkey history is tamper-evident\u001b[2m > \u001b[22m\u001b[2mrecords where an externally admitted key came from\n\u001b[22m\u001b[39m[amc] Explicit notary admission expanded the auditor signing role (31288d70b7cb2d49d8b6133f605025224c4951a86fa82cdd13e57c14e2240c3f).\n\n\u001b[90mstderr\u001b[2m | tests/newDomainEvidenceCaps.test.ts\u001b[2m > \u001b[22m\u001b[2mnew domain runner caps\u001b[2m > \u001b[22m\u001b[2mAMC-VOICE-1 is capped when high-risk workspace lacks llm request/response evidence\n\u001b[22m\u001b[39m[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\n",
+      "remediation": null,
+      "artifact": {
+        "path": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tmp/release-gate/vitest-lTzCQw/results.json",
+        "produced": true,
+        "valid": true,
+        "sha256": "790bf8582f8459488fc6d6f193944f2b9f3abde1ed0d7c9c5e81e295660bb557",
+        "counts": {
+          "total": 12262,
+          "passed": 12262,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 0,
+          "pendingSuites": 0,
+          "files": 1389
+        },
+        "temporary": false,
+        "retained": true
+      }
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-release-gate-artifacts-IIb6vj/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:31.730Z",
+      "endedAt": "2026-09-09T11:45:32.407Z",
+      "stdout": "Command inventory written to /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-release-gate-artifacts-IIb6vj/CLI_COMMAND_INVENTORY.md\n",
+      "stderr": "",
+      "remediation": null,
+      "artifact": {
+        "path": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-release-gate-artifacts-IIb6vj/CLI_COMMAND_INVENTORY.md",
+        "produced": true,
+        "temporary": true,
+        "retained": false
+      }
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:32.407Z",
+      "endedAt": "2026-09-09T11:45:33.705Z",
+      "stdout": "rc/vault/dsarCli.ts\": 171,\n    \"src/vault/honeytokens.ts\": 36,\n    \"src/vault/index.ts\": 34,\n    \"src/vault/invoiceFraud.ts\": 42,\n    \"src/vault/knowledgeRefreshLineage.ts\": 329,\n    \"src/vault/memoryTtl.ts\": 72,\n    \"src/vault/metadataScrubber.ts\": 61,\n    \"src/vault/passphraseStore.ts\": 145,\n    \"src/vault/privacyBudget.ts\": 27,\n    \"src/vault/ragGuard.ts\": 40,\n    \"src/vault/screenshotRedact.ts\": 83,\n    \"src/vault/secretsBroker.ts\": 115,\n    \"src/vault/undoLayer.ts\": 82,\n    \"src/vault/vault.ts\": 691,\n    \"src/vault/vaultCli.ts\": 69,\n    \"src/vault/vaultCrypto.ts\": 74,\n    \"src/vault/zkPrivacy.ts\": 756,\n    \"src/verify/verifyAll.ts\": 484,\n    \"src/version.ts\": 13,\n    \"src/watch/agentBus.ts\": 75,\n    \"src/watch/agentReadingTestLiveDrift.ts\": 364,\n    \"src/watch/aiReputationClaudeLiveDrift.ts\": 426,\n    \"src/watch/awesomeAgentMemoryLiveDrift.ts\": 359,\n    \"src/watch/behavioralProfiler.ts\": 354,\n    \"src/watch/bishengObservabilityLiveDrift.ts\": 518,\n    \"src/watch/braintrustLiveDrift.ts\": 211,\n    \"src/watch/continuousMonitor.ts\": 524,\n    \"src/watch/ctfAgentBenchmarkLiveDrift.ts\": 475,\n    \"src/watch/darwinGodelMachineLiveDrift.ts\": 532,\n    \"src/watch/dashboardFeed.ts\": 90,\n    \"src/watch/decibenchVoiceLiveDrift.ts\": 246,\n    \"src/watch/driftMath.ts\": 187,\n    \"src/watch/evidenceDrilldown.ts\": 64,\n    \"src/watch/evidenceRefs.ts\": 14,\n    \"src/watch/explainabilityPacket.ts\": 29,\n    \"src/watch/garageLiveDrift.ts\": 471,\n    \"src/watch/hookActionLifecycle.ts\": 364,\n    \"src/watch/hookHealthDiagnostics.ts\": 314,\n    \"src/watch/hostHardening.ts\": 79,\n    \"src/watch/index.ts\": 434,\n    \"src/watch/liveDriftAlerts.ts\": 10158,\n    \"src/watch/liveDriftTypes.ts\": 4436,\n    \"src/watch/llmFighterLiveDrift.ts\": 451,\n    \"src/watch/lmnrObservabilityLiveDrift.ts\": 431,\n    \"src/watch/multiTenantVerifier.ts\": 49,\n    \"src/watch/narrowTaskBroadMisalignmentLiveDrift.ts\": 425,\n    \"src/watch/observabilityBridge.ts\": 1158,\n    \"src/watch/openCompassLiveDrift.ts\": 491,\n    \"src/watch/outputAttestation.ts\": 34,\n    \"src/watch/overrideNearMissAnalytics.ts\": 473,\n    \"src/watch/paperReadSkillLiveDrift.ts\": 175,\n    \"src/watch/policyPacks.ts\": 89,\n    \"src/watch/proofDelegatedMonitor.ts\": 242,\n    \"src/watch/providerDriftAlerts.ts\": 5,\n    \"src/watch/ragTextGenerationLiveDrift.ts\": 354,\n    \"src/watch/railScoreLiveDrift.ts\": 492,\n    \"src/watch/realtimeAssurance.ts\": 709,\n    \"src/watch/reflexionAgentLiveDrift.ts\": 178,\n    \"src/watch/safetyTestkit.ts\": 260,\n    \"src/watch/sessionDriftProjection.ts\": 105,\n    \"src/watch/siemExporter.ts\": 173,\n    \"src/watch/skillMatchLiveDrift.ts\": 205,\n    \"src/watch/traceFailureIndex.ts\": 484,\n    \"src/watch/trismAgenticLiveDrift.ts\": 425,\n    \"src/wire/ndjsonFraming.ts\": 193,\n    \"src/wire/wireCli.ts\": 145,\n    \"src/wire/wireClient.ts\": 290,\n    \"src/wire/wireCodecs.ts\": 120,\n    \"src/wire/wireDispatcher.ts\": 211,\n    \"src/wire/wireJson.ts\": 278,\n    \"src/wire/wireListener.ts\": 249,\n    \"src/wire/wireMethods.ts\": 141,\n    \"src/wire/wireReply.ts\": 90,\n    \"src/wire/wireRpc.ts\": 154,\n    \"src/wire/workAcceptance.ts\": 244,\n    \"src/workflow/workflowPlan.ts\": 140,\n    \"src/workflow/workflowRunner.ts\": 167,\n    \"src/workflow/workflowTool.ts\": 96,\n    \"src/workorders/workorderCli.ts\": 23,\n    \"src/workorders/workorderEngine.ts\": 313,\n    \"src/workorders/workorderSchema.ts\": 34,\n    \"src/workspace.ts\": 782,\n    \"src/workspaces/hostAuth.ts\": 191,\n    \"src/workspaces/hostBootstrap.ts\": 116,\n    \"src/workspaces/hostCli.ts\": 177,\n    \"src/workspaces/hostDb.ts\": 1248,\n    \"src/workspaces/hostSchema.ts\": 33,\n    \"src/workspaces/workspaceContext.ts\": 8,\n    \"src/workspaces/workspaceId.ts\": 33,\n    \"src/workspaces/workspaceManager.ts\": 246,\n    \"src/workspaces/workspacePaths.ts\": 57,\n    \"src/workspaces/workspaceResolver.ts\": 43,\n    \"src/workspaces/workspaceRouter.ts\": 1778,\n    \"src/workspaces/workspaceRuntimeRegistry.ts\": 44,\n    \"src/workspaces/workspaceStudioProxy.ts\": 62\n  },\n  \"prefixBranchCount\": 2,\n  \"failures\": []\n}\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:33.705Z",
+      "endedAt": "2026-09-09T11:45:33.996Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:docs-drift\n> node scripts/docs-drift-check.mjs\n\nDocs drift check passed (212 files scanned).\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:33.996Z",
+      "endedAt": "2026-09-09T11:45:34.822Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 audit:runtime\n> pnpm audit --prod --audit-level moderate\n\nNo known vulnerabilities found\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:34.822Z",
+      "endedAt": "2026-09-09T11:45:36.168Z",
+      "stdout": "icense issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"privacy-security-mobility\",\n      \"name\": \"Privacy & Security\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"freight-3pl-warehouse\",\n      \"name\": \"Freight, 3PL & Warehouse Operations\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 8,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"cognition-to-intelligence\",\n      \"name\": \"Cognition to Intelligence\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"networked-ecosystems\",\n      \"name\": \"Connectivity to Networked Ecosystems\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"os-sustainable-outcomes\",\n      \"name\": \"Operating System for Sustainable Outcomes\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+      "stderr": "\n",
+      "remediation": null
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:45:36.169Z",
+      "endedAt": "2026-09-09T11:47:44.898Z",
+      "stdout": "up-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\\\"\\n}\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 733\n        },\n        {\n          \"id\": \"guide\",\n          \"command\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc guide\",\n          \"status\": \"passed\",\n          \"exitCode\": 0,\n          \"startedAt\": \"2026-09-09T11:47:36.090Z\",\n          \"endedAt\": \"2026-09-09T11:47:36.787Z\",\n          \"stdout\": \"\\n  🧭 Agent \\\"default\\\" has 244 gaps to close for L1 — Initial. 0/244 questions already at target.\\n\\n  1. AMC-3.1.1: Integrity (Alignment with North Star)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Completion Above Alignment\\\". Need \\\"Alignment Intent, Weak Practice\\\".\\n     Run: amc evidence collect\\n\\n  2. AMC-3.1.2: Ethics (Safety, Privacy, Fairness)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Ethics Ignored\\\". Need \\\"Ethics as Intent Only\\\".\\n     Run: amc evidence collect\\n\\n  3. AMC-3.1.3: Inspiration (Source of Improvement)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Trend Copying\\\". Need \\\"Benchmark Chasing\\\".\\n     Run: amc evidence collect\\n\\n  4. AMC-3.1.4: Innovation (Continuous Improvement Maturity)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Innovation Ignored\\\". Need \\\"Innovation When Forced\\\".\\n     Run: amc evidence collect\\n\\n  5. AMC-3.1.5: Optimization & Tradeoff Discipline\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Vanity Output Optimization\\\". Need \\\"Single-Metric Optimization\\\".\\n     Run: amc evidence collect\\n\\n  6. AMC-3.1.6: User Focus (Education → Ownership → Commitment)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Basic Support Only\\\". Need \\\"Responsive Service\\\".\\n     Run: amc evidence collect\\n\\n  7. AMC-3.2.1: Role Positioning & Responsibility\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Role Confusion\\\". Need \\\"Role Stated, Not Enforced\\\".\\n     Run: amc evidence collect\\n\\n  8. AMC-3.2.2: Identity, Voice, and Trust Signals\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Style Only / Inconsistent Persona\\\". Need \\\"Branded Tone, Weak Substance\\\".\\n     Run: amc evidence collect\\n\\n  ... and 236 more gaps. Use --export to see all.\\n\\n  Export all guides: amc guide --export\\n  Generate guardrails: amc guide --guardrails\\n  Apply to agent config: amc guide --apply\\n  Mechanic mode (pick & choose): amc guide --interactive\\n  Continuous monitoring: amc guide --watch\\n  Compare with previous: amc guide --diff\\n  List supported frameworks: amc guide --frameworks\\n  Target specific level: amc guide --target 4\\n\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 698\n        }\n      ],\n      \"assertions\": [\n        {\n          \"id\": \"amc-bin\",\n          \"status\": \"passed\",\n          \"details\": \"Installed CLI bin is present.\"\n        },\n        {\n          \"id\": \"full-score-contract\",\n          \"status\": \"passed\",\n          \"details\": \"questions=244; CLI-reported SLA met=true\"\n        },\n        {\n          \"id\": \"domain-pack-count\",\n          \"status\": \"passed\",\n          \"details\": \"packs=41\"\n        }\n      ],\n      \"status\": \"passed\",\n      \"checkCounts\": {\n        \"planned\": 10,\n        \"executed\": 10,\n        \"passed\": 10,\n        \"failed\": 0,\n        \"skipped\": 0\n      },\n      \"summary\": \"10/10 automated checks passed; 0 failed; 0 skipped.\",\n      \"measurements\": {\n        \"installWallMs\": 6819,\n        \"scoreCommandWallMs\": 1050,\n        \"cliReportedDiagnosticMs\": 330,\n        \"cliReportedSla\": {\n          \"targetMs\": 120000,\n          \"elapsedMs\": 330,\n          \"met\": true\n        }\n      },\n      \"evidence\": {\n        \"questionCount\": 244,\n        \"domainPackCount\": 41,\n        \"artifactStatus\": \"VALID\",\n        \"evidenceStatus\": \"INSUFFICIENT_EVIDENCE\",\n        \"claimEligible\": false\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-09-09T11:47:44.898Z",
+      "endedAt": "2026-09-09T11:47:44.898Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ],
+  "remediations": [
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ]
+}

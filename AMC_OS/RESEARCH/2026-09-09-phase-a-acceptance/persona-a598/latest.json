@@ -1,0 +1,1578 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "install-persona-qa",
+  "measurementType": "automated-contract-checks",
+  "startedAt": "2026-09-09T11:45:36.343Z",
+  "endedAt": "2026-09-09T11:47:36.788Z",
+  "status": "passed",
+  "summary": "103/103 persona checks passed; 0 failed; 0 skipped. Setup: 2/2 checks passed; 0 failed; 0 skipped.",
+  "packageTarball": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+  "personaCount": 10,
+  "checkCounts": {
+    "planned": 103,
+    "executed": 103,
+    "passed": 103,
+    "failed": 0,
+    "skipped": 0
+  },
+  "setupCheckCounts": {
+    "planned": 2,
+    "executed": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scope": "Automated command exit and declared JSON contract checks. Human usability, workflow quality and maturity qualification are outside this measurement.",
+  "reportPath": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/checkout/tmp/persona-install-qa/latest.md",
+  "setupSteps": [
+    {
+      "id": "package-pack",
+      "command": "npm pack --json --ignore-scripts --pack-destination /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK",
+      "status": "passed",
+      "exitCode": 0,
+      "startedAt": "2026-09-09T11:45:36.344Z",
+      "endedAt": "2026-09-09T11:45:38.946Z",
+      "stdout": "ces/hostSchema.js\",\n        \"size\": 906,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceContext.d.ts\",\n        \"size\": 135,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceContext.js\",\n        \"size\": 11,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceId.d.ts\",\n        \"size\": 278,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceId.js\",\n        \"size\": 1134,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceManager.d.ts\",\n        \"size\": 992,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceManager.js\",\n        \"size\": 10026,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspacePaths.d.ts\",\n        \"size\": 585,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspacePaths.js\",\n        \"size\": 1647,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceResolver.d.ts\",\n        \"size\": 478,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceResolver.js\",\n        \"size\": 995,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceRouter.d.ts\",\n        \"size\": 507,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceRouter.js\",\n        \"size\": 71763,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceRuntimeRegistry.d.ts\",\n        \"size\": 489,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceRuntimeRegistry.js\",\n        \"size\": 1874,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceStudioProxy.d.ts\",\n        \"size\": 366,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"dist/workspaces/workspaceStudioProxy.js\",\n        \"size\": 2706,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"docs/NATIVE_SANDBOX_UBUNTU.md\",\n        \"size\": 9139,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"fixtures/policy/amc-ci-policy-fixtures.yaml\",\n        \"size\": 1176,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"package.json\",\n        \"size\": 7129,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"scripts/postinstall.js\",\n        \"size\": 1020,\n        \"mode\": 384\n      },\n      {\n        \"path\": \"scripts/run-policy-fixtures-ci.mjs\",\n        \"size\": 2873,\n        \"mode\": 384\n      }\n    ],\n    \"entryCount\": 3839,\n    \"bundled\": []\n  }\n]\n",
+      "stderr": "",
+      "remediation": null,
+      "durationMs": 2602
+    }
+  ],
+  "setupAssertions": [
+    {
+      "id": "package-tarball",
+      "status": "passed",
+      "details": "Packed tarball is present."
+    }
+  ],
+  "results": [
+    {
+      "persona": {
+        "id": "solo-dev",
+        "name": "Solo Developer",
+        "agentId": "solo-dev-agent",
+        "fixture": "node-cli",
+        "checks": [
+          [
+            "history",
+            [
+              "history",
+              "--limit",
+              "5"
+            ],
+            "History command must exit successfully after the score command."
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:38.948Z",
+          "endedAt": "2026-09-09T11:45:45.634Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6686
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:45.634Z",
+          "endedAt": "2026-09-09T11:45:46.850Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1216
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:46.850Z",
+          "endedAt": "2026-09-09T11:45:47.530Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 680
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc --agent solo-dev-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:47.530Z",
+          "endedAt": "2026-09-09T11:45:48.591Z",
+          "stdout": "making maturity, compliance, or deployment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 314,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 314,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runs/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/reports/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/lifecycle-runs/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/episodes/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/finding-proofs/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/lifecycle-receipts/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/observability-lane/dfe3c2a0-99bf-4831-a32f-3d048e13c6fe.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1061
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:48.591Z",
+          "endedAt": "2026-09-09T11:45:49.289Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 698
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc runtime create --run solo-dev-runtime --agent solo-dev-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:49.289Z",
+          "endedAt": "2026-09-09T11:45:50.008Z",
+          "stdout": "ken\": \"resume_c212576a645aed3159809569\",\n    \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_93c00afa-00ea-4667-9bf2-e2a11feaef3c\",\n    \"runId\": \"solo-dev-runtime\",\n    \"agentId\": \"solo-dev-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:45:49.962Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/events/rte_run_started_93c00afa-00ea-4667-9bf2-e2a11feaef3c.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/events/rte_run_started_93c00afa-00ea-4667-9bf2-e2a11feaef3c.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/events/rte_run_started_93c00afa-00ea-4667-9bf2-e2a11feaef3c.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/.amc/agents/solo-dev-agent/runtime-runs/solo-dev-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 719
+        },
+        {
+          "id": "history",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/solo-dev/node_modules/.bin/amc history --limit 5",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:50.008Z",
+          "endedAt": "2026-09-09T11:45:50.730Z",
+          "stdout": "dfe3c2a0-99bf-4831-a32f-3d048e13c6fe | 2026-09-09T11:45:48.545Z | VALID | window 2026-08-10T11:45:48.472Z -> 2026-09-09T11:45:48.472Z\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 722
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6686,
+        "scoreCommandWallMs": 1061,
+        "cliReportedDiagnosticMs": 314,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 314,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "platform-engineer",
+        "name": "Platform Engineer",
+        "agentId": "platform-agent",
+        "fixture": "typescript-service",
+        "checks": [
+          [
+            "resource-validate",
+            [
+              "resource",
+              "validate",
+              "--agent",
+              "platform-agent",
+              "--json"
+            ],
+            "Resource guardrails validate"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:50.731Z",
+          "endedAt": "2026-09-09T11:45:57.313Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6582
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:57.313Z",
+          "endedAt": "2026-09-09T11:45:58.162Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 849
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:58.162Z",
+          "endedAt": "2026-09-09T11:45:58.842Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 680
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc --agent platform-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:58.842Z",
+          "endedAt": "2026-09-09T11:45:59.928Z",
+          "stdout": "holds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 364,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 364,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runs/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/reports/726b97e8-52e9-47f7-b3a8-db8b145ae3af.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/lifecycle-runs/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/episodes/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/finding-proofs/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/lifecycle-receipts/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/observability-lane/726b97e8-52e9-47f7-b3a8-db8b145ae3af.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1086
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:45:59.928Z",
+          "endedAt": "2026-09-09T11:46:00.632Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 704
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc runtime create --run platform-engineer-runtime --agent platform-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:00.632Z",
+          "endedAt": "2026-09-09T11:46:01.342Z",
+          "stdout": "as/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_c6c6ec1d-1236-4d96-8784-390e0e51f153\",\n    \"runId\": \"platform-engineer-runtime\",\n    \"agentId\": \"platform-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:01.298Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/events/rte_run_started_c6c6ec1d-1236-4d96-8784-390e0e51f153.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/events/rte_run_started_c6c6ec1d-1236-4d96-8784-390e0e51f153.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/events/rte_run_started_c6c6ec1d-1236-4d96-8784-390e0e51f153.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/runtime-runs/platform-engineer-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 710
+        },
+        {
+          "id": "resource-validate",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/node_modules/.bin/amc resource validate --agent platform-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:01.342Z",
+          "endedAt": "2026-09-09T11:46:02.038Z",
+          "stdout": "signatureExists\": true,\n    \"artifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/enforce/resources/manifest.json\",\n    \"sigPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/enforce/resources/manifest.json.sig\",\n    \"reason\": null,\n    \"artifactSha256\": \"edd0ddb6dfa134c3edaaf7e47cf94b88dac2e31df42d6182be9d13dbadc8729d\"\n  },\n  \"gates\": [\n    {\n      \"id\": \"manifest-signature-valid\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Baseline manifest signature is valid.\",\n      \"evidenceRefs\": [\n        \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/platform-engineer/.amc/agents/platform-agent/enforce/resources/manifest.json\"\n      ]\n    },\n    {\n      \"id\": \"manifest-diff-computed\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Manifest diff computed: 0 added, 0 changed, 0 removed, 4 unchanged.\",\n      \"evidenceRefs\": [\n        \"enforce-resources-1858928e1bb4a78c\",\n        \"enforce-resources-1858928e1bb4a78c\"\n      ]\n    },\n    {\n      \"id\": \"owners-present\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Every governed resource has an owner.\",\n      \"evidenceRefs\": []\n    },\n    {\n      \"id\": \"paths-contained\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"All governed resource paths remain inside the workspace.\",\n      \"evidenceRefs\": []\n    },\n    {\n      \"id\": \"immutable-resources-protected\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Immutable signature resources were not changed or removed.\",\n      \"evidenceRefs\": []\n    },\n    {\n      \"id\": \"rollback-snapshot-available\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Rollback snapshot bundle is available.\",\n      \"evidenceRefs\": [\n        \"enforce-resources-1858928e1bb4a78c\"\n      ]\n    },\n    {\n      \"id\": \"changes-require-review\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"No resource changes are pending.\",\n      \"evidenceRefs\": []\n    },\n    {\n      \"id\": \"changed-resources-have-evidence\",\n      \"surface\": \"Enforce\",\n      \"status\": \"passed\",\n      \"summary\": \"Changed resources have evidence references or no changes are pending.\",\n      \"evidenceRefs\": []\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 696
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6582,
+        "scoreCommandWallMs": 1086,
+        "cliReportedDiagnosticMs": 364,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 364,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "security-lead",
+        "name": "Security Lead",
+        "agentId": "security-agent",
+        "fixture": "security-bot",
+        "checks": [
+          [
+            "assurance-help",
+            [
+              "assurance",
+              "--help"
+            ],
+            "Assurance help command must exit successfully."
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:02.039Z",
+          "endedAt": "2026-09-09T11:46:08.277Z",
+          "stdout": "added 170 packages in 6s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6238
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:08.277Z",
+          "endedAt": "2026-09-09T11:46:09.149Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 872
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:09.149Z",
+          "endedAt": "2026-09-09T11:46:09.848Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 699
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc --agent security-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:09.849Z",
+          "endedAt": "2026-09-09T11:46:10.901Z",
+          "stdout": "loyment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 312,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 312,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runs/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/reports/248c6702-920e-4c27-a32d-11534fe9998c.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/lifecycle-runs/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/episodes/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/finding-proofs/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/lifecycle-receipts/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/observability-lane/248c6702-920e-4c27-a32d-11534fe9998c.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1052
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:10.901Z",
+          "endedAt": "2026-09-09T11:46:11.618Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 717
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc runtime create --run security-lead-runtime --agent security-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:11.618Z",
+          "endedAt": "2026-09-09T11:46:12.351Z",
+          "stdout": "cceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_a248e6ab-bfee-402f-827d-1d5c9cd1e5f3\",\n    \"runId\": \"security-lead-runtime\",\n    \"agentId\": \"security-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:12.307Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/events/rte_run_started_a248e6ab-bfee-402f-827d-1d5c9cd1e5f3.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/events/rte_run_started_a248e6ab-bfee-402f-827d-1d5c9cd1e5f3.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/events/rte_run_started_a248e6ab-bfee-402f-827d-1d5c9cd1e5f3.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/.amc/agents/security-agent/runtime-runs/security-lead-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 733
+        },
+        {
+          "id": "assurance-help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/security-lead/node_modules/.bin/amc assurance --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:12.351Z",
+          "endedAt": "2026-09-09T11:46:13.040Z",
+          "stdout": "     Apply assurance policy from YAML/JSON file\n  run [options]                  Run assurance pack(s) with deterministic\n                                 validation\n  runs                           List assurance lab runs\n  show [options]                 Show assurance run artifacts\n  cert-issue [options]           Issue signed assurance certificate for a run\n  cert-verify <file>             Verify assurance certificate bundle offline\n  scheduler                      Assurance scheduler controls\n  waiver                         Assurance threshold waiver controls\n  history [options]              List assurance run history\n  verify [options]               Verify assurance run determinism and signatures\n  patch [options]                Apply deterministic patch kit for failed\n                                 assurance findings\n  help [command]                 display help for command\n\nStart with a task:\n  • Run a native task     → amc agent-loop guide\n  • Assess evidence       → amc (baseline/assessment)\n  • Connect an agent      → amc connect\n  • First-time setup      → amc init --minimal\n  • Health check          → amc doctor\n  • Start services        → amc up\n  • Full assessment       → amc          / amc run / amc score\n  • Govern resources      → amc resource validate / amc resource apply\n  • Run assurance         → amc assurance run --all\n  • Inspect traces        → amc trace list / amc trace inspect\n  • Build audit artifacts → amc audit binder create\n  • Explore interactively → amc shell\n\nQuick start by role:\n  Developer   → amc agent-loop guide\n  DevOps      → amc ci check\n  Compliance  → amc comply report --framework EU_AI_ACT\n  Security    → amc redteam run\n  Executive   → amc fleet status | amc dashboard open\n\nDiscoverability:\n  • Use 'amc help <command>' for detailed subcommand docs\n  • Use '--help' after any command path (for example: 'amc run --help')\n  • Set NO_COLOR=1 or pass '--no-color' for plain, non-colored output\n  • Use 'amc commands --markdown' to generate the live CLI inventory for docs\n  • Namespace shortcuts:\n      - evidence  → verify, bundle, transparency, receipts\n      - score     → score, diagnostic, compare\n      - incidents → assurance, drift, integrations dispatch\n      - audit     → audit binder, policy, scheduler\n      - admin     → user, identity, vault, trust, ops\n      - lifecycle → init, up, doctor, verify\n      - eval      → run, compare, whatif\n  • Start with common entry points: amc, run, doctor, up, score, verify\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 689
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6238,
+        "scoreCommandWallMs": 1052,
+        "cliReportedDiagnosticMs": 312,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 312,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "compliance-officer",
+        "name": "Compliance Officer",
+        "agentId": "compliance-agent",
+        "fixture": "governance-assistant",
+        "checks": [
+          [
+            "comply-help",
+            [
+              "comply",
+              "--help"
+            ],
+            "Compliance help command must exit successfully."
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:13.042Z",
+          "endedAt": "2026-09-09T11:46:19.618Z",
+          "stdout": "added 170 packages in 6s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6576
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:19.618Z",
+          "endedAt": "2026-09-09T11:46:20.454Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 836
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:20.454Z",
+          "endedAt": "2026-09-09T11:46:21.142Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 688
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc --agent compliance-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:21.142Z",
+          "endedAt": "2026-09-09T11:46:22.179Z",
+          "stdout": "yIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 318,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 318,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runs/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/reports/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/lifecycle-runs/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/episodes/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/finding-proofs/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/lifecycle-receipts/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/observability-lane/a6e36705-2cfa-4356-bd4b-04b5ba446fbd.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1037
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:22.179Z",
+          "endedAt": "2026-09-09T11:46:22.877Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 698
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc runtime create --run compliance-officer-runtime --agent compliance-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:22.877Z",
+          "endedAt": "2026-09-09T11:46:23.659Z",
+          "stdout": "ompliance-agent/runtime-runs/compliance-officer-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_3f793344-d745-4dfb-90fb-83ebafcfd45c\",\n    \"runId\": \"compliance-officer-runtime\",\n    \"agentId\": \"compliance-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:23.616Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/events/rte_run_started_3f793344-d745-4dfb-90fb-83ebafcfd45c.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/events/rte_run_started_3f793344-d745-4dfb-90fb-83ebafcfd45c.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/events/rte_run_started_3f793344-d745-4dfb-90fb-83ebafcfd45c.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/.amc/agents/compliance-agent/runtime-runs/compliance-officer-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 782
+        },
+        {
+          "id": "comply-help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/compliance-officer/node_modules/.bin/amc comply --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:23.659Z",
+          "endedAt": "2026-09-09T11:46:24.357Z",
+          "stdout": "ps signature\n  report [options]            Generate evidence-linked compliance report\n  fleet [options]             Generate fleet compliance summary\n  diff <reportA> <reportB>    Diff two compliance report JSON files\n  matrix [options]            Generate multi-framework compliance coverage\n                              matrix with gap analysis\n  risk-classify [options]     Classify agent into EU AI Act risk tiers\n                              (UNACCEPTABLE / HIGH / LIMITED / MINIMAL)\n  roadmap [options]           Generate step-by-step compliance plan for a\n                              framework\n  regulatory-feeds [options]  List all configured regulatory feed sources\n  regulatory-check [options]  Check for regulatory changes from configured feeds\n  regulatory-gap [options]    Run gap analysis against current AMC configuration\n  help [command]              display help for command\n\nStart with a task:\n  • Run a native task     → amc agent-loop guide\n  • Assess evidence       → amc (baseline/assessment)\n  • Connect an agent      → amc connect\n  • First-time setup      → amc init --minimal\n  • Health check          → amc doctor\n  • Start services        → amc up\n  • Full assessment       → amc          / amc run / amc score\n  • Govern resources      → amc resource validate / amc resource apply\n  • Run assurance         → amc assurance run --all\n  • Inspect traces        → amc trace list / amc trace inspect\n  • Build audit artifacts → amc audit binder create\n  • Explore interactively → amc shell\n\nQuick start by role:\n  Developer   → amc agent-loop guide\n  DevOps      → amc ci check\n  Compliance  → amc comply report --framework EU_AI_ACT\n  Security    → amc redteam run\n  Executive   → amc fleet status | amc dashboard open\n\nDiscoverability:\n  • Use 'amc help <command>' for detailed subcommand docs\n  • Use '--help' after any command path (for example: 'amc run --help')\n  • Set NO_COLOR=1 or pass '--no-color' for plain, non-colored output\n  • Use 'amc commands --markdown' to generate the live CLI inventory for docs\n  • Namespace shortcuts:\n      - evidence  → verify, bundle, transparency, receipts\n      - score     → score, diagnostic, compare\n      - incidents → assurance, drift, integrations dispatch\n      - audit     → audit binder, policy, scheduler\n      - admin     → user, identity, vault, trust, ops\n      - lifecycle → init, up, doctor, verify\n      - eval      → run, compare, whatif\n  • Start with common entry points: amc, run, doctor, up, score, verify\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 698
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6576,
+        "scoreCommandWallMs": 1037,
+        "cliReportedDiagnosticMs": 318,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 318,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "ai-product-manager",
+        "name": "AI Product Manager",
+        "agentId": "product-agent",
+        "fixture": "product-copilot",
+        "checks": [
+          [
+            "strategy-compare",
+            [
+              "strategy",
+              "compare",
+              "--file",
+              "strategies.json",
+              "--agent",
+              "product-agent",
+              "--json"
+            ],
+            "Strategy comparison returns a recommendation"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:24.358Z",
+          "endedAt": "2026-09-09T11:46:31.174Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6816
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:31.174Z",
+          "endedAt": "2026-09-09T11:46:32.007Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 833
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:32.007Z",
+          "endedAt": "2026-09-09T11:46:32.792Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 785
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc --agent product-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:32.792Z",
+          "endedAt": "2026-09-09T11:46:33.879Z",
+          "stdout": "holds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 311,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 311,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runs/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/reports/fea32f78-2723-4f7d-8e18-d2af92c09b67.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/lifecycle-runs/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/episodes/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/finding-proofs/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/lifecycle-receipts/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/observability-lane/fea32f78-2723-4f7d-8e18-d2af92c09b67.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1087
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:33.879Z",
+          "endedAt": "2026-09-09T11:46:34.588Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 709
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc runtime create --run ai-product-manager-runtime --agent product-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:34.588Z",
+          "endedAt": "2026-09-09T11:46:35.334Z",
+          "stdout": "oduct-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_ed06827c-eb92-498d-b8b4-8642c9dbfea0\",\n    \"runId\": \"ai-product-manager-runtime\",\n    \"agentId\": \"product-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:35.291Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/events/rte_run_started_ed06827c-eb92-498d-b8b4-8642c9dbfea0.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/events/rte_run_started_ed06827c-eb92-498d-b8b4-8642c9dbfea0.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/events/rte_run_started_ed06827c-eb92-498d-b8b4-8642c9dbfea0.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/runtime-runs/ai-product-manager-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 746
+        },
+        {
+          "id": "strategy-compare",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/node_modules/.bin/amc strategy compare --file strategies.json --agent product-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:35.334Z",
+          "endedAt": "2026-09-09T11:46:36.055Z",
+          "stdout": ",\n          \"episode-remote\",\n          \"eval-remote\"\n        ]\n      },\n      {\n        \"receiptId\": \"strategy.validation-strategy-run-10f9710c3ad7a653\",\n        \"receiptType\": \"strategy.validation\",\n        \"status\": \"accepted\",\n        \"createdAt\": \"2026-09-09T11:46:36.010Z\",\n        \"strategyRunId\": \"strategy-run-10f9710c3ad7a653\",\n        \"recommendedStrategyId\": \"local-safe\",\n        \"policyChecks\": [\n          {\n            \"policyId\": \"strategy-count\",\n            \"passed\": true,\n            \"summary\": \"At least two inference strategies were compared.\",\n            \"evidenceRefs\": [\n              \"local-safe\",\n              \"remote-quality\"\n            ]\n          },\n          {\n            \"policyId\": \"recommended-evidence-present\",\n            \"passed\": true,\n            \"summary\": \"Recommended strategy has evidence references.\",\n            \"evidenceRefs\": [\n              \"episode-local\",\n              \"eval-local\"\n            ]\n          },\n          {\n            \"policyId\": \"risk-within-limit\",\n            \"passed\": true,\n            \"summary\": \"Recommended strategy risk is within policy.\",\n            \"evidenceRefs\": [\n              \"episode-local\",\n              \"eval-local\"\n            ]\n          },\n          {\n            \"policyId\": \"route-change-approved\",\n            \"passed\": true,\n            \"summary\": \"No route change requested.\",\n            \"evidenceRefs\": [\n              \"episode-local\",\n              \"eval-local\"\n            ]\n          }\n        ],\n        \"evidenceRefs\": [\n          \"local-safe\",\n          \"remote-quality\",\n          \"episode-local\",\n          \"eval-local\",\n          \"episode-local\",\n          \"eval-local\",\n          \"episode-local\",\n          \"eval-local\"\n        ]\n      }\n    ],\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/experiments/inference-strategies/strategy-run-10f9710c3ad7a653/strategy-run.json.sig\"\n  },\n  \"path\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/experiments/inference-strategies/strategy-run-10f9710c3ad7a653/strategy-run.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/ai-product-manager/.amc/agents/product-agent/experiments/inference-strategies/strategy-run-10f9710c3ad7a653/strategy-run.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 721
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        },
+        {
+          "id": "strategy-recommendation",
+          "status": "passed",
+          "details": "recommended=local-safe"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 11,
+        "executed": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "11/11 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6816,
+        "scoreCommandWallMs": 1087,
+        "cliReportedDiagnosticMs": 311,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 311,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "qa-engineer",
+        "name": "QA Engineer",
+        "agentId": "qa-agent",
+        "fixture": "test-agent",
+        "checks": [
+          [
+            "eval-help",
+            [
+              "eval",
+              "--help"
+            ],
+            "Eval help command must exit successfully."
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:36.057Z",
+          "endedAt": "2026-09-09T11:46:43.830Z",
+          "stdout": "added 170 packages in 8s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 7773
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:43.831Z",
+          "endedAt": "2026-09-09T11:46:44.670Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 839
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:44.670Z",
+          "endedAt": "2026-09-09T11:46:45.352Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 682
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc --agent qa-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:45.352Z",
+          "endedAt": "2026-09-09T11:46:46.405Z",
+          "stdout": "and rerun amc before making maturity, compliance, or deployment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 335,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 335,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runs/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/reports/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/lifecycle-runs/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/episodes/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/finding-proofs/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/lifecycle-receipts/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/observability-lane/b59ec497-5a4b-4896-8bbf-b5c42d9a9c50.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1053
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:46.405Z",
+          "endedAt": "2026-09-09T11:46:47.100Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 695
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc runtime create --run qa-engineer-runtime --agent qa-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:47.100Z",
+          "endedAt": "2026-09-09T11:46:47.826Z",
+          "stdout": "eToken\": \"resume_b3c16cd86fc9cfe4dfb56155\",\n    \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_410cc478-52d0-4b89-83cd-f3448f97e96d\",\n    \"runId\": \"qa-engineer-runtime\",\n    \"agentId\": \"qa-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:47.781Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/events/rte_run_started_410cc478-52d0-4b89-83cd-f3448f97e96d.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/events/rte_run_started_410cc478-52d0-4b89-83cd-f3448f97e96d.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/events/rte_run_started_410cc478-52d0-4b89-83cd-f3448f97e96d.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/.amc/agents/qa-agent/runtime-runs/qa-engineer-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 726
+        },
+        {
+          "id": "eval-help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/qa-engineer/node_modules/.bin/amc eval --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:47.826Z",
+          "endedAt": "2026-09-09T11:46:48.593Z",
+          "stdout": "Usage: amc eval [options] [command]\n\nEval interop import and coverage status\n\nOptions:\n  -h, --help          display help for command\n\nCommands:\n  registry [options]  Show signed metadata for existing AMC evaluators\n  import [options]    Import eval outputs (LangSmith, DeepEval, Promptfoo,\n                      OpenAI Evals, W&B, Langfuse, LangWatch) into signed AMC\n                      evidence\n  status [options]    Show imported eval coverage per AMC dimension\n  run [options]       One-shot evaluation: read amcconfig.yaml, run all\n                      diagnostic tests, output results\n  help [command]      display help for command\n\nStart with a task:\n  • Run a native task     → amc agent-loop guide\n  • Assess evidence       → amc (baseline/assessment)\n  • Connect an agent      → amc connect\n  • First-time setup      → amc init --minimal\n  • Health check          → amc doctor\n  • Start services        → amc up\n  • Full assessment       → amc          / amc run / amc score\n  • Govern resources      → amc resource validate / amc resource apply\n  • Run assurance         → amc assurance run --all\n  • Inspect traces        → amc trace list / amc trace inspect\n  • Build audit artifacts → amc audit binder create\n  • Explore interactively → amc shell\n\nQuick start by role:\n  Developer   → amc agent-loop guide\n  DevOps      → amc ci check\n  Compliance  → amc comply report --framework EU_AI_ACT\n  Security    → amc redteam run\n  Executive   → amc fleet status | amc dashboard open\n\nDiscoverability:\n  • Use 'amc help <command>' for detailed subcommand docs\n  • Use '--help' after any command path (for example: 'amc run --help')\n  • Set NO_COLOR=1 or pass '--no-color' for plain, non-colored output\n  • Use 'amc commands --markdown' to generate the live CLI inventory for docs\n  • Namespace shortcuts:\n      - evidence  → verify, bundle, transparency, receipts\n      - score     → score, diagnostic, compare\n      - incidents → assurance, drift, integrations dispatch\n      - audit     → audit binder, policy, scheduler\n      - admin     → user, identity, vault, trust, ops\n      - lifecycle → init, up, doctor, verify\n      - eval      → run, compare, whatif\n  • Start with common entry points: amc, run, doctor, up, score, verify\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 767
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 7773,
+        "scoreCommandWallMs": 1053,
+        "cliReportedDiagnosticMs": 335,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 335,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "devops-engineer",
+        "name": "DevOps Engineer",
+        "agentId": "devops-agent",
+        "fixture": "ci-agent",
+        "checks": [
+          [
+            "ci-print",
+            [
+              "ci",
+              "print"
+            ],
+            "CI guidance prints without setup"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:48.594Z",
+          "endedAt": "2026-09-09T11:46:55.329Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6735
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:55.329Z",
+          "endedAt": "2026-09-09T11:46:56.175Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 846
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:56.175Z",
+          "endedAt": "2026-09-09T11:46:56.860Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 685
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc --agent devops-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:56.860Z",
+          "endedAt": "2026-09-09T11:46:57.913Z",
+          "stdout": "loyment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 322,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 322,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runs/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/reports/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/lifecycle-runs/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/episodes/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/finding-proofs/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/lifecycle-receipts/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/observability-lane/ce0f7e3c-ebc0-44b0-b9a9-bd90651d35bd.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1053
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:57.913Z",
+          "endedAt": "2026-09-09T11:46:58.672Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 759
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc runtime create --run devops-engineer-runtime --agent devops-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:58.672Z",
+          "endedAt": "2026-09-09T11:46:59.425Z",
+          "stdout": "09-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_ac54fb06-650a-4e0b-8c05-6872f488bc3e\",\n    \"runId\": \"devops-engineer-runtime\",\n    \"agentId\": \"devops-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:46:59.380Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/events/rte_run_started_ac54fb06-650a-4e0b-8c05-6872f488bc3e.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/events/rte_run_started_ac54fb06-650a-4e0b-8c05-6872f488bc3e.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/events/rte_run_started_ac54fb06-650a-4e0b-8c05-6872f488bc3e.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/.amc/agents/devops-agent/runtime-runs/devops-engineer-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 753
+        },
+        {
+          "id": "ci-print",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/devops-engineer/node_modules/.bin/amc ci print",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:46:59.425Z",
+          "endedAt": "2026-09-09T11:47:00.203Z",
+          "stdout": "npm ci\nnpm run build\namc bundle verify .amc/bundles/latest.amcbundle\namc outcomes report --agent default --window 14d --out .amc/outcomes/reports/ci-latest.json\nif [ -n \"$AMC_EXPERIMENT_ID\" ] && [ -f \".amc/experimentGate.json\" ]; then amc experiment gate --agent default --experiment \"$AMC_EXPERIMENT_ID\" --policy .amc/experimentGate.json; fi\namc gate --bundle .amc/bundles/latest.amcbundle --policy .amc/gatePolicy.json\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 778
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6735,
+        "scoreCommandWallMs": 1053,
+        "cliReportedDiagnosticMs": 322,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 322,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "fleet-operator",
+        "name": "Fleet Operator",
+        "agentId": "fleet-agent",
+        "fixture": "multi-agent-system",
+        "checks": [
+          [
+            "fleet-graph-write",
+            [
+              "fleet",
+              "graph",
+              "write",
+              "--file",
+              "graph.json",
+              "--json"
+            ],
+            "Fleet graph writes"
+          ],
+          [
+            "fleet-graph-validate",
+            [
+              "fleet",
+              "graph",
+              "validate",
+              "--json"
+            ],
+            "Fleet graph validates"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:00.204Z",
+          "endedAt": "2026-09-09T11:47:07.926Z",
+          "stdout": "added 170 packages in 8s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 7722
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:07.926Z",
+          "endedAt": "2026-09-09T11:47:08.763Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 837
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:08.763Z",
+          "endedAt": "2026-09-09T11:47:09.443Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 680
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc --agent fleet-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:09.443Z",
+          "endedAt": "2026-09-09T11:47:10.482Z",
+          "stdout": "liance, or deployment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 315,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 315,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runs/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/reports/c313179a-ce40-4a23-b24e-0576cf32d40e.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/lifecycle-runs/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/episodes/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/finding-proofs/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/lifecycle-receipts/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/observability-lane/c313179a-ce40-4a23-b24e-0576cf32d40e.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1039
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:10.482Z",
+          "endedAt": "2026-09-09T11:47:11.209Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 727
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc runtime create --run fleet-operator-runtime --agent fleet-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:11.209Z",
+          "endedAt": "2026-09-09T11:47:11.926Z",
+          "stdout": "-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_f2883ae6-14a5-47c8-916e-0f118c2336da\",\n    \"runId\": \"fleet-operator-runtime\",\n    \"agentId\": \"fleet-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:47:11.883Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/events/rte_run_started_f2883ae6-14a5-47c8-916e-0f118c2336da.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/events/rte_run_started_f2883ae6-14a5-47c8-916e-0f118c2336da.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/events/rte_run_started_f2883ae6-14a5-47c8-916e-0f118c2336da.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/agents/fleet-agent/runtime-runs/fleet-operator-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 717
+        },
+        {
+          "id": "fleet-graph-write",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc fleet graph write --file graph.json --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:11.926Z",
+          "endedAt": "2026-09-09T11:47:12.614Z",
+          "stdout": "    \"permissions\": [\n          \"READ_ONLY\",\n          \"WRITE_LOW\"\n        ]\n      },\n      {\n        \"nodeId\": \"specialist\",\n        \"agentId\": \"fleet-agent-specialist\",\n        \"nodeType\": \"agent\",\n        \"role\": \"specialist\",\n        \"description\": \"Handles routed work.\",\n        \"inputs\": [\n          {\n            \"name\": \"ticket\",\n            \"schema\": \"Ticket\"\n          }\n        ],\n        \"outputs\": [\n          {\n            \"name\": \"resolution\",\n            \"schema\": \"Resolution\"\n          }\n        ],\n        \"tools\": [\n          {\n            \"toolId\": \"kb-search\",\n            \"permission\": \"READ_ONLY\",\n            \"policyRefs\": [\n              \"policy:kb\"\n            ]\n          }\n        ],\n        \"memoryScopes\": [\n          \"case-summary\"\n        ],\n        \"policyRefs\": [\n          \"policy:kb\"\n        ],\n        \"permissions\": [\n          \"READ_ONLY\"\n        ]\n      }\n    ],\n    \"edges\": [\n      {\n        \"edgeId\": \"handoff\",\n        \"from\": \"orchestrator\",\n        \"to\": \"specialist\",\n        \"edgeType\": \"handoff\",\n        \"purpose\": \"Route a validated ticket.\",\n        \"contract\": {\n          \"inputSchema\": \"Ticket\",\n          \"outputSchema\": \"Resolution\",\n          \"requiredEvidence\": [\n            \"signed-handoff\"\n          ],\n          \"approvalRequired\": false\n        },\n        \"permissions\": [\n          \"READ_ONLY\"\n        ],\n        \"failurePropagation\": \"degrade\"\n      }\n    ],\n    \"invariants\": [\n      {\n        \"invariantId\": \"signed-handoffs\",\n        \"description\": \"Handoffs require evidence.\",\n        \"severity\": \"high\",\n        \"requiredEvidence\": [\n          \"signed-handoff\"\n        ]\n      }\n    ]\n  },\n  \"graphPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/fleet/typed-graphs/fleet-operator-graph.json\",\n  \"latestPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/fleet/typed-graphs/latest.json\",\n  \"ref\": {\n    \"graphId\": \"fleet-operator-graph\",\n    \"path\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/fleet/typed-graphs/latest.json\",\n    \"digestSha256\": \"5ce4fc24143a70cba89d4506b85e741effd6b10cd27aa5b33926cc060efc218d\",\n    \"nodeCount\": 2,\n    \"edgeCount\": 1,\n    \"validation\": {\n      \"valid\": true,\n      \"summary\": \"Typed multi-agent graph is valid.\",\n      \"issueCount\": 0,\n      \"issues\": []\n    }\n  }\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 688
+        },
+        {
+          "id": "fleet-graph-validate",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/node_modules/.bin/amc fleet graph validate --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:12.614Z",
+          "endedAt": "2026-09-09T11:47:13.301Z",
+          "stdout": "{\n  \"ref\": {\n    \"graphId\": \"fleet-operator-graph\",\n    \"path\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/fleet-operator/.amc/fleet/typed-graphs/latest.json\",\n    \"digestSha256\": \"5ce4fc24143a70cba89d4506b85e741effd6b10cd27aa5b33926cc060efc218d\",\n    \"nodeCount\": 2,\n    \"edgeCount\": 1,\n    \"validation\": {\n      \"valid\": true,\n      \"summary\": \"Typed multi-agent graph is valid.\",\n      \"issueCount\": 0,\n      \"issues\": []\n    }\n  },\n  \"validation\": {\n    \"valid\": true,\n    \"summary\": \"Typed multi-agent graph is valid.\",\n    \"issueCount\": 0,\n    \"issues\": []\n  }\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 687
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 11,
+        "executed": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "11/11 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 7722,
+        "scoreCommandWallMs": 1039,
+        "cliReportedDiagnosticMs": 315,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 315,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "data-scientist",
+        "name": "Data Scientist",
+        "agentId": "data-agent",
+        "fixture": "eval-notebook-agent",
+        "checks": [
+          [
+            "neutral-import",
+            [
+              "import",
+              "import-data",
+              "--agent",
+              "data-agent",
+              "--dry-run",
+              "--json"
+            ],
+            "Neutral importer detects local traces"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:13.302Z",
+          "endedAt": "2026-09-09T11:47:20.469Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 7167
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:20.469Z",
+          "endedAt": "2026-09-09T11:47:21.352Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 883
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:21.352Z",
+          "endedAt": "2026-09-09T11:47:22.080Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 728
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc --agent data-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:22.080Z",
+          "endedAt": "2026-09-09T11:47:23.112Z",
+          "stdout": "y, compliance, or deployment claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 313,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 313,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runs/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/reports/e3896ae5-7d6a-484d-86a7-3c0c6240d040.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/lifecycle-runs/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/episodes/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/finding-proofs/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/lifecycle-receipts/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/observability-lane/e3896ae5-7d6a-484d-86a7-3c0c6240d040.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1032
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:23.112Z",
+          "endedAt": "2026-09-09T11:47:23.811Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 699
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc runtime create --run data-scientist-runtime --agent data-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:23.811Z",
+          "endedAt": "2026-09-09T11:47:24.534Z",
+          "stdout": "e/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_1892eb19-5297-4df3-938e-aa246af8d13d\",\n    \"runId\": \"data-scientist-runtime\",\n    \"agentId\": \"data-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:47:24.491Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/events/rte_run_started_1892eb19-5297-4df3-938e-aa246af8d13d.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/events/rte_run_started_1892eb19-5297-4df3-938e-aa246af8d13d.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/events/rte_run_started_1892eb19-5297-4df3-938e-aa246af8d13d.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/.amc/agents/data-agent/runtime-runs/data-scientist-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 723
+        },
+        {
+          "id": "neutral-import",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/node_modules/.bin/amc import import-data --agent data-agent --dry-run --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:24.534Z",
+          "endedAt": "2026-09-09T11:47:25.226Z",
+          "stdout": "me, total cost or maturity score is inferred.\",\n          \"Skipped-file record counts are unknown, not zero. Detail truncation never reduces accounting counts; inspect the retained source for omitted details.\"\n        ],\n        \"digestSha256\": \"176a23b95587c18769b73e23c6ab7a21d2d0779d7fe98c83d2e0a11bb92f2020\"\n      },\n      \"counts\": {\n        \"recognizedFiles\": 1,\n        \"skippedFiles\": 0,\n        \"malformedFiles\": 0,\n        \"unsupportedFiles\": 0,\n        \"oversizedFiles\": 0,\n        \"sourceItems\": 2,\n        \"normalizedTraces\": 2,\n        \"failureTraces\": 0,\n        \"unknownTimestamps\": 1,\n        \"unknownDurations\": 1\n      },\n      \"timing\": {\n        \"sourceTime\": \"retained-when-valid-otherwise-null\",\n        \"ingestTime\": \"plan.detectedAt\",\n        \"inferredDurations\": false\n      },\n      \"losses\": [\n        \"Redacted source artifacts are retained; only recognized trace fields are projected into the failure index.\",\n        \"Source item counts include records or config fields; they are not a trace coverage percentage.\",\n        \"Missing or invalid source event times remain unknown; ingestion time is separate.\",\n        \"Missing durations remain unknown, not zero latency. No elapsed duration is inferred between events.\",\n        \"No cost or maturity result is inferred from import completion. Source claims remain self-reported.\"\n      ],\n      \"nextActions\": [\n        {\n          \"label\": \"Inspect supported import options\",\n          \"argv\": [\n            \"amc\",\n            \"import\",\n            \"--help\"\n          ]\n        },\n        {\n          \"label\": \"Apply the reviewed import\",\n          \"argv\": [\n            \"amc\",\n            \"import\",\n            \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/data-scientist/import-data\",\n            \"--agent\",\n            \"data-agent\",\n            \"--expected-digest\",\n            \"7598a58136a114587be9231be17e8e02f6534a1670d238ad6f13dddbfbd40065\"\n          ]\n        },\n        {\n          \"label\": \"Review actual captured evidence\",\n          \"argv\": [\n            \"amc\",\n            \"evidence\",\n            \"--help\"\n          ]\n        }\n      ]\n    }\n  },\n  \"normalizedPath\": null,\n  \"importManifestPath\": null,\n  \"signaturePath\": null,\n  \"diagnosticReportPath\": null,\n  \"diagnosticMarkdownPath\": null,\n  \"episode\": null,\n  \"lifecycleRun\": null,\n  \"resourceManifest\": null,\n  \"traceFailureIndex\": null,\n  \"collaborationTelemetryEvents\": [],\n  \"writtenPaths\": []\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 692
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        },
+        {
+          "id": "import-plan-ready",
+          "status": "passed",
+          "details": "plan.status=ready"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 11,
+        "executed": 11,
+        "passed": 11,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "11/11 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 7167,
+        "scoreCommandWallMs": 1032,
+        "cliReportedDiagnosticMs": 313,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 313,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    },
+    {
+      "persona": {
+        "id": "startup-founder",
+        "name": "Startup Founder",
+        "agentId": "founder-agent",
+        "fixture": "support-agent",
+        "checks": [
+          [
+            "guide",
+            [
+              "guide"
+            ],
+            "Improvement guide is available"
+          ]
+        ]
+      },
+      "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder",
+      "steps": [
+        {
+          "id": "package-install",
+          "command": "npm install --no-audit --fund=false --package-lock=false /private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/agent-maturity-compass-1.2.0.tgz",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:25.228Z",
+          "endedAt": "2026-09-09T11:47:32.047Z",
+          "stdout": "added 170 packages in 7s\n\nPacked tarball installed with npm in an isolated persona workspace.",
+          "stderr": "npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.\n",
+          "remediation": null,
+          "durationMs": 6819
+        },
+        {
+          "id": "version",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc --version",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:32.047Z",
+          "endedAt": "2026-09-09T11:47:32.885Z",
+          "stdout": "1.2.0\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 839
+        },
+        {
+          "id": "help",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc --help",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:32.886Z",
+          "endedAt": "2026-09-09T11:47:33.568Z",
+          "stdout": "ty scoring and diagnostic execution\n  incidents Incident workflows, alerts, and regression detection\n  audit     Audit binder, evidence requests, and control maps\n  admin     Operational health, identity, vault, and trust controls\n  lifecycle Workspace bootstrapping, bring-up, and routine verification\n  eval      Evaluation shortcuts for runs, comparisons, and what-if\n\nHigh-signal commands:\n  evidence\n  amc evidence verify              Run the workspace verification suite\n  amc verify all                   Full trust/policy/plugin verification\n  amc bundle export                Export signed evidence bundle\n  amc transparency verify-bundle   Verify transparency export bundle\n  score\n  amc score tier                   Interactive quick/standard/deep scorecard\n  amc score production-ready       Production readiness gate check\n  incidents\n  amc incident list                List incidents by agent\n  amc incident create              Open a manual incident\n  amc incidents alert              Dispatch INCIDENT_CREATED event\n  amc drift check                  Detect drift that can trigger incidents\n  audit\n  amc audit binder create          Build an audit binder artifact\n  amc audit request list           List open evidence requests\n  amc audit map verify             Verify active compliance maps\n  amc audit verify                 Verify audit policy signatures\n  admin\n  amc setup                        Guided first-time environment setup\n  amc doctor                       System health + misconfiguration checks\n  amc admin status                 Control plane status and signatures\n  amc vault status                 Vault lock/unlock state\n  lifecycle\n  amc resource validate            Validate governed resource drift\n  amc resource apply               Dry-run or accept governed resource changes\n  eval\n  amc eval run                     Alias for diagnostic run\n  amc whatif equalizer             Run equalizer what-if simulation\n  amc e2e smoke                    Run deterministic smoke verification\n\nGlobal options:\n  --agent <agentId>                  Agent ID override\n  --no-color                         Disable ANSI color output (or set NO_COLOR=1)\n  -h, --help                         Show command help\n  -V, --version                      Show CLI version\n\nDiscoverability:\n  amc help <command>                 Detailed help for any command path\n  amc shell                          Interactive REPL session\n  amc --help --all                   Complete command list\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 682
+        },
+        {
+          "id": "full-score",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc --agent founder-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:33.568Z",
+          "endedAt": "2026-09-09T11:47:34.618Z",
+          "stdout": " claims.\",\n    \"thresholds\": {\n      \"readyIntegrity\": 0.6,\n      \"insufficientIntegrityBelow\": 0.4\n    }\n  },\n  \"score\": 0,\n  \"level\": \"L0.00\",\n  \"overallLevel\": 0,\n  \"trustLabel\": \"UNRELIABLE — DO NOT USE FOR CLAIMS\",\n  \"questionCount\": 244,\n  \"integrityIndex\": 0,\n  \"evidenceCoverage\": 0,\n  \"elapsedMs\": 330,\n  \"dimensions\": {\n    \"Strategic Agent Operations\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Leadership & Autonomy\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Culture & Alignment\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Resilience\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    },\n    \"Skills\": {\n      \"score\": 0,\n      \"level\": \"L0.00\"\n    }\n  },\n  \"createdWorkspace\": true,\n  \"createdAgentContext\": true,\n  \"signed\": true,\n  \"vaultReason\": null,\n  \"freshness\": \"generated-now\",\n  \"firstResultSla\": {\n    \"targetMs\": 120000,\n    \"elapsedMs\": 330,\n    \"met\": true\n  },\n  \"reportJsonPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runs/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"reportMarkdownPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/reports/2cd1007c-94a3-4225-95fc-c0b50872b73a.md\",\n  \"lifecycleArtifactPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/lifecycle-runs/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"episodeRecordPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/episodes/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"findingProofsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/finding-proofs/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"lifecycleReceiptsPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/lifecycle-receipts/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"observabilityPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/observability-lane/2cd1007c-94a3-4225-95fc-c0b50872b73a.json\",\n  \"studioEvidenceUrl\": null\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 1050
+        },
+        {
+          "id": "domain-packs",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc domain pack list --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:34.618Z",
+          "endedAt": "2026-09-09T11:47:35.357Z",
+          "stdout": "\"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 739
+        },
+        {
+          "id": "runtime-create",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc runtime create --run startup-founder-runtime --agent founder-agent --json",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:35.357Z",
+          "endedAt": "2026-09-09T11:47:36.090Z",
+          "stdout": "qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\",\n    \"eventsDir\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/events\"\n  },\n  \"event\": {\n    \"schemaVersion\": \"2026-05-22\",\n    \"eventId\": \"rte_run_started_87401951-ea78-4783-a162-7b7780064596\",\n    \"runId\": \"startup-founder-runtime\",\n    \"agentId\": \"founder-agent\",\n    \"episodeId\": null,\n    \"lifecycleRunId\": null,\n    \"source\": \"cli\",\n    \"type\": \"run.started\",\n    \"stage\": \"created\",\n    \"severity\": \"info\",\n    \"createdAt\": \"2026-09-09T11:47:36.046Z\",\n    \"message\": \"Runtime run started.\",\n    \"payloadRef\": null,\n    \"payloadSha256\": null,\n    \"payloadPreview\": null,\n    \"redacted\": false,\n    \"links\": {\n      \"receiptId\": null,\n      \"decisionId\": null,\n      \"policyDecisionId\": null,\n      \"traceId\": null,\n      \"candidateId\": null,\n      \"commitId\": null,\n      \"rollbackId\": null\n    },\n    \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/events/rte_run_started_87401951-ea78-4783-a162-7b7780064596.json\",\n    \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/events/rte_run_started_87401951-ea78-4783-a162-7b7780064596.json.sig\"\n  },\n  \"statePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json\",\n  \"eventPath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/events/rte_run_started_87401951-ea78-4783-a162-7b7780064596.json\",\n  \"signaturePath\": \"/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\"\n}\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 733
+        },
+        {
+          "id": "guide",
+          "command": "/private/tmp/amc-phase-a-acceptance-20260909-jxy3e9qn/tmp/amc-install-persona-qa-o9LNXK/personas/startup-founder/node_modules/.bin/amc guide",
+          "status": "passed",
+          "exitCode": 0,
+          "startedAt": "2026-09-09T11:47:36.090Z",
+          "endedAt": "2026-09-09T11:47:36.787Z",
+          "stdout": "\n  🧭 Agent \"default\" has 244 gaps to close for L1 — Initial. 0/244 questions already at target.\n\n  1. AMC-3.1.1: Integrity (Alignment with North Star)\n     Culture & Alignment · L0 → L1\n     Currently at \"Completion Above Alignment\". Need \"Alignment Intent, Weak Practice\".\n     Run: amc evidence collect\n\n  2. AMC-3.1.2: Ethics (Safety, Privacy, Fairness)\n     Culture & Alignment · L0 → L1\n     Currently at \"Ethics Ignored\". Need \"Ethics as Intent Only\".\n     Run: amc evidence collect\n\n  3. AMC-3.1.3: Inspiration (Source of Improvement)\n     Culture & Alignment · L0 → L1\n     Currently at \"Trend Copying\". Need \"Benchmark Chasing\".\n     Run: amc evidence collect\n\n  4. AMC-3.1.4: Innovation (Continuous Improvement Maturity)\n     Culture & Alignment · L0 → L1\n     Currently at \"Innovation Ignored\". Need \"Innovation When Forced\".\n     Run: amc evidence collect\n\n  5. AMC-3.1.5: Optimization & Tradeoff Discipline\n     Culture & Alignment · L0 → L1\n     Currently at \"Vanity Output Optimization\". Need \"Single-Metric Optimization\".\n     Run: amc evidence collect\n\n  6. AMC-3.1.6: User Focus (Education → Ownership → Commitment)\n     Culture & Alignment · L0 → L1\n     Currently at \"Basic Support Only\". Need \"Responsive Service\".\n     Run: amc evidence collect\n\n  7. AMC-3.2.1: Role Positioning & Responsibility\n     Culture & Alignment · L0 → L1\n     Currently at \"Role Confusion\". Need \"Role Stated, Not Enforced\".\n     Run: amc evidence collect\n\n  8. AMC-3.2.2: Identity, Voice, and Trust Signals\n     Culture & Alignment · L0 → L1\n     Currently at \"Style Only / Inconsistent Persona\". Need \"Branded Tone, Weak Substance\".\n     Run: amc evidence collect\n\n  ... and 236 more gaps. Use --export to see all.\n\n  Export all guides: amc guide --export\n  Generate guardrails: amc guide --guardrails\n  Apply to agent config: amc guide --apply\n  Mechanic mode (pick & choose): amc guide --interactive\n  Continuous monitoring: amc guide --watch\n  Compare with previous: amc guide --diff\n  List supported frameworks: amc guide --frameworks\n  Target specific level: amc guide --target 4\n\n",
+          "stderr": "",
+          "remediation": null,
+          "durationMs": 698
+        }
+      ],
+      "assertions": [
+        {
+          "id": "amc-bin",
+          "status": "passed",
+          "details": "Installed CLI bin is present."
+        },
+        {
+          "id": "full-score-contract",
+          "status": "passed",
+          "details": "questions=244; CLI-reported SLA met=true"
+        },
+        {
+          "id": "domain-pack-count",
+          "status": "passed",
+          "details": "packs=41"
+        }
+      ],
+      "status": "passed",
+      "checkCounts": {
+        "planned": 10,
+        "executed": 10,
+        "passed": 10,
+        "failed": 0,
+        "skipped": 0
+      },
+      "summary": "10/10 automated checks passed; 0 failed; 0 skipped.",
+      "measurements": {
+        "installWallMs": 6819,
+        "scoreCommandWallMs": 1050,
+        "cliReportedDiagnosticMs": 330,
+        "cliReportedSla": {
+          "targetMs": 120000,
+          "elapsedMs": 330,
+          "met": true
+        }
+      },
+      "evidence": {
+        "questionCount": 244,
+        "domainPackCount": 41,
+        "artifactStatus": "VALID",
+        "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+        "claimEligible": false
+      }
+    }
+  ]
+}

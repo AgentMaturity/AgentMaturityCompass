@@ -1,0 +1,45 @@
+{
+  "label": "publisher",
+  "command": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "scripts/update-native-task-openapi.mjs",
+    "--check"
+  ],
+  "startedAt": "2026-09-09T12:03:05.228929+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      32170,
+      501,
+      "Wed Sep 9 17:33:05 2026"
+    ],
+    "rootReaped": true,
+    "observations": 8,
+    "ownedProcesses": [
+      {
+        "pid": 32170,
+        "ppid": 32165,
+        "pgid": 32170,
+        "uid": 501,
+        "started": "Wed Sep 9 17:33:05 2026",
+        "firstObservedAt": "2026-09-09T12:03:05.246787+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      32170
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 0.7616866669995943,
+  "endedAt": "2026-09-09T12:03:05.990613+00:00"
+}
