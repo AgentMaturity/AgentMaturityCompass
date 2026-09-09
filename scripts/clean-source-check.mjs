@@ -22,9 +22,10 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isolatedInstallEnvironment } from "./packed-install-check.mjs";
+import { isCompletedRunSummary, verifyPackedRun } from "./packed-evidence-verification.mjs";
 
 /** The source-install path as documented. Change the docs and this together. */
 export const DOCUMENTED_SOURCE_COMMANDS = Object.freeze([
@@ -36,7 +37,14 @@ export const DOCUMENTED_SOURCE_COMMANDS = Object.freeze([
 export const SMOKE_PROMPT = "say hello";
 
 export function cleanSourceRuntimeEnvironment(base, home) {
-  const isolated = isolatedInstallEnvironment(base, home);
+  // Carry only OS/tool discovery settings, never provider credentials, loader
+  // overrides, cloud configuration or an operator's package-manager settings.
+  const operatingSystem = Object.fromEntries(Object.entries(base).filter(([key]) =>
+    /^(PATH|PATHEXT|SYSTEMROOT|WINDIR|COMSPEC|TEMP|TMP|TMPDIR|LANG|LC_[A-Z_]+|TERM|NO_COLOR)$/i.test(key)));
+  const inheritedPath = Object.entries(operatingSystem).find(([key]) => /^path$/i.test(key))?.[1];
+  for (const key of Object.keys(operatingSystem)) if (/^path$/i.test(key)) delete operatingSystem[key];
+  operatingSystem.PATH = [dirname(process.execPath), inheritedPath].filter(Boolean).join(delimiter);
+  const isolated = isolatedInstallEnvironment(operatingSystem, home);
   isolated.AMC_VAULT_PASSPHRASE = "clean-source-check";
   isolated.USERPROFILE = home;
   isolated.APPDATA = join(home, "AppData", "Roaming");
@@ -59,11 +67,21 @@ function run(label, cmd, args, opts) {
     const tail = `${result.stdout ?? ""}\n${result.stderr ?? ""}`.trim().split("\n").slice(-25).join("\n");
     console.error(tail);
   }
-  return ok;
+  return { ok, stdout: result.stdout ?? "" };
+}
+
+function summaryFrom(result) {
+  if (!result.ok) return null;
+  try { return JSON.parse(result.stdout); }
+  catch { console.error("FAIL native run did not return a structured JSON summary"); return null; }
 }
 
 export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
-  const head = spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim();
+  const revision = spawnSync("git", ["rev-parse", "--verify", "HEAD^{commit}"], { cwd: root, encoding: "utf8" });
+  const head = revision.stdout?.trim();
+  if (revision.status !== 0 || !/^[0-9a-f]{40}$/.test(head ?? "")) {
+    console.error("FAIL could not resolve the committed source revision"); return false;
+  }
   const work = mkdtempSync(join(tmpdir(), "amc-clean-source-"));
   const clone = join(work, "checkout");
   const home = join(work, "home");
@@ -71,37 +89,46 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
   mkdirSync(home); mkdirSync(workspace);
   console.log(`clean-source check of ${head.slice(0, 8)} in ${work}`);
 
-  const env = { ...process.env, CI: "1" };
-  // Runtime steps get an empty HOME: a check that quietly read this machine's
-  // ~/.amc would prove nothing about a new contributor's experience.
-  const isolated = cleanSourceRuntimeEnvironment(env, home);
+  // Install, build and runtime all get the same empty HOME and scrubbed env.
+  const isolated = cleanSourceRuntimeEnvironment(process.env, home);
   const cli = join(clone, "dist", "cli.js");
-  const handover = { sessionId: "" };
+  let firstTurn = null;
+  const runCli = (label, args) => run(label, process.execPath, [cli, ...args], { cwd: workspace, env: isolated });
+  const verifyRun = (summary, expectedTurns = 1) => {
+    const verified = verifyPackedRun({ summary, expectedTurns, runCommand: runCli });
+    console.log(`${verified ? "ok  " : "FAIL"} signed evidence and request reconstruction (${expectedTurns} expected turns)`);
+    return verified;
+  };
 
   const steps = [
-    () => run("git clone (committed tree only)", "git", ["clone", "-q", "--no-hardlinks", root, clone], { env })
-      && run("git checkout HEAD", "git", ["checkout", "-q", head], { cwd: clone, env }),
+    () => run("git clone (committed tree only)", "git", ["clone", "-q", "--no-hardlinks", root, clone], { env: isolated }).ok
+      && run("git checkout pinned commit", "git", ["checkout", "-q", "--detach", head], { cwd: clone, env: isolated }).ok,
     ...DOCUMENTED_SOURCE_COMMANDS.map((line) => () => {
       const [cmd, ...args] = line.split(" ");
-      return run(line, cmd, args, { cwd: clone, env });
+      return run(line, cmd, args, { cwd: clone, env: isolated }).ok;
     }),
     () => existsSync(cli) || (console.error(`FAIL build produced no ${cli}`), false),
-    () => run("amc doctor", "node", [cli, "doctor"], { cwd: workspace, env: isolated }),
-    () => run("amc init (isolated workspace)", "node", [cli, "init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }),
-    () => run(`amc agent-loop run "${SMOKE_PROMPT}" (stub provider, keyless)`, "node", [cli, "agent-loop", "run", SMOKE_PROMPT], { cwd: workspace, env: isolated }),
+    () => runCli("amc doctor", ["doctor"]).ok,
+    () => runCli("amc init (isolated workspace)", ["init", "--trust-boundary", "isolated"]).ok,
+    () => verifyRun(summaryFrom(runCli("keyless native tool turn", ["agent-loop", "run", "--provider", "stub", "--tools", "echo", "--json", SMOKE_PROMPT]))),
     // AMC-1511, across REAL processes: A leaves the session unsealed, B resumes
     // it by id, and the verifier re-derives every request from the log.
     () => {
-      const a = spawnSync("node", [cli, "agent-loop", "run", "--keep-open", "first of two"], { cwd: workspace, env: isolated, encoding: "utf8" });
-      const sessionId = /session ([0-9a-f-]{36})/.exec(`${a.stdout}${a.stderr}`)?.[1] ?? null;
-      const ok = a.status === 0 && sessionId !== null;
-      console.log(`${ok ? "ok  " : "FAIL"} process A: agent-loop run --keep-open (session ${sessionId ?? "?"})`);
-      if (!ok) { console.error(`${a.stdout}\n${a.stderr}`.trim().split("\n").slice(-15).join("\n")); return false; }
-      handover.sessionId = sessionId;
-      return true;
+      firstTurn = summaryFrom(runCli("process A: leave a completed turn open for resume",
+        ["agent-loop", "run", "--provider", "stub", "--tools", "echo", "--json", "--keep-open", "first of two"]));
+      const valid = isCompletedRunSummary(firstTurn);
+      if (!valid) console.error("FAIL process A did not record a completed signed tool turn");
+      return valid;
     },
-    () => run("process B: agent-loop run --session <id> (verified resume)", "node", [cli, "agent-loop", "run", "--session", handover.sessionId, "second of two"], { cwd: workspace, env: isolated }),
-    () => run("agent-loop verify <id> (both turns, one chain)", "node", [cli, "agent-loop", "verify", handover.sessionId], { cwd: workspace, env: isolated })
+    () => {
+      const resumed = summaryFrom(runCli("process B: resume and seal the same session",
+        ["agent-loop", "run", "--provider", "stub", "--tools", "echo", "--json", "--session", firstTurn.sessionId, "second of two"]));
+      if (resumed?.sessionId !== firstTurn.sessionId || !(resumed.requests > firstTurn.requests)
+          || !(resumed.events > firstTurn.events)) {
+        console.error("FAIL resume did not extend the original recorded session"); return false;
+      }
+      return verifyRun(resumed, 2);
+    }
   ];
 
   let ok = true;

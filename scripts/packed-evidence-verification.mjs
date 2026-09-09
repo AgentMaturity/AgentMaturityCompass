@@ -7,15 +7,19 @@ function parsed(result) {
 const empty = (value) => Array.isArray(value) && value.length === 0;
 const positiveCount = (value) => Number.isSafeInteger(value) && value > 0;
 
-export function verifyPackedRun({ summary, runCommand, requireTool = true }) {
-  if (!summary || typeof summary.sessionId !== "string" || !summary.sessionId.trim()
-      || summary.driverStatus !== "idle" || summary.unsignedRows !== 0
-      || !positiveCount(summary.events) || summary.turns !== 1
-      || !positiveCount(summary.requests)
-      || (requireTool && !positiveCount(summary.toolCalls))
-      || !Array.isArray(summary.endings) || summary.endings.length !== 1
-      || summary.endings[0]?.turn !== 1 || summary.endings[0]?.reason !== "complete"
-      || summary.endings[0].interrupted !== false) return false;
+export function isCompletedRunSummary(summary, { requireTool = true, expectedTurns = 1 } = {}) {
+  return positiveCount(expectedTurns) && !!summary && typeof summary.sessionId === "string" && !!summary.sessionId.trim()
+    && summary.driverStatus === "idle" && summary.unsignedRows === 0
+    && positiveCount(summary.events) && summary.turns === expectedTurns
+    && positiveCount(summary.requests)
+    && (!requireTool || positiveCount(summary.toolCalls))
+    && Array.isArray(summary.endings) && summary.endings.length === expectedTurns
+    && summary.endings.every((ending, index) => ending?.turn === index + 1
+      && ending?.reason === "complete" && ending.interrupted === false);
+}
+
+export function verifyPackedRun({ summary, runCommand, requireTool = true, expectedTurns = 1 }) {
+  if (!isCompletedRunSummary(summary, { requireTool, expectedTurns })) return false;
 
   // Separate CLI processes exercise cold credential access in the installed artifact.
   const ledger = parsed(runCommand("amc session verify --json", ["session", "verify", "--json"]));

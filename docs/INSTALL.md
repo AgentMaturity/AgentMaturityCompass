@@ -63,9 +63,13 @@ closure into `dist/kernel/amcRuntime.js` (`scripts/bundle-kernel.mjs`), the
 packed tarball carries the runtime too: `npm run check:packed-install` packs as
 `npm publish` would, installs into a fresh directory with an empty HOME, proves
 `@amc/core` is *not* resolvable there, and still completes a keyless native
-turn over a fully signed session. `npm run check:clean-source` proves the
-source path the same way. Both are local artifact checks; public release
-acceptance stays with the release gates.
+turn over a fully signed session. `npm run check:clean-source` runs the
+documented frozen install and build with an empty HOME/config and only OS/tool
+discovery settings inherited. It explicitly selects the keyless stub provider,
+then requires structured signed-evidence verification and request reconstruction
+for a tool turn and a session resumed by a separate process. Its output reports
+the attempted source revision; successful execution qualifies only that checkout
+and host. These local checks do not establish public release acceptance.
 
 Verify:
 

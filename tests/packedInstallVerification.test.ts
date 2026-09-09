@@ -31,6 +31,26 @@ describe("packed runtime evidence gate", () => {
     expect(verifyPackedRun({ summary: f.summary, runCommand: () => ({ ok: true, stdout: JSON.stringify(f.ledger) }) })).toBe(false);
   });
 
+  it("requires every expected resumed turn and authenticates all of its requests", () => {
+    const f = fixture();
+    f.summary.turns = 2;
+    f.summary.endings.push({ turn: 2, reason: "complete", interrupted: false });
+    const verify = () => verifyPackedRun({ summary: f.summary, expectedTurns: 2,
+      runCommand: (_label: string, args: string[]) => ({ ok: true, stdout: JSON.stringify(args[0] === "session" ? f.ledger : f.run) }) });
+    expect(verify()).toBe(true);
+    f.summary.endings[0]!.reason = "cancelled";
+    expect(verify()).toBe(false);
+    f.summary.endings[0]!.reason = "complete";
+    f.summary.endings[1]!.turn = 1;
+    expect(verify()).toBe(false);
+    f.summary.endings[1]!.turn = 2;
+    f.summary.endings[1]!.interrupted = true;
+    expect(verify()).toBe(false);
+    f.summary.endings[1]!.interrupted = false;
+    f.run.requests[0]!.status = "payload-pruned";
+    expect(verify()).toBe(false);
+  });
+
   it.each(["exit", "malformed", "session", "unsigned", "unreconstructed", "missing-request", "null-request", "missing-id", "duplicate-id"])("rejects %s verifier results", (kind) => {
     const f = fixture();
     if (kind === "session") f.run.sessionId = "different-session";
