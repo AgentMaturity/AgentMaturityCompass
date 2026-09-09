@@ -33,6 +33,29 @@ amc approvals deny --agent <agentId> <requestId> --reason "not approved" --usern
 
 `--username` and `--roles` are required for decisions; `--user-id` can bind a stable identity distinct from its display name. Unknown roles and a repeated reviewer on a distinct-user request fail closed. CLI decisions use the same lifecycle delivery path as Studio. `APPROVED` remains an input compatibility alias for canonical `QUORUM_MET`.
 
+### Native one-shot and interactive review
+
+The native one-shot approval prompt reads the actual signed pending request and
+prints an inspection command plus the existing authenticated login and decision
+templates. Unlike the legacy examples above, native templates include both
+`--session-token-file` and `--expect-request-digest`. Keep both: omitting them
+selects the legacy supplied-reviewer path, not authenticated native review.
+
+`amc approvals login --username '<existing-reviewer>' --token-file '<new-private-file>' --json`
+uses an existing active local user, a masked password prompt and a new private
+session file. It does not create a reviewer or grant roles. Its output contains
+identity, roles, expiry and file-path metadata, not the password or token. Fill the
+native template's user ID, username and comma-separated roles from that identity,
+and pass the private file **path**, never its contents. Review the request's tool,
+scope, current context and reason before choosing approve or deny.
+
+Native templates pin the canonical request digest and current effective mode;
+the actual decision command checks them again with the authenticated identity.
+Invalid, expired, changed or mismatched request/context produces inspection-only
+guidance, not a guessed decision command. A recorded decision is distinct from
+notification delivery, quorum satisfaction and tool execution. No command is run
+merely because instructions were printed. Ctrl-C cancels the waiting native turn.
+
 The list command searches only a case-insensitive stable request-ID fragment. It filters status, action class, approval risk tier, effective mode, inclusive RFC3339 or epoch-millisecond creation bounds, deterministic order, and a 1-200 row limit. It does not search tool names, raw arguments, intent or work-order IDs, reviewer identities, decision reasons, commands, MCP servers, prompts, payloads, credentials, Vault references, tokens, absolute paths, or destination URLs. `show` is the explicit authenticated local detail command for an approver who needs to inspect signed request context.
 
 Every list result is the same schema-versioned projection used by Studio and `GET /approvals/requests`. It reports normalized filters, aggregate inventory counts, total matches, returned rows, truncation, and generic integrity reason codes. The result says `derivedView: true`, `recorded: false`, and `proofEligible: false`: it is not a new activity record and does not prove that an approved action executed.

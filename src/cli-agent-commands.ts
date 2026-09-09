@@ -62,6 +62,7 @@ import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
+import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import type { ActionClass } from "./types.js";
 
 import {
@@ -677,14 +678,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                       } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
                       return;
                     }
-                    // The operator cannot answer a question whose id they do not
-                    // have, and it only exists once the engine has minted it.
-                    io.error(
-                      chalk.yellow(
-                        `awaiting approval ${event.approvalRequestId} — ` +
-                          `answer it with: amc approvals approve --agent ${agentId} --mode execute --reason "review reason" --username <reviewer> --roles <reviewer-roles> ${event.approvalRequestId}`
-                      )
-                    );
+                    // Use the same authenticated/digest-bound decision path as
+                    // native chat, not the legacy self-supplied reviewer mode.
+                    io.error(chalk.yellow(nativeApprovalInstructions({ workspace: process.cwd(), agentId,
+                      approvalId: event.approvalId, approvalRequestId: event.approvalRequestId }).text));
                   }
                 }
               }),
