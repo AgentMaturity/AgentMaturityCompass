@@ -82,3 +82,35 @@ Mutations require `x-amc-native-intent: task-workspace-v1`. Human session-cookie
 The same intent, origin and CSRF requirements protect the approval decision/cancellation aliases: `/approvals/:id/approve`, `/approvals/:id/deny`, `/approvals/requests/:id/decide` and `/approvals/requests/:id/cancel`. Existing Studio UI clients attach this proof automatically; custom cookie clients must update before using these mutations. Local demo sessions cannot approve, execute commands or modify policy.
 
 Hosted workspaces preserve the selected agent and event cursor through their workspace URL prefix. Native task admission uses the authenticated workspace membership and public browser origin. Workspace startup is shared across concurrent requests, and shutdown drains any accepted startup and its native task processes.
+
+## Authenticated history and reconnect boundaries
+
+Task responses include `history.status`, the selected `history.backend`, an
+authenticated session head and event count when available, and
+`resumeBlockedReason`. These describe actual persisted session metadata, not
+private retained-output access or a task-success verdict. An unavailable history
+has no authenticated head: its zero count means unknown, not a verified empty log.
+The browser withholds the previous transcript, validation outputs and verification
+badge when authentication fails. A prior verification also expires when the
+observed store head changes; restore evidence and explicitly verify a new snapshot.
+
+JSONL supports cold history inspection but not native writer resume. Studio does
+not offer Resume for a JSONL session, and a direct resume request is refused before
+a native client is started. SQLite eligibility still depends on the existing
+native identity, ownership, policy and recovery checks; a displayed control is
+not an ownership grant.
+
+After a network or control-response failure, the page requires **Refresh status**
+before another action. It clears previously displayed activity and labels the
+current evidence/validation status unconfirmed; reconnect never resubmits a
+prompt or grants an approval. A successful refresh reloads authenticated activity
+from cursor zero. Identical admitted-request retries retain their original ID,
+body and revision; changed-body retries and stale controls remain refusals.
+
+Every native route accepts each supported query parameter only once. Options and
+controls accept only `agentId`; task reads also accept `cursor`; listing also
+accepts `includeArchived`. Creation accepts no query options (its identity and
+choices are in its strict body). Unknown or repeated query fields are rejected
+before service dispatch. Follow-up revisions must be integers from 1 through 32.
+Monitor-fingerprint verification means the configured pin matched; its independent
+origin must be established by the operator, not inferred from the rendered label.

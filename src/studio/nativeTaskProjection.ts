@@ -9,7 +9,7 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import { listApprovalRequests } from "../approvals/approvalChainStore.js";
 import { getApprovalInboxItem } from "../approvals/approvalInbox.js";
 import { redactSdkText } from "../sdk/amcEvidence.js";
-import type { NativeTaskApproval, NativeTaskEvent, NativeTaskValidationOutput } from "./nativeTaskTypes.js";
+import type { NativeTaskApproval, NativeTaskEvent, NativeTaskValidationOutput, NativeTaskHistory } from "./nativeTaskTypes.js";
 import { opendirSync, lstatSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -46,6 +46,8 @@ function project(update: AcpSessionUpdate, cursor: number): NativeTaskEvent | nu
     ...(typeof update.status === "string" ? { status: update.status } : {}) };
 }
 export interface NativeTaskProjection {
+  readonly history: NativeTaskHistory;
+  readonly storeHeadEventHash: string;
   readonly validation: NativeValidationResult;
   readonly validationOutputs: readonly NativeTaskValidationOutput[];
   readonly events: readonly NativeTaskEvent[]; readonly nextCursor: number; readonly firstCursor: number;
@@ -103,6 +105,8 @@ export function readNativeTaskProjection(workspace: string, sessionId: string, a
     } catch { approvals.length = 0; approvalError = "Pending approval records could not be authenticated; use the signed approval inbox before deciding."; }
   }
   const validation = projectNativeValidation(workspace, rows);
-  return { validation, validationOutputs: readNativeTaskValidationOutputs(workspace, rows, validation),
+  return { history: { status: "authenticated", backend: history.backend, headEventHash: history.headEventHash,
+      eventCount: rows.length, message: "Persisted session metadata authenticated. Displayed payloads are checked separately; full run verification remains a separate action." },
+    storeHeadEventHash: history.storeHeadEventHash, validation, validationOutputs: readNativeTaskValidationOutputs(workspace, rows, validation),
     events, nextCursor: cursor, firstCursor: events[0]?.cursor ?? cursor + 1, droppedEvents, ending, endingId, closed, approvals, approvalError };
 }

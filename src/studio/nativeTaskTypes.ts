@@ -63,6 +63,14 @@ export interface NativeTaskEvent {
   /** Output comes from the native authenticated committed-row projector; full verification is separate. */
   readonly evidence: "committed";
 }
+export interface NativeTaskHistory {
+  readonly status: "not-started" | "authenticated" | "unavailable";
+  readonly backend: "sqlite" | "jsonl" | null;
+  readonly headEventHash: string | null;
+  readonly eventCount: number;
+  /** Metadata authentication is not a full run-verification or payload-access grant. */
+  readonly message: string;
+}
 export interface NativeTaskView {
   readonly taskId: string; readonly sessionId: string | null; readonly agentId: string;
   readonly revision: number; readonly clientRequestId: string; readonly lastClientRequestId: string;
@@ -79,6 +87,8 @@ export interface NativeTaskView {
   readonly approvals: readonly NativeTaskApproval[]; readonly approvalError: string | null;
   readonly nextCursor: number; readonly firstCursor: number; readonly droppedEvents: number;
   readonly canResume: boolean;
+  readonly resumeBlockedReason: string | null;
+  readonly history: NativeTaskHistory;
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {

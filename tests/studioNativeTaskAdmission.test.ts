@@ -17,7 +17,8 @@ const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewe
   clientRequestId: requestId, lastClientRequestId: requestId, provider: "stub", model: null, tools: "none", toolsDigest: null,
   maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
   validationOutputs: [], validationSelection: null, validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
-  verification: "not-verified", approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true };
+  verification: "not-verified", approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true,
+  resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" } };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
   providers: [{ id: "stub", local: true, credential: null }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },
@@ -103,6 +104,24 @@ async function fixture(options: { auth?: StudioApiAuthContext | null; executionA
 const startBody = { clientRequestId: requestId, agentId: "reviewer", provider: "stub", tools: "none", prompt: "Summarize this task." };
 
 describe("native Studio authenticated API admission", () => {
+  it("strict transport query contracts refuse duplicates and ignored authority fields before dispatch", async () => {
+    const f = await fixture();
+    for (const suffix of ["agentId=reviewer&agentId=other", "agentId=reviewer&workspace=other", "cursor=0"]) {
+      expect((await fetch(`${f.origin}/api/v1/native-tasks/options?${suffix}`)).status).toBe(400);
+    }
+    expect(f.service.configuration).not.toHaveBeenCalled();
+    for (const suffix of ["agentId=reviewer&agentId=other", "agentId=reviewer&cursor=0&cursor=1", "agentId=reviewer&env=other"]) {
+      expect((await fetch(`${f.origin}/api/v1/native-tasks/${taskId}?${suffix}`)).status).toBe(400);
+    }
+    expect(f.service.poll).not.toHaveBeenCalled();
+    for (const action of ["turn", "cancel", "release", "resume", "verify", "archive"] as const) {
+      const body = { expectedRevision: 3, ...(action === "turn" ? { clientRequestId: requestId, prompt: "Never dispatched" } : {}) };
+      expect((await f.post(`/api/v1/native-tasks/${taskId}/${action}?agentId=reviewer&agentId=other`, body)).status).toBe(400);
+      expect(f.service[action]).not.toHaveBeenCalled();
+    }
+    for (const suffix of ["agentId=reviewer", "workspace=other"]) expect((await f.post(`/api/v1/native-tasks?${suffix}`, startBody)).status).toBe(400);
+    expect(f.service.start).not.toHaveBeenCalled();
+  });
   it("accepts only named public-check IDs and a reviewed digest, never browser commands or config paths", async () => {
     const f = await fixture();
     const selected = { ...startBody, tools: "workspace", toolsDigest: "a".repeat(64),

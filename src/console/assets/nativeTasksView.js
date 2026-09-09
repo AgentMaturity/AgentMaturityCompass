@@ -43,7 +43,9 @@ export function renderTaskScope(config, toolsMode, task = null) {
 
 export function renderTaskIdentity(task) {
   if (!task) return '<p class="muted">No task has been started.</p>';
-  return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "local stub")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Last confirmed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}`;
+  return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "local stub")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Last confirmed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>
+    ${task.history ? `<p>Persisted history: <strong>${esc(task.history.status)}</strong>${task.history.backend ? ` · ${esc(task.history.backend)}` : ""}</p><p class="muted">${esc(task.history.message)}</p>` : ""}
+    ${task.resumeBlockedReason ? `<p class="muted">${esc(task.resumeBlockedReason)}</p>` : ""}${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}`;
 }
 export function renderTaskValidationSetup(config, selectedIds, task) {
   const catalogue = config.validation;
@@ -80,7 +82,8 @@ export function renderTaskApprovals(task) {
 }
 export function renderTaskVerification(task) {
   if (!task) return '<p class="muted">No task evidence yet.</p>';
-  const labels = { "not-verified": "Recorded; full verification not yet requested", "workspace-key-consistency": "Verified against workspace keys", "externally-anchored": "Verified against an independent trust anchor", failed: "Evidence verification failed" };
+  if (task.history?.status === "unavailable") return '<p class="status-bad">Current persisted history is unavailable. No previous verification verdict is current; restore the original evidence and refresh.</p>';
+  const labels = { "not-verified": "Recorded; no current full verification verdict", "workspace-key-consistency": "Verified against workspace keys", "externally-anchored": "Verified against the configured monitor fingerprint", failed: "Evidence verification failed" };
   return `<p class="${task.verification === "failed" ? "status-bad" : ""}"><strong>${esc(labels[task.verification] || "Verification unavailable")}</strong></p><p class="muted">This verdict concerns the recorded evidence and its stated trust scope. It does not assess whether the answer is correct.</p>${task.sessionId ? `<a href="./runtime?agent=${encodeURIComponent(task.agentId)}">Open runtime records</a>` : ""}`;
 }
 export function renderTaskList(tasks, selectedId) {

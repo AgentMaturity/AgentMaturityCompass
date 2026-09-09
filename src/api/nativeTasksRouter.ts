@@ -38,13 +38,21 @@ const startSchema = z.object({
   if (value.validation && value.tools !== "workspace") context.addIssue({ code: "custom", message: "Public checks require signed workspace tools." });
 });
 const turnSchema = z.object({
-  clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(0), prompt: promptSchema
+  clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(1).max(32), prompt: promptSchema
 }).strict();
 const controlSchema = z.object({ expectedRevision: z.number().int().min(1).max(32) }).strict();
 const listQuerySchema = z.object({ agentId: agentIdSchema.optional(), includeArchived: z.enum(["true", "false"]).optional() }).strict();
 
 function query(req: IncomingMessage): URLSearchParams {
   return new URL(req.url ?? "/", "http://native.invalid").searchParams;
+}
+
+/** Never let proxies and the server select different identities from one URL. */
+function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
+  if ([...params.keys()].some(key => !allowed.includes(key) || params.getAll(key).length !== 1)) {
+    throw new NativeTaskServiceError("QUERY_INVALID", 400,
+      "Supply each supported native task query parameter once. Put admission choices in the request body, not the URL.");
+  }
 }
 
 function actorFor(workspace: string, context: NativeTaskApiContext, rawAgent?: string | null): NativeTaskActor {
@@ -77,17 +85,19 @@ export async function handleNativeTasksRoute(
   try {
     const params = query(req);
     if (pathname === `${prefix}/options` && method === "GET") {
+      assertQuery(params, ["agentId"]);
       const configuration = await native.service.configuration(actorFor(context.workspace, native, params.get("agentId")));
       apiSuccess(res, { ...configuration, nativeCsrfToken: native.nativeCsrfToken, executionBlocked: !native.executionAllowed() });
       return true;
     }
     if (pathname === prefix && method === "GET") {
-      if ([...params.keys()].some(key => params.getAll(key).length !== 1)) throw new NativeTaskServiceError("QUERY_INVALID", 400, "Native task list parameters must be supplied once.");
+      assertQuery(params, ["agentId", "includeArchived"]);
       const selection = listQuerySchema.parse(Object.fromEntries(params));
       apiSuccess(res, { tasks: await native.service.list(actorFor(context.workspace, native, selection.agentId), selection.includeArchived === "true") });
       return true;
     }
     if (pathname === prefix && method === "POST") {
+      assertQuery(params, []);
       const input = await bodyJsonSchema(req, startSchema);
       if (!native.executionAllowed()) throw new NativeTaskServiceError("READ_ONLY", 403, "Workspace signatures require read-only operation. No native task was started.");
       const actor = actorFor(context.workspace, native, input.agentId);
@@ -99,6 +109,7 @@ export async function handleNativeTasksRoute(
     if (!match) { apiError(res, 404, "Native task route not found."); return true; }
     const taskId = match[1]!;
     const action = match[2];
+    assertQuery(params, action === undefined && method === "GET" ? ["agentId", "cursor"] : ["agentId"]);
     const actor = actorFor(context.workspace, native, params.get("agentId"));
     if (action === undefined && method === "GET") {
       const raw = params.get("cursor") ?? "0";

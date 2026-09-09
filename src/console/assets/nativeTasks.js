@@ -16,6 +16,10 @@ function taskView(value) {
   if (!object(value) || typeof value.taskId !== "string" || typeof value.agentId !== "string" || !STATES.has(value.state)
     || !integer(value.revision) || !integer(value.nextCursor) || !integer(value.firstCursor) || !integer(value.droppedEvents)
     || !object(value.validation) || !VALIDATION_STATES.has(value.validation.status) || !Array.isArray(value.validation.checks) || !Array.isArray(value.validationOutputs)
+    || !object(value.history) || !["authenticated","unavailable","not-started"].includes(value.history.status)
+    || !["sqlite","jsonl",null].includes(value.history.backend) || !integer(value.history.eventCount)
+    || typeof value.history.message !== "string"
+    || !(value.resumeBlockedReason === null || typeof value.resumeBlockedReason === "string")
     || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean" || typeof value.archived !== "boolean"
     || !["not-verified","workspace-key-consistency","externally-anchored","failed"].includes(value.verification)) {
     throw new Error("Studio returned an unsupported task state. Refresh this page after updating Studio.");
@@ -40,7 +44,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   const lifetime = new AbortController();
   let disposed = false, config = null, task = null, tasks = [], cursor = 0, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
-  let retryReady = false, reconciling = false;
+  let retryReady = false, reconciling = false, stale = false;
   let selectedChecks = [], selectedChecksDigest = null;
   let notice = "", selectedAgent = initialAgent, taskRead = null;
   root.innerHTML = nativeTasksShell(initialAgent);
@@ -64,6 +68,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     csrfToken: config?.nativeCsrfToken, adminToken: getAdminToken() });
   const provider = () => config?.providers.find(item => item.id === el("nativeTaskProvider").value);
   const clearTimer = () => { if (timer !== null) clearTimeout(timer); timer = null; };
+  function pauseObservation() {
+    stale = true; readPaused = true; retryReady = false; cursor = 0;
+    el("nativeTaskTranscript").replaceChildren();
+    project();
+  }
   function updateUrl(id) {
     const url = new URL(window.location.href); url.searchParams.set("agent", selectedAgent);
     if (id) url.searchParams.set("task", id); else url.searchParams.delete("task");
@@ -102,7 +111,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       && (!(task?.validationSelection || selectedChecks.length) || (config.validation.ready
         && (task?.validationSelection?.configSha256 || selectedChecksDigest) === config.validation.configSha256
         && el("nativeTaskTools").value === "workspace" && config.scope.tools.some(tool => tool.name === "bash")));
-    const canPrompt = setupReady && (!task || task.state === "idle");
+    const canPrompt = !stale && setupReady && (!task || task.state === "idle" && task.history.status === "authenticated");
     el("nativeTaskSubmit").disabled = !canPrompt || mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskSubmit").textContent = task ? "Send follow-up" : "Run task";
     el("nativeTaskRetry").hidden = !pending;
@@ -121,15 +130,16 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     el("nativeTaskSetup").querySelector('button[type="submit"]').disabled = mutation || inspecting || Boolean(pending);
     for (const name of ["MaxSteps","MaxTokens"]) el(`nativeTask${name}`).disabled = !config || Boolean(task) || mutation || Boolean(pending);
     el("nativeTaskCancel").hidden = !task || !["starting","running","cancel-requested"].includes(task.state);
-    el("nativeTaskCancel").disabled = mutation || Boolean(pending) || !navigator.onLine || task?.state === "cancel-requested";
+    el("nativeTaskCancel").disabled = stale || mutation || Boolean(pending) || !navigator.onLine || task?.state === "cancel-requested";
     el("nativeTaskRelease").hidden = !task || !["idle","failed"].includes(task.state) || !task.sessionId;
     el("nativeTaskResume").hidden = !task || !task.canResume;
     el("nativeTaskVerify").hidden = !task || !["idle","released","closed","failed"].includes(task.state) || !task.sessionId;
-    for (const action of ["Release","Resume","Verify"]) el(`nativeTask${action}`).disabled = mutation || inspecting || Boolean(pending) || !navigator.onLine;
+    for (const action of ["Release","Resume","Verify"]) el(`nativeTask${action}`).disabled = stale || mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskResume").disabled ||= !setupReady;
+    el("nativeTaskVerify").disabled ||= task?.history.status === "unavailable";
     el("nativeTaskVerify").textContent = task && ["released","closed","failed"].includes(task.state) ? "Verify evidence" : "Close and verify";
     el("nativeTaskArchive").hidden = !task || task.state !== "closed" || task.archived || !task.sessionId;
-    el("nativeTaskArchive").disabled = mutation || inspecting || Boolean(pending) || !navigator.onLine;
+    el("nativeTaskArchive").disabled = stale || task?.history.status !== "authenticated" || mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskArchiveHelp").hidden = el("nativeTaskArchive").hidden;
     el("nativeTaskIncludeArchived").disabled = !config || mutation || inspecting || Boolean(pending);
     el("nativeTaskRefresh").disabled = (!config && !pending) || mutation || inspecting || polling || reconciling || !navigator.onLine;
@@ -142,6 +152,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     for (const [id,html] of [["nativeTaskIdentity",renderTaskIdentity(task)], ["nativeTaskApprovals",renderTaskApprovals(task)],
       ["nativeTaskVerification",renderTaskVerification(task)], ["nativeTaskValidation",renderTaskValidation(task)], ["nativeTaskList",renderTaskList(tasks, task?.taskId)]]) {
       const node=el(id); if(node.dataset.rendered !== html) { node.innerHTML=html; node.dataset.rendered=html; }
+    }
+    if (stale) for (const id of ["nativeTaskVerification", "nativeTaskValidation", "nativeTaskApprovals"]) {
+      const node = el(id);
+      node.textContent = "Current status is unconfirmed. Refresh status to authenticate this view before acting; no previous result is presented as current.";
+      delete node.dataset.rendered;
     }
     const shown=el("nativeTaskTranscript").querySelectorAll(".native-task-event").length;
     const dropped = Math.max(0,(task?.nextCursor || 0)-shown);
@@ -157,7 +172,9 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     tell("Submission recorded. Waiting for the task's actual outcome.");
   }
   function receive(view) {
-    task = taskView(view); selectedAgent = task.agentId; updateUrl(task.taskId);
+    const next = taskView(view);
+    if (task && (next.taskId !== task.taskId || next.agentId !== task.agentId)) throw new Error("Task or agent identity changed unexpectedly. Refresh under the original identity.");
+    task = next; stale = false; selectedAgent = task.agentId; updateUrl(task.taskId);
     const index = tasks.findIndex(item=>item.taskId===task.taskId);
     if (task.archived && !el("nativeTaskIncludeArchived").checked) {
       if (index >= 0) tasks.splice(index,1);
@@ -180,7 +197,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       if (disposed || generation !== readGeneration || task?.taskId !== id) return;
       if (!object(value) || !Array.isArray(value.events) || typeof value.truncated !== "boolean") throw new Error("Unsupported task event response. Refresh status before continuing.");
       const view = taskView(value.task);
-      if (view.taskId !== id) throw new Error("Task identity changed unexpectedly. No further updates were applied.");
+      if (view.taskId !== id || view.agentId !== task.agentId) throw new Error("Task identity changed unexpectedly. No further updates were applied.");
+      if (view.history.status === "unavailable") {
+        el("nativeTaskTranscript").replaceChildren(); cursor = 0; readPaused = true;
+        receive(view); tell(view.history.message); return;
+      }
       const transcript = el("nativeTaskTranscript");
       const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 180;
       let added = 0;
@@ -200,7 +221,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       }
     } catch(error) {
       if (error?.name !== "AbortError" && generation === readGeneration) {
-        readPaused=true; tell("Updates paused. Refresh status to reconnect; no task action will be repeated automatically.");
+        pauseObservation(); tell("Updates paused. Refresh status to reconnect; no task action will be repeated automatically.");
       }
       throw error;
     } finally {
@@ -250,16 +271,17 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (reconciling || mutation) return;
     reconciling=true; retryReady=false; controls();
     try {
-      clearError(); readPaused=false; await inspect(pending?.agentId || task?.agentId || selectedAgent); await list(); if(task) await poll();
+      clearError(); readPaused=false; await inspect(pending?.agentId || task?.agentId || selectedAgent); await list(); if(task) await poll(); else stale=false;
       if (pending) {
         retryReady=nativeSubmissionScopeMatches(pending, submissionScope());
         tell(retryReady ? "Submission outcome is still unconfirmed. Retry original submission resends the same request only when you choose it."
           : "The sign-in or workspace changed. The original submission remains unconfirmed and cannot be retried under another identity.");
       }
-    } finally { reconciling=false; controls(); }
+    } catch(error) { pauseObservation(); throw error; }
+    finally { reconciling=false; controls(); }
   }
   async function mutate(action) {
-    if (!task || mutation || pending) return;
+    if (!task || mutation || pending || stale) return;
     const body={expectedRevision:task.revision};
     mutation=true;readGeneration++;taskRead?.abort();clearTimer();clearError();controls();
     try {
@@ -269,7 +291,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         if (action === "archive") { await list(); tell("Task archived. Its signed history is retained; use Show archived tasks to inspect it."); }
       }
     }
-    catch(error) { showError(error); tell("Action outcome may need confirmation. Refresh status before trying another action."); }
+    catch(error) { pauseObservation(); showError(error); tell("Action outcome may need confirmation. Refresh status before trying another action."); }
     finally { mutation=false;controls();schedule(); }
   }
   async function submit() {
@@ -327,7 +349,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   listen(el("nativeTaskNew"),"click",()=>{if(pending||mutation||ACTIVE.has(task?.state))return;clearTimer();readGeneration++;taskRead?.abort();task=null;selectedChecks=[];selectedChecksDigest=config?.validation.configSha256 ?? null;cursor=0;readPaused=false;el("nativeTaskTranscript").replaceChildren();updateUrl(null);project();tell("Choose the next task. Previous tasks remain available in Your tasks.");});
   listen(el("nativeTaskList"),"click",event=>{const button=event.target.closest("[data-native-task-id]");if(!button||mutation||pending)return;const view=tasks.find(item=>item.taskId===button.dataset.nativeTaskId);if(view)void selectTask(view).catch(showError);});
   const dispose=()=>{if(disposed)return;disposed=true;pending=null;clearTimer();taskRead?.abort();lifetime.abort();mounts.delete(root);};mounts.set(root,dispose);listen(window,"pagehide",dispose);
-  listen(window,"offline",()=>{retryReady=false;clearTimer();tell("Connection lost. Task outcome is unknown until Studio confirms it; this view does not stop the task.");controls();});
+  listen(window,"offline",()=>{clearTimer();pauseObservation();tell("Connection lost. Task outcome is unknown until Studio confirms it; this view does not stop the task.");controls();});
   listen(window,"online",()=>{tell("Connection restored. Refresh status before another action.");controls();});
   try {
     const requestedId=new URL(window.location.href).searchParams.get("task");

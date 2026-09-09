@@ -32,7 +32,8 @@ interface Entry {
   preparation?: Promise<void>; runtimeStartedAt: number;
   startupCancelled: boolean; startupAbort: AbortController;
   validationPriorTurn?: number | null;
-  projection?: NativeTaskProjection; projectionAt: number; touchedAt: number;
+  projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
+  verificationStoreHead?: string;
   verification: NativeTaskView["verification"]; finishing?: Promise<void>;
 }
 export interface NativeTaskServiceOptions {
@@ -138,27 +139,38 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return;
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
+      entry.projectionError = undefined;
+      if (entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
       entry.projectionAt = Date.now();
     } catch {
       entry.projection = undefined;
-      entry.error = "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown.";
+      entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
+      entry.projectionError = "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
     }
   }
   function view(entry: Entry, retainProjection = false): NativeTaskView {
     refresh(entry);
     const d = entry.descriptor, p = entry.projection;
+    const history: NativeTaskView["history"] = p?.history ?? { status: d.sessionId ? "unavailable" : "not-started",
+      backend: null, headEventHash: null, eventCount: 0,
+      message: d.sessionId ? entry.projectionError ?? "Persisted history is unavailable. Refresh after restoring the original evidence."
+        : "No native session has been recorded yet. Admission is not task completion." };
+    const resumeBlockedReason = d.sessionId && !d.closed && !p?.closed
+      ? !p ? "Authenticate the original persisted history before requesting resume."
+        : p.history.backend === "jsonl" ? "JSONL history can be inspected after restart, but writer resume is not supported. Start a new task to continue; no prior prompt will be replayed." : null : null;
     const validation = nativeTaskValidationView(d.validation, p?.validation,
         !!d.validation && d.pendingTurn && (entry.state === "starting" || (["running", "cancel-requested"].includes(entry.state) && (p?.validation.turn ?? null) === entry.validationPriorTurn)),
         d.pendingTurn && (!entry.client || (p?.validation.turn ?? null) === entry.validationPriorTurn));
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, revision: d.revision, clientRequestId: d.submissions[0]!.clientRequestId,
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
-      createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.error,
+      createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.projectionError ?? entry.error,
       validationSelection: d.validation ?? null,
       validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
       verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
-      canResume: !!d.sessionId && !d.closed && !p?.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
+      history, resumeBlockedReason,
+      canResume: !!d.sessionId && !!p && p.history.backend === "sqlite" && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
     // Released task history is reconstructed on demand, not retained for every descriptor in memory.
     if (!entry.client && !retainProjection) { entry.projection = undefined; entry.projectionAt = 0; }
     return result;
@@ -339,10 +351,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     poll(actor, taskId, cursor = 0) {
       if (!Number.isSafeInteger(cursor) || cursor < 0) throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose a nonnegative event cursor.");
       const entry = owned(actor, taskId), task = view(entry, true);
-      if (cursor > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
+      if (task.history.status !== "unavailable" && cursor > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
       const events = entry.projection?.events.filter(e => e.cursor > cursor) ?? [];
       if (!entry.client) { entry.projection = undefined; entry.projectionAt = 0; }
-      return { task, events, truncated: task.droppedEvents > 0 || cursor + 1 < task.firstCursor };
+      return { task, events, truncated: task.history.status === "unavailable" || task.droppedEvents > 0 || cursor + 1 < task.firstCursor };
     },
     async turn(actor, taskId, input) {
       const entry = owned(actor, taskId); assertPrompt(input.prompt);
@@ -381,6 +393,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       if (!entry.descriptor.sessionId || entry.descriptor.closed) throw new NativeTaskServiceError(
         entry.descriptor.archivedAt !== undefined ? "TASK_ARCHIVED" : "NOT_RESUMABLE", 409,
         entry.descriptor.archivedAt !== undefined ? "Archived tasks retain their evidence and cannot be resumed. Create a new task." : "This task has no resumable recorded native session.");
+      entry.projectionAt = 0; refresh(entry);
+      if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+        "Resume requires authenticated original session history. Restore it and refresh; no replacement session was created.");
+      if (entry.projection.history.backend === "jsonl") throw new NativeTaskServiceError("RESUME_UNSUPPORTED", 409,
+        "JSONL writer resume is not supported. Inspect the recorded history or start a new task; no native client or replacement session was started.");
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
       try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
@@ -421,9 +438,16 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       try {
         if (entry.client) { await entry.client.close(); entry.client = undefined; entry.session = undefined;
           entry.projectionAt = 0; refresh(entry); if (entry.projection?.closed) persist(entry, { closed: true }); }
+        entry.projectionAt = 0; refresh(entry);
+        const verificationHead = entry.projection?.storeHeadEventHash;
         const report = await verifyAgentRun(workspace, entry.descriptor.sessionId);
-        entry.verification = report.ok ? report.trustRoot.anchored ? "externally-anchored" : "workspace-key-consistency" : "failed";
+        entry.projectionAt = 0; refresh(entry);
+        const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
+        entry.verification = !report.ok ? "failed" : !sameHead ? "not-verified"
+          : report.trustRoot.anchored ? "externally-anchored" : "workspace-key-consistency";
+        entry.verificationStoreHead = sameHead ? verificationHead : undefined;
         entry.error = report.ok ? null : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
+        if (report.ok && !sameHead) entry.error = "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current.";
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
       finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; }
       return view(entry);

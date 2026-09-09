@@ -40,7 +40,7 @@ function operation(summary: string, responseSchema: string, write = false, reque
     ...(requestSchema ? { requestBody: body(requestSchema) } : {}),
     responses: {
       [status]: json(status === "202" ? "Admission recorded; inspect the task for its actual outcome." : "Current owned task state; no-store.", ref(responseSchema)),
-      "400": json("Invalid request, unknown fields or bounds exceeded.", ref("NativeTaskError")),
+      "400": json("Invalid request, unknown or repeated query fields, or bounds exceeded.", ref("NativeTaskError")),
       "401": json("A verified human session or bootstrap admin token is required.", ref("NativeTaskError")),
       "403": json("Identity, role, origin, CSRF, demo or read-only policy refused the operation.", ref("NativeTaskError")),
       "404": json("Unknown task or task belongs to another owner/agent.", ref("NativeTaskError")),
@@ -92,7 +92,7 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       maxTokens: { type: "integer", minimum: 1, maximum: 1024 }
     }, ["clientRequestId", "agentId", "provider", "tools", "prompt"]),
       description: "Workspace tools require toolsDigest from the inspected signed scope; no-tools requests must omit it. Real providers require an explicit model and a server-owned credential. Exact request replay returns the recorded admission; a conflicting reuse is refused." },
-    NativeTaskTurn: object({ clientRequestId: uuid, expectedRevision: integer, prompt }),
+    NativeTaskTurn: object({ clientRequestId: uuid, expectedRevision: { type: "integer", minimum: 1, maximum: 32 }, prompt }),
     NativeTaskControl: object({ expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
     NativeTask: object({ taskId: digest, sessionId: nullableString, agentId: agent, revision: integer,
       clientRequestId: uuid, lastClientRequestId: uuid, provider, model: nullableString, tools,
@@ -105,8 +105,13 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       verification: { type: "string", enum: ["not-verified", "workspace-key-consistency", "externally-anchored", "failed"],
         description: "Evidence integrity result, separate from task success. Other open ledger writers can prevent a complete verification." },
       approvals: { type: "array", items: ref("NativeTaskApproval") }, approvalError: nullableString,
-      nextCursor: integer, firstCursor: integer, droppedEvents: integer, canResume: bool
+      nextCursor: integer, firstCursor: integer, droppedEvents: integer, canResume: bool,
+      resumeBlockedReason: nullableString, history: ref("NativeTaskHistory")
     }),
+    NativeTaskHistory: { ...object({ status: { type: "string", enum: ["not-started", "authenticated", "unavailable"] },
+      backend: { type: ["string", "null"], enum: ["sqlite", "jsonl", null] },
+      headEventHash: { ...digest, type: ["string", "null"] }, eventCount: integer, message: string }),
+      description: "Actual selected-backend session metadata status; never a private payload access grant or JSONL writer-resume capability. When unavailable, withhold previous transcript/validation/verifier displays. eventCount zero then means unknown, not verified empty history." },
     NativeTaskApproval: object({ approvalRequestId: string, requestDigestSha256: digest, toolName: string,
       actionClass: string, riskTier: string, status: string, required: integer, received: integer, expiresTs: integer }),
     NativeTaskValidationSelection: { ...object({ configSha256: digest, checkIds: { type: "array", minItems: 1, maxItems: 8, uniqueItems: true,
