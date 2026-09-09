@@ -9,6 +9,7 @@ import { openaiResponsesAdapter } from "./llm/providers/openaiResponsesAdapter.j
 import { credentialRef } from "./credentials/credentialRef.js";
 import { STUB_PROVIDER_ID, stubProviderRoute } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
+import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
@@ -270,8 +271,10 @@ export function renderNotification(notification: LoopNotification): string | nul
           );
     case "turn-end":
       return chalk.bold(`turn ${notification.turn} ended: ${notification.ending.reason}`);
+    case "error":
+      return chalk.red(`  native error at turn ${notification.turn}, step ${notification.step}: ${renderNativeFailureGuidance(liveNativeFailureGuidance(notification.error))}`);
     default:
-      // status / step-end / inbox / error are all visible in the summary that
+      // status / step-end / inbox are visible in the summary that
       // follows, and echoing them here would bury the two lines that matter.
       return null;
   }

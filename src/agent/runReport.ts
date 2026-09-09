@@ -36,6 +36,7 @@ import type { NativeValidationResult } from "./nativeValidation.js";
 import { projectNativeValidation } from "./nativeValidationProjection.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
 import { projectNativeRunUsage, renderNativeRunUsage, type NativeRunUsage } from "./nativeRunUsage.js";
+import { projectNativeRunDiagnostics, renderNativeRunDiagnostics, type NativeRunDiagnostic } from "./nativeFailureGuidance.js";
 
 /** The literal a ledger writes in place of a signature under `AMC_NO_SIGN=1`. */
 /** The marker a row carries instead of a signature when signing is off. */
@@ -76,6 +77,8 @@ export interface AgentRunSummary {
   readonly validation: NativeValidationResult;
   /** Read-back usage; optional only for consumers of older serialized summaries. */
   readonly usage?: NativeRunUsage;
+  /** Cumulative recorded failed attempts; not the latest turn's success verdict. */
+  readonly diagnostics?: readonly NativeRunDiagnostic[];
 }
 
 /** Read one session's committed rows in commit order. */
@@ -145,7 +148,8 @@ export function readAgentRunSummary(
     assistantText: assistantTextOf(workspace, events),
     unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length,
     validation: projectNativeValidation(workspace, events),
-    usage: projectNativeRunUsage(events, sessionId)
+    usage: projectNativeRunUsage(events, sessionId),
+    diagnostics: projectNativeRunDiagnostics(events, sessionId)
   };
 }
 
@@ -275,6 +279,7 @@ export function renderRunSummary(summary: AgentRunSummary): string {
     lines.push(`  assistant: ${text}`);
   }
   lines.push(renderNativeRunUsage(summary.usage));
+  lines.push(renderNativeRunDiagnostics(summary.diagnostics));
   lines.push(`  validation ${summary.validation.status}${summary.validation.turn === null ? "" : ` (turn ${summary.validation.turn})`}`);
   for (const check of summary.validation.checks) lines.push(`    ${check.id}: ${check.status}${check.exitCode === null ? "" : ` (exit ${check.exitCode})`}${check.reason === null ? "" : ` — ${check.reason}`}`);
   if (summary.unsignedRows > 0) {

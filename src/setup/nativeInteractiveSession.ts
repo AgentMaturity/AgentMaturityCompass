@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
+import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpConfigError } from "./nativeMcpConfig.js";
@@ -344,6 +345,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const ending = Array.isArray(summary.endings) ? summary.endings.at(-1) : undefined;
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
       io.log(renderNativeRunUsage(summary.usage));
+      io.log(renderNativeRunDiagnostics(summary.diagnostics));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");

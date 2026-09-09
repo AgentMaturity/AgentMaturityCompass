@@ -58,6 +58,15 @@ the decision was recorded, does not resend it, and requests cancellation of the
 waiting turn. Inspect that exact approval before taking another action; existing
 authenticated reviewer, request-digest and quorum requirements still apply.
 
+Native failures now display a supported failure code and an inspection action,
+not arbitrary exception text. Recorded failed-attempt diagnostics appear in run
+text/JSON, chat and session inspection. These are cumulative: an earlier failed
+attempt can be followed by a successful retry, so read the latest turn ending and
+validation separately. Missing or inconsistent recorded metadata remains unknown.
+Suggested actions do not retry the task, change a signed budget, reset usage or
+re-sign policy. Use the session reference printed by the command in place of
+`<session-id>`; use its recorded owner in place of `<recorded-agent>`.
+
 ## What AMC is
 
 AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.

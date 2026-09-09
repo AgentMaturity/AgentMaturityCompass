@@ -9,6 +9,7 @@ export interface NativeChatChildSummary {
   readonly endings: readonly { readonly reason: TurnEndReason }[];
   readonly validation?: { readonly status: NativeValidationStatus };
   readonly usage?: unknown;
+  readonly diagnostics?: unknown;
 }
 export type NativeChatResult =
   | { readonly ok: true; readonly summary: NativeChatChildSummary }
@@ -67,6 +68,7 @@ export function parseNativeChatResult(input: {
     sessionId: row.sessionId, driverStatus: row.driverStatus,
     assistantText: [...row.assistantText] as string[], endings,
     ...(validation === undefined ? {} : { validation }),
-    ...(row.usage === undefined ? {} : { usage: row.usage })
+    ...(row.usage === undefined ? {} : { usage: row.usage }),
+    ...(row.diagnostics === undefined ? {} : { diagnostics: row.diagnostics })
   } };
 }
