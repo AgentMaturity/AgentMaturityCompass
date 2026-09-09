@@ -11,6 +11,15 @@ automated personas, recording software, or an actual study. It does not upload
 anything. It is independent of `scripts/install-persona-qa.mjs` and the automated
 runner documented in [HARNESS_COMPARISON.md](HARNESS_COMPARISON.md).
 
+### Optional preregistered observer capture
+
+Use the [observer capture workflow](HUMAN_FIRST_USE_CAPTURE.md) to preserve the
+planned roster, explicit observation events and correction history before intake.
+`scripts/human-first-use-capture.mjs` exports this unchanged study schema only when
+every planned session is closed and admissible; blocked exports retain missing
+sessions and evidence gaps without emitting a selected subset. Preparation is not
+human evidence, and capture does not authenticate observer declarations.
+
 ## Run after integration and qualification
 
 From a checkout containing the script, using an existing private output directory:
