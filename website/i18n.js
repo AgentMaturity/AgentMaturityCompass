@@ -14,7 +14,7 @@ const AMC_I18N = (() => {
       navDomainPacks: 'Domain Packs', navScale: 'Maturity Scale', navResearch: 'Research',
       navEUAct: 'EU AI Act', navGitHub: 'GitHub ↗', navBack: '← Back to AMC',
       // Hero
-      heroTagline: 'MIT Open Source · 1,209 CLI Paths · 1,375 Test Source Files',
+      heroTagline: 'MIT Open Source · 1,209 CLI Paths · 1,376 Test Source Files',
       heroSimpleH1: 'Your AI Agent Says<br>It\'s Safe.', heroSimpleH1Strong: 'Is It, Really?',
       heroSimpleSub: 'AMC watches what your AI actually does — not what it claims. Get a trustworthy safety score backed by proof. Free. Open-source. Takes 2 minutes.',
       heroTechH1: 'The Credit Score<br>for ', heroTechH1Strong: 'AI Agents.',

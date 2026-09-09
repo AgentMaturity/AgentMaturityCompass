@@ -2309,6 +2309,8 @@ components:
         toolsDigest:
           type: string
           pattern: ^[a-f0-9]{64}$
+        validation:
+          $ref: "#/components/schemas/NativeTaskValidationSelection"
         prompt:
           type: string
           minLength: 1
@@ -2368,11 +2370,15 @@ components:
         - model
         - tools
         - toolsDigest
+        - validationSelection
+        - validation
+        - validationOutputs
         - maxSteps
         - maxTokens
         - state
         - createdAt
         - updatedAt
+        - archived
         - turnEndReason
         - error
         - verification
@@ -2422,6 +2428,20 @@ components:
           type: string
           pattern: ^[a-f0-9]{64}$
           nullable: true
+        validationSelection:
+          oneOf:
+            - $ref: "#/components/schemas/NativeTaskValidationSelection"
+            - type: object
+              nullable: true
+              enum:
+                - null
+        validation:
+          $ref: "#/components/schemas/NativeTaskValidationResult"
+        validationOutputs:
+          type: array
+          maxItems: 8
+          items:
+            $ref: "#/components/schemas/NativeTaskValidationOutput"
         maxSteps:
           type: integer
           minimum: 0
@@ -2446,6 +2466,8 @@ components:
         updatedAt:
           type: integer
           minimum: 0
+        archived:
+          type: boolean
         turnEndReason:
           type: string
           nullable: true
@@ -2515,6 +2537,163 @@ components:
         expiresTs:
           type: integer
           minimum: 0
+    NativeTaskValidationSelection:
+      type: object
+      additionalProperties: false
+      required:
+        - configSha256
+        - checkIds
+      properties:
+        configSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        checkIds:
+          type: array
+          minItems: 1
+          maxItems: 8
+          uniqueItems: true
+          items:
+            type: string
+            pattern: ^[a-zA-Z0-9_-]{1,64}$
+      description: Creation-only selection from the operator's public check catalogue. The digest and ordered IDs
+        stay pinned across follow-up and resume; no commands, paths or grants are accepted.
+    NativeTaskValidationResult:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - turn
+        - configSha256
+        - checks
+      properties:
+        status:
+          type: string
+          enum:
+            - not-requested
+            - pending
+            - passed
+            - failed
+            - unavailable
+        turn:
+          type: integer
+          minimum: 0
+          nullable: true
+        configSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          nullable: true
+        checks:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - title
+              - status
+              - callId
+              - exitCode
+              - timedOut
+              - reason
+              - outputEventId
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+              status:
+                type: string
+                enum:
+                  - pending
+                  - passed
+                  - failed
+                  - unavailable
+              callId:
+                type: string
+                nullable: true
+              exitCode:
+                type: integer
+                nullable: true
+              timedOut:
+                type: boolean
+              reason:
+                type: string
+                nullable: true
+              outputEventId:
+                type: string
+                nullable: true
+    NativeTaskValidationConfiguration:
+      type: object
+      additionalProperties: false
+      required:
+        - ready
+        - configSha256
+        - checks
+        - message
+      properties:
+        ready:
+          type: boolean
+        configSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          nullable: true
+        checks:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - id
+              - title
+            properties:
+              id:
+                type: string
+              title:
+                type: string
+        message:
+          type: string
+    NativeTaskValidationOutput:
+      type: object
+      additionalProperties: false
+      required:
+        - checkId
+        - outputEventId
+        - payloadSha256
+        - status
+        - text
+        - truncated
+        - redacted
+        - bytes
+      properties:
+        checkId:
+          type: string
+        outputEventId:
+          type: string
+        payloadSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        status:
+          type: string
+          enum:
+            - available
+            - unavailable
+            - pruned
+        text:
+          type: string
+          nullable: true
+        truncated:
+          type: boolean
+        redacted:
+          type: boolean
+        bytes:
+          type: integer
+          minimum: 0
+          nullable: true
+      description: Text from the exact authenticated check-result payload after its complete bytes match
+        payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes,
+        not transformed display text. Reads over 2 MiB are withheld.
     NativeTaskEvent:
       type: object
       additionalProperties: false
@@ -2626,6 +2805,7 @@ components:
         - demo
         - providers
         - scope
+        - validation
         - limits
         - boundary
         - nativeCsrfToken
@@ -2683,6 +2863,8 @@ components:
                 nullable: true
         scope:
           $ref: "#/components/schemas/NativeTaskToolScope"
+        validation:
+          $ref: "#/components/schemas/NativeTaskValidationConfiguration"
         limits:
           type: object
           additionalProperties: false
@@ -8682,6 +8864,14 @@ paths:
             pattern: ^[a-z0-9][a-z0-9_-]*$
           description: Selected agent; defaults to the workspace selection. A task remains pinned to its original owner
             and agent.
+        - name: includeArchived
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: Set to true to inspect archived closed tasks as well. Only the literal true or false is accepted;
+            archived history keeps its request identities and cannot resume.
       responses:
         "200":
           description: Current owned task state; no-store.
@@ -9395,6 +9585,121 @@ paths:
   /v1/native-tasks/{taskId}/verify:
     post:
       summary: Close an active idle writer and verify native evidence; a sealed session cannot resume
+      tags:
+        - Studio
+        - Native Tasks
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-f0-9]{64}$
+        - name: agentId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+            pattern: ^[a-z0-9][a-z0-9_-]*$
+          description: Selected agent; defaults to the workspace selection. A task remains pinned to its original owner
+            and agent.
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native task/approval mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain from options or /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+            Admin-token clients may omit it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NativeTaskControl"
+      responses:
+        "200":
+          description: Current owned task state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskResponse"
+        "400":
+          description: Invalid request, unknown fields or bounds exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "401":
+          description: A verified human session or bootstrap admin token is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "403":
+          description: Identity, role, origin, CSRF, demo or read-only policy refused the operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "404":
+          description: Unknown task or task belongs to another owner/agent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "409":
+          description: Revision, request ID, signed scope or task state conflict. Refresh; do not automatically replay.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "413":
+          description: Request body exceeds the server's JSON limit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "429":
+          description: Active task or retained task capacity reached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "500":
+          description: Task status is uncertain. Inspect recorded state before another submission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "503":
+          description: Native task service is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+  /v1/native-tasks/{taskId}/archive:
+    post:
+      summary: Archive an owned closed task after authenticating its sealed history; retain evidence and request
+        identities
       tags:
         - Studio
         - Native Tasks
