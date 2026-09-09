@@ -35,6 +35,19 @@ Revocations are stored at:
 - `.amc/studio/leases/revocations.json`
 - `.amc/studio/leases/revocations.json.sig`
 
+Ordinary `amc lease revoke` authenticates the exact existing revocation snapshot
+before appending an ID. A tampered, unsigned, malformed or partially missing store
+is refused without rewriting its evidence; revoking another lease is not a
+repair operation and must not certify altered older revocations. Only a genuinely
+absent list **and** signature use first-store bootstrap behavior.
+
+Review and restore the approved history before using a deliberate repair command.
+The signer prepares the next list's signature before publishing either file, so
+an unavailable signer does not replace the old list with an unsigned update. The
+two-file publication is not represented as a cross-process transactional lock:
+an interrupted or inconsistent pair must still be rejected by consumers. Keep
+the original bytes and operator evidence when diagnosing such a failure.
+
 ## Enforcement
 
 - Gateway requires `x-amc-lease` for agent-attributed traffic.
