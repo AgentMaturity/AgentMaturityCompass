@@ -63,6 +63,61 @@ describe("native first-use local inspection", () => {
     const choices = await inspect({ provider: undefined, baseUrl: "https://models.example" });
     expect(choices.choices.filter(choice => choice.provider !== "stub").every(choice => choice.action.argv.includes("https://models.example"))).toBe(true);
   });
+  it("retains explicit home, file, model and reference when the provider is chosen later", async () => {
+    const file = join(root, "separate store", "selected.yaml");
+    const model = "chosen'model;$(never-execute)";
+    const result = await inspect({ provider: undefined, model, credential: "CHOSEN_API_KEY", credentialsFile: file, baseUrl: "https://models.example" });
+    expect(result.status).toBe("choose-provider");
+    expect(result.nextAction).toBeNull();
+    for (const choice of result.choices) {
+      expect(choice.action.cwd).toBe(workspace);
+      expect(choice.action.argv).toEqual(expect.arrayContaining(["--credentials-home", home, "--credentials-file", file]));
+      if (choice.provider === "stub") {
+        expect(choice.action.argv).not.toContain("--model");
+        expect(choice.action.argv).not.toContain("--credential");
+        expect(choice.action.argv).not.toContain("--base-url");
+      } else {
+        expect(choice.action.argv).toEqual(expect.arrayContaining(["--model", model, "--credential", "CHOSEN_API_KEY", "--base-url", "https://models.example"]));
+      }
+    }
+    expect(fs.existsSync(home)).toBe(false);
+  });
+  it("keeps the explicit shared home independently of the pinned ready-run credential file", async () => {
+    workspaceMarker(); ownedStore();
+    const elsewhere = join(root, "separate store");
+    fs.mkdirSync(elsewhere, { mode: 0o700 });
+    const file = join(elsewhere, "selected.yaml");
+    fs.writeFileSync(file, `OPENAI_API_KEY: ${SECRET}\n`, { mode: 0o600 });
+    const result = await inspect({ credentialsFile: file });
+    expect(result.status).toBe("ready");
+    for (const action of [result.nextAction, result.recheck]) {
+      expect(action?.argv).toEqual(expect.arrayContaining(["--credentials-home", home, "--credentials-file", file]));
+    }
+    expect(result.nextAction?.argv.filter(value => value === "--credentials-home")).toHaveLength(1);
+  });
+  it("does not invent a shared skill home from an explicit credential file", async () => {
+    workspaceMarker(); ownedStore();
+    const result = await inspect({ credentialsHome: undefined, credentialsFile: join(home, ".credentials.yaml") });
+    expect(result.status).toBe("ready");
+    expect(result.nextAction?.argv).not.toContain("--credentials-home");
+    expect(result.recheck?.argv).not.toContain("--credentials-home");
+  });
+  it("validates a supplied reference before copying it into provider choices", async () => {
+    const result = await inspect({ provider: undefined, credential: SECRET });
+    expect(result.code).toBe("AMC_CREDENTIAL_REF_INVALID");
+    expect(result.choices).toEqual([]);
+    expect(result.nextAction).toBeNull();
+  });
+  it.each([
+    { model: "model\ncontrol" },
+    { credentialsHome: "home\u001bcontrol" },
+    { credentialsFile: "file\rcontrol" }
+  ])("does not publish provider-choice argv containing terminal controls: %j", async extra => {
+    const result = await inspect({ provider: undefined, ...extra });
+    expect(result.code).toBe("ARGUMENT_INVALID");
+    expect(result.choices).toEqual([]);
+    expect(result.nextAction).toBeNull();
+  });
   it.each(["https://user:secret@example.test", "https://example.test/v1", "https://example.test?key=secret", "https://example.test#secret", "file:///tmp/model", "https://exa\nmple.test"])("withholds invalid provider origins from actionable commands: %s", async baseUrl => {
     const result = await inspect({ baseUrl });
     expect(result.code).toBe("PROVIDER_ORIGIN_INVALID");

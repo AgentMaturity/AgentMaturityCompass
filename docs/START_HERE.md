@@ -8,9 +8,22 @@ Choose what you want to do first. AMC can run a native task, assess evidence, or
 | Assess existing evidence | `amc` | Creates or updates an evidence baseline; a valid report can still have insufficient evidence. |
 | Connect an existing agent | `amc connect --help` | Shows capture and connection options for your existing runtime. |
 
-The native guide does not contact a model, open a session or change configuration. Choose OpenAI or Anthropic with a model you can access for a real task. Choose `--provider stub` explicitly for a local recording demonstration; it does not produce a real model answer. Native sessions currently use AMC's `default` agent identity.
+The native guide does not contact a model, open a session or change configuration. Choose OpenAI Chat Completions (`openai`), OpenAI Responses (`openai-responses`), or Anthropic with a model you can access for a real task. Choose `--provider stub` explicitly for a local recording demonstration; it does not produce a real model answer. Native commands pin the selected agent: explicit `--agent`, then `AMC_AGENT_ID`, the workspace's current agent, and finally `default`.
 
 See [the native task quickstart](QUICKSTART.md#run-a-native-task) for the commands and separate evidence verification step.
+
+For daily interactive use, run `amc agent-loop chat` with the same provider, model
+and credential reference. `--credentials-home` selects the shared skills directory
+at `<home>/skills` as well as the default credential-file location.
+`--credentials-file` can point elsewhere; it does not replace the selected skills
+home. The guide's provider choices and ready command retain these independent
+selections. Chat retains the explicit home and pinned credential file in every
+child turn and in its printed resume command, so a home-only slash skill is not
+lost when the next process starts. Workspace skills still take precedence.
+
+Pass reference names with `--credential`, never secret values. Local metadata
+being present does not prove remote authentication, task correctness or verified
+evidence; each remains a separate outcome.
 
 ## What AMC is
 

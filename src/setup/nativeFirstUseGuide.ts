@@ -79,16 +79,15 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   try { agentId = resolveAgentId(cwd, options.agentId); } catch { identityError = true; }
   const action = (...argv: string[]): NativeGuideAction => ({ cwd, argv });
   const nativeAction = (...argv: string[]): NativeGuideAction => action("amc", "--agent", agentId, "agent-loop", ...argv);
+  const homeArgs = options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome];
+  const overrides = [...homeArgs,
+    ...(options.credentialsFile === undefined ? [] : ["--credentials-file", options.credentialsFile])];
   let result: NativeFirstUseGuide = {
     schemaVersion: "2026-09-08", status: "choose-provider", code: "PROVIDER_REQUIRED",
     message: "Choose a provider for a real task, or choose the local recording demonstration.",
     agentId, provider: null, model: null, baseUrl, credential: null,
     workspace: { path: cwd, directoryPresent: null, configPresent: null },
-    choices: (["openai", "openai-responses", "anthropic", "stub"] as const).map(provider => ({
-      provider,
-      label: provider === "stub" ? "Local recording demonstration (no model answer)" : `${provider === "openai" ? "openai (Chat Completions)" : provider}: real task with your model and credential reference`,
-      action: nativeAction("guide", "--provider", provider, ...(provider === "stub" ? [] : endpointArgs))
-    })),
+    choices: [],
     nextAction: null, recheck: null, boundary: BOUNDARY
   };
   const finish = (status: NativeFirstUseGuide["status"], code: string, message: string, nextAction: NativeGuideAction | null = null): NativeFirstUseGuide =>
@@ -96,29 +95,38 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
   if (endpointError || identityError) result = { ...result, choices: [] };
   if (endpointError) return finish("blocked", "PROVIDER_ORIGIN_INVALID", "Use an HTTP(S) server origin without a path, query, fragment or embedded credentials. Set secrets through a credential reference.");
   if (identityError) return finish("blocked", "AGENT_SELECTION_INVALID", "Could not read a valid selected agent. Inspect --agent, AMC_AGENT_ID and .amc/current-agent before continuing.");
-  if (options.provider === undefined) return result;
-  if (options.provider !== "openai" && options.provider !== "openai-responses" && options.provider !== "anthropic" && options.provider !== "stub") {
+  if (options.provider !== undefined && options.provider !== "openai" && options.provider !== "openai-responses" && options.provider !== "anthropic" && options.provider !== "stub") {
     return finish("blocked", "PROVIDER_UNSUPPORTED", "Choose openai (Chat Completions), openai-responses, anthropic, or stub with --provider.");
   }
-  const provider = options.provider;
   // Terminal control characters cannot form useful copyable model/path inputs.
   if ([options.model, options.credentialsHome, options.credentialsFile, cwd].some(value => value !== undefined && /[\x00-\x1f\x7f]/.test(value))) {
     return finish("blocked", "ARGUMENT_INVALID", "Model and path arguments must not contain control characters.");
   }
-  let ref: ReturnType<typeof credentialRef> | null = null;
+  let requestedRef: ReturnType<typeof credentialRef> | undefined;
   try {
-    if (provider !== "stub") ref = credentialRef(options.credential ?? (provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY"));
+    if (options.provider !== "stub" && options.credential !== undefined) requestedRef = credentialRef(options.credential);
   } catch {
     return finish("blocked", "AMC_CREDENTIAL_REF_INVALID", "Use a credential reference name, such as OPENAI_API_KEY; never pass a key value.");
   }
+  if (options.provider === undefined) return {
+    ...result,
+    choices: (["openai", "openai-responses", "anthropic", "stub"] as const).map(provider => ({
+      provider,
+      label: provider === "stub" ? "Local recording demonstration (no model answer)" : `${provider === "openai" ? "openai (Chat Completions)" : provider}: real task with your model and credential reference`,
+      // Choosing a provider must not discard setup already supplied. A deliberate
+      // stub choice keeps local paths but does not inherit unused live-route data.
+      action: nativeAction("guide", "--provider", provider, ...(provider === "stub" ? [] : [
+        ...endpointArgs, ...(options.model?.trim() ? ["--model", options.model] : []),
+        ...(requestedRef === undefined ? [] : ["--credential", requestedRef])
+      ]), ...overrides)
+    }))
+  };
+  const provider = options.provider;
+  const ref = provider === "stub" ? null : requestedRef ?? credentialRef(provider === "anthropic" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY");
   if (provider === "stub" && (options.baseUrl !== undefined || options.credential !== undefined || (options.model !== undefined && options.model !== STUB_PROVIDER_MODEL))) {
     return finish("blocked", "STUB_OPTIONS_UNUSED", `The local demonstration uses ${STUB_PROVIDER_MODEL} without a credential reference. Omit --base-url, --credential and --model.`);
   }
   const model = provider === "stub" ? STUB_PROVIDER_MODEL : options.model?.trim() ? options.model : null;
-  const overrides = [
-    ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]),
-    ...(options.credentialsFile === undefined ? [] : ["--credentials-file", options.credentialsFile])
-  ];
   result = { ...result, provider, model, choices: [], recheck: nativeAction("guide", "--provider", provider, ...endpointArgs,
     ...(model === null ? [] : ["--model", model]), ...(ref === null ? [] : ["--credential", ref]), ...overrides) };
   let store: LocalCredentialsService | undefined;
@@ -147,7 +155,7 @@ export async function inspectNativeFirstUse(options: NativeFirstUseOptions): Pro
       : "Local setup markers and credential metadata are present. Run this bounded task to request a real model answer; provider errors remain possible.",
     nativeAction("run", provider === "stub" ? "Check recording with a local demonstration." : TASK,
       "--provider", provider, ...endpointArgs, "--model", model, ...(ref === null ? [] : ["--credential", ref]),
-      "--credentials-file", file, "--tools", provider === "stub" ? "echo" : "none", "--max-steps", provider === "stub" ? "2" : "1", "--max-tokens", "512"));
+      ...homeArgs, "--credentials-file", file, "--tools", provider === "stub" ? "echo" : "none", "--max-steps", provider === "stub" ? "2" : "1", "--max-tokens", "512"));
   } catch (error) {
     if (error instanceof CredentialsFilePermissionsError) return finish("blocked", error.code,
       `The credentials ${error.kind} permissions allow other users access. Review the exposure and restrict permissions, then rerun the guide.`,
