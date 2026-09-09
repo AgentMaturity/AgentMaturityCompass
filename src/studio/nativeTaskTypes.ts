@@ -73,6 +73,7 @@ export interface NativeTaskView {
   readonly validationOutputs: readonly NativeTaskValidationOutput[];
   readonly maxSteps: number; readonly maxTokens: number;
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
+  readonly archived: boolean;
   readonly turnEndReason: string | null; readonly error: string | null;
   readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "failed";
   readonly approvals: readonly NativeTaskApproval[]; readonly approvalError: string | null;
@@ -82,7 +83,7 @@ export interface NativeTaskView {
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {
   configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration>;
-  list(actor: NativeTaskActor): readonly NativeTaskView[];
+  list(actor: NativeTaskActor, includeArchived?: boolean): readonly NativeTaskView[];
   start(actor: NativeTaskActor, input: NativeTaskStart): Promise<NativeTaskView>;
   poll(actor: NativeTaskActor, taskId: string, cursor?: number): NativeTaskPoll;
   turn(actor: NativeTaskActor, taskId: string, input: { readonly prompt: string; readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
@@ -90,5 +91,6 @@ export interface NativeTaskService {
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   verify(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
+  archive(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   close(): Promise<void>;
 }

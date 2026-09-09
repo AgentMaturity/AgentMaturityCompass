@@ -74,6 +74,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         error: d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null,
         projectionAt: 0, touchedAt: Date.now(), runtimeStartedAt: Date.now(), startupCancelled: false, startupAbort: new AbortController(), verification: "not-verified" };
       entries.set(d.taskId, entry);
+    } else if (entry.descriptor.archivedAt !== d.archivedAt) {
+      if (entry.client || entry.session || entry.preparation || entry.turn || entry.work || entry.finishing
+        || entry.state === "starting" || entry.state === "verifying")
+        throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task archival changed while this process still owns an operation.");
+      entry.descriptor = d; entry.state = d.closed ? "closed" : entry.state; entry.projectionAt = 0;
     }
     return entry;
   }
@@ -90,10 +95,13 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     owned(actor, taskId); // Refuse unknown/foreign identities before creating any lock directory.
     return descriptors.lock(() => {
       const entry = owned(actor, taskId);
-      if (!Number.isSafeInteger(expectedRevision) || expectedRevision !== entry.descriptor.revision) throw new NativeTaskServiceError("STALE_REVISION", 409,
-        "The task revision changed. Refresh before controlling a newer turn.");
+      assertRevision(entry, expectedRevision);
       return entry;
     });
+  }
+  function assertRevision(entry: Entry, expectedRevision: number): void {
+    if (!Number.isSafeInteger(expectedRevision) || expectedRevision !== entry.descriptor.revision) throw new NativeTaskServiceError("STALE_REVISION", 409,
+      "The task revision changed. Refresh before controlling a newer turn.");
   }
   function capacity(): void {
     if (shuttingDown) throw new NativeTaskServiceError("SHUTTING_DOWN", 409, "Studio is stopping; no new native work was admitted.");
@@ -101,8 +109,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       throw new NativeTaskServiceError("CAPACITY", 429, "Four native tasks are active. Release an idle task before starting another.");
   }
   function assertUniqueSubmission(actor: NativeTaskActor, taskId: string, requestId: string): void {
-    if (descriptors.list().some(d => d.principalId === actor.principalId && d.taskId !== taskId && d.submissions.some(s => s.clientRequestId === requestId)))
-      throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already belongs to another native task.");
+    for (const d of descriptors.scan()) {
+      if (d.principalId === actor.principalId && d.taskId !== taskId && d.submissions.some(s => s.clientRequestId === requestId))
+        throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already belongs to another native task.");
+    }
   }
   function assertToolPin(d: NativeTaskDescriptor): void {
     assertNativeTaskValidationPin(validationConfig, d.validation);
@@ -138,7 +148,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, revision: d.revision, clientRequestId: d.submissions[0]!.clientRequestId,
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
-      createdAt: d.createdAt, updatedAt: d.updatedAt, turnEndReason: p?.ending ?? null, error: entry.error,
+      createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.error,
       validationSelection: d.validation ?? null,
       validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
       verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
@@ -273,7 +283,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
 
   return {
     configuration,
-    list(actor) { assertActor(actor); return descriptors.list().filter(d => d.principalId === actor.principalId && d.agentId === actor.agentId
+    list(actor, includeArchived = false) { assertActor(actor); return descriptors.list(includeArchived).filter(d => d.principalId === actor.principalId && d.agentId === actor.agentId
       && (!actor.demo || (d.demo && d.provider === "stub" && d.tools === "none"))).map(d => view(remember(d))).sort((a, b) => b.createdAt - a.createdAt); },
     async start(actor, input) {
       assertActor(actor);
@@ -299,7 +309,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
             throw new NativeTaskServiceError("VALIDATION_SCOPE_REQUIRED", 403, "Public checks require signed workspace bash and an authenticated operator; selecting a check creates no grant.");
         }
         capacity();
-        if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "Archive reviewed task descriptors before creating more tasks.");
+        if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "This workspace has 256 current tasks. Close and explicitly archive a reviewed task before creating more tasks.");
         const now = Date.now();
         const descriptor: NativeTaskDescriptor = { kind: "amc/studio-native-task/v1", taskId, principalId: actor.principalId, agentId: actor.agentId,
           demo: actor.demo, sessionId: null, provider: input.provider, model: input.model ?? null, tools: input.tools, toolsDigest: input.toolsDigest ?? null,
@@ -336,7 +346,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         assertUniqueSubmission(actor, taskId, input.clientRequestId);
         const prior = d.submissions.find(s => s.clientRequestId === input.clientRequestId);
         if (prior) { if (prior.bodyHash !== bodyHash) throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already names different turn content."); return; }
-        if (shuttingDown || d.closed || !entry.session || entry.turn || entry.finishing || entry.state !== "idle") throw new NativeTaskServiceError("TURN_BUSY", 409, "Wait for the active turn, or explicitly resume the released task.");
+        if (shuttingDown || d.closed || !entry.session || entry.turn || entry.finishing || entry.state !== "idle") throw new NativeTaskServiceError(
+          d.archivedAt !== undefined ? "TASK_ARCHIVED" : "TURN_BUSY", 409,
+          d.archivedAt !== undefined ? "Archived tasks retain their evidence and cannot accept new turns. Create a new task." : "Wait for the active turn, or explicitly resume the released task.");
         if (input.expectedRevision !== d.revision || d.revision !== entry.descriptor.revision) throw new NativeTaskServiceError("STALE_REVISION", 409, "The task revision changed. Refresh before submitting.");
         if (d.revision >= 32) throw new NativeTaskServiceError("TURN_LIMIT", 409, "This task reached its 32-submission limit. Release it and create a new task.");
         assertToolPin(d);
@@ -358,13 +370,39 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       const entry = control(actor, taskId, expectedRevision);
       if (entry.state === "idle" && entry.client) return view(entry);
       if (entry.client || entry.preparation || entry.finishing || entry.state === "starting" || entry.state === "verifying") throw new NativeTaskServiceError("ALREADY_ACTIVE", 409, "This task already has an active native operation.");
-      if (!entry.descriptor.sessionId || entry.descriptor.closed) throw new NativeTaskServiceError("NOT_RESUMABLE", 409, "This task has no resumable recorded native session.");
+      if (!entry.descriptor.sessionId || entry.descriptor.closed) throw new NativeTaskServiceError(
+        entry.descriptor.archivedAt !== undefined ? "TASK_ARCHIVED" : "NOT_RESUMABLE", 409,
+        entry.descriptor.archivedAt !== undefined ? "Archived tasks retain their evidence and cannot be resumed. Create a new task." : "This task has no resumable recorded native session.");
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
       try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
       catch { await stop(entry); entry.state = "failed"; entry.error = "Verified native resume was refused. No replacement session or provider request was created."; }
       finally { entry.preparation = undefined; }
       return view(entry);
+    },
+    archive(actor, taskId, expectedRevision) {
+      owned(actor, taskId);
+      return descriptors.lock(() => {
+        const entry = owned(actor, taskId);
+        assertRevision(entry, expectedRevision);
+        const d = entry.descriptor;
+        if (entry.client || entry.session || entry.preparation || entry.turn || entry.work || entry.finishing
+          || ["starting", "running", "cancel-requested", "releasing", "verifying"].includes(entry.state))
+          throw new NativeTaskServiceError("ARCHIVE_BUSY", 409, "Wait for all native operations to finish and close the session before archiving.");
+        if (d.pendingTurn) throw new NativeTaskServiceError("ARCHIVE_UNCERTAIN", 409, "A prior submission is unresolved. Inspect and reconcile its signed evidence before archiving.");
+        if (!d.sessionId) throw new NativeTaskServiceError("NO_SESSION", 409, "No recorded native session exists to authenticate for archival.");
+        let projection: NativeTaskProjection;
+        try { projection = readNativeTaskProjection(workspace, d.sessionId, d.agentId); }
+        catch { throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "Native evidence did not authenticate; this task was not archived."); }
+        if (!projection.closed) throw new NativeTaskServiceError("ARCHIVE_NOT_CLOSED", 409, "The authenticated native session is still open. Close it before archiving.");
+        if (d.archivedAt === undefined) {
+          const now = Date.now();
+          const archived = { ...d, closed: true, archivedAt: now, updatedAt: now };
+          descriptors.write(archived); entry.descriptor = archived;
+        }
+        entry.state = "closed"; entry.projection = projection; entry.projectionAt = Date.now();
+        return view(entry);
+      });
     },
     async verify(actor, taskId, expectedRevision) {
       const entry = control(actor, taskId, expectedRevision);

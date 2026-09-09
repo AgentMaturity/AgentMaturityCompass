@@ -41,6 +41,7 @@ const turnSchema = z.object({
   clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(0), prompt: promptSchema
 }).strict();
 const controlSchema = z.object({ expectedRevision: z.number().int().min(1).max(32) }).strict();
+const listQuerySchema = z.object({ agentId: agentIdSchema.optional(), includeArchived: z.enum(["true", "false"]).optional() }).strict();
 
 function query(req: IncomingMessage): URLSearchParams {
   return new URL(req.url ?? "/", "http://native.invalid").searchParams;
@@ -81,7 +82,9 @@ export async function handleNativeTasksRoute(
       return true;
     }
     if (pathname === prefix && method === "GET") {
-      apiSuccess(res, { tasks: await native.service.list(actorFor(context.workspace, native, params.get("agentId"))) });
+      if ([...params.keys()].some(key => params.getAll(key).length !== 1)) throw new NativeTaskServiceError("QUERY_INVALID", 400, "Native task list parameters must be supplied once.");
+      const selection = listQuerySchema.parse(Object.fromEntries(params));
+      apiSuccess(res, { tasks: await native.service.list(actorFor(context.workspace, native, selection.agentId), selection.includeArchived === "true") });
       return true;
     }
     if (pathname === prefix && method === "POST") {
@@ -92,7 +95,7 @@ export async function handleNativeTasksRoute(
       apiSuccess(res, await native.service.start(actor, input), 202);
       return true;
     }
-    const match = pathname.slice(prefix.length).match(/^\/([a-zA-Z0-9_-]{8,128})(?:\/(turn|cancel|release|resume|verify))?$/);
+    const match = pathname.slice(prefix.length).match(/^\/([a-zA-Z0-9_-]{8,128})(?:\/(turn|cancel|release|resume|verify|archive))?$/);
     if (!match) { apiError(res, 404, "Native task route not found."); return true; }
     const taskId = match[1]!;
     const action = match[2];
@@ -124,6 +127,7 @@ export async function handleNativeTasksRoute(
     const result = action === "cancel" ? await native.service.cancel(actor, taskId, expectedRevision)
       : action === "release" ? await native.service.release(actor, taskId, expectedRevision)
       : action === "resume" ? await native.service.resume(actor, taskId, expectedRevision)
+      : action === "archive" ? await native.service.archive(actor, taskId, expectedRevision)
       : await native.service.verify(actor, taskId, expectedRevision);
     apiSuccess(res, result, action === "cancel" ? 202 : 200);
     return true;

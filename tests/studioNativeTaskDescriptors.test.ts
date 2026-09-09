@@ -70,3 +70,39 @@ test("signed descriptor cannot be selected through a symlink or unbounded input"
   rmSync(file); writeFileSync(file, " ".repeat(32 * 1024 + 1));
   expect(() => store.read(d.taskId)).toThrow("did not verify");
 });
+
+test("archival is optional signed metadata and retains every submission across restart", () => {
+  const legacy = descriptor(); store.lock(() => store.write(legacy));
+  const path = join(store.directory, `${legacy.taskId}.json`), before = readFileSync(path);
+  expect(store.read(legacy.taskId)).not.toHaveProperty("archivedAt");
+  expect(readFileSync(path)).toEqual(before);
+  const archived = { ...legacy, pendingTurn: false, closed: true, archivedAt: 2, updatedAt: 2 };
+  store.lock(() => store.write(archived));
+  const restarted = new NativeTaskDescriptors(root);
+  expect(restarted.list()).toEqual([]);
+  expect(restarted.list(true)).toEqual([archived]);
+  expect([...restarted.scan()]).toEqual([archived]);
+  expect(restarted.read(legacy.taskId)?.submissions).toEqual(legacy.submissions);
+
+  const envelope = JSON.parse(readFileSync(path, "utf8")); delete envelope.descriptor.archivedAt;
+  writeFileSync(path, JSON.stringify(envelope));
+  expect(() => restarted.read(legacy.taskId)).toThrow("did not verify");
+  expect(() => restarted.list()).toThrow("did not verify");
+});
+
+test("archival metadata cannot describe an open, uncertain, unrecorded or inconsistent task", () => {
+  const archived = { ...descriptor(), pendingTurn: false, closed: true, archivedAt: 2, updatedAt: 2 };
+  for (const patch of [{ closed: false }, { pendingTurn: true }, { sessionId: null }, { archivedAt: 0 }, { archivedAt: 3 }]) {
+    expect(() => store.lock(() => store.write({ ...archived, ...patch }))).toThrow();
+  }
+});
+
+test("retained archives do not impose a second history cap or disappear from identity scans", () => {
+  const retained = Array.from({ length: 257 }, () => ({ ...descriptor(), pendingTurn: false, closed: true, archivedAt: 2, updatedAt: 2 }));
+  const current = descriptor();
+  store.lock(() => { for (const row of [...retained, current]) store.write(row); });
+  expect(store.list()).toEqual([current]);
+  expect(new Set(store.list(true).map(row => row.taskId))).toEqual(new Set([...retained, current].map(row => row.taskId)));
+  expect(new Set([...store.scan()].flatMap(row => row.submissions.map(submission => submission.clientRequestId))))
+    .toEqual(new Set([...retained, current].flatMap(row => row.submissions.map(submission => submission.clientRequestId))));
+});

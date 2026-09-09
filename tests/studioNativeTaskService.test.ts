@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -14,7 +14,7 @@ import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
-import { nativeTaskId } from "../src/studio/nativeTaskDescriptors.js";
+import { NativeTaskDescriptors, nativeTaskId } from "../src/studio/nativeTaskDescriptors.js";
 import type { NativeTaskActor, NativeTaskService, NativeTaskStart, NativeTaskView } from "../src/studio/nativeTaskTypes.js";
 
 // Exercise the actual built SDK's own compiled CLI path, as an installed server does.
@@ -153,6 +153,100 @@ test("cancel during initial preparation prevents the original prompt from later 
   const repeated = await s.start(actor, request); expect(repeated.taskId).toBe(taskId);
   expect(rows().filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 30_000);
+
+test("archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart", async () => {
+  const s = service(), request = input("Archive first recorded turn.");
+  let task = await s.start(actor, request); task = await idle(s, task.taskId);
+  const turn = { clientRequestId: randomUUID(), expectedRevision: task.revision, prompt: "Archive retained follow-up." };
+  await s.turn(actor, task.taskId, turn); task = await idle(s, task.taskId);
+  task = await s.verify(actor, task.taskId, task.revision);
+  expect(task.state).toBe("closed"); expect(task.archived).toBe(false);
+  const store = new NativeTaskDescriptors(root), original = store.read(task.taskId)!;
+  const recorded = rows(task.sessionId);
+  // Capacity is exercised with signed control metadata; only the real task above
+  // supplies native runtime/evidence acceptance. These are not 255 executed tasks.
+  store.lock(() => {
+    for (let index = 0; index < 255; index++) {
+      const requestId = randomUUID();
+      store.write({ ...original, taskId: nativeTaskId(actor.principalId, requestId), revision: 1,
+        submissions: [{ clientRequestId: requestId, bodyHash: original.submissions[0]!.bodyHash, revision: 1 }] });
+    }
+  });
+  const next = input("Admission after explicit archival.");
+  await expect(s.start(actor, next)).rejects.toMatchObject({ code: "NATIVE_TASK_HISTORY_LIMIT" });
+  const archived = s.archive(actor, task.taskId, task.revision);
+  expect(archived).toMatchObject({ taskId: task.taskId, sessionId: task.sessionId, revision: task.revision,
+    state: "closed", archived: true, canResume: false, clientRequestId: request.clientRequestId, lastClientRequestId: turn.clientRequestId });
+  expect(rows(task.sessionId)).toEqual(recorded);
+  expect(store.list()).toHaveLength(255); expect(store.list(true)).toHaveLength(256);
+  expect(store.read(task.taskId)?.submissions).toEqual(original.submissions);
+  const descriptorPath = join(store.directory, `${task.taskId}.json`), archiveBytes = readFileSync(descriptorPath);
+  expect(s.archive(actor, task.taskId, task.revision).archived).toBe(true);
+  expect(readFileSync(descriptorPath)).toEqual(archiveBytes);
+  await s.close();
+  const restarted = service();
+  expect(restarted.poll(actor, task.taskId).events.some(event => event.kind === "user" && event.text === turn.prompt)).toBe(true);
+  expect((await restarted.start(actor, request)).archived).toBe(true);
+  expect((await restarted.turn(actor, task.taskId, turn)).archived).toBe(true);
+  expect(rows(task.sessionId)).toEqual(recorded);
+  await expect(restarted.start(actor, { ...request, prompt: "conflicting original content" })).rejects.toMatchObject({ code: "NATIVE_REQUEST_CONFLICT" });
+  await expect(restarted.start(actor, { ...next, clientRequestId: turn.clientRequestId })).rejects.toMatchObject({ code: "NATIVE_REQUEST_CONFLICT" });
+  await expect(restarted.turn(actor, task.taskId, { ...turn, clientRequestId: randomUUID(), expectedRevision: task.revision }))
+    .rejects.toMatchObject({ code: "NATIVE_TASK_ARCHIVED" });
+  await expect(restarted.resume(actor, task.taskId, task.revision)).rejects.toMatchObject({ code: "NATIVE_TASK_ARCHIVED" });
+  const admitted = await restarted.start(actor, next); await idle(restarted, admitted.taskId);
+  expect(admitted.taskId).not.toBe(task.taskId);
+  expect(store.list()).toHaveLength(256);
+  expect(rows(task.sessionId)).toEqual(recorded);
+  await restarted.release(actor, admitted.taskId, admitted.revision);
+}, 90_000);
+
+test("archive refuses active, foreign, stale, unsealed and uncertain tasks without changing retained metadata", async () => {
+  const s = service(), request = input(), taskId = nativeTaskId(actor.principalId, request.clientRequestId);
+  const starting = s.start(actor, request);
+  expect(() => s.archive(actor, taskId, 1)).toThrow("operations to finish");
+  await starting; let task = await idle(s, taskId);
+  const store = new NativeTaskDescriptors(root), path = join(store.directory, `${taskId}.json`);
+  let before = readFileSync(path);
+  expect(() => s.archive({ ...actor, principalId: "different-owner" }, taskId, 1)).toThrow("not found");
+  expect(() => s.archive({ ...actor, agentId: "other-agent" }, taskId, 1)).toThrow("not found");
+  expect(() => s.archive(actor, taskId, 0)).toThrow("revision changed");
+  expect(() => s.archive(actor, taskId, 1)).toThrow("operations to finish");
+  expect(readFileSync(path)).toEqual(before);
+  await s.release(actor, taskId, 1);
+  // A signed control flag alone cannot substitute for an authenticated close.
+  store.lock(() => store.write({ ...store.read(taskId)!, closed: true }));
+  before = readFileSync(path);
+  const observer = service();
+  expect(() => observer.archive(actor, taskId, 1)).toThrow("session is still open");
+  expect(readFileSync(path)).toEqual(before);
+  store.lock(() => store.write({ ...store.read(taskId)!, closed: false, pendingTurn: true }));
+  before = readFileSync(path);
+  expect(() => service().archive(actor, taskId, 1)).toThrow("prior submission is unresolved");
+  expect(readFileSync(path)).toEqual(before);
+  expect(task.archived).toBe(false);
+}, 60_000);
+
+test("archive authenticates evidence again and hidden archived descriptors still fail closed on tampering", async () => {
+  const s = service(); let task = await s.start(actor, input()); task = await idle(s, task.taskId);
+  task = await s.verify(actor, task.taskId, task.revision); expect(task.state).toBe("closed");
+  const store = new NativeTaskDescriptors(root), path = join(store.directory, `${task.taskId}.json`), before = readFileSync(path);
+  const ledger = openLedger(root);
+  const close = ledger.db.prepare("SELECT id, writer_sig FROM evidence_events WHERE session_id = ? AND event_type = 'session/close'").get(task.sessionId) as { id: string; writer_sig: string };
+  expect(close).toBeDefined();
+  try {
+    ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run("tampered-archive-close", close.id);
+    expect(() => s.archive(actor, task.taskId, task.revision)).toThrow("evidence did not authenticate");
+    expect(readFileSync(path)).toEqual(before);
+  } finally { ledger.db.prepare("UPDATE evidence_events SET writer_sig = ? WHERE id = ?").run(close.writer_sig, close.id); ledger.close(); }
+  s.archive(actor, task.taskId, task.revision);
+  const authentic = readFileSync(path), envelope = JSON.parse(authentic.toString("utf8"));
+  delete envelope.descriptor.archivedAt; writeFileSync(path, JSON.stringify(envelope));
+  try {
+    expect(() => s.list(actor)).toThrow("did not verify");
+    await expect(s.start(actor, input())).rejects.toMatchObject({ code: "NATIVE_TASK_DESCRIPTOR_UNTRUSTED" });
+  } finally { writeFileSync(path, authentic); }
+}, 60_000);
 
 test("a physical workspace alias runs the same native session, while a different ACP root is refused", async () => {
   const alias = join(root, "same-workspace-alias"); symlinkSync(root, alias, "junction");

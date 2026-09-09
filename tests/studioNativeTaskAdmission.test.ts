@@ -15,7 +15,7 @@ const human: StudioApiAuthContext = { isAdmin: false, agentId: null, username: "
   roles: new Set(["OPERATOR"]), nativeCsrfToken: proof, sessionAuthSource: "LOCAL_USER" };
 const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewer", revision: 3,
   clientRequestId: requestId, lastClientRequestId: requestId, provider: "stub", model: null, tools: "none", toolsDigest: null,
-  maxSteps: 2, maxTokens: 64, state: "idle", createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
+  maxSteps: 2, maxTokens: 64, state: "idle", archived: false, createdAt: 1, updatedAt: 2, turnEndReason: "complete", error: null,
   validationOutputs: [], validationSelection: null, validation: { status: "not-requested", turn: null, configSha256: null, checks: [] },
   verification: "not-verified", approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
@@ -56,6 +56,7 @@ function fakeService() {
     cancel: vi.fn<NativeTaskService["cancel"]>(() => view),
     release: vi.fn<NativeTaskService["release"]>(async () => view),
     resume: vi.fn<NativeTaskService["resume"]>(async () => view),
+    archive: vi.fn<NativeTaskService["archive"]>(() => ({ ...view, state: "closed", archived: true, canResume: false })),
     verify: vi.fn<NativeTaskService["verify"]>(async () => view), close: vi.fn<NativeTaskService["close"]>(async () => {})
   } satisfies NativeTaskService;
 }
@@ -192,13 +193,54 @@ describe("native Studio authenticated API admission", () => {
     for (const action of ["turn", "resume"]) {
       expect((await f.post(`/api/v1/native-tasks/${taskId}/${action}?agentId=reviewer`, { expectedRevision: 3, ...(action === "turn" ? { clientRequestId: requestId, prompt: "Continue" } : {}) })).status).toBe(403);
     }
-    for (const action of ["cancel", "release", "verify"] as const) {
+    for (const action of ["cancel", "release", "verify", "archive"] as const) {
       expect((await f.post(`/api/v1/native-tasks/${taskId}/${action}?agentId=reviewer`, {})).status).toBe(400);
       expect(f.service[action]).not.toHaveBeenCalled();
       expect((await f.post(`/api/v1/native-tasks/${taskId}/${action}?agentId=reviewer`, { expectedRevision: 3 })).status).toBe(action === "cancel" ? 202 : 200);
       expect(f.service[action]).toHaveBeenCalledWith({ principalId: "session:LOCAL_USER:stable-user-id", agentId: "reviewer", demo: false }, taskId, 3);
     }
     expect(f.service.start).not.toHaveBeenCalled(); expect(f.service.turn).not.toHaveBeenCalled(); expect(f.service.resume).not.toHaveBeenCalled();
+  });
+
+  it("lists archives only by an explicit canonical query and rejects ambiguous selections", async () => {
+    const f = await fixture();
+    for (const suffix of ["", "&includeArchived=false", "&includeArchived=true"]) {
+      expect((await fetch(`${f.origin}/api/v1/native-tasks?agentId=reviewer${suffix}`)).status).toBe(200);
+      expect(f.service.list).toHaveBeenLastCalledWith({ principalId: "session:LOCAL_USER:stable-user-id", agentId: "reviewer", demo: false }, suffix.endsWith("=true"));
+    }
+    f.service.list.mockClear();
+    for (const suffix of ["includeArchived=1", "includeArchived=TRUE", "includeArchived=", "includeArchived=true&includeArchived=false",
+      "agentId=other", "unexpected=true"]) {
+      expect((await fetch(`${f.origin}/api/v1/native-tasks?agentId=reviewer&${suffix}`)).status).toBe(400);
+    }
+    expect(f.service.list).not.toHaveBeenCalled();
+  });
+
+  it("archives through the existing owner, intent, CSRF and strict revision boundary", async () => {
+    const f = await fixture();
+    const path = `/api/v1/native-tasks/${taskId}/archive?agentId=reviewer`;
+    for (const headers of [{ [NATIVE_INTENT_HEADER]: undefined }, { [NATIVE_CSRF_HEADER]: undefined }, { origin: "https://attacker.invalid" }]) {
+      expect((await f.post(path, { expectedRevision: 3 }, headers)).status).toBe(403);
+    }
+    for (const body of [{}, { expectedRevision: 0 }, { expectedRevision: 3, principalId: "other" }, { expectedRevision: 3, deleteEvidence: true }]) {
+      expect((await f.post(path, body)).status).toBe(400);
+    }
+    expect(f.service.archive).not.toHaveBeenCalled();
+    const response = await f.post(path, { expectedRevision: 3 });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ data: { taskId, state: "closed", archived: true, canResume: false } });
+    expect(f.service.archive).toHaveBeenCalledWith({ principalId: "session:LOCAL_USER:stable-user-id", agentId: "reviewer", demo: false }, taskId, 3);
+    expect(f.service.verify).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["unauthenticated", null, 401],
+    ["ordinary viewer", { ...human, roles: new Set(["VIEWER"]) }, 403],
+    ["agent token", { ...human, agentId: "reviewer", roles: new Set(["AGENT"]) }, 403]
+  ] satisfies Array<[string, StudioApiAuthContext | null, number]>)("refuses %s archival before native service", async (_label, auth, status) => {
+    const f = await fixture({ auth });
+    expect((await f.post(`/api/v1/native-tasks/${taskId}/archive?agentId=reviewer`, { expectedRevision: 3 })).status).toBe(status);
+    expect(f.service.archive).not.toHaveBeenCalled();
   });
 
   it.each(["workspace", "command", "env", "baseUrl", "credentialRef", "mcpConfig", "principalId"])("rejects caller-supplied authority field %s", async field => {
