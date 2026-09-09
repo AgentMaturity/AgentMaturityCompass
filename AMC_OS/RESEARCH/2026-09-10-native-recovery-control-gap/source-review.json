@@ -1,0 +1,30 @@
+{
+  "taskId": "native-recovery-control-gap-batch",
+  "reviewer": "cos-native-recovery-control-gap-prime",
+  "baseline": "b516869eeaa275fe31248024a02596d71255add0",
+  "status": "implemented-and-checkpointed-at-review-gate",
+  "changes": [
+    "Expose only Node-observed ACP child closure; preserve existing actual shutdown join.",
+    "Reconcile a dead managed client only after its preparation, turn, work and cleanup settle. Preserve signed descriptor and pending admissions; explicit resume retains native factory.",
+    "Authenticate original SQLite full-store history and configuration/controller restrictions before recovery or ownership claim; reuse the same existing JSONL restrictions.",
+    "Preserve external-controller refusal, user-cancel continuation, original budget records, approval/validation pinning and all existing owner/lease/browser gates."
+  ],
+  "reviewCorrections": [
+    "Corrected new test readBudgetEvents call to its actual workspace/ledger signature and compare actual budget-relevant signed rows, not all lifecycle events.",
+    "A connection error did not apply the helper/test patch: exact paths were read after reconnection before the corrected authoring request."
+  ],
+  "acceptance": "Not run yet; new source clone, actual process-death public/native controller/browser scenarios and restored security mutations are next.",
+  "unownedPathsTouched": false,
+  "policyWidening": false,
+  "externalCallbacksReconstructed": false,
+  "runtimeCommit": "efb4b638f4814637086d3fe076a6eba5685d6cad",
+  "candidateCommit": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
+  "firstAttempt": {
+    "passed": 20,
+    "failed": 2,
+    "qualified": false
+  },
+  "currentCandidateAcceptance": "unreviewed after refused poll; no substitute acceptance inspection",
+  "securityMutations": "authored, not executed",
+  "recordedAt": "2026-09-09T21:40:51.909515+00:00"
+}

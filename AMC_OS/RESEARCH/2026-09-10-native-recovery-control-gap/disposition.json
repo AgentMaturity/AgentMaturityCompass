@@ -1,0 +1,101 @@
+{
+  "taskId": "native-recovery-control-gap-batch",
+  "state": "instruction-needed-safe-checkpoint",
+  "checkpointAt": "2026-09-09T21:40:51.909515+00:00",
+  "branch": "amc/gap-register-execution",
+  "runtimeCommit": "efb4b638f4814637086d3fe076a6eba5685d6cad",
+  "candidateCommit": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
+  "implementationCommitted": true,
+  "batchFullyAccepted": false,
+  "fullProgramComplete": false,
+  "instructionNeeded": true,
+  "blocker": {
+    "kind": "automatic-tool-review",
+    "tool": "Chat_On_Steroids_Core.write_stdin",
+    "arguments": {
+      "session_id": 3263,
+      "chars": "",
+      "yield_time_ms": 1000
+    },
+    "reason": "This tool call was blocked by OpenAI because we couldn't determine the safety status of the request.",
+    "replayed": false,
+    "substitutedForAcceptance": false,
+    "recordedAt": "2026-09-09T21:40:51.909515+00:00"
+  },
+  "firstAttempt": {
+    "candidate": "efb4b638f4814637086d3fe076a6eba5685d6cad",
+    "clone": "tmp/cos-native-recovery-control-gap-01/candidate01/source",
+    "environment": {
+      "system": "Darwin",
+      "release": "25.6.0",
+      "arch": "arm64",
+      "node": "v25.5.0",
+      "pnpm": "10.33.0",
+      "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
+      "browserVersion": "Google Chrome for Testing 147.0.7727.15"
+    },
+    "passed": 20,
+    "failed": 2,
+    "qualified": false,
+    "receipt": "tmp/cos-native-recovery-control-gap-01/candidate01/receipts/receipt.json"
+  },
+  "currentCandidate": {
+    "candidate": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
+    "clone": "tmp/cos-native-recovery-control-gap-01/candidate02/source",
+    "executionTerminalObserved": true,
+    "acceptance": "unreviewed after tool gate; no result promoted",
+    "receipt": "tmp/cos-native-recovery-control-gap-01/candidate02/receipts/receipt.json"
+  },
+  "securityMutations": "authored; not executed",
+  "installedQualification": "not started; installed-case.mjs not authored",
+  "sourceBrowserBoundary": "one positive Chromium scenario in the unqualified candidate01 run; not installed or human qualification",
+  "platformReleaseBoundary": "no new platform matrix, full suite, release/prepack gate, publish or deploy",
+  "allObservedCommandGroupsClosed": true,
+  "allRecordedFixtureServersClosed": true,
+  "allRecordedBrowsersClosed": true,
+  "processClosureReceipt": "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/process-closure.json",
+  "trackerUpdates": [
+    {
+      "issue": "AMC-1511",
+      "kind": "implementation-start",
+      "id": "f1a2529a-509a-4edc-a3de-d47bd151d6c1",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1511",
+      "kind": "implementation-and-first-attempt",
+      "id": "e64bb6a4-2c93-4c10-adcb-d9fbd1253b8e",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1511",
+      "kind": "safe-checkpoint",
+      "id": "74bb5573-626d-4bf8-9c70-003361b41a1c",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1538",
+      "kind": "native-validation-controller-checkpoint",
+      "id": "d494c0bb-5259-47c4-a406-8e93d22ed747",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1540",
+      "kind": "immutable-submission-recovery-checkpoint",
+      "id": "0674270f-ff06-4f69-a618-95f52348d311",
+      "delivered": true
+    }
+  ],
+  "vault": {
+    "path": "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md",
+    "checkpointAppended": true
+  },
+  "oldRefusalsPreserved": true,
+  "oldErasureOccurred": false,
+  "ownershipReleased": true,
+  "activeOwnedExecution": null,
+  "workers": [],
+  "remainingOperation": null,
+  "nextAction": "After legitimate resolution of the review gate, reconcile the retained candidate02 acceptance evidence without assuming success from process closure; run restored security mutations at the pinned candidate and author/execute separate installed cookie/browser/tool-approval acceptance. Preserve the failed first attempt. Do not rerun old platform or erasure lanes."
+}

@@ -1,0 +1,305 @@
+{
+  "taskId": "native-recovery-control-gap-batch",
+  "observedAt": "2026-09-09T21:37:57.336411+00:00",
+  "purpose": "Resource closure only; no acceptance-result recovery through an alternative to refused write_stdin.",
+  "runs": [
+    {
+      "attempt": "candidate01",
+      "runnerPid": 90546,
+      "runnerAlive": false,
+      "commandGroups": [
+        {
+          "name": "clone",
+          "pid": 90548,
+          "pgid": 90548,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pin",
+          "pid": 90566,
+          "pgid": 90566,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pin-identity",
+          "pid": 90579,
+          "pgid": 90579,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "source-clean",
+          "pid": 90580,
+          "pgid": 90580,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "node-version",
+          "pid": 90582,
+          "pgid": 90582,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pnpm-version",
+          "pid": 90583,
+          "pgid": 90583,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "browser-version",
+          "pid": 90592,
+          "pgid": 90592,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "fresh-install",
+          "pid": 90593,
+          "pgid": 90593,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "vendor-build",
+          "pid": 90614,
+          "pgid": 90614,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "candidate-build",
+          "pid": 90627,
+          "pgid": 90627,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "new-native-recovery-control",
+          "pid": 90777,
+          "pgid": 90777,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        }
+      ]
+    },
+    {
+      "attempt": "candidate02",
+      "runnerPid": 91256,
+      "runnerAlive": false,
+      "commandGroups": [
+        {
+          "name": "clone",
+          "pid": 91258,
+          "pgid": 91258,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pin",
+          "pid": 91271,
+          "pgid": 91271,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pin-identity",
+          "pid": 91272,
+          "pgid": 91272,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "source-clean",
+          "pid": 91273,
+          "pgid": 91273,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "node-version",
+          "pid": 91276,
+          "pgid": 91276,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "pnpm-version",
+          "pid": 91277,
+          "pgid": 91277,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "browser-version",
+          "pid": 91279,
+          "pgid": 91279,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "fresh-install",
+          "pid": 91280,
+          "pgid": 91280,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "vendor-build",
+          "pid": 91292,
+          "pgid": 91292,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "candidate-build",
+          "pid": 91307,
+          "pgid": 91307,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "new-native-recovery-control",
+          "pid": 91487,
+          "pgid": 91487,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        },
+        {
+          "name": "affected-native-continuation",
+          "pid": 91665,
+          "pgid": 91665,
+          "recordedLeaderClosed": true,
+          "recordedGroupClosed": true,
+          "groupStillExists": false
+        }
+      ]
+    }
+  ],
+  "fixtureServers": [
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-jsonl-success-OLF5Vr/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-sqlite-success-SqtYBZ/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-jsonl-success-RELFTh/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-sqlite-success-68tiuZ/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-sqlite-success-jLuv9q/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-jsonl-success-vPEyOo/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-u9ikHS/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-JrMflb/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-fBJsr4/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-sqlite-success-nlixTq/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-sqlite-success-H2gwI7/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-Bea3ts/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-YA3VMj/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-TCjd5e/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-sqlite-success-h0ysVG/http-receipt.json",
+      "finalStopObserved": true,
+      "allFinalListenersClosed": true
+    }
+  ],
+  "browserClosures": [
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/public-fixtures/public-task-jsonl-success-vPEyOo/managed-recovery-browser.json",
+      "browserClosed": true
+    },
+    {
+      "receipt": "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/public-fixtures/public-task-jsonl-success-fBJsr4/managed-recovery-browser.json",
+      "browserClosed": true
+    }
+  ],
+  "allObservedCommandGroupsClosed": true,
+  "allRecordedFixtureServersClosed": true,
+  "allRecordedBrowsersClosed": true,
+  "workers": [],
+  "vmsStarted": [],
+  "signalsSent": [],
+  "unjoinedCoSSession": {
+    "id": 3263,
+    "reason": "write_stdin observation was refused; not replayed or substituted",
+    "automaticTerminalNotice": "Subsequent ownership read independently surfaced: Background session 3263 finished with exit code 0 and has unread output."
+  },
+  "remainingOperation": null,
+  "hiddenContinuationStarted": false
+}

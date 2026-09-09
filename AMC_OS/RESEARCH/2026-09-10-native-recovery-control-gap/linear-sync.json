@@ -1,0 +1,41 @@
+{
+  "taskId": "native-recovery-control-gap-batch",
+  "recordedAt": "2026-09-09T21:40:51.909515+00:00",
+  "updates": [
+    {
+      "issue": "AMC-1511",
+      "kind": "implementation-start",
+      "id": "f1a2529a-509a-4edc-a3de-d47bd151d6c1",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1511",
+      "kind": "implementation-and-first-attempt",
+      "id": "e64bb6a4-2c93-4c10-adcb-d9fbd1253b8e",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1511",
+      "kind": "safe-checkpoint",
+      "id": "74bb5573-626d-4bf8-9c70-003361b41a1c",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1538",
+      "kind": "native-validation-controller-checkpoint",
+      "id": "d494c0bb-5259-47c4-a406-8e93d22ed747",
+      "delivered": true
+    },
+    {
+      "issue": "AMC-1540",
+      "kind": "immutable-submission-recovery-checkpoint",
+      "id": "0674270f-ff06-4f69-a618-95f52348d311",
+      "delivered": true
+    }
+  ],
+  "stateTransitions": [],
+  "pendingCurrentBatchBodies": [],
+  "old1511FinalConfirmed": "07dba626-264f-4a7c-9739-14868149fd42",
+  "old1547Delivery": "uncertain; no retry",
+  "oldHelperRepin": "pending outside this batch"
+}

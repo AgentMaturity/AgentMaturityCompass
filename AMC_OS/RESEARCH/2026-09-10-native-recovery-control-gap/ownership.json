@@ -1,0 +1,72 @@
+{
+  "taskId": "native-recovery-control-gap-batch",
+  "owner": "cos-native-recovery-control-gap-prime",
+  "state": "instruction-needed-safe-checkpoint",
+  "observedAt": "2026-09-09T21:40:51.909515+00:00",
+  "reviewDeadline": "2026-09-09T22:45:00Z",
+  "branch": "amc/gap-register-execution",
+  "startingHead": "a9a0f2e194e154f02b1abed77c52061efb58f61d",
+  "runtimeBaseline": "b516869eeaa275fe31248024a02596d71255add0",
+  "modelRequested": "GPT-6 Pro",
+  "modelVerification": "Prime tool schema has no per-operation model selector; no worker was launched and no worker model is assumed.",
+  "bridgeAttribution": "Unattributed; no request or recording ID invented",
+  "ownershipReleased": true,
+  "activeOwnedExecution": null,
+  "workers": [],
+  "ownedProcessGroups": [],
+  "remainingOperation": null,
+  "sourcePaths": [
+    "src/sdk/nativeAgentClient.ts",
+    "src/studio/nativeTaskService.ts",
+    "src/session/sessionContinuationControls.ts",
+    "src/session/sessionResume.ts",
+    "src/session/jsonlContinuation.ts",
+    "tests/nativeRecoveryControl.test.ts",
+    "tests/nativeManagedRecovery.test.ts",
+    "docs/SESSION_RESUME.md",
+    "docs/NATIVE_STUDIO_TASKS.md"
+  ],
+  "researchPaths": [
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/ownership.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/NEXT_ACTION.md",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/SCOPE.md",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/REVIEW_BLOCKERS.md",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/TRACKER_PENDING.md",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/linear-sync.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/obsidian-update.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/source-review.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/process-closure.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/disposition.json",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/run.py",
+    "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/installed-case.mjs"
+  ],
+  "scratchPrefix": "tmp/cos-native-recovery-control-gap-01/",
+  "vaultPaths": [
+    "/Users/sid/Documents/AMC/Evidence/2026-09-10 Native Recovery Control Gap.md"
+  ],
+  "centralStatus": "Stale and not authoritative; prior refused update is not replayed.",
+  "predecessor": "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/NEXT_ACTION.md",
+  "instructionNeeded": true,
+  "sourceCandidate": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
+  "receiptPaths": [
+    "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate01/receipts/receipt.json",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-native-recovery-control-gap-01/candidate02/receipts/receipt.json"
+  ],
+  "blocker": {
+    "kind": "automatic-tool-review",
+    "tool": "Chat_On_Steroids_Core.write_stdin",
+    "arguments": {
+      "session_id": 3263,
+      "chars": "",
+      "yield_time_ms": 1000
+    },
+    "reason": "This tool call was blocked by OpenAI because we couldn't determine the safety status of the request.",
+    "replayed": false,
+    "substitutedForAcceptance": false,
+    "recordedAt": "2026-09-09T21:40:51.909515+00:00"
+  },
+  "nextAction": "After legitimate resolution of the review gate, reconcile the retained candidate02 acceptance evidence without assuming success from process closure; run restored security mutations at the pinned candidate and author/execute separate installed cookie/browser/tool-approval acceptance. Preserve the failed first attempt. Do not rerun old platform or erasure lanes.",
+  "runtimeCommit": "efb4b638f4814637086d3fe076a6eba5685d6cad",
+  "candidateCommit": "8d09ddd4517ff86298ccc1a563dbdb945a28bf88",
+  "processClosureReceipt": "AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/process-closure.json"
+}
