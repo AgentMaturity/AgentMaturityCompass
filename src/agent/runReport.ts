@@ -24,6 +24,7 @@
 import { openLedger } from "../ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
 import { verifySessionChains } from "../ledger/sessionVerification.js";
+import { openSessionEventStore, readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import { deriveSessionRequests } from "../llm/request/deriveRequest.js";
 import type { RequestDerivationStatus } from "../llm/request/deriveRequest.js";
 import { readEventPayload } from "../session/eventPayload.js";
@@ -162,7 +163,7 @@ export interface AgentRunVerification {
   /** The workspace-wide chain verdict, which a session cannot be sound without. */
   readonly ledgerOk: boolean;
   readonly ledgerErrors: readonly string[];
-  /** Per-session `seq` / `prevSessionEventHash` linkage. */
+  /** Session presence and SQLite linkage checks; selected JSONL chains are also enforced by ledgerErrors. */
   readonly sessionChainErrors: readonly string[];
   /** Rows whose signature is the literal "unsigned". */
   readonly unsignedRowIds: readonly string[];
@@ -196,21 +197,38 @@ export interface AgentRunVerification {
 export async function verifyAgentRun(workspace: string, sessionId: string): Promise<AgentRunVerification> {
   const result = await verifyLedgerIntegrity(workspace);
   const sessionChainErrors: string[] = [];
-  const ledger = openLedger(workspace, { readonly: true });
   let unsignedRowIds: string[];
-  try {
-    // No requests is valid for a recorded empty session, but cannot prove that
-    // an unrecorded session ever existed.
-    if (!ledger.getAllSessions().some((session) => session.session_id === sessionId)) {
-      sessionChainErrors.push(`Session ${sessionId} not found`);
+  if (readSessionStoreMarker(workspace) === "jsonl") {
+    // The operations SQLite ledger is not the JSONL session lifecycle.
+    // Read the selected backend without taking a writer lock or initializing
+    // anything. verifyLedgerIntegrity above still authenticates the complete
+    // JSONL global/session chains, lifecycle seals, payloads and monitor pin.
+    const store = openSessionEventStore(workspace, "jsonl", { readOnly: true });
+    try {
+      if (store.readSessionRecord(sessionId) === null) {
+        sessionChainErrors.push(`Session ${sessionId} not found`);
+      }
+      unsignedRowIds = store.readSessionEvents(sessionId)
+        .filter((event) => event.writer_sig === UNSIGNED).map((event) => event.id);
+    } finally {
+      store.close();
     }
-    verifySessionChains(ledger, sessionChainErrors);
-    unsignedRowIds = ledger
-      .getAllEvents()
-      .filter((event) => event.session_id === sessionId && event.writer_sig === UNSIGNED)
-      .map((event) => event.id);
-  } finally {
-    ledger.close();
+  } else {
+    const ledger = openLedger(workspace, { readonly: true });
+    try {
+      // No requests is valid for a recorded empty session, but cannot prove
+      // that an unrecorded session ever existed.
+      if (!ledger.getAllSessions().some((session) => session.session_id === sessionId)) {
+        sessionChainErrors.push(`Session ${sessionId} not found`);
+      }
+      verifySessionChains(ledger, sessionChainErrors);
+      unsignedRowIds = ledger
+        .getAllEvents()
+        .filter((event) => event.session_id === sessionId && event.writer_sig === UNSIGNED)
+        .map((event) => event.id);
+    } finally {
+      ledger.close();
+    }
   }
   const requests = deriveSessionRequests({ workspace, sessionId }).map((derivation) => ({
     headerEventId: derivation.headerEventId,
