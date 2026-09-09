@@ -1,0 +1,86 @@
+{
+  "source": "e12060297b6f847903501354d3a6425ffc51adb7",
+  "clone": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/checkout",
+  "home": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home",
+  "env": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_CTYPE": "C.UTF-8",
+    "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/Users/sid/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/sid/.codex/tmp/arg0/codex-arg0IKpdUb:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/sid/.local/bin:/Users/sid/.lmstudio/bin:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Users/sid/.lmstudio/bin",
+    "TMPDIR": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/",
+    "HOME": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home",
+    "CI": "1",
+    "npm_config_userconfig": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.npmrc",
+    "npm_config_globalconfig": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.npmrc-global",
+    "npm_config_cache": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.npm",
+    "npm_config_global": "false",
+    "XDG_CONFIG_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.config",
+    "XDG_CACHE_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.cache",
+    "XDG_DATA_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/home/.local/share"
+  },
+  "startedAt": "2026-09-09T11:04:32.497947+00:00",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0"
+  },
+  "cleanBeforeInstall": true,
+  "commands": [
+    {
+      "label": "install",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.782006041990826,
+      "processReaped": true
+    },
+    {
+      "label": "build",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "run",
+        "build"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 32.38527704200533,
+      "processReaped": true
+    },
+    {
+      "label": "command-inventory",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "dist/cli.js",
+        "commands",
+        "--markdown",
+        "--out",
+        "docs/CLI_COMMAND_INVENTORY.md"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.7783900420035934,
+      "processReaped": true
+    },
+    {
+      "label": "counts",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/gen-counts.mjs",
+        "--write"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.29045324999606237,
+      "processReaped": true
+    }
+  ],
+  "status": "completed",
+  "runnerSha256": "ed4ad5f5d8c96b9973c9cd4b7d6a5e290b9ba3c495133b88c18e6de859e75fc5",
+  "boundary": "Generated inventory preparation only; not final candidate acceptance",
+  "active": null,
+  "endedAt": "2026-09-09T11:05:10.936981+00:00",
+  "trackedDeltaAfter": " CONTRIBUTING.md                              |  2 +-\n README.md                                    | 10 +++++-----\n docs/API_REFERENCE.md                        |  2 +-\n docs/BENCHMARK_GALLERY.md                    |  2 +-\n docs/CLI_COMMAND_INVENTORY.md                | 12 +++++++++---\n docs/ENTERPRISE.md                           |  2 +-\n docs/PRICING.md                              |  2 +-\n docs/PRICING_FAQ.md                          |  2 +-\n docs/PRODUCT_EDITIONS.md                     |  2 +-\n docs/content/reddit-launch-drafts.md         |  4 ++--\n docs/content/show-hn-draft.md                |  2 +-\n docs/internal/competitive-landscape.md       |  2 +-\n docs/internal/mirofish-simulation-council.md |  2 +-\n src/console/assets/app.js                    |  2 +-\n website/docs/cli.html                        |  2 +-\n website/docs/competitive-analysis.md         |  4 ++--\n website/i18n.js                              |  2 +-\n website/index.html                           |  6 +++---\n website/lite.html                            |  2 +-\n whitepaper/AMC_WHITEPAPER_v1.md              |  8 ++++----\n 20 files changed, 39 insertions(+), 33 deletions(-)\n"
+}

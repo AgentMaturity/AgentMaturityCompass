@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-09T11:02:18.051532+00:00",
+  "issue": "AMC-1547",
+  "model": "GPT-6 Pro",
+  "workerCommit": "7c0f01bf73fb64845362bda20cd456e9bc6af31e",
+  "mergeCommit": "0f4b10a4553d1c652e4b0e07a705acf7d9bd45bd",
+  "registrationCommit": "68458818799d1db7826d67d1b604d6ad77ac4432",
+  "sourceReview": "Root and independent Astra reviews; final authored history-link and signed-conflict regression additions integrated. Operator guide links native bounded read command.",
+  "files": [
+    {
+      "path": "src/cli-spill-commands.ts",
+      "sha256": "b9e9931f20748e487f72ca9980bebde68dab7d933368935552b3923e57336956"
+    },
+    {
+      "path": "tests/cliSpillCommands.test.ts",
+      "sha256": "48052126e2370583276c167d5a2f1d9086acac88b3614769261446a21d9d5d08"
+    },
+    {
+      "path": "docs/SESSION_SPILL_COMMANDS.md",
+      "sha256": "e3c7215dd7b88217eef18f1da55f3fb52b245d5abf7696680d5a6629543aba80"
+    }
+  ],
+  "testsExecuted": false,
+  "qualification": "Source integration only; clean-clone final batch preparation now running",
+  "environment": "Darwin 25.6.0 ARM64; authoring only",
+  "handoffPath": "tmp/cos-spill-commands/AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md",
+  "workerPaused": true,
+  "workerFinalResponseObserved": true,
+  "workerIdleObserved": true
+}

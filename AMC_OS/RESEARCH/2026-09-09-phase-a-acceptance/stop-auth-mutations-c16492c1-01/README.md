@@ -1,0 +1,5 @@
+# Stop/auth mutation baseline refusal — September 9
+
+Fresh source c16492c10592112fe610bd2e59f216f8f7f310b4, macOS ARM64, Node22.22.0 and pnpm10.33.0. Frozen install succeeded; baseline measured126 tests:106 passed,20 failed,0 pending/todo. No mutations, expected-survival control or restored probes ran. All failures are Studio fixture setup at tests/studioAgentCredentialBinding.test.ts:54: the default agent config is absent before HTTP or intended security assertions. summary.json records the final clone clean at its pin; the logged child groups are closed. Original /private/tmp/amc-c16492c1-stop-auth-receipts-01 and /private/tmp/amc-c16492c1-stop-auth-clone-01 remain preserved.
+
+Root authored explicit native signed fleet/agent fixture initialization. Production credential guards and security assertions are unchanged. Reproduction awaits the next corrected candidate after the frozen full gate collects failures. This is a failed focused baseline, not security mutation qualification or an issue Done. [AMC-1545](https://linear.app/agentmaturitycompass/issue/AMC-1545), [AMC-1546](https://linear.app/agentmaturitycompass/issue/AMC-1546).

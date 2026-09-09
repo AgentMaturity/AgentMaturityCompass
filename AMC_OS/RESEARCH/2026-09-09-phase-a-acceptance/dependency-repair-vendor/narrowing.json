@@ -1,0 +1,8 @@
+{
+  "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
+  "status": "source-inputs-prepared-not-qualified",
+  "resolverGeneratedLockSha256": "c5bc43f74d74bff068e2ae5c2b181961a4383aff3bedf5026d88c1ad9eb4f7d2",
+  "selectedLockSha256": "fb1cccca6be43c7612240e4ce9bb9f5dffaa00289ffd6ff4fa2bc67c3a49c8e6",
+  "scope": "YAML 4.3.1 to4.3.2 for vendor/include and YAML3.15.1 to3.15.2 for existing read-yaml-file dependency; unrelated Vite/rolldown/picomatch/postcss changes omitted",
+  "boundary": "Selected actual resolver blocks composed with unchanged pinned lock inputs; next fresh frozen install and complete gate must qualify"
+}

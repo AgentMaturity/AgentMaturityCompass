@@ -1,0 +1,17 @@
+
+> agent-maturity-compass@1.2.0 prebuild /private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/checkout
+> npm run clean
+
+
+> agent-maturity-compass@1.2.0 clean
+> node scripts/clean-dist.mjs
+
+
+> agent-maturity-compass@1.2.0 build /private/tmp/amc-phase-a-acceptance-20260909-jxhoh_1b/checkout
+> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs
+
+
+> agent-maturity-compass@1.2.0 copy-assets
+> node scripts/copy-build-assets.mjs
+
+bundle-kernel: dist/kernel/amcRuntime.js 483 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp

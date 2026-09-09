@@ -1,0 +1,10 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 114, reused 0, downloaded 0, added 0
+Progress: resolved 368, reused 0, downloaded 0, added 0
+ WARN  1 deprecated subdependencies found: prebuild-install@7.1.3
+.                                        | +359 ++++++++++++++++++++++++++++++++
+Progress: resolved 412, reused 0, downloaded 8, added 4
+Progress: resolved 412, reused 0, downloaded 211, added 204
+Progress: resolved 412, reused 0, downloaded 357, added 357
+Progress: resolved 412, reused 0, downloaded 357, added 359, done
+Done in 6.3s using pnpm v10.33.0

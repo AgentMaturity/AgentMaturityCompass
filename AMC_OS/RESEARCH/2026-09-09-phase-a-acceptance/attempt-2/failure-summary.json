@@ -1,0 +1,101 @@
+{
+  "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
+  "fullSuiteSha256": "76ab9fcab50f2204be3a37f578b82d7806b781e5ba691eab900b98482c9919a5",
+  "total": 12263,
+  "passed": 12233,
+  "failed": 30,
+  "pending": 0,
+  "todo": 0,
+  "failures": [
+    {
+      "file": "tests/lineRatchet.test.ts",
+      "failed": 1,
+      "assertions": [
+        "line-count ratchet no tracked file exceeds its baseline"
+      ]
+    },
+    {
+      "file": "tests/nativeFirstUseGuide.test.ts",
+      "failed": 2,
+      "assertions": [
+        "native first-use local inspection prints a safely quoted corrective action without repairing permissions",
+        "native first-use local inspection blocks an insecure empty credentials directory"
+      ]
+    },
+    {
+      "file": "tests/publicDocsArtifact.test.ts",
+      "failed": 1,
+      "assertions": [
+        "public Docs Pages artifact builds a deterministic allowlisted artifact with source and renderer hashes"
+      ]
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "failed": 1,
+      "assertions": [
+        "AMC public Docs graph every local guide edge resolves to another promoted guide"
+      ]
+    },
+    {
+      "file": "tests/publicTypographyArtifact.test.ts",
+      "failed": 1,
+      "assertions": [
+        "AMC first-party typography artifact builds only the required same-origin font files with deterministic receipts"
+      ]
+    },
+    {
+      "file": "tests/sandboxConfinement.test.ts",
+      "failed": 1,
+      "assertions": [
+        "the kernel actually refuses the write resolves a symlinked workspace path before writing the profile"
+      ]
+    },
+    {
+      "file": "tests/sessionSpill.test.ts",
+      "failed": 1,
+      "assertions": [
+        "spill \u2014 oversized tool output leaves the ledger, its commitment does not degrades honestly when the spill store cannot write: no locator, but still a commitment"
+      ]
+    },
+    {
+      "file": "tests/spillLifecycle.test.ts",
+      "failed": 1,
+      "assertions": [
+        "explicit local spill erasure signs intention before real unlink and records exact outcomes while preserving other sessions"
+      ]
+    },
+    {
+      "file": "tests/studioAgentCredentialBinding.test.ts",
+      "failed": 20,
+      "assertions": [
+        "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+        "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+        "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+        "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+        "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+        "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+        "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+        "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+        "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+        "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+        "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+        "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+        "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+        "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+        "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+        "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+        "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+        "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+        "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+        "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+      ]
+    },
+    {
+      "file": "tests/performance/sessionSpine.performance.test.ts",
+      "failed": 1,
+      "assertions": [
+        "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "label": "resolution",
+  "command": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+    "--filter",
+    "@amc/cordis-plugin-include",
+    "update",
+    "js-yaml@^4.3.2",
+    "--lockfile-only",
+    "--ignore-scripts"
+  ],
+  "startedAt": "2026-09-09T11:33:39.771862+00:00",
+  "timeoutSeconds": 300,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      7151,
+      501,
+      "Wed Sep 9 17:03:39 2026"
+    ],
+    "rootReaped": true,
+    "observations": 35,
+    "ownedProcesses": [
+      {
+        "pid": 7151,
+        "ppid": 7085,
+        "pgid": 7151,
+        "uid": 501,
+        "started": "Wed Sep 9 17:03:39 2026",
+        "firstObservedAt": "2026-09-09T11:33:39.790669+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      7151
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 6.83387387500261,
+  "endedAt": "2026-09-09T11:33:46.605793+00:00"
+}

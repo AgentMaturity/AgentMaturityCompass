@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/sessionSpillCommitment.test.ts",
+    "tests/sessionSpill.test.ts",
+    "tests/spillEncryption.test.ts",
+    "tests/spillLifecycle.test.ts",
+    "tests/retentionSpill.test.ts",
+    "tests/bundleSpill.test.ts",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=json",
+    "--outputFile=/private/tmp/amc-c16492c1-spill-mutations-01/receipts/baseline/vitest.json"
+  ],
+  "cwd": "/private/tmp/amc-c16492c1-spill-mutations-01/clone",
+  "startedAt": 1788952162.887645,
+  "timeoutSeconds": 600,
+  "timedOut": false,
+  "cleanup": {
+    "processGroup": 82697,
+    "closed": true,
+    "signals": []
+  },
+  "pid": 82697,
+  "exitCode": 1,
+  "finishedAt": 1788952189.215056
+}

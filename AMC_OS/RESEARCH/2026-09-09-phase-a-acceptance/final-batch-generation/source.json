@@ -1,0 +1,61 @@
+{
+  "source": "68458818799d1db7826d67d1b604d6ad77ac4432",
+  "clone": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/checkout",
+  "home": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home",
+  "env": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "LC_CTYPE": "C.UTF-8",
+    "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/Users/sid/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/sid/.codex/tmp/arg0/codex-arg0IKpdUb:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/sid/.local/bin:/Users/sid/.lmstudio/bin:/Users/sid/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Users/sid/.lmstudio/bin",
+    "TMPDIR": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/",
+    "HOME": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home",
+    "CI": "1",
+    "npm_config_userconfig": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.npmrc",
+    "npm_config_globalconfig": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.npmrc-global",
+    "npm_config_cache": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.npm",
+    "npm_config_global": "false",
+    "XDG_CONFIG_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.config",
+    "XDG_CACHE_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.cache",
+    "XDG_DATA_HOME": "/private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/home/.local/share"
+  },
+  "startedAt": "2026-09-09T11:01:04.639006+00:00",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0"
+  },
+  "cleanBeforeInstall": true,
+  "commands": [
+    {
+      "label": "install",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.291914375004126,
+      "processReaped": true
+    },
+    {
+      "label": "build",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "run",
+        "build"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 31.94953029100725,
+      "processReaped": true
+    }
+  ],
+  "status": "failed",
+  "runnerSha256": "ed4ad5f5d8c96b9973c9cd4b7d6a5e290b9ba3c495133b88c18e6de859e75fc5",
+  "boundary": "Generated inventory preparation only; not final candidate acceptance",
+  "active": null,
+  "endedAt": "2026-09-09T11:01:42.142691+00:00",
+  "trackedDeltaAfter": ""
+}

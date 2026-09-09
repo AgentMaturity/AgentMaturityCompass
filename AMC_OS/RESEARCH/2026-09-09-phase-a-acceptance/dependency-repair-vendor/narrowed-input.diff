@@ -1,0 +1,68 @@
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 476a2585..7d910404 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -216,8 +216,8 @@ importers:
+         specifier: workspace:^
+         version: link:../cosmokit
+       js-yaml:
+-        specifier: ^4.1.0
+-        version: 4.3.1
++        specifier: ^4.3.2
++        version: 4.3.2
+ 
+   vendor/loader:
+     dependencies:
+@@ -1398,12 +1398,8 @@ packages:
+   js-tokens@4.0.0:
+     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+ 
+-  js-yaml@3.15.1:
+-    resolution: {integrity: sha512-S99WuO3HlhO3XN41EtYUNl9zzXjoJx7QvmipxsJVxtCBT0YHEFy+iOJhjSvrmV12nYhWpZaM8lPHkJm0yUMbag==}
+-    hasBin: true
+-
+-  js-yaml@4.3.1:
+-    resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
++  js-yaml@3.15.2:
++    resolution: {integrity: sha512-6EuL879VkRA+1Cz578mKMiKvjPNEuk6+r1JaFzoSWejZmtf7xWbIyw1e3KkxlkzTIt9Taw6JBhEppG7utc1P+w==}
+     hasBin: true
+ 
+   js-yaml@4.3.2:
+@@ -3247,15 +3243,11 @@ snapshots:
+ 
+   js-tokens@4.0.0: {}
+ 
+-  js-yaml@3.15.1:
++  js-yaml@3.15.2:
+     dependencies:
+       argparse: 1.0.10
+       esprima: 4.0.1
+ 
+-  js-yaml@4.3.1:
+-    dependencies:
+-      argparse: 2.0.1
+-
+   js-yaml@4.3.2:
+     dependencies:
+       argparse: 2.0.1
+@@ -3581,7 +3573,7 @@ snapshots:
+   read-yaml-file@1.1.0:
+     dependencies:
+       graceful-fs: 4.2.11
+-      js-yaml: 3.15.1
++      js-yaml: 3.15.2
+       pify: 4.0.1
+       strip-bom: 3.0.0
+ 
+diff --git a/vendor/include/package.json b/vendor/include/package.json
+index 46a47865..8f51dddd 100644
+--- a/vendor/include/package.json
++++ b/vendor/include/package.json
+@@ -35,6 +35,6 @@
+   },
+   "dependencies": {
+     "@amc/cosmokit": "workspace:^",
+-    "js-yaml": "^4.1.0"
++    "js-yaml": "^4.3.2"
+   }
+ }

@@ -1,0 +1,301 @@
+{
+  "retrievedAt": "2026-09-09T11:01:29.221Z",
+  "source": "Live Linear AMC-1505 child issue listing",
+  "issues": [
+    {
+      "id": "AMC-1547",
+      "title": "Commit retained tool output before materialization and govern encrypted spill lifecycle",
+      "status": "In Progress",
+      "description": "Source-confirmed close blocker for <issue id=\"6a733d74-226c-4723-a022-d18fc35a0dac\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1522/p1-recover-verified-origin-addressed-session-compaction-without\">AMC-1522</issue> at f0442ac118573683080681f443f518853cd91f22 (source review only, Darwin ARM64; no runtime acceptance in this observation). SessionService currently materializes plaintext spill before appending tool/result. Retention enume… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1547/commit-retained-tool-output-before-materialization-and-govern"
+    },
+    {
+      "id": "AMC-1518",
+      "title": "P1: Measure AMC, DSH and Pi on reproducible task and governance scenarios",
+      "status": "In Progress",
+      "description": "## September 9 — first real pilot final; native improvements remain active\n\nThe corrected nine-trial pilot is complete: **0 qualified passes, 5 qualified failures and 4 inconclusive trials**. Six trials received a completed real response from the privately pinned Qwen3-4B-Instruct-2507 Q4_K_M model. AMC and DSH range/CSV plus Pi range failed within recorded token bounds. Pi CSV lost its next response during the host-memory watchdog stop, so toke… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1518/p1-measure-amc-dsh-and-pi-on-reproducible-task-and-governance"
+    },
+    {
+      "id": "AMC-1512",
+      "title": "P1: Expose a governed interactive native-agent session workflow",
+      "status": "In Progress",
+      "description": "2026-09-08 installed native identity/custom-origin acceptance PASSED40/40 on actual Node24 consumer, artifact SHA9af6137af716def4567c12bfc79b3b556b4f646607a781867d08fb78cb7c8910 from91b2ad3b. Actual PTY chat kept reviewer despite current-agent file change; printed resume argv completed3rdturn with the same identity/origin. Three signed authenticated IPC approvals and workspace read audits all reviewer;6 real scripted Responses HTTP requests reco… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1512/p1-expose-a-governed-interactive-native-agent-session-workflow"
+    },
+    {
+      "id": "AMC-1522",
+      "title": "P1: Recover verified origin-addressed session compaction without invented savings",
+      "status": "In Review",
+      "description": "## Scoped native acceptance — September 8\n\nOrigin-addressed compaction is accepted: the installed AMC corpus exercised measured payload-byte reduction, retained original evidence, exact reconstruction, stale-head refusal, fork lineage and restart/recovery. The e7900221 complete local gate passes11,434 tests, including compaction/range validation. In-place JSONL resume remains explicitly refused; SQLite ownership controls supported writes. Receip… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1522/p1-recover-verified-origin-addressed-session-compaction-without"
+    },
+    {
+      "id": "AMC-1531",
+      "title": "P1: Deliver standalone native coding parity without DSH or Pi runtime dependencies",
+      "status": "In Review",
+      "description": "## Current native delivery — implementation and local acceptance complete\n\nAMC's standalone native workflow is implemented through d8d658532dbf532e447f65af6e64eb6fb15e2e0b. It owns the provider loop, interactive streaming chat, read/edit/shell tools, authenticated approvals, signed budgets and cross-session admission, cancellation, continuation/fork, compaction, delegation, signed extensions, stdio/HTTP MCP and TypeScript/Python process SDKs. Na… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1531/p1-deliver-standalone-native-coding-parity-without-dsh-or-pi-runtime"
+    },
+    {
+      "id": "AMC-1508",
+      "title": "P0: Recover authenticated portal-request attribution from the uncommitted worktree",
+      "status": "In Review",
+      "description": "2026-09-08 independent review: local commit 47141f7ab254e7ade53262adbdb74b46890fade4 repairs the reproduced forged caller-attribution path. Four focused files: 50 tests pass; typecheck passes. Independent real SQLite probe: all 11 authorized, forged, missing/blank-principal, viewer, agent and lease cases pass, with persisted rows checked. Receipts: AMC_OS/RESEARCH/2026-09-08-dsh-pi/portal-fix-{review.md,focused-tests.json,runtime-receipt.json}.\n… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1508/p0-recover-authenticated-portal-request-attribution-from-the"
+    },
+    {
+      "id": "AMC-1546",
+      "title": "P1: Bind Studio agent credentials before tool dispatch and honor supplied lease limits",
+      "status": "In Progress",
+      "description": "Source finding at 288e210f6b22ebb7d4e2c903aa50959849fcbbb8 blocks the shared Studio identity boundary tracked by <issue id=\"520a6785-a0ee-40ad-8d26-c9419cf5ddef\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1508/p0-recover-authenticated-portal-request-attribution-from-the\">AMC-1508</issue>. A static agent-A bearer plus valid agent-B execution lease and intent reaches executeIntent before the authenticated-agent comparison; the route c… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1546/p1-bind-studio-agent-credentials-before-tool-dispatch-and-honor"
+    },
+    {
+      "id": "AMC-1545",
+      "title": "P1: Enforce signed native delegation stop conditions across child continuations",
+      "status": "In Progress",
+      "description": "Source-confirmed September 9 at cf89a532: `SubagentRequest.stopConditions` is copied into signed handoff packets in `src/agent/subagentSpawn.ts` but never enforced; `src/autonomy/goalRounds.ts` explicitly records that limitation. This known-open brief item blocks closing the standalone governed delegation boundary under <issue id=\"a6b84be4-146b-48ae-a658-8c1de08c52c4\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1531/p1-deliver-standa… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1545/p1-enforce-signed-native-delegation-stop-conditions-across-child"
+    },
+    {
+      "id": "AMC-1540",
+      "title": "P1: Recover unconfirmed Studio native submissions with an explicit identical-request retry",
+      "status": "In Progress",
+      "description": "At native source 7bd1e8ce, a create/follow-up request that loses its response is retained in browser pending state. Refresh can reconcile an admitted request, but when the original request never reached Studio, pending stays forever and disables submission, setup, task switching and new-task controls. There is no explicit retry control, although server admissions already support request identity and body/revision matching.\n\nImplement an explicit… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1540/p1-recover-unconfirmed-studio-native-submissions-with-an-explicit"
+    },
+    {
+      "id": "AMC-1544",
+      "title": "P1: Publish nullable native validation references in the OpenAPI 3.0 artifact",
+      "status": "In Progress",
+      "description": "Candidate artifact preparation at `79f36cfd4d0d33af34ce4a07979c5195b149ba99` found `scripts/update-native-task-openapi.mjs` rejects the native task validationSelection schema's `oneOf: [null, $ref]` with Unsupported nullable OpenAPI union. This prevents generating the current public contract, including closed-task archival. Fresh Node22 clone build succeeded; generation failed before writing any artifact. No earlier acceptance is declared false … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1544/p1-publish-nullable-native-validation-references-in-the-openapi-30"
+    },
+    {
+      "id": "AMC-1538",
+      "title": "P1: Distinguish native task completion from operator-defined validation",
+      "status": "In Review",
+      "description": "## Native public validation — September 9\n\n<issue id=\"3d3b9f2d-2301-4637-a66c-8a13bec5120f\" href=\"https://linear.app/agentmaturitycompass/issue/AMC-1538/p1-distinguish-native-task-completion-from-operator-defined-validation\">AMC-1538</issue> is In Review. Native source `7bd1e8ce` implements operator-selected public checks across CLI/chat, ACP/SDK and Studio. Checks use AMC's signed shell, approvals, budgets, deadlines and cancellation controls. … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1538/p1-distinguish-native-task-completion-from-operator-defined-validation"
+    },
+    {
+      "id": "AMC-1541",
+      "title": "P1: Archive closed native Studio task descriptors without deleting signed session evidence",
+      "status": "In Progress",
+      "description": "At source 7bd1e8ce, Studio stops admitting new tasks at its 256 signed-descriptor history limit and asks an operator to archive reviewed descriptors, but no descriptor-store, service, API or UI archive action exists. Release/close retains every descriptor, so regular use permanently exhausts capacity.\n\nAdd an explicit owner-authorized archive operation for eligible closed/settled tasks, retaining signed descriptor integrity, request-identity ded… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1541/p1-archive-closed-native-studio-task-descriptors-without-deleting"
+    },
+    {
+      "id": "AMC-1509",
+      "title": "P0: Make documented source installation work with AMC's pnpm workspace",
+      "status": "In Review",
+      "description": "2026-09-08 independently verified local commit 2b737b3c: clean committed clone with sanitized environment and empty HOME/config passed frozen install (5.2s), build (47.2s), doctor, init, keyless native loop and npm linking with isolated prefix. Explicit native JSON result:24 signed events,1 completed turn,2 requests,1 tool call,0 unsigned; verifier ok/ledgerOk and both requests reconstructed. All @amc/core/cordis/runtime module paths resolve ins… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1509/p0-make-documented-source-installation-work-with-amcs-pnpm-workspace"
+    },
+    {
+      "id": "AMC-1543",
+      "title": "P2: Reconcile and recover the unmerged TypeDoc public API reference",
+      "status": "In Progress",
+      "description": "Phase A step 0 found recoverable committed work on local branch claude/eager-boyd, commit 33c4105ad8507a3e4f915946bc190773af834157. No worktree is currently registered for this branch. The source commit adds typedoc.json targeting src/index.ts and website/api, docs:api, the TypeDoc development dependency, generated-output ignore, and Pages generation/source triggers. The entire non-lock diff has been read; the lockfile delta is dependency instal… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1543/p2-reconcile-and-recover-the-unmerged-typedoc-public-api-reference"
+    },
+    {
+      "id": "AMC-1539",
+      "title": "P1: Retain bounded reviewable coding outputs before comparison cleanup",
+      "status": "In Review",
+      "description": "## September 9 — accepted locally; In Review\n\nSource `9ad22983ee6fd51784fc9655546d99b42bb25a9b` implements bounded final-source capture for all three coding adapter branches. The focused filesystem, UTF-8, redaction, mutation, descriptor and child-exit suite passed **23/23** cases; original log: `/tmp/amc-output-snapshot-9ad22983.log`.\n\nActual installed AMC 1.2.0 (native runtime `9b60d86fd74a7bd3b294c893b506f6da32373623`), DSH 0.1.3-alpha.2 and … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1539/p1-retain-bounded-reviewable-coding-outputs-before-comparison-cleanup"
+    },
+    {
+      "id": "AMC-1537",
+      "title": "P1: Run native code review with a signed read-only tool subset",
+      "status": "In Review",
+      "description": "## Local acceptance — September 9\n\nImplemented supported signed subsets in be5c3583, with the actual OpenAI Chat caller/encoder collision repaired in fd923f31 and built in 6b3f7b15. Native read-only code review no longer requires edit or shell grants. Model schemas expose only supported signed capabilities; guessed ungranted writes/bash produce signed denials. Studio displays readiness/tools from one verified snapshot; current approval, digest, … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1537/p1-run-native-code-review-with-a-signed-read-only-tool-subset"
+    },
+    {
+      "id": "AMC-1536",
+      "title": "P1: Run governed native AMC tasks directly in Studio with cancellation, approvals and resume",
+      "status": "In Review",
+      "description": "Studio previously required a terminal handoff for native tasks and could lose the selected agent. AMC now provides a governed native task screen backed by its own public SDK/ACP and signed session spine. Operators can inspect server-owned setup and signed tool scope, submit a bounded task, read committed activity, find real approvals, cancel, continue and release/resume. No DSH/Pi installation or generic CLI-command bridge is required.\n\nBrowser … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1536/p1-run-governed-native-amc-tasks-directly-in-studio-with-cancellation"
+    },
+    {
+      "id": "AMC-1535",
+      "title": "P1: Add native Streamable HTTP MCP with pinned origins and credential references",
+      "status": "In Review",
+      "description": "## Installed native HTTP delivery — accepted at 0af82e28\n\nAMC now implements Streamable HTTP through its own native MCP composition: exact endpoint/origin pins, credential references, initialization-bound session identity, bounded JSON/SSE transport, independent eight-hour notification lifetime, catalog/schema/grant enforcement and explicit disposal. No DSH/Pi runtime is required. Source-focused acceptance: 28 HTTP/stdio cases and both type gate… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1535/p1-add-native-streamable-http-mcp-with-pinned-origins-and-credential"
+    },
+    {
+      "id": "AMC-1534",
+      "title": "P0: Count native session spend and enforce signed budgets before further execution",
+      "status": "In Review",
+      "description": "## Scoped native acceptance — September 8\n\nComplete correction accepted at native source90855cf7 and test/docs candidate e7900221. The same installed runner that failed on prior CLI status passes on the corrected package: five actual requests/260 measured tokens, repeat read/edit refusal, correct exit1 on quota refusal, two-process last-slot race admits exactly one request/52 tokens, pending0, explicit unknown cost, unchanged signed policy and a… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1534/p0-count-native-session-spend-and-enforce-signed-budgets-before"
+    },
+    {
+      "id": "AMC-1533",
+      "title": "P1: Add native signed context and chat-command extensions with explicit lifecycle",
+      "status": "In Review",
+      "description": "### Local implementation accepted for review — September 8\n\nActual installed CLI/PTY acceptance passed: unsigned selection refusal; explicit inspect/sign/install/load; named extension chat command; signed request reconstruction with exact context bytes; inspect/verify/exit and fresh-process resume; unload; pin-count/digest/tampered/missing/re-signed manifest negatives. Negative cases left all30 existing evidence rows and policy/key digests uncha… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1533/p1-add-native-signed-context-and-chat-command-extensions-with-explicit"
+    },
+    {
+      "id": "AMC-1532",
+      "title": "P1: Align native ACP and SDK sessions with AMC CLI tools and providers",
+      "status": "In Review",
+      "description": "## Scoped native acceptance — September 8\n\nInstalled CLI, public TypeScript SDK and ACP now exercise the same native providers/tools and reviewed stdio MCP mounts. Native edit/error/denial, live committed updates, real transport cancellation and cleanup were exercised separately; final908 MCP consumer additionally passed real exact-request approvals, configured MCP forwarding, catalog/grant refusal and SDK closeAndVerify plus independent cold ch… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1532/p1-align-native-acp-and-sdk-sessions-with-amc-cli-tools-and-providers"
+    },
+    {
+      "id": "AMC-1530",
+      "title": "P1: Qualify supported Node and OS install paths with executable platform receipts",
+      "status": "In Progress",
+      "description": "## September 9 — Windows installer failure propagation\n\nImplemented in fda6e7ff: the generated install.ps1 captures npm's exit code immediately after both prefix/default install branches and refuses failure before printing success. Actual PowerShell 7.6.5 execution on macOS ARM64 passed all four controlled native npm child cases: exit 7 and exit 0, each with and without a prefix. Failure becomes PowerShell exit 1 with npm exit/rerun guidance; su… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1530/p1-qualify-supported-node-and-os-install-paths-with-executable"
+    },
+    {
+      "id": "AMC-1529",
+      "title": "P1: Restore authenticated signing through the optional Compose notary service",
+      "status": "In Review",
+      "description": "2026-09-08 optional notary/TLS acceptance PASSED; corrected deployment paths committed883b5d75134a7d6b2f0d464ebd24d27d0380d1b0. Actual separate-container software-notary producer, independently pinned Ed25519 over original digest bytes, wrong/missing auth, wrong checksum and replay refusal, CA-verified TLS Studio/Console and 401/200 authentication, restart identity/TLS persistence, and23-entry signed log verification all passed:42 assertions in8… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1529/p1-restore-authenticated-signing-through-the-optional-compose-notary"
+    },
+    {
+      "id": "AMC-1528",
+      "title": "P1: Report persona QA as automated contract evidence with truthful failed-check feedback",
+      "status": "In Review",
+      "description": "At bd781be5, scripts/install-persona-qa.mjs computes rating as passed checks / total *10 and presents it as an ease-of-use rating. personaFeedback only reads command steps, not contract assertions: an install with missing full-score output can be described as 'acceptable first score' even when the score-contract assertion fails. Pure-function reproduction is recorded in the September harness usability audit. This is misleading qualification evid… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1528/p1-report-persona-qa-as-automated-contract-evidence-with-truthful"
+    },
+    {
+      "id": "AMC-1527",
+      "title": "P0: Restore source-built container images for the pnpm workspace runtime",
+      "status": "In Review",
+      "description": "## Latest acceptance — September 8, 2026\n\nLocal Linux ARM64 qualification passes: 21/21 runtime checks, four successful cleanup operations, four successful cold-verification results after graceful stop/restart, and two expected strict refusals after SIGKILL leaves an unsealed gateway session. The VM is stopped and shared Docker/SSH/shell settings are unchanged. Source-built images use clean source `6553906e096173614563fe563900881f9478b9df`; fina… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1527/p0-restore-source-built-container-images-for-the-pnpm-workspace"
+    },
+    {
+      "id": "AMC-1526",
+      "title": "P1: Stop publishing source test inventory as passing execution results",
+      "status": "In Review",
+      "description": "Current scripts/gen-counts.mjs converts regex matches of direct it()/test() calls into public 'passing tests' claims across10 prose/website surfaces. This is source inventory, not an executed result. Disposable reproduction: generator --check passes before any tests, then also passes after Vitest reports2 passed/1failed/1skipped while README claims1passing test. Full AMC baseline independently ran10,932 passing tests at4247e610; those are distin… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1526/p1-stop-publishing-source-test-inventory-as-passing-execution-results"
+    },
+    {
+      "id": "AMC-1525",
+      "title": "P0: Require authenticated key-history admission before trusting historical signing keys",
+      "status": "In Review",
+      "description": "2026-09-08 independent G6-07 review reproduced attacker-key admission under existing tests' workspace-write threat model: append attacker public key plus a correctly computed unkeyed SHA-256 history chain link; chain verification and attacker-signed digest verification both pass while current public key remains unchanged. Existing negative tests only use missing/bogus hashes. SHA-256 consistency detects corruption, not authorization to add a tru… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1525/p0-require-authenticated-key-history-admission-before-trusting"
+    },
+    {
+      "id": "AMC-1524",
+      "title": "P1: Map AMC with Graphify and publish readable architecture navigation",
+      "status": "In Review",
+      "description": "## September 9 — signed subset code navigation\n\nGraphify 0.9.56 at be5c3583: 2,123 scanned files, 25,477 symbols and 76,453 relations; reduction 2,097 represented files / 7,569 directed pairs. Seven maps include Native Studio (32 files / 54 directed dependencies) and native runtime (43 / 90), with the shared signed capability selector shown. All 40 source-backed reading paths resolve. Actual Obsidian: 308 generated notes, seven canvases, 1,027 w… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1524/p1-map-amc-with-graphify-and-publish-readable-architecture-navigation"
+    },
+    {
+      "id": "AMC-1523",
+      "title": "P1: Explain import losses, unknown timing and next actions before accepting external evidence",
+      "status": "In Review",
+      "description": "## Current delivery — locally accepted at d8d65853\n\nPer-record normalization and readable Studio import review are implemented in dfe186da and included in final source d8d65853. Records have deterministic source-relative pointers and primary trace links, source version/digest, mapped/retained/malformed/unsupported dispositions, projected/partial/retained fields, redaction markers, truthful timing/outcome/cost provenance and explicit detail trunc… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1523/p1-explain-import-losses-unknown-timing-and-next-actions-before"
+    },
+    {
+      "id": "AMC-1521",
+      "title": "P1: Recover and gate test TypeScript checks from the existing worktree",
+      "status": "In Review",
+      "description": "## Scoped native acceptance — September 8\n\nThe complete Node22 e7900221 gate passes all14 executed checks:11,434 tests across1,349 files, zero failed/pending/todo; production and test types pass. The earlier deliberate test-only mismatch failed with TS2322 while production types passed, and exact restoration returned test types to green. Original worktree and stash remain preserved. Native final gate receipt SHA439f0bc4366f6b46e0142f73a91a873428… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1521/p1-recover-and-gate-test-typescript-checks-from-the-existing-worktree"
+    },
+    {
+      "id": "AMC-1520",
+      "title": "P1: Add DSH capture with explicit process, proxy and event coverage",
+      "status": "In Review",
+      "description": "Final integration accepted at 3ea14e58 on 2026-09-08: all 14 executed combined checks and 11,506 tests passed, zero failed/pending/todo across 1,355 source test files. Live deployment health remains explicitly skipped. The gateway/capture corrections are now covered together with the native identity, SDK, MCP, budget and deployment changes. Gate SHA d72b4fa5a08c736cad805506c518e1abc34ca1405dcd498b4e70e8dd9e1b0610; suite SHA c2250522ec7a6ceb4ebc0… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1520/p1-add-dsh-capture-with-explicit-process-proxy-and-event-coverage"
+    },
+    {
+      "id": "AMC-1519",
+      "title": "P1: Ship a typed native-run client with cancellation and receipt verification",
+      "status": "In Review",
+      "description": "## Installed TypeScript and Python lifecycle accepted\n\nThe canonical Python `amc-sdk` 0.2.0 wheel passed 37/37 actual isolated consumer checks against the standalone 90855cf7 AMC tarball. Python `-I` imported from venv site-packages only; installed runtime files match the wheel and source. Three real local Responses turns crossed a signed release/fresh-child resume with ordered history and unchanged prior evidence. A fourth in-flight HTTP reques… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1519/p1-ship-a-typed-native-run-client-with-cancellation-and-receipt"
+    },
+    {
+      "id": "AMC-1517",
+      "title": "P1: Bridge callback telemetry into AMC with semantic conformance and truthful trust",
+      "status": "In Review",
+      "description": "2026-09-08 actual installed conformance complete: unchanged Pi 0.85.1 createTelemetryAdapterConformance kit from pinned b2602be77cb7b0de45dd616407fd210daa48aa75 passed all 9 upstream cases against the public AMC ./telemetry/pi bridge in the exact d8 npm artifact (SHA05ea23718afaa94e1307c4cdcd81b05ae6395f167cb41a9e4a657f61f2ef4ced). Seven separate AMC boundary/privacy cases also passed; one run, 16/16, no failures. Upstream source kit SHA04a3ed06… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1517/p1-bridge-callback-telemetry-into-amc-with-semantic-conformance-and"
+    },
+    {
+      "id": "AMC-1516",
+      "title": "P1: Publish a versioned external-evidence profile and independent conformance verifier",
+      "status": "In Review",
+      "description": "### Local implementation accepted for review — September 8\n\nIndependent public-profile consumer acceptance at d3cae563 passes19/19 vectors in an otherwise empty consumer. Exact exported module imports only node:crypto; no AMC services, workspace, dependencies or credentials. Synthetic Pi/DSH positive vectors preserve source failures/unknowns; missing-parent/missing-call tests recompute digests before structural refusal; semantic/original/signatu… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1516/p1-publish-a-versioned-external-evidence-profile-and-independent"
+    },
+    {
+      "id": "AMC-1515",
+      "title": "P1: Execute MCP client tools through the governed native pipeline",
+      "status": "In Review",
+      "description": "## Scoped native acceptance — September 8\n\nActual final908 installed stdio MCP acceptance passed through both CLI and public SDK/ACP. Real authenticated exact-digest approvals held both WRITE_LOW calls before their side effects; catalog and signed grants were pinned. Changed catalog and missing grant refused before extra provider/tool execution. Tool arguments/results, committed updates, child cleanup and cold verification passed. Ten checks,29 … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1515/p1-execute-mcp-client-tools-through-the-governed-native-pipeline"
+    },
+    {
+      "id": "AMC-1514",
+      "title": "P1: Enforce native provider protocol and modality capabilities before model spend",
+      "status": "In Review",
+      "description": "## September 9 — native wire-name implementation accepted locally\n\nImplemented at 9b60d86fd74a7bd3b294c893b506f6da32373623. Chat v3, Anthropic v3 and Responses v2 now emit deterministic provider-valid aliases and resolve returned names against the exact prepared request's offered tools. Internal signed identities, policy keys and old encoder bytes remain unchanged. Signed calls/dropped evidence retain decoded wire-name provenance. Removed, unkno… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1514/p1-enforce-native-provider-protocol-and-modality-capabilities-before"
+    },
+    {
+      "id": "AMC-1513",
+      "title": "P1: Qualify real Linux sandbox enforcement for native tools",
+      "status": "In Review",
+      "description": "## Current installed native acceptance — passed at 9d963469\n\nThe corrected fresh AMC package passed 41/41 actual Ubuntu 24.04 ARM64 assertions. Six real native CLI shell calls performed one exact allowed write and refused outside reads, .amc reads, ungranted writes, INET sockets and pathname Unix sockets. All six signed Bubblewrap receipts retained actual outcomes (1 OK, 5 ERROR). Both independent cold verifiers passed against the pre-run pin, r… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1513/p1-qualify-real-linux-sandbox-enforcement-for-native-tools"
+    },
+    {
+      "id": "AMC-1511",
+      "title": "P1: Resume and fork signed native sessions across processes",
+      "status": "In Review",
+      "description": "ACP loadSession=false explicitly reflects inability to reattach a driver to a sealed session. Existing spine/recovery/fork projections are not an operator resume flow. Sources DSH-G05 and Pi session lineage.\n\nAcceptance: process A runs a tool turn and exits; process B verifies and resumes the same session with byte-consistent history, preserves old signatures and appends new evidence. Tampered history fails before model/tool dispatch. Crash afte… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1511/p1-resume-and-fork-signed-native-sessions-across-processes"
+    },
+    {
+      "id": "AMC-1510",
+      "title": "P0: Distribute the governed native runtime without private workspace dependencies",
+      "status": "In Review",
+      "description": "src/cli-agent-commands.ts explicitly keeps agent-loop hidden/checkout-only because @amc/core and Cordis packages are private workspace dependencies. DSH/Pi ship a runnable agent product; AMC already has the engine but public installation does not deliver it.\n\nAcceptance: choose an explicit bundling/public-package boundary; packed tarball contains all runtime code/licenses; install into clean directory outside checkout, run a labeled keyless tool… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1510/p0-distribute-the-governed-native-runtime-without-private-workspace"
+    },
+    {
+      "id": "AMC-1507",
+      "title": "P1: Preserve nested failures and branch provenance when importing Pi v3 sessions",
+      "status": "In Review",
+      "description": "Current neutral event importer only maps top-level error/status/toolName/model/provider/input/output. Official Pi v3 sessions place these inside message; toolResult.isError and assistant.stopReason=error/aborted disappear. The same five-row fixture produces Watch failure index entryCount=0. Metadata/header rows become traces; parentId branch semantics and missing timing are not represented.\n\nAcceptance:\n\n* Detect versioned Pi session JSONL expli… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1507/p1-preserve-nested-failures-and-branch-provenance-when-importing-pi-v3"
+    },
+    {
+      "id": "AMC-1506",
+      "title": "P0: Stop neutral imports from inventing maturity and observed-evidence claims",
+      "status": "In Review",
+      "description": "Reproduced at AMC 4247e610: runNeutralImport on a documented five-row Pi v3 JSONL fixture yields finalLevel=4, confidence=.9, integrityIndex=.72, observedCoverage=.166667. buildImportedDiagnosticReport invents these from file count/flags (src/importers/neutralImporter.ts:665–722). Report is UNSIGNED, verificationPassed=false and segregated in imported-runs, so this is a misleading import/episode/lifecycle claim, not a demonstrated scorer-admissi… (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1506/p0-stop-neutral-imports-from-inventing-maturity-and-observed-evidence"
+    },
+    {
+      "id": "AMC-1542",
+      "title": "P0: Recover authenticated managed-hook revocation checks and missing-list refusal",
+      "status": "In Progress",
+      "description": "Phase A step 0 recovered a real unmerged security fix from /Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee, branch claude/stoic-faraday-20e4ee, HEAD 3d6b8d4a0c010c9fcd6e0abd410cb4635a218268. The worktree is preserved read-only. Audit against integration 7bd1e8ce8e0b38c71f2d9792cd2e2043a1c3c544 found:\n\n1. src/adapters/hookIntegration.ts imports and calls raw loadLeaseRevocations in verifyManagedLease (around lines 45/822). … (truncated, use `get_issue` for full description)",
+      "url": "https://linear.app/agentmaturitycompass/issue/AMC-1542/p0-recover-authenticated-managed-hook-revocation-checks-and-missing"
+    }
+  ],
+  "hasNextPage": false
+}

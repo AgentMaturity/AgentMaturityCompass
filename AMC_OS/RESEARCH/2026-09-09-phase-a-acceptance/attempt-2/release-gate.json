@@ -1,0 +1,222 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "release-gate",
+  "createdAt": "2026-09-09T11:22:53.675Z",
+  "workspace": "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout",
+  "quick": false,
+  "status": "failed",
+  "qualification": "failed",
+  "partial": true,
+  "counts": {
+    "executed": 14,
+    "passed": 10,
+    "failed": 4,
+    "skipped": 1,
+    "total": 15
+  },
+  "summary": "10/14 executed checks passed; 4 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:12:01.382Z",
+      "endedAt": "2026-09-09T11:12:01.432Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:12:01.432Z",
+      "endedAt": "2026-09-09T11:12:01.630Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:12:01.630Z",
+      "endedAt": "2026-09-09T11:12:29.180Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "failed",
+      "startedAt": "2026-09-09T11:12:29.180Z",
+      "endedAt": "2026-09-09T11:13:07.455Z",
+      "stdout": "pe '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.\n  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.\ntests/humanFirstUseIntake.test.ts(433,38): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.\n  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.\ntests/humanFirstUseObserver.test.ts(213,12): error TS18047: 'view.projection.measurements' is possibly 'null'.\ntests/humanFirstUseObserver.test.ts(214,12): error TS18047: 'view.projection.measurements' is possibly 'null'.\ntests/humanFirstUseObserver.test.ts(214,12): error TS18047: 'view.projection.measurements.refusals' is possibly 'null'.\ntests/humanFirstUseObserver.test.ts(225,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.\ntests/humanFirstUseObserver.test.ts(402,43): error TS2322: Type 'PassThrough' is not assignable to type 'ReadStream & { fd: 0; }'.\n  Type 'Transform' is missing the following properties from type 'ReadStream': isRaw, setRawMode, isTTY, destroySoon, and 20 more.\ntests/humanFirstUseObserver.test.ts(402,50): error TS2322: Type 'PassThrough' is not assignable to type 'WriteStream & { fd: 1; }'.\n  Type 'Transform' is missing the following properties from type 'WriteStream': clearLine, clearScreenDown, cursorTo, moveCursor, and 27 more.\ntests/humanFirstUseObserver.test.ts(402,58): error TS2740: Type 'EventEmitter<any>' is missing the following properties from type 'Process': stdout, stderr, stdin, argv, and 51 more.\ntests/humanFirstUseObserver.test.ts(414,45): error TS2322: Type 'PassThrough' is not assignable to type 'ReadStream & { fd: 0; }'.\n  Type 'Transform' is missing the following properties from type 'ReadStream': isRaw, setRawMode, isTTY, destroySoon, and 20 more.\ntests/humanFirstUseObserver.test.ts(414,52): error TS2322: Type 'PassThrough' is not assignable to type 'WriteStream & { fd: 1; }'.\n  Type 'Transform' is missing the following properties from type 'WriteStream': clearLine, clearScreenDown, cursorTo, moveCursor, and 27 more.\ntests/humanFirstUseObserver.test.ts(414,60): error TS2740: Type 'EventEmitter<any>' is missing the following properties from type 'Process': stdout, stderr, stdin, argv, and 51 more.\ntests/spillLifecycle.test.ts(92,28): error TS2345: Argument of type '\"missing-object\"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.\ntests/spillLifecycle.test.ts(92,72): error TS2345: Argument of type '\"modified-object\"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.\ntests/spillLifecycle.test.ts(115,29): error TS2345: Argument of type '\"selected-session\"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.\ntests/spillLifecycle.test.ts(115,65): error TS2345: Argument of type '\"other-session\"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.\ntests/spillLifecycle.test.ts(232,28): error TS2345: Argument of type '\"not-materialized\"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.\ntests/studioAgentCredentialBinding.test.ts(84,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ default: string; \"credential-agent-b\": string; }'.\n  No index signature with a parameter of type 'string' was found on type '{ default: string; \"credential-agent-b\": string; }'.\n",
+      "stderr": "",
+      "remediation": "Fix test TypeScript contracts without bypassing assertions or suppressing type errors."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:13:07.455Z",
+      "endedAt": "2026-09-09T11:13:39.313Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 prebuild\n> npm run clean\n\n\n> agent-maturity-compass@1.2.0 clean\n> node scripts/clean-dist.mjs\n\n\n> agent-maturity-compass@1.2.0 build\n> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs\n\n\n> agent-maturity-compass@1.2.0 copy-assets\n> node scripts/copy-build-assets.mjs\n\nbundle-kernel: dist/kernel/amcRuntime.js 483 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:13:39.313Z",
+      "endedAt": "2026-09-09T11:13:55.202Z",
+      "stdout": "packed-install check of agent-maturity-compass@1.2.0 in /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-packed-install-urQbLr\nnote: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here\nok   npm pack --ignore-scripts (same files as publish) (2.7s)\nok   npm install <tarball> (fresh dir, empty HOME) (6.4s)\nok   @amc/core is not resolvable from the consumer directory\nok   amc doctor (1.8s)\nok   amc init (isolated workspace) (0.9s)\nok   amc agent-loop run (stub provider, keyless) (0.9s)\nok   amc session verify --json (0.8s)\nok   amc agent-loop verify --json (1.1s)\nok   installed evidence and request reconstruction\nskip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:13:55.202Z",
+      "endedAt": "2026-09-09T11:14:01.010Z",
+      "stdout": "\n\u001b[1m\u001b[30m\u001b[46m RUN \u001b[49m\u001b[39m\u001b[22m \u001b[36mv4.1.11 \u001b[39m\u001b[90m/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout\u001b[39m\n\n \u001b[32m✓\u001b[39m tests/gap0626AdversarialRegression.test.ts \u001b[2m(\u001b[22m\u001b[2m2 tests\u001b[22m\u001b[2m)\u001b[22m\u001b[33m 655\u001b[2mms\u001b[22m\u001b[39m\n     \u001b[33m\u001b[2m✓\u001b[22m\u001b[39m produces Score, Shield, Watch rerun output and receipt hashes \u001b[33m 641\u001b[2mms\u001b[22m\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m2 passed\u001b[39m\u001b[22m\u001b[90m (2)\u001b[39m\n\u001b[2m   Start at \u001b[22m 16:43:56\n\u001b[2m   Duration \u001b[22m 4.14s\u001b[2m (transform 2.48s, setup 0ms, import 3.36s, tests 655ms, environment 0ms)\u001b[22m\n\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --reporter=dot --reporter=json --outputFile.json=/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout/tmp/release-gate/vitest-boExC4/results.json",
+      "status": "failed",
+      "startedAt": "2026-09-09T11:14:01.011Z",
+      "endedAt": "2026-09-09T11:20:35.824Z",
+      "stdout": "m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[31mx\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\u001b[33m\u001b[39m\u001b[32m·\u001b[39m\n\n\u001b[2m Test Files \u001b[22m \u001b[1m\u001b[31m10 failed\u001b[39m\u001b[22m\u001b[2m | \u001b[22m\u001b[1m\u001b[32m1379 passed\u001b[39m\u001b[22m\u001b[90m (1389)\u001b[39m\n\u001b[2m      Tests \u001b[22m \u001b[1m\u001b[31m30 failed\u001b[39m\u001b[22m\u001b[2m | \u001b[22m\u001b[1m\u001b[32m12233 passed\u001b[39m\u001b[22m\u001b[90m (12263)\u001b[39m\n\u001b[2m   Start at \u001b[22m 16:44:01\n\u001b[2m   Duration \u001b[22m 393.61s\u001b[2m (transform 108.33s, setup 0ms, import 960.70s, tests 2951.32s, environment 241ms)\u001b[22m\n\nJSON report written to /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout/tmp/release-gate/vitest-boExC4/results.json\n",
+      "stderr": "   \u001b[35mthrow\u001b[39m \u001b[35mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Agent config not found: \u001b[39m\u001b[36m${\u001b[39mpaths\u001b[33m.\u001b[39magentConfig\u001b[36m}\u001b[39m\u001b[32m`\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m   |\u001b[39m           \u001b[31m^\u001b[39m\n    \u001b[90m371|\u001b[39m   }\n    \u001b[90m372|\u001b[39m   const parsed = YAML.parse(readFileSync(paths.agentConfig, \"utf8\")) a…\n\u001b[90m \u001b[2m❯\u001b[22m fixture tests/studioAgentCredentialBinding.test.ts:\u001b[2m54:33\u001b[22m\u001b[39m\n\u001b[90m \u001b[2m❯\u001b[22m tests/studioAgentCredentialBinding.test.ts:\u001b[2m349:21\u001b[22m\u001b[39m\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/30]⎯\u001b[22m\u001b[39m\n\n\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/studioAgentCredentialBinding.test.ts\u001b[2m > \u001b[22mhuman and legacy credential compatibility is explicit\u001b[2m > \u001b[22mretains human session and bootstrap admin precedence over irrelevant invalid agent credentials\n\u001b[31m\u001b[1mError\u001b[22m: Agent config not found: /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-agent-credential-binding-DmGclS/.amc/agent.config.yaml\u001b[39m\n\u001b[36m \u001b[2m❯\u001b[22m loadAgentConfig src/fleet/registry.ts:\u001b[2m370:11\u001b[22m\u001b[39m\n    \u001b[90m368|\u001b[39m   \u001b[35mconst\u001b[39m paths \u001b[33m=\u001b[39m \u001b[34mgetAgentPaths\u001b[39m(workspace\u001b[33m,\u001b[39m agentId)\u001b[33m;\u001b[39m\n    \u001b[90m369|\u001b[39m   \u001b[35mif\u001b[39m (\u001b[33m!\u001b[39m\u001b[34mpathExists\u001b[39m(paths\u001b[33m.\u001b[39magentConfig)) {\n    \u001b[90m370|\u001b[39m     \u001b[35mthrow\u001b[39m \u001b[35mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Agent config not found: \u001b[39m\u001b[36m${\u001b[39mpaths\u001b[33m.\u001b[39magentConfig\u001b[36m}\u001b[39m\u001b[32m`\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m   |\u001b[39m           \u001b[31m^\u001b[39m\n    \u001b[90m371|\u001b[39m   }\n    \u001b[90m372|\u001b[39m   const parsed = YAML.parse(readFileSync(paths.agentConfig, \"utf8\")) a…\n\u001b[90m \u001b[2m❯\u001b[22m fixture tests/studioAgentCredentialBinding.test.ts:\u001b[2m54:33\u001b[22m\u001b[39m\n\u001b[90m \u001b[2m❯\u001b[22m tests/studioAgentCredentialBinding.test.ts:\u001b[2m363:21\u001b[22m\u001b[39m\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/30]⎯\u001b[22m\u001b[39m\n\n\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/studioAgentCredentialBinding.test.ts\u001b[2m > \u001b[22mhuman and legacy credential compatibility is explicit\u001b[2m > \u001b[22mpreserves lease-only checks/read routes and refuses identity substitution on execution reads\n\u001b[31m\u001b[1mError\u001b[22m: Agent config not found: /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-agent-credential-binding-CVCbcc/.amc/agent.config.yaml\u001b[39m\n\u001b[36m \u001b[2m❯\u001b[22m loadAgentConfig src/fleet/registry.ts:\u001b[2m370:11\u001b[22m\u001b[39m\n    \u001b[90m368|\u001b[39m   \u001b[35mconst\u001b[39m paths \u001b[33m=\u001b[39m \u001b[34mgetAgentPaths\u001b[39m(workspace\u001b[33m,\u001b[39m agentId)\u001b[33m;\u001b[39m\n    \u001b[90m369|\u001b[39m   \u001b[35mif\u001b[39m (\u001b[33m!\u001b[39m\u001b[34mpathExists\u001b[39m(paths\u001b[33m.\u001b[39magentConfig)) {\n    \u001b[90m370|\u001b[39m     \u001b[35mthrow\u001b[39m \u001b[35mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`Agent config not found: \u001b[39m\u001b[36m${\u001b[39mpaths\u001b[33m.\u001b[39magentConfig\u001b[36m}\u001b[39m\u001b[32m`\u001b[39m)\u001b[33m;\u001b[39m\n    \u001b[90m   |\u001b[39m           \u001b[31m^\u001b[39m\n    \u001b[90m371|\u001b[39m   }\n    \u001b[90m372|\u001b[39m   const parsed = YAML.parse(readFileSync(paths.agentConfig, \"utf8\")) a…\n\u001b[90m \u001b[2m❯\u001b[22m fixture tests/studioAgentCredentialBinding.test.ts:\u001b[2m54:33\u001b[22m\u001b[39m\n\u001b[90m \u001b[2m❯\u001b[22m tests/studioAgentCredentialBinding.test.ts:\u001b[2m374:21\u001b[22m\u001b[39m\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/30]⎯\u001b[22m\u001b[39m\n\n\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m tests/performance/sessionSpine.performance.test.ts\u001b[2m > \u001b[22msession spine throughput\u001b[2m > \u001b[22mblob-backed content events sustain the floor and do not degrade super-linearly\n\u001b[31m\u001b[1mAssertionError\u001b[22m: content throughput 129 ev/s: expected 128.88582990305488 to be greater than 150\u001b[39m\n\u001b[36m \u001b[2m❯\u001b[22m tests/performance/sessionSpine.performance.test.ts:\u001b[2m86:78\u001b[22m\u001b[39m\n    \u001b[90m 84|\u001b[39m     // Floor: comfortably below the ~640 ev/s measured, so CI variance…\n    \u001b[90m 85|\u001b[39m     \u001b[90m// make it flaky, but far above a streaming turn's ~50-100 ev/s.\u001b[39m\n    \u001b[90m 86|\u001b[39m     expect(totalPerSec, `content throughput ${totalPerSec.toFixed(0)} …\n    \u001b[90m   |\u001b[39m                                                                              \u001b[31m^\u001b[39m\n    \u001b[90m 87|\u001b[39m\n    \u001b[90m 88|\u001b[39m     // No unbounded growth: with the O(n) blob-index fix, the second h…\n\n\u001b[31m\u001b[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/30]⎯\u001b[22m\u001b[39m\n\n",
+      "remediation": "Fix the full Vitest suite before release.",
+      "artifact": {
+        "path": "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout/tmp/release-gate/vitest-boExC4/results.json",
+        "produced": true,
+        "valid": false,
+        "sha256": "76ab9fcab50f2204be3a37f578b82d7806b781e5ba691eab900b98482c9919a5",
+        "counts": {
+          "total": 12263,
+          "passed": 12233,
+          "failed": 30,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 23,
+          "pendingSuites": 0,
+          "files": 1389
+        },
+        "temporary": false,
+        "retained": true
+      }
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-release-gate-artifacts-eNce7Z/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:20:35.846Z",
+      "endedAt": "2026-09-09T11:20:36.752Z",
+      "stdout": "Command inventory written to /private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-release-gate-artifacts-eNce7Z/CLI_COMMAND_INVENTORY.md\n",
+      "stderr": "",
+      "remediation": null,
+      "artifact": {
+        "path": "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-release-gate-artifacts-eNce7Z/CLI_COMMAND_INVENTORY.md",
+        "produced": true,
+        "temporary": true,
+        "retained": false
+      }
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "failed",
+      "startedAt": "2026-09-09T11:20:36.752Z",
+      "endedAt": "2026-09-09T11:20:38.357Z",
+      "stdout": "Line ratchet: 9 file(s) shrank by 263 lines.\n  src/adapters/hookIntegration.ts: 1953 -> 1906\n  src/cli.ts: 24539 -> 24436\n  src/gateway/server.ts: 1817 -> 1798\n  src/importers/neutralImporter.ts: 999 -> 989\n  src/index.ts: 2505 -> 2501\n  src/ledger/ledger.ts: 1310 -> 1303\n  src/studio/openapi.ts: 2213 -> 2209\n  src/studio/studioServer.ts: 8878 -> 8824\n  src/workspaces/workspaceRouter.ts: 1793 -> 1778\nRun with --update to lower the baselines and lock this in.\n",
+      "stderr": "re/identityContinuity.ts\": 73,\n    \"src/score/index.ts\": 557,\n    \"src/score/industryTrustModels.ts\": 254,\n    \"src/score/interpretability.ts\": 145,\n    \"src/score/kernelSandboxMaturity.ts\": 98,\n    \"src/score/knowledgeGraph.ts\": 329,\n    \"src/score/leanAMC.ts\": 125,\n    \"src/score/lessonLearnedDatabase.ts\": 190,\n    \"src/score/levelTransition.ts\": 215,\n    \"src/score/maturityTaxonomy.ts\": 44,\n    \"src/score/mcpCompliance.ts\": 569,\n    \"src/score/memoryDepth.ts\": 255,\n    \"src/score/memoryIntegrity.ts\": 176,\n    \"src/score/memoryMaturity.ts\": 644,\n    \"src/score/memorySecurityArchitecture.ts\": 86,\n    \"src/score/metricValidity.ts\": 18459,\n    \"src/score/modelDrift.ts\": 257,\n    \"src/score/monitorBypassResistance.ts\": 117,\n    \"src/score/multiAgentDimension.ts\": 90,\n    \"src/score/mutualVerification.ts\": 258,\n    \"src/score/networkTransparencyLog.ts\": 278,\n    \"src/score/nlpMetrics.ts\": 517,\n    \"src/score/operationalIndependence.ts\": 1298,\n    \"src/score/orchestrationDAG.ts\": 123,\n    \"src/score/organizationalSafetyPosture.ts\": 179,\n    \"src/score/outputAttestation.ts\": 272,\n    \"src/score/outputIntegrityMaturity.ts\": 113,\n    \"src/score/oversightIntegrity.ts\": 154,\n    \"src/score/owaspLLMCoverage.ts\": 147,\n    \"src/score/pauseQuality.ts\": 164,\n    \"src/score/platformDependency.ts\": 103,\n    \"src/score/policyConsistency.ts\": 167,\n    \"src/score/predictiveMaturity.ts\": 125,\n    \"src/score/predictiveValidity.ts\": 929,\n    \"src/score/processDeceptionDetection.ts\": 190,\n    \"src/score/productionReadiness.ts\": 187,\n    \"src/score/ragGroundingEval.ts\": 628,\n    \"src/score/ragMaturity.ts\": 603,\n    \"src/score/reasoningEfficiency.ts\": 183,\n    \"src/score/regulatoryReadiness.ts\": 315,\n    \"src/score/reputationPortability.ts\": 81,\n    \"src/score/runtimeIdentityMaturity.ts\": 97,\n    \"src/score/safetyMetrics.ts\": 791,\n    \"src/score/scenarioProvenance.ts\": 272,\n    \"src/score/scoreExplainer.ts\": 516,\n    \"src/score/scoreHistory.ts\": 591,\n    \"src/score/scoringScale.ts\": 111,\n    \"src/score/selfKnowledgeMaturity.ts\": 103,\n    \"src/score/simplicityScoring.ts\": 76,\n    \"src/score/simulationValidity.ts\": 245,\n    \"src/score/sleeperDetection.ts\": 153,\n    \"src/score/statisticalAnalysis.ts\": 510,\n    \"src/score/syntheticIdentityGovernance.ts\": 291,\n    \"src/score/taskHorizon.ts\": 205,\n    \"src/score/trustAuthorizationSync.ts\": 91,\n    \"src/score/trustWeights.ts\": 50,\n    \"src/score/vibeCodeAudit.ts\": 438,\n    \"src/sdk/amcAgent.ts\": 80,\n    \"src/sdk/amcClient.ts\": 262,\n    \"src/sdk/amcEvidence.ts\": 21,\n    \"src/sdk/amcGuards.ts\": 65,\n    \"src/sdk/amcSpan.ts\": 43,\n    \"src/sdk/amcTelemetry.ts\": 51,\n    \"src/sdk/errors.ts\": 43,\n    \"src/sdk/frameworkAdapters.ts\": 384,\n    \"src/sdk/index.ts\": 63,\n    \"src/sdk/integrations/anthropic.ts\": 28,\n    \"src/sdk/integrations/gemini.ts\": 37,\n    \"src/sdk/integrations/langchainJs.ts\": 22,\n    \"src/sdk/integrations/langgraphJs.ts\": 19,\n    \"src/sdk/integrations/openai.ts\": 209,\n    \"src/sdk/integrations/openaiAgentsSdk.ts\": 34,\n    \"src/sdk/integrations/vercelAiSdk.ts\": 57,\n    \"src/sdk/mobileFetch.ts\": 185,\n    \"src/sdk/nativeAgentClient.ts\": 477,\n    \"src/sdk/pythonSdkGenerator.ts\": 142,\n    \"src/sdk/versioning.ts\": 54,\n    \"src/security/index.ts\": 16,\n    \"src/security/safeTarArchive.ts\": 201,\n    \"src/security/supplyChainPosture.ts\": 273,\n    \"src/session/approvalEventMeta.ts\": 176,\n    \"src/session/eventPayload.ts\": 65,\n    \"src/session/loopEventMeta.ts\": 475,\n    \"src/session/projection/projectionCut.ts\": 98,\n    \"src/session/projection/projectionRegistry.ts\": 324,\n    \"src/session/projection/projectionTypes.ts\": 132,\n    \"src/session/projection/sessionProjections.ts\": 25,\n    \"src/session/requestHeaderMeta.ts\": 129,\n    \"src/session/requestOutcomeMeta.ts\": 211,\n    \"src/session/sessionApiTypes.ts\": 251,\n    \"src/session/sessionCompactionWorkflow.ts\": 100,\n    \"src/session/sessionMerkle.ts\": 50,\n    \"src/session/sessionOwnership.ts\": 114,\n    \"src/session/sessionRecovery.ts\": 752,\n    \"src/session/sessio",
+      "remediation": "Fix CLI/API/Studio boundary drift and rerun npm run check:architecture-boundaries."
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:20:38.357Z",
+      "endedAt": "2026-09-09T11:20:38.642Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:docs-drift\n> node scripts/docs-drift-check.mjs\n\nDocs drift check passed (203 files scanned).\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "failed",
+      "startedAt": "2026-09-09T11:20:38.642Z",
+      "endedAt": "2026-09-09T11:20:39.555Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 audit:runtime\n> pnpm audit --prod --audit-level moderate\n\n┌─────────────────────┬────────────────────────────────────────────────────────┐\n│ high                │ js-yaml: maxTotalMergeKeys does not limit CPU use for  │\n│                     │ empty merge sources                                    │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Package             │ js-yaml                                                │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Vulnerable versions │ >=4.0.0 <4.3.2                                         │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Patched versions    │ >=4.3.2                                                │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ Paths               │ vendor__include>js-yaml                                │\n├─────────────────────┼────────────────────────────────────────────────────────┤\n│ More info           │ https://github.com/advisories/GHSA-2883-xcg3-v3hh      │\n└─────────────────────┴────────────────────────────────────────────────────────┘\n1 vulnerabilities found\nSeverity: 1 high\n",
+      "stderr": "",
+      "remediation": "Fix runtime dependency advisories at moderate severity or higher."
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:20:39.556Z",
+      "endedAt": "2026-09-09T11:20:41.242Z",
+      "stdout": "icense issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"privacy-security-mobility\",\n      \"name\": \"Privacy & Security\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"freight-3pl-warehouse\",\n      \"name\": \"Freight, 3PL & Warehouse Operations\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 8,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"cognition-to-intelligence\",\n      \"name\": \"Cognition to Intelligence\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"networked-ecosystems\",\n      \"name\": \"Connectivity to Networked Ecosystems\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"os-sustainable-outcomes\",\n      \"name\": \"Operating System for Sustainable Outcomes\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+      "stderr": "\n",
+      "remediation": null
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-09-09T11:20:41.243Z",
+      "endedAt": "2026-09-09T11:22:53.674Z",
+      "stdout": "up-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\\\"\\n}\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 730\n        },\n        {\n          \"id\": \"guide\",\n          \"command\": \"/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/tmp/amc-install-persona-qa-JKVg8I/personas/startup-founder/node_modules/.bin/amc guide\",\n          \"status\": \"passed\",\n          \"exitCode\": 0,\n          \"startedAt\": \"2026-09-09T11:22:44.655Z\",\n          \"endedAt\": \"2026-09-09T11:22:45.354Z\",\n          \"stdout\": \"\\n  🧭 Agent \\\"default\\\" has 244 gaps to close for L1 — Initial. 0/244 questions already at target.\\n\\n  1. AMC-3.1.1: Integrity (Alignment with North Star)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Completion Above Alignment\\\". Need \\\"Alignment Intent, Weak Practice\\\".\\n     Run: amc evidence collect\\n\\n  2. AMC-3.1.2: Ethics (Safety, Privacy, Fairness)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Ethics Ignored\\\". Need \\\"Ethics as Intent Only\\\".\\n     Run: amc evidence collect\\n\\n  3. AMC-3.1.3: Inspiration (Source of Improvement)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Trend Copying\\\". Need \\\"Benchmark Chasing\\\".\\n     Run: amc evidence collect\\n\\n  4. AMC-3.1.4: Innovation (Continuous Improvement Maturity)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Innovation Ignored\\\". Need \\\"Innovation When Forced\\\".\\n     Run: amc evidence collect\\n\\n  5. AMC-3.1.5: Optimization & Tradeoff Discipline\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Vanity Output Optimization\\\". Need \\\"Single-Metric Optimization\\\".\\n     Run: amc evidence collect\\n\\n  6. AMC-3.1.6: User Focus (Education → Ownership → Commitment)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Basic Support Only\\\". Need \\\"Responsive Service\\\".\\n     Run: amc evidence collect\\n\\n  7. AMC-3.2.1: Role Positioning & Responsibility\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Role Confusion\\\". Need \\\"Role Stated, Not Enforced\\\".\\n     Run: amc evidence collect\\n\\n  8. AMC-3.2.2: Identity, Voice, and Trust Signals\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Style Only / Inconsistent Persona\\\". Need \\\"Branded Tone, Weak Substance\\\".\\n     Run: amc evidence collect\\n\\n  ... and 236 more gaps. Use --export to see all.\\n\\n  Export all guides: amc guide --export\\n  Generate guardrails: amc guide --guardrails\\n  Apply to agent config: amc guide --apply\\n  Mechanic mode (pick & choose): amc guide --interactive\\n  Continuous monitoring: amc guide --watch\\n  Compare with previous: amc guide --diff\\n  List supported frameworks: amc guide --frameworks\\n  Target specific level: amc guide --target 4\\n\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 699\n        }\n      ],\n      \"assertions\": [\n        {\n          \"id\": \"amc-bin\",\n          \"status\": \"passed\",\n          \"details\": \"Installed CLI bin is present.\"\n        },\n        {\n          \"id\": \"full-score-contract\",\n          \"status\": \"passed\",\n          \"details\": \"questions=244; CLI-reported SLA met=true\"\n        },\n        {\n          \"id\": \"domain-pack-count\",\n          \"status\": \"passed\",\n          \"details\": \"packs=41\"\n        }\n      ],\n      \"status\": \"passed\",\n      \"checkCounts\": {\n        \"planned\": 10,\n        \"executed\": 10,\n        \"passed\": 10,\n        \"failed\": 0,\n        \"skipped\": 0\n      },\n      \"summary\": \"10/10 automated checks passed; 0 failed; 0 skipped.\",\n      \"measurements\": {\n        \"installWallMs\": 6812,\n        \"scoreCommandWallMs\": 1040,\n        \"cliReportedDiagnosticMs\": 317,\n        \"cliReportedSla\": {\n          \"targetMs\": 120000,\n          \"elapsedMs\": 317,\n          \"met\": true\n        }\n      },\n      \"evidence\": {\n        \"questionCount\": 244,\n        \"domainPackCount\": 41,\n        \"artifactStatus\": \"VALID\",\n        \"evidenceStatus\": \"INSUFFICIENT_EVIDENCE\",\n        \"claimEligible\": false\n      }\n    }\n  ]\n}\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-09-09T11:22:53.674Z",
+      "endedAt": "2026-09-09T11:22:53.674Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ],
+  "remediations": [
+    {
+      "id": "typecheck-tests",
+      "status": "failed",
+      "remediation": "Fix test TypeScript contracts without bypassing assertions or suppressing type errors."
+    },
+    {
+      "id": "full-test-suite",
+      "status": "failed",
+      "remediation": "Fix the full Vitest suite before release."
+    },
+    {
+      "id": "architecture-boundaries",
+      "status": "failed",
+      "remediation": "Fix CLI/API/Studio boundary drift and rerun npm run check:architecture-boundaries."
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "status": "failed",
+      "remediation": "Fix runtime dependency advisories at moderate severity or higher."
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ]
+}

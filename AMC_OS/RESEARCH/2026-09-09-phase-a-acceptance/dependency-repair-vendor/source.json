@@ -1,0 +1,200 @@
+{
+  "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
+  "clone": "/private/tmp/amc-c164-vendor-yaml-01/checkout",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "arch": "arm64",
+    "node": "v22.22.0"
+  },
+  "commands": [
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--quiet",
+        "--no-local",
+        "--no-hardlinks",
+        "--no-checkout",
+        "/Users/sid/AgentMaturityCompass",
+        "/private/tmp/amc-c164-vendor-yaml-01/checkout"
+      ],
+      "startedAt": "2026-09-09T11:33:35.975842+00:00",
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          7088,
+          501,
+          "Wed Sep 9 17:03:35 2026"
+        ],
+        "rootReaped": true,
+        "observations": 17,
+        "ownedProcesses": [
+          {
+            "pid": 7088,
+            "ppid": 7085,
+            "pgid": 7088,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:35 2026",
+            "firstObservedAt": "2026-09-09T11:33:36.009545+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 7090,
+            "ppid": 7088,
+            "pgid": 7088,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:36 2026",
+            "firstObservedAt": "2026-09-09T11:33:36.228705+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 7091,
+            "ppid": 7088,
+            "pgid": 7088,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:36 2026",
+            "firstObservedAt": "2026-09-09T11:33:36.228888+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 7092,
+            "ppid": 7090,
+            "pgid": 7088,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:36 2026",
+            "firstObservedAt": "2026-09-09T11:33:36.228907+00:00",
+            "via": "live-owned-group"
+          }
+        ],
+        "ownedGroups": [
+          7088
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 2.7879340420040535,
+      "endedAt": "2026-09-09T11:33:38.763794+00:00"
+    },
+    {
+      "label": "checkout",
+      "command": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "checkout",
+        "--quiet",
+        "--detach",
+        "c16492c10592112fe610bd2e59f216f8f7f310b4"
+      ],
+      "startedAt": "2026-09-09T11:33:38.781116+00:00",
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          7131,
+          501,
+          "Wed Sep 9 17:03:38 2026"
+        ],
+        "rootReaped": true,
+        "observations": 9,
+        "ownedProcesses": [
+          {
+            "pid": 7131,
+            "ppid": 7085,
+            "pgid": 7131,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:38 2026",
+            "firstObservedAt": "2026-09-09T11:33:38.798228+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          7131
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.9718201249925187,
+      "endedAt": "2026-09-09T11:33:39.752943+00:00"
+    },
+    {
+      "label": "resolution",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "--filter",
+        "@amc/cordis-plugin-include",
+        "update",
+        "js-yaml@^4.3.2",
+        "--lockfile-only",
+        "--ignore-scripts"
+      ],
+      "startedAt": "2026-09-09T11:33:39.771862+00:00",
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          7151,
+          501,
+          "Wed Sep 9 17:03:39 2026"
+        ],
+        "rootReaped": true,
+        "observations": 35,
+        "ownedProcesses": [
+          {
+            "pid": 7151,
+            "ppid": 7085,
+            "pgid": 7151,
+            "uid": 501,
+            "started": "Wed Sep 9 17:03:39 2026",
+            "firstObservedAt": "2026-09-09T11:33:39.790669+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          7151
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 6.83387387500261,
+      "endedAt": "2026-09-09T11:33:46.605793+00:00"
+    }
+  ],
+  "status": "prepared-awaiting-root-diff-review",
+  "startedAt": "2026-09-09T11:33:35.909807+00:00",
+  "helperSha256": "f60775228084934eb8e9686e7a3234108c2aa4d6650af9dbc8aca2189cfc180f",
+  "supervisorSha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d",
+  "boundary": "Private lockfile resolution only; no install, build, test or acceptance",
+  "active": null,
+  "changedPaths": [
+    "pnpm-lock.yaml",
+    "vendor/include/package.json"
+  ],
+  "endedAt": "2026-09-09T11:33:47.148579+00:00",
+  "allObservedCommandProcessesClosed": true
+}

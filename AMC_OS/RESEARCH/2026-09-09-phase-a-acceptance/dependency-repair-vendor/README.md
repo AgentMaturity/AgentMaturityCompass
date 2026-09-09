@@ -1,0 +1,5 @@
+# Remaining YAML dependency correction — September 9
+
+The c16492c10592112fe610bd2e59f216f8f7f310b4 runtime audit found js-yaml4.3.1 through vendor/include. A private clone at that source resolved it to4.3.2 with declared floor^4.3.2. The resolver also returned3.15.2 for read-yaml-file, covering the same advisory's v3 range, plus unrelated toolchain updates. Root retained only the actual YAML package/snapshot resolutions and the vendor declaration. Other dependency inputs remain those of c164. `lockfile.diff` retains the complete original resolver output; `narrowed-input.diff` and `narrowing.json` describe the selected source delta. This is source input preparation, not an accepted resolver-generated lockfile until the next fresh frozen install qualifies it.
+
+The private clone, source.json and command/process records are preserved. All observed command processes closed. No install, build, audit or test acceptance ran in this preparation. Official patched-release advisory: https://github.com/advisories/GHSA-2883-xcg3-v3hh (retrieved2026-09-09). AMC-483 tracks the correction.

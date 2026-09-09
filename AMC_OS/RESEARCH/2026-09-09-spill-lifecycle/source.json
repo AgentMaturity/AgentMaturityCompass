@@ -1,16 +1,16 @@
 {
   "issue": "AMC-1547",
   "sourceReviewCommit": "f0442ac118573683080681f443f518853cd91f22",
-  "status": "core-integrated-operator-commands-in-progress",
+  "status": "runtime-integrated-validation-started",
   "acceptanceExecuted": false,
   "productionKeyOperations": false,
-  "testsDeferredByUser": true,
+  "testsDeferredByUser": false,
   "linearChildren": 42,
   "linearStates": {
     "In Review": 31,
     "In Progress": 11
   },
-  "updatedAt": "2026-09-09T10:22:34.325656+00:00",
+  "updatedAt": "2026-09-09T11:06:09.382446+00:00",
   "sourceIntegrationCommit": "249a2a812f2600c53564fa571761aa2cfb80a144",
   "regressionIntegrationCommit": "d9d55034b1e856513eea1c68b09e50ecd433063e",
   "storageCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
@@ -26,5 +26,21 @@
   },
   "boundedReadCommit": "3aa7077af4cae2d3da957c1825b9c47a48f2d382",
   "readCommand": "amc session spill-read <locator>",
-  "readQualification": "source review and authored regressions only; no execution"
+  "readQualification": "source review and authored regressions only; no execution",
+  "operatorCommandCommit": "68458818799d1db7826d67d1b604d6ad77ac4432",
+  "retentionTypeCorrectionCommit": "e12060297b6f847903501354d3a6425ffc51adb7",
+  "finalPreparationStarted": true,
+  "finalSuiteExecuted": false,
+  "preparationReceipt": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/final-batch-generation/source.json",
+  "acceptanceStarted": true,
+  "fullAcceptanceSource": "c16492c10592112fe610bd2e59f216f8f7f310b4",
+  "fullAcceptanceReceipt": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/source.json",
+  "focusedSpillBaseline": {
+    "total": 79,
+    "passed": 77,
+    "failed": 2,
+    "pending": 0,
+    "mutationsApplied": 0,
+    "receipt": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-c16492c1-01/README.md"
+  }
 }

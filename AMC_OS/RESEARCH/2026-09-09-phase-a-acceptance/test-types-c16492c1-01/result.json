@@ -1,0 +1,840 @@
+{
+  "source": "c16492c10592112fe610bd2e59f216f8f7f310b4",
+  "clone": "/private/tmp/amc-c16492c1-test-types-01/checkout",
+  "lane": "/private/tmp/amc-c16492c1-test-types-01",
+  "startedAt": "2026-09-09T11:17:54.372870+00:00",
+  "status": "failed",
+  "commands": [
+    {
+      "label": "node-version",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "--version"
+      ],
+      "startedAt": "2026-09-09T11:17:54.463428+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          96799,
+          501,
+          "Wed Sep 9 16:47:54 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 96799,
+            "ppid": 96791,
+            "pgid": 96799,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:54 2026",
+            "firstObservedAt": "2026-09-09T11:17:54.495488+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          96799
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.617115125,
+      "endedAt": "2026-09-09T11:17:55.080530+00:00"
+    },
+    {
+      "label": "pnpm-version",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "--version"
+      ],
+      "startedAt": "2026-09-09T11:17:55.118973+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          96816,
+          501,
+          "Wed Sep 9 16:47:55 2026"
+        ],
+        "rootReaped": true,
+        "observations": 10,
+        "ownedProcesses": [
+          {
+            "pid": 96816,
+            "ppid": 96791,
+            "pgid": 96816,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:55 2026",
+            "firstObservedAt": "2026-09-09T11:17:55.145648+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          96816
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 1.3161114170000001,
+      "endedAt": "2026-09-09T11:17:56.435086+00:00"
+    },
+    {
+      "label": "clone",
+      "command": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "clone",
+        "--no-local",
+        "--no-hardlinks",
+        "--no-checkout",
+        "--",
+        "/Users/sid/AgentMaturityCompass",
+        "/private/tmp/amc-c16492c1-test-types-01/checkout"
+      ],
+      "startedAt": "2026-09-09T11:17:56.462302+00:00",
+      "timeoutSeconds": 300,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          96840,
+          501,
+          "Wed Sep 9 16:47:56 2026"
+        ],
+        "rootReaped": true,
+        "observations": 32,
+        "ownedProcesses": [
+          {
+            "pid": 96840,
+            "ppid": 96791,
+            "pgid": 96840,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:56 2026",
+            "firstObservedAt": "2026-09-09T11:17:56.493573+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 96842,
+            "ppid": 96840,
+            "pgid": 96840,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:56 2026",
+            "firstObservedAt": "2026-09-09T11:17:56.724703+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 96843,
+            "ppid": 96842,
+            "pgid": 96840,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:56 2026",
+            "firstObservedAt": "2026-09-09T11:17:56.724737+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 96844,
+            "ppid": 96840,
+            "pgid": 96840,
+            "uid": 501,
+            "started": "Wed Sep 9 16:47:56 2026",
+            "firstObservedAt": "2026-09-09T11:17:56.724739+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          96840
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 6.711162417000001,
+      "endedAt": "2026-09-09T11:18:03.173533+00:00"
+    },
+    {
+      "label": "checkout",
+      "command": [
+        "git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "checkout",
+        "--detach",
+        "c16492c10592112fe610bd2e59f216f8f7f310b4"
+      ],
+      "startedAt": "2026-09-09T11:18:03.215982+00:00",
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          96947,
+          501,
+          "Wed Sep 9 16:48:03 2026"
+        ],
+        "rootReaped": true,
+        "observations": 13,
+        "ownedProcesses": [
+          {
+            "pid": 96947,
+            "ppid": 96791,
+            "pgid": 96947,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:03 2026",
+            "firstObservedAt": "2026-09-09T11:18:03.268745+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          96947
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 2.1046967500000004,
+      "endedAt": "2026-09-09T11:18:05.320696+00:00"
+    },
+    {
+      "label": "fresh-head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "startedAt": "2026-09-09T11:18:05.349718+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          96985,
+          501,
+          "Wed Sep 9 16:48:05 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 96985,
+            "ppid": 96791,
+            "pgid": 96985,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:05 2026",
+            "firstObservedAt": "2026-09-09T11:18:05.379139+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          96985
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.7044274169999998,
+      "endedAt": "2026-09-09T11:18:06.054141+00:00"
+    },
+    {
+      "label": "fresh-status",
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "startedAt": "2026-09-09T11:18:06.110310+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97007,
+          501,
+          "Wed Sep 9 16:48:06 2026"
+        ],
+        "rootReaped": true,
+        "observations": 8,
+        "ownedProcesses": [
+          {
+            "pid": 97007,
+            "ppid": 96791,
+            "pgid": 97007,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:06 2026",
+            "firstObservedAt": "2026-09-09T11:18:06.171301+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          97007
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.8805123749999986,
+      "endedAt": "2026-09-09T11:18:06.990823+00:00"
+    },
+    {
+      "label": "fresh-index-flags",
+      "command": [
+        "git",
+        "ls-files",
+        "-v"
+      ],
+      "startedAt": "2026-09-09T11:18:07.018167+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97032,
+          501,
+          "Wed Sep 9 16:48:07 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 97032,
+            "ppid": 96791,
+            "pgid": 97032,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:07 2026",
+            "firstObservedAt": "2026-09-09T11:18:07.064371+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          97032
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.6463050409999997,
+      "endedAt": "2026-09-09T11:18:07.664476+00:00"
+    },
+    {
+      "label": "install",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile",
+        "--store-dir",
+        "/private/tmp/amc-c16492c1-test-types-01/pnpm-store"
+      ],
+      "startedAt": "2026-09-09T11:18:07.697357+00:00",
+      "timeoutSeconds": 1200,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97056,
+          501,
+          "Wed Sep 9 16:48:07 2026"
+        ],
+        "rootReaped": true,
+        "observations": 44,
+        "ownedProcesses": [
+          {
+            "pid": 97056,
+            "ppid": 96791,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:07 2026",
+            "firstObservedAt": "2026-09-09T11:18:07.727604+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 97158,
+            "ppid": 97056,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:14 2026",
+            "firstObservedAt": "2026-09-09T11:18:14.857232+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 97167,
+            "ppid": 97056,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:14 2026",
+            "firstObservedAt": "2026-09-09T11:18:14.857345+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 97168,
+            "ppid": 97158,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:14 2026",
+            "firstObservedAt": "2026-09-09T11:18:14.857348+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 97169,
+            "ppid": 97167,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:14 2026",
+            "firstObservedAt": "2026-09-09T11:18:14.857349+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 97204,
+            "ppid": 97056,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:16 2026",
+            "firstObservedAt": "2026-09-09T11:18:16.822812+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 97205,
+            "ppid": 97204,
+            "pgid": 97056,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:16 2026",
+            "firstObservedAt": "2026-09-09T11:18:16.822957+00:00",
+            "via": "live-owned-group"
+          }
+        ],
+        "ownedGroups": [
+          97056
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 9.727902709,
+      "endedAt": "2026-09-09T11:18:17.425329+00:00"
+    },
+    {
+      "label": "installed-head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "startedAt": "2026-09-09T11:18:17.447117+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97229,
+          501,
+          "Wed Sep 9 16:48:17 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 97229,
+            "ppid": 96791,
+            "pgid": 97229,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:17 2026",
+            "firstObservedAt": "2026-09-09T11:18:17.486001+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          97229
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.6251294170000001,
+      "endedAt": "2026-09-09T11:18:18.072258+00:00"
+    },
+    {
+      "label": "installed-status",
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "startedAt": "2026-09-09T11:18:18.103154+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97245,
+          501,
+          "Wed Sep 9 16:48:18 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 97245,
+            "ppid": 96791,
+            "pgid": 97245,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:18 2026",
+            "firstObservedAt": "2026-09-09T11:18:18.152754+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          97245
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.6704139590000011,
+      "endedAt": "2026-09-09T11:18:18.773571+00:00"
+    },
+    {
+      "label": "installed-index-flags",
+      "command": [
+        "git",
+        "ls-files",
+        "-v"
+      ],
+      "startedAt": "2026-09-09T11:18:18.805324+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97268,
+          501,
+          "Wed Sep 9 16:48:18 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 97268,
+            "ppid": 96791,
+            "pgid": 97268,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:18 2026",
+            "firstObservedAt": "2026-09-09T11:18:18.848173+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          97268
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.6921151249999973,
+      "endedAt": "2026-09-09T11:18:19.497438+00:00"
+    },
+    {
+      "label": "typecheck-tests",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+        "run",
+        "typecheck:tests"
+      ],
+      "startedAt": "2026-09-09T11:18:19.526911+00:00",
+      "timeoutSeconds": 600,
+      "exitCode": 2,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          97296,
+          501,
+          "Wed Sep 9 16:48:19 2026"
+        ],
+        "rootReaped": true,
+        "observations": 572,
+        "ownedProcesses": [
+          {
+            "pid": 97296,
+            "ppid": 96791,
+            "pgid": 97296,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:19 2026",
+            "firstObservedAt": "2026-09-09T11:18:19.565848+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 97317,
+            "ppid": 97296,
+            "pgid": 97296,
+            "uid": 501,
+            "started": "Wed Sep 9 16:48:20 2026",
+            "firstObservedAt": "2026-09-09T11:18:20.359989+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          97296
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 138.456893417,
+      "endedAt": "2026-09-09T11:20:37.985010+00:00"
+    },
+    {
+      "label": "final-head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "startedAt": "2026-09-09T11:20:38.006438+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          4324,
+          501,
+          "Wed Sep 9 16:50:38 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 4324,
+            "ppid": 96791,
+            "pgid": 4324,
+            "uid": 501,
+            "started": "Wed Sep 9 16:50:38 2026",
+            "firstObservedAt": "2026-09-09T11:20:38.028952+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          4324
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.5512673329999984,
+      "endedAt": "2026-09-09T11:20:38.557710+00:00"
+    },
+    {
+      "label": "final-status",
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "startedAt": "2026-09-09T11:20:38.575106+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          4353,
+          501,
+          "Wed Sep 9 16:50:38 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 4353,
+            "ppid": 96791,
+            "pgid": 4353,
+            "uid": 501,
+            "started": "Wed Sep 9 16:50:38 2026",
+            "firstObservedAt": "2026-09-09T11:20:38.596130+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          4353
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.5408124169999837,
+      "endedAt": "2026-09-09T11:20:39.115921+00:00"
+    },
+    {
+      "label": "final-index-flags",
+      "command": [
+        "git",
+        "ls-files",
+        "-v"
+      ],
+      "startedAt": "2026-09-09T11:20:39.132551+00:00",
+      "timeoutSeconds": 60,
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          4382,
+          501,
+          "Wed Sep 9 16:50:39 2026"
+        ],
+        "rootReaped": true,
+        "observations": 7,
+        "ownedProcesses": [
+          {
+            "pid": 4382,
+            "ppid": 96791,
+            "pgid": 4382,
+            "uid": 501,
+            "started": "Wed Sep 9 16:50:39 2026",
+            "firstObservedAt": "2026-09-09T11:20:39.151896+00:00",
+            "via": "spawned-child"
+          }
+        ],
+        "ownedGroups": [
+          4382
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 0.531987249999986,
+      "endedAt": "2026-09-09T11:20:39.664540+00:00"
+    }
+  ],
+  "helper": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/runner.py",
+    "sha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d"
+  },
+  "runnerSha256": "e6c929d4d99d5c7ede78d2e045ab4f72ccb77ecb11b7bf9b09cf0718892a40d9",
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+    "node": "/opt/homebrew/opt/node@22/bin/node",
+    "pnpm": "/opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs",
+    "childEnv": {
+      "PATH": "/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+      "HOME": "/private/tmp/amc-c16492c1-test-types-01/home",
+      "TMPDIR": "/private/tmp/amc-c16492c1-test-types-01/tmp",
+      "CI": "1",
+      "LANG": "en_US.UTF-8",
+      "TZ": "UTC",
+      "NO_COLOR": "1",
+      "GIT_CONFIG_NOSYSTEM": "1",
+      "GIT_CONFIG_GLOBAL": "/dev/null",
+      "GIT_TERMINAL_PROMPT": "0",
+      "npm_config_userconfig": "/dev/null",
+      "npm_config_globalconfig": "/dev/null",
+      "npm_config_cache": "/private/tmp/amc-c16492c1-test-types-01/home/.npm",
+      "npm_config_global": "false",
+      "XDG_CONFIG_HOME": "/private/tmp/amc-c16492c1-test-types-01/home/.config",
+      "XDG_CACHE_HOME": "/private/tmp/amc-c16492c1-test-types-01/home/.cache",
+      "XDG_DATA_HOME": "/private/tmp/amc-c16492c1-test-types-01/home/.local/share"
+    },
+    "nodeVersion": "v22.22.0",
+    "pnpmVersion": "10.33.0",
+    "nodeSha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "pnpmSha256": "b276da51dc8ca5b0d3ee3371695b50fc8b3244b281b091c63a3f082a88dadeb9"
+  },
+  "scope": "One actual pnpm run typecheck:tests after isolated frozen install; no build, test execution, source repairs, retries, full-suite or issue-Done claim",
+  "active": null,
+  "script": "tsc -p tsconfig.tests.json --noEmit",
+  "sourceFileSha256": {
+    "package.json": "43a95ae45ca8d9218191b1a72d3b4703e7c3ac820645fe394868137f8c600fa5",
+    "pnpm-lock.yaml": "b083e76289078ee768a5e872ebe85c0a405f91104539bb5a0c60a3a91d4916a9",
+    "tsconfig.tests.json": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+  },
+  "installedLockfileSha256": "b083e76289078ee768a5e872ebe85c0a405f91104539bb5a0c60a3a91d4916a9",
+  "typecheckExitCode": 2,
+  "finalCleanAtPin": true,
+  "endedAt": "2026-09-09T11:20:39.666413+00:00",
+  "durationSeconds": 165.225765041,
+  "allObservedCommandProcessesClosed": true,
+  "retainedArtifacts": "Private clone, install store, fixture directory, raw logs and process identity/cleanup records retained; no automatic deletion"
+}

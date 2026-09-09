@@ -1,0 +1,77 @@
+{
+  "label": "clone",
+  "command": [
+    "git",
+    "clone",
+    "--quiet",
+    "--no-local",
+    "--no-hardlinks",
+    "--no-checkout",
+    "/Users/sid/AgentMaturityCompass",
+    "/private/tmp/amc-phase-a-acceptance-20260909-bz3ld3j9/checkout"
+  ],
+  "startedAt": "2026-09-09T11:11:51.157937+00:00",
+  "timeoutSeconds": 300,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      82990,
+      501,
+      "Wed Sep 9 16:41:51 2026"
+    ],
+    "rootReaped": true,
+    "observations": 17,
+    "ownedProcesses": [
+      {
+        "pid": 82990,
+        "ppid": 82986,
+        "pgid": 82990,
+        "uid": 501,
+        "started": "Wed Sep 9 16:41:51 2026",
+        "firstObservedAt": "2026-09-09T11:11:51.175626+00:00",
+        "via": "spawned-child"
+      },
+      {
+        "pid": 82992,
+        "ppid": 82990,
+        "pgid": 82990,
+        "uid": 501,
+        "started": "Wed Sep 9 16:41:51 2026",
+        "firstObservedAt": "2026-09-09T11:11:51.393071+00:00",
+        "via": "observed-parent"
+      },
+      {
+        "pid": 82993,
+        "ppid": 82992,
+        "pgid": 82990,
+        "uid": 501,
+        "started": "Wed Sep 9 16:41:51 2026",
+        "firstObservedAt": "2026-09-09T11:11:51.393100+00:00",
+        "via": "live-owned-group"
+      },
+      {
+        "pid": 82994,
+        "ppid": 82990,
+        "pgid": 82990,
+        "uid": 501,
+        "started": "Wed Sep 9 16:41:51 2026",
+        "firstObservedAt": "2026-09-09T11:11:51.393102+00:00",
+        "via": "observed-parent"
+      }
+    ],
+    "ownedGroups": [
+      82990
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 2.745584707998205,
+  "endedAt": "2026-09-09T11:11:53.903545+00:00"
+}

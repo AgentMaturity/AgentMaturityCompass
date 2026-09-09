@@ -1,0 +1,26 @@
+Scope: all 12 workspace projects
+ WARN  There are cyclic workspace dependencies: /private/tmp/amc-c16492c1-test-types-01/checkout/vendor/cordis, /private/tmp/amc-c16492c1-test-types-01/checkout/vendor/include
+Lockfile is up to date, resolution step is skipped
+Packages: +359
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 0, downloaded 1, added 0
+Progress: resolved 0, reused 0, downloaded 79, added 40
+Progress: resolved 0, reused 0, downloaded 242, added 159
+Progress: resolved 0, reused 0, downloaded 355, added 356
+Progress: resolved 0, reused 0, downloaded 356, added 358
+Progress: resolved 0, reused 0, downloaded 357, added 358
+Progress: resolved 0, reused 0, downloaded 357, added 359, done
+node_modules/better-sqlite3 install$ prebuild-install || node-gyp rebuild --release
+node_modules/esbuild postinstall$ node install.js
+node_modules/esbuild postinstall: Done
+node_modules/better-sqlite3 install: Done
+
+devDependencies:
++ @amc/cordis 4.0.1 <- vendor/cordis
++ @amc/cordis-plugin-loader 1.0.2 <- vendor/loader
++ @amc/core 0.1.0 <- packages/amc-core
++ @amc/schemastery 3.18.1 <- vendor/schemastery
+
+. postinstall$ node scripts/postinstall.js || true
+. postinstall: Done
+Done in 9s using pnpm v10.33.0

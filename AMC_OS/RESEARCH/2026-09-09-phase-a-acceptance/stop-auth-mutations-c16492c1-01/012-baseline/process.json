@@ -1,0 +1,30 @@
+{
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/subagentStopConditions.test.ts",
+    "tests/delegateTool.test.ts",
+    "tests/kernelDelegationGrant.test.ts",
+    "tests/nativeDelegationInheritance.test.ts",
+    "tests/cliDelegateFlag.test.ts",
+    "tests/studioAgentCredentialBinding.test.ts",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=json",
+    "--outputFile=/private/tmp/amc-c16492c1-stop-auth-receipts-01/012-baseline/vitest.json"
+  ],
+  "cwd": "/private/tmp/amc-c16492c1-stop-auth-clone-01",
+  "startedAt": 1788952499.472254,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "processGroup": 85945,
+    "signals": [],
+    "closed": true
+  },
+  "pid": 85945,
+  "exitCode": 1,
+  "finishedAt": 1788952615.9804852,
+  "durationSeconds": 116.50757583300583
+}

@@ -1,0 +1,38 @@
+# Phase A candidate acceptance — September 9, 2026
+
+## Current final batch
+
+Candidate `c16492c10592112fe610bd2e59f216f8f7f310b4` failed complete acceptance in a fresh independently installed clone on Darwin 25.6.0 ARM64 / Node 22.22.0. The full suite measured **12,263 total: 12,233 passed, 30 failed, 0 pending/todo**. The release gate measured **10 of 14 executed checks passed, 4 failed, 1 skipped**: test types, full suite, architecture limits and runtime dependency audit failed; live deployment health was skipped because no live URL was configured. Focused spill and stop/auth baselines also failed (77/79 and106/126 passed); no mutations were applied. The independent test typecheck recorded67 diagnostics. All observed command processes closed. The full-suite clone retains eight tracked test-key/public-history changes; it is not clean after execution. Root is repairing the complete failure batch before freezing a new candidate. Immutable receipts: `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/result.md`, `spill-mutations-c16492c1-01/`, `stop-auth-mutations-c16492c1-01/` and `test-types-c16492c1-01/`. No issue Done, full-suite pass, deployed release or comparative ranking is claimed.
+
+## Original failed candidate
+
+Status: **failed**. This record does not qualify any issue as Done.
+
+Candidate: `0fcce267ad52141dbec68af02a4af665211609bd`, integration branch `amc/gap-register-execution`. This includes runtime/source changes through `753da010` and the subsequent plan/ownership record commit. Fresh clone: `/private/tmp/amc-phase-a-acceptance-20260909-na5ukpgu/checkout`; isolated HOME is its sibling `home` directory. The clone was clean before dependency installation.
+
+Environment: Darwin 25.6.0 ARM64, Node 22.22.0; package-pinned pnpm 10.33.0. Source/environment/command results and process status are recorded in `source.json`. The frozen install completed with exit zero. The actual full release gate finished with exit1. The structured full suite reports11,848 total:11,842 passed,6 failed,0 pending. Gate counts are11 passed /3 failed /1 skipped (14 executed,15 registered). The failed steps are full-test-suite, architecture-boundaries and runtime-dependency-audit. Live-deploy-health was skipped because AMC_RELEASE_GATE_LIVE_URL was absent. The command process was reaped; source.json names tracked signing-key/history files modified within this disposable clone. These are not copied into root. release-gate.log and release-gate.json retain the full disposition.
+
+No source generator ran in the shared root; root dependencies and other worktrees remain untouched. The earlier API generation clone, initial nullable-reference failure, correction and warning output remain separate preparation records under `../2026-09-09-api-reference-recovery/`. They are not substituted for this candidate's acceptance.
+
+Remaining after the gate: inspect actual outcomes, correct demonstrated defects, perform targeted security mutations and native UI/installed cancellation acceptance, and retain exact bounds before any Linear closure. The cancellation helper preparation lives in `cancellation/`, using the corrected interruption expectations and an install-before-qualification sequence. Prior failed attempts remain immutable.
+
+This local candidate cannot establish human usability, a broader native platform matrix, matched real-model superiority, public npm publication, deployed Studio health or independent standard adoption. The required human first-use participants/recordings have been requested while other work continues. Graphify remains stopped. Any live-deployment check skipped by the gate must remain explicitly skipped.
+
+Tracking: [AMC-1505](https://linear.app/agentmaturitycompass/issue/AMC-1505), [AMC-1508](https://linear.app/agentmaturitycompass/issue/AMC-1508), [AMC-1509](https://linear.app/agentmaturitycompass/issue/AMC-1509), [AMC-1538](https://linear.app/agentmaturitycompass/issue/AMC-1538), and recovery issues AMC-1540 through AMC-1544.
+
+## Historical correction follow-through — before final runtime batch
+
+That historical tracker snapshot had **39 children: 31 In Review, 8 In Progress, no Backlog**. No issue has been closed from historical or partial evidence. The read-only audit and reconciliation remain dated at `7bd1e8ce8e0b38c71f2d9792cd2e2043a1c3c544`; old worktrees and the shared stash are preserved.
+
+**The first complete candidate acceptance failed.** Fresh clean source `0fcce267ad52141dbec68af02a4af665211609bd`, Darwin 25.6.0 ARM64, Node 22.22.0 and pnpm 10.33.0, completed its frozen install. The full suite measured **11,848 total: 11,842 passed, 6 failed, 0 pending**. The gate recorded **11 of 14 executed checks passed, 3 failed, 1 skipped**. Failures were the full suite, architecture limits and runtime dependency audit. Live deployment health was skipped because `AMC_RELEASE_GATE_LIVE_URL` was absent. The original logs and result remain immutable in `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/`.
+
+Corrections are integrated through `c2a7b41783a5cfb30c70facaf01cd27669a58b3a`. Commit `46f91e70` separates managed-hook credential verification into a small module, shortens the public barrel comment, fixes the current Anthropic encoder expectation and immutable-ledger tamper fixture, and gives complete API-site artifact builds measured time budgets plus a narrow generated-reference link check. Commits `7ad47529` / `c2a7b417` update the affected runtime dependencies; the actual lock resolutions are js-yaml 4.3.2 and Hono 4.13.7. This fixes source and dependency inputs; it does not establish that a rebuilt candidate passes. Existing AMC-483 tracks the dependency gate correction.
+
+The recovered native retry, closed-task archive, authenticated revocation, API documentation, nullable contract publication and source-install work remains integrated. No DSH or Pi runtime is introduced. API preparation and its omitted-type warnings remain separate dated evidence; it is not complete API coverage. Next: integrate the remaining owned implementation, qualify one fresh corrected candidate, run targeted security mutations and native UI/installed cancellation acceptance, then apply the per-issue Done contract.
+
+Sid authorized **Chat on Steroids alongside Codex**, with **GPT-6 Pro for every Chat on Steroids task**. The installed 2.0.8 app is connected and its task **Implement AMC Evidence Intake** is active in isolated branch `codex/cos-human-first-use`, worktree `tmp/cos-human-first-use`. It is implementing local human first-use intake validation and an operator guide for AMC-1512/AMC-1518. Codex owns integration; authored tests are deferred until implementation finishes. Actual human participants/recordings remain requested, and an intake tool cannot authenticate human participation.
+
+AMC-1512 real-provider/human evidence, AMC-1518 matched outcomes, AMC-1530 broader native platforms and AMC-1538 independent cancellation verification remain open. Public release, deployed health, measured superiority and independent standard adoption remain unproven. Graphify remains stopped.
+
+Records: `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/README.md`, its `dependency-repair/` record, and `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/README.md`. [Linear epic](https://linear.app/agentmaturitycompass/issue/AMC-1505).
+

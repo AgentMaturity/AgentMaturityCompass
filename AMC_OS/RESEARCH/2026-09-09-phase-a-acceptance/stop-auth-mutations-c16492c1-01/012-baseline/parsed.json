@@ -1,0 +1,844 @@
+{
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/subagentStopConditions.test.ts",
+    "tests/delegateTool.test.ts",
+    "tests/kernelDelegationGrant.test.ts",
+    "tests/nativeDelegationInheritance.test.ts",
+    "tests/cliDelegateFlag.test.ts",
+    "tests/studioAgentCredentialBinding.test.ts",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=json",
+    "--outputFile=/private/tmp/amc-c16492c1-stop-auth-receipts-01/012-baseline/vitest.json"
+  ],
+  "cwd": "/private/tmp/amc-c16492c1-stop-auth-clone-01",
+  "startedAt": 1788952499.472254,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "processGroup": 85945,
+    "signals": [],
+    "closed": true
+  },
+  "pid": 85945,
+  "exitCode": 1,
+  "finishedAt": 1788952615.9804852,
+  "durationSeconds": 116.50757583300583,
+  "folder": "/private/tmp/amc-c16492c1-stop-auth-receipts-01/012-baseline",
+  "reportPresent": true,
+  "assertions": [
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "amc agent-loop run --delegate refuses up front when the operator has not permitted the tool",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "amc agent-loop run --delegate changes what the model is offered when the flag is passed",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "amc agent-loop run --delegate offers an identical catalogue on two identical runs",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "amc agent-loop run --delegate reports the delegation bound it actually applied",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "amc agent-loop run --delegate refuses a depth that is not a number, rather than silently unbounding it",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator can scope a delegation reports the scope it will bind a delegate to",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator can scope a delegation says so when a delegate is unscoped, rather than staying quiet",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator can scope a delegation refuses an action class that is not one",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator chooses who executes a delegation defaults to the in-process driver and says so",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator chooses who executes a delegation refuses a foreign provider when there is no gateway to route it through",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator chooses who executes a delegation refuses a provider it does not have",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the operator chooses who executes a delegation refuses a provider without --delegate, rather than silently ignoring it",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the delegation options a run is given carries a foreign runner when one was resolved",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the delegation options a run is given omits the runner entirely when none was, so the kernel builds its driver",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the delegation options a run is given carries the scope, and omits it when there is none",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "the delegation options a run is given carries explicit stop conditions, including an empty operator reset, without inventing an absent bound",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration passes both repeated bounds into the actual composed run and describes their units",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration inherits signed bounds when flags are absent, replaces them explicitly, and preserves an explicit reset",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses stop options with delegation disabled: [ '--delegate-stop', 'max-turns:1' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses stop options with delegation disabled: [ '--no-delegate-stop' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses bounds if the chosen tool mode would offer no delegation",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-steps:2' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-turns:0' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-turns:01' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-turns:1.5' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-turns:9007199254740992' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'timeout-ms:2147483648' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ Array(2) ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses malformed, unknown, duplicate or unsafe bounds before a turn: [ 'max-turns:1', 'max-turns:1' ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses contradictory flags in either order: [ '--delegate-stop', …(2) ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "operator delegation stop configuration refuses contradictory flags in either order: [ '--no-delegate-stop', …(2) ]",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "a preset composes the run applies the preset's settings and says which preset it used",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "a preset composes the run lets an explicit flag win over the preset",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "a preset composes the run refuses an unknown preset, naming what exists",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/cliDelegateFlag.test.ts",
+      "fullName": "a preset composes the run refuses when the preset file does not verify",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "an agent can delegate from inside its own toolset offers `delegate` only when both its implementation capability and signed grant are present",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "an agent can delegate from inside its own toolset returns the child's own words, and nothing of the runtime's",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "an agent can delegate from inside its own toolset hands the child the ROOT's id, through the tool path too",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "depth is read from the identity, not from agentId refuses when the CALLER is already at the limit",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "depth is read from the identity, not from agentId allows a caller below the limit",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the model's arguments are not trusted pins operator stop conditions and ignores model attempts to replace them",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the model's arguments are not trusted refuses an unsupported operator stop before child execution or authorization",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the model's arguments are not trusted refuses an empty goal rather than delegating nothing",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the model's arguments are not trusted refuses a missing runAs",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "two parties must agree before an agent can delegate is denied by the signed allowlist even when the capability is granted",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the operator names the scope, not the model uses the capability's scope and ignores anything the model sends",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/delegateTool.test.ts",
+      "fullName": "the operator names the scope, not the model leaves a child unscoped when the capability names no scope",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the kernel hands over what only it has grants a capability governed as the run's own agent",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the kernel hands over what only it has grants before the first turn, so the tool is offered on it",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the kernel hands over what only it has writes the delegation rows into the PARENT's session",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the kernel hands over what only it has hands over a session that is live only while the run is",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the kernel hands over what only it has passes a maxDepth the caller chose",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the operator's delegation scope reaches the capability pins stop conditions before caller mutation during composition",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the operator's delegation scope reaches the capability refuses unsupported stops before a session or provider request is created",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the operator's delegation scope reaches the capability passes a declared scope through to the grant",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "the operator's delegation scope reaches the capability leaves it undefined when the caller declares none",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "a caller can supply its own executor uses a supplied runner instead of the in-process driver",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/kernelDelegationGrant.test.ts",
+      "fullName": "a caller can supply its own executor still builds the in-process driver when none is supplied",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance parent abort reaches the actual request, records parent cause, and removes the listener",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance aborting an idle continued child prevents later inbox insertion and closes it once",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance close during a continuation cancels before disposal and never returns partial success",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance the inherited turn ceiling stops a child before a second model request",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance grandchildren retain approval gates and a narrowed scope, and depth three is refused",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance scope intersection never interprets an empty restriction as unrestricted",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance nested delegation receives numeric minima and snapshots the configured stops",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance the production kernel grants actual recursive children with child-bound approval rows",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/nativeDelegationInheritance.test.ts",
+      "fullName": "native child cancellation and inherited governance delegate passes the actual execution abort signal before authorization",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-smsE2s/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:191:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-p4SoTB/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:203:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-4qJRVj/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:212:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-KfWyZ1/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:222:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-rz3gL9/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:236:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-M5bdNz/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:251:23\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-ycZNyI/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:251:23\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-0uhV6U/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:251:23\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-Ilp4Tw/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:251:23\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-7J1PYl/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:251:23\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-dRR3HW/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:263:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-zODsTk/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:276:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-ZL8HnL/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:287:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-1EgBRP/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:300:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-rhSsa9/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:317:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-lgbG9W/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:325:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-1jkcPE/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:337:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-Sdu9Ja/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:349:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-cpi6ra/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:363:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts",
+      "fullName": "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads",
+      "status": "failed",
+      "failureMessages": [
+        "Error: Agent config not found: /private/tmp/amc-c16492c1-stop-auth-receipts-01/tmp/amc-agent-credential-binding-Tt6VWO/.amc/agent.config.yaml\n    at loadAgentConfig (/private/tmp/amc-c16492c1-stop-auth-clone-01/src/fleet/registry.ts:370:11)\n    at fixture (/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:54:33)\n    at /private/tmp/amc-c16492c1-stop-auth-clone-01/tests/studioAgentCredentialBinding.test.ts:374:21\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-stop-auth-clone-01/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ]
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary snapshots supported canonical values without changing signed order",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary treats omitted and empty declarations as no extra bounds",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition stop when done",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:0",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:-1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:+1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:01",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:1.0",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:1e2",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns: 1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition  max-turns:1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:1 ",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:1\n",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition MAX-TURNS:1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition timeout-ms:0",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition timeout-ms:2147483648",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition max-turns:9007199254740992",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition timeout-ms:Infinity",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses unsupported or noncanonical condition unknown:2",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses duplicate kinds, malformed containers and non-string entries",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "the signed stop vocabulary refuses before minting a packet, announcing a session or invoking a runner",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation counts the initial invocation and closes immediately at max-turns:1",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation admits the final continuation, closes it, and refuses every later dispatch",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation refuses concurrent admissions without consuming a remaining turn or exposing raw continuations",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation uses snapshots of the goal, parent identity, scope and stop declarations after admission",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation preserves an unbounded retained child when conditions are undefined",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one admitted-invocation ceiling for an entire delegation preserves an unbounded retained child when conditions are []",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation keeps its timeout referenced during execution and releases that reference while idle",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation includes idle continuation time and releases the timed-out child exactly once",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation refuses late admission even before the event loop delivers the timeout callback",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation never returns a live initial handle after cancellation, even when the runner reports success",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation bounds an uncooperative initial executor, then closes its late retained resource without resettling",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation does not close a retained DB under an active continuation while timeout grace expires",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation defers active explicit close to bounded execution settlement",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation keeps the parent abort connection across idle continuations without a timeout",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation cleans timeout/listener state on a throwing continuation and never repeats settlement",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "one nonresetting lifetime timeout and bounded cancellation does not turn failed completion recording into a passing result or retry the row on timeout",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "native child integration with real session storage and scripted transport counts invocations rather than model steps and seals the native session at the final turn",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/tmp/amc-c16492c1-stop-auth-clone-01/tests/subagentStopConditions.test.ts",
+      "fullName": "native child integration with real session storage and scripted transport aborts the actual native continuation request and records cancellation before session close",
+      "status": "passed",
+      "failureMessages": []
+    }
+  ],
+  "counts": {
+    "numTotalTestSuites": 29,
+    "numPassedTestSuites": 24,
+    "numFailedTestSuites": 5,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 126,
+    "numPassedTests": 106,
+    "numFailedTests": 20,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "unhandledErrors": [],
+  "suiteMessages": [],
+  "emptyFailedSuites": []
+}

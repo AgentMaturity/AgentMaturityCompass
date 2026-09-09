@@ -1,0 +1,15 @@
+
+> agent-maturity-compass@1.2.0 prebuild /private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/checkout
+> npm run clean
+
+
+> agent-maturity-compass@1.2.0 clean
+> node scripts/clean-dist.mjs
+
+
+> agent-maturity-compass@1.2.0 build /private/tmp/amc-phase-a-acceptance-20260909-kig65j8k/checkout
+> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs
+
+src/ops/retention/retentionEngine.ts(276,52): error TS2345: Argument of type 'readonly string[]' is not assignable to parameter of type 'string[]'.
+  The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+ ELIFECYCLE  Command failed with exit code 2.

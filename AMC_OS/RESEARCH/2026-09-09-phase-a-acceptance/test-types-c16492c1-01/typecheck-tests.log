@@ -1,0 +1,91 @@
+
+> agent-maturity-compass@1.2.0 typecheck:tests /private/tmp/amc-c16492c1-test-types-01/checkout
+> tsc -p tsconfig.tests.json --noEmit
+
+tests/humanFirstUseCapture.test.ts(141,12): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(142,12): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(143,12): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(151,51): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(151,51): error TS18047: 'result.measurements.interruption' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(170,12): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(171,12): error TS18047: 'result.measurements' is possibly 'null'.
+tests/humanFirstUseCapture.test.ts(291,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseCapture.test.ts(381,74): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(410,101): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(412,85): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(415,137): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(417,102): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(418,63): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseCapture.test.ts(419,69): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(110,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(114,30): error TS2339: Property 'observer' does not exist on type '{ recordingCheck: any; recording: { path: any; sha256: any; } | null; index: any; sessionId: any; participantId: any; participation: any; status: any; errors: any; declaredOutcome: any; }'.
+tests/humanFirstUseIntake.test.ts(127,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(138,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(142,57): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(169,65): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(179,65): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(193,65): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(201,65): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(203,30): error TS2339: Property 'measurements' does not exist on type '{ recordingCheck: any; recording: { path: any; sha256: any; } | null; index: any; sessionId: any; participantId: any; participation: any; status: any; errors: any; declaredOutcome: any; }'.
+tests/humanFirstUseIntake.test.ts(211,63): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(215,59): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(221,59): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(229,65): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(244,67): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(253,63): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(256,59): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(266,62): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(279,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(283,17): error TS2531: Object is possibly 'null'.
+tests/humanFirstUseIntake.test.ts(297,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(299,21): error TS2531: Object is possibly 'null'.
+tests/humanFirstUseIntake.test.ts(306,70): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(315,33): error TS2322: Type '"2"' is not assignable to type '"1"'.
+tests/humanFirstUseIntake.test.ts(322,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(333,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(341,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseIntake.test.ts(342,12): error TS2532: Object is possibly 'undefined'.
+tests/humanFirstUseIntake.test.ts(343,12): error TS2532: Object is possibly 'undefined'.
+tests/humanFirstUseIntake.test.ts(363,101): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(378,95): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(412,95): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(422,95): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(431,73): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(432,79): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseIntake.test.ts(433,38): error TS2345: Argument of type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is not assignable to parameter of type 'Process'.
+  Type '{ stdout: { write: (text: string) => void; }; stderr: { write: (text: string) => void; }; }' is missing the following properties from type 'Process': stdin, argv, argv0, execArgv, and 64 more.
+tests/humanFirstUseObserver.test.ts(213,12): error TS18047: 'view.projection.measurements' is possibly 'null'.
+tests/humanFirstUseObserver.test.ts(214,12): error TS18047: 'view.projection.measurements' is possibly 'null'.
+tests/humanFirstUseObserver.test.ts(214,12): error TS18047: 'view.projection.measurements.refusals' is possibly 'null'.
+tests/humanFirstUseObserver.test.ts(225,47): error TS2353: Object literal may only specify known properties, and 'evidenceRoot' does not exist in type '{ generatedAt?: string | undefined; }'.
+tests/humanFirstUseObserver.test.ts(402,43): error TS2322: Type 'PassThrough' is not assignable to type 'ReadStream & { fd: 0; }'.
+  Type 'Transform' is missing the following properties from type 'ReadStream': isRaw, setRawMode, isTTY, destroySoon, and 20 more.
+tests/humanFirstUseObserver.test.ts(402,50): error TS2322: Type 'PassThrough' is not assignable to type 'WriteStream & { fd: 1; }'.
+  Type 'Transform' is missing the following properties from type 'WriteStream': clearLine, clearScreenDown, cursorTo, moveCursor, and 27 more.
+tests/humanFirstUseObserver.test.ts(402,58): error TS2740: Type 'EventEmitter<any>' is missing the following properties from type 'Process': stdout, stderr, stdin, argv, and 51 more.
+tests/humanFirstUseObserver.test.ts(414,45): error TS2322: Type 'PassThrough' is not assignable to type 'ReadStream & { fd: 0; }'.
+  Type 'Transform' is missing the following properties from type 'ReadStream': isRaw, setRawMode, isTTY, destroySoon, and 20 more.
+tests/humanFirstUseObserver.test.ts(414,52): error TS2322: Type 'PassThrough' is not assignable to type 'WriteStream & { fd: 1; }'.
+  Type 'Transform' is missing the following properties from type 'WriteStream': clearLine, clearScreenDown, cursorTo, moveCursor, and 27 more.
+tests/humanFirstUseObserver.test.ts(414,60): error TS2740: Type 'EventEmitter<any>' is missing the following properties from type 'Process': stdout, stderr, stdin, argv, and 51 more.
+tests/spillLifecycle.test.ts(92,28): error TS2345: Argument of type '"missing-object"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/spillLifecycle.test.ts(92,72): error TS2345: Argument of type '"modified-object"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/spillLifecycle.test.ts(115,29): error TS2345: Argument of type '"selected-session"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/spillLifecycle.test.ts(115,65): error TS2345: Argument of type '"other-session"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/spillLifecycle.test.ts(232,28): error TS2345: Argument of type '"not-materialized"' is not assignable to parameter of type '`${string}-${string}-${string}-${string}-${string}`'.
+tests/studioAgentCredentialBinding.test.ts(84,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ default: string; "credential-agent-b": string; }'.
+  No index signature with a parameter of type 'string' was found on type '{ default: string; "credential-agent-b": string; }'.
+ ELIFECYCLE  Command failed with exit code 2.

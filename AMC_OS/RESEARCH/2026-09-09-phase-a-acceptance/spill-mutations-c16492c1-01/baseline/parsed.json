@@ -1,0 +1,1037 @@
+{
+  "process": {
+    "argv": [
+      "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "/private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/vitest/vitest.mjs",
+      "run",
+      "tests/sessionSpillCommitment.test.ts",
+      "tests/sessionSpill.test.ts",
+      "tests/spillEncryption.test.ts",
+      "tests/spillLifecycle.test.ts",
+      "tests/retentionSpill.test.ts",
+      "tests/bundleSpill.test.ts",
+      "--maxWorkers=1",
+      "--no-file-parallelism",
+      "--reporter=json",
+      "--outputFile=/private/tmp/amc-c16492c1-spill-mutations-01/receipts/baseline/vitest.json"
+    ],
+    "cwd": "/private/tmp/amc-c16492c1-spill-mutations-01/clone",
+    "startedAt": 1788952162.887645,
+    "timeoutSeconds": 600,
+    "timedOut": false,
+    "cleanup": {
+      "processGroup": 82697,
+      "closed": true,
+      "signals": []
+    },
+    "pid": 82697,
+    "exitCode": 1,
+    "finishedAt": 1788952189.215056
+  },
+  "reportError": null,
+  "success": false,
+  "counts": {
+    "numTotalTestSuites": 14,
+    "numPassedTestSuites": 10,
+    "numFailedTestSuites": 4,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 79,
+    "numPassedTests": 77,
+    "numFailedTests": 2,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "unhandledErrors": [],
+  "suites": [
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/bundleSpill.test.ts",
+      "message": "",
+      "status": "passed",
+      "assertions": 4
+    },
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/retentionSpill.test.ts",
+      "message": "",
+      "status": "passed",
+      "assertions": 5
+    },
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/sessionSpill.test.ts",
+      "message": "",
+      "status": "failed",
+      "assertions": 15
+    },
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/sessionSpillCommitment.test.ts",
+      "message": "",
+      "status": "passed",
+      "assertions": 15
+    },
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/spillEncryption.test.ts",
+      "message": "",
+      "status": "passed",
+      "assertions": 25
+    },
+    {
+      "name": "/private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/spillLifecycle.test.ts",
+      "message": "",
+      "status": "failed",
+      "assertions": 15
+    }
+  ],
+  "assertions": [
+    {
+      "ancestorTitles": [
+        "portable evidence bundles retain encrypted spill commitments and explicit gaps"
+      ],
+      "fullName": "portable evidence bundles retain encrypted spill commitments and explicit gaps exports actual ciphertext with no raw spill or private key and verifies completeness without a vault",
+      "status": "passed",
+      "title": "exports actual ciphertext with no raw spill or private key and verifies completeness without a vault",
+      "duration": 596.031625,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "portable evidence bundles retain encrypted spill commitments and explicit gaps"
+      ],
+      "fullName": "portable evidence bundles retain encrypted spill commitments and explicit gaps names originally missing encrypted objects and excluded legacy plaintext without fabricating completeness",
+      "status": "passed",
+      "title": "names originally missing encrypted objects and excluded legacy plaintext without fabricating completeness",
+      "duration": 469.852584,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "portable evidence bundles retain encrypted spill commitments and explicit gaps"
+      ],
+      "fullName": "portable evidence bundles retain encrypted spill commitments and explicit gaps rejects a ciphertext-only attack despite a genuinely re-signed bundle manifest",
+      "status": "passed",
+      "title": "rejects a ciphertext-only attack despite a genuinely re-signed bundle manifest",
+      "duration": 488.94229199999995,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "portable evidence bundles retain encrypted spill commitments and explicit gaps"
+      ],
+      "fullName": "portable evidence bundles retain encrypted spill commitments and explicit gaps rejects a index-also-forged attack despite a genuinely re-signed bundle manifest",
+      "status": "passed",
+      "title": "rejects a index-also-forged attack despite a genuinely re-signed bundle manifest",
+      "duration": 477.5516670000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retention reaches committed spill objects without selecting active sessions"
+      ],
+      "fullName": "retention reaches committed spill objects without selecting active sessions prunes the encrypted object for an expired signed closed session and records exact erasure outcomes",
+      "status": "passed",
+      "title": "prunes the encrypted object for an expired signed closed session and records exact erasure outcomes",
+      "duration": 397.8029590000001,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retention reaches committed spill objects without selecting active sessions"
+      ],
+      "fullName": "retention reaches committed spill objects without selecting active sessions makes retention progress when a backlog exceeds one signed audit payload while keeping every locator's exact references together",
+      "status": "passed",
+      "title": "makes retention progress when a backlog exceeds one signed audit payload while keeping every locator's exact references together",
+      "duration": 436.88024999999993,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retention reaches committed spill objects without selecting active sessions"
+      ],
+      "fullName": "retention reaches committed spill objects without selecting active sessions preserves an old active session, a young closed session and an old result whose close is recent",
+      "status": "passed",
+      "title": "preserves an old active session, a young closed session and an old result whose close is recent",
+      "duration": 342.95291700000007,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retention reaches committed spill objects without selecting active sessions"
+      ],
+      "fullName": "retention reaches committed spill objects without selecting active sessions dry run leaves expired retained bytes and result payloads intact",
+      "status": "passed",
+      "title": "dry run leaves expired retained bytes and result payloads intact",
+      "duration": 275.8857919999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retention reaches committed spill objects without selecting active sessions"
+      ],
+      "fullName": "retention reaches committed spill objects without selecting active sessions a forged spill reference blocks erasure even when the real object and session are expired",
+      "status": "passed",
+      "title": "a forged spill reference blocks erasure even when the real object and session are expired",
+      "duration": 280.4530840000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not leaves an under-threshold result completely alone",
+      "status": "passed",
+      "title": "leaves an under-threshold result completely alone",
+      "duration": 301.84662500000013,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not spills an oversized result: the model reads a preview, the event commits to the full bytes",
+      "status": "passed",
+      "title": "spills an oversized result: the model reads a preview, the event commits to the full bytes",
+      "duration": 267.0217910000001,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not retrieves the exact original bytes through the locator",
+      "status": "passed",
+      "title": "retrieves the exact original bytes through the locator",
+      "duration": 277.30045900000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not keeps the spill directory 0700 and the object 0600",
+      "status": "passed",
+      "title": "keeps the spill directory 0700 and the object 0600",
+      "duration": 235.64349999999968,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not detects a tampered spill file whose length is unchanged",
+      "status": "passed",
+      "title": "detects a tampered spill file whose length is unchanged",
+      "duration": 240.7268750000003,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not detects a spill file that grew, without reading it",
+      "status": "passed",
+      "title": "detects a spill file that grew, without reading it",
+      "duration": 231.71900000000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not reports a deleted spill object as missing, not as tampering",
+      "status": "passed",
+      "title": "reports a deleted spill object as missing, not as tampering",
+      "duration": 231.86737500000027,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not refuses retrieval when the commitment itself was edited to match a swapped file",
+      "status": "passed",
+      "title": "refuses retrieval when the commitment itself was edited to match a swapped file",
+      "duration": 249.4466250000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not refuses retrieval when the commitment was edited and the event_hash recomputed to match",
+      "status": "passed",
+      "title": "refuses retrieval when the commitment was edited and the event_hash recomputed to match",
+      "duration": 250.61466699999983,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not does not follow a symlink planted in place of a spill object",
+      "status": "passed",
+      "title": "does not follow a symlink planted in place of a spill object",
+      "duration": 234.5370840000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not refuses retrieval when the row was re-signed with a substituted monitor key",
+      "status": "passed",
+      "title": "refuses retrieval when the row was re-signed with a substituted monitor key",
+      "duration": 256.731667,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not rejects a locator that tries to name a path outside the session directory",
+      "status": "passed",
+      "title": "rejects a locator that tries to name a path outside the session directory",
+      "duration": 235.31004099999973,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not degrades honestly when the spill store cannot write: no locator, but still a commitment",
+      "status": "failed",
+      "title": "degrades honestly when the spill store cannot write: no locator, but still a commitment",
+      "duration": 224.50462499999958,
+      "failureMessages": [
+        "AssertionError: an unretrievable spill is a gap, not a forgery: expected false to be true // Object.is equality\n    at /private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/sessionSpill.test.ts:472:72\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not authenticates and retrieves an explicitly historical plaintext v1 object",
+      "status": "passed",
+      "title": "authenticates and retrieves an explicitly historical plaintext v1 object",
+      "duration": 231.4674589999995,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "spill — oversized tool output leaves the ledger, its commitment does not"
+      ],
+      "fullName": "spill — oversized tool output leaves the ledger, its commitment does not refuses a policy whose preview budget would not shrink anything",
+      "status": "passed",
+      "title": "refuses a policy whose preview budget would not shrink anything",
+      "duration": 165.51587500000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence admits the signed non-surface commitment before any spill file, then admits the result after persistence",
+      "status": "passed",
+      "title": "admits the signed non-surface commitment before any spill file, then admits the result after persistence",
+      "duration": 337.554166,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a commitment failure at before-admission never persists an object or publishes a result",
+      "status": "passed",
+      "title": "a commitment failure at before-admission never persists an object or publishes a result",
+      "duration": 231.97250000000008,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a commitment failure at after-commit-return-lost never persists an object or publishes a result",
+      "status": "passed",
+      "title": "a commitment failure at after-commit-return-lost never persists an object or publishes a result",
+      "duration": 227.61950000000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a final result admission failure leaves encrypted bytes discoverable through the durable commitment",
+      "status": "passed",
+      "title": "a final result admission failure leaves encrypted bytes discoverable through the durable commitment",
+      "duration": 258.9710829999999,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence missing current-key signature produces only an explicit unretrievable preview and creates no key",
+      "status": "passed",
+      "title": "missing current-key signature produces only an explicit unretrievable preview and creates no key",
+      "duration": 226.95749999999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence unavailable vault cannot produce a signed result or spill plaintext, fallback keys or replacement material",
+      "status": "passed",
+      "title": "unavailable vault cannot produce a signed result or spill plaintext, fallback keys or replacement material",
+      "duration": 221.71320899999978,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence missing versioned key material on read is key-unavailable and never regenerated",
+      "status": "passed",
+      "title": "missing versioned key material on read is key-unavailable and never regenerated",
+      "duration": 289.28933300000017,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence refuses a spill-root symlink without creating or changing files through it",
+      "status": "passed",
+      "title": "refuses a spill-root symlink without creating or changing files through it",
+      "duration": 227.0904999999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence refuses a session-directory symlink without creating or changing files through it",
+      "status": "passed",
+      "title": "refuses a session-directory symlink without creating or changing files through it",
+      "duration": 221.41575000000012,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: 17",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: 17",
+      "duration": 217.98241700000017,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: []",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: []",
+      "duration": 214.62529200000017,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: {}",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: {}",
+      "duration": 216.83233299999984,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":99}",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":99}",
+      "duration": 214.01587500000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":2,\"format\":\"plaintext\"}",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":2,\"format\":\"plaintext\"}",
+      "duration": 217.02824999999984,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "signed spill commitment precedes encrypted persistence"
+      ],
+      "fullName": "signed spill commitment precedes encrypted persistence a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":1,\"bytes\":-1}",
+      "status": "passed",
+      "title": "a signed malformed spill declaration is invalid-reference rather than not-spilled: {\"v\":1,\"bytes\":-1}",
+      "duration": 215.90574999999944,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication prepares only in memory and publishes encrypted bytes from the input snapshot",
+      "status": "passed",
+      "title": "prepares only in memory and publishes encrypted bytes from the input snapshot",
+      "duration": 300.322125,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication requires a completed commitment callback before any publication",
+      "status": "passed",
+      "title": "requires a completed commitment callback before any publication",
+      "duration": 235.13875000000007,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses asynchronous commitment callbacks without writing",
+      "status": "passed",
+      "title": "refuses asynchronous commitment callbacks without writing",
+      "duration": 217.7640409999999,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication finishes short writes instead of publishing a truncated object",
+      "status": "passed",
+      "title": "finishes short writes instead of publishing a truncated object",
+      "duration": 226.01683400000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication removes its partial file when a write makes no progress",
+      "status": "passed",
+      "title": "removes its partial file when a write makes no progress",
+      "duration": 219.39200000000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication does not overwrite a name planted after preparation",
+      "status": "passed",
+      "title": "does not overwrite a name planted after preparation",
+      "duration": 215.26825000000008,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses no-sign mode without creating an unvaulted spill key",
+      "status": "passed",
+      "title": "refuses no-sign mode without creating an unvaulted spill key",
+      "duration": 223.06370900000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication does not repair missing current key metadata",
+      "status": "passed",
+      "title": "does not repair missing current key metadata",
+      "duration": 215.99937499999987,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication does not repair missing current key signature",
+      "status": "passed",
+      "title": "does not repair missing current key signature",
+      "duration": 213.15183300000035,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication rejects tampered current metadata instead of selecting its unverified version",
+      "status": "passed",
+      "title": "rejects tampered current metadata instead of selecting its unverified version",
+      "duration": 210.07799999999997,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses unsigned or tampered operations policy before trusting its size limit",
+      "status": "passed",
+      "title": "refuses unsigned or tampered operations policy before trusting its size limit",
+      "duration": 209.9498749999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses signed unsupported key version 0 before encoding",
+      "status": "passed",
+      "title": "refuses signed unsupported key version 0 before encoding",
+      "duration": 210.26095900000018,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses signed unsupported key version 4294967296 before encoding",
+      "status": "passed",
+      "title": "refuses signed unsupported key version 4294967296 before encoding",
+      "duration": 212.3159999999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication distinguishes unavailable key material from missing or corrupt evidence",
+      "status": "passed",
+      "title": "distinguishes unavailable key material from missing or corrupt evidence",
+      "duration": 263.780041,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication uses read-only vault access when supplied, then refuses after credentials disappear",
+      "status": "passed",
+      "title": "uses read-only vault access when supplied, then refuses after credentials disappear",
+      "duration": 246.7657089999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication reads historical keys after rotation even when current metadata disappears",
+      "status": "passed",
+      "title": "reads historical keys after rotation even when current metadata disappears",
+      "duration": 265.9488330000004,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication rejects changed ciphertext and donor objects without plaintext downgrade",
+      "status": "passed",
+      "title": "rejects changed ciphertext and donor objects without plaintext downgrade",
+      "duration": 227.1242919999995,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication checks the authentication tag even when a supplied envelope digest matches",
+      "status": "passed",
+      "title": "checks the authentication tag even when a supplied envelope digest matches",
+      "duration": 237.9307919999992,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication rejects malformed framing and cross-session AAD even with a matching encoded digest",
+      "status": "passed",
+      "title": "rejects malformed framing and cross-session AAD even with a matching encoded digest",
+      "duration": 227.01949999999943,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication returns no bytes after a regular object is replaced during its descriptor read",
+      "status": "passed",
+      "title": "returns no bytes after a regular object is replaced during its descriptor read",
+      "duration": 223.09529100000054,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses symbolic and hard linked objects for reading and erasure",
+      "status": "passed",
+      "title": "refuses symbolic and hard linked objects for reading and erasure",
+      "duration": 225.8331250000001,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication refuses a linked parent and an exposed private directory",
+      "status": "passed",
+      "title": "refuses a linked parent and an exposed private directory",
+      "duration": 216.87029100000018,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication restores authenticated ciphertext without keys and never overwrites it",
+      "status": "passed",
+      "title": "restores authenticated ciphertext without keys and never overwrites it",
+      "duration": 232.3537499999993,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication reads v1 plaintext only by an explicit legacy reference and excludes it from transport",
+      "status": "passed",
+      "title": "reads v1 plaintext only by an explicit legacy reference and excludes it from transport",
+      "duration": 212.30670800000007,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "retained spill encryption and publication"
+      ],
+      "fullName": "retained spill encryption and publication preserves both v2 unavailable forms and refuses unsupported reference versions",
+      "status": "passed",
+      "title": "preserves both v2 unavailable forms and refuses unsupported reference versions",
+      "duration": 209.518916,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "authenticated spill inventory"
+      ],
+      "fullName": "authenticated spill inventory deduplicates the commitment and actual result without decrypting ciphertext",
+      "status": "passed",
+      "title": "deduplicates the commitment and actual result without decrypting ciphertext",
+      "duration": 264.39133300000003,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "authenticated spill inventory"
+      ],
+      "fullName": "authenticated spill inventory refuses altered metadata before a narrowed erase scope can hide it",
+      "status": "passed",
+      "title": "refuses altered metadata before a narrowed erase scope can hide it",
+      "duration": 191.97395900000004,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "authenticated spill inventory"
+      ],
+      "fullName": "authenticated spill inventory refuses conflicting independently signed references and cross-session locators",
+      "status": "passed",
+      "title": "refuses conflicting independently signed references and cross-session locators",
+      "duration": 189.3605,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "authenticated spill inventory"
+      ],
+      "fullName": "authenticated spill inventory distinguishes missing encrypted objects from modified ciphertext",
+      "status": "passed",
+      "title": "distinguishes missing encrypted objects from modified ciphertext",
+      "duration": 192.10916700000007,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "explicit local spill erasure"
+      ],
+      "fullName": "explicit local spill erasure rejects empty scope and scope that leaves another signed reference outside it",
+      "status": "passed",
+      "title": "rejects empty scope and scope that leaves another signed reference outside it",
+      "duration": 190.177958,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "explicit local spill erasure"
+      ],
+      "fullName": "explicit local spill erasure signs intention before real unlink and records exact outcomes while preserving other sessions",
+      "status": "failed",
+      "title": "signs intention before real unlink and records exact outcomes while preserving other sessions",
+      "duration": 212.53787499999999,
+      "failureMessages": [
+        "AssertionError: expected false to be true // Object.is equality\n    at /private/tmp/amc-c16492c1-spill-mutations-01/clone/tests/spillLifecycle.test.ts:129:55\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/amc-c16492c1-spill-mutations-01/clone/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "explicit local spill erasure"
+      ],
+      "fullName": "explicit local spill erasure leaves bytes untouched when the signed intention cannot be written",
+      "status": "passed",
+      "title": "leaves bytes untouched when the signed intention cannot be written",
+      "duration": 188.38529100000028,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "explicit local spill erasure"
+      ],
+      "fullName": "explicit local spill erasure does not report success when final outcome signing fails after deletion",
+      "status": "passed",
+      "title": "does not report success when final outcome signing fails after deletion",
+      "duration": 231.05816700000014,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "explicit local spill erasure"
+      ],
+      "fullName": "explicit local spill erasure explicitly purges legacy plaintext while automatic export excludes it",
+      "status": "passed",
+      "title": "explicitly purges legacy plaintext while automatic export excludes it",
+      "duration": 184.55595799999992,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport exports and restores ciphertext with locked keys, preserving origin and refusing overwrite",
+      "status": "passed",
+      "title": "exports and restores ciphertext with locked keys, preserving origin and refusing overwrite",
+      "duration": 215.2888750000002,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport never trusts an export index without the destination's authenticated rows",
+      "status": "passed",
+      "title": "never trusts an export index without the destination's authenticated rows",
+      "duration": 190.7529159999999,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport preflights altered ciphertext and repointed index entries before creating any destination object",
+      "status": "passed",
+      "title": "preflights altered ciphertext and repointed index entries before creating any destination object",
+      "duration": 192.05104200000005,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport allows an operator-selected root alias but rejects planted transport file or subtree links",
+      "status": "passed",
+      "title": "allows an operator-selected root alias but rejects planted transport file or subtree links",
+      "duration": 197.47483299999976,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport exports under an explicitly selected parent alias without rejecting its canonical ancestry",
+      "status": "passed",
+      "title": "exports under an explicitly selected parent alias without rejecting its canonical ancestry",
+      "duration": 192.03337499999998,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    {
+      "ancestorTitles": [
+        "encrypted spill transport"
+      ],
+      "fullName": "encrypted spill transport reports omitted and unavailable references as gaps instead of a complete restore",
+      "status": "passed",
+      "title": "reports omitted and unavailable references as gaps instead of a complete restore",
+      "duration": 177.60945800000036,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    }
+  ]
+}

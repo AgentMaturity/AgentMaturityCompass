@@ -1,0 +1,49 @@
+{
+  "label": "checkout",
+  "command": [
+    "git",
+    "-c",
+    "core.hooksPath=/dev/null",
+    "checkout",
+    "--quiet",
+    "--detach",
+    "c16492c10592112fe610bd2e59f216f8f7f310b4"
+  ],
+  "startedAt": "2026-09-09T11:11:53.923139+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      83023,
+      501,
+      "Wed Sep 9 16:41:53 2026"
+    ],
+    "rootReaped": true,
+    "observations": 10,
+    "ownedProcesses": [
+      {
+        "pid": 83023,
+        "ppid": 82986,
+        "pgid": 83023,
+        "uid": 501,
+        "started": "Wed Sep 9 16:41:53 2026",
+        "firstObservedAt": "2026-09-09T11:11:53.945243+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      83023
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 1.221632665998186,
+  "endedAt": "2026-09-09T11:11:55.144768+00:00"
+}

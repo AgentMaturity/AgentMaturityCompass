@@ -1,6 +1,6 @@
 {
   "date": "2026-09-09T10:22:34.325656+00:00",
-  "status": "goal-running",
+  "status": "integrated-qualification-pending",
   "conversation": "Implement AMC Commands",
   "model": "GPT-6 Pro",
   "goalConfigured": true,
@@ -27,9 +27,17 @@
     "Stop turn"
   ],
   "assistantResponseRunningObserved": true,
-  "assistantSourceReadsObserved": false,
+  "assistantSourceReadsObserved": true,
   "openerFailure": "timeout_or_cancelled",
   "recovery": "Direct composer dispatch; delivery confirmed with saved Goal pursuing on GPT-6 Pro.",
   "confirmedAt": "2026-09-09T10:28:32.653016+00:00",
-  "timeoutReviewAt": "2026-09-09T10:58:32.653016+00:00"
+  "timeoutReviewAt": "2026-09-09T10:58:32.653016+00:00",
+  "completedAt": "2026-09-09T11:02:18.051231+00:00",
+  "goalPaused": true,
+  "finalResponseObserved": true,
+  "idleObserved": true,
+  "workerCommit": "7c0f01bf73fb64845362bda20cd456e9bc6af31e",
+  "mergeCommit": "0f4b10a4553d1c652e4b0e07a705acf7d9bd45bd",
+  "registrationCommit": "68458818799d1db7826d67d1b604d6ad77ac4432",
+  "finishBoundary": "Completion marker and final response observed; redundant queued finish instruction canceled; Send message idle state observed."
 }
