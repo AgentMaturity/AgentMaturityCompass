@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
@@ -19,6 +19,7 @@ import {
   resolveSpillPolicyConfig,
   type SpillRef
 } from "../src/session/spill/spillTypes.js";
+import { lockVault } from "../src/vault/vault.js";
 import { loadBlobPlaintext } from "../src/storage/blobs/blobStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
@@ -51,16 +52,22 @@ function bigOutput(): string {
 describe("spill — oversized tool output leaves the ledger, its commitment does not", () => {
   let dir: string;
   let priorPass: string | undefined;
+  let priorNoSign: string | undefined;
 
   beforeEach(() => {
     priorPass = process.env["AMC_VAULT_PASSPHRASE"];
+    priorNoSign = process.env.AMC_NO_SIGN;
+    delete process.env.AMC_NO_SIGN;
     process.env["AMC_VAULT_PASSPHRASE"] = PASS;
     dir = mkdtempSync(join(tmpdir(), "amc-spill-"));
     initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
   });
 
   afterEach(() => {
+    lockVault(dir);
     rmSync(dir, { recursive: true, force: true });
+    if (priorNoSign === undefined) delete process.env.AMC_NO_SIGN;
+    else process.env.AMC_NO_SIGN = priorNoSign;
     if (priorPass === undefined) {
       delete process.env["AMC_VAULT_PASSPHRASE"];
     } else {
@@ -69,40 +76,49 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
   });
 
   /** One turn, one tool call, one result of the caller's choosing. */
-  function runSessionWith(content: string): string {
+  function runSessionWith(content: string, sessionId = "spill-session", donorContent?: string): string {
     const service = new SessionService(dir, undefined, SPILL_CONFIG);
-    service.open({
-      sessionId: "spill-session",
-      agentId: "default",
-      harnessVersion: "2.3.0",
-      compositionDigest: sha256Hex("composition"),
-      policyDigest: sha256Hex("policy")
-    });
-    service.startTurn({ trigger: "user" });
-    service.startStep();
-    service.recordToolCall({
-      toolCallId: "call-1",
-      toolName: "grep",
-      dispatch: "native",
-      parentToken: null,
-      args: JSON.stringify({ pattern: "x" })
-    });
-    service.recordToolResult({
-      toolCallId: "call-1",
-      outcome: "OK",
-      exitCode: 0,
-      timedOut: false,
-      denied: false,
-      content
-    });
-    service.endStep({
-      stopReason: "end_turn",
-      usage: { inputTokens: 10, outputTokens: 10, cacheRead: 0, cacheWrite: 0 }
-    });
-    service.endTurn({ reason: "complete" });
-    service.sealTurn();
-    service.close({ reason: "done" });
-    return service.sessionId;
+    let closed = false;
+    try {
+      service.open({
+        sessionId,
+        agentId: "default",
+        harnessVersion: "2.3.0",
+        compositionDigest: sha256Hex("composition"),
+        policyDigest: sha256Hex("policy")
+      });
+      service.startTurn({ trigger: "user" });
+      service.startStep();
+      service.recordToolCall({
+        toolCallId: "call-1",
+        toolName: "grep",
+        dispatch: "native",
+        parentToken: null,
+        args: JSON.stringify({ pattern: "x" })
+      });
+      service.recordToolResult({
+        toolCallId: "call-1",
+        outcome: "OK",
+        exitCode: 0,
+        timedOut: false,
+        denied: false,
+        content
+      });
+      if (donorContent !== undefined) {
+        service.recordToolCall({ toolCallId: "call-2", toolName: "grep", dispatch: "native", parentToken: null, args: "{}" });
+        service.recordToolResult({ toolCallId: "call-2", outcome: "OK", exitCode: 0,
+          timedOut: false, denied: false, content: donorContent });
+      }
+      service.endStep({
+        stopReason: "end_turn",
+        usage: { inputTokens: 10, outputTokens: 10, cacheRead: 0, cacheWrite: 0 }
+      });
+      service.endTurn({ reason: "complete" });
+      service.sealTurn();
+      service.close({ reason: "done" });
+      closed = true;
+      return service.sessionId;
+    } finally { if (!closed) service.disposeWithoutClosing(); }
   }
 
   function allEvents(): EvidenceEvent[] {
@@ -114,8 +130,9 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     }
   }
 
-  function toolResultEvent(): EvidenceEvent {
-    const event = allEvents().find((row) => row.event_type === "tool/result");
+  function toolResultEvent(sessionId = "spill-session", toolCallId = "call-1"): EvidenceEvent {
+    const event = allEvents().find((row) => row.event_type === "tool/result" && row.session_id === sessionId
+      && JSON.parse(row.meta_json).toolCallId === toolCallId);
     expect(event, "the session recorded a tool/result row").toBeDefined();
     return event!;
   }
@@ -163,6 +180,8 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     const ref = spillRef(event);
 
     // The commitment is over the FULL output, not the preview.
+    expect(ref.v).toBe(2);
+    expect(ref.locator).toMatch(/^amc-spill:v2:/);
     expect(ref.contentSha256).toBe(sha256Hex(fullBytes));
     expect(ref.bytes).toBe(fullBytes.byteLength);
     expect(ref.locator).not.toBeNull();
@@ -211,7 +230,8 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     // nothing would also report ok).
     const sweep = verifySpilledContent(dir, allEvents());
     expect(sweep.ok, sweep.errors.join("; ")).toBe(true);
-    expect(sweep.checked).toBe(1);
+    expect(sweep.checked).toBe(2);
+    expect(allEvents().filter(row => row.event_type === "tool/spill-commitment")).toHaveLength(1);
     expect(sweep.missing).toEqual([]);
   });
 
@@ -221,6 +241,9 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     const path = resolveSpillPath(dir, ref.locator!);
     expect(path).not.toBeNull();
 
+    const stored = readFileSync(path!);
+    expect(stored.includes(Buffer.from("unique-15838"))).toBe(false);
+    expect(stored.equals(Buffer.from(bigOutput()))).toBe(false);
     expect(statSync(path!).mode & 0o777).toBe(0o600);
     expect(statSync(join(spillRoot(dir), `session-${sha256Hex("spill-session")}`)).mode & 0o777).toBe(0o700);
   });
@@ -237,13 +260,16 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
 
     // Same byte count, one character different: the size check cannot catch
     // this, so only the hash comparison can.
-    const tampered = Buffer.from(full.replace("unique-0", "unique-X"), "utf8");
-    expect(tampered.byteLength).toBe(ref.bytes);
+    const tampered = readFileSync(path);
+    expect(ref.v).toBe(2);
+    if (ref.v !== 2) throw new Error("expected an encrypted spill");
+    expect(tampered.byteLength).toBe(ref.encodedBytes);
+    tampered[tampered.length - 1] = tampered[tampered.length - 1]! ^ 1;
     writeFileSync(path, tampered);
 
     const inspected = inspectSpilledEvent(dir, event);
     expect(inspected.status).toBe("tampered");
-    expect(inspected.detail).toContain("the signed event committed to");
+    expect(inspected.detail).toContain("signed envelope commitment");
     expect(() => retrieveSpilledContent(dir, event)).toThrow(/tampered/);
 
     const sweep = verifySpilledContent(dir, allEvents());
@@ -255,11 +281,12 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     runSessionWith(bigOutput());
     const event = toolResultEvent();
     const ref = spillRef(event);
-    writeFileSync(resolveSpillPath(dir, ref.locator!)!, Buffer.alloc(ref.bytes + 1, 0x41));
+    if (ref.v !== 2 || ref.encodedBytes === null) throw new Error("expected encrypted byte commitment");
+    writeFileSync(resolveSpillPath(dir, ref.locator!)!, Buffer.alloc(ref.encodedBytes + 1, 0x41));
 
     const inspected = inspectSpilledEvent(dir, event);
     expect(inspected.status).toBe("tampered");
-    expect(inspected.detail).toContain(`the signed event committed to ${ref.bytes}`);
+    expect(inspected.detail).toContain("size differs from signed commitment");
   });
 
   it("reports a deleted spill object as missing, not as tampering", () => {
@@ -279,20 +306,19 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
 
   it("refuses retrieval when the commitment itself was edited to match a swapped file", () => {
     const full = bigOutput();
-    runSessionWith(full);
+    runSessionWith(full, "spill-session", bigOutput().replaceAll("unique-", "forged-"));
 
     const event = toolResultEvent();
     const ref = spillRef(event);
-    const path = resolveSpillPath(dir, ref.locator!)!;
 
     // The strongest attack available to someone with workspace write access:
     // replace the spilled output AND rewrite the row's commitment so the two
     // agree. It fails not because the file mismatches — it matches perfectly —
     // but because meta_json is inside event_hash, which is what was signed.
-    const swapped = Buffer.from("attacker-supplied output\n", "utf8");
-    writeFileSync(path, swapped);
+    const donorRef = spillRef(toolResultEvent("spill-session", "call-2"));
+    expect(donorRef.contentSha256).not.toBe(ref.contentSha256);
     const forgedMeta = JSON.parse(event.meta_json) as Record<string, unknown>;
-    forgedMeta.spilled = { ...ref, contentSha256: sha256Hex(swapped), bytes: swapped.byteLength };
+    forgedMeta.spilled = donorRef;
     const db = openRaw();
     db.prepare("UPDATE evidence_events SET meta_json = ? WHERE id = ?").run(
       JSON.stringify(forgedMeta),
@@ -313,11 +339,10 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
 
   it("refuses retrieval when the commitment was edited and the event_hash recomputed to match", () => {
     const full = bigOutput();
-    runSessionWith(full);
+    runSessionWith(full, "spill-session", bigOutput().replaceAll("unique-", "forged-"));
 
     const event = toolResultEvent();
     const ref = spillRef(event);
-    const path = resolveSpillPath(dir, ref.locator!)!;
 
     // One rung above the previous attack: the attacker knows meta_json is inside
     // event_hash, so it edits the commitment AND recomputes the hash correctly.
@@ -325,10 +350,10 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     // The only thing it cannot produce is a monitor signature over the new hash,
     // which is precisely what writer_sig is for. Without that check this row
     // would hand back attacker-supplied bytes.
-    const swapped = Buffer.from("attacker-supplied output\n", "utf8");
-    writeFileSync(path, swapped);
+    const donorRef = spillRef(toolResultEvent("spill-session", "call-2"));
+    expect(donorRef.contentSha256).not.toBe(ref.contentSha256);
     const forgedMeta = JSON.parse(event.meta_json) as Record<string, unknown>;
-    forgedMeta.spilled = { ...ref, contentSha256: sha256Hex(swapped), bytes: swapped.byteLength };
+    forgedMeta.spilled = donorRef;
     const forgedMetaJson = JSON.stringify(forgedMeta);
     const forgedHash = sha256Hex(
       `${event.prev_event_hash}${canonicalMetadataForHash({
@@ -372,13 +397,13 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     // it would "succeed" — which is why the read requires a regular file rather
     // than trusting a name inside a directory an attacker can write to.
     const decoy = join(dir, "decoy.txt");
-    writeFileSync(decoy, full);
+    writeFileSync(decoy, readFileSync(path));
     unlinkSync(path);
     symlinkSync(decoy, path);
 
     const inspected = inspectSpilledEvent(dir, event);
     expect(inspected.status).toBe("tampered");
-    expect(inspected.detail).toContain("not a regular file");
+    expect(inspected.bytes).toBeNull();
   });
 
   it("refuses retrieval when the row was re-signed with a substituted monitor key", () => {
@@ -407,6 +432,8 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     const ref = spillRef(toolResultEvent());
 
     const hostile = [
+      "amc-spill:v2:../../../../etc:passwd",
+      `amc-spill:v2:${"a".repeat(64)}:../../../../etc/passwd`,
       "amc-spill:v1:../../../../etc:passwd",
       `amc-spill:v1:${"a".repeat(64)}:../../../../etc/passwd`,
       `amc-spill:v1:${"a".repeat(64)}:${"0".repeat(32)}-../escape`,
@@ -433,7 +460,7 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     const event = toolResultEvent();
     const ref = spillRef(event);
     expect(ref.locator).toBeNull();
-    expect(ref.unretrievable).toContain("spill store write failed");
+    expect(ref.unretrievable).toMatch(/spill.*failed/);
     // The output is gone, but what it WAS is still provable from the signed row.
     expect(ref.contentSha256).toBe(sha256Hex(Buffer.from(full, "utf8")));
     expect(ref.bytes).toBe(Buffer.byteLength(full, "utf8"));
@@ -450,6 +477,33 @@ describe("spill — oversized tool output leaves the ledger, its commitment does
     const verdict = await verifyLedgerIntegrity(dir);
     expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
     expect(verdict.sessions.closed).toContain(sessionId);
+  });
+
+
+  it("authenticates and retrieves an explicitly historical plaintext v1 object", () => {
+    runSessionWith("historical preview");
+    const full = Buffer.from("historical v1 retained bytes\n");
+    const locator = `amc-spill:v1:${sha256Hex("legacy-session")}:${"a".repeat(32)}-output`;
+    const path = resolveSpillPath(dir, locator)!;
+    mkdirSync(spillRoot(dir), { recursive: true, mode: 0o700 });
+    mkdirSync(join(spillRoot(dir), `session-${sha256Hex("legacy-session")}`), { recursive: true, mode: 0o700 });
+    writeFileSync(path, full, { flag: "wx", mode: 0o600 });
+    const ref: SpillRef = { v: 1, locator, contentSha256: sha256Hex(full), bytes: full.length,
+      previewBytes: 0, maxInlineBytes: 1024, retrievalHint: "historical fixture only", unretrievable: null };
+    const ledger = openLedger(dir);
+    let legacy: EvidenceEvent;
+    try {
+      ledger.startSession({ sessionId: "legacy-session", runtime: "amc", binaryPath: "historical-fixture",
+        binarySha256: sha256Hex("historical-fixture") });
+      const id = ledger.appendEvidence({ sessionId: "legacy-session", runtime: "amc", eventType: "tool/result",
+        meta: { spilled: ref, outcome: "OK", fixture: "historical-format-authentication-only" } });
+      legacy = ledger.getAllEvents().find(row => row.id === id)!;
+    } finally { ledger.close(); }
+    expect(legacy!.writer_sig).not.toBe("unsigned");
+    expect(retrieveSpilledContent(dir, legacy!)).toEqual(full);
+    expect(existsSync(path)).toBe(true);
+    const changed = { ...legacy!, meta_json: JSON.stringify({ spilled: { ...ref, bytes: full.length + 1 } }) };
+    expect(inspectSpilledEvent(dir, changed).status).toBe("row-unauthentic");
   });
 
   it("refuses a policy whose preview budget would not shrink anything", () => {
