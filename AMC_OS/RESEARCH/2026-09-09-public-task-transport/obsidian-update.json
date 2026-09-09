@@ -1,0 +1,13 @@
+{
+  "taskId": "public-task-transport-browser-batch",
+  "date": "2026-09-09",
+  "source": "d9693bc1b24a5cd17a78ca4b6873075decdb1802",
+  "note": "/amc/Evidence/2026-09-09 Public Task Transport Browser.md",
+  "created": true,
+  "authoringUpdate": "successful CoS apply_patch",
+  "finalResultUpdate": "successful CoS apply_patch",
+  "existingHomeNowRoadmapRewritten": false,
+  "priorEvidenceNotesRewritten": false,
+  "priorBlockedCheckpointOperationReplayed": false,
+  "boundary": "new note for this source HTTP/browser result; not a human study, installed artifact, full release or issue closure"
+}

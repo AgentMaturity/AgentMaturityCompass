@@ -1,0 +1,494 @@
+{
+  "taskId": "public-task-transport-browser-batch",
+  "recordedAt": "2026-09-09T19:13:39.837650+00:00",
+  "owner": "cos-native-public-history-20260909T163519Z",
+  "sourceCommit": "d9693bc1b24a5cd17a78ca4b6873075decdb1802",
+  "branch": "amc/gap-register-execution",
+  "environment": {
+    "os": "Darwin",
+    "release": "25.6.0",
+    "machine": "arm64",
+    "nodePath": "/opt/homebrew/Cellar/node/25.5.0/bin/node",
+    "nodeSha256": "0c45beedbde68e147083ffed066aadbab5df99a9fa661e62bd2950cfee36c6e9",
+    "browserExecutable": "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+    "browserSha256": "a8a0ac2829aeaa132389b001640fb835bdc93a49fb7f26af0c3de0df3ee4d66f",
+    "node-version": "v25.5.0",
+    "pnpm-version": "10.33.0",
+    "browser-version": "Google Chrome for Testing 147.0.7727.15"
+  },
+  "scope": "fresh source candidate, actual authenticated HTTP and Chromium; not installed-package, full suite, release, human/provider or deployment",
+  "sourceCommits": [
+    "89faf72c6e9ba4aa82b9831f8c71e62b4254b1e4",
+    "5875ab865dc09cce7deea95887f3383336b335e2",
+    "d9693bc1b24a5cd17a78ca4b6873075decdb1802"
+  ],
+  "runs": [
+    {
+      "source": "89faf72c6e9ba4aa82b9831f8c71e62b4254b1e4",
+      "receipt": "tmp/cos-public-task-transport-01/candidate-01/receipt.json",
+      "receiptSha256": "bbb2c5043846582f0ea280a715e37fd39deb461377bec7c7ba7fd2fb13940414",
+      "status": "failed-or-interrupted",
+      "counts": {
+        "numTotalTests": 41,
+        "numPassedTests": 38,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "failures": [
+        {
+          "name": "actual HTTP admitted follow-up lost acknowledgement remains exact across restart and stale controls refuse",
+          "messages": [
+            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:57:35\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "JSONL HTTP cold history never grants writer resume or retains a verified badge after tampering",
+          "messages": [
+            "TypeError: fetch failed\n    at node:internal/deps/undici/undici:16416:13\n    at request (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:86:24)\n    at Object.poll (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/helpers/publicTaskHttpFixture.ts:96:24)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:69:30\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
+          "messages": [
+            "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n3 !== 4\n\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/e2e/public-task-transport-browser.mjs:73:16)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/tests/publicTaskTransport.test.ts:95:9\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-01/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "allObservedCommandProcessesClosed": true
+    },
+    {
+      "source": "5875ab865dc09cce7deea95887f3383336b335e2",
+      "receipt": "tmp/cos-public-task-transport-01/candidate-02/receipt.json",
+      "receiptSha256": "46f323d06c6bc9edfd36d97a77a33c74f04e6b47cd9fbe9ec4bf5ceb1e9a62ac",
+      "status": "failed-or-interrupted",
+      "counts": {
+        "numTotalTests": 41,
+        "numPassedTests": 40,
+        "numFailedTests": 1,
+        "numPendingTests": 0
+      },
+      "failures": [
+        {
+          "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
+          "messages": [
+            "AssertionError [ERR_ASSERTION]: {\"error\":\"invalid approval denial\"}\n\n400 !== 200\n\n    at Object.settle (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/helpers/publicTaskHttpFixture.ts:113:20)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/e2e/public-task-transport-browser.mjs:36:18)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/tests/publicTaskTransport.test.ts:95:9\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-02/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "allObservedCommandProcessesClosed": true
+    },
+    {
+      "source": "d9693bc1b24a5cd17a78ca4b6873075decdb1802",
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/receipt.json",
+      "receiptSha256": "6897ef56e8942c777c5f294a4868ca247b5a0742caf69ff9b72c06a173ef60d1",
+      "status": "scoped-checks-passed",
+      "counts": {
+        "numTotalTests": 41,
+        "numPassedTests": 41,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "failures": [],
+      "allObservedCommandProcessesClosed": true
+    }
+  ],
+  "finalChecks": [
+    {
+      "name": "node-version",
+      "exitCode": 0,
+      "elapsedSeconds": 0.549484458,
+      "closureConfirmed": true
+    },
+    {
+      "name": "pnpm-version",
+      "exitCode": 0,
+      "elapsedSeconds": 0.7741778750000001,
+      "closureConfirmed": true
+    },
+    {
+      "name": "browser-version",
+      "exitCode": 0,
+      "elapsedSeconds": 0.5934362910000002,
+      "closureConfirmed": true
+    },
+    {
+      "name": "clone",
+      "exitCode": 0,
+      "elapsedSeconds": 3.0931657080000003,
+      "closureConfirmed": true
+    },
+    {
+      "name": "checkout",
+      "exitCode": 0,
+      "elapsedSeconds": 1.008999417,
+      "closureConfirmed": true
+    },
+    {
+      "name": "source-head",
+      "exitCode": 0,
+      "elapsedSeconds": 0.6114407499999999,
+      "closureConfirmed": true
+    },
+    {
+      "name": "clean-before",
+      "exitCode": 0,
+      "elapsedSeconds": 0.5608597090000007,
+      "closureConfirmed": true
+    },
+    {
+      "name": "install",
+      "exitCode": 0,
+      "elapsedSeconds": 4.709086709,
+      "closureConfirmed": true
+    },
+    {
+      "name": "build",
+      "exitCode": 0,
+      "elapsedSeconds": 25.860338458999998,
+      "closureConfirmed": true
+    },
+    {
+      "name": "test-types",
+      "exitCode": 0,
+      "elapsedSeconds": 28.535881749999994,
+      "closureConfirmed": true
+    },
+    {
+      "name": "architecture",
+      "exitCode": 0,
+      "elapsedSeconds": 2.140709749999999,
+      "closureConfirmed": true
+    },
+    {
+      "name": "public-transport",
+      "exitCode": 0,
+      "elapsedSeconds": 32.004602417,
+      "closureConfirmed": true
+    },
+    {
+      "name": "clean-after",
+      "exitCode": 0,
+      "elapsedSeconds": 0.5824000000000069,
+      "closureConfirmed": true
+    }
+  ],
+  "browserScenarios": [
+    {
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-budget-FmiAhL/browser/receipt.json",
+      "sha256": "771a99f7a69534b50482c115f7c988ae1862d6dcf08e0bf22ea8d21e136b94a2",
+      "mode": "budget",
+      "browser": "147.0.7727.15",
+      "ok": true,
+      "checks": [
+        {
+          "name": "actual-http-browser-validation-outcome",
+          "status": "unavailable",
+          "taskId": "043500511cb6d42382eee51e8f36ec5216589e126f0f46b6bfb1671cebd2edca",
+          "sessionId": "fe4d00c3-c234-4f26-9cc2-320c683c114e",
+          "outputEventId": "4ed7e4a3-ccc1-498c-a9fc-44346b2523a6",
+          "historyHead": "e265b400026aed085e19be3d8be96c49af304ab9a914383199322dfa22028b88"
+        }
+      ],
+      "cleanup": {
+        "contextClosed": true,
+        "studioClosed": true
+      },
+      "screenshot": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-budget-FmiAhL/browser/outcome.png",
+      "screenshotSha256": "a82bb94fd06c7ef299b0a59005b35f7a59e3ecc3147f9486da48d24db0913f41"
+    },
+    {
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-denied-0QBxzK/browser/receipt.json",
+      "sha256": "0822c0c5deee4d9c946975b47689befa0a83ff15cd59db0f7348035a28a4e733",
+      "mode": "denied",
+      "browser": "147.0.7727.15",
+      "ok": true,
+      "checks": [
+        {
+          "name": "actual-http-browser-validation-outcome",
+          "status": "unavailable",
+          "taskId": "cc2635a4e5c0be201d1e965c0fbdcdba2dc115794b32e1760a71b199bc5ba454",
+          "sessionId": "11b580e1-2e32-446e-8a1d-0dd5e3bf4503",
+          "outputEventId": "7c042485-bebc-46a3-a67c-95c9df05a71d",
+          "historyHead": "68417c1d8468e2ad7c922b75d3ecfdf694f2f8380832a92536279f5b9bbe8895"
+        }
+      ],
+      "cleanup": {
+        "contextClosed": true,
+        "studioClosed": true
+      },
+      "screenshot": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-denied-0QBxzK/browser/outcome.png",
+      "screenshotSha256": "824f0392272db276bff243ac9365f76dbfb9f72f823229a88fee0fc19ff0ac03"
+    },
+    {
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-success-Dlr0Kt/browser/receipt.json",
+      "sha256": "7c306bda8ba7e21c358839463d1329b300af1279657e5f47182fcd88d8b31bff",
+      "mode": "success",
+      "browser": "147.0.7727.15",
+      "ok": true,
+      "checks": [
+        {
+          "name": "actual-http-browser-validation-outcome",
+          "status": "passed",
+          "taskId": "bf7d9482063583a3746c5509ae566534735f87791dffccb70698014c0dd1ec0f",
+          "sessionId": "26dd7b9c-1ad8-4b41-9385-1aad9856b3b5",
+          "outputEventId": "63c07b7a-a3d0-4ad9-a4c9-41804d19fc82",
+          "historyHead": "4c6a3e06022f36d66ac45f71d09265403ef27f5fa435d4026c706da53cf3c606"
+        },
+        {
+          "name": "admitted-followup-lost-ack-no-replay",
+          "revision": 2,
+          "originalId": "008f7a30-9765-431e-9a21-4a20c6edc4b9"
+        },
+        {
+          "name": "failed-poll-withholds-actions-and-refresh-reloads-authentic-history"
+        }
+      ],
+      "cleanup": {
+        "contextClosed": true,
+        "studioClosed": true
+      },
+      "screenshot": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-success-Dlr0Kt/browser/outcome.png",
+      "screenshotSha256": "c39de8e8a0be3c325b631476022754b09be9ae8e7690e5edd4d8af025ad52b96"
+    },
+    {
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-nonzero-cTXDxQ/browser/receipt.json",
+      "sha256": "547129e13cceff7ad3cc84a65e2ba2bb9f088865ca54a0ebbae5d0315b9ed157",
+      "mode": "nonzero",
+      "browser": "147.0.7727.15",
+      "ok": true,
+      "checks": [
+        {
+          "name": "actual-http-browser-validation-outcome",
+          "status": "failed",
+          "taskId": "91732c7d0a38d207663dfccefe2268c5ad48b6e804436473685b38ee55d0d64e",
+          "sessionId": "c953a79e-047c-437a-b6c3-1d0b2ce4cfa9",
+          "outputEventId": "cec7d230-7b42-4dd6-a5ce-ae43beba8ba6",
+          "historyHead": "14ea0ea5970c3c367c331082a1b9c2bbdc7a80e0681f9e5af92e6605ad664d46"
+        }
+      ],
+      "cleanup": {
+        "contextClosed": true,
+        "studioClosed": true
+      },
+      "screenshot": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-sqlite-nonzero-cTXDxQ/browser/outcome.png",
+      "screenshotSha256": "c83884a37b03e28d294f8c97328f8d794b2f9943d8a1eb76d666be8a2d4ad3a2"
+    },
+    {
+      "receipt": "tmp/cos-public-task-transport-01/candidate-03/fixtures/public-task-jsonl-success-vuCI4u/jsonl-browser-receipt.json",
+      "sha256": "aea8b9198c225db34eb4fc2d798e8513fa44484f9fe1332111c82c11ef6add69",
+      "mode": "jsonl-cold-history",
+      "browser": "147.0.7727.15",
+      "ok": true,
+      "checks": [
+        {
+          "name": "cold-jsonl-no-resume-control-or-dispatch",
+          "sessionId": "68bc018b-d0a5-4d7e-980c-39e3121a966d"
+        },
+        {
+          "name": "tampered-history-withdrawn-and-authentic-bytes-restored"
+        }
+      ],
+      "cleanup": {
+        "contextClosed": true,
+        "studioClosed": true
+      }
+    }
+  ],
+  "changedGuardMutations": {
+    "receipt": "tmp/cos-public-task-transport-01/candidate-03/mutations/receipt.json",
+    "sha256": "2c1d14f667918db1b6c84d5e2fc174a907dee0fef0288aef4c6e8d020b954e1a",
+    "results": [
+      {
+        "name": "strict-query",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 35,
+        "failures": [
+          {
+            "name": "native Studio authenticated API admission strict transport query contracts refuse duplicates and ignored authority fields before dispatch",
+            "messages": [
+              "AssertionError: expected 200 to be 400 // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/studioNativeTaskAdmission.test.ts:110:89\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "jsonl-resume",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "failures": [
+          {
+            "name": "JSONL HTTP cold history never grants writer resume or retains a verified badge after tampering",
+            "messages": [
+              "AssertionError: expected 200 to be 409 // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:74:26\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "stale-verifier",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "failures": [
+          {
+            "name": "a successful HTTP verifier label is withdrawn on evidence loss and is not restored by a metadata read",
+            "messages": [
+              "AssertionError: expected 'workspace-key-consistency' to be 'not-verified' // Object.is equality\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:111:43\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "stale-browser-submit",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "failures": [
+          {
+            "name": "real Chromium public validation, lost-ACK and evidence reconnect controls",
+            "messages": [
+              "Error: expect(locator).toBeDisabled() failed\n\nLocator:  locator('#nativeTaskSubmit')\nExpected: disabled\nReceived: enabled\nTimeout:  15000ms\n\nCall log:\n  - Expect \"to.be.disabled\" with timeout 15000ms\n  - waiting for locator('#nativeTaskSubmit')\n    34 \u00d7 locator resolved to <button type=\"submit\" id=\"nativeTaskSubmit\">Send follow-up</button>\n       - unexpected value \"enabled\"\n\n    at captureRawStack (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright-core/lib/coreBundle.js:9681:17)\n    at callMatcherAsStep (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13310:57)\n    at Object.toBeDisabled (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/playwright/lib/matchers/expect.js:13300:23)\n    at runPublicTaskBrowser (/Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/e2e/public-task-transport-browser.mjs:87:57)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/tests/publicTaskTransport.test.ts:95:9\n    at /Users/sid/AgentMaturityCompass/tmp/cos-public-task-transport-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      }
+    ],
+    "restored": {
+      "name": "restored",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "pending": 0,
+      "failures": [],
+      "mutationKilled": false
+    },
+    "sourceRestored": true,
+    "qualified": true
+  },
+  "builtArtifactBoundary": {
+    "kind": "compiled source files, not a tarball or published package",
+    "files": [
+      {
+        "path": "dist/api/nativeTasksRouter.js",
+        "sha256": "3402c25a2cd1dcc50c1e8a88ce5b083a9d71e478d941305605a5bde3bf22945d"
+      },
+      {
+        "path": "dist/studio/nativeTaskService.js",
+        "sha256": "57b1e1a580ecc9716d8610ee3601aa98aed4bba1bf2edaa4b53ea9688c0a4543"
+      },
+      {
+        "path": "dist/studio/nativeTaskProjection.js",
+        "sha256": "53d047fd8cf723b087ab005ea74ce6eaf87116461be759c68929be79290a3ef4"
+      },
+      {
+        "path": "dist/console/assets/nativeTasks.js",
+        "sha256": "6731408a18656029881ebcb89ba4cd765a6a118d08d270638b09e581d5c9b190"
+      },
+      {
+        "path": "dist/console/assets/nativeTasksView.js",
+        "sha256": "9726378f676285a24906c9b62c6f6bf8586971230cfb69017cc1ba37f3f2c735"
+      }
+    ]
+  },
+  "closure": {
+    "observedAt": "2026-09-09T19:13:39.837650+00:00",
+    "observedIdentityCount": 210,
+    "observedGroupCount": 52,
+    "groupIds": [
+      75256,
+      75265,
+      75278,
+      75293,
+      75320,
+      75345,
+      75365,
+      75379,
+      75464,
+      75761,
+      76104,
+      76136,
+      76229,
+      76647,
+      76658,
+      76677,
+      76691,
+      76729,
+      76745,
+      76755,
+      76767,
+      76844,
+      77197,
+      77544,
+      77577,
+      77710,
+      78257,
+      78266,
+      78283,
+      78298,
+      78360,
+      78376,
+      78395,
+      78408,
+      78487,
+      78805,
+      79103,
+      79149,
+      79274,
+      79470,
+      79613,
+      79639,
+      79930,
+      80011,
+      80264,
+      80342,
+      80773,
+      80801,
+      81010,
+      81220,
+      81294,
+      81518
+    ],
+    "remainingOwned": [],
+    "allObservedOwnedProcessesClosed": true,
+    "cleanupSignalCount": 0,
+    "scope": "sampled owned descendant identities/groups; not kernel containment or unobserved-daemon proof"
+  },
+  "qualifiedForDeclaredScope": true,
+  "trackers": {
+    "flag": "LINEAR-PENDING",
+    "applied": false,
+    "reason": "Current discovery exposes no Linear functions; uncertain old AMC-1547 comment requires live readback."
+  },
+  "centralStatus": {
+    "updated": false,
+    "reason": "Two writes blocked and not replayed; see REVIEW_BLOCKERS.md."
+  },
+  "vault": {
+    "newNote": "Evidence/2026-09-09 Public Task Transport Browser.md",
+    "authoringUpdateSucceeded": true,
+    "finalUpdate": "succeeded through apply_patch on the new task evidence note; prior Home/Now/Roadmap and earlier notes unchanged"
+  },
+  "notQualified": [
+    "new package install",
+    "full suite/release gate",
+    "platform breadth",
+    "real-provider quality",
+    "human evidence",
+    "JSONL writer resume",
+    "retained-output erasure",
+    "publication",
+    "deployment"
+  ],
+  "priorRetainedOutputBlockers": "Earlier separate JSONL130c/SQLite33481 scopes remain aggregate unqualified. No erasure or helper-repin operation was replayed.",
+  "privateArtifacts": "Full HTTP bodies, fixture vaults/credentials, recorded event files and runtime workspaces remain local under tmp; not copied into this public summary."
+}

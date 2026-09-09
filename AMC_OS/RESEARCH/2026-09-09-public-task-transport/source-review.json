@@ -1,0 +1,27 @@
+{
+  "taskId": "public-task-transport-browser-batch",
+  "reviewer": "CoS prime, same execution agent; not independent acceptance",
+  "baseCommit": "1797a3d36f4ef3c562207577903306291a1d38ed",
+  "stage": "source-reviewed-and-scoped-fresh-candidate-checked",
+  "finalSource": "d9693bc1b24a5cd17a78ca4b6873075decdb1802",
+  "changes": [
+    "Strict route parameter allowlists and no duplicate query keys before identity/service selection",
+    "Explicit persisted-history metadata status, backend and current head, with unavailable evidence withheld",
+    "Successful or failed verification bound to the observed store head; corruption or a changed head invalidates stale verdicts",
+    "JSONL resume refusal before client startup; cold reads never acquire writer ownership",
+    "Browser reconnect requires explicit refresh, withholds stale results/actions and retains exact original submission identities",
+    "Actual Studio HTTP/login/approval/native-client tests and new actual Chromium validation/reconnect scenarios"
+  ],
+  "reviewDecisions": [
+    "No private retained-output retrieval or raw-event HTTP endpoint added",
+    "No signed-policy, budget, approval quorum, signature or ownership relaxation",
+    "No general task-success claim inferred from admission, model end_turn, validation pass or metadata verification",
+    "Automated fixture reviewers use real authenticated HTTP; not human evidence",
+    "No historical browser suite or cancellation VM rerun",
+    "Verification failure on authentic unchanged history remains a failure rather than being overwritten by metadata authentication"
+  ],
+  "execution": "Fresh candidate-03 passed types/build/architecture and 41 scoped tests, including actual built-Studio HTTP and Chromium. Four removed guards were killed and restored checks passed; disposition.json retains exact scopes and earlier failures.",
+  "trackers": "LINEAR-PENDING; unavailable connector; no state change",
+  "vault": "New authoring and final-result note written: Evidence/2026-09-09 Public Task Transport Browser.md; earlier notes unchanged",
+  "statusBlockers": "REVIEW_BLOCKERS.md"
+}
