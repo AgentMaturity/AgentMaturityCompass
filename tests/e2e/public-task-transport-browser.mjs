@@ -107,7 +107,7 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       finally { writeFileSync(join(out, "receipt.json"), JSON.stringify(receipt, null, 2) + "\n", { mode: 0o600 }); runs.push({ root: f.root, ok: receipt.ok }); }
     }
   }
-  // A distinct JSONL task: cold read is useful, but it grants no writer resume.
+  // A distinct JSONL task: read-only eligibility still requires explicit recovery.
   const f = await createFixture("success", "jsonl");
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: "block" });
   const page = await context.newPage(), ui = new NativeTasksPage(page, expect, f.base, "default");
@@ -120,12 +120,15 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
     await expect(page.locator("#nativeTaskRelease")).toBeVisible();
     await ui.control("release"); await f.restart(); await page.reload();
     await expect(page.locator("#nativeTaskIdentity")).toContainText("jsonl");
-    await expect(page.locator("#nativeTaskResume")).toBeHidden();
-    await expect(page.locator("#nativeTaskIdentity")).toContainText("writer resume is not supported");
+    await expect(page.locator("#nativeTaskResume")).toBeEnabled();
+    await expect(page.locator('[data-native-recovery-state="ready"]')).toBeVisible();
     const before = f.jsonlBytes();
-    const denied = await f.control(task.taskId, "resume", task.revision);
-    assert.equal(denied.status, 409); assert.equal(denied.body.code, "NATIVE_RESUME_UNSUPPORTED"); assert.deepEqual(f.jsonlBytes(), before);
-    receipt.checks.push({ name: "cold-jsonl-no-resume-control-or-dispatch", sessionId: task.sessionId });
+    const resumed = await ui.control("resume");
+    assert.equal(resumed.state, "idle"); assert.equal(resumed.sessionId, task.sessionId);
+    assert.deepEqual(f.jsonlBytes().subarray(0, before.length), before);
+    assert.equal(f.history(task.sessionId).events.filter(row => row.event_type === "request/header").length, 1);
+    await ui.control("release");
+    receipt.checks.push({ name: "cold-jsonl-explicit-resume-without-prompt-replay", sessionId: task.sessionId });
     const path = join(f.workspace, ".amc/jsonl/events.jsonl"), original = readFileSync(path);
     const rows = original.toString("utf8").trimEnd().split("\n"); const row = JSON.parse(rows[0]); row.writer_sig = "unsigned"; rows[0] = JSON.stringify(row);
     restore = () => writeFileSync(path, original);

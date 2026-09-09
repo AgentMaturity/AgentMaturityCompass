@@ -25,12 +25,11 @@
  *    order, and `sanitizeMetaForHash` re-stringifies meta in insertion order, so
  *    a reordering read/write would silently break every `event_hash`.
  */
-import { closeSync, fsyncSync, openSync, readFileSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
-import { hostname } from "node:os";
+import { closeSync, constants, fstatSync, fsyncSync, lstatSync, openSync, readFileSync, writeSync } from "node:fs";
 import { join } from "node:path";
 import type { EvidenceEvent } from "../../types.js";
 import { ensureDir, pathExists, readUtf8 } from "../../utils/fs.js";
-import { SESSION_STORE_LOCKED } from "../sessionEventStore.js";
+export { JsonlWriterLock } from "./jsonlWriterLock.js";
 
 export function jsonlRoot(workspace: string): string {
   return join(workspace, ".amc", "jsonl");
@@ -207,18 +206,52 @@ export function lastEventHash(workspace: string): string | null {
  */
 export class AppendOnlyFile {
   private fd: number | null;
+  private readonly identity: { dev: number; ino: number };
+  private size: number;
+  private failed = false;
 
   constructor(private readonly path: string) {
     ensureDir(join(path, ".."));
-    this.fd = openSync(path, "a");
+    // An unterminated row must not be glued to the next row. A torn tail is
+    // evidence, not permission to truncate or silently repair history.
+    if (pathExists(path)) {
+      const info = lstatSync(path);
+      if (!info.isFile() || info.isSymbolicLink() || info.nlink !== 1) throw new Error("unsafe JSONL append path");
+      const bytes = readFileSync(path);
+      if (bytes.length && bytes[bytes.length - 1] !== 10) throw new Error("JSONL history has an unterminated tail; restore the original complete evidence before writing");
+    }
+    this.fd = openSync(path, constants.O_APPEND | constants.O_CREAT | constants.O_WRONLY | constants.O_NOFOLLOW, 0o600);
+    const info = fstatSync(this.fd);
+    this.identity = { dev: info.dev, ino: info.ino };
+    this.size = info.size;
   }
 
   appendLine(line: string): void {
-    if (this.fd === null) {
+    if (this.fd === null || this.failed) {
       throw new Error(`append after close: ${this.path}`);
     }
-    writeSync(this.fd, `${line}\n`);
-    fsyncSync(this.fd);
+    const current = lstatSync(this.path);
+    if (!current.isFile() || current.isSymbolicLink() || current.nlink !== 1
+      || current.dev !== this.identity.dev || current.ino !== this.identity.ino || current.size !== this.size) {
+      this.failed = true;
+      throw new Error("JSONL append target changed; no bytes were appended");
+    }
+    const bytes = Buffer.from(`${line}\n`, "utf8");
+    try {
+      let offset = 0;
+      while (offset < bytes.length) {
+        const written = writeSync(this.fd, bytes, offset, bytes.length - offset);
+        if (written <= 0) throw new Error("JSONL append made no progress");
+        offset += written;
+      }
+      fsyncSync(this.fd);
+      this.size += bytes.length;
+    } catch (error) {
+      // A partial write or uncertain fsync cannot be retried under the old head.
+      // Keep the bytes and require a new authenticated recovery boundary.
+      this.failed = true;
+      throw error;
+    }
   }
 
   close(): void {
@@ -227,89 +260,5 @@ export class AppendOnlyFile {
     }
     closeSync(this.fd);
     this.fd = null;
-  }
-}
-
-interface LockPayload {
-  readonly pid: number;
-  readonly hostId: string;
-  readonly acquiredTs: number;
-}
-
-function processIsAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0);
-    return true;
-  } catch (error) {
-    // EPERM means the process exists but belongs to another user — alive.
-    return (error as NodeJS.ErrnoException).code === "EPERM";
-  }
-}
-
-/**
- * A single-writer lock for the JSONL log.
- *
- * SQLite has `BEGIN IMMEDIATE`; a plain file append has nothing. Two writers
- * would each read the same chain head and produce two rows claiming the same
- * predecessor — a fork that verification reports as a chain break AFTER the
- * damage is durable. Refusing the second writer up front turns a silent
- * corruption into a loud open failure, which is why the JSONL backend declares
- * `concurrentWriters: false` rather than pretending parity with SQLite.
- *
- * A lock whose owning process is gone is taken over: a crashed writer must not
- * leave the workspace permanently unwritable. A lock held by a LIVE process —
- * including this one — is refused.
- */
-export class JsonlWriterLock {
-  private held = false;
-
-  constructor(private readonly path: string) {
-    ensureDir(join(path, ".."));
-    this.acquire();
-  }
-
-  private acquire(): void {
-    const payload: LockPayload = { pid: process.pid, hostId: hostname(), acquiredTs: Date.now() };
-    try {
-      writeFileSync(this.path, JSON.stringify(payload), { flag: "wx", mode: 0o600 });
-      this.held = true;
-      return;
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") {
-        throw error;
-      }
-    }
-    const existing = this.readExisting();
-    if (existing !== null && processIsAlive(existing.pid)) {
-      throw new Error(`${SESSION_STORE_LOCKED} (pid ${existing.pid} on ${existing.hostId})`);
-    }
-    // Stale (or unreadable) lock from a dead writer: take it over.
-    writeFileSync(this.path, JSON.stringify(payload), { mode: 0o600 });
-    this.held = true;
-  }
-
-  private readExisting(): LockPayload | null {
-    try {
-      const parsed = JSON.parse(readFileSync(this.path, "utf8")) as Partial<LockPayload>;
-      if (typeof parsed.pid !== "number" || typeof parsed.hostId !== "string") {
-        return null;
-      }
-      return { pid: parsed.pid, hostId: parsed.hostId, acquiredTs: parsed.acquiredTs ?? 0 };
-    } catch {
-      return null;
-    }
-  }
-
-  release(): void {
-    if (!this.held) {
-      return;
-    }
-    this.held = false;
-    try {
-      unlinkSync(this.path);
-    } catch {
-      // Best effort: a lock file we cannot remove is taken over as stale by the
-      // next writer, because its pid is by then dead.
-    }
   }
 }

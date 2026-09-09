@@ -12,8 +12,8 @@
  *                       speak. Formats evolve by REFUSING the unknown and, when
  *                       a migration exists, by appending a `session/migration`
  *                       receipt that names the source rows — signed bytes are
- *                       never rewritten in place. JSONL takeover and legacy
- *                       sessions without signed ownership are also refused.
+ *                       never rewritten in place. Legacy sessions without signed
+ *                       ownership are refused; JSONL uses a separate writer mutex.
  *   TAMPERED            the per-session chain (seq / prevSessionEventHash) or
  *                       the ledger's own hash/signature verification fails
  *   AGENT_MISMATCH      the requested agent differs from the signed session/open identity
@@ -36,6 +36,9 @@ import { SessionService } from "./sessionService.js";
 import type { SessionLineage } from "./sessionApiTypes.js";
 import { assertSessionOwnerAvailable, SessionWriterRefused } from "./sessionOwnership.js";
 import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./sessionTypes.js";
+import { openHistoryReader } from "./sessionHistoryReader.js";
+import { authenticateJsonlContinuation, type AuthenticatedJsonlContinuation } from "./jsonlContinuation.js";
+import { realpathSync } from "node:fs";
 
 export const SESSION_ENVELOPE_VERSION = 1;
 const DEFAULT_STALE_AFTER_MS = 60_000;
@@ -130,6 +133,7 @@ function assertLedgerVerifies(workspace: string, sessionId: string, allowIncompl
 }
 
 function verifiedRows(params: { workspace: string; sessionId: string; store: SessionEventStore }, allowSealed: boolean): EvidenceEvent[] {
+  if (params.store.backendId === "jsonl") return authenticateJsonlContinuation({ ...params, allowSealed }).rows;
   const record = params.store.readSessionRecord(params.sessionId);
   if (record === null) throw new SessionResumeRefused("MISSING", `no session ${params.sessionId} in this workspace`);
   if (!allowSealed && (record.session_seal_sig !== null || record.ended_ts !== null)) {
@@ -151,9 +155,13 @@ function unsealedTail(rows: readonly EvidenceEvent[]): EvidenceEvent[] {
 
 /** Read-only view for the checks; the writer store opens only once they pass. */
 function withReadOnlyStore<T>(params: { workspace: string; store?: SessionEventStore }, use: (store: SessionEventStore) => T): T {
-  if (params.store) return use(params.store);
-  const store = openSessionEventStore(params.workspace, undefined, { readOnly: true });
-  try { return use(store); } finally { store.close(); }
+  const reader = openHistoryReader(params.workspace);
+  try {
+    if (params.store && (params.store.backendId !== reader.backend || realpathSync(params.store.workspace) !== reader.workspace)) {
+      throw new SessionResumeRefused("TAMPERED", "the supplied store does not address the original selected workspace/backend");
+    }
+    return use(params.store ?? reader.store);
+  } finally { reader.store.close(); }
 }
 
 function assertResumeAgent(rows: readonly EvidenceEvent[], agentId: string): void {
@@ -171,11 +179,15 @@ export function assertSessionResumeAgent(params: { workspace: string; sessionId:
 export function resumeSession(params: ResumeSessionParams): { service: SessionService; report: ResumeReport } {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   let recovery: RecoveryReport | null = null;
+  let jsonl: AuthenticatedJsonlContinuation | null = null;
 
   // 1. Verify and classify through a read-only handle: no writer lock is held
   //    while the answer may still be "refuse".
   let rows = withReadOnlyStore(params, (store) => {
-    if (store.backendId !== "sqlite") throw new SessionResumeRefused("UNSUPPORTED_FORMAT", "JSONL resume requires atomic ownership takeover; read or fork this session instead");
+    if (store.backendId === "jsonl") {
+      jsonl = authenticateJsonlContinuation({ ...params, store });
+      return jsonl.rows;
+    }
     return verifiedRows({ workspace: params.workspace, sessionId: params.sessionId, store }, false);
   });
   // Check identity before ownership takeover or crash recovery can append rows.
@@ -200,13 +212,18 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
   }
   const head = rows[rows.length - 1]!;
 
-  // 3. The backend atomically claims this verified head inside its append transaction.
-  const store = params.store ?? openSessionEventStore(params.workspace);
+  // Re-authenticate under the JSONL mutex, before append descriptors are opened.
+  // The SQLite path retains its existing immediate-transaction head fence.
+  const beforeWriterOpen = (): void => {
+    authenticateJsonlContinuation({ ...params, expectedHeadEventHash: head.event_hash });
+  };
+  const store = params.store ?? openSessionEventStore(params.workspace, undefined, jsonl ? { beforeWriterOpen } : {});
   try {
+    if (jsonl && params.store) beforeWriterOpen();
     const service = new SessionService(params.workspace, store);
     service.attach({
       sessionId: params.sessionId,
-      runtime: params.runtime,
+      runtime: params.runtime ?? head.runtime,
       agentId: params.agentId,
       harnessVersion: params.harnessVersion,
       compositionDigest: params.compositionDigest,
@@ -215,6 +232,15 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
       observedHeadEventId: head.id,
       observedHeadEventHash: head.event_hash
     });
+    if (jsonl) {
+      const boundary = { auditType: "NATIVE_JSONL_RESUME_BOUNDARY", agentId: params.agentId,
+        version: 1, originalSessionId: params.sessionId, observedHeadEventId: head.id,
+        continuation: "new-explicit-turn-only", pendingInputIds: (jsonl as AuthenticatedJsonlContinuation).pendingInputIds,
+        unknownToolCallIds: (jsonl as AuthenticatedJsonlContinuation).unknownToolCallIds,
+        unsettledRequestIds: (jsonl as AuthenticatedJsonlContinuation).unsettledRequestIds,
+        retainedOutput: "not-decrypted-by-recovery" };
+      service.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(boundary), meta: boundary });
+    }
     return {
       service,
       report: {

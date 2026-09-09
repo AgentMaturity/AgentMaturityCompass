@@ -10,6 +10,9 @@ import type { EvidenceEvent, EvidenceEventType, RuntimeName } from "../types.js"
 import { verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
 import { assertSessionOwnerAvailable, newSessionWriterOwner, readSessionWriter, sessionWriterMeta, SESSION_WRITER_META, SessionWriterRefused } from "./sessionOwnership.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
+import { openHistoryReader } from "./sessionHistoryReader.js";
+import { authenticateJsonlContinuation } from "./jsonlContinuation.js";
+import { realpathSync } from "node:fs";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
@@ -427,19 +430,20 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
   const staleAfterMs = params.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
   const force = params.force ?? false;
   const close = params.close ?? false;
-  // Verification and unsupported-backend refusals must precede any writer open.
-  const readStore = params.store ?? openSessionEventStore(params.workspace, undefined, { readOnly: true });
+  // Strict backend/identity selection precedes writer open. Empty operations
+  // SQLite never stands in for the original native JSONL history.
+  const reader = openHistoryReader(params.workspace);
+  const readStore = params.store ?? reader.store;
+  const jsonl = reader.backend === "jsonl";
   let preflightEvents: EvidenceEvent[];
   try {
-    if (readStore.backendId !== "sqlite") return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
-      syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: 0, closed: false,
-      reason: "JSONL recovery requires atomic ownership takeover; no recovery was attempted" });
-    preflightEvents = readSessionEvents(readStore, params.sessionId);
-    const verification = preflightEvents.length > 0 ? verifyNativeSessionContinuation(params.workspace, params.sessionId) : null;
+    if (readStore.backendId !== reader.backend || realpathSync(readStore.workspace) !== reader.workspace) throw new Error("Recovery store does not address the exact selected workspace/backend");
+    preflightEvents = jsonl ? authenticateJsonlContinuation({ ...params, store: readStore, allowSealed: true }).rows : readSessionEvents(readStore, params.sessionId);
+    const verification = !jsonl && preflightEvents.length > 0 ? verifyNativeSessionContinuation(params.workspace, params.sessionId) : null;
     if (verification && !verification.chain.ok) return report({ verdict: "TAMPERED", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
       syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore: countUnsealedTail(preflightEvents), closed: false,
       reason: verification.chain.errors.join("; ") });
-  } finally { if (params.store === undefined) readStore.close(); }
+  } finally { reader.store.close(); }
   let store = params.store;
   let acquiredClaim: string | null = null;
   let attemptedClaim: string | null = null;
@@ -497,10 +501,10 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       });
     }
 
-    // 3. Liveness gate. A merely slow or paused process must not be declared
-    //    crashed, so recovery refuses a fresh session unless forced.
+    // 3. Preserve SQLite's historical age wait. JSONL preflight already requires
+    // actual abandoned signed ownership; a timeout never substitutes for that.
     const lastEvent = events[events.length - 1]!;
-    if (!force && Date.now() - lastEvent.ts <= staleAfterMs) {
+    if (!jsonl && !force && Date.now() - lastEvent.ts <= staleAfterMs) {
       return report({
         verdict: "INDETERMINATE",
         sessionId: params.sessionId,
@@ -526,7 +530,11 @@ export function recoverSession(params: RecoverSessionParams): RecoveryReport {
       return report({ verdict: "INDETERMINATE", sessionId: params.sessionId, claimEventId: null, wonClaim: false,
         syntheticTurnEnds: 0, syntheticStepEnds: 0, unknownToolOutcomes: 0, unsealedTailCountBefore, closed: false, reason: "no unsealed turn requires recovery" });
     }
-    store ??= openSessionEventStore(params.workspace);
+    const beforeWriterOpen = (): void => {
+      authenticateJsonlContinuation({ ...params, expectedHeadEventHash: lastEvent.event_hash });
+    };
+    store ??= openSessionEventStore(params.workspace, undefined, jsonl ? { beforeWriterOpen } : {});
+    if (jsonl && params.store) beforeWriterOpen();
     const seed = seedHead(events);
     const appender = new SyntheticAppender(
       store,

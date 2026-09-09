@@ -19,6 +19,9 @@ function taskView(value) {
     || !object(value.history) || !["authenticated","unavailable","not-started"].includes(value.history.status)
     || !["sqlite","jsonl",null].includes(value.history.backend) || !integer(value.history.eventCount)
     || typeof value.history.message !== "string"
+    || (value.recovery != null && (!object(value.recovery) || typeof value.recovery.eligible !== "boolean"
+      || !["ready","interrupted","blocked"].includes(value.recovery.state) || typeof value.recovery.message !== "string"
+      || value.recovery.eligible !== (value.recovery.state !== "blocked")))
     || !(value.resumeBlockedReason === null || typeof value.resumeBlockedReason === "string")
     || !Array.isArray(value.approvals) || typeof value.canResume !== "boolean" || typeof value.archived !== "boolean"
     || !["not-verified","workspace-key-consistency","externally-anchored","failed"].includes(value.verification)) {

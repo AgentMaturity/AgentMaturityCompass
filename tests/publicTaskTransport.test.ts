@@ -61,17 +61,19 @@ test("actual HTTP admitted follow-up lost acknowledgement remains exact across r
   expect(f.history(task.sessionId!).events).toEqual(coldBefore);
 }, 60_000);
 
-test("JSONL HTTP cold history never grants writer resume or retains a verified badge after tampering", async () => {
+test("JSONL HTTP cold history grants only eligible explicit recovery and withdraws displays after tampering", async () => {
   const f = await fixture("jsonl");
   const admitted = await f.request("/api/v1/native-tasks", { body: f.input() });
   let task = await f.settle(admitted.body.data.taskId);
   const released = await f.control(task.taskId, "release", task.revision); expect(released.status).toBe(200);
   await f.restart(); task = (await f.poll(task.taskId)).task;
-  expect(task.history.backend).toBe("jsonl"); expect(task.canResume).toBe(false);
-  expect(task.resumeBlockedReason).toContain("not supported");
+  expect(task.history.backend).toBe("jsonl"); expect(task.canResume).toBe(true);
+  expect(task.recovery).toMatchObject({ eligible: true, state: "ready" });
   const before = f.jsonlBytes();
-  const refused = await f.control(task.taskId, "resume", task.revision);
-  expect(refused.status).toBe(409); expect(refused.body.code).toBe("NATIVE_RESUME_UNSUPPORTED"); expect(f.jsonlBytes()).toEqual(before);
+  const resumed = await f.control(task.taskId, "resume", task.revision);
+  expect(resumed.status).toBe(200); expect(resumed.body.data.state).toBe("idle"); expect(resumed.body.data.sessionId).toBe(task.sessionId);
+  expect(f.jsonlBytes().subarray(0, before.length)).toEqual(before);
+  expect(f.history(task.sessionId!).events.filter(row => row.event_type === "request/header")).toHaveLength(1);
   // Verification may legitimately refuse an unsealed archive; its label must
   // never survive loss of authentic history, regardless of its previous value.
   await f.control(task.taskId, "verify", task.revision);

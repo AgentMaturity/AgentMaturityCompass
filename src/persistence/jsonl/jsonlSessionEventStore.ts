@@ -40,6 +40,7 @@ import { createPrivateKey, randomUUID, type KeyObject } from "node:crypto";
 import { join } from "node:path";
 import type { EvidenceEvent, SessionRecord } from "../../types.js";
 import { assertSessionWriteAllowed } from "../../session/sessionOwnership.js";
+import { verifyStoredSessionEventMetadata } from "../sessionStoreVerification.js";
 import { canonicalMetadataForHash } from "../../ledger/eventHash.js";
 import { ensureSigningKeys, getPrivateKeyPem, signHexDigestWith } from "../../crypto/keys.js";
 import { loadOpsPolicy } from "../../ops/policy.js";
@@ -203,15 +204,26 @@ export class JsonlSessionEventStore implements SessionEventStore {
     if (!this.readOnly) {
       ensureDir(jsonlRoot(workspace));
       ensureDir(join(workspace, ".amc", "blobs"));
-      if (!this.unsignedSignatures) {
-        ensureSigningKeys(workspace);
-      }
       // The lock comes before the descriptors: a refused writer must not have
       // created or touched the log files on its way to the error.
       lock = new JsonlWriterLock(jsonlLockPath(workspace));
       try {
-        head = lastEventHash(workspace) ?? GLOBAL_GENESIS;
-        ids = new Set(readEventRows(workspace).map((row) => row.id));
+        // Authenticate the STORE contract under its mutex. Generic producers
+        // have a lower-level schema than native SessionService, so the native
+        // continuation callback separately checks original native identity,
+        // selected workspace, ownership, configuration and reconstruction.
+        // Neither verification reads an empty operations database as history.
+        const prior = readEventRows(workspace);
+        const records = [...readSessionRecords(workspace).values()];
+        if (prior.length) {
+          const verified = verifyStoredSessionEventMetadata(workspace, prior, { sessionRecords: records });
+          if (!verified.ok) throw new Error("JSONL writer refused: existing history failed authentication; restore the original evidence before appending");
+        }
+        options.beforeWriterOpen?.();
+        lock.assertHeld();
+        if (!this.unsignedSignatures) ensureSigningKeys(workspace);
+        head = prior.at(-1)?.event_hash ?? GLOBAL_GENESIS;
+        ids = new Set(prior.map((row) => row.id));
         events = new AppendOnlyFile(jsonlEventsPath(workspace));
         sessions = new AppendOnlyFile(jsonlSessionsPath(workspace));
       } catch (error) {
@@ -442,6 +454,7 @@ export class JsonlSessionEventStore implements SessionEventStore {
     if (this.readOnly) {
       throw new Error(SESSION_STORE_READ_ONLY);
     }
+    this.lock?.assertHeld();
     if (process.env.AMC_EVALUATED_AGENT === "1") {
       throw new Error("untrusted evaluated agent process cannot write to AMC ledger");
     }

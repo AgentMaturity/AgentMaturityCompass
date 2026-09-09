@@ -450,7 +450,7 @@ describe("JSONL verification rules, one broken property at a time", () => {
 });
 
 describe("crash recovery on the JSONL backend", () => {
-  it("refuses recovery before mutation until JSONL atomic ownership takeover is supported", async () => {
+  it("refuses live-owner recovery even after its JSONL handle is dropped", async () => {
     const store = openSessionEventStore(workspace, "jsonl");
     const service = new SessionService(workspace, store);
     service.open({
@@ -469,25 +469,19 @@ describe("crash recovery on the JSONL backend", () => {
       parentToken: null,
       args: JSON.stringify({ command: "ls" })
     });
-    // The crash: no result, no turn/end, no seal, no close. Releasing the store
-    // (without sealing) is what a dead process leaves behind — the writer lock
-    // must not outlive it, or recovery could never take over.
+    // Dropping the handle is NOT an actual process crash. The signed owner is
+    // still alive and must not be stolen even though the workspace lock closes.
     store.close();
     await new Promise((resolve) => setTimeout(resolve, 25));
 
     const before = readRows();
-    const report = recoverSession({
+    expect(() => recoverSession({
       workspace,
       sessionId: "crashed-session",
       claimant: { pid: process.pid, hostId: "test-host", bootId: "boot", startedAt: Date.now() },
       staleAfterMs: 0,
       close: true
-    });
-    expect(report.verdict).toBe("INDETERMINATE");
-    expect(report.reason).toMatch(/JSONL recovery requires atomic ownership/);
-    expect(report.unknownToolOutcomes).toBe(0);
-    expect(report.syntheticTurnEnds).toBe(0);
-    expect(report.closed).toBe(false);
+    })).toThrow(/writer is live/);
     expect(readRows()).toEqual(before);
 
     const result = verifyStoredSessionEvents(workspace, readRows(), {

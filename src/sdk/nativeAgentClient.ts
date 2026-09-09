@@ -6,6 +6,7 @@ import type { AgentRunVerification } from "../agent/runReport.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
 import { parseNativeValidationResult } from "../agent/nativeValidationResult.js";
 export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefusal, type SessionEventHistory, type SessionEventHistoryOptions } from "../session/sessionEventHistory.js";
+export { inspectJsonlSessionRecovery, type JsonlSessionRecoveryReadiness } from "../session/jsonlContinuation.js";
 
 type JsonObject = Record<string, unknown>;
 const object = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);

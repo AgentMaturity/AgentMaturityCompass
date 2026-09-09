@@ -106,8 +106,11 @@ export function nativeTaskSchemas(): Record<string, unknown> {
         description: "Evidence integrity result, separate from task success. Other open ledger writers can prevent a complete verification." },
       approvals: { type: "array", items: ref("NativeTaskApproval") }, approvalError: nullableString,
       nextCursor: integer, firstCursor: integer, droppedEvents: integer, canResume: bool,
-      resumeBlockedReason: nullableString, history: ref("NativeTaskHistory")
+      resumeBlockedReason: nullableString, history: ref("NativeTaskHistory"),
+      recovery: { oneOf: [{ type: "null" }, ref("NativeTaskRecovery")] }
     }),
+    NativeTaskRecovery: { ...object({ eligible: bool, state: { type: "string", enum: ["ready", "interrupted", "blocked"] }, message: string }),
+      description: "Read-only native JSONL recovery eligibility, not a writer grant. Resume rechecks original history, identity, settings, accounting and actual abandoned ownership under the writer mutex. An interrupted turn is acknowledged without replaying its effects; submit a new explicit turn. Closed or archived sessions remain non-resumable." },
     NativeTaskHistory: { ...object({ status: { type: "string", enum: ["not-started", "authenticated", "unavailable"] },
       backend: { type: ["string", "null"], enum: ["sqlite", "jsonl", null] },
       headEventHash: { ...digest, type: ["string", "null"] }, eventCount: integer, message: string }),

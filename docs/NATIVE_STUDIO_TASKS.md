@@ -94,11 +94,23 @@ The browser withholds the previous transcript, validation outputs and verificati
 badge when authentication fails. A prior verification also expires when the
 observed store head changes; restore evidence and explicitly verify a new snapshot.
 
-JSONL supports cold history inspection but not native writer resume. Studio does
-not offer Resume for a JSONL session, and a direct resume request is refused before
-a native client is started. SQLite eligibility still depends on the existing
-native identity, ownership, policy and recovery checks; a displayed control is
-not an ownership grant.
+Eligible JSONL sessions display **Session ready to resume** or **Interrupted
+session · recovery available**, with **Resume** available to their authenticated
+operator. Recovery preserves the original session and history. It acknowledges
+unfinished work as interrupted or unknown, does not rerun previous effects, and
+waits for a new explicit turn. Task responses expose `recovery.eligible`,
+`recovery.state` and a public `recovery.message`; these are readiness information,
+not a completed recovery or an ownership grant.
+
+A live or unknown writer, incomplete history, missing original accounting,
+incompatible state or lost parent controller leaves the session cold-only with an
+actionable refusal. Resume requires the original execution settings and signed
+controls; closed and archived sessions remain non-resumable. JSONL permits one
+writer in a workspace, even when the general Studio task limit would allow more.
+The actual core rechecks exclusive ownership and authenticated history before
+opening its writer. SQLite keeps its existing native continuation rules. See the
+[native recovery contract](SESSION_RESUME.md) for local-filesystem limits and the
+difference between an interrupted turn, a released turn and a closed session.
 
 After a network or control-response failure, the page requires **Refresh status**
 before another action. It clears previously displayed activity and labels the

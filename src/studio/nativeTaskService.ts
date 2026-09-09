@@ -15,6 +15,7 @@ import { verifyAgentRun } from "../agent/runReport.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
 import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
+import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -155,9 +156,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       backend: null, headEventHash: null, eventCount: 0,
       message: d.sessionId ? entry.projectionError ?? "Persisted history is unavailable. Refresh after restoring the original evidence."
         : "No native session has been recorded yet. Admission is not task completion." };
+    const recovery = !entry.client && d.sessionId && !d.closed && !p?.closed && p?.history.backend === "jsonl"
+      ? inspectJsonlSessionRecovery({ workspace, sessionId: d.sessionId, agentId: d.agentId }) : null;
     const resumeBlockedReason = !entry.client && d.sessionId && !d.closed && !p?.closed
       ? !p ? "Authenticate the original persisted history before requesting resume."
-        : p.history.backend === "jsonl" ? "JSONL history can be inspected after restart, but writer resume is not supported. Start a new task to continue; no prior prompt will be replayed." : null : null;
+        : recovery && !recovery.eligible ? recovery.message : null : null;
     const validation = nativeTaskValidationView(d.validation, p?.validation,
         !!d.validation && d.pendingTurn && (entry.state === "starting" || (["running", "cancel-requested"].includes(entry.state) && (p?.validation.turn ?? null) === entry.validationPriorTurn)),
         d.pendingTurn && (!entry.client || (p?.validation.turn ?? null) === entry.validationPriorTurn));
@@ -169,8 +172,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
       verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
-      history, resumeBlockedReason,
-      canResume: !!d.sessionId && !!p && p.history.backend === "sqlite" && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
+      history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
+      canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
     // Released task history is reconstructed on demand, not retained for every descriptor in memory.
     if (!entry.client && !retainProjection) { entry.projection = undefined; entry.projectionAt = 0; }
     return result;
@@ -396,12 +399,14 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       entry.projectionAt = 0; refresh(entry);
       if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
         "Resume requires authenticated original session history. Restore it and refresh; no replacement session was created.");
-      if (entry.projection.history.backend === "jsonl") throw new NativeTaskServiceError("RESUME_UNSUPPORTED", 409,
-        "JSONL writer resume is not supported. Inspect the recorded history or start a new task; no native client or replacement session was started.");
+      if (entry.projection.history.backend === "jsonl") {
+        const recovery = inspectJsonlSessionRecovery({ workspace, sessionId: entry.descriptor.sessionId, agentId: entry.descriptor.agentId });
+        if (!recovery.eligible) throw new NativeTaskServiceError("RECOVERY_REFUSED", 409, recovery.message);
+      }
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
       try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
-      catch { await stop(entry); entry.state = "failed"; entry.error = "Verified native resume was refused. No replacement session or provider request was created."; }
+      catch { await stop(entry); entry.state = "failed"; entry.error = "Native resume was refused. Restore the original execution settings and signed policies, confirm the prior writer has exited, then refresh. No replacement session or provider request was created."; }
       finally { entry.preparation = undefined; }
       return view(entry);
     },

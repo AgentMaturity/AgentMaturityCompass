@@ -163,6 +163,8 @@ export interface SessionEventStore {
  */
 export interface SessionStoreOpenOptions {
   readonly readOnly?: boolean;
+  /** Internal continuation preflight, repeated under JSONL's exclusive mutex before append descriptors open. */
+  readonly beforeWriterOpen?: () => void;
 }
 
 /** Thrown when a write is attempted on a read-only store. */

@@ -110,8 +110,10 @@ Studio's managed-task reader uses this same selected-store history path for
 cold inspection and archival. Non-owning observers refresh authenticated task
 admissions before acknowledging an exact retry; they do not automatically
 dispatch, resume or grant a new task. Reading JSONL after restart does **not**
-add JSONL writer-resume ownership: that separate unsupported operation remains
-an explicit refusal.
+grant JSONL writer-resume ownership. The separate [native recovery operation](SESSION_RESUME.md)
+must authenticate original controls and accounting, establish actual abandoned
+ownership, and win the exclusive writer mutex before appending. Its read-only
+readiness result is not a writer grant and never substitutes a new session.
 
 Managed children preserve an explicitly configured operator
 `AMC_CONTROL_CHECKPOINT_DIR`, so signed-policy rollback checks use the same

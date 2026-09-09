@@ -88,6 +88,8 @@ export interface NativeTaskView {
   readonly nextCursor: number; readonly firstCursor: number; readonly droppedEvents: number;
   readonly canResume: boolean;
   readonly resumeBlockedReason: string | null;
+  /** Read-only eligibility, not an ownership grant or a completed recovery. */
+  readonly recovery?: { readonly eligible: boolean; readonly state: "ready" | "interrupted" | "blocked"; readonly message: string } | null;
   readonly history: NativeTaskHistory;
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
