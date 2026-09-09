@@ -70,7 +70,9 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
         await expect(page.locator("#nativeTaskRetry")).toBeHidden();
         await expect(page.locator("#nativeTaskPrompt")).toHaveValue("Edited draft must remain unsent.");
         const beforeReplay = f.history(task.sessionId).events;
-        assert.equal(beforeReplay.filter(row => row.event_type === "request/header").length, 4);
+        // Candidate-01 recorded three actual request headers across these two
+        // stub turns; operator validation is not an additional model request.
+        assert.equal(beforeReplay.filter(row => row.event_type === "request/header").length, 3);
         const replay = await f.request(f.taskPath(task.taskId, "turn"), { body: originalBody });
         assert.equal(replay.status, 202); assert.equal(replay.body.data.revision, task.revision);
         assert.deepEqual(f.history(task.sessionId).events, beforeReplay);

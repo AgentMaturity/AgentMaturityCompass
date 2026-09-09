@@ -77,7 +77,10 @@ export async function publicTaskHttpFixture(mode: OutcomeCase = "success", backe
       headers?: Record<string, string | undefined> } = {}) {
       const identity = identities[options.identity ?? "owner"];
       const method = options.method ?? (options.body === undefined ? "GET" : "POST");
-      const headers: Record<string, string> = { ...(identity ? { cookie: identity.cookie } : {}), "content-type": "application/json" };
+      // A fixture restart represents a new HTTP connection, not an implicit
+      // retry on a pooled socket owned by the server that just stopped.
+      const headers: Record<string, string> = { ...(identity ? { cookie: identity.cookie } : {}),
+        "content-type": "application/json", connection: "close" };
       if (method !== "GET") Object.assign(headers, { origin: base, "x-amc-native-intent": "task-workspace-v1",
         ...(identity ? { "x-amc-native-csrf": identity.csrf } : {}) });
       for (const [key, value] of Object.entries(options.headers ?? {})) {
