@@ -1,0 +1,711 @@
+{
+  "recordedAt": "2026-09-09T17:47:30.576880+00:00",
+  "owner": "cos-native-public-history-20260909T163519Z",
+  "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
+  "branch": "amc/gap-register-execution",
+  "sourceCommits": [
+    "5e6cd45ea8a997a942ff2b3691bc9921ddf73315",
+    "80d35c9c864fa43720f0f82f025ce270aa59a48c",
+    "130c2d0087cf574016411fdc7d91067d3eddd637"
+  ],
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "node": "v25.5.0",
+    "pnpm": "10.33.0"
+  },
+  "sourceRuns": [
+    {
+      "receipt": "tmp/cos-native-history-batch-01/checks-receipt.json",
+      "report": "tmp/cos-native-history-batch-01/focused-results.json",
+      "sourceCommit": "5e6cd45ea8a997a942ff2b3691bc9921ddf73315",
+      "qualified": false,
+      "passed": 98,
+      "failed": 12,
+      "pending": 0,
+      "files": 9
+    },
+    {
+      "receipt": "tmp/cos-native-history-batch-01/candidate-02/checks-receipt.json",
+      "report": "tmp/cos-native-history-batch-01/candidate-02/focused-results.json",
+      "sourceCommit": "80d35c9c864fa43720f0f82f025ce270aa59a48c",
+      "qualified": false,
+      "passed": 188,
+      "failed": 4,
+      "pending": 0,
+      "files": 16
+    },
+    {
+      "receipt": "tmp/cos-native-history-batch-01/candidate-03/checks-receipt.json",
+      "report": "tmp/cos-native-history-batch-01/candidate-03/focused-results.json",
+      "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
+      "qualified": true,
+      "passed": 193,
+      "failed": 0,
+      "pending": 0,
+      "files": 16
+    }
+  ],
+  "finalSourceChecks": {
+    "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
+    "clone": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "node": "v25.5.0",
+    "pnpm": "10.33.0",
+    "scope": "focused source capability batch only; not installed, full-suite, release, human or platform-breadth qualification",
+    "startedAt": "2026-09-09T17:38:23.452153+00:00",
+    "steps": [
+      {
+        "name": "install",
+        "command": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ],
+        "pid": 62906,
+        "processGroup": 62906,
+        "timeoutSeconds": 600,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true,
+        "durationSeconds": 1.548
+      },
+      {
+        "name": "test-types",
+        "command": [
+          "pnpm",
+          "run",
+          "typecheck:tests"
+        ],
+        "pid": 62922,
+        "processGroup": 62922,
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true,
+        "durationSeconds": 27.673
+      },
+      {
+        "name": "build",
+        "command": [
+          "pnpm",
+          "run",
+          "build"
+        ],
+        "pid": 63046,
+        "processGroup": 63046,
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true,
+        "durationSeconds": 24.946
+      },
+      {
+        "name": "architecture",
+        "command": [
+          "pnpm",
+          "run",
+          "check:architecture-boundaries"
+        ],
+        "pid": 63263,
+        "processGroup": 63263,
+        "timeoutSeconds": 120,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true,
+        "durationSeconds": 1.771
+      },
+      {
+        "name": "focused",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "tests/publicApiSurface.test.ts",
+          "tests/studioNativeTaskService.test.ts",
+          "tests/studioNativeTaskValidation.test.ts",
+          "tests/studioNativeTaskDescriptors.test.ts",
+          "tests/studioNativeTaskSubmission.test.ts",
+          "tests/nativeValidation.test.ts",
+          "tests/nativeValidationSurfaces.test.ts",
+          "tests/nativeValidationOutcomeSurfaces.test.ts",
+          "tests/sessionStoreConformance.test.ts",
+          "tests/agentRunJsonlVerification.test.ts",
+          "tests/jsonlWorkspaceVerification.test.ts",
+          "tests/jsonlSessionStore.test.ts",
+          "tests/sessionSpillCommitment.test.ts",
+          "tests/sessionSpillRead.test.ts",
+          "tests/sessionSpill.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/focused-results.json"
+        ],
+        "pid": 63292,
+        "processGroup": 63292,
+        "timeoutSeconds": 600,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true,
+        "durationSeconds": 111.055
+      }
+    ],
+    "qualified": true,
+    "trackedSourceClean": true,
+    "finishedAt": "2026-09-09T17:41:10.480809+00:00",
+    "allObservedProcessGroupsClosed": true
+  },
+  "mutations": {
+    "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
+    "environment": {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "node": "v25.5.0",
+      "pnpm": "10.33.0"
+    },
+    "scope": "five deliberate public-loader guard removals, focused regression source only",
+    "runs": [
+      {
+        "name": "verification-result",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/verification-result.json",
+          "-t",
+          "selected session cannot conceal"
+        ],
+        "pid": 63773,
+        "exitCode": 1,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 0,
+        "failed": 1,
+        "pending": 31,
+        "failedAssertions": [
+          {
+            "name": "public complete persisted session history the selected session cannot conceal corrupted evidence in another session",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:127:77\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "agent-identity",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/agent-identity.json",
+          "-t",
+          "wrong agent, wrong pin"
+        ],
+        "pid": 63782,
+        "exitCode": 1,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 0,
+        "failed": 1,
+        "pending": 31,
+        "failedAssertions": [
+          {
+            "name": "public complete persisted session history wrong agent, wrong pin and empty pin are refused; unpinned consistency is not anchored",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:184:95\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "sealed-required",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/sealed-required.json",
+          "-t",
+          "an unsealed signed prefix"
+        ],
+        "pid": 63787,
+        "exitCode": 1,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 0,
+        "failed": 1,
+        "pending": 31,
+        "failedAssertions": [
+          {
+            "name": "public complete persisted session history an unsealed signed prefix is explicit and can be bound to an independently saved head",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:109:79\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "external-head",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/external-head.json",
+          "-t",
+          "an unsealed signed prefix"
+        ],
+        "pid": 63793,
+        "exitCode": 1,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 0,
+        "failed": 1,
+        "pending": 31,
+        "failedAssertions": [
+          {
+            "name": "public complete persisted session history an unsealed signed prefix is explicit and can be bound to an independently saved head",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:112:104\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "snapshot-fence",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/snapshot-fence.json",
+          "-t",
+          "observed history changes"
+        ],
+        "pid": 63799,
+        "exitCode": 1,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 0,
+        "failed": 1,
+        "pending": 31,
+        "failedAssertions": [
+          {
+            "name": "public complete persisted session history observed history changes return no stale snapshot or partial rows",
+            "messages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/tests/sessionEventHistory.test.ts:201:58\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "mutationKilled": true
+      },
+      {
+        "name": "restored",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/sessionEventHistory.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile.json=/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/mutations/restored.json"
+        ],
+        "pid": 63803,
+        "exitCode": 0,
+        "timedOut": false,
+        "postParentGroupPresent": false,
+        "processGroupClosed": true,
+        "passed": 32,
+        "failed": 0,
+        "pending": 0,
+        "failedAssertions": []
+      }
+    ],
+    "qualified": true,
+    "restoredSourceSha256": "7e6ebce77034a1b52cd89beb1aa94725222bf16b4b49734082fd4c1d376bb9a2",
+    "trackedSourceClean": true,
+    "allObservedProcessGroupsClosed": true,
+    "finishedAt": "2026-09-09T17:43:19.337123+00:00"
+  },
+  "installedHistory": {
+    "sourceCommit": "130c2d0087cf574016411fdc7d91067d3eddd637",
+    "environment": {
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "machine": "arm64",
+      "node": "v25.5.0",
+      "pnpm": "10.33.0"
+    },
+    "scope": "installed package public root/native SDK JSONL history loading after real process restart, local stub only",
+    "notQualified": [
+      "full retained-output lifecycle acceptance",
+      "real providers",
+      "human evidence",
+      "other platforms",
+      "release gate",
+      "publication",
+      "deployment"
+    ],
+    "packGate": "npm pack --ignore-scripts deliberately skips prepack release gate for a scoped local package test; no gate pass is claimed",
+    "startedAt": "2026-09-09T17:43:19.449986+00:00",
+    "steps": [
+      {
+        "name": "pack",
+        "command": [
+          "npm",
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/source",
+        "pid": 63816,
+        "processGroup": 63816,
+        "timeoutSeconds": 120,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true
+      },
+      {
+        "name": "install",
+        "command": [
+          "npm",
+          "install",
+          "--omit=dev",
+          "--no-audit",
+          "--no-fund",
+          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "pid": 63820,
+        "processGroup": 63820,
+        "timeoutSeconds": 300,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true
+      },
+      {
+        "name": "dependency-tree",
+        "command": [
+          "npm",
+          "ls",
+          "--all",
+          "--json"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "pid": 63877,
+        "processGroup": 63877,
+        "timeoutSeconds": 120,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true
+      },
+      {
+        "name": "produce",
+        "command": [
+          "node",
+          "history.mjs",
+          "produce",
+          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "pid": 63878,
+        "processGroup": 63878,
+        "timeoutSeconds": 90,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true
+      },
+      {
+        "name": "cold-read",
+        "command": [
+          "node",
+          "history.mjs",
+          "cold-read",
+          "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer",
+        "pid": 63886,
+        "processGroup": 63886,
+        "timeoutSeconds": 60,
+        "timedOut": false,
+        "exitCode": 0,
+        "postParentGroupPresent": false,
+        "observedProcessGroupClosed": true
+      }
+    ],
+    "qualifiedForScope": true,
+    "package": {
+      "name": "agent-maturity-compass",
+      "version": "1.2.0",
+      "tarball": "/Users/sid/AgentMaturityCompass/tmp/cos-native-history-batch-01/candidate-03/installed-history/package/agent-maturity-compass-1.2.0.tgz",
+      "sha256": "3ce7c636ec4fc8fbb38caa567ada1587752dd2ffd26635ecc45dca4ca5ebf730",
+      "npmIntegrity": "sha512-cZymUCfFWp4i6MT5F3lE2xLQSGIOVCOvWil4tDhfhB3u7cE6GMLeUwT1gM078y7jreLZUCzHOLcX4wOzGftkCA=="
+    },
+    "consumerLockSha256": "60965a7d44de9ee0a07be8f7335d79efb1ac9c5f65df16f5e88594cd2210442e",
+    "result": {
+      "stage": "cold-read",
+      "readerPid": 63886,
+      "producerPid": 63878,
+      "rows": 28,
+      "sessions": [
+        {
+          "id": "5093d3c8-551d-447e-ad4b-d5feda13a7c7",
+          "head": "dffcd7fdc749f8b4c9fbdf4c630e39fc5f87a857ea6fd2a5b3cf08fe299d0032",
+          "rows": 14
+        },
+        {
+          "id": "c442c2be-0a37-4090-9bb7-19a6f8a07f6a",
+          "head": "c26f28f7b7287d95fb16e4d7c83840e11784edd74e5af35c4e912644bd2e48c7",
+          "rows": 14
+        }
+      ],
+      "refused": [
+        "missing-session",
+        "wrong-agent",
+        "wrong-monitor-pin",
+        "backend-conflict",
+        "torn-evidence",
+        "missing-jsonl-not-operations-fallback"
+      ],
+      "metadataOnly": true,
+      "retainedOutputRead": false,
+      "restoredByteIdentical": true,
+      "localFixturePinOnly": true,
+      "publicExportsOnly": true,
+      "processRestart": true
+    },
+    "trackedSourceClean": true,
+    "allObservedProcessGroupsClosed": true,
+    "finishedAt": "2026-09-09T17:43:36.271570+00:00"
+  },
+  "receiptIndex": [
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/checks-receipt.json",
+      "sha256": "5b92c4712eca89b41be32093100c47ea7ec445cb06a30ede9fa32e1e4e152e2d"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/focused-results.json",
+      "sha256": "2c772f4fa386bae3456eca1561b06518e9577c6c8d80340ae32dfdeb1ab9f324"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/mutations/receipt.json",
+      "sha256": "1fc9d0d5b4e491021cbc1574e5522134b585b33d602c47c119c4f231cc499db3"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/installed-history/receipt.json",
+      "sha256": "d7c077b5f29a8537c2b3a59f8ec4fe3f3b7a1efa84427320ea2c8b2a154bb2da"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/installed-history/writer-pin.json",
+      "sha256": "e6446564d7e27ce99e8246ff79ef20cdd229021bea2bdd25646caf1c1d242fd1"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/installed-history/cold-result.json",
+      "sha256": "83e20908478238f35a39a55ce95226c1ea06f293b5fd6e469c3c1a3096057b5d"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/installed-history/consumer/package-lock.json",
+      "sha256": "60965a7d44de9ee0a07be8f7335d79efb1ac9c5f65df16f5e88594cd2210442e"
+    },
+    {
+      "path": "tmp/cos-native-history-batch-01/candidate-03/installed-history/dependency-tree.stdout",
+      "sha256": "fe8858c0130cfebb6043b2a6b9048712b1ab1f7b785ca375e9e18238a3d06b95"
+    }
+  ],
+  "closure": {
+    "allObservedProcessGroupsClosed": true,
+    "observations": [
+      {
+        "processGroup": 60737,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 60758,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 60962,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 61119,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 61147,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 61662,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 61679,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 61803,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 62007,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 62046,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 62906,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 62922,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63046,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63263,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63292,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63773,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63782,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63787,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63793,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63799,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63803,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63816,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63820,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63877,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63878,
+        "presentAtFinalObservation": false
+      },
+      {
+        "processGroup": 63886,
+        "presentAtFinalObservation": false
+      }
+    ],
+    "activeOwnedExecution": null,
+    "workers": []
+  },
+  "trackers": {
+    "flag": "LINEAR-PENDING",
+    "applied": false,
+    "pendingActions": "TRACKER_PENDING.md",
+    "priorPendingPath": "AMC_OS/RESEARCH/2026-09-09-public-docs-correction/linear-pending.json",
+    "priorPendingSha256": "cb42b90123526724a9c960628502328bf9c356901d48b6d67463ad92d2e2b8b6",
+    "AMC1547ReadbackRequiredBeforeRetry": true
+  },
+  "obsidian": {
+    "updatedThisBatch": false,
+    "reason": "Checkpoint/update preparation was blocked and not replayed; prior five notes preserved."
+  },
+  "priorReviewBlocker": {
+    "path": "AMC_OS/RESEARCH/2026-09-09-public-docs-correction/checkpoint-blocker.json",
+    "sha256": "5764f882d344969981187f6b26737260b90d1f1d51256285277bc0db959df5ba",
+    "preserved": true
+  },
+  "reviewBlockers": "REVIEW_BLOCKERS.md",
+  "notQualified": [
+    "full suite",
+    "release/prepack gate",
+    "full installed retained-output lifecycle",
+    "new HTTP/browser acceptance",
+    "non-Darwin platforms",
+    "real providers",
+    "human evidence",
+    "JSONL writer-resume ownership",
+    "production secret/key rotation",
+    "publication",
+    "deployment"
+  ],
+  "nextAction": "Implement newly pinned installed retained-output lifecycle harness using the exported complete history loader; preserve all historical a598 labels and receipts."
+}
