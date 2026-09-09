@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, realpathSync, writeFileSync, readFileSync } from "
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Database from "better-sqlite3";
 import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
@@ -13,6 +13,7 @@ import { DEFAULT_MAX_DELEGATION_DEPTH } from "../src/agent/delegationIdentity.js
 import { delegationTurnOptions } from "../src/agent/providers/delegationProviders.js";
 import { initPresets, presetsPath, savePresets } from "../src/presets/agentPresets.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL } from "../src/agent/stubProvider.js";
+import * as nativeRunner from "../src/kernel/agentLoopRunner.js";
 
 /**
  * `amc agent-loop run --delegate`, end to end (P6.1a).
@@ -37,6 +38,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   process.chdir(cwd);
   rmSync(dir, { recursive: true, force: true });
   rmSync(home, { recursive: true, force: true });
@@ -349,6 +351,97 @@ describe("the delegation options a run is given", () => {
     expect(delegationTurnOptions({ grant, maxDepth: 3, scope: ["READ_ONLY"] }).scope)
       .toEqual(["READ_ONLY"]);
     expect("scope" in delegationTurnOptions({ grant, maxDepth: 3 })).toBe(false);
+  });
+
+  it("carries explicit stop conditions, including an empty operator reset, without inventing an absent bound", () => {
+    expect(delegationTurnOptions({ grant, maxDepth: 3, stopConditions: ["max-turns:2", "timeout-ms:5000"] }).stopConditions)
+      .toEqual(["max-turns:2", "timeout-ms:5000"]);
+    expect(delegationTurnOptions({ grant, maxDepth: 3, stopConditions: [] }).stopConditions).toEqual([]);
+    expect("stopConditions" in delegationTurnOptions({ grant, maxDepth: 3 })).toBe(false);
+  });
+});
+
+describe("operator delegation stop configuration", () => {
+  it("passes both repeated bounds into the actual composed run and describes their units", async () => {
+    process.chdir(dir); permitDelegate();
+    // A call-through spy observes the real CLI boundary; the local stub still
+    // drives its ordinary parent turn. Child lifetime enforcement has separate
+    // runtime tests, so this does not claim a child was spawned.
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const { program, captured } = programWith();
+    await run(program, argvFor(["--delegate", "--delegate-stop", "max-turns:2", "--delegate-stop", "timeout-ms:5000", "--json"]));
+    expect(captured.failures).toEqual([]);
+    expect(composed).toHaveBeenCalledOnce();
+    expect(composed.mock.calls[0]?.[0].delegation?.stopConditions).toEqual(["max-turns:2", "timeout-ms:5000"]);
+    expect(captured.errors.join("\n")).toContain("initial child executor turn plus continuations, not model steps");
+    expect(captured.errors.join("\n")).toContain("whole child lifetime including idle and does not reset on follow-up");
+  });
+
+  it("inherits signed bounds when flags are absent, replaces them explicitly, and preserves an explicit reset", async () => {
+    process.chdir(dir); permitDelegate();
+    savePresets(dir, [{ id: "bounded", description: "Bounded child work", model: STUB_PROVIDER_MODEL, providerId: STUB_PROVIDER_ID,
+      tools: "workspace", delegate: { enabled: true, stopConditions: ["max-turns:3", "timeout-ms:9000"] } }]);
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const inherited = programWith();
+    await run(inherited.program, argvFor(["--preset", "bounded", "--json"]));
+    expect(inherited.captured.failures).toEqual([]);
+    expect(composed.mock.calls.at(-1)?.[0].delegation?.stopConditions).toEqual(["max-turns:3", "timeout-ms:9000"]);
+    const explicit = programWith();
+    await run(explicit.program, argvFor(["--preset", "bounded", "--delegate-stop", "max-turns:1", "--json"]));
+    expect(explicit.captured.failures).toEqual([]);
+    expect(composed.mock.calls.at(-1)?.[0].delegation?.stopConditions).toEqual(["max-turns:1"]);
+    const cleared = programWith();
+    await run(cleared.program, argvFor(["--preset", "bounded", "--no-delegate-stop", "--json"]));
+    expect(cleared.captured.failures).toEqual([]);
+    expect(composed.mock.calls.at(-1)?.[0].delegation?.stopConditions).toEqual([]);
+    expect(cleared.captured.errors.join("\n")).toContain("extra delegation stops were explicitly cleared; existing budgets, depth and approvals still apply");
+  });
+
+  it.each([
+    ["--delegate-stop", "max-turns:1"], ["--no-delegate-stop"]
+  ].map(flags => ({ flags })))("refuses stop options with delegation disabled: $flags", async ({ flags }) => {
+    process.chdir(dir);
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const { program, captured } = programWith();
+    await run(program, argvFor([...flags, "--json"]));
+    expect(captured.failures).not.toEqual([]);
+    expect(captured.errors.join("\n")).toContain("require --delegate");
+    expect(composed).not.toHaveBeenCalled();
+  });
+
+  it("refuses bounds if the chosen tool mode would offer no delegation", async () => {
+    process.chdir(dir);
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const { program, captured } = programWith();
+    await run(program, argvFor(["--delegate", "--tools", "none", "--delegate-stop", "max-turns:1", "--json"]));
+    expect(captured.failures).not.toEqual([]);
+    expect(captured.errors.join("\n")).toContain("require --tools workspace");
+    expect(composed).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["max-steps:2"], ["max-turns:0"], ["max-turns:01"], ["max-turns:1.5"], ["max-turns:9007199254740992"],
+    ["timeout-ms:2147483648"], ["timeout-ms:1000", "timeout-ms:2000"], ["max-turns:1", "max-turns:1"]
+  ].map(conditions => ({ conditions })))("refuses malformed, unknown, duplicate or unsafe bounds before a turn: $conditions", async ({ conditions }) => {
+    process.chdir(dir);
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const { program, captured } = programWith();
+    await run(program, argvFor(["--delegate", ...conditions.flatMap(condition => ["--delegate-stop", condition]), "--json"]));
+    expect(captured.failures).not.toEqual([]);
+    expect(captured.errors.join("\n")).toContain("--delegate-stop:");
+    expect(composed).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["--delegate-stop", "max-turns:1", "--no-delegate-stop"],
+    ["--no-delegate-stop", "--delegate-stop", "max-turns:1"]
+  ].map(flags => ({ flags })))("refuses contradictory flags in either order: $flags", async ({ flags }) => {
+    process.chdir(dir);
+    const composed = vi.spyOn(nativeRunner, "runComposedTurn");
+    const { program } = programWith();
+    program.configureOutput({ writeErr: () => {} });
+    await expect(run(program, argvFor(["--delegate", ...flags]))).rejects.toMatchObject({ code: "commander.invalidArgument" });
+    expect(composed).not.toHaveBeenCalled();
   });
 });
 

@@ -106,6 +106,71 @@ describe("signed native chat composition admission", () => {
     expect(fetchBoundary).not.toHaveBeenCalled();
   });
 
+  it("retains signed child stops and accepts a complete explicit replacement", () => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, stopConditions: ["max-turns:3", "timeout-ms:9000"] } })]);
+    const inherited = resolveNativeChatProfile({ workspace: root, preset: "reviewer" });
+    expect(inherited.effectiveOptions.delegateStop).toEqual(["max-turns:3", "timeout-ms:9000"]);
+    const explicit = resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegateStop: ["max-turns:1"] });
+    expect(explicit.effectiveOptions.delegateStop).toEqual(["max-turns:1"]);
+    expect(nativeChatProfileArgv(explicit)).toContain("--delegate-stop=max-turns:1");
+    expect(nativeChatProfileArgv(explicit).join(" ")).not.toContain("timeout-ms:9000");
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
+  it.each([{ reset: false as const }, { reset: [] as string[] }])("preserves an explicit empty stop reset through captured argv: $reset", ({ reset }) => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, stopConditions: ["max-turns:3"] } })]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegateStop: reset });
+    expect(profile.effectiveOptions.delegateStop).toEqual([]);
+    expect(nativeChatProfileArgv(profile, "run")).toContain("--no-delegate-stop");
+    expect(nativeChatProfileArgv(profile, "chat")).toContain("--no-delegate-stop");
+    expect(() => assertNativeChatProfileCurrent(profile)).not.toThrow();
+  });
+
+  it("does not invent a reset or a stop when the operator has configured neither", () => {
+    const profile = resolveNativeChatProfile({ workspace: workspace(), delegate: true, tools: "workspace" });
+    expect(profile.effectiveOptions.delegateStop).toBeUndefined();
+    expect(nativeChatProfileArgv(profile).some(arg => arg.startsWith("--delegate-stop") || arg === "--no-delegate-stop")).toBe(false);
+  });
+
+  it("refuses a newly signed stop policy before the next chat turn even when an explicit override was captured", () => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, stopConditions: ["max-turns:3"] } })]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegateStop: ["max-turns:1"] });
+    savePresets(root, [reviewer({ delegate: { enabled: true, stopConditions: ["max-turns:4"] } })]);
+    expect(resolvePreset(root, "reviewer").ok).toBe(true);
+    expect(() => assertNativeChatProfileCurrent(profile)).toThrow(/changed|no longer verifies/i);
+    expect(profile.effectiveOptions.delegateStop).toEqual(["max-turns:1"]);
+  });
+
+  it.each([
+    ["max-steps:1"], ["max-turns:0"], ["max-turns:01"], ["max-turns:9007199254740992"],
+    ["timeout-ms:2147483648"], ["max-turns:1", "max-turns:2"]
+  ].map(conditions => ({ conditions })))("refuses bad stops in both explicit options and signed preset admission: $conditions", ({ conditions }) => {
+    const root = workspace();
+    expect(() => resolveNativeChatProfile({ workspace: root, tools: "workspace", delegate: true, delegateStop: conditions })).toThrow(/--delegate-stop/);
+    const invalid = reviewer({ delegate: { enabled: true, stopConditions: conditions } });
+    expect(() => savePresets(root, [invalid])).toThrow(/stopConditions/);
+    // Sign externally authored invalid bytes as an operator could. Signature
+    // validity must not turn an invalid stop vocabulary into a runnable preset.
+    writeFileSync(presetsPath(root), JSON.stringify({ presets: [invalid] }));
+    signFileWithAuditor(root, presetsPath(root));
+    expect(resolvePreset(root, "reviewer").ok).toBe(false);
+    expect(() => resolveNativeChatProfile({ workspace: root, preset: "reviewer" })).toThrow(/missing, invalid|unverifiable/);
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
+  it("refuses unused stops when delegation is disabled without reinterpreting the legacy foreign timeout", () => {
+    const root = workspace();
+    expect(() => resolveNativeChatProfile({ workspace: root, delegateStop: ["max-turns:1"] })).toThrow(/require --delegate/);
+    expect(() => resolveNativeChatProfile({ workspace: root, delegateStop: false })).toThrow(/require --delegate/);
+    expect(() => savePresets(root, [reviewer({ delegate: { enabled: false, stopConditions: ["max-turns:1"] } })])).toThrow(/delegate.enabled/);
+    savePresets(root, [reviewer({ delegate: { enabled: true, provider: "in-process", timeoutMs: 1000, stopConditions: ["timeout-ms:5000"] } })]);
+    expect(() => resolveNativeChatProfile({ workspace: root, preset: "reviewer" })).toThrow(/foreign-process delegation timeout/);
+  });
+
   it("refuses later changed policy even after the new bytes receive a valid workspace signature", () => {
     const root = workspace();
     savePresets(root, [reviewer()]);
@@ -171,6 +236,41 @@ describe("signed native chat composition admission", () => {
 });
 
 describe("native chat resume arguments target the actual chat grammar", () => {
+  it.each([
+    { explicit: undefined, expected: ["max-turns:3", "timeout-ms:9000"] },
+    { explicit: ["max-turns:1"], expected: ["max-turns:1"] },
+    { explicit: [] as string[], expected: [] as string[] }
+  ])("round-trips child stop selection through actual chat grammar: $expected", async ({ explicit, expected }) => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, stopConditions: ["max-turns:3", "timeout-ms:9000"] } })]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer", ...(explicit === undefined ? {} : { delegateStop: explicit }) });
+    tty(false);
+    const { program, output, fail } = registry(root);
+    await program.parseAsync(chatResumeArguments(profile, "existing-session-reference"), { from: "user" });
+    const chat = program.commands.find(command => command.name() === "agent-loop")!.commands.find(command => command.name() === "chat")!;
+    expect(chat.opts().delegateStop).toEqual(expected.length === 0 ? false : expected);
+    const reconstructed = resolveNativeChatProfile({ ...chat.opts(), workspace: root });
+    expect(reconstructed.effectiveOptions.delegateStop).toEqual(expected);
+    expect(output.join("\n")).toContain("Interactive chat requires a terminal");
+    expect(fail).toHaveBeenCalledOnce();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["--delegate-stop", "max-turns:1", "--no-delegate-stop"],
+    ["--no-delegate-stop", "--delegate-stop", "max-turns:1"]
+  ].map(flags => ({ flags })))("refuses conflicting chat stop/reset flags before preflight: $flags", async ({ flags }) => {
+    const root = workspace(); tty(true);
+    const { program, fail } = registry(root);
+    await expect(program.parseAsync(["agent-loop", "chat", "--delegate", "--tools", "workspace", ...flags], { from: "user" }))
+      .rejects.toMatchObject({ code: "commander.invalidArgument" });
+    expect(fail).not.toHaveBeenCalled();
+    expect(ioEdges.createInterface).not.toHaveBeenCalled();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
   it("parses a delegated signed resume command with exact free-text persona, then stops at the non-terminal boundary", async () => {
     const root = workspace();
     const persona = "--provider=stub $(touch nothing) 'quoted'\nKeep this as persona text.";

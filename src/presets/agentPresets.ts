@@ -4,6 +4,7 @@ import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { DELEGATION_SCOPE_TOKENS } from "../agent/delegationScope.js";
+import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 
 /**
  * Agent presets (plan P6.3): a named composition an operator can invoke.
@@ -35,9 +36,18 @@ const delegateSchema = z
     scope: z.array(z.enum(DELEGATION_SCOPE_TOKENS as unknown as [string, ...string[]])).optional(),
     maxDepth: z.number().int().min(1).optional(),
     provider: z.string().min(1).optional(),
-    timeoutMs: z.number().int().min(1_000).optional()
+    /** Foreign process timeout; distinct from the whole-child stop below. */
+    timeoutMs: z.number().int().min(1_000).optional(),
+    stopConditions: z.array(z.string()).optional()
   })
-  .strict();
+  .strict()
+  .superRefine((delegate, context) => {
+    const parsed = parseSubagentStopConditions(delegate.stopConditions);
+    if (!parsed.ok) context.addIssue({ code: "custom", path: ["stopConditions"], message: parsed.reason });
+    if (!delegate.enabled && delegate.stopConditions !== undefined) {
+      context.addIssue({ code: "custom", path: ["stopConditions"], message: "Delegation stop conditions require delegate.enabled: true." });
+    }
+  });
 
 const presetSchema = z
   .object({

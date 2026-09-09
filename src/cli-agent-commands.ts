@@ -48,6 +48,7 @@ import { NativeMcpConfigError, type LoadedNativeMcpConfiguration } from "./setup
 import { delegateTool } from "./agent/delegateTool.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
+import { parseSubagentStopConditions } from "./agent/subagentStopConditions.js";
 import { prepareSkillTurn, workspaceSkillRoots } from "./skills/skillTurn.js";
 import { buildSkillCatalog } from "./skills/skillCatalog.js";
 import { loadNativeExtensions, type NativeExtensionTurn } from "./extensions/nativeExtensionRuntime.js";
@@ -64,7 +65,7 @@ import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideComm
 import type { ActionClass } from "./types.js";
 
 import {
-  approvalGateFor, collectOption, integerOption, paramsFor, renderNotification, routeFor,
+  approvalGateFor, collectOption, collectDelegateStop, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
   type AgentLoopCliIo, type RunOptions
 } from "./cli-agent-options.js";
 export type { AgentLoopCliIo, RunOptions } from "./cli-agent-options.js";
@@ -180,6 +181,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--max-delegation-depth <n>", "maximum native child depth")
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop)
+    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
     .option("--provider <id>", "explicit provider; asks in a terminal when omitted")
     .option("--model <model>", "your model ID; asks for a real provider when omitted")
     .option("--base-url <origin>", "explicit HTTP(S) provider origin; retained for every turn and resume command")
@@ -240,6 +243,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "requires AMC Studio to be running."
     )
     .option("--delegate-timeout <ms>", "how long a foreign delegate may run before it is killed")
+    .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle); applies to native and foreign children", collectDelegateStop)
+    .option("--no-delegate-stop", "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply", resetDelegateStops)
     .option(
       "--preset <id>",
       "compose this run from a signed preset in .amc/agents.yaml. Explicit flags override it."
@@ -299,6 +304,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           approveTools: opts.approveTools ?? preset.approveTools,
           delegate: opts.delegate ?? preset.delegate?.enabled,
           delegateScope: opts.delegateScope ?? preset.delegate?.scope?.join(","),
+          delegateStop: opts.delegateStop ?? preset.delegate?.stopConditions,
           maxDelegationDepth: opts.maxDelegationDepth ?? (preset.delegate?.maxDepth === undefined ? undefined : String(preset.delegate.maxDepth)),
           delegateProvider: opts.delegateProvider ?? preset.delegate?.provider,
           delegateTimeout: opts.delegateTimeout ?? (preset.delegate?.timeoutMs === undefined ? undefined : String(preset.delegate.timeoutMs))
@@ -370,6 +376,10 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         delegateScope = parsed.classes;
       }
       const delegateTimeout = integerOption(io, "--delegate-timeout", opts.delegateTimeout, 0);
+      const delegateStops = parseSubagentStopConditions(opts.delegateStop === false ? [] : opts.delegateStop);
+      if (!delegateStops.ok) {
+        io.error(chalk.red(`--delegate-stop: ${delegateStops.reason}`)); io.fail(); return;
+      }
       const maxDelegationDepth = integerOption(
         io, "--max-delegation-depth", opts.maxDelegationDepth, DEFAULT_MAX_DELEGATION_DEPTH
       );
@@ -434,6 +444,14 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       // echo tool exists precisely to make a multi-step turn observable.
       const toolMode = opts.tools ?? preset?.tools ?? (providerId === STUB_PROVIDER_ID ? "echo" : "none");
       const wantsDelegation = opts.delegate === true;
+      if (!wantsDelegation && opts.delegateStop !== undefined) {
+        io.error(chalk.red("--delegate-stop and --no-delegate-stop require --delegate or delegate.enabled in the signed preset."));
+        io.fail(); return;
+      }
+      if (opts.delegateStop !== undefined && toolMode !== "workspace") {
+        io.error(chalk.red("Delegation stop conditions require --tools workspace; this run would otherwise offer no child delegation."));
+        io.fail(); return;
+      }
       if (!wantsDelegation && opts.delegateProvider !== undefined) {
         // A flag configuring a capability nobody asked for does nothing, and the
         // operator has no way to tell it did nothing.
@@ -573,6 +591,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
               ? "delegates have no additional action-class scope; native children use built-in workspace tools under the root's signed policy"
               : `delegates are scoped to: ${delegateScope.join(", ")}`
           ));
+          progress(chalk.dim(delegateStops.conditions.length === 0
+            ? `${opts.delegateStop === false ? "extra delegation stops were explicitly cleared" : "delegates have no extra stop conditions"}; existing budgets, depth and approvals still apply`
+            : `delegation stop conditions: ${delegateStops.conditions.join(", ")}; max-turns counts the initial child executor turn plus continuations, not model steps; timeout-ms covers the whole child lifetime including idle and does not reset on follow-up`));
         }
         // The run finally block releases mounts before this recorder handle.
       } else if (toolMode === "echo") {
@@ -682,6 +703,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                   grant: grantDelegation,
                   maxDepth: maxDelegationDepth,
                   scope: delegateScope,
+                  ...(opts.delegateStop === undefined ? {} : { stopConditions: delegateStops.conditions }),
                   runner: foreignRunner
                 })
               }),

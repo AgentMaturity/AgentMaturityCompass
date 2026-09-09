@@ -1,4 +1,5 @@
 import { parseDelegationScope } from "../agent/delegationScope.js";
+import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import { credentialRef } from "../credentials/credentialRef.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { resolvePreset, type AgentPreset } from "../presets/agentPresets.js";
@@ -10,6 +11,8 @@ export interface NativeChatProfileOptions extends NativeFirstUseOptions {
   readonly delegate?: boolean;
   readonly maxDelegationDepth?: string;
   readonly delegateScope?: string;
+  /** False explicitly clears a signed preset's extra stops. Effective values are arrays. */
+  readonly delegateStop?: readonly string[] | false;
   readonly tools?: string;
   readonly toolMode?: string;
   readonly maxTokens?: string;
@@ -87,9 +90,12 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
   if (delegate && preset?.delegate?.timeoutMs !== undefined) {
     throw new NativeChatProfileError("This preset sets a foreign-process delegation timeout. Remove that unused setting from the native preset instead of silently ignoring it.");
   }
-  if (!delegate && (options.maxDelegationDepth !== undefined || options.delegateScope !== undefined)) {
+  if (!delegate && (options.maxDelegationDepth !== undefined || options.delegateScope !== undefined || options.delegateStop !== undefined)) {
     throw new NativeChatProfileError("Delegation bounds require --delegate or delegate.enabled in the signed preset.");
   }
+  const rawStops = options.delegateStop === false ? [] : options.delegateStop ?? preset?.delegate?.stopConditions;
+  const stopConditions = parseSubagentStopConditions(rawStops);
+  if (!stopConditions.ok) throw new NativeChatProfileError(`--delegate-stop: ${stopConditions.reason}`);
   const maxTokens = positiveOption("--max-tokens", options.maxTokens, preset?.maxTokens);
   const maxSteps = positiveOption("--max-steps", options.maxSteps, preset?.maxSteps);
   const maxDelegationDepth = delegate
@@ -134,6 +140,7 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
     ...(maxSteps === undefined ? {} : { maxSteps }),
     ...(maxDelegationDepth === undefined ? {} : { maxDelegationDepth }),
     ...(delegateScope === undefined ? {} : { delegateScope }),
+    ...(rawStops === undefined ? {} : { delegateStop: stopConditions.conditions }),
     ...(approveTools === undefined ? {} : { approveTools }),
     ...(approveRisk === undefined ? {} : { approveRisk })
   };
@@ -153,7 +160,9 @@ export function nativeChatProfileArgv(profile: NativeChatProfile, surface: "run"
     ...(surface === "run" ? ["--tool-mode=native"] : []),
     ...(options.delegate ? ["--delegate", ...(surface === "run" ? ["--delegate-provider=in-process"] : []),
       ...(options.maxDelegationDepth === undefined ? [] : [`--max-delegation-depth=${options.maxDelegationDepth}`]),
-      ...(options.delegateScope === undefined ? [] : [`--delegate-scope=${options.delegateScope}`])] : [])
+      ...(options.delegateScope === undefined ? [] : [`--delegate-scope=${options.delegateScope}`]),
+      ...(options.delegateStop === undefined ? [] : options.delegateStop === false || options.delegateStop.length === 0
+        ? ["--no-delegate-stop"] : options.delegateStop.map(condition => `--delegate-stop=${condition}`))] : [])
   ];
 }
 
