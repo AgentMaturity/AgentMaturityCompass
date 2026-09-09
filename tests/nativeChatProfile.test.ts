@@ -78,6 +78,52 @@ function chatResumeArguments(profile: NativeChatProfile, sessionId: string): str
 }
 
 describe("signed native chat composition admission", () => {
+  it("pins disabled delegation instead of letting the child re-enable a signed preset", () => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, provider: "in-process", scope: ["READ_ONLY"], maxDepth: 2, stopConditions: ["max-turns:3"] } })]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegate: false, tools: "none" });
+    expect(profile.effectiveOptions).toMatchObject({ delegate: false, tools: "none", approveTools: "READ_ONLY" });
+    expect(profile.effectiveOptions.delegateStop).toBeUndefined();
+    expect(profile.effectiveOptions.delegateScope).toBeUndefined();
+    expect(profile.effectiveOptions.maxDelegationDepth).toBeUndefined();
+    for (const surface of ["run", "chat"] as const) {
+      const argv = nativeChatProfileArgv(profile, surface);
+      expect(argv).toContain("--no-delegate");
+      expect(argv).toContain("--preset=reviewer");
+      expect(argv).not.toContain("--delegate");
+      expect(argv.some(arg => /^--(?:delegate-(?:provider|scope|stop)|max-delegation-depth)=/.test(arg))).toBe(false);
+    }
+    expect(() => assertNativeChatProfileCurrent(profile)).not.toThrow();
+    expect(fetchBoundary).not.toHaveBeenCalled();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+  });
+
+  it("rejects explicit child bounds while delegation is disabled", () => {
+    const root = workspace(); savePresets(root, [reviewer()]);
+    for (const child of [{ delegateScope: "READ_ONLY" }, { maxDelegationDepth: "2" }, { delegateStop: ["max-turns:1"] }, { delegateStop: false as const }]) {
+      expect(() => resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegate: false, ...child })).toThrow(/require --delegate/);
+    }
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+  });
+
+  it("round-trips the disabled posture through actual chat resume grammar without a child or provider", async () => {
+    const root = workspace();
+    savePresets(root, [reviewer({ delegate: { enabled: true, provider: "in-process", stopConditions: ["max-turns:2"] } })]);
+    const profile = resolveNativeChatProfile({ workspace: root, preset: "reviewer", delegate: false });
+    tty(false);
+    const { program, output, fail } = registry(root);
+    await program.parseAsync(chatResumeArguments(profile, "same-session"), { from: "user" });
+    const chat = program.commands.find(command => command.name() === "agent-loop")!.commands.find(command => command.name() === "chat")!;
+    expect(chat.opts().delegate).toBe(false);
+    const reconstructed = resolveNativeChatProfile({ ...chat.opts(), workspace: root });
+    expect(reconstructed.effectiveOptions.delegate).toBe(false);
+    expect(reconstructed.effectiveOptions.delegateStop).toBeUndefined();
+    expect(output.join("\n")).toContain("requires a terminal");
+    expect(fail).toHaveBeenCalledOnce();
+    expect(ioEdges.spawn).not.toHaveBeenCalled();
+    expect(fetchBoundary).not.toHaveBeenCalled();
+  });
+
   it("retains an explicit agent and provider origin for the guide and interactive session", () => {
     const profile = resolveNativeChatProfile({ workspace: workspace(), agentId: "reviewer", baseUrl: "http://127.0.0.1:43123" });
     expect(profile.guideOptions).toMatchObject({ agentId: "reviewer", baseUrl: "http://127.0.0.1:43123" });
@@ -313,7 +359,7 @@ describe("native chat resume arguments target the actual chat grammar", () => {
     const chat = program.commands.find(command => command.name() === "agent-loop")!.commands.find(command => command.name() === "chat")!;
     expect(chat.opts()).toMatchObject({ provider: "openai-responses", model: "chosen-model", persona: "Literal {{user_data}}; no interpolation.", session: "prior-session" });
     expect(chat.opts().preset).toBeUndefined();
-    expect(chat.opts().delegate).toBeUndefined();
+    expect(chat.opts().delegate).toBe(false); // captured disabled posture, not a future default
     expect(output.join("\n")).toContain("requires a terminal");
     expect(fetchBoundary).not.toHaveBeenCalled();
   });

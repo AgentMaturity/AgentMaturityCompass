@@ -63,6 +63,7 @@ import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentR
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
+import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
 
 import {
@@ -180,6 +181,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
     .option("--persona <text>", "explicit native persona override")
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
+    .option("--no-delegate", "disable child delegation even when a signed preset enables it")
     .option("--max-delegation-depth <n>", "maximum native child depth")
     .option("--delegate-scope <classes>", "explicit comma-separated child action classes")
     .option("--delegate-stop <condition>", "repeatable child stop: max-turns:N (initial executor turn plus continuations) or timeout-ms:N (whole child lifetime including idle)", collectDelegateStop)
@@ -236,6 +238,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       + "Children share this run's budget and permissions and are recorded against it. "
       + "Requires \"delegate\" in the signed tool allowlist."
     )
+    .option("--no-delegate", "disable child delegation even when a signed preset enables it")
     .option("--max-delegation-depth <n>", "how deep a delegation chain may go (default 3)")
     .option(
       "--delegate-provider <id>",
@@ -301,15 +304,12 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         (opts.json ? io.error : io.log)(chalk.dim(`composed from preset "${preset.id}": ${preset.description}`));
         // Apply the remaining policy fields before approval and delegation are
         // built. A signed preset must not merely advertise these settings.
-        opts = { ...opts,
-          approveTools: opts.approveTools ?? preset.approveTools,
-          delegate: opts.delegate ?? preset.delegate?.enabled,
-          delegateScope: opts.delegateScope ?? preset.delegate?.scope?.join(","),
-          delegateStop: opts.delegateStop ?? preset.delegate?.stopConditions,
-          maxDelegationDepth: opts.maxDelegationDepth ?? (preset.delegate?.maxDepth === undefined ? undefined : String(preset.delegate.maxDepth)),
-          delegateProvider: opts.delegateProvider ?? preset.delegate?.provider,
-          delegateTimeout: opts.delegateTimeout ?? (preset.delegate?.timeoutMs === undefined ? undefined : String(preset.delegate.timeoutMs))
-        };
+        opts = { ...opts, approveTools: opts.approveTools ?? preset.approveTools };
+      }
+      try { opts = applyNativeDelegationPreset(opts, preset?.delegate); }
+      catch {
+        io.error("--no-delegate cannot be combined with explicit child scope, depth, provider, timeout or stop options. Remove the child options to disable delegation; signed approval and budget controls remain in force.");
+        io.fail(); return;
       }
 
       let rawPrompt = promptParts.join(" ").trim();

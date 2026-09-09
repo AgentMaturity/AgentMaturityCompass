@@ -67,6 +67,14 @@ Suggested actions do not retry the task, change a signed budget, reset usage or
 re-sign policy. Use the session reference printed by the command in place of
 `<session-id>`; use its recorded owner in place of `<recorded-agent>`.
 
+Use `--no-delegate` on native `run` or `chat` to disable child delegation even
+when a signed preset enables it. Chat retains the selected disabled posture in
+every child and printed resume command. Inherited child-only defaults cannot
+silently turn it back on; contradictory explicit child scope/depth/provider/stop
+settings are refused rather than ignored. The selected preset must still verify,
+and tool allowlists, approvals, budgets and all other composition settings remain
+in force. Disabling children does not grant any additional parent permissions.
+
 ## What AMC is
 
 AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.

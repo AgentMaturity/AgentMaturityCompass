@@ -93,7 +93,7 @@ export function resolveNativeChatProfile(options: NativeChatProfileOptions): Nat
   if (!delegate && (options.maxDelegationDepth !== undefined || options.delegateScope !== undefined || options.delegateStop !== undefined)) {
     throw new NativeChatProfileError("Delegation bounds require --delegate or delegate.enabled in the signed preset.");
   }
-  const rawStops = options.delegateStop === false ? [] : options.delegateStop ?? preset?.delegate?.stopConditions;
+  const rawStops = !delegate ? undefined : options.delegateStop === false ? [] : options.delegateStop ?? preset?.delegate?.stopConditions;
   const stopConditions = parseSubagentStopConditions(rawStops);
   if (!stopConditions.ok) throw new NativeChatProfileError(`--delegate-stop: ${stopConditions.reason}`);
   const maxTokens = positiveOption("--max-tokens", options.maxTokens, preset?.maxTokens);
@@ -162,7 +162,7 @@ export function nativeChatProfileArgv(profile: NativeChatProfile, surface: "run"
       ...(options.maxDelegationDepth === undefined ? [] : [`--max-delegation-depth=${options.maxDelegationDepth}`]),
       ...(options.delegateScope === undefined ? [] : [`--delegate-scope=${options.delegateScope}`]),
       ...(options.delegateStop === undefined ? [] : options.delegateStop === false || options.delegateStop.length === 0
-        ? ["--no-delegate-stop"] : options.delegateStop.map(condition => `--delegate-stop=${condition}`))] : [])
+        ? ["--no-delegate-stop"] : options.delegateStop.map(condition => `--delegate-stop=${condition}`))] : ["--no-delegate"])
   ];
 }
 
