@@ -1,0 +1,1587 @@
+{
+  "taskId": "installed-retained-output-public-history-batch",
+  "recordedAt": "2026-09-09T18:37:16.873964+00:00",
+  "owner": "cos-native-public-history-20260909T163519Z",
+  "branch": "amc/gap-register-execution",
+  "runtimeSource": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
+  "commits": {
+    "initialHelper": "a7482626f4c6aaded488a91af6f49e72d1df9b52",
+    "coldSqliteFix": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd"
+  },
+  "helperRepinCommitted": false,
+  "helperRepinReason": "compound staging/check/commit request was blocked before execution; not retried",
+  "currentHelperDigests": {
+    "run.py": "aeaf2e13bddb29dbe74f9c689a7e22b0da13ae3448d6c6994feb6bbc26d81218",
+    "native-case.mjs": "15e4c4da61dbd150641a5da9bff2e391f6b5534c1a59157ec4938d5965768355",
+    "README.md": "ef5f1e932d39049fae92ed2a05a1cfec23916dcb58b9d8143d2220b701ae36e9"
+  },
+  "sourceReview": {
+    "reviewer": "CoS prime, same execution agent",
+    "finding": "First read-only SQLite SELECT creates an absent zero-byte WAL without changing the database; prior stat fence falsely refused CHANGED. Corrected only absent-to-empty WAL handling, keeping existing/populated WAL and other paths strict.",
+    "implementation": "src/session/sessionHistoryReader.ts",
+    "regressions": "tests/sessionHistoryColdSqlite.test.ts",
+    "publicDocumentation": "docs/SESSION_EVENT_HISTORY.md"
+  },
+  "sourceChecks": {
+    "source": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
+    "environment": {
+      "os": "Darwin",
+      "release": "25.6.0",
+      "arch": "arm64",
+      "macOS": "26.6.2",
+      "node": "v25.5.0",
+      "npm": "11.10.1",
+      "pnpm": "10.33.0"
+    },
+    "clone": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/source",
+    "steps": [
+      {
+        "name": "helper-commit",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "node-version",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "npm-version",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "pnpm-version",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "helper-python-syntax",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "helper-node-syntax",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "clone",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "checkout",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "source-head",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "source-clean-before",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "install",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "build",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "test-types",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "architecture",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "focused",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "local-pack",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "final-head",
+        "exitCode": 0,
+        "closed": true
+      },
+      {
+        "name": "final-clean",
+        "exitCode": 0,
+        "closed": true
+      }
+    ],
+    "focused": {
+      "total": 37,
+      "passed": 37,
+      "failed": 0,
+      "pending": 0,
+      "files": 2
+    },
+    "trackedSourceCleanAfterChecks": true,
+    "packGate": "npm pack --ignore-scripts; prepack/release gate NOT executed or passed"
+  },
+  "mutations": {
+    "source": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
+    "checks": [
+      {
+        "name": "predecessor-cold-fence",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "mutationKilled": true
+      },
+      {
+        "name": "nonempty-wal-guard",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "mutationKilled": true
+      },
+      {
+        "name": "existing-wal-guard",
+        "exitCode": 1,
+        "passed": 0,
+        "failed": 1,
+        "pending": 4,
+        "mutationKilled": true
+      }
+    ],
+    "restored": {
+      "name": "restored",
+      "exitCode": 0,
+      "passed": 5,
+      "failed": 0,
+      "pending": 0
+    },
+    "sourceRestored": true,
+    "allObservedCommandProcessesClosed": true
+  },
+  "installedRuns": [
+    {
+      "source": "130c2d0087cf574016411fdc7d91067d3eddd637",
+      "package": {
+        "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/package/agent-maturity-compass-1.2.0.tgz",
+        "sha256": "889258079cd7ec94644f6e2b2c3cb0c2f31226597ddb06ec22cd0de24b52fb35",
+        "bytes": 6014480
+      },
+      "node": "v25.5.0",
+      "npm": "11.10.1",
+      "helperPins": {
+        "runner": "c6162008a1e6cc5202a25cf31acfd78eebbcb128d1ab50fbce5c172bb021163d",
+        "native": "63707dac004872253e8a2990f2ed74ef78741d4336cfaabb9bc18c3023855bfb"
+      },
+      "configPath": "tmp/cos-installed-retained-output-public-history-01/config.json",
+      "consumerLockSha256": "10cc7e745e6b23877d21e6b8258c1007b835700955d7652bacdc2206532757e9",
+      "qualified": false,
+      "status": "unqualified",
+      "outerExitCode": 1,
+      "groups": [
+        {
+          "backend": null,
+          "name": "installed-boundary",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "node-version",
+              "passed": true
+            },
+            {
+              "name": "npm-version",
+              "passed": true
+            },
+            {
+              "name": "bounded new local-tarball install",
+              "passed": true
+            },
+            {
+              "name": "installed public exports",
+              "passed": true
+            },
+            {
+              "name": "actual installed CLI digest",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "native-retention",
+          "verdict": "failed",
+          "checks": [
+            {
+              "name": "init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "budgets exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "firewall exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-sign exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-verify exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "governed SDK fixture verdict",
+              "passed": false
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "native-retention",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "budgets exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "firewall exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-sign exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-verify exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "governed SDK fixture verdict",
+              "passed": true
+            },
+            {
+              "name": "two distinct recorded native sessions",
+              "passed": true
+            },
+            {
+              "name": "cold native A",
+              "passed": true
+            },
+            {
+              "name": "cold native B",
+              "passed": true
+            },
+            {
+              "name": "tool policy unchanged",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "inventory-and-origins",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "complete selected-store ciphertext inventory",
+              "passed": true
+            },
+            {
+              "name": "paired origin A",
+              "passed": true
+            },
+            {
+              "name": "paired origin B",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "bounded-public-reads",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "CLI exact ranges A",
+              "passed": true
+            },
+            {
+              "name": "CLI exact ranges B",
+              "passed": true
+            },
+            {
+              "name": "public API full persisted history, exact ranges and refused invalid bounds",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "locked-vault-boundary",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "metadata reader grants neither plaintext nor another identity",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "encrypted-export",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "encrypted transport completed",
+              "passed": true
+            },
+            {
+              "name": "transport ciphertext commitment objects/62594d024cee2d7261530935699523774807e0e4ccc07dc0d295dc678ff5a811.blob",
+              "passed": true
+            },
+            {
+              "name": "transport ciphertext commitment objects/850a8f4f5531f51b02c7e5be5952317da9a9224039b79eb2db26419f5b73a17f.blob",
+              "passed": true
+            },
+            {
+              "name": "transport contains only index and named ciphertext",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "refused-overwrite",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "existing objects not overwritten",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "tamper-and-missing",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "tampered object visibly rejected",
+              "passed": true
+            },
+            {
+              "name": "tampered CLI read refused",
+              "passed": true
+            },
+            {
+              "name": "exact original recovered after confirmed closure",
+              "passed": true
+            },
+            {
+              "name": "missing content never becomes complete",
+              "passed": true
+            },
+            {
+              "name": "missing CLI bytes refused",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "existing-history-restore",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "native restore against unchanged authenticated destination history",
+              "passed": true
+            },
+            {
+              "name": "restored plaintext still matches independently generated fixtures",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "jsonl",
+          "name": "reviewed-erasure",
+          "verdict": "blocked",
+          "checks": [
+            {
+              "name": "outside-scope paired origin refused",
+              "passed": true
+            },
+            {
+              "name": "explicit exact-scope plan",
+              "passed": true
+            },
+            {
+              "name": "stale reason-bound review refused without mutation",
+              "passed": true
+            }
+          ],
+          "blockers": [
+            "ERASURE_REVIEW_NOT_SUPPLIED: no apply was attempted; consumer is retained, not resumable/reused."
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "bounded-public-reads",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "encrypted-export",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "existing-history-restore",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "inventory-and-origins",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "locked-vault-boundary",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "refused-overwrite",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "reviewed-erasure",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        },
+        {
+          "backend": "sqlite",
+          "name": "tamper-and-missing",
+          "verdict": "unknown",
+          "checks": [],
+          "blockers": [
+            "Not reached; no result inferred"
+          ]
+        }
+      ],
+      "failures": [
+        {
+          "phase": null,
+          "backend": "sqlite",
+          "error": "governed SDK fixture verdict"
+        }
+      ],
+      "workers": [
+        {
+          "mode": "ranges",
+          "backend": "jsonl",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "public byte cap present",
+              "passed": true
+            },
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "public API inventory uses full persisted reference set",
+              "passed": true
+            },
+            {
+              "name": "public API ciphertext transport",
+              "passed": true
+            },
+            {
+              "name": "A complete reassembled public API bytes",
+              "passed": true
+            },
+            {
+              "name": "A EOF is exact empty range",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":-1,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":0,\"limit\":0}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":0,\"limit\":16385}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":98305,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "B complete reassembled public API bytes",
+              "passed": true
+            },
+            {
+              "name": "B EOF is exact empty range",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":-1,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":0,\"limit\":0}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":0,\"limit\":16385}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":98305,\"limit\":1}",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": []
+        },
+        {
+          "mode": "capture",
+          "backend": "jsonl",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "A prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "A SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "A native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "A native completed result update",
+              "passed": true
+            },
+            {
+              "name": "A owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "A native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "B prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "B SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "B native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "B native completed result update",
+              "passed": true
+            },
+            {
+              "name": "B owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "B native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "finite wire exchange sequence",
+              "passed": true
+            },
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "A actual tool/commitment/result rows",
+              "passed": true
+            },
+            {
+              "name": "A native fs.read identity",
+              "passed": true
+            },
+            {
+              "name": "A successful real result",
+              "passed": true
+            },
+            {
+              "name": "A v2 signed full-content reference",
+              "passed": true
+            },
+            {
+              "name": "A commitment row precedes result",
+              "passed": true
+            },
+            {
+              "name": "A signature bytes present (cold verifier is separate)",
+              "passed": true
+            },
+            {
+              "name": "A native complete reason, not merely ACP end_turn",
+              "passed": true
+            },
+            {
+              "name": "B actual tool/commitment/result rows",
+              "passed": true
+            },
+            {
+              "name": "B native fs.read identity",
+              "passed": true
+            },
+            {
+              "name": "B successful real result",
+              "passed": true
+            },
+            {
+              "name": "B v2 signed full-content reference",
+              "passed": true
+            },
+            {
+              "name": "B commitment row precedes result",
+              "passed": true
+            },
+            {
+              "name": "B signature bytes present (cold verifier is separate)",
+              "passed": true
+            },
+            {
+              "name": "B native complete reason, not merely ACP end_turn",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": [
+            {
+              "name": "A",
+              "sessionId": "c654c96c-02f5-4818-bb4b-38150dd5c112",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
+              "historyHeadEventHash": "e151010cc8cad8f018674165d5730c2f87bfceca3683078bcb20ed03830178b1",
+              "historySha256": "3b88c9302f0c543102ea1d37ca59c5108ab48a91634c4752a9d17718c7f4f891"
+            },
+            {
+              "name": "B",
+              "sessionId": "0a4151f6-f716-49e8-9f1e-29c360eac5d1",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
+              "historyHeadEventHash": "ed47bc8621b93682e9ed130c193be698d9a591f5d7e659d9eed82c9024774845",
+              "historySha256": "f1d9574a7a75f8e6e2d9063324e15ce795d78e6e5254c496e4236daeb3f5de09"
+            }
+          ]
+        },
+        {
+          "mode": "privacy",
+          "backend": "jsonl",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "locked-vault inventory authenticates ciphertext without plaintext",
+              "passed": true
+            },
+            {
+              "name": "A metadata access does not grant decryption",
+              "passed": true
+            },
+            {
+              "name": "B metadata access does not grant decryption",
+              "passed": true
+            },
+            {
+              "name": "wrong-monitor public history refused",
+              "passed": true
+            },
+            {
+              "name": "missing-session public history refused",
+              "passed": true
+            },
+            {
+              "name": "wrong-agent public history refused",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": []
+        },
+        {
+          "mode": "capture",
+          "backend": "sqlite",
+          "verdict": "failed",
+          "checks": [
+            {
+              "name": "A prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "A SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "A native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "A native completed result update",
+              "passed": true
+            },
+            {
+              "name": "A owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "A native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "B prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "B SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "B native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "B native completed result update",
+              "passed": true
+            },
+            {
+              "name": "B owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "B native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "finite wire exchange sequence",
+              "passed": true
+            },
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            }
+          ],
+          "errors": [
+            {
+              "name": "SessionHistoryRefused",
+              "message": "CHANGED: History or trust changed during loading; quiesce writers and explicitly load a new snapshot."
+            }
+          ],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": [
+            {
+              "name": "A",
+              "sessionId": "bd9b5e91-4598-4970-8e4e-801232b2a884",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
+              "historyHeadEventHash": null,
+              "historySha256": null
+            },
+            {
+              "name": "B",
+              "sessionId": "928ab255-cfab-4693-ba94-f160fd5bf5f9",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
+              "historyHeadEventHash": null,
+              "historySha256": null
+            }
+          ]
+        }
+      ],
+      "allObservedProcessesClosed": true,
+      "erasureApplied": false,
+      "postErasureVerification": "not-reached; no erasure approval was supplied"
+    },
+    {
+      "source": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
+      "package": {
+        "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-retained-output-public-history-01/candidate-02/package/agent-maturity-compass-1.2.0.tgz",
+        "sha256": "cddd6be614fef3a7d34910fd10d5b73654ed59e9b9ef8ee6cad31160f0da65e9",
+        "bytes": 6014747
+      },
+      "node": "v25.5.0",
+      "npm": "11.10.1",
+      "helperPins": {
+        "runner": "aeaf2e13bddb29dbe74f9c689a7e22b0da13ae3448d6c6994feb6bbc26d81218",
+        "native": "15e4c4da61dbd150641a5da9bff2e391f6b5534c1a59157ec4938d5965768355"
+      },
+      "configPath": "tmp/cos-installed-retained-output-public-history-01/candidate-02/config.json",
+      "consumerLockSha256": "14becced02a3ca73daf0736ee963f5f1a488292a223c7e331d1c543e06cd3579",
+      "qualified": false,
+      "status": "unqualified",
+      "outerExitCode": 1,
+      "groups": [
+        {
+          "backend": null,
+          "name": "installed-boundary",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "node-version",
+              "passed": true
+            },
+            {
+              "name": "npm-version",
+              "passed": true
+            },
+            {
+              "name": "bounded new local-tarball install",
+              "passed": true
+            },
+            {
+              "name": "installed public exports",
+              "passed": true
+            },
+            {
+              "name": "actual installed CLI digest",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "native-retention",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "budgets exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "firewall exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-init exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-sign exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "tools-verify exit (setup only)",
+              "passed": true
+            },
+            {
+              "name": "governed SDK fixture verdict",
+              "passed": true
+            },
+            {
+              "name": "two distinct recorded native sessions",
+              "passed": true
+            },
+            {
+              "name": "cold native A",
+              "passed": true
+            },
+            {
+              "name": "cold native B",
+              "passed": true
+            },
+            {
+              "name": "tool policy unchanged",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "inventory-and-origins",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "complete selected-store ciphertext inventory",
+              "passed": true
+            },
+            {
+              "name": "paired origin A",
+              "passed": true
+            },
+            {
+              "name": "paired origin B",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "bounded-public-reads",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "CLI exact ranges A",
+              "passed": true
+            },
+            {
+              "name": "CLI exact ranges B",
+              "passed": true
+            },
+            {
+              "name": "public API full persisted history, exact ranges and refused invalid bounds",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "locked-vault-boundary",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "metadata reader grants neither plaintext nor another identity",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "encrypted-export",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "encrypted transport completed",
+              "passed": true
+            },
+            {
+              "name": "transport ciphertext commitment objects/8338ab0d40e9eabdffd9942f5d09f4b98f620e00b5c4642ca1b81704db3d35bf.blob",
+              "passed": true
+            },
+            {
+              "name": "transport ciphertext commitment objects/a4025f68f7ec30dd19f403f03540fe7ee44b6a699ae3532dbd87e0433ff18637.blob",
+              "passed": true
+            },
+            {
+              "name": "transport contains only index and named ciphertext",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "refused-overwrite",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "existing objects not overwritten",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "tamper-and-missing",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "tampered object visibly rejected",
+              "passed": true
+            },
+            {
+              "name": "tampered CLI read refused",
+              "passed": true
+            },
+            {
+              "name": "exact original recovered after confirmed closure",
+              "passed": true
+            },
+            {
+              "name": "missing content never becomes complete",
+              "passed": true
+            },
+            {
+              "name": "missing CLI bytes refused",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "existing-history-restore",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "native restore against unchanged authenticated destination history",
+              "passed": true
+            },
+            {
+              "name": "restored plaintext still matches independently generated fixtures",
+              "passed": true
+            }
+          ],
+          "blockers": []
+        },
+        {
+          "backend": "sqlite",
+          "name": "reviewed-erasure",
+          "verdict": "blocked",
+          "checks": [
+            {
+              "name": "outside-scope paired origin refused",
+              "passed": true
+            },
+            {
+              "name": "explicit exact-scope plan",
+              "passed": true
+            },
+            {
+              "name": "stale reason-bound review refused without mutation",
+              "passed": true
+            }
+          ],
+          "blockers": [
+            "ERASURE_REVIEW_NOT_SUPPLIED: no apply was attempted; consumer is retained, not resumable/reused."
+          ]
+        }
+      ],
+      "failures": [],
+      "workers": [
+        {
+          "mode": "ranges",
+          "backend": "sqlite",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "public byte cap present",
+              "passed": true
+            },
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "public API inventory uses full persisted reference set",
+              "passed": true
+            },
+            {
+              "name": "public API ciphertext transport",
+              "passed": true
+            },
+            {
+              "name": "A complete reassembled public API bytes",
+              "passed": true
+            },
+            {
+              "name": "A EOF is exact empty range",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":-1,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":0,\"limit\":0}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":0,\"limit\":16385}",
+              "passed": true
+            },
+            {
+              "name": "A invalid bounds refused {\"offset\":98305,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "B complete reassembled public API bytes",
+              "passed": true
+            },
+            {
+              "name": "B EOF is exact empty range",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":-1,\"limit\":1}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":0,\"limit\":0}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":0,\"limit\":16385}",
+              "passed": true
+            },
+            {
+              "name": "B invalid bounds refused {\"offset\":98305,\"limit\":1}",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": []
+        },
+        {
+          "mode": "capture",
+          "backend": "sqlite",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "A prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "A SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "A native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "A native completed result update",
+              "passed": true
+            },
+            {
+              "name": "A owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "A native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "B prior native client closed",
+              "passed": true
+            },
+            {
+              "name": "B SDK completion not task verification",
+              "passed": true
+            },
+            {
+              "name": "B native tool identity/update",
+              "passed": true
+            },
+            {
+              "name": "B native completed result update",
+              "passed": true
+            },
+            {
+              "name": "B owned fixture unchanged",
+              "passed": true
+            },
+            {
+              "name": "B native client closed before next writer",
+              "passed": true
+            },
+            {
+              "name": "finite wire exchange sequence",
+              "passed": true
+            },
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "A actual tool/commitment/result rows",
+              "passed": true
+            },
+            {
+              "name": "A native fs.read identity",
+              "passed": true
+            },
+            {
+              "name": "A successful real result",
+              "passed": true
+            },
+            {
+              "name": "A v2 signed full-content reference",
+              "passed": true
+            },
+            {
+              "name": "A commitment row precedes result",
+              "passed": true
+            },
+            {
+              "name": "A signature bytes present (cold verifier is separate)",
+              "passed": true
+            },
+            {
+              "name": "A native complete reason, not merely ACP end_turn",
+              "passed": true
+            },
+            {
+              "name": "B actual tool/commitment/result rows",
+              "passed": true
+            },
+            {
+              "name": "B native fs.read identity",
+              "passed": true
+            },
+            {
+              "name": "B successful real result",
+              "passed": true
+            },
+            {
+              "name": "B v2 signed full-content reference",
+              "passed": true
+            },
+            {
+              "name": "B commitment row precedes result",
+              "passed": true
+            },
+            {
+              "name": "B signature bytes present (cold verifier is separate)",
+              "passed": true
+            },
+            {
+              "name": "B native complete reason, not merely ACP end_turn",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": [
+            {
+              "name": "A",
+              "sessionId": "036c99ee-f1e4-44bf-9f84-5fccce429f0b",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
+              "historyHeadEventHash": "fe2103b0fe89566a7314f886f0c14deafdfb1bc4472379e79ab2d58fd7bec975",
+              "historySha256": "a5ad3c079bdeea075c7584a4d95e3188196a5cad732ef4acc6c9637de39bd99d"
+            },
+            {
+              "name": "B",
+              "sessionId": "553413c2-243d-4bfb-b96f-f5ec052b8f5a",
+              "fixtureBytes": 98304,
+              "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
+              "historyHeadEventHash": "f801112de802536b3a883a6d003986e52580916f910597c0bbe62fc908c3b709",
+              "historySha256": "eda5cfc997d2d96f7f5368476bb26c69c474a276bc2e882d3fed9d9cbf5d2fb8"
+            }
+          ]
+        },
+        {
+          "mode": "privacy",
+          "backend": "sqlite",
+          "verdict": "passed",
+          "checks": [
+            {
+              "name": "both supported history exports exist",
+              "passed": true
+            },
+            {
+              "name": "selected backend complete metadata snapshot",
+              "passed": true
+            },
+            {
+              "name": "history pins the fixture monitor without upgrading provenance",
+              "passed": true
+            },
+            {
+              "name": "locked-vault inventory authenticates ciphertext without plaintext",
+              "passed": true
+            },
+            {
+              "name": "A metadata access does not grant decryption",
+              "passed": true
+            },
+            {
+              "name": "B metadata access does not grant decryption",
+              "passed": true
+            },
+            {
+              "name": "wrong-monitor public history refused",
+              "passed": true
+            },
+            {
+              "name": "missing-session public history refused",
+              "passed": true
+            },
+            {
+              "name": "wrong-agent public history refused",
+              "passed": true
+            }
+          ],
+          "errors": [],
+          "cleanup": {
+            "sdkClosed": true,
+            "endpointClosed": true,
+            "processGroupClosure": "external-supervisor-required"
+          },
+          "subjects": []
+        }
+      ],
+      "allObservedProcessesClosed": true,
+      "erasureApplied": false,
+      "postErasureVerification": "not-reached; no erasure approval was supplied"
+    }
+  ],
+  "aggregateInstalledQualification": false,
+  "aggregateReason": "Initial SQLite failed; corrected SQLite passed through restore; both exact-erasure gates remained blocked. JSONL source130 and SQLite source334 remain separate, not one-candidate installed qualification.",
+  "closure": {
+    "path": "AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/final-process-closure.json",
+    "allObservedOwnedProcessesClosed": true,
+    "remainingOwned": []
+  },
+  "tracker": {
+    "applied": false,
+    "flag": "LINEAR-PENDING",
+    "priorExactPending": [
+      "AMC_OS/RESEARCH/2026-09-09-public-docs-correction/linear-pending.json",
+      "AMC_OS/RESEARCH/2026-09-09-native-history-batch/TRACKER_PENDING.md"
+    ],
+    "newExactPending": "TRACKER_PENDING.md",
+    "readbackRequired": "Earlier AMC-1547 8bef body has uncertain delivery; monitor denied duplicate-risk consent. Never retry without actual comment readback."
+  },
+  "obsidian": {
+    "newNote": "Evidence/2026-09-09 Installed Retained Output Public History.md",
+    "updatedThisBatch": true,
+    "priorNotesPreserved": true
+  },
+  "reviewBlockers": "REVIEW_BLOCKERS.md",
+  "receiptIndex": [
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/config.json",
+      "sha256": "feddbfa3d3c424f72495e409b17e23e350ea5e1116a43678c95160267cda031e"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/run/receipts/receipt.json",
+      "sha256": "13a8826b83a8e7195f417c13627ad0a01902e2073157524ed2f9a2e75fc0b135"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/outer/receipt.json",
+      "sha256": "7e3ef0709c8503f29a9d249267ede9c06a621e2c14991beaac9c46737c0967c7"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/run/receipts/jsonl-api-ranges/worker-receipt.json",
+      "sha256": "dc8a18abce9a7ed47b8bb7eeba0c2541a2206596b942eb1d79ce08546cc17401"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/run/receipts/jsonl-capture/worker-receipt.json",
+      "sha256": "9d2f58f9e713c44003a77052f70270662af32ee2c66b449d41d4312810c07549"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/run/receipts/jsonl-locked-vault/worker-receipt.json",
+      "sha256": "e6a3c2acb331241eeeff4d807da3d2e4e33884fd5fed7972ac6bd065bb7249de"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/run/receipts/sqlite-capture/worker-receipt.json",
+      "sha256": "609cb23a9129d84ea4c70c67ca29c22bd4f825df9cae6bf0e8fd34f48745f4f5"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/config.json",
+      "sha256": "a6b016a7a8b57ff0e3f1f70b4ccdc1ac8a59795cce1dada00ff6dc857aac1053"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/run/receipts/receipt.json",
+      "sha256": "38182515c362e18c7240ee3e036c2fe002c7046a1574a77fcd08f9a2a6a54b30"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/outer/receipt.json",
+      "sha256": "edd6b8c96dac320b22ae4408e8f0d586ee87141abde07429bbdafd23c0a7bc54"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/run/receipts/sqlite-api-ranges/worker-receipt.json",
+      "sha256": "f28a85647255abc1f2e14ab837ceb0ebfc5625038f296d724c94df68a8453774"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/run/receipts/sqlite-capture/worker-receipt.json",
+      "sha256": "d56b4cd4954e746ceb0fe208a27af6e3c94a3ee85f18b21e545e92c6f87185af"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/run/receipts/sqlite-locked-vault/worker-receipt.json",
+      "sha256": "93a207fd84b8aa5cb053015c23ed728cf97c53cf29a64d2eee70cf4e437bc12f"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/preparation/source.json",
+      "sha256": "b505fa55438f70a96b6c4d3d7c4deefb492b5373946daa59aa39915d4560ff68"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/focused-results.json",
+      "sha256": "9f1ae8e0c36333a1dab83d6f0739c6174cfaa6a29694fc185184d0d9cea6d4f4"
+    },
+    {
+      "path": "tmp/cos-installed-retained-output-public-history-01/candidate-02/mutations/receipt.json",
+      "sha256": "27fdd27a93da8eca5e741753c4127091a25e8b20aedbf231692860400ed16912"
+    },
+    {
+      "path": "AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/final-process-closure.json",
+      "sha256": "89e98675b35c70f81483eb37a21eecc60423014c4cf488fe16417154868df80a"
+    }
+  ],
+  "notQualified": [
+    "installed erasure and post-erasure verification",
+    "single-final-candidate both-backend installed acceptance",
+    "full suite",
+    "prepack/release gate",
+    "broader platform matrix",
+    "JSONL writer resume",
+    "real-provider/human evidence",
+    "production secret/key rotation",
+    "publish/deployment",
+    "comparative superiority"
+  ],
+  "nextAction": "Resolve review-gated erasure only through normal authorized review, not replay/obfuscation. Independent next implementation: remaining AMC-1538 current public transport/browser contracts after reading existing evidence once; do not rerun historical cancellation VMs."
+}

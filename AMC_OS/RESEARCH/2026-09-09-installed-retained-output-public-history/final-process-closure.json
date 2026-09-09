@@ -1,0 +1,521 @@
+{
+  "observedAt": "2026-09-09T18:36:16.590885+00:00",
+  "scope": "previously observed owned identities and process groups only, not kernel containment",
+  "receipts": [
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/preparation/source.json",
+      "commandCount": 15,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/outer/receipt.json",
+      "commandCount": 1,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/run/receipts/receipt.json",
+      "commandCount": 43,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/candidate-02/preparation/source.json",
+      "commandCount": 18,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/candidate-02/mutations/receipt.json",
+      "commandCount": 4,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/candidate-02/outer/receipt.json",
+      "commandCount": 1,
+      "allRecordedCommandsClosed": true
+    },
+    {
+      "receipt": "tmp/cos-installed-retained-output-public-history-01/candidate-02/run/receipts/receipt.json",
+      "commandCount": 36,
+      "allRecordedCommandsClosed": true
+    }
+  ],
+  "observedIdentityCount": 306,
+  "observedGroupCount": 118,
+  "remainingOwned": [],
+  "groups": [
+    {
+      "pgid": 65633,
+      "present": false
+    },
+    {
+      "pgid": 65643,
+      "present": false
+    },
+    {
+      "pgid": 65653,
+      "present": false
+    },
+    {
+      "pgid": 65674,
+      "present": false
+    },
+    {
+      "pgid": 65687,
+      "present": false
+    },
+    {
+      "pgid": 65696,
+      "present": false
+    },
+    {
+      "pgid": 65710,
+      "present": false
+    },
+    {
+      "pgid": 65735,
+      "present": false
+    },
+    {
+      "pgid": 65758,
+      "present": false
+    },
+    {
+      "pgid": 65768,
+      "present": false
+    },
+    {
+      "pgid": 65788,
+      "present": false
+    },
+    {
+      "pgid": 65855,
+      "present": false
+    },
+    {
+      "pgid": 66134,
+      "present": false
+    },
+    {
+      "pgid": 66164,
+      "present": false
+    },
+    {
+      "pgid": 66175,
+      "present": false
+    },
+    {
+      "pgid": 66378,
+      "present": false
+    },
+    {
+      "pgid": 66383,
+      "present": false
+    },
+    {
+      "pgid": 66398,
+      "present": false
+    },
+    {
+      "pgid": 66410,
+      "present": false
+    },
+    {
+      "pgid": 66610,
+      "present": false
+    },
+    {
+      "pgid": 66642,
+      "present": false
+    },
+    {
+      "pgid": 66668,
+      "present": false
+    },
+    {
+      "pgid": 66685,
+      "present": false
+    },
+    {
+      "pgid": 66702,
+      "present": false
+    },
+    {
+      "pgid": 66727,
+      "present": false
+    },
+    {
+      "pgid": 66744,
+      "present": false
+    },
+    {
+      "pgid": 66800,
+      "present": false
+    },
+    {
+      "pgid": 66820,
+      "present": false
+    },
+    {
+      "pgid": 66837,
+      "present": false
+    },
+    {
+      "pgid": 66852,
+      "present": false
+    },
+    {
+      "pgid": 66869,
+      "present": false
+    },
+    {
+      "pgid": 66887,
+      "present": false
+    },
+    {
+      "pgid": 66910,
+      "present": false
+    },
+    {
+      "pgid": 66951,
+      "present": false
+    },
+    {
+      "pgid": 66967,
+      "present": false
+    },
+    {
+      "pgid": 66983,
+      "present": false
+    },
+    {
+      "pgid": 66999,
+      "present": false
+    },
+    {
+      "pgid": 67015,
+      "present": false
+    },
+    {
+      "pgid": 67031,
+      "present": false
+    },
+    {
+      "pgid": 67047,
+      "present": false
+    },
+    {
+      "pgid": 67070,
+      "present": false
+    },
+    {
+      "pgid": 67095,
+      "present": false
+    },
+    {
+      "pgid": 67116,
+      "present": false
+    },
+    {
+      "pgid": 67133,
+      "present": false
+    },
+    {
+      "pgid": 67150,
+      "present": false
+    },
+    {
+      "pgid": 67170,
+      "present": false
+    },
+    {
+      "pgid": 67190,
+      "present": false
+    },
+    {
+      "pgid": 67209,
+      "present": false
+    },
+    {
+      "pgid": 67235,
+      "present": false
+    },
+    {
+      "pgid": 67252,
+      "present": false
+    },
+    {
+      "pgid": 67270,
+      "present": false
+    },
+    {
+      "pgid": 67296,
+      "present": false
+    },
+    {
+      "pgid": 67314,
+      "present": false
+    },
+    {
+      "pgid": 67335,
+      "present": false
+    },
+    {
+      "pgid": 67359,
+      "present": false
+    },
+    {
+      "pgid": 67377,
+      "present": false
+    },
+    {
+      "pgid": 67403,
+      "present": false
+    },
+    {
+      "pgid": 67420,
+      "present": false
+    },
+    {
+      "pgid": 67436,
+      "present": false
+    },
+    {
+      "pgid": 70914,
+      "present": false
+    },
+    {
+      "pgid": 70923,
+      "present": false
+    },
+    {
+      "pgid": 70933,
+      "present": false
+    },
+    {
+      "pgid": 70953,
+      "present": false
+    },
+    {
+      "pgid": 70964,
+      "present": false
+    },
+    {
+      "pgid": 70974,
+      "present": false
+    },
+    {
+      "pgid": 70989,
+      "present": false
+    },
+    {
+      "pgid": 71017,
+      "present": false
+    },
+    {
+      "pgid": 71037,
+      "present": false
+    },
+    {
+      "pgid": 71046,
+      "present": false
+    },
+    {
+      "pgid": 71059,
+      "present": false
+    },
+    {
+      "pgid": 71142,
+      "present": false
+    },
+    {
+      "pgid": 71404,
+      "present": false
+    },
+    {
+      "pgid": 71680,
+      "present": false
+    },
+    {
+      "pgid": 71719,
+      "present": false
+    },
+    {
+      "pgid": 71875,
+      "present": false
+    },
+    {
+      "pgid": 71902,
+      "present": false
+    },
+    {
+      "pgid": 71912,
+      "present": false
+    },
+    {
+      "pgid": 72141,
+      "present": false
+    },
+    {
+      "pgid": 72168,
+      "present": false
+    },
+    {
+      "pgid": 72203,
+      "present": false
+    },
+    {
+      "pgid": 72239,
+      "present": false
+    },
+    {
+      "pgid": 72378,
+      "present": false
+    },
+    {
+      "pgid": 72382,
+      "present": false
+    },
+    {
+      "pgid": 72394,
+      "present": false
+    },
+    {
+      "pgid": 72406,
+      "present": false
+    },
+    {
+      "pgid": 72581,
+      "present": false
+    },
+    {
+      "pgid": 72604,
+      "present": false
+    },
+    {
+      "pgid": 72622,
+      "present": false
+    },
+    {
+      "pgid": 72637,
+      "present": false
+    },
+    {
+      "pgid": 72656,
+      "present": false
+    },
+    {
+      "pgid": 72684,
+      "present": false
+    },
+    {
+      "pgid": 72703,
+      "present": false
+    },
+    {
+      "pgid": 72767,
+      "present": false
+    },
+    {
+      "pgid": 72786,
+      "present": false
+    },
+    {
+      "pgid": 72804,
+      "present": false
+    },
+    {
+      "pgid": 72827,
+      "present": false
+    },
+    {
+      "pgid": 72851,
+      "present": false
+    },
+    {
+      "pgid": 72874,
+      "present": false
+    },
+    {
+      "pgid": 72905,
+      "present": false
+    },
+    {
+      "pgid": 72924,
+      "present": false
+    },
+    {
+      "pgid": 72940,
+      "present": false
+    },
+    {
+      "pgid": 72962,
+      "present": false
+    },
+    {
+      "pgid": 72980,
+      "present": false
+    },
+    {
+      "pgid": 73011,
+      "present": false
+    },
+    {
+      "pgid": 73032,
+      "present": false
+    },
+    {
+      "pgid": 73050,
+      "present": false
+    },
+    {
+      "pgid": 73076,
+      "present": false
+    },
+    {
+      "pgid": 73097,
+      "present": false
+    },
+    {
+      "pgid": 73119,
+      "present": false
+    },
+    {
+      "pgid": 73150,
+      "present": false
+    },
+    {
+      "pgid": 73173,
+      "present": false
+    },
+    {
+      "pgid": 73202,
+      "present": false
+    },
+    {
+      "pgid": 73231,
+      "present": false
+    },
+    {
+      "pgid": 73257,
+      "present": false
+    },
+    {
+      "pgid": 73282,
+      "present": false
+    },
+    {
+      "pgid": 73304,
+      "present": false
+    },
+    {
+      "pgid": 73329,
+      "present": false
+    },
+    {
+      "pgid": 73351,
+      "present": false
+    }
+  ],
+  "allObservedOwnedProcessesClosed": true,
+  "workers": [],
+  "activeOwnedExecution": null
+}
