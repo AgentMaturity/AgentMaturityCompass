@@ -39,5 +39,43 @@
     "Pre-run monitor pin is local workspace consistency, not independent external trust."
   ],
   "initialMetadataInspection": "New execution prefix did not exist; stat nonzero was preserved as expected metadata refusal, not AMC acceptance.",
-  "nextAction": "Supervised helper syntax/config qualification, explicit-path integration commit, then one new installed lane."
+  "nextAction": "Supervised helper syntax/config qualification, explicit-path integration commit, then one new installed lane.",
+  "correctedAttempt02Review": {
+    "observedAt": "2026-09-09T15:32:58.276042+00:00",
+    "reviewer": "sole execution agent; not independent validation",
+    "integrationBase": "b9a8f39e09c146c2a9adb869443bc273308ce121",
+    "priorReviewSha256": "cff06c42ec0b327e7664de4a106a15e82a3a5b5b252d71adf7c974f5c3567412",
+    "preservedPriorReview": "AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/attempt-02/prior-source-review.json",
+    "files": {
+      "run.py": "8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0",
+      "native-case.mjs": "b666026f9aa3ece8d806d8aa5288225ec302373b707cdc07e578f768079e44ec",
+      "README.md": "e8fb9164c526ba0dd7ccaab68c8f99c619c5bdf9cd7280c7143def5d01a23a26"
+    },
+    "correction": "Supply labelled synthetic input_tokens/output_tokens/total_tokens on both completed scripted Responses wire messages; do not weaken the runtime usage guard.",
+    "reviewedContracts": [
+      "Native public SDK invokes installed CLI and native fs.read, verifies completed result updates",
+      "Real loopback wire exchanges and actual signed SQLite rows, no fabricated event rows or deep imports",
+      "JSONL public API loader gap remains explicit exit 3 and aggregate qualified=false",
+      "Outer and per-command reviewed supervisors, private fixture isolation and separate exact-scope erasure approval"
+    ],
+    "qualification": "source-review-only; no corrected installed result yet",
+    "pendingExternalUpdates": [
+      {
+        "issue": "AMC-1547",
+        "flag": "LINEAR-PENDING",
+        "targetState": "In Progress",
+        "body": "Preserved unqualified attempt-01; corrected synthetic usage fixture and preparing separately pinned attempt-02. No installed qualification claimed."
+      },
+      {
+        "issue": "AMC-1505",
+        "flag": "LINEAR-PENDING",
+        "body": "Connector unavailable after earlier dated issue read; do not reuse old child tally as live."
+      },
+      {
+        "target": "/Users/sid/Documents/AMC",
+        "flag": "OBSIDIAN-PENDING",
+        "reason": "Vault outside approved bridge root; read refused. No access-boundary bypass and no overwrite."
+      }
+    ]
+  }
 }

@@ -9,6 +9,9 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SOURCE = "a5987643ef6c26b01f687226fbc6a6709fc182cb";
+// Programmed protocol input, NOT observed inference/token usage. Successful
+// streams require usage; the real runtime guard remains enabled and unchanged.
+const SYNTHETIC_WIRE_USAGE = Object.freeze({ input_tokens: 40, output_tokens: 12, total_tokens: 52 });
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 const errorRecord = error => ({ name: error?.name ?? "Error", message: String(error?.message ?? error), stack: error?.stack ?? null });
 function plain(path, { directory = false, privatePath = false, maximum = 32 * 1024 * 1024 } = {}) {
@@ -66,7 +69,9 @@ assert.equal(packageRoot, join(input.ownedRoot, "consumer/node_modules/agent-mat
 const receipt = {
   schemaVersion: 1, source: SOURCE, mode: input.mode, backend: input.backend,
   classification: "actual-installed-public-interface-with-scripted-loopback-provider",
-  qualityClaim: false, modelInferencePerformed: false, tokenUsage: "not-measured-and-not-synthesized",
+  qualityClaim: false, modelInferencePerformed: false,
+  tokenUsage: "synthetic-protocol-fixture-input-not-measured",
+  syntheticWireUsage: SYNTHETIC_WIRE_USAGE,
   verdict: "unknown", checks: [], subjects: [], errors: [], blockers: [],
   trustBoundary: "same-workspace pre-run key consistency, not independent external anchoring",
   node: { version: process.version, platform: process.platform, arch: process.arch, sha256: input.node.sha256 },
@@ -127,7 +132,7 @@ function sseFrames(index, phase, wireName, fixtureRelative) {
       { type: "response.function_call_arguments.delta", output_index: 0, item_id: item.id, delta: item.arguments },
       { type: "response.function_call_arguments.done", output_index: 0, item_id: item.id, arguments: item.arguments },
       { type: "response.output_item.done", output_index: 0, item },
-      { type: "response.completed", response: { id: responseId, status: "completed", output: [item] } },
+      { type: "response.completed", response: { id: responseId, status: "completed", output: [item], usage: SYNTHETIC_WIRE_USAGE } },
     ];
   }
   const text = "Scripted fixture complete; inspect retained output separately.";
@@ -142,7 +147,7 @@ function sseFrames(index, phase, wireName, fixtureRelative) {
     { type: "response.output_text.done", output_index: 0, item_id: item.id, content_index: 0, text },
     { type: "response.content_part.done", output_index: 0, item_id: item.id, content_index: 0, part: item.content[0] },
     { type: "response.output_item.done", output_index: 0, item },
-    { type: "response.completed", response: { id: responseId, status: "completed", output: [item] } },
+    { type: "response.completed", response: { id: responseId, status: "completed", output: [item], usage: SYNTHETIC_WIRE_USAGE } },
   ];
 }
 async function scriptedEndpoint(subjects) {
@@ -151,7 +156,8 @@ async function scriptedEndpoint(subjects) {
   const server = createServer(async (req, res) => {
     const index = exchanges.length;
     const exchange = { index, classification: "scripted-provider-fixture-no-inference", requestSha256: null,
-                       responseSha256: null, subject: expectedSubject, phase: expectedPhase, error: null };
+                       responseSha256: null, subject: expectedSubject, phase: expectedPhase, error: null,
+                       usageClassification: "programmed-fixture-input-not-measured", syntheticWireUsage: SYNTHETIC_WIRE_USAGE };
     exchanges.push(exchange);
     try {
       assert.ok(index < subjects.length * 2, "Unexpected retry or extra request");

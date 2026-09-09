@@ -1,10 +1,26 @@
 # Installed public retained-output acceptance helper
 
+## Preserved first execution and protocol correction — 2026-09-09
+
+The initial helper at `b9a8f39e09c146c2a9adb869443bc273308ce121` was followed by
+an explicitly authorized fresh local installed attempt. It is **unqualified**:
+the scripted successful response omitted required usage, and neither backend's
+capture reached a completed tool result. The directly inspected JSONL history
+records `AMC_LLM_STREAM_USAGE_MISSING`. The first attempt's retained receipts
+are under `attempt-01/`; later cases were not reached and are not passing results.
+
+The narrow correction adds fixed usage values to the scripted wire response and
+labels them `synthetic-protocol-fixture-input-not-measured` in worker receipts
+and exchange transcripts. These numbers are programmed protocol inputs, not
+measured model tokens, savings, spend or a real-provider result. AMC's mandatory
+usage validation is not changed or bypassed. Any corrected execution needs new
+helper pins and a fresh consumer, with the original failed attempt retained.
+
 ## Status and scope
 
 This directory contains source preparation for AMC-1547, pinned to
 `a5987643ef6c26b01f687226fbc6a6709fc182cb`. The helper was authored and text-reviewed;
-this README does not assert that it was executed. A later execution must have its
+the initial authoring checkpoint did not assert execution. A later execution must have its
 own immutable configuration, command logs, process-closure receipts and final
 disposition. Neither the existing source gate nor a previous private-package
 smoke establishes this lane's result.
