@@ -192,8 +192,8 @@ interface PendingRequest {
 export class AMCNativeClient {
   readonly workspace: string;
   readonly protocolVersion = 1;
-  agentInfo: Readonly<JsonObject> = {};
-  capabilities: Readonly<JsonObject> = {};
+  agentInfo: Readonly<Record<string, unknown>> = {};
+  capabilities: Readonly<Record<string, unknown>> = {};
   private readonly child: ChildProcessWithoutNullStreams;
   private readonly command: readonly [string, ...string[]];
   private readonly env: NodeJS.ProcessEnv;

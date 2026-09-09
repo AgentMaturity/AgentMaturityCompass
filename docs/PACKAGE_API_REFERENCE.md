@@ -2,6 +2,8 @@
 
 Use this reference to find exported functions, classes, types and their source locations. It is generated from AMC's TypeScript source. An exported toolkit is available to an embedding application; its presence does not establish that AMC enables it in a running deployment.
 
+In the staged documentation site, [open the generated package reference](../api/). For a local source checkout, build it with the commands below.
+
 | Package import | Source entry | Purpose |
 | --- | --- | --- |
 | `agent-maturity-compass` | `src/index.ts` | Public library exports |

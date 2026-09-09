@@ -131,9 +131,14 @@ describe("public Docs Pages artifact", () => {
       entry.types.replace(/^\.\/dist\//, "src/").replace(/\.d\.ts$/, ".ts"));
     expect([...entryPoints].sort()).toEqual(publicSources.sort());
     const serialized = JSON.stringify(reflection);
-    for (const symbol of ["initWorkspace", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
+    for (const symbol of ["initWorkspace", "InitWorkspaceOptions", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
     expect(serialized).toContain(`/blob/${revision}/`);
     expect(pnpmIntegrityFor("typedoc", String(pkg.devDependencies.typedoc), root)).not.toBeNull();
+    const initPage = readFileSync(resolve(first, "api/functions/index.initWorkspace.html"), "utf8");
+    expect(initPage).toContain("interfaces/index.InitWorkspaceOptions.html");
+    expect(initPage).not.toContain("This barrel is the contract");
+    expect(readFileSync(resolve(first, "docs/content/PACKAGE_API_REFERENCE.md"), "utf8"))
+      .toContain("[open the generated package reference](../api/)");
   });
 
   test("rejects unsafe, duplicate, internal, and destructive build inputs", async () => {

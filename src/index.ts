@@ -15,9 +15,11 @@
  *  2. Because nothing internal imports this barrel, drift between it and the
  *     modules it re-exports will not break the build. tests/publicApiSurface
  *     guards the surface instead.
+ *
+ * @packageDocumentation
  */
 
-export { quickstartWizard, initWorkspace, runDoctor } from "./workspace.js";
+export { quickstartWizard, initWorkspace, runDoctor, type InitWorkspaceOptions } from "./workspace.js";
 export { runDoctorCli } from "./doctor/doctorCli.js";
 export {
   buildSupplyChainGuardDecisionReceiptInput,
