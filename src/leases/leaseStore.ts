@@ -68,6 +68,10 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
 } {
   const paths = leaseRevocationPaths(workspace);
   if (!pathExists(paths.file)) {
+    // An orphaned signature records an existing store, not an empty bootstrap.
+    if (pathExists(paths.sig)) {
+      return { valid: false, signatureExists: true, reason: "revocation list missing but signature present" };
+    }
     return { valid: true, signatureExists: false, reason: null };
   }
   if (!pathExists(paths.sig)) {

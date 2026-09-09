@@ -42,7 +42,7 @@ import {
   revokeLeaseForCli
 } from "../leases/leaseCli.js";
 import { leasePayloadSchema, type LeasePayload } from "../leases/leaseSchema.js";
-import { loadLeaseRevocations } from "../leases/leaseStore.js";
+import { revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -819,7 +819,17 @@ function verifyManagedLease(input: {
   }
   const token = readFileSync(input.tokenPath, "utf8").trim();
   if (!token) return { valid: false, expired: false, payload: null, error: "lease token is empty" };
-  const revokedLeaseIds = new Set(loadLeaseRevocations(input.workspace).revocations.map((row) => row.leaseId));
+  let revokedLeaseIds: Set<string>;
+  try {
+    revokedLeaseIds = revokedLeaseIdSet(input.workspace);
+  } catch (error) {
+    return {
+      valid: false,
+      expired: false,
+      payload: null,
+      error: String(error instanceof Error ? error.message : error)
+    };
+  }
   const scopes = leaseScopes(input.mode ?? "observe");
   let verification = verifyLeaseToken({
     workspace: input.workspace,
