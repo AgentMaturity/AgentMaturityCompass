@@ -169,3 +169,37 @@ Root also owns new checkpoints under `/Users/sid/Documents/AMC/Archive/Checkpoin
 ## Targeted mutation preparation
 
 Astra trust worker owns only `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/managed-and-portal.py` and `README.md` in that directory. Prepare an executable helper and exact mutation/expected-failing-case map for AMC-1542 managed lease authentication and AMC-1508 persisted attribution. Read current source including extracted managedHookLease.ts. No test runs, installs, mutation application, source edits or commits. Root owns all other records and source. Helpers must require a supplied fresh clean candidate clone and preserve original bytes after each deliberate negative mutation.
+
+## Native browser receipt scenario alignment
+
+Root serially owns `scripts/studio-native-browser-check.mjs`, new `scripts/lib/nativeStudioBrowserReceipt.mjs`, new `tests/nativeStudioBrowserReceipt.test.ts`, and already owned `tests/e2e/native-tasks-page.mjs`. Source inspection found that1540/1541 added two retry scenarios and an archive scenario while the receipt still planned only the old scenarios; a completely successful updated run would be misclassified. Use one declared scenario list and exact per-scenario completion, preserving all failures/skips. This is an AMC-1540/1541 browser qualification correction, not a new feature or passing receipt. No browser/check/test run yet.
+
+## Corrected candidate and browser acceptance preparation
+
+Root owns exact new paths `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-2/runner.py`, `source.json`, `install.log`, `release-gate.log`, `release-gate.json`, `clean-source.log`, `README.md`. Require an explicit full source SHA for the next fresh clone; refuse overwriting earlier results. Defer execution until CoS integration and generated inventories are committed.
+
+Astra delivery worker owns only new `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser/run-installed-studio-browser.py` and `README.md`. Prepare the owned local installed-browser/cold-verification orchestration from retained attempt4, accepting explicit new candidate/artifact/configuration and new output paths. No install, browser, server, tests, model calls or source edits. Source-local scenario driver/receipt updates remain root-owned.
+
+## Acceptance helpers ready; CoS handoff pending
+
+Astra mutation and browser preparation workers are finished; root has read both helpers and their exact bounds. Their previously assigned helper paths return to root. No helper has executed. Chat on Steroids has written its three source/document files plus its worktree-local handoff. Codex completed static source review with no blocking finding; final CoS acknowledgement is pending before serial integration. Root does not overwrite the existing shared `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md`; the worker's handoff remains in its isolated tree and is referenced by the CoS record.
+
+## Chat on Steroids handoff accepted for integration
+
+The app visibly completed `Implement AMC Evidence Intake` on GPT-6 Pro and returned all four assigned files. Root reviewed final source/documents and an independent Astra source reviewer found no blocking defect; no execution result is claimed. Chat on Steroids now owns no writable paths. Root takes serial integration ownership of its named worktree and exact `scripts/human-first-use-intake.mjs`, `tests/humanFirstUseIntake.test.ts`, `docs/HUMAN_FIRST_USE_STUDY.md` paths, committing that branch and merging it into integration. Its ignored worktree handoff stays local and does not overwrite the root role handoff. No old worktree is changed.
+
+## Post-CoS generated inventory
+
+Root owns new preparation records `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/post-cos-generation/runner.py`, `source.json`, `install.log`, `build.log`, `counts.log`, `README.md`. Run clean install/build and count generation only in a new candidate clone after the CoS branch merge. The previously declared exact generated inventory copy targets remain root-owned; inspect only their generated deltas before copying/committing. This is artifact preparation, followed by one corrected-source fresh-clone acceptance.
+
+## Chat on Steroids continuous implementation goal — September 9
+
+Sid requested continuing parallel/background work with Goal or Loop instructions. All CoS conversations and continuations must use GPT-6 Pro; Codex stays GPT-6 Astra and owns integration. The prior CoS intake branch was merged at `e63c8cb7fa108561b584a807ae59c4da63bb6792` and remains read-only.
+
+| Worker | Worktree / branch | Linear | Exact writable paths | State |
+|---|---|---|---|---|
+| Chat on Steroids, GPT-6 Pro Goal | `/Users/sid/AgentMaturityCompass/tmp/cos-study-capture` / `codex/cos-study-capture` at `e63c8cb7fa108561b584a807ae59c4da63bb6792` | AMC-1512, AMC-1518 | `scripts/human-first-use-capture.mjs`; `tests/humanFirstUseCapture.test.ts`; `docs/HUMAN_FIRST_USE_CAPTURE.md`; `docs/HUMAN_FIRST_USE_STUDY.md`; `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md`, all inside the assigned worktree only | Prepare study metadata, record explicit observer events, finalize intake-compatible records, then author focused regressions/operator instructions; automatically continue through this finite implementation queue. No tests/install/builds/generators/commits or edits elsewhere. |
+
+The integrated intake remains read-only to CoS. Root owns exact new `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/goal-task.md`, `goal-dispatch.json`, and already owned CoS evidence/plan/Obsidian paths. A read-only Astra scope reviewer owns no paths. Participant/observer truth remains declarations; no fabricated observations. Root handles review, integration and final validation. Stop this CoS goal when the implementation queue and handoff are complete or a concrete blocker prevents progress, rather than repeating finished work.
+
+Root owns new Obsidian checkpoints under `/Users/sid/Documents/AMC/Archive/Checkpoints/`: `2026-09-09 AMC Home cos-goal checkpoint.md`, `2026-09-09 AMC Now cos-goal checkpoint.md`, `2026-09-09 AMC Roadmap cos-goal checkpoint.md`, `2026-09-09 MOC - Current Operations cos-goal checkpoint.md`. Checkpoint the current lead before replacing stale CoS-active wording with the integrated intake plus newly running observer-capture Goal. The Astra scope reviewer is finished and owns no paths.
