@@ -24,12 +24,10 @@ import type { ActionClass } from "../types.js";
  *     missed round; letting one extend a run would make the bound whatever the
  *     model says it is, which is not a bound.
  *
- * `stopConditions` on a `SubagentRequest` is the same idea recorded in a signed
- * packet — and read by nothing, exactly as `delegationScope` was before it was
- * bound. It is left alone here rather than quietly re-used: what a packet
- * ASSERTS about a handoff and what this driver ENFORCES about a loop are
- * different claims, and conflating them would put a second unenforced field
- * behind a name that now sounds enforced.
+ * A delegated request's `stopConditions` are enforced by spawnSubagent for
+ * that child's invocation count and lifetime. They are separate from this
+ * driver's round ceiling: a round is one distinct delegation, while a retained
+ * child may accept several continuation invocations inside its own lifetime.
  */
 
 export type RoundStop = "max-rounds" | "done" | "human" | "failed" | "cancelled" | "refused";
