@@ -1,7 +1,7 @@
 {
   "issue": "AMC-1547",
   "sourceReviewCommit": "f0442ac118573683080681f443f518853cd91f22",
-  "status": "implementation-in-progress",
+  "status": "core-integrated-operator-commands-in-progress",
   "acceptanceExecuted": false,
   "productionKeyOperations": false,
   "testsDeferredByUser": true,
@@ -9,5 +9,19 @@
   "linearStates": {
     "In Review": 31,
     "In Progress": 11
+  },
+  "updatedAt": "2026-09-09T10:22:34.325656+00:00",
+  "sourceIntegrationCommit": "249a2a812f2600c53564fa571761aa2cfb80a144",
+  "regressionIntegrationCommit": "d9d55034b1e856513eea1c68b09e50ecd433063e",
+  "storageCommit": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+  "lifecycleCommit": "7f2e38e3ed027e2bf4d52bea950cff4d2bccad25",
+  "regressionCommit": "603b9f37efd2a26369b791d060e6e6ae30d96bb3",
+  "sourceReview": "Root complete source/tests review and independent binding review. Retention backlog finding corrected using one locator per audited erasure.",
+  "retentionBackend": "existing SQLite operations retention; JSONL automatic retention not added",
+  "bundlePlaintextVerified": false,
+  "environment": {
+    "os": "Darwin 25.6.0",
+    "arch": "arm64",
+    "execution": "source authoring only; no runtime qualification"
   }
 }
