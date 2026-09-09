@@ -29,6 +29,7 @@ export const SESSION_EVENT_TYPES: ReadonlySet<EvidenceEventType> = new Set<Evide
   "assistant/block",
   "tool/call",
   "tool/result",
+  "tool/spill-commitment",
   "approval/request",
   "approval/answer",
   "sandbox/mode",

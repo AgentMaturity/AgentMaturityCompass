@@ -54,6 +54,7 @@ export type EvidenceEventType =
   | "assistant/block"
   | "tool/call"
   | "tool/result"
+  | "tool/spill-commitment"
   | "approval/request"
   | "approval/answer"
   | "sandbox/mode"

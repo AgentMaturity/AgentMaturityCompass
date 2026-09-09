@@ -3,7 +3,8 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import type { BundleManifest, DiagnosticReport } from "../types.js";
+import type { BundleManifest, DiagnosticReport, EvidenceEvent } from "../types.js";
+import { exportSessionSpills, inventorySessionSpills, restoreSessionSpills } from "../session/spill/spillLifecycle.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -344,7 +345,7 @@ function copyEvidenceSlice(params: {
   sourceDbPath: string;
   outputDbPath: string;
   report: DiagnosticReport;
-}): { blobPaths: string[]; eventCount: number; sessionCount: number } {
+}): { blobPaths: string[]; events: EvidenceEvent[]; eventCount: number; sessionCount: number } {
   const source = new Database(params.sourceDbPath, { readonly: true });
   const out = new Database(params.outputDbPath);
 
@@ -481,6 +482,7 @@ function copyEvidenceSlice(params: {
     const blobPaths = [...new Set(selectedEvents.map((row) => String(row.payload_path ?? "")).filter((value) => value.length > 0))];
     return {
       blobPaths,
+      events: selectedEvents as unknown as EvidenceEvent[],
       eventCount: selectedEvents.length,
       sessionCount: sessions.length
     };
@@ -579,43 +581,70 @@ function collectMonitorKeysFromBundle(root: string): string[] {
   return collectRoleKeysFromBundle(root, "monitor");
 }
 
-function materializeBundleWorkspace(root: string): string {
+function materializeBundleWorkspace(root: string): { workspace: string; spillGaps: string[] } {
   const workspace = mkTmp("amc-bundle-verify-");
-  const amc = join(workspace, ".amc");
-  const keysDir = join(amc, "keys");
-  const blobsDir = join(amc, "blobs");
-  const targetsDir = join(amc, "targets");
-  ensureDir(keysDir);
-  ensureDir(blobsDir);
-  ensureDir(targetsDir);
+  const spillGaps: string[] = [];
+  try {
+    const amc = join(workspace, ".amc");
+    const keysDir = join(amc, "keys");
+    const blobsDir = join(amc, "blobs");
+    const targetsDir = join(amc, "targets");
+    ensureDir(keysDir);
+    ensureDir(blobsDir);
+    ensureDir(targetsDir);
 
-  writeFileAtomic(join(amc, "evidence.sqlite"), readFileSync(join(root, "evidence", "evidence.sqlite")));
+    writeFileAtomic(join(amc, "evidence.sqlite"), readFileSync(join(root, "evidence", "evidence.sqlite")));
 
-  const bundleBlobDir = join(root, "evidence", "blobs");
-  if (pathExists(bundleBlobDir)) {
-    for (const name of readdirSync(bundleBlobDir)) {
-      const source = join(bundleBlobDir, name);
-      const target = join(blobsDir, name);
-      writeFileAtomic(target, readFileSync(source));
+    const bundleBlobDir = join(root, "evidence", "blobs");
+    if (pathExists(bundleBlobDir)) {
+      for (const name of readdirSync(bundleBlobDir)) {
+        const source = join(bundleBlobDir, name);
+        const target = join(blobsDir, name);
+        writeFileAtomic(target, readFileSync(source));
+      }
     }
-  }
-  restorePayloadsFromBundle(root, workspace);
+    restorePayloadsFromBundle(root, workspace);
 
-  writeFileAtomic(join(keysDir, "monitor_ed25519.pub"), readUtf8(join(root, "public-keys", "monitor.pub")), 0o644);
-  writeFileAtomic(join(keysDir, "auditor_ed25519.pub"), readUtf8(join(root, "public-keys", "auditor.pub")), 0o644);
+    writeFileAtomic(join(keysDir, "monitor_ed25519.pub"), readUtf8(join(root, "public-keys", "monitor.pub")), 0o644);
+    writeFileAtomic(join(keysDir, "auditor_ed25519.pub"), readUtf8(join(root, "public-keys", "auditor.pub")), 0o644);
 
-  for (const kind of ["monitor", "auditor"] as const) {
-    const history = authenticatedHistoryFromBundle(root, kind);
-    if (history) {
-      writeFileAtomic(join(keysDir, `${kind}_history.json`), JSON.stringify(history, null, 2), 0o644);
+    for (const kind of ["monitor", "auditor"] as const) {
+      const history = authenticatedHistoryFromBundle(root, kind);
+      if (history) {
+        writeFileAtomic(join(keysDir, `${kind}_history.json`), JSON.stringify(history, null, 2), 0o644);
+      }
     }
-  }
 
-  if (pathExists(join(root, "target.json"))) {
-    writeFileAtomic(join(targetsDir, "bundle.target.json"), readFileSync(join(root, "target.json")));
-  }
+    const spillSource = join(root, "evidence", "spill");
+    const spillDb = new Database(join(amc, "evidence.sqlite"), { readonly: true });
+    try {
+      const events = spillDb.prepare("SELECT * FROM evidence_events ORDER BY rowid ASC").all() as EvidenceEvent[];
+      if (pathExists(spillSource)) {
+        const restored = restoreSessionSpills({ workspace, events, source: spillSource });
+        const failed = restored.entries.filter((entry) => entry.status === "failed");
+        if (failed.length > 0) {
+          throw new Error(`Bundle spill restore refused: ${failed.map((entry) => entry.detail).join("; ")}`);
+        }
+        spillGaps.push(...restored.entries.filter((entry) => entry.status !== "restored")
+          .map((entry) => `${entry.locator ?? "unretrievable output"}: ${entry.status}: ${entry.detail ?? ""}`));
+      } else {
+        const inventory = inventorySessionSpills({ workspace, events });
+        if (!inventory.ok) throw new Error(`Bundle spill references invalid: ${inventory.errors.join("; ")}`);
+        spillGaps.push(...inventory.entries.map((entry) => `${entry.locator ?? "unretrievable output"}: historical bundle has no spill transport index`));
+      }
+    } finally {
+      spillDb.close();
+    }
 
-  return workspace;
+    if (pathExists(join(root, "target.json"))) {
+      writeFileAtomic(join(targetsDir, "bundle.target.json"), readFileSync(join(root, "target.json")));
+    }
+
+    return { workspace, spillGaps };
+  } catch (error) {
+    rmSync(workspace, { recursive: true, force: true });
+    throw error;
+  }
 }
 
 function trustTierByEventIdFromBundle(root: string): Map<string, string> {
@@ -749,6 +778,14 @@ export function exportEvidenceBundle(params: {
     const outputDbPath = join(root, "evidence", "evidence.sqlite");
     const copied = copyEvidenceSlice({ sourceDbPath, outputDbPath, report });
 
+    // Transport authenticated encrypted objects, never vault keys or legacy
+    // plaintext. The signed bundle manifest includes this index and its gaps.
+    exportSessionSpills({
+      workspace: params.workspace,
+      events: copied.events,
+      destination: join(root, "evidence", "spill")
+    });
+
     for (const payloadPath of copied.blobPaths) {
       copyPayloadIntoBundle({
         workspace: params.workspace,
@@ -836,9 +873,11 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
   errors: string[];
   runId: string | null;
   agentId: string | null;
+  retainedSpills: { objectsComplete: boolean; plaintextVerified: false; gaps: string[] };
 }> {
   const extracted = withExtractedBundle(bundleFile);
   const errors: string[] = [];
+  const spillGaps: string[] = [];
   let manifestSignatureVerified = false;
   let manifestFilesVerified = false;
 
@@ -986,7 +1025,9 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
     }
 
     try {
-      const verifyWorkspace = materializeBundleWorkspace(extracted.rootDir);
+      const materialized = materializeBundleWorkspace(extracted.rootDir);
+      const verifyWorkspace = materialized.workspace;
+      spillGaps.push(...materialized.spillGaps);
       try {
         const externallyAuthenticatedPayloads = new Map<string, string>();
         if (manifest && manifestSignatureVerified && manifestFilesVerified) {
@@ -1030,7 +1071,8 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
       ok: errors.length === 0,
       errors,
       runId: manifest?.runId ?? run?.runId ?? null,
-      agentId: manifest?.agentId ?? run?.agentId ?? null
+      agentId: manifest?.agentId ?? run?.agentId ?? null,
+      retainedSpills: { objectsComplete: errors.length === 0 && spillGaps.length === 0, plaintextVerified: false, gaps: spillGaps }
     };
   } finally {
     extracted.cleanup();

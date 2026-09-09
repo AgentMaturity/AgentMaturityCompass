@@ -28,6 +28,8 @@ export {
 } from "./security/index.js";
 
 export { openLedger, verifyLedgerIntegrity } from "./ledger/ledger.js";
+export { inventorySessionSpills, eraseSessionSpills, exportSessionSpills, restoreSessionSpills } from "./session/spill/spillLifecycle.js";
+export { inspectSpilledEvent, retrieveSpilledContent, verifySpilledContent } from "./session/spill/spillEvidence.js";
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
 
 export {

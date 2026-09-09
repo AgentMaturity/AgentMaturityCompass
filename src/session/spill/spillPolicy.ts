@@ -1,30 +1,12 @@
 /**
- * The spill policy: the thing that DECIDES.
+ * Keep oversized tool output out of model context while committing its full
+ * digest. Preparation encrypts in memory with an existing authenticated key;
+ * SessionService commits the planned object before persistence. The final
+ * tool/result records the actual retention outcome and preview.
  *
- * Before this module `SpilledRef` was a type on `ToolResultInput` — the caller
- * declared what it had spilled and the log wrote that declaration down. Nothing
- * checked it, nothing produced it, and a caller that lied produced a signed row
- * asserting a locator and a length that had never existed. The decision now has
- * an owner: `apply()` measures the result, spills it if it is over the
- * threshold, and mints the ref from the bytes it actually wrote. The ref is
- * therefore a description of what happened rather than a claim about it.
- *
- * This runs at post-execute — after the tool produced its output, before that
- * output becomes model-visible. `SessionService.recordToolResult` is that point
- * today, and it applies this policy itself rather than accepting a ref, which is
- * what makes the guarantee structural. When P4.1 builds the real post-execute
- * waterfall the policy object moves into it unchanged; what must not move is the
- * rule that whoever records the result is whoever ran the policy.
- *
- * Failure posture, stated because it is a judgement call and not an obvious one:
- * a spill-store failure must NOT turn a successful tool call into an error (the
- * tool did its job), and must NOT silently fall back to recording the whole
- * output inline (that is how a 200 MB `grep` result reaches the ledger's blob
- * cap and takes the entire event down with it, losing the outcome as well as the
- * output). So it degrades: the model gets the same truncated preview, marked as
- * unretrievable with the reason, and the event still commits to the SHA-256 of
- * the full bytes. The output is lost; what it WAS remains provable, and the
- * failure is on the record instead of laundered.
+ * Storage failure may degrade to an unavailable preview only if ordinary
+ * signed event persistence remains available. Commitment/signing failure
+ * propagates: it must never be reported as a successfully retained result.
  */
 import { sha256Hex } from "../../utils/hash.js";
 import { SessionSpillStore } from "./spillStore.js";
@@ -123,49 +105,73 @@ export class SessionSpillPolicy {
     this.config = resolveSpillPolicyConfig(overrides);
   }
 
-  apply(input: SpillInput): SpillOutcome {
+  apply(input: SpillInput, commitBeforeRetain: (ref: SpillRef) => void): SpillOutcome {
     if (input.content.byteLength <= this.config.maxInlineBytes) {
       return { spilled: false, content: input.content, ref: null };
     }
 
-    // Hash BEFORE attempting the write, so the commitment exists whether or not
-    // the store cooperates. This ordering is the whole of the degraded path.
+    // Measure before preparation; only the callback makes this digest durable.
     const contentSha256 = sha256Hex(input.content);
 
-    let locator: string | null = null;
+    let prepared: ReturnType<SessionSpillStore["prepare"]> | null = null;
     let unretrievable: string | null = null;
     try {
-      locator = this.store.write(input.nameSeed, input.content).locator;
+      prepared = this.store.prepare(input.nameSeed, input.content);
     } catch (error) {
-      unretrievable = `spill store write failed: ${error instanceof Error ? error.message : String(error)}`;
+      unretrievable = `spill preparation unavailable: ${error instanceof Error ? error.message : String(error)}`;
     }
 
     const head = utf8SafeHead(input.content, this.config.previewHeadBytes);
     const tail = utf8SafeTail(input.content, this.config.previewTailBytes);
-    const marker = truncationMarker({
+    const previewFor = (locator: string | null, reason: string | null): Buffer => Buffer.concat([head, Buffer.from(truncationMarker({
       totalBytes: input.content.byteLength,
       headBytes: head.byteLength,
       tailBytes: tail.byteLength,
       contentSha256,
       locator,
-      unretrievable,
+      unretrievable: reason,
       retrievalHint: this.config.retrievalHint
+    }), "utf8"), tail]);
+    let locator = prepared?.object.locator ?? null;
+    let preview = previewFor(locator, unretrievable);
+    const refFor = (): SpillRef => ({
+      v: 2,
+      format: "amc-blob-v1",
+      keyVersion: prepared?.object.keyVersion ?? null,
+      encodedBytes: prepared?.object.encodedBytes ?? null,
+      encodedSha256: prepared?.object.encodedSha256 ?? null,
+      locator,
+      contentSha256,
+      bytes: input.content.byteLength,
+      previewBytes: preview.byteLength,
+      maxInlineBytes: this.config.maxInlineBytes,
+      retrievalHint: this.config.retrievalHint,
+      unretrievable
     });
-    const preview = Buffer.concat([head, Buffer.from(marker, "utf8"), tail]);
+
+    if (prepared !== null) {
+      // Admission failure must escape. No persistent artifact exists until this
+      // signed, surface-neutral commitment succeeds. It is an intention, not a
+      // claim that materialization completed; the following tool/result says so.
+      if (typeof commitBeforeRetain !== "function") throw new Error("spill requires a signed commitment before retention");
+      const commitment: unknown = commitBeforeRetain(Object.freeze(refFor()));
+      if (commitment !== null && (typeof commitment === "object" || typeof commitment === "function") && "then" in commitment) {
+        void Promise.resolve(commitment).catch(() => undefined);
+        throw new Error("spill commitment must complete synchronously before retention");
+      }
+      try {
+        prepared.persist();
+      } catch (error) {
+        locator = null;
+        unretrievable = `spill store write failed: ${error instanceof Error ? error.message : String(error)}`;
+        preview = previewFor(locator, unretrievable);
+      }
+    }
 
     return {
       spilled: true,
       content: preview,
-      ref: {
-        v: 1,
-        locator,
-        contentSha256,
-        bytes: input.content.byteLength,
-        previewBytes: preview.byteLength,
-        maxInlineBytes: this.config.maxInlineBytes,
-        retrievalHint: this.config.retrievalHint,
-        unretrievable
-      }
+      ref: refFor()
     };
   }
 }

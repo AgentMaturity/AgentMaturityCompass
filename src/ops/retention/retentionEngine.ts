@@ -19,6 +19,9 @@ import {
 } from "./retentionArchive.js";
 import { runVacuum } from "../maintenance/sqliteMaintenance.js";
 import { pruneGuardEvents } from "../../enforce/evidenceEmitter.js";
+import type { EvidenceEvent } from "../../types.js";
+import { inventorySessionSpills, eraseSessionSpills } from "../../session/spill/spillLifecycle.js";
+import { spillLifecycleEventAuthenticityError } from "../../session/spill/spillEvidence.js";
 
 export interface RetentionRunResult {
   dryRun: boolean;
@@ -27,6 +30,7 @@ export interface RetentionRunResult {
   /** Guard events deleted; 0 unless retention.pruneGuardEventsAfterDays is set. */
   prunedGuardEventCount: number;
   prunedBlobCount: number;
+  prunedSpillCount: number;
   segmentId: string | null;
   segmentPath: string | null;
   manifestPath: string | null;
@@ -172,6 +176,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
         prunedEventCount: pruneEvents.length,
         prunedGuardEventCount,
         prunedBlobCount: 0,
+        prunedSpillCount: 0,
         segmentId,
         segmentPath,
         manifestPath,
@@ -246,6 +251,46 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       prunedBlobCount += 1;
     }
 
+    // Signed spill commitments are metadata references, not ledger blob_ref.
+    // Include all references before selecting expired rows; otherwise a newer
+    // reference could be hidden by the retention window. Active native sessions
+    // keep their objects even when an earlier result has reached the cutoff.
+    const spillEvents = ledger.db.prepare("SELECT * FROM evidence_events ORDER BY rowid ASC").all() as EvidenceEvent[];
+    const spillInventory = inventorySessionSpills({ workspace: params.workspace, events: spillEvents });
+    if (!spillInventory.ok) throw new Error(`Spill retention refused: ${spillInventory.errors.join("; ")}`);
+    const byEventId = new Map(spillEvents.map((event) => [event.id, event]));
+    const lastBySession = new Map(spillEvents.map((event) => [event.session_id, event]));
+    const spillPruneGroups: string[][] = [];
+    for (const entry of spillInventory.entries) {
+      if (entry.locator === null || entry.status === "missing") continue;
+      const closed = entry.sessionIds.every((sessionId) => {
+        const last = lastBySession.get(sessionId);
+        return last?.event_type === "session/close" && last.ts < pruneBeforeTs &&
+          spillLifecycleEventAuthenticityError(params.workspace, last) === null;
+      });
+      const expired = entry.eventIds.every((id) => {
+        const event = byEventId.get(id);
+        return event !== undefined && event.ts < pruneBeforeTs &&
+          (event.event_type === "tool/spill-commitment" || event.payload_pruned === 1);
+      });
+      if (closed && expired) spillPruneGroups.push(entry.eventIds);
+    }
+    let prunedSpillCount = 0;
+    // One locator per audit transaction bounds the outcome payload as a backlog
+    // grows. Keep all of that locator's references together so scoped erasure
+    // cannot strand another signed reference to the same object.
+    for (const eventIds of spillPruneGroups) {
+      const erased = eraseSessionSpills({
+        workspace: params.workspace,
+        events: spillEvents,
+        scope: { eventIds },
+        reason: `signed ops retention prunePayloadsAfterDays=${policy.opsPolicy.retention.prunePayloadsAfterDays}`
+      });
+      auditEventIds.push(...erased.auditEventIds);
+      prunedSpillCount += erased.entries.filter((entry) => entry.status === "removed").length;
+      if (!erased.ok) throw new Error("Spill retention incomplete; inspect signed SESSION_SPILL_ERASURE_FINISHED audit events");
+    }
+
     const createdAudit = appendOpsAuditEvent({
       workspace: params.workspace,
       auditType: "RETENTION_SEGMENT_CREATED",
@@ -263,7 +308,8 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
         payload: {
           prunedEventCount: pruneIds.length,
           prunedGuardEventCount,
-          prunedBlobCount
+          prunedBlobCount,
+          prunedSpillCount
         }
       });
       auditEventIds.push(pruneAudit.eventId);
@@ -313,6 +359,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
       prunedEventCount: pruneIds.length,
       prunedGuardEventCount,
       prunedBlobCount,
+      prunedSpillCount,
       segmentId,
       segmentPath,
       manifestPath,

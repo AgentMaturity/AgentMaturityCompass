@@ -4,6 +4,16 @@ AMC keeps an oversized tool result's model-visible preview separate from its ret
 
 The functions are implemented in `src/session/spill/spillLifecycle.ts`. The storage and authentication helpers remain the authority for object framing, signed references, locator/session binding, and ciphertext integrity. This document describes source behavior; it is not an execution or release acceptance receipt.
 
+## Native session writes and keys
+
+`SessionService.recordToolResult` prepares an encrypted v2 object in memory, then synchronously appends a signed `tool/spill-commitment` event before allowing the object to be created. The commitment has no model-visible surface operation. Its signed metadata binds the full-output digest, ciphertext digest and size, key version, and session locator. Only after this event succeeds does storage publish the object; the normal `tool/result` records the preview and actual retention outcome.
+
+A commitment append failure creates no spill object. If the append committed but its caller lost the result, the signed reference can remain as an explicit missing object. If object publication succeeds but the later result append fails, the earlier commitment still identifies the retained object. These are visible failure states, not a transaction across the ledger and filesystem.
+
+New retained output uses the existing AMC blob envelope and versioned workspace key, authenticated by the signed current-key metadata and signed operations policy. Spill does not provision or rotate a key, accept the legacy unvaulted key, use `AMC_NO_SIGN`, or fall back to plaintext. A key or policy preparation failure can produce an explicitly unretrievable preview when the ordinary signed result path remains available. If the vault or signing path is unavailable too, the result write itself can fail; a preview is not guaranteed in that state. Ordinary ledger blob key provisioning is unchanged.
+
+Objects use exclusive private-file creation and full-write/fsync handling. Retrieval authenticates the signed reference before reading, verifies the encrypted envelope, and decrypts with the exact historical key version and locator-bound associated data. A missing historical key is reported as `key-unavailable` without replacement key creation. Historical v1 plaintext objects remain explicitly readable; no new v1 objects or automatic migration are introduced.
+
 ## Inventory
 
 `inventorySessionSpills({ workspace, events, options? })` accepts evidence rows and returns `ok`, `entries`, `errors`, and `contentVerification: "not-decrypted"`. Supply the complete applicable history, including both `tool/spill-commitment` and `tool/result` rows. Do not filter away references before asking about erasure.
@@ -26,6 +36,8 @@ This API is a hook for an operator or a DSAR fulfillment handler with an indepen
 
 Retention callers must supply all relevant rows and select only eligible expired references. A surviving newer reference must prevent deletion of the shared object. Whether a session is closed and its payloads are old enough is the retention policy caller's responsibility.
 
+The existing SQLite operations-retention path now inventories all ledger spill references. It removes an object only when every referring event is older than the pruning cutoff and has a pruned payload (or is the payload-free precommitment), and every referring session's final row is an authentic, expired `session/close`. Active sessions, recent closes, and surviving newer references keep their objects. Erasure processes one locator and all its reference IDs per signed audit operation, so a growing backlog does not become one oversized outcome payload. `prunedSpillCount` counts actual removals. Dry runs do not erase objects. Existing ordinary payload pruning runs separately before spill handling; a spill failure does not roll those earlier operations back. This integration does not add automatic retention for the JSONL session backend.
+
 ## Encrypted export and restore
 
 `exportSessionSpills({ workspace, events, destination, options? })` creates a new destination directory whose parent already exists. It writes `objects/<sha256(locator)>.blob` and publishes `index.json` last. It refuses to overwrite an existing destination. The index records authenticated references, their origins, ciphertext digests, copied object names, and explicit gaps. Legacy v1 plaintext is excluded with a reason. Keys and decrypted output are never included.
@@ -37,6 +49,8 @@ Restoration reports each object as `restored`, `failed`, `missing`, `unretrievab
 The operator-selected source root or destination parent is canonicalized once. Ordinary filesystem aliases, including macOS temporary-directory aliases and an explicitly selected folder alias, are supported. Below that trusted selection, directories must remain real directories; planted links in `objects/`, symlinked files, hard-linked input files, and path traversal are refused. POSIX transport directories must be owned by the operator and disallow group/other write access. These checks assume the selected private parent is not concurrently replaced by an actor with the operator's own filesystem authority.
 
 Default backups already include `.amc/spill` because their include root is `.amc`, and their archive payload is encrypted by default. This lifecycle work does not claim that backup copies are erased when a local spill is purged.
+
+Evidence bundles now include the authenticated ciphertext transport under `evidence/spill`, covered by the bundle manifest. Verification restores it into the temporary verification workspace after restoring its signed rows and public trust history. Malformed or modified objects fail verification; named missing, unretrievable, legacy-excluded, or absent-transport cases remain explicit gaps. `retainedSpills.objectsComplete` reports ciphertext completeness separately from the bundle's other verification results, while `retainedSpills.plaintextVerified` is always `false` for this keyless transport path. A valid bundle with a missing retained object therefore does not claim complete retained output. Old bundles without a spill index report their affected references as gaps.
 
 ## Qualification boundary
 

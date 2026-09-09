@@ -32,7 +32,7 @@ import { getPublicKeyHistory, verifyHexDigestAny } from "../../crypto/keys.js";
 import { verifyMonitorTrustRoot } from "../../persistence/sessionStoreVerification.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { readSpilled, spillRoot, type SpillReadStatus } from "./spillStore.js";
-import { extractSpillRef, type SpillRef } from "./spillTypes.js";
+import { extractSpillRef, parseSpillLocator, SPILL_META_KEY, type SpillRef } from "./spillTypes.js";
 
 export interface SpillRetrievalOptions {
   /**
@@ -53,7 +53,7 @@ export interface SpillRetrievalOptions {
  * purge as an incident, and — the direction that actually matters — would let a
  * real modification hide among the purges.
  */
-export type SpillEvidenceStatus = "ok" | "not-spilled" | "row-unauthentic" | SpillReadStatus;
+export type SpillEvidenceStatus = "ok" | "not-spilled" | "invalid-reference" | "row-unauthentic" | SpillReadStatus;
 
 export interface SpillEvidenceResult {
   readonly eventId: string;
@@ -129,20 +129,77 @@ function spillAuthContext(workspace: string, options: SpillRetrievalOptions): Sp
   };
 }
 
+function authenticateWithContext(
+  workspace: string,
+  event: EvidenceEvent,
+  resolveContext: SpillAuthContext | (() => SpillAuthContext)
+): SpillEvidenceResult {
+  const ref = extractSpillRef(event.meta_json);
+  if (ref === null) {
+    try {
+      const meta: unknown = JSON.parse(event.meta_json);
+      if (typeof meta !== "object" || meta === null || Array.isArray(meta)) throw new Error("invalid metadata");
+      const declared = (meta as Record<string, unknown>)[SPILL_META_KEY];
+      if (declared === null || declared === undefined) {
+        return { eventId: event.id, status: "not-spilled", detail: null, bytes: null, ref: null };
+      }
+    } catch {
+      // An unreadable declaration cannot establish that the event never spilled.
+    }
+    return { eventId: event.id, status: "invalid-reference", detail: "malformed or unsupported spill reference", bytes: null, ref: null };
+  }
+
+  const context = typeof resolveContext === "function" ? resolveContext() : resolveContext;
+  const authError = context.trustError ?? rowAuthenticityError(event, context.monitorKeys);
+  if (authError !== null) {
+    return { eventId: event.id, status: "row-unauthentic", detail: authError, bytes: null, ref };
+  }
+
+  if (ref.locator !== null) {
+    const locator = parseSpillLocator(ref.locator);
+    if (locator === null || locator.sessionHash !== sha256Hex(event.session_id) || locator.version !== ref.v) {
+      return { eventId: event.id, status: "invalid-reference", detail: "spill locator does not identify this event's session and format", bytes: null, ref };
+    }
+  }
+  return { eventId: event.id, status: "ok", detail: null, bytes: null, ref };
+}
+
+/** Authenticate only the signed reference. This does not read or verify the object. */
+export function authenticateSpillReference(
+  workspace: string,
+  event: EvidenceEvent,
+  options: SpillRetrievalOptions = {}
+): SpillEvidenceResult {
+  return authenticateWithContext(workspace, event, () => spillAuthContext(workspace, options));
+}
+
+/** One trust snapshot for a synchronous lifecycle inventory, resolved only if needed. */
+export function createSpillReferenceAuthenticator(
+  workspace: string,
+  options: SpillRetrievalOptions = {}
+): (event: EvidenceEvent) => SpillEvidenceResult {
+  let context: SpillAuthContext | undefined;
+  return (event) => authenticateWithContext(workspace, event, () => context ??= spillAuthContext(workspace, options));
+}
+
+/** Row authentication for lifecycle control events; does not verify a whole chain. */
+export function spillLifecycleEventAuthenticityError(
+  workspace: string,
+  event: EvidenceEvent,
+  options: SpillRetrievalOptions = {}
+): string | null {
+  const context = spillAuthContext(workspace, options);
+  return context.trustError ?? rowAuthenticityError(event, context.monitorKeys);
+}
+
 function inspectWithContext(
   workspace: string,
   event: EvidenceEvent,
   context: SpillAuthContext
 ): SpillEvidenceResult {
-  const ref = extractSpillRef(event.meta_json);
-  if (ref === null) {
-    return { eventId: event.id, status: "not-spilled", detail: null, bytes: null, ref: null };
-  }
-
-  const authError = context.trustError ?? rowAuthenticityError(event, context.monitorKeys);
-  if (authError !== null) {
-    return { eventId: event.id, status: "row-unauthentic", detail: authError, bytes: null, ref };
-  }
+  const authenticated = authenticateWithContext(workspace, event, context);
+  if (authenticated.status !== "ok" || authenticated.ref === null) return authenticated;
+  const ref = authenticated.ref;
 
   const read = readSpilled(workspace, ref, context.root);
   if (read.status === "ok") {

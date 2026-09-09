@@ -570,8 +570,16 @@ export class SessionService extends SessionEventWriter {
     this.ensureUsable();
     const turn = this.currentTurn;
     const step = this.currentStep;
-    const full = typeof result.content === "string" ? Buffer.from(result.content, "utf8") : result.content;
-    const outcome = this.requireSpill().apply({ nameSeed: result.toolCallId, content: full });
+    const full = typeof result.content === "string" ? Buffer.from(result.content, "utf8") : Buffer.from(result.content);
+    const outcome = this.requireSpill().apply({ nameSeed: result.toolCallId, content: full }, (ref) => {
+      this.appendSessionEvent({
+        eventType: "tool/spill-commitment",
+        typeMeta: { turn, step, toolCallId: result.toolCallId, [SPILL_META_KEY]: ref },
+        surface: { op: "none" },
+        turn,
+        step
+      });
+    });
     return this.recordContent({
       eventType: "tool/result",
       content: outcome.content,
