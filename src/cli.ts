@@ -193,6 +193,7 @@ import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
+import { registerSpillCommands } from "./cli-spill-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
 import { registerAcpCommands } from "./acp/acpCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
@@ -24388,6 +24389,7 @@ registerLateStageCliCommands({
 registerMirofishCommands(program);
 registerCompositionCommands(program);
 registerSessionCommands(program);
+registerSpillCommands(program);
 registerWireCommands(program);
 registerAcpCommands(program);
 registerAgentCommands(program);

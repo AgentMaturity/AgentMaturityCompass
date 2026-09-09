@@ -61,6 +61,7 @@ save()
 for label, args, timeout in [
     ('install', [node, pnpm, 'install', '--frozen-lockfile'], 900),
     ('build', [node, pnpm, 'run', 'build'], 900),
+    ('command-inventory', [node, 'dist/cli.js', 'commands', '--markdown', '--out', 'docs/CLI_COMMAND_INVENTORY.md'], 180),
     ('counts', [node, 'scripts/gen-counts.mjs', '--write'], 180),
 ]:
     started = time.monotonic()
