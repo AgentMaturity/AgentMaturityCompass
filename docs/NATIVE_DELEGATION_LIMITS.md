@@ -93,3 +93,29 @@ remains separate from that account. Limits cannot prove the answer correct,
 make a failed task successful, or establish comparative performance. Check the
 native signed session and independent verifier for the available execution
 evidence; preserve incomplete and unknown outcomes.
+
+### Output from a stopped native child
+
+A native turn may record useful text before cancellation, a step/token ceiling,
+or another failure. The native runner returns the newly recorded readable text
+separately from its unsuccessful outcome and runtime reason. The first spawn's
+failure may carry `childText`; a continuation failure carries `text`. Neither
+field makes `ok: false` successful. Text already returned by an earlier
+continuation is not returned again. A refusal before new work remains empty.
+
+Missing or pruned text payloads are described in the runtime reason as incomplete
+output, not replaced with diagnostic markers in the child's words. Available
+fresh text may still be returned with that failure. The existing unsigned-row
+refusal suppresses output. Reading text is not independent signature or chain
+verification; use the normal verifier and preserve the original child session.
+
+The model-facing `delegate` tool still reports the runtime failure account alone,
+without concatenating a partial answer as though the child succeeded. Native
+API callers must keep the text and settlement separate. Timeout/grace/abandonment,
+turn limits, root-governed budgets, scopes and approvals are unchanged. A late
+executor return still does not rewrite an already-unconfirmed settlement.
+
+This correction is implementation-only under AMC-1545. Its scripted native
+regressions in `tests/nativeChildStopOutput.test.ts` are **UNEXECUTED** pending
+the consolidated final qualification; no provider, process-stop or release
+acceptance is implied.

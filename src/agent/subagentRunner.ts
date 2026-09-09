@@ -1,4 +1,5 @@
 import { SessionService } from "../session/sessionService.js";
+import { readEventPayload } from "../session/eventPayload.js";
 import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScope } from "./delegationScope.js";
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
@@ -229,19 +230,37 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           await driver!.whenIdle();
           const summary = readAgentRunSummary(init.workspace, ctx.childSessionId, driver!.status);
           const ending = summary.endings.at(-1);
-          if (parentCancelled || ctx.signal?.aborted || releaseRequested || driver!.status === "failed"
-              || summary.endings.length <= completedTurns || ending?.reason !== "complete") {
-            releaseRequested = true;
-            return { ok: false, text: "", reason: parentCancelled || ctx.signal?.aborted
-              ? "parent cancelled the child" : `child turn did not complete (${ending?.reason ?? driver!.status})` };
-          }
+          const stopped = parentCancelled || ctx.signal?.aborted
+            ? "parent cancelled the child"
+            : releaseRequested || driver!.status === "failed" || summary.endings.length <= completedTurns || ending?.reason !== "complete"
+              ? `child turn did not complete (${ending?.reason ?? driver!.status})` : undefined;
           if (summary.unsignedRows > 0) {
             releaseRequested = true;
-            return { ok: false, text: "", reason: `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance` };
+            return { ok: false, text: "", reason: [stopped,
+              `child wrote ${summary.unsignedRows} unsigned row(s); its output has no provenance`].filter(Boolean).join("; ") };
           }
-          const fresh = summary.assistantText.slice(reported);
-          reported = summary.assistantText.length;
+          // A stop changes settlement, not what the child already recorded.
+          // Read only fresh text payloads: the terminal summary substitutes
+          // missing/pruned-payload diagnostics, which are not the child's words.
+          // This read-back retains the existing unsigned refusal; it is not an
+          // independent signature/chain verification or a successful-task claim.
+          const textBlocks = session.readEvents().filter(event => event.event_type === "assistant/block"
+            && (JSON.parse(event.meta_json) as { blockKind?: unknown }).blockKind === "text");
+          const fresh: string[] = [];
+          const unavailable = new Set<string>();
+          for (const event of textBlocks.slice(reported)) {
+            const payload = readEventPayload(init.workspace, event);
+            if (payload.status === "ok") fresh.push(payload.bytes.toString("utf8"));
+            else unavailable.add(payload.status);
+          }
+          reported = textBlocks.length;
           completedTurns = summary.endings.length;
+          if (stopped !== undefined || unavailable.size > 0) {
+            releaseRequested = true;
+            const incomplete = unavailable.size === 0 ? undefined
+              : `child text payload unavailable (${[...unavailable].join(", ")}); output is incomplete`;
+            return { ok: false, text: fresh.join("\n"), reason: [stopped, incomplete].filter(Boolean).join("; ") };
+          }
           return { ok: true, text: fresh.join("\n") };
         } catch (error) {
           releaseRequested = true;
