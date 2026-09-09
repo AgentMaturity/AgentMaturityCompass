@@ -260,7 +260,7 @@ export function runRetention(params: { workspace: string; dryRun: boolean }): Re
     if (!spillInventory.ok) throw new Error(`Spill retention refused: ${spillInventory.errors.join("; ")}`);
     const byEventId = new Map(spillEvents.map((event) => [event.id, event]));
     const lastBySession = new Map(spillEvents.map((event) => [event.session_id, event]));
-    const spillPruneGroups: string[][] = [];
+    const spillPruneGroups: Array<readonly string[]> = [];
     for (const entry of spillInventory.entries) {
       if (entry.locator === null || entry.status === "missing") continue;
       const closed = entry.sessionIds.every((sessionId) => {
