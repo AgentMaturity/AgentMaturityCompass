@@ -1,236 +1,342 @@
 /**
- * The spill store: session-scoped 0600 files, and the read path that checks
- * them against the signed commitment before returning a byte.
+ * Encrypted spill objects are prepared before their signed commitment and only
+ * published afterward. Legacy v1 plaintext is read-only.
  *
- * Three properties are load-bearing here, and each is enforced rather than
- * documented:
- *
- * 1. **Session scoping.** Objects live under `.amc/spill/session-<sha256(id)>`.
- *    The directory is named by a hash rather than the raw session id because
- *    the id is a caller-supplied string that would otherwise become a path
- *    component, and because a directory listing should not enumerate live
- *    session identifiers to anything that can read the workspace root.
- *
- * 2. **Least privilege.** The session directory is 0700 and every object 0600,
- *    re-applied with `chmod` after creation because `mkdir`/`open` modes are
- *    masked by the process umask and a permissive umask would otherwise
- *    silently widen them. Tool output is the most sensitive material the
- *    harness handles — it is whatever the agent just read — so it does not get
- *    default file modes.
- *
- * 3. **No overwrite, no symlink.** Objects are created with `O_CREAT|O_EXCL`
- *    (`flag: "wx"`), which fails rather than following an existing name — so a
- *    pre-planted symlink cannot redirect a write out of the directory. Reads
- *    require a regular file, so one cannot redirect a read either.
- *
- * The read path deliberately returns a STATUS rather than throwing for every
- * unhappy case, because "the file is gone" and "the file no longer matches what
- * was signed" are different facts: the first is what retention looks like, the
- * second is what tampering looks like, and a verifier that collapsed them would
- * report a purge as an attack (or, worse, the reverse).
+ * Filesystem boundary: the owner controls a stable workspace and its private
+ * spill directories. Each component below the workspace is checked without
+ * following links; objects use exclusive creation and O_NOFOLLOW descriptor
+ * reads. Node has no portable openat directory-fd API, so this does not claim
+ * confinement against a process with the same uid concurrently replacing the
+ * containing directory tree. Such a process already controls the workspace.
  */
-import { chmodSync, closeSync, fsyncSync, lstatSync, mkdirSync, openSync, rmSync, writeSync } from "node:fs";
-import { randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { sha256Hex } from "../../utils/hash.js";
 import {
-  formatSpillLocator,
-  parseSpillLocator,
-  type SpillRef
-} from "./spillTypes.js";
+  closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync,
+  mkdirSync, openSync, readSync, readdirSync, realpathSync, rmdirSync, unlinkSync, writeSync,
+  type Stats
+} from "node:fs";
+import { randomBytes } from "node:crypto";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { sha256Hex } from "../../utils/hash.js";
+import { decryptSpillBytes, encryptSpillBytes, SPILL_ENVELOPE_OVERHEAD, SpillKeyUnavailableError, validateSpillEnvelope } from "./spillEncryption.js";
+import { formatSpillLocator, isSpillRef, parseSpillLocator, type SpillRef } from "./spillTypes.js";
 
-/** Directory mode for a session's spill directory. Owner-only, no exceptions. */
 const SESSION_DIR_MODE = 0o700;
-/** File mode for a spilled object. */
 const OBJECT_FILE_MODE = 0o600;
 
-/** The workspace-wide spill root. One directory per session lives beneath it. */
 export function spillRoot(workspace: string): string {
   return join(workspace, ".amc", "spill");
 }
 
-/** The directory name for a session, derived from its id rather than being it. */
 export function sessionSpillDirName(sessionId: string): string {
   return `session-${sha256Hex(Buffer.from(sessionId, "utf8"))}`;
 }
 
-/** What a successful write produced. `sha256` is over the bytes as written. */
+/** Both commitments describe full plaintext and its encrypted representation. */
 export interface SpillObject {
+  readonly v: 2;
+  readonly format: "amc-blob-v1";
+  readonly keyVersion: number;
+  readonly encodedBytes: number;
+  readonly encodedSha256: string;
   readonly locator: string;
   readonly path: string;
   readonly bytes: number;
   readonly sha256: string;
 }
 
-/**
- * Turn an arbitrary caller-supplied label into a filename component.
- *
- * The label is model-influenced (it is derived from a tool call id), so it is
- * mapped onto `[A-Za-z0-9._-]` and truncated rather than validated: the object
- * name is always prefixed by 32 random hex characters, so the label affects
- * only readability, never uniqueness and never location.
- */
+export interface PreparedSpillObject {
+  readonly object: SpillObject;
+  /** Caller must durably sign object metadata before this publication step. */
+  persist(): SpillObject;
+}
+
 function safeNameComponent(seed: string): string {
   const cleaned = seed.replace(/[^A-Za-z0-9._-]/g, "_").slice(0, 40);
   return cleaned.length > 0 ? cleaned : "output";
 }
 
-/**
- * One session's writer. Created by the session's SessionService, which is the
- * single writer for that session's spine and therefore for its spill objects.
- */
+function isMissing(error: unknown): boolean {
+  return (error as NodeJS.ErrnoException)?.code === "ENOENT";
+}
+
+function ownerOnly(stat: Stats, directory: boolean, privateMode: boolean): void {
+  if (directory ? !stat.isDirectory() : !stat.isFile()) throw new Error("spill path has an unsafe file type");
+  if (typeof process.getuid === "function" && stat.uid !== process.getuid()) throw new Error("spill path is not owned by this operator");
+  if ((stat.mode & (privateMode ? 0o077 : 0o022)) !== 0) throw new Error("spill path permissions allow access outside its owner boundary");
+  if (!directory && stat.nlink !== 1) throw new Error("spill object has multiple hard links");
+}
+
+function sameIdentity(left: Stats, right: Stats): boolean {
+  return left.dev === right.dev && left.ino === right.ino;
+}
+
+function sameContents(left: Stats, right: Stats): boolean {
+  return sameIdentity(left, right) && left.size === right.size && left.mtimeMs === right.mtimeMs && left.ctimeMs === right.ctimeMs;
+}
+
+/** Canonicalize only the operator-selected workspace, never untrusted descendants. */
+function storageRoot(workspace: string, root: string): { base: string; root: string } {
+  const lexicalBase = resolve(workspace);
+  const suffix = relative(lexicalBase, resolve(root));
+  if (!suffix || suffix === ".." || suffix.startsWith(`..${sep}`) || suffix.startsWith(sep)) {
+    throw new Error("spill root must be a descendant of the workspace");
+  }
+  const base = realpathSync(lexicalBase);
+  ownerOnly(lstatSync(base), true, false);
+  return { base, root: join(base, suffix) };
+}
+
+/** No recursive mkdir/chmod: an existing unsafe component is refused, not repaired. */
+function checkedDirectory(workspace: string, root: string, sessionHash: string, create: boolean): string {
+  const paths = storageRoot(workspace, root);
+  const session = join(paths.root, `session-${sessionHash}`);
+  let current = paths.base;
+  for (const component of relative(paths.base, session).split(sep)) {
+    current = join(current, component);
+    let stat: Stats;
+    try {
+      stat = lstatSync(current);
+    } catch (error) {
+      if (!create || !isMissing(error)) throw error;
+      try { mkdirSync(current, { mode: SESSION_DIR_MODE }); } catch (createError) {
+        if ((createError as NodeJS.ErrnoException).code !== "EEXIST") throw createError;
+      }
+      stat = lstatSync(current);
+    }
+    ownerOnly(stat, true, current === paths.root || current === session);
+  }
+  return session;
+}
+
+function checkedObjectPath(workspace: string, locator: string, root: string, create: boolean): string {
+  const parts = parseSpillLocator(locator);
+  if (parts === null) throw new Error("invalid spill locator");
+  return join(checkedDirectory(workspace, root, parts.sessionHash, create), parts.objectName);
+}
+
+function stableObject(path: string, expectedSize?: number): Stats {
+  const stat = lstatSync(path);
+  ownerOnly(stat, false, true);
+  if (expectedSize !== undefined && stat.size !== expectedSize) throw new Error("spill object size differs from signed commitment");
+  return stat;
+}
+
+function readObject(workspace: string, locator: string, expectedSize: number, root: string): Buffer {
+  if (!Number.isSafeInteger(expectedSize) || expectedSize < 0 || expectedSize > 0xffffffff + SPILL_ENVELOPE_OVERHEAD) {
+    throw new Error("spill object size is unsupported");
+  }
+  const path = checkedObjectPath(workspace, locator, root, false);
+  const before = stableObject(path, expectedSize);
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const opened = fstatSync(fd);
+    ownerOnly(opened, false, true);
+    if (!sameContents(before, opened)) throw new Error("spill object changed before reading");
+    // Allocation and every read are bounded by authenticated reference metadata.
+    const bytes = Buffer.alloc(expectedSize);
+    let offset = 0;
+    while (offset < bytes.length) {
+      const count = readSync(fd, bytes, offset, bytes.length - offset, offset);
+      if (count === 0) throw new Error("spill object was truncated while reading");
+      offset += count;
+    }
+    const after = fstatSync(fd);
+    const named = stableObject(path, expectedSize);
+    if (!sameContents(opened, after) || !sameContents(after, named)) throw new Error("spill object changed while reading");
+    return bytes;
+  } finally {
+    closeSync(fd);
+  }
+}
+
+function publishObject(workspace: string, locator: string, encoded: Buffer, root: string): void {
+  const path = checkedObjectPath(workspace, locator, root, true);
+  const fd = openSync(path, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, OBJECT_FILE_MODE);
+  let created: Stats | undefined;
+  let complete = false;
+  try {
+    created = fstatSync(fd);
+    ownerOnly(created, false, true);
+    fchmodSync(fd, OBJECT_FILE_MODE);
+    let offset = 0;
+    while (offset < encoded.length) {
+      const count = writeSync(fd, encoded, offset, encoded.length - offset, offset);
+      if (count === 0) throw new Error("spill object write made no progress");
+      offset += count;
+    }
+    fsyncSync(fd);
+    const final = fstatSync(fd);
+    const named = stableObject(path, encoded.length);
+    if (!sameIdentity(created, final) || !sameContents(final, named)) throw new Error("spill object changed during publication");
+    // Persist the new directory entry as well as its contents.
+    const parent = openSync(dirname(path), constants.O_RDONLY | constants.O_DIRECTORY | constants.O_NOFOLLOW);
+    try { fsyncSync(parent); } finally { closeSync(parent); }
+    complete = true;
+  } finally {
+    closeSync(fd);
+    if (!complete) {
+      // Remove only the inode this invocation created; never a replacement.
+      try {
+        const named = lstatSync(path);
+        if (created && sameIdentity(created, named) && named.isFile() && named.nlink === 1) unlinkSync(path);
+      } catch { /* The signed commitment remains an explicit missing object. */ }
+    }
+  }
+}
+
+function removeObjectAtPath(path: string): void {
+  const before = stableObject(path);
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    const opened = fstatSync(fd);
+    ownerOnly(opened, false, true);
+    const named = stableObject(path);
+    if (!sameIdentity(before, opened) || !sameIdentity(opened, named)) throw new Error("spill object changed before erasure");
+    unlinkSync(path);
+    if (fstatSync(fd).nlink !== 0) throw new Error("spill object still has a retained hard link after erasure");
+  } finally { closeSync(fd); }
+}
+
 export class SessionSpillStore {
   readonly workspace: string;
   readonly sessionId: string;
   readonly sessionHash: string;
-  private readonly sessionDir: string;
+  private readonly root: string;
 
   constructor(workspace: string, sessionId: string, root: string = spillRoot(workspace)) {
     this.workspace = workspace;
     this.sessionId = sessionId;
-    const dirName = sessionSpillDirName(sessionId);
-    this.sessionHash = dirName.slice("session-".length);
-    this.sessionDir = join(root, dirName);
+    this.sessionHash = sessionSpillDirName(sessionId).slice("session-".length);
+    this.root = root;
   }
 
-  /**
-   * Write one object and return its locator.
-   *
-   * Throws on any filesystem failure. The caller (the spill policy) converts
-   * that into a recorded `unretrievable` reason rather than into a failed tool
-   * call — see spillPolicy.ts — so the throw here stays specific and the
-   * degradation decision stays in one place.
-   */
-  write(nameSeed: string, bytes: Buffer): SpillObject {
-    mkdirSync(this.sessionDir, { recursive: true, mode: SESSION_DIR_MODE });
-    // Re-assert the mode: `mkdir`'s is masked by umask, and on an existing
-    // directory it is not applied at all.
-    chmodSync(this.sessionDir, SESSION_DIR_MODE);
-
+  /** Reads existing keys and encrypts in memory; creates no directories or files. */
+  prepare(nameSeed: string, bytes: Buffer): PreparedSpillObject {
     const objectName = `${randomBytes(16).toString("hex")}-${safeNameComponent(nameSeed)}`;
-    const path = join(this.sessionDir, objectName);
-    // "wx" is O_CREAT|O_EXCL: it fails on an existing name, symlink included.
-    const fd = openSync(path, "wx", OBJECT_FILE_MODE);
-    try {
-      writeSync(fd, bytes);
-      // The commitment is already durable by the time the event commits; fsync
-      // here so the bytes it commits to are durable too, rather than leaving the
-      // retrievable half of the pair to the page cache.
-      fsyncSync(fd);
-    } finally {
-      closeSync(fd);
-    }
-    chmodSync(path, OBJECT_FILE_MODE);
-
-    return {
-      locator: formatSpillLocator({ sessionHash: this.sessionHash, objectName }),
-      path,
-      bytes: bytes.byteLength,
-      sha256: sha256Hex(bytes)
-    };
+    const locator = formatSpillLocator({ version: 2, sessionHash: this.sessionHash, objectName });
+    const plaintext = Buffer.from(bytes);
+    const { encoded, keyVersion, encodedSha256 } = encryptSpillBytes(this.workspace, locator, plaintext);
+    const object: SpillObject = Object.freeze({
+      v: 2, format: "amc-blob-v1", keyVersion, encodedBytes: encoded.length, encodedSha256,
+      locator, path: resolveSpillPath(this.workspace, locator, this.root)!, bytes: plaintext.length, sha256: sha256Hex(plaintext)
+    });
+    let attempted = false;
+    return Object.freeze({
+      object,
+      persist: (): SpillObject => {
+        if (attempted) throw new Error("prepared spill publication already attempted");
+        attempted = true;
+        publishObject(this.workspace, locator, encoded, this.root);
+        return object;
+      }
+    });
   }
 
-  /**
-   * Remove this session's spill directory and everything in it.
-   *
-   * NOT called at session close, and deliberately so: the signed log keeps
-   * referring to these objects for as long as it exists, so closing a session
-   * and destroying its retrievable output are different decisions. This is the
-   * hook a retention policy calls, and after it the affected rows verify as
-   * `missing` — a recorded gap, never a silent one.
-   */
+  /** Compatibility entry point: there is deliberately no unsigned default. */
+  write(nameSeed: string, bytes: Buffer, beforeWrite: (object: SpillObject) => void): SpillObject {
+    if (typeof beforeWrite !== "function") throw new Error("spill write requires a signed commitment callback before publication");
+    const prepared = this.prepare(nameSeed, bytes);
+    const result: unknown = beforeWrite(prepared.object);
+    if (result !== null && (typeof result === "object" || typeof result === "function") && "then" in result) {
+      // Refuse asynchronous commitment without leaving its rejection unhandled.
+      void Promise.resolve(result).catch(() => undefined);
+      throw new Error("spill commitment callback must finish synchronously before publication");
+    }
+    return prepared.persist();
+  }
+
+  /** Explicit whole-session erasure; no recursive traversal into planted paths. */
   purge(): void {
-    rmSync(this.sessionDir, { recursive: true, force: true });
+    let session: string;
+    try { session = checkedDirectory(this.workspace, this.root, this.sessionHash, false); } catch (error) {
+      if (isMissing(error)) return;
+      throw error;
+    }
+    const names = readdirSync(session);
+    // Refuse unsafe entries before deleting any object in this session.
+    for (const name of names) {
+      if (parseSpillLocator(`amc-spill:v1:${this.sessionHash}:${name}`) === null) throw new Error("invalid spill object name");
+      stableObject(join(session, name));
+    }
+    for (const name of names) removeObjectAtPath(join(session, name));
+    rmdirSync(session);
   }
 }
 
-/**
- * Resolve a locator to a path, or null if it is not a locator at all.
- *
- * Deliberately takes only the workspace: a locator carries its own session
- * hash, so retrieval — including retrieval by a verifier that never opened the
- * session — needs no session id and cannot be pointed at the wrong session's
- * directory by supplying one.
- */
 export function resolveSpillPath(workspace: string, locator: string, root: string = spillRoot(workspace)): string | null {
   const parts = parseSpillLocator(locator);
-  if (parts === null) {
-    return null;
-  }
+  if (parts === null) return null;
   return join(root, `session-${parts.sessionHash}`, parts.objectName);
 }
 
-export type SpillReadStatus = "ok" | "invalid-locator" | "unretrievable" | "missing" | "tampered";
-
+export type SpillReadStatus = "ok" | "invalid-locator" | "unretrievable" | "missing" | "tampered" | "key-unavailable";
 export type SpillReadResult =
   | { readonly status: "ok"; readonly bytes: Buffer; readonly detail: null }
   | { readonly status: Exclude<SpillReadStatus, "ok">; readonly bytes: null; readonly detail: string };
 
-/**
- * Read spilled bytes back and hold them to the ref that was signed.
- *
- * The ref is the authority for all three checks — length, regular-file-ness,
- * and content hash — and the ref only reaches this function from a row whose
- * `event_hash` and `writer_sig` the caller has verified (spillEvidence.ts does
- * exactly that). The length check is not redundant with the hash check: it
- * rejects a file that has been inflated, before reading it, so a hostile
- * workspace cannot turn a retrieval into an out-of-memory.
- */
-export function readSpilled(
-  workspace: string,
-  ref: SpillRef,
-  root: string = spillRoot(workspace)
-): SpillReadResult {
-  if (ref.locator === null) {
-    return {
-      status: "unretrievable",
-      bytes: null,
-      detail: ref.unretrievable ?? "the spill store did not retain these bytes"
-    };
-  }
-  const path = resolveSpillPath(workspace, ref.locator, root);
-  if (path === null) {
-    return { status: "invalid-locator", bytes: null, detail: `not a spill locator: ${ref.locator}` };
-  }
+function locatorMatches(ref: SpillRef): boolean {
+  return ref.locator !== null && parseSpillLocator(ref.locator)?.version === ref.v;
+}
 
-  let size: number;
+/** Caller authenticates the event signature before passing its reference here. */
+export function readSpilled(workspace: string, ref: SpillRef, root: string = spillRoot(workspace)): SpillReadResult {
+  if (!isSpillRef(ref)) return { status: "tampered", bytes: null, detail: "invalid spill reference" };
+  if (ref.locator === null) return { status: "unretrievable", bytes: null, detail: ref.unretrievable ?? "the spill store did not retain these bytes" };
+  if (!locatorMatches(ref)) return { status: "invalid-locator", bytes: null, detail: "spill locator and reference version do not match" };
   try {
-    const stat = lstatSync(path);
-    if (!stat.isFile()) {
-      // lstat does not follow links, so a symlink lands here rather than being
-      // read through — a swapped object cannot redirect the read.
-      return { status: "tampered", bytes: null, detail: `spill object is not a regular file: ${ref.locator}` };
-    }
-    size = stat.size;
-  } catch {
-    return { status: "missing", bytes: null, detail: `spill object not found: ${ref.locator}` };
-  }
-
-  if (size !== ref.bytes) {
+    const encodedSize = ref.v === 2 ? ref.encodedBytes! : ref.bytes;
+    if (ref.v === 2 && encodedSize !== ref.bytes + SPILL_ENVELOPE_OVERHEAD) throw new Error("invalid signed encrypted spill size");
+    const stored = readObject(workspace, ref.locator, encodedSize, root);
+    const bytes = ref.v === 2 ? decryptSpillBytes(workspace, ref, stored) : stored;
+    if (bytes.length !== ref.bytes || sha256Hex(bytes) !== ref.contentSha256) throw new Error("spill plaintext differs from signed commitment");
+    return { status: "ok", bytes, detail: null };
+  } catch (error) {
     return {
-      status: "tampered",
-      bytes: null,
-      detail: `spill object is ${size} bytes, the signed event committed to ${ref.bytes}`
+      status: error instanceof SpillKeyUnavailableError ? "key-unavailable" : isMissing(error) ? "missing" : "tampered",
+      bytes: null, detail: error instanceof Error ? error.message : String(error)
     };
   }
+}
 
-  let bytes: Buffer;
+export type SpillObjectInspection =
+  | { readonly status: "ok"; readonly encoded: Buffer; readonly detail: null }
+  | { readonly status: "missing" | "legacy-plaintext" | "tampered" | "invalid-locator" | "unretrievable"; readonly encoded: null; readonly detail: string };
+
+/** Keyless transport verifies the signed ciphertext digest, not decryption. */
+export function inspectSpillObject(workspace: string, ref: SpillRef, root: string = spillRoot(workspace)): SpillObjectInspection {
+  if (!isSpillRef(ref)) return { status: "tampered", encoded: null, detail: "invalid spill reference" };
+  if (ref.locator === null) return { status: "unretrievable", encoded: null, detail: ref.unretrievable ?? "spill bytes were not retained" };
+  if (!locatorMatches(ref)) return { status: "invalid-locator", encoded: null, detail: "spill locator and reference version do not match" };
+  if (ref.v === 1) return { status: "legacy-plaintext", encoded: null, detail: "legacy plaintext spill is excluded from encrypted transport" };
   try {
-    bytes = readFileSync(path);
-  } catch {
-    return { status: "missing", bytes: null, detail: `spill object could not be read: ${ref.locator}` };
+    if (ref.encodedBytes !== ref.bytes + SPILL_ENVELOPE_OVERHEAD) throw new Error("invalid signed encrypted spill size");
+    const encoded = readObject(workspace, ref.locator, ref.encodedBytes!, root);
+    validateSpillEnvelope(ref, encoded);
+    return { status: "ok", encoded, detail: null };
+  } catch (error) {
+    return { status: isMissing(error) ? "missing" : "tampered", encoded: null, detail: error instanceof Error ? error.message : String(error) };
   }
+}
 
-  const actual = sha256Hex(bytes);
-  if (actual !== ref.contentSha256) {
-    return {
-      status: "tampered",
-      bytes: null,
-      detail:
-        `spill object hashes to ${actual.slice(0, 16)}… but the signed event committed to ` +
-        `${ref.contentSha256.slice(0, 16)}…`
-    };
+/** The signed reference must already have been restored/authenticated by caller. */
+export function restoreSpillObject(workspace: string, ref: SpillRef, encoded: Buffer, root: string = spillRoot(workspace)): void {
+  if (!isSpillRef(ref) || ref.v !== 2 || !locatorMatches(ref)) throw new Error("restore requires a valid encrypted spill reference");
+  const snapshot = Buffer.from(encoded);
+  validateSpillEnvelope(ref, snapshot);
+  publishObject(workspace, ref.locator!, snapshot, root);
+}
+
+/** Caller supplies an authenticated, explicitly selected reference for erasure. */
+export function removeSpillObject(workspace: string, ref: SpillRef, root: string = spillRoot(workspace)): "removed" | "missing" {
+  if (!isSpillRef(ref)) throw new Error("erasure requires a valid spill reference");
+  if (ref.locator === null) return "missing";
+  if (!locatorMatches(ref)) throw new Error("erasure requires a valid spill reference");
+  try {
+    const path = checkedObjectPath(workspace, ref.locator, root, false);
+    removeObjectAtPath(path);
+    return "removed";
+  } catch (error) {
+    if (isMissing(error)) return "missing";
+    throw error;
   }
-  return { status: "ok", bytes, detail: null };
 }
