@@ -45,10 +45,17 @@ Open **View check output** for the exact authenticated check-result payload. AMC
 | Close and verify | Seals an idle session and checks native evidence. A sealed session cannot resume. |
 | Verify evidence | Checks released/closed evidence without creating a new model turn. Other open ledger writers can prevent complete verification. |
 | Refresh status | Reconciles the displayed state after a disconnected or uncertain request, without resubmitting it. |
+| Retry original submission | After a successful status refresh leaves admission unconfirmed, explicitly resends the original request and identity. Edited draft text is preserved for a later submission. |
 
 The activity view displays authenticated, committed updates. It does not provide provisional token previews. Task ending reasons and evidence verification are separate: recorded output does not prove task success, and workspace-key consistency is not an external trust anchor.
 
 If a request loses its response, keep the draft and refresh status. The browser retains its request ID and does not automatically submit a replacement. A conflicting request ID or stale revision produces a conflict response. After a Studio restart, eligible tasks appear released; resume explicitly before submitting a new turn. Uncertain prior admissions are flagged rather than replayed.
+
+When a successful refresh still cannot confirm the request, **Retry original submission** becomes available. It resends the original task or follow-up, including its original choices and revision, using the same request ID. An already admitted request returns its existing task without running another turn. A request that never arrived can then be admitted normally. A later edit in the draft is never included in this retry, and remains after acknowledgement. Repeated network failures require another refresh and explicit retry; an unreadable response or server error remains unconfirmed.
+
+Retry stays bound to the original agent, workspace and sign-in. It cannot move a task into another account or acquire changed grants. The pending request lives only in the current page; no prompt or credential is saved to browser storage. Keep the page open while resolving an uncertain admission. Reloading discards its in-memory request and draft; first inspect your task list before making a replacement submission.
+
+A refused retry does not prove the original request failed. A sign-in, ownership, rate-limit or policy refusal can happen before Studio looks up the earlier admission. The page therefore keeps that request unconfirmed, preserves your draft and requires another successful refresh before an explicit retry. A failed setup refresh also leaves **Refresh status** available so a temporary outage cannot strand the pending request.
 
 Resume checks the signed native session and recorded ledger prefix even while Studio's unrelated gateway session is still open. It does not classify that incomplete archive as fully verified. Existing signatures, present seals, native identity and writer ownership remain admission requirements; complete cold verification remains a separate operation.
 

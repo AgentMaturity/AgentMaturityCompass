@@ -185,6 +185,87 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
         return { taskId: accepted.taskId, requestId: accepted.clientRequestId, browserPosts: 1, acceptedTasks: 1, editedDraftPreserved: true };
       } finally { releaseAbort?.(); await page.unroute(`**${NATIVE}`, routeHandler); }
     });
+    for (const kind of ["create", "turn"]) await step(`unreceived-${kind}-explicit-identical-retry`, async () => {
+      let before = null;
+      if (kind === "turn") {
+        await ui.create(`Retry follow-up parent ${randomUUID()}`);
+        before = await ui.ready(); sessions.add(before.sessionId);
+      }
+      const prompt = `Unreceived ${kind} ${randomUUID()}`, edited = `Later draft ${randomUUID()}`;
+      const sentBodies = [], pattern = kind === "create" ? `**${NATIVE}` : `**${NATIVE}/${before.taskId}/turn?*`;
+      let attempts = 0;
+      const handler = async route => {
+        const request = route.request();
+        if (request.method() !== "POST") return route.fallback();
+        sentBodies.push(request.postData()); attempts++;
+        // First request never reaches Studio. The next attempt receives a real
+        // CSRF refusal, which cannot establish non-admission of the first one.
+        if (attempts === 1) return route.abort("connectionreset");
+        if (attempts === 2) {
+          const response = await route.fetch({ maxRetries: 0,
+            headers: { ...request.headers(), "x-amc-native-csrf": "deliberately-invalid-retry-csrf" } });
+          assert.equal(response.status(), 403); return route.fulfill({ response });
+        }
+        return route.continue();
+      };
+      await page.route(pattern, handler);
+      try {
+        if (kind === "create") await page.locator("#nativeTaskProvider").selectOption("stub");
+        await page.locator("#nativeTaskPrompt").fill(prompt);
+        await page.locator("#nativeTaskSubmit").click();
+        await expect(page.locator("#nativeTaskNotice")).toContainText("Submission outcome unknown");
+        await page.locator("#nativeTaskPrompt").fill(edited);
+        await expect(page.locator("#nativeTaskRetry")).toBeDisabled();
+        await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
+
+        // A failed options refresh must leave recovery reachable, even though
+        // stale setup is discarded. No admission is fabricated by this fault.
+        const optionsPattern = `**${NATIVE}/options?*`;
+        const failOptions = route => route.abort("connectionreset");
+        await page.route(optionsPattern, failOptions);
+        try {
+          await page.locator("#nativeTaskRefresh").click();
+          await expect(page.locator("#nativeTaskError")).toBeVisible();
+          await expect(page.locator("#nativeTaskRefresh")).toBeEnabled();
+          await expect(page.locator("#nativeTaskRetry")).toBeDisabled();
+        } finally { await page.unroute(optionsPattern, failOptions); }
+
+        await page.locator("#nativeTaskRefresh").click();
+        await expect(page.locator("#nativeTaskRetry")).toBeEnabled();
+        assert.equal(attempts, 1, "Status refresh must never submit");
+        if (before) assert.equal((await ui.task()).revision, before.revision);
+        await page.locator("#nativeTaskRetry").click();
+        await expect(page.locator("#nativeTaskError")).toContainText(/sign in|csrf|origin/i);
+        await expect(page.locator("#nativeTaskRetry")).toBeDisabled();
+        await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
+        await expect(page.locator("#nativeTaskPrompt")).toHaveValue(edited);
+
+        await page.locator("#nativeTaskRefresh").click();
+        await expect(page.locator("#nativeTaskRetry")).toBeEnabled();
+        const admittedResponse = page.waitForResponse(response => response.request().method() === "POST"
+          && JSON.stringify(response.request().postDataJSON()) === JSON.stringify(JSON.parse(sentBodies[0])) && response.status() === 202);
+        await page.locator("#nativeTaskRetry").click();
+        const admitted = await unwrap(await admittedResponse);
+        await expect.poll(() => new URL(page.url()).searchParams.get("task")).toBe(admitted.taskId);
+        const ready = await ui.ready(); sessions.add(ready.sessionId);
+        await expect(page.locator("#nativeTaskRetry")).toBeHidden();
+        await expect(page.locator("#nativeTaskPrompt")).toHaveValue(edited);
+        assert.equal(attempts, 3); assert.equal(new Set(sentBodies).size, 1, "All attempts must retain the exact original body");
+        const original = JSON.parse(sentBodies[0]); assert.equal(original.prompt, prompt);
+        if (before) {
+          assert.equal(original.expectedRevision, before.revision); assert.equal(ready.revision, before.revision + 1);
+          assert.equal(ready.sessionId, before.sessionId);
+        } else {
+          const list = await ui.json(`${NATIVE}?agentId=${encodeURIComponent(fixture.agentId)}`);
+          assert.equal(list.tasks.filter(task => task.clientRequestId === original.clientRequestId).length, 1);
+        }
+        await expect(page.locator(".native-task-event-user").filter({ hasText: prompt })).toHaveCount(1);
+        await ui.control("release"); await ui.newTask();
+        return { taskId: ready.taskId, sessionId: ready.sessionId, requestId: original.clientRequestId,
+          attempts, requestBodyIdentical: true, revisedDraftPreserved: true, firstAttemptReachedServer: false,
+          refusedRetry: "real CSRF check", failedRefreshRecoverable: true };
+      } finally { await page.unroute(pattern, handler); }
+    });
     await step("real-pending-approval-link-and-denial", async () => {
       assert.equal((await ui.options()).scope.ready, true, "CLI fixture must provide signed workspace policy and reviewer quorum");
       await ui.create(`Request governed stub tool ${randomUUID()}`, "workspace");

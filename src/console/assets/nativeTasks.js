@@ -1,6 +1,8 @@
 import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
   renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent } from "./nativeTasksView.js";
+import { captureNativeSubmission, nativeSubmissionScopeMatches, nativeSubmissionAcknowledged,
+  definiteNativeSubmissionRefusal } from "./nativeTaskSubmission.js";
 
 const API = "/api/v1/native-tasks";
 const mounts = new WeakMap();
@@ -38,6 +40,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   const lifetime = new AbortController();
   let disposed = false, config = null, task = null, tasks = [], cursor = 0, timer = null;
   let polling = false, mutation = false, inspecting = false, pending = null, readGeneration = 0, setupGeneration = 0, readPaused = false;
+  let retryReady = false, reconciling = false;
   let selectedChecks = [], selectedChecksDigest = null;
   let notice = "", selectedAgent = initialAgent, taskRead = null;
   root.innerHTML = nativeTasksShell(initialAgent);
@@ -53,6 +56,12 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   };
   const request = (path, options = {}) => apiNativeRequest(path, { ...options, nativeCsrfToken: config?.nativeCsrfToken });
   const endpoint = (id, suffix = "") => `${API}/${encodeURIComponent(id)}${suffix}?agentId=${encodeURIComponent(task?.agentId || selectedAgent)}`;
+  const workspaceScope = () => {
+    const url = new URL(window.location.href), parts = url.pathname.split("/").filter(Boolean);
+    return `${url.origin}${parts[0] === "w" ? `/w/${parts[1] || ""}` : parts[0] === "host" ? "/host" : ""}`;
+  };
+  const submissionScope = () => ({ agentId: config?.agentId, workspaceScope: workspaceScope(),
+    csrfToken: config?.nativeCsrfToken, adminToken: getAdminToken() });
   const provider = () => config?.providers.find(item => item.id === el("nativeTaskProvider").value);
   const clearTimer = () => { if (timer !== null) clearTimeout(timer); timer = null; };
   function updateUrl(id) {
@@ -96,6 +105,14 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     const canPrompt = setupReady && (!task || task.state === "idle");
     el("nativeTaskSubmit").disabled = !canPrompt || mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskSubmit").textContent = task ? "Send follow-up" : "Run task";
+    el("nativeTaskRetry").hidden = !pending;
+    el("nativeTaskRetry").disabled = !pending || !retryReady || mutation || inspecting || reconciling || polling
+      || !navigator.onLine || !nativeSubmissionScopeMatches(pending, submissionScope());
+    el("nativeTaskRetryHelp").hidden = !pending;
+    el("nativeTaskRetryHelp").textContent = !pending ? "" : !nativeSubmissionScopeMatches(pending, submissionScope())
+      ? "The original workspace or sign-in changed. Return to the original session and refresh status; this request cannot be sent under another identity."
+      : retryReady ? "Retry sends only the original task text and choices. Any edits in the draft below stay here for a later submission."
+      : "Refresh status first. If Studio cannot find the original admission, you can explicitly retry that same submission.";
     // Keep the draft editable while a submission is awaiting acknowledgement.
     el("nativeTaskPrompt").disabled = !config;
     el("nativeTaskProvider").disabled = !config || Boolean(task) || mutation || Boolean(pending);
@@ -111,7 +128,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     for (const action of ["Release","Resume","Verify"]) el(`nativeTask${action}`).disabled = mutation || inspecting || Boolean(pending) || !navigator.onLine;
     el("nativeTaskResume").disabled ||= !setupReady;
     el("nativeTaskVerify").textContent = task && ["released","closed","failed"].includes(task.state) ? "Verify evidence" : "Close and verify";
-    el("nativeTaskRefresh").disabled = !config || mutation || inspecting || polling || !navigator.onLine;
+    el("nativeTaskRefresh").disabled = (!config && !pending) || mutation || inspecting || polling || reconciling || !navigator.onLine;
     el("nativeTaskNew").disabled = !task || ACTIVE.has(task.state) || mutation || Boolean(pending);
     el("nativeTaskState").textContent = taskStateLabel(task);
     if (config) scope();
@@ -128,11 +145,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     el("nativeTaskRetention").textContent = `${shown} of ${task?.nextCursor || 0} recorded updates are displayed. Some updates are not loaded or were withheld by retention limits. The transcript is partial; use runtime evidence for the full verification verdict.`;
     controls();
   }
-  function confirmSubmission(view) {
+  function confirmSubmission(view, directResponse = false) {
     if (!pending) return;
-    if (view.lastClientRequestId !== pending.id && view.clientRequestId !== pending.id) return;
+    if (!nativeSubmissionAcknowledged(pending, view, directResponse)) return;
     if (el("nativeTaskPrompt").value === pending.prompt) el("nativeTaskPrompt").value = "";
-    pending = null;
+    pending = null; retryReady = false;
     tell("Submission recorded. Waiting for the task's actual outcome.");
   }
   function receive(view) {
@@ -224,8 +241,16 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     receive(task); await inspect(task.agentId); await poll();
   }
   async function refresh() {
-    clearError(); readPaused=false; await inspect(task?.agentId || selectedAgent); await list(); if(task) await poll();
-    if (pending) tell("Submission outcome is still unconfirmed. The original request identity is retained; this page will not send it again automatically.");
+    if (reconciling || mutation) return;
+    reconciling=true; retryReady=false; controls();
+    try {
+      clearError(); readPaused=false; await inspect(pending?.agentId || task?.agentId || selectedAgent); await list(); if(task) await poll();
+      if (pending) {
+        retryReady=nativeSubmissionScopeMatches(pending, submissionScope());
+        tell(retryReady ? "Submission outcome is still unconfirmed. Retry original submission resends the same request only when you choose it."
+          : "The sign-in or workspace changed. The original submission remains unconfirmed and cannot be retried under another identity.");
+      }
+    } finally { reconciling=false; controls(); }
   }
   async function mutate(action) {
     if (!task || mutation || pending) return;
@@ -243,17 +268,30 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (new TextEncoder().encode(prompt).length>config.limits.maxPromptBytes) { showError(new Error("This prompt exceeds the configured byte limit. Shorten it before submitting."));return; }
     const id=crypto.randomUUID();
     const body=task ? {prompt,clientRequestId:id,expectedRevision:task.revision} : {agentId:selectedAgent,provider:provider().id,...(provider().local?{}:{model:el("nativeTaskModel").value.trim()}),tools:el("nativeTaskTools").value,...(el("nativeTaskTools").value === "workspace" ? {toolsDigest:config.scope.digest} : {}),...(selectedChecks.length ? {validation:{configSha256:selectedChecksDigest,checkIds:[...selectedChecks]}} : {}),prompt,clientRequestId:id,maxSteps:Number(el("nativeTaskMaxSteps").value),maxTokens:Number(el("nativeTaskMaxTokens").value)};
-    pending={id,prompt,body,kind:task?"turn":"create"};mutation=true;readGeneration++;taskRead?.abort();clearTimer();clearError();controls();tell("Submitting once. Your draft stays here until Studio acknowledges it.");
+    pending=captureNativeSubmission({ url:task?endpoint(task.taskId,"/turn"):API,body,agentId:selectedAgent,
+      taskId:task?.taskId || null,...submissionScope() });
+    await sendSubmission(false);
+  }
+  async function sendSubmission(retry) {
+    if (!pending || mutation || inspecting || reconciling || (retry && (!retryReady || polling || !navigator.onLine))) return;
+    if (!nativeSubmissionScopeMatches(pending, submissionScope())) {
+      retryReady=false;showError(new Error("The original submission belongs to another workspace or sign-in. Refresh status under its original identity."));controls();return;
+    }
+    const original=pending;
+    retryReady=false;mutation=true;readGeneration++;taskRead?.abort();clearTimer();clearError();controls();
+    tell(retry ? "Retrying the original submission with the same request identity. Your edited draft will not be sent."
+      : "Submitting once. Your draft stays here until Studio acknowledges it.");
     let acknowledged=false;
     try {
-      const view=taskView(await request(task?endpoint(task.taskId,"/turn"):API,{method:"POST",body}));
+      const view=taskView(await apiNativeRequest(original.url,{method:"POST",body:original.body,nativeCsrfToken:original.csrfToken,signal:lifetime.signal}));
+      if (!nativeSubmissionAcknowledged(original,view,true)) throw new Error("Studio returned a different admission. The original submission is still unconfirmed; refresh its status.");
       acknowledged=true;
       if (disposed) return;
-      if (!task) await selectTask(view); else { receive(view); await poll(); }
-      // A successful response acknowledges this exact submitted request even before polling.
-      if (pending?.id===id) { if(el("nativeTaskPrompt").value===prompt) el("nativeTaskPrompt").value="";pending=null; }
+      // Settle the exact acknowledgement before any subsequent setup or polling can fail.
+      confirmSubmission(view,true);
+      if (original.kind === "create") await selectTask(view); else { receive(view); await poll(); }
     } catch(error) {
-      if (Number.isInteger(error?.status) && error.status>=400 && error.status<500 && error.code!=="INVALID_RESPONSE") pending=null;
+      if (pending===original && definiteNativeSubmissionRefusal(error,retry)) { pending=null;retryReady=false; }
       showError(error);tell(acknowledged ? "Submission recorded, but setup or status refresh failed. Refresh status to see its outcome; no request was repeated."
         : pending ? "Submission outcome unknown. Use Refresh status to find the original request; no automatic retry will run."
         : "Submission refused. Your draft is preserved; refresh setup or task status before trying again.");
@@ -268,14 +306,15 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   });
   listen(el("nativeTaskTools"),"change",()=>{if(!task && el("nativeTaskTools").value === "none") { selectedChecks=[];controls(); }});
   listen(el("nativeTaskPromptForm"),"submit",event=>{event.preventDefault();void submit();});
+  listen(el("nativeTaskRetry"),"click",()=>{void sendSubmission(true);});
   listen(el("nativeTaskPrompt"),"keydown",event=>{if(event.key==="Enter"&&(event.ctrlKey||event.metaKey)){event.preventDefault();void submit();}});
   listen(el("nativeTaskRefresh"),"click",()=>{void refresh().catch(showError);});
   for(const [id,action] of [["nativeTaskCancel","cancel"],["nativeTaskRelease","release"],["nativeTaskResume","resume"],["nativeTaskVerify","verify"]]) listen(el(id),"click",()=>{void mutate(action);});
   listen(el("nativeTaskNewMessages"),"click",()=>{el("nativeTaskTranscript").lastElementChild?.scrollIntoView({block:"nearest"});el("nativeTaskNewMessages").hidden=true;});
   listen(el("nativeTaskNew"),"click",()=>{if(pending||mutation||ACTIVE.has(task?.state))return;clearTimer();readGeneration++;taskRead?.abort();task=null;selectedChecks=[];selectedChecksDigest=config?.validation.configSha256 ?? null;cursor=0;readPaused=false;el("nativeTaskTranscript").replaceChildren();updateUrl(null);project();tell("Choose the next task. Previous tasks remain available in Your tasks.");});
   listen(el("nativeTaskList"),"click",event=>{const button=event.target.closest("[data-native-task-id]");if(!button||mutation||pending)return;const view=tasks.find(item=>item.taskId===button.dataset.nativeTaskId);if(view)void selectTask(view).catch(showError);});
-  const dispose=()=>{if(disposed)return;disposed=true;clearTimer();taskRead?.abort();lifetime.abort();mounts.delete(root);};mounts.set(root,dispose);listen(window,"pagehide",dispose);
-  listen(window,"offline",()=>{clearTimer();tell("Connection lost. Task outcome is unknown until Studio confirms it; this view does not stop the task.");controls();});
+  const dispose=()=>{if(disposed)return;disposed=true;pending=null;clearTimer();taskRead?.abort();lifetime.abort();mounts.delete(root);};mounts.set(root,dispose);listen(window,"pagehide",dispose);
+  listen(window,"offline",()=>{retryReady=false;clearTimer();tell("Connection lost. Task outcome is unknown until Studio confirms it; this view does not stop the task.");controls();});
   listen(window,"online",()=>{tell("Connection restored. Refresh status before another action.");controls();});
   try {
     const requestedId=new URL(window.location.href).searchParams.get("task");
