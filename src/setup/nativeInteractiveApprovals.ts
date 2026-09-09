@@ -57,7 +57,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     let resolveDone!: () => void;
     decisionDone = new Promise<void>(done => { resolveDone = done; });
     return new Promise(resolveDecision => {
-      let processError = false, outputBytes = 0;
+      let processError = false, timedOut = false, outputBytes = 0;
       let child: ChildProcess;
       try {
         child = spawn(process.execPath, [...process.execArgv, entry, ...args], {
@@ -71,7 +71,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
         force ??= setTimeout(() => child.kill("SIGKILL"), 1_000);
       };
       signal.addEventListener("abort", stop, { once: true });
-      const timeout = setTimeout(stop, 30_000);
+      const timeout = setTimeout(() => { timedOut = true; stop(); }, 30_000);
       // Output is never interpreted as a decision or rendered as terminal controls.
       const consume = (chunk: Buffer) => { outputBytes += chunk.byteLength; if (outputBytes > 256 * 1024) { processError = true; stop(); } };
       child.stdout?.on("data", consume); child.stderr?.on("data", consume);
@@ -79,7 +79,9 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       child.once("close", code => {
         clearTimeout(timeout); if (force) clearTimeout(force); signal.removeEventListener("abort", stop);
         if (decisionChild === child) { decisionChild = null; decisionDone = null; }
-        resolveDone(); resolveDecision(!closed && !signal.aborted && !processError && code === 0);
+        // A deadline-triggered SIGTERM can still produce exit zero. Preserve the
+        // deadline as uncertain delivery; signed decision read-back is separate.
+        resolveDone(); resolveDecision(!closed && !signal.aborted && !processError && !timedOut && code === 0);
       });
     });
   };

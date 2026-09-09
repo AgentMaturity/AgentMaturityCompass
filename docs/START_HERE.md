@@ -51,6 +51,13 @@ exists, remains available for deliberate inspection and verified resume. This
 protocol check does not itself verify signatures or prove a task succeeded: a
 valid failed or cancelled result retains its recorded outcome.
 
+Interactive approval also separates a signed decision from clean command
+delivery. If the decision command exceeds its deadline, even a later graceful
+zero exit is not clean delivery. Chat reads back the signed queue, names whether
+the decision was recorded, does not resend it, and requests cancellation of the
+waiting turn. Inspect that exact approval before taking another action; existing
+authenticated reviewer, request-digest and quorum requirements still apply.
+
 ## What AMC is
 
 AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.
