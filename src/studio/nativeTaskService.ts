@@ -73,6 +73,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   }
   function remember(d: NativeTaskDescriptor): Entry {
     let entry = entries.get(d.taskId);
+    if (entry) reconcileClosedClient(entry);
     if (!entry) {
       entry = { descriptor: d, state: d.closed ? "closed" : d.sessionId ? "released" : "failed",
         error: d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null,
@@ -114,6 +115,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   }
   function capacity(): void {
     if (shuttingDown) throw new NativeTaskServiceError("SHUTTING_DOWN", 409, "Studio is stopping; no new native work was admitted.");
+    for (const entry of entries.values()) reconcileClosedClient(entry);
     if ([...entries.values()].filter(e => e.client || e.preparation || e.state === "starting").length >= LIMITS.maxActive)
       throw new NativeTaskServiceError("CAPACITY", 429, "Four native tasks are active. Release an idle task before starting another.");
   }
@@ -151,7 +153,22 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       entry.projectionError = "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
     }
   }
+  function reconcileClosedClient(entry: Entry): void {
+    // Never infer process death from elapsed time or an RPC failure. Preparation,
+    // turn settlement and explicit cleanup retain their own handles until done.
+    if (entry.client?.processClosed !== true || entry.preparation || entry.turn || entry.work || entry.finishing
+      || ["starting", "verifying", "releasing"].includes(entry.state)) return;
+    entry.client = undefined; entry.session = undefined;
+    entry.processCleanupConfirmed = true;
+    entry.state = entry.descriptor.closed ? "closed" : "failed";
+    entry.error = "The native runtime process exited. No successful writer release or completed side effect is inferred. Refresh the original evidence and explicitly resume an eligible session before submitting a new turn.";
+    entry.projection = undefined; entry.projectionAt = 0;
+    entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
+    // Keep the signed descriptor, pendingTurn and every submission untouched.
+    // Only resume() may rebuild the fixed native approval/validation controller.
+  }
   function view(entry: Entry, retainProjection = false): NativeTaskView {
+    reconcileClosedClient(entry);
     refresh(entry);
     const d = entry.descriptor, p = entry.projection;
     const history: NativeTaskView["history"] = p?.history ?? { status: d.sessionId ? "unavailable" : "not-started",

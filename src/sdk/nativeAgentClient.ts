@@ -213,6 +213,13 @@ export class AMCNativeClient {
   private closePromise: Promise<void> | undefined;
   private readonly childClosed: Promise<void>;
 
+  /**
+   * True only after Node observed the owned ACP child's actual close event.
+   * A timeout, requested cancellation or a broken pipe is not process closure.
+   * This says nothing about a signed release, task success, or tool side effects.
+   */
+  get processClosed(): boolean { return this.closed; }
+
   private constructor(options: AMCNativeClientOptions) {
     if (!options.provider || (options.provider !== "stub" && !options.model)) {
       throw new Error("Choose an explicit provider and an accessible model; stub is a local demonstration.");

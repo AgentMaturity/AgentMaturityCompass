@@ -39,11 +39,13 @@ import { extractEnvelope, SESSION_ENVELOPE_META_KEY, SESSION_GENESIS } from "./s
 import { openHistoryReader } from "./sessionHistoryReader.js";
 import { authenticateJsonlContinuation, type AuthenticatedJsonlContinuation } from "./jsonlContinuation.js";
 import { realpathSync } from "node:fs";
+import { loadSessionEventHistory } from "./sessionEventHistory.js";
+import { assertSessionContinuationConfiguration, assertSessionContinuationControls, SessionContinuationControlRefused, type ContinuationControlRefusal } from "./sessionContinuationControls.js";
 
 export const SESSION_ENVELOPE_VERSION = 1;
 const DEFAULT_STALE_AFTER_MS = 60_000;
 
-export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "AGENT_MISMATCH" | "LIVE_WRITER" | "UNRECOVERED";
+export type ResumeRefusal = "MISSING" | "SEALED" | "UNSUPPORTED_FORMAT" | "TAMPERED" | "AGENT_MISMATCH" | "LIVE_WRITER" | "UNRECOVERED" | ContinuationControlRefusal;
 
 export class SessionResumeRefused extends Error {
   constructor(readonly code: ResumeRefusal, message: string, readonly details: readonly string[] = []) {
@@ -192,6 +194,27 @@ export function resumeSession(params: ResumeSessionParams): { service: SessionSe
   });
   // Check identity before ownership takeover or crash recovery can append rows.
   assertResumeAgent(rows, params.agentId);
+  if (!jsonl) {
+    // SQLite's chain verifier alone does not pin the replacement composition or
+    // reconstruct a missing parent controller. Authenticate the full original
+    // store so a child's apparently ordinary root-agent opening cannot hide its
+    // parent's grant/stop boundary. This is not used by read-only fork lineage.
+    const history = loadSessionEventHistory({ workspace: params.workspace });
+    const current = history.events.filter(row => row.session_id === params.sessionId);
+    if (history.backend !== "sqlite" || current.at(-1)?.event_hash !== rows.at(-1)?.event_hash) {
+      throw new SessionResumeRefused("TAMPERED", "the authenticated continuation history changed before control inspection");
+    }
+    if (params.runtime !== undefined && history.sessions.find(record => record.session_id === params.sessionId)?.runtime !== params.runtime) {
+      throw new SessionResumeRefused("AGENT_MISMATCH", "resume requires the original native runtime");
+    }
+    try {
+      assertSessionContinuationConfiguration(current, params);
+      assertSessionContinuationControls(history, params.sessionId);
+    } catch (error) {
+      if (error instanceof SessionContinuationControlRefused) throw new SessionResumeRefused(error.code, error.message);
+      throw error;
+    }
+  }
   try { assertSessionOwnerAvailable(rows[rows.length - 1]!); }
   catch (error) {
     if (error instanceof SessionWriterRefused) throw new SessionResumeRefused(error.code === "LIVE_WRITER" ? "LIVE_WRITER" : "UNSUPPORTED_FORMAT", error.message);

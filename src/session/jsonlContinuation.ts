@@ -12,6 +12,7 @@ import { exactHistoryId } from "./sessionHistoryReader.js";
 import { assertSessionOwnerAvailable, SessionWriterRefused } from "./sessionOwnership.js";
 import { SESSION_EVENT_TYPES, extractEnvelope } from "./sessionTypes.js";
 import { readTurnEndMeta } from "./turnLifecycleMeta.js";
+import { assertSessionContinuationConfiguration, assertSessionContinuationControls, SessionContinuationControlRefused } from "./sessionContinuationControls.js";
 
 export class JsonlContinuationRefused extends Error {
   constructor(readonly code: string, message: string) { super(message); this.name = "JsonlContinuationRefused"; }
@@ -52,6 +53,8 @@ function completeAppendBoundaries(workspace: string): void {
 }
 
 function recoveryState(history: SessionEventHistory, rows: readonly EvidenceEvent[], sessionId: string) {
+  try { assertSessionContinuationControls(history, sessionId); }
+  catch (error) { if (error instanceof SessionContinuationControlRefused) refuse(error.code, error.message); throw error; }
   const known = new Set([...SESSION_EVENT_TYPES, "session/resume", "session/release", "loop/retry"]);
   const pending = new Set<string>(), calls = new Set<string>(), results = new Set<string>(), seenResults = new Set<string>();
   const headers = new Set<string>(), settled = new Set<string>(), turns = new Set<number>(), ended = new Set<number>();
@@ -72,13 +75,6 @@ function recoveryState(history: SessionEventHistory, rows: readonly EvidenceEven
       const ending = readTurnEndMeta(row.meta_json);
       if (!ending || !turns.has(ending.turn) || ended.has(ending.turn)) refuse("INCOMPATIBLE_STATE", "A recorded turn ending cannot be safely reconstructed.");
       ended.add(ending.turn);
-      if (ending.cancelCause?.kind === "parent" || ending.cancelCause?.kind === "hook") {
-        refuse("STOP_CONTROL", "A parent or policy control stopped this session. Resume cannot discard that control; continue through its original controlling workflow.");
-      }
-    }
-    if (row.event_type === "loop/cancel") {
-      const cause = value.cause as { kind?: unknown } | null;
-      if (cause?.kind === "parent" || cause?.kind === "hook") refuse("STOP_CONTROL", "A parent or policy control stopped this session. Resume cannot discard that control; continue through its original controlling workflow.");
     }
     if (row.event_type === "turn/seal") lastSeal = index;
     if (row.event_type === "loop/inbox") {
@@ -99,16 +95,6 @@ function recoveryState(history: SessionEventHistory, rows: readonly EvidenceEven
     if (row.event_type === "request/response" || row.event_type === "request/failure") {
       if (typeof value.headerEventId !== "string" || !headers.has(value.headerEventId) || settled.has(value.headerEventId)) refuse("INCOMPATIBLE_STATE", "A recorded model result has no unique original request.");
       settled.add(value.headerEventId);
-    }
-  }
-  // A child's in-memory grant/abort subscription cannot be reconstructed from
-  // its root agent name. Never promote it to an unrestricted standalone agent.
-  for (const row of history.events) {
-    const value = meta(row);
-    if (row.session_id !== sessionId && value.childSessionId === sessionId) refuse("DELEGATED_SESSION", "A delegated session must retain its parent controller. Standalone resume cannot replace that controller.");
-    if (row.session_id === sessionId && typeof value.childSessionId === "string") {
-      const child = history.sessions.find(record => record.session_id === value.childSessionId);
-      if (!child || child.ended_ts === null) refuse("UNRESOLVED_CHILD", "A child session has not reached an authenticated closed state. Resolve it through the parent workflow before resuming.");
     }
   }
   return { needsRecovery: rows.slice(lastSeal + 1).some(row => row.event_type === "turn/start"),
@@ -164,8 +150,8 @@ export function authenticateJsonlContinuation(options: JsonlContinuationOptions)
   if ((options.agentId !== undefined && opening.agentId !== options.agentId) || (options.runtime !== undefined && record.runtime !== options.runtime)) refuse("AGENT_MISMATCH", "Select the original agent and runtime recorded for this session.");
   const digest = /^[a-f0-9]{64}$/i.test(opening.compositionDigest) ? opening.compositionDigest.toLowerCase() : sha256Hex(opening.compositionDigest);
   if (record.binary_sha256 !== digest) refuse("IDENTITY_MISMATCH", "The persisted lifecycle configuration differs from its signed opening.");
-  if ((options.compositionDigest !== undefined && opening.compositionDigest !== options.compositionDigest)
-    || (options.policyDigest !== undefined && opening.policyDigest !== options.policyDigest)) refuse("CONFIGURATION_MISMATCH", "Resume requires the original execution settings and signed policy. Restore them or deliberately start a separate task; this session cannot silently adopt changed controls.");
+  try { assertSessionContinuationConfiguration(rows, options); }
+  catch (error) { if (error instanceof SessionContinuationControlRefused) refuse(error.code, error.message); throw error; }
   if (options.expectedHeadEventHash !== undefined && rows.at(-1)!.event_hash !== options.expectedHeadEventHash) refuse("STALE_HEAD", "The authenticated session changed before ownership transfer. Refresh and review the new history.");
   if (options.store && (options.store.backendId !== "jsonl" || realpathSync(options.store.workspace) !== history.workspace
     || options.store.readSessionEvents(options.sessionId).at(-1)?.event_hash !== rows.at(-1)!.event_hash)) refuse("IDENTITY_MISMATCH", "The supplied writer does not address the exact authenticated workspace and session.");

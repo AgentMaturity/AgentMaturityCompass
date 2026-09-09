@@ -61,6 +61,24 @@ A refused retry does not prove the original request failed. A sign-in, ownership
 
 Resume checks the signed native session and recorded ledger prefix even while Studio's unrelated gateway session is still open. It does not classify that incomplete archive as fully verified. Existing signatures, present seals, native identity and writer ownership remain admission requirements; complete cold verification remains a separate operation.
 
+When a managed native runtime exits but Studio is still running, **Refresh status**
+now reconciles the obsolete client only after actual process closure and in-flight
+work settlement. It reports the failed runtime rather than pretending that an
+idle-looking handle is still usable or that a signed release succeeded. Eligible
+sessions can then be resumed without restarting Studio. No inspection or refresh
+replays a prompt, approves a tool, clears an uncertain submission, resets a budget
+or starts a replacement session.
+
+**Resume** reconstructs only Studio's own native approval and public-validation
+bindings under the task's original execution settings. Changed approval/tool/
+validation composition cannot be silently adopted, including on SQLite. Current
+signed policy, quota, owner/revision and browser controls still apply. A new turn
+requires a new explicit submission and any newly required signed approvals;
+earlier approvals are not permission for another call. Arbitrary external
+callbacks, parent-stopped sessions and delegated children without their original
+controller remain refused. An exited ACP process alone does not settle unknown
+tool side effects; inspect the recorded outcome and accounting before continuing.
+
 ## Capacity and retention
 
 Studio admits at most four active native tasks per workspace, one turn per task, eight steps and 1,024 output tokens per turn. The page can reduce those step/token limits. A turn times out after two minutes; idle native writers release after 15 minutes, and a live task process is limited to one hour. Prompts are limited to 16 KiB UTF-8.
@@ -108,7 +126,7 @@ actionable refusal. Resume requires the original execution settings and signed
 controls; closed and archived sessions remain non-resumable. JSONL permits one
 writer in a workspace, even when the general Studio task limit would allow more.
 The actual core rechecks exclusive ownership and authenticated history before
-opening its writer. SQLite keeps its existing native continuation rules. See the
+opening its writer. SQLite also preserves original composition and parent controls. See the
 [native recovery contract](SESSION_RESUME.md) for local-filesystem limits and the
 difference between an interrupted turn, a released turn and a closed session.
 

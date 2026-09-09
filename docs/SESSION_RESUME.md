@@ -1,6 +1,6 @@
 # Native session resume and recovery
 
-AMC can continue an eligible unsealed native SQLite or JSONL session using `amc agent-loop run --session <id>`. End the previous run with `--keep-open` to record a signed handover. For JSONL, use the original agent, provider/model, tool scope, step/token limits, validation selection and signed policy. Changing those settings is not a resume of the original execution contract. A closed session can be used as the parent of a new run with `--fork-from <id>`.
+AMC can continue an eligible unsealed native SQLite or JSONL session using `amc agent-loop run --session <id>`. End the previous run with `--keep-open` to record a signed handover. Both backends require the original agent, execution composition and policy: provider/model, tool scope, step/token limits, approval and validation selection. Changing those settings is not a resume of the original execution contract. A closed session can be used as the parent of a new run with `--fork-from <id>`.
 
 The original process owns its session from `session/open` until signed release or close. Completing a turn does not release ownership. A second process receives `LIVE_WRITER` while that owner is alive, including between sealed turns. The writer identity comes from the actual local process; caller-provided claimant fields are retained only as audit information.
 
@@ -13,6 +13,22 @@ After a demonstrably dead local owner, recovery acknowledges a pending unsealed 
 `force` and a zero staleness window can bypass the recovery age wait; they cannot bypass a live or unknown owner. Dropping a service/database handle, including the test helper `simulateCrash()`, is not proof that its process died. A foreign-host owner and an owner whose local liveness cannot be established are refused. PID reuse may conservatively require waiting for that process to exit; AMC does not claim cross-host lease coordination.
 
 ## Compatibility
+
+The native ACP/SDK/Studio factory reconstructs its own approval and validation
+bindings, rechecking the current signed configuration and using the original
+accounting journal. It does not infer arbitrary external callbacks or restore an
+absent parent's abort subscription. Both backends refuse standalone continuation
+of delegated children, parent/hook-stopped sessions and parents with unresolved
+children before acquiring a writer or appending crash recovery. A normal user
+cancellation does not carry that permanent external-controller refusal.
+
+`AMCNativeClient.processClosed` is a read-only observation of its actual ACP child
+close event, not a successful signed release or proof about uncertain effects.
+Studio can discard an exited child's obsolete handles after its in-flight work
+has settled, without restarting Studio. Refresh only reads original history;
+explicit **Resume** reopens an eligible same-session writer, and a **new explicit
+turn** is still required before any model or tool request. A live/unknown child
+or unsettled preparation/cleanup is never replaced on a timeout assumption.
 
 | Session state/backend | Read and verify | Resume/recovery | Fork |
 | --- | --- | --- | --- |
@@ -76,5 +92,6 @@ back to `newSession()`. Studio shows the same eligible recovery state and requir
 **Refresh status** after lost observation or a lost control response.
 
 This document describes the implementation contract. Qualification is recorded
-separately under `AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/`; source
-authoring alone is not a passed restart, installed-package, browser or platform test.
+separately under `AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/` and
+`AMC_OS/RESEARCH/2026-09-10-native-recovery-control-gap/`; source authoring alone is
+not a passed restart, installed-package, browser or platform test.
