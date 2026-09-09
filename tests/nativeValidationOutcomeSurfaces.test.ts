@@ -80,16 +80,25 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
       try { expect(cold.poll(actor, task!.taskId).task.validation).toEqual(summary.validation); } finally { await cold.close(); }
     }
   } finally { observerReceipt = approvals.stop(); }
-  expect(observerReceipt.errors).toEqual([]); expect(observerReceipt.requests).toBe(1);
-  expect(observerReceipt.decisions).toBe(mode === "denied" ? 1 : 2);
+  // The real stub adapter asks for the first offered tool with {text: prompt}
+  // once, before its text completion. That separate, invalid bash request is
+  // also governed. Do not erase it or pretend validation was a model tool call.
+  expect(observerReceipt.errors).toEqual([]); expect(observerReceipt.requests).toBe(2);
+  expect(observerReceipt.decisions).toBe(mode === "denied" ? 2 : 4);
   const status = mode === "success" ? "passed" : mode === "nonzero" ? "failed" : "unavailable";
   expect(summary.endings.at(-1)?.reason).toBe("complete");
   expect(summary.validation).toMatchObject({ status, configSha256: f.sha256, turn: 1, checks: [{ id: "public", status,
     exitCode: mode === "success" ? 0 : mode === "nonzero" ? 7 : null, reason: mode === "success" ? null : mode === "nonzero" ? "nonzero-exit" : "execution-denied" }] });
-  expect(summary.toolCalls).toBe(0);
+  expect(summary.toolCalls).toBe(1);
   expect(f.effect()).toBe(mode === "success" || mode === "nonzero" ? "validation-outcome" : null);
   const history = loadSessionEventHistory({ workspace, sessionId: summary.sessionId, agentId: "default", requireSealed: true });
   const outputId = summary.validation.checks[0]!.outputEventId;
+  const checkCallId = summary.validation.checks[0]!.callId;
+  const modelCalls = history.events.filter(row => row.event_type === "tool/call").map(row => JSON.parse(row.meta_json));
+  expect(modelCalls).toHaveLength(1); expect(modelCalls[0].toolCallId).toMatch(/^stub-call-/);
+  expect(modelCalls.some(meta => meta.toolCallId === checkCallId)).toBe(false);
+  const approvalsForCheck = history.events.filter(row => row.event_type === "approval/request" && JSON.parse(row.meta_json).toolCallId === checkCallId);
+  expect(approvalsForCheck).toHaveLength(1);
   expect(history.events.some(row => row.id === outputId && row.event_type === "audit")).toBe(true);
   const projection = readNativeTaskProjection(workspace, summary.sessionId, "default");
   expect(projection.validation).toEqual(summary.validation);

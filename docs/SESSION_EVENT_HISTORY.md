@@ -106,6 +106,11 @@ dispatch, resume or grant a new task. Reading JSONL after restart does **not**
 add JSONL writer-resume ownership: that separate unsupported operation remains
 an explicit refusal.
 
+Managed children preserve an explicitly configured operator
+`AMC_CONTROL_CHECKPOINT_DIR`, so signed-policy rollback checks use the same
+external checkpoint directory after process start. This is server configuration,
+not a task/browser-supplied path or an exception to signed policy verification.
+
 The API and its regressions are source changes. A build or focused source test
 is not an installed-consumer, broad platform, full-suite, human or deployment
 qualification. A new package exercise must pin a package built from the source

@@ -167,9 +167,12 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     // SDK merges env by default: explicitly erase every ambient key before the fixed allowlist.
     const env: NodeJS.ProcessEnv = Object.fromEntries(Object.keys(process.env).map(key => [key, undefined]));
     const permitted = ["HOME", "USERPROFILE", "SystemRoot", "WINDIR", "PATH", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL",
-      "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT"];
+      "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_CONTROL_CHECKPOINT_DIR"];
     if (provider !== "stub") permitted.push(REFS[provider]);
     for (const name of permitted) if (environment[name] !== undefined) env[name] = environment[name];
+    // The operator's external rollback checkpoints must remain the same across
+    // parent/child inspection. A different HOME is not authority to start a new
+    // checkpoint history. This value cannot come from browser task arguments.
     env.AMC_HOME = paths.homeDir; env.AMC_CREDENTIALS_FILE = paths.file; env.AMC_VAULT_REMEMBER = "0";
     return env;
   }
