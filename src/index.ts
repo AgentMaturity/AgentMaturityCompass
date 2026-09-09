@@ -32,6 +32,7 @@ export { inventorySessionSpills, inventorySessionSpillReferences, eraseSessionSp
 export { inspectSpilledEvent, retrieveSpilledContent, verifySpilledContent } from "./session/spill/spillEvidence.js";
 export { readSessionSpillRange, MAX_SPILL_READ_BYTES } from "./session/spill/spillRead.js";
 export type { SessionSpillRange } from "./session/spill/spillRead.js";
+export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefusal, type SessionEventHistory, type SessionEventHistoryOptions } from "./session/sessionEventHistory.js";
 export { wrapRuntime, wrapAny, superviseProcess, startMonitor } from "./ledger/monitor.js";
 
 export {

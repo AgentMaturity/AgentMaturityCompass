@@ -97,12 +97,14 @@ function requireString(source: Record<string, unknown>, key: string, line: numbe
 
 function optionalString(source: Record<string, unknown>, key: string): string | null {
   const value = source[key];
-  return typeof value === "string" ? value : null;
+  if (value !== undefined && value !== null && typeof value !== "string") throw new Error(`jsonl event log: invalid ${key}`);
+  return (value as string | null | undefined) ?? null;
 }
 
 function optionalNumber(source: Record<string, unknown>, key: string): number | null {
   const value = source[key];
-  return typeof value === "number" ? value : null;
+  if (value !== undefined && value !== null && (typeof value !== "number" || !Number.isSafeInteger(value))) throw new Error(`jsonl event log: invalid ${key}`);
+  return (value as number | null | undefined) ?? null;
 }
 
 /**
@@ -125,8 +127,13 @@ export function parseEventLine(text: string, line: number): EvidenceEvent {
   }
   const source = parsed as Record<string, unknown>;
   const ts = source["ts"];
-  if (typeof ts !== "number") {
+  if (typeof ts !== "number" || !Number.isSafeInteger(ts) || ts < 0) {
     throw new Error(`jsonl event log line ${line}: field ts is not a number`);
+  }
+  for (const field of ["archived", "payload_pruned"]) {
+    if (source[field] !== undefined && source[field] !== null && source[field] !== 0 && source[field] !== 1) {
+      throw new Error(`jsonl event log line ${line}: unsupported ${field} state`);
+    }
   }
   return {
     id: requireString(source, "id", line),

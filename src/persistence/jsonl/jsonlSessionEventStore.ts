@@ -112,7 +112,17 @@ function readSessionRecords(workspace: string): Map<string, SessionRecord> {
     } catch {
       throw new Error(`jsonl session log line ${index + 1}: not valid JSON`);
     }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)
+      || typeof parsed.session_id !== "string" || !parsed.session_id
+      || (parsed.op !== "start" && parsed.op !== "seal")) {
+      throw new Error(`jsonl session log line ${index + 1}: unsupported lifecycle record`);
+    }
     if (parsed.op === "start") {
+      if (records.has(parsed.session_id) || !Number.isSafeInteger(parsed.started_ts) || parsed.started_ts < 0
+        || typeof parsed.runtime !== "string" || !parsed.runtime || typeof parsed.binary_path !== "string"
+        || typeof parsed.binary_sha256 !== "string") {
+        throw new Error(`jsonl session log line ${index + 1}: duplicate or malformed session start`);
+      }
       records.set(parsed.session_id, {
         session_id: parsed.session_id,
         started_ts: parsed.started_ts,
@@ -128,6 +138,11 @@ function readSessionRecords(workspace: string): Map<string, SessionRecord> {
     const existing = records.get(parsed.session_id);
     if (existing === undefined) {
       throw new Error(`jsonl session log line ${index + 1}: seal for unstarted session ${parsed.session_id}`);
+    }
+    if (existing.ended_ts !== null || !Number.isSafeInteger(parsed.ended_ts) || parsed.ended_ts < existing.started_ts
+      || typeof parsed.session_final_event_hash !== "string" || !/^[a-f0-9]{64}$/.test(parsed.session_final_event_hash)
+      || typeof parsed.session_seal_sig !== "string" || !parsed.session_seal_sig) {
+      throw new Error(`jsonl session log line ${index + 1}: duplicate or malformed session seal`);
     }
     records.set(parsed.session_id, {
       ...existing,

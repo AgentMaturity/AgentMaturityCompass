@@ -25,7 +25,7 @@ describe("public API surface", () => {
 
   it("keeps the documented entry points available", () => {
     // A representative slice across the surfaces the README documents.
-    for (const name of ["initWorkspace", "runDoctorCli"]) {
+    for (const name of ["initWorkspace", "runDoctorCli", "loadSessionEventHistory", "SessionHistoryRefused"]) {
       expect(publicApi).toHaveProperty(name);
       expect(typeof (publicApi as Record<string, unknown>)[name]).toBe("function");
     }

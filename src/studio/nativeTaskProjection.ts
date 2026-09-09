@@ -1,7 +1,7 @@
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
 import { readNativeTaskValidationOutputs } from "./nativeTaskValidation.js";
-import { openLedger } from "../ledger/ledger.js";
+import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { validateAcpCommittedTail } from "../acp/acpCommittedUpdates.js";
 import { projectSessionUpdates, type AcpSessionUpdate } from "../acp/acpProjection.js";
 import { readApprovalRequestMeta, readApprovalAnswerMeta } from "../session/approvalEventMeta.js";
@@ -9,7 +9,6 @@ import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
 import { listApprovalRequests } from "../approvals/approvalChainStore.js";
 import { getApprovalInboxItem } from "../approvals/approvalInbox.js";
 import { redactSdkText } from "../sdk/amcEvidence.js";
-import type { EvidenceEvent } from "../types.js";
 import type { NativeTaskApproval, NativeTaskEvent, NativeTaskValidationOutput } from "./nativeTaskTypes.js";
 import { opendirSync, lstatSync } from "node:fs";
 import { join } from "node:path";
@@ -57,13 +56,11 @@ export interface NativeTaskProjection {
 
 /** Authenticate before rendering. No summary or ACP stop code is promoted to a whole-ledger verdict. */
 export function readNativeTaskProjection(workspace: string, sessionId: string, agentId: string): NativeTaskProjection {
-  const ledger = openLedger(workspace, { readonly: true });
-  let rows: EvidenceEvent[];
-  try {
-    const size = ledger.db.prepare("SELECT COUNT(*) AS count, COALESCE(SUM(length(meta_json)),0) AS bytes FROM evidence_events WHERE session_id = ?").get(sessionId) as { count: number; bytes: number };
-    if (size.count > 100_000 || size.bytes > 16 * 1024 * 1024) throw new Error("Native session projection exceeded its bound.");
-    rows = ledger.db.prepare("SELECT * FROM evidence_events WHERE session_id = ? ORDER BY rowid ASC").all(sessionId) as EvidenceEvent[];
-  } finally { ledger.close(); }
+  const history = loadSessionEventHistory({ workspace, sessionId, agentId });
+  const rows = history.events;
+  if (rows.length > 100_000 || rows.reduce((bytes, row) => bytes + Buffer.byteLength(row.meta_json), 0) > 16 * 1024 * 1024) {
+    throw new Error("Native session projection exceeded its bound.");
+  }
   if (rows.length === 0) throw new Error("Native session has no committed opening.");
   validateAcpCommittedTail(workspace, sessionId, rows, 0, null);
   if (rows[0]?.event_type !== "session/open" || JSON.parse(rows[0].meta_json).agentId !== agentId) throw new Error("Native session belongs to a different agent.");

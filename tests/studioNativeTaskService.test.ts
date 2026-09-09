@@ -13,6 +13,8 @@ import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
+import { loadSessionEventHistory } from "../src/sdk/nativeAgentClient.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { NativeTaskDescriptors, nativeTaskId } from "../src/studio/nativeTaskDescriptors.js";
 import type { NativeTaskActor, NativeTaskService, NativeTaskStart, NativeTaskView } from "../src/studio/nativeTaskTypes.js";
@@ -153,6 +155,42 @@ test("cancel during initial preparation prevents the original prompt from later 
   const repeated = await s.start(actor, request); expect(repeated.taskId).toBe(taskId);
   expect(rows().filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 30_000);
+
+test("a stale non-owning observer recovers the exact lost follow-up acknowledgement without dispatching it again", async () => {
+  const writer = service(), observer = service(), first = await writer.start(actor, input());
+  let task = await idle(writer, first.taskId);
+  expect(observer.poll(actor, task.taskId).task.revision).toBe(1);
+  const original = { clientRequestId: randomUUID(), expectedRevision: 1, prompt: "Exact lost-ack follow-up." };
+  await writer.turn(actor, task.taskId, original); task = await idle(writer, task.taskId);
+  await writer.release(actor, task.taskId, 2);
+  const before = rows(task.sessionId);
+  expect(before.filter(row => row.event_type === "request/header")).toHaveLength(2);
+  const acknowledged = await observer.turn(actor, task.taskId, original);
+  expect(acknowledged).toMatchObject({ revision: 2, lastClientRequestId: original.clientRequestId, sessionId: task.sessionId, state: "released" });
+  expect(observer.poll(actor, task.taskId).task.revision).toBe(2);
+  await expect(observer.turn(actor, task.taskId, { ...original, prompt: "edited draft stays local" })).rejects.toMatchObject({ code: "NATIVE_REQUEST_CONFLICT" });
+  expect(() => observer.cancel(actor, task.taskId, 1)).toThrow("revision changed");
+  expect(rows(task.sessionId)).toEqual(before);
+}, 60_000);
+
+test("JSONL managed task cold inspection, verification and archive retain actual history and create deduplication", async () => {
+  openSessionEventStore(root, "jsonl").close();
+  const first = service(), request = input("JSONL managed archive evidence.");
+  let task = await first.start(actor, request); task = await idle(first, task.taskId);
+  task = await first.verify(actor, task.taskId, task.revision);
+  expect(task).toMatchObject({ state: "closed", verification: "workspace-key-consistency" });
+  await first.close();
+  const before = loadSessionEventHistory({ workspace: root, sessionId: task.sessionId!, requireSealed: true });
+  expect(before.backend).toBe("jsonl");
+  expect(before.events.filter(row => row.event_type === "request/header")).toHaveLength(1);
+  const restarted = service();
+  expect(restarted.poll(actor, task.taskId).events.some(event => event.kind === "user" && event.text === request.prompt)).toBe(true);
+  expect(restarted.archive(actor, task.taskId, task.revision).archived).toBe(true);
+  expect((await restarted.start(actor, request)).archived).toBe(true);
+  expect((await restarted.verify(actor, task.taskId, task.revision)).verification).toBe("workspace-key-consistency");
+  expect(loadSessionEventHistory({ workspace: root, sessionId: task.sessionId! }).events).toEqual(before.events);
+  expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(0);
+}, 60_000);
 
 test("archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart", async () => {
   const s = service(), request = input("Archive first recorded turn.");

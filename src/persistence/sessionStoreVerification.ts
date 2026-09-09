@@ -141,7 +141,8 @@ function verifyPayload(event: EvidenceEvent, workspace: string, errors: string[]
 function verifyGlobalChainAndSignatures(
   rows: readonly EvidenceEvent[],
   workspace: string,
-  errors: string[]
+  errors: string[],
+  checkPayloads = true
 ): void {
   const monitorKeys = getPublicKeyHistory(workspace, "monitor");
   const seenIds = new Set<string>();
@@ -152,7 +153,7 @@ function verifyGlobalChainAndSignatures(
     }
     seenIds.add(event.id);
 
-    verifyPayload(event, workspace, errors);
+    if (checkPayloads) verifyPayload(event, workspace, errors);
 
     if (event.prev_event_hash !== previous) {
       errors.push(`Event ${event.id} previous hash mismatch`);
@@ -275,5 +276,24 @@ export function verifyStoredSessionEvents(
   if (options.sessionRecords !== undefined) {
     verifySessionRecords(rows, options.sessionRecords, workspace, errors);
   }
+  return { ok: errors.length === 0, errors, trustRoot };
+}
+
+/**
+ * Authenticate stored metadata without opening payloads or retained output.
+ * This verdict is deliberately NOT a payload, compaction, receipt or archive
+ * verdict. The public history loader validates shapes and presence first.
+ */
+export function verifyStoredSessionEventMetadata(
+  workspace: string,
+  rows: readonly EvidenceEvent[],
+  options: StoredSessionVerifyOptions = {}
+): StoredSessionVerifyResult {
+  const errors: string[] = [];
+  const expected = options.expectedMonitorFingerprint ?? process.env.AMC_EXPECTED_MONITOR_FINGERPRINT ?? null;
+  const trustRoot = verifyMonitorTrustRoot(workspace, expected, errors);
+  verifyGlobalChainAndSignatures(rows, workspace, errors, false);
+  verifySessionEnvelopeChains(rows, errors);
+  if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, workspace, errors);
   return { ok: errors.length === 0, errors, trustRoot };
 }

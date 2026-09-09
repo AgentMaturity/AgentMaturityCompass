@@ -1,5 +1,10 @@
 # Native runtime client
 
+For persisted signed evidence after restart, use the exported
+[`loadSessionEventHistory`](SESSION_EVENT_HISTORY.md), not the resumed
+conversation's projected `history` updates. It is available from both the package
+root and `agent-maturity-compass/sdk/native` without starting a runtime child.
+
 Use the Node SDK when your application owns a local AMC runtime process. It launches the CLI from the same installed package and uses ACP over standard input/output. It does not grant execution rights through a gateway lease.
 
 ```ts

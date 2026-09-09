@@ -74,11 +74,16 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         error: d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null,
         projectionAt: 0, touchedAt: Date.now(), runtimeStartedAt: Date.now(), startupCancelled: false, startupAbort: new AbortController(), verification: "not-verified" };
       entries.set(d.taskId, entry);
-    } else if (entry.descriptor.archivedAt !== d.archivedAt) {
+    } else if (taskBodyHash(entry.descriptor) !== taskBodyHash(d)) {
       if (entry.client || entry.session || entry.preparation || entry.turn || entry.work || entry.finishing
         || entry.state === "starting" || entry.state === "verifying")
-        throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task archival changed while this process still owns an operation.");
-      entry.descriptor = d; entry.state = d.closed ? "closed" : entry.state; entry.projectionAt = 0;
+        throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task admission changed while this process still owns an operation.");
+      // An observer may have cached revision N before another owner admitted
+      // N+1. Refresh authenticated control state without resuming or replaying
+      // any prompt, so the original lost-ack retry can reach deduplication.
+      entry.descriptor = d; entry.state = d.closed ? "closed" : d.sessionId ? "released" : "failed";
+      entry.error = d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null;
+      entry.verification = "not-verified"; entry.projection = undefined; entry.projectionAt = 0;
     }
     return entry;
   }
