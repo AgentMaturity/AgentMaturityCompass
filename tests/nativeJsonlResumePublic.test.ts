@@ -39,17 +39,17 @@ test("public SDK/ACP CLI resumes the actual killed JSONL writer without opening 
     maxSteps: 3, maxTokens: 128, timeoutMs: 20_000, env: { ...process.env } };
   const clients: import("../src/sdk/nativeAgentClient.js").AMCNativeClient[] = [];
   try {
-    const first = await sdk.createAMCNativeClient(options); clients.push(first);
+    const first = await sdk.AMCNativeClient.start(options); clients.push(first);
     const session = await first.newSession(); const original = await session.prompt("Original SDK JSONL recording.").result;
     expect(original.text).toContain("Original SDK JSONL recording.");
     const id = session.sessionId, prefix = f.jsonlBytes();
-    const competing = await sdk.createAMCNativeClient(options); clients.push(competing);
+    const competing = await sdk.AMCNativeClient.start(options); clients.push(competing);
     await expect(competing.resumeSession(id)).rejects.toThrow(); expect(f.jsonlBytes()).toEqual(prefix);
     const killedPid = await interruptFixtureWriter(f, id); await first.close(); await competing.close();
     expect(sdk.inspectJsonlSessionRecovery({ workspace: f.workspace, sessionId: id, agentId: "default" }).eligible).toBe(true);
-    const changed = await sdk.createAMCNativeClient({ ...options, maxSteps: 2 }); clients.push(changed);
+    const changed = await sdk.AMCNativeClient.start({ ...options, maxSteps: 2 }); clients.push(changed);
     await expect(changed.resumeSession(id)).rejects.toThrow(); await changed.close(); expect(f.jsonlBytes()).toEqual(prefix);
-    const client = await sdk.createAMCNativeClient(options); clients.push(client);
+    const client = await sdk.AMCNativeClient.start(options); clients.push(client);
     const resumed = await client.resumeSession(id);
     expect(resumed.sessionId).toBe(id); expect(resumed.history.some(row => JSON.stringify(row).includes("Original SDK JSONL recording."))).toBe(true);
     expect(f.jsonlBytes().subarray(0, prefix.length)).toEqual(prefix);
@@ -60,7 +60,7 @@ test("public SDK/ACP CLI resumes the actual killed JSONL writer without opening 
     const history = sdk.loadSessionEventHistory({ workspace: f.workspace, sessionId: id, requireSealed: true, verifyPayloads: true });
     expect(history.events.filter(row => row.event_type === "session/open")).toHaveLength(1);
     expect(history.events.filter(row => row.event_type === "request/header")).toHaveLength(2);
-    const closed = await sdk.createAMCNativeClient(options); clients.push(closed);
+    const closed = await sdk.AMCNativeClient.start(options); clients.push(closed);
     await expect(closed.resumeSession(id)).rejects.toThrow();
     writeFileSync(join(f.root, "new-sdk-resume-receipt.json"), JSON.stringify({ sourceBoundary: "built source SDK and real ACP CLI; not installed", sessionId: id,
       killedPid, actualExitObserved: true, sameSession: true, prefixUnchanged: true, modelHeaders: 2, inputKind: "local deterministic stub", providerQualified: false }, null, 2));

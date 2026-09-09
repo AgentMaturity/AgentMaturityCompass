@@ -119,6 +119,7 @@ describe("authenticated native JSONL writer recovery", () => {
   test("an empty replacement operations journal cannot authorize uncertain dispatch recovery", async () => {
     const owner = await start("create"), id = String(owner.ready.sessionId); await kill(owner.child);
     const before = readFileSync(jsonlEventsPath(workspace));
+    const abandonedLock = readFileSync(jsonlLockPath(workspace));
     const journal = join(workspace, ".amc", "evidence.sqlite"), moved: string[] = [];
     for (const path of [journal, `${journal}-wal`, `${journal}-shm`]) {
       if (existsSync(path)) { renameSync(path, `${path}.original-test-journal`); moved.push(path); }
@@ -127,7 +128,7 @@ describe("authenticated native JSONL writer recovery", () => {
       const empty = openLedger(workspace); empty.close();
       expect(() => resume(id)).toThrow(/Original usage or unresolved-dispatch reservations/);
       expect(readFileSync(jsonlEventsPath(workspace))).toEqual(before);
-      expect(existsSync(jsonlLockPath(workspace))).toBe(false);
+      expect(readFileSync(jsonlLockPath(workspace))).toEqual(abandonedLock);
     } finally {
       // Retain both the original and deliberately empty NEW fixture journals;
       // no prior consumer, erasure operation or evidence deletion is involved.

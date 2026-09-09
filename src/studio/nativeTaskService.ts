@@ -36,6 +36,8 @@ interface Entry {
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
   verificationStoreHead?: string;
   verification: NativeTaskView["verification"]; finishing?: Promise<void>;
+  /** Process closure is distinct from a successful signed session handover. */
+  processCleanupConfirmed?: boolean;
 }
 export interface NativeTaskServiceOptions {
   readonly workspace: string;
@@ -256,6 +258,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   async function stop(entry: Entry): Promise<void> {
     if (entry.finishing) return entry.finishing;
     entry.startupCancelled = true; entry.startupAbort.abort();
+    entry.processCleanupConfirmed = false;
     entry.finishing = (async () => {
       entry.state = "releasing";
       try {
@@ -270,7 +273,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         if (entry.session && entry.client) await entry.session.release();
         entry.state = entry.descriptor.closed ? "closed" : "released";
       } catch { entry.state = "failed"; entry.error = "The native writer did not release cleanly. Inspect signed evidence before attempting recovery."; }
-      finally { try { await entry.client?.close(); } catch { entry.state = "failed"; entry.error = "Native process cleanup did not complete cleanly."; }
+      finally { try { await entry.client?.close(); entry.processCleanupConfirmed = true; } catch { entry.state = "failed"; entry.error = "Native process cleanup did not complete cleanly."; }
         finally { entry.client = undefined; entry.session = undefined; entry.turn = undefined; entry.finishing = undefined; entry.projectionAt = 0; } }
     })();
     return entry.finishing;
@@ -462,7 +465,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       shuttingDown = true; clearInterval(sweep);
       const active = [...entries.values()].filter(e => e.client || e.preparation || e.state === "starting");
       shutdown = Promise.allSettled(active.map(stop)).then(results => {
-        if (results.some(result => result.status === "rejected") || active.some(entry => entry.state === "failed"))
+        // A crashed session stays visibly failed; successful process shutdown
+        // must not pretend a signed release occurred. Conversely, an observed
+        // closed child must not make Studio impossible to restart for recovery.
+        if (results.some(result => result.status === "rejected") || active.some(entry => !entry.processCleanupConfirmed))
           throw new Error("Native task shutdown could not cleanly release every owned writer; inspect its signed session before recovery.");
       });
       return shutdown;
