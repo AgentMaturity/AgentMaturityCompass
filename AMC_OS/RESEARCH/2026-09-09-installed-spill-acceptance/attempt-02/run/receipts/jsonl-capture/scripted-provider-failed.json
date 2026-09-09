@@ -1,0 +1,39 @@
+{
+  "exchanges": [
+    {
+      "index": 0,
+      "classification": "scripted-provider-fixture-no-inference",
+      "requestSha256": "7eaa29ade1f904d444feb13615860206a17e32e6b647a1ee69222b5273232357",
+      "responseSha256": "ca8fe8b76d0b17eb555c75fba311a492a330a47a9806d4a1fe6aa0ca92e8ce72",
+      "subject": 0,
+      "phase": 0,
+      "error": null,
+      "usageClassification": "programmed-fixture-input-not-measured",
+      "syntheticWireUsage": {
+        "input_tokens": 40,
+        "output_tokens": 12,
+        "total_tokens": 52
+      },
+      "offeredWireName": "amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs"
+    },
+    {
+      "index": 1,
+      "classification": "scripted-provider-fixture-no-inference",
+      "requestSha256": "a03abf95a1a5180a398212bcd298a71aa84458604ac757eea9b3ee4ed0fb1767",
+      "responseSha256": "6bf41fae81c0db8e79cabd246cf0dfc742a752eba4140a24aee348f350ca7da3",
+      "subject": 0,
+      "phase": 1,
+      "error": null,
+      "usageClassification": "programmed-fixture-input-not-measured",
+      "syntheticWireUsage": {
+        "input_tokens": 40,
+        "output_tokens": 12,
+        "total_tokens": 52
+      },
+      "offeredWireName": "amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs",
+      "previewSha256": "e96f23bf9a582073b672a19d7e509cd5309e0844e79a34c2c465b4bd7372d701",
+      "previewBytes": 6618
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,6 @@
+{
+  "operation": "owned-fixture-quarantine",
+  "originalPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/spill/session-e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2/b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
+  "retainedPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/originals/missing-1.blob",
+  "sha256": "34ba8df82a3e26e487007349be2080180b2fffe28547fbec3ef3d051fd327aab"
+}

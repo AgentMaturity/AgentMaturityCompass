@@ -1,0 +1,2 @@
+usage: run.py [-h] --config CONFIG [--execute]
+run.py: error: No execution or files created without --execute

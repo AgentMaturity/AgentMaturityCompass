@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "mode": "capture",
+  "backend": "jsonl",
+  "classification": "actual-installed-public-interface-with-scripted-loopback-provider",
+  "qualityClaim": false,
+  "modelInferencePerformed": false,
+  "tokenUsage": "synthetic-protocol-fixture-input-not-measured",
+  "syntheticWireUsage": {
+    "input_tokens": 40,
+    "output_tokens": 12,
+    "total_tokens": 52
+  },
+  "verdict": "failed",
+  "checks": [
+    {
+      "name": "A SDK completion not task verification",
+      "passed": true
+    },
+    {
+      "name": "A native tool identity/update",
+      "passed": true
+    },
+    {
+      "name": "A native completed result update",
+      "passed": true
+    },
+    {
+      "name": "A owned fixture unchanged",
+      "passed": true
+    }
+  ],
+  "subjects": [
+    {
+      "name": "A",
+      "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/A.txt",
+      "fixtureRelative": "workspace/allowed/A.txt",
+      "fixtureBytes": 98304,
+      "fixtureSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
+      "callId": "owned_read_0",
+      "sessionId": "23724572-9f88-418f-9744-5aa9a8dc861a",
+      "turn": {
+        "sessionId": "23724572-9f88-418f-9744-5aa9a8dc861a",
+        "state": "completed",
+        "stopReason": "end_turn",
+        "text": "Scripted fixture complete; inspect retained output separately.",
+        "updates": [
+          {
+            "sessionId": "23724572-9f88-418f-9744-5aa9a8dc861a",
+            "update": {
+              "sessionUpdate": "tool_call",
+              "toolCallId": "owned_read_0",
+              "title": "fs.read",
+              "status": "pending",
+              "kind": "other"
+            }
+          },
+          {
+            "sessionId": "23724572-9f88-418f-9744-5aa9a8dc861a",
+            "update": {
+              "sessionUpdate": "tool_call_update",
+              "toolCallId": "owned_read_0",
+              "status": "completed",
+              "content": [
+                {
+                  "type": "content",
+                  "content": {
+                    "type": "text",
+                    "text": "OWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|01234\n[amc-spill] output truncated: 98304 bytes total, showing the first 4096 and last 2048 bytes.\n[amc-spill] sha256=8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad is committed in this signed event.\n[amc-spill] read authenticated ranges with amc session spill-read <locator> --offset 0 --limit 4096; use --json for exact bytes; locator=amc-spill:v2:8ef3f5510b57c11b582664cf5be079823d7ec7444ea0d087f86688f4776e91f8:368f006ffe9e15df365c65428d3d6716-owned_read_0\n56789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\nOWNED-A|π|0123456789abcdefghijklmnopqrstuvwxyz\n"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "sessionId": "23724572-9f88-418f-9744-5aa9a8dc861a",
+            "update": {
+              "sessionUpdate": "agent_message_chunk",
+              "content": {
+                "type": "text",
+                "text": "Scripted fixture complete; inspect retained output separately."
+              }
+            }
+          }
+        ],
+        "meta": {
+          "dev.agentmaturity.amc": {
+            "validation": {
+              "status": "not-requested",
+              "turn": null,
+              "configSha256": null,
+              "checks": []
+            }
+          }
+        },
+        "verification": "not-verified",
+        "validation": {
+          "status": "not-requested",
+          "turn": null,
+          "configSha256": null,
+          "checks": []
+        }
+      }
+    },
+    {
+      "name": "B",
+      "fixturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace/workspace/allowed/B.txt",
+      "fixtureRelative": "workspace/allowed/B.txt",
+      "fixtureBytes": 98304,
+      "fixtureSha256": "5f87a6b38dc9b2027bfd5eb59bee639b58e614d09212c67ab238bce76b8f3cff",
+      "callId": "owned_read_2",
+      "sessionId": null,
+      "turn": null
+    }
+  ],
+  "errors": [
+    {
+      "name": "AMCNativeRefusedError",
+      "message": "the method failed",
+      "stack": "AMCNativeRefusedError: the method failed\n    at AMCNativeClient.ingest (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:411:36)\n    at Socket.<anonymous> (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:223:54)\n    at Socket.emit (node:events:519:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)\n    at Readable.push (node:internal/streams/readable:392:5)\n    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)"
+    }
+  ],
+  "blockers": [],
+  "trustBoundary": "same-workspace pre-run key consistency, not independent external anchoring",
+  "node": {
+    "version": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
+  },
+  "cli": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
+  },
+  "publicExports": {
+    "agent-maturity-compass/sdk/native": {
+      "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+      "sha256": "6802809eb08a5a902ab72eab13ddc127838be0ee8badaf4608ae7db36c0c811a"
+    }
+  },
+  "cleanup": {
+    "sdkClosed": true,
+    "endpointClosed": true,
+    "processGroupClosure": "external-supervisor-required"
+  },
+  "startedAt": "2026-09-09T15:40:31.680Z",
+  "signedEvidence": null,
+  "ciphertextEvidence": null,
+  "rangeEvidence": null,
+  "finishedAt": "2026-09-09T15:40:32.901Z"
+}

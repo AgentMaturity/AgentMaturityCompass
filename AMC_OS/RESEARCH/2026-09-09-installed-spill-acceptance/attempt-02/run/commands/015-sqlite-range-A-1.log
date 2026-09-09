@@ -1,0 +1,22 @@
+{
+  "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
+  "contentSha256": "8aad1d6792e5fde41714e501dafea616064d7d9619fa83a64a1320678b028aad",
+  "totalBytes": 98304,
+  "offset": 7,
+  "returnedBytes": 19,
+  "nextOffset": 26,
+  "contentBase64": "fM+AfDAxMjM0NTY3ODlhYmNkZQ==",
+  "eventIds": [
+    "11802639-dad8-4112-b9e3-56f0435630d8",
+    "3afba197-c8c0-43c8-875c-3d5df379eaad"
+  ],
+  "sessionIds": [
+    "af486e3f-e261-41f6-8668-eff2baa13937"
+  ],
+  "storage": "encrypted-v2",
+  "verification": {
+    "fullContentVerified": true,
+    "expectedMonitorFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+    "history": "supplied-references-only"
+  }
+}

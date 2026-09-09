@@ -1,0 +1,45 @@
+{
+  "label": "037-sqlite-erase-audit",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit/input.json"
+  ],
+  "startedAt": "2026-09-09T15:40:20.167288+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      51587,
+      501,
+      "Wed Sep 9 21:10:20 2026"
+    ],
+    "rootReaped": true,
+    "observations": 10,
+    "ownedProcesses": [
+      {
+        "pid": 51587,
+        "ppid": 50193,
+        "pgid": 51587,
+        "uid": 501,
+        "started": "Wed Sep 9 21:10:20 2026",
+        "firstObservedAt": "2026-09-09T15:40:20.191432+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      51587
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 1.21132750000001,
+  "endedAt": "2026-09-09T15:40:21.378625+00:00"
+}

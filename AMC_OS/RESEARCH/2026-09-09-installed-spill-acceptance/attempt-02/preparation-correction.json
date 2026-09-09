@@ -1,0 +1,17 @@
+{
+  "observedAt": "2026-09-09T15:35:03.343584+00:00",
+  "originalFailure": "private caller-owned parent required; installed root never created",
+  "originalPreflightReceiptSha256": "c7c95adaee9e1a7da042c388e5d1be05adee9c8f919e9eb487842dc6f04edea6",
+  "originalObservedProcessesClosed": true,
+  "correction": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02",
+    "previousMode": "0o755",
+    "newMode": "0o700"
+  },
+  "newPreflightPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/preflight-02.py",
+  "newPreflightSha256": "7d4fc92321e2f6ec6ab7f8d907a3522d889243ce9c4240eac57fb90ffe19a89a",
+  "newLauncherPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/launch-corrected.py",
+  "newLauncherSha256": "af8debb8361086e3e32c9bf5211209a87674ec32d26258515b025c95003f7c28",
+  "configurationUnchangedSha256": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0",
+  "boundary": "preparation correction only; original preflight, scripts and provenance unchanged; no runtime guard weakened"
+}

@@ -1,0 +1,11 @@
+{
+  "observedAt": "2026-09-09T15:34:12.795598+00:00",
+  "ownedIdentityMatches": [],
+  "priorGroupMembers": [],
+  "sourceReceipts": [
+    "tmp/cos-installed-spill-execution-01/run/receipts/receipt.json",
+    "tmp/cos-installed-spill-execution-01/outer/receipt.json"
+  ],
+  "oldReceiptSha256": "8d7d7bb2a29fef7cd19c57830bfd53666da43251f255692252e718268fe0cd8c",
+  "scope": "current receipt-owned identities and groups only; no signals sent"
+}

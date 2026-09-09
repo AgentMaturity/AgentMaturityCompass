@@ -1,0 +1,45 @@
+{
+  "label": "native-syntax",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "--check",
+    "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs"
+  ],
+  "startedAt": "2026-09-09T15:35:03.972261+00:00",
+  "timeoutSeconds": 30,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      49970,
+      501,
+      "Wed Sep 9 21:05:03 2026"
+    ],
+    "rootReaped": true,
+    "observations": 7,
+    "ownedProcesses": [
+      {
+        "pid": 49970,
+        "ppid": 49957,
+        "pgid": 49970,
+        "uid": 501,
+        "started": "Wed Sep 9 21:05:03 2026",
+        "firstObservedAt": "2026-09-09T15:35:03.993652+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      49970
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 0.561819583,
+  "endedAt": "2026-09-09T15:35:04.533996+00:00"
+}

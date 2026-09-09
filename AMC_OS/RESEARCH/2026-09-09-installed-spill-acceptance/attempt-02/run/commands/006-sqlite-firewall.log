@@ -1,0 +1,31 @@
+{
+  "policy": {
+    "schemaVersion": "2026-05-22",
+    "enabled": true,
+    "mode": "block",
+    "failClosedOnMissingPolicy": true,
+    "thresholds": {
+      "warnAt": 30,
+      "blockAt": 70
+    },
+    "rules": {
+      "promptInjection": true,
+      "secretExposure": true,
+      "destructiveAction": true,
+      "piiLeakage": true,
+      "payloadAnomaly": true,
+      "maxPayloadChars": 60000
+    },
+    "redaction": {
+      "redactSecrets": true,
+      "maxPreviewChars": 700
+    },
+    "updatedAt": "2026-09-09T15:38:58.126Z"
+  },
+  "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/firewall/policy.json",
+  "signaturePath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/firewall/policy.json.sig",
+  "revision": 1,
+  "checkpointPath": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/home/.amc/control-checkpoints/f77ee59a059bf234c7dfdf342e96665dbb8561c7c5b02e3a803576c84d896bbf/runtime-firewall-policy/000000000001.json",
+  "mirrorTrusted": true,
+  "mirrorWarning": null
+}

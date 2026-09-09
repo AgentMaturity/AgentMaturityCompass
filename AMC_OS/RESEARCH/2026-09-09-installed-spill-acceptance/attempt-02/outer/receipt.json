@@ -1,0 +1,1141 @@
+{
+  "schemaVersion": 1,
+  "classification": "outer-runner-process-supervision-not-an-independent-AMC-verdict",
+  "helperCommit": "446087ca8510c27e83c2465bab9946634a88724b",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "commands": [
+    {
+      "label": "installed-spill",
+      "command": [
+        "/Library/Developer/CommandLineTools/usr/bin/python3",
+        "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
+        "--config",
+        "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json",
+        "--execute"
+      ],
+      "startedAt": "2026-09-09T15:38:42.656252+00:00",
+      "timeoutSeconds": 2100,
+      "exitCode": 1,
+      "timedOut": false,
+      "interrupted": false,
+      "cleanup": {
+        "confirmedClosed": true,
+        "scope": "observed-owned-descendant-identities-and-owned-groups",
+        "rootIdentity": [
+          50193,
+          501,
+          "Wed Sep 9 21:08:42 2026"
+        ],
+        "rootReaped": true,
+        "observations": 488,
+        "ownedProcesses": [
+          {
+            "pid": 50193,
+            "ppid": 50188,
+            "pgid": 50193,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:42 2026",
+            "firstObservedAt": "2026-09-09T15:38:42.675328+00:00",
+            "via": "spawned-child"
+          },
+          {
+            "pid": 50196,
+            "ppid": 50193,
+            "pgid": 50196,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:42 2026",
+            "firstObservedAt": "2026-09-09T15:38:42.897695+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50199,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:43 2026",
+            "firstObservedAt": "2026-09-09T15:38:43.118316+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50209,
+            "ppid": 50193,
+            "pgid": 50209,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:43 2026",
+            "firstObservedAt": "2026-09-09T15:38:43.592867+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50225,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:43 2026",
+            "firstObservedAt": "2026-09-09T15:38:44.044505+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50228,
+            "ppid": 50193,
+            "pgid": 50228,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:44 2026",
+            "firstObservedAt": "2026-09-09T15:38:44.266498+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50296,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:49 2026",
+            "firstObservedAt": "2026-09-09T15:38:49.295461+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50299,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:49 2026",
+            "firstObservedAt": "2026-09-09T15:38:49.525436+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50303,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:49 2026",
+            "firstObservedAt": "2026-09-09T15:38:49.790562+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50305,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:50 2026",
+            "firstObservedAt": "2026-09-09T15:38:50.028493+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50307,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:50 2026",
+            "firstObservedAt": "2026-09-09T15:38:50.271243+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50309,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:50 2026",
+            "firstObservedAt": "2026-09-09T15:38:50.513496+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50311,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:50 2026",
+            "firstObservedAt": "2026-09-09T15:38:50.744723+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50315,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:50 2026",
+            "firstObservedAt": "2026-09-09T15:38:50.996527+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50317,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:51 2026",
+            "firstObservedAt": "2026-09-09T15:38:51.224031+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50333,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:52 2026",
+            "firstObservedAt": "2026-09-09T15:38:52.357038+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50337,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:52 2026",
+            "firstObservedAt": "2026-09-09T15:38:52.809774+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50351,
+            "ppid": 50228,
+            "pgid": 50228,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:52 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.056753+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50352,
+            "ppid": 50351,
+            "pgid": 50228,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:52 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.056797+00:00",
+            "via": "live-owned-group"
+          },
+          {
+            "pid": 50353,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:53 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.056799+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50355,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:53 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.284945+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50360,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:53 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.509016+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50364,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:53 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.735454+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50367,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:53 2026",
+            "firstObservedAt": "2026-09-09T15:38:53.972252+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50392,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:54 2026",
+            "firstObservedAt": "2026-09-09T15:38:54.432328+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50400,
+            "ppid": 50193,
+            "pgid": 50400,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:54 2026",
+            "firstObservedAt": "2026-09-09T15:38:54.876461+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50419,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:56 2026",
+            "firstObservedAt": "2026-09-09T15:38:56.224060+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50421,
+            "ppid": 50193,
+            "pgid": 50421,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:56 2026",
+            "firstObservedAt": "2026-09-09T15:38:56.445790+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50445,
+            "ppid": 50193,
+            "pgid": 50445,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:57 2026",
+            "firstObservedAt": "2026-09-09T15:38:57.558719+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50465,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:08:58 2026",
+            "firstObservedAt": "2026-09-09T15:38:58.690871+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50468,
+            "ppid": 50193,
+            "pgid": 50468,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:58 2026",
+            "firstObservedAt": "2026-09-09T15:38:58.914756+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50487,
+            "ppid": 50193,
+            "pgid": 50487,
+            "uid": 501,
+            "started": "Wed Sep 9 21:08:59 2026",
+            "firstObservedAt": "2026-09-09T15:39:00.033032+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50503,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:00 2026",
+            "firstObservedAt": "2026-09-09T15:39:00.935192+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50508,
+            "ppid": 50193,
+            "pgid": 50508,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:01 2026",
+            "firstObservedAt": "2026-09-09T15:39:01.385054+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50538,
+            "ppid": 50193,
+            "pgid": 50538,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:02 2026",
+            "firstObservedAt": "2026-09-09T15:39:02.498859+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50539,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:02 2026",
+            "firstObservedAt": "2026-09-09T15:39:02.498886+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50541,
+            "ppid": 50538,
+            "pgid": 50538,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:02 2026",
+            "firstObservedAt": "2026-09-09T15:39:02.721529+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50543,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:02 2026",
+            "firstObservedAt": "2026-09-09T15:39:02.721579+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50545,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:02 2026",
+            "firstObservedAt": "2026-09-09T15:39:02.952287+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50547,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:03 2026",
+            "firstObservedAt": "2026-09-09T15:39:03.171800+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50549,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:03 2026",
+            "firstObservedAt": "2026-09-09T15:39:03.397478+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50556,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:03 2026",
+            "firstObservedAt": "2026-09-09T15:39:03.628442+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50563,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:03 2026",
+            "firstObservedAt": "2026-09-09T15:39:03.852721+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50565,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:04 2026",
+            "firstObservedAt": "2026-09-09T15:39:04.076701+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50567,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:04 2026",
+            "firstObservedAt": "2026-09-09T15:39:04.302672+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50570,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:04 2026",
+            "firstObservedAt": "2026-09-09T15:39:04.522332+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50579,
+            "ppid": 50193,
+            "pgid": 50579,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:04 2026",
+            "firstObservedAt": "2026-09-09T15:39:04.969050+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50604,
+            "ppid": 50193,
+            "pgid": 50604,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.092554+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50605,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.092572+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50611,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.319419+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50618,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.545069+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50624,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.776827+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50628,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:06 2026",
+            "firstObservedAt": "2026-09-09T15:39:06.998368+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50641,
+            "ppid": 50193,
+            "pgid": 50641,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:07 2026",
+            "firstObservedAt": "2026-09-09T15:39:07.448065+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50661,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:08 2026",
+            "firstObservedAt": "2026-09-09T15:39:08.348458+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50663,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:08 2026",
+            "firstObservedAt": "2026-09-09T15:39:08.588339+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50665,
+            "ppid": 50193,
+            "pgid": 50665,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:08 2026",
+            "firstObservedAt": "2026-09-09T15:39:08.813316+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50694,
+            "ppid": 50193,
+            "pgid": 50694,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:09 2026",
+            "firstObservedAt": "2026-09-09T15:39:09.927383+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50706,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:10 2026",
+            "firstObservedAt": "2026-09-09T15:39:10.835583+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50713,
+            "ppid": 50193,
+            "pgid": 50713,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:11 2026",
+            "firstObservedAt": "2026-09-09T15:39:11.299846+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50744,
+            "ppid": 50193,
+            "pgid": 50744,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:12 2026",
+            "firstObservedAt": "2026-09-09T15:39:12.414605+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50761,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:13 2026",
+            "firstObservedAt": "2026-09-09T15:39:13.309949+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50769,
+            "ppid": 50193,
+            "pgid": 50769,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:13 2026",
+            "firstObservedAt": "2026-09-09T15:39:13.772511+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50797,
+            "ppid": 50193,
+            "pgid": 50797,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:14 2026",
+            "firstObservedAt": "2026-09-09T15:39:14.914948+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50825,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:16 2026",
+            "firstObservedAt": "2026-09-09T15:39:16.041864+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50837,
+            "ppid": 50193,
+            "pgid": 50837,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:16 2026",
+            "firstObservedAt": "2026-09-09T15:39:16.487878+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50864,
+            "ppid": 50193,
+            "pgid": 50864,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:17 2026",
+            "firstObservedAt": "2026-09-09T15:39:17.618335+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50865,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:17 2026",
+            "firstObservedAt": "2026-09-09T15:39:17.618378+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50874,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:17 2026",
+            "firstObservedAt": "2026-09-09T15:39:17.867474+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50876,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:18 2026",
+            "firstObservedAt": "2026-09-09T15:39:18.093706+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50878,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:18 2026",
+            "firstObservedAt": "2026-09-09T15:39:18.324385+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50882,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:18 2026",
+            "firstObservedAt": "2026-09-09T15:39:18.547272+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50896,
+            "ppid": 50193,
+            "pgid": 50896,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:18 2026",
+            "firstObservedAt": "2026-09-09T15:39:18.994770+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50922,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:20 2026",
+            "firstObservedAt": "2026-09-09T15:39:20.107367+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50925,
+            "ppid": 50193,
+            "pgid": 50925,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:20 2026",
+            "firstObservedAt": "2026-09-09T15:39:20.331075+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50952,
+            "ppid": 50193,
+            "pgid": 50952,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:21 2026",
+            "firstObservedAt": "2026-09-09T15:39:21.445981+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50969,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:22 2026",
+            "firstObservedAt": "2026-09-09T15:39:22.352508+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 50977,
+            "ppid": 50193,
+            "pgid": 50977,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:22 2026",
+            "firstObservedAt": "2026-09-09T15:39:22.816338+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51004,
+            "ppid": 50193,
+            "pgid": 51004,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:23 2026",
+            "firstObservedAt": "2026-09-09T15:39:23.930454+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51014,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:24 2026",
+            "firstObservedAt": "2026-09-09T15:39:24.826312+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51022,
+            "ppid": 50193,
+            "pgid": 51022,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:25 2026",
+            "firstObservedAt": "2026-09-09T15:39:25.279059+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51052,
+            "ppid": 50193,
+            "pgid": 51052,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:26 2026",
+            "firstObservedAt": "2026-09-09T15:39:26.397649+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51069,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:27 2026",
+            "firstObservedAt": "2026-09-09T15:39:27.070600+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51072,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:27 2026",
+            "firstObservedAt": "2026-09-09T15:39:27.304253+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51082,
+            "ppid": 50193,
+            "pgid": 51082,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:27 2026",
+            "firstObservedAt": "2026-09-09T15:39:27.789493+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51105,
+            "ppid": 50193,
+            "pgid": 51105,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:28 2026",
+            "firstObservedAt": "2026-09-09T15:39:28.918393+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51117,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:29 2026",
+            "firstObservedAt": "2026-09-09T15:39:29.596307+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51119,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:29 2026",
+            "firstObservedAt": "2026-09-09T15:39:29.821244+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51132,
+            "ppid": 50193,
+            "pgid": 51132,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:30 2026",
+            "firstObservedAt": "2026-09-09T15:39:30.271557+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51163,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:31 2026",
+            "firstObservedAt": "2026-09-09T15:39:31.389568+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51166,
+            "ppid": 50193,
+            "pgid": 51166,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:31 2026",
+            "firstObservedAt": "2026-09-09T15:39:31.616415+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51195,
+            "ppid": 50193,
+            "pgid": 51195,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:32 2026",
+            "firstObservedAt": "2026-09-09T15:39:32.734088+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51212,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:33 2026",
+            "firstObservedAt": "2026-09-09T15:39:33.649686+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51221,
+            "ppid": 50193,
+            "pgid": 51221,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:33 2026",
+            "firstObservedAt": "2026-09-09T15:39:34.091874+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51252,
+            "ppid": 50193,
+            "pgid": 51252,
+            "uid": 501,
+            "started": "Wed Sep 9 21:09:35 2026",
+            "firstObservedAt": "2026-09-09T15:39:35.217261+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51269,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:09:36 2026",
+            "firstObservedAt": "2026-09-09T15:39:36.104746+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51565,
+            "ppid": 50193,
+            "pgid": 51565,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:18 2026",
+            "firstObservedAt": "2026-09-09T15:40:18.502859+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51579,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:19 2026",
+            "firstObservedAt": "2026-09-09T15:40:19.856968+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51587,
+            "ppid": 50193,
+            "pgid": 51587,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:20 2026",
+            "firstObservedAt": "2026-09-09T15:40:20.299305+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51605,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:21 2026",
+            "firstObservedAt": "2026-09-09T15:40:21.415180+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51607,
+            "ppid": 50193,
+            "pgid": 51607,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:21 2026",
+            "firstObservedAt": "2026-09-09T15:40:21.638699+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51625,
+            "ppid": 50193,
+            "pgid": 51625,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:22 2026",
+            "firstObservedAt": "2026-09-09T15:40:22.762195+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51640,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:23 2026",
+            "firstObservedAt": "2026-09-09T15:40:23.882646+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51643,
+            "ppid": 50193,
+            "pgid": 51643,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:23 2026",
+            "firstObservedAt": "2026-09-09T15:40:24.107488+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51663,
+            "ppid": 50193,
+            "pgid": 51663,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:25 2026",
+            "firstObservedAt": "2026-09-09T15:40:25.443784+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51675,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:26 2026",
+            "firstObservedAt": "2026-09-09T15:40:26.336601+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51682,
+            "ppid": 50193,
+            "pgid": 51682,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:26 2026",
+            "firstObservedAt": "2026-09-09T15:40:26.789688+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51700,
+            "ppid": 50193,
+            "pgid": 51700,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:27 2026",
+            "firstObservedAt": "2026-09-09T15:40:27.905711+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51711,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:28 2026",
+            "firstObservedAt": "2026-09-09T15:40:28.795928+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51719,
+            "ppid": 50193,
+            "pgid": 51719,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:29 2026",
+            "firstObservedAt": "2026-09-09T15:40:29.244825+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51736,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:30 2026",
+            "firstObservedAt": "2026-09-09T15:40:30.358079+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51738,
+            "ppid": 50193,
+            "pgid": 51738,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:30 2026",
+            "firstObservedAt": "2026-09-09T15:40:30.584036+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51758,
+            "ppid": 50193,
+            "pgid": 51758,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:31 2026",
+            "firstObservedAt": "2026-09-09T15:40:31.703603+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51761,
+            "ppid": 51758,
+            "pgid": 51758,
+            "uid": 501,
+            "started": "Wed Sep 9 21:10:31 2026",
+            "firstObservedAt": "2026-09-09T15:40:31.926007+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51779,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:33 2026",
+            "firstObservedAt": "2026-09-09T15:40:33.045039+00:00",
+            "via": "observed-parent"
+          },
+          {
+            "pid": 51785,
+            "ppid": 50193,
+            "pgid": 50193,
+            "uid": 0,
+            "started": "Wed Sep 9 21:10:33 2026",
+            "firstObservedAt": "2026-09-09T15:40:33.284467+00:00",
+            "via": "observed-parent"
+          }
+        ],
+        "ownedGroups": [
+          50193,
+          50196,
+          50209,
+          50228,
+          50400,
+          50421,
+          50445,
+          50468,
+          50487,
+          50508,
+          50538,
+          50579,
+          50604,
+          50641,
+          50665,
+          50694,
+          50713,
+          50744,
+          50769,
+          50797,
+          50837,
+          50864,
+          50896,
+          50925,
+          50952,
+          50977,
+          51004,
+          51022,
+          51052,
+          51082,
+          51105,
+          51132,
+          51166,
+          51195,
+          51221,
+          51252,
+          51565,
+          51587,
+          51607,
+          51625,
+          51643,
+          51663,
+          51682,
+          51700,
+          51719,
+          51738,
+          51758
+        ],
+        "remainingOwned": [],
+        "ambiguousGroupMembers": [],
+        "signals": [],
+        "errors": [],
+        "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+      },
+      "elapsedSeconds": 111.167604709,
+      "endedAt": "2026-09-09T15:40:33.824545+00:00"
+    }
+  ],
+  "active": null,
+  "failures": [],
+  "exitCode": 1,
+  "configurationSha256": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0",
+  "allObservedCommandProcessesClosed": true
+}

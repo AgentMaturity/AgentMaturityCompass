@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "command": "erase",
+  "ok": false,
+  "status": "refused",
+  "mutationAttempted": false,
+  "mutationState": "not-started",
+  "plaintextVerified": false,
+  "error": {
+    "code": "stale-plan",
+    "message": "The supplied review digest does not match fresh full history, scope, reason and object states. No erasure was attempted.",
+    "repair": "Run and review a new read-only plan, not an automatic retry: amc spill erase --workspace /existing/workspace --session EXACT_SESSION_ID --reason \"Reviewed local retention request\" --json"
+  }
+}

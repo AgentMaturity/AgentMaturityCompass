@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "allowExecution": true,
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "sourceReceipt": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/installed-candidate-a598/source.json",
+    "sha256": "8a9f100998949288f5c7e5a81aa4f34a08e2b1c4e8a935f74b050f60dd48fefd"
+  },
+  "tarball": {
+    "path": "/private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z/agent-maturity-compass-1.2.0.tgz",
+    "sha256": "d0391019fb9e0b39c0f624657efab9f1a03e53b01b45fced04ea4d7cc980d1c9",
+    "bytes": 6008285
+  },
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "version": "v22.22.0"
+  },
+  "npm": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+    "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "version": "10.9.4"
+  },
+  "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
+  "supervisor": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill/AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/runner.py",
+    "sha256": "e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d"
+  },
+  "native": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/native-case.mjs",
+    "sha256": "b666026f9aa3ece8d806d8aa5288225ec302373b707cdc07e578f768079e44ec"
+  },
+  "runnerSha256": "8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0",
+  "root": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
+  "backends": [
+    "sqlite",
+    "jsonl"
+  ],
+  "nodePlatform": "darwin",
+  "nodeArch": "arm64",
+  "allowInstallScripts": true,
+  "installTimeoutSeconds": 600,
+  "commandTimeoutSeconds": 120,
+  "reviewTimeoutSeconds": 300
+}

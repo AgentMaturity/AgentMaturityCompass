@@ -1,0 +1,15 @@
+{
+  "preparedAt": "2026-09-09T15:34:12.795598+00:00",
+  "helperCommit": "446087ca8510c27e83c2465bab9946634a88724b",
+  "runtimeSource": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "files": {
+    "config.json": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0",
+    "prepared.json": "b12257608f25b6531133fc280950f820b8670ccd507b865d6ea74dc4e7753420",
+    "launch.py": "66856ffc7252ef874ab4b01297504c7f7eb2aff2c5f5ef553587941562b78ecf",
+    "preflight.py": "84fb8b189d0ff074928bb8e16ada29d0a63ce08ceaa068318e77daf20d9d5e9f"
+  },
+  "priorConfigSha256": "d39c073819a929e93ccf0a8e93d9c981fadf7d951c6c5bb8d139e146ef829960",
+  "priorLauncherSha256": "26db636b768f389cb1d7b44db61a22c6a5b234ce509464299a38c6474759d299",
+  "qualification": "none; immutable input provenance only",
+  "reasonForNewAttempt": "Corrected malformed synthetic provider usage. No runtime accounting change. Missing JSONL public loader remains blocked."
+}

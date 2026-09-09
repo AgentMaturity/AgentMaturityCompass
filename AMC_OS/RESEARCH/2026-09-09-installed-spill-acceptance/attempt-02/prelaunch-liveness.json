@@ -1,0 +1,16 @@
+{
+  "observedAt": "2026-09-09T15:38:42.590556+00:00",
+  "receiptPaths": [
+    "tmp/cos-installed-spill-execution-01/run/receipts/receipt.json",
+    "tmp/cos-installed-spill-execution-01/outer/receipt.json",
+    "tmp/cos-installed-spill-execution-02/preflight/receipt.json",
+    "tmp/cos-installed-spill-execution-02/preflight-02/receipt.json"
+  ],
+  "matchingOwnedIdentities": [],
+  "priorGroupMembers": [],
+  "preflightQualified": true,
+  "preflightAllObservedProcessesClosed": true,
+  "launchSha256": "af8debb8361086e3e32c9bf5211209a87674ec32d26258515b025c95003f7c28",
+  "oldReceiptSha256": "8d7d7bb2a29fef7cd19c57830bfd53666da43251f255692252e718268fe0cd8c",
+  "boundary": "current receipt-owned identity/group observation only; no signals and no installed result yet"
+}

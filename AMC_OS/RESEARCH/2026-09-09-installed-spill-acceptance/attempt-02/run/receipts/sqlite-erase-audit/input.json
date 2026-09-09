@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "mode": "audit",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "ownedRoot": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
+  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+  "output": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-erase-audit",
+  "backend": "sqlite",
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "version": "v22.22.0"
+  },
+  "cli": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+  "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
+  "nodePlatform": "darwin",
+  "nodeArch": "arm64",
+  "monitorFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+  "auditEventIds": [
+    "5720cc2b-9ba9-4d9e-9fef-f3b70aad15f3",
+    "20318e07-177b-434a-b95b-0698f6862457"
+  ]
+}

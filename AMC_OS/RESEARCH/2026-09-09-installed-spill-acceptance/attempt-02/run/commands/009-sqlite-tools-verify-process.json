@@ -1,0 +1,46 @@
+{
+  "label": "009-sqlite-tools-verify",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "tools",
+    "verify"
+  ],
+  "startedAt": "2026-09-09T15:39:01.201374+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      50508,
+      501,
+      "Wed Sep 9 21:09:01 2026"
+    ],
+    "rootReaped": true,
+    "observations": 10,
+    "ownedProcesses": [
+      {
+        "pid": 50508,
+        "ppid": 50193,
+        "pgid": 50508,
+        "uid": 501,
+        "started": "Wed Sep 9 21:09:01 2026",
+        "firstObservedAt": "2026-09-09T15:39:01.225645+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      50508
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 1.2392599170000018,
+  "endedAt": "2026-09-09T15:39:02.440647+00:00"
+}

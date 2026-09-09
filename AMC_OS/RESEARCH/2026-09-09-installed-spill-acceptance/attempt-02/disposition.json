@@ -1,0 +1,1020 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T15:43:46.166959+00:00",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "helperCommit": "446087ca8510c27e83c2465bab9946634a88724b",
+  "integrationHeadNow": "77912a555501c652989b090914b7c52c8e7c3bf0",
+  "status": "unqualified-jsonl-second-session-refused",
+  "qualified": false,
+  "platform": "darwin-arm64",
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "version": "v22.22.0"
+  },
+  "npm": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+    "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "version": "10.9.4"
+  },
+  "artifact": {
+    "path": "/private/tmp/amc-a5987643-package-01/tmp/amc-packed-install-L1B02Z/agent-maturity-compass-1.2.0.tgz",
+    "sha256": "d0391019fb9e0b39c0f624657efab9f1a03e53b01b45fced04ea4d7cc980d1c9",
+    "bytes": 6008285
+  },
+  "configSha256": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0",
+  "originalActualReceiptSha256": "c3a0f9b93cc6289da0afcb16d84de017b28dccce7511441228d60e39af2384e3",
+  "commandCount": 46,
+  "groups": [
+    {
+      "backend": null,
+      "name": "installed-boundary",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "native-retention",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "inventory-and-origins",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "bounded-public-reads",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "encrypted-export",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "refused-overwrite",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "tamper-and-missing",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "existing-history-restore",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "sqlite",
+      "name": "reviewed-erasure",
+      "verdict": "passed",
+      "blockers": []
+    },
+    {
+      "backend": "jsonl",
+      "name": "native-retention",
+      "verdict": "failed",
+      "blockers": []
+    },
+    {
+      "backend": "jsonl",
+      "name": "bounded-public-reads",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "encrypted-export",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "existing-history-restore",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "inventory-and-origins",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "refused-overwrite",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "reviewed-erasure",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    },
+    {
+      "backend": "jsonl",
+      "name": "tamper-and-missing",
+      "verdict": "unknown",
+      "blockers": [
+        "Not reached; no result inferred"
+      ]
+    }
+  ],
+  "failures": [
+    {
+      "backend": "jsonl",
+      "error": "governed SDK fixture verdict"
+    }
+  ],
+  "allObservedInnerProcessesClosed": true,
+  "allObservedOuterProcessesClosed": true,
+  "diagnosis": {
+    "observed": "JSONL A completed a real fs.read and response; second newSession failed with AMCNativeRefusedError/the method failed; B has no session ID. No JSONL downstream case reached.",
+    "sourceInference": "JSONL explicitly refuses concurrent writers; helper left A open when requesting B. Internal refusal reason was not retained by this SDK error path, so this is not a directly captured lock diagnostic.",
+    "nextChange": "Close each actual installed native client after its fixture before starting the next. Retain single-writer enforcement. New attempt-03 selects JSONL only.",
+    "publicApiGap": "PUBLIC_JSONL_HISTORY_LOADER_UNAVAILABLE remains; it was not reached in attempt 02 and is not marked passed."
+  },
+  "preparationFailure": "First helper preflight refused mode0755 parent; preserved. Owned parent restricted to0700; distinct preflight-02 passed/closed. Installed attempt ran once.",
+  "omitted": [
+    "fixture secrets",
+    "vault/private key material",
+    "raw workspace databases and blob stores",
+    "node_modules/npm cache",
+    "tarball duplicate",
+    "quarantined and exported ciphertext copies retained only in private attempt"
+  ],
+  "unexercised": [
+    "JSONL downstream CLI lifecycle and public ranges",
+    "independent post-erasure cryptographic audit",
+    "public JSONL history loader",
+    "legacy v1 installed path",
+    "unavailable-key installed paths",
+    "empty-history restore",
+    "cross-platform",
+    "real-provider/human/comparative quality",
+    "release/deployment"
+  ],
+  "files": [
+    {
+      "path": "config.json",
+      "bytes": 1915,
+      "sha256": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0"
+    },
+    {
+      "path": "input-provenance.json",
+      "bytes": 939,
+      "sha256": "979376485252ee76396f2ab365ca1c2a2f87047c8e988be9a03fa21348d403c2"
+    },
+    {
+      "path": "launch-corrected.py",
+      "bytes": 3577,
+      "sha256": "af8debb8361086e3e32c9bf5211209a87674ec32d26258515b025c95003f7c28"
+    },
+    {
+      "path": "launch.py",
+      "bytes": 3574,
+      "sha256": "66856ffc7252ef874ab4b01297504c7f7eb2aff2c5f5ef553587941562b78ecf"
+    },
+    {
+      "path": "outer/installed-spill-process.json",
+      "bytes": 30302,
+      "sha256": "c127716a858316a8989c45f16178ac601d160ee70930b25626ef3d261ec82cca"
+    },
+    {
+      "path": "outer/installed-spill.log",
+      "bytes": 140,
+      "sha256": "062bddcc62c0989e17908368213b21c287652a053ad47ffd2b3fca61a0b7646d"
+    },
+    {
+      "path": "outer/receipt.json",
+      "bytes": 35256,
+      "sha256": "1620ebf121dc5a2d5f282bd53f28aed991a72f22c224bdb9e59a186d4df69878"
+    },
+    {
+      "path": "preflight/config-validation-process.json",
+      "bytes": 1681,
+      "sha256": "6860d12076e70cf1593e025613eff8064b920479437691b37c5d520dbe461e71"
+    },
+    {
+      "path": "preflight/config-validation.log",
+      "bytes": 719,
+      "sha256": "fba786b7f8672d865a0ebee4ee433685ad74608376326a04509b7e4515bc4403"
+    },
+    {
+      "path": "preflight/native-syntax-process.json",
+      "bytes": 1316,
+      "sha256": "883572916a35263f1d1e4ac8d889936cc400110a0d08fe102fb736f577672ddd"
+    },
+    {
+      "path": "preflight/native-syntax.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "preflight/python-syntax-process.json",
+      "bytes": 1436,
+      "sha256": "2e2f2a4167af0ae186a43733e9cd2078c175ccd3bb982a7dd1d1ebf97cf1c3a1"
+    },
+    {
+      "path": "preflight/python-syntax.log",
+      "bytes": 47,
+      "sha256": "c532fee9da683ca199198a8efd2d0df151c3e6a4ae9b6c186e3ea2e18d8c22cb"
+    },
+    {
+      "path": "preflight/receipt.json",
+      "bytes": 6246,
+      "sha256": "c7c95adaee9e1a7da042c388e5d1be05adee9c8f919e9eb487842dc6f04edea6"
+    },
+    {
+      "path": "preflight-02/config-validation-process.json",
+      "bytes": 1672,
+      "sha256": "68e3de6f33f976b687e9dd1e71a5824deac1e71c74f3c50024c40707b14c71d3"
+    },
+    {
+      "path": "preflight-02/config-validation.log",
+      "bytes": 73,
+      "sha256": "ebc49c5925c13b655ac5cbf6a9f1cd7585cf11ac5e8b7bf79a4b61c188c8c1cf"
+    },
+    {
+      "path": "preflight-02/missing-opt-in-refused-process.json",
+      "bytes": 1411,
+      "sha256": "0005d8e142850c8c6ff1e29e717cf7e3c06158441be81f3a78dfa8d1ad7f7a55"
+    },
+    {
+      "path": "preflight-02/missing-opt-in-refused.log",
+      "bytes": 110,
+      "sha256": "47a89a74c0cc1b98c30c29c55eb589e3486d4b3fcb6545ae7b60f5301b70bdf5"
+    },
+    {
+      "path": "preflight-02/native-syntax-process.json",
+      "bytes": 1309,
+      "sha256": "d7a4861f16229e1bdbbdf6f64f78fca63691f39cf1343605873d4603a6b7423e"
+    },
+    {
+      "path": "preflight-02/native-syntax.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "preflight-02/python-syntax-process.json",
+      "bytes": 1433,
+      "sha256": "8bbf1b1deaaf249569bfbb881505127b4da33628217abc25870ff6ddea962908"
+    },
+    {
+      "path": "preflight-02/python-syntax.log",
+      "bytes": 47,
+      "sha256": "c532fee9da683ca199198a8efd2d0df151c3e6a4ae9b6c186e3ea2e18d8c22cb"
+    },
+    {
+      "path": "preflight-02/receipt.json",
+      "bytes": 7623,
+      "sha256": "775af718bdf473712ba48a766fa93af983b0d2b2fd436742f7e1e107b0bcbd38"
+    },
+    {
+      "path": "preflight-02.py",
+      "bytes": 3947,
+      "sha256": "7d4fc92321e2f6ec6ab7f8d907a3522d889243ce9c4240eac57fb90ffe19a89a"
+    },
+    {
+      "path": "preflight-liveness.json",
+      "bytes": 441,
+      "sha256": "00b00ae35e96c7320a59e903b9f76c94ade4d9bf6103f05ab9a4596a81a70047"
+    },
+    {
+      "path": "preflight.py",
+      "bytes": 3944,
+      "sha256": "84fb8b189d0ff074928bb8e16ada29d0a63ce08ceaa068318e77daf20d9d5e9f"
+    },
+    {
+      "path": "prelaunch-liveness.json",
+      "bytes": 773,
+      "sha256": "14aedd8c3d8becbf154d983a446561d7cd00d3e4ca03f4d7d13626d844725871"
+    },
+    {
+      "path": "preparation-correction.json",
+      "bytes": 1086,
+      "sha256": "b09e1f4ad80d6f066cb0d078a60b784c9c561ca782c6bd1f219a3c3e9c1c4ec3"
+    },
+    {
+      "path": "prepared.json",
+      "bytes": 654,
+      "sha256": "b12257608f25b6531133fc280950f820b8670ccd507b865d6ea74dc4e7753420"
+    },
+    {
+      "path": "run/commands/001-node-version-process.json",
+      "bytes": 1206,
+      "sha256": "0c013df763f10f5cc2fb4a10094ea017a3feea2503dd6771329f79659bf8b92f"
+    },
+    {
+      "path": "run/commands/001-node-version.log",
+      "bytes": 9,
+      "sha256": "c414f17896fa3ddfbd81ec3e6037beef712f6ec9200decd2d47c9c1e1594385a"
+    },
+    {
+      "path": "run/commands/002-npm-version-process.json",
+      "bytes": 1285,
+      "sha256": "7d27aec403d0da65c07622b6ebce43063a84215d78506c0c32ea50f0e980b1df"
+    },
+    {
+      "path": "run/commands/002-npm-version.log",
+      "bytes": 7,
+      "sha256": "1affb8f29ea203d9dc22f77b58c55ccff5317a28ca336aac0cd9a89aea9eb1fb"
+    },
+    {
+      "path": "run/commands/003-install-process.json",
+      "bytes": 2008,
+      "sha256": "9c5db8589f71c73fdd0faaac61ee3925809dd5abe3ef5cf06a73433395b5d550"
+    },
+    {
+      "path": "run/commands/003-install.log",
+      "bytes": 344,
+      "sha256": "c67fbb69e60987b07ed195f46e7d544fb52e445170ac16db49815ca2ba8599c1"
+    },
+    {
+      "path": "run/commands/004-sqlite-init-process.json",
+      "bytes": 1385,
+      "sha256": "7ff4f1edd629086d9a47df3bfa4887d7f933defe062b61d42809e5ed429239dc"
+    },
+    {
+      "path": "run/commands/004-sqlite-init.log",
+      "bytes": 636,
+      "sha256": "5a3891241973d3b07c3dcffe641ae5f46c9855aefd1fa977f80a72233dfd6c6b"
+    },
+    {
+      "path": "run/commands/005-sqlite-budgets-process.json",
+      "bytes": 1393,
+      "sha256": "b2d3d6fd010f5977540487ea22f944d094672432b26d4e8d20409f43b96464a9"
+    },
+    {
+      "path": "run/commands/005-sqlite-budgets.log",
+      "bytes": 252,
+      "sha256": "e922ac3cacf226d200b83f67b1e77f617ccb3fb20561c4736fac3dbdffbdc4d9"
+    },
+    {
+      "path": "run/commands/006-sqlite-firewall-process.json",
+      "bytes": 1408,
+      "sha256": "a50cbd1ace61b807faa5079cce81c0862c213d233462224ccb8de4a2216efe6d"
+    },
+    {
+      "path": "run/commands/006-sqlite-firewall.log",
+      "bytes": 1114,
+      "sha256": "6e45e7690cc1dbdf8b075f54ee4faa13090008d3d3018ac5c59c3ce3575170bb"
+    },
+    {
+      "path": "run/commands/007-sqlite-tools-init-process.json",
+      "bytes": 1364,
+      "sha256": "b274757d10fd87070d73efe491dfafb8bad9d646106186f9b0c8cc5c899f0acb"
+    },
+    {
+      "path": "run/commands/007-sqlite-tools-init.log",
+      "bytes": 249,
+      "sha256": "9f2ec90526a42684d5fd154c512c034242f2d86f87b897b9cd1de733e2e92ebb"
+    },
+    {
+      "path": "run/commands/008-sqlite-tools-sign-process.json",
+      "bytes": 1378,
+      "sha256": "2db26560e98fc76bf51aa4578ae3248f01f9c8903a27e1e95e6ff7fdae66cf5b"
+    },
+    {
+      "path": "run/commands/008-sqlite-tools-sign.log",
+      "bytes": 268,
+      "sha256": "b8fa1ac00a726b54d07a044b733605d66818bc0fd6dd1caa824ca43a82fac5b1"
+    },
+    {
+      "path": "run/commands/009-sqlite-tools-verify-process.json",
+      "bytes": 1368,
+      "sha256": "5bb0b8c5af2fbb8db7e9970157fa339fffae334eb7a96c512f1965bf1f4ba897"
+    },
+    {
+      "path": "run/commands/009-sqlite-tools-verify.log",
+      "bytes": 140,
+      "sha256": "974314ff6f516ff1eb49d9039d9a3618bd9afc3a8eb623fa2d969cc5ef365711"
+    },
+    {
+      "path": "run/commands/010-sqlite-capture-process.json",
+      "bytes": 1659,
+      "sha256": "b78a3c952a3e8617ed428d26d883999a26214b30fcfe24770db437765e776cf7"
+    },
+    {
+      "path": "run/commands/010-sqlite-capture.log",
+      "bytes": 150,
+      "sha256": "89d0a374de9e129baf1b9b5be6b8c69cc697fdc3d53c78b324039cbe756e1b92"
+    },
+    {
+      "path": "run/commands/011-sqlite-cold-A-process.json",
+      "bytes": 1418,
+      "sha256": "dd60c727584ea372d56da7a073ae5eab3738eeb02286960ad3b53cb14f80076b"
+    },
+    {
+      "path": "run/commands/011-sqlite-cold-A.log",
+      "bytes": 678,
+      "sha256": "7b9dff48fc8527a81ce1f392ee07eb9ad044755c05241a47cf81395c8f4c4fd9"
+    },
+    {
+      "path": "run/commands/012-sqlite-cold-B-process.json",
+      "bytes": 1425,
+      "sha256": "41f0ebc681b883fc67a8276bd6b4d9e083b3eae653f2289aa4343d76638d3faf"
+    },
+    {
+      "path": "run/commands/012-sqlite-cold-B.log",
+      "bytes": 678,
+      "sha256": "e6f20c7fbba9c2f66abfbac007890ba71987f25bd3613dcd8c38fc0af2abf02b"
+    },
+    {
+      "path": "run/commands/013-sqlite-inventory-process.json",
+      "bytes": 1594,
+      "sha256": "407fa6b5da8014b96790d94a361f168c5774c80c1b84ca3ea6ff6e74ad2aaf06"
+    },
+    {
+      "path": "run/commands/013-sqlite-inventory.log",
+      "bytes": 2307,
+      "sha256": "5dbdb38fa853eeafc91d6a5924759c7b0bc13959e89e70cf28a0bdafe5f1c447"
+    },
+    {
+      "path": "run/commands/014-sqlite-range-A-0-process.json",
+      "bytes": 1781,
+      "sha256": "c91756387ccc5bc0dfef6f6cc77a7b7578c4e4c4d4784e739388384bfae2f1a1"
+    },
+    {
+      "path": "run/commands/014-sqlite-range-A-0.log",
+      "bytes": 22593,
+      "sha256": "9dbf3963e82a9477c18337dd9e8c9a53273cb39c3cba41bc5aecdbb27a712d55"
+    },
+    {
+      "path": "run/commands/015-sqlite-range-A-1-process.json",
+      "bytes": 1778,
+      "sha256": "670095078bb03961a60f91c274b1b0657863bd02a9f69a208a23d220e4284bfb"
+    },
+    {
+      "path": "run/commands/015-sqlite-range-A-1.log",
+      "bytes": 767,
+      "sha256": "83ff49baaf27715765ecfdd94e84c93cbca76a9d45d87966167fec3941f6c9de"
+    },
+    {
+      "path": "run/commands/016-sqlite-range-A-2-process.json",
+      "bytes": 1775,
+      "sha256": "f6fc4147b2a490e85b307e2f60ddcf7a79a20a8ebed923fe4bc4847650d5d22f"
+    },
+    {
+      "path": "run/commands/016-sqlite-range-A-2.log",
+      "bytes": 752,
+      "sha256": "77156c2dc54d696a9bf2354dc3b690442385c0377ffae8e7b09f6b2f1999138c"
+    },
+    {
+      "path": "run/commands/017-sqlite-range-A-3-process.json",
+      "bytes": 1780,
+      "sha256": "2fbd1f1dbc0b819b686c82c8a9f236ad5b12537e8f4db7eca31852c90c1e23b7"
+    },
+    {
+      "path": "run/commands/017-sqlite-range-A-3.log",
+      "bytes": 744,
+      "sha256": "1f7e1cb3639cacea1d50196590fe3cb95c961780aca20017cac466bea5f66bce"
+    },
+    {
+      "path": "run/commands/018-sqlite-range-B-0-process.json",
+      "bytes": 1781,
+      "sha256": "a2a0a183b61d4ba741b8c89c9ef69dd201a693e16bf1d325927e8586d56ed1e5"
+    },
+    {
+      "path": "run/commands/018-sqlite-range-B-0.log",
+      "bytes": 22593,
+      "sha256": "5c0ecf96a2f1e935595d84efa7da47860c5d70032c0914c64c7523953c18d12c"
+    },
+    {
+      "path": "run/commands/019-sqlite-range-B-1-process.json",
+      "bytes": 1778,
+      "sha256": "5cdb58f765bbad607b831980ea4ec2a99325e42c287762bf020885a8a0a04761"
+    },
+    {
+      "path": "run/commands/019-sqlite-range-B-1.log",
+      "bytes": 767,
+      "sha256": "6bf70d8e5ae3f4dd0d6a3d74962a8324bd3fcbba1eaf00e96c4ecdc1e602b7dc"
+    },
+    {
+      "path": "run/commands/020-sqlite-range-B-2-process.json",
+      "bytes": 1782,
+      "sha256": "95c4e2cde5548b10b5c8f28518facf60db536f85b47f32131f6a50d81d3807c0"
+    },
+    {
+      "path": "run/commands/020-sqlite-range-B-2.log",
+      "bytes": 752,
+      "sha256": "a69ee723f7b4b91212efb8ae61eb85f5f17ff1e5d16a6ab5fef311337a7bbc19"
+    },
+    {
+      "path": "run/commands/021-sqlite-range-B-3-process.json",
+      "bytes": 1780,
+      "sha256": "3cad5f11b9e2310c885635bc2ec521458575e9ba8a5098778f38739a5eb83795"
+    },
+    {
+      "path": "run/commands/021-sqlite-range-B-3.log",
+      "bytes": 744,
+      "sha256": "d24fbfe69fc81de22b3442058009b5eec37998dcefe263181ad69e2f8e8f753b"
+    },
+    {
+      "path": "run/commands/022-sqlite-api-ranges-process.json",
+      "bytes": 1425,
+      "sha256": "001d9695a8af48d5a84313f2e645de85595508943995c36b495670fcd1aa0ed2"
+    },
+    {
+      "path": "run/commands/022-sqlite-api-ranges.log",
+      "bytes": 153,
+      "sha256": "11d2b2da493761998d272c2c850c2b9663dc384b3ec8e21f134a8a4e2829c38c"
+    },
+    {
+      "path": "run/commands/023-sqlite-export-process.json",
+      "bytes": 1697,
+      "sha256": "56efc82372525b57d4a953649317d868fc06e634541f444ed98bf8e18d225e36"
+    },
+    {
+      "path": "run/commands/023-sqlite-export.log",
+      "bytes": 3903,
+      "sha256": "87efc4fa5d37622019af581713caa0f88715095fa04278dee0d820e3ba3ea631"
+    },
+    {
+      "path": "run/commands/024-sqlite-restore-overwrite-process.json",
+      "bytes": 1711,
+      "sha256": "dc8b4de64f20468044fae3a68b4d5f4296801e1bf6f844e33d908290299833cf"
+    },
+    {
+      "path": "run/commands/024-sqlite-restore-overwrite.log",
+      "bytes": 3128,
+      "sha256": "0db03cbfd7f034eaba7fb372e87bc2d923a1ad712c8c145f18146815b125cd42"
+    },
+    {
+      "path": "run/commands/025-sqlite-tampered-inventory-process.json",
+      "bytes": 1603,
+      "sha256": "90c1d55c76ba639bf6500d4cbe3e1868e0ad2f6dbd4593775a4ec861483ef43e"
+    },
+    {
+      "path": "run/commands/025-sqlite-tampered-inventory.log",
+      "bytes": 2530,
+      "sha256": "f00a4a21aab061a80266098fc82b02e6e8b29d4bfb89814f7af6f374421d4ffc"
+    },
+    {
+      "path": "run/commands/026-sqlite-tampered-range-process.json",
+      "bytes": 1521,
+      "sha256": "68c3aeebfc225ab4f97310ef6306ded85120f1f888d97a3e5c932b8ef85d20b9"
+    },
+    {
+      "path": "run/commands/026-sqlite-tampered-range.log",
+      "bytes": 120,
+      "sha256": "60d3b274f4f15111ba0e0778bff4080b347eb9b23b8a05bd48d105e67fa2f618"
+    },
+    {
+      "path": "run/commands/027-sqlite-missing-inventory-process.json",
+      "bytes": 1602,
+      "sha256": "a32c96868dcd6357674ccaad9f018aee4a80e96113c81d18c928892b4cf171c5"
+    },
+    {
+      "path": "run/commands/027-sqlite-missing-inventory.log",
+      "bytes": 2253,
+      "sha256": "4bf347eba2253c708fdcd761d659768de7b7d37069bcdf0781758ad5511351fc"
+    },
+    {
+      "path": "run/commands/028-sqlite-missing-range-process.json",
+      "bytes": 1519,
+      "sha256": "c12ece43cff4e54861ab3677e50d6ceedc26891ff32f3b48cbe95fffae45bff4"
+    },
+    {
+      "path": "run/commands/028-sqlite-missing-range.log",
+      "bytes": 320,
+      "sha256": "05099c77c588c2764875793292640ad9f974016770189dd3d960ab1e5c30c241"
+    },
+    {
+      "path": "run/commands/029-sqlite-restore-missing-process.json",
+      "bytes": 1709,
+      "sha256": "aa3a68473bf31562fe165cb0efe5e8928b90dde9377c26372569f45fcdb70428"
+    },
+    {
+      "path": "run/commands/029-sqlite-restore-missing.log",
+      "bytes": 3080,
+      "sha256": "224ce310517ec9f6d3e924b61bb8246f208bb777b2a05c98ca756fbabd8fa214"
+    },
+    {
+      "path": "run/commands/030-sqlite-restored-A-process.json",
+      "bytes": 1782,
+      "sha256": "2f0d790968978a176ede5e3d0d5fb2a5de84d82fb62b85f71b9029aaaf44dd97"
+    },
+    {
+      "path": "run/commands/030-sqlite-restored-A.log",
+      "bytes": 22593,
+      "sha256": "9dbf3963e82a9477c18337dd9e8c9a53273cb39c3cba41bc5aecdbb27a712d55"
+    },
+    {
+      "path": "run/commands/031-sqlite-restored-B-process.json",
+      "bytes": 1782,
+      "sha256": "843df512050afdd3fc14d8ed6039527adba2cc4d35f51dad78e1a2342dfabfe6"
+    },
+    {
+      "path": "run/commands/031-sqlite-restored-B.log",
+      "bytes": 22593,
+      "sha256": "5c0ecf96a2f1e935595d84efa7da47860c5d70032c0914c64c7523953c18d12c"
+    },
+    {
+      "path": "run/commands/032-sqlite-partial-origin-process.json",
+      "bytes": 1722,
+      "sha256": "0004532eb818e6313a19fde142d14cbf49a6a89c3410c506e6ab3de75878c3e0"
+    },
+    {
+      "path": "run/commands/032-sqlite-partial-origin.log",
+      "bytes": 936,
+      "sha256": "f8dba1ed5dd4d25848f73d538e3c30e6999748a287dd3a7d3942bc6e9c203657"
+    },
+    {
+      "path": "run/commands/033-sqlite-erase-plan-process.json",
+      "bytes": 1721,
+      "sha256": "616615db122b358c01d84ad875680446cbea91fbaf5d0ea4cad53a62c443430d"
+    },
+    {
+      "path": "run/commands/033-sqlite-erase-plan.log",
+      "bytes": 4560,
+      "sha256": "a7008f26dce8a71118bc6c0e77507434ffa6d4dc1825a30f734b0b071dde01b5"
+    },
+    {
+      "path": "run/commands/034-sqlite-stale-plan-process.json",
+      "bytes": 1837,
+      "sha256": "4e2892fd4ec70db26d1f771a0232cc72d6d176d6680875b1652ad0c8a075b41c"
+    },
+    {
+      "path": "run/commands/034-sqlite-stale-plan.log",
+      "bytes": 567,
+      "sha256": "3daabf5121b0298e24331348124064fa1ed09b4b459b8f2514222e1da9cdf25e"
+    },
+    {
+      "path": "run/commands/035-sqlite-erase-review-process.json",
+      "bytes": 1722,
+      "sha256": "3eecf15c40b6bc6a12d95b48089911f54805b8423461e10b448445d4d444cb49"
+    },
+    {
+      "path": "run/commands/035-sqlite-erase-review.log",
+      "bytes": 4560,
+      "sha256": "a7008f26dce8a71118bc6c0e77507434ffa6d4dc1825a30f734b0b071dde01b5"
+    },
+    {
+      "path": "run/commands/036-sqlite-erase-apply-process.json",
+      "bytes": 1830,
+      "sha256": "a2520372e09266a496bd16711878bbfa965063a7a37ad6ed86044c3ad2822c87"
+    },
+    {
+      "path": "run/commands/036-sqlite-erase-apply.log",
+      "bytes": 3180,
+      "sha256": "dc63374aeb350491b09cd1ac903a91ae126d506310915c848a8b30af6f3214c5"
+    },
+    {
+      "path": "run/commands/037-sqlite-erase-audit-process.json",
+      "bytes": 1425,
+      "sha256": "89ced0b3f83f2ace1708cf0df27cf05591bb9fa1d0c5f14d50e6b551e7a40d87"
+    },
+    {
+      "path": "run/commands/037-sqlite-erase-audit.log",
+      "bytes": 154,
+      "sha256": "6e324e3ee6fb357e25b8edce11f22852b0b7c10133ce93a80c0938cb38c6dd44"
+    },
+    {
+      "path": "run/commands/038-sqlite-after-erase-inventory-process.json",
+      "bytes": 1605,
+      "sha256": "ac0951219b4a3649185b5827448d4e28855f8ea688610788d1d4c86c422067e2"
+    },
+    {
+      "path": "run/commands/038-sqlite-after-erase-inventory.log",
+      "bytes": 2282,
+      "sha256": "bd022d3744387c45ed22d3da31f54185b603092e584ca3bba8ab1c9fee82e996"
+    },
+    {
+      "path": "run/commands/039-sqlite-other-origin-preserved-process.json",
+      "bytes": 1793,
+      "sha256": "b5f2525f8909dd52c8c59ac3d249e374839164c10a08fc68c6c06e35f036dc56"
+    },
+    {
+      "path": "run/commands/039-sqlite-other-origin-preserved.log",
+      "bytes": 22593,
+      "sha256": "5c0ecf96a2f1e935595d84efa7da47860c5d70032c0914c64c7523953c18d12c"
+    },
+    {
+      "path": "run/commands/040-jsonl-init-process.json",
+      "bytes": 1384,
+      "sha256": "3cf2c9cc2e675f98108b742ca2d6887f2673c3cfebe28d15f8cdeeb370a6051d"
+    },
+    {
+      "path": "run/commands/040-jsonl-init.log",
+      "bytes": 635,
+      "sha256": "785c027fb639eb3d8d65c8fa82f803acab8327a060e74366e48a92a484d171af"
+    },
+    {
+      "path": "run/commands/041-jsonl-budgets-process.json",
+      "bytes": 1392,
+      "sha256": "38568f547dbf37749d1163f849e653e36f9bd45221354ea778b942a9a6c55b15"
+    },
+    {
+      "path": "run/commands/041-jsonl-budgets.log",
+      "bytes": 250,
+      "sha256": "3d8bf3111ed628d3e4fd37e5a406ec3a415ff79630b8506f91fe81923e1ff5a2"
+    },
+    {
+      "path": "run/commands/042-jsonl-firewall-process.json",
+      "bytes": 1407,
+      "sha256": "11b620ac9a35b92159f686ea62c9e01a3ad2094887a0367cfa17dcf8e9d1d918"
+    },
+    {
+      "path": "run/commands/042-jsonl-firewall.log",
+      "bytes": 1111,
+      "sha256": "c11e5166ccc052793fdb35ca2afb7f5235a8995291679e8cfdd99f255a8a6d0d"
+    },
+    {
+      "path": "run/commands/043-jsonl-tools-init-process.json",
+      "bytes": 1363,
+      "sha256": "486a9fe0459c93f245531418418ed199b9db1380e1c25f527a4b3038eac001b3"
+    },
+    {
+      "path": "run/commands/043-jsonl-tools-init.log",
+      "bytes": 247,
+      "sha256": "ad514d63d07a8529f1eda91ba465073df2672d583b28e429120aa0f3f46addb6"
+    },
+    {
+      "path": "run/commands/044-jsonl-tools-sign-process.json",
+      "bytes": 1377,
+      "sha256": "73c87eee4305318691b27e1041ef63de69e43b0a1d034672e360706b614adcfa"
+    },
+    {
+      "path": "run/commands/044-jsonl-tools-sign.log",
+      "bytes": 266,
+      "sha256": "d5478d36d7c085b5053b990baa08b1170937e46afc577ecc976188217da349dc"
+    },
+    {
+      "path": "run/commands/045-jsonl-tools-verify-process.json",
+      "bytes": 1367,
+      "sha256": "e885c44931cbdf2d3e9460d54696d70a3d6a12adab22926cfcb1244e4247cccf"
+    },
+    {
+      "path": "run/commands/045-jsonl-tools-verify.log",
+      "bytes": 139,
+      "sha256": "46d79ddc6719a6c5737a60e7b38fe73d1affc40e12e4610a9536e213a0aec5df"
+    },
+    {
+      "path": "run/commands/046-jsonl-capture-process.json",
+      "bytes": 1664,
+      "sha256": "5c478845e23b761aa34709304949f874dd20e733fea6c7e40cfff68ac21d2b9a"
+    },
+    {
+      "path": "run/commands/046-jsonl-capture.log",
+      "bytes": 149,
+      "sha256": "622631077ab743f373ccf8ccaeb698d2da2e32f1fd0912bd59d2f08dbad98746"
+    },
+    {
+      "path": "run/receipts/installed-package-lock.json",
+      "bytes": 82991,
+      "sha256": "85a5a28505a14770df49386cdb2a315023b4451fdaec484208c64ba662001957"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/input.json",
+      "bytes": 1078,
+      "sha256": "b2df0c218fa2e1da2dad3143c3cd83eb786f7cd797475e2bb3b90b77bd504867"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/provider-request-0.json",
+      "bytes": 702,
+      "sha256": "7eaa29ade1f904d444feb13615860206a17e32e6b647a1ee69222b5273232357"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/provider-request-1.json",
+      "bytes": 7919,
+      "sha256": "a03abf95a1a5180a398212bcd298a71aa84458604ac757eea9b3ee4ed0fb1767"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/provider-response-0.sse",
+      "bytes": 1668,
+      "sha256": "ca8fe8b76d0b17eb555c75fba311a492a330a47a9806d4a1fe6aa0ca92e8ce72"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/provider-response-1.sse",
+      "bytes": 2055,
+      "sha256": "6bf41fae81c0db8e79cabd246cf0dfc742a752eba4140a24aee348f350ca7da3"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/scripted-provider-failed.json",
+      "bytes": 1389,
+      "sha256": "cc8429a0a7b4b571c22264a200cd39f6f9341bf35ed8d12b26ad7eadb035ff05"
+    },
+    {
+      "path": "run/receipts/jsonl-capture/worker-receipt.json",
+      "bytes": 12302,
+      "sha256": "f17595f74d235e61196296cce0fb0904ca3c6cec11bd6ae30d8f682e45c47488"
+    },
+    {
+      "path": "run/receipts/receipt.json",
+      "bytes": 323019,
+      "sha256": "c3a0f9b93cc6289da0afcb16d84de017b28dccce7511441228d60e39af2384e3"
+    },
+    {
+      "path": "run/receipts/sqlite-api-ranges/complete-api-input-events.json",
+      "bytes": 97476,
+      "sha256": "181db8392f5c3ba4d5c41db5b514d16c401806c7636fa49944ed2cf35bc4b905"
+    },
+    {
+      "path": "run/receipts/sqlite-api-ranges/input.json",
+      "bytes": 2986,
+      "sha256": "29e1bd653d5cf573f5aeb4a88cf053ed71705fe61ed9f87b89a7dce0399ac6b1"
+    },
+    {
+      "path": "run/receipts/sqlite-api-ranges/ranges.json",
+      "bytes": 274395,
+      "sha256": "8bc35f097ec98ce8da923a5c8274bf8b584c1204788720818ce8fb691622fa48"
+    },
+    {
+      "path": "run/receipts/sqlite-api-ranges/refused-bounds.json",
+      "bytes": 5929,
+      "sha256": "c8bb4242d5d4f56bc3ee88a09117711dffc44e06e7367dd52af607fd2938c176"
+    },
+    {
+      "path": "run/receipts/sqlite-api-ranges/worker-receipt.json",
+      "bytes": 3122,
+      "sha256": "77cd6ea1a82e55a1bcb6da372b08fa0cc0ceb207cfcf50d5629adcb773f1b7e0"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/complete-sqlite-events.json",
+      "bytes": 97476,
+      "sha256": "181db8392f5c3ba4d5c41db5b514d16c401806c7636fa49944ed2cf35bc4b905"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/input.json",
+      "bytes": 1081,
+      "sha256": "74285d0bed5a1b4d62e57af0326187378bf889607dd974cb7caccdc41c1855ae"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-request-0.json",
+      "bytes": 702,
+      "sha256": "7eaa29ade1f904d444feb13615860206a17e32e6b647a1ee69222b5273232357"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-request-1.json",
+      "bytes": 7919,
+      "sha256": "c4e378fd9b37a52bcf946d92e4c4cec5cf5fb9051f25a48df55b4e7646ac63fe"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-request-2.json",
+      "bytes": 702,
+      "sha256": "8bd7162be3c3ddef2681e3621b166f008b3304e9051f7e5fa2b13eb72f03840b"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-request-3.json",
+      "bytes": 7919,
+      "sha256": "39e96a875011ad389cbdd9f8a50291dac6586bfed8d824cd49da8d2e1daca063"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-response-0.sse",
+      "bytes": 1668,
+      "sha256": "ca8fe8b76d0b17eb555c75fba311a492a330a47a9806d4a1fe6aa0ca92e8ce72"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-response-1.sse",
+      "bytes": 2055,
+      "sha256": "6bf41fae81c0db8e79cabd246cf0dfc742a752eba4140a24aee348f350ca7da3"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-response-2.sse",
+      "bytes": 1668,
+      "sha256": "ca98e0e0b07ff5ba9a7076293130070da51d0c3448148613cd362a11b3bbe4ab"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/provider-response-3.sse",
+      "bytes": 2055,
+      "sha256": "af9596b3de4bb14323d7cdd03e200aa61f5d9a9db9df91e104126e76058b6612"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/scripted-provider.json",
+      "bytes": 2841,
+      "sha256": "161e66ec010653069a46e12f3757f4f9f6c683e29e87eb4b94aeecb8fe403b2a"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/signed-origins.json",
+      "bytes": 14827,
+      "sha256": "85dc48922d907ab0357f2c1cb32015ebe3f70f13a735b83603304cacd396c838"
+    },
+    {
+      "path": "run/receipts/sqlite-capture/worker-receipt.json",
+      "bytes": 22277,
+      "sha256": "c46fd3a3ac81f21b86c9900525fa57b7c4e4865c184e6654eae45ffe4022862a"
+    },
+    {
+      "path": "run/receipts/sqlite-erase-audit/input.json",
+      "bytes": 1105,
+      "sha256": "a5ddcd7f35a96a26ca5bbe5dcfec2c98990d584cb4a16475f5c224ab7abfea79"
+    },
+    {
+      "path": "run/receipts/sqlite-erase-audit/operation-audit-rows.json",
+      "bytes": 5499,
+      "sha256": "75e1035efe1398b6227a15237d36a27b31423cbae18f2cdedaf6a031e6cf167b"
+    },
+    {
+      "path": "run/receipts/sqlite-erase-audit/worker-receipt.json",
+      "bytes": 2222,
+      "sha256": "6883ea16f8834038e895cfc90dd8001d81edea47a2f7d5c4fbc3d424712c837a"
+    },
+    {
+      "path": "run/sqlite/ciphertext-before.json",
+      "bytes": 907,
+      "sha256": "07047d1b5547747f364d5066b13e214d020e495fd93a312f7ac1882f9d295bff"
+    },
+    {
+      "path": "run/sqlite/erase-approval-retained.json",
+      "bytes": 569,
+      "sha256": "d9519f1e73eaec09fde0a95103a0a6663a04f61c18e7dafb4be430427e22eb6b"
+    },
+    {
+      "path": "run/sqlite/erase-approval.json",
+      "bytes": 569,
+      "sha256": "d9519f1e73eaec09fde0a95103a0a6663a04f61c18e7dafb4be430427e22eb6b"
+    },
+    {
+      "path": "run/sqlite/erase-review-request.json",
+      "bytes": 6230,
+      "sha256": "f7f7866a1dc7eb1eb685b83bf364e6cff51429c74acc993cc76e7e1196f00e43"
+    },
+    {
+      "path": "run/sqlite/originals/missing-0.blob.receipt.json",
+      "bytes": 493,
+      "sha256": "ee49f95021d50c1aa93d61073641bc7eacb174f932de98b3786ccbcf28131b25"
+    },
+    {
+      "path": "run/sqlite/originals/missing-1.blob.receipt.json",
+      "bytes": 493,
+      "sha256": "4ecb6d3c20a148a2b8074cff9c40971ee8b05c7859d1709a10867d4061463788"
+    },
+    {
+      "path": "run/sqlite/originals/selected-original.blob.receipt.json",
+      "bytes": 501,
+      "sha256": "2187b7b8947a15a0b2d63c7828fae24235105b13715812bef41e0c09ac9eacfc"
+    },
+    {
+      "path": "run/sqlite/originals/tampered-observed.blob.receipt.json",
+      "bytes": 501,
+      "sha256": "e762903dc23275b8021f15782bc86c60a6136ff7105403ac4dd834e500b1a1be"
+    },
+    {
+      "path": "run/sqlite/separate-erasure-review.json",
+      "bytes": 688,
+      "sha256": "bc91512d322f7fe6f8d1b24aea4f8399404a21519184bde96389ea2a3ab4d480"
+    },
+    {
+      "path": "run/sqlite/tamper-mutation.json",
+      "bytes": 453,
+      "sha256": "16d98ec67e7539b83adcaa552a12bffc9f1fdf09da536deb9decd3157795c4b0"
+    },
+    {
+      "path": "run/sqlite/tamper-reset.json",
+      "bytes": 135,
+      "sha256": "10d34d0eb775b515a95a3129aaaeeb0ef6d5cc1d1b297894102ff2a129f6d18e"
+    },
+    {
+      "path": "run/sqlite/transport-fingerprints.json",
+      "bytes": 389,
+      "sha256": "e8e60506de21e6491c2bf2b7eef835d99f0ad3483a86d06bb29a209192a8905e"
+    },
+    {
+      "path": "startup.json",
+      "bytes": 564,
+      "sha256": "c2033a30e24b17a7354983e833a959d687b9ef07c10feed3535c0c51262f713a"
+    }
+  ],
+  "pendingUpdates": [
+    {
+      "flag": "LINEAR-PENDING",
+      "issue": "AMC-1547",
+      "targetState": "In Progress",
+      "body": "Attempt-02 source a598/helper446 on Darwin ARM64 Node22.22.0: SQLite lifecycle groups passed; JSONL second session refused. Aggregate unqualified; both supervisors observed closure. Receipt attempt-02/disposition.json. No closure or full qualification claimed."
+    },
+    {
+      "flag": "LINEAR-PENDING",
+      "issue": "AMC-1505",
+      "body": "Actual installed-spill continuation and docs77912a55 committed. Live child tally cannot be refreshed: discovery exposes no Linear actions. User reports approved earlier AMC-1547 comment; do not duplicate, read back when tool returns."
+    },
+    {
+      "flag": "OBSIDIAN-PENDING",
+      "target": "/Users/sid/Documents/AMC",
+      "body": "Evidence/current update pending because bridge explicitly refused vault outside approved root. Before later material rewrite checkpoint Home/Now/Roadmap. No local vault changes claimed."
+    }
+  ]
+}

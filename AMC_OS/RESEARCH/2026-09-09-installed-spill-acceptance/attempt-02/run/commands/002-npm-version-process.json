@@ -1,0 +1,45 @@
+{
+  "label": "002-npm-version",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+    "--version"
+  ],
+  "startedAt": "2026-09-09T15:38:43.428364+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      50209,
+      501,
+      "Wed Sep 9 21:08:43 2026"
+    ],
+    "rootReaped": true,
+    "observations": 7,
+    "ownedProcesses": [
+      {
+        "pid": 50209,
+        "ppid": 50193,
+        "pgid": 50209,
+        "uid": 501,
+        "started": "Wed Sep 9 21:08:43 2026",
+        "firstObservedAt": "2026-09-09T15:38:43.448044+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      50209
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 0.603623667,
+  "endedAt": "2026-09-09T15:38:44.031993+00:00"
+}

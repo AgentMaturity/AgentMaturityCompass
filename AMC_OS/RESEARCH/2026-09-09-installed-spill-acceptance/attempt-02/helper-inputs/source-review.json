@@ -77,24 +77,5 @@
         "reason": "Vault outside approved bridge root; read refused. No access-boundary bypass and no overwrite."
       }
     ]
-  },
-  "correctedAttempt03Review": {
-    "observedAt": "2026-09-09T15:44:54.056008+00:00",
-    "reviewer": "sole execution agent; same-agent source review",
-    "priorAttemptReceiptSha256": "c3a0f9b93cc6289da0afcb16d84de017b28dccce7511441228d60e39af2384e3",
-    "priorAttempt": "attempt-02/disposition.json",
-    "files": {
-      "native-case.mjs": "4ac714202b0925e25e9cad4db339acbc2528cfdd95c32ac6b73ffb1214d4dd1d",
-      "run.py": "8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0",
-      "README.md": "5effbaa70ac50cfeda2d0eccaaab2dadffcc73bae12e64f83c9ff4c874ae91a9"
-    },
-    "change": "Sequential real installed ACP client lifetimes; close A before opening B. Both actual sessions remain in the same selected-backend workspace. No runtime lock/accounting change.",
-    "sourceContract": "src/persistence/jsonl/jsonlSessionEventStore.ts concurrentWriters:false and src/agent/agentSession.ts close closes SessionService",
-    "executionSelection": [
-      "jsonl"
-    ],
-    "notRepeated": "SQLite attempt-02 lane",
-    "qualified": false,
-    "reason": "awaiting distinct corrected installed attempt-03; known missing public JSONL history loader remains blocking"
   }
 }

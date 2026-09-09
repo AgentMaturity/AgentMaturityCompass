@@ -1,0 +1,25 @@
+{
+  "sessionId": "51c486fa-9367-491f-8ad1-16a418293fc6",
+  "ok": true,
+  "ledgerOk": true,
+  "ledgerErrors": [],
+  "sessionChainErrors": [],
+  "unsignedRowIds": [],
+  "requests": [
+    {
+      "headerEventId": "ea8097e8-3dbd-42d4-9e29-5a2975a006e4",
+      "status": "reconstructed",
+      "detail": null
+    },
+    {
+      "headerEventId": "29021536-a9ac-425c-b135-61e697265ab2",
+      "status": "reconstructed",
+      "detail": null
+    }
+  ],
+  "trustRoot": {
+    "anchored": true,
+    "monitorFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+    "expectedFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d"
+  }
+}

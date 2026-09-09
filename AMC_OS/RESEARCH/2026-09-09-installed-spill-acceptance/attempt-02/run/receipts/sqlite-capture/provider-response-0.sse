@@ -1,0 +1,18 @@
+event: response.created
+data: {"type":"response.created","response":{"id":"owned_response_0"},"sequence_number":0}
+
+event: response.output_item.added
+data: {"type":"response.output_item.added","output_index":0,"item":{"type":"function_call","id":"owned_fc_0","call_id":"owned_read_0","name":"amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs","arguments":"","status":"in_progress"},"sequence_number":1}
+
+event: response.function_call_arguments.delta
+data: {"type":"response.function_call_arguments.delta","output_index":0,"item_id":"owned_fc_0","delta":"{\"path\":\"workspace/allowed/A.txt\",\"maxBytes\":400000}","sequence_number":2}
+
+event: response.function_call_arguments.done
+data: {"type":"response.function_call_arguments.done","output_index":0,"item_id":"owned_fc_0","arguments":"{\"path\":\"workspace/allowed/A.txt\",\"maxBytes\":400000}","sequence_number":3}
+
+event: response.output_item.done
+data: {"type":"response.output_item.done","output_index":0,"item":{"type":"function_call","id":"owned_fc_0","call_id":"owned_read_0","name":"amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs","arguments":"{\"path\":\"workspace/allowed/A.txt\",\"maxBytes\":400000}","status":"completed"},"sequence_number":4}
+
+event: response.completed
+data: {"type":"response.completed","response":{"id":"owned_response_0","status":"completed","output":[{"type":"function_call","id":"owned_fc_0","call_id":"owned_read_0","name":"amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs","arguments":"{\"path\":\"workspace/allowed/A.txt\",\"maxBytes\":400000}","status":"completed"}],"usage":{"input_tokens":40,"output_tokens":12,"total_tokens":52}},"sequence_number":5}
+

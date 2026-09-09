@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "command": "erase",
+  "ok": false,
+  "status": "refused",
+  "mutationAttempted": false,
+  "mutationState": "not-started",
+  "plaintextVerified": false,
+  "error": {
+    "code": "outside-scope-reference",
+    "message": "A selected object has signed origins outside the exact scope. Include every commitment/result reference or its exact session.",
+    "repair": "amc spill erase --workspace /existing/workspace --session EXACT_SESSION_ID --reason \"Reviewed local retention request\" --json",
+    "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
+    "eventIds": [
+      "11802639-dad8-4112-b9e3-56f0435630d8",
+      "3afba197-c8c0-43c8-875c-3d5df379eaad"
+    ],
+    "sessionIds": [
+      "af486e3f-e261-41f6-8668-eff2baa13937"
+    ],
+    "outsideScopeEventIds": [
+      "3afba197-c8c0-43c8-875c-3d5df379eaad"
+    ]
+  }
+}

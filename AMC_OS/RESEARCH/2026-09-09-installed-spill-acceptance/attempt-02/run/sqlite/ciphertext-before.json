@@ -1,0 +1,10 @@
+{
+  "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/spill/session-8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c/3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
+    "sha256": "8fc7df71f6d99f5bc563ee2e133c1fd81df847b6bed2d562ee30b18abf3497af"
+  },
+  "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace/.amc/spill/session-e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2/b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
+    "sha256": "34ba8df82a3e26e487007349be2080180b2fffe28547fbec3ef3d051fd327aab"
+  }
+}

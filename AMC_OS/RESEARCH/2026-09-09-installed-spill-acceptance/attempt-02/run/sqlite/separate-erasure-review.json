@@ -1,0 +1,14 @@
+{
+  "reviewedAt": "2026-09-09T15:40:18.327039+00:00",
+  "reviewer": "sole execution agent; separate source/plan review, not human approval",
+  "requestSha256": "f7f7866a1dc7eb1eb685b83bf364e6cff51429c74acc993cc76e7e1196f00e43",
+  "approvedPlanSha256": "9cb5ef7e7ff93a204ee2ee0f75f9021cc54398e2ba399f15a319c487d02524ff",
+  "selectedSession": "af486e3f-e261-41f6-8668-eff2baa13937",
+  "excludedSession": "51c486fa-9367-491f-8ad1-16a418293fc6",
+  "pairedOriginIds": [
+    "11802639-dad8-4112-b9e3-56f0435630d8",
+    "3afba197-c8c0-43c8-875c-3d5df379eaad"
+  ],
+  "scope": "A owned local spill only; B, transport and quarantined originals excluded",
+  "commandProcessesClosedAtReview": true
+}

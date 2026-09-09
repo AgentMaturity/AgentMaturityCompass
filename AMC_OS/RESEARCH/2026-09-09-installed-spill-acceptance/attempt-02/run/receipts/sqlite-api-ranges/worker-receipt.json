@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "mode": "ranges",
+  "backend": "sqlite",
+  "classification": "actual-installed-public-interface-with-scripted-loopback-provider",
+  "qualityClaim": false,
+  "modelInferencePerformed": false,
+  "tokenUsage": "synthetic-protocol-fixture-input-not-measured",
+  "syntheticWireUsage": {
+    "input_tokens": 40,
+    "output_tokens": 12,
+    "total_tokens": 52
+  },
+  "verdict": "passed",
+  "checks": [
+    {
+      "name": "public byte cap present",
+      "passed": true
+    },
+    {
+      "name": "A complete reassembled public API bytes",
+      "passed": true
+    },
+    {
+      "name": "A EOF is exact empty range",
+      "passed": true
+    },
+    {
+      "name": "A invalid bounds refused {\"offset\":-1,\"limit\":1}",
+      "passed": true
+    },
+    {
+      "name": "A invalid bounds refused {\"offset\":0,\"limit\":0}",
+      "passed": true
+    },
+    {
+      "name": "A invalid bounds refused {\"offset\":0,\"limit\":16385}",
+      "passed": true
+    },
+    {
+      "name": "A invalid bounds refused {\"offset\":98305,\"limit\":1}",
+      "passed": true
+    },
+    {
+      "name": "B complete reassembled public API bytes",
+      "passed": true
+    },
+    {
+      "name": "B EOF is exact empty range",
+      "passed": true
+    },
+    {
+      "name": "B invalid bounds refused {\"offset\":-1,\"limit\":1}",
+      "passed": true
+    },
+    {
+      "name": "B invalid bounds refused {\"offset\":0,\"limit\":0}",
+      "passed": true
+    },
+    {
+      "name": "B invalid bounds refused {\"offset\":0,\"limit\":16385}",
+      "passed": true
+    },
+    {
+      "name": "B invalid bounds refused {\"offset\":98305,\"limit\":1}",
+      "passed": true
+    }
+  ],
+  "subjects": [],
+  "errors": [],
+  "blockers": [],
+  "trustBoundary": "same-workspace pre-run key consistency, not independent external anchoring",
+  "node": {
+    "version": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
+  },
+  "cli": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
+  },
+  "publicExports": {
+    "agent-maturity-compass": {
+      "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+      "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
+    }
+  },
+  "cleanup": {
+    "sdkClosed": true,
+    "endpointClosed": true,
+    "processGroupClosure": "external-supervisor-required"
+  },
+  "startedAt": "2026-09-09T15:39:18.953Z",
+  "signedEvidence": null,
+  "ciphertextEvidence": null,
+  "rangeEvidence": {
+    "status": "exact-bytes-checked",
+    "pages": "ranges.json",
+    "refusals": "refused-bounds.json",
+    "boundary": "Each bounded API response decrypts/verifies the complete selected object; this is not streaming I/O."
+  },
+  "finishedAt": "2026-09-09T15:39:19.674Z"
+}

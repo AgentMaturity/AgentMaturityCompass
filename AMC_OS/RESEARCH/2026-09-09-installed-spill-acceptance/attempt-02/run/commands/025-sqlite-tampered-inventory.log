@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "command": "inventory",
+  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+  "backend": "sqlite",
+  "plaintextVerified": false,
+  "inspection": {
+    "phase": "read-only",
+    "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+    "backend": "sqlite",
+    "eventCount": 58,
+    "historySha256": "9a025e5b32f10927185a802a4ff6d3f54695a5f5c8ecb821ca3b87a375abef8e",
+    "historyRead": "all-available-selected-store-events",
+    "chainVerification": "not-performed",
+    "eventAuthentication": "individual-rows-only",
+    "referenceVerification": "failed-or-incomplete",
+    "monitorTrust": {
+      "anchored": true,
+      "monitorFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+      "expectedFingerprint": "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+      "assurance": "out-of-band-pin-matched"
+    },
+    "contentVerification": "not-decrypted",
+    "plaintextVerified": false,
+    "retainedOutputComplete": false,
+    "entries": [
+      {
+        "locator": "amc-spill:v2:8f5ea55897b6682f430656160638787ef82d65b29ebbf059a7cac5da546a368c:3685ae9928f75b7af05d6d00e3d5dc0c-owned_read_0",
+        "eventIds": [
+          "11802639-dad8-4112-b9e3-56f0435630d8",
+          "3afba197-c8c0-43c8-875c-3d5df379eaad"
+        ],
+        "sessionIds": [
+          "af486e3f-e261-41f6-8668-eff2baa13937"
+        ],
+        "status": "tampered",
+        "referenceVersion": 2,
+        "detail": "Object integrity or path safety failed; do not treat this entry as verified."
+      },
+      {
+        "locator": "amc-spill:v2:e62a9c1436243a8dd1713f2776600baaeec1a3b8965871e9c3932f611c43ddf2:b7d79226ce359dfcbcbc265aa99cbf3c-owned_read_2",
+        "eventIds": [
+          "5b6ccb11-f474-4529-9c13-076556767c6b",
+          "e5652d7e-05eb-40da-a9a4-b343d8fa345b"
+        ],
+        "sessionIds": [
+          "51c486fa-9367-491f-8ad1-16a418293fc6"
+        ],
+        "status": "retained",
+        "referenceVersion": 2,
+        "detail": "Signed ciphertext framing and digest checked; plaintext and key availability unknown."
+      }
+    ],
+    "errors": [
+      {
+        "code": "reference-authentication-or-object-integrity-failed",
+        "eventIds": [],
+        "detail": "Native inventory refused this evidence or object. Raw metadata/error text is suppressed."
+      }
+    ]
+  },
+  "ok": false,
+  "status": "failed",
+  "mutationAttempted": false
+}

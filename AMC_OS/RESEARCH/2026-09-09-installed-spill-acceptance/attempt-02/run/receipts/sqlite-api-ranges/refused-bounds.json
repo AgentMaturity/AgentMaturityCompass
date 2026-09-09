@@ -1,0 +1,98 @@
+[
+  {
+    "subject": "A",
+    "invalid": {
+      "offset": -1,
+      "limit": 1
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill offset must be a nonnegative safe integer.",
+      "stack": "Error: Spill offset must be a nonnegative safe integer.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:17:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "A",
+    "invalid": {
+      "offset": 0,
+      "limit": 0
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill limit must be an integer from 1 to 16384 bytes.",
+      "stack": "Error: Spill limit must be an integer from 1 to 16384 bytes.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:19:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "A",
+    "invalid": {
+      "offset": 0,
+      "limit": 16385
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill limit must be an integer from 1 to 16384 bytes.",
+      "stack": "Error: Spill limit must be an integer from 1 to 16384 bytes.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:19:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "A",
+    "invalid": {
+      "offset": 98305,
+      "limit": 1
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill offset exceeds the committed output size (98304 bytes).",
+      "stack": "Error: Spill offset exceeds the committed output size (98304 bytes).\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:35:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "B",
+    "invalid": {
+      "offset": -1,
+      "limit": 1
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill offset must be a nonnegative safe integer.",
+      "stack": "Error: Spill offset must be a nonnegative safe integer.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:17:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "B",
+    "invalid": {
+      "offset": 0,
+      "limit": 0
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill limit must be an integer from 1 to 16384 bytes.",
+      "stack": "Error: Spill limit must be an integer from 1 to 16384 bytes.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:19:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "B",
+    "invalid": {
+      "offset": 0,
+      "limit": 16385
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill limit must be an integer from 1 to 16384 bytes.",
+      "stack": "Error: Spill limit must be an integer from 1 to 16384 bytes.\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:19:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  },
+  {
+    "subject": "B",
+    "invalid": {
+      "offset": 98305,
+      "limit": 1
+    },
+    "failure": {
+      "name": "Error",
+      "message": "Spill offset exceeds the committed output size (98304 bytes).",
+      "stack": "Error: Spill offset exceeds the committed output size (98304 bytes).\n    at readSessionSpillRange (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/session/spill/spillRead.js:35:15)\n    at ranges (file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:328:13)\n    at async file:///Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs:360:37"
+    }
+  }
+]

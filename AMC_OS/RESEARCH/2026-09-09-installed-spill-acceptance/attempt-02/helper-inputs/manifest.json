@@ -1,0 +1,26 @@
+[
+  {
+    "path": "helper-inputs/native-case.mjs",
+    "sha256": "b666026f9aa3ece8d806d8aa5288225ec302373b707cdc07e578f768079e44ec",
+    "bytes": 25286,
+    "origin": "actual consumer copy"
+  },
+  {
+    "path": "helper-inputs/run.py",
+    "sha256": "8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0",
+    "bytes": 44137,
+    "origin": "git object at helper commit 446087ca8510c27e83c2465bab9946634a88724b"
+  },
+  {
+    "path": "helper-inputs/README.md",
+    "sha256": "e8fb9164c526ba0dd7ccaab68c8f99c619c5bdf9cd7280c7143def5d01a23a26",
+    "bytes": 18491,
+    "origin": "git object at helper commit 446087ca8510c27e83c2465bab9946634a88724b"
+  },
+  {
+    "path": "helper-inputs/source-review.json",
+    "sha256": "d6f10ec2c07a1b8a3069795e31a31079534bde1d87551d27f4e2f000cc33ad1f",
+    "bytes": 4950,
+    "origin": "git object at helper commit 446087ca8510c27e83c2465bab9946634a88724b"
+  }
+]

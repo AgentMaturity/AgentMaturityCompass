@@ -1,0 +1,14 @@
+{
+  "config": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json",
+  "configSha256": "c332640791f9c4711e3ca37e5e92576b36321d7fb484af6a39ac808999b9b3f0",
+  "python": {
+    "path": "/Library/Developer/CommandLineTools/usr/bin/python3",
+    "version": "3.9.6",
+    "sha256": "bdea59019a38eb6600cc9e71e984a97fedadc406448431281e7657030f54987e"
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "status": "inputs-prepared-no-installed-acceptance",
+  "helperCommit": "446087ca8510c27e83c2465bab9946634a88724b",
+  "preparedAt": "2026-09-09T15:34:12.776648+00:00",
+  "runtimeSource": "a5987643ef6c26b01f687226fbc6a6709fc182cb"
+}

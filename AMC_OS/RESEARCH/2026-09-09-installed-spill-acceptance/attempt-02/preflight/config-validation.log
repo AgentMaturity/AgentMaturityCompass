@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py", line 134, in validate
+    plain(root.parent, directory=True, private=True)
+  File "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py", line 59, in plain
+    require(info.st_uid == os.getuid() and info.st_mode & 0o077 == 0,
+  File "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py", line 34, in require
+    raise RuntimeError(message)
+RuntimeError: Expected a private caller-owned path: /Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02

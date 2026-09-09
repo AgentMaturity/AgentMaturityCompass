@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "nonce": "c57bf79372554d148bc1aa913fb8a3de",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "backend": "sqlite",
+  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+  "sessionId": "af486e3f-e261-41f6-8668-eff2baa13937",
+  "reason": "Owned installed-spill acceptance fixture only",
+  "planSha256": "9cb5ef7e7ff93a204ee2ee0f75f9021cc54398e2ba399f15a319c487d02524ff",
+  "decision": "apply-owned-fixture-only",
+  "statement": "I reviewed this exact owned-fixture erasure plan."
+}

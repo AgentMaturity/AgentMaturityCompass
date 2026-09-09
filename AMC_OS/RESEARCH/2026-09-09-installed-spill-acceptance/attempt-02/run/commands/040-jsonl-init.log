@@ -1,0 +1,17 @@
+
+  Agent Maturity Compass
+  Evidence over claims.
+
+  ✓ Workspace initialized
+  → Location: /Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace
+
+  ━━━ What's next ━━━
+
+  1. amc — Generate the full evidence score immediately
+  2. amc config profile dev — Re-apply the selected workspace config profile
+  3. amc setup --demo — Load demo data and explore all features
+  4. amc doctor — Check what's available in your environment
+  5. amc up — Start Studio (web dashboard)
+
+  Full guide: https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/GETTING_STARTED.md
+

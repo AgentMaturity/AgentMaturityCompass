@@ -18,23 +18,6 @@ helper pins and a fresh consumer, with the original failed attempt retained.
 
 ## Status and scope
 
-The separately retained `attempt-02/disposition.json` records an actual
-corrected-usage installed run: its SQLite groups passed, but aggregate
-qualification is false because JSONL's second `session/new` was refused after
-the first fixture completed. The worker held the first writer open. Source
-`src/persistence/jsonl/jsonlSessionEventStore.ts` explicitly declares
-`concurrentWriters: false`; the SDK's generic refusal did not retain the
-internal reason, so the lock diagnosis is a source-backed inference rather
-than a captured error message.
-
-The next helper revision uses a separate, sequential installed ACP client
-lifetime per fixture and closes it before opening the next writer. It does not
-relax the lock, usage accounting, evidence requirements or public import
-boundary. The next distinct attempt selects JSONL only rather than repeating
-attempt 02's completed SQLite lane. Until that new receipt exists, this is a
-source correction, not JSONL qualification. The public JSONL loader gap below
-continues to be explicitly blocked/nonzero.
-
 This directory contains source preparation for AMC-1547, pinned to
 `a5987643ef6c26b01f687226fbc6a6709fc182cb`. The helper was authored and text-reviewed;
 the initial authoring checkpoint did not assert execution. A later execution must have its

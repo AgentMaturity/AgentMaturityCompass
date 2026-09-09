@@ -1,0 +1,58 @@
+{
+  "label": "034-sqlite-stale-plan",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "spill",
+    "erase",
+    "--workspace",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/sqlite/workspace",
+    "--expect-monitor",
+    "7f3af702e029d3cee4468b300a91aa726616360bce94f0ff9c79f6ecfe2f574d",
+    "--json",
+    "--session",
+    "af486e3f-e261-41f6-8668-eff2baa13937",
+    "--reason",
+    "Owned installed-spill acceptance fixture only changed",
+    "--apply",
+    "--expect-plan",
+    "9cb5ef7e7ff93a204ee2ee0f75f9021cc54398e2ba399f15a319c487d02524ff"
+  ],
+  "startedAt": "2026-09-09T15:39:33.925837+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 1,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      51221,
+      501,
+      "Wed Sep 9 21:09:33 2026"
+    ],
+    "rootReaped": true,
+    "observations": 10,
+    "ownedProcesses": [
+      {
+        "pid": 51221,
+        "ppid": 50193,
+        "pgid": 51221,
+        "uid": 501,
+        "started": "Wed Sep 9 21:09:33 2026",
+        "firstObservedAt": "2026-09-09T15:39:33.948384+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      51221
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 1.2025496669999995,
+  "endedAt": "2026-09-09T15:39:35.128395+00:00"
+}

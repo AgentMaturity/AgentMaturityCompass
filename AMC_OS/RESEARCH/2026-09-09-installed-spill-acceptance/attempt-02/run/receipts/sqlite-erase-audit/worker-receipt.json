@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "mode": "audit",
+  "backend": "sqlite",
+  "classification": "actual-installed-public-interface-with-scripted-loopback-provider",
+  "qualityClaim": false,
+  "modelInferencePerformed": false,
+  "tokenUsage": "synthetic-protocol-fixture-input-not-measured",
+  "syntheticWireUsage": {
+    "input_tokens": 40,
+    "output_tokens": 12,
+    "total_tokens": 52
+  },
+  "verdict": "passed",
+  "checks": [
+    {
+      "name": "exact native operation audit records exist",
+      "passed": true
+    },
+    {
+      "name": "operation signature bytes present",
+      "passed": true
+    },
+    {
+      "name": "intent row precedes finished row",
+      "passed": true
+    }
+  ],
+  "subjects": [],
+  "errors": [],
+  "blockers": [],
+  "trustBoundary": "same-workspace pre-run key consistency, not independent external anchoring",
+  "node": {
+    "version": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
+  },
+  "cli": {
+    "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+    "sha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b"
+  },
+  "publicExports": {
+    "agent-maturity-compass": {
+      "resolved": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/index.js",
+      "sha256": "71fd011afca17c6074a56ca2f2aaa35fff2981c0118ef088712fc87d9a5c99f0"
+    }
+  },
+  "cleanup": {
+    "sdkClosed": true,
+    "endpointClosed": true,
+    "processGroupClosure": "external-supervisor-required"
+  },
+  "startedAt": "2026-09-09T15:40:20.256Z",
+  "signedEvidence": {
+    "status": "signature-bytes-and-native-identifiers-observed",
+    "records": "operation-audit-rows.json",
+    "cryptographicVerificationAfterErasure": "not-performed",
+    "boundary": "Presence is not an independent signature/whole-log-verification result. The prior cold session verifier is a separate receipt."
+  },
+  "ciphertextEvidence": null,
+  "rangeEvidence": null,
+  "finishedAt": "2026-09-09T15:40:20.890Z"
+}

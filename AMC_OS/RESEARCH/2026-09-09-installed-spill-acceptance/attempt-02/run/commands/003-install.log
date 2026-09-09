@@ -1,0 +1,11 @@
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+
+> better-sqlite3@12.11.1 install
+> prebuild-install || node-gyp rebuild --release
+
+
+> agent-maturity-compass@1.2.0 postinstall
+> node scripts/postinstall.js || true
+
+
+added 170 packages in 10s

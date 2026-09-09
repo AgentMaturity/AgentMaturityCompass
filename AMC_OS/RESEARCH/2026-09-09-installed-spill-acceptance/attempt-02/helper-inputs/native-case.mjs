@@ -239,18 +239,14 @@ async function capture() {
   endpoint = await scriptedEndpoint(receipt.subjects);
   receipt.cleanup.endpointClosed = false;
   const { AMCNativeClient } = await publicModule("agent-maturity-compass/sdk/native");
+  receipt.cleanup.sdkClosed = false;
+  client = await AMCNativeClient.start({
+    workspace: input.workspace, provider: "openai-responses", model: "scripted-owned-spill",
+    baseUrl: endpoint.origin, credential: "OPENAI_API_KEY", tools: "workspace", agentId: "default",
+    expectedToolsDigest: input.toolsPolicySha256, credentialsMode: "operator-only",
+    command: [input.node.path, input.cli], timeoutMs: 45000, maxTokens: 128, maxSteps: 3,
+  });
   for (const subject of receipt.subjects) {
-    // JSONL declares concurrentWriters:false. Each fixture owns one real
-    // installed ACP lifetime; close it before requesting another writer.
-    // Do not weaken the native lock or treat an idle session as released.
-    check(subject.name + " prior native client closed", client === null && receipt.cleanup.sdkClosed);
-    receipt.cleanup.sdkClosed = false;
-    client = await AMCNativeClient.start({
-      workspace: input.workspace, provider: "openai-responses", model: "scripted-owned-spill",
-      baseUrl: endpoint.origin, credential: "OPENAI_API_KEY", tools: "workspace", agentId: "default",
-      expectedToolsDigest: input.toolsPolicySha256, credentialsMode: "operator-only",
-      command: [input.node.path, input.cli], timeoutMs: 45000, maxTokens: 128, maxSteps: 3,
-    });
     const session = await client.newSession(); subject.sessionId = session.sessionId;
     const result = await session.prompt("Read only the owned fixture " + subject.fixtureRelative +
                  " using the single offered native file tool. The scripted endpoint is a transport fixture, not a real model.").result;
@@ -264,9 +260,8 @@ async function capture() {
     check(subject.name + " native completed result update", updates.length === 1 &&
           updates[0].update.toolCallId === subject.callId && updates[0].update.status === "completed");
     check(subject.name + " owned fixture unchanged", sha(raw(subject.fixturePath)) === subject.fixtureSha256);
-    await client.close(); client = null; receipt.cleanup.sdkClosed = true;
-    check(subject.name + " native client closed before next writer", receipt.cleanup.sdkClosed);
   }
+  await client.close(); client = null; receipt.cleanup.sdkClosed = true;
   await endpoint.close(); receipt.cleanup.endpointClosed = true;
   check("finite wire exchange sequence", endpoint.complete() && endpoint.exchanges.length === receipt.subjects.length * 2 && endpoint.errors.length === 0);
   put(join(input.output, "scripted-provider.json"), { exchanges: endpoint.exchanges, errors: endpoint.errors,

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-09T14:54:14.396147+00:00",
+  "integrationHead": "b9a8f39e09c146c2a9adb869443bc273308ce121",
+  "oldReceiptSha256": "8d7d7bb2a29fef7cd19c57830bfd53666da43251f255692252e718268fe0cd8c",
+  "priorQualified": false,
+  "priorAllObservedProcessesClosed": true,
+  "matchingOwnedIdentities": [],
+  "priorGroupMembers": [],
+  "attempt02ExistedBeforeClaim": false,
+  "scope": "receipt-owned process identities and prior owned groups only; no unrelated process termination",
+  "boundary": "startup observation, not acceptance"
+}

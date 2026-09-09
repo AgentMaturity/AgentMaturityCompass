@@ -1,0 +1,46 @@
+{
+  "label": "missing-opt-in-refused",
+  "command": [
+    "/Library/Developer/CommandLineTools/usr/bin/python3",
+    "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py",
+    "--config",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/config.json"
+  ],
+  "startedAt": "2026-09-09T15:35:05.139779+00:00",
+  "timeoutSeconds": 30,
+  "exitCode": 2,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      49991,
+      501,
+      "Wed Sep 9 21:05:05 2026"
+    ],
+    "rootReaped": true,
+    "observations": 7,
+    "ownedProcesses": [
+      {
+        "pid": 49991,
+        "ppid": 49957,
+        "pgid": 49991,
+        "uid": 501,
+        "started": "Wed Sep 9 21:05:05 2026",
+        "firstObservedAt": "2026-09-09T15:35:05.161806+00:00",
+        "via": "spawned-child"
+      }
+    ],
+    "ownedGroups": [
+      49991
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 0.5564797910000001,
+  "endedAt": "2026-09-09T15:35:05.696175+00:00"
+}

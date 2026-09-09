@@ -1,0 +1,54 @@
+{
+  "label": "010-sqlite-capture",
+  "command": [
+    "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/native-case.mjs",
+    "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/sqlite-capture/input.json"
+  ],
+  "startedAt": "2026-09-09T15:39:02.463026+00:00",
+  "timeoutSeconds": 120,
+  "exitCode": 0,
+  "timedOut": false,
+  "interrupted": false,
+  "cleanup": {
+    "confirmedClosed": true,
+    "scope": "observed-owned-descendant-identities-and-owned-groups",
+    "rootIdentity": [
+      50538,
+      501,
+      "Wed Sep 9 21:09:02 2026"
+    ],
+    "rootReaped": true,
+    "observations": 15,
+    "ownedProcesses": [
+      {
+        "pid": 50538,
+        "ppid": 50193,
+        "pgid": 50538,
+        "uid": 501,
+        "started": "Wed Sep 9 21:09:02 2026",
+        "firstObservedAt": "2026-09-09T15:39:02.485027+00:00",
+        "via": "spawned-child"
+      },
+      {
+        "pid": 50541,
+        "ppid": 50538,
+        "pgid": 50538,
+        "uid": 501,
+        "started": "Wed Sep 9 21:09:02 2026",
+        "firstObservedAt": "2026-09-09T15:39:02.710080+00:00",
+        "via": "observed-parent"
+      }
+    ],
+    "ownedGroups": [
+      50538
+    ],
+    "remainingOwned": [],
+    "ambiguousGroupMembers": [],
+    "signals": [],
+    "errors": [],
+    "trackingBoundary": "Sampled ancestry/live-group membership, not kernel containment. Unobserved daemon reparenting, same-second PID reuse and the final identity-check/signal race remain possible."
+  },
+  "elapsedSeconds": 2.343983542,
+  "endedAt": "2026-09-09T15:39:04.807024+00:00"
+}

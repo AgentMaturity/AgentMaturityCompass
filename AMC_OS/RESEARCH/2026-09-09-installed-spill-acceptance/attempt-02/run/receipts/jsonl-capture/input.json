@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "mode": "capture",
+  "source": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+  "ownedRoot": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run",
+  "workspace": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/jsonl/workspace",
+  "output": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/receipts/jsonl-capture",
+  "backend": "jsonl",
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "version": "v22.22.0"
+  },
+  "cli": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/run/consumer/node_modules/agent-maturity-compass/dist/cli.js",
+  "cliSha256": "d009af626174b806e283e78a80c654fbbbc16e8c9d3a521169917c256ab2fb4b",
+  "nodePlatform": "darwin",
+  "nodeArch": "arm64",
+  "monitorFingerprint": "25441e211645d8ce46b6d2e4582643d694c2d81aba7e0d3d28162129a627ce9b",
+  "toolsPolicySha256": "fbd0a18d3ee78e7a5599a628ea5188ad6bb4ba2a1b3649eab6b638402b345281"
+}
