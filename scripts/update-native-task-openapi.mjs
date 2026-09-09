@@ -21,9 +21,18 @@ function schema30(value) {
   }
   if (result.oneOf?.some(branch => branch.type === "null")) {
     const branches = result.oneOf.filter(branch => branch.type !== "null");
-    if (branches.length !== 1 || !branches[0].type) throw new Error("Unsupported nullable OpenAPI union");
-    delete result.oneOf;
-    Object.assign(result, branches[0], { nullable: true });
+    if (branches.length !== 1) throw new Error("Unsupported nullable OpenAPI union");
+    if (typeof branches[0].$ref === "string") {
+      // OpenAPI 3.0 ignores siblings of $ref, and nullable only applies to a
+      // type in the same schema. Keep the referenced constraints and represent
+      // null with a separate branch whose enum excludes every object value.
+      // https://spec.openapis.org/oas/v3.0.3.html#schema-object
+      result.oneOf = [branches[0], { type: "object", nullable: true, enum: [null] }];
+    } else {
+      if (!branches[0].type) throw new Error("Unsupported nullable OpenAPI union");
+      delete result.oneOf;
+      Object.assign(result, branches[0], { nullable: true });
+    }
   }
   return result;
 }

@@ -54,6 +54,15 @@ describe("full OpenAPI contract", () => {
     Object.entries(spec.components.schemas).filter(([name]) => name.startsWith("NativeTask"))
       .forEach(([, schema]) => inspect(schema));
     expect(spec.components.schemas.NativeTask.properties.sessionId).toMatchObject({ type: "string", nullable: true });
+    // Preserve the reference constraints; nullable next to a $ref would be
+    // ignored in 3.0, while a bare nullable object would admit invalid objects.
+    expect(spec.components.schemas.NativeTask.properties.validationSelection).toEqual({ oneOf: [
+      { $ref: "#/components/schemas/NativeTaskValidationSelection" },
+      { type: "object", nullable: true, enum: [null] }
+    ] });
+    expect(spec.components.schemas.NativeTaskValidationSelection).toMatchObject({
+      type: "object", additionalProperties: false, required: ["configSha256", "checkIds"]
+    });
     expect(spec.components.schemas.NativeTaskOptions.properties.providers.items.properties.credential)
       .toMatchObject({ type: "object", nullable: true });
     for (const contract of [spec, generateFullOpenApiSpec()]) {
