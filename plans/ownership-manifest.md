@@ -137,3 +137,35 @@ Root owns exact generated-count copy targets after reviewing the candidate diff:
 The Astra artifact reviewer has finished read-only review. Root serially owns `src/index.ts`, `src/sdk/nativeAgentClient.ts`, `docs/PACKAGE_API_REFERENCE.md` and `tests/publicDocsArtifact.test.ts` for its concrete findings: package comment attribution, navigable InitWorkspaceOptions, a public inline agentInfo type and a staged-reference entry link. Root owns API recovery `artifact-review.json` and the final validation clone/record paths under `/private/tmp/amc-phase-a-acceptance-20260909-*` and `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/` (runner, source/environment manifest, command logs/results, mutation diffs and README only). No worker is writing source. Root will finish these source fixes before final validation.
 
 Exact initial validation record paths: `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/source.json`, `runner.py`, `install.log`, `release-gate.log`, `release-gate.json`, `README.md`. Root also owns new Obsidian checkpoints `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Home candidate-generation checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Now candidate-generation checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Roadmap candidate-generation checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 MOC - Current Operations candidate-generation checkpoint.md`. All implementation workers are finished; acceptance will use a fresh committed clone and no root dependencies.
+
+## AMC-1538 cold cancellation acceptance preparation
+
+Astra delivery worker owns only new `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation/README.md`, `install.py`, `run.mjs`, `host-vm.py`, `vm-qualify.py`, `sdk-case.mjs` in that directory. Adapt the retained helpers into these new paths with a persistent exact guest root `/var/tmp/amc-native-validation-0fcce267-cancel`; preserve prior receipts. No tests, installs, VM actions, secrets, model execution or commits. Root is running the separate pinned-candidate release gate and owns all other records/source paths.
+
+Root owns `/Users/sid/Documents/AMC/Evidence/2026-09-09 Phase A Candidate Acceptance.md` to mirror the in-progress acceptance record without prematurely changing issue status.
+
+## Demonstrated full-suite failure corrections
+
+At candidate0fcce267 the structured full suite reports11842 passes,6 failures,0 pending. Root preserves the failed report and finishes the remaining gate steps without changing its clone. Astra trust worker owns only root `tests/studioNativeTaskService.test.ts` to correct a tamper fixture blocked by the existing SQLite immutable-field trigger; do not weaken production controls. Astra delivery worker owns only root `tests/anthropicCacheBreakpoints.test.ts` to reconcile the stale v2-writer expectation with actual v3 support and legacy reconstruction. Their cancellation helper preparation is finished; those helper paths return to root. Neither worker may run checks/tests/builds/commits. Root owns docs-generation and file-size follow-through, and will serialize commits after review.
+
+Root exact correction paths: `src/adapters/hookIntegration.ts`, new `src/adapters/managedHookLease.ts`, `src/index.ts`, `scripts/build-pages-site.mjs`, `tests/publicDocsArtifact.test.ts`, `tests/publicTypographyArtifact.test.ts`, `tests/publicDocsGraph.test.ts`, and `docs/PACKAGE_API_REFERENCE.md`. Extract the managed-lease verification as a cohesive module and shorten the barrel's introductory prose; do not widen line budgets. The API build integration tests receive time limits for their now-measured full TypeScript documentation builds; generated-site links remain narrowly distinguished from Markdown guide links. Worker test edits are complete and return to root after review.
+
+## Chat on Steroids delegation — user-authorized September 9
+
+All Chat on Steroids tasks use GPT-6 Pro, explicitly requested by Sid. Codex remains integration owner. Root owns `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/README.md`, `task.md`, `dispatch.json`, and `/Users/sid/Documents/AMC/Evidence/2026-09-09 Chat on Steroids Collaboration.md`.
+
+| Worker | Worktree / branch | Linear | Exact writable paths | State |
+|---|---|---|---|---|
+| Chat on Steroids, GPT-6 Pro | `/Users/sid/AgentMaturityCompass/tmp/cos-human-first-use` / `codex/cos-human-first-use` | AMC-1512, AMC-1518 | `scripts/human-first-use-intake.mjs`; `tests/humanFirstUseIntake.test.ts`; `docs/HUMAN_FIRST_USE_STUDY.md`; `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md` inside that worktree only | Assigned: implement an independent local intake validator and operator packet for real human recordings; no study data fabrication, tests/install/generators/commits, external publishing, or edits elsewhere |
+
+The worker reads the root standing brief and rolebooks, but does not modify root. Root-owned pending failure corrections and all old worktrees remain untouched. Root will inspect its diff and integrate exact paths serially, then validate at the end of implementation. The intake validates supplied records; it cannot authenticate whether a human participated. Existing asynchronous request for participants/recordings remains pending.
+
+## AMC-483 dependency gate correction and failed-candidate checkpoint
+
+Astra diagnosis workers are finished and own no paths. Root serially owns `packages/amc-core/package.json`, `package.json`, `pnpm-lock.yaml`, and exact new records `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/dependency-repair/prepare.py`, `source.json`, `resolution.log`, `README.md`. Lock resolution runs in a new owned scratch clone, never the shared root. Correct only js-yaml4 runtime floor/resolution and MCP SDK transitive Hono floor/resolution; preserve the separate js-yaml3 development chain. No production credentials, publish or deployment.
+
+Root also owns new checkpoints under `/Users/sid/Documents/AMC/Archive/Checkpoints/`: `2026-09-09 AMC Home failed-candidate checkpoint.md`, `2026-09-09 AMC Now failed-candidate checkpoint.md`, `2026-09-09 AMC Roadmap failed-candidate checkpoint.md`, `2026-09-09 MOC - Current Operations failed-candidate checkpoint.md`. Update current acceptance, plan, epic and vault with the retained failed0fcce267 result; do not overwrite its source.json, logs or gate JSON.
+
+## Targeted mutation preparation
+
+Astra trust worker owns only `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/managed-and-portal.py` and `README.md` in that directory. Prepare an executable helper and exact mutation/expected-failing-case map for AMC-1542 managed lease authentication and AMC-1508 persisted attribution. Read current source including extracted managedHookLease.ts. No test runs, installs, mutation application, source edits or commits. Root owns all other records and source. Helpers must require a supplied fresh clean candidate clone and preserve original bytes after each deliberate negative mutation.
