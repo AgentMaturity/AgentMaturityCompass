@@ -8,3 +8,8 @@ Source implementation and authored regressions first. Fresh clean candidate full
 
 
 Source bindings: 249a2a812f2600c53564fa571761aa2cfb80a144. Storage worker: e89f4842892c1eae4e4acf6996c7d0d31a4b229e; lifecycle worker: 7f2e38e3ed027e2bf4d52bea950cff4d2bccad25; regression worker: 603b9f37efd2a26369b791d060e6e6ae30d96bb3, merged at d9d55034b1e856513eea1c68b09e50ecd433063e. Root read complete source/test diffs and independent binding review; the retention aggregate-audit finding was corrected before integration. See docs/SESSION_SPILL_LIFECYCLE.md for source behavior. No tests/checks/builds/installs/production key operations were executed for this change.
+
+
+### September 9 — bounded authenticated retained-output reading
+
+Native bounded retained-output reads are integrated at `3aa7077af4cae2d3da957c1825b9c47a48f2d382`: `amc session spill-read <locator>` and the public `readSessionSpillRange` API authenticate all supplied references, verify/decrypt the selected full object, and return an explicit byte range with origins and next offset. Metadata-only reference inventory avoids reading unrelated ciphertext. SQLite/JSONL read-only backend admission refuses conflicting environment selection and malformed or dangling markers; an empty monitor pin cannot be reported as verified identity. Text escapes terminal controls and JSON preserves exact bytes as base64. Source review and authored synthetic regressions only; no tests/builds/key operations, automatic model retrieval or whole-chain acceptance are claimed. Record: `AMC_OS/RESEARCH/2026-09-09-spill-lifecycle/source.json`.

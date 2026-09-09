@@ -23,5 +23,8 @@
     "os": "Darwin 25.6.0",
     "arch": "arm64",
     "execution": "source authoring only; no runtime qualification"
-  }
+  },
+  "boundedReadCommit": "3aa7077af4cae2d3da957c1825b9c47a48f2d382",
+  "readCommand": "amc session spill-read <locator>",
+  "readQualification": "source review and authored regressions only; no execution"
 }
