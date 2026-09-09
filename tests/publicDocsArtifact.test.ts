@@ -134,6 +134,16 @@ describe("public Docs Pages artifact", () => {
     expect(builtHtml).toContain('href="../api/"');
     const apiHtml = readFileSync(resolve(first, "api/index.html"), "utf8");
     expect(apiHtml).toContain("Agent Maturity Compass API");
+    expect(apiHtml).toContain("Find exported functions, classes and types");
+    expect(apiHtml).not.toContain('href="media/api"');
+    // TypeDoc's aggregate summary omits these exported provider interfaces.
+    // Keep useful inline inheritance and avoid links to missing summary anchors.
+    for (const provider of ["AnthropicMessages", "GeminiGenerateContent", "LocalChat", "OpenAIAudioSpeech",
+      "OpenAIChat", "OpenAIEmbeddings", "OpenAIImages", "OpenAIResponses", "OpenRouterChat", "XAIChat"]) {
+      const page = readFileSync(resolve(first, `api/interfaces/index.${provider}Payload.html`), "utf8");
+      expect(page).toContain('class="tsd-hierarchy"');
+      expect(page).not.toContain("hierarchy.html#");
+    }
     const reflection = JSON.parse(readFileSync(resolve(first, "api/reflection.json"), "utf8"));
     expect(reflection.children.length).toBeGreaterThan(0);
     const entryPoints = JSON.parse(readFileSync(resolve(root, "typedoc.json"), "utf8")).entryPoints as string[];
