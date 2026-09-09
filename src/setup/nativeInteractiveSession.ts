@@ -1,8 +1,8 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
-import type { AgentRunSummary } from "../agent/runReport.js";
 import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
+import { parseNativeChatResult } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
@@ -328,18 +328,13 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...(approvalClass === undefined ? [] : ["--interactive-approvals"]), "--keep-open", "--json", "--stream",
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
         { interactiveApprovals: approvalClass !== undefined, stream: true });
-      let summary: AgentRunSummary;
-      try {
-        const parsed: unknown = JSON.parse(outcome.stdout);
-        if (parsed === null || typeof parsed !== "object") throw new Error("Missing summary");
-        const record = parsed as Partial<AgentRunSummary>;
-        if (typeof record.sessionId !== "string" || !record.sessionId || !Array.isArray(record.assistantText) ||
-            !record.assistantText.every(block => typeof block === "string") || typeof record.driverStatus !== "string") throw new Error("Missing summary fields");
-        summary = record as AgentRunSummary;
-      } catch {
-        io.error("No usable recorded run summary was returned. Chat has stopped without guessing a session ID or retrying the task. Inspect AMC's session evidence before continuing.");
+      const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
+        requestedSessionId: priorSession, forkFrom: pendingFork });
+      if (!result.ok) {
+        io.error(`${result.code}: ${result.message} Chat has stopped without guessing a session ID or retrying the task. Inspect AMC's session evidence before continuing.`);
         io.fail(); break;
       }
+      const summary = result.summary;
       if (pendingFork !== null || priorSession !== summary.sessionId) assistantBlocks = 0;
       sessionId = summary.sessionId;
       forkFrom = null;

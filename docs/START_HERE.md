@@ -43,6 +43,14 @@ not an all-request hit probability, a complete-input ratio when fields are absen
 or a billing-savings estimate. A zero denominator has no rate. Historical records
 without explicit report provenance remain unknown rather than being upgraded.
 
+Chat checks a child command's result before adopting its session reference. A
+resume must return the requested session; a fork must return a distinct child.
+Truncated or malformed output and unsupported driver states stop chat without an
+automatic retry or a guessed session ID. The previous known reference, when one
+exists, remains available for deliberate inspection and verified resume. This
+protocol check does not itself verify signatures or prove a task succeeded: a
+valid failed or cancelled result retains its recorded outcome.
+
 ## What AMC is
 
 AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.

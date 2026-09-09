@@ -189,4 +189,66 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     expect(logs.join("\n")).toContain("not remote authentication proof");
     expect([...logs, ...errors].join("\n")).not.toContain(secret);
   });
+
+  it("stops on a mismatched resumed result and retains only the previously known reference", async () => {
+    seam.answers = ["task", "must not be submitted", "/exit"];
+    seam.onCommand = () => ({ code: 0, stdout: JSON.stringify({ sessionId: "wrong-session", driverStatus: "idle", assistantText: ["Unadmitted reply"] }) });
+    await runNativeInteractiveSession(options({ session: "known-session" }), {
+      log: line => logs.push(line), error: line => errors.push(line), fail
+    });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(seam.commands).toHaveLength(1);
+    expect(errors.join("\n")).toContain("SESSION_MISMATCH");
+    expect(logs.join("\n")).not.toContain("Unadmitted reply");
+    expect(logs.join("\n")).not.toContain("wrong-session");
+    expect(logs.find(line => line.startsWith("Resume in this workspace:"))).toContain("--session known-session");
+  });
+  it("does not adopt the parent as a new fork or submit another task after the bad result", async () => {
+    seam.answers = ["/fork", "forked task", "must not be submitted", "/exit"];
+    seam.onCommand = () => ({ code: 0, stdout: JSON.stringify({ sessionId: "parent-session", driverStatus: "idle", assistantText: ["Not a fork reply"] }) });
+    await runNativeInteractiveSession(options({ session: "parent-session" }), {
+      log: line => logs.push(line), error: line => errors.push(line), fail
+    });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(seam.commands).toHaveLength(1);
+    expect(option(seam.commands[0]!.argv, "--fork-from")).toBe("parent-session");
+    expect(errors.join("\n")).toContain("FORK_IDENTITY_INVALID");
+    expect(logs.join("\n")).not.toContain("Not a fork reply");
+    expect(logs.find(line => line.startsWith("Resume in this workspace:"))).toContain("--session parent-session");
+  });
+  it("adopts a distinct fork child and uses that exact reference on the next operator task", async () => {
+    seam.answers = ["/fork", "forked task", "follow-up", "/exit"];
+    seam.onCommand = () => ({ code: 0, stdout: JSON.stringify({ sessionId: "new-child-session", driverStatus: "idle", assistantText: ["Child reply"] }) });
+    await runNativeInteractiveSession(options({ session: "parent-session" }), {
+      log: line => logs.push(line), error: line => errors.push(line), fail
+    });
+    expect(fail).not.toHaveBeenCalled();
+    expect(seam.commands).toHaveLength(2);
+    expect(option(seam.commands[0]!.argv, "--fork-from")).toBe("parent-session");
+    expect(option(seam.commands[1]!.argv, "--session")).toBe("new-child-session");
+    expect(logs.find(line => line.startsWith("Resume in this workspace:"))).toContain("--session new-child-session");
+  });
+  it("stops when a closed child reports running instead of printing an adopted reply", async () => {
+    seam.answers = ["task", "must not be submitted", "/exit"];
+    seam.onCommand = () => ({ code: 0, stdout: JSON.stringify({ sessionId: "unusable-session", driverStatus: "running", assistantText: ["Unadmitted reply"] }) });
+    await runNativeInteractiveSession(options(), { log: line => logs.push(line), error: line => errors.push(line), fail });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(seam.commands).toHaveLength(1);
+    expect(errors.join("\n")).toContain("RESULT_STATE_INVALID");
+    expect(logs.join("\n")).not.toContain("Unadmitted reply");
+    expect(logs.some(line => line.startsWith("Resume in this workspace:"))).toBe(false);
+  });
+  it("keeps a valid matching failed outcome visible without claiming completion", async () => {
+    seam.answers = ["task", "/exit"];
+    seam.onCommand = () => ({ code: 1, stdout: JSON.stringify({ sessionId: "known-session", driverStatus: "failed",
+      assistantText: [], endings: [{ reason: "error" }], validation: { status: "unavailable" } }) });
+    await runNativeInteractiveSession(options({ session: "known-session" }), {
+      log: line => logs.push(line), error: line => errors.push(line), fail
+    });
+    expect(fail).toHaveBeenCalledOnce();
+    expect(logs.join("\n")).toContain("driver failed");
+    expect(logs.join("\n")).toContain("recorded turn ending error");
+    expect(errors.join("\n")).toContain("No successful task completion is claimed");
+    expect(logs.find(line => line.startsWith("Resume in this workspace:"))).toContain("--session known-session");
+  });
 });
