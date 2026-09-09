@@ -25,6 +25,24 @@ Pass reference names with `--credential`, never secret values. Local metadata
 being present does not prove remote authentication, task correctness or verified
 evidence; each remains a separate outcome.
 
+Native run output, chat replies and `amc session show <session-id>` display
+**cumulative recorded-session usage**, not counters remembered by the process.
+Inspection follows the workspace's recorded SQLite or JSONL backend and does not
+take a session writer. A missing or unreadable selected history is not replaced
+with a different backend. Use `amc agent-loop verify <session-id>` separately for
+evidence verification; inspection alone does not authenticate the rows.
+
+Token totals are labelled **observed subtotals**. Missing reports, partial failed
+streams, pending requests and local stub demonstrations remain visible. Retry
+attempts are counted once per recorded request, not again from step summaries.
+Unreported cache counts say `unreported`, never measured zero. The displayed
+**cache-read share of reported input** divides cache-read tokens by uncached input
+plus reported cache-read/write tokens from complete reports with a cache-read
+count. Its coverage names excluded requests and missing cache-write fields: it is
+not an all-request hit probability, a complete-input ratio when fields are absent,
+or a billing-savings estimate. A zero denominator has no rate. Historical records
+without explicit report provenance remain unknown rather than being upgraded.
+
 ## What AMC is
 
 AMC combines a governed native agent runtime with evidence-based assessment for agents and other runtimes.

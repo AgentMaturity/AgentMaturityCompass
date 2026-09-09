@@ -147,6 +147,7 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     expect(resume).toContain("--session simulated-child-session");
     expect([...logs, ...errors].join("\n")).not.toContain(secret);
     expect(seam.killed).toEqual([]);
+    expect(logs.join("\n")).toContain("this summary contains no usage projection");
   });
 
   it("preserves the same home on an explicitly resumed session while workspace skills still win", async () => {
@@ -175,5 +176,17 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
     expect(option(seam.commands[0]!.argv, "--credentials-file")).toBe(file);
     expect(loaded[0]?.sourcePath).toBe(workspacePath);
     expect(logs.find(line => line.startsWith("Resume in this workspace:"))).not.toContain("--credentials-home");
+  });
+
+  it("shows only the configured credential reference and source before a real-provider route is used", async () => {
+    seam.answers = ["/exit"];
+    await runNativeInteractiveSession(options({ provider: "openai", model: "fixture-model", credential: "OPENAI_API_KEY" }), {
+      log: line => logs.push(line), error: line => errors.push(line), fail
+    });
+    expect(fail).not.toHaveBeenCalled();
+    expect(seam.commands).toEqual([]);
+    expect(logs.join("\n")).toContain("Credential reference: OPENAI_API_KEY; local source file");
+    expect(logs.join("\n")).toContain("not remote authentication proof");
+    expect([...logs, ...errors].join("\n")).not.toContain(secret);
   });
 });

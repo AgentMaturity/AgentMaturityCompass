@@ -2,6 +2,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import type { AgentRunSummary } from "../agent/runReport.js";
+import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
@@ -217,6 +218,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const showScope = () => {
       io.log(`Native chat · agent ${guide.agentId} · provider ${provider} · model ${guide.model}`);
       if (guide.baseUrl !== null) io.log(`Provider origin: ${guide.baseUrl}`);
+      if (guide.credential !== null) io.log(`Credential reference: ${guide.credential.ref}; local source ${guide.credential.source ?? "unavailable"}. This setup snapshot is not remote authentication proof.`);
       if (profile.presetId !== null) io.log(`Signed native preset: ${profile.presetId}; changes require a new reviewed chat.`);
       if (options.delegate) io.log("Native in-process delegation enabled under the signed tool grant, configured scope and depth bound.");
       io.log(provider === "stub" ? "Local demonstration: canned replies, no real model answer." : "Real provider: requests may incur charges; local setup does not prove authentication or model access.");
@@ -346,6 +348,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       assistantBlocks = summary.assistantText.length;
       const ending = Array.isArray(summary.endings) ? summary.endings.at(-1) : undefined;
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
+      io.log(renderNativeRunUsage(summary.usage));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");

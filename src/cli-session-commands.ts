@@ -62,18 +62,19 @@ export function registerSessionCommands(program: Command): void {
     .argument("<id>", "session id")
     .option("--json", "Output as JSON")
     .action(async (id: string, opts: { json?: boolean }) => {
-      const { openLedger } = await import("./ledger/ledger.js");
+      const { readNativeSessionEvents } = await import("./session/readNativeSessionEvents.js");
+      const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectSurface } = await import("./session/surfaceProjection.js");
       const { extractEnvelope } = await import("./session/sessionTypes.js");
-      const ledger = openLedger(process.cwd());
       try {
-        const events = ledger.getAllEvents().filter((event) => event.session_id === id);
+        const events = readNativeSessionEvents(process.cwd(), id);
         if (events.length === 0) {
           console.error(chalk.red(`No events found for session ${id}.`));
-          process.exit(1);
+          process.exitCode = 1;
           return;
         }
         const history = projectSurface(events);
+        const usage = projectNativeRunUsage(events, id);
         const spine = events.map((event) => {
           const envelope = extractEnvelope(event.meta_json);
           return {
@@ -86,11 +87,12 @@ export function registerSessionCommands(program: Command): void {
           };
         });
         if (opts.json) {
-          console.log(JSON.stringify({ sessionId: id, spine, history }, null, 2));
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`));
         console.log(chalk.gray(`  ${events.length} events`));
+        console.log(renderNativeRunUsage(usage));
         console.log("");
         console.log(chalk.bold("Projected conversation (model-visible)"));
         for (const message of history) {
@@ -105,8 +107,9 @@ export function registerSessionCommands(program: Command): void {
           const label = `seq ${String(row.seq).padStart(3)} · turn ${row.turn ?? "-"} · step ${row.step ?? "-"}`;
           console.log(`  ${chalk.gray(label)}  ${row.eventType}  ${chalk.gray(row.surface)}`);
         }
-      } finally {
-        ledger.close();
+      } catch (error) {
+        console.error(chalk.red(`Session inspection unavailable: ${error instanceof Error ? error.message : "could not read recorded history"}`));
+        process.exitCode = 1;
       }
     });
 

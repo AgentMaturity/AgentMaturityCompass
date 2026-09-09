@@ -34,6 +34,8 @@ import type { EvidenceEvent } from "../types.js";
 import type { AgentStatus } from "./loopTypes.js";
 import type { NativeValidationResult } from "./nativeValidation.js";
 import { projectNativeValidation } from "./nativeValidationProjection.js";
+import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
+import { projectNativeRunUsage, renderNativeRunUsage, type NativeRunUsage } from "./nativeRunUsage.js";
 
 /** The literal a ledger writes in place of a signature under `AMC_NO_SIGN=1`. */
 /** The marker a row carries instead of a signature when signing is off. */
@@ -72,16 +74,13 @@ export interface AgentRunSummary {
   readonly unsignedRows: number;
   /** Public operator checks for the latest turn, independent of model completion. */
   readonly validation: NativeValidationResult;
+  /** Read-back usage; optional only for consumers of older serialized summaries. */
+  readonly usage?: NativeRunUsage;
 }
 
 /** Read one session's committed rows in commit order. */
 function sessionEvents(workspace: string, sessionId: string): EvidenceEvent[] {
-  const ledger = openLedger(workspace, { readonly: true });
-  try {
-    return ledger.getAllEvents().filter((event) => event.session_id === sessionId);
-  } finally {
-    ledger.close();
-  }
+  return readNativeSessionEvents(workspace, sessionId);
 }
 
 /** Assistant text blocks, read from their payloads. Pruned or missing bytes are named, not skipped. */
@@ -145,7 +144,8 @@ export function readAgentRunSummary(
     endings,
     assistantText: assistantTextOf(workspace, events),
     unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length,
-    validation: projectNativeValidation(workspace, events)
+    validation: projectNativeValidation(workspace, events),
+    usage: projectNativeRunUsage(events, sessionId)
   };
 }
 
@@ -274,6 +274,7 @@ export function renderRunSummary(summary: AgentRunSummary): string {
   for (const text of summary.assistantText) {
     lines.push(`  assistant: ${text}`);
   }
+  lines.push(renderNativeRunUsage(summary.usage));
   lines.push(`  validation ${summary.validation.status}${summary.validation.turn === null ? "" : ` (turn ${summary.validation.turn})`}`);
   for (const check of summary.validation.checks) lines.push(`    ${check.id}: ${check.status}${check.exitCode === null ? "" : ` (exit ${check.exitCode})`}${check.reason === null ? "" : ` — ${check.reason}`}`);
   if (summary.unsignedRows > 0) {
