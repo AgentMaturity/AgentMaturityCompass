@@ -120,6 +120,20 @@ describe("public Docs Pages artifact", () => {
     const builtScript = readFileSync(resolve(first, "docs/docs.js"), "utf8");
     expect(builtHtml).not.toContain("cdn.jsdelivr.net");
     expect(builtScript).not.toContain("raw.githubusercontent.com");
+    expect(builtHtml).toContain('href="../api/"');
+    const apiHtml = readFileSync(resolve(first, "api/index.html"), "utf8");
+    expect(apiHtml).toContain("Agent Maturity Compass API");
+    const reflection = JSON.parse(readFileSync(resolve(first, "api/reflection.json"), "utf8"));
+    expect(reflection.children.length).toBeGreaterThan(0);
+    const entryPoints = JSON.parse(readFileSync(resolve(root, "typedoc.json"), "utf8")).entryPoints as string[];
+    const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+    const publicSources = Object.values(pkg.exports as Record<string, { types: string }>).map(entry =>
+      entry.types.replace(/^\.\/dist\//, "src/").replace(/\.d\.ts$/, ".ts"));
+    expect([...entryPoints].sort()).toEqual(publicSources.sort());
+    const serialized = JSON.stringify(reflection);
+    for (const symbol of ["initWorkspace", "AMCNativeClient"]) expect(serialized).toContain(`"name":"${symbol}"`);
+    expect(serialized).toContain(`/blob/${revision}/`);
+    expect(pnpmIntegrityFor("typedoc", String(pkg.devDependencies.typedoc), root)).not.toBeNull();
   });
 
   test("rejects unsafe, duplicate, internal, and destructive build inputs", async () => {

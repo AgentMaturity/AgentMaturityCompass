@@ -26,6 +26,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs",
     "build:pages": "node scripts/build-pages-site.mjs",
+    "docs:api": "typedoc --options typedoc.json",
     "build:sea": "node scripts/build-sea.mjs",
     "brand:render": "node scripts/render-brand-assets.mjs",
     "package:desktop": "node scripts/package-desktop-installers.mjs",
@@ -169,6 +170,7 @@
     "esbuild": "0.28.2",
     "marked": "18.0.6",
     "tsx": "^4.23.0",
+    "typedoc": "0.28.20",
     "typescript": "^6.0.2",
     "vitest": "^4.1.10"
   },

@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import {
   copyFileSync,
   cpSync,
@@ -70,6 +71,7 @@ function prepareOutput(output, explicit) {
 
 function copyWebsite(output) {
   const excluded = [
+    resolve(websiteRoot, "api"),
     resolve(websiteRoot, "brand-assets.json"),
     resolve(websiteRoot, "docs/content"),
     resolve(websiteRoot, "docs/vendor"),
@@ -238,7 +240,15 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   const brandManifestPath = resolve(resolvedOutput, "brand-assets.json");
   writeFileSync(brandManifestPath, `${JSON.stringify(brandManifest, null, 2)}\n`, "utf8");
 
-  return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest };
+  // The reference is built from the public source entries into this same staged
+  // artifact, never copied from a possibly stale website/api directory.
+  const apiOutput = resolve(resolvedOutput, "api");
+  execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/bin/typedoc"),
+    "--options", resolve(repositoryRoot, "typedoc.json"), "--out", apiOutput,
+    "--json", resolve(apiOutput, "reflection.json"), ...(revision ? ["--gitRevision", revision] : [])],
+  { cwd: repositoryRoot, stdio: "inherit" });
+
+  return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };
 }
 
 async function main() {

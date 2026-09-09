@@ -2,6 +2,8 @@
 
 AMC exposes three HTTP surfaces with different contracts and auth models.
 
+For TypeScript package imports, see [Public package API reference](PACKAGE_API_REFERENCE.md). `pnpm docs:api` generates the searchable library reference; the staged site includes it at `/api/`. Package declarations and HTTP routes are separate contracts.
+
 ## 1) Lightweight Module API (`/api/v1/*`)
 
 Scope:

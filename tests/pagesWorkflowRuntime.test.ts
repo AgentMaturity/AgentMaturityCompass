@@ -21,6 +21,11 @@ describe("GitHub Pages deployment runtime", () => {
     for (const path of [
       "website/**",
       "docs/**",
+      "src/**",
+      "packages/**",
+      "vendor/**",
+      "typedoc.json",
+      "tsconfig.json",
       "scripts/build-pages-site.mjs",
       "package.json",
       "pnpm-lock.yaml",

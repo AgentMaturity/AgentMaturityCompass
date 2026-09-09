@@ -1,0 +1,28 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/sdk/mobileFetch.ts",
+    "src/sdk/nativeAgentClient.ts",
+    "src/standard/externalEvidenceProfile.ts",
+    "src/importers/piTelemetryCallbacks.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "out": "tmp/api-reference",
+  "json": "tmp/api-reference/reflection.json",
+  "tsconfig": "tsconfig.json",
+  "name": "Agent Maturity Compass API",
+  "readme": "docs/PACKAGE_API_REFERENCE.md",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "skipErrorChecking": false,
+  "githubPages": true,
+  "sourceLinkTemplate": "https://github.com/AgentMaturity/AgentMaturityCompass/blob/{gitRevision}/{path}#L{line}",
+  "navigationLinks": {
+    "Guides": "https://agentmaturity.co/docs/",
+    "HTTP API": "https://agentmaturity.co/openapi.yaml",
+    "GitHub": "https://github.com/AgentMaturity/AgentMaturityCompass"
+  }
+}
