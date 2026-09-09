@@ -95,6 +95,8 @@ Use chat's `--preset` option to select an existing signed profile from `.amc/age
 
 `--persona` supplies an explicit native persona. `--delegate` enables in-process child agents only with workspace tools and an independently signed `delegate` tool grant. `--delegate-scope` narrows the child's action classes, and `--max-delegation-depth` bounds actual nesting. Nested children inherit non-widening scopes, signed approval requirements, per-turn limits and parent cancellation; existing budgets and write scopes still apply. Foreign-delegate and code-mode profiles are refused by this chat surface rather than silently changed. These controls do not establish the quality of a delegated answer.
 
+Use repeatable `--delegate-stop` conditions to bound each delegation's lifetime, for example `--delegate-stop timeout-ms:60000`. Native run/chat and signed presets preserve these conditions through the composed child capability. See [Native delegation limits](NATIVE_DELEGATION_LIMITS.md) for turn counting, timeout settlement, explicit reset and the distinction between cancellation and confirmed process shutdown. This new implementation is awaiting combined qualification; the earlier installed receipts above do not qualify it.
+
 For reusable context files and named prompt commands, see [Native Extensions](NATIVE_EXTENSIONS.md). Inspect and explicitly sign the manifest with AMC's existing workspace authority, then select its path with `--extension` or chat `/load`. Loading pins both manifest and content; it cannot load executable hooks, select credentials or grant tools. `/unload` removes future contributions while preserving signed history.
 
 ## Enable workspace and MCP tools deliberately

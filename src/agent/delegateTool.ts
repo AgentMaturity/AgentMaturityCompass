@@ -58,6 +58,8 @@ export interface SubagentCapability {
    * `execution.arguments` into this.
    */
   readonly delegationScope?: readonly ActionClass[];
+  /** Operator-selected child lifetime limits; never read from model arguments. */
+  readonly stopConditions?: readonly string[];
   /** Injected so a test can pin the child's session id. */
   readonly mintSessionId?: () => string;
 }
@@ -116,6 +118,8 @@ function readArgs(raw: unknown): { ok: true; args: DelegateArgs } | { ok: false;
 export function delegateTool(capability: SubagentCapability): ToolDefinition {
   const maxDepth = capability.maxDepth ?? DEFAULT_MAX_DELEGATION_DEPTH;
   const mintSessionId = capability.mintSessionId ?? (() => `child-${randomUUID().slice(0, 12)}`);
+  const stopConditions = capability.stopConditions === undefined
+    ? undefined : Object.freeze([...capability.stopConditions]);
 
   return defineTool({
     name: "delegate",
@@ -140,7 +144,8 @@ export function delegateTool(capability: SubagentCapability): ToolDefinition {
           // From the capability, never from `parsed.args`.
           ...(capability.delegationScope === undefined
             ? {}
-            : { delegationScope: capability.delegationScope })
+            : { delegationScope: capability.delegationScope }),
+          ...(stopConditions === undefined ? {} : { stopConditions })
         },
         session: capability.session,
         runner: capability.runner,

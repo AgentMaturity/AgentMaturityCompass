@@ -60,6 +60,7 @@ import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
 import type { SubagentRunner } from "../agent/subagentSpawn.js";
+import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
@@ -218,6 +219,8 @@ export interface ComposedTurnOptions {
      * it — three layers gated on a field no caller could populate.
      */
     readonly scope?: readonly ActionClass[];
+    /** Operator-selected lifetime limits, enforced before each child dispatch. */
+    readonly stopConditions?: readonly string[];
     /**
      * Execute children with this instead of the in-process driver.
      *
@@ -372,6 +375,16 @@ function policyDigestOf(options: ComposedTurnOptions): string {
  * command exit with work still committed to the inbox.
  */
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
+  if (options.delegation !== undefined) {
+    const parsed = parseSubagentStopConditions(options.delegation.stopConditions);
+    if (!parsed.ok) throw new Error(`Delegation stop conditions: ${parsed.reason}`);
+    // Pin the operator's declaration before asynchronous composition or provider
+    // work. A later caller mutation cannot change the child authorization.
+    options = { ...options, delegation: Object.freeze({ ...options.delegation,
+      ...(options.delegation.scope === undefined ? {} : { scope: Object.freeze([...options.delegation.scope]) }),
+      ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: Object.freeze([...parsed.conditions]) })
+    }) };
+  }
   const profile = promptProfileFor(options);
   const identity = {
     agentId: options.agentId,
@@ -495,7 +508,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           ...(gate === undefined ? {} : { approvalGate: gate }),
           grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
-            ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }) }
+            ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
+            ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) }
         });
       }
       options.delegation.grant({
@@ -507,7 +521,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           : { maxDepth: options.delegation.maxDepth }),
         ...(options.delegation.scope === undefined
           ? {}
-          : { delegationScope: options.delegation.scope })
+          : { delegationScope: options.delegation.scope }),
+        ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions })
       });
     }
 

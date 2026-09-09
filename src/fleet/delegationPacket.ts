@@ -47,7 +47,10 @@ export interface DelegationPacketRequest {
    * enforcement point — guards are — and this module does not pretend otherwise.
    */
   readonly delegationScope?: readonly string[];
-  /** Told to the child; not enforced by the runtime. */
+  /**
+   * Signed declaration. Native spawn validates and enforces max-turns:N and
+   * timeout-ms:N; minting this packet alone does not execute or enforce them.
+   */
   readonly stopConditions?: readonly string[];
 }
 

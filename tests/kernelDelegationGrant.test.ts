@@ -180,6 +180,35 @@ describe("the kernel hands over what only it has", () => {
 });
 
 describe("the operator's delegation scope reaches the capability", () => {
+  it("pins stop conditions before caller mutation during composition", async () => {
+    const s = setup(), grants: SubagentCapability[] = [];
+    const stops = ["max-turns:2", "timeout-ms:30000"];
+    await runComposedTurn(turnOptions(s, { delegation: { stopConditions: stops, grant: capability => {
+      stops.splice(0, stops.length, "max-turns:999");
+      grants.push(capability);
+    } } }));
+    expect(grants).toHaveLength(1);
+    expect(grants[0]!.stopConditions).toEqual(["max-turns:2", "timeout-ms:30000"]);
+    expect(Object.isFrozen(grants[0]!.stopConditions)).toBe(true);
+  });
+
+  it("refuses unsupported stops before a session or provider request is created", async () => {
+    const s = setup();
+    let grants = 0, requests = 0;
+    const sessionId = "unsupported-delegation-stops";
+    const transport = stubProviderTransport();
+    await expect(runComposedTurn(turnOptions(s, { sessionId,
+      transport: async request => { requests += 1; return transport(request); },
+      delegation: { stopConditions: ["until done"], grant: () => { grants += 1; } }
+    }))).rejects.toThrow(/Delegation stop conditions/);
+    expect(grants).toBe(0);
+    expect(requests).toBe(0);
+    const db = new Database(join(s.workspace, ".amc", "evidence.sqlite"), { readonly: true });
+    try {
+      expect((db.prepare("SELECT COUNT(*) n FROM evidence_events WHERE session_id = ?").get(sessionId) as { n: number }).n).toBe(0);
+    } finally { db.close(); }
+  });
+
   it("passes a declared scope through to the grant", async () => {
     // Without this the whole scope chain is unreachable: `delegationScope` is
     // honoured by spawnSubagent, enforced by createDriverRunner and projected as

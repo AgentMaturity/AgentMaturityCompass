@@ -1,5 +1,6 @@
 import { SessionService } from "../session/sessionService.js";
 import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScope } from "./delegationScope.js";
+import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
 import type { AgentLoopConfig } from "./loopTypes.js";
@@ -87,9 +88,30 @@ export interface DriverRunnerInit {
     readonly runner: SubagentRunner;
     /** Optional additional narrowing; always intersected with the child's scope. */
     readonly delegationScope?: readonly ActionClass[];
+    /** Each descendant inherits the narrower declared per-delegation limits. */
+    readonly stopConditions?: readonly string[];
     readonly maxDepth?: number;
     readonly mintSessionId?: () => string;
   };
+}
+
+function descendantStopConditions(
+  inherited: readonly string[] | undefined,
+  configured: readonly string[] | undefined
+): readonly string[] | undefined {
+  if (inherited === undefined && configured === undefined) return undefined;
+  const parent = parseSubagentStopConditions(inherited);
+  const grant = parseSubagentStopConditions(configured);
+  if (!parent.ok) throw new Error(parent.reason);
+  if (!grant.ok) throw new Error(grant.reason);
+  const narrower = (a: number | undefined, b: number | undefined): number | undefined =>
+    a === undefined ? b : b === undefined ? a : Math.min(a, b);
+  const turns = narrower(parent.maxTurns, grant.maxTurns);
+  const timeout = narrower(parent.timeoutMs, grant.timeoutMs);
+  return Object.freeze([
+    ...(turns === undefined ? [] : [`max-turns:${turns}`]),
+    ...(timeout === undefined ? [] : [`timeout-ms:${timeout}`])
+  ]);
 }
 
 /**
@@ -107,7 +129,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
     ...(init.approvalGate.toolNames === undefined ? {} : { toolNames: [...init.approvalGate.toolNames] }),
     ...(init.approvalGate.answerers === undefined ? {} : { answerers: [...init.approvalGate.answerers] }) };
   const grant = init.grantDelegation === undefined ? undefined : { ...init.grantDelegation,
-    ...(init.grantDelegation.delegationScope === undefined ? {} : { delegationScope: [...init.grantDelegation.delegationScope] }) };
+    ...(init.grantDelegation.delegationScope === undefined ? {} : { delegationScope: [...init.grantDelegation.delegationScope] }),
+    ...(init.grantDelegation.stopConditions === undefined ? {} : { stopConditions: Object.freeze([...init.grantDelegation.stopConditions]) }) };
 
   return async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
     if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
@@ -117,6 +140,9 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!parsed.ok) return { ok: false, text: "", reason: parsed.reason };
     }
     const descendantScope = intersectDelegationScopes(scope, grant?.delegationScope);
+    let descendantStops: readonly string[] | undefined;
+    try { descendantStops = descendantStopConditions(ctx.stopConditions, grant?.stopConditions); }
+    catch (error) { return { ok: false, text: "", reason: `child stop conditions: ${error instanceof Error ? error.message : String(error)}` }; }
     const session = new SessionService(init.workspace);
     let toolset: ReturnType<typeof agentToolset> | undefined;
     let driver: AgentDriver | undefined;
@@ -174,7 +200,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           identity: ctx.identity, runner: grant.runner, session,
           ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),
           ...(grant.mintSessionId === undefined ? {} : { mintSessionId: grant.mintSessionId }),
-          ...(descendantScope === undefined ? {} : { delegationScope: descendantScope })
+          ...(descendantScope === undefined ? {} : { delegationScope: descendantScope }),
+          ...(descendantStops === undefined ? {} : { stopConditions: descendantStops })
         } }) });
       if (scope !== undefined) toolset.registry.restrict({ deny: new Set(deniedToolNamesForScope(toolset.registry, scope)) });
       const systemPromptEventId = session.recordSystemPrompt(init.systemPrompt).eventId;

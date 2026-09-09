@@ -14,6 +14,7 @@ import { delegateTool } from "../src/agent/delegateTool.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { runComposedTurn, type ComposedToolSession } from "../src/kernel/agentLoopRunner.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
+import { loadHandoffPacket } from "../src/fleet/handoffPacket.js";
 import { intersectDelegationScopes } from "../src/agent/delegationScope.js";
 import type { SubagentRunContext, SubagentRunner } from "../src/agent/subagentSpawn.js";
 import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
@@ -169,6 +170,26 @@ describe("native child cancellation and inherited governance", () => {
     expect(intersectDelegationScopes(["READ_ONLY"], ["WRITE_HIGH"])).toEqual([]);
   });
 
+  test("nested delegation receives numeric minima and snapshots the configured stops", async () => {
+    const workspace = setup(), seen: SubagentRunContext[] = [];
+    const configured = ["max-turns:8", "timeout-ms:30000"];
+    const runner = createDriverRunner(init(workspace, {
+      grantDelegation: { runner: async child => { seen.push(child); return { ok: true, text: "grandchild done" }; },
+        stopConditions: configured, mintSessionId: () => "bounded-grandchild" },
+      makeLlm: session => llmFor(session, [
+        toolStep("bounded_delegate", "delegate", '{"runAs":"grandchild","goal":"Answer briefly.","stopConditions":[]}'),
+        textStep("child done")
+      ])
+    }));
+    configured.splice(0, configured.length, "max-turns:999", "timeout-ms:999999");
+    const parent = new AbortController();
+    const result = await runner({ ...context(parent.signal), stopConditions: ["max-turns:2", "timeout-ms:60000"] });
+    expect(result.ok).toBe(true);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]!.stopConditions).toEqual(["max-turns:2", "timeout-ms:30000"]);
+    expect(seen[0]!.signal).toBeDefined();
+  });
+
   test("the production kernel grants actual recursive children with child-bound approval rows", async () => {
     const workspace = setup(); let writer: ComposedToolSession | undefined;
     const tools = agentToolset({ workspace, agentId: "default", sessionId: "native-root",
@@ -187,7 +208,8 @@ describe("native child cancellation and inherited governance", () => {
         config: { maxStepsPerTurn: 2, maxParallelToolCalls: 1 },
         credentials: { homeDir: join(workspace, "fixture-credentials"), env: {}, watch: false, projectDir: null },
         approvalGate: { actionClass: "READ_ONLY", riskTier: "low", answerers: [{ name: "fixture-reviewer", answer: async () => "allow" }] },
-        delegation: { maxDepth: 2, scope: ["READ_ONLY"], grant: capability => { tools.registry.define(delegateTool(capability)); } }
+        delegation: { maxDepth: 2, scope: ["READ_ONLY"], stopConditions: ["max-turns:1", "timeout-ms:30000"],
+          grant: capability => { tools.registry.define(delegateTool(capability)); } }
       });
       const events = rows(workspace);
       const starts = events.filter(row => row.event_type === "agent_delegation_started");
@@ -195,7 +217,9 @@ describe("native child cancellation and inherited governance", () => {
       const approvalSessions = new Set(events.filter(row => row.event_type === "approval/request").map(row => row.session_id));
       expect(approvalSessions.size).toBe(2); expect(approvalSessions.has("native-root")).toBe(true);
       for (const start of starts) {
-        const child = JSON.parse(start.meta_json).childSessionId;
+        const meta = JSON.parse(start.meta_json);
+        const child = meta.childSessionId;
+        expect(loadHandoffPacket(workspace, meta.packetId).stopConditions).toEqual(["max-turns:1", "timeout-ms:30000"]);
         expect(events.filter(row => row.session_id === child && row.event_type === "session/close")).toHaveLength(1);
       }
     } finally { tools.close(); }

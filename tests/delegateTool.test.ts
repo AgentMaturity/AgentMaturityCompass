@@ -212,6 +212,37 @@ describe("depth is read from the identity, not from agentId", () => {
 });
 
 describe("the model's arguments are not trusted", () => {
+  it("pins operator stop conditions and ignores model attempts to replace them", async () => {
+    const dir = workspace();
+    allowDelegate(dir);
+    const spy = spyRunner();
+    const stops = ["max-turns:1", "timeout-ms:30000"];
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session",
+      subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session: recorder(), stopConditions: stops } });
+    stops.splice(0, stops.length, "max-turns:999");
+    try {
+      await toolset.seam.execute(call({ runAs: "researcher", goal: "answer briefly", stopConditions: [], maxTurns: 999 }));
+      expect(spy.seen).toHaveLength(1);
+      expect(spy.seen[0]!.stopConditions).toEqual(["max-turns:1", "timeout-ms:30000"]);
+      expect(Object.isFrozen(spy.seen[0]!.stopConditions)).toBe(true);
+    } finally { toolset.close(); }
+  });
+
+  it("refuses an unsupported operator stop before child execution or authorization", async () => {
+    const dir = workspace();
+    allowDelegate(dir);
+    const spy = spyRunner(), session = recorder();
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "toolset-test-session",
+      subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session, stopConditions: ["when satisfied"] } });
+    try {
+      const result = await toolset.seam.execute(call({ runAs: "researcher", goal: "answer briefly" }));
+      expect(String(result.content)).toContain("delegation refused");
+      expect(String(result.content)).toContain("max-turns:");
+      expect(spy.seen).toHaveLength(0);
+      expect(session.rows).toEqual([]);
+    } finally { toolset.close(); }
+  });
+
   it("refuses an empty goal rather than delegating nothing", async () => {
     // A child asked to do nothing still costs a turn and still writes a
     // delegation to the log.
