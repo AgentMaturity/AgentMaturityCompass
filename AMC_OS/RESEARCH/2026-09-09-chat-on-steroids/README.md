@@ -1,0 +1,24 @@
+## Guided observer integrated; retained-output command Goal configured — September 9
+
+Chat on Steroids completed its guided observer workflow on GPT-6 Pro. Worker `71a81a966188f044c124e09ccc6bca0a45ed9dfb` is merged at `25e0c58805e5435c45dc134f29e07835c494219e`. AMC now has guided study preparation, explicit observation entry, resumable status and reviewed export over its unchanged capture/intake core. Root and independent Astra source review found no concrete blocker; tests and actual human sessions remain pending. The completed automation was paused after its final handoff. Its next finite Goal implements native retained-output operator commands in `tmp/cos-spill-commands` for AMC-1547. The automatic opener timed out; direct composer dispatch recovered it. The app confirms delivery, the active conversation **Implement AMC Commands**, **Pursuing goal**, **GPT-6 Pro** and a running turn. Codex continues independently and inspects CoS only at completion, timeout or an instruction need. Records: `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/observer-integration.json` and `spill-goal-dispatch.json`.
+
+Records: /Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/observer-integration.json and spill-goal-dispatch.json. [AMC-1512](https://linear.app/agentmaturitycompass/issue/AMC-1512), [AMC-1518](https://linear.app/agentmaturitycompass/issue/AMC-1518).
+# Chat on Steroids collaboration — September 9, 2026
+
+Historical capture dispatch observation: the original intake implementation is integrated at `e63c8cb7fa108561b584a807ae59c4da63bb6792`. Sid then requested continuing parallel/background work. The new **Implement AMC Observer Capture** conversation visibly shows **Pursuing goal**, **GPT-6 Pro** and a running assistant response. `goal-task.md` holds the finite implementation queue and exact five-file ownership; `goal-dispatch.json` records delivery. The prior completed loop was visibly turned Off. New source is not yet accepted; Codex owns integration and final validation. Earlier paragraphs below are retained observations of the first assignment.
+
+Sid authorized delegating AMC work to the installed Chat on Steroids and requires GPT-6 Pro for all its tasks. Installed bundle reports version 2.0.8. The native UI shows a connected bridge and an existing successful command in the approved AMC root. A separate new chat is selected as GPT-6 Pro; no assignment completion is claimed.
+
+PR114 was merged September8: https://github.com/totec448-spec/chat-on-steroids/pull/114. Its version does not alone prove every integration is configured. The local UI confirms the currently used bridge. Tasks are supplied through the app's composer, which delivers to its connected ChatGPT conversation. Source at PR merge067c40d maps GPT-6 Pro to Astra in src/shared/chat-models.ts.
+
+Codex retains integration ownership. The isolated worker branch is codex/cos-human-first-use, at base0fcce267ad52141dbec68af02a4af665211609bd in /Users/sid/AgentMaturityCompass/tmp/cos-human-first-use. See task.md and plans/ownership-manifest.md for the exact write scope. Task1 builds local human first-use intake validation; task2 provides the operator protocol and authored regression cases. These serve AMC-1512 and AMC-1518 but cannot replace the required real participants or model trials. No checks are delegated before implementation completion.
+
+Status: delivered and active. The app shows “Implement AMC Evidence Intake”, GPT-6 Pro and an assistant response beginning the required reads. See dispatch.json. This proves delivery, not implementation completion.
+
+Observed follow-through: native timeline now shows completed required brief and four-path reads while the GPT-6 Pro task is active. Actual implementation completion is still pending.
+
+The app settings now visibly select GPT-6 Pro / Pro for Goal, Loop and Plan and for default workers. The current continuation/plan sources use ChatGPT. User connector instructions now require GPT-6 Pro for all tasks and prohibit silent fallback; the app says new conversations load updated connector instructions. The active assignment was already explicitly launched as GPT-6 Pro. No new API credentials or access permissions were created.
+
+## Implementation integrated
+
+The native app completed the GPT-6 Pro assignment and returned its final handoff. Codex reviewed the final source/guide and integrated the three source/document files by committing branch `0030c2b5cf087291384859f8d0238055a2caff49` and merging it at `e63c8cb7fa108561b584a807ae59c4da63bb6792`. The ignored worktree-local role handoff remains referenced, preserving the existing root handoff. All expected source outputs exist; their actual byte hashes are in dispatch.json. The worktree is retained. No tests were run by CoS; final acceptance remains pending.

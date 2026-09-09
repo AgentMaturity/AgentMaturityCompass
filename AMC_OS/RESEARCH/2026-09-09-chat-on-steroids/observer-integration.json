@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-09T10:22:34.325656+00:00",
+  "status": "integrated-qualification-pending",
+  "workerCommit": "71a81a966188f044c124e09ccc6bca0a45ed9dfb",
+  "integrationCommit": "25e0c58805e5435c45dc134f29e07835c494219e",
+  "model": "GPT-6 Pro",
+  "completion": "Final local handoff and final app response confirmed; completed automation paused and task idle.",
+  "sourceReview": "Root source/tests/guide review and independent Astra source review, no concrete blocker.",
+  "files": {
+    "scripts/human-first-use-observer.mjs": "5f1c7a91ea7bb1b4689923ea87bef37abe928d694a76d1416f82e0e840e12612",
+    "tests/humanFirstUseObserver.test.ts": "6f6e4ab66bdfa17b4458669e9832978e0b5b92e3a54f08aa2e98c4113b7d8b6b",
+    "docs/HUMAN_FIRST_USE_OBSERVER.md": "ffddf94305b642c2a7d12a87eb2ff8bf4ced7ed35fea142f89eeae6774fc0992"
+  },
+  "testsExecuted": false,
+  "humanObservations": "none collected",
+  "qualification": "pending final fresh-candidate acceptance",
+  "processCleanup": "No test/server/watcher process started for this integration; finished CoS Goal paused."
+}
