@@ -82,16 +82,27 @@ export function openHistoryReader(workspacePath: string) {
   files.push(join(amc, "keys", "monitor_ed25519.pub"), join(amc, "keys", "monitor_history.json"));
   // Detect ordinary concurrent append, retention, replacement and trust changes.
   // This is not an atomic cross-file transaction or a hostile-filesystem lock.
-  const snapshot = () => JSON.stringify(files.map(path => {
+  const snapshot = () => files.map(path => {
     const info = stat(path);
     if (info && (!info.isFile() || info.isSymbolicLink())) historyRefuse("UNSAFE_PATH", "A history or trust path became unsafe.");
-    return info ? [path, info.dev, info.ino, info.size, info.mtimeMs, info.ctimeMs] : [path, null];
-  }));
+    return { path, identity: info ? { dev: info.dev, ino: info.ino, size: info.size, mtime: info.mtimeMs, ctime: info.ctimeMs } : null };
+  });
   const before = snapshot();
   try {
     const store = openSessionEventStore(workspace, backend, { readOnly: true });
     return { workspace, backend, store, assertUnchanged: () => {
-      if (snapshot() !== before) historyRefuse("CHANGED", "History or trust changed during loading; quiesce writers and explicitly load a new snapshot.");
+      const after = snapshot();
+      const unchanged = before.every((prior, index) => {
+        const current = after[index]!;
+        // A cold read-only SQLite SELECT can create an empty WAL coordination
+        // file. It contains no evidence. Permit only this absent-to-empty case;
+        // existing WAL identity/timestamps and every populated WAL stay fenced.
+        // The database, marker, trust and rollback journal remain strict too.
+        if (backend === "sqlite" && prior.path === join(amc, "evidence.sqlite-wal")
+          && prior.identity === null && current.identity?.size === 0) return true;
+        return JSON.stringify(current) === JSON.stringify(prior);
+      });
+      if (!unchanged) historyRefuse("CHANGED", "History or trust changed during loading; quiesce writers and explicitly load a new snapshot.");
     } };
   } catch (error) {
     if (error instanceof SessionHistoryRefused) throw error;

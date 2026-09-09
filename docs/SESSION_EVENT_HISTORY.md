@@ -78,6 +78,13 @@ It does not lock writers or provide a transaction across files. Quiesce writers
 and retention for operational decisions; after a `CHANGED` refusal, deliberately
 load a new snapshot rather than automatically repeating a mutation.
 
+SQLite may create empty WAL/shared-memory coordination sidecars on its first
+read after restart. The history fence permits only an absent WAL becoming an
+empty regular file while the database and all other tracked history/trust paths
+stay unchanged. It does not ignore existing WAL changes, populated WALs or
+unsafe links, and never uses immutable-database mode that would omit live WAL
+evidence. Coordination sidecars are not new signed session events.
+
 ## Use the complete workspace history for lifecycle operations
 
 ```ts
