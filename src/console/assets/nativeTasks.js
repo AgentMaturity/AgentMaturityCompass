@@ -144,7 +144,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     el("nativeTaskIncludeArchived").disabled = !config || mutation || inspecting || Boolean(pending);
     el("nativeTaskRefresh").disabled = (!config && !pending) || mutation || inspecting || polling || reconciling || !navigator.onLine;
     el("nativeTaskNew").disabled = !task || ACTIVE.has(task.state) || mutation || Boolean(pending);
-    el("nativeTaskState").textContent = taskStateLabel(task);
+    el("nativeTaskState").textContent = stale ? "Status unconfirmed"
+      : task?.history.status === "unavailable" ? "Evidence unavailable" : taskStateLabel(task);
     if (config) scope();
   }
   function project() {
@@ -157,6 +158,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       const node = el(id);
       node.textContent = "Current status is unconfirmed. Refresh status to authenticate this view before acting; no previous result is presented as current.";
       delete node.dataset.rendered;
+    }
+    if (stale) {
+      const identity = el("nativeTaskIdentity");
+      identity.textContent = `Last selected task: ${task?.taskId || "none"}. Its current history and state are unconfirmed until Refresh status succeeds.`;
+      delete identity.dataset.rendered;
     }
     const shown=el("nativeTaskTranscript").querySelectorAll(".native-task-event").length;
     const dropped = Math.max(0,(task?.nextCursor || 0)-shown);

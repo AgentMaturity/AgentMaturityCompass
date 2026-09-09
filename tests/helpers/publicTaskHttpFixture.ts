@@ -109,7 +109,8 @@ export async function publicTaskHttpFixture(mode: OutcomeCase = "success", backe
           assert.equal(approval.toolName, "bash"); assert.equal(approval.actionClass, "WRITE_HIGH"); assert.equal(approval.required, 2);
           for (const identity of mode === "denied" ? ["ada"] : ["ada", "grace"]) {
             const response = await request(`/approvals/${approval.approvalRequestId}/${mode === "denied" ? "deny" : "approve"}?agentId=default`,
-              { identity, body: { decision: mode === "denied" ? "DENY" : "APPROVE_EXECUTE", reason: "Automated fixture reviewer; not a human approval study." } });
+              { identity, body: { ...(mode === "denied" ? {} : { decision: "APPROVE_EXECUTE" }),
+                reason: "Automated fixture reviewer; not a human approval study." } });
             assert.equal(response.status, 200, JSON.stringify(response.body));
           }
           decided.add(approval.approvalRequestId);

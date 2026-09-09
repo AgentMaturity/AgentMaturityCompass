@@ -83,6 +83,7 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
         await page.route(pollPattern, route => route.abort("failed"));
         await expect(page.locator("#nativeTaskRefresh")).toBeEnabled(); await page.locator("#nativeTaskRefresh").click();
         await expect(page.locator("#nativeTaskVerification")).toContainText("Current status is unconfirmed");
+        await expect(page.locator("#nativeTaskState")).toHaveText("Status unconfirmed");
         await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
         await expect(page.locator("#nativeTaskVerify")).toBeDisabled();
         await expect(page.locator("#nativeTaskTranscript .native-task-event")).toHaveCount(0);
@@ -131,6 +132,7 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
     writeFileSync(path, rows.join("\n") + "\n");
     await page.locator("#nativeTaskRefresh").click();
     await expect(page.locator("#nativeTaskIdentity")).toContainText("unavailable");
+    await expect(page.locator("#nativeTaskState")).toHaveText("Evidence unavailable");
     await expect(page.locator("#nativeTaskVerification")).toContainText("No previous verification verdict is current");
     await expect(page.locator("#nativeTaskTranscript .native-task-event")).toHaveCount(0);
     await expect(page.locator("#nativeTaskResume")).toBeHidden();

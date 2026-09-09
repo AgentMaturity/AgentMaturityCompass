@@ -155,7 +155,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       backend: null, headEventHash: null, eventCount: 0,
       message: d.sessionId ? entry.projectionError ?? "Persisted history is unavailable. Refresh after restoring the original evidence."
         : "No native session has been recorded yet. Admission is not task completion." };
-    const resumeBlockedReason = d.sessionId && !d.closed && !p?.closed
+    const resumeBlockedReason = !entry.client && d.sessionId && !d.closed && !p?.closed
       ? !p ? "Authenticate the original persisted history before requesting resume."
         : p.history.backend === "jsonl" ? "JSONL history can be inspected after restart, but writer resume is not supported. Start a new task to continue; no prior prompt will be replayed." : null : null;
     const validation = nativeTaskValidationView(d.validation, p?.validation,
