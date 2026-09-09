@@ -1,0 +1,13 @@
+{
+  "issue": "AMC-1547",
+  "sourceReviewCommit": "f0442ac118573683080681f443f518853cd91f22",
+  "status": "implementation-in-progress",
+  "acceptanceExecuted": false,
+  "productionKeyOperations": false,
+  "testsDeferredByUser": true,
+  "linearChildren": 42,
+  "linearStates": {
+    "In Review": 31,
+    "In Progress": 11
+  }
+}
