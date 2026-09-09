@@ -1,5 +1,6 @@
 /** Parsing, provider routing, approval policy selection and progress formatting for the native CLI. */
 import chalk from "chalk";
+import { InvalidArgumentError } from "commander";
 import { readFileSync } from "node:fs";
 import type { LlmRouteConfig } from "./llm/adapter/adapterRegistry.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
@@ -36,6 +37,8 @@ export interface RunOptions {
   delegate?: boolean;
   maxDelegationDepth?: string;
   delegateScope?: string;
+  /** False is the explicit operator --no-delegate-stop reset, never a model argument. */
+  delegateStop?: string[] | false;
   preset?: string;
   delegateProvider?: string;
   delegateTimeout?: string;
@@ -68,6 +71,19 @@ export interface RunOptions {
 
 const RISK_TIERS: readonly ApprovalRiskTier[] = ["low", "medium", "high", "critical"];
 export const collectOption = (value: string, previous: string[] = []): string[] => [...previous, value];
+
+/** Keep contradictory stop/reset flags a refusal in either argv order. */
+export function collectDelegateStop(value: string, previous: string[] | false = []): string[] {
+  if (previous === false) throw new InvalidArgumentError("--delegate-stop and --no-delegate-stop cannot be combined.");
+  return [...previous, value];
+}
+
+export function resetDelegateStops(_value: string, previous: string[] | false | undefined): false {
+  if (Array.isArray(previous) && previous.length > 0) {
+    throw new InvalidArgumentError("--delegate-stop and --no-delegate-stop cannot be combined.");
+  }
+  return false;
+}
 
 /** What the run's tool calls need before they may run, or `null` when nothing does. */
 export interface ApprovalGateChoice {
