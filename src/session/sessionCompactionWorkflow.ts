@@ -1,7 +1,7 @@
 /** Native operator workflow; no provider, external harness or summarizer dependency. */
 import { randomUUID } from "node:crypto";
 import { hostname } from "node:os";
-import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
+import { openHistoryReader } from "./sessionHistoryReader.js";
 import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
 import { describeMeasuredLiveEntries, prepareSurfaceCompaction } from "./surfaceCompaction.js";
 import { compactionReceipt } from "./surfaceCompactionValidation.js";
@@ -9,20 +9,25 @@ import { resumeSession } from "./sessionResume.js";
 import type { SessionService } from "./sessionService.js";
 
 function snapshot(workspace: string, sessionId: string) {
-  const integrity = verifyLedgerIntegrity(workspace);
-  if (!integrity.chain.ok) throw new Error(`Session compaction refuses invalid evidence: ${integrity.chain.errors.slice(0, 3).join("; ")}`);
-  const store = openSessionEventStore(workspace, undefined, { readOnly: true });
+  // Inspect the recorded backend, never a permissive fallback selected from a
+  // malformed marker or environment. Keep verification and measurement inside
+  // the same reader's change fence; this is still read-only, not writer admission.
+  const reader = openHistoryReader(workspace);
   try {
+    const integrity = verifyLedgerIntegrity(reader.workspace);
+    if (!integrity.chain.ok) throw new Error(`Session compaction refuses invalid evidence: ${integrity.chain.errors.slice(0, 3).join("; ")}`);
+    const store = reader.store;
     const record = store.readSessionRecord(sessionId);
     if (record === null) throw new Error(`No session ${sessionId} exists in this workspace`);
     const rows = store.readSessionEvents(sessionId), head = rows.at(-1);
     if (!head) throw new Error("Session has no native history to compact");
-    const entries = describeMeasuredLiveEntries(workspace, rows);
+    const entries = describeMeasuredLiveEntries(reader.workspace, rows);
     let lastSeal = -1;
     rows.forEach((row, index) => { if (row.event_type === "turn/seal") lastSeal = index; });
     const interrupted = rows.slice(lastSeal + 1).some(row => row.event_type === "turn/start");
+    reader.assertUnchanged();
     return { rows, head, record, entries, interrupted, backend: store.backendId, anchored: integrity.trustRoot.anchored };
-  } finally { store.close(); }
+  } finally { reader.store.close(); }
 }
 
 export function inspectSessionCompaction(workspace: string, sessionId: string) {

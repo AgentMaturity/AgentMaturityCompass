@@ -1,12 +1,13 @@
-import { mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { compactionReceipt } from "../src/session/surfaceCompactionValidation.js";
 import { validateSurfaceCompactions } from "../src/session/surfaceCompaction.js";
+import * as surfaceCompaction from "../src/session/surfaceCompaction.js";
 import { resolveRequestSources } from "../src/llm/request/requestSources.js";
 import { resumeSession, forkSession } from "../src/session/sessionResume.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -20,6 +21,8 @@ const roots: string[] = [], services: SessionService[] = [];
 let previousPassphrase: string | undefined;
 beforeEach(() => { previousPassphrase = process.env.AMC_VAULT_PASSPHRASE; process.env.AMC_VAULT_PASSPHRASE = "origin-compaction-test-only"; });
 afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   for (const service of services.splice(0)) { try { service.disposeWithoutClosing(); } catch { /* already closed */ } }
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
   if (previousPassphrase === undefined) delete process.env.AMC_VAULT_PASSPHRASE;
@@ -173,6 +176,56 @@ describe("origin-addressed native compaction", () => {
     const listed = inspectSessionCompaction(root, sessionId), before = storedRows(root, sessionId);
     expect(() => compactReleasedSession({ workspace: root, sessionId, expectedHeadHash: listed.headEventHash,
       originEventIds: ["not-a-live-origin"], mode: "summarize", replacement: "summary", reason: "operator request" })).toThrow(/missing/);
+    expect(storedRows(root, sessionId)).toEqual(before);
+  });
+
+  it.each(["{malformed", JSON.stringify({ v: 2, backend: "sqlite" }), JSON.stringify({ v: 1, backend: "unknown" })])(
+    "refuses an invalid recorded backend rather than inspecting fallback SQLite: %s", markerText => {
+      const root = workspace(), service = open(root); textTurn(service);
+      const sessionId = service.sessionId; service.releaseWithoutClosing();
+      const listed = inspectSessionCompaction(root, sessionId), before = storedRows(root, sessionId);
+      const marker = join(root, ".amc", "session-store.json"), originalMarker = readFileSync(marker);
+      writeFileSync(marker, markerText);
+      try {
+        expect(() => inspectSessionCompaction(root, sessionId)).toThrow(/UNSUPPORTED_FORMAT/);
+        expect(() => compactReleasedSession({ workspace: root, sessionId, expectedHeadHash: listed.headEventHash,
+          originEventIds: [listed.entries[0]!.originEventId], mode: "summarize", replacement: "summary", reason: "operator request" }))
+          .toThrow(/UNSUPPORTED_FORMAT/);
+        expect(readFileSync(marker, "utf8")).toBe(markerText);
+      } finally { writeFileSync(marker, originalMarker); }
+      expect(storedRows(root, sessionId)).toEqual(before);
+    }
+  );
+
+  it.each([["not-a-backend", "INVALID_INPUT"], ["jsonl", "BACKEND_MISMATCH"]])(
+    "refuses selector %s against recorded SQLite before returning a compaction snapshot", (backend, reason) => {
+      const root = workspace(), service = open(root); textTurn(service);
+      const sessionId = service.sessionId; service.releaseWithoutClosing();
+      const before = storedRows(root, sessionId);
+      const marker = join(root, ".amc", "session-store.json"), originalMarker = readFileSync(marker);
+      vi.stubEnv("AMC_SESSION_STORE", backend);
+      try {
+        expect(() => inspectSessionCompaction(root, sessionId)).toThrow(reason);
+        expect(readFileSync(marker)).toEqual(originalMarker);
+      } finally { vi.unstubAllEnvs(); }
+      expect(storedRows(root, sessionId)).toEqual(before);
+    }
+  );
+
+  it("refuses a backend-marker change during authenticated measurement instead of publishing a stale snapshot", () => {
+    const root = workspace(), service = open(root); textTurn(service);
+    const sessionId = service.sessionId; service.releaseWithoutClosing();
+    const before = storedRows(root, sessionId);
+    const marker = join(root, ".amc", "session-store.json"), originalMarker = readFileSync(marker);
+    const measure = surfaceCompaction.describeMeasuredLiveEntries;
+    vi.spyOn(surfaceCompaction, "describeMeasuredLiveEntries").mockImplementation((selectedWorkspace, rows) => {
+      const entries = measure(selectedWorkspace, rows);
+      writeFileSync(marker, JSON.stringify({ v: 1, backend: "sqlite", changedDuringMeasurement: true }));
+      return entries;
+    });
+    try {
+      expect(() => inspectSessionCompaction(root, sessionId)).toThrow(/CHANGED/);
+    } finally { writeFileSync(marker, originalMarker); }
     expect(storedRows(root, sessionId)).toEqual(before);
   });
 });
