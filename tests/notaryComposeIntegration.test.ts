@@ -170,10 +170,11 @@ describe("optional Compose notary listener and policy signing", () => {
       expect(() => signDigestWithPolicy({ workspace, kind: "MERKLE_ROOT", digestHex })).toThrow("notary sign failed (401)");
       setVaultSecret(workspace, "notary/auth", AUTH);
 
-      const request = async (checksum: string, timestamp: number) => {
+      const request = async (checksum: string, timestamp: number, uppercaseAuth = false) => {
         const body = JSON.stringify({ kind: "MERKLE_ROOT", payloadB64: digestBytes.toString("base64"), payloadSha256: checksum });
+        const auth = buildNotaryAuthSignature({ secret: AUTH, ts: timestamp, method: "POST", path: "/sign", bodyBytes: Buffer.from(body) });
         const headers = { "content-type": "application/json", "x-amc-notary-ts": String(timestamp),
-          "x-amc-notary-auth": buildNotaryAuthSignature({ secret: AUTH, ts: timestamp, method: "POST", path: "/sign", bodyBytes: Buffer.from(body) }) };
+          "x-amc-notary-auth": uppercaseAuth ? auth.toUpperCase() : auth };
         return fetch(`${baseUrl}/sign`, { method: "POST", body, headers });
       };
       const mismatch = await request(digestHex, Date.now());
@@ -186,6 +187,20 @@ describe("optional Compose notary listener and policy signing", () => {
       const replay = await request(sha256Hex(digestBytes), timestamp);
       expect(replay.status).toBe(401);
       expect((await replay.json() as { reason: string }).reason).toBe("replay detected");
+      const equivalentReplay = await request(sha256Hex(digestBytes), timestamp, true);
+      expect(equivalentReplay.status).toBe(401);
+      expect((await equivalentReplay.json() as { reason: string }).reason).toBe("replay detected");
+
+      const logAuth = buildNotaryAuthSignature({ secret: AUTH, ts: timestamp, method: "GET", path: "/log/tail", bodyBytes: Buffer.alloc(0) });
+      const logRequest = (signature: string) => fetch(`${baseUrl}/log/tail`, {
+        headers: { "x-amc-notary-ts": String(timestamp), "x-amc-notary-auth": signature }
+      });
+      const log = await logRequest(logAuth);
+      expect(log.status).toBe(200);
+      expect(Array.isArray((await log.json() as { entries: unknown[] }).entries)).toBe(true);
+      const logReplay = await logRequest(logAuth.toUpperCase());
+      expect(logReplay.status).toBe(401);
+      expect((await logReplay.json() as { reason: string }).reason).toBe("replay detected");
     } finally { await stopChild(child); }
   }, 30_000);
 

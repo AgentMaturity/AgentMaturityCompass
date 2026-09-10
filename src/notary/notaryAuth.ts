@@ -27,6 +27,34 @@ function secureHexEqual(a: string, b: string): boolean {
   return timingSafeEqual(left, right);
 }
 
+export interface AuthenticatedNotaryRequest {
+  ok: true;
+  /** Identity of the authenticated bytes, not the header's textual spelling. */
+  replayKey: string;
+  /** Inclusive end of the same clock-skew window used during authentication. */
+  replayExpiresTs: number;
+}
+
+export function createNotaryReplayGuard(maxEntries = 10_000):
+  (request: AuthenticatedNotaryRequest) => { ok: true } | { ok: false; reason: string } {
+  if (!Number.isSafeInteger(maxEntries) || maxEntries < 1) {
+    throw new Error("Notary replay capacity must be a positive safe integer");
+  }
+  const seen = new Map<string, number>();
+  return (request) => {
+    const now = Date.now();
+    for (const [key, expiresTs] of seen) {
+      if (expiresTs < now) seen.delete(key);
+    }
+    if (request.replayExpiresTs < now) return { ok: false, reason: "authentication expired" };
+    if (seen.has(request.replayKey)) return { ok: false, reason: "replay detected" };
+    // Never evict live authentication to make room: that would admit its replay.
+    if (seen.size >= maxEntries) return { ok: false, reason: "replay protection capacity exhausted" };
+    seen.set(request.replayKey, request.replayExpiresTs);
+    return { ok: true };
+  };
+}
+
 export function verifyNotaryRequestAuth(params: {
   req: IncomingMessage;
   bodyBytes: Buffer;
@@ -35,7 +63,7 @@ export function verifyNotaryRequestAuth(params: {
   tsHeaderName: string;
   maxClockSkewSeconds: number;
   path: string;
-}): { ok: true } | { ok: false; reason: string } {
+}): AuthenticatedNotaryRequest | { ok: false; reason: string } {
   const sigHeader = params.req.headers[params.headerName.toLowerCase()];
   const tsHeader = params.req.headers[params.tsHeaderName.toLowerCase()];
   if (typeof sigHeader !== "string" || sigHeader.trim().length === 0) {
@@ -63,6 +91,11 @@ export function verifyNotaryRequestAuth(params: {
   if (!secureHexEqual(expected, sigHeader)) {
     return { ok: false, reason: "signature mismatch" };
   }
-  return { ok: true };
+  // Use the verified canonical HMAC, not the supplied header. Equivalent hex
+  // casing/whitespace (or timestamp spellings) must consume the same admission.
+  return {
+    ok: true,
+    replayKey: `${(params.req.method ?? "GET").toUpperCase()}:${params.path}:${Math.trunc(ts)}:${expected}`,
+    replayExpiresTs: Math.trunc(ts) + params.maxClockSkewSeconds * 1000
+  };
 }
-

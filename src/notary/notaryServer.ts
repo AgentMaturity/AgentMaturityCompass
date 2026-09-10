@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import { isIP, type Socket } from "node:net";
 import { loadNotaryConfig, resolveNotaryDir } from "./notaryConfigStore.js";
 import { loadNotarySigner } from "./notarySigner.js";
-import { verifyNotaryRequestAuth } from "./notaryAuth.js";
+import { createNotaryReplayGuard, verifyNotaryRequestAuth } from "./notaryAuth.js";
 import { notarySignRequestSchema } from "./notaryApiTypes.js";
 import { sha256Hex } from "../utils/hash.js";
 import { appendNotaryLogEntry, initNotaryLog, tailNotaryLog } from "./notaryLog.js";
@@ -93,34 +93,6 @@ function rateLimiter(limit: number): (key: string) => boolean {
   };
 }
 
-function replayGuard(windowMs: number, maxEntries = 10_000): (key: string) => boolean {
-  const seen = new Map<string, number>();
-  return (key: string): boolean => {
-    const now = Date.now();
-    for (const [entry, expiresTs] of seen) {
-      if (expiresTs <= now) {
-        seen.delete(entry);
-      }
-    }
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.set(key, now + windowMs);
-    if (seen.size > maxEntries) {
-      const overflow = seen.size - maxEntries;
-      let removed = 0;
-      for (const entry of seen.keys()) {
-        seen.delete(entry);
-        removed += 1;
-        if (removed >= overflow) {
-          break;
-        }
-      }
-    }
-    return true;
-  };
-}
-
 export async function startNotaryServer(options: NotaryStartOptions = {}): Promise<{
   url: string;
   close: () => Promise<void>;
@@ -159,7 +131,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
     attestationLevel: signer ? signer.attestationLevel() : null
   };
   const limiter = rateLimiter(config.notary.rateLimitPerMinute);
-  const markAuthReplay = replayGuard(Math.max(1, config.notary.auth.maxClockSkewSeconds) * 1000);
+  const markAuthReplay = createNotaryReplayGuard();
   const sockets = new Set<Socket>();
 
     const server = createServer(async (req, res) => {
@@ -252,9 +224,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
             json(res, 401, { error: "unauthorized", reason: auth.reason });
             return;
           }
-          const sigHeaderValue = req.headers[config.notary.auth.headerName.toLowerCase()];
-          const tsHeaderValue = req.headers[config.notary.auth.tsHeaderName.toLowerCase()];
-          if (typeof sigHeaderValue !== "string" || typeof tsHeaderValue !== "string") {
+          const replay = markAuthReplay(auth);
+          if (!replay.ok) {
             appendNotaryLogEntry({
               notaryDir,
               signer,
@@ -262,19 +233,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
               kind: "NOTARY_AUTH_FAILED",
               payloadSha256: sha256Hex(body)
             });
-            json(res, 401, { error: "unauthorized", reason: "missing auth headers after verification" });
-            return;
-          }
-          const replayKey = `${method}:${pathname}:${Math.trunc(Number(tsHeaderValue))}:${sigHeaderValue}`;
-          if (!markAuthReplay(replayKey)) {
-            appendNotaryLogEntry({
-              notaryDir,
-              signer,
-              requestId,
-              kind: "NOTARY_AUTH_FAILED",
-              payloadSha256: sha256Hex(body)
-            });
-            json(res, 401, { error: "unauthorized", reason: "replay detected" });
+            json(res, 401, { error: "unauthorized", reason: replay.reason });
             return;
           }
         }
@@ -348,21 +307,8 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
             json(res, 401, { error: "unauthorized", reason: auth.reason });
             return;
           }
-          const sigHeaderValue = req.headers[config.notary.auth.headerName.toLowerCase()];
-          const tsHeaderValue = req.headers[config.notary.auth.tsHeaderName.toLowerCase()];
-          if (typeof sigHeaderValue !== "string" || typeof tsHeaderValue !== "string") {
-            appendNotaryLogEntry({
-              notaryDir,
-              signer,
-              requestId,
-              kind: "NOTARY_AUTH_FAILED",
-              payloadSha256: sha256Hex(`${pathname}:missing auth headers after verification`)
-            });
-            json(res, 401, { error: "unauthorized", reason: "missing auth headers after verification" });
-            return;
-          }
-          const replayKey = `${method}:${pathname}:${Math.trunc(Number(tsHeaderValue))}:${sigHeaderValue}`;
-          if (!markAuthReplay(replayKey)) {
+          const replay = markAuthReplay(auth);
+          if (!replay.ok) {
             appendNotaryLogEntry({
               notaryDir,
               signer,
@@ -370,7 +316,7 @@ export async function startNotaryServer(options: NotaryStartOptions = {}): Promi
               kind: "NOTARY_AUTH_FAILED",
               payloadSha256: sha256Hex(`${pathname}:replay`)
             });
-            json(res, 401, { error: "unauthorized", reason: "replay detected" });
+            json(res, 401, { error: "unauthorized", reason: replay.reason });
             return;
           }
         }
