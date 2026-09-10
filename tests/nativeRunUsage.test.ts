@@ -58,7 +58,11 @@ describe("recorded native usage visibility", () => {
     expect(result.status).toBe("recorded");
     expect(result.totals.cacheReadTokens).toEqual({ observedTokens: 0, reportedRequests: 1 });
     expect(result.cache.readShare).toBeNull();
-    expect(renderNativeRunUsage(result)).not.toContain("0.00%");
+    expect(renderNativeRunUsage(result)).toContain("Cache-read share: unavailable");
+    // A zero token denominator cannot yield a token share. A completed request
+    // with an explicit zero cache count can still establish zero request hits.
+    expect(result.requestCache).toMatchObject({ hitRequests: 0, eligibleRequests: 1, hitRate: 0 });
+    expect(renderNativeRunUsage(result)).toContain("Request cache-read hit rate: 0.00% (0/1");
   });
   it("shows no cache rate when the provider did not report cache reads", () => {
     const result = projectNativeRunUsage([header("a"), outcome("a", reported({ cacheReadTokens: null }))], sessionId);

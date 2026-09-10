@@ -70,6 +70,21 @@ describe.each(["sqlite", "jsonl"] as const)("native %s read-back surfaces", back
       totals: { cacheReadTokens: { observedTokens: 50 }, cacheWriteTokens: { observedTokens: 10 } },
       cache: { readShare: 0.625, readTokens: 50, inputTokens: 80 } });
     expect(renderRunSummary(summary)).toContain("62.50% (50/80 tokens");
+    const recorded = readNativeSessionEvents(fixture.dir, fixture.sessionId);
+    const header = recorded.find(row => row.event_type === "request/header")!;
+    const outcome = recorded.find(row => row.event_type === "request/response")!;
+    const headerMeta = JSON.parse(header.meta_json), outcomeMeta = JSON.parse(outcome.meta_json);
+    expect(summary.usage?.requestReports).toEqual([expect.objectContaining({
+      headerEventId: header.id, outcomeEventId: outcome.id,
+      providerId: headerMeta.providerId, model: headerMeta.model,
+      encoderId: headerMeta.encoderId, encoderVersion: headerMeta.encoderVersion,
+      adapterId: outcomeMeta.adapterId, adapterVersion: outcomeMeta.adapterVersion,
+      outcome: "completed", usageStatus: "complete", cacheReadTokens: 50
+    })]);
+    expect(summary.usage?.requestCache).toMatchObject({ hitRequests: 1, eligibleRequests: 1, hitRate: 1 });
+    expect(renderRunSummary(summary)).toContain(`provider ${headerMeta.providerId}; model ${headerMeta.model}`);
+    expect(renderRunSummary(summary)).toContain(`request/header ${header.id}; outcome ${outcome.id}`);
+    expect(renderRunSummary(summary)).toContain("Request cache-read hit rate: 100.00% (1/1");
     expect(snapshot(fixture.dir)).toEqual(before);
     // The original writer still owns the session; the reader did not fence it.
     fixture.driver.followup("The original writer can continue.");
@@ -97,6 +112,15 @@ describe.each(["sqlite", "jsonl"] as const)("native %s read-back surfaces", back
     expect(result.spine.length).toBe(expected.events);
     expect(result.history.some((row: { role: string }) => row.role === "assistant")).toBe(true);
     expect(result.usage).toEqual(expected.usage);
+    expect(result.usage.requestReports).toHaveLength(1);
+    expect(result.usage.requestReports[0].headerEventId).toBe(expected.usage!.requestReports![0]!.headerEventId);
+    expect(result.usage.requestCache).toMatchObject({ hitRequests: 1, eligibleRequests: 1, hitRate: 1 });
+    output.length = 0;
+    const textProgram = new Command(); registerSessionCommands(textProgram);
+    await textProgram.parseAsync(["node", "amc", "session", "show", fixture.sessionId]);
+    expect(errors).not.toHaveBeenCalled();
+    expect(output.join("\n")).toContain(`request/header ${expected.usage!.requestReports![0]!.headerEventId}`);
+    expect(output.join("\n")).toContain("Request cache-read hit rate: 100.00% (1/1");
     expect(snapshot(fixture.dir)).toEqual(before);
   });
 });
