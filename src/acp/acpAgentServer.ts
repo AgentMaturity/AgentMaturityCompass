@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
-import type { AgentSession } from "../agent/agentSession.js";
+import type { AgentPromptResult, AgentSession } from "../agent/agentSession.js";
 import { SessionResumeRefused } from "../session/sessionResume.js";
 import { amcVersion } from "../version.js";
 import { createAcpConnection, type AcpConnection, type AcpSink } from "./acpConnection.js";
@@ -63,10 +63,12 @@ export interface AcpAgentInit {
 
 interface Registered {
   readonly session: AgentSession;
-  /** Rows already projected, so a prompt never re-sends an earlier answer. */
+  /** Rows emitted or deliberately withheld, never output owned by a later prompt. */
   projected: number;
   projectedHash: string | null;
   updateBytes: number;
+  /** A failed projection cannot be retried under a later prompt's identity. */
+  projectionFailed: boolean;
   running: boolean;
   releasing: boolean;
   /**
@@ -209,7 +211,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       await session.close();
       throw new AcpFailure(ACP_ERROR.internal, "session creation was cancelled or returned an incompatible identity");
     }
-    sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, running: false, releasing: false, cancelled: false });
+    sessions.set(sessionId, { session, projected: 0, projectedHash: null, updateBytes: 0, projectionFailed: false, running: false, releasing: false, cancelled: false });
     return { sessionId };
   }
 
@@ -249,7 +251,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
       const projectedHash = validateAcpCommittedTail(init.workspace, request.sessionId, rows, 0, null);
       const history = projectSessionUpdates(init.workspace, rows, 0, { includeUser: true });
       if (history.unsigned > 0) throw new Error("cannot replay unsigned history");
-      const entry: Registered = { session, projected: rows.length, projectedHash, updateBytes: 0, running: false, releasing: false, cancelled: false };
+      const entry: Registered = { session, projected: rows.length, projectedHash, updateBytes: 0, projectionFailed: false, running: false, releasing: false, cancelled: false };
       sessions.set(request.sessionId, entry);
       // ACP loading replays historical updates before its response. These are
       // history, not output attributed to a newly submitted prompt.
@@ -286,6 +288,9 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     if (entry.running || entry.releasing) {
       throw new AcpFailure(ACP_ERROR.invalidParams, "a prompt is already running on this session");
     }
+    if (entry.projectionFailed) {
+      throw new AcpFailure(ACP_ERROR.internal, "this session's committed updates are unusable; close the client and inspect the session evidence before continuing");
+    }
     if (signal.aborted) return { stopReason: "cancelled" };
 
     const text = flattenPrompt(request.prompt);
@@ -313,7 +318,15 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     const timer = setInterval(poll, 100);
     timer.unref();
     try {
-      const outcome = await entry.session.prompt(text);
+      let outcome: AgentPromptResult;
+      try {
+        outcome = await entry.session.prompt(text);
+      } catch (error) {
+        // A rejected prompt may also have committed rows. Withhold its tail as
+        // for ok:false, but never leave it for a later prompt to emit as new.
+        if (!streamFailed) flush(entry, request.sessionId, false);
+        throw error;
+      }
       if (streamFailed) throw new AcpFailure(ACP_ERROR.internal, "committed update authentication or output bounds failed; inspect the session evidence");
 
       // A CANCEL OUTRANKS EVERYTHING, including the `ok: false` a cancelled turn
@@ -328,10 +341,11 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         } : {}) };
       }
 
-      // A failed turn emits no further tail. Already delivered updates were
-      // independently authenticated at their commit boundary; they do not
-      // claim that the whole turn subsequently completed or verified.
+      // A failed turn emits no further tail. Authenticate and retire those rows
+      // now, or the next prompt's flush would misattribute them as fresh output.
+      // Already delivered updates remain distinct from the failed turn result.
       if (!outcome.ok) {
+        flush(entry, request.sessionId, false);
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason });
       }
 
@@ -369,16 +383,26 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
     entry.session.cancel({ kind: "user" }, "acp-client");
   }
 
-  /** Send every update the session has produced since the last flush. */
-  function flush(entry: Registered, sessionId: string): void {
-    const events = entry.session.readEvents();
-    const head = validateAcpCommittedTail(init.workspace, sessionId, events, entry.projected, entry.projectedHash);
-    const projected = projectSessionUpdates(init.workspace, events, entry.projected);
-    if (projected.unsigned > 0) throw new Error("ACP refused an unsigned committed update.");
-    entry.projected = events.length;
-    entry.projectedHash = head;
-    for (const update of projected.updates) {
-      sendUpdate(entry, sessionId, update);
+  /** Advance only over authenticated rows; failed-prompt tails are not emitted. */
+  function flush(entry: Registered, sessionId: string, emit = true): void {
+    if (entry.projectionFailed) throw new Error("ACP committed projection is unusable.");
+    try {
+      const events = entry.session.readEvents();
+      const head = validateAcpCommittedTail(init.workspace, sessionId, events, entry.projected, entry.projectedHash);
+      // Withheld output never reaches a client, so it needs no payload rendering.
+      // Its row signatures, ownership and sequence still must authenticate.
+      const projected = emit ? projectSessionUpdates(init.workspace, events, entry.projected) : null;
+      if (projected && projected.unsigned > 0) throw new Error("ACP refused an unsigned committed update.");
+      entry.projected = events.length;
+      entry.projectedHash = head;
+      for (const update of projected?.updates ?? []) {
+        sendUpdate(entry, sessionId, update);
+      }
+    } catch (error) {
+      // In particular, an output-limit failure must not reset with updateBytes
+      // on a new prompt, nor can a bad tail be silently skipped before spending.
+      entry.projectionFailed = true;
+      throw error;
     }
   }
 

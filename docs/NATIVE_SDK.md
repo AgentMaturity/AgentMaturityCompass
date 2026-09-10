@@ -43,6 +43,16 @@ The process startup options include `tools: "workspace"`, `approveTools`, `appro
 
 `newSession()` establishes an accepted conversation. A turn starts `submitted`, becomes `receiving` if committed updates arrive, and produces a `completed` result or a failure. Submission is not an acknowledgement that a model request has started. ACP `end_turn` is not a task-success verdict: read metadata for lossy mappings. Every response remains `not-verified` until a separate cold verifier returns a consistent receipt. `workspace-key-consistency` proves consistency against the workspace's own key; only `externally-anchored` includes an expected external fingerprint. Neither proves the answer correct.
 
+A failed or rejected prompt does not publish its remaining output tail. Its
+authenticated rows are consumed by that prompt's update cursor, so a later prompt
+cannot receive them as a new answer. Blocks already delivered while the prompt
+ran remain distinct from the failure result; cancellation retains its signed-tail
+flush behavior. If committed-row authentication, payload projection or an output
+bound fails, that loaded session refuses further prompts before execution. Close
+the client and inspect its persisted evidence; a new prompt does not reset that
+failure. This failure-boundary correction is source implementation only as of
+2026-09-10; its regressions and current installed qualification remain unexecuted.
+
 Call `turn.cancel()` or pass an `AbortSignal` to `session.prompt()`. Cancellation is a request until the result confirms its outcome. Breaking out of the update iterator also requests cancellation. `close()` closes the pipe, waits for the child, and escalates termination if the process does not exit. Forced termination can leave incomplete evidence; the verifier must refuse it.
 
 The client validates protocol identity, reply IDs, frame and output limits, stop reasons and verifier structure. It rejects loading or writer release when the installed runtime does not advertise support. `resumeSession()` never silently creates a different session.
