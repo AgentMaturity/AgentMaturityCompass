@@ -61,6 +61,7 @@ import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
+import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand, type NativeFirstUseOptions } from "./setup/nativeFirstUseGuide.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
@@ -115,6 +116,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
   // prompt is the IDENTITY half of the same native-agent surface `agent-loop`
   // runs — the two answer halves of one question and belong together.
   registerPromptCommands(program, io);
+  registerNativeScheduleCommands(program, io);
 
   const group = program
     .command("agent-loop")

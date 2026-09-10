@@ -8,7 +8,7 @@ import { runDueSchedules } from "../src/autonomy/scheduleRunner.js";
 import {
   MAX_CONSECUTIVE_FAILURES,
   claimDueRun,
-  completeRun,
+  completeRun as completeOwnedRun,
   dueSchedules,
   initSchedules,
   interruptedClaims,
@@ -30,6 +30,15 @@ import {
  */
 const PASS = "schedule-store-test-passphrase";
 const dirs: string[] = [];
+
+// Existing cadence cases now close with the fixture's actual claim identity.
+// Token mismatch, stale completion and duplicate closure have separate negative
+// regressions in nativeScheduleLifecycle.test.ts. AUTHORED UNEXECUTED in task11.
+function completeRun(dir: string, id: string, outcome: { ok: boolean; summary: string }): void {
+  const claimId = interruptedClaims(dir).find(claim => claim.scheduleId === id)?.claimId;
+  if (!claimId) throw new Error("fixture has no owned claim");
+  completeOwnedRun(dir, id, outcome, claimId);
+}
 
 afterEach(() => {
   while (dirs.length > 0) {
@@ -259,14 +268,9 @@ describe("running what is due", () => {
     // A leaked claim would wedge the schedule forever: nothing else can claim it
     // and nothing would ever close it.
     //
-    // NOTE ON WHAT THIS DOES NOT REACH. The runner here throws, but
-    // `spawnSubagent` catches a throwing SubagentRunner (subagentSpawn.ts:343)
-    // and returns `{ok: false}`, so the failure arrives through the NORMAL path
-    // and `runDueSchedules`'s own try/catch never fires. Mutation testing showed
-    // that: deleting its `completeRun` left this green. That catch is defence
-    // against `runGoalRounds` itself throwing — an unexpected failure the
-    // current stack cannot produce on demand — and is kept as defence for an
-    // unknown, not claimed as tested.
+    // spawnSubagent catches the runner's throw, so this exercises a returned
+    // failure, not a thrown goal-round driver. The new closer is shared by both
+    // paths; historical mutation results do not qualify this implementation.
     const dir = workspace();
     saveSchedules(dir, [nightly()]);
 

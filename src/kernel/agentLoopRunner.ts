@@ -38,7 +38,7 @@
  * command that finished.
  */
 import { Context } from "./amcRuntime.js";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/approvalGate.js";
 import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
@@ -63,6 +63,8 @@ import type { SubagentRunner } from "../agent/subagentSpawn.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
+import { runDueSchedules, type ScheduleRunResult } from "../autonomy/scheduleRunner.js";
+import { assertNativeScheduleAdmission } from "../autonomy/scheduleService.js";
 import type { SubagentCapability } from "../agent/delegateTool.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
 import { amcVersion } from "../version.js";
@@ -127,6 +129,13 @@ export interface ComposedToolSession {
 export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
+  /** Explicit owner-driven due pass, not a model turn, timer or resumable task. */
+  readonly schedulePass?: {
+    readonly now: number;
+    readonly expectedSchedulesDigest: string;
+    readonly expectedToolsDigest: string;
+    readonly signal?: AbortSignal;
+  };
   /**
    * The session id to open, minted when absent.
    *
@@ -250,6 +259,8 @@ export interface ComposedTurnOutcome {
   readonly sessionId: string;
   /** The driver's terminal state. `failed` means the spine refused a closer. */
   readonly status: AgentStatus;
+  /** Mechanical schedule outcomes, never goal-quality or cold-verification claims. */
+  readonly scheduleResults?: readonly ScheduleRunResult[];
   readonly validation: NativeValidationResult;
   /**
    * The `system/prompt` row every request in this run cites.
@@ -375,6 +386,18 @@ function policyDigestOf(options: ComposedTurnOptions): string {
  * command exit with work still committed to the inbox.
  */
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
+  if (options.schedulePass !== undefined) {
+    if (options.resume !== undefined || options.forkFrom !== undefined || options.keepOpen
+      || options.delegation !== undefined || options.tools !== undefined || options.validation !== undefined
+      || options.onSteer !== undefined || options.prompt !== "" || options.approvalGate === undefined
+      || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined) {
+      throw new Error("A native schedule pass requires a fresh owned session, native leaf runners and the actual all-tools signed approval gate. Resume, custom runners/tools, validation, approval exceptions and ordinary prompts are not schedule admission.");
+    }
+    if (!Number.isSafeInteger(options.schedulePass.now) || options.schedulePass.now < 0) throw new Error("Invalid native schedule clock.");
+    if (options.schedulePass.signal?.aborted) throw new Error("Native schedule pass cancelled before composition.");
+    assertNativeScheduleAdmission({ workspace: options.workspace, ...options.schedulePass,
+      approvalClass: options.approvalGate.actionClass });
+  }
   if (options.delegation !== undefined) {
     const parsed = parseSubagentStopConditions(options.delegation.stopConditions);
     if (!parsed.ok) throw new Error(`Delegation stop conditions: ${parsed.reason}`);
@@ -488,12 +511,12 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     // Built here because nowhere else has all three inputs: the parent's own
     // session for the delegation rows, a child-session-bound LLM factory, and
     // the prompt this composition rendered.
-    if (options.delegation !== undefined) {
+    if (options.delegation !== undefined || options.schedulePass !== undefined) {
       const llmSeam = serviceOn<LlmSeamService>(ctx, LLM_SEAM.name);
       // A recursive native closure uses each child's own identity, session and
       // inherited scope. The existing spawn boundary enforces the real depth.
       // An explicitly supplied foreign runner keeps its existing contract.
-      let runner = options.delegation.runner;
+      let runner = options.delegation?.runner;
       if (runner === undefined) {
         const runNative: SubagentRunner = (child) => runner!(child);
         runner = createDriverRunner({
@@ -506,23 +529,44 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           policyDigest: policyDigestOf(options),
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
-          grantDelegation: { runner: runNative,
+          ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
-            ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) }
+            ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
       }
-      options.delegation.grant({
+      if (options.schedulePass !== undefined) {
+        const pass = options.schedulePass;
+        const nativeRunner = runner;
+        const scheduleResults = await runDueSchedules({
+          workspace: options.workspace, parent: rootIdentity(options.agentId), session,
+          runner: async child => {
+            // Recheck each actual dispatch, including later rounds. Timers and
+            // signed schedules cannot grandfather a replaced tools policy.
+            assertNativeScheduleAdmission({ workspace: options.workspace, ...pass,
+              approvalClass: options.approvalGate!.actionClass });
+            return nativeRunner(child);
+          },
+          mintSessionId: randomUUID, now: pass.now, parentSessionId: sessionId,
+          expectedSchedulesDigest: pass.expectedSchedulesDigest,
+          ...(pass.signal === undefined ? {} : { signal: pass.signal })
+        });
+        return { sessionId, status: "idle", scheduleResults,
+          validation: projectNativeValidation(options.workspace, session.readEvents()),
+          systemPromptEventId: systemPromptRef.eventId,
+          promptSections: prompt.assemble().sections.map(section => section.name) };
+      }
+      options.delegation!.grant({
         identity: rootIdentity(options.agentId),
         session,
         runner,
-        ...(options.delegation.maxDepth === undefined
+        ...(options.delegation!.maxDepth === undefined
           ? {}
-          : { maxDepth: options.delegation.maxDepth }),
-        ...(options.delegation.scope === undefined
+          : { maxDepth: options.delegation!.maxDepth }),
+        ...(options.delegation!.scope === undefined
           ? {}
-          : { delegationScope: options.delegation.scope }),
-        ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions })
+          : { delegationScope: options.delegation!.scope }),
+        ...(options.delegation!.stopConditions === undefined ? {} : { stopConditions: options.delegation!.stopConditions })
       });
     }
 
@@ -577,8 +621,13 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     if (steerTimer !== null) clearTimeout(steerTimer);
     // Reverse order: the loop lets go of the model seam before the model seam
     // lets go of the credentials it resolves per request.
+    let scheduleDisposalError: unknown;
     for (const fiber of [...fibers].reverse()) {
-      await fiber.dispose();
+      try { await fiber.dispose(); }
+      catch (error) {
+        if (options.schedulePass === undefined) throw error;
+        scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
+      }
     }
     try {
       if (options.keepOpen) {
@@ -588,11 +637,16 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       } else {
         session.close({ reason: "completed" });
       }
-    } catch {
+    } catch (error) {
       // A driver that entered `failed` left an open turn only recovery may
       // close, and the spine refuses a close over it. Swallowed HERE and only
       // here: the status returned above already reports it, and throwing from a
       // finally would replace the real failure with this one.
+      if (options.schedulePass !== undefined) {
+        try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
+        throw error; // A schedule owner cannot report released/closed on a refused seal.
+      }
     }
+    if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
   }
 }
