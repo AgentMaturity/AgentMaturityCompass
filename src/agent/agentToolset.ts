@@ -315,7 +315,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   return {
     seam: { ...seam, schemas: () => {
-      const selected = new Set(selectSupportedNativeTools(loadVerifiedToolsConfigSnapshot(workspace), NATIVE_DELEGATION_CAPABILITIES).map(tool => tool.name));
+      const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
+      // The body guard runs after model/approval waits. It cannot stop a newer
+      // signed policy from exposing unreviewed schemas to that earlier request.
+      // Refuse before model preparation rather than silently switching to no tools.
+      if (options.expectedToolsDigest !== undefined && (!snapshot.signatureValid || !snapshot.config
+        || snapshot.digestSha256 !== options.expectedToolsDigest)) {
+        throw new Error("The signed workspace tool policy changed or cannot be verified. Review the current scope and start a new pinned native session before another model request.");
+      }
+      const selected = new Set(selectSupportedNativeTools(snapshot, NATIVE_DELEGATION_CAPABILITIES).map(tool => tool.name));
       // Keep bodies registered for recorded refusals of guessed built-in calls.
       // Visibility still honors registry restrictions, late mounts and run_code.
       const schemas = seam.schemas()?.filter(schema => !nativeIdentities.has(schema.name)

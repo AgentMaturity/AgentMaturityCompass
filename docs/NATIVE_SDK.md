@@ -41,6 +41,15 @@ For a custom Responses server, supply its origin as `baseUrl`, for example `"htt
 
 The process startup options include `tools: "workspace"`, `approveTools`, `approveRisk`, `mcpConfig`, `mcpConfigSha256`, `credentialsHome`, `credentialsFile`, `maxTokens` and `maxSteps`. These are explicit operator choices for the spawned runtime; a later session request cannot silently widen them. Workspace tools still require signed policy and exact recorder binding. MCP uses the same [reviewed native configuration](NATIVE_MCP.md); server connections are owned and disposed by the runtime. Installed TypeScript acceptance exercised actual workspace tools and separately qualified stdio/HTTP MCP through this ACP child, including authenticated approvals, cancellation and cold verification.
 
+An explicit `expectedToolsDigest` also gates model-facing tool schemas at each
+native step. Changed or unverifiable signed policy refuses the step before another
+model request, rather than advertising newly granted tools or silently switching
+to no-tools. Review the current scope and start a newly pinned session. This does
+not replace execution-time digest, approval or budget checks, and it does not
+undo a request or side effect already dispatched. This schema-admission correction
+is source implementation only as of 2026-09-10; its regressions and current
+installed qualification remain unexecuted.
+
 `newSession()` establishes an accepted conversation. A turn starts `submitted`, becomes `receiving` if committed updates arrive, and produces a `completed` result or a failure. Submission is not an acknowledgement that a model request has started. ACP `end_turn` is not a task-success verdict: read metadata for lossy mappings. Every response remains `not-verified` until a separate cold verifier returns a consistent receipt. `workspace-key-consistency` proves consistency against the workspace's own key; only `externally-anchored` includes an expected external fingerprint. Neither proves the answer correct.
 
 A failed or rejected prompt does not publish its remaining output tail. Its
