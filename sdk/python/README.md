@@ -65,6 +65,63 @@ Loading uses native signed session verification, atomic ownership admission and 
 
 `stop_reason == "end_turn"` is not a success verdict: ACP's stop reasons also encode some blocked, error and interrupted endings. Inspect `result.meta`, and use the signed record for the authoritative ending. `result.verification` is always `"not-verified"`. Received text, tool updates, local replay and protocol completion are not cryptographic verification receipts.
 
+`result.validation` is a separate `NativeValidationResult`, with `status`,
+`turn`, `config_sha256` and an immutable tuple of `NativeValidationCheckResult`
+objects. Public statuses are `not-requested`, `pending`, `passed`, `failed` and
+`unavailable`; none changes `stop_reason` or `verification`. Check fields are
+`id`, `title`, `status`, `call_id`, `exit_code`, `timed_out`, `reason` and
+`output_event_id`. The original wire metadata remains available in `result.meta`.
+These types and the status aliases are exported by `amc_sdk`.
+
+Missing validation metadata from an older peer is explicitly `unavailable`, with
+no inferred configuration, turn or checks. Explicit malformed validation metadata
+raises `AmcProtocolError`: unknown/missing fields, duplicate checks, truthy
+non-booleans, invalid identities and inconsistent outcomes are not accepted.
+The decoder follows AMC's native wire semantics, including a pending aggregate
+until the native finished row exists. Parsing does not authenticate a peer or
+prove the reported configuration/IDs match your request; use independently
+verified signed evidence for that. A public check passing does not guarantee
+task correctness or make cold ledger/proof verification unnecessary.
+
+### Select reviewed public checks and pin the tool policy
+
+```python
+with AmcAgent(
+    workspace=".", provider="stub", tools="workspace",
+    validation_config="reviewed-public-checks.json",
+    validation_config_sha256=reviewed_config_sha256,
+    validate=["unit", "lint"],
+    expected_tools_digest=reviewed_signed_tools_sha256,
+) as agent:
+    result = agent.new_session().prompt("Local recording demonstration.")
+    print(result.stop_reason, result.validation.status, result.verification)
+    for check in result.validation.checks:
+        print(check.id, check.status, check.reason, check.output_event_id)
+```
+
+The digest variables above must come from your reviewed configuration and signed
+tool policy, not placeholders or an untrusted peer. Provision the workspace and
+grants separately; this example does not initialize, sign, approve or widen them.
+Use `approve_tools`/`approve_risk` when the existing signed approval gate is needed.
+The `stub` provider remains only a local demonstration.
+
+`validation_config` is an explicit UTF-8 path (client limit: 4096 bytes, no NUL).
+`validate` is a list of one through eight distinct IDs, each 1–64 ASCII letters,
+digits, underscores or hyphens. IDs and an optional lowercase SHA-256 config pin
+require that path. A config file does not implicitly select all its checks:
+the native runtime refuses a config without selected IDs. Python forwards each
+ID as a separate `--validate` argument; no commands are taken from the prompt.
+The native loader, not Python, reads the explicit regular nonsymlink JSON file
+(at most 32 KiB), checks its exact-byte digest, and selects the named checks.
+It preserves the existing schemaVersion 1, bounded commands (8192 UTF-8 bytes)
+and timeouts (1–600000 ms). No config discovery, new validator or automatic repair.
+
+`expected_tools_digest` requires `tools="workspace"` and a lowercase 64-character
+SHA-256 value. It forwards the existing `--expected-tools-digest` policy pin:
+native startup and tool dispatch refuse a changed signed policy. It does not
+grant a tool or replace approvals, budgets, sandbox restrictions or cancellation.
+All these options are fixed at child launch, not mutable through session messages.
+
 ```python
 from amc_sdk import export_proof, verify_proof
 
@@ -114,3 +171,26 @@ handoff/load can mount the same reviewed configuration again.
 
 Qualification receipts apply only to their recorded source, installed artifacts,
 platforms and exercised behavior. These API descriptions do not extend that scope.
+
+### Regression scope (task10: AUTHORED UNEXECUTED)
+
+`tests/test_validation.py` covers public options, native result/negative wire
+semantics and pending-request ownership. `tests/test_validation_installed.py`
+launches a Python `-I` consumer that requires a non-editable installed canonical
+wheel and matching candidate client/export bytes. Set `AMC_PYTHON_INSTALLED` to
+that environment's absolute interpreter. Its scripted ACP peer checks protocol
+handling and child cleanup; it is **not** signed-native or provider acceptance.
+Neither test file builds, installs or probes a CLI at collection.
+Installed fixture supervision currently requires POSIX process groups; other
+platforms are explicitly skipped, not qualified. Timeouts and forced cleanup
+fail the fixture instead of counting as a malformed-metadata refusal.
+
+The optional real-native test requires `AMC_PYTHON_NATIVE_VALIDATION_FIXTURES`,
+a JSON manifest of disposable, already-provisioned signed workspaces and explicit
+installed CLI commands, with reviewed validation/policy pins and expected
+passing/nonzero/unavailable checks (schema documented in the test). Fixture
+checks must fit the consumer's request/cleanup deadlines. No workspace setup,
+signing or provider setup is performed by the test. Without those fixtures that
+lane is skipped, not passed. All new tests remain unexecuted in this authoring
+batch; clean candidate/package/platform, cold verification and release gates
+remain separate and must not reuse these descriptions as acceptance receipts.

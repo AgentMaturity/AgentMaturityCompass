@@ -11,19 +11,29 @@ import json
 import math
 import os
 import queue
+import re
 import subprocess
 import threading
 from dataclasses import dataclass, field
-from typing import Any, Iterator, Optional
+from typing import Any, Iterator, Literal, Optional
 
 __all__ = ["AmcAgent", "Session", "Turn", "SessionUpdate", "RunResult", "ToolCall",
-           "AmcError", "AmcProtocolError", "AmcRefusedError"]
+           "NativeValidationStatus", "NativeValidationCheckStatus", "NativeValidationCheckResult",
+           "NativeValidationResult", "AmcError", "AmcProtocolError", "AmcRefusedError"]
 DEFAULT_TIMEOUT_SECONDS = 120.0
 MAX_FRAME_BYTES = 1024 * 1024
 MAX_OUTPUT_BYTES = 8 * 1024 * 1024
 MAX_UPDATES = 32768
 MAX_PENDING = 32
 STOP_REASONS = {"end_turn", "max_tokens", "max_turn_requests", "refusal", "cancelled"}
+MAX_VALIDATION_CHECKS = 8
+MAX_VALIDATION_CONFIG_PATH_BYTES = 4096
+_CHECK_ID = re.compile(r"[a-zA-Z0-9_-]{1,64}")
+_SHA256 = re.compile(r"[a-f0-9]{64}")
+# Match JavaScript String.trim, rather than Python's broader Unicode whitespace.
+_JS_WHITESPACE = "\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
+NativeValidationStatus = Literal["not-requested", "pending", "passed", "failed", "unavailable"]
+NativeValidationCheckStatus = Literal["pending", "passed", "failed", "unavailable"]
 
 
 class AmcError(Exception):
@@ -56,7 +66,34 @@ class SessionUpdate:
 
 
 @dataclass(frozen=True)
+class NativeValidationCheckResult:
+    """One public check's reported outcome; its event identity is not a proof."""
+    id: str
+    title: str
+    status: NativeValidationCheckStatus
+    call_id: Optional[str]
+    exit_code: Optional[int]
+    timed_out: bool
+    reason: Optional[str]
+    output_event_id: Optional[str]
+
+
+@dataclass(frozen=True)
+class NativeValidationResult:
+    """Strictly decoded native public checks, independent of completion/verification."""
+    status: NativeValidationStatus
+    turn: Optional[int]
+    config_sha256: Optional[str]
+    checks: tuple[NativeValidationCheckResult, ...]
+
+
+def _unavailable_validation() -> NativeValidationResult:
+    return NativeValidationResult("unavailable", None, None, ())
+
+
+@dataclass(frozen=True)
 class RunResult:
+    """Completion, public validation and evidence verification are separate outcomes."""
     session_id: str
     stop_reason: str
     text: str
@@ -64,6 +101,8 @@ class RunResult:
     meta: dict[str, Any] = field(default_factory=dict)
     updates: list[SessionUpdate] = field(default_factory=list)
     verification: str = "not-verified"
+    # Append after legacy fields to preserve positional construction compatibility.
+    validation: NativeValidationResult = field(default_factory=_unavailable_validation)
 
     @property
     def cancelled(self) -> bool:
@@ -76,6 +115,89 @@ def _invalid_constant(_value: str) -> None:
 
 def _identity(value: Any) -> bool:
     return isinstance(value, str) and 0 < len(value) <= 1024 and not any(ord(c) < 32 or ord(c) == 127 for c in value)
+
+
+def _wire_string(value: Any, maximum: int) -> bool:
+    # Native Zod string limits count UTF-16 code units, not Python code points.
+    return isinstance(value, str) and 1 <= len(value.encode("utf-16-le", errors="surrogatepass")) // 2 <= maximum
+
+
+def _wire_integer(value: Any) -> bool:
+    # JSON 1 and 1.0 are the same JS number. Reject booleans/strings, fractions,
+    # non-finite numbers and values outside native Zod 4's safe integer range.
+    return type(value) in (int, float) and -(2**53 - 1) <= value <= 2**53 - 1 and (type(value) is int or value.is_integer())
+
+
+def _parse_native_validation_result(value: Any) -> NativeValidationResult:
+    """Port of src/agent/nativeValidationResult.ts; wire validation, not authentication."""
+    def refuse() -> None:
+        raise AmcProtocolError("native prompt returned invalid validation metadata")
+
+    if not isinstance(value, dict) or set(value) != {"status", "turn", "configSha256", "checks"}:
+        refuse()
+    status, turn, digest, raw_checks = value["status"], value["turn"], value["configSha256"], value["checks"]
+    if not isinstance(status, str) or status not in {"not-requested", "pending", "passed", "failed", "unavailable"}:
+        refuse()
+    if turn is not None and (not _wire_integer(turn) or turn < 1):
+        refuse()
+    if digest is not None and (not isinstance(digest, str) or _SHA256.fullmatch(digest) is None):
+        refuse()
+    if not isinstance(raw_checks, list) or len(raw_checks) > MAX_VALIDATION_CHECKS:
+        refuse()
+    checks: list[NativeValidationCheckResult] = []
+    ids: set[str] = set()
+    for check in raw_checks:
+        if not isinstance(check, dict) or set(check) != {"id", "title", "status", "callId", "exitCode", "timedOut", "reason", "outputEventId"}:
+            refuse()
+        check_id, title, check_status = check["id"], check["title"], check["status"]
+        if not isinstance(check_id, str) or _CHECK_ID.fullmatch(check_id) is None or check_id in ids:
+            refuse()
+        if not _wire_string(title, 160) or not title.strip(_JS_WHITESPACE) or any(ord(c) < 32 or ord(c) == 127 for c in title):
+            refuse()
+        if not isinstance(check_status, str) or check_status not in {"pending", "passed", "failed", "unavailable"}:
+            refuse()
+        for key in ("callId", "reason", "outputEventId"):
+            if check[key] is not None and not _wire_string(check[key], 128):
+                refuse()
+        exit_code, timed_out = check["exitCode"], check["timedOut"]
+        if (exit_code is not None and not _wire_integer(exit_code)) or type(timed_out) is not bool:
+            refuse()
+        call_id, reason, output_id = check["callId"], check["reason"], check["outputEventId"]
+        if check_status == "passed" and (exit_code != 0 or timed_out or reason is not None or call_id is None or output_id is None):
+            refuse()
+        if check_status == "failed" and (exit_code is None or exit_code == 0 or timed_out or reason != "nonzero-exit" or call_id is None or output_id is None):
+            refuse()
+        if check_status == "pending" and (exit_code is not None or timed_out or reason is not None or output_id is not None):
+            refuse()
+        if check_status == "unavailable" and reason is None:
+            refuse()
+        ids.add(check_id)
+        checks.append(NativeValidationCheckResult(check_id, title, check_status, call_id,
+                      None if exit_code is None else int(exit_code), timed_out, reason, output_id))
+    if status == "not-requested":
+        if digest is not None or checks:
+            refuse()
+    elif not (status == "unavailable" and not checks):
+        if turn is None or digest is None or not checks:
+            refuse()
+        aggregate = ("failed" if any(check.status == "failed" for check in checks) else
+                     "pending" if any(check.status == "pending" for check in checks) else
+                     "unavailable" if any(check.status == "unavailable" for check in checks) else "passed")
+        # Native ongoing turns may remain pending until the signed finished row.
+        if status != aggregate and status != "pending":
+            refuse()
+    return NativeValidationResult(status, None if turn is None else int(turn), digest, tuple(checks))
+
+
+def _prompt_validation(response: dict[str, Any]) -> NativeValidationResult:
+    if not isinstance(response.get("stopReason"), str) or response["stopReason"] not in STOP_REASONS or not isinstance(response.get("_meta", {}), dict):
+        raise AmcProtocolError("native prompt returned an invalid outcome")
+    extension = response.get("_meta", {}).get("dev.agentmaturity.amc")
+    # Match the native client's legacy/non-object extension behavior. An explicit
+    # validation value (including null) must decode; absence is never a pass.
+    if not isinstance(extension, dict) or "validation" not in extension:
+        return _unavailable_validation()
+    return _parse_native_validation_result(extension["validation"])
 
 
 class _Updates:
@@ -116,8 +238,7 @@ class Turn:
             self._condition.notify_all()
 
     def _finish(self, response: dict[str, Any]) -> None:
-        if not isinstance(response.get("stopReason"), str) or response["stopReason"] not in STOP_REASONS or not isinstance(response.get("_meta", {}), dict):
-            raise AmcProtocolError("native prompt returned an invalid outcome")
+        validation = _prompt_validation(response)
         with self._condition:
             if self._done:
                 return
@@ -140,7 +261,7 @@ class Turn:
                                           update.get("status", previous.status if previous else "pending"), output)
             self._result = RunResult(self.session_id, response["stopReason"], "".join(chunks),
                                      list(tools.values()), copy.deepcopy(response.get("_meta", {})),
-                                     copy.deepcopy(self._updates.items))
+                                     copy.deepcopy(self._updates.items), validation=validation)
             self._done, self.state = True, "completed"
             self._condition.notify_all()
 
@@ -199,6 +320,9 @@ class AmcAgent:
                  credential: Optional[str] = None, base_url: Optional[str] = None, agent_id: str = "default",
                  tools: str = "none", approve_tools: Optional[str] = None, approve_risk: Optional[str] = None,
                  mcp_config: Optional[str] = None, mcp_config_sha256: Optional[str] = None,
+                 expected_tools_digest: Optional[str] = None,
+                 validation_config: Optional[str] = None, validation_config_sha256: Optional[str] = None,
+                 validate: Optional[list[str]] = None,
                  credentials_home: Optional[str] = None, credentials_file: Optional[str] = None,
                  max_tokens: int = 512, max_steps: Optional[int] = None,
                  amc_bin: Optional[str | list[str]] = None, env: Optional[dict[str, str]] = None,
@@ -217,6 +341,26 @@ class AmcAgent:
             raise ValueError("reviewed MCP requires workspace tools and signed approvals")
         if mcp_config_sha256 is not None and (mcp_config is None or len(mcp_config_sha256) != 64 or any(c not in "0123456789abcdef" for c in mcp_config_sha256)):
             raise ValueError("MCP digest requires an explicit config and lowercase SHA-256")
+        if expected_tools_digest is not None and (tools != "workspace" or not isinstance(expected_tools_digest, str) or _SHA256.fullmatch(expected_tools_digest) is None):
+            raise ValueError("a tool policy pin requires workspace tools and an exact lowercase SHA-256 digest")
+        if validation_config is not None:
+            if not isinstance(validation_config, str) or not validation_config or "\0" in validation_config:
+                raise ValueError("validation_config must be an explicit nonempty path without NUL bytes")
+            try:
+                path_bytes = len(validation_config.encode("utf-8"))
+            except UnicodeError as error:
+                raise ValueError("validation_config must be a UTF-8 path") from error
+            if path_bytes > MAX_VALIDATION_CONFIG_PATH_BYTES:
+                raise ValueError("validation_config exceeds the 4096-byte client path limit")
+        if validation_config_sha256 is not None and (validation_config is None or not isinstance(validation_config_sha256, str) or _SHA256.fullmatch(validation_config_sha256) is None):
+            raise ValueError("a validation digest requires an explicit config and lowercase SHA-256")
+        if validate is not None:
+            if (not isinstance(validate, list) or not 1 <= len(validate) <= MAX_VALIDATION_CHECKS
+                    or any(not isinstance(check_id, str) or _CHECK_ID.fullmatch(check_id) is None for check_id in validate)
+                    or len(set(validate)) != len(validate)):
+                raise ValueError("select one through eight distinct public validation check IDs")
+            if validation_config is None:
+                raise ValueError("public validation requires an explicit operator config file")
         self.workspace, self.timeout = os.path.abspath(workspace), timeout
         resolved = amc_bin or os.environ.get("AMC_BIN") or "amc"
         self._bin = list(resolved) if isinstance(resolved, list) else (["node", resolved] if resolved.endswith(".js") else [resolved])
@@ -226,12 +370,16 @@ class AmcAgent:
         for flag, value in [("--model", model), ("--credential", credential), ("--base-url", base_url),
                             ("--approve-tools", approve_tools), ("--approve-risk", approve_risk),
                             ("--mcp-config", mcp_config), ("--mcp-config-sha256", mcp_config_sha256),
+                            ("--expected-tools-digest", expected_tools_digest),
+                            ("--validation-config", validation_config), ("--validation-config-sha256", validation_config_sha256),
                             ("--credentials-home", credentials_home), ("--credentials-file", credentials_file),
                             ("--max-steps", None if max_steps is None else str(max_steps))]:
             if value is not None:
                 if not isinstance(value, str) or not value or "\0" in value:
                     raise ValueError("native launch options must be nonempty strings without NUL bytes")
                 argv.extend([flag, value])
+        for check_id in validate or []:
+            argv.extend(["--validate", check_id])
         self._lock = threading.Lock()
         self._next_id = 1
         self._replies: dict[int, queue.Queue[Any]] = {}
@@ -358,9 +506,9 @@ class AmcAgent:
             raise AmcProtocolError("uncorrelated or repeated response")
         method, session_id = context
         if method == "session/prompt" and "result" in message:
-            result = message["result"]
-            if not isinstance(result.get("stopReason"), str) or result["stopReason"] not in STOP_REASONS or not isinstance(result.get("_meta", {}), dict):
-                raise AmcProtocolError("native prompt returned an invalid outcome")
+            # Refuse before removing the waiter/turn: fatal transport handling
+            # must still settle both rather than strand a malformed peer's turn.
+            _prompt_validation(message["result"])
         with self._lock:
             self._replies.pop(request_id, None)
             self._request_context.pop(request_id, None)
