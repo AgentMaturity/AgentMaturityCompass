@@ -1,10 +1,10 @@
-import { nativeTaskValidationSelectionSchema } from "../studio/nativeTaskValidation.js";
+import { assertNativeTaskData, nativeTaskStartSchema as startSchema, nativeTaskTurnSchema as turnSchema } from "../studio/nativeTaskInput.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import { resolveAgentId } from "../fleet/paths.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskService } from "../studio/nativeTaskTypes.js";
 import { assertNativeExecutionIdentity, NativeAdmissionError, type NativeAdmissionActor } from "../studio/nativeAdmission.js";
-import { apiError, apiSuccess, bodyJsonSchema, isRequestBodyError } from "./apiHelpers.js";
+import { apiError, apiSuccess, isRequestBodyError } from "./apiHelpers.js";
 
 /** Supplied only by Studio's authenticated, origin-checked delegation boundary. */
 export interface NativeTaskApiContext {
@@ -16,32 +16,34 @@ export interface NativeTaskApiContext {
   readonly executionAllowed: () => boolean;
 }
 
-const plainText = (maximum: number) => z.string().min(1).max(maximum)
-  .refine(value => !/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(value), "Control characters are not accepted.");
 const agentIdSchema = z.string().min(1).max(128).regex(/^[a-z0-9][a-z0-9_-]*$/, "Choose a valid agent ID.");
-const promptSchema = plainText(16_384).refine(value => value.trim().length > 0, "Enter a task.");
-const startSchema = z.object({
-  clientRequestId: z.string().uuid(),
-  agentId: agentIdSchema,
-  provider: z.enum(["stub", "openai", "openai-responses", "anthropic"]),
-  model: plainText(200).optional(),
-  tools: z.enum(["none", "workspace"]),
-  toolsDigest: z.string().regex(/^[a-f0-9]{64}$/, "Use the displayed tool-scope digest.").optional(),
-  validation: nativeTaskValidationSelectionSchema.optional(),
-  prompt: promptSchema,
-  maxSteps: z.number().int().min(1).max(8).optional(),
-  maxTokens: z.number().int().min(1).max(1024).optional()
-}).strict().superRefine((value, context) => {
-  if ((value.tools === "workspace") !== (value.toolsDigest !== undefined)) {
-    context.addIssue({ code: "custom", message: "Workspace tools require the displayed scope digest; no-tools tasks must omit it." });
-  }
-  if (value.validation && value.tools !== "workspace") context.addIssue({ code: "custom", message: "Public checks require signed workspace tools." });
-});
-const turnSchema = z.object({
-  clientRequestId: z.string().uuid(), expectedRevision: z.number().int().min(1).max(32), prompt: promptSchema
-}).strict();
 const controlSchema = z.object({ expectedRevision: z.number().int().min(1).max(32) }).strict();
 const listQuerySchema = z.object({ agentId: agentIdSchema.optional(), includeArchived: z.enum(["true", "false"]).optional() }).strict();
+
+/** Native admission hashes the exact supported body: never sanitize away unknown fields first. */
+async function bodyJsonSchema<T extends z.ZodTypeAny>(req: IncomingMessage, schema: T): Promise<z.output<T>> {
+  const bytes = await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let length = 0, refused = false;
+    const fail = (error: NativeTaskServiceError) => { refused = true; chunks.length = 0; reject(error); };
+    req.on("data", (chunk: Buffer | string) => {
+      if (refused) return; // Drain without retaining an oversized request.
+      const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, "utf8");
+      length += bytes.length;
+      if (length > 1024 * 1024) { fail(new NativeTaskServiceError("INPUT_TOO_LARGE", 413, "Native JSON request exceeds 1 MiB.")); return; }
+      chunks.push(bytes);
+    });
+    req.once("end", () => { if (!refused) resolve(Buffer.concat(chunks)); });
+    req.once("error", () => fail(new NativeTaskServiceError("INPUT_INVALID", 400, "Native request body could not be read.")));
+    req.once("aborted", () => fail(new NativeTaskServiceError("INPUT_INVALID", 400, "Native request body was interrupted.")));
+  });
+  const text = bytes.toString("utf8");
+  if (!Buffer.from(text, "utf8").equals(bytes)) throw new NativeTaskServiceError("INPUT_INVALID", 400, "Native JSON requires lossless UTF-8.");
+  let value: unknown;
+  try { value = JSON.parse(text); } catch { throw new NativeTaskServiceError("INPUT_INVALID", 400, "Native request body must be JSON."); }
+  assertNativeTaskData(value);
+  return schema.parse(value);
+}
 
 function query(req: IncomingMessage): URLSearchParams {
   return new URL(req.url ?? "/", "http://native.invalid").searchParams;

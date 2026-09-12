@@ -38,5 +38,28 @@
 .native-tasks [hidden] { display:none !important; }
 .native-tasks :is(button,input,select,textarea,a,summary):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .native-task-sr { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+.native-task-observation { border:1px solid var(--border); border-radius:8px; padding:12px; margin:12px 0; overflow-wrap:anywhere; }
+.native-task-observation p { margin:4px 0 8px; }
+#nativeTaskConnection { font-weight:600; }
+#nativeTaskObservedAt, #nativeTaskDraftBytes { font-size:.8rem; }
+.native-task-approval-banner { border:1px solid var(--accent); border-left-width:4px; border-radius:8px; padding:12px; margin:14px 0; overflow-wrap:anywhere; }
+.native-task-tool-panel { border-bottom:1px solid var(--border); padding-bottom:12px; }
+.native-task-tool-panel h4 { margin:16px 0 8px; }
+#nativeTaskToolStatus { max-height:300px; overflow:auto; }
+.native-task-tool-status { border-top:1px solid var(--border); padding:10px 0; overflow-wrap:anywhere; }
+.native-task-tool-status small { display:block; margin-top:6px; color:var(--muted); }
+.native-task-tool-status .pill { flex:none; }
+.native-task-attachments { border:1px solid var(--border); border-radius:8px; margin:16px 0; padding:12px; min-width:0; }
+.native-task-attachments legend { font-weight:600; }
+.native-task-attachments input[type="file"] { width:100%; max-width:100%; }
+.native-task-attachment { border-top:1px solid var(--border); margin-top:12px; padding-top:12px; overflow-wrap:anywhere; }
+.native-task-attachment .native-task-row strong { flex:1 1 130px; min-width:0; }
+.native-task-attachment .native-task-row > div { display:flex; flex-wrap:wrap; gap:8px; }
+.native-task-attachment-evidence code { overflow-wrap:anywhere; word-break:break-word; }
+.native-task-attachment pre, #nativeTaskSubmittedText { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; font-size:.85rem; max-height:260px; overflow:auto; }
+#nativeTaskSubmissionPreview { margin:12px 0 18px; }
+#nativeTaskApprovals { scroll-margin-top:24px; }
+.native-tasks [aria-busy="true"] { cursor:progress; }
+.native-tasks button:disabled { cursor:not-allowed; }
 @media (max-width:1050px) { .native-task-layout { grid-template-columns:minmax(0,1fr); } .native-task-sidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
 @media (max-width:560px) { .native-task-sidebar { display:block; } .native-task-fields { display:block; } .native-task-fields label { margin:12px 0; } .native-task-actions > button { width:100%; } .native-task-event { padding:10px; } }

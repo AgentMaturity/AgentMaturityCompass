@@ -3,6 +3,7 @@ import type { NativeValidationResult } from "../agent/nativeValidation.js";
 import { readNativeTaskValidationOutputs } from "./nativeTaskValidation.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { validateAcpCommittedTail } from "../acp/acpCommittedUpdates.js";
+import { validateAcpOrderedHistory } from "../acp/acpHistoryContinuity.js";
 import { projectSessionUpdates, type AcpSessionUpdate } from "../acp/acpProjection.js";
 import { readApprovalRequestMeta, readApprovalAnswerMeta } from "../session/approvalEventMeta.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
@@ -40,6 +41,16 @@ function project(update: AcpSessionUpdate, cursor: number): NativeTaskEvent | nu
   const kind = update.sessionUpdate === "agent_message_chunk" ? "assistant" : update.sessionUpdate === "user_message_chunk" ? "user"
     : update.sessionUpdate === "tool_call" ? "tool" : update.sessionUpdate === "tool_call_update" ? "tool-update" : null;
   if (kind === null) return null;
+  // ACP has already checked the complete signed source sequence and original bytes.
+  // Return a bounded receipt, not another base64 copy or a fabricated original filename.
+  if (kind === "user" && object(update.content) && (update.content.type === "image" || update.content.type === "audio")) {
+    const type = update.content.type, content = update.content;
+    if (typeof content.data !== "string" || typeof content.mimeType !== "string") throw new Error("Native attachment projection is incomplete.");
+    const bytes = Buffer.from(content.data, "base64");
+    if (bytes.toString("base64") !== content.data) throw new Error("Native attachment projection is not canonical.");
+    return { cursor, kind, text: `[Committed ${type}: ${content.mimeType}, ${bytes.length} bytes]`, evidence: "committed",
+      attachment: { type, mimeType: content.mimeType, byteLength: bytes.length, sha256: sha256Hex(bytes) } };
+  }
   const text = redactSdkText(typeof update.title === "string" ? update.title : contentText(update.content));
   return { cursor, kind, text, evidence: "committed",
     ...(typeof update.toolCallId === "string" ? { toolCallId: `call_${sha256Hex(update.toolCallId)}` } : {}),
@@ -66,6 +77,11 @@ export function readNativeTaskProjection(workspace: string, sessionId: string, a
   if (rows.length === 0) throw new Error("Native session has no committed opening.");
   validateAcpCommittedTail(workspace, sessionId, rows, 0, null);
   if (rows[0]?.event_type !== "session/open" || JSON.parse(rows[0].meta_json).agentId !== agentId) throw new Error("Native session belongs to a different agent.");
+  validateAcpOrderedHistory(workspace, rows);
+  // Provenance is a cross-row contract. Projecting [row] loses the signed audio
+  // source and can neither authenticate its complete sequence nor reject a missing suffix.
+  const projected = projectSessionUpdates(workspace, rows, 0, { includeUser: true });
+  if (projected.unsigned !== 0) throw new Error("Native history contains unsigned output.");
   const events: NativeTaskEvent[] = [];
   const requests = new Map<string, NonNullable<ReturnType<typeof readApprovalRequestMeta>>>();
   let bytes = 0, cursor = 0, droppedEvents = 0, ending: string | null = null, endingId: string | null = null, closed = false;
@@ -74,15 +90,15 @@ export function readNativeTaskProjection(workspace: string, sessionId: string, a
     if (row.event_type === "approval/answer") { const answer = readApprovalAnswerMeta(row.meta_json); if (answer) requests.delete(answer.approvalId); }
     if (row.event_type === "turn/end") { ending = readTurnEndMeta(row.meta_json)?.reason ?? null; endingId = row.id; }
     if (row.event_type === "session/close") closed = true;
-    for (const update of projectSessionUpdates(workspace, [row], 0, { includeUser: true }).updates) {
-      const event = project(update, ++cursor);
-      if (!event) { cursor--; continue; }
-      const size = Buffer.byteLength(JSON.stringify(event));
-      // Oversized individual blocks are withheld, never silently shortened into an apparently exact quote.
-      if (size > 2 * 1024 * 1024) { droppedEvents++; continue; }
-      events.push(event); bytes += size;
-      while (events.length > 512 || bytes > 2 * 1024 * 1024) { bytes -= Buffer.byteLength(JSON.stringify(events.shift()!)); droppedEvents++; }
-    }
+  }
+  for (const update of projected.updates) {
+    const event = project(update, ++cursor);
+    if (!event) { cursor--; continue; }
+    const size = Buffer.byteLength(JSON.stringify(event));
+    // Oversized individual blocks are withheld, never silently shortened into an apparently exact quote.
+    if (size > 2 * 1024 * 1024) { droppedEvents++; continue; }
+    events.push(event); bytes += size;
+    while (events.length > 512 || bytes > 2 * 1024 * 1024) { bytes -= Buffer.byteLength(JSON.stringify(events.shift()!)); droppedEvents++; }
   }
   const approvals: NativeTaskApproval[] = [];
   let approvalError: string | null = null;

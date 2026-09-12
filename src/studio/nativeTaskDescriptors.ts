@@ -13,7 +13,7 @@ const id = z.string().uuid();
 export const taskDescriptorSchema = z.object({
   kind: z.literal("amc/studio-native-task/v1"), taskId: z.string().regex(/^[a-f0-9]{64}$/),
   principalId: z.string().min(1).max(256), agentId: z.string().min(1).max(128), demo: z.boolean(),
-  sessionId: z.string().min(1).max(200).nullable(), provider: z.enum(["stub", "openai", "openai-responses", "anthropic"]),
+  sessionId: z.string().min(1).max(200).nullable(), provider: z.enum(["stub", "openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama"]),
   model: z.string().min(1).max(200).nullable(), tools: z.enum(["none", "workspace"]),
   toolsDigest: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
   // Optional without a default: parsing old signed v1 descriptors must preserve their exact body.

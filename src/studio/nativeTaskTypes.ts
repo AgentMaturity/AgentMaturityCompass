@@ -1,7 +1,7 @@
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
 
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
-export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic";
+export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic" | "deepseek" | "gemini" | "gemini-audio" | "ollama";
 export class NativeTaskServiceError extends Error {
   readonly code: string;
   constructor(code: string, readonly statusCode: number, message: string) {
@@ -21,6 +21,28 @@ export interface NativeTaskStart {
   readonly prompt: string;
   readonly maxSteps?: number;
   readonly maxTokens?: number;
+}
+/** Original bytes only. Filenames, URLs, paths and caller-supplied commitments are not authority. */
+export type NativeTaskInputPart =
+  | { readonly type: "text"; readonly text: string }
+  | { readonly type: "image"; readonly mimeType: "image/png" | "image/jpeg" | "image/gif" | "image/webp"; readonly data: string }
+  | { readonly type: "audio"; readonly mimeType: "audio/wav"; readonly data: string };
+export interface NativeTaskStructuredInput {
+  readonly format: "amc-image-input@2" | "amc-audio-input@1";
+  readonly parts: readonly NativeTaskInputPart[];
+}
+export type NativeTaskPrompt =
+  | { readonly prompt: string; readonly input?: never }
+  | { readonly prompt?: never; readonly input: NativeTaskStructuredInput };
+/** Keep the historical text-only NativeTaskStart type available to existing callers. */
+export type NativeTaskStartRequest = Omit<NativeTaskStart, "prompt"> & NativeTaskPrompt;
+export type NativeTaskTurn = NativeTaskPrompt & { readonly clientRequestId: string; readonly expectedRevision: number };
+export interface NativeTaskInputCapabilities {
+  readonly formats: readonly ("text" | NativeTaskStructuredInput["format"])[];
+  readonly imageMimeTypes: readonly string[]; readonly audioMimeTypes: readonly string[];
+  readonly maxParts: number; readonly maxImages: number; readonly maxAudios: number;
+  readonly maxTextBytes: number; readonly maxSerializedPartsBytes: number; readonly maxPromptFrameBytes: number;
+  readonly modelSupport: "not-probed";
 }
 export interface NativeTaskValidationSelection { readonly configSha256: string; readonly checkIds: readonly string[] }
 export interface NativeTaskValidationConfiguration {
@@ -47,6 +69,9 @@ export interface NativeTaskToolScope {
 export interface NativeTaskConfiguration {
   readonly schemaVersion: "2026-09-08"; readonly agentId: string; readonly demo: boolean;
   readonly providers: readonly { readonly id: NativeTaskProvider; readonly local: boolean;
+    /** `fixed`: the provider pins its own model (stub). `required`: the operator names an accessible model, local servers included. */
+    readonly model: "fixed" | "required";
+    readonly input?: NativeTaskInputCapabilities;
     readonly credential: { readonly ref: string; readonly configured: boolean; readonly source: "env" | "file" | null } | null }[];
   readonly scope: NativeTaskToolScope; readonly limits: NativeTaskLimits;
   readonly validation: NativeTaskValidationConfiguration;
@@ -60,6 +85,8 @@ export interface NativeTaskApproval {
 export interface NativeTaskEvent {
   readonly cursor: number; readonly kind: "user" | "assistant" | "tool" | "tool-update" | "plan";
   readonly text: string; readonly toolCallId?: string; readonly status?: string;
+  /** Metadata derived from authenticated original payload bytes, not a draft or an upload receipt. */
+  readonly attachment?: { readonly type: "image" | "audio"; readonly mimeType: string; readonly byteLength: number; readonly sha256: string };
   /** Output comes from the native authenticated committed-row projector; full verification is separate. */
   readonly evidence: "committed";
 }
@@ -96,9 +123,9 @@ export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events
 export interface NativeTaskService {
   configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration>;
   list(actor: NativeTaskActor, includeArchived?: boolean): readonly NativeTaskView[];
-  start(actor: NativeTaskActor, input: NativeTaskStart): Promise<NativeTaskView>;
+  start(actor: NativeTaskActor, input: NativeTaskStartRequest): Promise<NativeTaskView>;
   poll(actor: NativeTaskActor, taskId: string, cursor?: number): NativeTaskPoll;
-  turn(actor: NativeTaskActor, taskId: string, input: { readonly prompt: string; readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
+  turn(actor: NativeTaskActor, taskId: string, input: NativeTaskTurn): Promise<NativeTaskView>;
   cancel(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;

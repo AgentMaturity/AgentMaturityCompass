@@ -8,7 +8,7 @@ const bool = { type: "boolean" };
 const strings = { type: "array", items: string };
 const uuid = { type: "string", format: "uuid" };
 const digest = { type: "string", pattern: "^[a-f0-9]{64}$" };
-const provider = { type: "string", enum: ["stub", "openai", "openai-responses", "anthropic"] };
+const provider = { type: "string", enum: ["stub", "openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama"] };
 const tools = { type: "string", enum: ["none", "workspace"] };
 const agent = { type: "string", minLength: 1, maxLength: 128, pattern: "^[a-z0-9][a-z0-9_-]*$" };
 const prompt = { type: "string", minLength: 1, maxLength: 16384,
@@ -88,11 +88,20 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       ok: { type: "boolean", const: false }, error: string, code: string
     } },
     NativeTaskStart: { ...object({ clientRequestId: uuid, agentId: agent, provider, model: { ...string, minLength: 1, maxLength: 200 },
-      tools, toolsDigest: digest, validation: ref("NativeTaskValidationSelection"), prompt, maxSteps: { type: "integer", minimum: 1, maximum: 8 },
+      tools, toolsDigest: digest, validation: ref("NativeTaskValidationSelection"), prompt, input: ref("NativeTaskStructuredInput"), maxSteps: { type: "integer", minimum: 1, maximum: 8 },
       maxTokens: { type: "integer", minimum: 1, maximum: 1024 }
-    }, ["clientRequestId", "agentId", "provider", "tools", "prompt"]),
-      description: "Workspace tools require toolsDigest from the inspected signed scope; no-tools requests must omit it. Real providers require an explicit model and a server-owned credential. Exact request replay returns the recorded admission; a conflicting reuse is refused." },
-    NativeTaskTurn: object({ clientRequestId: uuid, expectedRevision: { type: "integer", minimum: 1, maximum: 32 }, prompt }),
+    }, ["clientRequestId", "agentId", "provider", "tools"]), oneOf: [{ required: ["prompt"], not: { required: ["input"] } }, { required: ["input"], not: { required: ["prompt"] } }],
+      description: "Supply exactly one of prompt or ordered input. Workspace tools require the reviewed toolsDigest; no-tools requests must omit it. Real providers require an explicit model and an operator credential. Retry the identical request ID and body, including original attachment bytes, order and format; a conflicting reuse is refused. No input is automatically replayed." },
+    NativeTaskTurn: { ...object({ clientRequestId: uuid, expectedRevision: { type: "integer", minimum: 1, maximum: 32 }, prompt,
+      input: ref("NativeTaskStructuredInput") }, ["clientRequestId", "expectedRevision"]),
+      oneOf: [{ required: ["prompt"], not: { required: ["input"] } }, { required: ["input"], not: { required: ["prompt"] } }] },
+    NativeTaskStructuredInput: { ...object({ format: { type: "string", enum: ["amc-image-input@2", "amc-audio-input@1"] },
+      parts: { type: "array", minItems: 1, maxItems: 256, items: { oneOf: [
+        object({ type: { type: "string", const: "text" }, text: { type: "string", maxLength: 16384 } }),
+        object({ type: { type: "string", const: "image" }, mimeType: { type: "string", enum: ["image/png", "image/jpeg", "image/gif", "image/webp"] }, data: { type: "string", minLength: 1, maxLength: 260096, contentEncoding: "base64" } }),
+        object({ type: { type: "string", const: "audio" }, mimeType: { type: "string", const: "audio/wav" }, data: { type: "string", minLength: 1, maxLength: 260096, contentEncoding: "base64" } })
+      ] } } }),
+      description: "Exact ordered text/original canonical-base64 parts; empty and adjacent text are preserved. At most eight images and eight audio parts, aggregate text 16 KiB UTF-8, serialized parts 260096 bytes and complete ACP frame 262144 bytes. Image format requires an image and forbids audio; audio format requires audio and literal gemini-audio. Gemini refuses GIF. No URLs, filenames, paths, annotations, transcoding or client commitments. Native header checks and runtime negotiation still apply; no remote model support is claimed." },
     NativeTaskControl: object({ expectedRevision: { type: "integer", minimum: 1, maximum: 32 } }),
     NativeTask: object({ taskId: digest, sessionId: nullableString, agentId: agent, revision: integer,
       clientRequestId: uuid, lastClientRequestId: uuid, provider, model: nullableString, tools,
@@ -132,16 +141,21 @@ export function nativeTaskSchemas(): Record<string, unknown> {
       truncated: bool, redacted: bool, bytes: { type: ["integer", "null"], minimum: 0 } }),
       description: "Text from the exact authenticated check-result payload after its complete bytes match payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes, not transformed display text. Reads over 2 MiB are withheld." },
     NativeTaskEvent: object({ cursor: integer, kind: { type: "string", enum: ["user", "assistant", "tool", "tool-update", "plan"] },
-      text: string, toolCallId: string, status: string, evidence: { type: "string", const: "committed" }
+      text: string, toolCallId: string, status: string, evidence: { type: "string", const: "committed" },
+      attachment: object({ type: { type: "string", enum: ["image", "audio"] }, mimeType: string, byteLength: integer, sha256: digest })
     }, ["cursor", "kind", "text", "evidence"]),
+    NativeTaskInputCapabilities: { ...object({ formats: { type: "array", items: { type: "string", enum: ["text", "amc-image-input@2", "amc-audio-input@1"] } },
+      imageMimeTypes: strings, audioMimeTypes: strings, maxParts: integer, maxImages: integer, maxAudios: integer,
+      maxTextBytes: integer, maxSerializedPartsBytes: integer, maxPromptFrameBytes: integer, modelSupport: { type: "string", const: "not-probed" } }),
+      description: "Native input bindings and local admission bounds, not live model qualification. Dispatch separately requires the running client's exact input contract." },
     NativeTaskToolScope: object({ ready: bool, digest: { ...digest, type: ["string", "null"] }, approvalRequired: { type: "boolean", const: true },
       tools: { type: "array", items: object({ name: string, actionClass: string, paths: strings, deniedPaths: strings, hosts: strings, binaries: strings,
         nativeSandbox: { oneOf: [{ type: "null" }, object({ kind: { type: "string", const: "linux-bwrap" }, writableDirectories: strings })] }
       }) }, message: string }),
     NativeTaskOptions: object({ schemaVersion: { type: "string", const: "2026-09-08" }, agentId: agent, demo: bool,
-      providers: { type: "array", items: object({ id: provider, local: bool, credential: { oneOf: [
+      providers: { type: "array", items: object({ id: provider, local: bool, model: { type: "string", enum: ["fixed", "required"] }, credential: { oneOf: [
         { type: "null" }, object({ ref: string, configured: bool, source: { type: ["string", "null"], enum: ["env", "file", null] } })
-      ] } }) }, scope: ref("NativeTaskToolScope"), validation: ref("NativeTaskValidationConfiguration"),
+      ] }, input: ref("NativeTaskInputCapabilities") }, ["id", "local", "model", "credential"]) }, scope: ref("NativeTaskToolScope"), validation: ref("NativeTaskValidationConfiguration"),
       limits: object(Object.fromEntries(["maxActive", "maxSteps", "maxTokens", "turnTimeoutMs", "idleTimeoutMs", "lifetimeMs", "maxEvents", "maxEventBytes", "maxPromptBytes"].map(key => [key, integer]))),
       boundary: string, nativeCsrfToken: nullableString, executionBlocked: bool
     }),
