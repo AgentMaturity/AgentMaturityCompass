@@ -1,5 +1,16 @@
 # Human first-use observer capture
 
+> September 11, 2026 — prospective capture `2026-09-11.1` adds typed nullable
+> model revision declarations while retaining credential contract `1` and legacy
+> defaults. See [Model revision](HUMAN_FIRST_USE_MODEL_REVISION.md). Source and
+> regressions are authored, not executed; no automatic migration enters that version.
+
+> Version notice — 2026-09-10: the original text below describes legacy capture
+> `2026-09-09.1`. The opt-in `2026-09-10.1` credential contract and preparation-only
+> migration are defined in [Credential transitions](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md)
+> and the dated addendum below. Historical executor/validation directions do not
+> override the current sole-CoS instruction or execution hold.
+
 Local operator workflow for **AMC-1512 / AMC-1518**, authored 2026-09-09.
 Implementation and regression authoring are not execution qualification or human
 study evidence. Codex owns integration and final validation.
@@ -371,3 +382,52 @@ The resumable/final worker handoff is
 `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md` inside
 `/Users/sid/AgentMaturityCompass/tmp/cos-study-capture`. No issue Done, passing-test,
 release or collected-human-evidence claim is made by this implementation batch.
+
+## 2026-09-10 addendum — capture 2026-09-10.1 / credentials 1
+
+Default preparation stays `2026-09-09.1`; select the new version explicitly with
+`prepare ... --capture-version 2026-09-10.1`. The prepare JSON shape is unchanged;
+do not add version, migration, credentials or used fields to it. New drafts add
+`migration: null`; exported studies use schema `2026-09-10`.
+
+The planned `model.credentialState` remains immutable. New events are
+`credential-change` with `{from,to,actor}` and `model-use` with
+`{credentialState}` inside the existing event envelope. Actual-use state must
+match the state at that point, not a later repair. New close completeness adds
+the required `credentials` boolean. False preserves observations but blocks
+export. Operator changes count as assistance once; unknown actors preserve null
+assistance. Record intentional submitted actions separately under the existing rule.
+
+The missing/unknown-start export limitation described in the legacy section is
+not a direction to rewrite a baseline. New prospectively observed transitions
+are representable through the opt-in contract, while an already observed legacy
+journal stays legacy. Migration is only a reviewed-head, new/disjoint create-only
+fork of an unobserved preparation. Any observation/correction, including an empty
+effective corrected sequence, refuses automatic migration. Original bytes remain.
+
+Full-roster blocked export, retained corrections and recording admission are
+unchanged. Read the [exact contract and migration guide](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md)
+for schema, refusal codes and deferred command forms. Credential regressions are
+authored in `tests/humanFirstUseCredentials.test.ts`, UNEXECUTED. No checks,
+imports, fixtures, migrations, providers or human sessions are authorized now.
+
+### Recovery authority — capture `2026-09-10.1`, credential contract `1`
+
+2026-09-10; task `amc-1512-credential-authoring-recovery-2026-09-10`.
+The version-labelled addendum is retained. The credential guide's recovery
+addendum clarifies sticky assistance unknowns and equal-time capture/intake
+lossiness. Sole CoS authoring is current; historical worker/Codex validation
+instructions do not authorize execution. No test, check, build, import, fixture,
+acceptance, provider or human session may run yet.
+
+### September 11 correction boundary — capture `2026-09-10.1`
+
+For a migrated preparation, even an empty correction declaration cannot predate
+`migration.declaredAt`. Replaced/replacement observations and attestations remain
+additional lower bounds. `correction-order` refuses the append and also refuses
+an existing contradictory journal during load; it does not rewrite history.
+Non-migrated and legacy preparation floors are unchanged. Keep original bytes
+and truthful times, not an automatically advanced date. See the credential guide's
+migration correction chronology and the unexecuted
+`tests/humanFirstUseCredentialMigrationBoundary.test.ts`. Full-roster blocked
+export and all execution holds remain.

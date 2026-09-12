@@ -16,6 +16,24 @@ const sameFile = (a: Stats, b: Stats) =>
   (["dev", "ino", "size", "mtimeMs", "ctimeMs"] as const).every(key => a[key] === b[key]);
 const LIMIT = 32 * 1024;
 
+/** JSON.parse has checked grammar; reject ambiguous members before shape admission. */
+function refuseDuplicateMembers(text: string): void {
+  const stack: Array<{ keys: Set<string> | null; expectingKey: boolean }> = [];
+  for (const [token] of text.matchAll(/"(?:\\[\s\S]|[^"\\])*"|[{}\[\],:]/g)) {
+    const frame = stack[stack.length - 1];
+    if (token === "{") stack.push({ keys: new Set(), expectingKey: true });
+    else if (token === "[") stack.push({ keys: null, expectingKey: false });
+    else if (token === "}" || token === "]") stack.pop();
+    else if (token === "," && frame?.keys) frame.expectingKey = true;
+    else if (token.startsWith('"') && frame?.keys && frame.expectingKey) {
+      const key: string = JSON.parse(token);
+      if (frame.keys.has(key)) return refuse("Validation config contains duplicate JSON object members. File content is withheld.");
+      frame.keys.add(key);
+      frame.expectingKey = false;
+    }
+  }
+}
+
 /** Explicit operator input, captured once; no discovery, execution or tool grants. */
 export function loadNativeValidationConfiguration(path: string, expectedSha256?: string): LoadedNativeValidationConfiguration {
   const absolute = resolve(path);
@@ -45,8 +63,10 @@ export function loadNativeValidationConfiguration(path: string, expectedSha256?:
   if (expectedSha256 !== undefined && (!/^[a-f0-9]{64}$/.test(expectedSha256) || expectedSha256 !== sha256))
     return refuse("Validation configuration changed from its pinned digest. Review it before starting another run.");
   let value: unknown;
-  try { value = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
+  let text: string;
+  try { text = new TextDecoder("utf-8", { fatal: true }).decode(bytes); value = JSON.parse(text); }
   catch { return refuse("Validation config must contain valid UTF-8 JSON. File content is withheld."); }
+  refuseDuplicateMembers(text);
   if (!object(value) || value.schemaVersion !== 1 || !onlyKeys(value, ["schemaVersion", "checks"])
     || !Array.isArray(value.checks) || value.checks.length < 1 || value.checks.length > 8)
     return refuse("Validation config requires schemaVersion 1 and one through eight public checks.");

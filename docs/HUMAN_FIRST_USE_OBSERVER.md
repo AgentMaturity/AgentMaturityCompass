@@ -1,5 +1,15 @@
 # Guided human first-use observer
 
+> September 11, 2026 — explicit preparation version `2026-09-11.1` adds
+> unknown-preserving revision prompts with required reasons and reviewed typed
+> declarations. See [Model revision](HUMAN_FIRST_USE_MODEL_REVISION.md). Legacy
+> prompts/defaults remain; authored source is not qualification or authority to run.
+
+> Version notice — 2026-09-10: the original walkthrough below is legacy-default.
+> See [Credential transitions](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md) and the
+> dated addendum for opt-in capture `2026-09-10.1`. Historical executor/validation
+> directions do not override the current sole-CoS instruction or execution hold.
+
 Local terminal workflow for **AMC-1512 / AMC-1518**, authored 2026-09-09.
 Implementation and synthetic regression source are **not execution qualification
 or collected human evidence**. Codex owns integration and final validation.
@@ -272,3 +282,52 @@ source/environment receipts, failures and platform limitations separately.
 
 The implementation handoff is `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md`
 inside `/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide`.
+
+## 2026-09-10 addendum — guided credential observations
+
+Only explicit `prepare ... --capture-version 2026-09-10.1` selects the new
+contract. Without it, preparation retains legacy behavior. Full-roster review
+and explicit create remain mandatory; existing journals retain their version.
+The guided observer has no migration command. Use the reviewed capture migration
+interface from the [contract guide](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md)
+only at the later authorized boundary, and only for an unobserved preparation.
+
+After start, a new-version non-demo session offers `credential-change` and
+`model-use`. Prompts ask for from/to/actor or the actual-use state, never a secret.
+The core replays each candidate and saves only after explicit head-bound review.
+The useful-result menu requires a prior model-use observation, not merely a
+configured state. Status shows starting and last-declared state separately.
+Displayed counts are retained entries, not proof of complete coverage.
+
+Close additionally asks whether credential-transition/use coverage is complete,
+partial or unknown. Partial/unknown encodes false and retains a closed-blocked
+record; it does not invent absent events. Unknown actors keep assistance null;
+operator changes count automatically once, so do not duplicate that intervention
+as an assistance event. Other intentional actions and distinct help remain explicit.
+
+Pause, EOF and cancellation never auto-create model use or close. Inadmissible
+events stay refused; preserve/reconcile the private candidate rather than changing
+facts. Full-roster blocked export still writes no subset study. Guided opt-in,
+event/close, pause and blocked-export regressions are authored in
+`tests/humanFirstUseCredentials.test.ts` and remain UNEXECUTED. No study,
+fixture/import, provider, check or acceptance is run or authorized by this addendum.
+
+### Recovery authority — observer capture `2026-09-10.1`, credentials `1`
+
+2026-09-10; task `amc-1512-credential-authoring-recovery-2026-09-10`.
+Keep the complete journal: the reduced intake cannot reconstruct the separate
+same-time result/use order. Later known assistance never resolves an earlier
+unknown actor. See the credential guide's recovery addendum. Sole CoS authoring
+supersedes historical worker/Codex validation assignments, not the execution
+hold. No preparation, observation or export session is authorized now.
+
+### September 11 boundary note — observer capture `2026-09-10.1`
+
+The separate capture correction command now rejects declarations before the
+migration boundary even for an empty effective sequence. Existing journal load
+may therefore refuse a contradictory old correction. Preserve its original bytes
+and the rejected declaration; do not treat that refusal as permission to remove
+a revision, invent a date or repeat a participant's first use. The guided observer
+does not add a migration or automatic repair command. See the credential guide's
+migration correction chronology. Review prompts, pause behavior, unknown assistance,
+full-roster export and the execution hold are unchanged.

@@ -6,11 +6,14 @@ import { lstat, open, opendir, realpath, mkdir } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  COMMON_PROTOCOL, COMMON_TASK, SCHEMA_VERSION, isRecordingPath,
+  COMMON_PROTOCOL, COMMON_TASK, SCHEMA_VERSION, CREDENTIAL_SCHEMA_VERSION, CREDENTIAL_CONTRACT_VERSION, isRecordingPath,
+  MODEL_REVISION_SCHEMA_VERSION, validateModelRevisionIdentity,
   validateSession, validateStudy, inspectRecording, parseStudyJson
 } from "./human-first-use-intake.mjs";
 
 export const CAPTURE_VERSION = "2026-09-09.1";
+export const CREDENTIAL_CAPTURE_VERSION = "2026-09-10.1";
+export const MODEL_REVISION_CAPTURE_VERSION = "2026-09-11.1";
 export const LIMITS = Object.freeze({
   sessions: 2000, eventsPerSession: 2000, revisions: 10000,
   jsonBytes: 16 * 1024 * 1024, journalBytes: 64 * 1024 * 1024,
@@ -32,6 +35,13 @@ export class CaptureError extends Error {
 function requireThat(condition, code, message) {
   if (!condition) throw new CaptureError(code, message);
 }
+export function intakeSchemaForCapture(version) {
+  requireThat([CAPTURE_VERSION, CREDENTIAL_CAPTURE_VERSION, MODEL_REVISION_CAPTURE_VERSION].includes(version), "version", "Unsupported capture version; retain the original, never relabel it.");
+  if (version === MODEL_REVISION_CAPTURE_VERSION) return MODEL_REVISION_SCHEMA_VERSION;
+  return version === CREDENTIAL_CAPTURE_VERSION ? CREDENTIAL_SCHEMA_VERSION : SCHEMA_VERSION;
+}
+export const hasCredentialContract = version => [CREDENTIAL_CAPTURE_VERSION, MODEL_REVISION_CAPTURE_VERSION].includes(version);
+const observationBoundary = draft => draft.migration?.declaredAt ?? draft.preparedAt;
 function shape(value, keys, field) {
   requireThat(object(value) && Object.keys(value).length === keys.length
     && keys.every(key => Object.hasOwn(value, key)), "schema", `${field}: supply exactly the documented fields.`);
@@ -60,7 +70,8 @@ function recordingPath(value) {
   requireThat(isRecordingPath(value), "recording-path", "Use a local relative recording path without traversal, symlinks, drives or URLs.");
 }
 
-function validatePlan(plan) {
+function validatePlan(plan, captureVersion = CAPTURE_VERSION) {
+  const revisionContract = captureVersion === MODEL_REVISION_CAPTURE_VERSION;
   shape(plan, ["sessionId", "participation", "participantId", "observerId", "harness", "environment", "model"], "planned session");
   text(plan.sessionId, "sessionId", ID);
   text(plan.participantId, "participantId", PARTICIPANT);
@@ -82,20 +93,25 @@ function validatePlan(plan) {
   text(e.nodeVersion, "environment.nodeVersion", /^v?\d+\.\d+\.\d+(?:-[a-zA-Z0-9.-]+)?$/);
   choice(e.installState, ["clean", "preinstalled", "unknown"], "environment.installState");
   const m = plan.model;
-  shape(m, ["kind", "provider", "id", "revision", "settingsSha256", "credentialState"], "planned model (no used flag)");
+  shape(m, ["kind", "provider", "id", "revision", "settingsSha256", "credentialState", ...(revisionContract ? ["revisionIdentity"] : [])], "planned model (no used flag)");
   choice(m.kind, ["live-provider", "local-provider", "keyless-demo"], "model.kind");
   choice(m.credentialState, ["configured", "not-required", "missing", "unknown"], "model.credentialState");
   if (m.kind === "keyless-demo") {
     requireThat([m.provider, m.id, m.revision, m.settingsSha256].every(value => value === null)
       && m.credentialState === "not-required", "demo-model", "A keyless demo has no model identity/settings or required credentials.");
   } else {
-    for (const key of ["provider", "id", "revision"]) text(m[key], `model.${key}`, undefined, 256);
+    for (const key of ["provider", "id", ...(!revisionContract ? ["revision"] : [])]) text(m[key], `model.${key}`, undefined, 256);
     text(m.settingsSha256, "model.settingsSha256", HASH);
+  }
+  if (revisionContract) {
+    const errors = validateModelRevisionIdentity(m);
+    if (errors.length) throw new CaptureError(errors[0].code, `${errors[0].path}: ${errors[0].message}`);
   }
 }
 
 /** Pure preregistration. Preparation declares intent, not consent, presence, use or outcomes. */
-export function prepareDraft(input) {
+export function prepareDraft(input, captureVersion = CAPTURE_VERSION) {
+  intakeSchemaForCapture(captureVersion);
   shape(input, ["studyId", "preparedAt", "operator", "protocol", "task", "observationWindowRule", "assistancePolicy", "plannedSessions"], "preparation");
   text(input.studyId, "studyId", ID);
   timestamp(input.preparedAt, "preparedAt");
@@ -111,23 +127,54 @@ export function prepareDraft(input) {
   requireThat(input.plannedSessions.length > 0, "roster-empty", "Preregister a nonempty pseudonymous roster before observations.");
   const sessions = new Set(), pairs = new Set();
   for (const plan of input.plannedSessions) {
-    validatePlan(plan);
+    validatePlan(plan, captureVersion);
     requireThat(!sessions.has(plan.sessionId), "duplicate-session", "Every planned session ID must be unique.");
     sessions.add(plan.sessionId);
     const pair = JSON.stringify([plan.participantId, plan.harness.name]);
     requireThat(!pairs.has(pair), "duplicate-first-use", "Preregister only one first-use attempt per participant/harness pair.");
     pairs.add(pair);
   }
-  const draft = { captureVersion: CAPTURE_VERSION, ...clone(input) };
+  const draft = { captureVersion, ...clone(input), ...(hasCredentialContract(captureVersion) ? { migration: null } : {}) };
   requireThat(encoded(draft).length <= LIMITS.jsonBytes, "size", "Preparation exceeds the JSON byte limit.");
   return draft;
 }
 
 function validateDraft(draft) {
-  shape(draft, ["captureVersion", "studyId", "preparedAt", "operator", "protocol", "task", "observationWindowRule", "assistancePolicy", "plannedSessions"], "draft");
-  requireThat(draft.captureVersion === CAPTURE_VERSION, "version", "Unsupported capture version; retain the original and use its matching tool.");
-  const { captureVersion, ...input } = draft;
-  return prepareDraft(input);
+  intakeSchemaForCapture(draft?.captureVersion);
+  const versioned = hasCredentialContract(draft.captureVersion);
+  shape(draft, ["captureVersion", "studyId", "preparedAt", "operator", "protocol", "task", "observationWindowRule", "assistancePolicy", "plannedSessions", ...(versioned ? ["migration"] : [])], "draft");
+  const { captureVersion, migration, ...input } = draft;
+  const prepared = prepareDraft(input, captureVersion);
+  if (captureVersion === MODEL_REVISION_CAPTURE_VERSION) {
+    requireThat(migration === null, "migration-version", "The model-revision contract supports new prospective preparations only; no automatic migration or inferred identity classification.");
+  }
+  if (versioned && migration !== null) {
+    shape(migration, ["fromVersion", "sourceHeadSha256", "declaredAt", "reason", "startingStatesUnchanged"], "migration");
+    requireThat(migration.fromVersion === CAPTURE_VERSION, "migration-version", "Only an explicitly reviewed legacy preparation can be forked into this contract.");
+    text(migration.sourceHeadSha256, "migration.sourceHeadSha256", HASH);
+    timestamp(migration.declaredAt, "migration.declaredAt"); text(migration.reason, "migration.reason");
+    requireThat(migration.startingStatesUnchanged === true, "migration-baseline", "Migration requires an explicit unchanged-starting-states declaration; never repair or relabel the baseline.");
+    requireThat(Date.parse(migration.declaredAt) >= Date.parse(prepared.preparedAt), "migration-order", "Migration cannot precede original preregistration.");
+    prepared.migration = clone(migration);
+  }
+  requireThat(encoded(prepared).length <= LIMITS.jsonBytes, "size", "Versioned preparation exceeds the JSON byte limit.");
+  return prepared;
+}
+
+/** Pure, preparation-only migration. The persistence API loads the source itself. */
+export function migratePreparationDraft(state, expectedHead, declaration) {
+  text(expectedHead, "expected head SHA-256", HASH);
+  requireThat(state?.headSha256 === expectedHead, "revision-conflict", "Migration requires the reviewed source head; reconcile rather than retry blindly.");
+  const original = validateDraft(state.draft);
+  requireThat(original.captureVersion === CAPTURE_VERSION, "migration-version", "Only the legacy preparation version is a supported migration source.");
+  requireThat(state.revision === 0 && state.history.length === 1 && state.history[0].kind === "prepare"
+    && [...state.sessions.values()].every(events => events.length === 0), "migration-observed",
+  "Automatic migration of any observed or corrected journal is refused. Preserve its events, failures and blocked exports; do not manufacture retrospective credential observations.");
+  shape(declaration, ["declaredAt", "reason", "startingStatesUnchanged"], "migration declaration");
+  const { captureVersion: _legacy, ...input } = original;
+  return validateDraft({ ...prepareDraft(input, CREDENTIAL_CAPTURE_VERSION), migration: {
+    fromVersion: CAPTURE_VERSION, sourceHeadSha256: expectedHead, ...clone(declaration)
+  } });
 }
 
 function observerDeclaration(value, at) {
@@ -138,14 +185,51 @@ function observerDeclaration(value, at) {
   requireThat(Date.parse(value.recordedAt) >= Date.parse(at), "attestation-order", "Observer attestation must cover the full window at or after close.");
 }
 
-/** Pure event replay; one submitted-action event is one intentionally submitted operation. */
-export function projectSession(plan, events, preparedAt) {
-  validatePlan(plan);
+/**
+ * Raw captured measurements as replayed from the retained event journal. This is
+ * the pre-intake record: narratives are still present, and a coverage-gated list
+ * is null only when the close event declared that coverage incomplete.
+ *
+ * @typedef {'completed' | 'failed' | 'incomplete'} CapturedOutcome
+ * @typedef {{at: string, code: string, detail: string}} CapturedSetupFailure
+ * @typedef {{at: string, code: string, namedFix: boolean | null}} CapturedRefusal
+ * @typedef {{at: string | null, resumedAt: string | null, resumeOutcome: 'succeeded' | 'failed' | 'not-attempted' | 'not-observed', reason: string | null}} CapturedInterruption
+ * @typedef {{outcome: 'returned' | 'did-not-return' | 'not-observed', at: string | null, reason: string | null}} CapturedSecondTask
+ * @typedef {Object} CapturedMeasurements
+ * @property {string} startedAt
+ * @property {string} endedAt
+ * @property {CapturedOutcome} outcome
+ * @property {string | null} firstUsefulResultAt
+ * @property {number | null} actionsToFirstUsefulResult
+ * @property {string | null} noResultReason
+ * @property {number | null} assistanceCount
+ * @property {CapturedSetupFailure[] | null} setupFailures
+ * @property {CapturedRefusal[] | null} refusals
+ * @property {CapturedInterruption} interruption
+ * @property {CapturedSecondTask} secondTask
+ * @typedef {{path: string, code: string, message: string}} ProjectionBlocker
+ * @typedef {{status: 'unobserved' | 'open', outcome: CapturedOutcome | null, measurements: null, observer: null, model: null, recordingPath: null, coverage: null, blockers: ProjectionBlocker[]}} OpenProjection
+ * @typedef {{status: 'closed' | 'closed-blocked', outcome: CapturedOutcome, measurements: CapturedMeasurements, observer: any, model: any, recordingPath: string | null, coverage: any, blockers: ProjectionBlocker[]}} ClosedProjection
+ *
+ * `observer`, `model` and `coverage` are replayed verbatim from the retained journal and stay untyped here; the
+ * public contract for those blocks is the intake projection in human-first-use-intake.mjs.
+ */
+
+/**
+ * Pure event replay; one submitted-action event is one intentionally submitted operation.
+ * @returns {OpenProjection | ClosedProjection}
+ */
+export function projectSession(plan, events, preparedAt, captureVersion = CAPTURE_VERSION) {
+  const schemaVersion = intakeSchemaForCapture(captureVersion);
+  const credentialContract = hasCredentialContract(captureVersion);
+  validatePlan(plan, captureVersion);
   timestamp(preparedAt, "preparedAt");
   boundedArray(events, LIMITS.eventsPerSession, "session events");
   let startedAt = null, firstTask = null, recovery = null, secondTask = null, closed = null;
   let actions = 0, assistance = 0, previousAt = preparedAt;
   const setupFailures = [], refusals = [];
+  const credentialObservations = [];
+  let currentCredentialState = plan.model.credentialState, unknownCredentialActor = false;
   for (const event of events) {
     shape(event, ["type", "at", "timing", "data"], "event");
     timestamp(event.at, "event.at");
@@ -162,6 +246,27 @@ export function projectSession(plan, events, preparedAt) {
     }
     requireThat(startedAt !== null, "start-required", "Record start before any session observation.");
     switch (event.type) {
+      case "credential-change":
+        requireThat(credentialContract, "version", "Credential transitions require an explicitly versioned journal; legacy evidence is not upgraded in place.");
+        shape(d, ["from", "to", "actor"], "credential-change.data");
+        choice(d.from, ["configured", "not-required", "missing", "unknown"], "credential-change.from");
+        choice(d.to, ["configured", "not-required", "missing", "unknown"], "credential-change.to");
+        choice(d.actor, ["participant", "operator", "observation-only", "unknown"], "credential-change.actor");
+        requireThat(plan.model.kind !== "keyless-demo", "demo-model", "A keyless demonstration cannot declare credential changes.");
+        requireThat(d.from === currentCredentialState && d.from !== d.to, "credential-transition-conflict", "Record the actual transition from the last declared state; never replace the starting state.");
+        requireThat(d.actor !== "observation-only" || d.from === "unknown", "credential-discovery-conflict", "Observation-only resolves a previously unknown state, not an unattributed configuration action.");
+        currentCredentialState = d.to;
+        if (d.actor === "operator") assistance += 1;
+        if (d.actor === "unknown") unknownCredentialActor = true;
+        credentialObservations.push(clone(event));
+        break;
+      case "model-use":
+        requireThat(credentialContract, "version", "Actual-use state observations require the versioned credential contract.");
+        shape(d, ["credentialState"], "model-use.data");
+        choice(d.credentialState, ["configured", "not-required"], "model-use.credentialState");
+        requireThat(plan.model.kind !== "keyless-demo" && d.credentialState === currentCredentialState, "credential-use-conflict", "Actual use must match the known credential state at this point, not a later repair or a keyless demonstration.");
+        credentialObservations.push(clone(event));
+        break;
       case "submitted-action":
         shape(d, ["description"], "submitted-action.data");
         text(d.description, "action.description");
@@ -186,6 +291,7 @@ export function projectSession(plan, events, preparedAt) {
       case "useful-result":
         shape(d, ["judgement"], "useful-result.data");
         text(d.judgement, "useful-result.judgement");
+        requireThat(!credentialContract || credentialObservations.some(item => item.type === "model-use"), "credential-result-order", "Record the observed model use and actual-use credential state before its useful result; never infer use from the result.");
         requireThat(firstTask === null, "first-task-ended", "The first-task outcome is already recorded; use correction to change it.");
         firstTask = { outcome: "completed", firstUsefulResultAt: event.at, actionsToFirstUsefulResult: actions, noResultReason: null };
         break;
@@ -226,7 +332,7 @@ export function projectSession(plan, events, preparedAt) {
         break;
       case "close":
         shape(d, ["completeness", "modelUsed", "observer", "recordingPath", "windowRuleSatisfied", "windowRuleDeviation"], "close.data");
-        shape(d.completeness, ["actions", "assistance", "setupFailures", "refusals"], "close.completeness");
+        shape(d.completeness, ["actions", "assistance", "setupFailures", "refusals", ...(credentialContract ? ["credentials"] : [])], "close.completeness");
         for (const key of Object.keys(d.completeness)) boolean(d.completeness[key], `completeness.${key}`);
         boolean(d.modelUsed, "close.modelUsed"); boolean(d.windowRuleSatisfied, "close.windowRuleSatisfied");
         if (d.windowRuleSatisfied) requireThat(d.windowRuleDeviation === null, "window-rule", "A satisfied window rule must have null deviation.");
@@ -245,17 +351,21 @@ export function projectSession(plan, events, preparedAt) {
   const measurements = {
     startedAt, endedAt: closed.at, ...firstTask,
     actionsToFirstUsefulResult: coverage.actions ? firstTask.actionsToFirstUsefulResult : null,
-    assistanceCount: coverage.assistance ? assistance : null,
+    assistanceCount: coverage.assistance && !unknownCredentialActor ? assistance : null,
     setupFailures: coverage.setupFailures ? setupFailures : null,
     refusals: coverage.refusals ? refusals : null,
     interruption: recovery, secondTask
   };
   const observer = { id: plan.observerId, ...closed.observer };
   const model = { ...clone(plan.model), used: closed.modelUsed };
+  if (credentialContract) model.credentials = {
+    version: CREDENTIAL_CONTRACT_VERSION, startingState: plan.model.credentialState,
+    coverageComplete: coverage.credentials, observations: credentialObservations
+  };
   // Validate all available intake fields now; an expected recording hash is never invented.
   const fields = { sessionId: plan.sessionId, participation: plan.participation, participantId: plan.participantId,
     harness: plan.harness, environment: plan.environment, protocol: COMMON_PROTOCOL, observer, model, measurements };
-  const blockers = validateSession(fields).filter(error => error.path !== "session.recording");
+  const blockers = validateSession(fields, "session", schemaVersion).filter(error => error.path !== "session.recording");
   if (closed.recordingPath === null) blockers.push({ path: "session.recording", code: "recording-missing", message: "Declare the retained recording path in an explicit correction." });
   if (!closed.windowRuleSatisfied) blockers.push({ path: "session.windowRule", code: "window-rule-unsatisfied", message: "The preregistered observation-window rule was not satisfied; retain the deviation." });
   return { status: blockers.length ? "closed-blocked" : "closed", outcome: firstTask.outcome,
@@ -278,7 +388,7 @@ function emptyState(draft) {
 /** Pure revision application. Corrections retain the old revisions and cannot change the roster. */
 export function applyRevision(state, revision, digest, byteLength) {
   shape(revision, ["captureVersion", "revision", "previousSha256", "savedAt", "kind", "payload"], "revision");
-  requireThat(revision.captureVersion === CAPTURE_VERSION, "version", "Unsupported journal version.");
+  intakeSchemaForCapture(revision.captureVersion);
   timestamp(revision.savedAt, "revision.savedAt");
   text(digest, "revision digest", HASH);
   requireThat(Number.isSafeInteger(byteLength) && byteLength > 0 && byteLength <= LIMITS.jsonBytes, "size", "Revision exceeds its byte limit.");
@@ -287,6 +397,7 @@ export function applyRevision(state, revision, digest, byteLength) {
     requireThat(revision.kind === "prepare" && revision.revision === 0 && revision.previousSha256 === null, "journal-origin", "The journal must begin with its original preparation revision.");
     state = emptyState(validateDraft(revision.payload));
   }
+  requireThat(revision.captureVersion === state.draft.captureVersion, "version", "Journal revision and immutable preparation versions must match; no in-place migration or downgrade.");
   requireThat(revision.revision === state.revision + 1 && revision.previousSha256 === state.headSha256,
     "revision-conflict", "Revision/head conflict. Re-read status and reconcile; do not blindly retry an observation.");
   requireThat(state.journalBytes + byteLength <= LIMITS.journalBytes, "size", "Journal exceeds its retained-history byte limit.");
@@ -308,14 +419,19 @@ export function applyRevision(state, revision, digest, byteLength) {
       events = clone(p.events);
     }
     // Validate replacement shapes before reading their times or close declarations.
-    projectSession(plan, events, state.draft.preparedAt);
+    projectSession(plan, events, observationBoundary(state.draft), state.draft.captureVersion);
     if (revision.kind === "correction") {
       const prior = sessions.get(sessionId);
-      const latest = [state.draft.preparedAt, ...prior.map(event => event.at), ...events.map(event => event.at),
+      // A migrated preparation keeps its original preparedAt. Even an empty
+      // replacement is a declaration in the new journal, not before migration.
+      // For legacy and non-migrated drafts observationBoundary is preparedAt.
+      const latest = [observationBoundary(state.draft), ...prior.map(event => event.at), ...events.map(event => event.at),
         ...prior.filter(event => event.type === "close").map(event => event.data.observer.recordedAt),
         ...events.filter(event => event?.type === "close").map(event => event.data?.observer?.recordedAt)];
       requireThat(latest.every(at => Number.isFinite(Date.parse(at)) && Date.parse(p.declaredAt) >= Date.parse(at)),
-        "correction-order", "Declare the correction at or after all replaced/replacement observations and attestations.");
+        "correction-order", state.draft.migration
+          ? "Declare the correction at or after migration and all replaced/replacement observations and attestations. Preserve the original declaration; do not invent a later time."
+          : "Declare the correction at or after all replaced/replacement observations and attestations.");
     }
     sessions.set(sessionId, events);
   } else requireThat(state.revision === -1, "roster-frozen", "Preparation and the planned population cannot be replaced within a journal.");
@@ -469,9 +585,8 @@ export async function loadCapture(storePath) {
   return { ...state, directory, sources };
 }
 
-export async function createCapture(input, storePath, savedAt = new Date().toISOString()) {
-  const draft = prepareDraft(input);
-  const revision = { captureVersion: CAPTURE_VERSION, revision: 0, previousSha256: null, savedAt, kind: "prepare", payload: draft };
+async function createDraftCapture(draft, storePath, savedAt) {
+  const revision = { captureVersion: draft.captureVersion, revision: 0, previousSha256: null, savedAt, kind: "prepare", payload: draft };
   const bytes = encoded(revision);
   const state = applyRevision(null, revision, sha256(bytes), bytes.length);
   const directory = await newDirectory(storePath);
@@ -480,12 +595,29 @@ export async function createCapture(input, storePath, savedAt = new Date().toISO
   return state;
 }
 
+export async function createCapture(input, storePath, savedAt = new Date().toISOString(), captureVersion = CAPTURE_VERSION) {
+  return createDraftCapture(prepareDraft(input, captureVersion), storePath, savedAt);
+}
+
+/** Create a disjoint new journal. Original revisions are never rewritten or deleted. */
+export async function migrateCapture(storePath, expectedHead, outputPath, declaration, savedAt = new Date().toISOString()) {
+  const source = await loadCapture(storePath);
+  const draft = migratePreparationDraft(source, expectedHead, declaration);
+  requireThat(typeof outputPath === "string" && isAbsolute(outputPath), "output-path", "Migration requires a new absolute journal path.");
+  const parent = await localDirectory(resolve(outputPath, ".."));
+  const destination = join(parent.root, relative(parent.supplied, resolve(outputPath)));
+  requireThat(!nested(source.directory.root, destination) && !nested(destination, source.directory.root), "output-overlap", "Migration output must be disjoint from the retained source journal.");
+  const latest = await loadCapture(storePath);
+  requireThat(latest.headSha256 === expectedHead, "revision-conflict", "Source advanced during migration preparation; preserve it and review the new head.");
+  return createDraftCapture(draft, destination, savedAt);
+}
+
 export async function appendCapture(storePath, expectedHead, kind, payload, savedAt = new Date().toISOString()) {
   text(expectedHead, "expected head SHA-256", HASH);
   choice(kind, ["event", "correction"], "append kind");
   const state = await loadCapture(storePath);
   requireThat(state.headSha256 === expectedHead, "revision-conflict", "The journal advanced. Read status and reconcile with retained history; do not retry blindly.");
-  const revision = { captureVersion: CAPTURE_VERSION, revision: state.revision + 1, previousSha256: expectedHead, savedAt, kind, payload };
+  const revision = { captureVersion: state.draft.captureVersion, revision: state.revision + 1, previousSha256: expectedHead, savedAt, kind, payload };
   const bytes = encoded(revision);
   const next = applyRevision(state, revision, sha256(bytes), bytes.length);
   await checkDirectory(state.directory);
@@ -499,7 +631,7 @@ export async function appendCapture(storePath, expectedHead, kind, payload, save
 export function captureStatus(state) {
   const sessions = state.draft.plannedSessions.map(plan => {
     const events = state.sessions.get(plan.sessionId);
-    const projection = projectSession(plan, events, state.draft.preparedAt);
+    const projection = projectSession(plan, events, observationBoundary(state.draft), state.draft.captureVersion);
     return { sessionId: plan.sessionId, participantId: plan.participantId, participation: plan.participation,
       harness: plan.harness.name, status: projection.status, firstTaskOutcome: projection.outcome,
       activeEventCount: events.length,
@@ -507,7 +639,7 @@ export function captureStatus(state) {
       observationGaps: projection.coverage === null ? null : Object.keys(projection.coverage).filter(key => !projection.coverage[key]),
       blockers: clone(projection.blockers) };
   });
-  return { captureVersion: CAPTURE_VERSION, studyId: state.draft.studyId, revision: state.revision, headSha256: state.headSha256,
+  return { captureVersion: state.draft.captureVersion, studyId: state.draft.studyId, revision: state.revision, headSha256: state.headSha256,
     preparationOnly: state.history.every(item => item.kind === "prepare"), plannedSessionCount: sessions.length, sessions };
 }
 
@@ -548,7 +680,7 @@ export async function finalizeCapture(storePath, expectedHead, evidenceRoot, out
     row.recordingCheck = { status: "not-checked", sha256: null, bytes: null };
     if (row.status !== "closed") continue;
     const plan = state.draft.plannedSessions.find(item => item.sessionId === row.sessionId);
-    const projection = projectSession(plan, state.sessions.get(row.sessionId), state.draft.preparedAt);
+    const projection = projectSession(plan, state.sessions.get(row.sessionId), observationBoundary(state.draft), state.draft.captureVersion);
     try {
       requireThat(budget > 0, "recording-total-size", "Recording population exceeds the aggregate 64 GiB snapshot limit.");
       const before = await containedRegular(evidence, projection.recordingPath, Math.min(LIMITS.recordingBytes, budget));
@@ -560,7 +692,7 @@ export async function finalizeCapture(storePath, expectedHead, evidenceRoot, out
       requireThat(unchanged(before.info, after.info), "file-changed", "Recording changed since export preflight; no record is admitted.");
       const recording = { path: actual.path, sha256: actual.sha256 };
       const candidate = intakeFields(plan, projection, state.draft.protocol, recording);
-      const errors = validateSession(candidate);
+      const errors = validateSession(candidate, "session", intakeSchemaForCapture(state.draft.captureVersion));
       row.blockers.push(...errors);
       row.recordingCheck = { status: "hash-derived-not-yet-verified", sha256: actual.sha256, bytes: actual.bytes };
       snapshots.set(row.sessionId, { info: before.info, size });
@@ -570,7 +702,7 @@ export async function finalizeCapture(storePath, expectedHead, evidenceRoot, out
       row.blockers.push(asBlocker(error));
     }
   }
-  const study = { schemaVersion: SCHEMA_VERSION, studyId: state.draft.studyId, sessions: candidates };
+  const study = { schemaVersion: intakeSchemaForCapture(state.draft.captureVersion), studyId: state.draft.studyId, sessions: candidates };
   const validation = validateStudy(study);
   for (const entry of validation.records) {
     const candidate = candidates[entry.index];
@@ -633,7 +765,8 @@ export async function finalizeCapture(storePath, expectedHead, evidenceRoot, out
 }
 
 const HELP = `Local observer capture (no harness execution, recording or uploads).
-  prepare --input /private/preparation.json --store /private/new-journal
+  prepare --input /private/preparation.json --store /private/new-journal [--capture-version VERSION]
+  migrate --store /private/legacy-preparation --expect HEAD_SHA256 --input /private/migration-declaration.json --out /private/new-journal
   event --store /private/journal --expect HEAD_SHA256 --session SESSION_ID --input /private/event.json [--record-now]
   correct --store /private/journal --expect HEAD_SHA256 --input /private/correction.json
   status --store /private/journal
@@ -649,13 +782,18 @@ otherwise it writes report.json plus retained journal history, with no subset st
 Exit 0: command completed (not validation/human proof); 2: blocked export report;
 1: refusal/I/O error. Preserve partial output, reconcile conflicts, and use new paths.
 Event/correction schema and recovery: docs/HUMAN_FIRST_USE_CAPTURE.md
+Credential transitions and preparation-only migration: docs/HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md
+Default preparation remains legacy. Migration never upgrades an observed journal.
+Prospective model revision: --capture-version 2026-09-11.1; credentials-only: 2026-09-10.1.
+Nullable revision declarations: docs/HUMAN_FIRST_USE_MODEL_REVISION.md
+Migration still targets credentials-only; no migration into the model-revision contract.
 `;
 
 function argumentsFor(args) {
   const command = args[0];
   const required = {
     prepare: ["--input", "--store"], event: ["--store", "--expect", "--session", "--input"],
-    correct: ["--store", "--expect", "--input"], status: ["--store"],
+    correct: ["--store", "--expect", "--input"], status: ["--store"], migrate: ["--store", "--expect", "--input", "--out"],
     export: ["--store", "--expect", "--evidence-root", "--out"], protocol: []
   };
   requireThat(Object.hasOwn(required, command), "arguments", "Choose a documented command; use --help for its flags.");
@@ -664,7 +802,7 @@ function argumentsFor(args) {
     const key = args[index];
     requireThat(!Object.hasOwn(flags, key), "arguments", "Duplicate flags are ambiguous; supply each flag once.");
     if (key === "--record-now" && command === "event") { flags[key] = true; continue; }
-    requireThat(required[command].includes(key), "arguments", "Unexpected flag; use --help for the exact command interface.");
+    requireThat(required[command].includes(key) || (command === "prepare" && key === "--capture-version"), "arguments", "Unexpected flag; use --help for the exact command interface.");
     const value = args[++index];
     requireThat(typeof value === "string" && value.trim().length > 0 && !value.startsWith("--"), "arguments", "Every path, session and expected-head flag requires an explicit value.");
     flags[key] = value;
@@ -686,7 +824,8 @@ export async function runCli(args = process.argv.slice(2), io = process) {
     const { command, flags: f } = argumentsFor(args);
     if (command === "protocol") { io.stdout.write(`${JSON.stringify({ protocol: COMMON_PROTOCOL, task: COMMON_TASK })}\n`); return 0; }
     let result;
-    if (command === "prepare") result = await createCapture(await readCaptureJson(f["--input"]), f["--store"]);
+    if (command === "prepare") result = await createCapture(await readCaptureJson(f["--input"]), f["--store"], new Date().toISOString(), f["--capture-version"] ?? CAPTURE_VERSION);
+    else if (command === "migrate") result = await migrateCapture(f["--store"], f["--expect"], f["--out"], await readCaptureJson(f["--input"]));
     else if (command === "event") {
       let event = await readCaptureJson(f["--input"]);
       if (f["--record-now"]) event = declareRecordNow(event, new Date().toISOString());

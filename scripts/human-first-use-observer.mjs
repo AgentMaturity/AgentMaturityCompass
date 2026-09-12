@@ -3,15 +3,15 @@
 import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { COMMON_PROTOCOL, COMMON_TASK } from "./human-first-use-intake.mjs";
+import { COMMON_PROTOCOL, COMMON_TASK, MODEL_REVISION_CONTRACT_VERSION } from "./human-first-use-intake.mjs";
 import {
-  LIMITS, CaptureError, prepareDraft, readCaptureJson, createCapture,
+  LIMITS, CAPTURE_VERSION, MODEL_REVISION_CAPTURE_VERSION, hasCredentialContract, intakeSchemaForCapture, CaptureError, prepareDraft, readCaptureJson, createCapture,
   loadCapture, captureStatus, projectSession, declareRecordNow, appendCapture, finalizeCapture
 } from "./human-first-use-capture.mjs";
 
 const BOUNDARY = "Operator declarations only: preparation is not participation; hashes bind bytes, not humans. Export is not task success, study qualification or issue Done.";
 const HELP = `Guided local observer (no recording, harness/model execution, network or uploads).
-  node scripts/human-first-use-observer.mjs prepare --store /private/new-journal [--input /private/reviewed-preparation.json]
+  node scripts/human-first-use-observer.mjs prepare --store /private/new-journal [--input /private/reviewed-preparation.json] [--capture-version VERSION]
   node scripts/human-first-use-observer.mjs observe --store /private/journal [--session SESSION_ID]
   node scripts/human-first-use-observer.mjs status --store /private/journal
   node scripts/human-first-use-observer.mjs export --store /private/journal [--evidence-root /private/recordings] [--out /private/new-export]
@@ -29,6 +29,12 @@ Exit 0: completed command or safe pause; 2: unready declaration or blocked expor
 1: refusal, conflict or I/O failure. None is a passing-test or human-study claim.
 Corrections stay in the reviewed low-level CLI: docs/HUMAN_FIRST_USE_CAPTURE.md.
 Guide: docs/HUMAN_FIRST_USE_OBSERVER.md
+Credential observations require explicit version opt-in. Default preparation stays legacy.
+Preparation-only migration uses the reviewed capture CLI; observed journals are not upgraded.
+Contract: docs/HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md
+Explicit versions: credentials-only 2026-09-10.1; prospective model-revision 2026-09-11.1.
+Unknown immutable revision is supported only in the latter and blocks fixed-model comparison.
+Model-revision guide: docs/HUMAN_FIRST_USE_MODEL_REVISION.md; no automatic migration into it.
 `;
 
 export class ObserverPause extends Error {
@@ -141,7 +147,8 @@ async function studyFields(ctx, input) {
   input.observationWindowRule = await text(ctx, "observationWindowRule", "Preregister the end rule covering first task, recovery and optional return");
   input.assistancePolicy = await text(ctx, "assistancePolicy", "Preregister the common assistance policy and how gaps will be retained");
 }
-async function planFields(ctx, plan, index) {
+async function planFields(ctx, plan, index, captureVersion = CAPTURE_VERSION) {
+  const revisionContract = captureVersion === MODEL_REVISION_CAPTURE_VERSION;
   const prefix = `plannedSessions.${index}`;
   ctx.say(`Planned session ${index + 1}: this is intent, never evidence that anyone participated.`);
   plan.sessionId = await text(ctx, `${prefix}.sessionId`, "Unique session ID (lowercase letters/digits, - or _)");
@@ -167,19 +174,30 @@ async function planFields(ctx, plan, index) {
   if (m.kind === "keyless-demo") {
     ctx.say("Keyless-demo explicitly means no model identity/settings or required credential, and cannot complete the common real-model task.");
     Object.assign(m, { provider: null, id: null, revision: null, settingsSha256: null, credentialState: "not-required" });
+    if (revisionContract) m.revisionIdentity = { version: MODEL_REVISION_CONTRACT_VERSION, status: "not-applicable", reference: null, reason: null };
   } else {
     m.provider = await text(ctx, `${prefix}.model.provider`, "Exact planned provider identity, never a credential");
     m.id = await text(ctx, `${prefix}.model.id`, "Exact planned model ID");
-    m.revision = await text(ctx, `${prefix}.model.revision`, "Exact planned model revision/reference");
+    if (revisionContract) {
+      ctx.say("Requested label, optional reference and immutable revision are distinct. Declare unknown honestly; no model lookup or authentication is performed.");
+      const identity = m.revisionIdentity = { version: MODEL_REVISION_CONTRACT_VERSION };
+      identity.status = await ask(ctx, `${prefix}.model.revisionIdentity.status`, "Can you explicitly declare a planned immutable revision with independently reviewable basis?", ["declared-immutable", "unknown"]);
+      m.revision = identity.status === "unknown" ? null : await text(ctx, `${prefix}.model.revision`, "Declared immutable revision (a declaration requiring retained basis, not an authenticated served-model pin)");
+      identity.reference = await optionalText(ctx, `${prefix}.model.revisionIdentity.reference`, "Optional original revision/reference label, not an immutable pin or returned-model observation");
+      identity.reason = identity.status === "unknown"
+        ? await text(ctx, `${prefix}.model.revisionIdentity.reason`, "Explain why the immutable revision is unknown; do not fabricate a revision") : null;
+    } else m.revision = await text(ctx, `${prefix}.model.revision`, "Exact planned model revision/reference");
     m.settingsSha256 = await text(ctx, `${prefix}.model.settingsSha256`, "Actual SHA-256 of retained sanitized generation settings (no secrets)");
     m.credentialState = await ask(ctx, `${prefix}.model.credentialState`, "Starting credential state only; do not paste credential values", ["configured", "not-required", "missing", "unknown"]);
   }
 }
 
 async function guidedPrepare(ctx, flags) {
+  const captureVersion = flags["--capture-version"] ?? CAPTURE_VERSION;
+  intakeSchemaForCapture(captureVersion);
   printProtocol(ctx);
   const input = flags["--input"] ? await readCaptureJson(flags["--input"]) : {};
-  ctx.pending = { store: flags["--store"], preparation: input };
+  ctx.pending = { store: flags["--store"], preparation: input, ...(flags["--capture-version"] ? { captureVersion } : {}) };
   if (!flags["--input"]) {
     await studyFields(ctx, input);
     let count;
@@ -191,16 +209,19 @@ async function guidedPrepare(ctx, flags) {
     }
     input.plannedSessions = [];
     for (let index = 0; index < count; index += 1) {
-      const plan = {}; input.plannedSessions.push(plan); await planFields(ctx, plan, index);
+      const plan = {}; input.plannedSessions.push(plan); await planFields(ctx, plan, index, captureVersion);
     }
   }
   for (;;) {
     // The core alone owns validation. Its result is never a declaration of consent or outcomes.
     let valid = false;
-    try { prepareDraft(input); valid = true; } catch (error) { explain(ctx, error); }
+    try { prepareDraft(input, captureVersion); valid = true; } catch (error) { explain(ctx, error); }
     ctx.say("FULL PLANNED POPULATION / metadata review (private). Creation freezes every entry and identity:");
     ctx.say(json(ctx.pending));
-    ctx.say("Unknown install/credential states stay declared unknown. Missing/unknown starting credentials with later used=true can block intake; do not rewrite them to force admission.");
+    ctx.say(hasCredentialContract(captureVersion)
+      ? "Starting states remain frozen. Record credential-change and each observed model-use separately; later repair never rewrites the baseline. Unknown starting state still blocks matched comparison."
+      : "Unknown install/credential states stay declared unknown. Missing/unknown starting credentials with later used=true can block intake; do not rewrite them to force admission.");
+    if (captureVersion === MODEL_REVISION_CAPTURE_VERSION) ctx.say("Unknown immutable revision is a retained declaration, not a failed task or fixed-model match. Planned identity stays frozen; served model identity is never authenticated here.");
     const action = await ask(ctx, "prepare.review", "Review every row, pins, window rule and assistance policy before choosing create", valid
       ? ["create", "edit-study", "edit-session", "pause"] : ["edit-study", "edit-session", "pause"]);
     if (action === "pause") throw new ObserverPause();
@@ -214,10 +235,10 @@ async function guidedPrepare(ctx, flags) {
       }
       const choices = input.plannedSessions.map((_plan, index) => String(index + 1));
       const index = Number(await ask(ctx, "prepare.edit-session", "Which displayed roster row will you explicitly re-enter?", choices)) - 1;
-      const plan = {}; input.plannedSessions[index] = plan; await planFields(ctx, plan, index); continue;
+      const plan = {}; input.plannedSessions[index] = plan; await planFields(ctx, plan, index, captureVersion); continue;
     }
     active(ctx); ctx.writeAttempted = true;
-    const state = await createCapture(input, flags["--store"], ctx.now());
+    const state = await createCapture(input, flags["--store"], ctx.now(), captureVersion);
     clearPending(ctx);
     ctx.say(`Preparation saved; no observations created. Journal: ${flags["--store"]}`);
     printStatus(ctx, state);
@@ -231,6 +252,8 @@ const EVENT_LABELS = Object.freeze({
   assistance: "Observed assistance, including unsolicited help",
   "setup-failure": "Observed setup failure; retain even if the task later succeeds",
   refusal: "Observed refusal and whether its message actually named an actionable fix",
+  "credential-change": "Observed credential-state transition; retain its starting state and actual actor, never a secret",
+  "model-use": "Observed actual model use and credential state at that time; not preparation or an inferred successful answer",
   "useful-result": "First useful real-model result under the common task criteria",
   "first-task-ended": "First attempt failed or incomplete, without a useful result",
   interruption: "Observed interruption for the separate recovery exercise",
@@ -245,7 +268,7 @@ export function sessionView(state, sessionId) {
   const plan = state.draft.plannedSessions.find(row => row.sessionId === sessionId);
   if (!plan) throw new ObserverError("unplanned-session", "Choose an existing roster session ID; preparation cannot be replaced or extended.");
   const events = state.sessions.get(sessionId);
-  const projection = projectSession(plan, events, state.draft.preparedAt);
+  const projection = projectSession(plan, events, state.draft.migration?.declaredAt ?? state.draft.preparedAt, state.draft.captureVersion);
   const interruption = events.find(event => event.type === "interruption");
   const disposition = events.find(event => ["resume", "recovery-decision"].includes(event.type));
   const returned = events.find(event => event.type === "second-task");
@@ -255,13 +278,18 @@ export function sessionView(state, sessionId) {
   if (projection.status === "unobserved") next.push("start");
   else if (projection.status === "open") {
     next.push("submitted-action", "assistance", "setup-failure", "refusal");
-    if (projection.outcome === null) next.push("useful-result", "first-task-ended");
+    const credentials = hasCredentialContract(state.draft.captureVersion);
+    if (credentials && plan.model.kind !== "keyless-demo") next.push("credential-change", "model-use");
+    if (projection.outcome === null) {
+      if (!credentials || events.some(event => event.type === "model-use")) next.push("useful-result");
+      next.push("first-task-ended");
+    }
     else if (recovery === "not-recorded") next.push("interruption", "recovery-decision");
     else if (recovery === "awaiting-resume") next.push("resume");
     else if (secondTask === "not-recorded") next.push("second-task");
     else next.push("close");
   }
-  return { plan, events, projection, recovery, secondTask, next, lastAt: events.at(-1)?.at ?? state.draft.preparedAt };
+  return { plan, events, projection, recovery, secondTask, next, lastAt: events.at(-1)?.at ?? state.draft.migration?.declaredAt ?? state.draft.preparedAt };
 }
 
 function printStatus(ctx, state, report = captureStatus(state)) {
@@ -272,6 +300,15 @@ function printStatus(ctx, state, report = captureStatus(state)) {
     ctx.say(`${row.sessionId} | ${row.harness} | ${row.participantId} | ${row.participation} | ${row.status}`);
     ctx.say(`  First task: ${row.firstTaskOutcome ?? "NOT RECORDED"}; recovery: ${view.recovery}; voluntary return: ${view.secondTask}; retained events: ${row.activeEventCount}`);
     ctx.say(`  Coverage gaps: ${row.observationGaps === null ? "not yet declared (not zero)" : row.observationGaps.length ? row.observationGaps.join(", ") : "none declared"}; correction revisions: ${row.correctionRevisions.join(", ") || "none"}`);
+    if (hasCredentialContract(state.draft.captureVersion)) {
+      const changes = view.events.filter(event => event.type === "credential-change");
+      const uses = view.events.filter(event => event.type === "model-use");
+      ctx.say(`  Credential starting state: ${view.plan.model.credentialState}; last declared state: ${changes.at(-1)?.data.to ?? view.plan.model.credentialState}; observed changes: ${changes.length}; actual-use observations: ${uses.length} (counts are not coverage).`);
+    }
+    if (state.draft.captureVersion === MODEL_REVISION_CAPTURE_VERSION) {
+      const identity = view.plan.model.revisionIdentity;
+      ctx.say(`  Planned revision identity: ${identity.status}; immutable revision: ${view.plan.model.revision ?? "UNKNOWN / NOT APPLICABLE"}; reference: ${identity.reference ?? "none declared"}. Served model match: not established.`);
+    }
     if (view.projection.status === "unobserved") ctx.say("  Missing: start, first-task outcome, recovery disposition, return disposition and close declarations.");
     else if (view.projection.status === "open") ctx.say(`  Still open. Next event categories: ${view.next.join(", ")}. Pause is always safe; it does not close the window.`);
     for (const blocker of row.blockers) ctx.say(`  BLOCKED ${blocker.path} [${blocker.code}]: ${blocker.message}`);
@@ -281,13 +318,15 @@ function printStatus(ctx, state, report = captureStatus(state)) {
   ctx.say(BOUNDARY);
 }
 
-async function closeFields(ctx, data) {
+async function closeFields(ctx, data, credentialContract = false) {
   ctx.say("Close is a declaration about the entire window, not just this terminal invocation. Unknown coverage is never counted as none.");
   const coverage = data.completeness = {};
-  for (const [key, label] of Object.entries({ actions: "submitted actions", assistance: "assistance", setupFailures: "setup failures", refusals: "refusals" })) {
+  for (const [key, label] of Object.entries({ actions: "submitted actions", assistance: "assistance", setupFailures: "setup failures", refusals: "refusals", ...(credentialContract ? { credentials: "credential transitions and actual model uses" } : {}) })) {
     const value = await ask(ctx, `close.completeness.${key}`, `Is the retained list of ${label} complete across the window? complete with no events explicitly declares none`, ["complete", "partial", "unknown"]);
     coverage[key] = value === "complete";
-    if (!coverage[key]) ctx.say(`${key}: partial/unknown coverage is encoded as false by the core, yielding null measurements, never zero or an empty list. Setup/refusal gaps block export; action gaps block completed first-task records.`);
+    if (!coverage[key]) ctx.say(key === "credentials"
+      ? "Credential/use coverage is partial or unknown: observations remain retained, coverageComplete=false blocks export. Missing observations are never asserted absent."
+      : `${key}: partial/unknown coverage is encoded as false by the core, yielding null measurements, never zero or an empty list. Setup/refusal gaps block export; action gaps block completed first-task records.`);
   }
   data.modelUsed = await declaration(ctx, "close.modelUsed", "Was the planned real model actually used? Planned identity does not establish use");
   const observer = data.observer = {};
@@ -304,10 +343,19 @@ async function closeFields(ctx, data) {
   data.windowRuleDeviation = data.windowRuleSatisfied ? null : await text(ctx, "close.windowRuleDeviation", "Describe the actual window-rule deviation; it remains an export blocker");
 }
 
-async function eventFields(ctx, event) {
+async function eventFields(ctx, event, credentialContract = false) {
   const d = event.data;
   switch (event.type) {
     case "start": break;
+    case "credential-change":
+      ctx.say("Do not paste credentials. Operator changes count as assistance automatically; do not enter a duplicate assistance event for the same action. Unknown actors keep assistance unknown.");
+      d.from = await ask(ctx, "credential-change.from", "State immediately before the observed change (must match retained history)", ["configured", "not-required", "missing", "unknown"]);
+      d.to = await ask(ctx, "credential-change.to", "State after this observed change, without relabelling preregistration", ["configured", "not-required", "missing", "unknown"]);
+      d.actor = await ask(ctx, "credential-change.actor", "Actual configuration actor; observation-only only resolves an unknown state, not an unattributed action", ["participant", "operator", "observation-only", "unknown"]);
+      break;
+    case "model-use":
+      d.credentialState = await ask(ctx, "model-use.credentialState", "Credential state at this actual observed use; configured does not itself establish model use", ["configured", "not-required"]);
+      break;
     case "submitted-action": d.description = await text(ctx, "action.description", "Describe ONE actually submitted operation, sanitized of secrets"); break;
     case "assistance": d.detail = await text(ctx, "assistance.detail", "Describe the actual assistance, without private identities or secrets"); break;
     case "setup-failure":
@@ -340,7 +388,7 @@ async function eventFields(ctx, event) {
       d.reason = d.outcome === "returned"
         ? await optionalText(ctx, "second-task.reason", "Optional actual voluntary-return explanation")
         : await text(ctx, "second-task.reason", "Explain the observed non-return or missing observation"); break;
-    case "close": await closeFields(ctx, d); break;
+    case "close": await closeFields(ctx, d, credentialContract); break;
     default: throw new ObserverError("event", "Choose a documented next event category.");
   }
 }
@@ -353,7 +401,7 @@ async function collectEvent(ctx, state, sessionId, type) {
     event.at = await text(ctx, "close.at", "Actual observed UTC close time, YYYY-MM-DDTHH:mm:ss.sssZ; never record-now or an automatic future time");
     event.timing = "explicit-observed";
   }
-  await eventFields(ctx, event);
+  await eventFields(ctx, event, hasCredentialContract(state.draft.captureVersion));
   if (type !== "close") {
     const mode = await ask(ctx, "event.timing", "Use an explicit observed UTC timestamp, or deliberately declare this event observed now (not independent timing)?", ["explicit-observed", "record-now"]);
     if (mode === "record-now") {
@@ -411,7 +459,7 @@ async function guidedObserve(ctx, flags) {
     for (;;) {
       const event = await collectEvent(ctx, state, id, type);
       let projection;
-      try { projection = projectSession(view.plan, [...view.events, event], state.draft.preparedAt); }
+      try { projection = projectSession(view.plan, [...view.events, event], state.draft.migration?.declaredAt ?? state.draft.preparedAt, state.draft.captureVersion); }
       catch (error) { explain(ctx, error); }
       ctx.say("REVIEW proposed event and expected head (private; not yet saved):"); ctx.say(json(ctx.pending));
       if (projection?.blockers.length) {
@@ -474,7 +522,7 @@ async function guidedExport(ctx, flags) {
 
 function parseArguments(args) {
   const specs = {
-    prepare: { required: ["--store"], optional: ["--input"] },
+    prepare: { required: ["--store"], optional: ["--input", "--capture-version"] },
     observe: { required: ["--store"], optional: ["--session"] },
     status: { required: ["--store"], optional: [] },
     export: { required: ["--store"], optional: ["--evidence-root", "--out"] },

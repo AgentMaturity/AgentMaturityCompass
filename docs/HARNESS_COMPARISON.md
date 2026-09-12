@@ -342,3 +342,21 @@ interventions. No rank, synthetic score, maturity blend or tenfold factor is
 generated. A tenfold reduction in manual evidence-preparation actions requires
 a separately observed matched human baseline and enough reported samples to
 support that exact claim.
+
+## September 11, 2026 — atomic results-directory admission
+
+AMC-1518 / `phase-a-b01-t02-comparison-output-2026-09-11`: the runner now claims
+the output leaf using a nonrecursive directory creation, after preparing only
+its ancestors. Existing directories (including empty ones), files and symlinks
+are not accepted as new output. A competing creator at admission is refused
+before the first report artifact, trial workspace or adapter command.
+
+Use a new results path for every attempt. Do not remove the winner's files or
+retry into a partial earlier output. Existing per-artifact exclusive writes,
+full trial population, unknown metrics, redaction, opt-ins and schema are unchanged.
+Ordinary parent-directory errors remain errors, not fabricated run results.
+
+This fixes output-leaf ownership, not ongoing hostile ancestor replacement or
+an OS filesystem sandbox. `tests/harnessComparisonOutputOwnership.test.ts`
+contains synthetic actual-runner admission regressions, authored but not run.
+No adapter, oracle, model, provider or human execution is authorized here.

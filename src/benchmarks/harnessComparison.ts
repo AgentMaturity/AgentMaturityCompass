@@ -117,8 +117,14 @@ export async function runHarnessComparison(options: HarnessComparisonOptions): P
   }
   const base = dirname(resolve(options.manifestPath));
   const output = resolve(options.outputDir);
-  if (existsSync(output)) throw new Error("Comparison output must be a new directory.");
-  mkdirSync(output, { recursive: true, mode: 0o700 });
+  // Create ancestors separately; only a successful nonrecursive leaf creation
+  // owns this run's output. An exists-then-recursive-mkdir check is race-prone.
+  mkdirSync(dirname(output), { recursive: true, mode: 0o700 });
+  try { mkdirSync(output, { mode: 0o700 }); }
+  catch (error) {
+    if ((error as NodeJS.ErrnoException)?.code === "EEXIST") throw new Error("Comparison output must be a new directory.");
+    throw error;
+  }
   const startedAt = new Date().toISOString();
   const report: HarnessComparisonReport = {
     schemaVersion: HARNESS_COMPARISON_VERSION, comparisonId: manifest.id, startedAt, finishedAt: startedAt,

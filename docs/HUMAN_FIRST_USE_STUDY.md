@@ -1,5 +1,15 @@
 # Human first-use evidence intake
 
+> September 11, 2026 — opt-in intake `2026-09-11` supports explicit unknown
+> immutable revisions without admitting them to fixed-model comparison. See
+> [Model revision](HUMAN_FIRST_USE_MODEL_REVISION.md) for strict fields and
+> declaration-only report limits. Existing schemas remain unchanged; execution held.
+
+> Version notice — 2026-09-10: legacy intake remains `2026-09-09`. The additive
+> `2026-09-10` schema is documented in [Credential transitions](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md)
+> and the dated addendum below; it is not a relabel of old evidence. Current
+> sole-CoS/execution-hold instructions supersede historical validation routing.
+
 Implementation/operator packet for **AMC-1512** (native first use and real-provider
 evidence) and **AMC-1518** (matched comparative outcomes), authored 2026-09-09.
 This document contains no collected human results or execution qualification.
@@ -367,3 +377,97 @@ and exclusive report creation to establish that the authored tests fail for the
 right reason. Retain the exact source/environment and any failures. No earlier
 repository test receipt qualifies this new script. The worker handoff is
 `AMC_OS/INBOX/REV_IMPLEMENTATION_SPECIALIST.md` in the assigned worktree.
+
+## 2026-09-10 addendum — intake 2026-09-10 / credentials 1
+
+New-schema session models additionally require `credentials` with exactly
+`version: "1"`, `startingState`, `coverageComplete`, and ordered `observations`.
+The original `model.credentialState` remains the starting state and must equal
+`credentials.startingState`. Each change carries from/to/actor; each actual-use
+observation carries its credential state at that point. A later configuration
+cannot validate an earlier unsupported use or useful result.
+
+Intake independently admits chronology inside the measurement window, declared
+use/result consistency, coverage and assistance semantics. Incomplete credential
+coverage blocks admission. Operator changes cannot disappear from a known
+assistance count; unknown actors require null assistance. Unknown starting state
+can remain in a valid individual record but still blocks matched comparison.
+
+One study declares one schema version. New fields in legacy input and missing
+new fields in versioned input are refused; unsupported versions are not coerced.
+Cohort identities retain starting state and isolate credential contract versions.
+Neither repairs nor successful use replace original starting strata or erase
+failures. Full-roster capture, recording-byte admission and human/automation
+separation still apply. Intake alone cannot detect a roster omitted upstream.
+
+See [Credential transitions](HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md) for the
+exact contract, migration limits and privacy boundaries. New regression source:
+`tests/humanFirstUseCredentials.test.ts`, authored but not run. Legacy/new
+compatibility, runtime correctness and source/package/platform qualification
+remain unverified by execution; no provider or human evidence is created here.
+
+### Recovery authority — intake `2026-09-10`, credential contract `1`
+
+2026-09-10; task `amc-1512-credential-authoring-recovery-2026-09-10`.
+The credential guide's recovery addendum distinguishes same-time timestamp
+admission from complete-journal order and supplied baseline agreement from
+independent preregistration authentication. Known later help cannot erase an
+unknown actor. Sole CoS authoring is current; historical worker/Codex validation
+directions are not execution authority. All validation and session execution
+remain held; legacy `2026-09-09` is not retroactively upgraded.
+
+### September 11 boundary note — intake `2026-09-10`, credentials `1`
+
+The capture reader now refuses correction declarations earlier than a migrated
+journal's explicit migration, including empty corrections. Direct intake does
+not receive that original migration/journal history and cannot independently
+establish this property. Keep the retained journal and independent review
+references; do not insert new migration fields into strict study JSON. The schema,
+starting-state cohorts, assistance unknowns and automation exclusions are unchanged.
+See the credential guide's migration correction chronology. Added regression
+source remains unexecuted; no data collection or acceptance is authorized here.
+
+## September 11, 2026 — direct-intake phase-order admission correction
+
+Task `amc-1512-phase-order-implementation-2026-09-11`; finding
+`AMC1512-DIRECT-INTAKE-PHASE-ORDER`. This is a reader-admission correction across
+existing intake schemas `2026-09-09`, `2026-09-10` and `2026-09-11`, not a new
+schema, changed default, migration or permission to collect evidence.
+
+The corrected `validateMeasurements` rejects a canonical interruption timestamp
+before a known completed first useful result. An observed `returned` or
+`did-not-return` decision must not precede the known recovery boundary: the
+interruption, or a supplied canonical resume time that is admissible under the
+existing outcome and resume-after-interruption rules. A failed outcome's optional
+supplied resume timestamp remains a bound, not a declaration of successful resume.
+Existing window, result-to-second-task and resume-after-interruption rules remain.
+
+Strict inversions use `code: time-order`, `kind: invalid`, at
+`measurements.interruption.at` or `measurements.secondTask.at` under the exact
+session path. Absent/malformed times retain their existing required/timestamp
+classification. New comparisons do not parse null as epoch, normalize rolled or
+noncanonical dates, infer absent timestamps, sort events or rewrite the input.
+Equality alone remains admissible but does not prove full event occurrence order.
+Failed/incomplete first-task termination and nonsuccessful/unobserved decision
+times omitted by reduced intake remain unknown; retain full-journal review.
+
+An invalid human row remains in the full report with original identity and
+`declaredOutcome`; its invalid measurement projection is null and the existing
+aggregate blocker withholds human summaries. Valid failed/incomplete records
+remain eligible under the unchanged declaration/cohort rules. Credentials, model
+revision unknowns, assistance unknowns, privacy and served-model non-authentication
+are not altered. Capture's stronger phase/event replay remains unchanged.
+
+Contradictory inputs formerly admitted can now be refused without changing their
+schema label. Preserve original input/journal/recording bytes and old reports;
+never overwrite or silently relabel them to obtain admission. At a later authorized
+boundary, use a new report path and bind the corrected reader via the CLI's existing
+`toolSha256` and retained source/dependency provenance. In-memory intake still
+leaves input/tool hashes null. Code 2 denotes a written invalid/insufficient
+report; code 1 remains argument/parse/I/O failure, not proof of a completed report.
+
+`tests/humanFirstUsePhaseOrder.test.ts` authors synthetic direct admission,
+full-population report/CLI and lawful capture-projection regressions. They have
+not been imported, collected or run. This correction is source authoring, not
+runtime qualification or genuine human/provider evidence. All execution holds
+and fresh-candidate/full-suite/release/independent-evidence obligations persist.

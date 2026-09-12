@@ -33,17 +33,26 @@ export interface NativeValidationResult {
 
 /** Snapshot the reviewed plan before any prompt executes. No file discovery or grants. */
 export function freezeNativeValidationPlan(plan: NativeValidationPlan): NativeValidationPlan {
-  if (!/^[a-f0-9]{64}$/.test(plan.configSha256) || !Array.isArray(plan.checks) || plan.checks.length < 1 || plan.checks.length > 8) throw new Error("Invalid native validation plan.");
+  if (plan === null || typeof plan !== "object" || Array.isArray(plan)) throw new Error("Invalid native validation plan.");
+  const { configSha256, checks: requestedChecks } = plan;
+  if (typeof configSha256 !== "string" || !/^[a-f0-9]{64}$/.test(configSha256)
+    || !Array.isArray(requestedChecks) || requestedChecks.length < 1 || requestedChecks.length > 8) throw new Error("Invalid native validation plan.");
   const ids = new Set<string>();
-  const checks = plan.checks.map(check => {
-    if (!/^[a-zA-Z0-9_-]{1,64}$/.test(check.id) || ids.has(check.id)
-      || typeof check.title !== "string" || !check.title.trim() || check.title.length > 160 || /[\x00-\x1f\x7f]/.test(check.title)
-      || typeof check.command !== "string" || !check.command.trim() || Buffer.byteLength(check.command) > 8192 || check.command.includes("\0")
-      || !Number.isSafeInteger(check.timeoutMs) || check.timeoutMs < 1 || check.timeoutMs > 600_000) throw new Error("Invalid native validation check.");
-    ids.add(check.id);
-    return Object.freeze({ id: check.id, title: check.title, command: check.command, timeoutMs: check.timeoutMs });
-  });
-  return Object.freeze({ configSha256: plan.configSha256, checks: Object.freeze(checks) });
+  const checks: NativeValidationCheck[] = [];
+  for (let index = 0; index < requestedChecks.length; index += 1) {
+    // Sparse or inherited slots are not selected checks; never skip or fill them.
+    if (!Object.hasOwn(requestedChecks, index)) throw new Error("Invalid native validation check.");
+    const check = requestedChecks[index];
+    if (check === null || typeof check !== "object" || Array.isArray(check)) throw new Error("Invalid native validation check.");
+    const { id, title, command, timeoutMs } = check;
+    if (typeof id !== "string" || !/^[a-zA-Z0-9_-]{1,64}$/.test(id) || ids.has(id)
+      || typeof title !== "string" || !title.trim() || title.length > 160 || /[\x00-\x1f\x7f]/.test(title)
+      || typeof command !== "string" || !command.trim() || Buffer.byteLength(command) > 8192 || command.includes("\0")
+      || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 600_000) throw new Error("Invalid native validation check.");
+    ids.add(id);
+    checks.push(Object.freeze({ id, title, command, timeoutMs }));
+  }
+  return Object.freeze({ configSha256, checks: Object.freeze(checks) });
 }
 
 export function validationCheckPending(check: Pick<NativeValidationCheck, "id" | "title">): NativeValidationCheckResult {

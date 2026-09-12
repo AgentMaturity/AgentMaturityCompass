@@ -8,6 +8,13 @@ import { isAbsolute, join, relative, resolve, sep, win32 } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const SCHEMA_VERSION = "2026-09-09";
+// Opt-in additive schema. Never silently relabel legacy evidence as this version.
+export const CREDENTIAL_SCHEMA_VERSION = "2026-09-10";
+export const CREDENTIAL_CONTRACT_VERSION = "1";
+// Prospective opt-in only; an unknown immutable revision is not a fabricated pin.
+export const MODEL_REVISION_SCHEMA_VERSION = "2026-09-11";
+export const MODEL_REVISION_CONTRACT_VERSION = "1";
+const SCHEMA_VERSIONS = Object.freeze([SCHEMA_VERSION, CREDENTIAL_SCHEMA_VERSION, MODEL_REVISION_SCHEMA_VERSION]);
 export const MIN_HUMAN_SESSIONS_PER_HARNESS = 5; // Standing target, not a collected sample.
 export const COMMON_TASK = "Draft three acceptance tests for a CLI that imports JSONL, rejects malformed records, and reports partial failures.";
 export const COMMON_PROTOCOL = Object.freeze({
@@ -26,6 +33,13 @@ const PARTICIPATION = ["human-declared", "automated-fixture"];
 const isObject = value => value !== null && typeof value === "object" && !Array.isArray(value);
 const digest = bytes => createHash("sha256").update(bytes).digest("hex");
 const time = value => typeof value === "string" ? Date.parse(value) : Number.NaN;
+// Shared with timestamp admission: null, rolled dates and parseable noncanonical
+// spellings are not known times for cross-phase comparisons.
+const canonicalTime = value => {
+  const parsed = time(value);
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+    && Number.isFinite(parsed) && new Date(parsed).toISOString() === value ? parsed : Number.NaN;
+};
 const issue = (path, code, message, kind = "invalid") => ({ path, code, message, kind });
 
 function validator(errors) {
@@ -64,8 +78,7 @@ function validator(errors) {
   };
   const timestamp = (value, path) => {
     if (missing(value, path)) return;
-    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
-      || !Number.isFinite(Date.parse(value)) || new Date(value).toISOString() !== value) {
+    if (!Number.isFinite(canonicalTime(value))) {
       add(path, "timestamp", "Expected a real UTC timestamp: YYYY-MM-DDTHH:mm:ss.sssZ.");
     }
   };
@@ -86,9 +99,12 @@ export function isRecordingPath(value) {
 }
 
 /** Pure structural/semantic validation. No file, clock, provider or participant access. */
-export function validateSession(session, path = "session") {
+export function validateSession(session, path = "session", schemaVersion = SCHEMA_VERSION) {
   const errors = [];
   const v = validator(errors);
+  v.choice(schemaVersion, `${path}.schemaVersion`, SCHEMA_VERSIONS);
+  const revisionContract = schemaVersion === MODEL_REVISION_SCHEMA_VERSION;
+  const credentialContract = schemaVersion === CREDENTIAL_SCHEMA_VERSION || revisionContract;
   if (!v.object(session, path, ["sessionId", "participation", "participantId", "observer", "harness", "environment", "protocol", "model", "measurements", "recording"])) return errors;
   v.text(session.sessionId, `${path}.sessionId`, ID);
   v.choice(session.participation, `${path}.participation`, PARTICIPATION);
@@ -126,24 +142,112 @@ export function validateSession(session, path = "session") {
     v.text(p.taskSha256, `${path}.protocol.taskSha256`, HASH);
   }
   const m = session.model;
-  if (v.object(m, `${path}.model`, ["kind", "used", "provider", "id", "revision", "settingsSha256", "credentialState"])) {
+  if (v.object(m, `${path}.model`, ["kind", "used", "provider", "id", "revision", "settingsSha256", "credentialState", ...(credentialContract ? ["credentials"] : []), ...(revisionContract ? ["revisionIdentity"] : [])])) {
     v.choice(m.kind, `${path}.model.kind`, ["live-provider", "local-provider", "keyless-demo"]);
     v.bool(m.used, `${path}.model.used`);
     for (const key of ["provider", "id", "revision"]) v.nullable(m[key], `${path}.model.${key}`, (x, field) => v.text(x, field, undefined, 256));
     v.nullable(m.settingsSha256, `${path}.model.settingsSha256`, (x, field) => v.text(x, field, HASH));
     v.choice(m.credentialState, `${path}.model.credentialState`, ["configured", "not-required", "missing", "unknown"]);
     if (m.used === true) {
-      for (const key of ["provider", "id", "revision", "settingsSha256"]) if (m[key] === null) v.add(`${path}.model.${key}`, "model-identity-missing", "A used model requires its identity and settings pin.", "missing-evidence");
-      if (["missing", "unknown"].includes(m.credentialState)) v.add(`${path}.model.credentialState`, "model-credentials", "A used model requires a known configured or not-required credential state.");
+      for (const key of ["provider", "id", ...(!revisionContract ? ["revision"] : []), "settingsSha256"]) if (m[key] === null) v.add(`${path}.model.${key}`, "model-identity-missing", "A used model requires its identity and settings pin.", "missing-evidence");
+      if (!credentialContract && ["missing", "unknown"].includes(m.credentialState)) v.add(`${path}.model.credentialState`, "model-credentials", "A used model requires a known configured or not-required credential state.");
     }
     if (m.kind === "keyless-demo" && (m.used !== false || m.provider !== null || m.id !== null || m.revision !== null
       || m.settingsSha256 !== null || m.credentialState !== "not-required")) v.add(`${path}.model`, "demo-model", "A keyless demonstration cannot declare model use or credentials.");
   }
+  if (revisionContract) errors.push(...validateModelRevisionIdentity(m, `${path}.model`));
   validateMeasurements(session, path, v);
+  if (credentialContract) errors.push(...validateCredentialEvidence(m, session.measurements, `${path}.model.credentials`));
   const r = session.recording;
   if (v.object(r, `${path}.recording`, ["path", "sha256"])) {
     if (v.text(r.path, `${path}.recording.path`) && !isRecordingPath(r.path)) v.add(`${path}.recording.path`, "recording-path", "Use a relative local path without traversal, backslashes, drive prefixes or URLs.");
     v.text(r.sha256, `${path}.recording.sha256`, HASH);
+  }
+  return errors;
+}
+
+/** Pure typed declaration admission, shared with new-version preparation. No identity authentication. */
+export function validateModelRevisionIdentity(model, path = "model") {
+  const errors = [], v = validator(errors), identity = model?.revisionIdentity;
+  const field = `${path}.revisionIdentity`;
+  if (!v.object(identity, field, ["version", "status", "reference", "reason"])) return errors;
+  v.choice(identity.version, `${field}.version`, [MODEL_REVISION_CONTRACT_VERSION]);
+  v.choice(identity.status, `${field}.status`, ["declared-immutable", "unknown", "not-applicable"]);
+  v.nullable(identity.reference, `${field}.reference`, (value, key) => v.text(value, key, undefined, 256));
+  v.nullable(model?.revision, `${path}.revision`, (value, key) => v.text(value, key, undefined, 256));
+  if (identity.status === "unknown") {
+    if (model?.revision !== null) v.add(`${path}.revision`, "model-revision-conflict", "Unknown immutable revision requires explicit null, never a replacement label or guessed pin.");
+    v.text(identity.reason, `${field}.reason`);
+  } else if (identity.status === "declared-immutable") {
+    v.text(model?.revision, `${path}.revision`, undefined, 256);
+    if (identity.reason !== null) v.add(`${field}.reason`, "model-revision-conflict", "A declared immutable revision uses a null unknown-revision reason; supporting provenance remains independently reviewed.");
+  } else if (identity.status === "not-applicable") {
+    if (model?.kind !== "keyless-demo" || model?.revision !== null || identity.reference !== null || identity.reason !== null) {
+      v.add(field, "model-revision-conflict", "Not-applicable is only for a keyless demo with null revision, reference and reason.");
+    }
+  }
+  if (model?.kind === "keyless-demo" && identity.status !== "not-applicable") {
+    v.add(field, "model-revision-conflict", "A keyless demo must explicitly declare revision identity not-applicable, never immutable or unknown provider identity.");
+  }
+  return errors;
+}
+
+/**
+ * Pure credential timeline admission. Starting state is never replaced by a later
+ * state. Each model-use observation declares the actual-use state at that point;
+ * a later successful configuration cannot repair an earlier unsupported use.
+ * The ordered array resolves equal timestamps without sorting operator evidence.
+ */
+export function validateCredentialEvidence(model, measurements, path = "session.model.credentials") {
+  const errors = [], v = validator(errors), c = model?.credentials;
+  if (!v.object(c, path, ["version", "startingState", "coverageComplete", "observations"])) return errors;
+  v.choice(c.version, `${path}.version`, [CREDENTIAL_CONTRACT_VERSION]);
+  const states = ["configured", "not-required", "missing", "unknown"];
+  v.choice(c.startingState, `${path}.startingState`, states);
+  if (c.startingState !== model?.credentialState) v.add(`${path}.startingState`, "credential-start-conflict", "Credential starting state must equal the immutable model credentialState, not the final state.");
+  v.bool(c.coverageComplete, `${path}.coverageComplete`);
+  if (c.coverageComplete === false) v.add(`${path}.coverageComplete`, "credential-coverage-missing", "Partial or unknown credential/use observation coverage is retained but cannot be admitted.", "missing-evidence");
+  let current = c.startingState, previousAt = measurements?.startedAt;
+  let operatorChanges = 0, unknownActors = 0;
+  const uses = [];
+  v.array(c.observations, `${path}.observations`, (observation, field) => {
+    if (!v.object(observation, field, ["type", "at", "timing", "data"])) return;
+    v.choice(observation.type, `${field}.type`, ["credential-change", "model-use"]);
+    v.timestamp(observation.at, `${field}.at`);
+    v.choice(observation.timing, `${field}.timing`, ["explicit-observed", "operator-declared-now"]);
+    if (time(observation.at) < time(previousAt)
+      || time(observation.at) < time(measurements?.startedAt)
+      || time(observation.at) > time(measurements?.endedAt)) {
+      v.add(`${field}.at`, "credential-time-order", "Keep credential observations in recorded order and inside the full observation window.");
+    }
+    previousAt = observation.at;
+    const d = observation.data;
+    if (observation.type === "credential-change") {
+      if (!v.object(d, `${field}.data`, ["from", "to", "actor"])) return;
+      v.choice(d.from, `${field}.data.from`, states);
+      v.choice(d.to, `${field}.data.to`, states);
+      v.choice(d.actor, `${field}.data.actor`, ["participant", "operator", "observation-only", "unknown"]);
+      if (d.from !== current || d.from === d.to) v.add(`${field}.data`, "credential-transition-conflict", "A change must start at the last declared state and move to a different state; do not backfill the starting state.");
+      if (d.actor === "observation-only" && d.from !== "unknown") v.add(`${field}.data.actor`, "credential-discovery-conflict", "Observation-only resolves a previously unknown state; use the actual actor or unknown for a configuration change.");
+      if (d.actor === "operator") operatorChanges += 1;
+      if (d.actor === "unknown") unknownActors += 1;
+      current = d.to;
+    } else if (observation.type === "model-use") {
+      if (!v.object(d, `${field}.data`, ["credentialState"])) return;
+      v.choice(d.credentialState, `${field}.data.credentialState`, ["configured", "not-required"]);
+      if (d.credentialState !== current) v.add(`${field}.data.credentialState`, "credential-use-conflict", "Actual model use must match the known state at that point in the retained timeline, not a later repair.");
+      uses.push(observation.at);
+    }
+  });
+  if (model?.used === true && uses.length === 0) v.add(`${path}.observations`, "credential-use-missing", "Declared model use requires an explicit actual-use state observation; preparation or an answer alone is not that observation.", "missing-evidence");
+  if (model?.used === false && uses.length !== 0) v.add(`${path}.observations`, "credential-use-conflict", "model.used=false contradicts a retained actual-use observation.");
+  if (measurements?.outcome === "completed" && !uses.some(at => time(at) <= time(measurements.firstUsefulResultAt))) {
+    v.add(`${path}.observations`, "credential-result-order", "A completed useful result requires an actual-use observation at or before that result.");
+  }
+  if (model?.kind === "keyless-demo" && Array.isArray(c.observations) && c.observations.length) v.add(`${path}.observations`, "demo-model", "A keyless demonstration cannot declare credential changes or real model use.");
+  if (unknownActors && measurements?.assistanceCount !== null) v.add(`${path}.observations`, "credential-assistance-unknown", "Unknown configuration actors require unknown assistance, not an asserted zero or complete count.");
+  if (Number.isSafeInteger(measurements?.assistanceCount) && measurements.assistanceCount < operatorChanges) {
+    v.add(`${path}.observations`, "credential-assistance-conflict", "Observed operator configuration changes must not disappear from the assistance count.");
   }
   return errors;
 }
@@ -186,6 +290,9 @@ function validateMeasurements(session, path, v) {
     v.timestamp(row.at, `${field}.at`); inWindow(row.at, `${field}.at`);
     v.text(row.code, `${field}.code`, ID); v.nullable(row.namedFix, `${field}.namedFix`, v.bool);
   });
+  // Reduced intake cannot recover omitted phase times or equal-time event order.
+  // Compare only known canonical times; never manufacture a failed-task end time.
+  let recoveryLowerBound = Number.NaN;
   const i = m.interruption;
   if (v.object(i, `${base}.interruption`, ["at", "resumedAt", "resumeOutcome", "reason"])) {
     v.nullable(i.at, `${base}.interruption.at`, v.timestamp);
@@ -198,6 +305,14 @@ function validateMeasurements(session, path, v) {
     if (["not-attempted", "not-observed"].includes(i.resumeOutcome) && i.resumedAt !== null) v.add(`${base}.interruption.resumedAt`, "resume-conflict", "An unobserved or unattempted resume must not have a success timestamp.");
     if (i.resumedAt !== null && (i.at === null || time(i.resumedAt) < time(i.at))) v.add(`${base}.interruption.resumedAt`, "time-order", "Resume cannot precede interruption.");
     if (i.resumeOutcome !== "succeeded") v.text(i.reason, `${base}.interruption.reason`);
+    recoveryLowerBound = canonicalTime(i.at);
+    if (m.outcome === "completed" && recoveryLowerBound < canonicalTime(m.firstUsefulResultAt)) {
+      v.add(`${base}.interruption.at`, "time-order", "Recovery interruption precedes the first useful result.");
+    }
+    const resumedAt = canonicalTime(i.resumedAt);
+    // Preserve the existing optional supplied resumedAt on failed outcomes; it
+    // is a time bound, not a promotion to success. An inadmissible pair adds no bound.
+    if (["succeeded", "failed"].includes(i.resumeOutcome) && resumedAt >= recoveryLowerBound) recoveryLowerBound = resumedAt;
   }
   const s = m.secondTask;
   if (v.object(s, `${base}.secondTask`, ["outcome", "at", "reason"])) {
@@ -209,6 +324,9 @@ function validateMeasurements(session, path, v) {
     if (s.outcome === "not-observed" && s.at !== null) v.add(`${base}.secondTask.at`, "return-conflict", "An unobserved return must have a null timestamp.");
     if (s.outcome !== "returned") v.text(s.reason, `${base}.secondTask.reason`);
     if (s.at !== null && m.firstUsefulResultAt !== null && time(s.at) < time(m.firstUsefulResultAt)) v.add(`${base}.secondTask.at`, "time-order", "Second-task decision precedes the first useful result.");
+    else if (["returned", "did-not-return"].includes(s.outcome) && canonicalTime(s.at) < recoveryLowerBound) {
+      v.add(`${base}.secondTask.at`, "time-order", "Second-task decision precedes the known recovery boundary.");
+    }
   }
 }
 
@@ -223,13 +341,13 @@ export function validateStudy(study) {
   const errors = [];
   const v = validator(errors);
   if (!v.object(study, "study", ["schemaVersion", "studyId", "sessions"])) return { errors, records: [] };
-  v.choice(study.schemaVersion, "study.schemaVersion", [SCHEMA_VERSION]);
+  v.choice(study.schemaVersion, "study.schemaVersion", SCHEMA_VERSIONS);
   v.text(study.studyId, "study.studyId", ID);
   if (!Array.isArray(study.sessions) || study.sessions.length > MAX_SESSIONS) {
     v.add("study.sessions", "sessions", "Expected an array of at most 2000 sessions.");
     return { errors, records: [] };
   }
-  const records = study.sessions.map((session, index) => ({ index, errors: validateSession(session, `sessions[${index}]`) }));
+  const records = study.sessions.map((session, index) => ({ index, errors: validateSession(session, `sessions[${index}]`, study.schemaVersion) }));
   const rejectDuplicates = (keyFor, field, code, message) => {
     const groups = new Map();
     study.sessions.forEach((session, index) => {
@@ -334,7 +452,9 @@ function publicMetadata(value) {
  * @typedef {{name: 'amc' | 'dsh' | 'pi', version: string, sourceCommit: string | null, artifactSha256: string | null}} ProjectedHarness
  * @typedef {{machineClass: string, os: 'darwin' | 'linux' | 'win32', osVersion: string, arch: string, nodeVersion: string, installState: 'clean' | 'preinstalled' | 'unknown'}} ProjectedEnvironment
  * @typedef {{id: string, version: string, taskId: string, taskVersion: string, taskSha256: string}} ProjectedProtocol
- * @typedef {{kind: 'live-provider' | 'local-provider' | 'keyless-demo', used: boolean, provider: string | null, id: string | null, revision: string | null, settingsSha256: string | null, credentialState: 'configured' | 'not-required' | 'missing' | 'unknown'}} ProjectedModel
+ * @typedef {{version: string, startingState: string, coverageComplete: boolean, observations: Array<{type: string, at: string, timing: string, data: {from?: string, to?: string, actor?: string, credentialState?: string}}>}} ProjectedCredentials
+ * @typedef {{version: string, status: 'declared-immutable' | 'unknown' | 'not-applicable', reference: string | null, reasonRecorded: boolean}} ProjectedRevisionIdentity
+ * @typedef {{kind: 'live-provider' | 'local-provider' | 'keyless-demo', used: boolean, provider: string | null, id: string | null, revision: string | null, settingsSha256: string | null, credentialState: 'configured' | 'not-required' | 'missing' | 'unknown', credentials?: ProjectedCredentials, revisionIdentity?: ProjectedRevisionIdentity}} ProjectedModel
  * @typedef {{at: string | null, resumedAt: string | null, resumeOutcome: 'succeeded' | 'failed' | 'not-attempted' | 'not-observed', reasonRecorded: boolean}} ProjectedInterruption
  * @typedef {{outcome: 'returned' | 'did-not-return' | 'not-observed', at: string | null, reasonRecorded: boolean}} ProjectedSecondTask
  *
@@ -417,19 +537,31 @@ function summarizeHarness(rows) {
     refusals: { total: refusals.length, namedFix: refusals.filter(r => r.namedFix === true).length,
       didNotNameFix: refusals.filter(r => r.namedFix === false).length, unknown: refusals.filter(r => r.namedFix === null).length },
     resume: Object.fromEntries(["succeeded", "failed", "not-attempted", "not-observed"].map(key => [key, ms.filter(m => m.interruption.resumeOutcome === key).length])),
-    secondTask: Object.fromEntries(["returned", "did-not-return", "not-observed"].map(key => [key, ms.filter(m => m.secondTask.outcome === key).length])) };
+    secondTask: Object.fromEntries(["returned", "did-not-return", "not-observed"].map(key => [key, ms.filter(m => m.secondTask.outcome === key).length])),
+    ...(rows.some(row => row.model.credentials) ? { credentialObservations: {
+      source: "operator-declared states at observed changes and actual uses; no secrets or provider attestation",
+      changedSessions: rows.filter(row => row.model.credentials?.observations.some(o => o.type === "credential-change")).length,
+      operatorChanges: rows.flatMap(row => row.model.credentials?.observations ?? []).filter(o => o.type === "credential-change" && o.data.actor === "operator").length,
+      unknownActorChanges: rows.flatMap(row => row.model.credentials?.observations ?? []).filter(o => o.type === "credential-change" && o.data.actor === "unknown").length,
+      actualUseStates: Object.fromEntries(["configured", "not-required"].map(state => [state,
+        rows.flatMap(row => row.model.credentials?.observations ?? []).filter(o => o.type === "model-use" && o.data.credentialState === state).length]))
+    } } : {}) };
 }
 
 function cohortIdentity(row) {
   if (!row.protocol || !row.environment || !row.model) return null;
   const p = row.protocol, e = row.environment, m = row.model;
-  // Ordered tuples, not source object order; model.used is an outcome, not a stratum.
+  // Outcomes/repairs never replace starting strata. Keep legacy cohort IDs stable;
+  // different observation contracts are separate cohorts, not silently pooled.
   return [p.id, p.version, p.taskId, p.taskVersion, p.taskSha256, e.machineClass, e.os, e.osVersion, e.arch,
-    e.nodeVersion, e.installState, m.kind, m.provider, m.id, m.revision, m.settingsSha256, m.credentialState];
+    e.nodeVersion, e.installState, m.kind, m.provider, m.id, m.revision, m.settingsSha256, m.credentialState,
+    ...(m.credentials ? ["credential-contract", m.credentials.version] : []),
+    ...(m.revisionIdentity ? ["model-revision-contract", m.revisionIdentity.version, m.revisionIdentity.status, m.revisionIdentity.reference] : [])];
 }
 
 /** Internal pure projection of validated intake rows; never emits ranks or speedup claims. */
-function aggregateHumanCohorts(records, studyErrors) {
+function aggregateHumanCohorts(records, studyErrors, schemaVersion = SCHEMA_VERSION) {
+  const revisionContract = schemaVersion === MODEL_REVISION_SCHEMA_VERSION;
   const blockingReasons = [];
   if (studyErrors.length) blockingReasons.push("study-record-invalid-or-missing");
   if (records.some(row => row.participation !== "automated-fixture" && row.status !== "human-declared")) blockingReasons.push("human-or-unclassified-records-invalid-or-missing");
@@ -449,14 +581,20 @@ function aggregateHumanCohorts(records, studyErrors) {
     if (Object.entries(COMMON_PROTOCOL).some(([field, value]) => sample.protocol[field] !== value)) reasons.push("not-the-standing-common-task-protocol");
     if (sample.model.kind === "keyless-demo") reasons.push("keyless-demonstration-is-not-the-real-model-task");
     if (["provider", "id", "revision", "settingsSha256"].some(field => sample.model[field] === null)) reasons.push("unmatched-model-identity");
+    if (revisionContract && sample.model.revisionIdentity?.status !== "declared-immutable") reasons.push("unknown-immutable-model-revision");
     if (sample.model.credentialState === "unknown" || sample.environment.installState === "unknown") reasons.push("unknown-starting-state");
     for (const harness of HARNESSES) {
       const pins = new Set(rows.filter(r => r.harness.name === harness).map(r => JSON.stringify([r.harness.version, r.harness.sourceCommit, r.harness.artifactSha256])));
       if (pins.size > 1) reasons.push(`mixed-${harness}-identities`);
     }
     cohorts.push({ cohortId: digest(key), protocol: sample.protocol, environment: sample.environment,
-      model: { ...sample.model, used: undefined }, humanDeclaredCounts: counts,
+      model: { ...sample.model, used: undefined, credentials: undefined,
+        ...(sample.model.credentials ? { credentialContractVersion: sample.model.credentials.version } : {}) }, humanDeclaredCounts: counts,
       status: reasons.length ? "insufficient-evidence" : "matched-declared-cohort", reasons,
+      ...(revisionContract ? {
+        modelMatchBasis: sample.model.revisionIdentity?.status === "declared-immutable" ? "declared-immutable-planning-identities" : "insufficient-provenance",
+        servedModelMatch: "not-established", modelIdentityAuthenticated: false
+      } : {}),
       summaries: reasons.length ? null : Object.fromEntries(HARNESSES.map(h => [h, summarizeHarness(rows.filter(r => r.harness.name === h))])) });
   }
   // Do not hide unmatched human strata behind one adequate subgroup.
@@ -464,7 +602,11 @@ function aggregateHumanCohorts(records, studyErrors) {
   return { status: sufficient ? "matched-declared-cohorts" : "insufficient-evidence", minimumPerHarness: MIN_HUMAN_SESSIONS_PER_HARNESS,
     reasons: cohorts.length ? [...blockingReasons, ...(!sufficient ? ["not-all-human-cohorts-are-matched-and-sufficient"] : [])] : [...blockingReasons, "no-eligible-human-declared-cohort"],
     excludedAutomatedRecords: records.filter(row => row.participation === "automated-fixture").length,
-    humanParticipationAuthenticated: false, ranking: null, superiorityClaim: null, cohorts };
+    humanParticipationAuthenticated: false, ranking: null, superiorityClaim: null, cohorts,
+    ...(revisionContract ? {
+      modelMatchBasis: sufficient ? "declared-immutable-planning-identities" : "insufficient-provenance",
+      servedModelMatch: "not-established", modelIdentityAuthenticated: false
+    } : {}) };
 }
 
 /**
@@ -488,13 +630,13 @@ export async function intakeStudy(study, { evidenceRoot, generatedAt = new Date(
     records.push(projectRecord(session, entry, check));
   }
   const allErrors = [...validated.errors, ...records.flatMap(r => r.errors)];
-  return { schemaVersion: SCHEMA_VERSION, receiptType: "human-first-use-intake", generatedAt,
+  return { schemaVersion: SCHEMA_VERSIONS.includes(study?.schemaVersion) ? study.schemaVersion : null, receiptType: "human-first-use-intake", generatedAt,
     studyId: typeof study?.studyId === "string" && ID.test(study.studyId) ? study.studyId : null,
     intakeStatus: allErrors.some(e => e.kind === "invalid") ? "invalid" : allErrors.length ? "missing-evidence" : "valid-records",
     inputSha256: null, toolSha256: null, intakeEnvironment: { os: platform(), arch: arch(), nodeVersion: process.version },
     boundary: "Local record/schema and recording-byte intake only. Human participation, consent, observer independence, task correctness, model identity and harness provenance are operator declarations, not authenticated attestations. No human study was run by this tool.",
     studyErrors: validated.errors, recordCounts: Object.fromEntries([...PARTICIPATION, "missing-evidence", "invalid"].map(s => [s, records.filter(r => r.status === s).length])),
-    records, comparative: aggregateHumanCohorts(records, validated.errors) };
+    records, comparative: aggregateHumanCohorts(records, validated.errors, study?.schemaVersion) };
 }
 
 /** Exclusive creation also rejects existing symlinks; never truncate an earlier report. */

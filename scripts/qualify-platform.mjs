@@ -2,7 +2,7 @@
 /** Real local artifact qualification. No mocked execution, global installation or provider calls. */
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir, release } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,9 +10,26 @@ import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/platform-qualification/report.json"), keep = false } = {}) {
+  const reportPath = resolve(out), directory = dirname(reportPath);
+  // Claim the whole result directory before scratch creation or any command.
+  // Recursive creation of the leaf would silently reuse another run's evidence.
+  mkdirSync(dirname(directory), { recursive: true, mode: 0o700 });
+  try { mkdirSync(directory, { mode: 0o700 }); }
+  catch (error) {
+    if (error?.code === "EEXIST") throw Object.assign(new Error("Platform qualification output must use a new directory; preserve the existing evidence and choose a new parent for --out."), { code: "output-exists" });
+    throw error;
+  }
+  // Reserve the report name too, so it cannot collide with a step artifact.
+  // A setup/write failure can leave an empty or partial file, never a receipt of success.
+  const reportFd = openSync(reportPath, "wx", 0o600);
+  try { return qualifyPlatformInOwnedDirectory({ root, out: reportPath, keep, reportFd }); }
+  finally { closeSync(reportFd); }
+}
+
+function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
   const scratch = mkdtempSync(join(tmpdir(), "amc-platform-"));
   const home = join(scratch, "home"), consumer = join(scratch, "consumer"), workspace = join(scratch, "workspace with spaces");
-  for (const dir of [home, consumer, workspace, dirname(out)]) mkdirSync(dir, { recursive: true });
+  for (const dir of [home, consumer, workspace]) mkdirSync(dir, { recursive: true });
   const env = { ...process.env, HOME: home, USERPROFILE: home, APPDATA: join(home, "AppData/Roaming"), LOCALAPPDATA: join(home, "AppData/Local"), CI: "1" };
   for (const key of Object.keys(env)) if (/^AMC_|^npm_config_|(?:API_KEY|ACCESS_TOKEN|SECRET|PASSWORD|CREDENTIAL)$/i.test(key)) delete env[key];
   delete env.NODE_OPTIONS; delete env.NODE_PATH;
@@ -41,7 +58,7 @@ export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/pl
     const artifact = { stdout, stderr, exitCode: result.status, signal: result.signal, errorCode: result.error?.code ?? null };
     const serialized = `${JSON.stringify(artifact, null, 2)}\n`;
     const artifactPath = join(dirname(out), filename);
-    writeFileSync(artifactPath, serialized, { mode: 0o600 });
+    writeFileSync(artifactPath, serialized, { mode: 0o600, flag: "wx" });
     report.steps.push({ id, status: expected ? "passed" : "failed", startedAt, durationMs: performance.now() - started,
       exitCode: result.status, signal: result.signal, expectedFailure, artifact: filename, artifactSha256: hash(serialized) });
     console.log(`${expected ? "ok" : "failed"}: ${id}`);
@@ -83,7 +100,7 @@ export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/pl
       try { rmSync(scratch, { recursive: true, force: true }); report.cleanup = "removed"; }
       catch { report.cleanup = "failed"; report.status = "failed"; }
     }
-    writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`);
+    writeFileSync(reportFd, `${JSON.stringify(report, null, 2)}\n`);
   }
   return report;
 }
