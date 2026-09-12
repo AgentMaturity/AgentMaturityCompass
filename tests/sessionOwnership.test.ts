@@ -126,14 +126,20 @@ test("a rejected mixed batch cannot leave an earlier legacy blob or signed blob-
   } finally { ledger.close(); service.close({ reason: "completed" }); }
 });
 
-test("JSONL resume and recovery fail closed without appending", () => {
+test("JSONL resume authenticates the original configuration and refuses a changed one without appending", () => {
   const dir = workspace(); const store = openSessionEventStore(dir, "jsonl"); const service = new SessionService(dir, store);
   service.open(identity); service.releaseWithoutClosing(); const sessionId = service.sessionId;
   const before = rows(dir, sessionId);
-  expect(() => resumeSession({ workspace: dir, sessionId, claimant, ...identity })).toThrow(/JSONL resume requires atomic ownership/);
-  const recovery = recoverSession({ workspace: dir, sessionId, claimant, force: true });
-  expect(recovery.verdict).toBe("INDETERMINATE"); expect(recovery.reason).toMatch(/JSONL recovery requires atomic ownership/);
+  // A changed signed policy cannot silently adopt the released session, and the refusal appends nothing.
+  expect(() => resumeSession({ workspace: dir, sessionId, claimant, ...identity, policyDigest: `${identity.policyDigest}-changed` }))
+    .toThrow(/original execution settings and signed policy/);
   expect(rows(dir, sessionId)).toEqual(before);
+  // The original configuration resumes the released writer; the recorded prefix is preserved byte for byte.
+  const resumed = resumeSession({ workspace: dir, sessionId, claimant, ...identity });
+  try {
+    expect(resumed.service.sessionId).toBe(sessionId);
+    expect(rows(dir, sessionId).slice(0, before.length)).toEqual(before);
+  } finally { resumed.service.releaseWithoutClosing(); }
 });
 
 test("legacy unowned sessions remain readable and forkable but cannot be resumed", () => {

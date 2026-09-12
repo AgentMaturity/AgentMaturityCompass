@@ -1,3 +1,6 @@
+import { ACP_MAX_TURN_UPDATE_BYTES } from "../src/acp/acpCommittedUpdates.js";
+import { ACP_MAX_UPDATE_PARAMS_BYTES } from "../src/acp/acpRuntimeContracts.js";
+import { sessionPayloadCap } from "../src/session/sessionPayloadCap.js";
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -25,6 +28,15 @@ function deferred<T>() {
   let reject!: (error: Error) => void;
   const promise = new Promise<T>((accept, refuse) => { resolve = accept; reject = refuse; });
   return { promise, resolve, reject };
+}
+
+/** Bounded assistant blocks measured exactly as the server accounts each `session/update` frame; `fit` frames fit the turn aggregate. */
+function boundedBlocks(sessionId: string): { fit: number; block: (index: number) => string } {
+  const block = (index: number) => `${index}:` + "x".repeat(60_000);
+  const frame = (index: number) => Buffer.byteLength(JSON.stringify({ sessionId, update: { sessionUpdate: "agent_message_chunk", content: { type: "text", text: block(index) } } }), "utf8");
+  let total = 0, fit = 0;
+  while (total + frame(fit) <= ACP_MAX_TURN_UPDATE_BYTES) { total += frame(fit); fit++; }
+  return { fit, block };
 }
 
 const success = (): AgentPromptResult => ({ ok: true, text: "fixture result is not the output source", status: "idle",
@@ -116,7 +128,7 @@ async function harness(backend: "sqlite" | "jsonl" = "sqlite") {
   const promptParams = (text: string) => ({ sessionId, prompt: [{ type: "text", text }] });
 
   return {
-    sent, cancellations,
+    sent, cancellations, sessionId, workspace,
     get invocations() { return invocations; },
     get texts(): string[] {
       return sent.flatMap(frame => {
@@ -225,27 +237,34 @@ describe("AMC-1532 failed ACP prompt tails never become a later prompt's output"
     expect(h.texts).toEqual([]);
   });
 
-  it("does not reset an exceeded output frame bound by starting another prompt", async () => {
+  it("does not reset an exceeded output bound by starting another prompt", async () => {
     const h = await harness();
+    // One signed row cannot reach the per-frame bound: the signed per-event cap is smaller, and the ledger refuses
+    // above it. The bound a legitimate stream of bounded blocks can exceed is the turn aggregate.
+    expect(sessionPayloadCap(h.workspace)).toBeLessThan(ACP_MAX_UPDATE_PARAMS_BYTES);
     const first = await h.begin("oversized committed output");
-    h.commit("x".repeat(900_001)); h.finish(success());
+    const { fit, block } = boundedBlocks(h.sessionId);
+    for (let index = 0; index <= fit; index++) h.commit(block(index));
+    h.finish(success());
     expect((await first.reply).error).toMatchObject({ code: -32603 });
-    expect(h.texts).toEqual([]);
+    expect(h.texts).toHaveLength(fit);
     expect((await h.submit("next prompt cannot reset the failure")).error).toMatchObject({ code: -32603, message: expect.stringContaining("unusable") });
     expect(h.invocations).toBe(1);
+    expect(h.texts).toHaveLength(fit);
   });
 
   it("keeps a cumulative output-bound failure sticky after some signed updates were emitted", async () => {
-    const h = await harness();
+    const h = await harness("jsonl");
     const first = await h.begin("too much output across bounded frames");
-    // Each frame fits; the tenth frame exceeds the existing eight-MiB turn cap.
-    for (let index = 0; index < 10; index++) h.commit(`${index}:` + "x".repeat(850_000));
+    // Each frame fits within the signed per-event cap; the frame after `fit` exceeds the eight-MiB turn aggregate.
+    const { fit, block } = boundedBlocks(h.sessionId);
+    for (let index = 0; index <= fit; index++) h.commit(block(index));
     h.finish(success());
     expect((await first.reply).error).toMatchObject({ code: -32603 });
-    expect(h.texts).toHaveLength(9);
+    expect(h.texts).toHaveLength(fit);
     expect((await h.submit("cannot reset cumulative output admission")).error).toMatchObject({ code: -32603, message: expect.stringContaining("unusable") });
     expect(h.invocations).toBe(1);
-    expect(h.texts).toHaveLength(9);
+    expect(h.texts).toHaveLength(fit);
   });
 
   it("preserves cancellation output and never replays it into the following prompt", async () => {

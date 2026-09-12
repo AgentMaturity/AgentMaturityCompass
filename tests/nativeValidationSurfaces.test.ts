@@ -66,8 +66,9 @@ test("SDK never turns absent or malformed validation metadata into a pass", asyn
   legacy.finish({ stopReason: "end_turn" });
   expect((await legacy.result).validation.status).toBe("unavailable");
   const forged = new AMCNativeTurn("forged", () => undefined);
-  forged.finish({ stopReason: "end_turn", _meta: { "dev.agentmaturity.amc": { validation: {
+  // Malformed metadata fails the turn and is also thrown to the dispatcher, which fails the whole client (see AMCNativeClient.prompt).
+  expect(() => forged.finish({ stopReason: "end_turn", _meta: { "dev.agentmaturity.amc": { validation: {
     status: "passed", turn: 1, configSha256: "a".repeat(64), checks: []
-  } } } });
+  } } } })).toThrow("invalid validation metadata");
   await expect(forged.result).rejects.toThrow("invalid validation metadata");
 });

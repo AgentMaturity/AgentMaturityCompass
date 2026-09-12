@@ -20,7 +20,7 @@ const view: NativeTaskView = { taskId, sessionId: "session-1", agentId: "reviewe
   verification: "not-verified", approvals: [], approvalError: null, nextCursor: 2, firstCursor: 0, droppedEvents: 0, canResume: true,
   resumeBlockedReason: null, history: { status: "authenticated", backend: "sqlite", headEventHash: "a".repeat(64), eventCount: 2, message: "Synthetic route dispatch fixture" } };
 const configuration: NativeTaskConfiguration = { schemaVersion: "2026-09-08", agentId: "reviewer", demo: false,
-  providers: [{ id: "stub", local: true, credential: null }],
+  providers: [{ id: "stub", local: true, model: "fixed", credential: null }],
   validation: { ready: false, configSha256: null, checks: [], message: "No operator checks configured." },
   scope: { ready: false, digest: null, approvalRequired: true, tools: [], message: "Review signed tools first." },
   limits: { maxActive: 4, maxSteps: 8, maxTokens: 1024, turnTimeoutMs: 1000, idleTimeoutMs: 1000, lifetimeMs: 5000,

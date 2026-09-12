@@ -138,8 +138,11 @@ function dropLastLine(workspace: string): void {
 class UnsignedStore extends DelegatingStore {
   override appendSessionEvent(input: SessionStoreAppendInput): SessionStoreAppendResult {
     const result = this.inner.appendSessionEvent(input);
+    // Forge the signature bytes without changing the row's length: the JSONL
+    // writer refuses to append to a target whose size moved under it, and that
+    // guard must stay out of this mutation so only the signature rule can fire.
     rewriteLastLine(this.inner.workspace, (row) => {
-      row["writer_sig"] = "AAAA";
+      row["writer_sig"] = "A".repeat(String(row["writer_sig"]).length);
     });
     return result;
   }
@@ -305,9 +308,12 @@ describe("the conformance suite has teeth (mutation tests)", () => {
     const report = withPassphrase(() =>
       runSessionStoreConformance(brokenBackend("unsigned", (inner) => new UnsignedStore(inner)))
     );
-    expect(report.failed.map((failure) => failure.caseName)).toEqual([
+    // The JSONL writer also authenticates existing history before it will append again, so a forged
+    // signature is caught a third time at reopen — still the signature rule, applied at open.
+    expect(report.failed.map((failure) => failure.caseName), report.failed.map((failure) => `${failure.caseName}: ${failure.message}`).join("\n")).toEqual([
       "every-row-carries-a-valid-monitor-signature",
-      "a-clean-log-verifies"
+      "a-clean-log-verifies",
+      "chain-head-survives-a-reopen"
     ]);
   });
 });

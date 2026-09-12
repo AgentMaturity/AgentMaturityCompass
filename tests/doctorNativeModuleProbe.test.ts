@@ -45,7 +45,7 @@ describe("doctor native SQLite execution probe", () => {
   });
   it("closes after a query exception without echoing raw loader or database messages", () => {
     const close = vi.fn();
-    class Database { prepare() { throw new Error("secret-fixture-query\n/private/path"); } close = close; }
+    class Database { prepare(): { get(): unknown } { throw new Error("secret-fixture-query\n/private/path"); } close = close; }
     const check = nativeModuleCheck(() => Database);
     expect(check.status).toBe("FAIL");
     expect(close).toHaveBeenCalledOnce();

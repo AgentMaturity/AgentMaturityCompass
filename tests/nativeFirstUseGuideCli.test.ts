@@ -46,7 +46,7 @@ describe("native first-use CLI discovery", () => {
     const result = JSON.parse(output.join("\n"));
     expect(result.status).toBe("choose-provider");
     expect(result.provider).toBeNull();
-    expect(result.choices.map((choice: { provider: string }) => choice.provider)).toEqual(["openai", "openai-responses", "anthropic", "stub"]);
+    expect(result.choices.map((choice: { provider: string }) => choice.provider)).toEqual(["openai", "openai-responses", "anthropic", "deepseek", "gemini", "gemini-audio", "ollama", "stub"]);
     expect(result.nextAction).toBeNull();
     expect(failures).toEqual([]);
   });

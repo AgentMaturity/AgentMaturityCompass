@@ -1,3 +1,4 @@
+import { loadSessionEventHistory } from "../src/session/sessionEventHistory.js";
 import Database from "better-sqlite3";
 import { mkdtempSync, rmSync } from "node:fs";
 import { hostname, tmpdir } from "node:os";
@@ -48,6 +49,14 @@ function released(): string {
   } finally { writer.disposeWithoutClosing(); }
 }
 function resume(sessionId: string) { return resumeSession({ workspace: root, sessionId, claimant, ...identity }); }
+/** Resume under the session's own recorded configuration; a different composition or policy digest is refused by design. */
+function resumeAsRecorded(sessionId: string) {
+  const opening = loadSessionEventHistory({ workspace: root, sessionId }).events.find(row => row.event_type === "session/open");
+  if (!opening) throw new Error("session/open row missing");
+  const meta = JSON.parse(opening.meta_json) as { agentId: string; harnessVersion: string; compositionDigest: string; policyDigest: string };
+  return resumeSession({ workspace: root, sessionId, claimant, agentId: meta.agentId, harnessVersion: meta.harnessVersion,
+    compositionDigest: meta.compositionDigest, policyDigest: meta.policyDigest });
+}
 
 test("a real live gateway permits verified native handoff without becoming a cold complete-ledger success", async () => {
   const sessionId = released(), before = rows(), gatewayId = before.find(row => row.runtime === "gateway")!.session_id;
@@ -72,7 +81,8 @@ test("direct recovery claims a genuinely dead native writer while the gateway st
   expect(recovered.verdict).toBe("RECOVERED"); expect(recovered.unknownToolOutcomes).toBe(1);
   expect(verifyNativeSessionContinuation(root, sessionId).chain).toEqual({ ok: true, errors: [] });
   expect(verifyLedgerIntegrity(root).chain.ok).toBe(false);
-  const resumed = resume(sessionId);
+  expect(() => resume(sessionId)).toThrow(/original execution settings and signed policy/);
+  const resumed = resumeAsRecorded(sessionId);
   try { resumed.service.releaseWithoutClosing(); } finally { resumed.service.disposeWithoutClosing(); }
   await gateway!.close(); gateway = undefined;
   expect(verifyLedgerIntegrity(root).chain).toEqual({ ok: true, errors: [] });

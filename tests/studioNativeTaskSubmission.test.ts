@@ -18,7 +18,7 @@ test("an explicit retry retains original body, nested choices, route and revisio
   expect(pending.url).toBe("/original/task-a/turn");
   expect(pending.body).toEqual({ clientRequestId: "original-request", prompt: "original task", expectedRevision: 4,
     validation: { configSha256: "original-checks", checkIds: ["unit"] } });
-  expect(Object.isFrozen(pending)).toBe(true); expect(Object.isFrozen(pending.body.validation.checkIds)).toBe(true);
+  expect(Object.isFrozen(pending)).toBe(true); expect(Object.isFrozen(pending.body.validation!.checkIds)).toBe(true);
 });
 
 describe("retry scope", () => {

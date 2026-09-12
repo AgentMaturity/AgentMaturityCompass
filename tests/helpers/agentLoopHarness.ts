@@ -136,7 +136,10 @@ function usageOf(usage: Partial<StreamUsageInput> | undefined): StreamUsageInput
 }
 
 /** An adapter that replays one scripted chunk list per dispatch. */
-export function scriptedAdapter(scripts: readonly StreamChunk[][]): LlmAdapter {
+/** A scripted provider turn: literal chunks, or a generator that may throw an `LlmError` mid-stream. */
+export type ScriptedStream = readonly StreamChunk[] | (() => AsyncIterable<StreamChunk>);
+
+export function scriptedAdapter(scripts: readonly ScriptedStream[]): LlmAdapter {
   let index = 0;
   return {
     id: "scripted-loop",
@@ -157,6 +160,7 @@ export function scriptedAdapter(scripts: readonly StreamChunk[][]): LlmAdapter {
       const script = scripts[index] ?? scripts[scripts.length - 1];
       index += 1;
       if (script === undefined) throw new Error("scripted adapter has no script configured");
+      if (typeof script === "function") { yield* script(); return; }
       for (const chunk of script) yield chunk;
     }
   };
@@ -230,7 +234,7 @@ export interface LoopHarness {
 }
 
 export interface LoopHarnessOptions {
-  readonly scripts: readonly StreamChunk[][];
+  readonly scripts: readonly ScriptedStream[];
   readonly tools?: StubToolSeam;
   readonly hooks?: Partial<LoopHooks>;
   readonly config?: Partial<AgentLoopConfig>;

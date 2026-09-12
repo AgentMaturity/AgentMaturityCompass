@@ -30,7 +30,12 @@ process.on("message", (value: string) => {
   if (value === "release") {
     try { service?.releaseWithoutClosing(); lock?.release(); report({ kind: "released", ok: true }); }
     catch (error) { report({ kind: "released", ok: false, error: String(error) }); }
-    finally { clearInterval(held); process.disconnect(); }
+    finally {
+      clearInterval(held);
+      // Only an IPC-spawned child has a disconnect; this worker is always one, so refuse loudly otherwise.
+      if (process.disconnect === undefined) throw new Error("jsonl resume worker requires an IPC channel");
+      process.disconnect();
+    }
   }
 });
 if (mode === "create") {

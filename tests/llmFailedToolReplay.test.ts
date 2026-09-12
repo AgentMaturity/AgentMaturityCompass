@@ -21,10 +21,10 @@ function request(isError: boolean, text = "denied"): EncodableRequest {
 }
 
 describe("versioned OpenAI tool-result state", () => {
-  test("historical Chat v1 keeps its exact bytes while the active adapter selects v3", () => {
+  test("historical Chat v1 keeps its exact bytes while the active adapter selects v4", () => {
     expect(openaiChatEncoder.encode(request(true)).toString()).toBe(String.raw`{"messages":[{"content":null,"role":"assistant","tool_calls":[{"function":{"arguments":"{ \"x\": 1 }","name":"lookup"},"id":"call_a","type":"function"}]},{"content":"denied","role":"tool","tool_call_id":"call_a"}],"model":"fixture","stream":true,"stream_options":{"include_usage":true}}`);
     expect(openaiChatEncoder.encode(request(true)).equals(openaiChatEncoder.encode(request(false)))).toBe(true);
-    expect(openaiAdapter.encoderVersion).toBe(3);
+    expect(openaiAdapter.encoderVersion).toBe(4);
     expect(openaiChatEncoderV2.encode(request(true)).equals(openaiChatEncoderV2.encode(request(false)))).toBe(false);
   });
 

@@ -165,7 +165,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s uses provider-valid alia
       .toEqual([{ name: "fs.read", type: "TOOL_CALL_ALLOWED" }]);
     const call = JSON.parse(rows.find(row => row.event_type === "tool/call")!.meta_json);
     expect(call.toolName).toBe("fs.read");
-    expect(call.providerName).toMatchObject({ version: 1, encoderId: "openai-chat", encoderVersion: 3,
+    expect(call.providerName).toMatchObject({ version: 1, encoderId: "openai-chat", encoderVersion: 4,
       wireName: requests[0]!.tools!.find(tool => !["glob", "grep"].includes(tool.function.name))!.function.name });
     for (const row of audits) { expect(row.writer_sig).not.toBe("unsigned"); expect(extractEnvelope(row.meta_json)?.sessionId).toBe(summary.sessionId); }
   } finally { ledger.close(); }

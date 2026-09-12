@@ -52,7 +52,7 @@ function resume(sessionId: string, extra = {}) {
 function released(ending: "complete" | "cancelled" = "complete", parentStop = false): string {
   const service = new SessionService(workspace, openSessionEventStore(workspace, "jsonl")); services.push(service);
   service.open(OPEN); service.startTurn({ trigger: "user" }); service.recordUserMessage("original");
-  service.endTurn({ reason: ending, ...(ending === "cancelled" ? { cause: parentStop ? { kind: "parent" as const } : { kind: "user" as const } } : {}) });
+  service.endTurn(ending === "cancelled" ? { reason: "cancelled", cause: parentStop ? { kind: "parent" } : { kind: "user" } } : { reason: "complete" });
   service.sealTurn(); service.releaseWithoutClosing(); return service.sessionId;
 }
 function usage() {

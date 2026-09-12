@@ -4,6 +4,7 @@ import {
   anthropicMessagesEncoderV2
 } from "../src/llm/request/anthropicMessagesEncoder.js";
 import { anthropicMessagesEncoderV3 } from "../src/llm/request/anthropicMessagesEncoderV3.js";
+import { anthropicMessagesEncoderV4 } from "../src/llm/request/anthropicMessagesEncoderV4.js";
 import { DEFAULT_REQUEST_ENCODERS } from "../src/llm/request/deriveRequest.js";
 import { anthropicAdapter } from "../src/llm/providers/anthropicAdapter.js";
 import type { EncodableRequest } from "../src/llm/request/requestSpec.js";
@@ -83,11 +84,12 @@ describe("Anthropic versioned cache breakpoints", () => {
     expect(body.system).toBe("You are the agent under test.");
   });
 
-  test("frozen v1/v2 and active v3 are registered; the adapter writes v3", () => {
+  test("frozen v1/v2/v3 and active v4 are registered; the adapter writes v4", () => {
     expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 1)).toBe(anthropicMessagesEncoder);
     expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 2)).toBe(anthropicMessagesEncoderV2);
     expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 3)).toBe(anthropicMessagesEncoderV3);
+    expect(DEFAULT_REQUEST_ENCODERS.get("anthropic-messages", 4)).toBe(anthropicMessagesEncoderV4);
     expect(anthropicAdapter.encoderId).toBe("anthropic-messages");
-    expect(anthropicAdapter.encoderVersion).toBe(3);
+    expect(anthropicAdapter.encoderVersion).toBe(4);
   });
 });

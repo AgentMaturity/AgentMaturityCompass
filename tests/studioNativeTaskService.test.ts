@@ -139,7 +139,8 @@ test("owner/selected-agent/demo and stale submission boundaries refuse without e
   expect(() => s.poll(otherAgent, task.taskId)).toThrow("not found");
   await expect(s.start(actor, { ...input(), provider: "openai", model: "not-contacted" })).rejects.toMatchObject({ code: "NATIVE_SCOPE_REFUSED" });
   await expect(s.start(actor, { ...input(), tools: "workspace", toolsDigest: "a".repeat(64) })).rejects.toMatchObject({ code: "NATIVE_SCOPE_REFUSED" });
-  await expect(s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 0, prompt: "stale" })).rejects.toMatchObject({ code: "NATIVE_STALE_REVISION" });
+  // Revision 0 is now refused by the request schema before any revision comparison; a valid-but-wrong revision exercises the stale boundary.
+  await expect(s.turn(actor, task.taskId, { clientRequestId: randomUUID(), expectedRevision: 7, prompt: "stale" })).rejects.toMatchObject({ code: "NATIVE_STALE_REVISION" });
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(1);
   await s.release(actor, task.taskId, 1);
 }, 60_000);

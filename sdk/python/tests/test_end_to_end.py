@@ -120,7 +120,8 @@ def test_refuses_mcp_servers_rather_than_ignoring_them(workspace):
             ]})
         # Accepting the array and never connecting the servers is the dishonest
         # form; the client surfaces the refusal rather than hiding it.
-        assert "MCP server" in raised.value.message
+        # The refusal names MCP and the exact field so an operator knows what to do instead.
+        assert "MCP" in raised.value.message and "mcpServers" in raised.value.message
 
 
 @needs_amc
