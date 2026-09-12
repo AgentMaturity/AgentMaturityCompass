@@ -77,6 +77,9 @@ export async function prepareAcpNativeSession(options: {
     return finishing;
   };
   return { ...session,
-    cancel: (cause, by) => { session.cancel(cause, by); serverLifetime.abort(); },
+    // Tool invocations receive the native turn signal. Cancelling one prompt
+    // must not permanently abort the reviewed mount needed by the next prompt.
+    // The server lifetime is stopped only by preparation failure or teardown.
+    cancel: (cause, by) => { session.cancel(cause, by); },
     close: () => finish(false), release: () => finish(true) };
 }

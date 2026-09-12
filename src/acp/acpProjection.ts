@@ -2,6 +2,10 @@ import { UNSIGNED } from "../agent/runReport.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
+import { projectAcpAttachment } from "./acpImageHistory.js";
+import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
+import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
+import { NativeAudioProvenanceError, validateNativeAudioProvenance } from "../session/nativeAudioProvenance.js";
 
 /**
  * Turning signed session rows into ACP `session/update` notifications
@@ -57,6 +61,12 @@ export function projectSessionUpdates(
 ): ProjectedUpdates {
   const updates: AcpSessionUpdate[] = [];
   let unsigned = 0;
+  let historyBytes = 0;
+  if (options.includeUser) {
+    try { validateNativeAudioProvenance(workspace, events); }
+    catch (error) { throw new AcpFailure(ACP_ERROR.internal, "Original signed audio history cannot be faithfully replayed; no prefix was emitted.",
+      { reason: error instanceof NativeAudioProvenanceError ? error.reason : "evidence-inconsistent" }); }
+  }
 
   for (const event of events.slice(from)) {
     // `UNSIGNED` is IMPORTED, not restated. This file declared its own
@@ -73,9 +83,23 @@ export function projectSessionUpdates(
       && readEventPayload(workspace, event).status !== "ok") {
       throw new Error("Session history payload is unavailable; cannot faithfully replay the conversation.");
     }
-    const update = options.includeUser && event.event_type === "user/message"
-      ? userUpdate(workspace, event) : updateFor(workspace, event);
-    if (update) updates.push(update);
+    const update = options.includeUser && event.event_type === "user/attachment"
+      ? projectAcpAttachment(workspace, event)
+      : options.includeUser && event.event_type === "user/message"
+        ? userUpdate(workspace, event) : updateFor(workspace, event);
+    if (update) {
+      if (options.includeUser) {
+        // Preflight the complete replay before session/load emits ANY prefix.
+        // Incremental checking also bounds retained base64 across many images.
+        const bytes = Buffer.byteLength(JSON.stringify({ sessionId: event.session_id, update }), "utf8");
+        if (bytes > 900_000 || historyBytes + bytes > ACP_MAX_TURN_UPDATE_BYTES) {
+          throw new AcpFailure(ACP_ERROR.internal,
+            "Session history exceeds the ACP replay frame or aggregate bound; no partial replay is available.", { reason: "history-output-limit" });
+        }
+        historyBytes += bytes;
+      }
+      updates.push(update);
+    }
   }
 
   return { updates, unsigned };
@@ -137,16 +161,19 @@ function metaOf(event: EvidenceEvent): Record<string, unknown> {
 }
 
 /**
- * The row's payload as text, or null when it cannot be read.
+ * The row's lossless text, or an explicit refusal when it cannot be read.
  *
  * A payload that was pruned, archived or spilled is NOT rendered as a
  * placeholder string the way `readAgentRunSummary` does for a human-facing
- * report. A client would display that placeholder as the agent's words; saying
- * nothing is better than putting `[amc:payload missing]` in a chat transcript.
+ * report. Refuse the projection instead of advancing past missing content: a
+ * silently shortened stream would falsely imply faithful delivery.
  */
 function payloadText(workspace: string, event: EvidenceEvent): string | null {
   const payload = readEventPayload(workspace, event);
-  if (payload.status !== "ok") return null;
+  if (payload.status !== "ok") throw new AcpFailure(ACP_ERROR.internal,
+    "Committed ACP text payload is unavailable; the stream cannot faithfully continue.", { reason: `payload-${payload.status}` });
   if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error("ACP payload does not match its committed digest.");
-  return payload.bytes.toString("utf8");
+  const text = payload.bytes.toString("utf8");
+  if (!Buffer.from(text, "utf8").equals(payload.bytes)) throw new AcpFailure(ACP_ERROR.internal, "Committed ACP text is not lossless UTF-8.");
+  return text;
 }

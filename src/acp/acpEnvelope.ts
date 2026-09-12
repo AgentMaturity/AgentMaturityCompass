@@ -55,6 +55,9 @@ export function classifyAcpMessage(value: Record<string, unknown>): AcpMessage {
   }
 
   if (has(value, "method")) {
+    if (has(value, "result") || has(value, "error")) {
+      return { kind: "malformed", reason: "a method cannot also carry a response result or error", id: readId(value["id"]) };
+    }
     const method = value["method"];
     if (typeof method !== "string" || method.length === 0) {
       return { kind: "malformed", reason: "method is not a non-empty string", id: readId(value["id"]) };
@@ -113,6 +116,7 @@ function frame(body: Record<string, unknown>): Buffer {
 }
 
 export function acpResult(id: AcpId, result: unknown): Buffer {
+  if (result === undefined || typeof result === "function" || typeof result === "symbol") throw new Error("An ACP handler returned no serializable result.");
   return frame({ jsonrpc: "2.0", id, result });
 }
 

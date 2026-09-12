@@ -19,3 +19,6 @@ dev = ["pytest>=8"]
 
 [tool.setuptools]
 packages = ["amc_sdk"]
+
+[tool.setuptools.package-data]
+amc_sdk = ["py.typed"]

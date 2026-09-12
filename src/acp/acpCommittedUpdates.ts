@@ -9,8 +9,8 @@ export const ACP_MAX_TURN_UPDATE_BYTES = 8 * 1024 * 1024;
 
 /** Authenticate each newly committed row before projecting it as native output. */
 export function validateAcpCommittedTail(workspace: string, sessionId: string, events: readonly EvidenceEvent[], from: number, previousHash: string | null): string | null {
-  if (events.length > ACP_MAX_SESSION_ROWS || from > events.length || from < 0) throw new Error("ACP session history exceeds its bound or was truncated.");
-  if (from > 0 && previousHash !== null && events[from - 1]?.event_hash !== previousHash) throw new Error("ACP's previously observed session head changed.");
+  if (events.length > ACP_MAX_SESSION_ROWS || !Number.isSafeInteger(from) || from > events.length || from < 0) throw new Error("ACP session history exceeds its bound or was truncated.");
+  if ((from === 0 && previousHash !== null) || (from > 0 && (previousHash === null || events[from - 1]?.event_hash !== previousHash))) throw new Error("ACP's previously observed session head changed.");
   if (from === events.length) return previousHash;
   const keys = getPublicKeyHistory(workspace, "monitor");
   let previous = from > 0 ? events[from - 1]!.event_hash : SESSION_GENESIS;

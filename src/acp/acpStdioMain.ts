@@ -1,14 +1,11 @@
-import { credentialRef } from "../credentials/credentialRef.js";
+import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { hostname } from "node:os";
 import { randomUUID } from "node:crypto";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { AdapterRegistry, type LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { LlmRuntime } from "../llm/adapter/llmRuntime.js";
-import { anthropicAdapter } from "../llm/providers/anthropicAdapter.js";
-import { openaiAdapter } from "../llm/providers/openaiAdapter.js";
-import { stubProviderRoute, stubProviderTransport, STUB_PROVIDER_ID } from "../agent/stubProvider.js";
+import { stubProviderTransport, STUB_PROVIDER_ID } from "../agent/stubProvider.js";
 import type { AgentSessionInit } from "../agent/agentSession.js";
-import { openaiResponsesAdapter } from "../llm/providers/openaiResponsesAdapter.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants } from "../setup/nativeMcpConfig.js";
@@ -19,6 +16,9 @@ import { prepareAcpNativeSession } from "./acpNativeSession.js";
 import { resolveNativeValidationSelection } from "../setup/nativeValidationConfig.js";
 import { amcVersion } from "../version.js";
 import { createAcpAgent, type AcpAgent } from "./acpAgentServer.js";
+import type { AcpForkSessionFactory } from "./acpRuntimeContracts.js";
+import { ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedUpdates.js";
+import type { AcpSink } from "./acpConnection.js";
 
 /**
  * Running the ACP agent on stdio (plan P7.1a).
@@ -62,6 +62,30 @@ export interface AcpInputStream {
   off(event: "end", listener: () => void): unknown;
 }
 
+export interface AcpOutputStream {
+  write(chunk: Buffer): boolean;
+  readonly writableLength?: number;
+  readonly destroyed?: boolean;
+  readonly writableEnded?: boolean;
+  on?(event: "error", listener: (error: Error) => void): unknown;
+  off?(event: "error", listener: (error: Error) => void): unknown;
+}
+
+/** Bound the process output queue without pausing the cancellation read path.
+ * Node's write(false) means buffered, not failed; asynchronous errors are handled
+ * separately by startAcpStdio. A custom sink that cannot expose backlog must fail
+ * explicitly when backpressured rather than silently retaining unbounded bytes.
+ */
+export function createAcpStdioSink(stdout: AcpOutputStream): AcpSink {
+  return frame => {
+    const queued = stdout.writableLength ?? 0;
+    if (stdout.destroyed || stdout.writableEnded || !Number.isSafeInteger(queued) || queued < 0
+        || queued + frame.byteLength > ACP_MAX_TURN_UPDATE_BYTES) throw new Error("ACP stdout is closed or exceeds its bounded output queue.");
+    const writable = stdout.write(frame);
+    if (!writable && stdout.writableLength === undefined) throw new Error("ACP stdout is backpressured without a measurable output queue.");
+  };
+}
+
 export interface AcpStdioInit {
   readonly workspace: string;
   readonly agentId: string;
@@ -83,10 +107,14 @@ export interface AcpStdioInit {
   readonly credentialsFile?: string;
   readonly credentialsMode?: "layered" | "operator-only";
   readonly maxTokens?: number;
+  readonly thinking?: string;
+  readonly reasoningEffort?: string;
   readonly maxSteps?: number;
+  /** Operator composition only: must implement authenticated inherited model context. */
+  readonly forkSessionFactory?: AcpForkSessionFactory;
   /** Defaults to the real streams; injected by tests. */
   readonly stdin?: AcpInputStream;
-  readonly stdout?: { write(chunk: Buffer): boolean };
+  readonly stdout?: AcpOutputStream;
   readonly stderr?: { write(chunk: string): boolean };
 }
 
@@ -94,18 +122,6 @@ export interface AcpStdioHandle {
   readonly agent: AcpAgent;
   close(): Promise<void>;
 }
-
-const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = {
-  anthropic: "https://api.anthropic.com",
-  openai: "https://api.openai.com",
-  "openai-responses": "https://api.openai.com"
-};
-
-const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = {
-  anthropic: "ANTHROPIC_API_KEY",
-  openai: "OPENAI_API_KEY",
-  "openai-responses": "OPENAI_API_KEY"
-};
 
 /**
  * The route this agent serves, or an error naming what is missing.
@@ -116,35 +132,10 @@ const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = {
  * process spends.
  */
 export function acpRouteFor(init: AcpStdioInit): LlmRouteConfig | { readonly error: string } {
-  if (init.providerId === STUB_PROVIDER_ID) return stubProviderRoute();
-
-  const adapter = init.providerId === "openai"
-    ? openaiAdapter
-    : init.providerId === "openai-responses" ? openaiResponsesAdapter
-      : init.providerId === "anthropic" ? anthropicAdapter : null;
-  if (adapter === null) {
-    return {
-      error: `unknown provider ${JSON.stringify(init.providerId)}; `
-        + `this surface serves "${STUB_PROVIDER_ID}", "anthropic", "openai" and "openai-responses"`
-    };
+  try { return nativeRouteFor(init.providerId, init, init.model); }
+  catch (error) {
+    return { error: error instanceof Error ? error.message : "Native provider selection failed." };
   }
-  if (init.model === undefined || init.model.length === 0) {
-    return { error: `--model is required for provider ${init.providerId}` };
-  }
-  const baseUrl = init.baseUrl ?? DEFAULT_BASE_URLS[init.providerId];
-  if (baseUrl === undefined) return { error: `--base-url is required for provider ${init.providerId}` };
-
-  return {
-    providerId: init.providerId,
-    adapter,
-    baseUrl,
-    // A REFERENCE, never a value. The credentials seam resolves it per request
-    // and this module never sees what it resolves to.
-    credentialRef: credentialRef(
-      init.credential ?? DEFAULT_CREDENTIAL_REFS[init.providerId] ?? "AMC_LLM_API_KEY"
-    ),
-    models: [init.model]
-  };
 }
 
 export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
@@ -159,6 +150,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const maxTokens = init.maxTokens ?? 512;
   const maxSteps = init.maxSteps ?? (init.providerId === STUB_PROVIDER_ID ? 2 : 8);
   if (!Number.isSafeInteger(maxTokens) || maxTokens < 1 || maxTokens > 1_000_000 || !Number.isSafeInteger(maxSteps) || maxSteps < 1 || maxSteps > 1024) throw new Error("ACP token/step limits are outside the supported positive integer bounds.");
+  const requestParams = paramsFor(route.providerId, maxTokens, init);
   const actionClass = init.approveTools?.trim().toUpperCase();
   const riskTier = (init.approveRisk ?? "high").trim().toLowerCase();
   if ((actionClass !== undefined && !isActionClass(actionClass)) || !["low", "medium", "high", "critical"].includes(riskTier) || (init.approveRisk !== undefined && actionClass === undefined)) throw new Error("ACP approval settings require a valid action class and risk tier.");
@@ -213,13 +205,12 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       route: {
         providerId: route.providerId,
         model: route.models?.[0] ?? "",
-        params: route.providerId === "openai-responses" ? { max_output_tokens: maxTokens }
-          : route.providerId === "openai" ? { max_tokens: maxTokens }
-            : { max_tokens: maxTokens, stream: true }
+        params: requestParams
       },
       systemPrompt: init.systemPrompt,
       harnessVersion: amcVersion,
       compositionDigest: sha256Hex(JSON.stringify({ surface: "acp-native", provider: route.providerId, model: route.models?.[0], tools, maxTokens, maxSteps, approval, mcp: mcp?.sha256 ?? null,
+        ...(route.providerId === "deepseek" ? { params: requestParams } : {}),
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
       policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
@@ -235,7 +226,11 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     workspace: init.workspace,
     agentId: init.agentId,
     nativeExecution: { tools, signedApprovalGate: approval !== undefined, reviewedMcpConfigured: mcp !== undefined, taskValidation: true },
-    write: (frame) => { stdout.write(frame); },
+    promptRoute: registry.pin({ providerId: route.providerId, model: route.models?.[0] ?? "" }),
+    orderedImageInput: true,
+    audioInput: true,
+    ...(init.forkSessionFactory === undefined ? {} : { forkSessionFactory: init.forkSessionFactory }),
+    write: createAcpStdioSink(stdout),
     sessionFactory: params => prepareAcpNativeSession({ session: sessionOptions(params), signal: params.signal,
       ...(approval ? { approval } : {}), ...(mcp ? { mcp } : {}),
       ...(init.credentialsHome === undefined ? {} : { credentialsHome: init.credentialsHome }),
@@ -252,15 +247,24 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   });
 
   const onData = (chunk: Buffer): void => agent.connection.ingest(chunk);
-  stdin.on("data", onData);
   // A client that closes its side has ended the conversation; there is nothing
   // further to read and nothing more worth saying.
   const reportShutdownFailure = (): void => {
     stderr.write("amc acp: shutdown could not cleanly settle every owned session\n");
     process.exitCode = 1;
   };
-  const onEnd = (): void => { void close().catch(reportShutdownFailure); };
-  stdin.once("end", onEnd);
+  const onEnd = (): void => {
+    agent.connection.end();
+    void close().catch(reportShutdownFailure);
+  };
+  const onOutputError = (): void => {
+    // An async EPIPE must abort in-flight work even if write previously accepted
+    // its bytes. There is no safe success response on this failed transport.
+    process.exitCode = 1;
+    try { stderr.write("amc acp: output transport failed; active requests were aborted\n"); } catch { /* preserve cancellation when both streams fail */ }
+    agent.connection.close();
+    void close().catch(reportShutdownFailure);
+  };
   let closePromise: Promise<void> | undefined;
 
   function close(): Promise<void> {
@@ -269,10 +273,17 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
     stdin.off("end", onEnd);
     closePromise = (async () => {
       try { await agent.close(); }
-      finally { await credentials.close(); }
+      finally {
+        stdout.off?.("error", onOutputError);
+        await credentials.close();
+      }
     })();
     return closePromise;
   }
+
+  stdout.on?.("error", onOutputError);
+  stdin.on("data", onData);
+  stdin.once("end", onEnd);
 
   return {
     agent,

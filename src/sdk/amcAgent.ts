@@ -8,9 +8,18 @@ import { createVercelAIFetchBridge } from "./integrations/vercelAiSdk.js";
 import { createLangChainJsBridge } from "./integrations/langchainJs.js";
 import { createLangGraphJsBridge } from "./integrations/langgraphJs.js";
 import { instrumentOpenAIAgentsSdk } from "./integrations/openaiAgentsSdk.js";
+import { AMCNativeClient, type AMCNativeClientOptions } from "./nativeAgentClient.js";
 
 export class AMCAgent {
   readonly client: AMCClient;
+
+  /** Explicit local operator execution, separate from bridge instrumentation.
+   * No bridge lease, telemetry field or provider default becomes native authority.
+   * The caller owns close/release and may use newSession or verified resumeSession.
+   */
+  static startNative(options: AMCNativeClientOptions): Promise<AMCNativeClient> {
+    return AMCNativeClient.start(options);
+  }
 
   constructor(client: AMCClient) {
     this.client = client;

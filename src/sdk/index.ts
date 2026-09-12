@@ -1,3 +1,6 @@
+// The package root re-exports this SDK barrel. Keep the native LLM seam usable
+// without reaching into a package-private dist path or a foreign harness.
+export * as llm from "../llm/index.js";
 export {
   AMCClient,
   createAMCClient,
@@ -21,6 +24,10 @@ export {
   AMCNativeClient, AMCNativeSession, AMCNativeTurn, AMCNativeProtocolError, AMCNativeRefusedError,
   type AMCNativeClientOptions, type AMCNativeRunResult, type AMCNativeUpdate, type AMCNativeReceipt
 } from "./nativeAgentClient.js";
+export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart,
+  type OrderedAgentSession } from "./nativeAgentClient.js";
+export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType,
+  loadNativeAudioManifest, NATIVE_AUDIO_FILE_MANIFEST_FORMAT } from "./nativeAgentClient.js";
 export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
 export {
   discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName,

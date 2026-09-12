@@ -74,6 +74,8 @@ export interface AcpConnection {
   abortInbound(id: AcpId): boolean;
   /** Whether a request with this id is still running. */
   isInFlight(id: AcpId): boolean;
+  /** End the read side; a truncated final record is an explicit transport fault. */
+  end(): void;
   /** Stop accepting and emitting. */
   close(): void;
 }
@@ -83,6 +85,11 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
   const inbound = new Map<string, InFlight>();
   const log = init.log ?? ((): void => undefined);
   let usable = true;
+  let ended = false;
+
+  const diagnostic = (message: string): void => {
+    try { log(message.replace(/[\r\n\u2028\u2029]/g, " ")); } catch { /* diagnostics cannot break cancellation */ }
+  };
 
   // Ids are compared as strings so that the number 1 and the string "1" cannot
   // collide in the table while still being echoed back with their own type.
@@ -91,8 +98,19 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
   const unusable = (reason: string): void => {
     if (!usable) return;
     usable = false;
-    log(reason);
-    init.onUnusable?.(reason);
+    for (const entry of inbound.values()) entry.controller.abort();
+    inbound.clear();
+    diagnostic(reason);
+    try { init.onUnusable?.(reason); } catch { diagnostic("ACP unusable callback failed"); }
+  };
+
+  const write = (frame: Buffer): void => {
+    if (!usable) throw new Error("ACP connection is unusable; no output was delivered.");
+    try { init.write(frame); }
+    catch {
+      unusable("ACP output transport failed; no further messages will be accepted");
+      throw new Error("ACP output transport failed.");
+    }
   };
 
   const settle = (id: AcpId, outcome: { result: unknown } | { error: AcpErrorObject }): void => {
@@ -100,37 +118,49 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
     if (!entry || entry.answered) {
       // Dropped rather than written. Two answers to one id is a protocol
       // violation by US, and the client would correlate the second to nothing.
-      log(`dropped a second answer for request ${String(id)}`);
+      diagnostic("dropped a second answer for a settled request");
       return;
     }
     entry.answered = true;
     inbound.delete(key(id));
     if (!usable) return;
-    init.write("error" in outcome ? acpFailure(id, outcome.error) : acpResult(id, outcome.result));
+    try {
+      let frame: Buffer;
+      try { frame = "error" in outcome ? acpFailure(id, outcome.error) : acpResult(id, outcome.result); }
+      catch {
+        diagnostic("ACP handler produced an unserializable response");
+        frame = acpFailure(id, { code: ACP_ERROR.internal, message: "the method produced an invalid response" });
+      }
+      write(frame);
+    } catch { /* write latched the transport failure; never answer this id twice */ }
   };
 
   return {
     ingest(chunk: Buffer): void {
-      if (!usable) return;
-      const framed = framer.push(chunk);
+      if (!usable || ended) return;
+      try {
+        const framed = framer.push(chunk);
 
-      for (const line of framed.lines) {
-        const parsed = parseWireObject(line.bytes, line.ordinal);
-        if (!parsed.ok) {
-          // Byte-level faults are not addressed to a request and the stream may
-          // be desynchronised, so nothing is written back.
-          unusable(`unreadable message: ${parsed.reason}`);
-          return;
+        for (const line of framed.lines) {
+          if (!usable) return;
+          const parsed = parseWireObject(line.bytes, line.ordinal);
+          if (!parsed.ok) {
+            // Byte-level faults are not addressed to a request and the stream may
+            // be desynchronised, so nothing is written back.
+            unusable(`unreadable message: ${parsed.reason}`);
+            return;
+          }
+          route(parsed.value);
         }
-        route(parsed.value);
-      }
 
-      if (framed.refusal) unusable(`unframeable message: ${framed.refusal.reason}`);
+        if (framed.refusal) unusable(`unframeable message: ${framed.refusal.reason}`);
+      } catch { unusable("ACP inbound dispatch failed; the stream cannot safely continue"); }
     },
 
     notify(method: string, params: unknown): void {
-      if (!usable) return;
-      init.write(acpNotification(method, params));
+      // A caller must retire its cursor as unusable if delivery fails. Silently
+      // dropping a notification would convert transport loss into apparent success.
+      write(acpNotification(method, params));
     },
 
     abortInbound(id: AcpId): boolean {
@@ -148,8 +178,17 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
       return entry !== undefined && !entry.answered;
     },
 
+    end(): void {
+      if (ended) return;
+      ended = true;
+      const tail = framer.end();
+      if (tail.discardedBytes > 0) unusable(`ACP input ended with ${tail.discardedBytes} bytes of an incomplete record`);
+    },
+
     close(): void {
       usable = false;
+      ended = true;
+      framer.end();
       for (const entry of inbound.values()) entry.controller.abort();
       inbound.clear();
     }
@@ -163,12 +202,13 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
         // Answerable only if it carried a usable id. A malformed frame with no
         // id has nothing to address, and inventing one would be worse.
         if (message.id !== null) {
-          init.write(acpFailure(message.id, {
+          if (inbound.has(key(message.id))) { duplicate(message.id); return; }
+          write(acpFailure(message.id, {
             code: ACP_ERROR.invalidRequest,
             message: message.reason
           }));
         } else {
-          log(`ignored a malformed message: ${message.reason}`);
+          diagnostic(`ignored a malformed message: ${message.reason}`);
         }
         return;
       }
@@ -177,7 +217,7 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
       case "response-error": {
         // Nothing outbound is issued in this slice, so any response is
         // unsolicited. Ignored, never answered.
-        log(`ignored a response to id ${String(message.id)}, which nothing requested`);
+        diagnostic("ignored an unsolicited response");
         return;
       }
 
@@ -187,39 +227,53 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
         } catch (error) {
           // A notification has no reply, so a throwing handler can only be
           // reported. Swallowing it silently would hide a real fault.
-          log(`notification ${message.method} threw: ${messageOf(error)}`);
+          diagnostic(`notification ${message.method} threw: ${messageOf(error)}`);
         }
         return;
       }
 
       case "request": {
         if (inbound.has(key(message.id))) {
-          init.write(acpFailure(message.id, {
-            code: ACP_ERROR.invalidRequest,
-            message: "a request with this id is already in flight"
-          }));
+          duplicate(message.id);
           return;
         }
         const entry: InFlight = { answered: false, controller: new AbortController() };
         inbound.set(key(message.id), entry);
         // Launched, NOT awaited. See the module note.
-        void init.handlers
-          .request(message.method, message.params, entry.controller.signal)
-          .then((result) => settle(message.id, { result }))
-          .catch((error: unknown) => {
-            // Logged HERE because this is the last place the real reason exists:
-            // `toAcpError` deliberately drops an unplanned exception's message
-            // before it reaches the peer, and its note said the detail went to
-            // the log while nothing on this path logged anything. A missing
-            // vault passphrase reached a client as "the method failed" with
-            // zero bytes on stderr, which is undiagnosable from either side.
-            if (!(error instanceof AcpFailure)) {
-              log(`${message.method} failed: ${messageOf(error)}`);
-            }
-            settle(message.id, { error: toAcpError(error) });
-          });
+        const failed = (error: unknown): void => {
+          // Logged HERE because this is the last place the real reason exists:
+          // `toAcpError` deliberately drops an unplanned exception's message
+          // before it reaches the peer, and its note said the detail went to
+          // the log while nothing on this path logged anything. A missing
+          // vault passphrase reached a client as "the method failed" with
+          // zero bytes on stderr, which is undiagnosable from either side.
+          if (!(error instanceof AcpFailure)) {
+            diagnostic(`${message.method} failed: ${messageOf(error)}`);
+          }
+          settle(message.id, { error: toAcpError(error) });
+        };
+        // Invoke synchronously so the server can reserve a prompt before a cancel
+        // in this same read. Catch synchronous throws as well as promise rejection.
+        try {
+          void Promise.resolve(init.handlers.request(message.method, message.params, entry.controller.signal))
+            .then(result => settle(message.id, { result }), failed);
+        } catch (error) { failed(error); }
         return;
       }
+    }
+  }
+
+  function duplicate(id: AcpId): void {
+    // One ID now describes two requests: no later result can be correlated safely.
+    // Send one error, retire the original, abort the connection, and never emit its
+    // eventual result under either this ID or a subsequently reused one.
+    const original = inbound.get(key(id));
+    ended = true;
+    try { settle(id, { error: { code: ACP_ERROR.invalidRequest, message: "a request with this id is already in flight" } }); }
+    finally {
+      // settle removes the correlation entry, so abort its captured controller too.
+      original?.controller.abort();
+      unusable("duplicate in-flight ACP request id; correlation is ambiguous");
     }
   }
 }
@@ -236,11 +290,10 @@ function messageOf(error: unknown): string {
  * process. The detail goes to the log, not to the peer.
  */
 function toAcpError(error: unknown): AcpErrorObject {
-  if (error !== null && typeof error === "object" && "acpCode" in error) {
-    const failure = error as { acpCode: number; message: string; acpData?: unknown };
-    return failure.acpData === undefined
-      ? { code: failure.acpCode, message: failure.message }
-      : { code: failure.acpCode, message: failure.message, data: failure.acpData };
+  if (error instanceof AcpFailure) {
+    return error.acpData === undefined
+      ? { code: error.acpCode, message: error.message }
+      : { code: error.acpCode, message: error.message, data: error.acpData };
   }
   return { code: ACP_ERROR.internal, message: "the method failed" };
 }

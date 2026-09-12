@@ -34,6 +34,7 @@ export const ACP_INBOUND_SHAPES = [
   "AuthenticateRequest",
   "NewSessionRequest",
   "LoadSessionRequest",
+  "ForkSessionRequest",
   "PromptRequest",
   "CancelNotification"
 ] as const;
@@ -50,6 +51,7 @@ interface CompiledSchema {
 }
 
 let compiled: CompiledSchema | null = null;
+let compiling: Promise<CompiledSchema> | undefined;
 
 /**
  * Where the schema lives, in a checkout and in an installed package.
@@ -100,8 +102,14 @@ interface SchemaCompiler {
  * import, so a process that loads this module without serving ACP does not pay
  * for it at all.
  */
-async function compile(): Promise<CompiledSchema> {
-  if (compiled) return compiled;
+function compile(): Promise<CompiledSchema> {
+  if (compiled) return Promise.resolve(compiled);
+  // Concurrent first frames share the same compilation (including its failure).
+  // A malformed installation must not repeatedly rebuild a different validator.
+  return compiling ??= compileSchema();
+}
+
+async function compileSchema(): Promise<CompiledSchema> {
   const module_ = (await import("ajv/dist/2020.js")) as unknown as {
     default: new (options: Record<string, unknown>) => SchemaCompiler;
   };
@@ -152,6 +160,14 @@ function readProtocolVersion(document: object): number {
 /** Check one inbound message against its schema definition. */
 export async function checkAcpShape(shape: AcpInboundShape, value: unknown): Promise<SchemaCheck> {
   return (await compile()).validate(shape, value);
+}
+
+/** initialize loads the schema before admitting session work. Notifications use
+ * that exact validator synchronously so a cancel cannot overtake or lag the
+ * prompt whose slot existed when its frame arrived.
+ */
+export function checkInitializedAcpShape(shape: AcpInboundShape, value: unknown): SchemaCheck {
+  return compiled === null ? { ok: false, reason: "ACP schema has not been initialized" } : compiled.validate(shape, value);
 }
 
 /** Check any definition by name. Used by tests to validate what AMC sends. */
