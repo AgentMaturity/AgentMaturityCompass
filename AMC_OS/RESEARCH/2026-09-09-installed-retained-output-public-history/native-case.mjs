@@ -8,7 +8,7 @@ import { lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SOURCE = "130c2d0087cf574016411fdc7d91067d3eddd637";
+const SOURCE = "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd";
 // Programmed protocol input, NOT observed inference/token usage. Successful
 // streams require usage; the real runtime guard remains enabled and unchanged.
 const SYNTHETIC_WIRE_USAGE = Object.freeze({ input_tokens: 40, output_tokens: 12, total_tokens: 52 });

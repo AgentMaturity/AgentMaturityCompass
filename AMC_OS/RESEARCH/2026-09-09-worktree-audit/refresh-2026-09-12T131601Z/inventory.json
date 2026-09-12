@@ -1,0 +1,2577 @@
+{
+ "schema": "amc.read-only-worktree-audit-refresh",
+ "version": 3,
+ "refreshId": "refresh-2026-09-12T131601Z",
+ "capturedAt": "2026-09-12T13:16:01Z",
+ "writtenAt": "2026-09-12T13:17:37.992957+00:00",
+ "auditOnly": true,
+ "acceptance": false,
+ "integration": {
+  "branch": "amc/gap-register-execution",
+  "head": "4d2d69e5d4d01bfd1f82662ceff0305b5c2885b5",
+  "headUnchangedSince": "refresh-2026-09-11T080851Z"
+ },
+ "environment": {
+  "os": "Darwin 25.6.0 arm64",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "shell": "/bin/zsh",
+  "runtimeExecuted": false,
+  "testsExecuted": false,
+  "typecheckExecuted": false
+ },
+ "sharedStash": {
+  "object": "152a61696f336f658893a72aa9357d58df8c5679",
+  "expected": "152a61696f336f658893a72aa9357d58df8c5679",
+  "preserved": true
+ },
+ "totals": {
+  "worktrees": 63,
+  "dirtyWorktrees": 15,
+  "rootDirtyPaths": 242,
+  "rootTracked": 99,
+  "rootUntracked": 143,
+  "localBranches": 125,
+  "unmergedLocalBranches": 90,
+  "prunableRegistrations": 0
+ },
+ "worktrees": [
+  {
+   "path": "/Users/sid/AgentMaturityCompass",
+   "branch": "amc/gap-register-execution",
+   "head": "4d2d69e5",
+   "dirtyPaths": 242,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/private/tmp/amc-1541-archive-20260909",
+   "branch": "codex/amc-1541-native-task-archive",
+   "head": "d018f15f",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/private/tmp/amc-1542-revocation-20260909",
+   "branch": "codex/amc-1542-managed-revocation",
+   "head": "3c49ca9b",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+   "branch": "agent/domain-proof-lane",
+   "head": "b253cc17",
+   "dirtyPaths": 34,
+   "exclusiveCommits": 26
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+   "branch": "agent/gap-0635",
+   "head": "0d19650e",
+   "dirtyPaths": 8,
+   "exclusiveCommits": 13
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+   "branch": "agent/gap-0636",
+   "head": "0d19650e",
+   "dirtyPaths": 10,
+   "exclusiveCommits": 13
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+   "branch": "agent/gap-0637",
+   "head": "0d19650e",
+   "dirtyPaths": 4,
+   "exclusiveCommits": 13
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+   "branch": "agent/gap-0638",
+   "head": "0d19650e",
+   "dirtyPaths": 12,
+   "exclusiveCommits": 13
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+   "branch": "agent/gap-0639",
+   "head": "0d19650e",
+   "dirtyPaths": 9,
+   "exclusiveCommits": 13
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+   "branch": "agent/gap-0640",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+   "branch": "agent/gap-0641",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+   "branch": "agent/gap-0642",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+   "branch": "agent/gap-0643",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+   "branch": "agent/gap-0644",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+   "branch": "agent/gap-0645",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+   "branch": "agent/gap-0646",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+   "branch": "agent/gap-0647",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+   "branch": "agent/gap-0648",
+   "head": "84c2a1f2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 14
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+   "branch": "agent/gap-0649",
+   "head": "a984023e",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+   "branch": "agent/gap-0650",
+   "head": "98da12c0",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+   "branch": "agent/gap-0651",
+   "head": "0cbffc03",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+   "branch": "agent/gap-0652",
+   "head": "d2252996",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+   "branch": "agent/gap-0653",
+   "head": "0020199e",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+   "branch": "agent/gap-0654",
+   "head": "2efcaa3e",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+   "branch": "agent/gap-0655",
+   "head": "4af70f4d",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+   "branch": "agent/gap-0656",
+   "head": "d7cf71b2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+   "branch": "agent/gap-0657",
+   "head": "39606508",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+   "branch": "agent/gap-0658",
+   "head": "2f587bdc",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 16
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+   "branch": "agent/gap-0659",
+   "head": "bfb4bbb2",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+   "branch": "agent/gap-0660",
+   "head": "1cadbe49",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+   "branch": "agent/gap-0661",
+   "head": "b253cc17",
+   "dirtyPaths": 3,
+   "exclusiveCommits": 26
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+   "branch": "agent/gap-0662",
+   "head": "b253cc17",
+   "dirtyPaths": 3,
+   "exclusiveCommits": 26
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+   "branch": "agent/gap-0663",
+   "head": "fca3c073",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+   "branch": "agent/gap-0664",
+   "head": "6f52c907",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+   "branch": "agent/gap-0665",
+   "head": "00f73fa1",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+   "branch": "agent/gap-0666",
+   "head": "b9d63bdb",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+   "branch": "agent/gap-0667",
+   "head": "c2d11191",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 27
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+   "branch": "agent/gap-0668",
+   "head": "b253cc17",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 26
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+   "branch": "hermes/knowledge-refresh-20260713",
+   "head": "6579367f",
+   "dirtyPaths": 1,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+   "branch": "hermes/state-of-art-20260713",
+   "head": "ef5486c3",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+   "branch": "hermes/state-of-art-20260713-v2",
+   "head": "360b4166",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8",
+   "branch": "claude/admiring-gates-a751a8",
+   "head": "8ebe4b3b",
+   "dirtyPaths": 25,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8",
+   "branch": "claude/dreamy-moser-3bf7b8",
+   "head": "e4d1312a",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 21
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9",
+   "branch": "claude/interesting-haslett-d9efa9",
+   "head": "12803a2e",
+   "dirtyPaths": 14,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee",
+   "branch": "claude/stoic-faraday-20e4ee",
+   "head": "3d6b8d4a",
+   "dirtyPaths": 4,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c",
+   "branch": "claude/sweet-merkle-71246c",
+   "head": "b5e2ec77",
+   "dirtyPaths": 17,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549",
+   "branch": "claude/vigilant-merkle-2d8549",
+   "head": "3d6b8d4a",
+   "dirtyPaths": 8,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-operator",
+   "branch": "codex/amc-1545-stop-operator",
+   "head": "6ee3a0e0",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-runtime",
+   "branch": "codex/amc-1545-stop-runtime",
+   "head": "0d1565d4",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests",
+   "branch": "codex/amc-1546-agent-auth-tests",
+   "head": "7c18ce64",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle",
+   "branch": "codex/amc-1547-spill-lifecycle",
+   "head": "7f2e38e3",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep",
+   "branch": "codex/amc-1547-spill-mutation-prep",
+   "head": "f145ea1e",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-session-tests",
+   "branch": "codex/amc-1547-spill-session-tests",
+   "head": "603b9f37",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-storage",
+   "branch": "codex/amc-1547-spill-storage",
+   "head": "e89f4842",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep",
+   "branch": "codex/amc-cancellation-candidate-prep",
+   "head": "6c55771c",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep",
+   "branch": "codex/amc-stop-auth-mutation-prep",
+   "head": "3f955a33",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map",
+   "branch": "codex/cos-closure-map",
+   "head": "4967f975",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-human-first-use",
+   "branch": "codex/cos-human-first-use",
+   "head": "0030c2b5",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill",
+   "branch": "codex/cos-installed-spill",
+   "head": "a5987643",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide",
+   "branch": "codex/cos-observer-guide",
+   "head": "71a81a96",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries",
+   "branch": "codex/cos-spill-boundaries",
+   "head": "491a5077",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-commands",
+   "branch": "codex/cos-spill-commands",
+   "head": "7c0f01bf",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  },
+  {
+   "path": "/Users/sid/AgentMaturityCompass/tmp/cos-study-capture",
+   "branch": "codex/cos-study-capture",
+   "head": "74589311",
+   "dirtyPaths": 0,
+   "exclusiveCommits": 0
+  }
+ ],
+ "worktreeDeltaVsRefresh2026_09_11": [
+  {
+   "path": "/Users/sid/AgentMaturityCompass",
+   "delta": {
+    "dirtyPaths": [
+     239,
+     242
+    ]
+   }
+  }
+ ],
+ "rootDirtyPaths": [
+  {
+   "status": " M",
+   "path": "AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/closure-goal-dispatch.json",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T11:39:54.499405+00:00"
+  },
+  {
+   "status": " M",
+   "path": "AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/README.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T18:27:30.504521+00:00"
+  },
+  {
+   "status": " M",
+   "path": "AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/native-case.mjs",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T18:27:30.503905+00:00"
+  },
+  {
+   "status": " M",
+   "path": "AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/run.py",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T18:27:30.502869+00:00"
+  },
+  {
+   "status": " M",
+   "path": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/README.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T11:58:06.766995+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/ARCHITECTURE_NAVIGATION.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-08T21:18:06.984175+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/HARNESS_COMPARISON.md",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:36:08.990462+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/HUMAN_FIRST_USE_CAPTURE.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:12:22.957679+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/HUMAN_FIRST_USE_OBSERVER.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:12:22.962556+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/HUMAN_FIRST_USE_STUDY.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:08:27.709968+00:00"
+  },
+  {
+   "status": " M",
+   "path": "docs/PLATFORM_QUALIFICATION.md",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:31:53.928727+00:00"
+  },
+  {
+   "status": " M",
+   "path": "plans/amc-dsh-pi-execution-2026-09-08.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-11T05:01:12.965202+00:00"
+  },
+  {
+   "status": " M",
+   "path": "plans/ownership-manifest.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-11T06:14:34.435896+00:00"
+  },
+  {
+   "status": " M",
+   "path": "scripts/human-first-use-capture.mjs",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:02:37.322893+00:00"
+  },
+  {
+   "status": " M",
+   "path": "scripts/human-first-use-intake.mjs",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:08:27.707693+00:00"
+  },
+  {
+   "status": " M",
+   "path": "scripts/human-first-use-observer.mjs",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:03:08.240206+00:00"
+  },
+  {
+   "status": " M",
+   "path": "scripts/qualify-platform.mjs",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:31:53.926610+00:00"
+  },
+  {
+   "status": " M",
+   "path": "sdk/python/amc_sdk/__init__.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:17.739112+00:00"
+  },
+  {
+   "status": " M",
+   "path": "sdk/python/amc_sdk/client.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:31:56.488945+00:00"
+  },
+  {
+   "status": " M",
+   "path": "sdk/python/pyproject.toml",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:24:01.111377+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpAgentServer.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:48:01.135273+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpCli.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:37:52.193496+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpCommittedUpdates.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:09.238254+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpConnection.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:49:38.270307+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpEnvelope.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:48:01.136442+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpNativeSession.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:28:06.980319+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpProjection.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:44.703595+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpSchema.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:44.698690+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/acp/acpStdioMain.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T09:00:14.985025+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/agentDriver.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.597837+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/agentSession.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:49:04.145166+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/inbox.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.597160+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/index.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:59:56.503201+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/loopTypes.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.596544+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/nativeRunUsage.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:26.210891+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/agent/nativeValidation.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:50:49.964549+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/api/nativeTasksRouter.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:13.784908+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/attachments/attachmentIngest.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:04:36.272927+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/benchmarks/harnessComparison.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:36:08.989436+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/cli-agent-commands.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:59:56.495257+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/cli-agent-options.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T09:08:14.183884+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/cli-native-schedule-commands.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:39:45.711130+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/cli.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T09:00:14.994302+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/console/assets/nativeTaskSubmission.js",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:54:22.348201+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/console/assets/nativeTasks.css",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:48:51.319656+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/console/assets/nativeTasks.js",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:54:22.349002+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/console/assets/nativeTasksView.js",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:56:40.195608+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/console/pages/native-tasks.html",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:34:57.701507+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/extensions/nativeExtensionManifest.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:20:29.898907+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/extensions/nativeExtensionRuntime.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:29:55.737125+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/extensions/nativeExtensionStore.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:20:29.900628+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/kernel/agentLoopRunner.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:59:56.496476+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/kernel/services/agentLoopServices.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:06:42.115919+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/kernel/services/terminalServices.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.258824+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/adapter/providerCapabilities.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.775176+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/adapter/streamRecorder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:49:00.822219+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/adapter/transport.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:06:41.467594+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/blockAssembler.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:56:04.155576+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/index.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.778930+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/providers/anthropicAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:05:24.353729+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/providers/openaiAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:40:45.645651+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/providers/openaiResponsesAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:15:09.115559+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/anthropicMessagesEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.533345+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/builtInEncoders.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.776058+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/deriveRequest.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:04:36.272353+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/openaiChatEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.534854+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/openaiChatEncoderV2.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:40:45.644408+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/openaiResponsesEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:15:09.114019+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/providerToolNames.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.776791+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/requestSources.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.778125+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/request/requestSpec.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:51:57.246334+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/llm/streamChunk.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:49:00.815823+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/mcp/nativeMcpClient.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:41:19.551622+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/mcp/nativeMcpHttpTransport.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:43:58.961502+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/plugins/pluginLoader.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:18.465864+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/plugins/pluginManifestSchema.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:18:09.920665+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/plugins/pluginPackage.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:18:09.922169+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/plugins/pluginTypes.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:18:09.919403+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/sdk/amcAgent.ts",
+   "lane": "P07 TypeScript SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:25:15.990685+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/sdk/index.ts",
+   "lane": "P07 TypeScript SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:59:56.499742+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/sdk/nativeAgentClient.ts",
+   "lane": "P07 TypeScript SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:37:22.026917+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/session/loopEventMeta.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:51:57.245201+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/session/sessionApiTypes.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:49:00.818623+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/session/sessionService.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.601497+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/session/sessionTypes.ts",
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.600585+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/setup/nativeChatResult.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:26.210252+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/setup/nativeFirstUseGuide.ts",
+   "lane": "unknown",
+   "classification": "unknown",
+   "mtime": "2026-09-10T05:37:52.187246+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/setup/nativeInteractiveApprovals.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:20:02.880729+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/setup/nativeInteractiveSession.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:17:14.062232+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/setup/nativeValidationConfig.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:50:49.963081+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/studio/nativeTaskDescriptors.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:30:47.237657+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/studio/nativeTaskOpenapi.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:13.786868+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/studio/nativeTaskProjection.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:41:15.442575+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/studio/nativeTaskService.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:41:15.441438+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/studio/nativeTaskTypes.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:30:47.235899+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/terminal/pipeTerminal.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.256914+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/terminal/terminalSession.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.256352+00:00"
+  },
+  {
+   "status": " M",
+   "path": "src/terminal/terminalTypes.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.255203+00:00"
+  },
+  {
+   "status": " M",
+   "path": "tests/llmResponsesCapabilities.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:24:49.871862+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/AMC_1512_EVIDENCE_PROTOCOL.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T20:33:28.370879+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/AMC_1512_HUMAN_FIRST_USE_PROTOCOL.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T20:33:28.372134+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:12:22.963680+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/HUMAN_FIRST_USE_MODEL_REVISION.md",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:12:22.956737+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_ACP_IMAGE_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:51:08.975087+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_CHAT_IMAGE_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:54:54.672750+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_DEEPSEEK_WIRE.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T06:22:13.958628+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_GEMINI_PROTOCOL.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:19:49.065681+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_ORDERED_IMAGE_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:27:15.620384+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_RESPONSES_IMAGE_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:24:49.874360+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_SIGNED_AUDIO_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:58:04.042573+00:00"
+  },
+  {
+   "status": "??",
+   "path": "docs/NATIVE_SIGNED_IMAGE_INPUT.md",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:51:08.975415+00:00"
+  },
+  {
+   "status": "??",
+   "path": "plans/2026-09-09-amc-execution-brief.md",
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "classification": "bookkeeping",
+   "mtime": "2026-09-09T07:04:04.788321+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/amc_sdk/py.typed",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:24:01.111596+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/P06_acp_peer.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:24:01.111798+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/test_P06_client.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:31:56.489946+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/test_gemini_protocol.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:15:51.176198+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/test_image_input.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:46:15.448319+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/test_ordered_image_input.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:15:25.743564+00:00"
+  },
+  {
+   "status": "??",
+   "path": "sdk/python/tests/test_signed_audio_input.py",
+   "lane": "P06 Python SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:16:36.045858+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/acp/acpAudioInput.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:01:08.129331+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/acp/acpHistoryContinuity.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:46:36.641799+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/acp/acpImageHistory.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:28:06.977953+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/acp/acpPromptInput.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:53:55.597069+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/acp/acpRuntimeContracts.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:09.235739+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/agent/nativeAudioMessage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:48:18.595452+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/agent/nativeImageMessage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:06:42.112917+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/agent/nativeOrderedMessage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:21:51.549418+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/attachments/nativeAudioFiles.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:59:56.490916+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/attachments/nativeAudioInput.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:49:04.143690+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/attachments/nativeImageFiles.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:17:00.866768+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/attachments/nativeImageInput.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:17:00.867595+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/attachments/nativeOrderedInput.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:22:50.840556+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/extensions/nativeExecutableExtension.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:24:45.575946+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/deepseekAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:35:07.859962+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/deepseekContract.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:34:30.691201+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/deepseekUsage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:04:18.603300+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:51:57.251562+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiAudioAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:51:57.252198+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiAudioUsage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:51:57.252015+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiContract.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:56:04.154334+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiJson.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:47:46.252388+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/geminiUsage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:56:04.153712+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaAdapter.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:17.462597+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaContract.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:21.645080+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaJson.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:16:32.148616+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaRoute.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:19:16.383202+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaToolIdentity.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:16:32.149295+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/providers/ollamaUsage.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:16:32.149625+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/anthropicMessagesEncoderV4.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.533994+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/deepseekChatEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.535553+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/geminiContentEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:06:41.466668+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/geminiContentEncoderV2.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:53:55.593809+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/ollamaChatEncoder.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:23.779479+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/openaiChatEncoderV4.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:40:45.641878+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/llm/request/openaiResponsesEncoderV3.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:24:49.873146+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/mcp/nativeMcpReconnect.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:41:19.548727+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/mcp/nativeMcpReconnectStream.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:43:58.959964+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutableBootstrap.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:18.464391+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutablePackage.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:38:25.084729+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutablePolicy.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:53.576301+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutableRunner.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:53.575604+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutableSchema.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:20:29.902713+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/plugins/nativeExecutableSource.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:38:25.083153+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/session/geminiPartMeta.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:56:04.154809+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/session/nativeAudioProvenance.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:13:41.156832+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/studio/nativeTaskInput.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:14.633699+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/terminal/nativePtyHelper.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:18:43.947124+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/terminal/nativePtySandbox.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:18:43.952567+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/terminal/nativePtyTerminal.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.257697+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/terminal/nativeTerminal.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:37.711370+00:00"
+  },
+  {
+   "status": "??",
+   "path": "src/terminal/terminalOutput.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:21:18.074516+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosBatch1OllamaUsage.test.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T09:08:14.185326+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosBatch1ProviderIntegration.test.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T09:08:14.184638+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct01Approvals.test.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:26.211991+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct01Chat.test.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:23:26.213598+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct01Usage.test.ts",
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:17:14.062908+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct02NativePty.test.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:57.156291+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct02NativePtyLinux.test.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:40:35.259537+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct02NativeTerminal.test.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:37.708058+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct02TerminalSession.test.ts",
+   "lane": "P02 terminal/PTY",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:57.155731+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct03McpReconnect.test.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:43:58.963906+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct03McpRecoveryMount.test.ts",
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:47:01.085892+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct04ExecutableLifecycle.test.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:45.538133+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct04SignedExtensions.test.ts",
+   "lane": "P04 extensions/plugins",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:38:25.085826+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct05Modalities.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:32:17.464308+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct05OllamaRuntime.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:21.645930+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct05OllamaWire.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:29:53.047410+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct07NativeSdk.test.ts",
+   "lane": "P07 TypeScript SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:37:22.033237+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct07NativeSdkProcess.test.ts",
+   "lane": "P07 TypeScript SDK",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:37:22.028449+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct08Connection.test.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:48:01.138181+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct08Continuity.test.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:46:36.643392+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct08Runtime.test.ts",
+   "lane": "P08 ACP",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:48:01.139579+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct09StudioPage.test.ts",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:51:13.411812+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct09StudioState.test.ts",
+   "lane": "P09 Studio console assets",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:56:40.196490+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct10NativeTaskInput.test.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:35:14.634237+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct10NativeTaskProjection.test.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:37:41.481266+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct10NativeTaskService.test.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:37:41.479652+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/cosProduct10NativeTasksRouter.test.ts",
+   "lane": "P10 Studio native tasks backend",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T06:41:15.443476+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/deepseekNativeIntegration.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:10:13.896323+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/deepseekNativeWire.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T05:39:45.712119+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/deepseekPublicSurface.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T06:22:13.957516+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeAcpImageClientPeer.mjs",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T10:27:41.678721+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeAcpImageRuntime.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.478381+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeChatCli.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:54:54.669980+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeChatImageStream.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:46:15.445956+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeGeminiCli.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:13:05.104588+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeGeminiStream.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:08:38.120553+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeOrderedAcpCli.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.483263+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeOrderedImageClientPeer.mjs",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.483611+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeOrderedImageHarness.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.482067+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeResponsesImageStream.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:16:14.366745+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeSignedAudio.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.536084+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeSignedAudioCli.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:13:41.156293+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeSignedAudioCold.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:06:41.536707+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/fixtures/nativeSignedImageCold.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:10:13.896802+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/harnessComparisonOutputOwnership.test.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:37:37.101379+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/humanFirstUseCredentialMigrationBoundary.test.ts",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T20:14:08.268530+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/humanFirstUseCredentials.test.ts",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T18:23:23.594018+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/humanFirstUseModelRevision.test.ts",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T03:13:15.208199+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/humanFirstUsePhaseOrder.test.ts",
+   "lane": "AMC-1512 human first-use protocol",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:13:47.195972+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeAcpImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.479242+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeChatAcpImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.481098+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeChatImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:54:54.671379+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeGeminiColdHostile.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:19:49.063335+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeGeminiPublic.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:13:05.105862+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeGeminiRuntime.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:19:49.064160+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeGeminiWire.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T14:10:41.487292+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeImageSdk.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:46:15.447260+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeOrderedAcpImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:27:15.619788+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeOrderedImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:22:50.843158+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeOrderedImageSdk.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:13:50.206096+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeResponsesAcpImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T13:10:02.480136+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeResponsesImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:46:15.451828+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedAudioColdHostile.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:51:34.585682+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedAudioInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:49:04.149033+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedAudioPublic.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:51:34.582820+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedAudioRuntime.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T15:51:34.584083+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedImageInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T11:46:15.449280+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeSignedImagePublicInput.test.ts",
+   "lane": "P05 providers/modalities",
+   "classification": "recoverable work",
+   "mtime": "2026-09-10T07:14:05.490581+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeValidationConfigAmbiguity.test.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:54:03.017089+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/nativeValidationPlanAdmission.test.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:54:03.018095+00:00"
+  },
+  {
+   "status": "??",
+   "path": "tests/platformQualificationOutputOwnership.test.ts",
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "classification": "recoverable work",
+   "mtime": "2026-09-11T04:33:27.446074+00:00"
+  }
+ ],
+ "rootLaneSummary": [
+  {
+   "lane": "P05 providers/modalities",
+   "paths": 99,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P08 ACP",
+   "paths": 17,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P04 extensions/plugins",
+   "paths": 16,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "AMC-1512 human first-use protocol",
+   "paths": 14,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P02 terminal/PTY",
+   "paths": 13,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "cross-lane wiring (agent loop/session/kernel/CLI registration)",
+   "paths": 12,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P01 native CLI/chat/approvals/usage",
+   "paths": 12,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P10 Studio native tasks backend",
+   "paths": 11,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "AMC-1518/1530/1538 batch-01/02 corrections",
+   "paths": 10,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P06 Python SDK",
+   "paths": 10,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "bookkeeping (plans/receipts/navigation)",
+   "paths": 9,
+   "classification": "bookkeeping"
+  },
+  {
+   "lane": "P09 Studio console assets",
+   "paths": 7,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P03 MCP client/HTTP/reconnect",
+   "paths": 6,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "P07 TypeScript SDK",
+   "paths": 5,
+   "classification": "recoverable work"
+  },
+  {
+   "lane": "unknown",
+   "paths": 1,
+   "classification": "unknown"
+  }
+ ],
+ "rootDeltaVsRefresh2026_09_11": {
+  "previousRootPathsRecovered": 232,
+  "previousReadmeReportedRootDirtyPaths": 239,
+  "added": [
+   "src/agent/nativeRunUsage.ts",
+   "src/cli.ts",
+   "src/setup/nativeChatResult.ts",
+   "src/setup/nativeInteractiveApprovals.ts",
+   "src/setup/nativeInteractiveSession.ts",
+   "tests/cosBatch1OllamaUsage.test.ts",
+   "tests/cosBatch1ProviderIntegration.test.ts",
+   "tests/cosProduct01Approvals.test.ts",
+   "tests/cosProduct01Chat.test.ts",
+   "tests/cosProduct01Usage.test.ts"
+  ],
+  "removed": [],
+  "note": "The previous inventory walk recovered fewer root paths than its README total; the added/removed lists are computed against the recovered set and the README totals are quoted separately."
+ },
+ "untrackedSourceImportWiring": [
+  {
+   "path": "src/acp/acpAudioInput.ts",
+   "srcImporters": 5,
+   "testImporters": 1
+  },
+  {
+   "path": "src/acp/acpHistoryContinuity.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  },
+  {
+   "path": "src/acp/acpImageHistory.ts",
+   "srcImporters": 1,
+   "testImporters": 1
+  },
+  {
+   "path": "src/acp/acpPromptInput.ts",
+   "srcImporters": 6,
+   "testImporters": 6
+  },
+  {
+   "path": "src/acp/acpRuntimeContracts.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  },
+  {
+   "path": "src/agent/nativeAudioMessage.ts",
+   "srcImporters": 1,
+   "testImporters": 3
+  },
+  {
+   "path": "src/agent/nativeImageMessage.ts",
+   "srcImporters": 1,
+   "testImporters": 1
+  },
+  {
+   "path": "src/agent/nativeOrderedMessage.ts",
+   "srcImporters": 1,
+   "testImporters": 5
+  },
+  {
+   "path": "src/attachments/nativeAudioFiles.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/attachments/nativeAudioInput.ts",
+   "srcImporters": 19,
+   "testImporters": 6
+  },
+  {
+   "path": "src/attachments/nativeImageFiles.ts",
+   "srcImporters": 2,
+   "testImporters": 3
+  },
+  {
+   "path": "src/attachments/nativeImageInput.ts",
+   "srcImporters": 24,
+   "testImporters": 9
+  },
+  {
+   "path": "src/attachments/nativeOrderedInput.ts",
+   "srcImporters": 12,
+   "testImporters": 11
+  },
+  {
+   "path": "src/extensions/nativeExecutableExtension.ts",
+   "srcImporters": 1,
+   "testImporters": 0
+  },
+  {
+   "path": "src/llm/providers/deepseekAdapter.ts",
+   "srcImporters": 2,
+   "testImporters": 4
+  },
+  {
+   "path": "src/llm/providers/deepseekContract.ts",
+   "srcImporters": 7,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/deepseekUsage.ts",
+   "srcImporters": 1,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/providers/geminiAdapter.ts",
+   "srcImporters": 3,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/providers/geminiAudioAdapter.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/geminiAudioUsage.ts",
+   "srcImporters": 1,
+   "testImporters": 0
+  },
+  {
+   "path": "src/llm/providers/geminiContract.ts",
+   "srcImporters": 8,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/geminiJson.ts",
+   "srcImporters": 5,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/geminiUsage.ts",
+   "srcImporters": 1,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/providers/ollamaAdapter.ts",
+   "srcImporters": 3,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/providers/ollamaContract.ts",
+   "srcImporters": 6,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/ollamaJson.ts",
+   "srcImporters": 4,
+   "testImporters": 1
+  },
+  {
+   "path": "src/llm/providers/ollamaRoute.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/providers/ollamaToolIdentity.ts",
+   "srcImporters": 5,
+   "testImporters": 3
+  },
+  {
+   "path": "src/llm/providers/ollamaUsage.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/request/anthropicMessagesEncoderV4.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/request/deepseekChatEncoder.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/request/geminiContentEncoder.ts",
+   "srcImporters": 3,
+   "testImporters": 3
+  },
+  {
+   "path": "src/llm/request/geminiContentEncoderV2.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/request/ollamaChatEncoder.ts",
+   "srcImporters": 2,
+   "testImporters": 3
+  },
+  {
+   "path": "src/llm/request/openaiChatEncoderV4.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/llm/request/openaiResponsesEncoderV3.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/mcp/nativeMcpReconnect.ts",
+   "srcImporters": 3,
+   "testImporters": 1
+  },
+  {
+   "path": "src/mcp/nativeMcpReconnectStream.ts",
+   "srcImporters": 1,
+   "testImporters": 0
+  },
+  {
+   "path": "src/plugins/nativeExecutableBootstrap.ts",
+   "srcImporters": 1,
+   "testImporters": 0
+  },
+  {
+   "path": "src/plugins/nativeExecutablePackage.ts",
+   "srcImporters": 3,
+   "testImporters": 0
+  },
+  {
+   "path": "src/plugins/nativeExecutablePolicy.ts",
+   "srcImporters": 1,
+   "testImporters": 1
+  },
+  {
+   "path": "src/plugins/nativeExecutableRunner.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  },
+  {
+   "path": "src/plugins/nativeExecutableSchema.ts",
+   "srcImporters": 7,
+   "testImporters": 2
+  },
+  {
+   "path": "src/plugins/nativeExecutableSource.ts",
+   "srcImporters": 2,
+   "testImporters": 0
+  },
+  {
+   "path": "src/session/geminiPartMeta.ts",
+   "srcImporters": 9,
+   "testImporters": 1
+  },
+  {
+   "path": "src/session/nativeAudioProvenance.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  },
+  {
+   "path": "src/studio/nativeTaskInput.ts",
+   "srcImporters": 2,
+   "testImporters": 2
+  },
+  {
+   "path": "src/terminal/nativePtyHelper.ts",
+   "srcImporters": 1,
+   "testImporters": 0
+  },
+  {
+   "path": "src/terminal/nativePtySandbox.ts",
+   "srcImporters": 3,
+   "testImporters": 2
+  },
+  {
+   "path": "src/terminal/nativePtyTerminal.ts",
+   "srcImporters": 1,
+   "testImporters": 3
+  },
+  {
+   "path": "src/terminal/nativeTerminal.ts",
+   "srcImporters": 1,
+   "testImporters": 1
+  },
+  {
+   "path": "src/terminal/terminalOutput.ts",
+   "srcImporters": 2,
+   "testImporters": 1
+  }
+ ],
+ "concurrentSessionObservation": {
+  "newestDirtyPathMtimeUtc": "2026-09-11T09:08:14.185326+00:00",
+  "dirtyPathsModifiedInLast3h": 0,
+  "codexAppServerProcessesObserved": true,
+  "claudeDesktopProcessesObserved": true,
+  "interpretation": "Lane sessions are dormant by file activity; not proven closed. No shell, index or lock activity was observed."
+ },
+ "unmergedBranchClassification": "Carried forward unchanged from refresh-2026-09-11T080851Z classification-review.json: every worktree HEAD, branch, dirty count and exclusive-commit count is identical to that capture, so no branch was re-read. One superseded (patch-equivalent), 89 unknown.",
+ "operationsPerformed": [
+  "git worktree list --porcelain",
+  "git status --porcelain=v1 --untracked-files=all (root and each worktree)",
+  "git rev-parse / rev-list --count (each worktree)",
+  "git branch --list / --no-merged",
+  "stat mtimes",
+  "grep import scan"
+ ],
+ "operationsNotPerformed": [
+  "reset",
+  "stash",
+  "worktree remove/prune",
+  "checkout",
+  "stage",
+  "commit",
+  "build",
+  "typecheck",
+  "test",
+  "install",
+  "publish",
+  "deploy",
+  "Graphify",
+  "DSH or pi execution"
+ ]
+}

@@ -2,11 +2,11 @@
 
 Start with the flow you need to change. The [Graphify guide](CODE_GRAPH.md) explains how to query the complete local graph. The smaller maps below reduce that graph to a few connected files so a contributor can follow an operation without opening the CLI monolith first.
 
-The current maps use clean source `9b60d86fd74a7bd3b294c893b506f6da32373623`, including versioned provider tool names, canonical runtime binding and signed replay metadata, the local coding comparison, and the earlier native Studio and signed-subset work. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/provider-tool-wire-names/graphify-9b60d86f/README.md) pins source, tool and raw graph hashes. Eight views cover provider names, Studio tasks, native execution, imports, trust, integrations, budgets and sandbox/optional DSH launch boundaries. Graphify extracted 25,565 symbols and 76,671 relationships from 2,134 code files; the reduced graph contains 2,107 files and 7,596 directed pairs. All 44 recorded reading paths have extracted hops. Generated maps describe source dependencies; runtime qualification remains separate, and historical receipts below apply only to their named revisions.
+The current maps use clean source `d69d7037c20161ae65c1030efa4e39598c1beb21`, including native public validation, its CLI/ACP/SDK/Studio integration, versioned provider tool names and the earlier native workflows. The [dated extraction receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-validation-core/graphify-d69d7037/README.md) pins source, tool and raw graph hashes. Nine views cover validation, provider names, Studio tasks, native execution, imports, trust, integrations, budgets and sandbox/optional DSH launch. Graphify extracted 25,617 symbols and 76,888 relationships from 2,139 code files; the reduced graph contains 2,112 files and 7,635 directed pairs. All 49 recorded reading paths have extracted hops. Source navigation and runtime qualification remain separate.
 
-The generated Obsidian export contains 338 Markdown notes and 8 canvases, with 1,121 resolved wiki-links, 241 file cards and 450 Canvas edges. No requested source file, recorded reading hop or generated link is missing. The extraction uses zero model tokens; inferred edges and unresolved endpoints remain omitted rather than filled with synthetic connections.
+The generated Obsidian export contains 383 Markdown notes and 9 canvases, with 1,277 resolved wiki-links, 271 file cards and 512 Canvas edges. No requested source file, recorded reading hop or generated link is missing. The extraction uses zero model tokens; inferred edges and unresolved endpoints are omitted rather than filled with synthetic connections.
 
-The [prior `be5c3583` snapshot](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-graphify-be5c3583/README.md) remains historical. This refresh includes the later Chat option correction and local coding comparison source, but no focused comparison map or model-quality qualification is inferred. Read the [comparison workflow](../examples/harness-comparison/codingREADME.md) and its [dated batch receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/local-coding-batch-acceptance/README.md) for their separately scoped evidence.
+The [prior provider-name snapshot](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/provider-tool-wire-names/graphify-9b60d86f/README.md) and [be5c3583 snapshot](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-graphify-be5c3583/README.md) remain historical. No focused comparison map or model-quality qualification is inferred. Read the [comparison workflow](../examples/harness-comparison/codingREADME.md) and its [dated batch receipt](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/local-coding-batch-acceptance/README.md) for separately scoped evidence.
 
 ## Native agent execution
 
@@ -33,7 +33,7 @@ For packaging changes, follow [`bundle-kernel.mjs`](../scripts/bundle-kernel.mjs
 
 ## Native tasks in Studio
 
-The browser flow has small modules for each boundary. The `native-studio` map contains all 32 requested files and 54 extracted directed pairs; 396 pairs cross its focused boundary and are omitted from this view.
+The browser flow has small modules for each boundary. The `native-studio` map contains all 32 requested files and 54 extracted directed pairs; 409 pairs cross its focused boundary and are omitted from this view.
 
 1. [`nativeTasks.js`](../src/console/assets/nativeTasks.js) owns page state, one request ID per submission, revision-bound controls and cursor reads. [`nativeTasksView.js`](../src/console/assets/nativeTasksView.js) renders scope, committed events and separate outcome/verification states. [`api.js`](../src/console/assets/api.js) preserves authentication and the hosted workspace prefix.
 2. [`apiDelegation.ts`](../src/studio/apiDelegation.ts) derives the owner from a verified human session; [`nativeAdmission.ts`](../src/studio/nativeAdmission.ts) validates browser origin and mutation proof. [`nativeTasksRouter.ts`](../src/api/nativeTasksRouter.ts) accepts typed task inputs and checks read-only execution policy.
@@ -83,18 +83,18 @@ The `native-integrations` map separates operator interfaces from runtime composi
 
 ## Provider tool names and replay
 
-The `native-provider-names` view has 24 files and 44 extracted directed pairs; 171 source pairs cross the focused boundary and are omitted. Open `graphify-out/navigation/native-provider-names/graph.html`. Its four reading paths locate distinct responsibilities:
+The `native-provider-names` view has 24 files and 44 extracted directed pairs; 172 source pairs cross the focused boundary and are omitted. Open `graphify-out/navigation/native-provider-names/graph.html`. Its four reading paths locate distinct responsibilities:
 
 1. [`llmRuntime.ts`](../src/llm/adapter/llmRuntime.ts) → [`providerToolNames.ts`](../src/llm/request/providerToolNames.ts): stable provider-safe names are derived from exact canonical tool identities. The current offered schema is the reverse-binding authority; a name found only in old history does not become executable.
 2. `llmRuntime.ts` → [`providerToolBinding.ts`](../src/llm/adapter/providerToolBinding.ts): the stream binding checks provider names against the current request before canonical tool dispatch. A stable outbound alias is separate from permission to execute a tool.
 3. `llmRuntime.ts` → [`streamRecorder.ts`](../src/llm/adapter/streamRecorder.ts) → [`sessionService.ts`](../src/session/sessionService.ts): committed native evidence retains canonical identity and provider-wire metadata. Inspect the actual fields and call boundaries when changing stream handling; an import edge does not establish that a particular stream was received.
 4. [`deriveRequest.ts`](../src/llm/request/deriveRequest.ts) → [`builtInEncoders.ts`](../src/llm/request/builtInEncoders.ts) → [`openaiChatEncoderV3.ts`](../src/llm/request/openaiChatEncoderV3.ts) → `providerToolNames.ts`: reconstruction selects the recorded encoder version. Chat 3, Anthropic 3 and Responses 2 map schema names, historical calls and explicit tool choices; older encoders remain separately registered for their original bytes.
 
-The four paths add to the 40 retained earlier reading paths; all 76 recorded hops have raw extracted evidence. This source map does not establish official-provider acceptance, successful tool execution or compatibility with an unexercised endpoint.
+The four provider-name paths remain among the 44 retained earlier reading paths. With the five validation paths below, all 87 recorded hops across 49 paths have raw extracted evidence. This source map does not establish official-provider acceptance, successful tool execution or compatibility with an unexercised endpoint.
 
 ## Native public validation
 
-The `native-validation` map configuration adds the operator-check path. Its refreshed extraction is pending the source checkpoint; the eight generated maps and counts above still describe `9b60d86f` until that receipt is replaced. Validation status remains separate from model completion and evidence-integrity verification.
+The `native-validation` map contains all 30 requested files and 62 extracted directed pairs; 244 pairs cross its focused boundary and are omitted. Open `graphify-out/navigation/native-validation/graph.html`. All five paths below have raw extracted evidence. Validation status remains separate from model completion and evidence-integrity verification.
 
 1. [`cli-agent-commands.ts`](../src/cli-agent-commands.ts) → [`nativeValidationConfig.ts`](../src/setup/nativeValidationConfig.ts) → [`nativeValidation.ts`](../src/agent/nativeValidation.ts) locates explicit public configuration, selected IDs and the immutable command snapshot. The loader pins exact bytes; it does not discover commands or grant tool permissions.
 2. [`agentLoopRunner.ts`](../src/kernel/agentLoopRunner.ts) → [`agentLoopServices.ts`](../src/kernel/services/agentLoopServices.ts) → [`agentDriver.ts`](../src/agent/agentDriver.ts) → `nativeValidation.ts` follows native CLI composition into the existing loop. Checks run after a normal model completion through the same governed tool seam. The check itself is signed audit evidence rather than a fabricated assistant call.
@@ -106,7 +106,7 @@ The shell outcome mapping in [`bashTool.ts`](../src/tools/builtin/bashTool.ts) p
 
 ## Native budget admission
 
-The `native-budgets` map separates operator policy, pre-dispatch admission and usage reconstruction. At `9b60d86f` it contains 22 files and 36 directed source pairs; open `graphify-out/navigation/native-budgets/graph.html`. Older map receipts remain historical snapshots.
+The `native-budgets` map separates operator policy, pre-dispatch admission and usage reconstruction. At `d69d7037` it contains 22 files and 36 directed source pairs; open `graphify-out/navigation/native-budgets/graph.html`. Older map receipts remain historical snapshots.
 
 1. [`cli-budget-commands.ts`](../src/cli-budget-commands.ts) exposes reviewed budget signing and status. [`cli-tools-commands.ts`](../src/cli-tools-commands.ts) exposes reviewed tool grants separately. Signing validates the existing bytes instead of replacing the policy with defaults.
 2. [`llmRuntime.ts`](../src/llm/adapter/llmRuntime.ts) admits a model dispatch after request preparation and before transport. [`policyGuards.ts`](../src/tools/guards/policyGuards.ts) admits a native tool before its body executes.
@@ -163,3 +163,6 @@ Use the current `summary.json` for file counts, directed dependency pairs and `l
 For CLI changes, begin with the registered command module. For Studio changes, begin with the relevant router. For barrel files, inspect the exported implementation rather than splitting a catalog merely to reduce its count. Keep source extraction and existing architecture/size checks as evidence for any proposed decomposition.
 
 The reduced maps omit unresolved endpoints and inferred edges and report those omissions alongside dependencies crossing each focused boundary. Check the extraction receipt for parser coverage and failures. Tests, vendor trees, generated files and archived Python are excluded by `.graphifyignore`. Dynamic dispatch, service injection, build-time resolution and runtime behavior still require source inspection and meaningful tests.
+
+
+Later source boundary: `7bd1e8ce8e0b38c71f2d9792cd2e2043a1c3c544` corrects the explicit Stats type in `src/setup/nativeValidationConfig.ts` and tuple typing in `tests/nativeValidationConfig.test.ts`. It landed after this extraction. The map remains pinned to `d69d7037`; the later type/fixture correction is retained in the receipt and does not receive a new extracted-source or runtime verdict here.

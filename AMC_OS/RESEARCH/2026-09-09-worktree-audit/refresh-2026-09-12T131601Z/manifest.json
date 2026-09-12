@@ -1,0 +1,43 @@
+{
+ "schema": "amc.read-only-worktree-audit-refresh-manifest",
+ "version": 3,
+ "refreshId": "refresh-2026-09-12T131601Z",
+ "source": "4d2d69e5d4d01bfd1f82662ceff0305b5c2885b5",
+ "branch": "amc/gap-register-execution",
+ "capturedAt": "2026-09-12T13:16:01Z",
+ "writtenAt": "2026-09-12T13:17:37.992957+00:00",
+ "auditOnly": true,
+ "acceptance": false,
+ "files": [
+  {
+   "path": "README.md",
+   "bytes": 4194,
+   "sha256": "e5df27d91090ea063b0ec3b28c4e60bda978372415a974d40a391f12626d8c61"
+  },
+  {
+   "path": "inventory.json",
+   "bytes": 71790,
+   "sha256": "aacc18cb9519f9d8876891e804f9478406f8682d32eac60721032c9eddbfc3af"
+  },
+  {
+   "path": "root-status.txt",
+   "bytes": 9397,
+   "sha256": "2f4dd2e4e28b0b9f81d0c66216b50d95a4018d0cc4d17b0620ddad2d170f26d9"
+  },
+  {
+   "path": "untracked-import-wiring.tsv",
+   "bytes": 3457,
+   "sha256": "d50c9d2bf063d9e1049c908428dee0b010e78023ceb6d1b301f9174f1751780f"
+  },
+  {
+   "path": "worktree-status.tsv",
+   "bytes": 6734,
+   "sha256": "592819230d306de87bd83eed9d8b8f7b3b174ea5fa7e8aff4360b6634ec87d59"
+  },
+  {
+   "path": "worktrees-porcelain.txt",
+   "bytes": 9525,
+   "sha256": "10fa159501797c66ece70aa6d1d7ba14df733c37dddd6303f37e301aea539dd1"
+  }
+ ]
+}

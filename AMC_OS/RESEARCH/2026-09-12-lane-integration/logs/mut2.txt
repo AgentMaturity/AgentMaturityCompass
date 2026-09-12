@@ -1,0 +1,26 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/sessionPayloadCap.test.ts (3 tests | 1 failed) 920ms
+     × an oversize attachment is refused before any row is recorded, naming the limit and the fix 220ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/sessionPayloadCap.test.ts > session payload cap > an oversize attachment is refused before any row is recorded, naming the limit and the fix
+AssertionError: expected Error: payload exceeds max bytes per even… to be an instance of SessionPayloadCapError
+ ❯ tests/sessionPayloadCap.test.ts:43:21
+     41|     try { writer.recordUserAttachment({ filename: "large.png", content…
+     42|     catch (error) { refusal = error; }
+     43|     expect(refusal).toBeInstanceOf(SessionPayloadCapError);
+       |                     ^
+     44|     const message = (refusal as Error).message;
+     45|     expect(message).toContain(`${cap + 1} bytes`); expect(message).toC…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  19:28:26
+   Duration  2.91s (transform 1.36s, setup 0ms, import 1.86s, tests 920ms, environment 0ms)
+

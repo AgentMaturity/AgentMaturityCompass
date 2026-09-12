@@ -1,0 +1,143 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/cosProduct10NativeTaskService.test.ts (8 tests | 7 failed) 3593ms
+     × admission snapshots before await, dispatches audio once, and stores only the signed identity hash 702ms
+     × lost follow-up acknowledgements survive release and observer restart without replay 542ms
+     × running cancellation is a request, not a signed completion or replay grant 325ms
+     × rejects unsupported media before signing an admission, and rechecks negotiation before a new turn 533ms
+     × failed initial negotiation creates no session or provider prompt 416ms
+     × history authentication failure clears prior media, approval and validation views 445ms
+     × discovery offers explicit Gemini versions but demo remains text-only stub 210ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > admission snapshots before await, dispatches audio once, and stores only the signed identity hash
+AssertionError: expected 'failed' to be 'running' // Object.is equality
+
+Expected: "running"
+Received: "failed"
+
+ ❯ tests/cosProduct10NativeTaskService.test.ts:85:24
+     83|     const starting = s.start(actor, request); parts.splice(0);
+     84|     const task = await starting;
+     85|     expect(task.state).toBe("running"); expect(clients).toHaveLength(1…
+       |                        ^
+     86|     expect(clients[0]!.session.prompt).not.toHaveBeenCalled(); expect(…
+     87|     expect(clients[0]!.session.promptAudioParts.mock.calls[0]![0].map(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > lost follow-up acknowledgements survive release and observer restart without replay
+NativeTaskServiceError: Wait for the active turn, or explicitly resume the released task.
+ ❯ Object.operation src/studio/nativeTaskService.ts:394:122
+    392|         const prior = d.submissions.find(s => s.clientRequestId === in…
+    393|         if (prior) { if (prior.bodyHash !== bodyHash) throw new Native…
+    394|         if (shuttingDown || d.closed || !entry.session || entry.turn |…
+       |                                                                                                                          ^
+    395|           d.archivedAt !== undefined ? "TASK_ARCHIVED" : "TURN_BUSY", …
+    396|           d.archivedAt !== undefined ? "Archived tasks retain their ev…
+ ❯ withControlFileLock src/lifecycle/controlFileLock.ts:151:18
+ ❯ NativeTaskDescriptors.lock src/studio/nativeTaskDescriptors.ts:89:12
+ ❯ Object.turn src/studio/nativeTaskService.ts:389:19
+ ❯ tests/cosProduct10NativeTaskService.test.ts:102:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > running cancellation is a request, not a signed completion or replay grant
+AssertionError: expected 'failed' to be 'cancel-requested' // Object.is equality
+
+Expected: "cancel-requested"
+Received: "failed"
+
+ ❯ tests/cosProduct10NativeTaskService.test.ts:131:51
+    129|   test("running cancellation is a request, not a signed completion or …
+    130|     const s = service(), request = input(), task = await s.start(actor…
+    131|     expect(s.cancel(actor, task.taskId, 1).state).toBe("cancel-request…
+       |                                                   ^
+    132|     expect(new NativeTaskDescriptors(root).read(task.taskId)?.pendingT…
+    133|     await s.start(actor, request); expect(clients[0]!.session.promptAu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > rejects unsupported media before signing an admission, and rechecks negotiation before a new turn
+TypeError: Cannot set properties of undefined (setting 'capabilities')
+ ❯ tests/cosProduct10NativeTaskService.test.ts:147:17
+    145|     expect(new NativeTaskDescriptors(root).list()).toEqual([]); expect…
+    146|     const task = await s.start(actor, request); await finish();
+    147|     clients[0]!.capabilities = { promptCapabilities: { audio: true, im…
+       |                 ^
+    148|     const before = new NativeTaskDescriptors(root).read(task.taskId);
+    149|     await expect(s.turn(actor, task.taskId, { clientRequestId: randomU…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > failed initial negotiation creates no session or provider prompt
+TypeError: Cannot read properties of undefined (reading 'newSession')
+ ❯ tests/cosProduct10NativeTaskService.test.ts:159:24
+    157|     const task = await service().start(actor, input());
+    158|     expect(task.state).toBe("failed"); expect(task.sessionId).toBeNull…
+    159|     expect(clients[0]!.newSession).not.toHaveBeenCalled(); expect(clie…
+       |                        ^
+    160|     expect(task.history.status).toBe("not-started"); expect(task.verif…
+    161|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > history authentication failure clears prior media, approval and validation views
+AssertionError: expected { task: { …(31) }, events: [], …(1) } to match object { events: [], truncated: true, …(1) }
+(33 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -3,12 +3,12 @@
+    "task": {
+      "approvals": [],
+      "canResume": false,
+      "history": {
+        "headEventHash": null,
+-       "status": "unavailable",
++       "status": "not-started",
+      },
+      "validationOutputs": [],
+      "verification": "not-verified",
+    },
+-   "truncated": true,
++   "truncated": false,
+  }
+
+ ❯ tests/cosProduct10NativeTaskService.test.ts:168:18
+    166|     await s.release(actor, task.taskId, 1);
+    167|     const poll = s.poll(actor, task.taskId);
+    168|     expect(poll).toMatchObject({ events: [], truncated: true, task: { …
+       |                  ^
+    169|       approvals: [], validationOutputs: [], verification: "not-verifie…
+    170|     await expect(s.resume(actor, task.taskId, 1)).rejects.toMatchObjec…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/cosProduct10NativeTaskService.test.ts > P10 native task media lifecycle > discovery offers explicit Gemini versions but demo remains text-only stub
+CredentialsFilePermissionsError: credentials directory /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p10-service-A6MukX/operator-home is mode 0755, which grants access to group or other. It holds API keys, so it must be reachable by its owner alone. AMC refuses to read it rather than repairing it silently: until this is fixed the keys in it must be treated as exposed. Fix: chmod 700 /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p10-service-A6MukX/operator-home
+ ❯ assertOwnerOnly src/credentials/credentialsFilePermissions.ts:68:9
+     66|   const mode = permissionBits(input.stats.mode);
+     67|   if (isOwnerOnlyMode(mode)) return;
+     68|   throw new CredentialsFilePermissionsError({
+       |         ^
+     69|     path: input.path,
+     70|     kind: input.kind,
+ ❯ readOwnedFile src/credentials/credentialsSnapshot.ts:62:3
+ ❯ loadCredentialsSnapshot src/credentials/credentialsSnapshot.ts:88:17
+ ❯ new LocalCredentialsService src/credentials/localCredentialsService.ts:112:21
+ ❯ Object.configuration src/studio/nativeTaskService.ts:223:31
+ ❯ tests/cosProduct10NativeTaskService.test.ts:175:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed | 25 passed | 1 skipped (27)
+      Tests  7 failed | 439 passed | 12 skipped (458)
+   Start at  19:05:23
+   Duration  18.65s (transform 23.82s, setup 0ms, import 45.44s, tests 64.78s, environment 2ms)
+
+cos exit=1

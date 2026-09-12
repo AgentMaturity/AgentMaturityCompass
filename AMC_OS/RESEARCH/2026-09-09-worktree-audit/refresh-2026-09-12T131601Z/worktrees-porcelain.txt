@@ -1,0 +1,252 @@
+worktree /Users/sid/AgentMaturityCompass
+HEAD 4d2d69e5d4d01bfd1f82662ceff0305b5c2885b5
+branch refs/heads/amc/gap-register-execution
+
+worktree /private/tmp/amc-1541-archive-20260909
+HEAD d018f15f7ff66c7f3a0eb6c8a069ea54516b4f77
+branch refs/heads/codex/amc-1541-native-task-archive
+
+worktree /private/tmp/amc-1542-revocation-20260909
+HEAD 3c49ca9b45be57f8c0fb6515e23da7bbe736cd7e
+branch refs/heads/codex/amc-1542-managed-revocation
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane
+HEAD b253cc171f35eab4c06b0ca323b8f8924962097b
+branch refs/heads/agent/domain-proof-lane
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0635
+HEAD 0d19650e5445e1bdcdb7961e5d7a149e88f2e27a
+branch refs/heads/agent/gap-0635
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0636
+HEAD 0d19650e5445e1bdcdb7961e5d7a149e88f2e27a
+branch refs/heads/agent/gap-0636
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0637
+HEAD 0d19650e5445e1bdcdb7961e5d7a149e88f2e27a
+branch refs/heads/agent/gap-0637
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0638
+HEAD 0d19650e5445e1bdcdb7961e5d7a149e88f2e27a
+branch refs/heads/agent/gap-0638
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0639
+HEAD 0d19650e5445e1bdcdb7961e5d7a149e88f2e27a
+branch refs/heads/agent/gap-0639
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0640
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0640
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0641
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0641
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0642
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0642
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0643
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0643
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0644
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0644
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0645
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0645
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0646
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0646
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0647
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0647
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0648
+HEAD 84c2a1f22b0901cf74e652a60d71a49b946d5cd5
+branch refs/heads/agent/gap-0648
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0649
+HEAD a984023ec0a11d2229ab533fed5fdbb2699f2348
+branch refs/heads/agent/gap-0649
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0650
+HEAD 98da12c0a15d4a281c55bd3a92e3e2a1bf5a9604
+branch refs/heads/agent/gap-0650
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0651
+HEAD 0cbffc03df5c3d583c9fc3ae4f093516ab79a7c6
+branch refs/heads/agent/gap-0651
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0652
+HEAD d225299636418148b42217387fa82710aa86ebe3
+branch refs/heads/agent/gap-0652
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0653
+HEAD 0020199ef90026390b95f2fe616b83f4c6739946
+branch refs/heads/agent/gap-0653
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0654
+HEAD 2efcaa3e3c662afe0558dbc1065676a78b6a6e6c
+branch refs/heads/agent/gap-0654
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0655
+HEAD 4af70f4d0fc97417b8ff954fca78cd7a69269aa2
+branch refs/heads/agent/gap-0655
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0656
+HEAD d7cf71b21ec215125ccd1945e1237f99485b3bb8
+branch refs/heads/agent/gap-0656
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0657
+HEAD 39606508fb979cdb87eb98ea9658cc78c79935a6
+branch refs/heads/agent/gap-0657
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0658
+HEAD 2f587bdc942c3b45e53c56d8808c2a53bf230b4a
+branch refs/heads/agent/gap-0658
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0659
+HEAD bfb4bbb2123cf87d72fd1dbb4b4517e0a496e004
+branch refs/heads/agent/gap-0659
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0660
+HEAD 1cadbe4933350f4532c853fa870e5f36f3e5e76f
+branch refs/heads/agent/gap-0660
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0661
+HEAD b253cc171f35eab4c06b0ca323b8f8924962097b
+branch refs/heads/agent/gap-0661
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0662
+HEAD b253cc171f35eab4c06b0ca323b8f8924962097b
+branch refs/heads/agent/gap-0662
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0663
+HEAD fca3c0736661258725fd8a619af348413f3d0899
+branch refs/heads/agent/gap-0663
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0664
+HEAD 6f52c9079b606ebd672f58d5ca8ed09eee9805b6
+branch refs/heads/agent/gap-0664
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0665
+HEAD 00f73fa1c65bb8d9c95cf72848a3714fc1a0e2f3
+branch refs/heads/agent/gap-0665
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0666
+HEAD b9d63bdb3facf3afed272c9c9d255f32727d1ff3
+branch refs/heads/agent/gap-0666
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0667
+HEAD c2d11191f120d9884290235fb1f3df20656d9744
+branch refs/heads/agent/gap-0667
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/gap-0668
+HEAD b253cc171f35eab4c06b0ca323b8f8924962097b
+branch refs/heads/agent/gap-0668
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713
+HEAD 6579367f7368d0e48b28873aac950b48fab6a858
+branch refs/heads/hermes/knowledge-refresh-20260713
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713
+HEAD ef5486c302c15d43504e30061cae3fc19b0f7784
+branch refs/heads/hermes/state-of-art-20260713
+
+worktree /Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713
+HEAD 360b41669cab760273f3199ba4eec2bc49d7f3ea
+branch refs/heads/hermes/state-of-art-20260713-v2
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8
+HEAD 8ebe4b3b532cf2b74046eb22e25ef448a2dd1451
+branch refs/heads/claude/admiring-gates-a751a8
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8
+HEAD e4d1312add351a62a7a69de09694316d9c248671
+branch refs/heads/claude/dreamy-moser-3bf7b8
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9
+HEAD 12803a2e017898d2c91d88a3610bdc90849c2457
+branch refs/heads/claude/interesting-haslett-d9efa9
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee
+HEAD 3d6b8d4a0c010c9fcd6e0abd410cb4635a218268
+branch refs/heads/claude/stoic-faraday-20e4ee
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c
+HEAD b5e2ec773f5c03f16386e12c3281d8442dde56ea
+branch refs/heads/claude/sweet-merkle-71246c
+
+worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549
+HEAD 3d6b8d4a0c010c9fcd6e0abd410cb4635a218268
+branch refs/heads/claude/vigilant-merkle-2d8549
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-operator
+HEAD 6ee3a0e0719f38b87b5177fbda17b46f1ffe3653
+branch refs/heads/codex/amc-1545-stop-operator
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-runtime
+HEAD 0d1565d4cafe7aad2467a0d7f6ea6e7410a5d0e7
+branch refs/heads/codex/amc-1545-stop-runtime
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests
+HEAD 7c18ce6490bfe391a42dbaf910d1fe8d38ad2e7a
+branch refs/heads/codex/amc-1546-agent-auth-tests
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle
+HEAD 7f2e38e3ed027e2bf4d52bea950cff4d2bccad25
+branch refs/heads/codex/amc-1547-spill-lifecycle
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep
+HEAD f145ea1ee97b00db8643fb0de5e1355a9fd78228
+branch refs/heads/codex/amc-1547-spill-mutation-prep
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-session-tests
+HEAD 603b9f37efd2a26369b791d060e6e6ae30d96bb3
+branch refs/heads/codex/amc-1547-spill-session-tests
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-storage
+HEAD e89f4842892c1eae4e4acf6996c7d0d31a4b229e
+branch refs/heads/codex/amc-1547-spill-storage
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep
+HEAD 6c55771ca409ae34ef2efc2194e758f7995e4ebf
+branch refs/heads/codex/amc-cancellation-candidate-prep
+
+worktree /Users/sid/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep
+HEAD 3f955a338a2d0a011926f6d4fefd33aeb2aee1d1
+branch refs/heads/codex/amc-stop-auth-mutation-prep
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-closure-map
+HEAD 4967f97541140fcd5d5b18360e9953006c061500
+branch refs/heads/codex/cos-closure-map
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-human-first-use
+HEAD 0030c2b5cf087291384859f8d0238055a2caff49
+branch refs/heads/codex/cos-human-first-use
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-installed-spill
+HEAD a5987643ef6c26b01f687226fbc6a6709fc182cb
+branch refs/heads/codex/cos-installed-spill
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-observer-guide
+HEAD 71a81a966188f044c124e09ccc6bca0a45ed9dfb
+branch refs/heads/codex/cos-observer-guide
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries
+HEAD 491a5077e83d889cc7c333a027ec27bbcde718ed
+branch refs/heads/codex/cos-spill-boundaries
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-spill-commands
+HEAD 7c0f01bf73fb64845362bda20cd456e9bc6af31e
+branch refs/heads/codex/cos-spill-commands
+
+worktree /Users/sid/AgentMaturityCompass/tmp/cos-study-capture
+HEAD 745893115193834ddbbadfd0accec37a69f71e72
+branch refs/heads/codex/cos-study-capture
+

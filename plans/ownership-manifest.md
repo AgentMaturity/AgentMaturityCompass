@@ -373,3 +373,1513 @@ Root explicit receipt commit paths after execution closure: `AMC_OS/INBOX/REV_TE
 The existing ignored REV_TECH_LEAD inbox remains a local handoff only; its accumulated history is excluded from the receipt commit. The owned latest dated handoff is written there and mirrored in the execution log.
 
 All c164 correction writers returned their paths. Root completed full source-diff review and independent reviews of bundle/JSDoc/security fixtures. The public study guide now links to the existing promoted CLI inventory. The new complete candidate retains the same performance floors and renderer timeout; it will run without an independent concurrent compiler lane. Source commit follows before any fresh qualification.
+
+Root current-candidate checkpoint ownership: `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Home a598-qualification checkpoint.md`; `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Now a598-qualification checkpoint.md`; `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Roadmap a598-qualification checkpoint.md`; `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 MOC - Current Operations a598-qualification checkpoint.md`. Complete qualification is now running at a5987643ef6c26b01f687226fbc6a6709fc182cb; all source writers are finished/read-only.
+
+CoS closure mapping completion marker observed on GPT-6 Pro at its configured timeout boundary; its automation was paused and idle Send message state observed. All three assigned worktree paths return to root for source/evidence review. The map is not issue qualification. Native Astra reviewers are read-only and own no paths.
+
+## CoS next finite retained-output boundary mutation preparation
+
+CoS GPT-6 Pro owns ONLY `AMC_OS/RESEARCH/2026-09-09-spill-boundary-mutations/run.py`, `AMC_OS/RESEARCH/2026-09-09-spill-boundary-mutations/README.md` and local `AMC_OS/INBOX/REV_QA_LEAD.md` inside new `/Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries`, branch `codex/cos-spill-boundaries` from a5987643ef6c26b01f687226fbc6a6709fc182cb. Prepare bounded executable source-mutation instructions for the operator and bounded-reader security boundaries omitted by the lifecycle helper; no runtime/tests edits, no execution, no new capability queue. Root independently reviews before executing any prepared mutation. Whole gate remains running alone, and this authoring lane must not start an install/compiler/build/test.
+
+Root owns exact new `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/spill-boundaries-task.md` and `spill-boundaries-dispatch.json` to dispatch/record this task. Completion stops its finite queue; inspect the app only at completion, timeout or instruction need. The CoS closure map worktree remains read-only pending root review.
+
+CoS closure-map review found no blocker; root owns integration of only `AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.json` and `closure-map.md` from its finished worktree. The local role handoff remains there. Root additionally owns this directory’s exact new `REVIEW.md`, `receipt.json`, and `contracts-1544-1547.json` for later live-contract reconciliation and current scope disposition, without rewriting the dated map.
+
+## a598 source gate green; remaining qualification lanes
+
+Candidate a5987643ef6c26b01f687226fbc6a6709fc182cb full suite measured12,262 passed/0 failed/0 pending/todo; all14 executed gates passed, live-deploy-health skipped for absent URL, and clean-source passed. Root records final cleanup before promoting any receipt. No issue Done yet.
+
+Astra capture worker owns ONLY new `/private/tmp/amc-a5987643-spill-mutations-01/` and its helper-created clone/receipts to execute the already source-reviewed spill-lifecycle.py at the exact candidate. Astra operator worker owns ONLY new `/private/tmp/amc-a5987643-stop-auth-clone-01/` and `/private/tmp/amc-a5987643-stop-auth-receipts-01/` to execute the source-reviewed stops-and-credentials.py at that same candidate. No root edits, retries or fixes in these execution lanes; retain all failures, classifications and process/source-restoration evidence for root review.
+
+Astra runtime worker owns ONLY `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/managed-and-portal.py` and `managed-and-portal.md` in root to preserve cleanup-error process receipts and latch unconfirmed closure before any restoration or next command. No execution or source/runtime/test changes. Return helper for independent review before dispatch.
+
+Root owns new package-preparation directory `/private/tmp/amc-a5987643-package-01/` and exact phase-a-acceptance `installed-candidate-a598/preparation.py`, `README.md`, `source.json`, `clone-process.json`, `clone.log`, `checkout-process.json`, `checkout.log`, `install-process.json`, `install.log`, `packed-install-process.json`, `packed-install.log`. This independent clone builds and privately installs/retains one candidate artifact; no publication. CoS retains its separate finite helper-authoring assignment and must not be inspected until its completion/timeout/instruction boundary.
+
+Root final a598 gate receipt paths: `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/full-suite.json`; `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/summary.json`; `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/result.md`.
+
+The a598 spill and stop/auth execution workers have finished and returned their private output paths read-only to root. Astra capture worker independently reviews the amended managed/portal helper without writes or execution. Astra operator worker owns ONLY new `/private/tmp/amc-a5987643-browser-01/` for fresh source clone, browser qualification inputs and results. It may read the retained immutable package and existing browser dependencies, but may not change them. It must read the reviewed browser helper and input requirements, measure current pins, preserve refusal/failure evidence without repair or retry, and close all owned browser/server groups. No root source edits or issue closure.
+
+Root owns exact new vault acceptance note `/Users/sid/Documents/AMC/Evidence/2026-09-09 Final Candidate a598 Source Acceptance.md` and checkpoints `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Home a598-passed checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Now a598-passed checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 AMC Roadmap a598-passed checkpoint.md`, `/Users/sid/Documents/AMC/Archive/Checkpoints/2026-09-09 MOC - Current Operations a598-passed checkpoint.md`. Existing current notes, Spill and CoS evidence notes remain root-owned.
+
+Astra runtime worker's managed/portal helper paths are returned to root. It now owns ONLY new `/Users/sid/AgentMaturityCompass/tmp/a598-cancellation-stage/` for exact copied cancellation helpers/SDK fixture, measured configuration inputs and durable receipts, and the helper-admitted new private Linux guest root `/var/tmp/amc-native-validation-a5987643ef6c26b01f687226fbc6a6709fc182cb-cancel`. It may operate only the preexisting owned `amc-qual` VM after a fresh observation requires exactly one Stopped profile; preserve and restore its existing restrictive AppArmor configuration and final stopped state. Input package and historical records remain read-only. No source changes, retry, root record edits, production credential use or public endpoint. The final staged exact file inventory and hashes must be recorded before execution.
+
+Root and independent Astra read the complete amended managed/portal helper at SHA256 d89b90747f8912dd577dedd61553ea79ceacbd0c868f00dc7f478d3c1fe579c3; no source-review blocker remains. Astra capture worker owns ONLY new `/private/tmp/amc-a5987643-managed-portal-clone-01/` for independently supervised fresh clone/frozen install provenance and `/private/tmp/amc-a5987643-managed-portal-receipts-01/` for one run of the reviewed helper. It must preserve actual assertion/failure and cleanup evidence without repair/retry; root and other private lanes remain read-only. This helper tracks owned Vitest groups, not detached sessions, and its provisional named AssertionErrors require causal review.
+
+Browser preparation attempt 01 stopped before cloning because its wrapper reused /dev/null for npm user and global configuration. The refusal and both closed-process receipts remain immutable. Astra operator worker owns ONLY new `/private/tmp/amc-a5987643-browser-02/` for the corrected preparation and one browser run, using distinct empty private npm configuration files. Package inputs, source, browser helper and earlier output remain unchanged/read-only. Preserve any new failure before another repair.
+
+Root owns new `/private/tmp/amc-a5987643-public-artifacts-01/` and exact phase-a-acceptance paths `public-artifacts-a598/run.py`, `README.md`, `source.json`, `publisher-process.json`, `publisher.log`, `counts-process.json`, `counts.log`, `pages-process.json`, `pages.log`, `inspection.json`, `full-suite-extract.json`, and `closure-contracts.json`. It uses the already independently cloned, clean, frozen-installed and built a598 package checkout, whose provenance is retained unchanged, to check actual publisher/inventory consistency and retain a source-pinned Pages artifact. No new build/full suite, runtime edits or deployment; only new external artifact/receipt paths.
+
+The owned Colima profile was admitted Stopped using its recorded private environment. Its existing guest mount exposes only `/private/tmp/amc-lx-20260908/share/`. Astra runtime worker additionally owns ONLY new `/private/tmp/amc-lx-20260908/share/a598-cancellation-stage/` for exact copied helpers/SDK/artifact/configs and durable guest receipts under the same host/guest path spelling. Existing mounts, VM configuration and other shared contents remain read-only. The earlier default-profile enumeration remains a preserved preparation discovery failure.
+
+Browser attempt 02 completed and returned to root for receipt review; its directory becomes read-only. Astra operator worker now owns ONLY new root helper files `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/key-history.py` and `key-history.md` for bounded source-only mutation preparation against a598. No runtime/tests edits, no helper execution, no imports/compiler/tests, no commit. Cover the existing key-history admission security contract and explicit redundancy/omissions; root reviews before one fresh-clone run.
+
+Managed/portal attempt 01 passed all 73 baseline tests but stopped before mutation because its expected object-interpolation names omitted Vitest's actual quotes. Preserve that failed preparation and all closed-group evidence. Root owns only the helper/guide correction; native capture worker reviews the corrected strings against the recorded actual baseline before fresh execution.
+
+Independent review matched all 36 expected-name occurrences across eight selections to actual baseline records after the quote-only correction (helper SHA256 5ee124c5374e081d01bff2d18098e116be9ba88a5de4bed561501582de73963e). Astra capture worker owns ONLY new `/private/tmp/amc-a5987643-managed-portal-clone-02/` and `/private/tmp/amc-a5987643-managed-portal-receipts-02/` for one fresh independently installed corrected attempt. Attempt 01 and original copies remain immutable.
+
+The retained a598 Pages artifact exposes eleven broken static navigation links (one API self-link and ten missing hierarchy-summary anchors), recorded under public-artifacts-a598. Root owns ONLY `typedoc.json`, new `docs/PACKAGE_API_INTRO.md`, and `tests/publicDocsArtifact.test.ts` for this AMC-1543 correction: use an API-specific landing introduction with no copied self-link and retain inline type hierarchies while disabling the renderer's incomplete aggregate summary links. Existing a598 qualification remains pinned and immutable; new source qualification awaits completion of the current failure batch.
+
+
+## Root immutable completed-lane receipt mirrors
+
+All execution workers have returned these completed outputs read-only. Root owns only these exact mirror/summary paths; originals remain preserved:
+
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/checkout/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/claim-complete-despite-spill-gaps/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/cleanup-final-state-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/cleanup-final-state-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/cleanup-final-state-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/clone/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/erase-partial-reference-scope/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/executed-helper.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/final-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/final-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/final-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/frozen-install/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-last-close-age/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-monitor-row-signature/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-ciphertext-digest/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/ignore-signed-row-hash/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/initial-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/initial-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/initial-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/installed-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/installed-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/installed-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/invent-fallback-spill-key/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/mutation-map.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-0/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-1/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-10/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-11/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-12/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-13/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-14/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-15/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-2/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-3/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-4/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-5/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-6/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-7/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-8/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pin-file-9/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/pnpm-version/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-before-signed-commitment/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/publish-raw-plaintext/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/requested-run.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/restored-baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/restored-baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/restored-baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/retain-no-closed-session-gate/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/runtime/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/sign-erasure-intention-after-unlink/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/summary.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-commitment-admission-failure/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/swallow-final-erasure-audit-failure/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-index-reference-for-restore/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy-restored-flags/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/trust-unsigned-spill-policy/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/001-node-environment/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/002-clone/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/003-checkout-pin/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/004-fresh-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/005-fresh-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/006-fresh-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/007-pnpm-version/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/008-frozen-install/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/009-installed-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/010-installed-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/011-installed-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/012-baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/012-baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/012-baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/013-stop-turn-ceiling-disabled-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/014-stop-turn-ceiling-disabled-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/015-stop-turn-ceiling-disabled-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/016-stop-turn-ceiling-disabled/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/016-stop-turn-ceiling-disabled/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/016-stop-turn-ceiling-disabled/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/017-stop-turn-ceiling-disabled-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/018-stop-turn-ceiling-disabled-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/019-stop-turn-ceiling-disabled-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/020-stop-turn-ceiling-disabled-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/020-stop-turn-ceiling-disabled-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/020-stop-turn-ceiling-disabled-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/021-stop-idle-timer-disabled-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/022-stop-idle-timer-disabled-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/023-stop-idle-timer-disabled-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/024-stop-idle-timer-disabled/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/024-stop-idle-timer-disabled/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/024-stop-idle-timer-disabled/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/025-stop-idle-timer-disabled-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/026-stop-idle-timer-disabled-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/027-stop-idle-timer-disabled-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/028-stop-idle-timer-disabled-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/028-stop-idle-timer-disabled-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/028-stop-idle-timer-disabled-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/029-stop-late-admission-deadline-disabled-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/030-stop-late-admission-deadline-disabled-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/031-stop-late-admission-deadline-disabled-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/032-stop-late-admission-deadline-disabled/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/032-stop-late-admission-deadline-disabled/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/032-stop-late-admission-deadline-disabled/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/033-stop-late-admission-deadline-disabled-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/034-stop-late-admission-deadline-disabled-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/035-stop-late-admission-deadline-disabled-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/036-stop-late-admission-deadline-disabled-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/036-stop-late-admission-deadline-disabled-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/036-stop-late-admission-deadline-disabled-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/037-stop-runner-signal-disconnected-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/038-stop-runner-signal-disconnected-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/039-stop-runner-signal-disconnected-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/040-stop-runner-signal-disconnected/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/040-stop-runner-signal-disconnected/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/040-stop-runner-signal-disconnected/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/041-stop-runner-signal-disconnected-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/042-stop-runner-signal-disconnected-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/043-stop-runner-signal-disconnected-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/044-stop-runner-signal-disconnected-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/044-stop-runner-signal-disconnected-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/044-stop-runner-signal-disconnected-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/045-delegate-operator-snapshot-removed-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/046-delegate-operator-snapshot-removed-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/047-delegate-operator-snapshot-removed-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/048-delegate-operator-snapshot-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/048-delegate-operator-snapshot-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/048-delegate-operator-snapshot-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/049-delegate-operator-snapshot-removed-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/050-delegate-operator-snapshot-removed-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/051-delegate-operator-snapshot-removed-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/052-delegate-operator-snapshot-removed-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/052-delegate-operator-snapshot-removed-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/052-delegate-operator-snapshot-removed-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/053-kernel-operator-snapshot-removed-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/054-kernel-operator-snapshot-removed-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/055-kernel-operator-snapshot-removed-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/056-kernel-operator-snapshot-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/056-kernel-operator-snapshot-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/056-kernel-operator-snapshot-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/057-kernel-operator-snapshot-removed-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/058-kernel-operator-snapshot-removed-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/059-kernel-operator-snapshot-removed-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/060-kernel-operator-snapshot-removed-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/060-kernel-operator-snapshot-removed-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/060-kernel-operator-snapshot-removed-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/061-descendant-minimum-widened-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/062-descendant-minimum-widened-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/063-descendant-minimum-widened-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/064-descendant-minimum-widened/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/064-descendant-minimum-widened/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/064-descendant-minimum-widened/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/065-descendant-minimum-widened-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/066-descendant-minimum-widened-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/067-descendant-minimum-widened-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/068-descendant-minimum-widened-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/068-descendant-minimum-widened-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/068-descendant-minimum-widened-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/069-provider-stop-forwarding-removed-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/070-provider-stop-forwarding-removed-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/071-provider-stop-forwarding-removed-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/072-provider-stop-forwarding-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/072-provider-stop-forwarding-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/072-provider-stop-forwarding-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/073-provider-stop-forwarding-removed-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/074-provider-stop-forwarding-removed-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/075-provider-stop-forwarding-removed-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/076-provider-stop-forwarding-removed-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/076-provider-stop-forwarding-removed-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/076-provider-stop-forwarding-removed-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/077-studio-mixed-identity-admitted-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/078-studio-mixed-identity-admitted-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/079-studio-mixed-identity-admitted-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/080-studio-mixed-identity-admitted/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/080-studio-mixed-identity-admitted/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/080-studio-mixed-identity-admitted/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/081-studio-mixed-identity-admitted-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/082-studio-mixed-identity-admitted-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/083-studio-mixed-identity-admitted-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/084-studio-mixed-identity-admitted-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/084-studio-mixed-identity-admitted-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/084-studio-mixed-identity-admitted-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/085-studio-scope-intersection-removed-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/086-studio-scope-intersection-removed-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/087-studio-scope-intersection-removed-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/088-studio-scope-intersection-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/088-studio-scope-intersection-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/088-studio-scope-intersection-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/089-studio-scope-intersection-removed-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/090-studio-scope-intersection-removed-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/091-studio-scope-intersection-removed-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/092-studio-scope-intersection-removed-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/092-studio-scope-intersection-removed-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/092-studio-scope-intersection-removed-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/093-studio-secondary-lease-ignored-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/094-studio-secondary-lease-ignored-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/095-studio-secondary-lease-ignored-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/096-studio-secondary-lease-ignored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/096-studio-secondary-lease-ignored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/096-studio-secondary-lease-ignored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/097-studio-secondary-lease-ignored-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/098-studio-secondary-lease-ignored-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/099-studio-secondary-lease-ignored-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/100-studio-secondary-lease-ignored-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/100-studio-secondary-lease-ignored-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/100-studio-secondary-lease-ignored-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/101-studio-revocation-set-ignored-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/102-studio-revocation-set-ignored-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/103-studio-revocation-set-ignored-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/104-studio-revocation-set-ignored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/104-studio-revocation-set-ignored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/104-studio-revocation-set-ignored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/105-studio-revocation-set-ignored-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/106-studio-revocation-set-ignored-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/107-studio-revocation-set-ignored-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/108-studio-revocation-set-ignored-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/108-studio-revocation-set-ignored-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/108-studio-revocation-set-ignored-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/109-studio-duplicate-authorization-ignored-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/110-studio-duplicate-authorization-ignored-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/111-studio-duplicate-authorization-ignored-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/112-studio-duplicate-authorization-ignored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/112-studio-duplicate-authorization-ignored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/112-studio-duplicate-authorization-ignored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/113-studio-duplicate-authorization-ignored-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/114-studio-duplicate-authorization-ignored-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/115-studio-duplicate-authorization-ignored-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/116-studio-duplicate-authorization-ignored-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/116-studio-duplicate-authorization-ignored-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/116-studio-duplicate-authorization-ignored-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/117-studio-owner-guard-overlap-control-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/118-studio-owner-guard-overlap-control-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/119-studio-owner-guard-overlap-control-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/120-studio-owner-guard-overlap-control/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/120-studio-owner-guard-overlap-control/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/120-studio-owner-guard-overlap-control/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/121-studio-owner-guard-overlap-control-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/122-studio-owner-guard-overlap-control-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/123-studio-owner-guard-overlap-control-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/124-studio-owner-guard-overlap-control-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/124-studio-owner-guard-overlap-control-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/124-studio-owner-guard-overlap-control-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/125-studio-owner-refusal-after-effect-before-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/126-studio-owner-refusal-after-effect-before-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/127-studio-owner-refusal-after-effect-before-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/128-studio-owner-refusal-after-effect/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/128-studio-owner-refusal-after-effect/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/128-studio-owner-refusal-after-effect/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/129-studio-owner-refusal-after-effect-restored-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/130-studio-owner-refusal-after-effect-restored-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/131-studio-owner-refusal-after-effect-restored-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/132-studio-owner-refusal-after-effect-restored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/132-studio-owner-refusal-after-effect-restored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/132-studio-owner-refusal-after-effect-restored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/133-final-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/134-final-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/135-final-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/136-exit-head/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/137-exit-status/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/138-exit-index/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/mutation-map.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/source-files.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/summary.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/mutation-map.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/summary.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/managed-raw-list/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/managed-raw-list/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/managed-raw-list/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/mutation-map.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/orphan-signature-ignored/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/orphan-signature-ignored/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/orphan-signature-ignored/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-agent-exclusion-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-agent-exclusion-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-agent-exclusion-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-body-not-strict/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-body-not-strict/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-body-not-strict/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-missing-principal-guard-removed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-missing-principal-guard-removed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-missing-principal-guard-removed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-principal-not-propagated/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-principal-not-propagated/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-principal-not-propagated/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-role-enforcement-bypassed/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-role-enforcement-bypassed/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/portal-role-enforcement-bypassed/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/restored-baseline/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/restored-baseline/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/restored-baseline/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/summary.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/verification-failure-empty-set/parsed.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/verification-failure-empty-set/process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/verification-failure-empty-set/vitest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/source.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/clone-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/checkout-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/managed-portal.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/frozen-install.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/checkout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/clone.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/managed-portal-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/frozen-install-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/source.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/clone-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/checkout-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/managed-portal.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/frozen-install.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/checkout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/clone.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/managed-portal-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/frozen-install-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/run.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/package-source-receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/source.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/browser-helper.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/supervisor-source.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/preparation/node-version-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/preparation/node-version.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/preparation/npm-version.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/preparation/npm-version-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/run.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/package-source-receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/source.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/browser-helper.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/supervisor-source.py`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/node-version-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/playwright-resolution-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/browser-qualification-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/node-version.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/clone-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/checkout-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/npm-version.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/source-head.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/source-status.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/npm-version-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/source-head-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/checkout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/playwright-resolution.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/clone.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/source-status-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/preparation/browser-qualification.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/qualification/fixture-run-receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/qualification/browser/receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/owned-initial-observation.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/result.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/default-enumeration-combined.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/proposed-owned-observation.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/result.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/preparation-inputs.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/owned-initial-observation.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/default-enumeration-refusal.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/owned-initial-observation.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/staged-inventory-before-execution.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/final-receipt-manifest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-install.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-final-state.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-initial-state.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-start.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-stop.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-validation.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/commands.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-install.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-final-state.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/host-receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-initial-state.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-stop.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-validation.stdout.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/host-run-01/vm-start.stderr.log`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/installed-closure.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/install.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/qualification.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/scripted-provider.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/receipt.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/public-checks.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/tools-sign.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/firewall.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/cold-native.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/tools-init.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/budgets-init.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/cold-ledger.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/init.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/sdk-process.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/session-evidence.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/linux-receipts/qualification/raw/sdk-cancel/tools-verify.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/latest.json`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/latest.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/spill-mutations-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/stop-auth-mutations-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/managed-portal-a598-02/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/browser-a598-02/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/cancellation-a598-01/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/README.md`
+- `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/completed-lanes-manifest.json`
+
+
+Astra capture worker owns ONLY new `/private/tmp/amc-a5987643-test-type-negative-01/` for an independent fresh clone, frozen install and the actual AMC-1521 negative gate receipt. Add only a newly owned canonical test-source file containing a deliberate type mismatch, prove production typechecking still succeeds and actual test typechecking rejects that exact line, remove only that owned fixture after confirmed process closure, then prove restored test typechecking succeeds and tracked source is clean. Preserve every command/process/output and source hash, no runtime/test weakening, old worktree edits or full-suite rerun. Root files and other lanes remain read-only.
+
+CoS retained-output boundary helper completion marker was observed on GPT-6 Pro at its timeout review; automation was paused and idle Send message observed. Its three paths return to root for review. CoS GPT-6 Pro now owns ONLY `AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/run.py`, `native-case.mjs`, `README.md`, and local `AMC_OS/INBOX/REV_QA_LEAD.md` in new `/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill`, branch `codex/cos-installed-spill` from a5987643ef6c26b01f687226fbc6a6709fc182cb. Author a finite installed native operator/read qualification helper using public installed entry points, without any execution or runtime changes. Root owns exact new `AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/installed-spill-task.md` and `installed-spill-dispatch.json`.
+
+## 2026-09-09 12:52 UTC — focused qualification execution ownership
+
+- Native delegation_stop_runtime: AMC-1547 bounded mutation execution, no root runtime writes. Sole new private output `/private/tmp/amc-a5987643-spill-boundaries-01/` (helper-generated clone, private install, mutation backups and receipts only). Input reviewed CoS helper and clean a598 package clone are read-only. No full-suite, VM or provider work. Return ownership on completion; preserve all outputs.
+- Root: completed CoS spill-boundaries `run.py` and `README.md` integration only, plus dispatch records; no local CoS handoff staging.
+- Root: `AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/closures-a598/{README.md,contracts.json,full-suite-extract.json,receipt.json}` and vault `Evidence/2026-09-09 Source Contract Closures a598.md`, `Evidence/2026-09-09 Installed Candidate a598 Acceptance.md`. These record existing measured evidence, no new runtime claims.
+
+## 2026-09-09 — key-history finite execution admitted
+
+Native cos_capture_scope owns sole NEW `/private/tmp/amc-a5987643-key-history-01/` for one execution of reviewed helper `mutations/key-history.py` SHA256 `c9502985d1e1864d7270db39af2093fd63605badc1809f782847255f48e582d4`. Root and independent source review completed without concrete blocker. Input root/helper/full report and original worktrees are read-only. No root runtime changes, retry or full-suite run; output clone/backups/receipts retained and ownership returned on completion.
+
+## 2026-09-09 — current closure checkpoints
+
+Root owns the four existing current vault notes and their new immutable `Archive/Checkpoints/2026-09-09 <stem> three-closures checkpoint.md` copies, plus exact root `closures-a598/linear-transitions.json` and `closures-a598/live-child-states.json`. Records reflect the three independently applied Done transitions, not mass closure.
+
+## 2026-09-09 — user-directed Chat on Steroids execution ownership transfer
+
+The user's execution handoff delivered to the active Chat on Steroids conversation
+supersedes its earlier installed-spill author-only delegation. Chat on Steroids is
+the sole AMC executor; Codex is monitor/instruction-only and the user's handoff
+reports all native workers stopped with ownership returned. The initial read-only
+root check returned branch `amc/gap-register-execution` at
+`777d6214bbbf6703594ec78ac5e65a93427f788e`.
+
+Former root/Codex program ownership in this manifest, including serial CLI,
+Studio, session/ledger integration, the pending public TypeDoc correction,
+acceptance records, plan/tracker coordination and checkpointed current vault
+notes, transfers to this executor. This is not ownership of external changes:
+preserve `docs/ARCHITECTURE_NAVIGATION.md`, the externally authored execution
+brief, all other worktrees and stash
+`152a61696f336f658893a72aa9357d58df8c5679`. No add-A, stash, reset, amend, push or
+worktree removal is authorized. Any integration commit uses explicit paths and
+the established disabled-hooks procedure; the accumulated root
+`AMC_OS/INBOX/REV_TECH_LEAD.md` remains append-only and never staged.
+
+Immediate finite unit: finish and text-review the installed CLI/SDK spill
+acceptance helper in `tmp/cos-installed-spill` (the four assigned paths above),
+then explicitly review/integrate its source and execute one bounded private
+installed-candidate lane using the immutable a598 tarball and a hash-pinned
+reviewed supervisor. A new private execution root and its exact pins must be
+recorded before launch. Completed full-suite, baseline, mutation, browser,
+cancellation and VM lanes are not restarted. New failures retain their original
+receipts and stop rather than laundering retries. Broader release, production
+secret/key-rotation, publishing and deployment confirmation gates remain intact.
+
+NEXT_ACTION: finish `native-case.mjs`, source-review the owned `run.py` and
+README, preserve any public-seam limitations, then prepare the explicit bounded
+execution configuration. No installed-spill execution has occurred at transfer.
+
+### Installed-spill execution preparation — exact newly owned paths
+
+Source authoring/text review is complete in the original four-file worktree.
+Chat on Steroids owns promotion of only its reviewed `run.py`, `native-case.mjs`
+and `README.md` to the matching root directory
+`AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/`, plus a new root
+`source-review.json` there. The worktree's local QA handoff is not promoted or
+staged. Integration uses exclusive destination creation and exact content hashes.
+
+The sole new execution-preparation prefix is
+`/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-01/`.
+It will hold private preparation/configuration and supervision receipts and the
+new `run/` child consumer/output directory. Initial path inspection reported
+this prefix absent; that expected absence was a nonzero metadata inspection,
+not a failed AMC acceptance. No prior private lane or installation is reused.
+The executor owns only new files below this prefix, including bounded generated
+fixture workspaces, local disposable vaults, quarantine originals and separately
+reviewed local erasure approvals. Nothing there is permission to mutate the
+read-only immutable package clone or other private qualification directories.
+
+Read-only hashes observed before preparation:
+`run.py` = `8fd0003f4e4c5ea198bc77ad5c43a7b147cb6e8db1878d168f555155c6ad0fc0`;
+`native-case.mjs` = `8c5158635b4a08be7b63463962dae5bd91eb2dceac04c4cca96809b6590e90a0`;
+`README.md` = `ffd92bc89d2c2898bb73c7e9f77cd122ac628974992ef087c310639d182a1bc9`.
+The reviewed attempt-3 supervisor observed hash is
+`e5696055be4b67ca81678da26bb8a253484199eabefcdbdc0ffc8f11d690b54d`.
+The dated source receipt observed hash is
+`8a9f100998949288f5c7e5a81aa4f34a08e2b1c4e8a935f74b050f60dd48fefd`.
+The tarball remains `d0391019fb9e0b39c0f624657efab9f1a03e53b01b45fced04ea4d7cc980d1c9`,
+6,008,285 bytes; Node and npm executable hashes match the dated artifact receipt.
+These are file observations, not executed installed-spill results.
+
+### Installed-spill attempt 01 preserved; protocol-fixture correction
+
+The reviewed helper was integrated at `b9a8f39e09c146c2a9adb869443bc273308ce121`.
+Helper-only supervised syntax/config checks completed with observed closure;
+the subsequent fresh installed attempt ended unqualified. Both capture workers
+stopped at the missing completed tool-result assertion. The inspected JSONL
+history records `AMC_LLM_STREAM_USAGE_MISSING`: the scripted successful provider
+response omitted required usage. This is a fixture-protocol defect, not evidence
+of successful retained-output qualification or permission to weaken the runtime
+stream/accounting guard. Downstream spill scenarios were not reached.
+
+The executor owns the new exact root receipt prefix
+`AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/attempt-01/` for a selected
+safe mirror, diagnosis and hash manifest. Existing private attempt 01 inputs,
+logs, SDK results and workspaces stay intact. A separate public-export read-only
+SQLite diagnosis may write only new `diagnosis/` receipts under that already
+owned private prefix; it cannot become a resumed qualification run.
+
+The narrow source correction is owned in the already promoted root
+`native-case.mjs` and `README.md`: supply expressly synthetic wire usage as
+fixture input, never measured tokens/cost or model evidence. After review, a
+deliberately new private attempt may use the exact new prefix
+`/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill-execution-02/` and a new
+root `attempt-02/` receipt prefix. New pins and the reason for the new attempt
+must precede launch; attempt 01 is never overwritten, reused or relabelled green.
+No runtime source change, full gate, previously completed mutation or VM rerun
+is authorized by this fixture correction. NEXT_ACTION: preserve diagnosis,
+correct the scripted protocol, review its new pins, then run only the new lane.
+
+## 2026-09-09 — Execute AMC Goal continuation and monitor status
+
+The current user restarts execution once after the optional opening-message timeout.
+Chat on Steroids remains the sole executor; Codex is monitor/instruction-only.
+The saved execution Goal was recovered from the local Task helper recording
+`2026-09-09-eb307f8b` (14:06:20 UTC); current chat recording is
+`2026-09-09-602337ca`, title `Execute AMC Goal`. Bridge operations presently report
+Unattributed, so recording identity is not asserted as tool-call attribution.
+
+This executor claims exact new monitor file
+`AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/execution-status.json` and recovery
+record `AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/recovery-20260909.json`.
+Existing transferred helper, receipt, plan and checkpointed vault ownership is
+unchanged. The old attempt's original `tmp/cos-installed-spill-execution-01/`
+contents are read-only. The already assigned distinct attempt-02 prefix is the
+only next execution destination, after source review, provenance and cleanup.
+
+Read-only startup observed root HEAD `b9a8f39e09c146c2a9adb869443bc273308ce121`,
+an empty staged index and the preserved shared stash. The original attempt-01
+receipt explicitly says unqualified, qualified=false, active=null and
+allObservedProcessesClosed=true. No matching old runner/capture process was
+found in the bounded startup process inspection. No full audit or qualification
+lane was restarted. NEXT_ACTION: save the monitor/liveness checkpoint, inspect
+the predecessor's exact synthetic wire-usage correction and existing diagnosis,
+commit only reviewed owned helper changes, then run the distinct corrected lane.
+
+## 2026-09-09 — Installed-spill continuation, sole executor (14:53 UTC)
+
+This chat takes sole execution ownership under the user's complete current
+assignment. The prior native Goal is paused, its undelivered followup canceled,
+and all Codex workers stopped per the user handoff. Codex monitors only. No
+recorded sessions or separate saved Goal will be retrieved. No Graphify, DSH/pi
+runtime dependency, production secrets, publishing or deployment is authorized.
+Bridge attribution is currently Unattributed; no recording id is invented.
+Local executor label: `amc-installed-spill-continuation-20260909T1453Z`.
+
+Immediate exact writable paths are `plans/ownership-manifest.md`,
+`plans/amc-dsh-pi-execution-2026-09-08.md`,
+`AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/execution-status.json`, and
+`AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/{run.py,native-case.mjs,README.md,source-review.json}`.
+New files may be written only under the already assigned private
+`tmp/cos-installed-spill-execution-02/` and matching root evidence `attempt-02/`
+prefixes. Attempt 01 and recovery-20260909.json remain read-only. This includes
+new startup/liveness, input provenance, configuration, launch, cleanup and safe
+selected receipt mirrors for attempt 02. Ownership of further implementation
+paths and exact vault notes/checkpoints will be declared before new writes.
+
+No completed worktree audit or acceptance lane will be restarted. Preserve the
+externally authored brief, unrelated dirty paths, all old worktrees, the whole
+ignored root REV_TECH_LEAD handoff and stash 152a61696f336f658893a72aa9357d58df8c5679.
+NEXT_ACTION: immediately replace stale execution-status with this chat's actual
+timestamp; check current owned identities, review only the exact helper diff,
+then pin and execute a distinct corrected installed attempt 02.
+
+### Current continuation — handed-over public Docs fix
+
+The same sole executor adopts only the user-named predecessor changes in
+`typedoc.json`, `docs/PACKAGE_API_INTRO.md`, and
+`tests/publicDocsArtifact.test.ts` for AMC-1543. The existing diff was inspected;
+it separates the generated API introduction from the guides landing page and
+keeps inline inheritance without broken aggregate-summary anchors. No other
+predecessor dirty path is adopted by this declaration.
+
+The executor owns new evidence under
+`AMC_OS/RESEARCH/2026-09-09-public-docs-correction/` and the new private prefix
+`tmp/cos-public-docs-correction-01/` for a pinned fresh clone, isolated install,
+targeted verification, logs and observed cleanup. Generators run only inside
+that fresh clone, never the shared root. This is not authorization to repeat
+completed broad suites, publish, deploy, or edit the externally authored brief.
+Linear and Obsidian mutations remain pending until usable authorized connectors
+are available; an approved comment must be read back rather than duplicated.
+
+### Corrected JSONL lifecycle attempt 03
+
+Attempt 02 is closed and immutable: its SQLite groups passed while JSONL's
+second `session/new` was refused after A completed. Source review establishes
+that JSONL has `concurrentWriters: false`; the helper must close each SDK client
+before starting the next fixture session rather than weaken that lock.
+The same executor owns new files exclusively under
+`tmp/cos-installed-spill-execution-03/` and
+`AMC_OS/RESEARCH/2026-09-09-installed-spill-acceptance/attempt-03/` for a distinct
+JSONL-only corrected run. Do not repeat the completed SQLite lane. The a598
+tarball and accounting/writer guards stay unchanged, and the missing public
+JSONL history-loader case remains explicitly unqualified. This diagnosis is
+source-backed; the prior SDK error hid the internal reason and is not relabelled
+as a captured lock-error message.
+
+### Installed JSONL cold-verification defect — native source correction
+
+Attempt 03 is closed, unqualified, and must not be reused. Both actual JSONL
+fixture sessions completed with separately closed clients. The installed cold
+verifier then reconstructed A's requests but reported its session missing.
+`verifyAgentRun` reads lifecycle presence from SQLite's `getAllSessions()` even
+when the workspace's session-store marker is JSONL. The sole executor owns
+`src/agent/runReport.ts` and new `tests/agentRunJsonlVerification.test.ts` for a
+real selected-backend correction and failure regressions. Existing native
+verification and monitor/signature checks must remain enforced.
+
+This source correction shares the already declared fresh-clone scoped
+verification prefix with the committed public Docs fix. It requires a new
+source/package qualification boundary, not relabelling a598's immutable
+tarball. No public JSONL loader is invented; that separate installed API case
+stays explicitly missing. All updates/receipts under the previously owned
+attempt-03 and public-docs-correction prefixes remain in scope.
+
+
+### Authorized Obsidian continuation checkpoint
+
+At 2026-09-09T15:55:29.404652+00:00 the user-shared vault alias is accessible. This sole executor owns only `AMC Home.md`, `Projects/AMC/AMC Now.md`, `Projects/AMC/AMC Roadmap.md`, `MOCs/MOC - Current Operations.md`, and new `Evidence/2026-09-09 Installed Spill Corrected Attempts.md` in the authorized vault. Before material updates, own and create exclusive byte-for-byte checkpoints `Archive/Checkpoints/2026-09-09 <note-name> installed-spill-continuation checkpoint.md` for those four named notes. Existing checkpoints remain immutable. Record hashes under the already owned repository spill acceptance evidence prefix. No generated Graphify notes, canvases, unrelated vault notes or old receipts are adopted. Linear readback is still pending; do not duplicate the user-approved AMC-1547 comment.
+
+### Scoped correction verification checkpoint
+
+The supervised fresh-clone source/docs lane at
+`8bef3c3bdb9358cb068a8ef8601968148ee54a0b` has returned its terminal result.
+The executor retains the actual receipt and red/restored mutation evidence
+under the already owned public-docs-correction prefix. This is not an installed
+package or full-suite qualification. No old acceptance lane is restarted.
+
+Before the next material vault update, the executor owns the exact new
+checkpoint filenames `Archive/Checkpoints/2026-09-09 <note-name> scoped-verification
+checkpoint.md`, where `<note-name>` is only `AMC Home`, `AMC Now`, `AMC Roadmap`,
+`MOC - Current Operations`, or `Installed Spill Corrected Attempts`. Checkpoints
+are exclusive byte copies of the five previously owned notes. The evidence
+note and top current-state sections may then record this actual scoped result;
+all historical receipts retain their source boundary. Intended Linear changes
+remain explicitly pending because connector discovery still exposes no Linear
+actions. No issue closure or current child tally is inferred.
+
+### Current bounded batch — public persisted session history (CoS prime)
+
+Owner: `cos-native-public-history-20260909T163519Z`, sole Chat on Steroids
+executor on the existing integration branch at initial HEAD
+`8bef3c3bdb9358cb068a8ef8601968148ee54a0b`. The prior task is closed. Worker
+status failed with WORKER_IDENTITY_LOST twice (initial call and single retry);
+no workers were started, so implementation and shared integration serialize here.
+
+Exact prime source ownership: new `src/session/sessionEventHistory.ts`, new
+`src/session/sessionHistoryReader.ts`, `src/persistence/jsonl/jsonlEventLog.ts`,
+`src/persistence/jsonl/jsonlSessionEventStore.ts`, `src/sdk/nativeAgentClient.ts`,
+`src/index.ts`, new `tests/sessionEventHistory.test.ts`,
+`tests/publicApiSurface.test.ts`, `docs/NATIVE_SDK.md`, and new
+`docs/SESSION_EVENT_HISTORY.md`. Further managed-task/validation files will be
+declared after inspecting their current implementations, before edits.
+
+Exact metadata ownership: this appended ownership section and central
+`AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/execution-status.json`; new files
+under `AMC_OS/RESEARCH/2026-09-09-native-history-batch/` and the private
+`tmp/cos-native-history-batch-01/` prefix, including a fresh pinned validation
+clone. Existing dirty manifest content is preserved, not adopted for staging.
+The earlier public-docs-correction checkpoint blocker and uncommitted mirrors
+remain unchanged and are not included in new proposed source commits.
+
+Vault ownership: existing `AMC Home.md`, `Projects/AMC/AMC Now.md`,
+`Projects/AMC/AMC Roadmap.md`, `MOCs/MOC - Current Operations.md`, new
+`Evidence/2026-09-09 Native History Capability Batch.md`, and exclusive
+`Archive/Checkpoints/2026-09-09 <note-name> native-history-batch checkpoint.md`
+for only those four existing notes. Checkpoint bytes before material updates.
+Do not rewrite the previous installed-spill evidence note or checkpoints.
+
+No acceptance runs until the implementation batch is ready; no generators in
+the shared root. No historical acceptance/reconciliation rerun, old package
+relabeling, production-secret operation, publication, deployment or issue Done
+claim. NEXT_ACTION: implement the public read-only selected-backend history
+path, then the remaining managed-task and validation deltas, before focused
+fresh-candidate checks.
+
+The prime additionally owns `src/persistence/sessionStoreVerification.ts` for
+factoring its existing signature/chain checks into an explicitly metadata-only
+reader verdict. The existing full payload verifier retains its default checks.
+
+Managed-task serial lane ownership: `src/studio/nativeTaskService.ts`,
+`src/studio/nativeTaskProjection.ts`, `tests/studioNativeTaskService.test.ts`,
+new `tests/studioNativeTaskHistory.test.ts`. No worker source writes exist.
+The source-confirmed delta is refreshing a non-owning observer's stale signed
+descriptor after a remote admission, and selected-backend cold projection.
+Existing archive, retry and capacity contracts are retained, not reimplemented.
+
+Validation serial lane: new `tests/nativeValidationOutcomeSurfaces.test.ts` and
+new `tests/helpers/nativeValidationOperator.ts`; no application policy or
+approval/quorum weakening. The fixtures may sign disposable workspace policies
+and record automated decisions by distinct fixture approvers. They are not
+human approvals, real-provider evidence or broad OS-confinement qualification.
+The managed regressions are grouped in the existing service test file; the
+previously reserved `tests/studioNativeTaskHistory.test.ts` is not needed.
+
+Bounded native-history implementation complete through source
+`130c2d0087cf574016411fdc7d91067d3eddd637` on 2026-09-09. The prime releases
+all source paths above; no workers or owned runtime/check processes remain.
+Fresh candidate-03 passed 193 focused tests, types/build/architecture, five
+guard-removal red checks with 32 restored passes, and the scoped new installed
+public JSONL history restart exercise. This is not full-suite/release/platform
+or full installed-spill acceptance. See
+`AMC_OS/RESEARCH/2026-09-09-native-history-batch/NEXT_ACTION.md` for exact receipts,
+blocked vault/tracker updates and the next bounded implementation task.
+Prior dirty manifest content and prior blocked evidence staging stay preserved.
+
+### Current bounded batch — installed-retained-output-public-history-batch
+
+Owner: same CoS conversation `cos-native-public-history-20260909T163519Z`;
+bridge attribution currently Unattributed (no recording identity invented).
+Prior batch returned normally and released ownership. Prime executes serially.
+Exact helper writes: new
+`AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/run.py`,
+`native-case.mjs`, `README.md`, `source-review.json`, `NEXT_ACTION.md`,
+`disposition.json`, `TRACKER_PENDING.md`, `REVIEW_BLOCKERS.md`,
+`previous-execution-status.json`, `ownership.json`, `obsidian-update.json`.
+This new evidence directory may additionally contain exact per-run receipt
+mirrors and reviewed fixture-erasure proposals; no historical receipt is adopted.
+Private run prefix: `tmp/cos-installed-retained-output-public-history-01/` only,
+including fresh pinned source clones, package/consumer, logs and disposable
+synthetic workspaces. Every erasure requires an explicit session/event and plan
+digest review after capture, before apply. No broad cleanup is authorized.
+Prime owns the new appended manifest section and central execution-status.json;
+existing dirty manifest content is preserved and not staged. Source runtime
+paths will be declared individually before any production fix. No workers started.
+New vault note only: `Evidence/2026-09-09 Installed Retained Output Public History.md`.
+This is a new task-state proposal, not replay of denied prior checkpoints or notes.
+Previous vault updates, evidence staging and their blocker records remain intact.
+No tests before helper implementation/review; no generators in shared root,
+historical a598 reruns, release/publish/deploy or production-secret operations.
+
+The new installed run exposed a cold SQLite reader `CHANGED` refusal after real
+fixture capture. Prime additionally owns `src/session/sessionHistoryReader.ts`,
+new `tests/sessionHistoryColdSqlite.test.ts`, and `docs/SESSION_EVENT_HISTORY.md`
+for a native correction and cold-process/concurrent-change regressions. No
+production fixes are delegated. The current frozen installed package remains
+unchanged. New candidate preparation stays under the existing private run prefix.
+The exact JSONL fixture-erasure approval was blocked by tool review; it is not
+retried or created by another method. Preserve its plan and let its finite gate
+report blocked; this is not a runtime erasure result.
+
+### Installed retained-output batch handoff — ownership released
+
+The same CoS prime ends this bounded batch with runtime correction
+`33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd` and new evidence/handoff commit
+`1797a3d3`. Initial helper `a7482626` is committed; its subsequent source-pin
+edits remain saved but unstaged/uncommitted after a denied compound commit
+proposal. No equivalent retry was made. All source/helper/vault paths claimed
+above are released; no GPT workers or runtime/check processes remain owned.
+
+Fresh corrected source passed types/build/architecture and 37 focused tests;
+three mutation selections went red and five restored cold tests passed.
+Installed JSONL source130c2d00 and corrected SQLite source33481a72 passed their
+separate scopes through restore. Exact erasure approval was blocked/not supplied,
+so aggregate installed qualification remains false and post-erasure checks remain
+unexercised. See the committed
+`AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/NEXT_ACTION.md`.
+Final observed process closure is recorded there. New Obsidian evidence note
+updated; Linear pending and prior review blockers remain explicit. Preserve
+all old dirt, closed lanes and historical receipts. No full-program Done claim.
+
+### Public task transport/browser implementation ownership
+
+Owner: same CoS conversation `cos-native-public-history-20260909T163519Z`;
+bridge Unattributed, no recording identity inferred. Initial compound status /
+generic ownership preparation was blocked and did not run. This is a new exact
+source ownership proposal after inspecting current contracts, not its replay.
+Prime executes serially; no workers are requested.
+
+Exact source writes: `src/api/nativeTasksRouter.ts`,
+`src/studio/nativeTaskTypes.ts`, `src/studio/nativeTaskProjection.ts`,
+`src/studio/nativeTaskService.ts`, `src/studio/nativeTaskOpenapi.ts`,
+`src/console/assets/nativeTasks.js`, `src/console/assets/nativeTasksView.js`,
+`docs/NATIVE_STUDIO_TASKS.md`, `tests/studioNativeTaskAdmission.test.ts`,
+new `tests/publicTaskTransport.test.ts`, new
+`tests/e2e/public-task-transport-browser.mjs`, and new
+`tests/helpers/publicTaskHttpFixture.ts`.
+Prime alone integrates service/route changes. No StudioServer, ledger, session,
+signed production config or package edits are assigned.
+
+Exact task records: new `AMC_OS/RESEARCH/2026-09-09-public-task-transport/`
+`REVIEW_BLOCKERS.md`, `SCOPE.md`, `ownership.json`, `source-review.json`,
+`NEXT_ACTION.md`, `TRACKER_PENDING.md`, `disposition.json`, `process-closure.json`,
+and `obsidian-update.json`; private `tmp/cos-public-task-transport-01/` prefix
+for new pinned candidate checks. New vault note only:
+`Evidence/2026-09-09 Public Task Transport Browser.md`. Earlier denied operations,
+three uncommitted retained-output helper files and all unrelated dirt are excluded.
+Current findings: duplicate/unknown query parameters bypass strict selection on
+options/task/control routes; failed history refresh can retain a stale verifier
+label; JSONL cold observers advertise unsupported writer resume; browser pauses
+polling after errors without withholding stale actions and prior evidence labels.
+Existing historical browser/retry/archive/cancellation scopes stay preserved.
+
+Public-task-transport-browser-batch completed with scoped source candidate
+`d9693bc1b24a5cd17a78ca4b6873075decdb1802` and committed handoff
+`efd29a0d32c98fbdd18df6d02a7f32bc0c944ea4` in
+`AMC_OS/RESEARCH/2026-09-09-public-task-transport/NEXT_ACTION.md`.
+All source paths assigned above are released. No workers or owned runtime/check
+processes remain. The fresh source/HTTP/Chromium check passed 41 scoped tests;
+four changed guard removals failed targeted checks and restored checks passed.
+Final process observation is in `process-closure.json`, with no remaining
+observed owned identities and zero cleanup signals. No new installed package,
+full suite, release, human/provider, deployment or Done decision is asserted.
+Prior dirty manifest content remains unstaged, and all earlier blocked
+retained-output/erasure/helper paths remain excluded and unchanged.
+
+### Current ownership: native-jsonl-writer-resume-batch
+
+Owner `cos-native-jsonl-writer-resume-prime`, fresh CoS conversation; no recording
+history loaded, no worker started. Prime is the serial implementation/review/test
+executor; Codex has no execution ownership. Previous public-task ownership is
+released. Latest user model/role directions supersede old sections above.
+
+Exact initial writable source paths: `src/session/sessionResume.ts`,
+`src/session/sessionRecovery.ts`, `src/session/sessionOwnership.ts`,
+`src/session/sessionService.ts`, `src/agent/agentSession.ts`,
+`src/sdk/nativeAgentClient.ts`, `src/studio/nativeTaskService.ts`,
+`src/studio/nativeTaskProjection.ts`, `src/studio/nativeTaskTypes.ts`,
+`src/console/assets/nativeTasks.js`, `src/console/assets/nativeTasksView.js`,
+`docs/NATIVE_STUDIO_TASKS.md`, `docs/SESSION_EVENT_HISTORY.md`.
+Additional persistence/core/test paths will be declared by exact name before edits.
+All ledger/session/CLI/StudioServer/signed-config/package changes serialize here;
+no production signed config or package changes are currently authorized as needed.
+
+Exact metadata writes: this appended manifest section;
+`AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/execution-status.json`;
+new `AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/SCOPE.md`,
+`REVIEW_BLOCKERS.md`, `TRACKER_PENDING.md`, `source-review.json`,
+`NEXT_ACTION.md`, `disposition.json`, `process-closure.json`, `ownership.json`,
+`linear-sync.json`, `obsidian-update.json`, `run.py`, `installed-case.mjs`
+in that new research directory. New private scratch prefix only:
+`tmp/cos-native-jsonl-writer-resume-01/`. New vault evidence note only:
+`/amc/Evidence/2026-09-10 Native JSONL Writer Resume.md`.
+
+AMC-1541 live read succeeded and covers archival, not writer recovery. Existing
+resume coverage is being checked before any new issue proposal. No live tally or
+state transition claimed. Preserve every unrelated dirty file/worktree, external
+brief, architecture navigation, shared stash and all denied/pending prior bodies.
+No audit restart, historical validation-lane rerun, erasure, helper-repin staging,
+Loop/session_finish, Goal helper, publish/deploy or production-secret work.
+
+#### JSONL resume exact-path extension (before implementation)
+
+Existing live coverage is AMC-1511 under AMC-1505; initial progress comment
+`aadf417f-baba-44e4-94da-b05d0ee4c0c5` delivered, no state change or duplicate issue.
+Additional serial writable paths: `src/persistence/jsonl/jsonlWriterLock.ts`,
+`src/persistence/jsonl/jsonlEventLog.ts`,
+`src/persistence/jsonl/jsonlSessionEventStore.ts`,
+`src/persistence/sessionEventStore.ts`, `src/session/jsonlContinuation.ts`,
+`docs/SESSION_RESUME.md`, `docs/adr/007-native-jsonl-writer-recovery.md`,
+`tests/jsonlWriterResume.test.ts`, `tests/fixtures/jsonlWriterResumeWorker.ts`,
+`tests/nativeJsonlResumePublic.test.ts`.
+
+Coordination design: use AMC's already-shipped SQLite binding only for a dedicated
+kernel-released workspace mutex beside the JSONL files. That empty coordinator is
+not the operations ledger and provides no identity, history, accounting or write
+authority. JSONL remains the sole session evidence backend. Complete original
+JSONL verification and actual signed owner availability remain separate mandatory
+gates, repeated under the mutex before opening append descriptors. No new package
+dependency, DSH/pi runtime, evidence migration, or production configuration change.
+
+#### Public contract and affected-regression extension
+
+Additional exact writable paths before edits: `src/studio/nativeTaskOpenapi.ts`,
+`tests/jsonlSessionStore.test.ts`, `tests/studioNativeTaskService.test.ts`.
+Only directly superseded JSONL-refusal assertions may change in existing tests;
+old evidence and historical acceptance lanes are not rerun or rewritten.
+
+The subsequent central-status refresh was blocked before execution. Its old
+timestamp must not be presented as current. Exact refusal/body are preserved in
+this batch's `REVIEW_BLOCKERS.md`. No command, test, build, browser or worker is
+currently owned/running; implementation and source review continue serially.
+
+Additional exact superseded assertion paths: `tests/publicTaskTransport.test.ts`
+and `tests/e2e/public-task-transport-browser.mjs`. Only their former blanket JSONL
+unsupported assertions change to authenticated recovery/unchanged-prefix checks.
+The old pinned results and receipts remain unchanged and are not reused as new
+acceptance. New runtime public coverage lives in `tests/nativeJsonlResumePublic.test.ts`.
+
+#### Current candidate and finite shipping-boundary qualification
+
+CoS committed implementation `96accade0821eaf730d30218dfc5851b667f98f0`, then
+correction `b516869eeaa275fe31248024a02596d71255add0`. Fresh candidate02 installed
+and built, and its 23 new scoped core/SDK/ACP/HTTP/real-Chromium checks passed.
+This is not installed-package, broad-suite, release or provider/human qualification.
+Candidate01's four failures remain intact; the real dead-writer Studio shutdown
+defect was fixed rather than reclassified.
+
+Additional exact new writable helper:
+`AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/qualify.py`.
+The already-owned `installed-case.mjs` will use supported package root/native SDK
+exports and actual public HTTP only, not private source imports. New create-only
+consumer/artifact/negative receipts stay under the owned scratch prefix. Security
+mutations may modify only exact owned source files inside the already-fresh pinned
+candidate02 clone, restoring identical original bytes after each attempt. No
+historical erasure consumer, prior helper repin, shared source mutation or release
+script is part of this boundary. Packing with ignored scripts is artifact creation,
+not prepack/release qualification.
+
+#### Native JSONL resume batch — ownership release
+
+Runtime source `b516869eeaa275fe31248024a02596d71255add0` is qualified only for
+the new scoped source/browser and installed SDK/ACP/admin-HTTP boundaries recorded
+in `AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/NEXT_ACTION.md`.
+Four changed guards were detected and restored; earlier failures remain retained.
+The latest live Linear comment is `07dba626-264f-4a7c-9739-14868149fd42` on AMC-1511.
+Only the new vault evidence note was created/appended. No issue was closed.
+
+All declared source, docs, tests, scratch, new research and new vault-note paths
+are released by `cos-native-jsonl-writer-resume-prime` after the final exact-path
+handoff commit. There are no active runtime/test/browser processes or workers;
+closure receipt confirms40 command groups,31 observed writer PIDs and six ports.
+The final metadata commit itself is a finite foreground CoS operation, not a new
+runtime/test owner. No automatic continuation, Goal, Loop or session_finish starts.
+
+Both later central-status proposals were refused. Their exact bodies remain in
+this batch's `REVIEW_BLOCKERS.md`; central's older timestamp must not be presented
+as current. This release and the new independent `ownership.json` are current.
+No denied metadata request is being rerouted, split or replayed. Old manifest
+history remains unstaged; no other owner's paths, helper-repin files, stash,
+external brief, architecture navigation or unrelated worktree is changed by release.
+
+## 2026-09-10 — amc-1512-evidence-protocols-2026-09-10
+
+The current CoS assistant owns only the new documentation/protocol/receipt paths
+and exact task-keyed append regions declared in
+`AMC_OS/RESEARCH/2026-09-10-amc-1512-evidence-protocols/SCOPE.md`.
+Root branch observed by file read: `amc/gap-register-execution`; observed ref
+`4d2d69e5d4d01bfd1f82662ceff0305b5c2885b5`. No clean-tree/index claim.
+No new worktree or runtime source ownership. Existing human-study tools stay
+unchanged. The separate `2026-09-10-amc-1512-protocol-readiness` owner and all of
+its artifact paths remain untouched; shared-document edits are independent,
+contextual, task-keyed appends, not replacement of its regions.
+No tests/checks/builds/imports/fixtures/acceptance/provider/human execution,
+Git mutation, worker, model change or central-vault rewrite is authorized.
+Task-local ownership.json records this task's active/released disposition.
+
+Terminal release for `amc-1512-evidence-protocols-2026-09-10`: public protocol
+docs/forms and task-local receipts were authored and read back; canonical log,
+role appends and the dedicated vault note were delivered and read back. Linear
+comment `cfb6bd41-92c6-427f-b3e7-fdb905c350e8` was created once and read back.
+Owner, activeOwnedExecution and remainingOwnedOperation are null in this task's
+ownership.json; no worker/runtime process/successor was started. This releases
+only this task's declared regions, not the independent protocol-readiness task,
+other sessions or uncommitted work. No qualification, Git mutation or issue Done.
+
+## 2026-09-10 — amc-1512-operator-completion-398da2c9
+
+Independent additive scope:
+`AMC_OS/RESEARCH/2026-09-10-amc-1512-operator-completion-398da2c9/SCOPE.md`.
+Scope/ownership were written before this completion's substantive writes.
+Owned paths are that file's enumerated new artifacts, this labelled manifest
+section, independent execution-log and REV_TECH_LEAD/INNO_EVAL_BENCHMARKER
+additions, and the dedicated Operator Completion 398da2c9 vault note.
+No existing protocol packet, runtime source, script, test, worktree, index or
+stash is claimed. Final release is in this completion's ownership.json.
+No worker, runtime operation, model switch or automatic continuation.
+
+Terminal release for `amc-1512-operator-completion-398da2c9`: substantive
+artifacts, receipts, canonical role/log additions and dedicated vault note were
+acknowledged. Linear comment f90c3ee4-2d81-47d1-8270-b53141fbcf4a was delivered.
+This completion's ownership.json releases only its declared artifact regions;
+owner/activeOwnedExecution/remainingOwnedOperation=null. No source, script,
+test, other worktree, previous packet or other-session ownership is changed.
+
+## 2026-09-10 — amc-1512-credential-transition-contract-2026-09-10
+
+Sole CoS authoring scope opened 2026-09-10T17:42:12Z, before source changes.
+Exact paths/regions: AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/SCOPE.md.
+Three existing human first-use scripts, one new regression source, additive
+documentation, this task's receipts/log/role/vault records. Legacy journal bytes,
+previous packets, all other dirty work, worktrees, index and stashes are unowned
+and preserved. No execution, workers or successor. Terminal release will be
+recorded in this task's ownership.json; no previous owner's record is replaced.
+
+### 2026-09-10 — credential-transition handoff recovery
+
+Recovery key: `amc-1512-credential-transition-handoff-recovery-2026-09-10`.
+The predecessor's SCOPE.md and ownership.json remain unchanged. Its generic
+AUTHORING_ACTIVE_EXECUTION_HELD label is an unattributed prior record, not proof
+of an active operation; no source ownership is claimed by this recovery.
+Current scripts are partially authored; the named credential regression and
+contract guide are absent. No previous source edits are replayed or overwritten.
+
+Recovery write regions only: new receipt/handoff/source-observation/reconciliation/
+delivery files in `AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/`;
+this section; the recovery's execution-log append; REV_TECH_LEAD and REV_QA_LEAD
+inbox appends; new INNO_USER_RESEARCH_PLANNER inbox and implementation-specialist
+log; dedicated Credential Transition Contract vault note; labelled forward
+reference in the existing Operator Completion 398da2c9 evidence note.
+Tracker delivery is a new deduplicated progress comment, not an issue-state change.
+
+`recovery-ownership.json` is this recovery's terminal record: owner,
+activeOwnedExecution and remainingOwnedOperation are null, workers empty and no
+hidden successor. This releases only recovery record regions and changes no
+other owner's files or claims. No source/test/Git/worktree mutation or validation.
+
+### 2026-09-10 — amc-1512-credential-regressions-and-guide-2026-09-10
+
+The user authorizes the next safe action after the recovered handoff: new
+`tests/humanFirstUseCredentials.test.ts`, new credential contract guide and
+version-labelled addenda, plus this task's records. Exact scope:
+`AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/authoring-completion/SCOPE.md`.
+The current three scripts and existing tests are read-only; no earlier source
+mutation is replayed. Predecessor active-authoring and terminal-recovery records
+remain historical, unchanged. All other worktrees/uncommitted work are preserved.
+Sole CoS executor, requested GPT-6 Pro, no workers or fallback. All tests, checks,
+builds, imports, fixtures, acceptance, providers and human sessions remain held.
+Terminal ownership will be recorded in this continuation's own ownership.json.
+
+Terminal release for `amc-1512-credential-regressions-and-guide-2026-09-10`:
+new test/guide, four guide addenda, receipt/canonical role records and local vault
+continuation are acknowledged and text-read back. LINEAR-PENDING is explicit;
+no tracker state change or remote delivery is claimed. This continuation's
+ownership.json sets owner/activeOwnedExecution/remainingOwnedOperation=null,
+workers=[] and hiddenSuccessor=false. Existing scripts, legacy tests, predecessor
+ownership records, other uncommitted work and every worktree remain unmodified
+by this task. No tests/checks/imports/fixtures/acceptance/providers/humans ran.
+
+### 2026-09-10 — amc-1512-credential-authoring-recovery-2026-09-10
+
+Sole current CoS author; explicit scope:
+`AMC_OS/RESEARCH/2026-09-10-amc-1512-credential-transition-contract/authoring-completion/stall-recovery/SCOPE.md`.
+Preserved late-present predecessor regression, guide, addenda and terminal
+ownership. Own only recovery additions to the named test and documentation-record
+surfaces in that scope and task-labelled canonical/vault appends; no runtime
+script, legacy test, worktree, Git/index/stash or other session mutation.
+Current task permits terminal text authoring; all execution qualification remains
+held. Actual recovery ownership/closure is in the new stall-recovery/ownership.json,
+not a rewritten predecessor owner. Requested GPT-6 Pro; no independent attestation.
+
+Terminal release for `amc-1512-credential-authoring-recovery-2026-09-10`:
+own scoped authoring delivered, owner null, no owned operation or worker remains.
+Actual closure and tracker readback: stall-recovery/ownership.json,
+process-closure.json and linear-sync.json under the scope path above. This releases
+only this recovery, not any predecessor or other session/worktree; execution held.
+
+## 2026-09-11 — amc-1512-credential-contract-finalization-2026-09-11
+
+Sole CoS continuation, source authoring only. Exact contextual regions declared
+before substantive writes in
+`AMC_OS/RESEARCH/2026-09-11-amc-1512-credential-contract-finalization/SCOPE.md`.
+One capture applyRevision correction-floor region, a new independent synthetic
+regression file, additive version-labelled guide notes, this task's receipt/log/
+role regions and new dated vault note. The existing credential implementation,
+regression file, historical guides/receipts and stale original owner metadata are
+preserved; no whole-file ownership or prior authorship is claimed. All changes
+are serial. No worker/worktree operation, Git/index/stash mutation, validation,
+provider or human execution. Terminal release belongs only to this continuation.
+
+Terminal release — amc-1512-credential-contract-finalization-2026-09-11:
+source correction, new regression, guide addenda and local receipt/role/vault
+records are authored. Exact delivery/readback authority is record-sync.json in
+this task's evidence directory. Own owner/activeOwnedExecution/remainingOperation
+are null, workers=[], hiddenSuccessor=false. No prior owner is rewritten or
+released by this declaration. Linear remains explicitly pending, state unchanged;
+all execution, qualification, seven-Done and external gates remain held.
+
+## 2026-09-11 — amc-1512-evidence-transfer-v2-2026-09-11
+
+Sole CoS protocol-authoring scope declared before substantive writes:
+`AMC_OS/RESEARCH/2026-09-11-amc-1512-evidence-transfer-v2/SCOPE.md`.
+Own only that new packet, task-labelled public provider/human-guide addenda,
+canonical log/manifest/tech-lead/research-planner additions and new dedicated
+Evidence/2026-09-11 AMC-1512 Evidence Transfer v2.md note. No source/test schema,
+legacy transfer packet, prior receipt/owner, other worktree or dirty work is
+claimed or rewritten. Exact-context overlaps are serialized. No Git, checks,
+imports, fixtures, provider/human execution, worker or successor. Release is
+recorded only in this new task's ownership.json and later terminal entry.
+
+Terminal release — amc-1512-evidence-transfer-v2-2026-09-11:
+the separate mapping/protocol/blank-sidecar authoring, scoped public-guide addenda
+and local receipt/role/vault records are authored. Own owner/activeOwnedExecution/
+remainingOperation=null; workers=[]; hiddenSuccessor=false in this task's
+ownership.json/process-closure.json. Final delivery/readback: record-sync.json.
+No previous owner record is changed or released. LINEAR-PENDING is independent
+and explicit, no state change or remote ID. No source/test schema edit, execution,
+qualification, worktree/index/stash mutation or automatic continuation.
+
+## 2026-09-11 — amc-1512-model-revision-reconciliation-2026-09-11
+
+Sole CoS source-read-only reconciliation. Exact document/standalone regression
+authoring scope: AMC_OS/RESEARCH/2026-09-11-amc-1512-model-revision-reconciliation/SCOPE.md.
+Own that new packet and task-labelled log/manifest/tech-lead/research-planner
+additions plus one new dated vault evidence note. No runtime source, collector
+schema, existing test, prior packet, prior ownership or worktree is claimed.
+Regression source is an unexecuted task-local authoring artifact, not installed
+in the test suite. Proposed schema is documentation only. No execution or worker.
+The task-local ownership.json will release only these exact regions at closure.
+
+Terminal release — amc-1512-model-revision-reconciliation-2026-09-11:
+read-only source findings/proposal/standalone unexecuted regression and local
+receipt/handoff/vault records are authored. Source/schema/existing tests and
+previous owners/packets stay unchanged. Owner/activeOwnedExecution/remainingOperation
+are null; workers=[]; hiddenSuccessor=false only for this task. Actual local
+delivery/readback: record-sync.json. Linear remains independent LINEAR-PENDING,
+state unchanged. No execution, worker, source qualification or Phase A completion.
+
+## 2026-09-11 — phase-a-step1-queue-reconciliation-2026-09-11
+
+Sole CoS read-only source/receipt reconciliation. Exact new record paths and
+task-labelled shared log/manifest/role additions are declared in
+AMC_OS/RESEARCH/2026-09-11-phase-a-queue-reconciliation/SCOPE.md.
+No source/test/worktree or prior ownership is claimed. Use the completed audit
+refresh as dated baseline, not another audit. Linear currently unavailable;
+preserve archived-versus-live distinctions and refusal-equivalent boundaries.
+Own only the reconciliation records and new dedicated vault note. No execution,
+Git mutation, worker, source implementation or automatic successor. Final release
+will be recorded only in this task's ownership.json/process-closure.json.
+
+## 2026-09-11 — phase-a-step1-absolute-path-closure-2026-09-11
+
+Scope is record-only terminal delivery to the exact requested
+AMC_OS/RESEARCH/2026-09-10-phase-a-step1-reconciliation/ directory:
+repository-observations.json, queue-reconciliation.json, README.md,
+LINEAR-PENDING.json, DELIVERY.json, ROLE_HANDOFF.md, process-closure.json,
+ownership.json. The existing SCOPE.md and REVIEW_BLOCKERS.md are unchanged.
+Additional writes are this append, the labelled execution-log append, new
+AMC_OS/INBOX/REV_PROGRAM_MANAGER.md and the absent scoped vault note
+Evidence/2026-09-10 Phase A Queue Reconciliation.md. No whole-file ownership of
+shared logs, source, prior packets or other worktrees is claimed.
+
+Terminal ownership release applies only to this closure. owner,
+activeOwnedExecution and remainingOperation are null; workers=[];
+hiddenSuccessor=false. The separate September 11 reconciliation ownership label
+is preserved and is not released or treated as proof of an active process.
+No runtime, worker, Git mutation, test/check/build/import, source change or
+successor is started. Local delivery is not completed live reconciliation.
+
+## 2026-09-11 — amc-1512-credential-review-binding-2026-09-11
+
+Sole CoS artifact-authoring scope, declared before substantive writes:
+`AMC_OS/RESEARCH/2026-09-10-amc-1512-operator-completion-398da2c9/credential-review-binding-v1/SCOPE.md`.
+The already-authored separate transfer/2 packet is reused, not duplicated or
+relabelled. Own only this new binding-profile directory, task-keyed canonical
+log/manifest/tech/QA/research-planner/activity additions, and the new dedicated
+Credential Review Binding evidence note. All pre-existing legacy/transfer/2
+files, source/tests, earlier owner/pending records, other dirty work and worktrees
+remain unowned and untouched. No execution, worker, Git or credential operation.
+Terminal release will name only this profile's regions in its ownership.json.
+
+Terminal release — amc-1512-credential-review-binding-2026-09-11:
+new profile artifacts, canonical role/log additions and dedicated local vault
+note were acknowledged and text-read back. The task's ownership.json now records
+owner/activeOwnedExecution/remainingOwnedOperation=null, workers=[] and no hidden
+successor. Only its declared new artifact/labelled shared-document regions are
+released. Existing legacy/v2 packets, original owner/pending records, runtime
+source, tests, other dirty work and worktrees were not written. LINEAR-PENDING
+is explicit; no remote state/delivery or executable qualification is claimed.
+
+## 2026-09-11 — amc-1512-model-revision-implementation-2026-09-11
+
+Sole CoS contextual source authoring, exact scope declared before source edits:
+`AMC_OS/RESEARCH/2026-09-11-amc-1512-model-revision-implementation/SCOPE.md`.
+Three human first-use scripts, new actual-path regression/guide, labelled guide
+pointers and this task's receipt/log/role/vault records only. Prior source and
+tests/packets/owners/dirty work/worktrees remain preserved outside named regions.
+No execution, Git/index/stash/worktree operation or worker. Terminal release
+belongs only to this task's ownership.json; prior owners are not rewritten.
+
+Terminal release — amc-1512-model-revision-implementation-2026-09-11:
+scoped source/regression/guide authoring and local canonical/vault records are
+acknowledged and text-read back. Own owner/activeOwnedExecution/remainingOwnedOperation
+are null, workers=[] and hiddenSuccessor=false. Exact delivery: this task's DELIVERY.md.
+Existing tests, prior packets/ownership, unrelated dirty work, index/stash and other
+worktrees remain untouched. LINEAR-PENDING is explicit; no current state/delivery
+or executable qualification is claimed. No runtime operation or successor remains.
+
+## 2026-09-11 — amc-1512-model-revision-mapping-2026-09-11
+
+Sole CoS document-authoring scope declared before substantive writes:
+`AMC_OS/RESEARCH/2026-09-11-amc-1512-model-revision-mapping/SCOPE.md`.
+Own only the named new mapping/review addenda, append-only packet reading pointers,
+this task's receipt/log/role regions and new dedicated vault note. No source,
+test, template, prior owner or worktree is claimed. All execution holds persist;
+terminal release applies only to this task and launches no successor.
+
+Terminal release — amc-1512-model-revision-mapping-2026-09-11:
+only this task's new addenda/receipt/note and labelled shared-document regions are
+released. owner/activeOwnedExecution/remainingOwnedOperation=null, workers=[],
+hiddenSuccessor=false. Actual delivery: this task's DELIVERY.md. Earlier packet
+owners and the separate queue-reconciliation ACTIVE label remain unchanged.
+No source/test/template/Git/index/stash/worktree operation or execution occurred;
+LINEAR-PENDING and all qualification gates remain explicit.
+
+## 2026-09-11 — phase-a-queue-handoff-recovery-2026-09-11
+
+Current explicit user authority: bounded recovery of the missing September 11
+queue handoff, sole CoS. Exact scope is
+AMC_OS/RESEARCH/2026-09-11-phase-a-queue-reconciliation/handoff-recovery-2026-09-11/SCOPE.md.
+Own only the missing parent ROLE_HANDOFF.md/remaining-work.json slots, new child
+recovery records and task-labelled log/role/vault sections. The original parent
+ownership.json remains preserved, not silently released. Session history records
+an interrupted queue turn followed by a different-directory terminal closure;
+its active metadata is not an observed running process. No prior source/worktree
+ownership, shared stash, index, runtime operation, worker or other gap is claimed.
+All execution holds persist. Final release belongs only to the new child scope.
+
+Terminal release — phase-a-queue-handoff-recovery-2026-09-11:
+new parent handoff/index and scoped local recovery/log/role/vault records were
+acknowledged and read back. This child scope's owner, activeOwnedExecution,
+remainingOperation and remainingOwnedOperation are null; no worker/successor.
+Original parent ownership.json is unchanged; stopped-turn/active-label evidence
+is reconciled in the child RECONCILIATION.md, not promoted to runtime liveness.
+No other owner, source region, worktree, index or shared stash was taken over.
+Delivery is the child DELIVERY.md. Current queue truth remains unresolved;
+LINEAR-PENDING and every execution/refusal boundary persist.
+
+## 2026-09-11 — amc-1512-current-applicability-reconciliation-2026-09-11
+
+Sole CoS read-only source/protocol applicability reconciliation. Exact scope:
+AMC_OS/RESEARCH/2026-09-11-amc-1512-current-applicability-reconciliation/SCOPE.md.
+Own only new reconciliation records/note and task-labelled log/role sections.
+No source/test/protocol/template/previous-owner/worktree ownership is claimed.
+The recovered queue handoff is preserved, not recreated. No worker, runtime or
+different implementation gap is started; all execution and refusal holds remain.
+
+Terminal release — amc-1512-current-applicability-reconciliation-2026-09-11:
+own reconciliation/receipt/log/role/note regions are delivered and text-read back.
+Owner/activeOwnedExecution/remaining operations are null in this task's terminal
+records. No source/test/protocol/template/previous-owner/worktree/index/stash
+region was taken over or changed. Source-only phase-order finding is recorded,
+not implemented. LINEAR-PENDING and all execution/refusal/qualification holds
+persist; no different gap, runtime, worker or successor is launched.
+
+## 2026-09-11 — amc-1512-phase-order-action-selection-2026-09-11
+
+Sole CoS bounded next-action selection, not corrective implementation. Exact scope:
+AMC_OS/RESEARCH/2026-09-11-amc-1512-current-applicability-reconciliation/queue-action-selection/SCOPE.md.
+Own only the child decision/receipt records and task-labelled log/inbox/vault
+additions. Parent applicability ownership is terminal/null and is preserved.
+No source/test/protocol/template/other-owner/worktree/index/stash region is taken.
+All execution and inherited refusal holds persist. Final release is task-local.
+
+Terminal release — amc-1512-phase-order-action-selection-2026-09-11:
+scoped decision/receipt/role/log/vault records are delivered and text-read back;
+final boundary is queue-action-selection/DELIVERY.md beneath the applicability
+packet. Own owner/activeOwnedExecution/remaining operations are null, workers=[],
+hiddenSuccessor=false. Parent and earlier owners are preserved. No source/test,
+other-worktree, index or stash ownership was acquired; no runtime or different
+gap started. Same-issue correction is selected, not implemented or qualified.
+
+## 2026-09-11 — amc-1512-phase-order-implementation-2026-09-11
+
+Sole CoS implementation of the selected same-issue direct-intake phase-order gap.
+Exact contextual scope: AMC_OS/RESEARCH/2026-09-11-amc-1512-phase-order-implementation/SCOPE.md.
+Own only private timestamp/measurement admission regions in the intake script,
+new tests/humanFirstUsePhaseOrder.test.ts, a dated study-guide addendum and own
+receipt/log/role/note regions. Selected predecessor and model-revision source
+ownership are terminal/null; do not rewrite them. Capture, existing tests, schemas,
+old observations/reports, unrelated worktrees and shared stash remain untouched.
+Execution stays held; no global audit, Git operation, worker or different gap.
+
+Terminal release — amc-1512-phase-order-implementation-2026-09-11:
+only scoped intake helper/measurement regions, new phase-order regression, appended
+guide and this task's receipt/role/log/note regions are released. CoS acknowledged
+and text-read the source/regression/guide and canonical records. Exact delivery:
+AMC_OS/RESEARCH/2026-09-11-amc-1512-phase-order-implementation/DELIVERY.md.
+Own owner/activeOwnedExecution/remainingOperation/remainingOwnedOperation=null;
+workers=[], hiddenSuccessor=false. Prior owners/worktrees/shared stash remain
+untouched. No executable qualification, current HEAD proof or whole-goal completion.
+
+## 2026-09-11 — phase-a-batch-01-2026-09-11
+
+Current user explicitly authorizes bounded CoS concurrency, maximum five active
+tasks, GPT-6 Pro only, no validation/provider/human execution. Exact batch scope:
+AMC_OS/RESEARCH/2026-09-11-phase-a-batches/batch-01/SCOPE.md.
+T01 owns only scripts/qualify-platform.mjs, tests/platformQualificationOutputOwnership.test.ts,
+docs/PLATFORM_QUALIFICATION.md plus its exact task-local receipt/note claims.
+T02 owns only src/benchmarks/harnessComparison.ts, tests/harnessComparisonOutputOwnership.test.ts,
+docs/HARNESS_COMPARISON.md plus its exact task-local receipt/note claims.
+T03 owns only its task-local read-only-applicability records/note, no source/tests.
+Their ownership.json files enumerate every receipt basename and unique note path.
+The prime alone writes canonical logs/inboxes/this manifest and batch records;
+workers never append shared files. Dispatch is not yet acknowledged. Source-based
+eligibility is two corrective tasks plus one prerequisite, not five invented gaps.
+All prior owners/evidence, worktrees/uncommitted files/shared stash and holds stay.
+
+### Batch 01 direct-write recovery — September 11, 2026
+
+Latest user instruction assigns implementation directly to the current CoS prime,
+without further worker-status calls. T01 is active as current-CoS-prime-T01; T02
+remains reserved until T01 authoring ends. Exact disjoint source/test/doc claims
+and task-local receipt/note paths above are unchanged. No worker launch was
+acknowledged; no parallel-execution result is claimed. Maximum owned active
+implementation tasks is one in this direct serial recovery, below the cap of five.
+All canonical logs/inboxes remain single-writer. No prior owner is released.
+
+T01 source and regression authoring is now released in its task-local ownership;
+T02 follows as current-CoS-prime-T02 on its disjoint existing claims. The direct
+recovery performs one implementation action at a time; no worker launch is
+acknowledged, and no third source task or write claim has been added.
+
+Batch01 terminal source release: T01 and T02 have null owners and remaining
+operations in their individual packets. The T03 reservation is released unstarted;
+it had no source claims and no worker acknowledgement. No predecessor ownership,
+other worktree, index or stash ownership is changed. Direct authoring was serial.
+Final batch receipt and ROLE_HANDOFF retain the next read-only prerequisite;
+no hidden successor, additional implementation or validation is scheduled.
+
+Final batch-01 receipt and terminal process/ownership records now release only
+this batch's direct contextual claims. Both task packets and canonical sections
+were text-read back; final closure is batch-01/DELIVERY.md. Own batch owner,
+activeOwnedExecution and remaining operations are null. No earlier owner or
+worktree/stash is released or changed, and no background continuation is retained.
+
+## 2026-09-11 — Phase A batch 02 exact implementation claims
+
+Current CoS prime coordinates AMC-1538 under the latest up-to-five-task instruction.
+Batch01 ownership is terminal/null and is not rewritten. Fresh scoped source reads
+support the prepared config-ambiguity and strict plan-admission actions.
+Exact scope: AMC_OS/RESEARCH/2026-09-11-phase-a-batches/batch-02/SCOPE.md.
+T01 exclusively claims src/setup/nativeValidationConfig.ts and new
+tests/nativeValidationConfigAmbiguity.test.ts, its listed task records and unique
+Validation Config Ambiguity note. T02 exclusively claims only
+src/agent/nativeValidation.ts:freezeNativeValidationPlan and new
+tests/nativeValidationPlanAdmission.test.ts, its own records and unique Plan Admission
+note. All shared log/inbox writes are prime-only. No third source action is selected.
+Claims are prepared, not worker-launch or implementation acknowledgements. All
+runtime/test/provider/human, protected-source, worktree/stash and evidence holds stay.
+
+Batch02 direct assignment and terminal release: worker status returned
+WORKER_IDENTITY_LOST and the explicit T01/T02 dispatch was safety-blocked.
+The refusal is preserved without retry/reroute in batch-02/DISPATCH.json; no
+worker launch is acknowledged. Previously authorized direct CoS authoring wrote
+both exact source/regression claims synchronously, with distinct task metadata.
+T01 source110/test161 and T02 source160/test172 lines were read fully, followed
+by both task record packets and unique notes. These are file-text observations.
+The prime serially delivered canonical logs and role sections; no shared worker
+claims or source-path collisions were introduced. Own T01/T02 and batch owner,
+activeOwnedExecution and remaining operations are null at terminal closure.
+No earlier owner, worktree, index, shared stash or unrelated file was changed.
+No runtime/qualification, safety-refusal removal or automatic next batch is claimed.
+
+## 2026-09-11 — Native product batch: ten independently dispatched CoS lanes
+
+Latest Sid assignment supersedes bookkeeping-only queues. Each lane uses UI 6 Pro,
+owns only the paths below, and spawns no workers or successors. P01 alone integrates
+CLI/package and maintains this shared manifest. Authoring is not validation; no
+tests/checks/builds/fixtures/provider/human sessions are authorized at this boundary.
+
+| Lane | Exclusive product scope (repository-relative) | New regression scope |
+| --- | --- | --- |
+| P01 (this session) | `src/cli.ts`; `src/setup/nativeInteractiveSession.ts`; `src/setup/nativeInteractiveApprovals.ts`; `src/setup/nativeChatResult.ts`; `src/agent/agentSession.ts`; `src/agent/nativeRunUsage.ts`; `package.json`; `pnpm-lock.yaml`; `plans/ownership-manifest.md` | `tests/cosProduct01*.test.ts` |
+| P02 | `src/terminal/**`; `src/kernel/services/terminalServices.ts` | `tests/cosProduct02*.test.ts` |
+| P03 | `src/mcp/nativeMcpClient.ts`; `src/mcp/nativeMcpHttpTransport.ts`; new `src/mcp/nativeMcpReconnect*.ts` | `tests/cosProduct03*.test.ts` |
+| P04 | `src/extensions/**`; `src/plugins/**` | `tests/cosProduct04*.test.ts` |
+| P05 | `src/llm/**`; `src/attachments/**`; `src/agent/nativeAudioMessage.ts`; `src/agent/nativeImageMessage.ts`; `src/agent/nativeOrderedMessage.ts` | `tests/cosProduct05*.test.ts` |
+| P06 | `sdk/python/**` | `tests/cosProduct06*.test.ts` |
+| P07 | `src/sdk/nativeAgentClient.ts`; `src/sdk/amcAgent.ts` | `tests/cosProduct07*.test.ts` |
+| P08 | `src/acp/**` | `tests/cosProduct08*.test.ts` |
+| P09 | `src/console/assets/nativeTasks.js`; `src/console/assets/nativeTasksView.js`; `src/console/assets/nativeTaskSubmission.js`; `src/console/assets/nativeTasks.css`; `src/console/pages/native-tasks.html` | `tests/cosProduct09*.test.ts` |
+| P10 | `src/studio/nativeTask*.ts`; `src/studio/nativeAdmission.ts`; `src/api/nativeTasksRouter.ts` | `tests/cosProduct10*.test.ts` |
+
+Other lanes are assigned, not attested as started or delivered by this table. Preserve
+all prior edits, worktrees, evidence and stash `152a61696f336f658893a72aa9357d58df8c5679`.
+No ownership of another lane's source, shared tests or existing docs is granted.
+
+## 2026-09-12 — Claude Code (Fable 5.1) integration session claims root lane authoring
+
+Standing order: `plans/2026-09-09-amc-execution-brief.md` plus Sid's 2026-09-12 `/goal`
+directive to integrate the authored P01–P10 lane source into AMC. Audit refresh:
+`AMC_OS/RESEARCH/2026-09-09-worktree-audit/refresh-2026-09-12T131601Z/`. Lane sessions
+above are dormant by file activity (newest dirty-path mtime 2026-09-11 14:38 local); they
+are not proven closed, so this claim is recorded here and in the execution log as the
+coordination channel.
+
+| Worker | Worktree / branch | Linear | Exact writable paths | State |
+|---|---|---|---|---|
+| Claude Code Fable 5.1 (this session) | `/Users/sid/AgentMaturityCompass` / `amc/gap-register-execution` | AMC-1505 and the lane issues it names per task | Every currently dirty root path listed in `refresh-2026-09-12T131601Z/root-status.txt` (all P01–P10, AMC-1512, batch-01/02 and cross-lane paths), plus `plans/amc-dsh-pi-execution-2026-09-08.md`, `plans/ownership-manifest.md`, `plans/2026-09-09-amc-execution-brief.md` (fact corrections only), new `AMC_OS/RESEARCH/2026-09-12-*/` receipts, and new `tests/*.test.ts` it authors | Active: integration of dormant lane authoring; serial in root; no worktree, stash or other-session file touched |
+
+Serial-only surfaces (`src/cli.ts`, `src/studio/studioServer.ts`, ledger/session spine,
+signed configs, `package.json`) are edited only in root by this session, one change at a
+time. All other worktrees, their branches and the shared stash remain untouched.

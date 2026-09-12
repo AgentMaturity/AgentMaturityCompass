@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:28:29
+   Duration  3.04s (transform 1.38s, setup 0ms, import 1.88s, tests 1.06s, environment 0ms)
+

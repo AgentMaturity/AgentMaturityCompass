@@ -1,0 +1,104 @@
+src/llm/adapter/streamRecorder.ts(322,74): error TS2366: Function lacks ending return statement and return type does not include 'undefined'.
+src/llm/blockAssembler.ts(381,26): error TS2345: Argument of type '"audio"' is not assignable to parameter of type 'never'.
+src/llm/blockAssembler.ts(417,26): error TS2345: Argument of type '"audio"' is not assignable to parameter of type 'never'.
+src/llm/streamChunk.ts(142,3): error TS2344: Type 'false' does not satisfy the constraint 'true'.
+src/llm/streamChunk.ts(150,44): error TS2339: Property 'audio' does not exist on type 'ContentBlockMap'.
+src/sdk/nativeAgentClient.ts(50,41): error TS18047: 'value' is possibly 'null'.
+src/sdk/nativeAgentClient.ts(50,41): error TS2365: Operator '<' cannot be applied to types '{}' and 'number'.
+src/sdk/nativeAgentClient.ts(50,54): error TS18047: 'value' is possibly 'null'.
+src/sdk/nativeAgentClient.ts(50,54): error TS2365: Operator '>' cannot be applied to types '{}' and 'number'.
+src/sdk/nativeAgentClient.ts(54,3): error TS2322: Type 'Readonly<{ maxEvents: {} | null; maxBytes: {} | null; }>' is not assignable to type 'Required<AMCNativeEventBufferOptions>'.
+  Types of property 'maxEvents' are incompatible.
+    Type '{} | null' is not assignable to type 'number'.
+      Type 'null' is not assignable to type 'number'.
+src/studio/nativeTaskService.ts(355,15): error TS2322: Type '{ maxSteps: number; maxTokens: number; createdAt: number; updatedAt: number; revision: number; pendingTurn: true; closed: false; submissions: { clientRequestId: string; bodyHash: string; revision: number; }[]; ... 10 more ...; toolsDigest: string | null; }' is not assignable to type '{ kind: "amc/studio-native-task/v1"; taskId: string; principalId: string; agentId: string; demo: boolean; sessionId: string | null; provider: "gemini" | "openai" | "anthropic" | "openai-responses" | "stub" | "gemini-audio"; ... 12 more ...; archivedAt?: number | undefined; }'.
+  Types of property 'validation' are incompatible.
+    Type 'NativeTaskValidationSelection | undefined' is not assignable to type '{ configSha256: string; checkIds: string[]; } | undefined'.
+      Type 'NativeTaskValidationSelection' is not assignable to type '{ configSha256: string; checkIds: string[]; }'.
+        Types of property 'checkIds' are incompatible.
+          The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+tests/cosBatch1OllamaUsage.test.ts(77,92): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/cosProduct02NativePty.test.ts(30,40): error TS2322: Type 'Mock<Procedure | Constructable>' is not assignable to type '() => void'.
+  Type 'MockInstance<Procedure | Constructable> & (new (...args: any[]) => any) & {}' is not assignable to type '() => void'.
+    Type 'MockInstance<Procedure | Constructable> & (new (...args: any[]) => any) & {}' provides no match for the signature '(): void'.
+tests/cosProduct05OllamaRuntime.test.ts(84,129): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/cosProduct09StudioPage.test.ts(181,43): error TS7006: Parameter 'provider' implicitly has an 'any' type.
+tests/cosProduct09StudioState.test.ts(57,66): error TS2322: Type '{ name: string; text: string; bytes: number; }[]' is not assignable to type 'never[]'.
+  Type '{ name: string; text: string; bytes: number; }' is not assignable to type 'never'.
+tests/cosProduct09StudioState.test.ts(135,63): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(140,94): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(148,45): error TS2322: Type 'Readonly<{ name: any; bytes: number; data: string; type: string; mimeType: string; }>' is not assignable to type 'never'.
+tests/cosProduct09StudioState.test.ts(148,52): error TS2322: Type 'Readonly<{ name: any; bytes: number; data: string; type: string; mimeType: string; }>' is not assignable to type 'never'.
+tests/cosProduct09StudioState.test.ts(150,41): error TS7006: Parameter 'part' implicitly has an 'any' type.
+tests/cosProduct09StudioState.test.ts(157,64): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(158,74): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(160,65): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(168,82): error TS2345: Argument of type 'NativeTaskInputCapabilities' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(180,67): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(183,58): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(184,64): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(185,64): error TS2345: Argument of type '{ formats: string[]; imageMimeTypes: string[]; audioMimeTypes: string[]; maxParts: number; maxImages: number; maxAudios: number; maxTextBytes: number; maxSerializedPartsBytes: number; maxPromptFrameBytes: number; modelSupport: string; }' is not assignable to parameter of type 'null | undefined'.
+tests/cosProduct09StudioState.test.ts(208,30): error TS7006: Parameter 'row' implicitly has an 'any' type.
+tests/deepseekNativeIntegration.test.ts(99,71): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/doctorNativeModuleProbe.test.ts(49,37): error TS2345: Argument of type '() => typeof Database' is not assignable to parameter of type '() => DoctorSqliteConstructor'.
+  Call signature return types 'typeof Database' and 'DoctorSqliteConstructor' are incompatible.
+    Construct signature return types 'Database' and 'DoctorSqliteDatabase' are incompatible.
+      The types returned by 'prepare(...)' are incompatible between these types.
+        Type 'void' is not assignable to type '{ get(): unknown; }'.
+tests/fixtures/jsonlWriterResumeWorker.ts(33,36): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+tests/fixtures/nativeSignedAudio.ts(97,92): error TS2322: Type 'SessionEventRef' is not assignable to type 'void | Promise<void>'.
+tests/humanFirstUseCredentials.test.ts(666,89): error TS2339: Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; }'.
+  Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; }'.
+tests/humanFirstUseCredentials.test.ts(711,31): error TS2339: Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; }'.
+  Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; }'.
+tests/humanFirstUseModelRevision.test.ts(175,12): error TS18047: 'projected.measurements' is possibly 'null'.
+tests/humanFirstUseModelRevision.test.ts(175,35): error TS2339: Property 'outcome' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; }'.
+  Property 'outcome' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; }'.
+tests/humanFirstUseModelRevision.test.ts(219,49): error TS18047: 'projected.measurements' is possibly 'null'.
+tests/humanFirstUseModelRevision.test.ts(229,12): error TS18047: 'operator.measurements' is possibly 'null'.
+tests/humanFirstUseModelRevision.test.ts(329,31): error TS2345: Argument of type '(r: { sessionId: string; }) => string' is not assignable to parameter of type '(value: IntakeRecord, index: number, array: IntakeRecord[]) => string'.
+  Types of parameters 'r' and 'value' are incompatible.
+    Type 'IntakeRecord' is not assignable to type '{ sessionId: string; }'.
+      Types of property 'sessionId' are incompatible.
+        Type 'string | null' is not assignable to type 'string'.
+          Type 'null' is not assignable to type 'string'.
+tests/humanFirstUsePhaseOrder.test.ts(312,12): error TS18047: 'projection.measurements' is possibly 'null'.
+tests/humanFirstUsePhaseOrder.test.ts(312,36): error TS2339: Property 'outcome' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; }'.
+  Property 'outcome' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; }'.
+tests/humanFirstUsePhaseOrder.test.ts(314,40): error TS18047: 'projection.measurements' is possibly 'null'.
+tests/humanFirstUsePhaseOrder.test.ts(314,40): error TS18047: 'projection.measurements.interruption' is possibly 'null'.
+tests/humanFirstUsePhaseOrder.test.ts(315,41): error TS18047: 'projection.measurements' is possibly 'null'.
+tests/humanFirstUsePhaseOrder.test.ts(315,65): error TS2339: Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; }'.
+  Property 'firstUsefulResultAt' does not exist on type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; }'.
+tests/humanFirstUsePhaseOrder.test.ts(432,32): error TS2345: Argument of type '{ model: any; measurements: { actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | {...' is not assignable to parameter of type '{ sessionId: string; participation: string; participantId: string; observer: { id: string; humanPresent: boolean; independent: boolean; consentRecorded: boolean; firstUse: boolean; statement: string; recordedAt: string; }; ... 5 more ...; recording: { ...; }; }'.
+  Types of property 'measurements' are incompatible.
+    Type '{ actionsToFirstUsefulResult: number | null; assistanceCount: number | null; setupFailures: any[] | null; refusals: any[] | null; interruption: { at: any; resumedAt: any; resumeOutcome: any; reason: any; } | null; secondTask: { ...; } | null; startedAt: any; endedAt: any; } | { ...; } | { ...; } | null' is not assignable to type '{ startedAt: string; endedAt: string; outcome: Outcome; firstUsefulResultAt: string | null; actionsToFirstUsefulResult: number | null; noResultReason: string | null; assistanceCount: number | null; setupFailures: Array<{ at: string; code: string; detail: string; }>; refusals: Array<{ at: string; code: string; namedF...'.
+      Type 'null' is not assignable to type '{ startedAt: string; endedAt: string; outcome: Outcome; firstUsefulResultAt: string | null; actionsToFirstUsefulResult: number | null; noResultReason: string | null; assistanceCount: number | null; setupFailures: Array<{ at: string; code: string; detail: string; }>; refusals: Array<{ at: string; code: string; namedF...'.
+tests/jsonlWriterResume.test.ts(55,19): error TS2345: Argument of type '{ cause?: { kind: "parent"; } | { kind: "user"; } | undefined; reason: "cancelled" | "complete"; }' is not assignable to parameter of type 'TurnEndParams'.
+  Type '{ cause?: { kind: "parent"; } | { kind: "user"; } | undefined; reason: "cancelled" | "complete"; }' is not assignable to type '{ readonly reason: "error" | "complete" | "max_steps" | "max_tokens" | "blocked"; readonly cause?: undefined; }'.
+    Types of property 'reason' are incompatible.
+      Type '"cancelled" | "complete"' is not assignable to type '"error" | "complete" | "max_steps" | "max_tokens" | "blocked"'.
+        Type '"cancelled"' is not assignable to type '"error" | "complete" | "max_steps" | "max_tokens" | "blocked"'.
+tests/nativeFailureVisibility.test.ts(33,45): error TS2322: Type '() => AsyncGenerator<never, never, unknown>' is not assignable to type 'StreamChunk[]'.
+tests/nativeGeminiPublic.test.ts(51,35): error TS2322: Type 'string[]' is not assignable to type 'readonly [string, ...string[]]'.
+  Source provides no match for required element at position 0 in target.
+tests/nativeGeminiRuntime.test.ts(53,129): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/nativeGeminiWire.test.ts(143,144): error TS2345: Argument of type '{ baseUrl: string; model: string; extraHeaders: {}; credential: string; body: Buffer<ArrayBufferLike>; signal: AbortSignal; } | { model: string; baseUrl: string; extraHeaders: {}; credential: string; body: Buffer<...>; signal: AbortSignal; } | { ...; } | { ...; }' is not assignable to parameter of type 'AdapterEnvelopeInput'.
+  Type '{ extraHeaders: { "X-Goog-Api-Key": string; Authorization?: undefined; }; baseUrl: string; model: string; credential: string; body: Buffer<ArrayBufferLike>; signal: AbortSignal; }' is not assignable to type 'AdapterEnvelopeInput'.
+    Types of property 'extraHeaders' are incompatible.
+      Type '{ "X-Goog-Api-Key": string; Authorization?: undefined; }' is not assignable to type 'Readonly<Record<string, string>>'.
+        Property 'Authorization' is incompatible with index signature.
+          Type 'undefined' is not assignable to type 'string'.
+tests/nativeSignedAudioPublic.test.ts(49,112): error TS2322: Type 'string[]' is not assignable to type 'readonly [string, ...string[]]'.
+  Source provides no match for required element at position 0 in target.
+tests/nativeSignedAudioRuntime.test.ts(44,125): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/nativeSignedAudioRuntime.test.ts(161,78): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+tests/nativeSignedAudioRuntime.test.ts(169,77): error TS2322: Type 'StreamTokenUsage | null' is not assignable to type 'TokenUsage | null'.
+  Type 'StreamTokenUsage' is missing the following properties from type 'TokenUsage': cacheRead, cacheWrite
+npx tsc -p tsconfig.tests.json --noEmit  37.73s user 5.60s system 131% cpu 32.887 total

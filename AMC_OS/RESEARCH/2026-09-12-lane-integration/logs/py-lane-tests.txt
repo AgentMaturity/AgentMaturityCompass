@@ -1,0 +1,10 @@
+........................................................................ [ 66%]
+.....................................                                    [100%]
+=============================== warnings summary ===============================
+tests/test_P06_client.py::test_canonical_workspace_alias_and_fixed_root
+  /opt/homebrew/lib/python3.14/site-packages/pytest_asyncio/plugin.py:1190: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    return asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+109 passed, 1 warning in 65.39s (0:01:05)
+py exit=0

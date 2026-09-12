@@ -1,0 +1,102 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/cosProduct09StudioPage.test.ts (4 tests | 4 failed) 7303ms
+   × P09 actual browser text attachments retain the original bytes across explicit retry and preserve edited drafts 5775ms
+   × P09 an old real poll cannot restore controls after offline, and failed setup still exposes reconnect 543ms
+   × P09 signed approval visibility, actual cancellation, and same-session resume never imply a prompt replay 484ms
+   × P09 original media picker follows real discovery, keeps ordering local, and never tests a provider by selecting files 500ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cosProduct09StudioPage.test.ts > P09 actual browser text attachments retain the original bytes across explicit retry and preserve edited drafts
+Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+ ❯ withStudio tests/cosProduct09StudioPage.test.ts:20:30
+     18|   try {
+     19|     f = await publicTaskHttpFixture("success", "sqlite");
+     20|     browser = await chromium.launch({ headless: true,
+       |                              ^
+     21|       ...(process.env.AMC_TEST_BROWSER_EXECUTABLE ? { executablePath: …
+     22|     context = await browser.newContext({ viewport: { width: 1280, heig…
+ ❯ tests/cosProduct09StudioPage.test.ts:44:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/cosProduct09StudioPage.test.ts > P09 an old real poll cannot restore controls after offline, and failed setup still exposes reconnect
+Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+ ❯ withStudio tests/cosProduct09StudioPage.test.ts:20:30
+     18|   try {
+     19|     f = await publicTaskHttpFixture("success", "sqlite");
+     20|     browser = await chromium.launch({ headless: true,
+       |                              ^
+     21|       ...(process.env.AMC_TEST_BROWSER_EXECUTABLE ? { executablePath: …
+     22|     context = await browser.newContext({ viewport: { width: 1280, heig…
+ ❯ tests/cosProduct09StudioPage.test.ts:90:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/cosProduct09StudioPage.test.ts > P09 signed approval visibility, actual cancellation, and same-session resume never imply a prompt replay
+Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+ ❯ withStudio tests/cosProduct09StudioPage.test.ts:20:30
+     18|   try {
+     19|     f = await publicTaskHttpFixture("success", "sqlite");
+     20|     browser = await chromium.launch({ headless: true,
+       |                              ^
+     21|       ...(process.env.AMC_TEST_BROWSER_EXECUTABLE ? { executablePath: …
+     22|     context = await browser.newContext({ viewport: { width: 1280, heig…
+ ❯ tests/cosProduct09StudioPage.test.ts:141:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/cosProduct09StudioPage.test.ts > P09 original media picker follows real discovery, keeps ordering local, and never tests a provider by selecting files
+Error: browserType.launch: Executable doesn't exist at /Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     npx playwright install                                 ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+ ❯ withStudio tests/cosProduct09StudioPage.test.ts:20:30
+     18|   try {
+     19|     f = await publicTaskHttpFixture("success", "sqlite");
+     20|     browser = await chromium.launch({ headless: true,
+       |                              ^
+     21|       ...(process.env.AMC_TEST_BROWSER_EXECUTABLE ? { executablePath: …
+     22|     context = await browser.newContext({ viewport: { width: 1280, heig…
+ ❯ tests/cosProduct09StudioPage.test.ts:177:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  19:33:59
+   Duration  7.44s (transform 3.61s, setup 0ms, import 23ms, tests 7.30s, environment 0ms)
+
+browser exit=1

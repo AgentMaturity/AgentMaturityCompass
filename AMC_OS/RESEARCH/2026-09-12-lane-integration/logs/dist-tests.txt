@@ -1,0 +1,28 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/nativeValidationSurfaces.test.ts (3 tests | 1 failed) 3615ms
+   × SDK never turns absent or malformed validation metadata into a pass 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/nativeValidationSurfaces.test.ts > SDK never turns absent or malformed validation metadata into a pass
+AMCNativeProtocolError: native prompt returned invalid validation metadata
+ ❯ AMCNativeTurn.finish src/sdk/nativeAgentClient.ts:243:21
+    241|       : parseNativeValidationResult(rawValidation);
+    242|     if (validation === null) {
+    243|       const error = new AMCNativeProtocolError("native prompt returned…
+       |                     ^
+    244|     }
+    245|     const text = this.updates.flatMap(({ update }) => {
+ ❯ tests/nativeValidationSurfaces.test.ts:69:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 15 passed (16)
+   Start at  19:33:34
+   Duration  24.87s (transform 3.78s, setup 0ms, import 4.75s, tests 26.02s, environment 0ms)
+
+dist-tests exit=1

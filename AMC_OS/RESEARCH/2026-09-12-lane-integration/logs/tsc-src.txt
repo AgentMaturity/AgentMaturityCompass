@@ -1,0 +1,20 @@
+src/llm/adapter/streamRecorder.ts(322,74): error TS2366: Function lacks ending return statement and return type does not include 'undefined'.
+src/llm/blockAssembler.ts(381,26): error TS2345: Argument of type '"audio"' is not assignable to parameter of type 'never'.
+src/llm/blockAssembler.ts(417,26): error TS2345: Argument of type '"audio"' is not assignable to parameter of type 'never'.
+src/llm/streamChunk.ts(142,3): error TS2344: Type 'false' does not satisfy the constraint 'true'.
+src/llm/streamChunk.ts(150,44): error TS2339: Property 'audio' does not exist on type 'ContentBlockMap'.
+src/sdk/nativeAgentClient.ts(50,41): error TS18047: 'value' is possibly 'null'.
+src/sdk/nativeAgentClient.ts(50,41): error TS2365: Operator '<' cannot be applied to types '{}' and 'number'.
+src/sdk/nativeAgentClient.ts(50,54): error TS18047: 'value' is possibly 'null'.
+src/sdk/nativeAgentClient.ts(50,54): error TS2365: Operator '>' cannot be applied to types '{}' and 'number'.
+src/sdk/nativeAgentClient.ts(54,3): error TS2322: Type 'Readonly<{ maxEvents: {} | null; maxBytes: {} | null; }>' is not assignable to type 'Required<AMCNativeEventBufferOptions>'.
+  Types of property 'maxEvents' are incompatible.
+    Type '{} | null' is not assignable to type 'number'.
+      Type 'null' is not assignable to type 'number'.
+src/studio/nativeTaskService.ts(355,15): error TS2322: Type '{ maxSteps: number; maxTokens: number; createdAt: number; updatedAt: number; revision: number; pendingTurn: true; closed: false; submissions: { clientRequestId: string; bodyHash: string; revision: number; }[]; ... 10 more ...; toolsDigest: string | null; }' is not assignable to type '{ kind: "amc/studio-native-task/v1"; taskId: string; principalId: string; agentId: string; demo: boolean; sessionId: string | null; provider: "gemini" | "openai-responses" | "stub" | "openai" | "anthropic" | "gemini-audio"; ... 12 more ...; archivedAt?: number | undefined; }'.
+  Types of property 'validation' are incompatible.
+    Type 'NativeTaskValidationSelection | undefined' is not assignable to type '{ configSha256: string; checkIds: string[]; } | undefined'.
+      Type 'NativeTaskValidationSelection' is not assignable to type '{ configSha256: string; checkIds: string[]; }'.
+        Types of property 'checkIds' are incompatible.
+          The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+npx tsc -p tsconfig.json --noEmit  26.00s user 1.80s system 121% cpu 22.799 total

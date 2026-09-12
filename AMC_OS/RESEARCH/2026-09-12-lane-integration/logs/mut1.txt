@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/sessionPayloadCap.test.ts (3 tests | 1 failed) 934ms
+     × an oversize queued input is refused before the inbox row exists, and the lane stays empty 280ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/sessionPayloadCap.test.ts > session payload cap > an oversize queued input is refused before the inbox row exists, and the lane stays empty
+AssertionError: expected Error: payload exceeds max bytes per even… to be an instance of SessionPayloadCapError
+ ❯ tests/sessionPayloadCap.test.ts:62:21
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  19:28:22
+   Duration  2.98s (transform 1.39s, setup 0ms, import 1.94s, tests 934ms, environment 0ms)
+

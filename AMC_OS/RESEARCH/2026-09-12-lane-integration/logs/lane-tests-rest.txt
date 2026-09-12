@@ -1,0 +1,509 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/deepseekNativeWire.test.ts (134 tests | 1 failed) 46ms
+     × refuses 'audio' at its actual encoding boundary 4ms
+ ❯ tests/nativeSignedImageInput.test.ts (11 tests | 6 failed) 10991ms
+     × actual runtime transport receives original image bytes; a fresh process reconstructs identical request bytes after writer closure 2273ms
+     × image + provider-safe offered tool + keyed failed result remain reconstructable 1464ms
+     × cold reconstruction distinguishes missing evidence 728ms
+     × cold reconstruction distinguishes pruned evidence 1540ms
+     × cold reconstruction distinguishes tampered evidence 1597ms
+     × cold reconstruction distinguishes mime evidence 728ms
+ ❯ tests/nativeGeminiWire.test.ts (26 tests | 1 failed) 52ms
+     × actual cold registry, exact public route and historical identities 14ms
+ ❯ tests/nativeAcpImageInput.test.ts (35 tests | 2 failed) 40696ms
+     × large signed local image history fails ACP load before any partial replay 773ms
+     × aggregate history is bounded over real signed image rows, and text attachments retain their meaning 541ms
+ ❯ tests/nativeSignedAudioRuntime.test.ts (11 tests | 1 failed) 41962ms
+     × a failed native multi-step audio prompt cannot lend its signed text to the next successful prompt 4719ms
+ ❯ tests/nativeChatImageInput.test.ts (29 tests | 2 failed) 35708ms
+     × sqlite: real registered CLI action sends Chat images through local HTTP and leaves a cold-reconstructable closed session 7896ms
+     × jsonl: real registered CLI action sends Chat images through local HTTP and leaves a cold-reconstructable closed session 3091ms
+ ❯ tests/nativeSignedImagePublicInput.test.ts (8 tests | 1 failed) 6933ms
+     × public composed native input reaches actual adapter HTTP and cold default reconstruction after composition closes its writer 1916ms
+ ❯ tests/nativeGeminiPublic.test.ts (12 tests | 1 failed) 40639ms
+     × actual agent-loop run selects Gemini native body and original CLI image 2004ms
+ ❯ tests/nativeSignedAudioPublic.test.ts (29 tests | 4 failed) 65791ms
+     × a signed provider failure is not public success just because the driver returns idle 4474ms
+     × actual agent-loop run admits a local ordered audio manifest, not a transcript or positional reorder 1762ms
+     × sqlite valid in-process binary larger than ACP replay frame refuses the whole load, not a prefix 364ms
+     × jsonl valid in-process binary larger than ACP replay frame refuses the whole load, not a prefix 398ms
+ ❯ tests/nativeOrderedAcpImageInput.test.ts (30 tests | 1 failed) 83306ms
+     × lower ACP history frame bound still refuses a legitimate larger local ordered session 359ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 20 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/deepseekNativeWire.test.ts > DeepSeek explicit option and encoding contract (unexecuted) > refuses 'audio' at its actual encoding boundary
+AssertionError: expected [Function] to throw error matching /unknown input modality/ but got 'DeepSeek request: native audio input …'
+
+- Expected:
+/unknown input modality/
+
++ Received:
+"DeepSeek request: native audio input is unsupported by deepseek-chat@1"
+
+ ❯ tests/deepseekNativeWire.test.ts:162:121
+    160|   ];
+    161|   it.each(malformedHistory)("refuses $name at its actual encoding boun…
+    162|     expect(() => encoded(request({ tools: functions, messages: message…
+       |                                                                                                                         ^
+    163|   });
+    164|   it("rejects duplicate calls/results, cross-call joins and invalid ar…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯
+
+ FAIL  tests/nativeAcpImageInput.test.ts > ACP signed images: public wire and lifecycle (not executed) > large signed local image history fails ACP load before any partial replay
+Error: payload exceeds max bytes per event (933482 > 65536)
+ ❯ Ledger.buildEvidenceInsert src/ledger/ledger.ts:520:15
+    518|       const bytes = typeof payload === "string" ? Buffer.from(payload,…
+    519|       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadByte…
+    520|         throw new Error(
+       |               ^
+    521|           `payload exceeds max bytes per event (${bytes.byteLength} > …
+    522|         );
+ ❯ src/ledger/ledger.ts:589:30
+ ❯ runImmediateTransaction src/ledger/ledgerSessionTransactions.ts:12:20
+ ❯ Ledger.runImmediateTransaction src/ledger/ledger.ts:259:12
+ ❯ Ledger.appendEvidenceDetailed src/ledger/ledger.ts:586:27
+ ❯ SqliteSessionEventStore.appendSessionEvent src/persistence/sqliteSessionEventStore.ts:83:24
+ ❯ SessionService.appendSessionEvent src/session/sessionSpine.ts:190:31
+ ❯ SessionService.recordLoopEvent src/session/sessionService.ts:688:17
+ ❯ LoopInbox.insert src/agent/inbox.ts:84:30
+ ❯ AgentDriver.enqueue src/agent/agentDriver.ts:183:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/20]⎯
+
+ FAIL  tests/nativeAcpImageInput.test.ts > ACP signed images: public wire and lifecycle (not executed) > aggregate history is bounded over real signed image rows, and text attachments retain their meaning
+Error: payload exceeds max bytes per event (620000 > 65536)
+ ❯ Ledger.buildEvidenceInsert src/ledger/ledger.ts:520:15
+    518|       const bytes = typeof payload === "string" ? Buffer.from(payload,…
+    519|       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadByte…
+    520|         throw new Error(
+       |               ^
+    521|           `payload exceeds max bytes per event (${bytes.byteLength} > …
+    522|         );
+ ❯ src/ledger/ledger.ts:589:30
+ ❯ runImmediateTransaction src/ledger/ledgerSessionTransactions.ts:12:20
+ ❯ Ledger.runImmediateTransaction src/ledger/ledger.ts:259:12
+ ❯ Ledger.appendEvidenceDetailed src/ledger/ledger.ts:586:27
+ ❯ SqliteSessionEventStore.appendSessionEvent src/persistence/sqliteSessionEventStore.ts:83:24
+ ❯ SessionService.appendSessionEvent src/session/sessionSpine.ts:190:31
+ ❯ SessionService.recordContent src/session/sessionSpine.ts:122:17
+ ❯ SessionService.recordUserAttachment src/session/sessionService.ts:506:17
+ ❯ tests/nativeAcpImageInput.test.ts:312:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/20]⎯
+
+ FAIL  tests/nativeChatImageInput.test.ts > native Chat signed-image encoder and runtime (not executed) > sqlite: real registered CLI action sends Chat images through local HTTP and leaves a cold-reconstructable closed session
+AssertionError: expected [ { …(2) }, …(2) ] to deeply equal [ { type: 'text', …(1) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -8,6 +8,13 @@
+        "detail": "auto",
+        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=",
+      },
+      "type": "image_url",
+    },
++   {
++     "text": "Current runtime context. This snapshot supersedes earlier runtime-context snapshots.
++
++ Time sampled while preparing turn 1, step 1: 2026-09-12T19:07:25+05:30[Asia/Calcutta]
++ Elapsed since the preceding model-visible message: unavailable.",
++     "type": "text",
++   },
+  ]
+
+ ❯ tests/nativeChatImageInput.test.ts:175:10
+    173|       const body = JSON.parse(sent[0]!.body.toString("utf8"));
+    174|       expect(body.messages.find((message: { role: string }) => message…
+    175|         .toEqual([{ type: "text", text: "Describe the original image" …
+       |          ^
+    176|       expect(body).toMatchObject({ max_tokens: 64, stream: true, strea…
+    177|       expect(body.input).toBeUndefined(); rmSync(file);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/20]⎯
+
+ FAIL  tests/nativeChatImageInput.test.ts > native Chat signed-image encoder and runtime (not executed) > jsonl: real registered CLI action sends Chat images through local HTTP and leaves a cold-reconstructable closed session
+AssertionError: expected [ { …(2) }, …(2) ] to deeply equal [ { type: 'text', …(1) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -8,6 +8,13 @@
+        "detail": "auto",
+        "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=",
+      },
+      "type": "image_url",
+    },
++   {
++     "text": "Current runtime context. This snapshot supersedes earlier runtime-context snapshots.
++
++ Time sampled while preparing turn 1, step 1: 2026-09-12T19:07:28+05:30[Asia/Calcutta]
++ Elapsed since the preceding model-visible message: unavailable.",
++     "type": "text",
++   },
+  ]
+
+ ❯ tests/nativeChatImageInput.test.ts:175:10
+    173|       const body = JSON.parse(sent[0]!.body.toString("utf8"));
+    174|       expect(body.messages.find((message: { role: string }) => message…
+    175|         .toEqual([{ type: "text", text: "Describe the original image" …
+       |          ^
+    176|       expect(body).toMatchObject({ max_tokens: 64, stream: true, strea…
+    177|       expect(body.input).toBeUndefined(); rmSync(file);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/20]⎯
+
+ FAIL  tests/nativeGeminiPublic.test.ts > native Gemini public seams (unexecuted) > actual agent-loop run selects Gemini native body and original CLI image
+AssertionError: expected [ …(3) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+@@ -6,6 +6,12 @@
+      "inlineData": {
+        "data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=",
+        "mimeType": "image/png",
+      },
+    },
++   {
++     "text": "Current runtime context. This snapshot supersedes earlier runtime-context snapshots.
++
++ Time sampled while preparing turn 1, step 1: 2026-09-12T19:07:58+05:30[Asia/Calcutta]
++ Elapsed since the preceding model-visible message: unavailable.",
++   },
+  ]
+
+ ❯ tests/nativeGeminiPublic.test.ts:150:114
+    148|     try {
+    149|       expect(await ended, stderr).toBe(0); const report = JSON.parse(s…
+    150|       expect(server.sent).toHaveLength(1); expect(JSON.parse(server.se…
+       |                                                                                                                  ^
+    151|         { text: "Describe the original image" }, GEMINI_EXPECTED_INPUT…
+    152|       expect(orderedCold(root, report.sessionId)[0]!.bytes).toBe(serve…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/20]⎯
+
+ FAIL  tests/nativeGeminiWire.test.ts > Gemini GenerateContent@1 native wire (unexecuted) > actual cold registry, exact public route and historical identities
+AssertionError: expected { id: 'gemini-generate-content', …(2) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "encode": [Function encode],
+  "id": "gemini-generate-content",
+  "version": 2,
+}
+
+ ❯ tests/nativeGeminiWire.test.ts:33:56
+     31|     const registry = new RequestEncoderRegistry(BUILT_IN_REQUEST_ENCOD…
+     32|     expect(registry.get("gemini-generate-content", 1)).toBe(geminiCont…
+     33|     expect(registry.get("gemini-generate-content", 2)).toBeNull();
+       |                                                        ^
+     34|     for (const [id, versions] of [["openai-chat", [1, 2, 3, 4]], ["ope…
+     35|       for (const version of versions) expect(registry.get(id, version)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/20]⎯
+
+ FAIL  tests/nativeOrderedAcpImageInput.test.ts > ordered image input through public ACP (unexecuted) > lower ACP history frame bound still refuses a legitimate larger local ordered session
+Error: payload exceeds max bytes per event (933503 > 65536)
+ ❯ Ledger.buildEvidenceInsert src/ledger/ledger.ts:520:15
+    518|       const bytes = typeof payload === "string" ? Buffer.from(payload,…
+    519|       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadByte…
+    520|         throw new Error(
+       |               ^
+    521|           `payload exceeds max bytes per event (${bytes.byteLength} > …
+    522|         );
+ ❯ src/ledger/ledger.ts:589:30
+ ❯ runImmediateTransaction src/ledger/ledgerSessionTransactions.ts:12:20
+ ❯ Ledger.runImmediateTransaction src/ledger/ledger.ts:259:12
+ ❯ Ledger.appendEvidenceDetailed src/ledger/ledger.ts:586:27
+ ❯ SqliteSessionEventStore.appendSessionEvent src/persistence/sqliteSessionEventStore.ts:83:24
+ ❯ SessionService.appendSessionEvent src/session/sessionSpine.ts:190:31
+ ❯ SessionService.recordLoopEvent src/session/sessionService.ts:688:17
+ ❯ LoopInbox.insert src/agent/inbox.ts:84:30
+ ❯ AgentDriver.enqueue src/agent/agentDriver.ts:183:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+
+ FAIL  tests/nativeSignedAudioPublic.test.ts > native audio public paths (unexecuted) > a signed provider failure is not public success just because the driver returns idle
+AssertionError: expected { code: -32603, …(2) } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "code": -32603,
+  "data": {
+    "reason": "signed turn 2 ended error; idle is not successful completion",
+  },
+  "message": "the turn did not complete",
+}
+
+ ❯ tests/nativeSignedAudioPublic.test.ts:62:25
+     60|     expect(JSON.parse(endings.at(-1)!.meta_json).reason).toBe("error");
+     61|     const later = await h.call("session/prompt", { sessionId, prompt: …
+     62|     expect(later.error).toBeUndefined(); expect(later.result).toMatchO…
+       |                         ^
+     63|     expect(requests).toBe(2);
+     64|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+
+ FAIL  tests/nativeSignedAudioPublic.test.ts > native audio public paths (unexecuted) > actual agent-loop run admits a local ordered audio manifest, not a transcript or positional reorder
+AssertionError: expected [ { inlineData: { …(2) } }, …(2) ] to deeply equal [ { inlineData: { …(2) } }, …(1) ]
+
+- Expected
++ Received
+
+@@ -6,6 +6,12 @@
+      },
+    },
+    {
+      "text": "after original  ",
+    },
++   {
++     "text": "Current runtime context. This snapshot supersedes earlier runtime-context snapshots.
++
++ Time sampled while preparing turn 1, step 1: 2026-09-12T19:08:05+05:30[Asia/Calcutta]
++ Elapsed since the preceding model-visible message: unavailable.",
++   },
+  ]
+
+ ❯ tests/nativeSignedAudioPublic.test.ts:182:77
+    180|     try {
+    181|       expect(await ended, stderr).toBe(0); const report = JSON.parse(s…
+    182|       expect(JSON.parse(server.sent[0]!.body.toString()).contents[0].p…
+       |                                                                             ^
+    183|       expect(audioCold(root, report.sessionId)[0]!.bytes).toBe(server.…
+    184|     } finally { clearTimeout(timer); if (child.exitCode === null && ch…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/20]⎯
+
+ FAIL  tests/nativeSignedAudioPublic.test.ts > native audio public paths (unexecuted) > sqlite valid in-process binary larger than ACP replay frame refuses the whole load, not a prefix
+Error: payload exceeds max bytes per event (1067015 > 65536)
+ ❯ Ledger.buildEvidenceInsert src/ledger/ledger.ts:520:15
+    518|       const bytes = typeof payload === "string" ? Buffer.from(payload,…
+    519|       if (bytes.byteLength > policy.opsPolicy.retention.maxPayloadByte…
+    520|         throw new Error(
+       |               ^
+    521|           `payload exceeds max bytes per event (${bytes.byteLength} > …
+    522|         );
+ ❯ src/ledger/ledger.ts:589:30
+ ❯ runImmediateTransaction src/ledger/ledgerSessionTransactions.ts:12:20
+ ❯ Ledger.runImmediateTransaction src/ledger/ledger.ts:259:12
+ ❯ Ledger.appendEvidenceDetailed src/ledger/ledger.ts:586:27
+ ❯ SqliteSessionEventStore.appendSessionEvent src/persistence/sqliteSessionEventStore.ts:83:24
+ ❯ SessionService.appendSessionEvent src/session/sessionSpine.ts:190:31
+ ❯ SessionService.recordLoopEvent src/session/sessionService.ts:688:17
+ ❯ LoopInbox.insert src/agent/inbox.ts:84:30
+ ❯ AgentDriver.enqueue src/agent/agentDriver.ts:183:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/20]⎯
+
+ FAIL  tests/nativeSignedAudioPublic.test.ts > native audio public paths (unexecuted) > jsonl valid in-process binary larger than ACP replay frame refuses the whole load, not a prefix
+Error: payload exceeds max bytes per event (1067015 > 65536)
+ ❯ JsonlSessionEventStore.storePayload src/persistence/jsonl/jsonlSessionEventStore.ts:409:13
+    407|     const maxBytes = policy.opsPolicy.retention.maxPayloadBytesPerEven…
+    408|     if (bytes.byteLength > maxBytes) {
+    409|       throw new Error(`payload exceeds max bytes per event (${bytes.by…
+       |             ^
+    410|     }
+    411|     if (bytes.byteLength > policy.opsPolicy.retention.maxBlobBytes) {
+ ❯ JsonlSessionEventStore.appendSessionEvent src/persistence/jsonl/jsonlSessionEventStore.ts:272:25
+ ❯ SessionService.appendSessionEvent src/session/sessionSpine.ts:190:31
+ ❯ SessionService.recordLoopEvent src/session/sessionService.ts:688:17
+ ❯ LoopInbox.insert src/agent/inbox.ts:84:30
+ ❯ AgentDriver.enqueue src/agent/agentDriver.ts:183:32
+ ❯ AgentDriver.sendAudioParts src/agent/agentDriver.ts:175:17
+ ❯ AgentDriver.followupAudioParts src/agent/agentDriver.ts:204:17
+ ❯ src/agent/agentSession.ts:262:57
+ ❯ runPrompt src/agent/agentSession.ts:219:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/20]⎯
+
+ FAIL  tests/nativeSignedAudioRuntime.test.ts > native audio Gemini2 signed runtime (unexecuted) > a failed native multi-step audio prompt cannot lend its signed text to the next successful prompt
+AssertionError: expected { ok: false, …(1) } to match object { ok: true, …(2) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "ok": true,
+-   "text": "Original audio fixture answer",
+-   "turnEndReason": "complete",
++   "ok": false,
+  }
+
+ ❯ tests/nativeSignedAudioRuntime.test.ts:82:20
+     80|       expect(observed.readEvents().some(row => row.event_type === "ass…
+     81|       const next = await session.prompt("Continue without misattributi…
+     82|       expect(next).toMatchObject({ ok: true, text: "Original audio fix…
+       |                    ^
+     83|       expect(request).toBe(3);
+     84|     } finally { await session.close(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > actual runtime transport receives original image bytes; a fresh process reconstructs identical request bytes after writer closure
+AssertionError: expected { status: 'payload-missing', …(6) } to match object { status: 'reconstructed', …(3) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "bytes": "eyJtYXhfdG9rZW5zIjo2NCwibWVzc2FnZXMiOlt7ImNvbnRlbnQiOlt7InRleHQiOiJEZXNjcmliZSB0aGlzIGltYWdlLiIsInR5cGUiOiJ0ZXh0In0seyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwic291cmNlIjp7ImRhdGEiOiJpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQUVBQUFBQkNBUUFBQUMxSEF3Q0FBQUFDMGxFUVZSNDJtUDgveDhBQXdNQ0FPK2paMXNBQUFBQVNVVk9SSzVDWUlJPSIsIm1lZGlhX3R5cGUiOiJpbWFnZS9wbmciLCJ0eXBlIjoiYmFzZTY0In0sInR5cGUiOiJpbWFnZSJ9XSwicm9sZSI6InVzZXIifV0sIm1vZGVsIjoiZml4dHVyZS1tb2RlbCIsInN0cmVhbSI6dHJ1ZSwic3lzdGVtIjpbeyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwidGV4dCI6IkRlc2NyaWJlIHRoZSBhY3R1YWwgYXR0YWNoZWQgYnl0ZXMuIE5vIGV4dGVybmFsIG1vZGVsIHN1cHBvcnQgaXMgYXNzZXJ0ZWQuIiwidHlwZSI6InRleHQifV19",
+-   "derivedDigest": "c968554a559e0b068156dcf1c6e9f260bda8f197da9bcf8d11a0abf7fbaf818e",
++   "bytes": null,
++   "derivedDigest": null,
+    "recordedDigest": "c968554a559e0b068156dcf1c6e9f260bda8f197da9bcf8d11a0abf7fbaf818e",
+-   "status": "reconstructed",
++   "status": "payload-missing",
+  }
+
+ ❯ tests/nativeSignedImageInput.test.ts:120:21
+    118|     h.close();
+    119|     const rows = cold(h); expect(rows).toHaveLength(1);
+    120|     expect(rows[0]).toMatchObject({ status: "reconstructed", bytes: h.…
+       |                     ^
+    121|     const verified = verifyLedgerIntegrity(h.workspace);
+    122|     expect(verified.chain, verified.chain.errors.join("\n")).toEqual({…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > image + provider-safe offered tool + keyed failed result remain reconstructable
+AssertionError: expected [ null, null ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+  [
+-   "eyJtYXhfdG9rZW5zIjo2NCwibWVzc2FnZXMiOlt7ImNvbnRlbnQiOlt7InRleHQiOiJEZXNjcmliZSB0aGlzIGltYWdlLiIsInR5cGUiOiJ0ZXh0In0seyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwic291cmNlIjp7ImRhdGEiOiJpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQUVBQUFBQkNBUUFBQUMxSEF3Q0FBQUFDMGxFUVZSNDJtUDgveDhBQXdNQ0FPK2paMXNBQUFBQVNVVk9SSzVDWUlJPSIsIm1lZGlhX3R5cGUiOiJpbWFnZS9wbmciLCJ0eXBlIjoiYmFzZTY0In0sInR5cGUiOiJpbWFnZSJ9XSwicm9sZSI6InVzZXIifV0sIm1vZGVsIjoiZml4dHVyZS1tb2RlbCIsInN0cmVhbSI6dHJ1ZSwic3lzdGVtIjpbeyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwidGV4dCI6IkRlc2NyaWJlIHRoZSBhY3R1YWwgYXR0YWNoZWQgYnl0ZXMuIE5vIGV4dGVybmFsIG1vZGVsIHN1cHBvcnQgaXMgYXNzZXJ0ZWQuIiwidHlwZSI6InRleHQifV0sInRvb2xzIjpbeyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwiZGVzY3JpcHRpb24iOiJyZWFkIiwiaW5wdXRfc2NoZW1hIjp7InR5cGUiOiJvYmplY3QifSwibmFtZSI6ImFtY19mc19yZWFkX1FIUzhBbGRWRWVJeXBYMVl1cERVcDlQbS15a1cwNDF2R2oxS2FjSkctcnMifV19",
+-   "eyJtYXhfdG9rZW5zIjo2NCwibWVzc2FnZXMiOlt7ImNvbnRlbnQiOlt7InRleHQiOiJEZXNjcmliZSB0aGlzIGltYWdlLiIsInR5cGUiOiJ0ZXh0In0seyJzb3VyY2UiOnsiZGF0YSI6ImlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFBRUFBQUFCQ0FRQUFBQzFIQXdDQUFBQUMwbEVRVlI0Mm1QOC94OEFBd01DQU8raloxc0FBQUFBU1VWT1JLNUNZSUk9IiwibWVkaWFfdHlwZSI6ImltYWdlL3BuZyIsInR5cGUiOiJiYXNlNjQifSwidHlwZSI6ImltYWdlIn1dLCJyb2xlIjoidXNlciJ9LHsiY29udGVudCI6W3siaWQiOiJpbWFnZS1yZWFkIiwiaW5wdXQiOnsicGF0aCI6ImZpeHR1cmUudHh0In0sIm5hbWUiOiJhbWNfZnNfcmVhZF9RSFM4QWxkVkVlSXlwWDFZdXBEVXA5UG0teWtXMDQxdkdqMUthY0pHLXJzIiwidHlwZSI6InRvb2xfdXNlIn1dLCJyb2xlIjoiYXNzaXN0YW50In0seyJjb250ZW50IjpbeyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwiY29udGVudCI6W3sidGV4dCI6IlJlYWQgcmVmdXNlZCBieSBmaXh0dXJlIiwidHlwZSI6InRleHQifV0sImlzX2Vycm9yIjp0cnVlLCJ0b29sX3VzZV9pZCI6ImltYWdlLXJlYWQiLCJ0eXBlIjoidG9vbF9yZXN1bHQifV0sInJvbGUiOiJ1c2VyIn1dLCJtb2RlbCI6ImZpeHR1cmUtbW9kZWwiLCJzdHJlYW0iOnRydWUsInN5c3RlbSI6W3siY2FjaGVfY29udHJvbCI6eyJ0eXBlIjoiZXBoZW1lcmFsIn0sInRleHQiOiJEZXNjcmliZSB0aGUgYWN0dWFsIGF0dGFjaGVkIGJ5dGVzLiBObyBleHRlcm5hbCBtb2RlbCBzdXBwb3J0IGlzIGFzc2VydGVkLiIsInR5cGUiOiJ0ZXh0In1dLCJ0b29scyI6W3siY2FjaGVfY29udHJvbCI6eyJ0eXBlIjoiZXBoZW1lcmFsIn0sImRlc2NyaXB0aW9uIjoicmVhZCIsImlucHV0X3NjaGVtYSI6eyJ0eXBlIjoib2JqZWN0In0sIm5hbWUiOiJhbWNfZnNfcmVhZF9RSFM4QWxkVkVlSXlwWDFZdXBEVXA5UG0teWtXMDQxdkdqMUthY0pHLXJzIn1dfQ==",
++   null,
++   null,
+  ]
+
+ ❯ tests/nativeSignedImageInput.test.ts:135:54
+    133|     const second = h.runtime.prepare(spec); await drain(second.stream(…
+    134|     expect(h.sent[1]!.body.toString("utf8")).toContain('"is_error":tru…
+    135|     h.close(); expect(cold(h).map(row => row.bytes)).toEqual(h.sent.ma…
+       |                                                      ^
+    136|   });
+    137|   test.each(["missing", "pruned", "tampered", "mime"] as const)("cold …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > cold reconstruction distinguishes missing evidence
+SqliteError: evidence immutable fields changed
+ ❯ tests/nativeSignedImageInput.test.ts:140:159
+    138|     const h = harness(); await drain(h.runtime.prepare(h.spec).stream(…
+    139|     corruptRow(h, (db, id) => {
+    140|       if (mode === "missing") db.prepare("UPDATE evidence_events SET p…
+       |                                                                                                                                                               ^
+    141|       if (mode === "pruned") db.prepare("UPDATE evidence_events SET pa…
+    142|       if (mode === "tampered") db.prepare("UPDATE evidence_events SET …
+ ❯ corruptRow tests/nativeSignedImageInput.test.ts:97:5
+ ❯ tests/nativeSignedImageInput.test.ts:139:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > cold reconstruction distinguishes pruned evidence
+AssertionError: expected { status: 'payload-missing', …(6) } to match object { status: 'payload-pruned', …(1) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "bytes": null,
+-   "status": "payload-pruned",
++   "status": "payload-missing",
+  }
+
+ ❯ tests/nativeSignedImageInput.test.ts:149:24
+    147|     });
+    148|     const expected = mode === "missing" ? "payload-missing" : mode ===…
+    149|     expect(cold(h)[0]).toMatchObject({ status: expected, bytes: null }…
+       |                        ^
+    150|     if (mode === "mime") expect(verifyLedgerIntegrity(h.workspace).cha…
+    151|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > cold reconstruction distinguishes tampered evidence
+AssertionError: expected { status: 'payload-missing', …(6) } to match object { …(2) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "bytes": null,
+-   "status": "evidence-inconsistent",
++   "status": "payload-missing",
+  }
+
+ ❯ tests/nativeSignedImageInput.test.ts:149:24
+    147|     });
+    148|     const expected = mode === "missing" ? "payload-missing" : mode ===…
+    149|     expect(cold(h)[0]).toMatchObject({ status: expected, bytes: null }…
+       |                        ^
+    150|     if (mode === "mime") expect(verifyLedgerIntegrity(h.workspace).cha…
+    151|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/20]⎯
+
+ FAIL  tests/nativeSignedImageInput.test.ts > native signed original image bytes (authored, not executed) > cold reconstruction distinguishes mime evidence
+SqliteError: evidence immutable fields changed
+ ❯ tests/nativeSignedImageInput.test.ts:145:77
+    143|       if (mode === "mime") {
+    144|         const row = db.prepare("SELECT meta_json FROM evidence_events …
+    145|         db.prepare("UPDATE evidence_events SET meta_json = ? WHERE id …
+       |                                                                             ^
+    146|       }
+    147|     });
+ ❯ corruptRow tests/nativeSignedImageInput.test.ts:97:5
+ ❯ tests/nativeSignedImageInput.test.ts:139:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/20]⎯
+
+ FAIL  tests/nativeSignedImagePublicInput.test.ts > native image public input and durable admission > public composed native input reaches actual adapter HTTP and cold default reconstruction after composition closes its writer
+AssertionError: expected { status: 'payload-missing', …(6) } to match object { status: 'reconstructed', …(1) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "bytes": "eyJtYXhfdG9rZW5zIjo2NCwibWVzc2FnZXMiOlt7ImNvbnRlbnQiOlt7InRleHQiOiJEZXNjcmliZSIsInR5cGUiOiJ0ZXh0In0seyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwic291cmNlIjp7ImRhdGEiOiJpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQUVBQUFBQkNBUUFBQUMxSEF3Q0FBQUFDMGxFUVZSNDJtUDgveDhBQXdNQ0FPK2paMXNBQUFBQVNVVk9SSzVDWUlJPSIsIm1lZGlhX3R5cGUiOiJpbWFnZS9wbmciLCJ0eXBlIjoiYmFzZTY0In0sInR5cGUiOiJpbWFnZSJ9XSwicm9sZSI6InVzZXIifV0sIm1vZGVsIjoiZml4dHVyZS1tb2RlbCIsInN0cmVhbSI6dHJ1ZSwic3lzdGVtIjpbeyJjYWNoZV9jb250cm9sIjp7InR5cGUiOiJlcGhlbWVyYWwifSwidGV4dCI6IkZpeHR1cmUgcHJvbXB0IiwidHlwZSI6InRleHQifV19",
+-   "status": "reconstructed",
++   "bytes": null,
++   "status": "payload-missing",
+  }
+
+ ❯ tests/nativeSignedImagePublicInput.test.ts:123:21
+    121|     expect(result.error).toBeUndefined(); expect(result.status, result…
+    122|     const rows = JSON.parse(result.stdout); expect(rows).toHaveLength(…
+    123|     expect(rows[0]).toMatchObject({ status: "reconstructed", bytes: up…
+       |                     ^
+    124|   });
+    125| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/20]⎯
+
+
+ Test Files  10 failed | 27 passed (37)
+      Tests  20 failed | 1077 passed (1097)
+   Start at  19:06:56
+   Duration  91.36s (transform 51.32s, setup 0ms, import 98.56s, tests 637.87s, environment 3ms)
+
+rest exit=1

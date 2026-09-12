@@ -1,0 +1,13 @@
+tests/doctorNativeModuleProbe.test.ts(49,37): error TS2345: Argument of type '() => typeof Database' is not assignable to parameter of type '() => DoctorSqliteConstructor'.
+  Call signature return types 'typeof Database' and 'DoctorSqliteConstructor' are incompatible.
+    Construct signature return types 'Database' and 'DoctorSqliteDatabase' are incompatible.
+      The types returned by 'prepare(...)' are incompatible between these types.
+        Type 'void' is not assignable to type '{ get(): unknown; }'.
+tests/fixtures/jsonlWriterResumeWorker.ts(33,36): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+tests/jsonlWriterResume.test.ts(55,19): error TS2345: Argument of type '{ cause?: { kind: "parent"; } | { kind: "user"; } | undefined; reason: "cancelled" | "complete"; }' is not assignable to parameter of type 'TurnEndParams'.
+  Type '{ cause?: { kind: "parent"; } | { kind: "user"; } | undefined; reason: "cancelled" | "complete"; }' is not assignable to type '{ readonly reason: "error" | "complete" | "max_steps" | "max_tokens" | "blocked"; readonly cause?: undefined; }'.
+    Types of property 'reason' are incompatible.
+      Type '"cancelled" | "complete"' is not assignable to type '"error" | "complete" | "max_steps" | "max_tokens" | "blocked"'.
+        Type '"cancelled"' is not assignable to type '"error" | "complete" | "max_steps" | "max_tokens" | "blocked"'.
+tests/nativeFailureVisibility.test.ts(33,45): error TS2322: Type '() => AsyncGenerator<never, never, unknown>' is not assignable to type 'StreamChunk[]'.
+tsc-tests exit=2

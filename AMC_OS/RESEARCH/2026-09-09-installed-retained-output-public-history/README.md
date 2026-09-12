@@ -2,8 +2,18 @@
 
 Task: `installed-retained-output-public-history-batch`, AMC-1547 / AMC-1505.
 This is a new helper and new run, not a modification or retry of a598 attempts.
-Runtime pin: `130c2d0087cf574016411fdc7d91067d3eddd637`. The prior metadata-only
+Runtime pin: `33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd`. The prior metadata-only
 package smoke and 193-test source receipt keep their original scope.
+
+The first new run at `130c2d0087cf574016411fdc7d91067d3eddd637` is preserved under
+`tmp/cos-installed-retained-output-public-history-01/run/`. SQLite capture reached
+both completed outputs but cold metadata loading refused a newly empty WAL as
+changed history. The named newer runtime corrects only that cold SQLite case.
+JSONL passed through native restore; its exact erasure approval was blocked by
+automatic tool review, so the finite gate ended blocked without deletion. That
+proposal is not retried. The next separately pinned run selects SQLite only;
+it cannot promote the earlier JSONL scope into new-candidate package evidence.
+Erasure remains an explicit review blocker, not a failing runtime assertion.
 
 ## Implementation
 
@@ -44,7 +54,7 @@ The config has exactly these keys (all digests must be measured from actual file
 {
   "schemaVersion": 1,
   "allowExecution": true,
-  "source": "130c2d0087cf574016411fdc7d91067d3eddd637",
+  "source": "33481a72aba1b11d4f3d63f14c8ab4f7ea1f7afd",
   "sourceReceipt": {"path": "/absolute/source.json", "sha256": "REPLACE"},
   "tarball": {"path": "/absolute/candidate.tgz", "sha256": "REPLACE", "bytes": 0},
   "node": {"path": "/absolute/node", "sha256": "REPLACE", "version": "REPLACE"},

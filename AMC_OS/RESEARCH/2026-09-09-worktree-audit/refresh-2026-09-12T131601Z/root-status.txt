@@ -1,0 +1,242 @@
+ M AMC_OS/RESEARCH/2026-09-09-chat-on-steroids/closure-goal-dispatch.json
+ M AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/README.md
+ M AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/native-case.mjs
+ M AMC_OS/RESEARCH/2026-09-09-installed-retained-output-public-history/run.py
+ M AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/README.md
+ M docs/ARCHITECTURE_NAVIGATION.md
+ M docs/HARNESS_COMPARISON.md
+ M docs/HUMAN_FIRST_USE_CAPTURE.md
+ M docs/HUMAN_FIRST_USE_OBSERVER.md
+ M docs/HUMAN_FIRST_USE_STUDY.md
+ M docs/PLATFORM_QUALIFICATION.md
+ M plans/amc-dsh-pi-execution-2026-09-08.md
+ M plans/ownership-manifest.md
+ M scripts/human-first-use-capture.mjs
+ M scripts/human-first-use-intake.mjs
+ M scripts/human-first-use-observer.mjs
+ M scripts/qualify-platform.mjs
+ M sdk/python/amc_sdk/__init__.py
+ M sdk/python/amc_sdk/client.py
+ M sdk/python/pyproject.toml
+ M src/acp/acpAgentServer.ts
+ M src/acp/acpCli.ts
+ M src/acp/acpCommittedUpdates.ts
+ M src/acp/acpConnection.ts
+ M src/acp/acpEnvelope.ts
+ M src/acp/acpNativeSession.ts
+ M src/acp/acpProjection.ts
+ M src/acp/acpSchema.ts
+ M src/acp/acpStdioMain.ts
+ M src/agent/agentDriver.ts
+ M src/agent/agentSession.ts
+ M src/agent/inbox.ts
+ M src/agent/index.ts
+ M src/agent/loopTypes.ts
+ M src/agent/nativeRunUsage.ts
+ M src/agent/nativeValidation.ts
+ M src/api/nativeTasksRouter.ts
+ M src/attachments/attachmentIngest.ts
+ M src/benchmarks/harnessComparison.ts
+ M src/cli-agent-commands.ts
+ M src/cli-agent-options.ts
+ M src/cli-native-schedule-commands.ts
+ M src/cli.ts
+ M src/console/assets/nativeTaskSubmission.js
+ M src/console/assets/nativeTasks.css
+ M src/console/assets/nativeTasks.js
+ M src/console/assets/nativeTasksView.js
+ M src/console/pages/native-tasks.html
+ M src/extensions/nativeExtensionManifest.ts
+ M src/extensions/nativeExtensionRuntime.ts
+ M src/extensions/nativeExtensionStore.ts
+ M src/kernel/agentLoopRunner.ts
+ M src/kernel/services/agentLoopServices.ts
+ M src/kernel/services/terminalServices.ts
+ M src/llm/adapter/providerCapabilities.ts
+ M src/llm/adapter/streamRecorder.ts
+ M src/llm/adapter/transport.ts
+ M src/llm/blockAssembler.ts
+ M src/llm/index.ts
+ M src/llm/providers/anthropicAdapter.ts
+ M src/llm/providers/openaiAdapter.ts
+ M src/llm/providers/openaiResponsesAdapter.ts
+ M src/llm/request/anthropicMessagesEncoder.ts
+ M src/llm/request/builtInEncoders.ts
+ M src/llm/request/deriveRequest.ts
+ M src/llm/request/openaiChatEncoder.ts
+ M src/llm/request/openaiChatEncoderV2.ts
+ M src/llm/request/openaiResponsesEncoder.ts
+ M src/llm/request/providerToolNames.ts
+ M src/llm/request/requestSources.ts
+ M src/llm/request/requestSpec.ts
+ M src/llm/streamChunk.ts
+ M src/mcp/nativeMcpClient.ts
+ M src/mcp/nativeMcpHttpTransport.ts
+ M src/plugins/pluginLoader.ts
+ M src/plugins/pluginManifestSchema.ts
+ M src/plugins/pluginPackage.ts
+ M src/plugins/pluginTypes.ts
+ M src/sdk/amcAgent.ts
+ M src/sdk/index.ts
+ M src/sdk/nativeAgentClient.ts
+ M src/session/loopEventMeta.ts
+ M src/session/sessionApiTypes.ts
+ M src/session/sessionService.ts
+ M src/session/sessionTypes.ts
+ M src/setup/nativeChatResult.ts
+ M src/setup/nativeFirstUseGuide.ts
+ M src/setup/nativeInteractiveApprovals.ts
+ M src/setup/nativeInteractiveSession.ts
+ M src/setup/nativeValidationConfig.ts
+ M src/studio/nativeTaskDescriptors.ts
+ M src/studio/nativeTaskOpenapi.ts
+ M src/studio/nativeTaskProjection.ts
+ M src/studio/nativeTaskService.ts
+ M src/studio/nativeTaskTypes.ts
+ M src/terminal/pipeTerminal.ts
+ M src/terminal/terminalSession.ts
+ M src/terminal/terminalTypes.ts
+ M tests/llmResponsesCapabilities.test.ts
+?? docs/AMC_1512_EVIDENCE_PROTOCOL.md
+?? docs/AMC_1512_HUMAN_FIRST_USE_PROTOCOL.md
+?? docs/HUMAN_FIRST_USE_CREDENTIAL_TRANSITIONS.md
+?? docs/HUMAN_FIRST_USE_MODEL_REVISION.md
+?? docs/NATIVE_ACP_IMAGE_INPUT.md
+?? docs/NATIVE_CHAT_IMAGE_INPUT.md
+?? docs/NATIVE_DEEPSEEK_WIRE.md
+?? docs/NATIVE_GEMINI_PROTOCOL.md
+?? docs/NATIVE_ORDERED_IMAGE_INPUT.md
+?? docs/NATIVE_RESPONSES_IMAGE_INPUT.md
+?? docs/NATIVE_SIGNED_AUDIO_INPUT.md
+?? docs/NATIVE_SIGNED_IMAGE_INPUT.md
+?? plans/2026-09-09-amc-execution-brief.md
+?? sdk/python/amc_sdk/py.typed
+?? sdk/python/tests/P06_acp_peer.py
+?? sdk/python/tests/test_P06_client.py
+?? sdk/python/tests/test_gemini_protocol.py
+?? sdk/python/tests/test_image_input.py
+?? sdk/python/tests/test_ordered_image_input.py
+?? sdk/python/tests/test_signed_audio_input.py
+?? src/acp/acpAudioInput.ts
+?? src/acp/acpHistoryContinuity.ts
+?? src/acp/acpImageHistory.ts
+?? src/acp/acpPromptInput.ts
+?? src/acp/acpRuntimeContracts.ts
+?? src/agent/nativeAudioMessage.ts
+?? src/agent/nativeImageMessage.ts
+?? src/agent/nativeOrderedMessage.ts
+?? src/attachments/nativeAudioFiles.ts
+?? src/attachments/nativeAudioInput.ts
+?? src/attachments/nativeImageFiles.ts
+?? src/attachments/nativeImageInput.ts
+?? src/attachments/nativeOrderedInput.ts
+?? src/extensions/nativeExecutableExtension.ts
+?? src/llm/providers/deepseekAdapter.ts
+?? src/llm/providers/deepseekContract.ts
+?? src/llm/providers/deepseekUsage.ts
+?? src/llm/providers/geminiAdapter.ts
+?? src/llm/providers/geminiAudioAdapter.ts
+?? src/llm/providers/geminiAudioUsage.ts
+?? src/llm/providers/geminiContract.ts
+?? src/llm/providers/geminiJson.ts
+?? src/llm/providers/geminiUsage.ts
+?? src/llm/providers/ollamaAdapter.ts
+?? src/llm/providers/ollamaContract.ts
+?? src/llm/providers/ollamaJson.ts
+?? src/llm/providers/ollamaRoute.ts
+?? src/llm/providers/ollamaToolIdentity.ts
+?? src/llm/providers/ollamaUsage.ts
+?? src/llm/request/anthropicMessagesEncoderV4.ts
+?? src/llm/request/deepseekChatEncoder.ts
+?? src/llm/request/geminiContentEncoder.ts
+?? src/llm/request/geminiContentEncoderV2.ts
+?? src/llm/request/ollamaChatEncoder.ts
+?? src/llm/request/openaiChatEncoderV4.ts
+?? src/llm/request/openaiResponsesEncoderV3.ts
+?? src/mcp/nativeMcpReconnect.ts
+?? src/mcp/nativeMcpReconnectStream.ts
+?? src/plugins/nativeExecutableBootstrap.ts
+?? src/plugins/nativeExecutablePackage.ts
+?? src/plugins/nativeExecutablePolicy.ts
+?? src/plugins/nativeExecutableRunner.ts
+?? src/plugins/nativeExecutableSchema.ts
+?? src/plugins/nativeExecutableSource.ts
+?? src/session/geminiPartMeta.ts
+?? src/session/nativeAudioProvenance.ts
+?? src/studio/nativeTaskInput.ts
+?? src/terminal/nativePtyHelper.ts
+?? src/terminal/nativePtySandbox.ts
+?? src/terminal/nativePtyTerminal.ts
+?? src/terminal/nativeTerminal.ts
+?? src/terminal/terminalOutput.ts
+?? tests/cosBatch1OllamaUsage.test.ts
+?? tests/cosBatch1ProviderIntegration.test.ts
+?? tests/cosProduct01Approvals.test.ts
+?? tests/cosProduct01Chat.test.ts
+?? tests/cosProduct01Usage.test.ts
+?? tests/cosProduct02NativePty.test.ts
+?? tests/cosProduct02NativePtyLinux.test.ts
+?? tests/cosProduct02NativeTerminal.test.ts
+?? tests/cosProduct02TerminalSession.test.ts
+?? tests/cosProduct03McpReconnect.test.ts
+?? tests/cosProduct03McpRecoveryMount.test.ts
+?? tests/cosProduct04ExecutableLifecycle.test.ts
+?? tests/cosProduct04SignedExtensions.test.ts
+?? tests/cosProduct05Modalities.test.ts
+?? tests/cosProduct05OllamaRuntime.test.ts
+?? tests/cosProduct05OllamaWire.test.ts
+?? tests/cosProduct07NativeSdk.test.ts
+?? tests/cosProduct07NativeSdkProcess.test.ts
+?? tests/cosProduct08Connection.test.ts
+?? tests/cosProduct08Continuity.test.ts
+?? tests/cosProduct08Runtime.test.ts
+?? tests/cosProduct09StudioPage.test.ts
+?? tests/cosProduct09StudioState.test.ts
+?? tests/cosProduct10NativeTaskInput.test.ts
+?? tests/cosProduct10NativeTaskProjection.test.ts
+?? tests/cosProduct10NativeTaskService.test.ts
+?? tests/cosProduct10NativeTasksRouter.test.ts
+?? tests/deepseekNativeIntegration.test.ts
+?? tests/deepseekNativeWire.test.ts
+?? tests/deepseekPublicSurface.test.ts
+?? tests/fixtures/nativeAcpImageClientPeer.mjs
+?? tests/fixtures/nativeAcpImageRuntime.ts
+?? tests/fixtures/nativeChatCli.ts
+?? tests/fixtures/nativeChatImageStream.ts
+?? tests/fixtures/nativeGeminiCli.ts
+?? tests/fixtures/nativeGeminiStream.ts
+?? tests/fixtures/nativeOrderedAcpCli.ts
+?? tests/fixtures/nativeOrderedImageClientPeer.mjs
+?? tests/fixtures/nativeOrderedImageHarness.ts
+?? tests/fixtures/nativeResponsesImageStream.ts
+?? tests/fixtures/nativeSignedAudio.ts
+?? tests/fixtures/nativeSignedAudioCli.ts
+?? tests/fixtures/nativeSignedAudioCold.ts
+?? tests/fixtures/nativeSignedImageCold.ts
+?? tests/harnessComparisonOutputOwnership.test.ts
+?? tests/humanFirstUseCredentialMigrationBoundary.test.ts
+?? tests/humanFirstUseCredentials.test.ts
+?? tests/humanFirstUseModelRevision.test.ts
+?? tests/humanFirstUsePhaseOrder.test.ts
+?? tests/nativeAcpImageInput.test.ts
+?? tests/nativeChatAcpImageInput.test.ts
+?? tests/nativeChatImageInput.test.ts
+?? tests/nativeGeminiColdHostile.test.ts
+?? tests/nativeGeminiPublic.test.ts
+?? tests/nativeGeminiRuntime.test.ts
+?? tests/nativeGeminiWire.test.ts
+?? tests/nativeImageSdk.test.ts
+?? tests/nativeOrderedAcpImageInput.test.ts
+?? tests/nativeOrderedImageInput.test.ts
+?? tests/nativeOrderedImageSdk.test.ts
+?? tests/nativeResponsesAcpImageInput.test.ts
+?? tests/nativeResponsesImageInput.test.ts
+?? tests/nativeSignedAudioColdHostile.test.ts
+?? tests/nativeSignedAudioInput.test.ts
+?? tests/nativeSignedAudioPublic.test.ts
+?? tests/nativeSignedAudioRuntime.test.ts
+?? tests/nativeSignedImageInput.test.ts
+?? tests/nativeSignedImagePublicInput.test.ts
+?? tests/nativeValidationConfigAmbiguity.test.ts
+?? tests/nativeValidationPlanAdmission.test.ts
+?? tests/platformQualificationOutputOwnership.test.ts

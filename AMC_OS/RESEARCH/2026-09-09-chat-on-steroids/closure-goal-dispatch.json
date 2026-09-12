@@ -1,7 +1,7 @@
 {
   "confirmedAt": "2026-09-09T11:08:56.921577+00:00",
   "timeoutReviewAt": "2026-09-09T11:38:56.921577+00:00",
-  "status": "goal-running",
+  "status": "completion-observed-reviewing-artifacts",
   "model": "GPT-6 Pro",
   "conversation": "Produce the finite AMC Phase A closure-evidence map using GPT-6 Pro throughout.",
   "goalConfigured": true,
@@ -18,5 +18,12 @@
   "recovery": "Direct composer delivery confirmed, Pursuing goal and Stop turn observed on GPT-6 Pro",
   "checkPolicy": "Only completion marker, timeout or instruction need; Codex validates independently",
   "completionMarker": "Closure map complete; ready for Codex receipt reconciliation",
-  "qualification": "Evidence mapping assignment, not runtime acceptance or permission to close issues"
+  "qualification": "Evidence mapping assignment, not runtime acceptance or permission to close issues",
+  "checkedAt": "2026-09-09T11:39:54.498945+00:00",
+  "checkTrigger": "configured30-minute timeout reached",
+  "modelObserved": "GPT-6 Pro",
+  "finalCompletionMarkerObserved": true,
+  "pausedAutomationObserved": true,
+  "idleSendMessageObserved": true,
+  "remainingAutomaticFollowup": "cancelled by app; not retried"
 }

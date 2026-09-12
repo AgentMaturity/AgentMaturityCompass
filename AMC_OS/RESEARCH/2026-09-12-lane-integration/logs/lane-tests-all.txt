@@ -1,0 +1,178 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass
+
+ ❯ tests/nativeGeminiWire.test.ts (26 tests | 1 failed) 43ms
+     × actual cold registry, exact public route and historical identities 12ms
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts (13 tests | 13 failed) 12526ms
+   × Darwin 'CLI' public validation reports 'success', preserves its actual output reference and survives cold inspection 2419ms
+   × Darwin 'CLI' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection 2171ms
+   × Darwin 'CLI' public validation reports 'denied', preserves its actual output reference and survives cold inspection 1840ms
+   × Darwin 'CLI' public validation reports 'budget', preserves its actual output reference and survives cold inspection 2082ms
+   × Darwin 'SDK' public validation reports 'success', preserves its actual output reference and survives cold inspection 336ms
+   × Darwin 'SDK' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection 447ms
+   × Darwin 'SDK' public validation reports 'denied', preserves its actual output reference and survives cold inspection 343ms
+   × Darwin 'SDK' public validation reports 'budget', preserves its actual output reference and survives cold inspection 616ms
+   × Darwin 'Studio' public validation reports 'success', preserves its actual output reference and survives cold inspection 533ms
+   × Darwin 'Studio' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection 534ms
+   × Darwin 'Studio' public validation reports 'denied', preserves its actual output reference and survives cold inspection 490ms
+   × Darwin 'Studio' public validation reports 'budget', preserves its actual output reference and survives cold inspection 352ms
+   × Studio refuses a non-private operator credential directory before opening a native session 361ms
+ ❯ tests/nativeValidationSurfaces.test.ts (3 tests | 3 failed) 2425ms
+   × actual built CLI distinguishes completed turns from unavailable selected checks and seals evidence 2100ms
+   × actual built SDK distinguishes completed turns from unavailable selected checks and seals evidence 321ms
+   × SDK never turns absent or malformed validation metadata into a pass 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 17 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/nativeGeminiWire.test.ts > Gemini GenerateContent@1 native wire (unexecuted) > actual cold registry, exact public route and historical identities
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/nativeGeminiWire.test.ts:45:117
+     43|       thinking: "signed-parts-replay", features: { "audio-input": "uns…
+     44|     const route = { encoderId: geminiAdapter.encoderId, encoderVersion…
+     45|     // gemini-generate-content@2 (native audio) still admits ordered i…
+       |                                                                                                                     ^
+     46|     expect(acpSupportsImageInput(route)).toBe(true); expect(acpSupport…
+     47|     expect(acpSupportsImageInput({ ...route, encoderVersion: 3 })).toB…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'CLI' public validation reports 'success', preserves its actual output reference and survives cold inspection
+AssertionError: error: unknown option '--validation-config'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:49:42
+     47|         child.once("close", code => { clearTimeout(term); clearTimeout…
+     48|       });
+     49|       expect(result.code, result.stderr).toBe(mode === "success" ? 0 :…
+       |                                          ^
+     50|       summary = JSON.parse(result.stdout) as AgentRunSummary;
+     51|     } else if (surface === "SDK") {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'CLI' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection
+SyntaxError: Unexpected end of JSON input
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:50:22
+     48|       });
+     49|       expect(result.code, result.stderr).toBe(mode === "success" ? 0 :…
+     50|       summary = JSON.parse(result.stdout) as AgentRunSummary;
+       |                      ^
+     51|     } else if (surface === "SDK") {
+     52|       const { AMCNativeClient } = await import(pathToFileURL(resolve("…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'CLI' public validation reports 'denied', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'CLI' public validation reports 'budget', preserves its actual output reference and survives cold inspection
+SyntaxError: Unexpected end of JSON input
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:50:22
+     48|       });
+     49|       expect(result.code, result.stderr).toBe(mode === "success" ? 0 :…
+     50|       summary = JSON.parse(result.stdout) as AgentRunSummary;
+       |                      ^
+     51|     } else if (surface === "SDK") {
+     52|       const { AMCNativeClient } = await import(pathToFileURL(resolve("…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'success', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'denied', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'SDK' public validation reports 'budget', preserves its actual output reference and survives cold inspection
+Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:52:35
+     50|       summary = JSON.parse(result.stdout) as AgentRunSummary;
+     51|     } else if (surface === "SDK") {
+     52|       const { AMCNativeClient } = await import(pathToFileURL(resolve("…
+       |                                   ^
+     53|       const client = await AMCNativeClient.start({ workspace, provider…
+     54|         validationConfig: f.checks, validationConfigSha256: f.sha256, …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'success', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'nonzero', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'denied', preserves its actual output reference and survives cold inspection
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Darwin 'Studio' public validation reports 'budget', preserves its actual output reference and survives cold inspection
+Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:62:43
+     60|       } finally { await client.close(); }
+     61|     } else {
+     62|       const { createNativeTaskService } = await import(pathToFileURL(r…
+       |                                           ^
+     63|       const service = createNativeTaskService({ workspace, validationC…
+     64|       const actor = { principalId: "automated-validation-fixture", age…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  tests/nativeValidationOutcomeSurfaces.test.ts > Studio refuses a non-private operator credential directory before opening a native session
+Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/studio/nativeTaskService.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts
+ ❯ tests/nativeValidationOutcomeSurfaces.test.ts:116:39
+    114|   vi.stubEnv("AMC_VAULT_PASSPHRASE", pass); vi.stubEnv("AMC_CONTROL_CH…
+    115|   const f = validationOperatorFixture(workspace, "success");
+    116|   const { createNativeTaskService } = await import(pathToFileURL(resol…
+       |                                       ^
+    117|   const service = createNativeTaskService({ workspace, validationConfi…
+    118|     environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSP…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  tests/nativeValidationSurfaces.test.ts > actual built CLI distinguishes completed turns from unavailable selected checks and seals evidence
+SyntaxError: Unexpected end of JSON input
+ ❯ tests/nativeValidationSurfaces.test.ts:42:20
+     40|     });
+     41|     expect(result.code, result.stderr).toBe(1);
+     42|     summary = JSON.parse(result.stdout) as AgentRunSummary;
+       |                    ^
+     43|   } else {
+     44|     const { AMCNativeClient } = await import(pathToFileURL(resolve("di…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  tests/nativeValidationSurfaces.test.ts > actual built SDK distinguishes completed turns from unavailable selected checks and seals evidence
+Error: Cannot find module 'file:///Users/sid/AgentMaturityCompass/dist/sdk/nativeAgentClient.js' imported from /Users/sid/AgentMaturityCompass/tests/nativeValidationSurfaces.test.ts
+ ❯ tests/nativeValidationSurfaces.test.ts:44:33
+     42|     summary = JSON.parse(result.stdout) as AgentRunSummary;
+     43|   } else {
+     44|     const { AMCNativeClient } = await import(pathToFileURL(resolve("di…
+       |                                 ^
+     45|     const client = await AMCNativeClient.start({ workspace, provider: …
+     46|       validationConfig: checks, validationConfigSha256: config.sha256,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  tests/nativeValidationSurfaces.test.ts > SDK never turns absent or malformed validation metadata into a pass
+AMCNativeProtocolError: native prompt returned invalid validation metadata
+ ❯ AMCNativeTurn.finish src/sdk/nativeAgentClient.ts:243:21
+    241|       : parseNativeValidationResult(rawValidation);
+    242|     if (validation === null) {
+    243|       const error = new AMCNativeProtocolError("native prompt returned…
+       |                     ^
+    244|     }
+    245|     const text = this.updates.flatMap(({ update }) => {
+ ❯ tests/nativeValidationSurfaces.test.ts:69:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+
+ Test Files  3 failed | 73 passed | 1 skipped (77)
+      Tests  17 failed | 1789 passed | 12 skipped (1818)
+   Start at  19:29:00
+   Duration  133.70s (transform 43.97s, setup 0ms, import 128.12s, tests 849.42s, environment 6ms)
+
+all exit=1
