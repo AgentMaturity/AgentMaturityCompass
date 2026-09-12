@@ -98,6 +98,8 @@ export interface LoopInboxRecord {
   readonly origin: InboxOrigin | null;
   /** The text being queued. Present on `insert` only. */
   readonly text: string | null;
+  /** Absent is historical literal text. The versioned image bundle is blob-backed. */
+  readonly payloadFormat?: "amc-image-input@1" | "amc-image-input@2" | "amc-audio-input@1";
   /** Whether this insertion was allowed to wake an idle driver. */
   readonly wake: boolean;
   /**
@@ -346,6 +348,9 @@ function assertCause(cause: TurnCancelCause): TurnCancelCause {
 }
 
 function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
+  if (record.payloadFormat !== undefined && (record.op !== "insert" || !["amc-image-input@1", "amc-image-input@2", "amc-audio-input@1"].includes(record.payloadFormat))) {
+    throw new Error("loop/inbox: unsupported image payload format or format on a removal");
+  }
   if (record.op === "insert") {
     if (record.text === null || record.messageIds.length !== 1 || record.origin === null) {
       throw new Error(
@@ -369,7 +374,8 @@ function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
       // it" when folding the log, so it is never omitted.
       outcome: record.op === "cancel" ? "cancelled" : null,
       wake: record.wake,
-      demotedFrom: record.demotedFrom
+      demotedFrom: record.demotedFrom,
+      ...(record.payloadFormat === undefined ? {} : { payloadFormat: record.payloadFormat })
     },
     payload: record.text
   };
@@ -377,6 +383,7 @@ function buildInboxRow(record: LoopInboxRecord): LoopEventRow {
 
 /** A `loop/inbox` row's meta, as read back out of the log. */
 export interface LoopInboxMeta {
+  readonly payloadFormat?: "amc-image-input@1" | "amc-image-input@2" | "amc-audio-input@1";
   readonly op: InboxSpliceOp;
   readonly target: InboxTarget;
   readonly start: number;
@@ -408,6 +415,7 @@ export function readLoopInboxMeta(metaJson: string): LoopInboxMeta | null {
   }
   const meta = parsed as Record<string, unknown>;
   const { op, target, start, removedCount, messageIds, origin } = meta;
+  if (meta.payloadFormat !== undefined && (typeof meta.payloadFormat !== "string" || !["amc-image-input@1", "amc-image-input@2", "amc-audio-input@1"].includes(meta.payloadFormat) || op !== "insert")) return null;
   if (typeof op !== "string" || !INBOX_OPS.has(op)) return null;
   if (typeof target !== "string" || !INBOX_TARGETS.has(target)) return null;
   if (!Number.isSafeInteger(start) || (start as number) < 0) return null;
@@ -420,7 +428,8 @@ export function readLoopInboxMeta(metaJson: string): LoopInboxMeta | null {
     start: start as number,
     removedCount: removedCount as number,
     messageIds: messageIds as readonly string[],
-    origin: (origin as InboxOrigin | null) ?? null
+    origin: (origin as InboxOrigin | null) ?? null,
+    ...(meta.payloadFormat === undefined ? {} : { payloadFormat: meta.payloadFormat as "amc-image-input@1" | "amc-image-input@2" | "amc-audio-input@1" })
   };
 }
 

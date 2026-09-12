@@ -197,6 +197,7 @@ import { registerSpillCommands } from "./cli-spill-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
 import { registerAcpCommands } from "./acp/acpCli.js";
 import { registerAgentCommands } from "./cli-agent-commands.js";
+import { registerNativeProviderCommands } from "./cli-agent-options.js";
 import { registerNativeExtensionCommands } from "./cli-native-extension-commands.js";
 import { registerCredentialsCommands } from "./cli-credentials-commands.js";
 import { issueCertificate, inspectCertificate, revokeCertificate, verifyCertificate, verifyRevocation } from "./assurance/certificate.js";
@@ -350,7 +351,7 @@ import {
   benchVerifyCli,
   benchVerifyPolicyCli
 } from "./bench/benchCli.js";
-import { initOpsPolicy, loadOpsPolicy, verifyOpsPolicySignature } from "./ops/policy.js";
+import { initOpsPolicy, loadOpsPolicy, signOpsPolicy, verifyOpsPolicySignature } from "./ops/policy.js";
 import { retentionRunCli, retentionStatusCli, retentionVerifyCli } from "./ops/retention/retentionCli.js";
 import { backupCreateCli, backupPrintCli, backupRestoreCli, backupVerifyCli } from "./ops/backup/backupCli.js";
 import {
@@ -8206,6 +8207,17 @@ ops
     const created = initOpsPolicy(process.cwd());
     console.log(chalk.green(`Ops policy created: ${created.configPath}`));
     console.log(`Signature: ${created.sigPath}`);
+  });
+
+ops
+  .command("sign")
+  .description("Re-sign an edited .amc/ops-policy.yaml so the ledger, retention and payload caps apply it")
+  .action(() => {
+    const workspace = process.cwd();
+    const policy = loadOpsPolicy(workspace);
+    const sigPath = signOpsPolicy(workspace);
+    console.log(chalk.green(`Ops policy signed: ${sigPath}`));
+    console.log(`retention.maxPayloadBytesPerEvent: ${policy.opsPolicy.retention.maxPayloadBytesPerEvent}`);
   });
 
 ops
@@ -24396,6 +24408,7 @@ registerSpillCommands(program);
 registerWireCommands(program);
 registerAcpCommands(program);
 registerAgentCommands(program);
+registerNativeProviderCommands(program);
 registerNativeExtensionCommands(program);
 registerCredentialsCommands(program);
 

@@ -17,8 +17,12 @@ import { assertToolSchemaCommitted } from "./toolSchemaCommitment.js";
 import { buildStepEndMeta, buildTurnEndMeta } from "./turnLifecycleMeta.js";
 import { buildApprovalRow } from "./approvalEventMeta.js";
 import { buildLoopEventRow } from "./loopEventMeta.js";
+import { assertNativeImageBytes, snapshotNativeImages } from "../attachments/nativeImageInput.js";
+import { assertNativeAudioBytes, snapshotNativeAudio, NATIVE_AUDIO_INPUT_FORMAT } from "../attachments/nativeAudioInput.js";
+import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
+import { assertSessionPayloadWithinCap } from "./sessionPayloadCap.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
 import { SPILL_META_KEY, type SpillPolicyConfig } from "./spill/spillTypes.js";
 import type {
@@ -404,20 +408,31 @@ export class SessionService extends SessionEventWriter {
     });
   }
 
-  recordUserMessage(text: string): SessionEventRef {
+  recordUserMessage(text: string, provenance?: {
+    readonly sourceInputEventId: string;
+    readonly sourceInputFormat: "amc-image-input@2" | "amc-audio-input@1";
+    readonly sourceContentIndex: number;
+  }): SessionEventRef {
+    if (provenance !== undefined && (!["amc-image-input@2", NATIVE_AUDIO_INPUT_FORMAT].includes(provenance.sourceInputFormat)
+        || typeof provenance.sourceInputEventId !== "string" || !provenance.sourceInputEventId
+        || !Number.isSafeInteger(provenance.sourceContentIndex) || provenance.sourceContentIndex < 0)) {
+      throw new Error("Ordered text provenance requires its source inbox, format and nonnegative content index.");
+    }
     return this.recordContent({
       eventType: "user/message",
       content: text,
       slot: "user",
       role: "user",
       kind: "text",
-      buildMeta: () => ({}),
+      buildMeta: () => provenance === undefined ? {} : ({ sourceInputEventId: provenance.sourceInputEventId,
+        sourceInputFormat: provenance.sourceInputFormat, sourceContentIndex: provenance.sourceContentIndex }),
       turn: this.currentTurn,
       step: this.currentStep
     });
   }
 
   recordAssistantBlock(block: AssistantBlockInput): SessionEventRef {
+    const gemini = block.gemini === undefined ? undefined : snapshotRecordedGeminiPart(block.gemini, block.blockKind, block.content);
     const turn = this.currentTurn;
     const step = this.currentStep;
     return this.recordContent({
@@ -431,7 +446,8 @@ export class SessionService extends SessionEventWriter {
         step,
         blockIndex: block.blockIndex,
         blockKind: block.blockKind,
-        stopReason: block.stopReason
+        stopReason: block.stopReason,
+        ...(gemini === undefined ? {} : { gemini })
       }),
       turn,
       step
@@ -454,14 +470,42 @@ export class SessionService extends SessionEventWriter {
   recordUserAttachment(params: {
     readonly filename: string;
     readonly content: string | Buffer;
-    readonly kind: "text" | "image";
+    readonly kind: "text" | "image" | "audio";
     readonly mimeType: string;
+    readonly sourceInputEventId?: string;
+    readonly sourceInputIndex?: number;
+    readonly sourceInputFormat?: "amc-image-input@2" | "amc-audio-input@1";
+    readonly sourceContentIndex?: number;
   }): SessionEventRef {
     const turn = this.currentTurn;
     const step = this.currentStep;
     const bytes = typeof params.content === "string"
       ? Buffer.from(params.content, "utf8")
-      : params.content;
+      : Buffer.from(params.content);
+    if ((params.sourceInputEventId !== undefined || params.sourceInputIndex !== undefined)
+        && ((params.kind !== "image" && params.kind !== "audio") || typeof params.sourceInputEventId !== "string" || !params.sourceInputEventId
+          || !Number.isSafeInteger(params.sourceInputIndex) || params.sourceInputIndex! < 0)) {
+      throw new Error("Image input provenance requires a source inbox row and nonnegative image index together.");
+    }
+    if ((params.sourceInputFormat !== undefined || params.sourceContentIndex !== undefined)
+        && ((params.sourceInputFormat !== "amc-image-input@2" && params.sourceInputFormat !== NATIVE_AUDIO_INPUT_FORMAT) || params.sourceInputEventId === undefined
+          || !Number.isSafeInteger(params.sourceContentIndex) || params.sourceContentIndex! < 0)) {
+      throw new Error("Ordered image provenance requires its source inbox, format and nonnegative content index.");
+    }
+    // Original bytes become one signed row; refuse an oversize attachment before it is recorded, naming the fix.
+    assertSessionPayloadWithinCap(this.workspace, `Attachment ${JSON.stringify(params.filename)}`, bytes.byteLength);
+    if (params.kind === "image") {
+      assertNativeImageBytes(bytes, params.mimeType);
+      snapshotNativeImages([{ filename: params.filename, bytes, mediaType: params.mimeType }]);
+    }
+    if (params.kind === "audio") {
+      if (params.sourceInputFormat !== NATIVE_AUDIO_INPUT_FORMAT || params.sourceInputEventId === undefined
+          || !Number.isSafeInteger(params.sourceContentIndex) || !Number.isSafeInteger(params.sourceInputIndex)) {
+        throw new Error("Audio attachments require original signed audio inbox/order provenance.");
+      }
+      assertNativeAudioBytes(bytes, params.mimeType);
+      snapshotNativeAudio({ filename: params.filename, bytes, mediaType: params.mimeType });
+    }
     return this.recordContent({
       eventType: "user/attachment",
       content: bytes,
@@ -475,7 +519,9 @@ export class SessionService extends SessionEventWriter {
         step,
         filename: params.filename,
         mimeType: params.mimeType,
-        bytes: bytes.byteLength
+        bytes: bytes.byteLength,
+        ...(params.sourceInputEventId === undefined ? {} : { sourceInputEventId: params.sourceInputEventId, sourceInputIndex: params.sourceInputIndex }),
+        ...(params.sourceInputFormat === undefined ? {} : { sourceInputFormat: params.sourceInputFormat, sourceContentIndex: params.sourceContentIndex })
       }),
       turn,
       step
@@ -483,6 +529,8 @@ export class SessionService extends SessionEventWriter {
   }
 
   recordToolCall(call: ToolCallInput): SessionEventRef {
+    const gemini = call.gemini === undefined ? undefined : snapshotRecordedGeminiPart(call.gemini, "tool_use", call.args,
+      { id: call.toolCallId, wireName: call.providerName?.wireName ?? call.toolName });
     // Recorded (and therefore durably committed) BEFORE the caller performs the
     // tool side effect, so no model-visible dispatch precedes its log entry.
     const turn = this.currentTurn;
@@ -501,7 +549,8 @@ export class SessionService extends SessionEventWriter {
         argsSha256,
         dispatch: call.dispatch,
         parentToken: call.parentToken,
-        ...(call.providerName === undefined ? {} : { providerName: call.providerName })
+        ...(call.providerName === undefined ? {} : { providerName: call.providerName }),
+        ...(gemini === undefined ? {} : { gemini })
       }),
       turn,
       step

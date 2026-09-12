@@ -90,6 +90,8 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
       .requiredOption("--approve-tools <actionClass>", "signed approval class; all enabled schedule scopes must match it")
       .option("--approve-risk <tier>", "signed approval risk tier, default high")
       .option("--max-tokens <n>", "positive per-request output ceiling", "1024")
+      .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
+      .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
       .option("--max-steps <n>", "positive native model steps per round", "8");
     if (commandName === "watch") command.option("--poll-ms <ms>", "delay after a pass settles, never an overlapping interval", "30000");
     command.action(async (opts: ExecuteOptions) => {
@@ -112,6 +114,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
         const pollMs = integerOption(io, "--poll-ms", opts.pollMs, 30000);
         if (maxTokens === null || maxSteps === null || pollMs === null) return;
         if (maxTokens < 1 || maxSteps < 1) throw new Error("Scheduled rounds require positive --max-tokens and --max-steps.");
+        const requestParams = paramsFor(opts.provider, maxTokens, opts);
         const admission = { workspace: root, expectedSchedulesDigest: opts.expectDigest,
           expectedToolsDigest: opts.expectToolsDigest, approvalClass: gate.actionClass };
         assertNativeScheduleAdmission(admission);
@@ -126,7 +129,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
           const runtime = await loadRuntime();
           if (signal.aborted) return { sessionId: null, scheduleResults: [], cancelled: true };
           const outcome = await runtime.runComposedTurn({ workspace: root, agentId: opts.agent, prompt: "",
-            route: { providerId: opts.provider, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, params: paramsFor(opts.provider, maxTokens) },
+            route: { providerId: opts.provider, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, params: requestParams },
             routes: [route], ...(opts.provider === STUB_PROVIDER_ID ? { transport: stubProviderTransport({}) } : {}),
             config: { maxStepsPerTurn: maxSteps },
             approvalGate: { actionClass: gate.actionClass, riskTier: gate.riskTier,

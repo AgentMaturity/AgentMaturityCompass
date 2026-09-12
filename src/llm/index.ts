@@ -3,7 +3,7 @@
  *
  * P3.1 in full: the stream contract, the fold, the typed failure taxonomy, the
  * reconstructable-request path, the adapter registry with its per-call pin, the
- * runtime that dispatches and records, and three providers.
+ * runtime that dispatches and records, and native provider wire adapters.
  *
  * The invariant this seam exists to protect: an adapter translates a wire
  * format into {@link StreamChunk}s and stops. It does not assemble, it does not
@@ -25,6 +25,7 @@ export {
   DELTA_BLOCK_KIND,
   type FinishReason,
   type ImageContentBlock,
+  type AudioContentBlock,
   type StreamChunk,
   type StreamChunkType,
   type StreamTokenUsage,
@@ -105,8 +106,12 @@ export {
 export { OPENAI_CHAT_ENCODER_ID, openaiChatEncoder } from "./request/openaiChatEncoder.js";
 export { openaiChatEncoderV2 } from "./request/openaiChatEncoderV2.js";
 export { openaiChatEncoderV3 } from "./request/openaiChatEncoderV3.js";
+export { openaiChatEncoderV4 } from "./request/openaiChatEncoderV4.js";
 export { anthropicMessagesEncoderV3 } from "./request/anthropicMessagesEncoderV3.js";
+export { anthropicMessagesEncoderV4 } from "./request/anthropicMessagesEncoderV4.js";
 export { openaiResponsesEncoderV2 } from "./request/openaiResponsesEncoderV2.js";
+export { openaiResponsesEncoderV3 } from "./request/openaiResponsesEncoderV3.js";
+export { deepseekChatEncoder } from "./request/deepseekChatEncoder.js";
 export { BUILT_IN_REQUEST_ENCODERS } from "./request/builtInEncoders.js";
 export {
   DEFAULT_REQUEST_ENCODERS,
@@ -188,6 +193,20 @@ export {
 // ── Providers ────────────────────────────────────────────────────────────
 export { ANTHROPIC_ADAPTER_ID, anthropicAdapter } from "./providers/anthropicAdapter.js";
 export { OPENAI_ADAPTER_ID, openaiAdapter } from "./providers/openaiAdapter.js";
+export { deepseekAdapter } from "./providers/deepseekAdapter.js";
+export { ollamaAdapter, decodeOllama, ollamaEnvelope } from "./providers/ollamaAdapter.js";
+export { ollamaChatEncoder } from "./request/ollamaChatEncoder.js";
+export { OLLAMA_CHAT_ID, OLLAMA_CHAT_VERSION, OLLAMA_DEFAULT_BASE_URL, OLLAMA_WIRE_CONTRACT, ollamaParams } from "./providers/ollamaContract.js";
+export { createOllamaRoute, type OllamaRouteOptions } from "./providers/ollamaRoute.js";
+export { ollamaUsage } from "./providers/ollamaUsage.js";
+export { OLLAMA_CALL_KEY_PREFIX, readOllamaCallKey, type OllamaCallIdentity } from "./providers/ollamaToolIdentity.js";
+export { geminiAdapter, decodeGemini } from "./providers/geminiAdapter.js";
+export { GEMINI_CONTENT_ID, GEMINI_CONTENT_VERSION, GEMINI_WIRE_CONTRACT, geminiParams } from "./providers/geminiContract.js";
+export { geminiContentEncoder } from "./request/geminiContentEncoder.js";
+export { geminiContentEncoderV2 } from "./request/geminiContentEncoderV2.js";
+export { geminiAudioAdapter, decodeGeminiAudio, GEMINI_AUDIO_CONTENT_VERSION } from "./providers/geminiAudioAdapter.js";
+export { GEMINI_AUDIO_CAPABILITIES } from "./adapter/providerCapabilities.js";
+export { DEEPSEEK_CHAT_ID, DEEPSEEK_CHAT_VERSION, DEEPSEEK_WIRE_CONTRACT, deepseekParams } from "./providers/deepseekContract.js";
 export { type GatewayAdapterOptions, gatewayAdapter } from "./providers/gatewayAdapter.js";
 
 // `assertNever` is intentionally NOT re-exported: it is the seam's own
@@ -197,7 +216,7 @@ export { type GatewayAdapterOptions, gatewayAdapter } from "./providers/gatewayA
 export { OPENAI_RESPONSES_ADAPTER_ID, openaiResponsesAdapter } from "./providers/openaiResponsesAdapter.js";
 export { OPENAI_RESPONSES_ENCODER_ID, openaiResponsesEncoder } from "./request/openaiResponsesEncoder.js";
 export {
-  CAPABILITY_NAMES, ANTHROPIC_CAPABILITIES, OPENAI_CHAT_CAPABILITIES, OPENAI_RESPONSES_CAPABILITIES, STUB_CAPABILITIES,
+  CAPABILITY_NAMES, ANTHROPIC_CAPABILITIES, OPENAI_CHAT_CAPABILITIES, OPENAI_CHAT_TEXT_CAPABILITIES, OPENAI_RESPONSES_CAPABILITIES, OPENAI_RESPONSES_TEXT_CAPABILITIES, DEEPSEEK_CAPABILITIES, GEMINI_CAPABILITIES, OLLAMA_CAPABILITIES, STUB_CAPABILITIES,
   LlmCapabilityError, assertRequestCapabilities, assertRequiredCapabilities, snapshotCapabilities,
   type ProviderCapability, type CapabilitySupport, type ProviderCapabilities
 } from "./adapter/providerCapabilities.js";

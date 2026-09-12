@@ -1,5 +1,6 @@
 /**
- * `openai-chat@1` — OpenAI's Chat Completions stream as AMC stream chunks.
+ * `openai-chat@4` — native signed user-image requests; unchanged Chat stream
+ * decoding below. Wire support is not a probe of any remote model or origin.
  *
  * THE STRUCTURAL DIFFERENCE FROM ANTHROPIC, and the one thing worth reading
  * before the code: OpenAI's stream has no block boundaries. There is no
@@ -273,9 +274,9 @@ async function* decodeOpenai(response: HttpResponse): AsyncIterable<StreamChunk>
 export const openaiAdapter: LlmAdapter = {
   capabilities: OPENAI_CHAT_CAPABILITIES,
   id: OPENAI_ADAPTER_ID,
-  version: 3,
+  version: 4,
   encoderId: OPENAI_CHAT_ENCODER_ID,
-  encoderVersion: 3,
+  encoderVersion: 4,
 
   assertParams(params): void {
     if ((params.n !== undefined && params.n !== 1) || params.functions !== undefined || params.function_call !== undefined

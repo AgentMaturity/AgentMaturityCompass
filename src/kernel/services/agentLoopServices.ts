@@ -36,6 +36,7 @@
 import { AmcSeam, defineSeam } from "../amcRuntime.js";
 import type { Context } from "../amcRuntime.js";
 import { AgentDriver } from "../../agent/agentDriver.js";
+import type { NativeImageInput } from "../../attachments/nativeImageInput.js";
 import type {
   AgentLoopConfig,
   AgentStatus,
@@ -134,8 +135,8 @@ export class AgentLoopSeamService extends AmcSeam {
   }
 
   /** Queue a prompt that gets its own turn, and wake the driver. */
-  followup(text: string): InboxReceipt {
-    return this.driver.followup(text);
+  followup(text: string, images?: readonly NativeImageInput[]): InboxReceipt {
+    return this.driver.followup(text, images);
   }
 
   /** Steer the nearest step boundary. An idle driver starts a turn for it. */

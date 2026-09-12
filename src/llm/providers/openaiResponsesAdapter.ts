@@ -1,4 +1,5 @@
-/** OpenAI Responses SSE. Text/function tools only; opaque reasoning/media explicitly refuse.
+/** OpenAI Responses SSE. Signed user image input; output remains text/function
+ * tools only. Opaque reasoning and media OUTPUT explicitly refuse.
  * Wire references (retrieved 2026-09-08):
  * https://developers.openai.com/api/docs/guides/streaming-responses
  * https://developers.openai.com/api/docs/guides/function-calling
@@ -194,7 +195,7 @@ async function* decodeResponses(response: HttpResponse): AsyncIterable<StreamChu
   return fail("connection ended before a terminal response event");
 }
 export const openaiResponsesAdapter: LlmAdapter = {
-  id: OPENAI_RESPONSES_ADAPTER_ID, version: 2, encoderId: OPENAI_RESPONSES_ENCODER_ID, encoderVersion: 2,
+  id: OPENAI_RESPONSES_ADAPTER_ID, version: 3, encoderId: OPENAI_RESPONSES_ENCODER_ID, encoderVersion: 3,
   capabilities: OPENAI_RESPONSES_CAPABILITIES,
   envelope(input) {
     return { url: `${input.baseUrl}/v1/responses`, method: "POST", headers: { ...input.extraHeaders,

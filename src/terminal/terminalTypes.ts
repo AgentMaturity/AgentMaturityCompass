@@ -18,17 +18,18 @@
  *   marker     true     true     this send's own sentinel came back
  *   idle       true     false    silence, which is not proof of completion
  *   timeout    FALSE    false    the deadline passed. Not readiness at all.
+ *   cancelled  FALSE    false    a stop was requested, not an observed exit
  *
  * `proven: false` on `idle` is not pedantry. A command that is slow between
  * writes is indistinguishable from one that has finished, and an evidence
  * product must not record a guess in the same shape as an observation.
  */
 
-export type ReadinessRung = "exited" | "marker" | "idle" | "timeout";
+export type ReadinessRung = "exited" | "marker" | "idle" | "timeout" | "cancelled";
 
 export interface TerminalReadiness {
   readonly rung: ReadinessRung;
-  /** False when the deadline passed without readiness being established. */
+  /** False for a readiness deadline or stop request without observed completion. */
   readonly settled: boolean;
   /** True only when a rung OBSERVED completion rather than inferring it. */
   readonly proven: boolean;
@@ -43,6 +44,20 @@ export interface TerminalSendResult {
   readonly output: string;
   /** The command's exit status. Only the `marker` rung can know it. */
   readonly exitCode: number | null;
+  /** Bytes omitted from the bounded per-command transcript, not the live stream. */
+  readonly droppedBytes?: number;
+}
+
+/** A stop request is not evidence of exit. `done` resolves after observed closure. */
+export interface TerminalExit {
+  readonly code: number | null;
+  readonly signal: string | null;
+  readonly reason: "exit" | "cancel" | "timeout" | "dispose" | "error";
+  readonly treeExitProven: boolean;
+  readonly error?: string;
+  /** Set by the confined backend only after its separate launcher receipt. */
+  readonly confined?: boolean;
+  readonly outputComplete?: boolean;
 }
 
 /**
@@ -54,10 +69,17 @@ export interface TerminalSendResult {
  */
 export interface TerminalBackend {
   readonly kind: "pipe" | "pty";
-  write(data: string): void;
+  readonly pid?: number | null;
+  readonly ready?: Promise<void>;
+  readonly done?: Promise<TerminalExit>;
+  /** False for non-POSIX command interpreters; raw input is still available. */
+  readonly supportsCommandMarkers?: boolean;
+  /** Transport/PTY acknowledgement is not proof that a program consumed input. */
+  write(data: string): void | Promise<void>;
   onData(listener: (text: string) => void): () => void;
   onExit(listener: (code: number | null) => void): () => void;
-  resize?(cols: number, rows: number): void;
+  resize?(cols: number, rows: number): void | Promise<void>;
+  cancel?(): void;
   dispose(): void;
 }
 
@@ -68,4 +90,12 @@ export interface TerminalSessionOptions {
   readonly timeoutMs?: number;
   /** How often readiness is re-evaluated. */
   readonly pollIntervalMs?: number;
+  /** Maximum retained UTF-8 bytes per send; live output is not truncated. */
+  readonly maxOutputBytes?: number;
+}
+
+export function assertTerminalDimensions(cols: number, rows: number): void {
+  if (!Number.isInteger(cols) || !Number.isInteger(rows) || cols < 1 || rows < 1 || cols > 1000 || rows > 1000) {
+    throw new RangeError("Terminal dimensions must be integers between 1 and 1000.");
+  }
 }

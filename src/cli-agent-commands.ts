@@ -66,6 +66,9 @@ import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideComm
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { applyNativeDelegationPreset } from "./setup/nativePresetDelegation.js";
 import type { ActionClass } from "./types.js";
+import { loadNativeImageFiles } from "./attachments/nativeImageFiles.js";
+import { loadNativeAudioManifest } from "./attachments/nativeAudioFiles.js";
+import type { NativeAudioPart } from "./attachments/nativeAudioInput.js";
 
 import {
   approvalGateFor, collectOption, collectDelegateStop, resetDelegateStops, integerOption, paramsFor, renderNotification, routeFor,
@@ -126,7 +129,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .command("guide")
     .option("--agent <id>", "agent identity; defaults to AMC_AGENT_ID, the current agent, then default")
     .description("Inspect local setup without writes or provider calls and show the next native task command")
-    .option("--provider <id>", "choose openai (Chat Completions), openai-responses, anthropic, or stub (local demonstration)")
+    .option("--provider <id>", "choose openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, ollama (local model server), or stub (local demonstration)")
     .option("--model <model>", "your model ID; required for a real provider")
     .option("--base-url <origin>", "explicit HTTP(S) provider origin; no path or embedded credentials")
     .option("--credential <ref>", "credential reference name, never a key value")
@@ -200,6 +203,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
+    .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
+    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
     .option("--max-steps <n>", "model steps per turn (default 8, or 2 for stub)")
     .option("--session <id>", "resume this unsealed session; each turn verifies before acquiring its writer")
     .option("--fork-from <id>", "create a child of this verified parent on the first task")
@@ -219,6 +224,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
     .option("--stream", "show provisional live text on stderr; final structured result remains on stdout")
     .argument("[prompt...]", "the prompt that opens the turn")
+    .option("--image <path>", "attach original local image bytes through the signed inbox; repeat for more; requires native image-input support", collectOption)
+    .option("--audio-input <manifest>", "original ordered text/image/WAV input from a canonical local amc-audio-files@1 manifest; requires --provider gemini-audio; exclusive with positional text and --image")
     .option("--provider <id>", `provider route to send on (default "${STUB_PROVIDER_ID}": local recording demonstration)`)
     .option("--model <model>", "model to address")
     .option("--base-url <url>", "provider origin, when it differs from the default")
@@ -228,6 +235,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--mcp-config <path>", "reviewed MCP JSON; requires --tools workspace and --approve-tools")
     .option("--mcp-config-sha256 <digest>", "refuse an MCP config changed from these exact reviewed bytes")
     .option("--max-tokens <n>", "provider max_tokens for each request")
+    .option("--thinking <mode>", "DeepSeek only: enabled (default) or disabled")
+    .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high (default), or max with enabled thinking")
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
@@ -315,6 +324,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
 
       let rawPrompt = promptParts.join(" ").trim();
+      if (opts.audioInput !== undefined && (promptParts.length > 0 || opts.image !== undefined)) {
+        io.error("--audio-input is exclusive with positional text and --image; put every original part in its manifest order."); io.fail(); return;
+      }
       let extensionTurn: NativeExtensionTurn;
       try {
         const catalog = buildSkillCatalog(workspaceSkillRoots(process.cwd(), opts.credentialsHome));
@@ -340,7 +352,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const prompt = skillTurn.prompt;
-      if (prompt.length === 0) {
+      if (prompt.length === 0 && opts.audioInput === undefined) {
         io.error(chalk.red("a prompt is required: amc agent-loop run \"...\""));
         io.fail();
         return;
@@ -400,6 +412,24 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
       const route = routeFor(io, providerId, opts, opts.model ?? preset?.model);
       if (route === null) return;
+      let images: ReturnType<typeof loadNativeImageFiles>;
+      let audioParts: readonly NativeAudioPart[] | undefined;
+      try {
+        if (opts.audioInput !== undefined) {
+          if (prompt !== "" || route.adapter.encoderId !== "gemini-generate-content" || route.adapter.encoderVersion !== 2
+              || route.adapter.capabilities?.features["audio-input"] !== "supported") {
+            throw new Error("--audio-input requires the explicitly selected native Gemini audio v2 route and no expanded positional text. No media file was read or fallback selected.");
+          }
+          audioParts = loadNativeAudioManifest(opts.audioInput);
+        }
+        if ((opts.image?.length ?? 0) > 0 && route.adapter.capabilities?.features["image-input"] !== "supported") {
+          throw new Error("--image requires an explicitly supported native image-input adapter; this route is unsupported. No image file was read and no provider call was made.");
+        }
+        images = loadNativeImageFiles(opts.image);
+      } catch (error) { io.error(error instanceof Error ? error.message : "Native image input refused."); io.fail(); return; }
+      let requestParams: Record<string, unknown>;
+      try { requestParams = paramsFor(providerId, maxTokens, opts); }
+      catch (error) { io.error(error instanceof Error ? error.message : "Invalid provider parameters."); io.fail(); return; }
       if (opts.mcpConfigSha256 !== undefined && opts.mcpConfig === undefined) {
         io.error("--mcp-config-sha256 requires --mcp-config."); io.fail(); return;
       }
@@ -688,7 +718,9 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 }
               }),
           prompt,
-          route: { providerId, model, params: paramsFor(providerId, maxTokens) },
+          images,
+          ...(audioParts === undefined ? {} : { audioParts }),
+          route: { providerId, model, params: requestParams },
           routes: [route],
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }

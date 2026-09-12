@@ -16,6 +16,7 @@
  * a row nobody can rewrite.
  */
 import { canonicalize } from "../../utils/json.js";
+import type { RecordedGeminiPart } from "../../session/geminiPartMeta.js";
 
 /**
  * One tool as the model is shown it.
@@ -50,14 +51,15 @@ export function canonicalToolSchemaBytes(tools: readonly ToolSchema[]): Buffer {
 
 /** A part of a message, carrying everything an encoder needs to emit it. */
 export type EncodablePart =
-  | { readonly kind: "text"; readonly text: string }
-  | { readonly kind: "thinking"; readonly text: string }
+  | { readonly kind: "text"; readonly text: string; readonly gemini?: RecordedGeminiPart }
+  | { readonly kind: "thinking"; readonly text: string; readonly gemini?: RecordedGeminiPart }
   | {
       readonly kind: "tool_use";
       readonly toolCallId: string;
       readonly toolName: string;
       /** Raw JSON string exactly as the model produced it. */
       readonly argumentsJson: string;
+      readonly gemini?: RecordedGeminiPart;
     }
   | {
       readonly kind: "tool_result";
@@ -68,8 +70,18 @@ export type EncodablePart =
     }
   | {
       readonly kind: "image";
-      /** Digest of the image bytes; the bytes themselves live in the blob store. */
+      /** The committed digest, not a URL, file reference or substitute for bytes. */
       readonly sha256: string;
+      /** Populated from the signed attachment row; absent on legacy digest-only inputs. */
+      readonly mediaType?: string;
+      readonly bytes?: Buffer;
+    }
+  | {
+      readonly kind: "audio";
+      /** Original local binary, resolved from its signed audio inbox and attachment. */
+      readonly sha256: string;
+      readonly mediaType: string;
+      readonly bytes: Buffer;
     };
 
 /**

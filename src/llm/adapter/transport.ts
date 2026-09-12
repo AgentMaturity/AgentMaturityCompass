@@ -31,6 +31,9 @@ export interface HttpRequest {
   /** The exact bytes a signed `request/header` row committed to. */
   readonly body: Buffer;
   readonly signal?: AbortSignal;
+  /** Opt-in for protocols carrying a custom credential header. */
+  readonly redirect?: "error";
+  readonly cancelBodyOnReturn?: true;
 }
 
 /**
@@ -46,6 +49,8 @@ export interface HttpResponse {
   /** Lowercased header names; repeated headers already joined by the transport. */
   readonly headers: Readonly<Record<string, string>>;
   readonly body: AsyncIterable<Uint8Array>;
+  /** Opt-in disposal even when a decoder refuses before reading the body. */
+  readonly close?: () => Promise<void>;
 }
 
 /**
@@ -99,15 +104,19 @@ async function* emptyBody(): AsyncIterable<Uint8Array> {
   // Intentionally yields nothing.
 }
 
-async function* readableToIterable(stream: ReadableStream<Uint8Array>): AsyncIterable<Uint8Array> {
+async function* readableToIterable(stream: ReadableStream<Uint8Array>, cancelOnReturn = false): AsyncIterable<Uint8Array> {
   const reader = stream.getReader();
+  let ended = false;
   try {
     for (;;) {
       const { done, value } = await reader.read();
-      if (done) return;
+      if (done) { ended = true; return; }
       if (value !== undefined) yield value;
     }
   } finally {
+    if (cancelOnReturn && !ended) {
+      try { await reader.cancel(); } catch { /* retain the original decoder/abort outcome */ }
+    }
     // Releasing matters on the abort path: a reader still holding the lock
     // keeps the underlying socket from being reclaimed for the life of the
     // process, and a cancelled turn is exactly when that happens.
@@ -129,12 +138,18 @@ export const fetchTransport: HttpTransport = async (request) => {
     // A Buffer is a Uint8Array; passing the view directly avoids a copy of what
     // may be a large request body.
     body: new Uint8Array(request.body),
-    ...(request.signal !== undefined ? { signal: request.signal } : {})
+    ...(request.signal !== undefined ? { signal: request.signal } : {}),
+    ...(request.redirect === undefined ? {} : { redirect: request.redirect })
   });
   return {
     status: response.status,
     headers: lowercaseHeaders(response.headers),
-    body: response.body === null ? emptyBody() : readableToIterable(response.body)
+    body: response.body === null ? emptyBody() : readableToIterable(response.body, request.cancelBodyOnReturn === true),
+    ...(request.cancelBodyOnReturn !== true ? {} : { close: async () => {
+      if (response.body !== null && !response.body.locked) {
+        try { await response.body.cancel(); } catch { /* completed/aborted bodies have nothing left to close */ }
+      }
+    } })
   };
 };
 

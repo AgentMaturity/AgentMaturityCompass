@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { RequestEncodingError, type EncodableRequest, type ToolSchema } from "./requestSpec.js";
 
-export type ToolNameEncoderId = "openai-chat" | "openai-responses" | "anthropic-messages";
+export type ToolNameEncoderId = "openai-chat" | "openai-responses" | "anthropic-messages" | "deepseek-chat";
 const SAFE_NAME = /^[A-Za-z0-9_-]{1,64}$/;
 const RESERVED_PREFIX = "amc_";
 
@@ -64,7 +64,7 @@ function mappedToolChoice(choice: unknown, encoderId: ToolNameEncoderId, offered
     if (typeof name !== "string" || !offered.has(name)) throw new RequestEncodingError("Provider tool_choice must select an offered canonical function");
     return addIdentity(universe, name);
   };
-  if (encoderId === "openai-chat" && choice.type === "function" && record(choice.function)) {
+  if ((encoderId === "openai-chat" || encoderId === "deepseek-chat") && choice.type === "function" && record(choice.function)) {
     return { ...choice, function: { ...choice.function, name: selected(choice.function.name) } };
   }
   if (encoderId === "openai-responses" && choice.type === "function") {
@@ -82,7 +82,7 @@ function mappedToolChoice(choice: unknown, encoderId: ToolNameEncoderId, offered
  * canonical identity space; only the provider request receives the stable alias.
  */
 export function encodeProviderToolNames(request: EncodableRequest, encoderId: ToolNameEncoderId): EncodableRequest {
-  if (!["openai-chat", "openai-responses", "anthropic-messages"].includes(encoderId)) {
+  if (!["openai-chat", "openai-responses", "anthropic-messages", "deepseek-chat"].includes(encoderId)) {
     throw new RequestEncodingError("Unknown provider tool-name encoder");
   }
   const bindings = new Map(bindProviderToolNames(request.tools ?? []));
@@ -99,7 +99,10 @@ export function encodeProviderToolNames(request: EncodableRequest, encoderId: To
 
 /** No optimistic admission of unknown future or historical encoder behavior. */
 export function usesProviderToolNames(encoderId: string, version: number): boolean {
-  return (encoderId === "openai-chat" && version === 3)
-    || (encoderId === "anthropic-messages" && version === 3)
-    || (encoderId === "openai-responses" && version === 2);
+  return (encoderId === "openai-chat" && (version === 3 || version === 4))
+    || (encoderId === "anthropic-messages" && (version === 3 || version === 4))
+    || (encoderId === "openai-responses" && (version === 2 || version === 3))
+    || (encoderId === "deepseek-chat" && version === 1)
+    || (encoderId === "ollama-chat" && version === 1)
+    || (encoderId === "gemini-generate-content" && (version === 1 || version === 2));
 }

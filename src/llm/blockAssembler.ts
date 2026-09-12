@@ -35,6 +35,7 @@
  * before anything is signed.
  */
 import type { SurfaceKind } from "../session/sessionTypes.js";
+import type { GeminiPartMeta } from "../session/geminiPartMeta.js";
 import { assertNever } from "./exhaustive.js";
 import {
   type ContentBlock,
@@ -161,6 +162,7 @@ interface PartialBlockState {
   providerWireName?: string;
   toolArguments: string;
   closedBlock: ContentBlock | null;
+  gemini?: GeminiPartMeta;
 }
 
 /**
@@ -217,6 +219,7 @@ export class BlockAssembler {
         // dsh's "ignore deltas after block-end" branch is unreachable here
         // because the grammar rejects those deltas outright.
         this.mustGet(chunk.index).text += chunk.text;
+        if (chunk.gemini !== undefined) this.mustGet(chunk.index).gemini = Object.freeze({ ...chunk.gemini });
         return;
       }
       case "tool-call-delta": {
@@ -227,6 +230,7 @@ export class BlockAssembler {
         if (chunk.name !== undefined && chunk.name.length > 0) partial.toolName = chunk.name;
         if (chunk.providerWireName !== undefined) partial.providerWireName = chunk.providerWireName;
         partial.toolArguments += chunk.argumentsDelta;
+        if (chunk.gemini !== undefined) partial.gemini = Object.freeze({ ...chunk.gemini });
         return;
       }
       case "block-end": {
@@ -355,9 +359,9 @@ export class BlockAssembler {
 function assembleOpen(partial: PartialBlockState): ContentBlock | null {
   switch (partial.blockKind) {
     case "text":
-      return { kind: "text", text: partial.text };
+      return { kind: "text", text: partial.text, ...(partial.gemini === undefined ? {} : { gemini: partial.gemini }) };
     case "thinking":
-      return { kind: "thinking", text: partial.text };
+      return { kind: "thinking", text: partial.text, ...(partial.gemini === undefined ? {} : { gemini: partial.gemini }) };
     case "tool_use":
       return partial.toolCallId === null
         ? null
@@ -366,10 +370,12 @@ function assembleOpen(partial: PartialBlockState): ContentBlock | null {
             id: partial.toolCallId,
             name: partial.toolName ?? "",
             ...(partial.providerWireName === undefined ? {} : { providerWireName: partial.providerWireName }),
-            arguments: partial.toolArguments
+            arguments: partial.toolArguments,
+            ...(partial.gemini === undefined ? {} : { gemini: partial.gemini })
           };
     case "tool_result":
     case "image":
+    case "audio":
       // No delta variant can build one; only a `block-end` carries these.
       return null;
     default:
@@ -405,6 +411,7 @@ function resolveOutcome(
       return { status: "dropped", reason: "tool_call_truncated" };
     case "tool_result":
     case "image":
+    case "audio":
       // Unreachable through a closed block (handled above) and unassemblable
       // through an open one, so the reason is never in doubt.
       return { status: "dropped", reason: "unassemblable" };

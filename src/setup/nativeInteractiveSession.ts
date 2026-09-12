@@ -3,7 +3,7 @@ import { createInterface } from "node:readline";
 import { resolve } from "node:path";
 import { renderNativeRunUsage } from "../agent/nativeRunUsage.js";
 import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
-import { parseNativeChatResult } from "./nativeChatResult.js";
+import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { loadNativeMcpConfiguration, requireReviewedNativeMcpGrants, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { inspectNativeFirstUse, renderNativeFirstUseGuide, renderNativeGuideCommand } from "./nativeFirstUseGuide.js";
@@ -13,6 +13,7 @@ import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManag
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
 import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
+import { deepseekParams } from "../llm/providers/deepseekContract.js";
 
 export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfig?: string;
@@ -26,6 +27,8 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly approveRisk?: string;
   readonly tools?: string;
   readonly maxTokens?: string;
+  readonly thinking?: string;
+  readonly reasoningEffort?: string;
   readonly maxSteps?: string;
   readonly session?: string;
   readonly forkFrom?: string;
@@ -73,6 +76,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
   const terminal = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
   let closed = false;
   let child: ChildProcess | null = null;
+  let cancelActiveCommand: (() => void) | null = null;
   let pendingAnswer: ((answer: string | null) => void) | null = null;
   const question = (prompt: string, signal?: AbortSignal): Promise<string | null> => {
     if (closed || signal?.aborted || pendingAnswer !== null) return Promise.resolve(null);
@@ -95,24 +99,24 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     });
   };
   const cancel = () => {
-    if (child !== null) {
-      io.error("Cancelling the active command; waiting for its recorded outcome…");
-      child.kill("SIGINT");
-    } else terminal.close();
+    if (cancelActiveCommand !== null) cancelActiveCommand();
+    else terminal.close();
   };
   terminal.on("SIGINT", cancel);
   terminal.on("close", () => {
     closed = true;
     pendingAnswer?.(null); pendingAnswer = null;
-    if (child !== null) child.kill("SIGINT");
+    cancelActiveCommand?.();
   });
   process.on("SIGINT", cancel);
 
   // The child sees exactly the same installed/source CLI, environment and cwd.
   // No shell, alternate runner, approval bypass, or background session writer.
-  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; stream?: boolean } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean }> => new Promise(resolveResult => {
+  const execute = (args: readonly string[], display: { interactiveApprovals?: boolean; stream?: boolean } = {}): Promise<{ code: number | null; stdout: string; truncated: boolean; cancelRequested: boolean }> => new Promise(resolveResult => {
     let stdout = "";
     let truncated = false;
+    let cancelRequested = false;
+    let previewOpen = false;
     const interactiveApprovals = display.interactiveApprovals === true;
     let running: ChildProcess;
     try {
@@ -120,22 +124,33 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         cwd, env: process.env, shell: false,
         stdio: interactiveApprovals ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]
       });
-    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated }); return; }
+    } catch { io.error("Could not start the AMC command."); resolveResult({ code: 1, stdout, truncated, cancelRequested }); return; }
     child = running;
     const approvals = interactiveApprovals ? createNativeInteractiveApprovals({
       child: running, workspace: cwd, entry, agentId: selectedAgentId ?? "default", question, log: io.log, error: io.error
     }) : null;
+    const requestCancel = () => {
+      if (cancelRequested) return;
+      cancelRequested = true;
+      io.error("Cancelling the active command; waiting for its recorded outcome… Approval input is stopped; any already-recorded decision is not revoked.");
+      // Abort the reviewer question synchronously, rather than waiting for close.
+      // Do not force-kill the writer or automatically resubmit this task.
+      pendingAnswer?.(null);
+      if (approvals !== null) approvals.cancel();
+      else running.kill("SIGINT");
+    };
+    cancelActiveCommand = requestCancel;
     running.stdout!.setEncoding("utf8");
     running.stderr!.setEncoding("utf8");
     running.stdout!.on("data", (text: string) => {
       if (truncated) return;
       if (Buffer.byteLength(stdout) + Buffer.byteLength(text) > 8 * 1024 * 1024) {
-        truncated = true; running.kill("SIGINT"); return;
+        truncated = true; requestCancel(); return;
       }
       stdout += text;
     });
     running.stderr!.on("data", (text: string) => {
-      if (display.stream) process.stderr.write(text);
+      if (display.stream) { process.stderr.write(text); previewOpen = !text.endsWith("\n"); }
       else io.error(text.trimEnd());
     });
     running.once("error", () => { io.error("Could not start the AMC command."); });
@@ -144,24 +159,30 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         let finalCode = code;
         try { await approvals?.close(); }
         catch { io.error("Native approval cleanup did not complete cleanly; inspect the recorded request before continuing."); finalCode = 1; }
-        finally { child = null; resolveResult({ code: finalCode, stdout, truncated }); }
+        finally {
+          if (previewOpen) process.stderr.write("\n");
+          if (child === running) child = null;
+          if (cancelActiveCommand === requestCancel) cancelActiveCommand = null;
+          resolveResult({ code: finalCode, stdout, truncated, cancelRequested });
+        }
       })();
     });
   });
 
   let sessionId = options.session ?? null;
   let forkFrom = options.forkFrom ?? null;
-  let assistantBlocks = 0;
+  let previousSummary: NativeChatChildSummary | null = null;
+  let unresolvedOutcome = false;
   try {
     let provider = options.provider;
     if (provider === undefined) {
-      io.log("Choose openai (Chat Completions), openai-responses, or anthropic for a real model task; choose stub for a local recording demonstration.");
+      io.log("Choose openai (Chat Completions), openai-responses, anthropic, deepseek, gemini, gemini-audio, or ollama (local model server) for a real model task; choose stub for a local recording demonstration.");
       const choice = await question("Provider (no default): ");
       if (choice === null) return;
       provider = choice.trim();
     }
     let model = options.model;
-    if ((provider === "openai" || provider === "openai-responses" || provider === "anthropic") && !model?.trim()) {
+    if (provider !== "stub" && !model?.trim()) {
       const choice = await question("Model ID you can access (no default): ");
       if (choice === null) return;
       model = choice.trim();
@@ -182,6 +203,18 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     if (![maxTokens, maxSteps].every(value => /^[1-9][0-9]*$/.test(value) && Number.isSafeInteger(Number(value)))) {
       io.error("--max-tokens and --max-steps must be positive integers."); io.fail(); return;
     }
+    try {
+      if (provider === "deepseek") {
+        deepseekParams({ max_tokens: Number(maxTokens),
+          ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
+          ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) });
+        if (tools === "none" && options.thinking !== "disabled") {
+          throw new Error("Tools-free DeepSeek chat requires --thinking disabled from its first turn. Signed reasoning is never discarded; select tools explicitly for thinking replay.");
+        }
+      } else if (options.thinking !== undefined || options.reasoningEffort !== undefined) {
+        throw new Error("--thinking and --reasoning-effort require --provider deepseek; unused options are not ignored.");
+      }
+    } catch (error) { io.error(error instanceof Error ? error.message : "Invalid thinking options."); io.fail(); return; }
     const approvalClass = options.approveTools?.trim().toUpperCase();
     const approvalRisk = (options.approveRisk ?? "high").trim().toLowerCase();
     if ((approvalClass !== undefined && !isActionClass(approvalClass)) ||
@@ -212,6 +245,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
       "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens,
+      ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
+      ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,
       ...(validation === undefined ? [] : ["--validation-config", resolve(options.validationConfig!), "--validation-config-sha256", validation.configSha256,
         ...validation.checks.flatMap(check => ["--validate", check.id])])];
@@ -236,7 +271,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     };
     showScope();
     if (forkFrom !== null) io.log("The fork starts a new conversation with verified parent lineage; it does not copy the parent conversation.");
-    io.log("Type a task. /inspect shows the session, /verify checks evidence, /compact summarizes a reviewed range, /fork queues a child, /extensions manages signed text and commands, /exit leaves. Ctrl-C cancels an active command or exits at the prompt.");
+    io.log("Type a task. /inspect shows the session, /verify checks evidence, /compact summarizes a reviewed range, /fork queues a child (/fork cancel clears the queue), /extensions manages signed text and commands, /exit leaves. Ctrl-C cancels an active command or exits at the prompt.");
     if (options.session !== undefined) io.log("The first reply also displays prior recorded assistant text from the resumed session.");
     while (!closed) {
       const entered = await question("you> ");
@@ -244,7 +279,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       const text = entered.trim();
       if (text.length === 0) continue;
       if (text === "/exit") break;
-      if (text === "/help") { showScope(); io.log("/inspect · /verify · /compact · /fork · /extensions · /load · /unload · /exit. Built-in commands prompt for their inputs. Loaded extension commands accept text arguments."); continue; }
+      if (text === "/help") { showScope(); io.log("/inspect · /verify · /compact · /fork · /fork cancel · /extensions · /load · /unload · /exit. Built-in commands prompt for their inputs. Loaded extension commands accept text arguments."); continue; }
       if (text === "/extensions") {
         try { io.log(JSON.stringify({ loaded: extensions.inspect(), commands: extensions.listCommands() }, null, 2)); }
         catch (error) { io.error(error instanceof Error ? error.message : "An extension no longer verifies."); }
@@ -288,6 +323,15 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         else io.log("Compaction recorded; original evidence is retained. /verify checks reconstruction separately.");
         continue;
       }
+      if (text === "/fork cancel") {
+        if (forkFrom === null) io.log("No fork is queued.");
+        else {
+          forkFrom = null;
+          io.log(sessionId === null ? "Queued fork cleared. The next task starts a new independent session; no existing history was changed."
+            : `Queued fork cleared. The next task resumes ${sessionId}; no existing history was changed.`);
+        }
+        continue;
+      }
       if (text === "/fork") {
         if (sessionId === null) io.error("Run a task or resume a session before forking.");
         else { forkFrom = sessionId; io.log(`Fork queued from ${sessionId}. Your next task creates a new conversation with verified parent lineage; prior conversation is not copied. No child has been created yet.`); }
@@ -323,6 +367,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         }
       } catch (error) { io.error(error instanceof Error ? error.message : "The selected native composition changed."); io.fail(); continue; }
       io.log(`Running ${provider}/${guide.model}; Ctrl-C requests cancellation.`);
+      io.log("Live output is provisional until the recorded reply below; a preview is not proof of completion.");
       const priorSession = sessionId;
       const pendingFork = forkFrom;
       const outcome = await execute(["agent-loop", "run", ...routeArgs, ...nativeExtensionRunArgv(extensions),
@@ -330,26 +375,36 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
         ...(forkFrom !== null ? ["--fork-from", forkFrom] : sessionId === null ? [] : ["--session", sessionId]), "--", prompt],
         { interactiveApprovals: approvalClass !== undefined, stream: true });
       const result = parseNativeChatResult({ stdout: outcome.stdout, truncated: outcome.truncated,
-        requestedSessionId: priorSession, forkFrom: pendingFork });
+        requestedSessionId: priorSession, forkFrom: pendingFork, previousSummary });
       if (!result.ok) {
+        unresolvedOutcome = true;
         io.error(`${result.code}: ${result.message} Chat has stopped without guessing a session ID or retrying the task. Inspect AMC's session evidence before continuing.`);
         io.fail(); break;
       }
       const summary = result.summary;
-      if (pendingFork !== null || priorSession !== summary.sessionId) assistantBlocks = 0;
+      const previous = pendingFork === null && previousSummary?.sessionId === summary.sessionId ? previousSummary : null;
+      const freshEndings = summary.endings.slice(previous?.endings.length ?? 0);
       sessionId = summary.sessionId;
       forkFrom = null;
       io.log("Recorded reply:");
-      for (const block of summary.assistantText.slice(assistantBlocks)) io.log(block);
-      assistantBlocks = summary.assistantText.length;
-      const ending = Array.isArray(summary.endings) ? summary.endings.at(-1) : undefined;
+      for (const block of summary.assistantText.slice(previous?.assistantText.length ?? 0)) io.log(block);
+      previousSummary = summary;
+      const ending = freshEndings.at(-1);
       io.log(`Session ${sessionId} · driver ${summary.driverStatus}${ending?.reason ? ` · recorded turn ending ${ending.reason}` : ""}. This summary is not an evidence-verification result.`);
-      io.log(renderNativeRunUsage(summary.usage));
+      io.log(renderNativeRunUsage(summary.usage, { requestWindow: "latest" }));
       io.log(renderNativeRunDiagnostics(summary.diagnostics));
       io.log(`Public task validation: ${summary.validation?.status ?? "unavailable"}. Passing selected checks does not guarantee correctness.`);
       if (outcome.code !== 0 || outcome.truncated || summary.driverStatus === "failed") {
         io.error("The turn failed or was interrupted. No successful task completion is claimed; /inspect and /verify show what was recorded.");
         io.fail();
+      } else if (outcome.cancelRequested || ending?.reason !== "complete") {
+        io.log(`Task completion is not established: ${ending?.reason ?? "no recorded turn ending"}${outcome.cancelRequested ? "; cancellation was requested" : ""}. Driver idle only means it can accept another explicit task; no retry was sent.`);
+      }
+    }
+    if (forkFrom !== null) {
+      if (unresolvedOutcome) io.error("The attempted fork has no admitted child result. Do not repeat it blindly; inspect the parent's recorded lineage before choosing a continuation.");
+      else {
+        io.log("The fork remains queued, not created. To continue that selection in this workspace:\n  " + renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat", ...routeBaseArgs, ...nativeChatProfileArgv(profile, "chat"), ...nativeExtensionRunArgv(extensions), "--fork-from", forkFrom] }));
       }
     }
     if (sessionId !== null) {

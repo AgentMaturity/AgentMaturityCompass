@@ -21,6 +21,8 @@
  */
 export { AgentDriver, type AgentDriverInit } from "./agentDriver.js";
 export { LoopInbox, type InsertOptions } from "./inbox.js";
+export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType } from "../attachments/nativeAudioInput.js";
 export {
   DEFAULT_AGENT_LOOP_CONFIG,
   NO_HOOKS,

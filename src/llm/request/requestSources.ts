@@ -28,6 +28,13 @@ import type { SurfaceEntry } from "../../session/surfaceProjection.js";
 import { validateSurfaceCompactions } from "../../session/surfaceCompaction.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
+import { assertNativeImageBytes } from "../../attachments/nativeImageInput.js";
+import { assertNativeAudioBytes } from "../../attachments/nativeAudioInput.js";
+import { NativeAudioProvenanceError, validateNativeAudioProvenance } from "../../session/nativeAudioProvenance.js";
+import { snapshotRecordedGeminiPart, type RecordedGeminiPart } from "../../session/geminiPartMeta.js";
+import { parseRequestHeaderMeta } from "../../session/requestHeaderMeta.js";
+import { bindProviderToolNames } from "./providerToolNames.js";
+import { OLLAMA_CALL_KEY_PREFIX, readOllamaCallKey } from "../providers/ollamaToolIdentity.js";
 import type { EncodableMessage, EncodablePart, EncodableRequest, ToolSchema } from "./requestSpec.js";
 
 /** Why an assembly could not be completed. Each kind means something different. */
@@ -36,6 +43,8 @@ export type RequestSourceFailureKind =
   | "payload-pruned"
   /** A referenced payload is gone with no prune record, or unreadable. An alarm. */
   | "payload-missing"
+  /** Readable image bytes or signed image metadata contradict their commitments. */
+  | "evidence-inconsistent"
   /** The log does not describe a request this code can assemble at all. */
   | "unreconstructable";
 
@@ -115,22 +124,44 @@ function digestProjection(entries: readonly SurfaceEntry[]): string {
 }
 
 /** One surface entry as an encodable part, using its own row's meta for ids. */
-function toPart(entry: SurfaceEntry, event: EvidenceEvent, text: string): EncodablePart | { readonly error: string } {
+function toPart(entry: SurfaceEntry, event: EvidenceEvent, bytes: Buffer): EncodablePart | { readonly error: string } {
   const meta = metaOf(event);
+  // Binary images never pass through a UTF-8 round trip.
+  const text = entry.part.kind === "image" || entry.part.kind === "audio" ? "" : bytes.toString("utf8");
+  let gemini: RecordedGeminiPart | undefined;
+  if (meta.gemini !== undefined) {
+    if (entry.role !== "assistant" || !["assistant/block", "tool/call"].includes(event.event_type)) return { error: "Gemini replay has no original assistant source" };
+    try {
+      const providerName = meta.providerName as { wireName?: unknown } | undefined;
+      gemini = snapshotRecordedGeminiPart(meta.gemini as RecordedGeminiPart, entry.part.kind, bytes,
+        entry.part.kind === "tool_use" ? { id: String(meta.toolCallId ?? ""), wireName: String(providerName?.wireName ?? meta.toolName ?? "") } : undefined);
+    } catch (error) { return { error: error instanceof Error ? error.message : "invalid Gemini replay" }; }
+  }
   switch (entry.part.kind) {
     case "text":
-      return { kind: "text", text };
+      return { kind: "text", text, ...(gemini === undefined ? {} : { gemini }) };
     case "thinking":
-      return { kind: "thinking", text };
-    case "image":
-      return { kind: "image", sha256: entry.part.sha256 };
+      return { kind: "thinking", text, ...(gemini === undefined ? {} : { gemini }) };
+    case "image": {
+      if (event.event_type !== "user/attachment" || entry.role !== "user") return { error: `image ${event.id} is not a signed user attachment` };
+      if (!Number.isSafeInteger(meta.bytes) || meta.bytes !== bytes.length) return { error: `image ${event.id} byte length disagrees with its signed metadata` };
+      try { assertNativeImageBytes(bytes, meta.mimeType); }
+      catch (error) { return { error: `image ${event.id}: ${error instanceof Error ? error.message : "invalid signed media type"}` }; }
+      return { kind: "image", sha256: entry.part.sha256, mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
+    }
+    case "audio": {
+      if (event.event_type !== "user/attachment" || entry.role !== "user" || meta.bytes !== bytes.length) return { error: `audio ${event.id} is not its original signed user binary` };
+      try { assertNativeAudioBytes(bytes, meta.mimeType); }
+      catch (error) { return { error: `audio ${event.id}: ${error instanceof Error ? error.message : "invalid signed MIME"}` }; }
+      return { kind: "audio", sha256: entry.part.sha256, mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
+    }
     case "tool_use": {
       const toolCallId = stringField(meta, "toolCallId");
       const toolName = stringField(meta, "toolName");
       if (toolCallId === null || toolName === null) {
         return { error: `event ${event.id} contributes a tool_use part but records no toolCallId/toolName` };
       }
-      return { kind: "tool_use", toolCallId, toolName, argumentsJson: text };
+      return { kind: "tool_use", toolCallId, toolName, argumentsJson: text, ...(gemini === undefined ? {} : { gemini }) };
     }
     case "tool_result": {
       const toolCallId = stringField(meta, "toolCallId");
@@ -246,8 +277,17 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     return failure("unreconstructable", `invalid surface compaction: ${error instanceof Error ? error.message : "unsupported history"}`, notes);
   }
   const parts: { role: SurfaceEntry["role"]; part: EncodablePart }[] = [];
+  try {
+    for (const id of validateNativeAudioProvenance(input.workspace, input.events.slice(0, cutoffIndex + 1), entries)) {
+      if (!sourceEventIds.includes(id)) sourceEventIds.push(id);
+    }
+  } catch (error) {
+    return failure(error instanceof NativeAudioProvenanceError ? error.reason : "evidence-inconsistent",
+      error instanceof Error ? error.message : "invalid original audio provenance", notes);
+  }
   for (const entry of entries) {
     if (entry.role === "system") {
+      if (entry.part.kind === "image" || entry.part.kind === "audio") return failure("evidence-inconsistent", "Binary input cannot be projected into the system role", notes);
       continue;
     }
     const row = byId.get(entry.sourceEventId);
@@ -258,9 +298,65 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     if (!Buffer.isBuffer(bytes)) {
       return bytes;
     }
-    const part = toPart(entry, row, bytes.toString("utf8"));
+    if ((entry.part.kind === "image" || entry.part.kind === "audio") && (sha256Hex(bytes) !== row.payload_sha256 || entry.part.sha256 !== row.payload_sha256)) {
+      return failure("evidence-inconsistent", `${entry.part.kind} ${row.id} bytes or surface digest do not match the committed payload_sha256; refusing tampered binary input`, notes);
+    }
+    const part = toPart(entry, row, bytes);
     if ("error" in part) {
-      return failure("unreconstructable", part.error, notes);
+      return failure(entry.part.kind === "image" || entry.part.kind === "audio" ? "evidence-inconsistent" : "unreconstructable", part.error, notes);
+    }
+    if ("gemini" in part && part.gemini !== undefined) {
+      const original = byId.get(part.gemini.headerEventId), header = original && parseRequestHeaderMeta(original.meta_json);
+      if (!original || original.event_type !== "request/header" || !header || header.encoderId !== "gemini-generate-content" || ![1, 2].includes(header.encoderVersion)
+          || header.model !== input.model || input.events.indexOf(original) >= input.events.indexOf(row)
+          || sha256Hex(bytes) !== row.payload_sha256 || entry.part.sha256 !== row.payload_sha256) {
+        return failure("evidence-inconsistent", "Gemini replay does not resolve to its original earlier request, model and payload", notes);
+      }
+      if (!sourceEventIds.includes(original.id)) sourceEventIds.push(original.id);
+      if (part.kind === "tool_use") {
+        const offeredRow = header.toolSchemaEventId === null ? undefined : byId.get(header.toolSchemaEventId);
+        if (!offeredRow || offeredRow.event_type !== "request/tools" || offeredRow.payload_sha256 !== header.toolSchemaSha256
+            || input.events.indexOf(offeredRow) >= input.events.indexOf(original)) return failure("evidence-inconsistent", "Gemini call has no original offered schema commitment", notes);
+        const offeredBytes = readInto(offeredRow); if (!Buffer.isBuffer(offeredBytes)) return offeredBytes;
+        const offered = parseToolSchemas(offeredBytes), providerName = metaOf(row).providerName as Record<string, unknown> | undefined;
+        if (!offered || sha256Hex(offeredBytes) !== offeredRow.payload_sha256 || !providerName || providerName.version !== 1
+            || providerName.headerEventId !== original.id || providerName.encoderId !== header.encoderId || providerName.encoderVersion !== header.encoderVersion
+            || typeof providerName.wireName !== "string" || bindProviderToolNames(offered).get(providerName.wireName) !== part.toolName) {
+          return failure("evidence-inconsistent", "Gemini historical call was not bound to that request's exact offered canonical function", notes);
+        }
+        if (!sourceEventIds.includes(offeredRow.id)) sourceEventIds.push(offeredRow.id);
+      }
+    }
+    // A labelled native Ollama key is a join representation, not authority by
+    // itself. Resolve its exact prior header/schema/name binding on SEND and
+    // cold DERIVE, just as the original Gemini protocol retains its own proof.
+    if (part.kind === "tool_use") {
+      const providerName = metaOf(row).providerName as Record<string, unknown> | undefined;
+      if (part.toolCallId.startsWith(OLLAMA_CALL_KEY_PREFIX) || providerName?.encoderId === "ollama-chat") {
+        try { readOllamaCallKey(part.toolCallId); }
+        catch { return failure("evidence-inconsistent", "Ollama tool replay lost its original native call key", notes); }
+        const original = typeof providerName?.headerEventId === "string" ? byId.get(providerName.headerEventId) : undefined;
+        const header = original && parseRequestHeaderMeta(original.meta_json);
+        if (!original || original.event_type !== "request/header" || !header || header.encoderId !== "ollama-chat" || header.encoderVersion !== 1
+            || header.model !== input.model || input.events.indexOf(original) >= input.events.indexOf(row)
+            || row.event_type !== "tool/call" || entry.role !== "assistant" || sha256Hex(bytes) !== row.payload_sha256 || entry.part.sha256 !== row.payload_sha256
+            || providerName?.version !== 1 || providerName.encoderId !== header.encoderId || providerName.encoderVersion !== header.encoderVersion) {
+          return failure("evidence-inconsistent", "Ollama replay does not resolve to its original earlier request, model and signed payload", notes);
+        }
+        const offeredRow = header.toolSchemaEventId === null ? undefined : byId.get(header.toolSchemaEventId);
+        if (!offeredRow || offeredRow.event_type !== "request/tools" || offeredRow.payload_sha256 !== header.toolSchemaSha256
+            || input.events.indexOf(offeredRow) >= input.events.indexOf(original)) {
+          return failure("evidence-inconsistent", "Ollama call lacks its original offered schema commitment", notes);
+        }
+        const offeredBytes = readInto(offeredRow); if (!Buffer.isBuffer(offeredBytes)) return offeredBytes;
+        const offered = parseToolSchemas(offeredBytes);
+        if (!offered || sha256Hex(offeredBytes) !== offeredRow.payload_sha256 || typeof providerName.wireName !== "string"
+            || bindProviderToolNames(offered).get(providerName.wireName) !== part.toolName) {
+          return failure("evidence-inconsistent", "Ollama historical call was not bound to that request's exact offered function", notes);
+        }
+        if (!sourceEventIds.includes(original.id)) sourceEventIds.push(original.id);
+        if (!sourceEventIds.includes(offeredRow.id)) sourceEventIds.push(offeredRow.id);
+      }
     }
     parts.push({ role: entry.role, part });
     sourceEventIds.push(entry.sourceEventId);

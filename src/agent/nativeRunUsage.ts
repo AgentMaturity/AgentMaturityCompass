@@ -276,7 +276,12 @@ function hasReadableRequestReports(usage: NativeRunUsage): boolean {
     && cache.hitRate === (eligible === 0 ? null : hits / eligible);
 }
 
-function renderRequestReports(usage: NativeRunUsage): string[] {
+export interface NativeUsageDisplayOptions {
+  /** Interactive chats show recent routes; legacy inspection keeps its first-page view. */
+  readonly requestWindow?: "first" | "latest";
+}
+
+function renderRequestReports(usage: NativeRunUsage, options: NativeUsageDisplayOptions): string[] {
   if (!hasReadableRequestReports(usage)) {
     return ["Recorded provider/model identity and request cache-hit rate: unavailable (older or malformed request projection); token share is not a substitute."];
   }
@@ -285,14 +290,16 @@ function renderRequestReports(usage: NativeRunUsage): string[] {
   const label = (value: string | number | null) => value === null ? "unavailable/withheld" : String(value);
   const lines = ["Recorded request identities (header + linked outcome; configured labels, not remote identity or capability proof):"];
   // Text remains bounded for long sessions; JSON preserves every request reference.
-  const visible = reports.slice(0, 10);
+  const recent = options.requestWindow === "latest";
+  const visible = recent ? reports.slice(-10) : reports.slice(0, 10);
+  if (recent && reports.length > visible.length) lines.push("  Latest recorded requests in chronological order; all usage totals and rates below remain cumulative for the session.");
   for (const report of visible) {
     lines.push(`  provider ${label(report.providerId)}; model ${label(report.model)}; encoder ${label(report.encoderId)}@${label(report.encoderVersion)}; adapter ${label(report.adapterId)}@${label(report.adapterVersion)}.`);
     lines.push(`    ${report.outcome}; usage ${report.usageStatus}; cache-read tokens ${report.cacheReadTokens === null ? "unreported" : report.cacheReadTokens}; dispatch attempted ${report.dispatchAttempted === null ? "unavailable" : report.dispatchAttempted ? "yes (recorded)" : "no (recorded)"}.`);
     lines.push(`    evidence: request/header ${label(report.headerEventId)}; outcome ${report.outcome === "pending" ? "pending" : label(report.outcomeEventId)}.`);
   }
   if (reports.length === 0) lines.push("  No request headers recorded; no provider/model identity inferred.");
-  if (reports.length > visible.length) lines.push(`  ${reports.length - visible.length} further request identities omitted from text; use amc session show <session-id> --json for the full projection.`);
+  if (reports.length > visible.length) lines.push(`  ${reports.length - visible.length} ${recent ? "earlier" : "further"} request identities omitted from text; use amc session show <session-id> --json for the full projection.`);
   if (cache.hitRate === null) lines.push("  Request cache-read hit rate: unavailable (no eligible completed request reported a cache-read count).");
   else lines.push(`  Request cache-read hit rate${cache.excludedRequests > 0 ? " (eligible subset)" : ""}: ${(cache.hitRate * 100).toFixed(2)}% (${cache.hitRequests}/${cache.eligibleRequests} eligible completed requests).`);
   lines.push(`  Request-rate basis: a hit means reported cache-read tokens > 0; ${cache.excludedRequests} provider requests excluded. Failed, partial, pending, missing-cache and synthetic requests do not supply hits or a denominator.`);
@@ -301,7 +308,7 @@ function renderRequestReports(usage: NativeRunUsage): string[] {
 }
 
 /** Same read-back projection in one-shot output, session inspection and chat. */
-export function renderNativeRunUsage(value: unknown): string {
+export function renderNativeRunUsage(value: unknown, options: NativeUsageDisplayOptions = {}): string {
   if (value === undefined) return "Recorded session usage: unavailable (this summary contains no usage projection).";
   if (!isReadableUsage(value)) return "Recorded session usage: unavailable (unsupported or malformed usage projection).";
   const usage = value;
@@ -312,10 +319,22 @@ export function renderNativeRunUsage(value: unknown): string {
     `  Observed token subtotals: adapter-normalized input ${tokenText("inputTokens")}; output ${tokenText("outputTokens")}; cache read ${tokenText("cacheReadTokens")}; cache write ${tokenText("cacheWriteTokens")}.`,
     `  Cache-count coverage: read ${usage.totals.cacheReadTokens.reportedRequests}, write ${usage.totals.cacheWriteTokens.reportedRequests} reported requests; absent counts are not zero.`
   ];
-  if (usage.cache.readShare === null) lines.push("  Cache-read share: unavailable (no positive eligible reported-input subtotal).");
+  // Serialized token shares need the same numerator/denominator discipline as
+  // request-hit rates. An in-range percentage alone is not a measured ratio.
+  const cache = usage.cache;
+  const readableCoverage = cache.eligibleRequests <= usage.completeRequests
+    && cache.excludedRequests === usage.requests - usage.syntheticRequests - cache.eligibleRequests
+    && cache.unreportedWriteRequests <= cache.eligibleRequests;
+  const readableShare = readableCoverage && (cache.eligibleRequests === 0
+    ? cache.readTokens === null && cache.inputTokens === null && cache.readShare === null
+    : cache.readTokens !== null && cache.inputTokens !== null && cache.readTokens <= cache.inputTokens
+      && cache.readShare === (cache.inputTokens === 0 ? null : cache.readTokens / cache.inputTokens));
+  if (!readableShare) lines.push("  Cache-read share: unavailable (serialized token subtotal, coverage or ratio is inconsistent); no percentage inferred.");
+  else if (usage.cache.readShare === null) lines.push("  Cache-read share: unavailable (no positive eligible reported-input subtotal).");
   else lines.push(`  Cache-read share of reported input: ${(usage.cache.readShare * 100).toFixed(2)}% (${usage.cache.readTokens}/${usage.cache.inputTokens} tokens; ${usage.cache.eligibleRequests} complete reports).`);
-  lines.push(`  Rate coverage: ${usage.cache.excludedRequests} provider requests excluded; ${usage.cache.unreportedWriteRequests} eligible reports omit cache-write counts. This is not an all-request hit probability or a cost estimate.`);
+  if (readableCoverage) lines.push(`  Rate coverage: ${usage.cache.excludedRequests} provider requests excluded; ${usage.cache.unreportedWriteRequests} eligible reports omit cache-write counts. This is not an all-request hit probability or a cost estimate.`);
+  else lines.push("  Token-rate coverage: unavailable (serialized request counts disagree); no all-request probability or cost estimate is inferred.");
   if (usage.syntheticRequests > 0) lines.push(`  ${usage.syntheticRequests} local demonstration requests excluded from provider/cache measurements.`);
-  lines.push(...renderRequestReports(usage));
+  lines.push(...renderRequestReports(usage, options));
   return lines.join("\n");
 }

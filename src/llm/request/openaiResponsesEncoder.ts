@@ -1,6 +1,6 @@
 /** Explicit stateless Responses wire shape. No remote conversation state or opaque reasoning replay. */
 import { canonicalize } from "../../utils/json.js";
-import { assertRequestCapabilities, OPENAI_RESPONSES_CAPABILITIES } from "../adapter/providerCapabilities.js";
+import { assertRequestCapabilities, OPENAI_RESPONSES_TEXT_CAPABILITIES as OPENAI_RESPONSES_CAPABILITIES } from "../adapter/providerCapabilities.js";
 import type { RequestEncoder } from "./requestEncoder.js";
 import { RequestEncodingError, type EncodableRequest } from "./requestSpec.js";
 import { toolResultTextEnvelope } from "./toolResultTextEnvelope.js";

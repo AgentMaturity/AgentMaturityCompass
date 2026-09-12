@@ -86,7 +86,9 @@ describe("explicit Responses protocol and required capabilities", () => {
     const readEvents = vi.fn(), resolve = vi.fn(), transport = vi.fn();
     const runtime = new LlmRuntime({ registry, session: { readEvents } as unknown as SessionService,
       credentials: { resolve } as unknown as CredentialsService, transport });
-    for (const requiredCapabilities of [["image-input"], ["invented-capability"]]) {
+    // Responses v3 supports signed user images; opaque thinking replay still refuses.
+    expect(() => assertRequiredCapabilities(OPENAI_RESPONSES_CAPABILITIES, ["image-input"])).not.toThrow();
+    for (const requiredCapabilities of [["thinking-replay"], ["invented-capability"]]) {
       expect(() => runtime.prepare({ providerId: "responses", model: "fixture", params: {}, tools: null,
         systemPromptEventId: "unused", requiredCapabilities })).toThrow(LlmCapabilityError);
     }

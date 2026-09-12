@@ -1,5 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { AgentDriver } from "./agentDriver.js";
+import type { NativeImageInput } from "../attachments/nativeImageInput.js";
+import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { agentToolset, type AgentToolset } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
@@ -7,7 +10,7 @@ import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus } from "./loopTypes.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
-import type { TurnCancelCause } from "../session/sessionTypes.js";
+import type { TurnCancelCause, TurnEndReason } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
 import { SessionService } from "../session/sessionService.js";
 import { resumeSession } from "../session/sessionResume.js";
@@ -72,6 +75,8 @@ export type AgentPromptResult =
       /** Only what this prompt produced, never the whole conversation. */
       readonly text: string;
       readonly status: AgentStatus;
+      /** Native signed ending, independent of the driver's ability to accept more work. */
+      readonly turnEndReason?: TurnEndReason;
       readonly validation: NativeValidationResult;
     }
   | { readonly ok: false; readonly reason: string };
@@ -79,7 +84,10 @@ export type AgentPromptResult =
 export interface AgentSession {
   readonly sessionId: string;
   /** Run one prompt to completion. Rejects a second while one is in flight. */
-  prompt(text: string): Promise<AgentPromptResult>;
+  prompt(text: string, images?: readonly NativeImageInput[]): Promise<AgentPromptResult>;
+  /** Optional on externally supplied legacy factories; native composition implements it. */
+  promptParts?(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
+  promptAudioParts?(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
   cancel(cause: TurnCancelCause, by: string): void;
   /**
    * This session's committed rows.
@@ -95,16 +103,21 @@ export interface AgentSession {
   release?(): void | Promise<void>;
 }
 
-export function openAgentSession(init: AgentSessionInit): AgentSession {
+export interface OrderedAgentSession extends AgentSession {
+  promptParts(parts: readonly NativeInputPart[]): Promise<AgentPromptResult>;
+  promptAudioParts(parts: readonly NativeAudioPart[]): Promise<AgentPromptResult>;
+}
+
+export function openAgentSession(init: AgentSessionInit): OrderedAgentSession {
   return composeAgentSession(init);
 }
 
 /** Reattach only through the native signature, ownership and crash-recovery gates. */
-export function resumeAgentSession(init: AgentSessionInit & { readonly sessionId: string; readonly claimant: RecoveryClaimant }): AgentSession {
+export function resumeAgentSession(init: AgentSessionInit & { readonly sessionId: string; readonly claimant: RecoveryClaimant }): OrderedAgentSession {
   return composeAgentSession(init, init.claimant);
 }
 
-function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant): AgentSession {
+function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant): OrderedAgentSession {
   if (init.tools !== undefined && init.tools !== "none" && init.tools !== "workspace") throw new Error("Unknown native tool mode.");
   if (init.expectedToolsDigest !== undefined && (init.tools !== "workspace" || !/^[a-f0-9]{64}$/.test(init.expectedToolsDigest))) throw new Error("A native tool policy pin requires explicit workspace tools and a SHA-256 digest.");
   if (init.maxSteps !== undefined && (!Number.isSafeInteger(init.maxSteps) || init.maxSteps < 1 || init.maxSteps > 1024)) throw new Error("Native maxSteps must be an integer from 1 through 1024.");
@@ -143,6 +156,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
    * back as though it were the new one.
    */
   let reported = 0;
+  let reportedEndings = 0;
 
   const finish = (release: boolean): void => {
     if (closed) return;
@@ -164,7 +178,11 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
 
   let driver!: AgentDriver;
   try {
-    if (claimant !== undefined) reported = readAgentRunSummary(init.workspace, sessionId, "idle").assistantText.length;
+    if (claimant !== undefined) {
+      const history = readAgentRunSummary(init.workspace, sessionId, "idle");
+      reported = history.assistantText.length;
+      reportedEndings = history.endings.length;
+    }
     if (claimant === undefined) session.open({
       sessionId,
       agentId: init.agentId,
@@ -191,21 +209,24 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     throw error;
   }
 
-  return {
-    sessionId,
-
-    async prompt(text: string): Promise<AgentPromptResult> {
+  const runPrompt = async (enqueue: () => void): Promise<AgentPromptResult> => {
       if (closed) return { ok: false, reason: "session is closed" };
       // Claimed before any await. Checking after one would let two callers both
       // pass the check and then interleave on a serial driver.
       if (running) return { ok: false, reason: "a prompt is already running on this session" };
       running = true;
       try {
-        driver.followup(text);
+        enqueue();
         await driver.whenIdle();
 
         const status = driver.status;
         const summary = readAgentRunSummary(init.workspace, sessionId, status);
+        const fresh = summary.assistantText.slice(reported);
+        const endings = summary.endings.slice(reportedEndings);
+        // Retire this prompt's text even on a failed outcome. A later successful
+        // prompt must not receive an earlier failed turn's observations as its own.
+        reported = summary.assistantText.length;
+        reportedEndings = summary.endings.length;
 
         // `failed` is terminal: the spine refused a `turn/end` or `turn/seal`, so
         // the log has an open turn nothing may build on. The text may look
@@ -222,14 +243,23 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           };
         }
 
-        const fresh = summary.assistantText.slice(reported);
-        reported = summary.assistantText.length;
-        return { ok: true, text: fresh.join("\n"), status, validation: summary.validation };
+        const knownEndings: readonly TurnEndReason[] = ["complete", "cancelled", "max_tokens", "max_steps", "blocked", "error", "interrupted"];
+        const failed = endings.find(ending => ending.reason === "error" || ending.reason === "interrupted"
+          || !knownEndings.some(reason => reason === ending.reason));
+        if (failed) return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion` };
+        const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
+        if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };
+        return { ok: true, text: fresh.join("\n"), status, turnEndReason, validation: summary.validation };
       } finally {
         running = false;
       }
-    },
+  };
 
+  return {
+    sessionId,
+    prompt: (text, images) => runPrompt(() => { driver.followup(text, images); }),
+    promptParts: parts => runPrompt(() => { driver.followupParts(parts); }),
+    promptAudioParts: parts => runPrompt(() => { driver.followupAudioParts(parts); }),
     readEvents: () => session.readEvents(),
 
     cancel(cause: TurnCancelCause, by: string): void {

@@ -27,6 +27,7 @@
  * the closed-union discipline.
  */
 import type { SurfaceKind } from "../session/sessionTypes.js";
+import type { GeminiPartMeta } from "../session/geminiPartMeta.js";
 import { assertNever } from "./exhaustive.js";
 import type { LlmFailure } from "./llmFailure.js";
 
@@ -36,7 +37,8 @@ import type { LlmFailure } from "./llmFailure.js";
 declare const TOOL_CALL_ID_BRAND: unique symbol;
 
 /**
- * A provider-issued tool-call identifier.
+ * A provider-issued tool-call identifier, or an explicitly provenance-labelled
+ * native join key when a protocol omits one (Gemini metadata records which).
  *
  * Branded for the same reason `CredentialRef` is: the convention "this is an
  * id, not a name" becomes a compiler check instead of a reviewer's good day.
@@ -73,24 +75,27 @@ export function toolCallId(value: string): ToolCallId {
 export interface TextContentBlock {
   readonly kind: "text";
   readonly text: string;
+  readonly gemini?: GeminiPartMeta;
 }
 
 /** Reasoning content, distinct from visible text. Spelled `thinking` to match `SurfaceKind`. */
 export interface ThinkingContentBlock {
   readonly kind: "thinking";
   readonly text: string;
+  readonly gemini?: GeminiPartMeta;
 }
 
 /** A tool invocation requested by the model. */
 export interface ToolUseContentBlock {
   readonly kind: "tool_use";
-  /** Provider-issued call id; correlates with the matching tool result. */
+  /** Call join key; Gemini metadata distinguishes an optional wire id from a local key. */
   readonly id: ToolCallId;
   readonly name: string;
   /** Decoded provider name before request-scoped binding; not raw HTTP bytes. */
   readonly providerWireName?: string;
   /** Raw JSON string exactly as the model produced it — never re-parsed in transit. */
   readonly arguments: string;
+  readonly gemini?: GeminiPartMeta;
 }
 
 /** The result of a tool invocation, as it is sent back to the model. */
@@ -118,6 +123,23 @@ export interface ImageContentBlock {
   readonly sha256: string;
 }
 
+/**
+ * Audio referenced by content digest, the same digest form as {@link ImageContentBlock}.
+ *
+ * `audio` entered `SurfaceKind` with native signed audio input: the bytes are a
+ * user attachment recorded through the session spine, never model output. No
+ * adapter emits this block; the assembler and recorder refuse it the way they
+ * refuse `image`, and the shape exists so the closed-union proof below stays
+ * total instead of being relaxed.
+ */
+export interface AudioContentBlock {
+  readonly kind: "audio";
+  /** IANA media type, e.g. `audio/wav`. */
+  readonly mediaType: string;
+  /** Digest of the audio bytes, which live in the evidence blob store. */
+  readonly sha256: string;
+}
+
 /** Content blocks keyed by their `SurfaceKind` tag. Closed — see the module note. */
 export interface ContentBlockMap {
   readonly text: TextContentBlock;
@@ -125,6 +147,7 @@ export interface ContentBlockMap {
   readonly tool_use: ToolUseContentBlock;
   readonly tool_result: ToolResultContentBlock;
   readonly image: ImageContentBlock;
+  readonly audio: AudioContentBlock;
 }
 
 /**
@@ -219,8 +242,8 @@ export function billedInputTokens(usage: StreamTokenUsage): number {
  */
 export type StreamChunk =
   | { readonly type: "block-start"; readonly index: number; readonly blockKind: SurfaceKind }
-  | { readonly type: "text-delta"; readonly index: number; readonly text: string }
-  | { readonly type: "thinking-delta"; readonly index: number; readonly text: string }
+  | { readonly type: "text-delta"; readonly index: number; readonly text: string; readonly gemini?: GeminiPartMeta }
+  | { readonly type: "thinking-delta"; readonly index: number; readonly text: string; readonly gemini?: GeminiPartMeta }
   | {
       readonly type: "tool-call-delta";
       readonly index: number;
@@ -229,6 +252,7 @@ export type StreamChunk =
       readonly name?: string;
       readonly providerWireName?: string;
       readonly argumentsDelta: string;
+      readonly gemini?: GeminiPartMeta;
     }
   | { readonly type: "block-end"; readonly index: number; readonly block: ContentBlock }
   | { readonly type: "usage"; readonly usage: StreamTokenUsage }

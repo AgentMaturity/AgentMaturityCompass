@@ -43,6 +43,12 @@ import type { SessionEventRef, SessionService } from "../session/sessionService.
 import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
 import { LoopInbox } from "./inbox.js";
+import type { NativeImageInput } from "../attachments/nativeImageInput.js";
+import { recordNativeImageMessage } from "./nativeImageMessage.js";
+import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import { assertOrderedClaimDecision, recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
+import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
+import { assertAudioClaimDecision, recordNativeAudioMessage } from "./nativeAudioMessage.js";
 import { DEFAULT_RETRY_RUNTIME } from "./requestRetry.js";
 import {
   DEFAULT_AGENT_LOOP_CONFIG,
@@ -156,22 +162,46 @@ export class AgentDriver {
    * classification is captured BEFORE the insertion so that a cancel triggered
    * re-entrantly by an observer of the insertion cannot reclassify it.
    */
-  send(text: string, target: InboxTarget, wakeup: boolean): InboxReceipt {
+  send(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[]): InboxReceipt {
+    return this.enqueue(text, target, wakeup, images);
+  }
+
+  /** Preserve the same lane, wake, abort-demotion and durable admission machinery. */
+  sendParts(parts: readonly NativeInputPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, parts);
+  }
+
+  sendAudioParts(parts: readonly NativeAudioPart[], target: InboxTarget, wakeup: boolean): InboxReceipt {
+    return this.enqueue("", target, wakeup, undefined, undefined, parts);
+  }
+
+  private enqueue(text: string, target: InboxTarget, wakeup: boolean, images?: readonly NativeImageInput[], parts?: readonly NativeInputPart[], audioParts?: readonly NativeAudioPart[]): InboxReceipt {
     this.assertUsable();
     const wakingAfterAbort =
       wakeup && this.phase.kind === "running" && this.phase.abort.signal.aborted;
     const resolved: InboxTarget = wakingAfterAbort ? "next-turn" : target;
     const receipt = this.inbox.insert(resolved, text, originFor(target, wakeup), {
       wake: wakeup,
-      demotedFrom: wakingAfterAbort ? target : null
+      demotedFrom: wakingAfterAbort ? target : null,
+      ...(images === undefined ? {} : { images }),
+      ...(parts === undefined ? {} : { parts }),
+      ...(audioParts === undefined ? {} : { audioParts })
     });
     if (wakeup) this.wakeDriver(wakingAfterAbort);
     return receipt;
   }
 
   /** Queue a prompt that gets its own turn, and wake the driver. */
-  followup(text: string): InboxReceipt {
-    return this.send(text, "next-turn", true);
+  followup(text: string, images?: readonly NativeImageInput[]): InboxReceipt {
+    return this.send(text, "next-turn", true, images);
+  }
+
+  followupParts(parts: readonly NativeInputPart[]): InboxReceipt {
+    return this.sendParts(parts, "next-turn", true);
+  }
+
+  followupAudioParts(parts: readonly NativeAudioPart[]): InboxReceipt {
+    return this.sendAudioParts(parts, "next-turn", true);
   }
 
   /** Steer the nearest step boundary. An idle driver starts a turn for it. */
@@ -373,7 +403,21 @@ export class AgentDriver {
         let usage: TokenUsage | null = null;
         try {
           for (const message of decision.messages) {
-            this.head = this.session.recordUserMessage(message.text);
+            if (message.audioParts !== undefined) {
+              this.head = recordNativeAudioMessage(this.session, message);
+              continue;
+            }
+            if (message.parts !== undefined) {
+              this.head = recordNativeOrderedMessage(this.session, message);
+              continue;
+            }
+            // The signed inbox already records an image-only input's empty text.
+            // Do not manufacture an empty provider text block beside its image;
+            // historical rows/encoders and ordinary text-only behavior stay intact.
+            if (message.text.length > 0 || !message.images?.length) {
+              this.head = this.session.recordUserMessage(message.text);
+            }
+            this.head = recordNativeImageMessage(this.session, message) ?? this.head;
           }
           const outcome = await runStep(this.stepInit, turnRef.turn, step, signal);
           stopReason = outcome.stopReason;
@@ -470,6 +514,9 @@ export class AgentDriver {
   private async preStep(target: InboxTarget, turn: number, step: number): Promise<PreStepDecision> {
     const signal = this.requireRunning().abort.signal;
     const claimed: readonly InboxMessage[] = this.inbox.claim(target);
+    // A hook may mutate the batch array, but cannot erase the captured v2 claims.
+    const orderedClaims = claimed.filter(message => message.parts !== undefined);
+    const audioClaims = claimed.filter(message => message.audioParts !== undefined);
     const decision = await this.hooks.preStep(
       { turn, step, target, messages: claimed, signal },
       (): Promise<PreparedStep> => Promise.resolve({ kind: "enter", messages: claimed })
@@ -484,6 +531,8 @@ export class AgentDriver {
         claimedMessageIds: claimed.map((message) => message.messageId)
       });
     }
+    if (decision.kind === "enter") assertOrderedClaimDecision(orderedClaims, decision.messages);
+    if (decision.kind === "enter") assertAudioClaimDecision(audioClaims, decision.messages);
     return decision;
   }
 

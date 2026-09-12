@@ -55,7 +55,7 @@ export const DEFAULT_REQUEST_ENCODERS = new RequestEncoderRegistry(BUILT_IN_REQU
 export type RequestDerivationStatus =
   /** Bytes rebuilt, they hash to the signed digest, and every commitment holds. */
   | "reconstructed"
-  /** Bytes rebuilt and they hash correctly, but a commitment in the row is wrong. */
+  /** A source commitment is wrong; tampered image input can be refused without rebuilding bytes. */
   | "evidence-inconsistent"
   /** Bytes rebuilt and they do NOT hash to the signed digest. */
   | "digest-mismatch"

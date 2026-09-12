@@ -145,6 +145,7 @@ export const openaiChatEncoder: RequestEncoder = {
   id: OPENAI_CHAT_ENCODER_ID,
   version: 1,
   encode(request: EncodableRequest): Buffer {
+    if (request.messages.some(message => message.parts.some(part => part.kind === "audio"))) throw new RequestEncodingError("This historical Chat encoder does not support native audio; no content was flattened or discarded.");
     const body: Record<string, JsonValue> = {};
     for (const [key, value] of Object.entries(request.params)) {
       if (RESERVED_BODY_KEYS.has(key)) {

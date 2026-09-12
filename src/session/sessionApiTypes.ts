@@ -15,6 +15,7 @@
  * convention — the exact trade this codebase keeps refusing.
  */
 import type { RuntimeName } from "../types.js";
+import type { RecordedGeminiPart } from "./geminiPartMeta.js";
 import type {
   ApprovalAnswer,
   SurfaceKind,
@@ -166,6 +167,7 @@ export interface AssistantBlockInput {
   readonly blockKind: SurfaceKind;
   readonly stopReason: string | null;
   readonly content: string | Buffer;
+  readonly gemini?: RecordedGeminiPart;
 }
 
 export interface ToolCallInput {
@@ -174,6 +176,7 @@ export interface ToolCallInput {
   readonly dispatch: ToolDispatch;
   readonly parentToken: string | null;
   readonly args: string | Buffer; // payload; argsSha256 = payload_sha256
+  readonly gemini?: RecordedGeminiPart;
   /** Request-scoped provider identity; canonical toolName remains the policy key. */
   readonly providerName?: {
     readonly version: 1;

@@ -1,6 +1,7 @@
 import { detonateAttachment } from "../shield/attachmentDetonation.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { SessionService } from "../session/sessionService.js";
+import { imageTypeForFilename, nativeImageMediaType, snapshotNativeImages } from "./nativeImageInput.js";
 
 /**
  * Content-addressed attachments, gated on the way in (plan P6.3).
@@ -32,9 +33,6 @@ export type AttachmentIngest =
   | { readonly ok: true; readonly sha256: string; readonly mimeType: string }
   | { readonly ok: false; readonly reason: string };
 
-/** Extensions whose bytes the model reads as an image part rather than as text. */
-const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
-
 export function ingestAttachment(params: {
   readonly session: SessionService;
   readonly filename: string;
@@ -55,12 +53,19 @@ export function ingestAttachment(params: {
     };
   }
 
+  const imageType = imageTypeForFilename(params.filename);
+  if (imageType !== null || nativeImageMediaType(bytes) !== null) {
+    if (imageType === null) return { ok: false, reason: "Image bytes require an explicit matching supported image filename; they are not text." };
+    try { snapshotNativeImages([{ filename: params.filename, mediaType: imageType, bytes }]); }
+    catch (error) { return { ok: false, reason: error instanceof Error ? error.message : "Image attachment refused." }; }
+  }
+  const mimeType = imageType ?? verdict.mimeType;
   params.session.recordUserAttachment({
     filename: params.filename,
     content: bytes,
-    kind: IMAGE_TYPES.has(verdict.mimeType) ? "image" : "text",
-    mimeType: verdict.mimeType
+    kind: imageType === null ? "text" : "image",
+    mimeType
   });
 
-  return { ok: true, sha256: sha256Hex(bytes), mimeType: verdict.mimeType };
+  return { ok: true, sha256: sha256Hex(bytes), mimeType };
 }

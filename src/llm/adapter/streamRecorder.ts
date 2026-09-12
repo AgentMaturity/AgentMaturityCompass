@@ -298,7 +298,7 @@ export class StreamRecorder {
     // model produced and the consumer's stream yielded never reached the signed
     // log. That was this same side-channel reopening one branch over, so the
     // content is now taken from whichever of the two actually holds it.
-    const content =
+    const rawContent =
       block !== null
         ? block.kind === "text" || block.kind === "thinking"
           ? block.text
@@ -306,6 +306,9 @@ export class StreamRecorder {
             ? `${block.name}${block.arguments}`
             : JSON.stringify(block)
         : `${record.partial?.text ?? ""}${record.partial?.toolArguments ?? ""}`;
+    const gemini = block !== null && "gemini" in block ? block.gemini : undefined;
+    const content = gemini === undefined ? rawContent : JSON.stringify({ type: "amc.gemini-dropped-part", version: 1,
+      headerEventId: this.init.headerEventId, gemini, content: rawContent });
     const wireName = block?.kind === "tool_use" ? block.providerWireName : record.partial?.providerWireName;
     return this.init.session.recordAssistantBlock({
       blockIndex: record.ordinal,
@@ -334,7 +337,8 @@ export class StreamRecorder {
           blockIndex: record.ordinal,
           blockKind: block.kind,
           stopReason,
-          content: block.text
+          content: block.text,
+          ...(block.gemini === undefined ? {} : { gemini: { ...block.gemini, headerEventId: this.init.headerEventId } })
         }).eventId;
       case "tool_use":
         return session.recordToolCall({
@@ -343,13 +347,15 @@ export class StreamRecorder {
           ...(block.providerWireName === undefined ? {} : { providerName: this.providerName(block.providerWireName) }),
           dispatch: "native",
           parentToken: null,
-          args: block.arguments
+          args: block.arguments,
+          ...(block.gemini === undefined ? {} : { gemini: { ...block.gemini, headerEventId: this.init.headerEventId } })
         }).eventId;
       case "image":
+      case "audio":
       case "tool_result":
         throw new LlmRecordingError(
           `adapter ${this.init.pinned.adapterId}@${this.init.pinned.adapterVersion} emitted a ${block.kind} block; ` +
-            `a provider stream produces model output, and neither kind has a durable payload this seam can record`
+            `a provider stream produces model output, and none of these kinds has a durable payload this seam can record`
         );
     }
   }

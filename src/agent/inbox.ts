@@ -23,13 +23,23 @@
 import { randomUUID } from "node:crypto";
 import type { EvidenceEvent } from "../types.js";
 import { readEventPayload } from "../session/eventPayload.js";
+import { assertSessionPayloadWithinCap } from "../session/sessionPayloadCap.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
 import type { InboxOrigin, InboxSpliceOp, InboxTarget, LoopInboxMeta } from "../session/loopEventMeta.js";
 import type { SessionService } from "../session/sessionService.js";
 import type { InboxMessage, InboxReceipt, LoopNotification } from "./loopTypes.js";
+import { decodeNativeImageInput, encodeNativeImageInput, NATIVE_IMAGE_INPUT_FORMAT, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
+import { sha256Hex } from "../utils/hash.js";
+import { decodeNativeOrderedInput, encodeNativeOrderedInput, NATIVE_ORDERED_INPUT_FORMAT,
+  snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import { decodeNativeAudioInput, encodeNativeAudioInput, NATIVE_AUDIO_INPUT_FORMAT,
+  snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 
 /** How an insertion was routed, beyond the target itself. */
 export interface InsertOptions {
+  readonly images?: readonly NativeImageInput[];
+  readonly parts?: readonly NativeInputPart[];
+  readonly audioParts?: readonly NativeAudioPart[];
   /** Whether this insertion is allowed to wake an idle driver. */
   readonly wake: boolean;
   /** The target the sender asked for, when this one is a demotion. */
@@ -65,20 +75,34 @@ export class LoopInbox {
 
   /** Queue one message at the end of a lane. */
   insert(target: InboxTarget, text: string, origin: InboxOrigin, options: InsertOptions): InboxReceipt {
-    const message: InboxMessage = { messageId: randomUUID(), text, origin };
+    if (options.audioParts !== undefined && (text !== "" || options.images !== undefined || options.parts !== undefined)) throw new Error("Audio input cannot be combined with legacy text/image input options.");
+    const audioParts = options.audioParts === undefined ? undefined : snapshotNativeAudioParts(options.audioParts);
+    if (options.parts !== undefined && (text !== "" || options.images !== undefined)) throw new Error("Ordered input cannot be combined with legacy text/images.");
+    const parts = options.parts === undefined ? undefined : snapshotNativeInputParts(options.parts);
+    const images = snapshotNativeImages(options.images);
+    const messageId = randomUUID();
     const list = this.state[target];
+    const payloadText = audioParts !== undefined ? encodeNativeAudioInput(audioParts) : parts !== undefined ? encodeNativeOrderedInput(parts) : images.length === 0 ? text : encodeNativeImageInput(text, images);
+    // The queued message becomes one signed row. An oversize one is refused here, before anything is recorded,
+    // with the limit and its fix named — not as a bare ledger error after the caller believes it was queued.
+    assertSessionPayloadWithinCap(this.session.workspace, "The queued input (text plus encoded media)", Buffer.byteLength(payloadText, "utf8"));
     const ref = this.session.recordLoopEvent({
       kind: "inbox",
       op: "insert",
       target,
       start: list.length,
       removedCount: 0,
-      messageIds: [message.messageId],
+      messageIds: [messageId],
       origin,
-      text,
+      text: payloadText,
+      ...(audioParts !== undefined ? { payloadFormat: NATIVE_AUDIO_INPUT_FORMAT } : parts !== undefined ? { payloadFormat: NATIVE_ORDERED_INPUT_FORMAT } : images.length === 0 ? {} : { payloadFormat: NATIVE_IMAGE_INPUT_FORMAT }),
       wake: options.wake,
       demotedFrom: options.demotedFrom
     });
+    const message: InboxMessage = Object.freeze({ messageId, text, origin,
+      ...(audioParts === undefined ? {} : { audioParts, inputEventId: ref.eventId }),
+      ...(parts === undefined ? {} : { parts, inputEventId: ref.eventId }),
+      ...(images.length === 0 ? {} : { images, inputEventId: ref.eventId }) });
     list.push(message);
     this.notify({ kind: "inbox", op: "insert", target, messageIds: [message.messageId] });
     return {
@@ -196,6 +220,18 @@ export class LoopInbox {
       throw new Error(
         `agent inbox: loop/inbox row ${event.id} has no readable text (${payload.status})`
       );
+    }
+    if (meta.payloadFormat === NATIVE_AUDIO_INPUT_FORMAT) {
+      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: audio input ${event.id} has tampered payload bytes`);
+      return Object.freeze({ messageId, text: "", audioParts: decodeNativeAudioInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
+    }
+    if (meta.payloadFormat === NATIVE_ORDERED_INPUT_FORMAT) {
+      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: ordered input ${event.id} has tampered payload bytes`);
+      return Object.freeze({ messageId, text: "", parts: decodeNativeOrderedInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
+    }
+    if (meta.payloadFormat === NATIVE_IMAGE_INPUT_FORMAT) {
+      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: image input ${event.id} has tampered payload bytes`);
+      return Object.freeze({ messageId, ...decodeNativeImageInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
     }
     return { messageId, text: payload.bytes.toString("utf8"), origin: meta.origin };
   }

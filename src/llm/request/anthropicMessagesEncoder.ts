@@ -90,8 +90,9 @@ function parseArguments(part: Extract<EncodablePart, { kind: "tool_use" }>): Jso
 }
 
 /** One surface part as an Anthropic content block, or null when v1 omits it. */
-function encodePart(part: EncodablePart): JsonValue | null {
+export function encodePart(part: EncodablePart): JsonValue | null {
   switch (part.kind) {
+    case "audio": throw new RequestEncodingError("Native audio is unsupported by this Anthropic encoder; no content was discarded.");
     case "text":
       return { type: "text", text: part.text };
     case "thinking":
@@ -136,6 +137,7 @@ function providerRole(role: EncodableMessage["role"]): "user" | "assistant" | nu
  * here that is a total function of the input order.
  */
 function encodeMessages(messages: readonly EncodableMessage[]): JsonValue[] {
+  if (messages.some(message => message.parts.some(part => part.kind === "audio"))) throw new RequestEncodingError("Native audio requires its separately versioned supported route.");
   type ProviderMessage = { readonly role: "user" | "assistant"; readonly content: readonly JsonValue[] };
   const merged = messages.reduce<readonly ProviderMessage[]>((out, message) => {
     const role = providerRole(message.role);

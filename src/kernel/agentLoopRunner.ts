@@ -55,6 +55,8 @@ import {
   type AgentPromptProfileOptions
 } from "../prompt/agentPromptProfile.js";
 import { SessionService } from "../session/sessionService.js";
+import { materializeNativeImages, snapshotNativeImages, type NativeImageInput } from "../attachments/nativeImageInput.js";
+import { materializeNativeAudioParts, snapshotNativeAudioParts, type NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { forkSession, resumeSession, type ResumeReport } from "../session/sessionResume.js";
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
@@ -188,6 +190,9 @@ export interface ComposedTurnOptions {
   readonly approvalGate?: ComposedApprovalGate;
   /** The prompt that opens the turn. Enters the durable inbox like any other message. */
   readonly prompt: string;
+  /** Original image bytes, captured before asynchronous composition and queued durably. */
+  readonly images?: readonly NativeImageInput[];
+  readonly audioParts?: readonly NativeAudioPart[];
   readonly route: LoopRoute;
   /** Routes registered on the composed `amcLlm`. Must include `route.providerId`. */
   readonly routes: readonly LlmRouteConfig[];
@@ -386,10 +391,15 @@ function policyDigestOf(options: ComposedTurnOptions): string {
  * command exit with work still committed to the inbox.
  */
 export async function runComposedTurn(options: ComposedTurnOptions): Promise<ComposedTurnOutcome> {
+  if (options.audioParts !== undefined && (options.prompt !== "" || (options.images?.length ?? 0) > 0 || options.schedulePass !== undefined)) {
+    throw new Error("Audio input requires its complete ordered sequence, without legacy prompt/images or schedule execution.");
+  }
+  const audioParts = options.audioParts === undefined ? undefined : materializeNativeAudioParts(snapshotNativeAudioParts(options.audioParts));
+  const images = materializeNativeImages(snapshotNativeImages(options.images));
   if (options.schedulePass !== undefined) {
     if (options.resume !== undefined || options.forkFrom !== undefined || options.keepOpen
       || options.delegation !== undefined || options.tools !== undefined || options.validation !== undefined
-      || options.onSteer !== undefined || options.prompt !== "" || options.approvalGate === undefined
+      || options.onSteer !== undefined || options.prompt !== "" || images.length > 0 || options.approvalGate === undefined
       || (options.approvalGate.answerers?.length ?? 0) > 0 || options.approvalGate.toolNames !== undefined) {
       throw new Error("A native schedule pass requires a fresh owned session, native leaf runners and the actual all-tools signed approval gate. Resume, custom runners/tools, validation, approval exceptions and ordinary prompts are not schedule admission.");
     }
@@ -592,7 +602,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
         loop.cancel(cause);
       }
     });
-    loop.followup(options.prompt);
+    if (audioParts !== undefined) loop.agent.followupAudioParts(audioParts);
+    else loop.followup(options.prompt, images);
     if (options.onSteer !== undefined) {
       const steer = options.onSteer;
       steerTimer = setTimeout(() => {

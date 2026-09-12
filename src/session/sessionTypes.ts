@@ -57,7 +57,7 @@ export const SESSION_ENVELOPE_META_KEY = "amcSession";
 
 export type SurfaceRole = "system" | "user" | "assistant" | "tool";
 
-export type SurfaceKind = "text" | "thinking" | "tool_use" | "tool_result" | "image";
+export type SurfaceKind = "text" | "thinking" | "tool_use" | "tool_result" | "image" | "audio";
 
 export interface SurfacePartRef {
   readonly kind: SurfaceKind;
@@ -211,7 +211,7 @@ function isSurfacePartRef(value: unknown): value is SurfacePartRef {
     kind === "thinking" ||
     kind === "tool_use" ||
     kind === "tool_result" ||
-    kind === "image";
+    kind === "image" || kind === "audio";
   return validKind && typeof candidate.sha256 === "string";
 }
 

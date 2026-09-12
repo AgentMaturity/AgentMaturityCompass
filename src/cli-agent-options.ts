@@ -1,13 +1,23 @@
 /** Parsing, provider routing, approval policy selection and progress formatting for the native CLI. */
 import chalk from "chalk";
-import { InvalidArgumentError } from "commander";
+import { InvalidArgumentError, type Command } from "commander";
 import { readFileSync } from "node:fs";
-import type { LlmRouteConfig } from "./llm/adapter/adapterRegistry.js";
+import type { LlmRouteConfig, ProviderDescription } from "./llm/adapter/adapterRegistry.js";
+import type { LlmAdapter } from "./llm/adapter/adapterTypes.js";
+import { snapshotCapabilities } from "./llm/adapter/providerCapabilities.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
 import { openaiResponsesAdapter } from "./llm/providers/openaiResponsesAdapter.js";
+import { deepseekAdapter } from "./llm/providers/deepseekAdapter.js";
+import { deepseekParams } from "./llm/providers/deepseekContract.js";
+import { geminiAdapter } from "./llm/providers/geminiAdapter.js";
+import { geminiAudioAdapter } from "./llm/providers/geminiAudioAdapter.js";
+import { geminiParams } from "./llm/providers/geminiContract.js";
+import { ollamaAdapter } from "./llm/providers/ollamaAdapter.js";
+import { createOllamaRoute } from "./llm/providers/ollamaRoute.js";
+import { ollamaParams } from "./llm/providers/ollamaContract.js";
 import { credentialRef } from "./credentials/credentialRef.js";
-import { STUB_PROVIDER_ID, stubProviderRoute } from "./agent/stubProvider.js";
+import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderAdapter, stubProviderRoute } from "./agent/stubProvider.js";
 import type { LoopNotification } from "./agent/loopTypes.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
@@ -28,6 +38,8 @@ export interface AgentLoopCliIo {
 }
 
 export interface RunOptions {
+  image?: string[];
+  audioInput?: string;
   validationConfig?: string;
   validationConfigSha256?: string;
   validate?: string[];
@@ -50,6 +62,8 @@ export interface RunOptions {
   credentialsHome?: string;
   credentialsFile?: string;
   maxTokens?: string;
+  thinking?: string;
+  reasoningEffort?: string;
   maxSteps?: string;
   tools?: string;
   toolMode?: string;
@@ -176,8 +190,22 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
 }
 
 /** The default wire params for each supported adapter, and why each one is there. */
-export function paramsFor(providerId: string, maxTokens: number): Record<string, unknown> {
+export function paramsFor(providerId: string, maxTokens: number, options: Pick<RunOptions, "thinking" | "reasoningEffort"> = {}): Record<string, unknown> {
+  if (providerId !== "deepseek" && (options.thinking !== undefined || options.reasoningEffort !== undefined)) {
+    throw new Error("--thinking and --reasoning-effort on this surface require --provider deepseek; unused options are not ignored.");
+  }
   switch (providerId) {
+    case "ollama":
+      // The native contract validates the bound and maps it to options.num_predict.
+      // No OpenAI compatibility params or fabricated usage/cache options are sent.
+      return ollamaParams({ max_tokens: maxTokens });
+    case "gemini": case "gemini-audio": return geminiParams({ generationConfig: { maxOutputTokens: maxTokens } });
+    case "deepseek":
+      // The native encoder owns stream/include_usage. Emit explicit documented
+      // defaults, not SDK extra_body or silently remapped effort aliases.
+      return deepseekParams({ max_tokens: maxTokens,
+        ...(options.thinking === undefined ? {} : { thinking: { type: options.thinking } }),
+        ...(options.reasoningEffort === undefined ? {} : { reasoning_effort: options.reasoningEffort }) });
     case "openai-responses":
       // The Responses encoder owns stream; its output bound has a different name.
       return { max_output_tokens: maxTokens };
@@ -193,16 +221,176 @@ export function paramsFor(providerId: string, maxTokens: number): Record<string,
 }
 
 const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = Object.freeze({
+  "gemini-audio": "https://generativelanguage.googleapis.com",
+  gemini: "https://generativelanguage.googleapis.com",
+  deepseek: "https://api.deepseek.com",
   anthropic: "https://api.anthropic.com",
   openai: "https://api.openai.com",
   "openai-responses": "https://api.openai.com"
 });
 
 const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = Object.freeze({
+  "gemini-audio": "GEMINI_API_KEY",
+  gemini: "GEMINI_API_KEY",
+  deepseek: "DEEPSEEK_API_KEY",
   anthropic: "ANTHROPIC_API_KEY",
   openai: "OPENAI_API_KEY",
   "openai-responses": "OPENAI_API_KEY"
 });
+
+/** One inventory for executable CLI/ACP selection and local adapter discovery.
+ * Gateway templates are deliberately not native adapters. Looking up entries in
+ * an array also means prototype property names can never become provider routes.
+ */
+const NATIVE_ADAPTERS: readonly { readonly providerId: string; readonly adapter: LlmAdapter }[] = Object.freeze([
+  { providerId: STUB_PROVIDER_ID, adapter: stubProviderAdapter },
+  { providerId: "anthropic", adapter: anthropicAdapter },
+  { providerId: "openai", adapter: openaiAdapter },
+  { providerId: "openai-responses", adapter: openaiResponsesAdapter },
+  { providerId: "deepseek", adapter: deepseekAdapter },
+  { providerId: "gemini", adapter: geminiAdapter },
+  { providerId: "gemini-audio", adapter: geminiAudioAdapter },
+  { providerId: "ollama", adapter: ollamaAdapter }
+]);
+
+function nativeAdapterFor(providerId: string): LlmAdapter {
+  const entry = NATIVE_ADAPTERS.find(candidate => candidate.providerId === providerId);
+  if (entry === undefined) {
+    throw new Error(`unknown provider ${JSON.stringify(providerId)}; native CLI/ACP routes are `
+      + NATIVE_ADAPTERS.map(candidate => JSON.stringify(candidate.providerId)).join(", "));
+  }
+  return entry.adapter;
+}
+
+/** Pure operator selection shared with ACP. It never resolves a credential,
+ * probes a server, pulls a model or falls back to a different protocol.
+ */
+export function nativeRouteFor(
+  providerId: string,
+  options: Pick<RunOptions, "baseUrl" | "credential">,
+  model: string | undefined
+): LlmRouteConfig {
+  const adapter = nativeAdapterFor(providerId);
+  if (providerId === STUB_PROVIDER_ID) return stubProviderRoute();
+  if (model === undefined || model.trim().length === 0) {
+    throw new Error(`--model is required for provider ${providerId}`);
+  }
+  if (providerId === "ollama") {
+    return createOllamaRoute({ model,
+      ...(options.baseUrl === undefined ? {} : { baseUrl: options.baseUrl }),
+      // Local Ollama needs no credential by default. An explicit reference is
+      // retained for an operator-configured authenticated origin, never guessed.
+      ...(options.credential === undefined ? {} : { credentialRef: credentialRef(options.credential) }) });
+  }
+  const baseUrl = options.baseUrl ?? DEFAULT_BASE_URLS[providerId];
+  if (baseUrl === undefined) throw new Error(`--base-url is required for provider ${providerId}`);
+  return { providerId, adapter, baseUrl,
+    credentialRef: credentialRef(options.credential ?? DEFAULT_CREDENTIAL_REFS[providerId] ?? "AMC_LLM_API_KEY"),
+    models: [model] };
+}
+
+/** These are reporting rules, not measurements supplied by discovery. The actual
+ * CLI/session reports still fold linked recorded outcomes via nativeRunUsage.
+ */
+const NATIVE_USAGE_CACHE_CONTRACT = Object.freeze({
+  source: "linked-recorded-request-outcomes",
+  missingCounts: "unknown-not-zero",
+  tokenShareBasis: "reported-input-token-subtotal",
+  requestHitRateBasis: "completed-requests-with-reported-cache-read",
+  requestHit: "positive-reported-cache-read-tokens",
+  excludedFromRates: Object.freeze(["failed", "partial", "pending", "unreported", "missing-cache-read", "synthetic"]),
+  invalidEvidence: "rates-unavailable",
+  cost: "not-derived"
+});
+const NATIVE_DISCOVERY_BOUNDARY = "Bundled adapter contracts only: no server, installed model, credential or cache probe. "
+  + "Capabilities are not measured model support; a surface may accept fewer modalities. "
+  + "Guide/chat menus are separate from the run/ACP selectors. Missing cache counts remain unknown, not zero.";
+
+export interface NativeProviderDescription extends Omit<ProviderDescription, "models"> {
+  readonly encoderId: string;
+  readonly encoderVersion: number;
+  /** Discovery only, not a route allowlist: null means models were not enumerated. */
+  readonly models: readonly string[] | null;
+  readonly modelSelection: "explicit-required" | "fixed-synthetic";
+}
+
+/** Snapshot the same adapter contracts the route registry captures. Real model
+ * names remain unknown; the sole listed model belongs to the synthetic stub.
+ * No route endpoint, credential reference/value, environment or provider I/O.
+ */
+export function discoverNativeProviders(providerId?: string) {
+  if (providerId !== undefined) nativeAdapterFor(providerId);
+  const providers: readonly NativeProviderDescription[] = Object.freeze(NATIVE_ADAPTERS
+    .filter(entry => providerId === undefined || entry.providerId === providerId)
+    .map(({ providerId: id, adapter }) => Object.freeze({
+      providerId: id, adapterId: adapter.id, adapterVersion: adapter.version,
+      encoderId: adapter.encoderId, encoderVersion: adapter.encoderVersion,
+      models: id === STUB_PROVIDER_ID ? Object.freeze([STUB_PROVIDER_MODEL]) : null,
+      modelSelection: id === STUB_PROVIDER_ID ? "fixed-synthetic" as const : "explicit-required" as const,
+      capabilities: snapshotCapabilities(adapter.capabilities)
+    })));
+  return Object.freeze({ schemaVersion: 1 as const, scope: "bundled-native-adapters" as const,
+    selectors: Object.freeze(["agent-loop run", "acp"]),
+    modelDiscovery: "not-performed" as const, credentialsChecked: false as const,
+    measurement: "not-performed" as const, providers, usageCache: NATIVE_USAGE_CACHE_CONTRACT,
+    boundary: NATIVE_DISCOVERY_BOUNDARY });
+}
+
+export function renderNativeProviderDiscovery(discovery: ReturnType<typeof discoverNativeProviders>): string {
+  const lines = ["Native provider discovery (local adapter contracts)", discovery.boundary];
+  for (const provider of discovery.providers) {
+    const capabilities = provider.capabilities;
+    lines.push(`${provider.providerId}: adapter ${provider.adapterId}@${provider.adapterVersion}; encoder ${provider.encoderId}@${provider.encoderVersion}`,
+      `  protocol ${capabilities?.protocol ?? "unknown"}; model support ${capabilities?.modelSupport ?? "unknown"}; usage ${capabilities?.usage ?? "unknown"}; cache ${capabilities?.cache ?? "unknown"}`,
+      `  cache-read reporting ${capabilities?.features["cache-read-usage"] ?? "unknown"}; cache-write reporting ${capabilities?.features["cache-write-usage"] ?? "unknown"}`);
+  }
+  lines.push("Cache-read token share is not request hit rate. Only complete, reported request outcomes with an explicit cache-read count enter rates; a reported zero is an eligible miss.",
+    "Failed, partial, pending, missing-cache and synthetic requests are excluded. Invalid evidence makes rates unavailable. No token counts, cache rates or costs were measured by discovery.");
+  return lines.join("\n");
+}
+
+/** Called by the CLI composition after the existing agent-loop and ACP commands.
+ * Discovery is an explicit operator subcommand, never a banner on ACP stdio.
+ */
+export function registerNativeProviderCommands(program: Command, io: AgentLoopCliIo = {
+  log: line => { console.log(line); }, error: line => { console.error(line); }, fail: () => { process.exitCode = 1; }
+}): void {
+  const agentLoop = program.commands.find(command => command.name() === "agent-loop");
+  const acp = program.commands.find(command => command.name() === "acp");
+  if (!agentLoop || !acp) throw new Error("Register agent-loop and ACP before native provider discovery.");
+  for (const group of [agentLoop, acp]) {
+    group.command("providers")
+      .description("Describe bundled native adapters and usage/cache contracts without provider calls")
+      .option("--provider <id>", "Describe this exact native provider; no fallback or live model search")
+      .option("--json", "Output adapter contracts, explicit unknowns and reporting rules as JSON")
+      .action((options: { provider?: string; json?: boolean }, command: Command) => {
+        try {
+          // Commander may consume shared flags on a parent even after the child
+          // name. Honor explicit flags from either location, never ACP's default
+          // stub (which would hide the rest of the inventory).
+          let providerId = options.provider, json = options.json;
+          for (let parent = command.parent; parent; parent = parent.parent) {
+            if (providerId === undefined && parent.getOptionValueSource("provider") === "cli") {
+              providerId = parent.getOptionValue("provider") as string | undefined;
+            }
+            if (json === undefined && parent.getOptionValueSource("json") === "cli") {
+              json = parent.getOptionValue("json") === true;
+            }
+          }
+          const discovery = discoverNativeProviders(providerId);
+          io.log(json ? JSON.stringify(discovery, null, 2) : renderNativeProviderDiscovery(discovery));
+        } catch (error) {
+          io.error(error instanceof Error ? error.message : "Native provider discovery failed.");
+          io.fail();
+        }
+      });
+  }
+  const help = "\nNative provider routes: " + NATIVE_ADAPTERS.map(entry => entry.providerId).join(", ")
+    + ".\nUse amc agent-loop providers --json for adapter contracts, not model availability. "
+    + "Ollama requires an explicit model and defaults to its native local origin without a credential.";
+  agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help);
+  acp.addHelpText("after", help);
+}
 
 /** Build the route the operator asked for, or explain why it cannot be built. */
 /**
@@ -216,41 +404,12 @@ export function routeFor(
   options: RunOptions,
   model: string | undefined
 ): LlmRouteConfig | null {
-  if (providerId === STUB_PROVIDER_ID) return stubProviderRoute();
-  const adapter = providerId === "openai" ? openaiAdapter
-    : providerId === "openai-responses" ? openaiResponsesAdapter
-      : providerId === "anthropic" ? anthropicAdapter : null;
-  if (adapter === null) {
-    io.error(
-      chalk.red(
-        `unknown provider ${JSON.stringify(providerId)}; this surface ships ` +
-          `"${STUB_PROVIDER_ID}", "anthropic", "openai" (Chat Completions), and "openai-responses"`
-      )
-    );
+  try { return nativeRouteFor(providerId, options, model); }
+  catch (error) {
+    io.error(chalk.red(error instanceof Error ? error.message : "Native provider selection failed."));
     io.fail();
     return null;
   }
-  // `model` is a parameter now; see the note above.
-  if (model === undefined) {
-    io.error(chalk.red(`--model is required for provider ${providerId}`));
-    io.fail();
-    return null;
-  }
-  const baseUrl = options.baseUrl ?? DEFAULT_BASE_URLS[providerId];
-  if (baseUrl === undefined) {
-    io.error(chalk.red(`--base-url is required for provider ${providerId}`));
-    io.fail();
-    return null;
-  }
-  return {
-    providerId,
-    adapter,
-    baseUrl,
-    // A REFERENCE, never a value: the credentials seam resolves it per request
-    // and this module never sees what it resolves to.
-    credentialRef: credentialRef(options.credential ?? DEFAULT_CREDENTIAL_REFS[providerId] ?? "AMC_LLM_API_KEY"),
-    models: [model]
-  };
 }
 
 /** One line per notification, so an operator watching a long turn sees it move. */

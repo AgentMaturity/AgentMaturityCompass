@@ -30,18 +30,24 @@ function loadPending(workspace: string, event: Raised): ApprovalInboxItem {
 }
 
 /** IPC-only prompts over actual signed requests. No stdout parsing or injected answerer. */
-export function createNativeInteractiveApprovals(options: NativeApprovalPromptOptions): { close(): Promise<void> } {
+export function createNativeInteractiveApprovals(options: NativeApprovalPromptOptions): { cancel(): void; close(): Promise<void> } {
   const workspace = resolve(options.workspace), entry = resolve(options.entry);
-  let closed = false, channelLost = false, promptAbort: AbortController | null = null, tokenFile: string | null = null;
+  let closed = false, cancelled = false, channelLost = false, promptAbort: AbortController | null = null, tokenFile: string | null = null;
   let decisionChild: ChildProcess | null = null, decisionDone: Promise<void> | null = null;
   let pending = 0, queue = Promise.resolve(), closing: Promise<void> | null = null;
   const seen = new Set<string>();
   const queuedRequests = new Map<string, Raised>();
   const cancelTurn = () => {
+    if (cancelled) return;
+    // Stop accepting answers before signalling the caller. Its signed turn can
+    // take time to settle; that interval must not admit another reviewer action.
+    // Aborting an in-flight decision does not revoke a decision already recorded.
+    cancelled = true;
+    promptAbort?.abort();
     if (options.child.exitCode === null && options.child.signalCode === null) options.child.kill("SIGINT");
   };
   const ask = (prompt: string, signal: AbortSignal): Promise<string | null> => {
-    if (closed || signal.aborted) return Promise.resolve(null);
+    if (closed || cancelled || signal.aborted) return Promise.resolve(null);
     return new Promise(resolveAnswer => {
       let settled = false;
       const finish = (answer: string | null) => {
@@ -49,11 +55,12 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       };
       const aborted = () => finish(null);
       signal.addEventListener("abort", aborted, { once: true });
-      Promise.resolve().then(() => options.question(prompt, signal)).then(answer => finish(answer), () => finish(null));
+      Promise.resolve().then(() => closed || cancelled || signal.aborted ? null : options.question(prompt, signal))
+        .then(answer => finish(answer), () => finish(null));
     });
   };
   const decide = (args: string[], signal: AbortSignal): Promise<boolean> => {
-    if (closed || signal.aborted) return Promise.resolve(false);
+    if (closed || cancelled || signal.aborted) return Promise.resolve(false);
     let resolveDone!: () => void;
     decisionDone = new Promise<void>(done => { resolveDone = done; });
     return new Promise(resolveDecision => {
@@ -81,12 +88,12 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
         if (decisionChild === child) { decisionChild = null; decisionDone = null; }
         // A deadline-triggered SIGTERM can still produce exit zero. Preserve the
         // deadline as uncertain delivery; signed decision read-back is separate.
-        resolveDone(); resolveDecision(!closed && !signal.aborted && !processError && !timedOut && code === 0);
+        resolveDone(); resolveDecision(!closed && !cancelled && !signal.aborted && !processError && !timedOut && code === 0);
       });
     });
   };
   const handle = async (event: Raised): Promise<void> => {
-    if (closed || channelLost) return;
+    if (closed || cancelled || channelLost) return;
     const item = loadPending(workspace, event);
     if (item.status !== "PENDING") { options.log(`Approval ${event.approvalRequestId} is already ${item.status}; no decision requested.`); return; }
     const controller = new AbortController(); promptAbort = controller;
@@ -100,13 +107,13 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
         boundHashes: request.boundHashes }, null, 2));
       options.log("The inbox binds tool arguments by digest; it does not store their text. Cancel if you cannot establish the intended scope from the recorded task.");
       const choice = await ask("Approval: approve, deny, or cancel this turn (no default): ", controller.signal);
-      if (channelLost) return;
+      if (closed || cancelled || channelLost) return;
       if (choice === null || choice.trim().toLowerCase() === "cancel") { cancelTurn(); return; }
       const decision = choice.trim().toLowerCase();
       if (decision !== "approve" && decision !== "deny") { options.error("No explicit approve/deny decision received; cancelling this turn."); cancelTurn(); return; }
       if (tokenFile === null) {
         const path = await ask("Path to an existing private tracked workspace session token file (not the token; blank cancels): ", controller.signal);
-        if (channelLost) return;
+        if (closed || cancelled || channelLost) return;
         if (!path?.trim()) { options.error("An authenticated reviewer session is required. Configure workspace login before approving; no identity was invented."); cancelTurn(); return; }
         tokenFile = resolve(workspace, path.trim());
       }
@@ -114,9 +121,9 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       if (!actor.roles.some(role => request.rolesAllowed.includes(role))) throw new Error("Your authenticated roles are not allowed to decide this request");
       options.log(`Reviewer ${JSON.stringify(actor.username)}; authenticated roles ${actor.roles.join(", ")}. Required distinct-user quorum remains in force.`);
       const reason = await ask(`Reason to ${decision} this exact request (required, up to 1000 characters): `, controller.signal);
-      if (channelLost) return;
+      if (closed || cancelled || channelLost) return;
       if (reason === null || !reason.trim() || reason.trim().length > 1000) { options.error("No valid decision reason received; cancelling this turn."); cancelTurn(); return; }
-      if (closed || controller.signal.aborted) { cancelTurn(); return; }
+      if (closed || cancelled || controller.signal.aborted) { cancelTurn(); return; }
       const current = loadPending(workspace, event);
       if (current.status !== "PENDING" || current.requestDigestSha256 !== item.requestDigestSha256) throw new Error("The approval changed while you were reviewing it; no decision sent");
       const args = ["approvals", decision, "--agent", request.agentId,
@@ -141,7 +148,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     }
   };
   const onMessage = (value: unknown) => {
-    if (closed || channelLost) return;
+    if (closed || cancelled || channelLost) return;
     if (!raised(value, options.agentId ?? "default")) {
       if (value !== null && typeof value === "object" && (value as { type?: unknown }).type === "amc/native-approval-raised") {
         options.error("Native approval IPC had an invalid request identity; cancelling the turn."); cancelTurn();
@@ -190,5 +197,5 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
     return closing;
   };
   options.child.on("message", onMessage); options.child.once("close", onClose); options.child.once("disconnect", onDisconnect);
-  return { close };
+  return { cancel: () => { if (!closed) cancelTurn(); }, close };
 }

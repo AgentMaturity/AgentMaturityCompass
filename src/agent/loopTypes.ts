@@ -15,6 +15,9 @@
 import type { TurnEndParams } from "../session/sessionApiTypes.js";
 import type { InboxOrigin, InboxSpliceOp, InboxTarget } from "../session/loopEventMeta.js";
 import type { TurnCancelCause } from "../session/sessionTypes.js";
+import type { QueuedNativeImage } from "../attachments/nativeImageInput.js";
+import type { QueuedNativeInputPart } from "../attachments/nativeOrderedInput.js";
+import type { QueuedNativeAudioPart } from "../attachments/nativeAudioInput.js";
 
 export type { InboxOrigin, InboxSpliceOp, InboxTarget } from "../session/loopEventMeta.js";
 
@@ -23,6 +26,13 @@ export interface InboxMessage {
   readonly messageId: string;
   readonly text: string;
   readonly origin: InboxOrigin;
+  readonly images?: readonly QueuedNativeImage[];
+  /** v2 original sequence; text is an empty sentinel, never a flattened copy. */
+  readonly parts?: readonly QueuedNativeInputPart[];
+  /** Separate audio-bearing version; never flattened into text or the image codec. */
+  readonly audioParts?: readonly QueuedNativeAudioPart[];
+  /** Exact signed loop/inbox row whose image bundle this message carries. */
+  readonly inputEventId?: string;
 }
 
 /**
