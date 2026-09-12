@@ -41,7 +41,8 @@ export const pluginManifestSchema = z.object({
             "learn",
             "transform",
             "outcomes",
-            "casebooks"
+            "casebooks",
+            "extensions"
           ])
         )
         .min(1)
@@ -71,4 +72,3 @@ export const pluginManifestSignatureSchema = z.object({
 
 export type PluginManifest = z.infer<typeof pluginManifestSchema>;
 export type PluginManifestSignature = z.infer<typeof pluginManifestSignatureSchema>;
-

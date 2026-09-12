@@ -12,7 +12,8 @@ export const pluginArtifactKindSchema = z.enum([
   "casebook_template",
   "transform_overlay",
   "transform_intervention_library",
-  "learn_md"
+  "learn_md",
+  "extension_module"
 ]);
 export type PluginArtifactKind = z.infer<typeof pluginArtifactKindSchema>;
 
@@ -30,4 +31,3 @@ export interface PluginCatalogEntry {
   riskCategory: PluginRiskCategory;
   sourceRegistryId: string;
 }
-

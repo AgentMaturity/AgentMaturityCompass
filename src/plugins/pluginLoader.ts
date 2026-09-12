@@ -18,6 +18,8 @@ import { extractPluginPackage, verifyPluginPackage } from "./pluginPackage.js";
 import { loadInstalledPluginsLock, loadPluginOverrides, pluginInstalledPackagePath, verifyPluginOverrides } from "./pluginStore.js";
 import { canOverrideAsset } from "./rules/overlayRules.js";
 import { verifyInstalledPluginsIntegrity } from "./pluginVerifier.js";
+import { readInstalledNativeExecutable, type NativeExecutableModuleSnapshot } from "./nativeExecutablePackage.js";
+import { nativeExecutableReference, type NativeExecutableReference } from "./nativeExecutableSchema.js";
 
 const assurancePackDeclarativeSchema = z.object({
   id: z.string().min(1),
@@ -42,6 +44,8 @@ export interface PluginLoadStatus {
   loaded: boolean;
   failedValidation: boolean;
   errors: string[];
+  /** Descriptor discovery is not code execution or an execution approval. */
+  executableCode?: "not-started";
 }
 
 export interface LoadedPluginAssets {
@@ -53,6 +57,7 @@ export interface LoadedPluginAssets {
   casebookTemplates: Map<string, unknown>;
   transformOverlays: Map<string, unknown>;
   learnDocs: Map<string, string>;
+  executableModules?: Map<string, NativeExecutableReference>;
 }
 
 export interface PluginLoadResult {
@@ -133,7 +138,8 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
     outcomeTemplates: new Map(),
     casebookTemplates: new Map(),
     transformOverlays: new Map(),
-    learnDocs: new Map()
+    learnDocs: new Map(),
+    executableModules: new Map()
   };
 
   for (const installed of lock.installed) {
@@ -146,6 +152,12 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
       failedValidation: false,
       errors: []
     };
+    if (!integrity.ok) {
+      status.failedValidation = true;
+      status.errors.push("PLUGIN_INSTALLATION_UNTRUSTED: no assets or executable descriptors loaded from an invalid signed installation");
+      statuses.push(status);
+      continue;
+    }
     if (!pathExists(packageFile)) {
       status.failedValidation = true;
       status.errors.push("installed package missing");
@@ -156,9 +168,11 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
       status.errors.push(`PLUGIN_OVERRIDES_UNTRUSTED:${overridesSig.reason ?? "unknown"}`);
     }
     const verified = verifyPluginPackage({ file: packageFile });
-    if (!verified.ok || !verified.manifest) {
+    if (!verified.ok || !verified.manifest || verified.publisherFingerprint !== installed.publisherFingerprint
+      || verified.manifest.plugin.id !== installed.id || verified.manifest.plugin.version !== installed.version) {
       status.failedValidation = true;
       status.errors.push(...verified.errors);
+      if (verified.ok) status.errors.push("PLUGIN_IDENTITY_MISMATCH: publisher or identity differs from the signed installation lock");
       statuses.push(status);
       continue;
     }
@@ -182,6 +196,13 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
           continue;
         }
         try {
+          if (artifact.kind === "extension_module") {
+            const reference = nativeExecutableReference({ pluginId: installed.id, version: installed.version,
+              packageSha256: installed.sha256, publisherFingerprint: installed.publisherFingerprint, entrypoint: artifact.path });
+            assets.executableModules!.set(`${installed.id}@${installed.version}:${artifact.path}`, Object.freeze(reference));
+            status.executableCode = "not-started";
+            continue;
+          }
           if (artifact.kind === "policy_pack") {
             const parsed = policyPackSchema.parse(parseStructured(file));
             const id = parsed.id;
@@ -345,4 +366,9 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
     statuses,
     assets
   };
+}
+
+/** Explicit native loader path; verifies the exact installed archive and never imports its module into AMC. */
+export function loadInstalledPluginExecutable(workspace: string, reference: NativeExecutableReference): NativeExecutableModuleSnapshot {
+  return readInstalledNativeExecutable(workspace, reference);
 }

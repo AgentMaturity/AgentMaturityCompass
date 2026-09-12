@@ -8,7 +8,8 @@ import type { AgentToolset } from "../agent/agentToolset.js";
 import type { ActionClass } from "../types.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
-import { NativeMcpHttpTransport, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
+import { NativeMcpHttpTransport, NativeMcpHttpRefused, type NativeMcpHttpServer } from "./nativeMcpHttpTransport.js";
+import { NATIVE_MCP_RECONNECT_LIMITS } from "./nativeMcpReconnect.js";
 
 export interface NativeMcpStdioServer {
   readonly transport?: "stdio";
@@ -54,16 +55,17 @@ function canonical(value: unknown): string {
     .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`).join(",")}}`;
 }
 
-function scrubString(value: string, secrets: readonly string[]): string {
+function scrubString(value: string, secrets: readonly string[], transport?: Transport): string {
+  if (transport instanceof NativeMcpHttpTransport) value = transport.redactString(value);
   for (const secret of secrets) value = value.split(secret).join("[REDACTED]");
   return value;
 }
-function scrubResult(value: unknown, secrets: readonly string[], depth = 0): unknown {
+function scrubResult(value: unknown, secrets: readonly string[], depth = 0, transport?: Transport): unknown {
   if (depth > 64) throw new Error("MCP result nesting limit exceeded");
-  if (typeof value === "string") return scrubString(value, secrets);
-  if (Array.isArray(value)) return value.map((item) => scrubResult(item, secrets, depth + 1));
+  if (typeof value === "string") return scrubString(value, secrets, transport);
+  if (Array.isArray(value)) return value.map((item) => scrubResult(item, secrets, depth + 1, transport));
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value)
-    .map(([key, item]) => [scrubString(key, secrets), scrubResult(item, secrets, depth + 1)]));
+    .map(([key, item]) => [scrubString(key, secrets, transport), scrubResult(item, secrets, depth + 1, transport)]));
   return value;
 }
 
@@ -98,7 +100,7 @@ function parameters(server: NativeMcpServer, workspace: string): { transport: Tr
   return { transport, client, timeout };
 }
 
-async function catalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
+async function readCatalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
   const tools: NativeMcpCatalogTool[] = [];
   const cursors = new Set<string>();
   let cursor: string | undefined;
@@ -122,7 +124,23 @@ async function catalog(client: Client, server: NativeMcpServer, timeout: number,
   for (const secret of serverSecrets(server, transport)) {
     if (secret && bytes.includes(JSON.stringify(secret).slice(1,-1))) throw new Error("MCP catalog contains credential material");
   }
+  if (transport instanceof NativeMcpHttpTransport && transport.containsSensitiveMaterial(bytes)) {
+    throw new Error("MCP catalog contains credential material");
+  }
   return { serverId: server.id, tools, digest: createHash("sha256").update(bytes).digest("hex") };
+}
+
+/** A notification gap invalidates an in-progress catalog snapshot, not the pin. */
+async function catalog(client: Client, server: NativeMcpServer, timeout: number, signal?: AbortSignal, transport?: Transport): Promise<NativeMcpCatalog> {
+  if (!(transport instanceof NativeMcpHttpTransport)) return readCatalog(client, server, timeout, signal, transport);
+  for (let attempt = 0; attempt <= NATIVE_MCP_RECONNECT_LIMITS.retries; attempt++) {
+    await transport.waitForRecovery(signal);
+    const generation = transport.recoveryGeneration;
+    const current = await readCatalog(client, server, timeout, signal, transport);
+    await transport.waitForRecovery(signal);
+    if (generation === transport.recoveryGeneration) return current;
+  }
+  throw new Error("MCP catalog did not stabilize within the bounded recovery window");
 }
 
 /** Connects only to the explicit server to inspect its catalog, then disposes the transport. */
@@ -135,7 +153,13 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
     await client.connect(transport, { timeout, signal });
     return await catalog(client, server, timeout, signal, transport);
   } catch { throw new Error(transportFailure(transport, "MCP catalog discovery failed; no tool grant was created")); }
-  finally { signal?.removeEventListener("abort", abort); try { await client.close(); } finally { await transport.close(); } }
+  finally {
+    signal?.removeEventListener("abort", abort);
+    // Preserve a classified authentication/session failure even if remote DELETE
+    // is also refused. A successful discovery still exposes termination failure.
+    try { try { await client.close(); } finally { await transport.close(); } }
+    catch (error) { if (!(transport instanceof NativeMcpHttpTransport) || !transport.failureMessage) throw error; }
+  }
 }
 
 export interface MountedNativeMcpServer {
@@ -147,7 +171,8 @@ export interface MountedNativeMcpServer {
 /**
  * Adds pinned tools to an existing governed toolset. Registry guards, approvals,
  * budgets and signed call recording remain on the toolset's execution path.
- * No automatic allowlist edits, reconnect or tenant-global cache.
+ * No automatic allowlist edits, fresh-session reconnect or tenant-global cache.
+ * HTTP recovery stays inside the original session, pin and authorization snapshot.
  */
 export async function mountNativeMcpServer(options: {
   readonly server: NativeMcpServer;
@@ -213,25 +238,35 @@ export async function mountNativeMcpServer(options: {
           const abort = () => { void close().catch(() => {}); };
           if (signal?.aborted) throw new Error("MCP call cancelled before dispatch");
           signal?.addEventListener("abort", abort, { once: true });
+          let callStarted = false;
+          let responseReceived = false;
           try {
             const current = await catalog(client, server, timeout, signal, transport);
             if (!active || current.digest !== initial.digest) { await close(); throw new Error("catalog changed"); }
+            if (signal?.aborted) throw new Error("MCP call cancelled before dispatch");
             // listTools() resets the SDK output-validator cache for EACH page.
             // Accept only AMC's pinned per-tool schema, independently of that
             // mutable cache and before redaction changes returned values.
+            callStarted = true;
             const result = await client.request({ method: "tools/call", params: { name: remote.name, arguments: { ...execution.arguments } } }, CallToolResultSchema, { timeout, signal });
+            responseReceived = true;
+            if (!active || signal?.aborted) throw new Error("MCP grant was disposed while receiving the response");
             if (validateOutput !== null) {
               if (result.structuredContent === undefined && result.isError !== true) throw new Error("MCP structured output is missing");
               if (result.structuredContent !== undefined && !validateOutput(result.structuredContent).valid) throw new Error("MCP structured output does not match the reviewed schema");
             }
-            const output = JSON.stringify(scrubResult(result, secrets));
+            const output = JSON.stringify(scrubResult(result, secrets, 0, transport));
             return { ok: result.isError !== true, output, bytes: Buffer.byteLength(output), exitCode: result.isError === true ? 1 : 0 };
           } catch (error) {
             await close().catch(() => {});
+            const notDispatched = error instanceof NativeMcpHttpRefused && (error.code === "NOT_DISPATCHED" || error.code === "CLOSED");
+            const uncertainty = callStarted && !responseReceived && !notDispatched
+              ? "; the remote tool may have executed. It was not replayed. Inspect the remote service before another invocation."
+              : "";
             return { ok: false, exitCode: 1, timedOut: (transport instanceof NativeMcpHttpTransport && transport.failureTimedOut)
                 || (error instanceof McpError && error.code === ErrorCode.RequestTimeout),
-              output: signal?.aborted ? "MCP call cancelled; connection and grants disposed"
-                : transportFailure(transport, "MCP call failed or catalog changed; review and mount again") };
+              output: (signal?.aborted ? "MCP call cancelled; connection and grants disposed"
+                : notDispatched ? error.message : transportFailure(transport, "MCP call failed or catalog changed; review and mount again")) + uncertainty };
           } finally { signal?.removeEventListener("abort", abort); }
         }
       }, agentId));

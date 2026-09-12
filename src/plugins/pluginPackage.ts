@@ -118,6 +118,7 @@ function copyTree(src: string, dst: string): void {
 }
 
 function artifactKindForPath(path: string): PluginArtifactKind {
+  if (path.startsWith("content/extensions/") && path.endsWith(".mjs")) return "extension_module";
   if (path.startsWith("content/policy-packs/")) return "policy_pack";
   if (path.startsWith("content/assurance-packs/")) return "assurance_pack";
   if (path.startsWith("content/compliance-maps/")) return "compliance_map";

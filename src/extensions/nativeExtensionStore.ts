@@ -128,12 +128,15 @@ export function readNativeExtension(options: {
 
 export function describeNativeExtension(snapshot: NativeExtensionSnapshot) {
   return {
-    schemaVersion: 1, id: snapshot.manifest.id, manifestPath: snapshot.manifestPath,
+    schemaVersion: snapshot.manifest.schemaVersion, id: snapshot.manifest.id, manifestPath: snapshot.manifestPath,
     manifestDigest: snapshot.manifestDigest, signatureValid: snapshot.signatureValid,
     contexts: snapshot.manifest.contexts.map(entry => ({ ...entry })),
     commands: Object.entries(snapshot.manifest.commands).map(([name, entry]) => ({ name, ...entry })),
     totalContentBytes: snapshot.totalContentBytes,
-    boundary: "Declarative context and prompt commands only. No code execution, tool grants or OS confinement. Loading does not sign or activate an extension in another session."
+    ...(snapshot.manifest.schemaVersion === 2 ? { executable: JSON.parse(JSON.stringify(snapshot.manifest.executable)) as typeof snapshot.manifest.executable } : {}),
+    boundary: snapshot.manifest.schemaVersion === 1
+      ? "Declarative context and prompt commands only. No code execution, tool grants or OS confinement. Loading does not sign or activate an extension in another session."
+      : "Executable contributions require the exact publisher-signed installed package, a separate workspace-signed execution approval, and Linux Bubblewrap confinement. Inspection, signing and installation do not approve or execute code. Only declared context and command handlers receive bounded input."
   };
 }
 
