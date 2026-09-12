@@ -1397,3 +1397,32 @@ provider entries carry `model: "fixed" | "required"` so a keyless local server i
 mistaken for the stub demo; deepseek is text-only, ollama carries images. New regression
 `tests/nativeFirstUseGuideProviders.test.ts`; `cosProduct10NativeTaskService` asserts the
 new entries. Affected set (14 files, 300 tests) passed; src/tests typecheck 0/0.
+
+### 2026-09-12 — Full root suite, HEAD baseline, and the integration commits
+
+Full `vitest run` in root against the rebuilt `dist/` (Node v25.5.0): 1,477 files — 1,462
+passed, 14 failed, 1 skipped; 14,057 tests — 14,025 passed, 17 failed, 15 skipped. The same
+14 files were then run in a fresh built clone of HEAD `4d2d69e5`: 6 files / 8 tests already
+fail there (pre-existing since the last green suite at a598): `acpFailedTurnUpdates` (two
+tests record 850–900 KB assistant blocks the 64 KiB per-event cap refuses), `publicDocsGraph`
+(promoted guides link to unpromoted ones), `publicStatsDrift` (README badge 1,389 vs the real
+test-file count), `sessionContinuationWithGateway`, `sessionOwnership` and
+`sessionStoreConformance` (all three encode pre-JSONL-writer-recovery semantics that commit
+96accade replaced). The other 9 were lane- or integration-caused: v4 encoders now bind
+provider tool names (`providerToolNames`, `anthropicCacheBreakpoints`, `llmFailedToolReplay`,
+`cliSignedToolSubset`), the guide's provider list (`nativeFirstUseGuideCli`), a revision-0
+request now refused by schema (`studioNativeTaskService`), typedoc absent from root's
+node_modules (`publicDocsArtifact`, present in the clone), and the perf floor at 487 ev/s
+under full-suite load (2/2 pass in isolation). Every failure except the README counts and the
+OpenAPI artifact is resolved in the tree; both generators run only in the fresh clone.
+
+Committed by explicit path lists (no `git add -A`), HEAD was `4d2d69e5`, no index lock:
+`a3467629` providers/modalities/terminal (P01/P02/P05), `b0104235` MCP/extensions (P03/P04),
+`858aaa08` SDK/ACP (P06/P07/P08), `54c3ce6a` Studio (P09/P10), `da626c52` AMC-1512 and
+batch-01/02, `41180d62` integration fixes, `c1b5cf9c` records (amended to force-add this
+session's receipt directories, which `.gitignore` excludes under `AMC_OS/`). Root is clean at
+`c1b5cf9c`. The Sep 9–11 sessions' untracked audit receipts under
+`AMC_OS/RESEARCH/2026-09-09-worktree-audit/` (8.3 MB, 119 ignored paths) were left untouched.
+Next: fresh clone at `c1b5cf9c` for build, typechecks, the OpenAPI publisher and
+`gen-counts --write`; bring the regenerated artifacts back as candidate B; full suite, Python
+suite and release gate in a fresh clone at B.

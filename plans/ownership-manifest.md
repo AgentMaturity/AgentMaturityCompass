@@ -1883,3 +1883,13 @@ coordination channel.
 Serial-only surfaces (`src/cli.ts`, `src/studio/studioServer.ts`, ledger/session spine,
 signed configs, `package.json`) are edited only in root by this session, one change at a
 time. All other worktrees, their branches and the shared stash remain untouched.
+
+### 2026-09-12 — Integration committed; root clean at `c1b5cf9c`
+
+The dormant lane paths claimed above are committed on `amc/gap-register-execution` in
+`a3467629`, `b0104235`, `858aaa08`, `54c3ce6a`, `da626c52`, `41180d62` and `c1b5cf9c`
+(records, amended). Root has no uncommitted paths at `c1b5cf9c`; this session retains
+ownership of `plans/amc-dsh-pi-execution-2026-09-08.md`, `plans/ownership-manifest.md`,
+`AMC_OS/RESEARCH/2026-09-12-lane-integration/`, `README.md` and `website/openapi.yaml`
+(regenerated artifacts to be brought back from the fresh clone) until the receipt lands.
+No other worktree, branch or the shared stash was touched.
