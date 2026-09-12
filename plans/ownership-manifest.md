@@ -1893,3 +1893,10 @@ ownership of `plans/amc-dsh-pi-execution-2026-09-08.md`, `plans/ownership-manife
 `AMC_OS/RESEARCH/2026-09-12-lane-integration/`, `README.md` and `website/openapi.yaml`
 (regenerated artifacts to be brought back from the fresh clone) until the receipt lands.
 No other worktree, branch or the shared stash was touched.
+
+### 2026-09-12 — Integration session closed; root clean at the records commit after `09d353f5`
+
+Every path this session claimed is committed on `amc/gap-register-execution`; the fresh-clone
+acceptance at `09d353f5` is recorded in `AMC_OS/RESEARCH/2026-09-12-lane-integration/`. This
+session releases all claims. No other worktree, branch, uncommitted file or the shared stash
+`152a61696f336f658893a72aa9357d58df8c5679` was touched.

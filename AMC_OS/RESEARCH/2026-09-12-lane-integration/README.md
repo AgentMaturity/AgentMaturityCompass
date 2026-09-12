@@ -1,7 +1,9 @@
 # Native lane integration — 2026-09-12 (Claude Code, Fable 5.1)
 
-**Status: integration committed; fresh-clone acceptance in progress. Nothing below is a
-package, platform or deployed-release qualification.**
+**Status: integration committed and reproduced in a fresh clone at candidate C `09d353f5` — full suite
+1,477/1,477 files and 14,043/14,043 tests with no skips, release gate 14/14 executed checks (live-deploy-health
+skipped). This is source and local-package qualification on Darwin arm64 / Node v25.5.0; it is not platform,
+published-package or deployed-release qualification.**
 
 Standing order: `plans/2026-09-09-amc-execution-brief.md` plus Sid's 2026-09-12 `/goal`
 directive to integrate the authored P01–P10 lane source into AMC end to end. Environment for
@@ -20,6 +22,9 @@ console, P10 Studio backend, AMC-1512 human first-use protocol, batch-01/02 corr
 Commits on `amc/gap-register-execution` from `4d2d69e5`: `a3467629` (P01/P02/P05),
 `b0104235` (P03/P04), `858aaa08` (P06/P07/P08), `54c3ce6a` (P09/P10), `da626c52`
 (AMC-1512, batch-01/02), `41180d62` (integration fixes), `c1b5cf9c` (records).
+Then `24584211` (generated counts and OpenAPI artifact, produced in a fresh clone), `40f80de1`
+(records; candidate B), `09d353f5` (gate repairs: line-cap extractions and opt-in registration;
+candidate C). The records commit after C is documentation only.
 
 ## Integration defects found and fixed (product)
 
@@ -68,4 +73,9 @@ regenerated only in the fresh clone.
 
 ## Fresh-clone acceptance
 
-See `fresh-clone/README.md` (written when the run completes).
+`fresh-clone/README.md`: candidate C `09d353f5` — install, build, typechecks 0/0, OpenAPI check, full suite
+1,477/1,477 files and 14,043/14,043 tests (0 failed, 0 skipped), Python 290 passed / 21 installed-wheel
+failures / 1 skipped, release gate 14/14 executed checks passed with live-deploy-health skipped. Candidate B
+failed the gate on two checks (new files over the 800-line cap; 15 opt-in skips in the mandatory profile),
+repaired in C by extracting `src/sdk/nativeAgentErrors.ts` and `src/cli-agent-guide-commands.ts` and by
+registering opt-in scenarios only under their documented conditions.

@@ -1,0 +1,651 @@
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index ef246507..4e9c9afe 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -49,7 +49,7 @@ npx vitest run --grep "my test name"              # by name
+ cd platform/python && python3 -m pytest tests/ -q # Python
+ ```
+ 
+-The root suite contains <!-- amc:count:testFiles -->1,389<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
++The root suite contains <!-- amc:count:testFiles -->1,477<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
+ 
+ All tests must pass before submitting a PR.
+ 
+diff --git a/README.md b/README.md
+index 5c7326cb..e22336a3 100644
+--- a/README.md
++++ b/README.md
+@@ -14,7 +14,7 @@
+   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
+   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
+   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
+-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C389-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
++  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C477-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
+ </p>
+ 
+@@ -881,7 +881,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
+ 
+ ```bash
+ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,389<!-- /amc:count --> test source files; Vitest reports run outcomes
++cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,477<!-- /amc:count --> test source files; Vitest reports run outcomes
+ ```
+ 
+ **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
+diff --git a/docs/content/reddit-launch-drafts.md b/docs/content/reddit-launch-drafts.md
+index 843d68cb..b3d153b9 100644
+--- a/docs/content/reddit-launch-drafts.md
++++ b/docs/content/reddit-launch-drafts.md
+@@ -22,7 +22,7 @@ Different tools for different jobs. Promptfoo evaluates prompt quality. AMC answ
+ 
+ **What's paid:** 41 industry-specific domain packs for regulated verticals (healthcare, finance, education, logistics).
+ 
+-1,389 Vitest test source files. Would love feedback from this community.
++1,477 Vitest test source files. Would love feedback from this community.
+ 
+ GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
+ 
+@@ -46,7 +46,7 @@ Sharing a project I've been working on: an open-source framework for evaluating
+ 
+ The framework generates compliance mappings for EU AI Act, ISO 42001, NIST AI RMF, and OWASP LLM Top 10.
+ 
+-MIT licensed, 1,389 Vitest test source files, TypeScript.
++MIT licensed, 1,477 Vitest test source files, TypeScript.
+ 
+ Paper references and methodology: https://agentmaturity.co/methodology.html
+ GitHub: https://github.com/AgentMaturity/AgentMaturityCompass
+diff --git a/docs/content/show-hn-draft.md b/docs/content/show-hn-draft.md
+index 1a30ec7c..24bc1131 100644
+--- a/docs/content/show-hn-draft.md
++++ b/docs/content/show-hn-draft.md
+@@ -30,6 +30,6 @@ What makes it different from eval tools like Promptfoo:
+ 
+ The entire trust stack is MIT licensed and free. Only the industry-specific domain packs are paid.
+ 
+-Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 1,389 Vitest test source files, MCP server for AI coding assistants.
++Tech: TypeScript, Commander CLI, Ed25519 crypto, SQLite evidence ledger, 1,477 Vitest test source files, MCP server for AI coding assistants.
+ 
+ I'd love feedback on the scoring model and whether the evidence-weighted approach resonates. Happy to answer any questions about the architecture.
+diff --git a/docs/internal/competitive-landscape.md b/docs/internal/competitive-landscape.md
+index 83d3cdf8..f5775260 100644
+--- a/docs/internal/competitive-landscape.md
++++ b/docs/internal/competitive-landscape.md
+@@ -54,7 +54,7 @@ No existing tool combines:
+ ### Short-term (3-6 months)
+ - **Promptfoo adds maturity model**: Possible but unlikely — different product DNA (eval vs governance)
+ - **LangSmith adds compliance**: Would be framework-locked to LangChain
+-- **New entrant**: AMC has 1,389 Vitest test source files, 244 default questions, and 142 assurance packs. These inventories do not establish competitive risk or execution quality.
++- **New entrant**: AMC has 1,477 Vitest test source files, 244 default questions, and 142 assurance packs. These inventories do not establish competitive risk or execution quality.
+ 
+ ### Medium-term (6-12 months)
+ - **Cloud providers** (AWS, Azure, GCP) add agent evaluation: Would be provider-locked. AMC is provider-agnostic.
+diff --git a/docs/internal/mirofish-simulation-council.md b/docs/internal/mirofish-simulation-council.md
+index b0624b72..4415040a 100644
+--- a/docs/internal/mirofish-simulation-council.md
++++ b/docs/internal/mirofish-simulation-council.md
+@@ -3,7 +3,7 @@
+ ## Council Roles Simulated
+ 
+ ### 🎯 Product Manager
+-**Assessment**: AMC has a broad source inventory (94 score modules, 142 assurance packs, 1,389 Vitest test source files) but the first-touch experience needs simplification. 1,171 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
++**Assessment**: AMC has a broad source inventory (94 score modules, 142 assurance packs, 1,477 Vitest test source files) but the first-touch experience needs simplification. 1,171 CLI command paths is powerful but intimidating. The task-first `amc` entry point should remain the default front door.
+ **Score**: 7/10 — depth is there, onboarding needs work.
+ 
+ ### 🔒 Security Researcher  
+diff --git a/website/i18n.js b/website/i18n.js
+index 5d0adfbb..d246f034 100644
+--- a/website/i18n.js
++++ b/website/i18n.js
+@@ -14,7 +14,7 @@ const AMC_I18N = (() => {
+       navDomainPacks: 'Domain Packs', navScale: 'Maturity Scale', navResearch: 'Research',
+       navEUAct: 'EU AI Act', navGitHub: 'GitHub ↗', navBack: '← Back to AMC',
+       // Hero
+-      heroTagline: 'MIT Open Source · 1,215 CLI Paths · 1,389 Test Source Files',
++      heroTagline: 'MIT Open Source · 1,215 CLI Paths · 1,477 Test Source Files',
+       heroSimpleH1: 'Your AI Agent Says<br>It\'s Safe.', heroSimpleH1Strong: 'Is It, Really?',
+       heroSimpleSub: 'AMC watches what your AI actually does — not what it claims. Get a trustworthy safety score backed by proof. Free. Open-source. Takes 2 minutes.',
+       heroTechH1: 'The Credit Score<br>for ', heroTechH1Strong: 'AI Agents.',
+diff --git a/website/index.html b/website/index.html
+index 58f593bf..6fae8798 100644
+--- a/website/index.html
++++ b/website/index.html
+@@ -87,7 +87,7 @@
+           <div class="stat gs"><span class="stat-value">1,215</span><span class="stat-label">CLI commands</span></div>
+           <div class="stat gs"><span class="stat-value">142</span><span class="stat-label">attack test packs</span></div>
+           <div class="stat gs"><span class="stat-value">41</span><span class="stat-label">industry packs</span></div>
+-          <div class="stat gs"><span class="stat-value">1,389</span><span class="stat-label">test source files</span></div>
++          <div class="stat gs"><span class="stat-value">1,477</span><span class="stat-label">test source files</span></div>
+         </div>
+       </div>
+     </section>
+diff --git a/website/lite.html b/website/lite.html
+index d8b0a959..2ac9c3b7 100644
+--- a/website/lite.html
++++ b/website/lite.html
+@@ -71,7 +71,7 @@ nav a{font-size:.8rem;color:#a0a0a0}nav a:hover{color:#4AEF79}
+       <div class="stat"><b>84pt</b><span>Average gap between<br>claimed & real score</span></div>
+       <div class="stat"><b>60 sec</b><span>Zero to first<br>honest baseline</span></div>
+       <div class="stat"><b>14+</b><span>Frameworks<br>supported</span></div>
+-      <div class="stat"><b>1,389</b><span>Test source<br>files</span></div>
++      <div class="stat"><b>1,477</b><span>Test source<br>files</span></div>
+     </div>
+     <p><strong style="color:#fff">First-run trust contract:</strong> a signed, <code>VALID</code> artifact may still be <code>INSUFFICIENT_EVIDENCE</code>. Signing proves integrity, not evidence sufficiency.</p>
+   </div>
+diff --git a/website/openapi.yaml b/website/openapi.yaml
+index 23a16d2d..4c383197 100644
+--- a/website/openapi.yaml
++++ b/website/openapi.yaml
+@@ -2280,7 +2280,6 @@ components:
+         - agentId
+         - provider
+         - tools
+-        - prompt
+       properties:
+         clientRequestId:
+           type: string
+@@ -2297,6 +2296,10 @@ components:
+             - openai
+             - openai-responses
+             - anthropic
++            - deepseek
++            - gemini
++            - gemini-audio
++            - ollama
+         model:
+           type: string
+           minLength: 1
+@@ -2316,6 +2319,8 @@ components:
+           minLength: 1
+           maxLength: 16384
+           description: Nonblank task text, at most 16 KiB UTF-8. Control characters other than tabs/newlines are rejected.
++        input:
++          $ref: "#/components/schemas/NativeTaskStructuredInput"
+         maxSteps:
+           type: integer
+           minimum: 1
+@@ -2324,28 +2329,133 @@ components:
+           type: integer
+           minimum: 1
+           maximum: 1024
+-      description: Workspace tools require toolsDigest from the inspected signed scope; no-tools requests must omit
+-        it. Real providers require an explicit model and a server-owned credential. Exact request replay returns
+-        the recorded admission; a conflicting reuse is refused.
++      oneOf:
++        - required:
++            - prompt
++          not:
++            required:
++              - input
++        - required:
++            - input
++          not:
++            required:
++              - prompt
++      description: Supply exactly one of prompt or ordered input. Workspace tools require the reviewed toolsDigest;
++        no-tools requests must omit it. Real providers require an explicit model and an operator credential. Retry
++        the identical request ID and body, including original attachment bytes, order and format; a conflicting
++        reuse is refused. No input is automatically replayed.
+     NativeTaskTurn:
+       type: object
+       additionalProperties: false
+       required:
+         - clientRequestId
+         - expectedRevision
+-        - prompt
+       properties:
+         clientRequestId:
+           type: string
+           format: uuid
+         expectedRevision:
+           type: integer
+-          minimum: 0
++          minimum: 1
++          maximum: 32
+         prompt:
+           type: string
+           minLength: 1
+           maxLength: 16384
+           description: Nonblank task text, at most 16 KiB UTF-8. Control characters other than tabs/newlines are rejected.
++        input:
++          $ref: "#/components/schemas/NativeTaskStructuredInput"
++      oneOf:
++        - required:
++            - prompt
++          not:
++            required:
++              - input
++        - required:
++            - input
++          not:
++            required:
++              - prompt
++    NativeTaskStructuredInput:
++      type: object
++      additionalProperties: false
++      required:
++        - format
++        - parts
++      properties:
++        format:
++          type: string
++          enum:
++            - amc-image-input@2
++            - amc-audio-input@1
++        parts:
++          type: array
++          minItems: 1
++          maxItems: 256
++          items:
++            oneOf:
++              - type: object
++                additionalProperties: false
++                required:
++                  - type
++                  - text
++                properties:
++                  type:
++                    type: string
++                    enum:
++                      - text
++                  text:
++                    type: string
++                    maxLength: 16384
++              - type: object
++                additionalProperties: false
++                required:
++                  - type
++                  - mimeType
++                  - data
++                properties:
++                  type:
++                    type: string
++                    enum:
++                      - image
++                  mimeType:
++                    type: string
++                    enum:
++                      - image/png
++                      - image/jpeg
++                      - image/gif
++                      - image/webp
++                  data:
++                    type: string
++                    minLength: 1
++                    maxLength: 260096
++                    contentEncoding: base64
++              - type: object
++                additionalProperties: false
++                required:
++                  - type
++                  - mimeType
++                  - data
++                properties:
++                  type:
++                    type: string
++                    enum:
++                      - audio
++                  mimeType:
++                    type: string
++                    enum:
++                      - audio/wav
++                  data:
++                    type: string
++                    minLength: 1
++                    maxLength: 260096
++                    contentEncoding: base64
++      description: Exact ordered text/original canonical-base64 parts; empty and adjacent text are preserved. At
++        most eight images and eight audio parts, aggregate text 16 KiB UTF-8, serialized parts 260096 bytes and
++        complete ACP frame 262144 bytes. Image format requires an image and forbids audio; audio format requires
++        audio and literal gemini-audio. Gemini refuses GIF. No URLs, filenames, paths, annotations, transcoding or
++        client commitments. Native header checks and runtime negotiation still apply; no remote model support is
++        claimed.
+     NativeTaskControl:
+       type: object
+       additionalProperties: false
+@@ -2388,6 +2498,9 @@ components:
+         - firstCursor
+         - droppedEvents
+         - canResume
++        - resumeBlockedReason
++        - history
++        - recovery
+       properties:
+         taskId:
+           type: string
+@@ -2416,6 +2529,10 @@ components:
+             - openai
+             - openai-responses
+             - anthropic
++            - deepseek
++            - gemini
++            - gemini-audio
++            - ollama
+         model:
+           type: string
+           nullable: true
+@@ -2501,6 +2618,75 @@ components:
+           minimum: 0
+         canResume:
+           type: boolean
++        resumeBlockedReason:
++          type: string
++          nullable: true
++        history:
++          $ref: "#/components/schemas/NativeTaskHistory"
++        recovery:
++          oneOf:
++            - $ref: "#/components/schemas/NativeTaskRecovery"
++            - type: object
++              nullable: true
++              enum:
++                - null
++    NativeTaskRecovery:
++      type: object
++      additionalProperties: false
++      required:
++        - eligible
++        - state
++        - message
++      properties:
++        eligible:
++          type: boolean
++        state:
++          type: string
++          enum:
++            - ready
++            - interrupted
++            - blocked
++        message:
++          type: string
++      description: Read-only native JSONL recovery eligibility, not a writer grant. Resume rechecks original
++        history, identity, settings, accounting and actual abandoned ownership under the writer mutex. An
++        interrupted turn is acknowledged without replaying its effects; submit a new explicit turn. Closed or
++        archived sessions remain non-resumable.
++    NativeTaskHistory:
++      type: object
++      additionalProperties: false
++      required:
++        - status
++        - backend
++        - headEventHash
++        - eventCount
++        - message
++      properties:
++        status:
++          type: string
++          enum:
++            - not-started
++            - authenticated
++            - unavailable
++        backend:
++          type: string
++          enum:
++            - sqlite
++            - jsonl
++            - null
++          nullable: true
++        headEventHash:
++          type: string
++          pattern: ^[a-f0-9]{64}$
++          nullable: true
++        eventCount:
++          type: integer
++          minimum: 0
++        message:
++          type: string
++      description: Actual selected-backend session metadata status; never a private payload access grant or JSONL
++        writer-resume capability. When unavailable, withhold previous transcript/validation/verifier displays.
++        eventCount zero then means unknown, not verified empty history.
+     NativeTaskApproval:
+       type: object
+       additionalProperties: false
+@@ -2724,6 +2910,83 @@ components:
+           type: string
+           enum:
+             - committed
++        attachment:
++          type: object
++          additionalProperties: false
++          required:
++            - type
++            - mimeType
++            - byteLength
++            - sha256
++          properties:
++            type:
++              type: string
++              enum:
++                - image
++                - audio
++            mimeType:
++              type: string
++            byteLength:
++              type: integer
++              minimum: 0
++            sha256:
++              type: string
++              pattern: ^[a-f0-9]{64}$
++    NativeTaskInputCapabilities:
++      type: object
++      additionalProperties: false
++      required:
++        - formats
++        - imageMimeTypes
++        - audioMimeTypes
++        - maxParts
++        - maxImages
++        - maxAudios
++        - maxTextBytes
++        - maxSerializedPartsBytes
++        - maxPromptFrameBytes
++        - modelSupport
++      properties:
++        formats:
++          type: array
++          items:
++            type: string
++            enum:
++              - text
++              - amc-image-input@2
++              - amc-audio-input@1
++        imageMimeTypes:
++          type: array
++          items:
++            type: string
++        audioMimeTypes:
++          type: array
++          items:
++            type: string
++        maxParts:
++          type: integer
++          minimum: 0
++        maxImages:
++          type: integer
++          minimum: 0
++        maxAudios:
++          type: integer
++          minimum: 0
++        maxTextBytes:
++          type: integer
++          minimum: 0
++        maxSerializedPartsBytes:
++          type: integer
++          minimum: 0
++        maxPromptFrameBytes:
++          type: integer
++          minimum: 0
++        modelSupport:
++          type: string
++          enum:
++            - not-probed
++      description: Native input bindings and local admission bounds, not live model qualification. Dispatch
++        separately requires the running client's exact input contract.
+     NativeTaskToolScope:
+       type: object
+       additionalProperties: false
+@@ -2830,6 +3093,7 @@ components:
+             required:
+               - id
+               - local
++              - model
+               - credential
+             properties:
+               id:
+@@ -2839,8 +3103,17 @@ components:
+                   - openai
+                   - openai-responses
+                   - anthropic
++                  - deepseek
++                  - gemini
++                  - gemini-audio
++                  - ollama
+               local:
+                 type: boolean
++              model:
++                type: string
++                enum:
++                  - fixed
++                  - required
+               credential:
+                 type: object
+                 additionalProperties: false
+@@ -2861,6 +3134,8 @@ components:
+                       - null
+                     nullable: true
+                 nullable: true
++              input:
++                $ref: "#/components/schemas/NativeTaskInputCapabilities"
+         scope:
+           $ref: "#/components/schemas/NativeTaskToolScope"
+         validation:
+@@ -8791,7 +9066,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskOptionsResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -8880,7 +9155,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskListResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -8977,7 +9252,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9073,7 +9348,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskPollResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9187,7 +9462,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9301,7 +9576,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9415,7 +9690,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9529,7 +9804,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9643,7 +9918,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+@@ -9758,7 +10033,7 @@ paths:
+               schema:
+                 $ref: "#/components/schemas/NativeTaskResponse"
+         "400":
+-          description: Invalid request, unknown fields or bounds exceeded.
++          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+           content:
+             application/json:
+               schema:
+diff --git a/whitepaper/AMC_WHITEPAPER_v1.md b/whitepaper/AMC_WHITEPAPER_v1.md
+index 22c5d4b7..cbd470d7 100644
+--- a/whitepaper/AMC_WHITEPAPER_v1.md
++++ b/whitepaper/AMC_WHITEPAPER_v1.md
+@@ -19,7 +19,7 @@
+ 
+ ## Abstract
+ 
+-The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 1,389 Vitest test source files.
++The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 1,477 Vitest test source files.
+ 
+ **Keywords:** AI agent maturity, autonomous systems evaluation, execution-proof evidence, AI governance, capability maturity, agent reliability, AI risk management, EU AI Act compliance, agent passport, fleet trust composition
+ 
+@@ -412,7 +412,7 @@ The self-improvement loop is subject to five mandatory safeguards:
+ 
+ ### 6.1 Experimental Design
+ 
+-We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. All evaluations were conducted on production-equivalent agent instances running on the AMC platform. The platform's 1130 modules span six packages, with 1,389 Vitest test source files:
++We evaluate AMC through two primary case studies and one controlled anti-gaming experiment. All evaluations were conducted on production-equivalent agent instances running on the AMC platform. The platform's 1130 modules span six packages, with 1,477 Vitest test source files:
+ 
+ - **`shield`** (31 modules): Input validation, prompt injection detection, output filtering
+ - **`enforce`** (28 modules): Policy enforcement, constitutional constraints, access controls
+@@ -420,7 +420,7 @@ We evaluate AMC through two primary case studies and one controlled anti-gaming
+ - **`vault`** (22 modules): Evidence artifact storage, integrity verification, audit logs
+ - **`product`** (42 modules): Evaluation runners, cost controls, remediation catalog, scoring engine
+ 
+-Test source inventory: 1,389 Vitest test source files as of the current repository audit. This count measures source paths; execution outcomes and coverage require their own run reports from the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml).
++Test source inventory: 1,477 Vitest test source files as of the current repository audit. This count measures source paths; execution outcomes and coverage require their own run reports from the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml).
+ 
+ ### 6.2 Case Study 1: ContentModerationBot (CMB) — Human-Guided Maturity Improvement
+ 
+@@ -870,7 +870,7 @@ The empirical results are encouraging. Human-guided improvement brought the Cont
+ 
+ AMC's integration of Bloom-inspired behavioral evaluation, METR task horizon scoring, Google FACTS factuality dimensions, graduated autonomy governance, memory integrity scoring, and interpretability assessment represents a significant expansion of what agent maturity measurement covers. The framework's mapping to EU AI Act (12 articles), ISO 42001 (14 clauses), NIST AI RMF, and SOC 2 positions it as the execution substrate for regulatory compliance. The Agent Passport (.amcpass) provides a portable, verifiable credential for fleet-level trust composition.
+ 
+-AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—with 1,389 Vitest test source files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
++AMC is not a compliance checkbox or a one-time audit exercise. It is a continuous, executable, self-improving measurement system—with 1,477 Vitest test source files and 1,200+ platform modules—designed to grow alongside the agents it measures. As AI agents advance from tools to collaborators to autonomous teammates, the question of how we establish credible evidence for their trustworthiness becomes one of the most important in technology. AMC offers a rigorous, empirically validated answer.
+ 
+ ---
+ 

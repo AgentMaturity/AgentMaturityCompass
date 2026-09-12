@@ -1426,3 +1426,51 @@ session's receipt directories, which `.gitignore` excludes under `AMC_OS/`). Roo
 Next: fresh clone at `c1b5cf9c` for build, typechecks, the OpenAPI publisher and
 `gen-counts --write`; bring the regenerated artifacts back as candidate B; full suite, Python
 suite and release gate in a fresh clone at B.
+
+### 2026-09-12 — Fresh-clone acceptance at candidate B `40f80de1`; two gate failures repaired in C `09d353f5`
+
+Fresh clone of `40f80de1` (scratch path in the receipt; frozen install from the local pnpm
+store; Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0): install, build, src and tests
+typechecks and the OpenAPI contract check passed; full `vitest run` **1,476/1,477 files,
+14,042/14,057 tests passed, 15 skipped, 0 failed** (327 s); Python suite from `sdk/python`
+against the clone's `dist/cli.js`: **290 passed, 21 failed, 1 skipped** — all 21 are
+`test_validation_installed.py`, which requires the wheel installed in the interpreter.
+`pnpm release:gate`: **12/14 executed checks passed, 2 failed, live-deploy-health skipped**
+(no `AMC_RELEASE_GATE_LIVE_URL`). The two failures: `architecture-boundaries` — new files
+`src/cli-agent-commands.ts` (814) and `src/sdk/nativeAgentClient.ts` (823) over the 800-line
+cap (HEAD `4d2d69e5` passes this check); `full-test-suite` — the mandatory profile permits no
+skipped tests and the lanes' opt-in browser/Linux scenarios registered 15 skips. The gate also
+rotated the clone's tracked `.amc/keys/*` (the known post-suite key/history churn).
+
+Candidate C `09d353f5` extracts `src/sdk/nativeAgentErrors.ts` (re-exported unchanged) and
+`src/cli-agent-guide-commands.ts` (guide + mcp-catalog) — 796 and 764 lines — and registers
+the six opt-in scenarios only when their documented condition holds (the browser-only file
+keeps a mandatory fixture-resolution test). Root: typechecks 0/0, architecture check passes,
+13 affected files 148 tests 0 skipped. Fresh-clone acceptance at C is running.
+
+### 2026-09-12 — Fresh-clone acceptance at candidate C `09d353f5`: suite and gate green
+
+Fresh clone of `09d353f5` (scratch `clone-c`, frozen install from the local pnpm store; Darwin
+25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0; tracked tree clean after checkout): install, build,
+src and tests typechecks (0/0) and the OpenAPI contract check passed; full `vitest run`
+**1,477/1,477 files, 14,043/14,043 tests, 0 failed, 0 skipped** (329 s); Python from `sdk/python`
+against the clone's `dist/cli.js` **290 passed, 21 failed, 1 skipped** (the 21 are the
+installed-wheel cases; no stray workspace left); `pnpm release:gate` **14/14 executed checks
+passed, 0 failed, live-deploy-health skipped** (no live URL). The gate's own suite report:
+14,043/14,043, 1,477 files, sha256 in the receipt. Post-run the clone's tracked `.amc/keys/*`
+rotated (13 paths), as earlier receipts recorded; the clone is not claimed clean after execution.
+
+Receipt: `AMC_OS/RESEARCH/2026-09-12-lane-integration/` (README, `fresh-clone/README.md`,
+`fresh-clone/candidate-{a,b,c}/`, `logs/`), Obsidian `Evidence/2026-09-12 Native Lane
+Integration.md`, Linear AMC-1505 comments. This is source and local-package qualification on
+Darwin arm64 / Node v25.5.0 — not platform, published-package or deployed-release
+qualification, and no AMC-1505 child is moved to Done on its strength alone (the per-issue
+Definition of Done still requires each issue's own receipt, Linear comment and note). The
+records commit after `09d353f5` is documentation only; `git diff --stat 09d353f5..HEAD` shows
+only `plans/` and `AMC_OS/RESEARCH/2026-09-12-lane-integration/`.
+
+Open for Sid (nothing here was done without confirmation): Chromium headless shell download for
+the opt-in browser scenarios; the 8.3 MB of Sep 9–11 audit receipts untracked under the
+ignored `AMC_OS/` path; spill-backed attachments above the signed per-event cap; installing
+the Python wheel for `test_validation_installed.py`; the budget admission's block after any
+provider failure (requires a signed `ALLOW_WITH_WARNING`), which is hostile first-run UX.

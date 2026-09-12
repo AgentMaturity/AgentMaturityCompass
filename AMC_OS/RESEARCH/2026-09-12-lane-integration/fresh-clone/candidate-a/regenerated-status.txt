@@ -1,0 +1,11 @@
+ M CONTRIBUTING.md
+ M README.md
+ M docs/content/reddit-launch-drafts.md
+ M docs/content/show-hn-draft.md
+ M docs/internal/competitive-landscape.md
+ M docs/internal/mirofish-simulation-council.md
+ M website/i18n.js
+ M website/index.html
+ M website/lite.html
+ M website/openapi.yaml
+ M whitepaper/AMC_WHITEPAPER_v1.md

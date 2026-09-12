@@ -1,0 +1,13 @@
+ M .amc/keys/auditor_ed25519.pub
+ M .amc/keys/auditor_history.json
+ M .amc/keys/lease_ed25519.pub
+ M .amc/keys/lease_history.json
+ M .amc/keys/monitor_ed25519.pub
+ M .amc/keys/monitor_history.json
+ M .amc/keys/session_ed25519.pub
+ M .amc/keys/session_history.json
+ M .amc/release-gate/latest.json
+?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b
+?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981
+?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015
+?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20

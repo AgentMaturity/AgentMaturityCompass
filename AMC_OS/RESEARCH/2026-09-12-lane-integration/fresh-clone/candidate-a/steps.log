@@ -1,0 +1,10 @@
+clone exit=0 seconds=2
+checkout exit=0 seconds=1
+install exit=0 seconds=2
+build exit=0 seconds=28
+typecheck-src exit=0 seconds=24
+typecheck-tests exit=0 seconds=35
+openapi-check exit=1 seconds=0
+openapi-publish exit=0 seconds=0
+gen-counts exit=0 seconds=0
+done

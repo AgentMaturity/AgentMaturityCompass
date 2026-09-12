@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+__________________ ERROR collecting tests/test_P06_client.py ___________________
+ImportError while importing test module '/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-b/sdk/python/tests/test_P06_client.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sdk/python/tests/test_P06_client.py:20: in <module>
+    from amc_sdk import (AmcAgent, AmcError, AmcProtocolError, AmcRefusedError, AmcTimeoutError,
+E   ModuleNotFoundError: No module named 'amc_sdk'
+=========================== short test summary info ============================
+ERROR sdk/python/tests/test_P06_client.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.05s

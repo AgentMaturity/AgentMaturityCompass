@@ -1,0 +1,30 @@
+Scope: all 12 workspace projects
+ WARN  There are cyclic workspace dependencies: /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-c/vendor/cordis, /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-c/vendor/include
+Lockfile is up to date, resolution step is skipped
+Packages: +358
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Progress: resolved 0, reused 356, downloaded 0, added 357
+Progress: resolved 0, reused 356, downloaded 0, added 358, done
+
+devDependencies:
++ @amc/cordis 4.0.1 <- vendor/cordis
++ @amc/cordis-plugin-loader 1.0.2 <- vendor/loader
++ @amc/core 0.1.0 <- packages/amc-core
++ @amc/schemastery 3.18.1 <- vendor/schemastery
+
+. postinstall$ node scripts/postinstall.js || true
+. postinstall:   ┌──────────────────────────────────────────────┐
+. postinstall:   │                                              │
+. postinstall:   │   🧭  Agent Maturity Compass installed!      │
+. postinstall:   │                                              │
+. postinstall:   │   Quick start:                               │
+. postinstall:   │     amc                                      │
+. postinstall:   │     amc up                                   │
+. postinstall:   │     amc quickscore --rapid                   │
+. postinstall:   │                                              │
+. postinstall:   │   Docs:  amc --help                          │
+. postinstall:   │                                              │
+. postinstall:   └──────────────────────────────────────────────┘
+. postinstall: Done
+Done in 1.6s using pnpm v10.33.0
