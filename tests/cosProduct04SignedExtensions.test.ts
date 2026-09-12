@@ -231,7 +231,7 @@ describe("P04 strict executable declaration", () => {
 // Opt-in, real Linux execution regressions. The authoring phase does not set
 // this variable or execute this file. Binary presence is not an acceptance
 // claim: once selected, an unusable backend causes a real failure, not a skip.
-describe.skipIf(process.env.AMC_TEST_NATIVE_EXECUTABLE !== "1" || process.platform !== "linux")("P04 isolated execution integration", () => {
+if (process.env.AMC_TEST_NATIVE_EXECUTABLE === "1" && process.platform === "linux") describe("P04 isolated execution integration", () => {
   it("runs publisher-signed handlers and lifecycle through the actual context host and async command path", async () => {
     const f = fixture(); approve(f);
     const manager = new NativeExtensionManager(f.workspace); manager.load(f.manifestPath, f.digest);

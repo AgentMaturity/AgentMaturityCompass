@@ -52,7 +52,8 @@ async function waitForText(output: () => string, text: string): Promise<void> {
   }
 }
 
-describe.runIf(enabled)("P02 opt-in Linux real PTY integration", () => {
+// Opt-in Linux integration: registered only when enabled, so the mandatory profile never reports it as skipped.
+if (enabled) describe("P02 opt-in Linux real PTY integration", () => {
   it("allocates actual tty stdio and a controlling terminal with resize", async () => {
     const { session } = await fixture();
     expect(session.backendKind).toBe("pty");

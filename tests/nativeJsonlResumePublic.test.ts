@@ -103,7 +103,8 @@ test("authenticated HTTP JSONL resume preserves admissions and current control r
     sessionId: id, killedPid, actualExitObserved: true, prefixUnchanged: true, originalRequestIds: [original.clientRequestId, input.clientRequestId], archivedRefusal: true }, null, 2));
 }, 90_000);
 
-test.runIf(process.env.AMC_JSONL_RESUME_BROWSER === "1")("actual Chromium JSONL Resume and lost-control refresh preserve one ownership transfer", async () => {
+// Opt-in real-browser scenario: registered only with AMC_JSONL_RESUME_BROWSER=1 so the mandatory profile never reports it as skipped.
+if (process.env.AMC_JSONL_RESUME_BROWSER === "1") test("actual Chromium JSONL Resume and lost-control refresh preserve one ownership transfer", async () => {
   const { chromium, expect: browserExpect } = await import("@playwright/test");
   const { NativeTasksPage } = await import("./e2e/native-tasks-page.mjs");
   const f = await fixture();

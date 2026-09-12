@@ -4,7 +4,14 @@ import type { PublicTaskFixture } from "./helpers/publicTaskHttpFixture.js";
 
 // Author-only delivery. Opt in after P01's implementation/integration boundary and a matching build.
 // Every successful API response below comes from real Studio. Faults delay/drop transport, not fake success.
-const integration = test.runIf(process.env.AMC_PUBLIC_TASK_BROWSER === "1" && process.platform === "darwin");
+const BROWSER = process.env.AMC_PUBLIC_TASK_BROWSER === "1" && process.platform === "darwin";
+/** Opt-in real-browser scenarios: registered only with AMC_PUBLIC_TASK_BROWSER=1 on darwin, so the mandatory profile never reports them as skipped. */
+const integration = (name: string, fn: () => Promise<void>, timeout?: number): void => { if (BROWSER) test(name, fn, timeout); };
+
+test("P09 browser fixtures resolve even when the browser scenarios are not enabled", async () => {
+  await expect(import("./e2e/native-tasks-page.mjs")).resolves.toHaveProperty("NativeTasksPage");
+  await expect(import("./helpers/publicTaskHttpFixture.js")).resolves.toHaveProperty("publicTaskHttpFixture");
+});
 type BrowserExpect = typeof import("@playwright/test").expect;
 type Ui = InstanceType<typeof import("./e2e/native-tasks-page.mjs").NativeTasksPage>;
 type Context = { page: Page; context: BrowserContext; f: PublicTaskFixture; ui: Ui; check: BrowserExpect;

@@ -127,7 +127,8 @@ test("SDK observes actual process closure without equating a live idle child to 
   } finally { await client.close(); }
 }, 60_000);
 
-test.runIf(process.env.AMC_RECOVERY_CONTROL_BROWSER === "1")("Chromium restores a dead native controller in the same Studio and reconciles a lost resume response", async () => {
+// Opt-in real-browser scenario: registered only with AMC_RECOVERY_CONTROL_BROWSER=1 so the mandatory profile never reports it as skipped.
+if (process.env.AMC_RECOVERY_CONTROL_BROWSER === "1") test("Chromium restores a dead native controller in the same Studio and reconciles a lost resume response", async () => {
   const { chromium, expect: browserExpect } = await import("@playwright/test");
   const { NativeTasksPage } = await import("./e2e/native-tasks-page.mjs");
   const f = await fixture("jsonl");

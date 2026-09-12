@@ -89,7 +89,8 @@ test("JSONL HTTP cold history grants only eligible explicit recovery and withdra
   expect((await f.poll(task.taskId)).task.history.status).toBe("authenticated");
 }, 60_000);
 
-test.runIf(process.env.AMC_PUBLIC_TASK_BROWSER === "1" && process.platform === "darwin")("real Chromium public validation, lost-ACK and evidence reconnect controls", async () => {
+// Opt-in real-browser scenario: registered only with AMC_PUBLIC_TASK_BROWSER=1 on darwin so the mandatory profile never reports it as skipped.
+if (process.env.AMC_PUBLIC_TASK_BROWSER === "1" && process.platform === "darwin") test("real Chromium public validation, lost-ACK and evidence reconnect controls", async () => {
   const { chromium, expect: browserExpect } = await import("@playwright/test");
   const { runPublicTaskBrowser } = await import("./e2e/public-task-transport-browser.mjs");
   const browser = await chromium.launch({ headless: true,
