@@ -1555,3 +1555,13 @@ describing the 2026-09-08 receipt schema. Mutation: a timed-out step reading as 
 the new test red; restored. 4 persona/gate files 53/53. The stale tracked gate receipt stays
 open (refreshing it means running the gate, not allowed in the shared root). Receipt table:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`.
+
+### 2026-09-14 — Stale default gate receipt untracked: `5a13961e`
+
+`.amc/release-gate/latest.json` (committed 2026-08-25, schema 2026-05-23) was the gate's default
+`--out` path, tracked by accident, not in the npm package (`package.json` `files`), read by no
+test or script, and still carrying the persona `rating: 10 / install was straightforward` text
+that AMC-1528 retired. It is now untracked and `.amc/release-gate/` is ignored beside
+`.amc/release/working/`; the local file stays on disk. Dated receipts live only under
+`AMC_OS/RESEARCH/`. This closes the last AMC-1528 follow-up that root could close; the two
+untracked 2026-09-08 receipt paths remain for Sid. Fleet script `HEAD` now `5a13961e`.
