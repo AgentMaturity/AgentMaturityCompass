@@ -89,10 +89,12 @@ import { exportPolicyPack } from "../exports/policyExport.js";
 import { verifyReceipt } from "../receipts/receipt.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import {
+  AgentTokenGrantError,
   ensureAgentToken,
   readStudioState,
   updateStudioLastLease
 } from "./studioState.js";
+import { agentExecuteClassCheck, scopeRefusal } from "./agentTokenScopeGuard.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { vaultStatus } from "../vault/vault.js";
 import { ToolHubService } from "../toolhub/toolhubServer.js";
@@ -5433,13 +5435,26 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const agents = listAgents(options.workspace).map((agent) => {
-          const token = ensureAgentToken(options.workspace, agent.id);
-          return {
-            ...agent,
-            agentTokenPath: token.tokenPath,
-            agentTokenScopes: token.scopes
-          };
+          try {
+            const token = ensureAgentToken(options.workspace, agent.id);
+            return {
+              ...agent,
+              agentTokenPath: token.tokenPath,
+              agentTokenScopes: token.scopes,
+              agentTokenExecuteActionClasses: token.executeActionClasses,
+              agentTokenGrantedBy: token.grantedBy
+            };
+          } catch (error) {
+            // Fail closed: no token is minted without a valid signed grant.
+            return {
+              ...agent,
+              agentTokenScopes: [],
+              agentTokenRefusal: error instanceof Error ? error.message : String(error),
+              ...(error instanceof AgentTokenGrantError ? { agentTokenRefusedBy: error.refusedBy, agentTokenWiden: error.widen } : {})
+            };
+          }
         });
+
         json(res, 200, { agents });
         return;
       }
@@ -6254,7 +6269,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       if (pathname === "/verify/receipt" && req.method === "POST") {
         if (!hasScope(auth, "receipt:verify")) {
-          json(res, 403, { error: "missing scope receipt:verify" });
+          json(res, 403, scopeRefusal(options.workspace, auth, "receipt:verify"));
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6268,7 +6283,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const governorCheck = pathname.match(/^\/governor\/check$/);
       if (governorCheck && req.method === "POST") {
         if (!hasScope(auth, "governor:check") && !hasAnyRole([...auth.roles], ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
-          json(res, 403, { error: "missing scope governor:check" });
+          json(res, 403, scopeRefusal(options.workspace, auth, "governor:check"));
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6300,7 +6315,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       if (pathname === "/toolhub/tools" && req.method === "GET") {
         if (!hasScope(auth, "toolhub:intent") && !hasAnyRole([...auth.roles], ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
-          json(res, 403, { error: "missing scope toolhub:intent" });
+          json(res, 403, scopeRefusal(options.workspace, auth, "toolhub:intent"));
           return;
         }
         json(res, 200, toolhub.listToolContext());
@@ -6309,7 +6324,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       if (pathname === "/toolhub/intent" && req.method === "POST") {
         if (!hasScope(auth, "toolhub:intent") && !hasAnyRole([...auth.roles], ["OPERATOR", "OWNER", "APPROVER", "AUDITOR"])) {
-          json(res, 403, { error: "missing scope toolhub:intent" });
+          json(res, 403, scopeRefusal(options.workspace, auth, "toolhub:intent"));
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6373,7 +6388,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       if (pathname === "/toolhub/execute" && req.method === "POST") {
         if (!hasScope(auth, "toolhub:execute") && !hasAnyRole([...auth.roles], ["OPERATOR", "OWNER", "APPROVER", "AUDITOR"])) {
-          json(res, 403, { error: "missing scope toolhub:execute" });
+          json(res, 403, scopeRefusal(options.workspace, auth, "toolhub:execute"));
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6400,6 +6415,17 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         });
         if (!leaseCheck.ok) {
           json(res, leaseCheck.status, { error: leaseCheck.error });
+          return;
+        }
+        // Refuse before the intent, ticket or approval is consumed.
+        const classCheck = agentExecuteClassCheck({
+          workspace: options.workspace,
+          auth,
+          agentId: intentAgent,
+          actionClass: toolhub.intent(parsed.intentId)?.actionClass ?? null
+        });
+        if (!classCheck.ok) {
+          json(res, 403, classCheck.body);
           return;
         }
         const response = await toolhub.executeIntent({
