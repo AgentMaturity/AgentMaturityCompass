@@ -213,6 +213,7 @@ AMC-1530, AMC-1538). Verify this live before planning against it.
 > 2026-09-12 correction (live Linear read): 43 children — 28 In Review, 11 In Progress
 > (AMC-1512, 1518, 1530, 1540, 1541, 1542, 1543, 1545, 1546, 1547, 1548), 3 Done
 > (AMC-1526, 1528, 1544), 1 Canceled (AMC-1524). AMC-1538 is In Review, not In Progress.
+> 2026-09-14: 44 children after AMC-1549 (Todo, P2, from the Phase C register); no state changes otherwise.
 
 "In Review" here means *implemented and locally accepted* — not merged, not released, not
 independently validated. Phase A converts that into real Done.
