@@ -1,0 +1,97 @@
+{
+ "type": "result",
+ "key": "v2:6cba9c87b7ed1eca10fe42e6dd5c0e5bea73a271d01f29de2ab477093585ebe6",
+ "agentId": "aa639b2204c46e24e",
+ "result": {
+  "track": "IMPL-5",
+  "status": "COMPLETE",
+  "summary": "First-run path shipped in scope: `amc firewall enable` is now idempotent (a trusted policy with the same mode/enabled/fail-closed is reported, not re-journaled) and explains what it wrote and what it means; `amc doctor` names the two preconditions a fresh init leaves open (runtime-firewall-policy, vault passphrase in shell) with a copyable \"Run: ...\" fix each, repeats fixes under What's next even at exit 0, and fails closed on them under --strict; `amc init` (both paths) prints the three operator actions to a governed, verified keyless stub turn, and `--minimal` now prints the generated passphrase export once instead of discarding it. Measured on the final build from a fresh temp workspace: init 1.21 s, firewall enable 0.75 s, stub turn 0.84 s, verify 0.73 s (verify ok=true); 15 required test files / 142 tests green; both typechecks clean; 6 mutations all went RED.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/src/cli.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/src/doctor/doctorRules.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/src/doctor/doctorReport.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/docs/QUICKSTART.md",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/docs/START_HERE.md"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/src/doctor/firstRunPlan.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/tests/firstRunDoctor.test.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1/tests/firstRunProtocol.test.ts"
+  ],
+  "testsAdded": [
+   "tests/firstRunDoctor.test.ts (9 tests: missing policy WARN+fix by default, FAIL under --strict, invalid policy names status/migrate commands, disabled policy WARN+fix, signed+enabled PASS with mode/revision, vault WARN names export, vault PASS without echoing the passphrase, ordered fix commands FAIL-before-WARN, three init actions in order)",
+   "tests/firstRunProtocol.test.ts (2 tests against built dist/cli.js: init prints the three actions and never echoes the passphrase -> doctor WARN/strict FAIL naming `amc firewall enable` and repeating it under What's next -> firewall enable writes revision 1 and explains -> repeated enable changed:false, revision stays 1, says nothing was written -> --mode block writes revision 2 -> doctor PASS with mode/revision; init --minimal without a passphrase prints the export line and doctor vault WARN names it)"
+  ],
+  "testResults": [
+   {
+    "command": "pnpm vitest run tests/doctorRules.test.ts tests/doctorLocalDiagnostics.test.ts tests/doctorFreshInstallBoundary.test.ts tests/doctorLiveProbe.test.ts tests/doctorNativeModuleProbe.test.ts tests/adaptersDoctorLeaseCarriers.test.ts tests/firewallDenyByDefault.test.ts tests/runtimeFirewall.test.ts tests/nativeFirstUseGuide.test.ts tests/nativeFirstUseGuideCli.test.ts tests/nativeFirstUseGuideProviders.test.ts tests/agentToolsetWiring.test.ts tests/studioVaultModeLoop.test.ts tests/firstRunDoctor.test.ts tests/firstRunProtocol.test.ts  (final sources; 15 files)",
+    "passed": 142,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm vitest run tests/firstRunDoctor.test.ts tests/firstRunProtocol.test.ts  (RED run before implementation: 1 module-not-found + 2 assertion failures, as expected)",
+    "passed": 0,
+    "failed": 2,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm vitest run tests/firstRunDoctor.test.ts tests/firstRunProtocol.test.ts tests/adaptersDoctorLeaseCarriers.test.ts tests/doctorFreshInstallBoundary.test.ts tests/doctorLocalDiagnostics.test.ts tests/doctorRules.test.ts  (after the WARN-default/FAIL-strict split)",
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "The missing-firewall-policy doctor check names its fix (fixHint 'Run: amc firewall enable')",
+    "mutation": "src/doctor/doctorRules.ts: fixHint on the uninitialized branch replaced with undefined",
+    "wentRed": true
+   },
+   {
+    "property": "The missing-firewall-policy check reports the workspace as not ok (pre-split version of the property: FAIL always)",
+    "mutation": "src/doctor/doctorRules.ts: status FAIL -> WARN on the uninitialized branch (before the strict split; superseded by M5)",
+    "wentRed": true
+   },
+   {
+    "property": "The doctor vault check never renders the passphrase value",
+    "mutation": "src/doctor/doctorRules.ts: vault PASS message interpolates process.env.AMC_VAULT_PASSPHRASE",
+    "wentRed": true
+   },
+   {
+    "property": "`amc firewall enable` idempotence compares the requested mode (a mode change must write a new signed revision)",
+    "mutation": "src/cli.ts: removed `&& before.policy.mode === requested.mode` from the unchanged check; dist rebuilt with tsc; tests/firstRunProtocol.test.ts changed:true / revision 2 assertion failed",
+    "wentRed": true
+   },
+   {
+    "property": "`--strict` fails closed on a missing firewall policy while plain doctor warns",
+    "mutation": "src/doctor/doctorRules.ts: `status: strict ? \"FAIL\" : \"WARN\"` -> `status: \"WARN\"`",
+    "wentRed": true
+   },
+   {
+    "property": "The vault-locked WARN names the shell export that fixes it",
+    "mutation": "src/doctor/doctorRules.ts: fixHint line removed from the vault WARN",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "pnpm typecheck exit 0 (0 errors); pnpm typecheck:tests exit 0 (0 errors); pnpm build exit 0 (tsc + copy-assets + bundle-kernel) \u2014 all on the final sources at 910e6d97 + this diff, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0",
+  "behaviorChanges": [
+   "`amc firewall enable` is idempotent: if a trusted policy already has the requested mode, enabled=true and fail-closed setting, it prints 'already enabled ... nothing was written' (JSON: changed:false, same revision) and does not append a journal revision; otherwise it writes/signs and prints what it wrote (policy, signature, checkpoint path, revision), what it means (before: every native tool call denied with missing-policy), the mode semantics, and how to widen/narrow deliberately.",
+   "`amc doctor` (workspace mode) adds check `runtime-firewall-policy`: missing -> WARN by default / FAIL under --strict with fix 'Run: amc firewall enable'; invalid -> FAIL naming `amc firewall status` and `amc firewall migrate-signature --approve-legacy-kind`; signed-but-disabled -> WARN with the enable command; signed+enabled -> PASS with mode, revision, fail-closed.",
+   "`amc doctor` vault check is passphrase-aware: PASS when AMC_VAULT_PASSPHRASE is set (value never rendered) or the vault is unlocked; otherwise WARN naming `export AMC_VAULT_PASSPHRASE='<...>'` (interactive alternative `amc vault unlock`) instead of INFO 'normal for fresh install'.",
+   "`amc doctor` text: when no FAIL but warnings carry fixes, the headline no longer says 'All critical checks pass'; What's next repeats every FAIL/WARN fix verbatim (FAIL first) even when the exit code is 0.",
+   "`amc init` and `amc init --minimal` print the three operator actions after init: `amc firewall enable`, the stub keyless `agent-loop run` command, `amc agent-loop verify <session-id>`.",
+   "`amc init --minimal` without AMC_VAULT_PASSPHRASE now generates a random passphrase (`amc-local-<base64url>`) and prints the export line once; previously it used `minimal-startup-<timestamp>` and never showed it, leaving a vault no later command could unlock."
+  ],
+  "decisions": [
+   "The worktree was created at 3d6b8d4a (424 commits behind the integration commit). I moved it with `git checkout --detach 910e6d9785a51ded454233aa24ec9f84de0e87e4` inside my own worktree (clean status; no branch, reset, stash or other worktree touched). All work and measurements are at 910e6d97 + this uncommitted diff.",
+   "Missing firewall policy is WARN under plain `amc doctor` and FAIL under `--strict`. A FAIL-by-default version broke tests/adaptersDoctorLeaseCarriers.test.ts:376 (asserts a fresh init with no firewall policy is `ok`), which is outside my write scope, so I did not edit it. The fix command is identical either way and is repeated under What's next even at exit 0.",
+   "src/workspace.ts left untouched: making initWorkspace create the firewall policy would invert the premise of tests/firewallDenyByDefault.test.ts and the brief names `amc firewall enable` as the explicit operator action.",
+   "Idempotence compares mode, enabled and failClosedOnMissingPolicy of a trusted policy; different settings still write a new revision, so the existing concurrent-writers test (three modes -> revision 3) still holds.",
+   "Tool-guard and vault refusal texts that do not name a working fix live in src/tools/guards/policyGuards.ts, src/runtime/firewall.ts and the vault CLI (outside scope); reported as defects rather than edited.",
+   "Docs quote only numbers produced in this session and name commit/environment/date inline; no '10x' or superiority language."
+  ],
+  "blockers": [],
+  "reportMarkdown": "# IMPL-5 \u2014 first-run: `amc firewall enable`, `amc doctor` fixes, `amc init` actions\n\n**Source:** 910e6d9785a51ded454233aa24ec9f84de0e87e4 (amc/gap-register-execution) + this uncommitted diff, in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1` (detached at that commit; the worktree had been created at 3d6b8d4a, 424 commits behind \u2014 moved with `git checkout --detach`, nothing else touched). **Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `pnpm install --frozen-lockfile --prefer-offline` exit 0, `pnpm build` exit 0. This is a fresh worktree with a clean install, not a fresh clone (\u00a74 receipt rule); nothing was committed.\n\n## What was wrong at 910e6d97 (baseline measured, workspace `/tmp/amc-firstrun-Dc8Xky`, removed)\n- `amc doctor` after `amc init --minimal`: `PASS \u2705 (29 pass, 0 fail, 3 warn, 3 info)` \u2014 never mentioned the runtime firewall policy, the precondition that denies every tool call.\n- Vault check said `[INFO] vault: Vault locked (normal for fresh install\u2026) fix: Run: amc vault unlock` even with `AMC_VAULT_PASSPHRASE` in the shell (signing worked).\n- `amc firewall enable` twice \u2192 `firewall status` `policyRevision: 2` (not idempotent); output was three lines with no explanation.\n- `amc init --minimal` printed quickscore/guide/doctor, not the path to a governed turn; without `AMC_VAULT_PASSPHRASE` it silently used `minimal-startup-<timestamp>` and never showed it \u2014 every later signing command then refused with `Vault locked. Run \\`amc vault unlock\\` first\u2026`, a fix that cannot work because the passphrase was never disclosed.\n- The stub `agent-loop run \u2026 --tools echo` before `firewall enable` exits 0 with `tool calls 1`; the run output does not say whether the call was denied.\n\n## What shipped (scope respected)\n- `src/cli.ts` firewall block: `enable` inspects first; unchanged trusted policy \u2192 \"already enabled in warn mode (revision N); nothing was written\" (JSON `changed:false`); otherwise writes and prints *What this wrote* (policy, signature, checkpoint, revision), *What it means* (before: every native tool call denied with missing-policy), mode semantics, and how to widen/narrow (`--mode block|observe`, `status`, `disable`).\n- `src/doctor/doctorRules.ts`: new check `runtime-firewall-policy` (missing \u2192 WARN / FAIL under `--strict`, fix `Run: amc firewall enable`; invalid \u2192 FAIL naming `amc firewall status` and `migrate-signature --approve-legacy-kind`; disabled \u2192 WARN; signed+enabled \u2192 PASS with mode/revision/fail-closed). Vault check \u2192 PASS when the passphrase is in the shell (never rendered) else WARN naming `export AMC_VAULT_PASSPHRASE='\u2026'`.\n- `src/doctor/firstRunPlan.ts` (new): `firstRunActions()` (the three actions) and `firstRunFixCommands(report)` (FAIL-before-WARN copyable fixes). `src/doctor/doctorReport.ts`: headline names warnings-with-fixes instead of \"All critical checks pass\". `amc doctor` wiring prints the fixes under *What's next* even at exit 0.\n- `amc init` / `amc init --minimal` print the three actions; `--minimal` generates a random passphrase and prints the export once.\n- `docs/START_HERE.md`, `docs/QUICKSTART.md`: the keyless first-turn block and the measured timing, with commit/environment/date named inline.\n\n## Measured first-run protocol (final dist, fresh temp workspace `/tmp/amc-firstrun-PB8bss`, removed; `AMC_VAULT_PASSPHRASE` exported first)\n| # | command | exit | s |\n|---|---|---|---|\n| 1 | `amc init --minimal` (prints the three actions) | 0 | 1.21 |\n| 2 | `amc doctor` (WARN runtime-firewall-policy \u2192 fix `amc firewall enable`; vault PASS) | 0 | 1.83 |\n| 3 | stub `agent-loop run \u2026 --tools echo` before the policy (exit 0; tool outcome not surfaced) | 0 | 0.90 |\n| 4 | `amc firewall enable` \u2192 revision 1, explains what it wrote | 0 | 0.75 |\n| 5 | `amc firewall enable` again \u2192 \"already enabled \u2026 nothing was written\", revision stays 1 | 0 | 0.72 |\n| 6 | `amc doctor` \u2192 `[PASS] runtime-firewall-policy \u2026 (mode warn, revision 1, fail-closed on)` | 0 | 1.72 |\n| 7 | stub `agent-loop run \u2026` \u2192 session `dea244ea-\u2026`, turn complete | 0 | 0.84 |\n| 8 | `amc agent-loop verify dea244ea-\u2026 --json` \u2192 `ok:true, ledgerOk:true` | 0 | 0.73 |\n\nOperator path from nothing: `export AMC_VAULT_PASSPHRASE`, `init`, `firewall enable`, `run`, `verify` = 3.53 s of command time across four commands (five shell actions counting the export); three commands after init. The \u00a77a \"<5 minutes\" bound is met by a wide margin; the \"\u22643 operator actions\" bound is met only if the passphrase is already in the environment and verification is counted as part of the turn \u2014 I do not claim it as met. Script wall-clock for all 8 steps: 9.06 s.\n\n**No-passphrase variant** (`/tmp/amc-firstrun-UKFg4R`, removed): init 1.16 s prints `export AMC_VAULT_PASSPHRASE='<generated>'` once; doctor 1.91 s exit 0 with `[WARN] vault \u2026 fix: Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>'` and the firewall WARN; `firewall enable` and both runs exit 1 with `Vault locked. Run \\`amc vault unlock\\` first, or \\`amc setup\\`\u2026`.\n\n## Refusals encountered and whether each named its fix\n- Firewall guard `runtime firewall blocked this call (missing-policy)` (src/tools/guards/policyGuards.ts:47) \u2014 **no fix named**, and `agent-loop run` does not surface it (exit 0). I could not read the recorded tool result back (109 files scanned incl. zlib/gzip and sqlite strings: 0 hits; evidence blobs appear encrypted), so the doc states only what was observed. Out of scope \u2192 defect for the guard/agent-loop owner.\n- Missing-policy decision reason \"Runtime Firewall was required but no policy file was found.\" (src/runtime/firewall.ts:1115) \u2014 no fix named; out of scope.\n- `Vault locked. Run \\`amc vault unlock\\` first\u2026` \u2014 names a fix that does not work in a fresh non-interactive shell; out of scope. Mitigated in scope: init prints the export, doctor names it.\n- `amc doctor` (after change): every FAIL/WARN carries a `Run: \u2026` fix; verified by tests and mutation.\n\n## Tests, typechecks, mutations\n- Final required suites (15 files: doctor*, firewallDenyByDefault, runtimeFirewall, nativeFirstUseGuide*, agentToolsetWiring, studioVaultModeLoop, adaptersDoctorLeaseCarriers, firstRun*): **142 passed, 0 failed, 0 skipped**. No `tests/cliFirewall*.test.ts` exists; `tests/runtimeFirewall.test.ts` holds the CLI `firewall enable` coverage (concurrent three-mode writers \u2192 revision 3 still passes).\n- RED first: the two new files failed before implementation (module missing + 2 assertions).\n- `pnpm typecheck` 0 errors; `pnpm typecheck:tests` 0 errors.\n- Mutations (all RED, sources restored and diff-verified): drop firewall fixHint; FAIL\u2192WARN (pre-split); leak passphrase into doctor text; idempotence ignores mode (dist rebuilt, protocol test RED); ignore `--strict`; drop vault fixHint.\n\n## Not exercised\nReal providers, notary/`--live-probes`, Studio, Linux/Windows, the full vitest suite, package/platform/release qualification, a human first-use session (this is one automated session on one machine). Side effect of the CLI's own design: `amc firewall enable` wrote host-local checkpoints under `/Users/sid/.amc/control-checkpoints/<workspace-id>/runtime-firewall-policy/` for the temp workspaces; not removed.\n\n## Defects for other tracks\n1. Tool-guard denial text does not name `amc firewall enable` and `agent-loop run` hides the denial (policyGuards.ts / cli-agent-commands).\n2. Vault-locked refusal names `amc vault unlock`, which needs the passphrase interactively; should also name the `export`.\n3. tests/adaptersDoctorLeaseCarriers.test.ts:376 treats a workspace with no firewall policy as `ok`; if the owner wants FAIL-by-default, that fixture should call `writeRuntimeFirewallPolicy` first."
+ }
+}

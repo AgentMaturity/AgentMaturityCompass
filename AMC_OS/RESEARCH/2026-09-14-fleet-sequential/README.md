@@ -177,6 +177,49 @@ Linux (Landlock/bwrap), a launcher that actually re-execs AMC under a profile (n
 the measurement reports unconfined everywhere until one does), full suite, build, release gate,
 fresh clone. Linear: AMC-1513 (state unchanged, comment posted).
 
+### impl:first-run — IMPL-5, COMPLETE → integrated as `d635a5e2` (docs measurement `1e56333e`)
+
+Agent: `wf_e71e93d9-c37`, worktree `.claude/worktrees/wf_e71e93d9-c37-1`, base `910e6d97`
+(worktree provisioned at `3d6b8d4a`; the agent detached its own checkout at the base), 105
+tool uses, 31.6 min. Records: `impl-first-run/result.json`, `report.md`.
+
+Done (brief §7 item 4 / §7a): `amc init` and `amc init --minimal` print the three operator
+actions to a governed, verified, keyless turn; `--minimal` without `AMC_VAULT_PASSPHRASE`
+generates a random passphrase and prints the export line once (before: generated silently and
+discarded, leaving a vault no command could unlock). `amc doctor` gains `runtime-firewall-policy`
+(missing → WARN, FAIL under `--strict`, fix `amc firewall enable`; invalid → FAIL naming
+status/migration; disabled → WARN; signed+enabled → PASS with mode/revision), a passphrase-aware
+vault check that never renders the value, and a What's next that repeats every FAIL/WARN fix
+verbatim even at exit 0. `amc firewall enable` is idempotent (trusted policy with the requested
+mode/enabled/fail-closed → reported, not re-journaled) and explains what it wrote, what it means
+and how to widen or narrow. `src/workspace.ts` untouched by design (`tests/firewallDenyByDefault`
+premise). Design point for Sid: the generated `--minimal` passphrase is printed to stdout once;
+the alternative was refusing init without one.
+
+Root change on top: the two dist-backed protocol cases converted from `test.skipIf` to
+conditional registration with a mandatory case (the gate refuses skipped tests).
+
+Root re-verification at `d635a5e2`:
+
+| Check | Result |
+|---|---|
+| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` | exit 0 / exit 0 |
+| `node scripts/architecture-boundaries-check.mjs` | `failures: []` (`cli.ts` 24516 under its 24539 ratchet) |
+| `pnpm build` (root dist refreshed for the protocol test) | exit 0 |
+| 15 required files (doctor ×6, firewall ×2, first-use guide ×3, toolset wiring, Studio vault loop, two new) + 3 init/guidance files | 18 files, 154/154 passed, 0 skipped |
+| Mutation M1 — missing-policy fix hint removed | 3 failed / 6 passed |
+| Mutation M5 — `--strict` no longer fails closed | 2 failed / 7 passed |
+| Mutation M3 — vault PASS message renders the passphrase | 1 failed / 8 passed |
+| First-run path against the root build in a disposable temp workspace | init 1.19 s; doctor before: `runtime-firewall-policy` WARN, `vault` PASS, exit 0; enable 0.94 s (revision 1); enable again 0.80 s "nothing was written"; stub turn 0.85 s (1 turn, 2 steps, 1 tool call, 24 events); verify 0.83 s VERIFIED, ledger/session chains ok, 0 unsigned rows, 2/2 requests derived, trust root UNANCHORED; doctor after: PASS |
+| tracked `.amc/keys/*` and root `.amc/firewall` after every run | unchanged |
+
+Not exercised in root: the agent's M2/M4/M6 mutations (red in its worktree per `result.json`;
+M4 needs a dist rebuild per mutation), a real provider, `amc init` (non-minimal) interactive
+path, Linux/Windows, full suite, release gate, fresh clone. Observed UX defect, unchanged: before
+`amc firewall enable` the stub turn exits 0 without saying its tool call was denied (the guard
+result is inside the encrypted tool row); the doctor is where the fix is named. Linear: AMC-1505
+(comment posted; no child issue owns first-run).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |

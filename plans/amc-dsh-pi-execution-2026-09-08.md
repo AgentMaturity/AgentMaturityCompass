@@ -1640,3 +1640,21 @@ row in the parent session before calling it — so a foreign or injected runner 
 leave the absence of inherited control unrecorded. Two mutations red (driver declaring nothing;
 kernel closure declaring nothing), restored; 30 delegation/loop/hook/schedule files 339/339; tsc
 and boundaries clean. Receipt table: `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`.
+
+### 2026-09-14 — impl:first-run integrated as `d635a5e2` (docs `1e56333e`)
+
+Fifth sequential agent (`wf_e71e93d9-c37`, 105 tool uses, 31.6 min) returned COMPLETE: the
+first-run path of brief §7 item 4 / §7a is in the product — `amc init` prints the three
+operator actions to a governed, verified, keyless turn; `--minimal` shows its generated
+passphrase once instead of discarding it; `amc doctor` names the two preconditions a fresh
+init leaves open (runtime firewall policy, vault passphrase in the shell) with copyable fixes,
+repeats fixes under What's next even at exit 0 and fails closed on them under `--strict`;
+`amc firewall enable` is idempotent and explains what it wrote. Root converted the dist-backed
+protocol cases to conditional registration, re-verified (tsc, boundaries with `cli.ts` under
+its ratchet, fresh build, 18 files 154/154, three mutations red then restored) and re-measured
+the path against the root build in a disposable workspace: init 1.19 s, enable 0.94 s (repeat
+0.80 s, nothing written), stub turn 0.85 s, verify 0.83 s VERIFIED 2/2 — about 3.7 s of command
+time. Observed and left as a named defect: before enabling, the stub turn exits 0 without saying
+its tool call was denied. The generated-passphrase-to-stdout choice is flagged for Sid. Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:gap-register`
+(research, REPORT_ONLY) at `d635a5e2`.
