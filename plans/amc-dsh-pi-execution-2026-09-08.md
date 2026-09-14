@@ -1583,3 +1583,15 @@ policy granting) each red then restored, tracked keys unchanged. This closes the
 item "studioState.ts:130 issues every agent token all four scopes". Receipt:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:hook-inheritance`
 at `2eed9bee`.
+
+### 2026-09-14 — Brief §5 known-open list re-verified at `2eed9bee`
+
+Six of the ten bullets had moved and are corrected in place in the brief: the static-token
+scope item is closed by `2eed9bee` (lease granularity stays open); the `correlate.ts`
+filter was already fixed at `7fdf5b7e` on 2026-08-27 with a passing 6-test file;
+`stopConditions` are parsed and passed to the child runner at spawn (enforcement not
+re-verified here); a `schedule` CLI command and an admission-checked schedule pass in the loop
+runner exist (no standing timer found); coverage thresholds are 65/75/59/64, not 0; the
+Playwright e2e runner is wired and only the browser download is missing. Unchanged: hook
+inheritance (agent running now), `ToolsetReadiness.confined` (queued agent), `lint` aliasing
+`typecheck`, the number drift, and the spill items closed by AMC-1547 plus today's `fa2ffac6`.

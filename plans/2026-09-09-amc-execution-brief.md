@@ -275,18 +275,24 @@ re-derive them from scratch:
 - `studioState.ts:130` issues every agent bearer token
   `toolhub:intent`/`toolhub:execute`/`governor:check`/`receipt:verify` unconditionally — a
   child holding one routes around its lease.
+  > 2026-09-14 correction: closed for static tokens at `2eed9bee` (grant derived from the signed action policy, per-class execute, never widened after issue, refusals name the grant). Lease-level class granularity remains open (`leaseScopeSchema` is a closed enum).
 - `WRITE_LOW` and `WRITE_HIGH` both map to `toolhub:execute` (granularity loss).
+  > 2026-09-14 correction: static agent tokens now record `executeActionClasses` and `/toolhub/execute` refuses outside them (`2eed9bee`); the loss persists on leases.
 - `correlate.ts:33` filters `stdout`/`stderr` but the adapter path writes
   `agent_stdout`/`agent_stderr` — contributes zero to `correlationRatio`, a precondition for
   `OBSERVED_HARDENED`.
+  > 2026-09-14 correction: already closed at `7fdf5b7e` (2026-08-27); `TRACE_SOURCE_EVENT_TYPES` lists all four and `tests/correlationAdapterEventTypes.test.ts` (6 tests) passes at HEAD.
 - `stopConditions` on `SubagentRequest` is written into the signed packet, rendered for
   humans, and read by nothing.
+  > 2026-09-14 correction: moved — `src/agent/subagentSpawn.ts:268/426` parses them (`subagentStopConditions.ts`), passes them to the child runner, and `src/agent/subagentRunner.ts:145` composes descendant stop conditions from them; enforcement was not re-verified by a test in this session.
 - Hook control is not inherited by a spawned child; no spawn path installs it.
 - `ToolsetReadiness.confined` is a machine probe, not a process property.
 - P6.1d: no CLI manages schedules; nothing calls `runDueSchedules` on a timer.
+  > 2026-09-14 correction: partly moved — `src/kernel/agentLoopRunner.ts:551` runs due schedules under an admission-checked schedule pass; `src/cli.ts:13960` `loop schedule` only prints cron/launchd/systemd config ("no automatic installation"), so no CLI manages signed schedules and no standing timer was found.
 - Spill writes plaintext, is invisible to retention/DSAR/export/backup, and a spill write can
   precede its signed commitment (ADR-0010) — close before spill carries regulated content.
 - Coverage thresholds are all 0; `lint` aliases `typecheck`; Playwright e2e is unwired.
+  > 2026-09-14 correction: `vitest.config.ts` thresholds are lines 65 / functions 75 / branches 59 / statements 64, not 0; `lint` still aliases `typecheck`; `test:e2e` runs `scripts/run-e2e.mjs` with `@playwright/test` declared — only the browser download (`npx playwright install`) is missing on this machine.
 - Number drift across three disagreeing scorers: tests 8,604 (badge) / ~4.2k / 5,031;
   questions 126 / 244 / 264; packs 142 / 153.
 
