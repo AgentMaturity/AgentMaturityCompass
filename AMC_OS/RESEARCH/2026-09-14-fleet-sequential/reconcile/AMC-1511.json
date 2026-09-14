@@ -1,0 +1,142 @@
+{
+ "type": "result",
+ "key": "v2:06787c7a42c5f9bdfcfdf89d49769ab791691c47ba68ecdefef8fd026299d632",
+ "agentId": "a130785469a13c1fd",
+ "result": {
+  "issue": "AMC-1511 \u2014 P1: Resume and fork signed native sessions across processes (In Review, child of AMC-1505)",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Implementation commits named in the issue and comments (62c8b44a, 4cd258f5, 927a92ae, 73b7ae43, e8448405, fdabeba9, 96accade, b516869e, efb4b638, 8d09ddd4) are merged on the integration branch",
+    "evidence": "git log --format='%h %ad %s' HEAD | grep of each hash at 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f lists all of them as ancestors (plus 7bd1e8ce, 6378ec8a, a9a0f2e1, d9693bc1)",
+    "holds": true
+   },
+   {
+    "claim": "Process A runs a tool turn and exits; process B verifies and resumes the same session with byte-consistent history, preserved old signatures and appended new evidence",
+    "evidence": "tests/sessionResume.test.ts:93 ('B verifies and resumes A's session: byte-consistent history, old signatures kept, new evidence appended'), tests/sessionOwnership.test.ts:64 (explicit release preserves the signed prefix), tests/jsonlWriterResume.test.ts:83 (real killed writer: original prefix survives genuine resume); all passed in this session's run at 6e7875f2",
+    "holds": true
+   },
+   {
+    "claim": "Tampered history fails before model/tool dispatch",
+    "evidence": "src/session/sessionResume.ts:115-134 (assertChainIntact / assertLedgerVerifies throw TAMPERED) run inside step 1 through a read-only handle (sessionResume.ts:188-196) before any writer lock or append; tests/sessionResume.test.ts:119 passes. Mutation M1b: prefixing all four TAMPERED throws (lines 122,133,163,205) with `if (false)` made 'tampered history is refused before anything is appended' and 'forking a tampered parent is refused' fail (2 failed | 9 passed); source restored, git diff empty",
+    "holds": true,
+    "note": "An earlier mutation attempt (M1) was inconclusive because `false && A || B || C` left the seq/prev-hash checks live; M1b is the valid mutation."
+   },
+   {
+    "claim": "Crash after a side effect is recovered with synthetic unknown outcomes and never replayed automatically",
+    "evidence": "src/session/sessionResume.ts:222-231 (open turn -> recoverSession, 'Nothing is re-executed'); src/session/sessionRecovery.ts:584 (outcome TOOL_OUTCOME_UNKNOWN); tests/sessionResume.test.ts:177, tests/sessionOwnership.test.ts:45 and :76, tests/sessionRecoveryRetry.test.ts (2 test.each cases asserting tool/result count stays 1 with TOOL_OUTCOME_UNKNOWN), tests/nativeRecoveryControl.test.ts:84 \u2014 all passed at 6e7875f2",
+    "holds": true,
+    "note": "Source-level only. Installed-package crash-after-side-effect non-replay acceptance (named missing by the 2026-09-09 phase-A comment) was not exercised and no in-repo receipt for it exists."
+   },
+   {
+    "claim": "Legal-boundary fork records verified parent lineage without writing the parent",
+    "evidence": "src/session/sessionResume.ts:288-303 forkSession reads the parent via verifiedRows(..., allowSealed=true) and opens a new session with parent {sessionId, finalEventHash, seq}; tests/sessionResume.test.ts:197 and :209 pass",
+    "holds": true
+   },
+   {
+    "claim": "Tests cover writer contention, repeated resume and future unsupported formats",
+    "evidence": "tests/sessionResume.test.ts:155 (live writer wins), :164 (A->B->C repeated resume), :141 (future envelope version refused, not migrated); tests/sessionOwnership.test.ts:35 (two live processes), tests/jsonlWriterResume.test.ts:110 and :142 (mutex contention); src/session/sessionResume.ts:95-113 envelopedRows raises UNSUPPORTED_FORMAT. Mutation M2: replacing the LIVE_WRITER throw at src/session/sessionOwnership.ts:56 with `return` made 'two genuinely live processes cannot take over...' and 'a live writer wins...' fail (2 failed | 19 passed); restored, git diff empty",
+    "holds": true
+   },
+   {
+    "claim": "Immutable format evolution/migration receipts are defined without rewriting signed source bytes",
+    "evidence": "Only the refusal exists: src/session/sessionResume.ts:45 SESSION_ENVELOPE_VERSION = 1 and :102-106 UNSUPPORTED_FORMAT ('does not rewrite signed rows'). grep -rliE 'migration receipt|format evolution|envelope version' over docs/ and both 2026-09-10 evidence dirs returned nothing; docs/SESSION_RESUME.md does not define a migration receipt",
+    "holds": false,
+    "note": "Acceptance item not met at 6e7875f2: no defined migration/evolution receipt format, only fail-closed refusal of v!=1."
+   },
+   {
+    "claim": "ACP capabilities advertise only demonstrated operations",
+    "evidence": "src/acp/acpAgentServer.ts:218-219 advertises loadSession only when init.resumeSessionFactory is supplied and forkSession only when a fork factory is supplied; src/acp/acpRuntimeContracts.ts:55 adds releaseSession only with loadSession; src/acp/acpStdioMain.ts:239 supplies a real resumeSessionFactory via prepareAcpNativeSession; tests/acpAgentServer.test.ts:123 asserts loadSession=false without a factory (13/13 passed); tests/nativeJsonlResumePublic.test.ts:34 drives the packaged ACP CLI resume (passed)",
+    "holds": true
+   },
+   {
+    "claim": "docs/SESSION_RESUME.md operator contract exists and matches the implemented refusal set",
+    "evidence": "docs/SESSION_RESUME.md (8788 bytes) describes LIVE_WRITER between sealed turns, dead-local-owner recovery, JSONL kernel mutex via writer.lock.coordination.sqlite, refusal matrix; matches src/persistence/jsonl/jsonlWriterLock.ts (BEGIN EXCLUSIVE, no timeout takeover, lines 60-105) and sessionOwnership.ts:50-56",
+    "holds": true
+   },
+   {
+    "claim": "Historical counts quoted in the issue: 11,107/0/0 at fdabeba9, 11,102/2 at 73b7ae43, 23/23 candidate02 at b516869e, 20/20 restored mutations, 20/2 at efb4b638, installed tgz sha 28990ad1...",
+    "evidence": "Cited receipts are absent from the checkout: AMC_OS/RESEARCH/2026-09-08-dsh-pi/ (0 tracked files, directory missing), AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (missing), tmp/cos-*/receipts (tmp/ is gitignored at .gitignore:101, directory missing). Only the tracked disposition.json files under AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/ and 2026-09-10-native-recovery-control-gap/ restate the numbers",
+    "holds": false,
+    "note": "CANNOT_VERIFY: numbers are quoted from receipts that are not reachable at 6e7875f2."
+   },
+   {
+    "claim": "Historical qualification covers the current integration commit",
+    "evidence": "git log 8d09ddd4..HEAD over the resume/recovery/ACP/SDK/Studio sources and the 8 regression files lists 14 later commits (a6d5e2e3 \u2026 b76967e9, 2026-09-10 to 2026-09-14). The last batch receipts pin b516869e/efb4b638/8d09ddd4, not 6e7875f2",
+    "holds": false,
+    "note": "Not decay: the same regression files are green at 6e7875f2 in this session, but the historical counts do not describe HEAD."
+   },
+   {
+    "claim": "Linear comment and Obsidian evidence note exist for this work",
+    "evidence": "Linear: 8 comments on AMC-1511 up to 2026-09-09T21:38Z; the latest is a 'STOP / instructionNeeded' checkpoint stating candidate02 (8d09ddd4) acceptance was never promoted, security mutations not executed, installed qualification not started. Obsidian: read-only ls confirms /Users/sid/Documents/AMC/Evidence/2026-09-10 Native JSONL Writer Resume.md (6524 B) and 2026-09-10 Native Recovery Control Gap.md (4209 B) exist; contents not read",
+    "holds": true,
+    "note": "No comment or note yet records a reconciliation at 6e7875f2; the recovery-control-gap batch disposition.json states batchFullyAccepted=false."
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/sessionResume.test.ts tests/sessionOwnership.test.ts tests/sessionRecoveryRetry.test.ts tests/jsonlWriterResume.test.ts tests/nativeRecoveryControl.test.ts tests/sessionRecovery.test.ts",
+    "files": 6,
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 14.88
+   },
+   {
+    "command": "pnpm build (exit 0) && npx vitest run tests/nativeManagedRecovery.test.ts tests/nativeJsonlResumePublic.test.ts",
+    "files": 2,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 31.07
+   },
+   {
+    "command": "npx vitest run tests/acpAgentServer.test.ts",
+    "files": 1,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "MUTATION M1b (expected RED): sed prefixes every `throw new SessionResumeRefused(\"TAMPERED\"` in src/session/sessionResume.ts with `if (false)`; npx vitest run tests/sessionResume.test.ts; source restored (git diff empty)",
+    "files": 1,
+    "passed": 9,
+    "failed": 2,
+    "skipped": 0
+   },
+   {
+    "command": "MUTATION M2 (expected RED): sed replaces the LIVE_WRITER throw at src/session/sessionOwnership.ts:56 with `return;`; npx vitest run tests/sessionOwnership.test.ts tests/sessionResume.test.ts; source restored (git diff empty)",
+    "files": 2,
+    "passed": 19,
+    "failed": 2,
+    "skipped": 0
+   },
+   {
+    "command": "MUTATION M1 (inconclusive, superseded by M1b): `false &&` inserted at sessionResume.ts:121 and :132 left the seq/prev-hash checks live due to && / || precedence; npx vitest run tests/sessionResume.test.ts",
+    "files": 1,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0
+   }
+  ],
+  "missingForDone": [
+   "Acceptance item not met: define immutable format evolution/migration receipts (only the UNSUPPORTED_FORMAT refusal of envelope v!=1 exists at src/session/sessionResume.ts:45,102; no definition in docs/SESSION_RESUME.md or the evidence dirs).",
+   "Durable receipts for every count the issue quotes: the primary receipts (full-suite-qualified-fdabeba9.{md,json}, installed-workspace-tool-binding-fdabeba9.json, native-corpus-acceptance/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json, tmp/cos-native-jsonl-writer-resume-01/*/receipts, tmp/cos-native-recovery-control-gap-01/*/receipts) are not in the repository at 6e7875f2 (tmp/ gitignored; the 2026-09-08 and 2026-09-09 dirs untracked). Either commit them with `git add -f` or re-derive them at the integration commit.",
+   "Fresh single-commit full-suite run at the integration commit: 14 commits touched the resume/recovery/ACP/SDK/Studio sources and regression files after the last qualified pin 8d09ddd4; only the 9 scoped files (84 tests) were run here.",
+   "Close the recovery-control-gap batch (efb4b638/8d09ddd4): its disposition.json is state 'instruction-needed-safe-checkpoint', batchFullyAccepted=false \u2014 candidate02 acceptance never promoted, its authored security mutations not executed, installed cookie/browser/tool-approval acceptance not started.",
+   "Installed-package crash-after-side-effect non-replay acceptance (named missing in the 2026-09-09 phase-A comment) \u2014 no in-repo receipt; not exercised here.",
+   "Linear comment recording the reconciliation at 6e7875f2 (proposed text below) and a dated Obsidian note for it; existing notes cover only the 2026-09-10 batches.",
+   "Named release-gate disposition and Done transition \u2014 not requested by this reconciliation."
+  ],
+  "defectsFound": [
+   {
+    "file": "AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/disposition.json",
+    "line": 22,
+    "severity": "medium",
+    "description": "Evidence-contract defect (not runtime): the tracked disposition quotes 23/23, 20/20-mutation and installed-artifact results whose receipts are pointed at tmp/cos-native-jsonl-writer-resume-01/... \u2014 tmp/ is gitignored (.gitignore:101) and absent at 6e7875f2, so the quoted numbers cannot be re-read from the integration branch. Same pattern in 2026-09-10-native-recovery-control-gap/disposition.json (receipt paths under tmp/) and in the issue body (AMC_OS/RESEARCH/2026-09-08-dsh-pi/ receipts, 0 tracked files)."
+   }
+  ],
+  "boundary": "Source commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f on amc/gap-register-execution, verified with git rev-parse in an isolated worktree fast-forwarded from 3d6b8d4a. Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; pnpm install --frozen-lockfile --prefer-offline and pnpm build (exit 0) run in this checkout. Exercised: 9 regression files / 84 tests (source-level SQLite and JSONL resume, ownership, recovery retry, recovery control, ACP server capabilities, built-dist SDK/ACP-CLI/HTTP JSONL resume with real child-process death) plus two security-property mutations (TAMPERED refusals, LIVE_WRITER refusal) each RED and restored; worktree clean afterward. Not exercised: full suite; installed package (.tgz) qualification; Chromium/Studio browser resume; real model provider; human evidence; Linux or any other platform; the recovery-control-gap batch's own authored mutations and installed scenarios; contents of the two Obsidian notes (existence only); any receipt under tmp/ or AMC_OS/RESEARCH/2026-09-08-dsh-pi/ (absent from this checkout). No commit, push, generator, publish or deploy was performed.",
+  "proposedLinearComment": "Phase A step 1 reconciliation at integration commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, isolated fresh worktree, pnpm install --frozen-lockfile and pnpm build exit 0. Verdict: PARTIAL.\n\nVerified at this commit: every implementation commit named on this issue (62c8b44a, 4cd258f5, 927a92ae, 73b7ae43, e8448405, fdabeba9, 96accade, b516869e, efb4b638, 8d09ddd4) is an ancestor of HEAD. Regression run: `npx vitest run tests/sessionResume.test.ts tests/sessionOwnership.test.ts tests/sessionRecoveryRetry.test.ts tests/jsonlWriterResume.test.ts tests/nativeRecoveryControl.test.ts tests/sessionRecovery.test.ts` \u2014 6 files, 64 passed / 0 failed / 0 skipped (14.88 s). After build: `npx vitest run tests/nativeManagedRecovery.test.ts tests/nativeJsonlResumePublic.test.ts` \u2014 2 files, 7 passed / 0 failed / 0 skipped (31.07 s), real ACP child death and admin HTTP resume. `npx vitest run tests/acpAgentServer.test.ts` \u2014 13 passed / 0 failed. Cross-process resume with byte-consistent prefix, tamper refusal before any writer opens (sessionResume.ts:115-134, 188-196), non-replayed crash recovery (sessionRecovery.ts:584 TOOL_OUTCOME_UNKNOWN), verified fork lineage (sessionResume.ts:288-303), writer contention / repeated resume / future-envelope refusal, and ACP loadSession/forkSession advertised only when a factory is bound (acpAgentServer.ts:218-219) all hold in source and tests.\n\nMutation checks (each restored, git diff empty): disabling all four TAMPERED throws in sessionResume.ts turned 2 of 11 resume tests red; replacing the LIVE_WRITER throw at sessionOwnership.ts:56 with a silent return turned 2 of 21 ownership/resume tests red.\n\nNot verifiable here: the receipts behind the quoted counts (11,107/0/0 at fdabeba9, 23/23 and 20/20 at b516869e, 20/2 at efb4b638, installed tgz) live under gitignored tmp/ or untracked AMC_OS/RESEARCH/2026-09-08-dsh-pi/ and 2026-09-09-phase-a-reconciliation/, none present at this commit. Fourteen commits touched the resume/recovery/ACP/SDK/Studio sources after the last qualified pin 8d09ddd4, so those historical numbers do not describe HEAD; the counts above are the current evidence for the scoped files.\n\nNot exercised: full suite, installed package, Chromium/Studio, real provider, human, non-macOS platforms, the recovery-control-gap batch's own mutations and installed scenarios.\n\nStill open before Done: (1) the acceptance item \"immutable format evolution/migration receipts\" has no definition \u2014 only the UNSUPPORTED_FORMAT refusal exists; (2) durable in-repo receipts for the quoted counts; (3) a single-commit full-suite run at the integration commit; (4) closure of the recovery-control-gap batch (disposition.json: batchFullyAccepted=false, candidate02 never promoted); (5) installed crash-after-side-effect non-replay acceptance; (6) dated Obsidian note and release-gate disposition. No state change requested."
+ }
+}
