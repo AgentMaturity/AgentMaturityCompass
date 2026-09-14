@@ -1658,3 +1658,18 @@ time. Observed and left as a named defect: before enabling, the stub turn exits 
 its tool call was denied. The generated-passphrase-to-stdout choice is flagged for Sid. Receipt:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:gap-register`
 (research, REPORT_ONLY) at `d635a5e2`.
+
+### 2026-09-14 — Correction: the "hidden denial" first-run defect was not real (`b382967c`)
+
+The 2026-09-14 first-run entry, the fleet receipt and the AMC-1505 comment recorded an observed
+UX defect: that before `amc firewall enable` the stub turn exits 0 without saying its tool
+call was denied. Root read the ledger row meta of a pre-enable stub run at `d635a5e2`: the
+`echo` tool result is `outcome OK, denied false`. The `echo` seam (`--tools echo`, the stub
+provider's default) is a demonstration outside the firewall and allowlist; the policy gates
+workspace tools (`--tools workspace`), whose run refuses up front naming the fix. So there was
+no hidden denial, and the first-run plan text plus both guides overstated what the policy
+gates ("every tool call" → "every workspace tool call"). Corrected in `b382967c`
+(`src/doctor/firstRunPlan.ts`, `docs/QUICKSTART.md`, `docs/START_HERE.md`; 12/12 first-run
+tests); the receipt carries a dated correction block and a correction is posted on AMC-1505.
+The measured timings stand. This was root's own receipt, an hour old, caught by reading the
+evidence rather than the summary.

@@ -215,10 +215,19 @@ Root re-verification at `d635a5e2`:
 
 Not exercised in root: the agent's M2/M4/M6 mutations (red in its worktree per `result.json`;
 M4 needs a dist rebuild per mutation), a real provider, `amc init` (non-minimal) interactive
-path, Linux/Windows, full suite, release gate, fresh clone. Observed UX defect, unchanged: before
-`amc firewall enable` the stub turn exits 0 without saying its tool call was denied (the guard
-result is inside the encrypted tool row); the doctor is where the fix is named. Linear: AMC-1505
-(comment posted; no child issue owns first-run).
+path, Linux/Windows, full suite, release gate, fresh clone. Linear: AMC-1505 (comment posted; no
+child issue owns first-run).
+
+> **Correction, 2026-09-14 12:23 IST (`b382967c`).** This section and the AMC-1505 comment first
+> recorded an "observed UX defect": that before `amc firewall enable` the stub turn exits 0
+> without saying its tool call was denied. That was wrong. Reading the ledger row meta of a
+> pre-enable stub run at `d635a5e2` shows the `echo` tool result recorded `outcome: "OK",
+> denied: false` — the `echo` seam (`src/agent/echoTool.ts`, selected by `--tools echo`, the
+> default for the stub provider) is a demonstration outside the firewall and allowlist, so
+> nothing was denied and nothing was hidden. The policy governs workspace tools
+> (`--tools workspace`), whose run refuses up front naming `amc firewall enable`. The first-run
+> plan text and both guides overstated what the policy gates ("every tool call"); corrected in
+> `b382967c`. The measured timings above are unaffected.
 
 ### Root follow-ups landed between agents
 
