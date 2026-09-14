@@ -96,17 +96,8 @@ Memory files are the persistence layer. If poisoned, every future session inheri
 ## CLI Usage
 
 ```bash
-# Full memory maturity assessment
-amc memory assess --agent <id>
-
-# Check memory file integrity
-amc memory integrity-check --path ./memory/
-
-# Test cross-session continuity
-amc memory continuity-test
-
-# View memory-related lessons
-amc memory lessons list
+# Full memory maturity assessment (the registered memory command; see `amc memory --help`)
+amc memory assess <agentId>
 ```
 
 ## Assurance Pack: memoryMaturityPack

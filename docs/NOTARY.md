@@ -95,7 +95,7 @@ When Notary key changes:
 
 - Monitor:
   - `amc notary status`
-  - `amc notary log verify`
+  - `amc notary log-verify`
   - Studio `/readyz`
 - Back up:
   - Notary dir (`~/.amc-notary` or `AMC_NOTARY_DIR`) securely

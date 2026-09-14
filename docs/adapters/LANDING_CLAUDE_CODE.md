@@ -5,7 +5,7 @@ You already use Claude Code. AMC wraps it — zero code changes.
 ## Get started
 
 ```bash
-amc wrap claude-code -- claude "analyze this code"
+amc adapters run --agent my-claude --adapter claude-cli -- claude "analyze this code"
 amc
 amc fix
 ```

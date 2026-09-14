@@ -5,7 +5,7 @@ AMC wraps any command-line agent — zero code changes.
 ## Get started
 
 ```bash
-amc wrap generic-cli -- python my_bot.py
+amc adapters run --agent my-bot --adapter generic-cli -- python my_bot.py
 amc
 amc fix
 ```

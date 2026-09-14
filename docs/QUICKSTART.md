@@ -211,7 +211,7 @@ amc quickscore --rapid --answers '{"AMC-1.1":3,"AMC-2.1":4}' --json
 
 If `amc quickscore` cannot open terminal prompts, its placeholder L0 output includes the hint "Did you mean to run the interactive score?" so first-run users know to rerun in a terminal or pass answer JSON.
 
-If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc wrap <runtime> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
+If `amc quickscore --auto --json` cannot find captured execution evidence, it returns `scoreStatus: "AUTO_NO_EVIDENCE"` and no measured score fields. Use `amc adapters run --agent <id> --adapter <id> -- <your-agent-command>` to capture evidence first, or use `amc quickscore --answers answers.json --json` when you want CI-safe survey scoring.
 
 For Claude Code or Gemini CLI, observe native tool requests with one reversible project setup:
 
@@ -309,7 +309,7 @@ cd examples/langchain-python
 pip install -r requirements.txt
 
 amc up                                          # Start AMC Gateway
-amc wrap langchain-python -- python main.py     # Run with evidence capture
+amc adapters run --agent my-agent --adapter langchain-python -- python main.py     # Run with evidence capture
 ```
 
 ### CrewAI
@@ -319,7 +319,7 @@ cd examples/crewai
 pip install -r requirements.txt
 
 amc up
-amc wrap crewai -- python main.py
+amc adapters run --agent my-agent --adapter crewai-cli -- python main.py
 ```
 
 ### OpenAI Agents SDK
@@ -329,7 +329,7 @@ cd examples/openai-agents-sdk
 pip install -r requirements.txt
 
 amc up
-amc wrap openai-agents -- python main.py
+amc adapters run --agent my-agent --adapter openai-agents-sdk -- python main.py
 ```
 
 ### LangGraph
@@ -339,21 +339,21 @@ cd examples/langgraph-python
 pip install -r requirements.txt
 
 amc up
-amc wrap langgraph -- python main.py
+amc adapters run --agent my-agent --adapter langgraph-python -- python main.py
 ```
 
 ### OpenClaw
 
 ```bash
 amc up
-amc wrap openclaw-cli -- openclaw run
+amc adapters run --agent my-agent --adapter openclaw-cli -- openclaw run
 ```
 
 ### Generic CLI Agent
 
 ```bash
 amc up
-amc wrap generic -- your-agent-command
+amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 ```
 
 > All examples live in `examples/` with their own README. The gateway proxy (`amc up`) captures LLM calls transparently — your agent code doesn't change.

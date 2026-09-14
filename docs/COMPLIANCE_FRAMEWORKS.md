@@ -112,7 +112,7 @@ print(f"Passed: {result.passed}, Risk Score: {result.risk_score}")
 
 ```bash
 # List available frameworks
-amc compliance frameworks
+amc guide --frameworks
 
 # Generate compliance report for a framework
 amc compliance report --framework NIST_AI_RMF --output report.json

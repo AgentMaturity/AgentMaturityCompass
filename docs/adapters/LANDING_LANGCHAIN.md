@@ -9,7 +9,7 @@ LangChain gives you agent orchestration. AMC gives you trust evidence for what t
 
 ```bash
 # Wrap your existing LangChain agent
-amc wrap langchain -- python my_agent.py
+amc adapters run --agent my-agent --adapter langchain-python -- python my_agent.py
 
 # Score it
 amc

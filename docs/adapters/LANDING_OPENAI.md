@@ -5,7 +5,7 @@ You already use the OpenAI Agents SDK. AMC wraps it — zero code changes.
 ## Get started
 
 ```bash
-amc wrap openai-agents-sdk -- python my_agent.py
+amc adapters run --agent my-agent --adapter openai-agents-sdk -- python my_agent.py
 amc
 amc fix
 ```

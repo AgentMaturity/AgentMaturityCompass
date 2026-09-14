@@ -624,7 +624,7 @@ amc transparency report --format json > agent-report.json
 ```bash
 amc mcp serve --workspace .
 # Then add to Claude Code / Cursor / Windsurf config
-amc mcp install-config --ide claude-code
+amc mcp config --ide claude-code
 ```
 
 Questions? Issues? [GitHub](https://github.com/AgentMaturity/AgentMaturityCompass)

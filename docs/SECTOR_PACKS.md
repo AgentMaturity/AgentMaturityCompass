@@ -215,13 +215,13 @@ console.log(result.complianceGaps); // [...] questions below L3
 
 ```bash
 # List all sector packs
-amc sector packs list
+amc sector pack list
 
-# List packs for a station
-amc sector packs list --station health
+# List packs for one domain
+amc sector pack list --domain health
 
-# Score an agent against a sector pack
-amc sector score --pack digital-health-record --agent my-agent
+# Score an agent against a sector pack (the registered command is `pack run`; the agent comes from the global --agent selector)
+amc --agent my-agent sector pack run --pack digital-health-record --baseline
 
 # Get compliance gaps for a pack
 amc sector gaps --pack clinical-trials --agent my-agent

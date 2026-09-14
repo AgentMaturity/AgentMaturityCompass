@@ -5,7 +5,7 @@ You already use CrewAI. AMC wraps it — zero code changes.
 ## Get started
 
 ```bash
-amc wrap crewai -- python crew.py
+amc adapters run --agent my-crew --adapter crewai-cli -- python crew.py
 amc
 amc fix
 ```
