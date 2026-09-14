@@ -31,6 +31,34 @@ renew an expired lease through the existing operator workflow, or have an
 operator deliberately issue the intended authority. Do not broaden a signed
 policy just to conceal a refusal.
 
+## Static token grants
+
+Since integration commit `2eed9bee` a static agent token is minted only under a
+grant, and the grant comes from the signed action policy (`.amc/action-policy.yaml`
+and its `.sig`): `toolhub:intent`, `governor:check` and `receipt:verify` when the
+policy has at least one rule, `toolhub:execute` only when a rule sets
+`allowExecute: true`, and an `executeActionClasses` list naming exactly the action
+classes whose rule allows execute. A missing or invalid policy signature refuses the
+mint and writes nothing; `GET /agents` then reports the agent with empty scopes and
+the refusing file instead of minting.
+
+The token's meta file (`.amc/studio/agent.tokens/<agent>.token.meta.json`, version 2)
+records the scopes, the execute action classes and `grantedBy`. An issued token keeps
+the grant it was issued with even when the live policy later widens; widening is an
+operator act (edit and re-sign the policy, then remove the token and meta so
+`GET /agents` mints under the current policy, or issue one with an explicit grant).
+A meta written before version 2 keeps its scopes but covers no execute action class
+until the token is re-issued.
+
+`POST /toolhub/execute` refuses a static-token request whose grant does not cover
+the intent's action class before any intent, ticket or approval is consumed. Every
+scope refusal on the scope-gated routes keeps its `missing scope <scope>` error and,
+for a static-token agent, adds `refusedBy` (the meta path, scopes, execute classes
+and grant source) and `widen` (the exact operator steps). Lease scopes cannot name an
+action class (`leaseScopeSchema` is a closed enum), so a lease-only execute is decided
+by the governor's signed action policy alone; that boundary is asserted by
+`tests/studioAgentTokenScopes.test.ts`, not claimed as a guard.
+
 ## Tool execution and compatibility
 
 `/toolhub/intent` and `/toolhub/execute` still perform their independent signed
