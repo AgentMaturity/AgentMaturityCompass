@@ -32,17 +32,19 @@ const RUN_PREFIX = "Run: ";
 /**
  * The three operator actions after `amc init`, in order. `amc init` already
  * signs tools.yaml; the runtime firewall policy is the precondition it leaves
- * open, and every tool call is denied (`missing-policy`) until it is signed.
+ * open, and every WORKSPACE tool call is denied (`missing-policy`) until it is
+ * signed. The keyless stub turn uses the echo demonstration seam, which the
+ * policy does not govern; it demonstrates signed recording and verification.
  */
 export function firstRunActions(): readonly FirstRunAction[] {
   return [
     {
       cmd: "amc firewall enable",
-      desc: "Create and sign the Runtime Firewall policy. Until it exists every tool call is denied (missing-policy). Idempotent; explains what it wrote."
+      desc: "Create and sign the Runtime Firewall policy. Until it exists every workspace tool call (--tools workspace: fs.read, fs.write, bash) is denied (missing-policy). Idempotent; explains what it wrote."
     },
     {
       cmd: STUB_FIRST_TURN_COMMAND,
-      desc: "Run the first governed turn keyless: the stub provider records a canned response through the signed session log (no real model answer)."
+      desc: "Run the first turn keyless: the stub provider records a canned response through the signed session log (no real model answer). Its echo tool is a demonstration seam outside the firewall and allowlist; workspace tools are what the signed policy governs."
     },
     {
       cmd: "amc agent-loop verify <session-id>",

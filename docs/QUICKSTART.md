@@ -64,9 +64,13 @@ Follow the explicit stub/echo command it prints. This exercises local recording,
 
 ### First governed turn in three actions (keyless)
 
-A fresh workspace denies every native tool call with `missing-policy` until its
-Runtime Firewall policy is signed. `amc init` signs `tools.yaml` but leaves that
-policy to an explicit operator action, and prints the three actions below:
+A fresh workspace denies every workspace tool call (`--tools workspace`: `fs.read`,
+`fs.write`, `bash`) with `missing-policy` until its Runtime Firewall policy is signed.
+`amc init` signs `tools.yaml` but leaves that policy to an explicit operator action,
+and prints the three actions below. The keyless stub turn uses the `echo`
+demonstration seam, which the firewall and allowlist do not govern; what it
+demonstrates is signed recording and verification, and the policy is what the
+workspace tools then run under:
 
 ```bash
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # every signing command reads it from the shell
@@ -92,11 +96,13 @@ root UNANCHORED (internal consistency only, not authorship), `amc doctor` afterw
 PASS — about 3.7 s of command time across the four operator commands, well inside the
 five-minute target. The fleet agent's earlier measurement in its worktree at `910e6d97`
 plus this change gave the same shape (1.21 / 0.75 / 0.84 / 0.73 s). Before
-`amc firewall enable`, the same stub turn exits 0 and its output does not say whether
-the `echo` tool call was denied; the recorded tool result is stored encrypted, so that
-receipt could not read it back. The guard's deny-by-default behaviour is covered
-separately by `tests/firewallDenyByDefault.test.ts` and `tests/agentToolsetWiring.test.ts`,
-and `amc doctor` is where the missing policy names its fix. These are single measured
+`amc firewall enable`, the same stub turn runs identically: its `echo` tool result is
+recorded `outcome OK, denied false` (read from the ledger row meta at `d635a5e2`),
+because the echo seam is a demonstration outside the firewall and allowlist. The
+deny-by-default behaviour for workspace tools is covered by
+`tests/firewallDenyByDefault.test.ts` and `tests/agentToolsetWiring.test.ts`, and a
+`--tools workspace` run refuses up front ("the workspace toolset is not ready") naming
+`amc firewall enable`; `amc doctor` names the same fix. These are single measured
 sessions on one machine, not a platform qualification.
 
 For a setup problem, `amc doctor` runs local diagnostics without issuing a

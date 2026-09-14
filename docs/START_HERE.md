@@ -12,9 +12,11 @@ The native guide does not contact a model, open a session or change configuratio
 
 See [the native task quickstart](QUICKSTART.md#run-a-native-task) for the commands and separate evidence verification step.
 
-**First governed turn, keyless.** A fresh workspace denies every native tool call
-until its Runtime Firewall policy is signed; `amc init` signs the tool allowlist but
-leaves that policy to you, and prints the three actions that follow it:
+**First governed turn, keyless.** A fresh workspace denies every workspace tool
+call until its Runtime Firewall policy is signed; `amc init` signs the tool allowlist
+but leaves that policy to you, and prints the three actions that follow it. The stub
+turn's `echo` tool is a demonstration seam the policy does not govern; it shows signed
+recording and verification, and the workspace tools are what the policy then gates:
 
 ```bash
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # signing commands read it from the shell
