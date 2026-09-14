@@ -1610,3 +1610,22 @@ dropped, kernel passing nothing, record claiming an absent control) red then res
 keys unchanged. Closes the known-open item "hook control is not inherited by a spawned child".
 Receipt: `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent:
 `impl:confinement-property` at `c3c46083`.
+
+### 2026-09-14 — impl:confinement-property integrated as `910e6d97`
+
+Fourth sequential agent (`wf_a2e7e6c6-6fc`, 35 tool uses, 16.2 min) returned COMPLETE:
+`ToolsetReadiness.confined` is now a measured process property — one filesystem create the OS
+refuses or permits, attributed only after ownership, write bit and listability rule out
+ordinary permissions — with a tri-state verdict where `unknown` is never confined and every
+consumer fails closed through one derivation. A launcher declares the denied directory in
+`AMC_CONFINEMENT_PROBE_DIR`; a declaration the OS does not honour measures unconfined. Root
+converted the five environment-dependent cases to conditional registration with a mandatory
+registration/profile assertion (the gate refuses skipped tests), then re-verified: tsc clean,
+boundaries clean, 9 files 107/107 with real children under `sandbox-exec`, three mutations
+(verdict without a probe, unknown counted as confined, machine probe restored) red then
+restored. Recorded limitation: an immutable-flag directory would also read as confined
+(operator-owned launcher contract). Closes the known-open item "`ToolsetReadiness.confined` is
+a machine probe". No launcher re-execs AMC under a profile yet, so the measurement reports
+unconfined everywhere today — measured, not assumed. Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:first-run` at
+`910e6d97`.

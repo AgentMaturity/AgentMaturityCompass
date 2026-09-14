@@ -1,0 +1,101 @@
+{
+ "type": "result",
+ "key": "v2:2c5b48b21f3cbd5ccd7ed8acd8306eb31630575e6e2b1b13f64a74579f8450ba",
+ "agentId": "abc43254d16f073f6",
+ "result": {
+  "track": "IMPL-4",
+  "status": "COMPLETE",
+  "summary": "ToolsetReadiness.confined is now derived from a measured, tri-state process confinement verdict (confined | unconfined | unknown) produced by one real filesystem write the OS refuses or permits, instead of the constant false (and formerly a machine probe). A launcher that confines AMC declares the denied directory in AMC_CONFINEMENT_PROBE_DIR; a refusal counts only after ownership, the owner write bit and readability rule out ordinary permissions and TCC. \"unknown\" is never confined; Code Mode and the CLI read the derived boolean, which is true for exactly the \"confined\" verdict. Verified at c3c46083 on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0: 83/83 tests across the seven required files (0 skipped), both typechecks exit 0, and five mutations all went RED, including an end-to-end child under a real sandbox-exec profile where readiness measured confined and run_code returned 2. Linux (Landlock/bwrap) was not exercised.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1/src/sandbox/processConfinement.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1/src/agent/agentToolset.ts"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1/tests/toolsetConfinementProperty.test.ts"
+  ],
+  "testsAdded": [
+   "tests/toolsetConfinementProperty.test.ts: with nothing declared, measures this process as unconfined by writing outside any workspace root, and cleans up",
+   "tests/toolsetConfinementProperty.test.ts: a DECLARED probe directory this process can still write to is unconfined: the declaration is measured, not trusted",
+   "tests/toolsetConfinementProperty.test.ts: a declared probe directory that does not exist is unknown, never confined",
+   "tests/toolsetConfinementProperty.test.ts: a relative declared path is unknown",
+   "tests/toolsetConfinementProperty.test.ts: a refusal that ordinary permissions explain (chmod 500) is unknown, not confined",
+   "tests/toolsetConfinementProperty.test.ts: a refused write with nothing declared is unknown: the refusal cannot be attributed",
+   "tests/toolsetConfinementProperty.test.ts: under a REAL seatbelt profile that denies the declared directory, THIS process measures confined (child under /usr/bin/sandbox-exec; probe refused with EPERM; nothing created)",
+   "tests/toolsetConfinementProperty.test.ts: the same child WITHOUT the profile measures unconfined: the verdict comes from the OS, not the variable",
+   "tests/toolsetConfinementProperty.test.ts: processIsConfined is true for exactly one verdict",
+   "tests/toolsetConfinementProperty.test.ts: readiness carries the measurement, and confined is false in this unconfined test process",
+   "tests/toolsetConfinementProperty.test.ts: an UNKNOWN measurement keeps Code Mode refused (run_code dispatch -> ERROR)",
+   "tests/toolsetConfinementProperty.test.ts: Code Mode runs a program ONLY in a process the OS measurably confines (end-to-end child under sandbox-exec: readiness.confined true, run_code returns 2)"
+  ],
+  "testResults": [
+   {
+    "command": "pnpm exec vitest run tests/toolsetConfinementProperty.test.ts tests/codeModeConfinement.test.ts tests/agentToolsetSession.test.ts tests/agentToolsetWiring.test.ts tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/gap4746PortkeySandboxResourceLimitsBoundary.test.ts  (final run after mutation restore; 7 files)",
+    "passed": 83,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/toolsetConfinementProperty.test.ts  (new file alone, after harness fix)",
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/toolsetConfinementProperty.test.ts  (RED run before implementation; missing API)",
+    "passed": 0,
+    "failed": 12,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "readiness.confined is measured, never returned without a probe",
+    "mutation": "M1: measureProcessConfinement returns {verdict:'confined'} before touching the filesystem",
+    "wentRed": true
+   },
+   {
+    "property": "every consumer fails closed on unknown",
+    "mutation": "M2: processIsConfined returns verdict !== 'unconfined' (treats unknown as confined)",
+    "wentRed": true
+   },
+   {
+    "property": "a refusal explained by ordinary permissions never counts as OS confinement",
+    "mutation": "M3: owner-write-bit check in refusalWouldBeAttributable disabled (chmod 500 dir -> EACCES would read as confined)",
+    "wentRed": true
+   },
+   {
+    "property": "Code Mode is gated by the measurement",
+    "mutation": "M4: runCodeTool wiring in agentToolset changed to confined: () => true",
+    "wentRed": true
+   },
+   {
+    "property": "readiness.confined is a process property, not a machine probe (the original defect)",
+    "mutation": "M5: checkToolsetReadiness sets confined: backend !== null (sandbox-exec exists on this Mac)",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "pnpm run typecheck (tsc -p tsconfig.json --noEmit) exit 0; pnpm run typecheck:tests (tsc -p tsconfig.tests.json --noEmit) exit 0 \u2014 both run twice: once after implementation and again against the byte-restored files after the mutation pass.",
+  "behaviorChanges": [
+   "src/sandbox/processConfinement.ts: processIsConfined() no longer returns a constant false; it takes a required ConfinementMeasurement and is true for exactly verdict === 'confined'. processConfinementReason() likewise takes the measurement. Only caller was src/agent/agentToolset.ts.",
+   "New exports: measureProcessConfinement(options?), CONFINEMENT_PROBE_DIR_ENV ('AMC_CONFINEMENT_PROBE_DIR'), types ConfinementVerdict, ConfinementProbe, ConfinementMeasurement, MeasureConfinementOptions.",
+   "New launcher contract: a process that confines AMC sets AMC_CONFINEMENT_PROBE_DIR to an absolute directory its profile denies writes to. Declared-but-writable measures 'unconfined' (declaration not trusted). Missing/relative/not-owned/no-owner-write-bit/unlistable directory measures 'unknown'.",
+   "checkToolsetReadiness now performs one create-then-unlink of a zero-byte hidden file (.amc-confinement-probe-<pid>-<hex>) per call: in the declared directory when set, otherwise in os.tmpdir(). A permitted write with nothing declared measures 'unconfined'; a refused write with nothing declared measures 'unknown'.",
+   "ToolsetReadiness gains readonly confinement: ConfinementMeasurement (verdict, declaredProbeDir, probe {path,result,code}, reason). confined: boolean is unchanged in type and derived only from the measurement.",
+   "ToolsetReadiness.sandboxReason when no backend exists now reads '<measurement reason>; no sandbox backend on this machine: <backend reasons>' instead of only the backend reasons; with a backend it is the measurement reason. The CLI warning in src/cli-agent-commands.ts prints this string (not edited; out of write scope).",
+   "Refusal errno set is EPERM (seatbelt) and EACCES (Landlock). EROFS and any other errno yield 'unknown' (fail closed).",
+   "Non-darwin/linux platforms measure 'unknown' without attempting a write."
+  ],
+  "decisions": [
+   "The worktree was NOT at c3c46083 as stated: HEAD was 3d6b8d4a (2026-07-15, 420 commits behind, target files absent) on branch worktree-wf_a2e7e6c6-6fc-1. Since c3c46083 was present and HEAD was its ancestor, I fast-forwarded my own worktree branch with `git merge --ff-only c3c46083` (no reset, no checkout of another branch, no other worktree touched) and verified HEAD == c3c46083 with a clean tree before any work.",
+   "Kept `confined: boolean` on ToolsetReadiness for consumers and added the tri-state as a sibling `confinement` field, so every existing consumer (Code Mode gate, CLI warning, agentToolsetWiring test) fails closed on 'unknown' by construction rather than by each learning a third state. M2 proves the derivation is the single fail-closed point.",
+   "Attribution gate before counting a refusal: directory must be absolute, exist, be owned by this uid, carry the owner write bit, and be listable. This rules out POSIX permissions (chmod 500 is tested) and macOS TCC (which refuses reads too). The reason string states what is NOT claimed: a refused probe proves an OS write boundary is active on the process, not that the profile's roots equal the signed write scope.",
+   "Did not edit src/cli-agent-commands.ts (outside IMPL-4 write scope); it already fails closed because it branches on the boolean. Did not edit tests/codeModeConfinement.test.ts (outside scope); its three tests still pass unchanged, though its header comment describing processIsConfined as 'ALWAYS FALSE TODAY' is now stale.",
+   "Child-process harness uses CommonJS `node --import tsx --eval` with dynamic import(), not `--input-type=module`: the ESM flag is inherited by the Code Mode worker's execArgv and broke its bootstrap with 'require is not defined in ES module scope' (harness artifact, observed in the first end-to-end run, after the child had already measured confined).",
+   "No fixture file was added under tests/fixtures; the child scripts are inline so the only new file matches the scoped name tests/toolsetConfinementProperty*.test.ts.",
+   "Did not run pnpm build (no test needed dist/), the full vitest suite, coverage, or any generator."
+  ],
+  "blockers": [],
+  "reportMarkdown": "## IMPL-4 \u2014 `ToolsetReadiness.confined` as a measured process property\n\n**Boundary.** Source commit c3c46083a8087b7c6fd6cfaad79b3180f9f7483f (worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1`, fast-forwarded from 3d6b8d4a \u2014 see decisions). Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, `/usr/bin/sandbox-exec` present, not root. Source qualification only: no package, platform or deployed-release claim.\n\n### What changed\n- `src/sandbox/processConfinement.ts` (rewritten, 215 lines): `measureProcessConfinement()` returns `{verdict: confined|unconfined|unknown, declaredProbeDir, probe{path,result,code}, reason}`. One `openSync(path,\"wx\")` in the launcher-declared `AMC_CONFINEMENT_PROBE_DIR` (else `os.tmpdir()`), unlinked on success. EPERM/EACCES in a directory this process owns, may write by mode and can list \u2192 `confined`; permitted \u2192 `unconfined` regardless of declaration; everything else \u2192 `unknown`. `processIsConfined(m)` is true for exactly `verdict === \"confined\"`.\n- `src/agent/agentToolset.ts`: readiness measures once; `confined` derives from it; new `confinement` field; `sandboxReason` leads with the measurement reason.\n- `tests/toolsetConfinementProperty.test.ts`: 12 tests, two of them real children under a real `sandbox-exec` profile built by `buildSeatbeltProfile` (workspace writable, probe dir denied), one of them end-to-end through `agentToolset` + `run_code`.\n\n### Measured\n- `pnpm exec vitest run` on the 7 required files (new file, codeModeConfinement, agentToolsetSession, agentToolsetWiring, sandboxConfinement, nativeSandboxPolicyBinding, gap4746PortkeySandboxResourceLimitsBoundary): **83 passed / 0 failed / 0 skipped** (final run after the mutation pass restored the files).\n- RED before implementation: 12/12 failed on the missing API.\n- `pnpm run typecheck` exit 0; `pnpm run typecheck:tests` exit 0 (each run twice, the second against the restored files).\n- Under the seatbelt child: verdict `confined`, probe `refused` with `EPERM`, nothing created in the probe dir; `readiness.confined === true`; `run_code` outcome `OK`, content contains `2`. Same child without the profile: `unconfined`, `permitted`.\n- Mutations (all RED): M1 probe returns confined without measuring (12 tests red across 2 files); M2 unknown treated as confined (2 red); M3 owner-write-bit check dropped (1 red: chmod-500 test); M4 Code Mode gate `() => true` (3 red across 3 files, incl. agentToolsetWiring \"passes the MEASURED confinement answer\"); M5 `confined: backend !== null`, the original defect (4 red across 2 files).\n\n### Not exercised\n- **Linux.** No Landlock or bwrap run. The seatbelt tests are `skipIf(!sandboxExecPresent)` and would skip there, so on Linux this suite proves only the unconfined/unknown paths. A Linux qualification needs: (1) a launcher that applies a Landlock ruleset (or bwrap) to the whole AMC process and sets `AMC_CONFINEMENT_PROBE_DIR`; (2) the same two child tests under it; (3) a decision on EROFS \u2014 a bwrap `--ro-bind` refuses with EROFS, which this code classifies as `unknown` (fail closed, but never `confined`), because EROFS is also what an ordinary read-only filesystem returns and cannot be attributed to a sandbox by errno alone. Landlock's EACCES is counted; that mapping is read from documentation, not measured here.\n- Root uid (mode checks are bypassed by root; two tests `skipIf(isRoot)` \u2014 they ran here).\n- `src/cli-agent-commands.ts` warning path (typecheck only; its `sandboxReason` text shape changed).\n- Full vitest suite, coverage thresholds, `pnpm build`, any launcher that re-execs AMC under a profile (none exists; the measurement therefore reads `unconfined` in every normal AMC invocation today, and reads it rather than returning it).\n\n### Known-open after this track\n- No AMC launcher sets `AMC_CONFINEMENT_PROBE_DIR`; the contract exists, the re-exec does not.\n- `tests/codeModeConfinement.test.ts` header comment still says processIsConfined is \"ALWAYS FALSE TODAY\" (assertions remain correct and pass; file out of scope).",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1"
+ }
+}

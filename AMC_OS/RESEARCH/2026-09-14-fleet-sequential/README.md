@@ -140,6 +140,43 @@ Not exercised in root: the agent's M2/M5 mutations (red in its worktree per `res
 suite, build, release gate, fresh clone, a real provider (scripted adapter only), plugin-side
 attribution under a child. Linear: AMC-1545 (state unchanged, comment posted).
 
+### impl:confinement-property — IMPL-4, COMPLETE → integrated as `910e6d97`
+
+Agent: `wf_a2e7e6c6-6fc`, worktree `.claude/worktrees/wf_a2e7e6c6-6fc-1`, base `c3c46083`
+(worktree provisioned at `3d6b8d4a`; the agent fast-forwarded its own branch), 35 tool uses,
+16.2 min. Records: `impl-confinement-property/result.json`, `report.md`.
+
+Done: `ToolsetReadiness.confined` is derived from a measured tri-state verdict
+(`confined | unconfined | unknown`) produced by one create-then-unlink the OS refuses or
+permits. A launcher declares the denied directory in `AMC_CONFINEMENT_PROBE_DIR`; a refusal
+counts only after ownership, owner write bit and listability rule out ordinary permissions and
+TCC; declared-but-writable measures unconfined; unattributable measures unknown, never
+confined. `sandboxReason` leads with the measurement. Root change on top: the two
+unprivileged-user cases and three `sandbox-exec` cases were converted from `it.skipIf` to
+conditional registration, plus a mandatory case asserting what this machine registers and that
+`buildSeatbeltProfile` denies the probe directory (the gate's mandatory profile refuses any
+skipped test). Known limitation recorded here: a directory with the BSD immutable flag (`chflags
+uchg`) also refuses with EPERM and would read as confined — the launcher contract is
+operator-owned, so this is a misconfiguration class, not an untrusted-input one; Node exposes no
+`st_flags` to rule it out cheaply.
+
+Root re-verification at `910e6d97`:
+
+| Check | Result |
+|---|---|
+| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` | exit 0 / exit 0 |
+| `node scripts/architecture-boundaries-check.mjs` | `failures: []` (`processConfinement.ts` 215, `agentToolset.ts` 355 lines) |
+| 9 files: new `toolsetConfinementProperty` (13, incl. real children under `/usr/bin/sandbox-exec`), `codeModeConfinement`, `agentToolsetSession`, `agentToolsetWiring`, `sandboxConfinement`, `nativeSandboxPolicyBinding`, `gap4746PortkeySandboxResourceLimitsBoundary` + 2 readiness consumers | 9 files, 107/107 passed, 0 skipped, 12.2 s |
+| Mutation M1 — verdict `confined` returned before any probe | 8 failed across both confinement files (every measured-unconfined and Code-Mode-refusal case) |
+| Mutation M2 — `unknown` counted as confined | 2 failed / 14 passed: exactly the single-verdict and unknown-keeps-Code-Mode-refused tests |
+| Mutation M5 — `confined: backend !== null` (the original machine probe) | 4 failed / 12 passed: exactly the process-unconfined, Code-Mode-refusal, readiness and unknown tests |
+| tracked `.amc/keys/*` and `$TMPDIR` probe leftovers after every run | unchanged / none |
+
+Not exercised in root: the agent's M3/M4 mutations (red in its worktree per `result.json`),
+Linux (Landlock/bwrap), a launcher that actually re-execs AMC under a profile (none exists yet;
+the measurement reports unconfined everywhere until one does), full suite, build, release gate,
+fresh clone. Linear: AMC-1513 (state unchanged, comment posted).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
