@@ -256,6 +256,9 @@ function entryTimestamp(entry: Entry, message: Record<string, unknown> | null): 
       const calendar = new Date(`${iso[1]}T00:00:00.000Z`);
       if (!Number.isFinite(calendar.getTime()) || !calendar.toISOString().startsWith(`${iso[1]}T`)) continue;
     }
+    // Numeric values follow the generic mapper's bounds (../importers/traceMapping.ts traceTimestamp):
+    // a finite non-negative epoch up to the Date range; a pre-1970 or out-of-range number is unknown, not a time.
+    if (typeof value === "number" && (value < 0 || value > 8.64e15)) continue;
     const parsed = new Date(value).getTime();
     if (Number.isFinite(parsed)) return parsed;
   }

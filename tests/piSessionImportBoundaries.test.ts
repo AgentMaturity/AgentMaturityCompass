@@ -108,7 +108,7 @@ test("reserved safe-ID collisions and structural references preserve identity wh
   expect(format.branch.branchPoints).toEqual([rows[1].id]);
 });
 
-test.each([undefined, "not-a-time", "2026-02-30T00:00:00.000Z", "2026-09-08T24:00:00.000Z", 1e100])("unknown/invalid source time %s preserves the failure without invented chronology", (timestamp) => {
+test.each([undefined, "not-a-time", "2026-02-30T00:00:00.000Z", "2026-09-08T24:00:00.000Z", 1e100, -1])("unknown/invalid source time %s preserves the failure without invented chronology", (timestamp) => {
   const { result, normalized, index, report } = imported([header, user, { ...failure, timestamp }]);
   expect(normalized.artifacts[0].traces[0].timestamp).toBeNull();
   expect(index.entries).toHaveLength(1);
