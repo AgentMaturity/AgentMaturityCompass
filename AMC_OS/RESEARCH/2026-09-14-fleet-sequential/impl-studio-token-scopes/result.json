@@ -1,0 +1,120 @@
+{
+ "type": "result",
+ "key": "v2:65def74074bcd26b30c03f97362835b6fff17c7ec81fda85604bc1aab9f62eac",
+ "agentId": "a1ac35065c0c04093",
+ "result": {
+  "track": "IMPL-2",
+  "status": "COMPLETE",
+  "summary": "Agent bearer tokens now carry only the scopes the signed action policy (or an issuing lease) grants, the token meta records per-action-class execute grants, /toolhub/execute refuses a static-token execute whose grant does not cover the intent's action class before any approval/ticket is consumed, and every scope refusal names the grant/policy that refused plus how to widen it. 10 new tests green (RED first), 6/6 mutations RED (M1 proves the governor did not already cover the case), 152 tests across 14 Studio/native-task/cosProduct10 files green, both typechecks exit 0. Measured at fa2ffac6 on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0. Lease-level class granularity cannot be done in this track: leaseScopeSchema is a closed enum outside the write scope.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1/src/studio/studioState.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1/src/studio/studioServer.ts"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1/tests/studioAgentTokenScopes.test.ts"
+  ],
+  "testsAdded": [
+   "tests/studioAgentTokenScopes.test.ts > omits toolhub:execute when no signed rule allows execute and records the granting policy",
+   "tests/studioAgentTokenScopes.test.ts > grants execute only for the action classes the signed policy allows",
+   "tests/studioAgentTokenScopes.test.ts > refuses to mint a token under an unsigned policy and names the file that refused",
+   "tests/studioAgentTokenScopes.test.ts > never widens an already issued token when the live policy later widens",
+   "tests/studioAgentTokenScopes.test.ts > derives a lease-backed grant from the lease's own scopes and names why classes fall back to the policy",
+   "tests/studioAgentTokenScopes.test.ts > reads a legacy scopes-only meta as granting no execute action class",
+   "tests/studioAgentTokenScopes.test.ts > refuses a WRITE_LOW execute from a token whose grant stops at READ_ONLY, naming the grant and how to widen it",
+   "tests/studioAgentTokenScopes.test.ts > names the signed action policy when a policy-derived token lacks toolhub:execute",
+   "tests/studioAgentTokenScopes.test.ts > keeps a lease-only execute governed by the live signed policy and says so (boundary, not a guard)",
+   "tests/studioAgentTokenScopes.test.ts > lists agents without minting a token when the action policy is unsigned"
+  ],
+  "testResults": [
+   {
+    "command": "pnpm exec vitest run tests/studioAgentTokenScopes.test.ts (before implementation, RED)",
+    "passed": 1,
+    "failed": 9,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/studioAgentTokenScopes.test.ts (after implementation)",
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/studioAgentCredentialBinding.test.ts tests/studioApiAuthorization.test.ts tests/studioCliBridgeAuthz.test.ts tests/studioNativeTask tests/cosProduct10 tests/studioAgentTokenScopes.test.ts (14 files; before pnpm build)",
+    "passed": 142,
+    "failed": 0,
+    "skipped": 10
+   },
+   {
+    "command": "pnpm build && pnpm exec vitest run tests/studioNativeTaskService.test.ts (the 10 previously skipped; needs dist/)",
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/studioNativeTaskService.test.ts (rerun to attribute the .amc/keys side effect; did not reproduce it)",
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "M1: /toolhub/execute refuses a static-token execute whose grant excludes the intent's action class (and the existing governor guard does not cover it)",
+    "mutation": "studioServer.ts agentExecuteClassCheck: replace `if (actionClass === null || !record.executeActionClasses.includes(actionClass))` with `if (false)`",
+    "wentRed": true
+   },
+   {
+    "property": "M2: policy-derived token grant honours allowExecute per action class",
+    "mutation": "studioState.ts agentTokenGrantFromActionPolicy: drop `&& rule.allowExecute` from the class filter",
+    "wentRed": true
+   },
+   {
+    "property": "M3: no token is minted under an invalid/missing action-policy signature",
+    "mutation": "studioState.ts agentTokenGrantFromActionPolicy: replace `if (!signature.valid)` with `if (false)`",
+    "wentRed": true
+   },
+   {
+    "property": "M4: ensureAgentToken never widens an existing token when the live policy widens",
+    "mutation": "studioState.ts ensureAgentToken: rewrite the meta from the live policy unconditionally instead of only when meta is missing",
+    "wentRed": true
+   },
+   {
+    "property": "M5: legacy v1 token meta covers no execute action class",
+    "mutation": "studioState.ts readAgentToken: return executeActionClasses [...ACTION_CLASSES] for legacy meta",
+    "wentRed": true
+   },
+   {
+    "property": "M6: scope refusals name the refusing token grant and how to widen it",
+    "mutation": "studioServer.ts scopeRefusal: return the bare `{ error }` body before attaching refusedBy/widen",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "pnpm exec tsc -p tsconfig.json --noEmit exit 0; pnpm exec tsc -p tsconfig.tests.json --noEmit exit 0 (final sources, after all mutations were restored byte-identically)",
+  "behaviorChanges": [
+   "ensureAgentToken(workspace, agentId, grant?) no longer issues the constant four-scope set: without an explicit grant it derives the grant from the signed action policy (toolhub:intent/governor:check/receipt:verify iff the policy has at least one rule; toolhub:execute iff at least one rule has allowExecute; executeActionClasses = the classes whose rule allows execute) and throws AgentTokenGrantError, writing nothing, when the policy signature is missing/invalid.",
+   "Agent token meta is now v2: { v: 2, agentId, issuedTs, scopes, executeActionClasses, grantedBy }. An existing token keeps the scopes it was issued with even when the live policy later widens; issueAgentToken(workspace, agentId, grant) rotates under an explicit grant.",
+   "Legacy v1 meta (scopes only) reads as executeActionClasses [] with grantedBy { kind: 'legacy-unconditional' }: its scopes on disk are preserved, but a static-token execute is refused with a named reason until the token is re-issued (fail closed on upgrade).",
+   "POST /toolhub/execute: after the lease check and before toolhub.executeIntent, a request authenticated with a static token (auth.username === 'agent-token') is refused 403 `toolhub:execute does not cover action class <class>` when the token grant's executeActionClasses excludes the intent's actionClass; body carries refusedBy { kind: 'agent-token', metaPath, scopes, executeActionClasses, grantedBy } and widen (edit + re-sign .amc/action-policy.yaml, then re-issue the token). No approval, ticket or intent is consumed on refusal (asserted: sentinel absent, approval still QUORUM_MET). Admins, human sessions and lease-only agents are unaffected.",
+   "Scope refusals at /verify/receipt, /governor/check, /toolhub/tools, /toolhub/intent and /toolhub/execute keep the exact `missing scope <scope>` error string and, for static-token agents, add refusedBy and widen.",
+   "GET /agents fails closed per agent: when no valid signed grant exists the row carries agentTokenScopes: [] plus agentTokenRefusal (and agentTokenRefusedBy/agentTokenWiden) and no token file is written; successful rows gain agentTokenExecuteActionClasses and agentTokenGrantedBy.",
+   "findAgentByToken/readAgentToken return executeActionClasses and grantedBy alongside token/scopes (additive; agentCredentialAuth.ts unchanged and still typechecks).",
+   "studioAgentTokenPath and studioAgentTokenMetaPath are now exported from studioState.ts."
+  ],
+  "decisions": [
+   "Worktree provisioning mismatch: the worktree was created at main (3d6b8d4a, 409 commits behind fa2ffac6, none of the Studio agent-auth work present). I ran `git checkout --detach fa2ffac6733fb67ee525f64c2da436365fa7f697` inside my own worktree only (no branch moved, no reset, no other worktree or .git internals touched). All work and every number here is against fa2ffac6; the diff is `git diff` in the worktree (uncommitted, detached HEAD).",
+   "The signed action policy (.amc/action-policy.yaml + .sig, verifyActionPolicySignature/loadActionPolicy) is the grant source for static tokens because it is the operator-controlled, signed artefact that already names allowExecute per action class; the mapping policy->scopes is recorded in the meta's grantedBy so a refusal can name it.",
+   "Lease-level granularity (WRITE_LOW vs WRITE_HIGH on a lease) is NOT implemented, and the exact reason is named in code, tests and refusal text: leaseScopeSchema in src/leases/leaseSchema.ts is a closed zod enum with no per-action-class execute scope, and src/leases is outside this track's write scope. A lease-only request is therefore decided by the governor's existing `action-policy-execute` condition alone (tested as an explicit boundary, not claimed as a guard). agentTokenGrantFromLease is provided (scopes = lease \u2229 AGENT_TOKEN_SCOPES; execute classes from the signed policy with the reason recorded) for callers that mint tokens from a lease; nothing in src calls it yet.",
+   "Rule 7 proof that the new route guard is not decoration: M1 removed only the new check while the live policy allowed WRITE_LOW execute; the execute returned 200 with allowed:true and actually wrote the sentinel, i.e. the governor did not cover a token grant narrower than the live policy.",
+   "Widen text names what exists: edit the action policy rule, re-sign via signActionPolicy (there is no `amc policy action sign` verb; `amc policy action init` creates+signs and `verify` verifies), then remove the token/meta so GET /agents re-mints, or call issueAgentToken with an explicit operator grant. No new CLI was added (cli.ts is out of scope).",
+   "The /agents test scaffolds a second agent (token-scope-child) because getAgentPaths maps the legacy `default` agent to .amc/ itself and listAgents only reads .amc/agents/*, so `default` is never listed (same reason the AMC-1546 fixture uses a second agent).",
+   "apiDelegation.ts was not touched; nothing in it issues tokens or checks scopes.",
+   "Side effect observed and reverted: the 14-file batch run rotated the tracked fixture keys under .amc/keys/ (8 tracked files modified, 4 *.previous-* files created). Restored with `git checkout -- .amc/keys` and removed the untracked files; a rerun of studioNativeTaskService did not reproduce it, so it is attributable to one of the other 13 files but not pinned down (budget). Not caused by this track's changes."
+  ],
+  "blockers": [
+   "Lease scope granularity (a `toolhub:execute:<class>` lease scope, verifier support, and lease issuance CLI/route) requires edits to src/leases/leaseSchema.ts, src/leases/leaseVerifier.ts and the /leases/issue route defaults \u2014 outside IMPL-2's write scope; hand to the leases track.",
+   "Not exercised: the full vitest suite, the release gate (mandatory profile), packaged/platform qualification, the `amc` CLI paths, gateway/proxy/wire/hook scopes, and any browser flow. A green run of the 14 named files is source qualification only."
+  ],
+  "reportMarkdown": "# IMPL-2 \u2014 Studio agent token scopes\n\n**Commit** fa2ffac6733fb67ee525f64c2da436365fa7f697 (detached in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1`; the worktree had been provisioned at main 3d6b8d4a, 409 commits behind, so I detached my own checkout at the named commit \u2014 no branch moved, no reset, nothing outside the worktree touched).\n**Environment** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. `pnpm install --frozen-lockfile --prefer-offline` OK; `pnpm build` run only because `tests/studioNativeTaskService.test.ts` imports `dist/`.\n\n## What changed\n- `src/studio/studioState.ts` (222 \u2192 345 lines): `AGENT_TOKEN_SCOPES`, `AgentTokenGrant`/`AgentTokenGrantSource`, `AgentTokenGrantError`, `agentTokenGrantFromActionPolicy`, `agentTokenGrantFromLease`, `issueAgentToken`, `agentTokenWidenText`; `ensureAgentToken(workspace, agentId, grant?)` derives the grant from the signed action policy when none is given and never widens an existing token; meta v2 records `executeActionClasses` + `grantedBy`; legacy v1 meta fails closed for execute classes; `readAgentToken`/`findAgentByToken` return the grant; token path helpers exported.\n- `src/studio/studioServer.ts` (+110/\u2212?): `scopeRefusal` and `agentExecuteClassCheck` helpers next to `hasScope`; the five `missing scope \u2026` sites now return `refusedBy`/`widen` for static-token agents (error strings unchanged); `/toolhub/execute` refuses a static-token execute whose grant excludes the intent's action class after the lease check and before `executeIntent`; `GET /agents` fails closed per agent instead of minting under an invalid policy.\n- `tests/studioAgentTokenScopes.test.ts` (new, 288 lines): 6 unit + 4 loopback-HTTP tests against the real Studio server, ToolHub, approvals and fs.write in a temp workspace.\n\n## Results (all measured this run)\n- New file: RED first (9 failed / 1 passed \u2014 the one pass is the lease-only boundary case, by design), then 10/10 green.\n- 14 files (`studioAgentCredentialBinding`, `studioApiAuthorization`, `studioCliBridgeAuthz`, `studioNativeTask*` \u00d76, `cosProduct10*` \u00d74, new file): 142 passed, 10 skipped (dist-backed) before build; after `pnpm build` the 10 pass \u2192 152/152, 0 failed.\n- Typechecks: `tsc -p tsconfig.json` exit 0; `tsc -p tsconfig.tests.json` exit 0.\n- Mutations: 6/6 went RED (see structured list). **M1** is the brief \u00a72 rule-7 proof: with only the new route check disabled and the live policy allowing WRITE_LOW, the execute returned 200 `allowed:true` and wrote the sentinel \u2014 the governor's `action-policy-execute` condition does not cover a token grant narrower than the live policy.\n\n## Named limitation\nExecute-scope granularity is enforced on the **static token** grant (meta `executeActionClasses`). A **lease** cannot name an action class: `leaseScopeSchema` (`src/leases/leaseSchema.ts`) is a closed enum outside this track's write scope. Lease-only requests are decided by the governor's signed action policy alone; the test file asserts that boundary explicitly and the refusal/grant texts name it.\n\n## Not exercised\nFull suite, release gate, packaged/platform qualification, CLI paths, gateway/proxy/wire/hook scopes, browser. Side effect reverted: the 14-file batch rotated tracked `.amc/keys/*` fixtures (not this track's change; restored via `git checkout -- .amc/keys`; not attributed to a single file).\n\nTool calls used: about 47 of 150.",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1"
+ }
+}

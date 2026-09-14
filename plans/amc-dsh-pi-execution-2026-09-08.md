@@ -1565,3 +1565,21 @@ that AMC-1528 retired. It is now untracked and `.amc/release-gate/` is ignored b
 `.amc/release/working/`; the local file stays on disk. Dated receipts live only under
 `AMC_OS/RESEARCH/`. This closes the last AMC-1528 follow-up that root could close; the two
 untracked 2026-09-08 receipt paths remain for Sid. Fleet script `HEAD` now `5a13961e`.
+
+### 2026-09-14 — impl:studio-token-scopes integrated as `2eed9bee`
+
+Second sequential agent (`wf_3cc93fba-030`, 59 tool uses, 23.7 min) returned COMPLETE: agent
+bearer tokens now carry only what the signed action policy grants (no valid signature, no
+token; meta v2 with `executeActionClasses` and `grantedBy`; never widened after issue; legacy
+meta covers no execute class), `/toolhub/execute` refuses a static-token execute outside its
+grant before any intent, ticket or approval is consumed, scope refusals name the grant and the
+widening steps, `GET /agents` fails closed. Lease scopes cannot name an action class
+(`leaseScopeSchema`), so lease-only execution stays governed by the signed policy alone — a
+named boundary, not a guard. Root moved the two route helpers into
+`src/studio/agentTokenScopeGuard.ts` so `studioServer.ts` stays under its 8878-line ratchet
+(8849), then re-verified: tsc clean, boundaries clean, fresh build, 14 Studio/native-task files
+152/152, three mutations (route guard removed, token rewritten from live policy, unsigned
+policy granting) each red then restored, tracked keys unchanged. This closes the known-open
+item "studioState.ts:130 issues every agent token all four scopes". Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:hook-inheritance`
+at `2eed9bee`.

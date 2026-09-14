@@ -64,6 +64,44 @@ the agent restored them and could not attribute the cause within budget.
 
 Linear: AMC-1547 (retained spill lifecycle; state unchanged, comment posted with this receipt).
 
+### impl:studio-token-scopes — IMPL-2, COMPLETE → integrated as `2eed9bee`
+
+Agent: `wf_3cc93fba-030`, worktree `.claude/worktrees/wf_3cc93fba-030-1`, base `fa2ffac6`
+(the harness provisioned the worktree at the merge-base `3d6b8d4a`; the agent detached its own
+checkout at `fa2ffac6` before any edit), 59 tool uses, 23.7 min. Records:
+`impl-studio-token-scopes/result.json`, `report.md`.
+
+Done: `ensureAgentToken` derives the grant from the signed action policy (no valid signature,
+no token), token meta v2 records `executeActionClasses` and `grantedBy`, an issued token never
+widens when the live policy widens, legacy v1 meta covers no execute class; `/toolhub/execute`
+refuses a static-token execute whose grant excludes the intent's action class before any
+intent, ticket or approval is consumed; the five scope-gated routes name the refusing grant
+and how to widen it; `GET /agents` fails closed per agent. Named limitation: lease scopes
+cannot name an action class (`leaseScopeSchema` is a closed enum outside the track), so a
+lease-only execute stays governed by the signed policy alone; the test asserts that boundary.
+
+Root change on top of the agent's diff: the two route helpers moved into new
+`src/studio/agentTokenScopeGuard.ts` (78 lines) because `studioServer.ts` would have grown to
+8911 lines against its 8878-line ratchet; it lands at 8849. Root re-verification at
+`2eed9bee`:
+
+| Check | Result |
+|---|---|
+| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` | exit 0 / exit 0 |
+| `node scripts/architecture-boundaries-check.mjs` | `failures: []` |
+| `pnpm build` (root dist refreshed for the dist-backed Studio tests) | exit 0 |
+| 14 files: new `studioAgentTokenScopes` + `studioAgentCredentialBinding`, `studioApiAuthorization`, `studioCliBridgeAuthz`, `studioNativeTask*` ×6, `cosProduct10*` ×4 | 14 files, 152/152 passed, 22.0 s |
+| Mutation M1 — route guard removed while the live policy allows WRITE_LOW | 1 failed / 9 passed: exactly the WRITE_LOW-refusal test (the governor alone did not refuse) |
+| Mutation M4 — existing token meta rewritten from the live policy | 1 failed / 9 passed: exactly the never-widens test |
+| Mutation M3 — unsigned policy still grants | 2 failed / 8 passed: exactly the unsigned-policy mint and `/agents` tests |
+| tracked `.amc/keys/*` after every run | unchanged |
+
+Not exercised in root: the agent's M2/M5/M6 mutations (recorded in its `result.json` as red in
+its worktree), full suite, release gate, fresh clone, CLI paths, gateway/proxy/wire/hook
+scopes, browser. The agent's 14-file batch rotated its worktree's tracked `.amc/keys/*` once
+(restored there, not attributed to a file, not reproduced in root). Linear: AMC-1546 (state
+unchanged, comment posted).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
