@@ -1,0 +1,157 @@
+{
+ "type": "result",
+ "key": "v2:3c09cd4407b144acca37126de247a0729eeb3195db234e602d6accf83e47ba95",
+ "agentId": "a41b75dd105970ff3",
+ "result": {
+  "issue": "AMC-1508",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Fix commit 47141f7a (portal job attribution from the authenticated caller) is merged on the integration branch",
+    "evidence": "git log HEAD at 6e7875f2 lists 47141f7a 'fix(api): portal job attribution comes from the authenticated caller (AMC-1508)'; file history: src/api/productRouter.ts, src/studio/apiDelegation.ts, tests/portalAttribution.test.ts last touched by 79f36cfd (2026-09-09) after 47141f7a and 2631eb68",
+    "holds": true
+   },
+   {
+    "claim": "Persisted-attribution regression commit 79f36cfd is merged and uses real temporary SQLite plus the actual role policy",
+    "evidence": "79f36cfd is an ancestor of 6e7875f2; tests/portalAttribution.test.ts:24-31 opens a mkdtemp SQLite via openProductDb(join(workspace,'product.db')) and seeds a prior row; :72-86 calls enforceRoleOrAdmin/parseUserRoles from src/auth; :118-124 asserts exact submitted_by row and unchanged prior rows",
+    "holds": true
+   },
+   {
+    "claim": "Body submittedBy is rejected with 400 (strict schema), never silently discarded",
+    "evidence": "src/api/productRouter.ts:15-22 submitPortalBodySchema .strict() with no submittedBy field; test 'rejects client submittedBy=...' x4 passed; mutation M2 (remove .strict()) -> 4 failed / 17 passed (expected 201 to be 400)",
+    "holds": true
+   },
+   {
+    "claim": "No authenticated principal fails closed with 401 before any write",
+    "evidence": "src/api/productRouter.ts:87-90 returns 401 when context.principal is blank; tests 'anonymous', 'missing identity', 'blank identity', 'direct product route with no principal', 'registry cannot manufacture an omitted principal' passed; mutation M3 (fallback to 'anonymous') -> 3 failed / 18 passed (expected 201 to be 401)",
+    "holds": true
+   },
+   {
+    "claim": "principalFromAuth derives identity by role: agent:<agentId> for AGENT credentials, username otherwise; bootstrap admin attributed by name",
+    "evidence": "src/studio/apiDelegation.ts:60-66; tests/portalAttribution.test.ts:169-175 passed; mutation M1 (drop the AGENT-role branch, username-only) -> 1 failed / 20 passed (expected 'agent-token' to be 'agent:agent-7')",
+    "holds": true
+   },
+   {
+    "claim": "Agent-token and lease credentials cannot reach the internal portal route (403) so agent identity is never silently lost on this path",
+    "evidence": "src/studio/apiDelegation.ts:92-95; tests 'agent token with OPERATOR role' and 'lease with OWNER role' -> 403 passed; mutation M4 (remove that guard) -> 2 failed / 19 passed (expected 201 to be 403)",
+    "holds": true
+   },
+   {
+    "claim": "Portal submit write policy admits OPERATOR/OWNER only, not every authenticated viewer",
+    "evidence": "src/api/accessPolicy.ts:11 OPERATOR_ROLES=['OPERATOR','OWNER']; resolveApiRolePolicy default branch returns access 'operate' with OPERATOR_ROLES (src/api/accessPolicy.ts:116-157); tests viewer/approver/auditor/no-roles -> 403 and invalid users-config -> 403 passed",
+    "holds": true
+   },
+   {
+    "claim": "Request-contract change is documented (docs + OpenAPI) and pinned by a schema test",
+    "evidence": "docs/API_SURFACES.md:147; website/openapi.yaml:8790 and :8854; tests/openapiWebhookSchemas.test.ts:112 asserts schema.properties.submittedBy is undefined (passed)",
+    "holds": true
+   },
+   {
+    "claim": "AMC-1546 Studio credential-binding blocker is integrated (d668d841 incl. b889cd4f, 7c18ce64) and resolved",
+    "evidence": "d668d841, b889cd4f, 7c18ce64 and 288e210f are ancestors of 6e7875f2; Linear AMC-1546 is still 'In Progress' (updated 2026-09-14) and its acceptance (executed real-HTTP regressions and mutations) is not claimed done; the 2026-09-09 comment says it blocks AMC-1508",
+    "holds": false,
+    "note": "Source integrated; blocker not closed. AMC-1546 acceptance was not exercised in this run."
+   },
+   {
+    "claim": "Receipts AMC_OS/RESEARCH/2026-09-08-dsh-pi/portal-fix-{review.md,focused-tests.json,runtime-receipt.json}, 2026-09-09-clean-source-followthrough/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json and 2026-09-09-studio-agent-credentials/README.md exist",
+    "evidence": "None of these directories exist in the 6e7875f2 checkout; .gitignore:81 ignores AMC_OS/ and git ls-files shows they were never force-added (only 2026-09-09-phase-a-acceptance and other dirs are tracked)",
+    "holds": false,
+    "note": "CANNOT_VERIFY from the integration commit; the evidence named in every AMC-1508 comment is unreachable at 6e7875f2."
+   },
+   {
+    "claim": "Obsidian evidence note Evidence/2026-09-09 Clean Source Follow-through.md exists and records the boundary",
+    "evidence": "Read-only check of /Users/sid/Documents/AMC/Evidence/2026-09-09 Clean Source Follow-through.md: source_revision 79f36cfd, Darwin 25.6.0 arm64 Node v25.5.0, 'no tests, build or install have run for this batch', 'not real HTTP cookie authentication acceptance', AMC-1508 remains In Review",
+    "holds": true,
+    "note": "Note exists but records no execution; it needs updating with the 6e7875f2 test and mutation results."
+   },
+   {
+    "claim": "Forged submittedBy was reproduced (201 under the forged name) at 4247e610 before the fix",
+    "evidence": "Historical claim in the 2026-09-08 comment only; 4247e610 is an ancestor of HEAD but the pre-fix behaviour was not re-executed (would require checking out an older commit, which this run does not do)",
+    "holds": false,
+    "note": "CANNOT_VERIFY here; current behaviour (400/401/403) verified instead."
+   },
+   {
+    "claim": "Source worktree .claude/worktrees/vigilant-merkle-2d8549 was left intact",
+    "evidence": "git worktree list shows /Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549 at 3d6b8d4a [claude/vigilant-merkle-2d8549]; its dirty state was not inspected",
+    "holds": true,
+    "note": "Existence verified; uncommitted contents not inspected (other worktrees are read-only and out of scope)."
+   },
+   {
+    "claim": "Full suite 1306 files / 10944 tests passed at 47141f7a; full suite and gate passed for the merged candidate",
+    "evidence": "Not re-run. Tracked receipt AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/full-suite.json is for candidate a5987643 on Node 22.22.0 (12,262/12,262), not 6e7875f2. A later commit 3439cda6 (not in this checkout) claims fresh-clone acceptance of 6e7875f2 with 14,101/14,101 and gate 14/14; not verified here",
+    "holds": false,
+    "note": "CANNOT_VERIFY in this run; only the three scoped files were executed."
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/portalAttribution.test.ts tests/apiRouters.test.ts tests/openapiWebhookSchemas.test.ts",
+    "files": 3,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 4.83
+   },
+   {
+    "command": "mutation M1 (src/studio/apiDelegation.ts:61 AGENT-role branch disabled) then: npx vitest run tests/portalAttribution.test.ts",
+    "files": 1,
+    "passed": 20,
+    "failed": 1,
+    "skipped": 0
+   },
+   {
+    "command": "mutation M2 (src/api/productRouter.ts:22 .strict() removed) then: npx vitest run tests/portalAttribution.test.ts",
+    "files": 1,
+    "passed": 17,
+    "failed": 4,
+    "skipped": 0
+   },
+   {
+    "command": "mutation M3 (src/api/productRouter.ts:87 principal falls back to 'anonymous') then: npx vitest run tests/portalAttribution.test.ts",
+    "files": 1,
+    "passed": 18,
+    "failed": 3,
+    "skipped": 0
+   },
+   {
+    "command": "mutation M4 (src/studio/apiDelegation.ts:92 agent/lease 403 guard removed) then: npx vitest run tests/portalAttribution.test.ts",
+    "files": 1,
+    "passed": 19,
+    "failed": 2,
+    "skipped": 0
+   }
+  ],
+  "missingForDone": [
+   "Resolve blocker AMC-1546 (still In Progress as of 2026-09-14): execute its real-HTTP/lease/side-effect regressions and mutations on a fresh candidate, then record the combined qualification the 2026-09-09 comment says AMC-1508 waits on.",
+   "A reachable receipt for AMC-1508 at 6e7875f2 (or the next candidate) naming commit, environment (Darwin 25.6.0 arm64, Node v25.5.0), what was exercised (3 files / 58 tests; 4 mutations all RED and restored) and what was not (no real HTTP cookie/bearer/session auth, no browser, no full suite, no AMC_PRODUCT_DB_PATH path). The receipts named in the issue comments are under AMC_OS/RESEARCH/2026-09-08-dsh-pi/, 2026-09-09-clean-source-followthrough/, 2026-09-09-phase-a-reconciliation/ and 2026-09-09-studio-agent-credentials/, none of which are tracked (AMC_OS/ is ignored at .gitignore:81) so they must be force-added (git add -f) or the receipt rewritten in a tracked location.",
+   "Single-commit full-suite and release-gate disposition for the candidate that carries this fix, verified from the tracked receipt (3439cda6 claims fresh-clone acceptance of 6e7875f2 with 14,101/14,101 and gate 14/14; that commit is not in this checkout and was not verified here).",
+   "Post the Linear comment recording the 6e7875f2 verification (text proposed below).",
+   "Update Obsidian Evidence/2026-09-09 Clean Source Follow-through.md (or a new dated note): it currently states no tests, build or install ran for that batch; add the executed 58/58 and the four mutation outcomes with their boundary.",
+   "Decide and record whether a live-credential regression (real cookie/bearer/session through the Studio HTTP server, not injected authenticate/requireRoles) is required for Done or is an accepted, named boundary; every existing test injects authentication at the seam (tests/portalAttribution.test.ts:15-20).",
+   "The role-restriction mutation listed in the Obsidian note's plan (widen resolveApiRolePolicy for the portal path so VIEWER is admitted) was not applied in this run; apply it in the receipt run so all four planned mutations are on record.",
+   "Remove or correct the stale reference to AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/managed-and-portal.py in plans/ownership-manifest.md:171; that helper does not exist at 6e7875f2 (mutations/ holds only spill-lifecycle and stops-and-credentials)."
+  ],
+  "defectsFound": [
+   {
+    "file": ".gitignore",
+    "line": 81,
+    "description": "AMC_OS/ is ignored wholesale, and the receipts every AMC-1508 comment cites (2026-09-08-dsh-pi/portal-fix-*, 2026-09-09-clean-source-followthrough/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json, 2026-09-09-studio-agent-credentials/README.md) were never force-added, so the issue's evidence is unreachable from the integration commit 6e7875f2. Evidence-contract defect (brief section 2 rule 4), not a code defect.",
+    "severity": "medium"
+   },
+   {
+    "file": "src/product/productDb.ts",
+    "line": 23,
+    "description": "openProductDb() is a process-wide singleton resolved from an explicit path, AMC_PRODUCT_DB_PATH or process.cwd(); src/api/productRouter.ts:94 calls new PortalManager() (src/product/portal.ts:176 openProductDb()) and ignores context.workspace. The 'per-workspace tenant boundary' claimed on 2026-09-08 is therefore per-process, not per-request workspace. Not demonstrated exploitable for a single-workspace Studio server; flagged so the tenant-boundary acceptance is stated precisely.",
+    "severity": "low"
+   },
+   {
+    "file": "plans/ownership-manifest.md",
+    "line": 171,
+    "description": "Names AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/mutations/managed-and-portal.py as the AMC-1508 mutation helper; the file does not exist at 6e7875f2 (only spill-lifecycle.{md,py} and stops-and-credentials.{md,py} are present). Stale plan reference.",
+    "severity": "low"
+   }
+  ],
+  "boundary": "Commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f in worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b4936e2d-bcd-1 (fast-forwarded from 3d6b8d4a; git status clean before and after). Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, pnpm install --frozen-lockfile --prefer-offline; no pnpm build (the three test files import from src, not dist). Exercised: tests/portalAttribution.test.ts, tests/apiRouters.test.ts, tests/openapiWebhookSchemas.test.ts (58/58) and four sequential source mutations against tests/portalAttribution.test.ts, each turning RED and both files restored byte-identical to backup. Not exercised: real HTTP cookie/bearer/session authentication (every test injects authenticate/requireRoles at the seam), browser, the dashboard server path (src/dashboard/serve.ts:156 not read), AMC_PRODUCT_DB_PATH resolution, the resolveApiRolePolicy widening mutation, typecheck, the full suite and the release gate. Pre-fix reproduction at 4247e610 not re-run. Other worktrees (including vigilant-merkle-2d8549) only listed, never entered. Obsidian vault read once, read-only. No DSH or pi runtime used. Nothing committed, generated or published.",
+  "proposedLinearComment": "Phase A reconciliation at 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution), Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, frozen-lockfile install in a fresh worktree; no build needed.\n\nMerged on the integration branch: 47141f7a (fix), 79f36cfd (persisted-row regression), and the AMC-1546 source d668d841/b889cd4f/7c18ce64 are all ancestors of 6e7875f2. Source verified: src/api/productRouter.ts:15-22 strict body schema without submittedBy; :87-90 401 when no principal; src/studio/apiDelegation.ts:60-66 role-based principalFromAuth (agent:<agentId> for AGENT, username otherwise); :92-95 agent/lease refused on internal /api/v1; src/api/accessPolicy.ts:11/157 portal submit requires OPERATOR or OWNER. Contract documented at docs/API_SURFACES.md:147 and website/openapi.yaml:8790/8854, pinned by tests/openapiWebhookSchemas.test.ts:112.\n\nExecuted: npx vitest run tests/portalAttribution.test.ts tests/apiRouters.test.ts tests/openapiWebhookSchemas.test.ts -> 3 files, 58 passed, 0 failed, 0 skipped (4.83s).\n\nMutations against tests/portalAttribution.test.ts (21 tests), each restored byte-identical afterwards: M1 drop the AGENT-role branch in principalFromAuth -> 1 failed/20 passed; M2 remove .strict() from submitPortalBodySchema -> 4 failed/17 passed; M3 fall back to 'anonymous' when no principal -> 3 failed/18 passed; M4 remove the agent/lease 403 guard -> 2 failed/19 passed. All four RED as required.\n\nNot exercised: real HTTP cookie/bearer/session authentication (all tests inject authenticate/requireRoles at the seam), browser, the dashboard server path, AMC_PRODUCT_DB_PATH, the role-policy widening mutation, typecheck, full suite, release gate, and the pre-fix reproduction at 4247e610.\n\nGaps before Done: (1) AMC-1546 is still In Progress and was declared a blocker on 2026-09-09; its acceptance is not recorded. (2) The receipts cited in this issue's comments (AMC_OS/RESEARCH/2026-09-08-dsh-pi/portal-fix-*, 2026-09-09-clean-source-followthrough/, 2026-09-09-phase-a-reconciliation/, 2026-09-09-studio-agent-credentials/) are not tracked at 6e7875f2 (AMC_OS/ ignored at .gitignore:81) and are unreachable from the integration commit; a tracked receipt for this run is needed. (3) No single-commit full-suite/gate disposition was verified here (3439cda6 claims one for 6e7875f2; not checked in this run). (4) Obsidian Evidence/2026-09-09 Clean Source Follow-through.md still says no tests ran for that batch and needs these results. (5) Observation, low severity: the product DB is a process-wide singleton keyed by env or cwd (src/product/productDb.ts:23-31) and the router ignores context.workspace, so the tenant boundary is per-process rather than per-request workspace; state that precisely in the acceptance. Verdict: PARTIAL. No state change requested."
+ }
+}
