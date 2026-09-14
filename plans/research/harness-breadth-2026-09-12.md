@@ -130,5 +130,6 @@ Pages tried and not usable: https://learn.chatgpt.com/docs/security (navigation 
 
 1. Retrieve Codex's sandbox/approval documentation from a live official URL (the security nav referenced `/codex/sandboxing` and `/codex/agent-approvals-security`; try the developers.openai.com paths with a browser, since WebFetch got 404s at the redirect host) and fill the Codex refusal row.
 2. Confirm whether `src/cli-late-stage-commands.ts:399` ("Agent Transparency Report + MCP Server") registers a command that serves AMC over MCP; if it does not, `codex mcp-server` becomes a second Codex-only capability worth recording.
+   > Resolved by root 2026-09-14 at `746cc0d7`: `registerMcpCommands` (`src/mcp/mcpCli.ts:53-59`) registers `amc mcp serve` — "Start the AMC MCP server (stdio transport for IDE integration)" — plus `amc mcp config` and `amc mcp list-tools`. AMC does serve over MCP, so an MCP-server mode is not a Codex-only capability. Not exercised here.
 3. When the first-use protocol is run (five recorded sessions per harness, human vs automated labelled separately), replace every "not evaluated" cell; the install and resume commands above are the exact strings to use.
 4. Re-pin all seven before publication; Claude Code released on the day of the requested label date and the others move weekly.
