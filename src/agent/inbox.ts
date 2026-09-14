@@ -23,7 +23,8 @@
 import { randomUUID } from "node:crypto";
 import type { EvidenceEvent } from "../types.js";
 import { readEventPayload } from "../session/eventPayload.js";
-import { assertSessionPayloadWithinCap } from "../session/sessionPayloadCap.js";
+import { queuedInputPayloadRoute } from "../session/sessionPayloadCap.js";
+import { resolveSpilledInboxPayload } from "../session/spill/spillInput.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
 import type { InboxOrigin, InboxSpliceOp, InboxTarget, LoopInboxMeta } from "../session/loopEventMeta.js";
 import type { SessionService } from "../session/sessionService.js";
@@ -83,9 +84,13 @@ export class LoopInbox {
     const messageId = randomUUID();
     const list = this.state[target];
     const payloadText = audioParts !== undefined ? encodeNativeAudioInput(audioParts) : parts !== undefined ? encodeNativeOrderedInput(parts) : images.length === 0 ? text : encodeNativeImageInput(text, images);
-    // The queued message becomes one signed row. An oversize one is refused here, before anything is recorded,
-    // with the limit and its fix named — not as a bare ledger error after the caller believes it was queued.
-    assertSessionPayloadWithinCap(this.session.workspace, "The queued input (text plus encoded media)", Buffer.byteLength(payloadText, "utf8"));
+    // The queued message becomes one signed row — or, above the per-event cap, a signed `loop/inbox` spill
+    // commitment durable BEFORE the object plus a row whose payload is the descriptor (src/session/spill/
+    // spillInput.ts). Above the blob cap it is refused here, before anything is recorded, with the fix named —
+    // not as a bare ledger error after the caller believes it was queued.
+    const what = "The queued input (text plus encoded media)", encoded = Buffer.from(payloadText, "utf8");
+    const route = queuedInputPayloadRoute(this.session.workspace, what, encoded.byteLength);
+    const retained = route.spill ? this.session.retainOversizeInput(what, encoded, route.cap, { subject: "loop/inbox", messageId }) : null;
     const ref = this.session.recordLoopEvent({
       kind: "inbox",
       op: "insert",
@@ -94,7 +99,7 @@ export class LoopInbox {
       removedCount: 0,
       messageIds: [messageId],
       origin,
-      text: payloadText,
+      text: retained === null ? payloadText : retained.descriptor.toString("utf8"),
       ...(audioParts !== undefined ? { payloadFormat: NATIVE_AUDIO_INPUT_FORMAT } : parts !== undefined ? { payloadFormat: NATIVE_ORDERED_INPUT_FORMAT } : images.length === 0 ? {} : { payloadFormat: NATIVE_IMAGE_INPUT_FORMAT }),
       wake: options.wake,
       demotedFrom: options.demotedFrom
@@ -174,7 +179,8 @@ export class LoopInbox {
 
   /** Rebuild the two lanes from this session's committed `loop/inbox` rows. */
   private replay(): void {
-    for (const event of this.session.readEvents()) {
+    const events = this.session.readEvents();
+    for (const event of events) {
       if (event.event_type !== "loop/inbox") {
         continue;
       }
@@ -182,17 +188,17 @@ export class LoopInbox {
       if (meta === null) {
         throw new Error(`agent inbox: unreadable loop/inbox row ${event.id}`);
       }
-      this.apply(meta, event);
+      this.apply(meta, event, events);
     }
   }
 
   /** Apply one persisted splice, refusing anything the live lanes cannot accept. */
-  private apply(meta: LoopInboxMeta, event: EvidenceEvent): void {
+  private apply(meta: LoopInboxMeta, event: EvidenceEvent, events: readonly EvidenceEvent[]): void {
     const list = this.state[meta.target];
     if (meta.start > list.length || meta.start + meta.removedCount > list.length) {
       throw new Error(`agent inbox: loop/inbox row ${event.id} splices outside the replayed queue`);
     }
-    const inserted = meta.op === "insert" ? [this.replayMessage(meta, event)] : [];
+    const inserted = meta.op === "insert" ? [this.replayMessage(meta, event, events)] : [];
     if (inserted.length > 0) {
       this.assertUnique(inserted[0]!.messageId, event);
     }
@@ -207,33 +213,29 @@ export class LoopInbox {
    * joins against the `user/message` row to prove the model was shown the
    * message verbatim. Rebuilding from anything else would break that join.
    */
-  private replayMessage(meta: LoopInboxMeta, event: EvidenceEvent): InboxMessage {
+  private replayMessage(meta: LoopInboxMeta, event: EvidenceEvent, events: readonly EvidenceEvent[]): InboxMessage {
     const messageId = meta.messageIds[0];
     if (messageId === undefined || meta.origin === null) {
       throw new Error(`agent inbox: loop/inbox row ${event.id} inserts a message with no id or origin`);
     }
-    const payload = readEventPayload(this.session.workspace, event);
-    if (payload.status !== "ok") {
-      // Pruned and missing are both fatal HERE even though they mean different
-      // things elsewhere: either way the queued text cannot be shown to a model,
-      // and continuing would silently drop a message the sender was told landed.
-      throw new Error(
-        `agent inbox: loop/inbox row ${event.id} has no readable text (${payload.status})`
-      );
-    }
+    // Pruned, missing, tampered and unresolvable are all fatal HERE even though
+    // they mean different things elsewhere: either way the queued text cannot be
+    // shown to a model, and continuing would silently drop a message the sender
+    // was told landed. Above the cap the payload is a descriptor: the bytes come
+    // from the object its preceding signed `loop/inbox` commitment names, never
+    // from the descriptor itself.
+    const bytes = readQueuedInputBytes(this.session.workspace, events, event, messageId,
+      { what: "agent inbox: queued", consequence: `loop/inbox row ${event.id} cannot be replayed.` });
     if (meta.payloadFormat === NATIVE_AUDIO_INPUT_FORMAT) {
-      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: audio input ${event.id} has tampered payload bytes`);
-      return Object.freeze({ messageId, text: "", audioParts: decodeNativeAudioInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
+      return Object.freeze({ messageId, text: "", audioParts: decodeNativeAudioInput(bytes), origin: meta.origin, inputEventId: event.id });
     }
     if (meta.payloadFormat === NATIVE_ORDERED_INPUT_FORMAT) {
-      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: ordered input ${event.id} has tampered payload bytes`);
-      return Object.freeze({ messageId, text: "", parts: decodeNativeOrderedInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
+      return Object.freeze({ messageId, text: "", parts: decodeNativeOrderedInput(bytes), origin: meta.origin, inputEventId: event.id });
     }
     if (meta.payloadFormat === NATIVE_IMAGE_INPUT_FORMAT) {
-      if (sha256Hex(payload.bytes) !== event.payload_sha256) throw new Error(`agent inbox: image input ${event.id} has tampered payload bytes`);
-      return Object.freeze({ messageId, ...decodeNativeImageInput(payload.bytes), origin: meta.origin, inputEventId: event.id });
+      return Object.freeze({ messageId, ...decodeNativeImageInput(bytes), origin: meta.origin, inputEventId: event.id });
     }
-    return { messageId, text: payload.bytes.toString("utf8"), origin: meta.origin };
+    return { messageId, text: bytes.toString("utf8"), origin: meta.origin };
   }
 
   private assertUnique(messageId: string, event: EvidenceEvent): void {
@@ -243,4 +245,25 @@ export class LoopInbox {
       }
     }
   }
+}
+
+/**
+ * A queued row's ORIGINAL bytes: its payload, or — above the per-event cap — the
+ * object named by the signed `loop/inbox` spill commitment that precedes it in
+ * `events` (src/session/spill/spillInput.ts). Every reader that decodes a
+ * `loop/inbox` row goes through here, so none can mistake a descriptor for the
+ * queued input. Pruned, missing, tampered and unresolvable all throw, with the
+ * caller's `what` and `consequence` in the message; nothing degrades.
+ */
+export function readQueuedInputBytes(
+  workspace: string, events: readonly EvidenceEvent[], source: EvidenceEvent, messageId: string,
+  describe: { readonly what: string; readonly consequence: string }
+): Buffer {
+  const payload = readEventPayload(workspace, source);
+  if (payload.status !== "ok") throw new Error(`${describe.what} inbox payload is ${payload.status}; ${describe.consequence}`);
+  if (sha256Hex(payload.bytes) !== source.payload_sha256) throw new Error(`${describe.what} inbox payload was tampered with.`);
+  const spilled = resolveSpilledInboxPayload({ workspace, event: source, messageId, payload: payload.bytes, events });
+  if (spilled.status === "not-spilled") return payload.bytes;
+  if (spilled.status !== "ok") throw new Error(`${describe.what} inbox payload is ${spilled.status}; ${describe.consequence} (${spilled.detail})`);
+  return spilled.bytes;
 }

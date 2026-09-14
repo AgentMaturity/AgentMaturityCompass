@@ -23,7 +23,7 @@ import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
 import { attachmentPayloadRoute } from "./sessionPayloadCap.js";
-import { SPILL_COMMITMENT_EVENT_TYPE, SPILL_SUBJECT_META_KEY } from "./spill/spillInput.js";
+import { SPILL_COMMITMENT_EVENT_TYPE, spillCommitmentMeta, spillCommitmentNameSeed, type SpillCommitmentSubject } from "./spill/spillInput.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
 import { SPILL_META_KEY, type SpillPolicyConfig, type SpillRef } from "./spill/spillTypes.js";
 import type {
@@ -508,7 +508,7 @@ export class SessionService extends SessionEventWriter {
       assertNativeAudioBytes(bytes, params.mimeType);
       snapshotNativeAudio({ filename: params.filename, bytes, mediaType: params.mimeType });
     }
-    const retained = route.spill ? this.retainOversizeAttachment(what, params.filename, bytes, route.cap, turn, step) : null;
+    const retained = route.spill ? this.retainOversizeInput(what, bytes, route.cap, { subject: "user/attachment", filename: params.filename }) : null;
     return this.recordContent({
       eventType: "user/attachment",
       content: retained === null ? bytes : retained.descriptor,
@@ -532,9 +532,9 @@ export class SessionService extends SessionEventWriter {
     });
   }
 
-  private retainOversizeAttachment(what: string, filename: string, bytes: Buffer, cap: number, turn: number | null, step: number | null): { readonly ref: SpillRef; readonly descriptor: Buffer } {
-    return this.requireSpill().retainInput({ nameSeed: filename, content: bytes }, { what, cap }, (ref) => void this.appendSessionEvent({ eventType: SPILL_COMMITMENT_EVENT_TYPE,
-      surface: { op: "none" }, turn, step, typeMeta: { turn, step, [SPILL_SUBJECT_META_KEY]: "user/attachment", filename, [SPILL_META_KEY]: ref } }));
+  retainOversizeInput(what: string, bytes: Buffer, cap: number, subject: SpillCommitmentSubject): { readonly ref: SpillRef; readonly descriptor: Buffer } { // Commitment row durable BEFORE the object (./spill/spillInput.ts).
+    return this.requireSpill().retainInput({ nameSeed: spillCommitmentNameSeed(subject), content: bytes }, { what, cap }, (ref) => void this.appendSessionEvent({ eventType: SPILL_COMMITMENT_EVENT_TYPE,
+      surface: { op: "none" }, turn: this.currentTurn, step: this.currentStep, typeMeta: { turn: this.currentTurn, step: this.currentStep, ...spillCommitmentMeta(subject), [SPILL_META_KEY]: ref } }));
   }
 
   recordToolCall(call: ToolCallInput): SessionEventRef {

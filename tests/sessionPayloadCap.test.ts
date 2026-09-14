@@ -1,8 +1,8 @@
 /**
- * The per-event payload cap at the two media doors. The inbox door refuses above it, before anything is recorded,
- * with the fix named. The attachment door retains image/text bytes above it through the signed spill store
- * (tests/sessionAttachmentSpill.test.ts covers that path end to end) and refuses, with nothing recorded, when the
- * store cannot prepare -- here because no blob has provisioned the workspace key yet.
+ * The per-event payload cap at the two media doors. Both retain bytes above it through the signed spill store
+ * (tests/sessionAttachmentSpill.test.ts and tests/sessionInboxSpill.test.ts cover those paths end to end) and
+ * refuse, with nothing recorded, when the store cannot prepare -- here because no blob has provisioned the
+ * workspace key yet.
  */
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -11,7 +11,8 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { LoopInbox } from "../src/agent/inbox.js";
-import { SessionPayloadCapError, sessionPayloadCap } from "../src/session/sessionPayloadCap.js";
+import type { NativeInputPart } from "../src/attachments/nativeOrderedInput.js";
+import { sessionPayloadCap } from "../src/session/sessionPayloadCap.js";
 import { SpilledInputRetentionError } from "../src/session/spill/spillInput.js";
 import { extractSpillRef } from "../src/session/spill/spillTypes.js";
 import { loadOpsPolicy } from "../src/ops/policy.js";
@@ -67,21 +68,37 @@ describe("session payload cap", () => {
     expect(writer.readEvents()).toHaveLength(before + 4);
   });
 
-  test("an oversize queued input is refused before the inbox row exists, and the lane stays empty", () => {
+  test("an oversize queued input is refused before the inbox row exists while the spill store has no key, then retained behind a signed loop/inbox commitment", () => {
     const { writer, cap } = opened();
     const inbox = new LoopInbox(writer, () => {});
     const before = writer.readEvents().length;
     // Base64 inflates the image by a third, so a raw image well under the cap can still overflow the queued row.
     const raw = Math.ceil(cap * 0.8);
+    const parts: NativeInputPart[] = [{ type: "text", text: "Look" }, { type: "image", image: { filename: "large.png", mediaType: "image/png", bytes: png(raw) } }];
     let refusal: unknown;
-    try { inbox.insert("next-turn", "", "followup", { wake: false, demotedFrom: null, parts: [{ type: "text", text: "Look" }, { type: "image", image: { filename: "large.png", mediaType: "image/png", bytes: png(raw) } }] }); }
+    try { inbox.insert("next-turn", "", "followup", { wake: false, demotedFrom: null, parts }); }
     catch (error) { refusal = error; }
-    expect(refusal).toBeInstanceOf(SessionPayloadCapError);
+    expect(refusal).toBeInstanceOf(SpilledInputRetentionError);
+    expect((refusal as SpilledInputRetentionError).stage).toBe("prepare");
     expect((refusal as Error).message).toContain("queued input");
+    expect((refusal as Error).message).toContain("Nothing was recorded");
     expect(writer.readEvents()).toHaveLength(before);
     expect(inbox.hasPending).toBe(false);
+    // An ordinary blob provisions the workspace key; the same queued input is then one signed loop/inbox commitment
+    // row plus one descriptor row, and the lane holds the message.
+    writer.recordUserMessage("provisions the key");
+    const receipt = inbox.insert("next-turn", "", "followup", { wake: false, demotedFrom: null, parts });
+    const events = writer.readEvents();
+    expect(events).toHaveLength(before + 3);
+    const commitment = events[events.length - 2]!;
+    expect(commitment.event_type).toBe("tool/spill-commitment");
+    expect(JSON.parse(commitment.meta_json)).toMatchObject({ subject: "loop/inbox", messageId: receipt.messageId });
+    expect(extractSpillRef(commitment.meta_json)).toMatchObject({ maxInlineBytes: cap });
+    expect(events[events.length - 1]!.id).toBe(receipt.eventId);
+    expect(extractSpillRef(events[events.length - 1]!.meta_json)).toBeNull();
+    expect(inbox.hasPending).toBe(true);
     // A small queued input is admitted as one row.
     inbox.insert("next-turn", "", "followup", { wake: false, demotedFrom: null, parts: [{ type: "text", text: "Look" }, { type: "image", image: { filename: "small.png", mediaType: "image/png", bytes: PNG } }] });
-    expect(inbox.hasPending).toBe(true); expect(writer.readEvents()).toHaveLength(before + 1);
+    expect(inbox.nextTurn).toHaveLength(2); expect(writer.readEvents()).toHaveLength(before + 4);
   });
 });

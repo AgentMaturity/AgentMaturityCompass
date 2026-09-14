@@ -46,6 +46,33 @@ export const SPILLED_INPUT_FORMAT = "amc-spilled-input@1";
 export const SPILL_COMMITMENT_EVENT_TYPE = "tool/spill-commitment" as const;
 /** Meta key on an input commitment row naming the event type it precedes. Tool commitments carry `toolCallId` instead. */
 export const SPILL_SUBJECT_META_KEY = "subject";
+/** Subject of a commitment that precedes a queued `loop/inbox` row (see `resolveSpilledInboxPayload`). */
+export const SPILL_INBOX_SUBJECT = "loop/inbox" as const;
+/** Meta key on a `loop/inbox` commitment naming the one queued message it retains bytes for. */
+export const SPILL_INBOX_MESSAGE_META_KEY = "messageId";
+
+/**
+ * What a spilled input's commitment row names besides the reference. A
+ * `user/attachment` row carries the same reference in its own meta; a
+ * `loop/inbox` row cannot (its meta is a fixed hash pre-image in
+ * ../loopEventMeta.ts), so its commitment binds the queued message id instead
+ * and the reader finds the commitment by subject, message id and descriptor.
+ */
+export type SpillCommitmentSubject =
+  | { readonly subject: "user/attachment"; readonly filename: string }
+  | { readonly subject: typeof SPILL_INBOX_SUBJECT; readonly messageId: string };
+
+/** The subject's contribution to the commitment row's signed meta. */
+export function spillCommitmentMeta(subject: SpillCommitmentSubject): Record<string, unknown> {
+  return subject.subject === SPILL_INBOX_SUBJECT
+    ? { [SPILL_SUBJECT_META_KEY]: SPILL_INBOX_SUBJECT, [SPILL_INBOX_MESSAGE_META_KEY]: subject.messageId }
+    : { [SPILL_SUBJECT_META_KEY]: "user/attachment", filename: subject.filename };
+}
+
+/** The store's object-name seed for a subject: the filename, or the queued message id. */
+export function spillCommitmentNameSeed(subject: SpillCommitmentSubject): string {
+  return subject.subject === SPILL_INBOX_SUBJECT ? subject.messageId : subject.filename;
+}
 const MAX_DESCRIPTOR_BYTES = 1024;
 const SHA256_RE = /^[0-9a-f]{64}$/;
 
@@ -178,10 +205,21 @@ export function resolveSpilledInputPayload(input: {
     if (commitment === null) return inconsistent(`no signed spill commitment precedes event ${event.id} for ${ref.locator}`);
     commitmentEventId = commitment.id;
   }
-  // Row hash and monitor signature, then the object held to the signed digest — the same walk tool output takes.
-  const inspected = inspectSpilledEvent(input.workspace, event, input.options ?? {});
+  return readCommittedObject(input.workspace, event, ref, commitmentEventId, input.options);
+}
+
+/**
+ * Row hash and monitor signature of the row that carries `ref` in its meta, then
+ * the object held to the signed digest and length — the same walk tool output
+ * takes. For an attachment the carrier is the attachment row itself; for a
+ * queued input it is the commitment row, the only signed row naming the object.
+ */
+function readCommittedObject(
+  workspace: string, carrier: EvidenceEvent, ref: SpillRef, commitmentEventId: string | null, options?: SpillRetrievalOptions
+): SpilledInputResolution {
+  const inspected = inspectSpilledEvent(workspace, carrier, options ?? {});
   if (inspected.status !== "ok" || inspected.bytes === null) {
-    const detail = `event ${event.id}: ${inspected.detail ?? inspected.status}`;
+    const detail = `event ${carrier.id}: ${inspected.detail ?? inspected.status}`;
     switch (inspected.status) {
       case "missing":
       case "unretrievable":
@@ -196,7 +234,43 @@ export function resolveSpilledInputPayload(input: {
   }
   const bytes = inspected.bytes;
   if (bytes.length !== ref.bytes || sha256Hex(bytes) !== ref.contentSha256) {
-    return inconsistent(`event ${event.id}: resolved bytes differ from the signed commitment`);
+    return inconsistent(`event ${carrier.id}: resolved bytes differ from the signed commitment`);
   }
   return { status: "ok", bytes, ref, commitmentEventId };
+}
+
+/**
+ * Resolve a queued `loop/inbox` row's original bytes, or say exactly why not.
+ *
+ * A `loop/inbox` row's meta is a fixed hash pre-image, so it carries no
+ * reference of its own: the descriptor is its payload, and the signed
+ * reference lives on the `tool/spill-commitment` row (subject `loop/inbox`,
+ * naming this message id) that must precede it in `events`. The history is
+ * therefore required, not optional. A payload that is not a descriptor is the
+ * queued input itself (`not-spilled`); a descriptor with no matching preceding
+ * commitment is refused, never decoded as input.
+ */
+export function resolveSpilledInboxPayload(input: {
+  readonly workspace: string;
+  readonly event: EvidenceEvent;
+  readonly messageId: string;
+  readonly payload: Buffer;
+  readonly events: readonly EvidenceEvent[];
+  readonly options?: SpillRetrievalOptions;
+}): SpilledInputResolution {
+  const { event } = input;
+  const descriptor = decodeSpilledInputDescriptor(input.payload);
+  if (descriptor === null) return { status: "not-spilled" };
+  if (event.event_type !== "loop/inbox") return inconsistent(`event ${event.id} carries a spilled-input descriptor but is not a loop/inbox row`);
+  const index = input.events.findIndex((row) => row.id === event.id);
+  if (index < 0) return inconsistent(`event ${event.id} is not in the supplied session history`);
+  for (const row of input.events.slice(0, index)) {
+    if (row.event_type !== SPILL_COMMITMENT_EVENT_TYPE || row.session_id !== event.session_id) continue;
+    const meta = metaOf(row);
+    if (meta[SPILL_SUBJECT_META_KEY] !== SPILL_INBOX_SUBJECT || meta[SPILL_INBOX_MESSAGE_META_KEY] !== input.messageId) continue;
+    const declared = extractSpillRef(row.meta_json);
+    if (declared === null || declared.locator !== descriptor.locator || declared.contentSha256 !== descriptor.contentSha256 || declared.bytes !== descriptor.bytes) continue;
+    return readCommittedObject(input.workspace, row, declared, row.id, input.options);
+  }
+  return inconsistent(`no signed loop/inbox spill commitment for message ${input.messageId} precedes event ${event.id} naming ${descriptor.locator}`);
 }

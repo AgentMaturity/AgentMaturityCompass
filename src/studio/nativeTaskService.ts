@@ -3,7 +3,7 @@ import { assertNativeTaskData, assertNativeTaskInputCapability, dispatchNativeTa
   nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
 import { encodeNativeOrderedInput } from "../attachments/nativeOrderedInput.js";
 import { encodeNativeAudioInput } from "../attachments/nativeAudioInput.js";
-import { sessionPayloadCap } from "../session/sessionPayloadCap.js";
+import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AMCNativeClient, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
@@ -56,15 +56,17 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   const workspace = resolve(options.workspace), descriptors = new NativeTaskDescriptors(workspace);
   const environment = { ...(options.environment ?? process.env) };
   const validationConfig = options.validationConfig ?? environment.AMC_NATIVE_VALIDATION_CONFIG;
-  // The queued input becomes one signed session row, capped by the workspace's signed ops policy. Advertise the
-  // effective bound so the browser refuses early, and refuse here before a signed admission for anything larger.
-  const queuedInputCap = () => sessionPayloadCap(workspace);
+  // The queued input becomes one signed session row, or above the per-event cap a signed spill commitment plus a
+  // descriptor row (src/session/spill/spillInput.ts), so its bound is the smaller of the prompt frame and the
+  // workspace's signed blob cap. Advertise the effective bound so the browser refuses early, and refuse here
+  // before a signed admission for anything larger.
+  const queuedInputCap = () => Math.min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap(workspace));
   const inputCapabilities = (id: Parameters<typeof nativeTaskInputCapabilities>[0]) => ({ ...nativeTaskInputCapabilities(id),
-    maxSerializedPartsBytes: Math.min(NATIVE_TASK_MAX_PARTS_BYTES, Math.max(1, queuedInputCap() - 512)) });
+    maxSerializedPartsBytes: Math.max(1, queuedInputCap() - 512) });
   const assertQueuedInputWithinCap = (input: PreparedNativeTaskInput) => {
     const encoded = input.kind === "text" ? input.text : input.kind === "image" ? encodeNativeOrderedInput(input.parts) : encodeNativeAudioInput(input.parts);
     const bytes = Buffer.byteLength(encoded, "utf8"), cap = queuedInputCap();
-    if (bytes > cap) throw new NativeTaskServiceError("INPUT_TOO_LARGE", 413, `The task input is ${bytes} bytes once queued, above the ${cap}-byte limit for one signed session event (retention.maxPayloadBytesPerEvent in .amc/ops-policy.yaml). Nothing was admitted. Attach smaller media or split the input across turns; an operator can raise the limit by editing retention.maxPayloadBytesPerEvent in .amc/ops-policy.yaml and re-signing it with amc ops sign.`);
+    if (bytes > cap) throw new NativeTaskServiceError("INPUT_TOO_LARGE", 413, `The task input is ${bytes} bytes once queued, above the ${cap}-byte limit for one queued input (the smaller of the ${NATIVE_TASK_MAX_PARTS_BYTES}-byte prompt frame bound and retention.maxBlobBytes in .amc/ops-policy.yaml). Nothing was admitted. Attach smaller media or split the input across turns; an operator can raise the policy limit by editing retention.maxBlobBytes in .amc/ops-policy.yaml and re-signing it with amc ops sign.`);
   };
   const paths = resolveCredentialsPaths({ env: environment, ...(options.credentialsHome ? { homeDir: options.credentialsHome } : {}),
     ...(options.credentialsFile ? { path: options.credentialsFile } : {}) });
