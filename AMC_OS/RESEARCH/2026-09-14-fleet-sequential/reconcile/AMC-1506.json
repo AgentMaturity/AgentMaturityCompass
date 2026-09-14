@@ -1,0 +1,133 @@
+{
+ "type": "result",
+ "key": "v2:3d100cea7688fa7b978439f57760d2e1e4f8ee67f6d8d3dc5e2840c8d4b5dee7",
+ "agentId": "aa5fbb6e7bf8577d1",
+ "result": {
+  "issue": "AMC-1506",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Fix commit 5eec4d9d (fix(import): keep external artifacts unevaluated and self-reported) is merged into the integration commit 6e7875f2.",
+    "evidence": "git merge-base --is-ancestor 5eec4d9d HEAD \u2192 true at HEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f; commit touches src/importers/neutralImporter.ts, src/diagnostic/evidenceReadiness.ts, src/lifecycle/episodeRecord.ts, src/lifecycle/lifecycleRunArtifact.ts, src/types.ts, src/cli-import-commands.ts, docs/EVIDENCE_TRUST.md, tests/importProvenance.test.ts, tests/neutralImporter.test.ts.",
+    "holds": true
+   },
+   {
+    "claim": "Import never assigns positive maturity, measured integrity, receipt correlation or OBSERVED/ATTESTED coverage; report is UNSIGNED and verificationPassed=false.",
+    "evidence": "src/importers/neutralImportPresentation.ts:37-56 \u2014 status \"UNSIGNED\", verificationPassed false, integrityIndex 0, trustLabel \"UNRELIABLE \u2014 DO NOT USE FOR CLAIMS\", layerScores [], questionScores [], correlationRatio 0, evidenceCoverage 0, evidenceTrustCoverage {observed 0, attested 0, selfReported 1}. Called from src/importers/neutralImporter.ts:804-810.",
+    "holds": true,
+    "note": "The issue description cites src/importers/neutralImporter.ts:665\u2013722 as the builder; after the AMC-1507 refactors (8defa070, c050244a) buildImportedDiagnosticReport lives in src/importers/neutralImportPresentation.ts:19-77. Stale reference, not a regression."
+   },
+   {
+    "claim": "Imported artifacts are explicitly SELF_REPORTED / unverified with evaluationPerformed=false; classification confidence cannot become score confidence.",
+    "evidence": "src/importers/neutralImportPresentation.ts:57-63 importProvenance {evaluationPerformed:false, sourceTrustTier:\"SELF_REPORTED\"}; src/types.ts:4033-4034 types those as literals; src/importers/neutralImporter.ts:666-667 normalization.sourceTrust \"SELF_REPORTED\", evaluation \"NOT_EVALUATED\", confidenceMeaning \"format-classification-only\". The only 0.9 left is candidate.confidence at neutralImporter.ts:571 (file-format classification); questionScores is empty so no score confidence exists, and tests/importProvenance.test.ts:95-100 asserts any emitted row has confidence 0.",
+    "holds": true
+   },
+   {
+    "claim": "Readiness is non-eligible for imports.",
+    "evidence": "src/diagnostic/evidenceReadiness.ts:52-59 \u2014 if report.importProvenance \u2192 readiness(\"UNVERIFIED\", \"External import \u2014 not evaluated\", [\"NO_ACCEPTED_EVIDENCE\"], \"Imported content is SELF_REPORTED. Importing or signing an artifact does not verify source claims or perform a maturity evaluation.\").",
+    "holds": true
+   },
+   {
+    "claim": "Episode, lifecycle, CLI and markdown views disclose import-only measurement status; no positive Score/Shield verdict.",
+    "evidence": "src/lifecycle/episodeRecord.ts:212-213 (\"Evaluation: Not performed. Imported content is SELF_REPORTED and unverified.\"); src/lifecycle/lifecycleRunArtifact.ts:161-172 (Score and Shield status \"pending\" with import-only summaries, Vault \"partial\"); src/cli-import-commands.ts:58 (\"Imported as SELF_REPORTED evidence. No maturity evaluation was performed.\"); src/importers/neutralImportPresentation.ts:89-90 markdown lines. tests/importProvenance.test.ts third case passes.",
+    "holds": true
+   },
+   {
+    "claim": "Normalized artifacts, source digests/redaction, rollback and scored-run segregation are preserved.",
+    "evidence": "Segregation: src/lifecycle/episodeRecord.ts:75-76 and src/lifecycle/lifecycleRunArtifact.ts:274-275 route imports to imported-runs/imported-reports. Digest: neutralImporter.ts:568 sha256Hex(raw). Redaction and rollback: tests/neutralImporter.test.ts:136 (redactionCount>0), :333-345 (rollbackNeutralImport removes artifacts and writes a receipt) \u2014 10/10 pass at HEAD.",
+    "holds": true
+   },
+   {
+    "claim": "Regression with an arbitrary config JSON and a failed Pi v3 session proves zero inferred maturity and no observed evidence.",
+    "evidence": "tests/importProvenance.test.ts (3 tests: failed Pi v3 session, arbitrary config JSON, episode/lifecycle disclosure) \u2014 3 passed, 0 failed at 6e7875f2. Mutation check: injecting integrityIndex 0.72 and observed 0.166667 into neutralImportPresentation.ts made all 3 fail (\"expected 0.72 to be +0\" at test lines 109/118/124); file restored, git diff clean.",
+    "holds": true
+   },
+   {
+    "claim": "Existing neutral-import/episode/lifecycle tests and typecheck pass.",
+    "evidence": "npx vitest run over 9 files (importProvenance, neutralImporter, piSessionImport, piSessionImportBoundaries, neutralImportMapping, neutralImportReview, lifecycle/episodeRecord, lifecycle/lifecycleRunArtifact, firstRunEvidenceReadiness): 61 passed / 0 failed / 0 skipped after pnpm build. pnpm typecheck (tsc -p tsconfig.json --noEmit) completed with no diagnostics in ~28s; pnpm build exit 0.",
+    "holds": true,
+    "note": "firstRunEvidenceReadiness.test.ts spawns dist/cli.js (test line 82) and fails with MODULE_NOT_FOUND until pnpm build has run; it is adjacent to, not part of, the AMC-1506 acceptance."
+   },
+   {
+    "claim": "Issue-time verification: 33 tests across eight affected suites pass.",
+    "evidence": "The historical partition is not named file-by-file in the issue or comments, so the exact 33/8 figure cannot be reproduced. At 6e7875f2 the nine adjacent files hold 61 tests, all green.",
+    "holds": false,
+    "note": "CANNOT_VERIFY the historical count as stated; superseded by the measured 61/61 over 9 files at HEAD. Not a decay."
+   },
+   {
+    "claim": "Before/after receipts exist: AMC_OS/RESEARCH/2026-09-08-dsh-pi/pi-import-reproduction.json and pi-import-after-amc1506.json.",
+    "evidence": "AMC_OS/ is ignored by .gitignore:81; git ls-files at 6e7875f2 has no AMC_OS/RESEARCH/2026-09-08-dsh-pi/ entries; the directory is absent from this fresh worktree. The tracked closure map (AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.json, evidence id import-1506) cites pi-import-after-amc1506.json only under root \"repository\" with the limit \"Source/environment not self-contained in this JSON\".",
+    "holds": false,
+    "note": "CANNOT_VERIFY in this environment: the receipts are unreachable from the integration commit. Per the standing rule, reading the root checkout is out of bounds for this agent."
+   },
+   {
+    "claim": "Phase A reconciliation record AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1506) exists.",
+    "evidence": "Same gitignore boundary (.gitignore:81); not tracked at 6e7875f2; not present in the worktree. Only plans/amc-gap-register.md:16, plans/amc-gap-execution-log.md:14 and closure-map.md:65 reference AMC-1506 in tracked files.",
+    "holds": false,
+    "note": "CANNOT_VERIFY; unreachable from the integration commit."
+   },
+   {
+    "claim": "Isolated source CLI import verified (issue description).",
+    "evidence": "Only the CLI disclosure string was read in source (src/cli-import-commands.ts:58); no end-to-end `amc import` run against dist/cli.js was performed in this reconciliation.",
+    "holds": false,
+    "note": "Not exercised here; CANNOT_VERIFY without a run. firstRunEvidenceReadiness.test.ts exercises dist/cli.js but not the import command."
+   },
+   {
+    "claim": "Independent test tests/importProvenance.test.ts, written before seeing the fix, passes 3/3 (second comment).",
+    "evidence": "3 passed / 0 failed at 6e7875f2 (npx vitest run tests/importProvenance.test.ts, also within the 9-file run).",
+    "holds": true
+   },
+   {
+    "claim": "Obsidian completion note exists for AMC-1506.",
+    "evidence": "git grep AMC-1506 over tracked files finds no Obsidian note; the only obsidian-update.json records at HEAD belong to 2026-09-09-public-task-transport, 2026-09-10-native-jsonl-writer-resume and 2026-09-10-native-recovery-control-gap.",
+    "holds": false,
+    "note": "Missing for Done."
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/importProvenance.test.ts tests/neutralImporter.test.ts tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/neutralImportMapping.test.ts tests/neutralImportReview.test.ts tests/lifecycle/episodeRecord.test.ts tests/lifecycle/lifecycleRunArtifact.test.ts tests/firstRunEvidenceReadiness.test.ts (before pnpm build)",
+    "passed": 60,
+    "failed": 1,
+    "skipped": 0,
+    "files": 9,
+    "durationSeconds": 3.95
+   },
+   {
+    "command": "pnpm build (exit 0), then npx vitest run <same 9 files> \u2014 per file: importProvenance 3, neutralImporter 10, piSessionImport 11, piSessionImportBoundaries 14, neutralImportMapping 10, neutralImportReview 4, lifecycle/episodeRecord 3, lifecycle/lifecycleRunArtifact 4, firstRunEvidenceReadiness 2",
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0,
+    "files": 9,
+    "durationSeconds": 4.15
+   },
+   {
+    "command": "Mutation check: sed integrityIndex 0\u21920.72 and observed 0\u21920.166667 in src/importers/neutralImportPresentation.ts; npx vitest run tests/importProvenance.test.ts; then git checkout -- the file (diff clean afterwards)",
+    "passed": 0,
+    "failed": 3,
+    "skipped": 0,
+    "files": 1
+   },
+   {
+    "command": "pnpm typecheck (tsc -p tsconfig.json --noEmit) \u2014 completed with no diagnostics; recorded as 1 pass",
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "files": 0,
+    "durationSeconds": 28
+   }
+  ],
+  "missingForDone": [
+   "A receipt for AMC-1506 at 6e7875f2 in a tracked path (AMC_OS/ is gitignored at .gitignore:81, so it must be force-added like other RESEARCH receipts) naming commit, Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0, the 9 files and 61/61 result, the mutation RED result, typecheck, and what was not exercised.",
+   "The historical receipts named by the issue (pi-import-reproduction.json, pi-import-after-amc1506.json under AMC_OS/RESEARCH/2026-09-08-dsh-pi/, and the 2026-09-09 reconciliation.json) are unreachable from the integration commit; either commit them with -f or re-cite them with an explicit not-in-history boundary.",
+   "An end-to-end `amc import` run of the built CLI (dist/cli.js) on the Pi v3 and config fixtures, recorded in the receipt \u2014 only the source string at src/cli-import-commands.ts:58 was read here.",
+   "A Linear comment on AMC-1506 recording the measured result at 6e7875f2 (proposed text below).",
+   "An Obsidian note for AMC-1506 \u2014 none is present in tracked files.",
+   "Refresh the issue description's stale code reference: the builder is src/importers/neutralImportPresentation.ts:19-77, not neutralImporter.ts:665\u2013722.",
+   "Full-suite single-commit acceptance is outside this scoped run; commit 3439cda6's record claims candidate E 6e7875f2 at 14,101/14,101 with gate 14/14, which this agent did not re-run and does not vouch for."
+  ],
+  "defectsFound": [],
+  "boundary": "Source: 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f on the isolated worktree branch worktree-wf_7e729cdc-322-1 (fast-forwarded from 3d6b8d4a; git status clean after the mutation restore). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; pnpm install --frozen-lockfile --prefer-offline; pnpm build exit 0. Exercised: source read of neutralImportPresentation.ts, neutralImporter.ts, evidenceReadiness.ts, episodeRecord.ts, lifecycleRunArtifact.ts, types.ts, cli-import-commands.ts, docs/EVIDENCE_TRUST.md; nine vitest files (61 tests) run twice (pre- and post-build); one mutation pair on the report builder (RED 3/3, restored); pnpm typecheck. Not exercised: the full suite; an end-to-end `amc import` CLI run; Studio browser review of imports (neutralImportReview.js); real Pi/DSH runtime sessions (all fixtures are synthetic); Linux/CI; the gitignored historical receipts and reconciliation JSON, which are absent from this checkout and were not read from the root checkout by rule.",
+  "proposedLinearComment": "Phase A step 1 reconciliation at integration commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution), fresh worktree, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, pnpm install --frozen-lockfile, pnpm build exit 0.\n\nVerified in source at this commit: fix 5eec4d9d is an ancestor. The imported report builder now lives in src/importers/neutralImportPresentation.ts:19-77 (the description's neutralImporter.ts:665\u2013722 reference is stale after the AMC-1507 refactors): status UNSIGNED, verificationPassed false, integrityIndex 0, correlationRatio 0, evidenceCoverage 0, evidenceTrustCoverage observed 0 / attested 0 / selfReported 1, empty layerScores and questionScores, importProvenance {evaluationPerformed false, sourceTrustTier SELF_REPORTED}. Readiness returns UNVERIFIED / NO_ACCEPTED_EVIDENCE for any report with importProvenance (src/diagnostic/evidenceReadiness.ts:52-59). Episode (episodeRecord.ts:212-213), lifecycle (lifecycleRunArtifact.ts:161-172, Score and Shield pending), CLI (cli-import-commands.ts:58) and markdown (neutralImportPresentation.ts:89-90) all state that no evaluation was performed. The remaining 0.9 is candidate file-format classification confidence (neutralImporter.ts:571, labelled format-classification-only at :667) and never reaches a score row. Segregation into imported-runs/imported-reports holds (episodeRecord.ts:75-76).\n\nMeasured: npx vitest run over tests/importProvenance, neutralImporter, piSessionImport, piSessionImportBoundaries, neutralImportMapping, neutralImportReview, lifecycle/episodeRecord, lifecycle/lifecycleRunArtifact, firstRunEvidenceReadiness \u2014 9 files, 61 passed, 0 failed, 0 skipped (per file: 3/10/11/14/10/4/3/4/2). Before pnpm build the same command was 60 passed / 1 failed because firstRunEvidenceReadiness spawns dist/cli.js. Mutation check: setting integrityIndex to 0.72 and observed to 0.166667 in the builder made importProvenance fail 3/3; file restored. pnpm typecheck completed with no diagnostics.\n\nNot exercised: the full suite; an end-to-end `amc import` run of the built CLI; Studio browser review; real Pi/DSH runtime sessions (fixtures are synthetic); Linux/CI. The receipts named in this issue (AMC_OS/RESEARCH/2026-09-08-dsh-pi/pi-import-reproduction.json, pi-import-after-amc1506.json) and the 2026-09-09 reconciliation.json are under the gitignored AMC_OS/ path (.gitignore:81), are not tracked at 6e7875f2 and are absent from a fresh worktree, so they could not be verified here.\n\nStill missing for Done: a tracked receipt for this commit carrying the above boundary; the historical receipts committed (git add -f) or re-cited with an explicit not-in-history boundary; an end-to-end CLI import run recorded; an Obsidian note (none found in tracked files); a refreshed code reference in the description. No state change requested by this comment."
+ }
+}
