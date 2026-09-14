@@ -31,6 +31,17 @@ describe("packed runtime evidence gate", () => {
     expect(verifyPackedRun({ summary: f.summary, runCommand: () => ({ ok: true, stdout: JSON.stringify(f.ledger) }) })).toBe(false);
   });
 
+  it("refuses a ledger whose overall verdict is ok but whose session chain is not", () => {
+    // Each ledger verdict must be checked on its own: a reassuring top-level `ok`
+    // cannot stand in for a broken chain. This case keeps `ok` true so the chain
+    // check is the only thing that can refuse.
+    const f = fixture();
+    f.ledger.ok = true; f.ledger.chain.ok = false;
+    // Route both verifier calls faithfully so the broken chain is the only refusal.
+    expect(verifyPackedRun({ summary: f.summary, runCommand: (_label: string, args: string[]) =>
+      ({ ok: true, stdout: JSON.stringify(args[0] === "session" ? f.ledger : f.run) }) })).toBe(false);
+  });
+
   it("requires every expected resumed turn and authenticates all of its requests", () => {
     const f = fixture();
     f.summary.turns = 2;
