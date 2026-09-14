@@ -53,7 +53,7 @@ async function importRunner(): Promise<typeof import("../kernel/approvalSeamRunn
           "The composition kernel (@amc/core) is not installed.\n" +
             "`approvals ask` puts the question through the composed tree, and that tree lives in\n" +
             "workspace packages this release does not publish. Run from a repository checkout\n" +
-            "(npm install && npm run build:workspace)."
+            "(pnpm install --frozen-lockfile && pnpm run build)."
         )
       );
       return null;

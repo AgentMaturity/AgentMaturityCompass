@@ -45,7 +45,7 @@ export function registerCompositionCommands(program: Command): void {
               "The composition kernel (@amc/core) is not installed.\n" +
                 "It is a workspace package, not part of the published npm tarball — it re-exports\n" +
                 "the vendored Cordis tree, which this release does not ship. Run this command from\n" +
-                "a repository checkout (npm install && npm run build:workspace)."
+                "a repository checkout (pnpm install --frozen-lockfile && pnpm run build)."
             )
           );
           process.exit(1);
