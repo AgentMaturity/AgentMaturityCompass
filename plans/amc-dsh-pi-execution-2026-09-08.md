@@ -1708,3 +1708,18 @@ Todo, P2, child of AMC-1505). Register rows posted as comments to their owners i
 issues: AMC-1514 (L-01/L-02/L-04/L-05), AMC-483 (S-01/S-02/S-03/S-05), AMC-1512 (I-01/I-02/I-04
 and the §7a interaction list); summary and the dsh-clone boundary on AMC-1505. Register commits
 `25de30e6`, `00f229c5`.
+
+### 2026-09-14 — Phase C step 2: `plans/research/harness-breadth-2026-09-12.md` written from `impl:harness-breadth`
+
+Seventh sequential agent (`wf_6fbda2c5-fe7`, research, REPORT_ONLY, 64 tool uses, 11.9 min)
+recorded seven first-party harnesses (Claude Code v2.1.270, Codex CLI 0.154.0, Gemini CLI
+v0.59.0, OpenCode v1.18.30, Cursor CLI by dated changelog, Aider v0.86.0/PyPI 0.86.2, Hermes
+Agent v2026.9.11), each pinned from its own repository or registry with a UTC retrieval
+timestamp (2026-09-14T07:08:27Z), documented install/keyless/refusal/resume facets, and one
+capability per harness that AMC at `6062bd6d` lacks, grep-verified. All seven are marked "not
+evaluated" on the §7a protocol because it requires installs and five recorded sessions, which
+the track forbids. Root wrote the document with a preamble, re-ran three absence greps at
+`505a28ce` (LSP and repo-map absent; per-domain egress exists at the application level in
+`src/enforce/egressProxy.ts` but not in the native sandbox path — noted in the file) and
+recorded no ranking. The market-breadth claim of §7a therefore stays unmade: documented
+capabilities only. Posted to AMC-1518. Next agent: `impl:docs-reading-order`.

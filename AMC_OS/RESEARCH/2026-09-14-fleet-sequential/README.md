@@ -239,6 +239,15 @@ preamble. The 2026-09-08 dsh analysis cites GitHub at the pinned commit and stan
 the comparator is a third-party download and awaits Sid. No superiority language; all
 "AMC-ahead" cells are mechanism-presence statements with caveats.
 
+### impl:harness-breadth — IMPL-7, REPORT_ONLY → `plans/research/harness-breadth-2026-09-12.md`
+
+Agent: `wf_6fbda2c5-fe7`, 64 tool uses, 11.9 min, no repo writes, no installs, no binaries.
+Records: `impl-harness-breadth/result.json`, `report.md`. Seven harnesses pinned from official
+sources with retrieval timestamps; every §7a cell "not evaluated" with the reason; one grep-verified
+AMC absence per harness. Root spot-checked three absence greps at `505a28ce` and added a note
+that AMC's application-level egress check (`src/enforce/egressProxy.ts`) exists outside the
+native sandbox path. No ranking language anywhere; "better than" appears only in the disclaimer.
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
