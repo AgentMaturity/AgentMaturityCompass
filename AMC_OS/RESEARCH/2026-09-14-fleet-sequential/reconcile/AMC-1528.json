@@ -1,0 +1,150 @@
+{
+ "run": "wf_870dd21b-f1e",
+ "label": "unknown",
+ "result": {
+  "issue": "AMC-1528",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Fix 95aa5e8018ef574414beaa1fd46f073fd733ae49 (\"fix: report installation QA with truthful automated evidence\") is integrated on amc/gap-register-execution; qualified source a5987643 and receipt commit 777d6214 are also integrated.",
+    "evidence": "git merge-base --is-ancestor at 43f61d5e: 95aa5e80 yes, a5987643 yes, 777d6214 yes. git show --stat 95aa5e80: scripts/install-persona-qa.mjs, tests/installPersonaIsolation.test.ts, tests/installPersonaResults.test.ts, tests/releaseReadinessScripts.test.ts.",
+    "holds": true
+   },
+   {
+    "claim": "Final script hash c1f410b3a8fe9e04e10b5eb5794adf0de423dff683aa260c028dfe1ed1eb12c9 unchanged.",
+    "evidence": "shasum -a 256 scripts/install-persona-qa.mjs at 43f61d5e = c1f410b3a8fe9e04e10b5eb5794adf0de423dff683aa260c028dfe1ed1eb12c9 (also re-verified after the two mutation checks were restored).",
+    "holds": true
+   },
+   {
+    "claim": "Receipt schema 2026-09-08 labels measurementType automated-contract-checks and removes human ratings/feedback; the Markdown report carries no rating/ease-of-use wording.",
+    "evidence": "scripts/install-persona-qa.mjs:538-540 (schemaVersion \"2026-09-08\", receiptType \"install-persona-qa\", measurementType \"automated-contract-checks\"), :550 scope string, :458-490 renderMarkdownReport; tests/installPersonaResults.test.ts:54-55, :118, :191-197 assert absence of rating/feedback/averageRating; AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/latest.json header shows schemaVersion 2026-09-08 and no rating/feedback keys on any of the 10 results.",
+    "holds": true
+   },
+   {
+    "claim": "Thirty distinct result/isolation assertions pass (24 result/report + 6 isolation).",
+    "evidence": "npx vitest run tests/installPersonaResults.test.ts tests/installPersonaIsolation.test.ts at 43f61d5e: 2 files, 30 passed, 0 failed, 0 skipped, 7.92s. Test-case count by reading: installPersonaResults 24 cases (lines 50-211), installPersonaIsolation 6 cases (lines 23-140).",
+    "holds": true
+   },
+   {
+    "claim": "Failed required assertions appear in the persona summary even when the command exited zero; planned totals do not shrink.",
+    "evidence": "scripts/install-persona-qa.mjs:330-344 (checkCounts/checkSummary list failed and skipped ids), :383-392 (status derived from steps+assertions), :441-450 (assertion evaluated only after its dependency passed). tests/installPersonaResults.test.ts:59-75, :98-102. Mutation A (line 383 changed to count steps only): 19 of 24 tests failed, then restored.",
+    "holds": true
+   },
+   {
+    "claim": "Missing or malformed score data never implies acceptable first use; artifact validity is not presented as evidence readiness.",
+    "evidence": "scripts/install-persona-qa.mjs:354-364 validateContract full-score-contract requires ok/questionCount>=240/coherent elapsed+SLA; :402-408 evidence fields fall back to null, never to another field. tests/installPersonaResults.test.ts:122-153. Mutation D (evidenceStatus falling back to artifactStatus at line 406): 1 test failed (\"never presents artifact validity as evidence readiness\"), then restored.",
+    "holds": true
+   },
+   {
+    "claim": "Command wall time is separated from CLI-reported diagnostic elapsed; invalid timing inputs are rejected rather than invented.",
+    "evidence": "scripts/install-persona-qa.mjs:346-348 duration(), :394-400 measurements {installWallMs, scoreCommandWallMs, cliReportedDiagnosticMs, cliReportedSla}; report columns :464. tests/installPersonaResults.test.ts:107-120, :140-146. persona-a598/latest.md rows show distinct install wall / score wall / CLI-reported values per persona.",
+    "holds": true
+   },
+   {
+    "claim": "Actual release-gate producer performed ten private npm installs at a5987643: 103/103 persona checks and 2/2 setup checks, zero failed/skipped; all ten distinguish artifact VALID, evidence INSUFFICIENT_EVIDENCE, claimEligible=false; exact JSON/Markdown retained under persona-a598/.",
+    "evidence": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/latest.json (tracked, added in 777d6214): summary \"103/103 persona checks passed; 0 failed; 0 skipped. Setup: 2/2 ...\", personaCount 10, started 2026-09-09T11:45:36Z; every result evidence = {artifactStatus VALID, evidenceStatus INSUFFICIENT_EVIDENCE, claimEligible false}. SHA-256 of latest.json ae38a146\u2026 and latest.md 312acdf1\u2026 match closures-a598/receipt.json:32-33. Not re-run at 43f61d5e in this session; a later real gate run at ancestor 09d353f5 (AMC_OS/RESEARCH/2026-09-12-lane-integration/fresh-clone/candidate-c/release-gate-latest.json, Node v25.5.0) shows install-persona-qa status passed.",
+    "holds": true,
+    "note": "Dated receipt verified; the producer was not re-executed at HEAD in this session."
+   },
+   {
+    "claim": "Human/paired-task usability measurement is kept separate from these automated checks (tracked under AMC-1518).",
+    "evidence": "docs/HUMAN_FIRST_USE_STUDY.md:19-23 states the study tooling is independent of scripts/install-persona-qa.mjs; :123 \"Do not convert any existing automated persona into a human record\"; scripts/install-persona-qa.mjs:550 scope string excludes human usability.",
+    "holds": true
+   },
+   {
+    "claim": "Structured report consumers are preserved through explicit schema evolution or documented backward-compatible deprecation; only producer/renderer read rating fields; the release gate consumes process status.",
+    "evidence": "Versioning is explicit inside the receipt (scripts/install-persona-qa.mjs:538-540); scripts/release-gate.mjs:252-256 runs qa:install-personas as a builtStep and consumes exit status; grep of src/, scripts/, docs/ finds no remaining reader of persona rating/feedback/averageRating. However no doc in docs/ describes the 2026-09-08 schema or the removal of rating/feedback (only docs/HUMAN_FIRST_USE_STUDY.md:21 mentions the script).",
+    "holds": false,
+    "note": "Field-level versioning exists; the 'documented' half of the acceptance bullet is not present in docs/."
+   },
+   {
+    "claim": "Verify malformed/missing score, assertion-only failure, slow install and all-pass cases; review emitted Markdown/JSON.",
+    "evidence": "Malformed/missing score: tests/installPersonaResults.test.ts:59-75, :140-153. Assertion-only failure: :70-75, :98-102. All-pass and emitted JSON/Markdown: :157-211 (all-valid, strategy-missing, pack-failed, tarball-missing modes). Slow install: no test exercises a timed-out or slow npm install; the only related check is a string assertion that the script contains the spawnError line (tests/releaseReadinessScripts.test.ts:44). closures-a598/README.md:19 records the slow-install concern as reinterpreted into timing semantics.",
+    "holds": false,
+    "note": "Four of the five acceptance cases are exercised by tests; slow install is not."
+   },
+   {
+    "claim": "Design doc AMC_OS/RESEARCH/2026-09-08-dsh-pi/persona-contract-result-design.md and receipt persona-contract-results/actual-6553906e-corrected/README.md exist (named in the issue description).",
+    "evidence": "Directory AMC_OS/RESEARCH/2026-09-08-dsh-pi/ is absent from the worktree; git ls-tree HEAD AMC_OS/RESEARCH/ lists only 2026-09-09+ directories; git log -- AMC_OS/RESEARCH/2026-09-08-dsh-pi returns nothing; .gitignore:78 ignores AMC_OS/. CANNOT_VERIFY at 43f61d5e.",
+    "holds": false,
+    "note": "CANNOT_VERIFY: not tracked on the integration branch; likely untracked in the root checkout, which this agent must not read."
+   },
+   {
+    "claim": "AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json row AMC-1528 exists (named in the 2026-09-09T07:18 comment).",
+    "evidence": "Directory absent from worktree; git log -- AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation returns nothing. CANNOT_VERIFY at 43f61d5e.",
+    "holds": false,
+    "note": "CANNOT_VERIFY: not tracked on the integration branch."
+   },
+   {
+    "claim": "Receipt commit 777d6214 retains closures-a598/README.md, receipt.json, contracts.json, full-suite-extract.json and persona-a598/latest.{json,md}; receipt names commit, environment and non-claims.",
+    "evidence": "git show --stat 777d6214 lists all six files; closures-a598/receipt.json:2-11 (source a5987643, Darwin 25.6.0 arm64, Node 22.22.0, pnpm 10.33.0), :43-47 nonClaims; README.md:15-19 AMC-1528 section with exercised/not-exercised boundaries.",
+    "holds": true
+   },
+   {
+    "claim": "Full suite 12,262 passed / 0 failed at a5987643 in an independent clone (Node 22.22.0) and 14/14 executed release checks passed with live-deploy-health skipped.",
+    "evidence": "closures-a598/receipt.json:35-41 fullSuite counts; README.md:5. Not re-run in this session (out of scope: full suite forbidden).",
+    "holds": true,
+    "note": "Quoted from the dated receipt only; not re-measured here."
+   },
+   {
+    "claim": "Obsidian evidence note Evidence/2026-09-09 Source Contract Closures a598.md exists, is dated, and links the issue and receipt path.",
+    "evidence": "/Users/sid/Documents/AMC/Evidence/2026-09-09 Source Contract Closures a598.md read-only: frontmatter source_revision a5987643, linear_ids [AMC-1544, AMC-1526, AMC-1528], links the closures-a598/README.md path and an AMC-1528 bullet with 30 assertions, 103/103 + 2/2, and non-claims.",
+    "holds": true
+   },
+   {
+    "claim": "Linear Done-transition comment names commit, environment, exercised/not-exercised and receipt path.",
+    "evidence": "AMC-1528 comment f0e7fae6 (2026-09-09T12:56:55Z): fix 95aa5e80, qualified source a5987643, Darwin 25.6.0 ARM64 / Node 22.22.0 / pnpm 10.33.0, receipt commit 777d6214 and closures-a598 paths, explicit non-claims (no publication, platform matrix, human usability, deployment, comparator ranking).",
+    "holds": true
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/installPersonaResults.test.ts tests/installPersonaIsolation.test.ts",
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0,
+    "files": 2,
+    "durationSeconds": 7.92
+   },
+   {
+    "command": "npx vitest run tests/releaseReadinessScripts.test.ts tests/releaseGateExecution.test.ts",
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "files": 2,
+    "durationSeconds": 2.4
+   },
+   {
+    "command": "[mutation A: scripts/install-persona-qa.mjs:383 counted steps only, assertions excluded] npx vitest run tests/installPersonaResults.test.ts (then restored; hash c1f410b3\u2026 re-verified)",
+    "passed": 5,
+    "failed": 19,
+    "skipped": 0,
+    "files": 1
+   },
+   {
+    "command": "[mutation D: scripts/install-persona-qa.mjs:406 evidenceStatus falls back to artifactStatus] npx vitest run tests/installPersonaResults.test.ts (then restored; hash c1f410b3\u2026 re-verified; git status clean)",
+    "passed": 23,
+    "failed": 1,
+    "skipped": 0,
+    "files": 1
+   }
+  ],
+  "missingForDone": [
+   "Two receipt/design paths named in the issue description and the 2026-09-09T07:18 comment are not tracked on amc/gap-register-execution and cannot be verified from this worktree: AMC_OS/RESEARCH/2026-09-08-dsh-pi/persona-contract-result-design.md, AMC_OS/RESEARCH/2026-09-08-dsh-pi/persona-contract-results/actual-6553906e-corrected/README.md, and AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (AMC_OS/ is gitignored at .gitignore:78). Either commit them under a tracked path (as closures-a598/ and persona-a598/ were in 777d6214) or annotate in Linear that they are superseded by closures-a598/.",
+   "Acceptance bullet 'slow install' has no behavioral test: nothing exercises a timed-out or slow npm install being recorded as failed with the spawn error and its consumers skipped (scripts/install-persona-qa.mjs:116-120, :282-284). Add such a test or record explicitly in Linear that this bullet was reinterpreted as timing semantics only.",
+   "Acceptance bullet 'explicit schema evolution or documented backward-compatible deprecation': the 2026-09-08 receipt schema and the removal of rating/feedback fields are versioned inside the JSON (script lines 538-540) but are not described in any docs/ page. Add a short note (e.g. where the release gate or qa:install-personas is documented) or record that field-level versioning is the accepted form.",
+   "The real gate persona step (npm pack + ten isolated npm installs) was not re-executed at 43f61d5e in this session; the nearest real runs are the 2026-09-09 receipt at a5987643 (persona-a598/) and the 2026-09-12 fresh-clone gate at ancestor 09d353f5 (candidate-c/release-gate-latest.json, install-persona-qa passed). A run at the current integration head remains for the combined candidate gate, not for this issue alone.",
+   "Optional hygiene: the tracked default gate output .amc/release-gate/latest.json (last changed 2286753a, 2026-08-25, schema 2026-05-23) still embeds the retired persona 'rating': 10 / 'install was straightforward; fast first score' text at line 126; refresh it from a current run or stop tracking it so the checkout's 'latest' receipt does not show the wording this issue removed."
+  ],
+  "defectsFound": [
+   {
+    "file": ".amc/release-gate/latest.json",
+    "line": 126,
+    "description": "Tracked release-gate receipt (schemaVersion 2026-05-23, createdAt 2026-08-25, last commit 2286753a) still embeds the pre-fix persona QA output with \"rating\": 10 and \"install was straightforward; fast first score; role-specific command worked\" \u2014 the exact misleading wording AMC-1528 removed. It is the default output path of scripts/release-gate.mjs and is overwritten on every gate run (the 2026-09-12 fresh-clone README notes it differs after a run), so it is stale committed output rather than a code defect, but anyone reading the checkout's 'latest' gate receipt sees the retired human-sounding rating.",
+    "severity": "low"
+   }
+  ],
+  "boundary": "Verified at commit 43f61d5eaabccc5652e1021e439cefbed6901eae (amc/gap-register-execution) in isolated worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_870dd21b-f1e-2 on Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, after pnpm install --frozen-lockfile --prefer-offline; no pnpm build was needed (the four test files import scripts/*.mjs directly, not dist/). Machine shared with up to 50 concurrent agents; no timeouts occurred. Exercised: tests/installPersonaResults.test.ts, tests/installPersonaIsolation.test.ts, tests/releaseReadinessScripts.test.ts, tests/releaseGateExecution.test.ts (52 tests, all green), two mutation checks on the persona status/summary and evidence-status properties (19 and 1 failures respectively, script restored to hash c1f410b3\u2026, worktree clean), read-only review of the script, tests, release gate step, tracked receipts (closures-a598/, persona-a598/, 2026-09-12 lane-integration candidate-c gate receipt), the Linear issue and comments, and the Obsidian note. Not exercised: the real persona gate producer (npm pack + ten isolated npm installs) at 43f61d5e, the full Vitest suite, the full release gate, Node 22.x, Linux/Windows, any real provider, browser scenarios, or the untracked AMC_OS/RESEARCH/2026-09-08-dsh-pi and 2026-09-09-phase-a-reconciliation records (not on this branch; root checkout deliberately not read). No files were left modified; nothing was committed.",
+  "proposedLinearComment": "Phase A step 1 reconciliation \u2014 2026-09-12, read at integration commit 43f61d5eaabccc5652e1021e439cefbed6901eae (amc/gap-register-execution), isolated worktree, Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0.\n\nVerified at 43f61d5e:\n- Fix 95aa5e80, qualified source a5987643 and receipt commit 777d6214 are ancestors of HEAD. scripts/install-persona-qa.mjs hashes to c1f410b3a8fe9e04e10b5eb5794adf0de423dff683aa260c028dfe1ed1eb12c9 as recorded.\n- npx vitest run tests/installPersonaResults.test.ts tests/installPersonaIsolation.test.ts: 30 passed, 0 failed, 0 skipped (2 files, 7.9 s) \u2014 the 24 result/report + 6 isolation cases named in closures-a598/README.md.\n- npx vitest run tests/releaseReadinessScripts.test.ts tests/releaseGateExecution.test.ts: 22 passed, 0 failed, 0 skipped (2 files, 2.4 s); the gate still runs qa:install-personas as a built step and consumes exit status (scripts/release-gate.mjs:252-256).\n- Mutation checks (restored afterward, hash re-verified, tree clean): excluding assertions from persona counts/status (line 383) turned 19/24 result tests red; letting evidenceStatus fall back to artifactStatus (line 406) turned 1 test red. The failed-assertion-in-summary and no-fabricated-evidence properties are enforced by the tests, not passing by accident.\n- Receipts: AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/persona-a598/latest.{json,md} are tracked (777d6214) and their SHA-256s match closures-a598/receipt.json; content shows schema 2026-09-08, measurementType automated-contract-checks, 103/103 persona + 2/2 setup checks, 10 personas, every result artifact VALID / evidence INSUFFICIENT_EVIDENCE / claimEligible false, no rating or feedback fields. A later real gate run at ancestor 09d353f5 (2026-09-12-lane-integration/fresh-clone/candidate-c, Node v25.5.0) also shows install-persona-qa passed.\n- Obsidian Evidence/2026-09-09 Source Contract Closures a598.md exists, is dated, and links this issue and the receipt path. The 2026-09-09T12:56 Done comment names commit, environment, exercised/not-exercised and receipt paths.\n\nNot exercised in this session: the real persona gate producer (npm pack + ten isolated npm installs) at 43f61d5e itself; full suite; full release gate; Node 22.x; Linux/Windows; real providers.\n\nCannot verify from the integration branch: AMC_OS/RESEARCH/2026-09-08-dsh-pi/persona-contract-result-design.md, .../persona-contract-results/actual-6553906e-corrected/README.md and AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json are not tracked (AMC_OS/ is gitignored; git log for those paths is empty). The Done-transition evidence (closures-a598/, persona-a598/) is tracked and verified; the older paths should be committed or marked superseded.\n\nRemaining against the acceptance text: (1) 'slow install' has no behavioral test \u2014 nothing exercises a timed-out install being recorded as failed with its spawn error and consumers skipped; (2) the 2026-09-08 schema / removal of rating and feedback is versioned inside the receipt but not described in docs/. Low-severity observation: tracked .amc/release-gate/latest.json (2026-08-25, schema 2026-05-23) still embeds the retired 'rating: 10 / install was straightforward' persona text at line 126; refresh or untrack it.\n\nDisposition: implementation and acceptance tests hold at 43f61d5e; nothing previously accepted has decayed. Done remains justified on the tracked evidence, with the three items above open as follow-ups. Source-contract qualification only; no package, platform, deployment, human usability or comparator claim."
+ }
+}

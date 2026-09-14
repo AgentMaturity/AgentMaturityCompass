@@ -1900,3 +1900,28 @@ Every path this session claimed is committed on `amc/gap-register-execution`; th
 acceptance at `09d353f5` is recorded in `AMC_OS/RESEARCH/2026-09-12-lane-integration/`. This
 session releases all claims. No other worktree, branch, uncommitted file or the shared stash
 `152a61696f336f658893a72aa9357d58df8c5679` was touched.
+
+### 2026-09-12 — 50-agent fleet (Claude Code workflows `wf_c8a6e5b1-57d`, `wf_0b845f07-2cd`, `wf_870dd21b-f1e`, `wf_410a5044-c06`, `wf_80ecc1f0-12d`; every agent Fable 5.1)
+
+Launched from root at `43f61d5e`. Every agent runs in its own fresh git worktree at that commit
+(created by the workflow runtime; auto-removed when unchanged); none writes to root, another
+worktree or the shared stash. Root paths are integrated serially by this session afterwards.
+
+| Worker | Worktree / branch | Linear | Exact writable paths | State |
+|---|---|---|---|---|
+| reconcile:AMC-1506 … AMC-1548 (42 agents, AMC-1524 excluded) | own fresh worktree at `43f61d5e` | the named child | none (read, install, build, run that issue's tests) | queued (sequential, 2026-09-14) |
+| impl:spill-attachments | `.claude/worktrees/wf_e54e6c35-3e3-1` (done, read-only now) | AMC-1547 | `src/session/spill/**`, `src/session/sessionPayloadCap.ts`, `src/session/sessionService.ts` (recordUserAttachment path), `src/agent/inbox.ts`, `src/llm/request/requestSources.ts`, `src/acp/acpImageHistory.ts`, `src/studio/nativeTaskService.ts` (cap helpers), `tests/sessionAttachmentSpill*.test.ts`, `docs/SESSION_SPILL_LIFECYCLE.md` | finished 2026-09-14; integrated in root as `fa2ffac6` (inbox.ts and nativeTaskService.ts untouched by design); paths released to root |
+| impl:studio-token-scopes | own worktree | AMC-1546 | `src/studio/studioState.ts`, `src/studio/studioServer.ts` (token issuance/scope checks), `src/studio/apiDelegation.ts`, `tests/studioAgentTokenScopes*.test.ts` | queued (sequential, 2026-09-14) |
+| impl:hook-inheritance | own worktree | AMC-1545 | `src/agent/subagentRunner.ts`, `src/agent/delegateTool.ts`, `src/kernel/agentLoopRunner.ts` (hook composition), `src/agent/loopTypes.ts`, `tests/subagentHookInheritance*.test.ts` | queued (sequential, 2026-09-14) |
+| impl:confinement-property | own worktree | AMC-1513 | `src/agent/agentToolset.ts`, `src/sandbox/processConfinement.ts`, `src/sandbox/**`, `tests/toolsetConfinementProperty*.test.ts` | queued (sequential, 2026-09-14) |
+| impl:first-run | own worktree | AMC-1505 (§7 item 4) | `src/cli.ts` (firewall block and doctor wiring only), `src/doctor/**`, `src/workspace.ts` (guided init), `docs/START_HERE.md`, `docs/QUICKSTART.md`, `tests/firstRun*.test.ts` | queued (sequential, 2026-09-14) |
+| impl:gap-register | own worktree | AMC-1505 (Phase C) | none — returns `plans/amc-gap-register-2026-09.md` content | queued (sequential, 2026-09-14) |
+| impl:harness-breadth | own worktree | AMC-1505 (§7a) | none — returns `plans/research/harness-breadth-2026-09-12.md` content | queued (sequential, 2026-09-14) |
+| readiness:b0-b1 | own worktree | AMC-483 / AMC-7 | none — returns `AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md` content | queued (sequential, 2026-09-14) |
+
+Serial-only surfaces touched by impl agents (`src/cli.ts`, `src/studio/studioServer.ts`, the
+session spine) are merged into root only by this session, one change at a time, after review.
+
+### 2026-09-14 — Fleet runs one agent at a time
+
+On Sid's instruction the fleet above runs sequentially (`amc-fleet-sequential`, label-selected). Only one fleet worktree is live at any moment; every other row is queued and owns nothing until its agent starts. The first agent, `impl:spill-attachments`, finished and its diff was integrated into root as `fa2ffac6` after root re-ran both typechecks, 31 affected test files (504/504) and three mutations (receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`). Its worktree is retained read-only. Next live agent: `impl:studio-token-scopes` (AMC-1546; `src/studio/studioState.ts`, `src/studio/studioServer.ts` token issuance/scope checks, `src/studio/apiDelegation.ts`, `tests/studioAgentTokenScopes*.test.ts`), base `fa2ffac6`.

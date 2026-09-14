@@ -1474,3 +1474,69 @@ the opt-in browser scenarios; the 8.3 MB of Sep 9–11 audit receipts untracked 
 ignored `AMC_OS/` path; spill-backed attachments above the signed per-event cap; installing
 the Python wheel for `test_validation_installed.py`; the budget admission's block after any
 provider failure (requires a signed `ALLOW_WITH_WARNING`), which is hostile first-run UX.
+
+## 2026-09-12 — Fleet: 50 non-overlapping Fable 5.1 agents (five concurrent workflow slices)
+
+Sid re-issued the standing order with "complete all phases; deploy 50 agents at once with
+non-overlapping implementations; all Fable 5.1", and stated the aim as AMC being better than
+pi and dsh by 10x — recorded here as the target it is under §11, not as a claim. Launched from
+root at `43f61d5e` (clean): 42 reconciliation agents (Phase A step 1, one AMC-1505 child each,
+AMC-1524 canceled excluded; verify claims at HEAD and run that issue's tests in a fresh
+worktree), seven implementation/research agents on the disjoint scopes in the ownership
+manifest (spill-backed attachments, Studio token scopes, hook inheritance, confinement as a
+process property, first-run experience, Phase C gap register vs the pinned comparators,
+harness breadth), and one B0/B1 release-readiness audit. Every agent inherits the session
+model. The first launch (`wf_ad10b7b9-ae2`) queued 40 agents behind one workflow's cap of 10 on
+this 12-core machine, so on Sid's instruction it was stopped before any agent finished and the
+same 50 agents were relaunched as five concurrent slices (`wf_c8a6e5b1-57d`, `wf_0b845f07-2cd`,
+`wf_870dd21b-f1e`, `wf_410a5044-c06`, `wf_80ecc1f0-12d`), all 50 running at once. Results are integrated into
+root serially by this session, with Linear comments per issue posted from the agents'
+verified findings, never from summaries. Publish/deploy remain excluded by Sid's order.
+
+### 2026-09-14 — Fleet switched to one agent at a time
+
+Both concurrent launches (all 50 at once, 2026-09-12 evening and after the 23:40 reset) were cut
+off by the account's session limit before completion: the first after ~6.5 minutes with every
+agent still reading, the second after ~18 minutes with one structured result (AMC-1528,
+PARTIAL: claims verified at `43f61d5e`, 30/30 persona tests, two documentation/test gaps and two
+receipts not tracked on the branch; saved for the Linear comment). Root stayed intact on
+`amc/gap-register-execution` at `43f61d5e`. On Sid's instruction the fleet now runs one agent
+at a time (`amc-fleet-sequential`, `args.labels`), each in a fresh worktree with a hard
+tool-call budget (reconcile 45, implementation 150, research 80, readiness 60) so every run
+ends in a structured result; implementation agents run first, then research, readiness, and
+the remaining 41 reconciliations. Results are integrated into root serially after each agent.
+
+### 2026-09-14 — AMC-1528 reconciliation posted; first sequential agent running
+
+The AMC-1528 result was spot-checked in root before posting (the two 2026-09-08 receipt paths
+and `AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/` exist on disk but are untracked;
+`persona-a598/` is tracked; `.amc/release-gate/latest.json` line 126 still embeds the retired
+2026-08-25 persona rating). The reconciliation comment was posted to AMC-1528 at
+2026-09-14T04:17Z (Linear comment `4fb9a1c6`); state left at Done, three follow-ups named in
+the comment (slow-install behavioral test, schema-change docs, stale tracked gate receipt).
+The first sequential agent, `impl:spill-attachments` (`wf_e54e6c35-3e3`, worktree
+`.claude/worktrees/wf_e54e6c35-3e3-1`), started 09:42 IST; its result is integrated into root
+only after its diff is read and its tests re-run here, since the session spine is serial-only.
+
+### 2026-09-14 — impl:spill-attachments integrated as `fa2ffac6`
+
+The first sequential fleet agent (`wf_e54e6c35-3e3`, 94 tool uses, 37.6 min) returned PARTIAL:
+the attachment door is done end to end — `recordUserAttachment` retains image/text bytes above
+`retention.maxPayloadBytesPerEvent` through the encrypted spill store behind a signed
+`tool/spill-commitment` row (subject `user/attachment`), the attachment row carries a canonical
+`amc-spilled-input@1` descriptor plus the same `SpillRef`, request assembly (send and cold
+derive) and ACP history replay resolve and re-verify the bytes, and above
+`retention.maxBlobBytes` the attachment is refused naming that key. Queued inbox inputs and
+audio attachments stay fail-closed at the per-event cap by design (their claim-time and
+provenance readers decode the row payload directly; remaining steps are in the receipt). Root
+read the full diff (7 files, 209 insertions, plus `src/session/spill/spillInput.ts` and
+`tests/sessionAttachmentSpill.test.ts`), applied it by explicit path, and re-verified here:
+both tsc profiles exit 0; 6 focused files 82/82; 25 further affected files 422/422; boundaries
+check `failures: []` with `sessionService.ts` at 799 lines; three mutations — object before
+commitment, absent commitment accepted on read, audio routed to spill — each turned exactly its
+target tests red and every file was restored to the agent's hash; root's tracked `.amc/keys`
+unchanged after every run. Committed as `fa2ffac6` (nine paths). Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Not exercised in root: build, full
+suite, release gate, JSONL backend, `AMC_NO_SIGN=1`, a text attachment actually spilled.
+AMC-1547 stays In Progress with a comment; the fresh-clone re-acceptance runs once the
+implementation agents have all landed. Next agent: `impl:studio-token-scopes` at `fa2ffac6`.

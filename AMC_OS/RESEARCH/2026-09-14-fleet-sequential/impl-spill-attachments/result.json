@@ -1,0 +1,120 @@
+{
+ "type": "result",
+ "key": "v2:eaafc4eee4efcb74df4e729fc333f544edb50386e1f6ddf49d4938e73e80a0b8",
+ "agentId": "a6e5718ee882b21c4",
+ "result": {
+  "track": "IMPL-1",
+  "status": "PARTIAL",
+  "summary": "Attachment door done end-to-end: recordUserAttachment now retains image/text bytes above retention.maxPayloadBytesPerEvent through the encrypted spill store behind a signed tool/spill-commitment row (subject: user/attachment), the user/attachment row carries a canonical descriptor payload plus the same SpillRef in `spilled` meta, request assembly (send + cold derive) and ACP history replay resolve and re-verify the bytes, lifecycle (inventory/erase/export/retention) covers them unchanged, and anything above retention.maxBlobBytes is refused naming that key. Inbox door (LoopInbox.insert, nativeTaskService cap helpers) deliberately left fail-closed at the cap: every claim path and continuity validator that re-reads inbox rows is outside this track's write scope, so spilling there would fail at claim time. Measured at 43f61d5e on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0 / vitest 4.1.11: new+updated spill tests 12/12, 19 affected files 293/293, 12 spill-group files 211/211, final 6-file rerun 82/82, both tsc profiles exit 0, two mutations each turned exactly their target tests red.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/session/sessionService.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/session/sessionPayloadCap.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/session/spill/spillPolicy.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/llm/request/requestSources.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/acp/acpImageHistory.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/tests/sessionPayloadCap.test.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/docs/SESSION_SPILL_LIFECYCLE.md"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/src/session/spill/spillInput.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1/tests/sessionAttachmentSpill.test.ts"
+  ],
+  "testsAdded": [
+   "tests/sessionAttachmentSpill.test.ts: 9 tests \u2014 commitment row durable before any object exists and both rows carry the same reference (admission-proxy observed phases); live Anthropic-encoded request carries the original bytes and a spawned fresh process (tests/fixtures/nativeSignedImageCold.ts) derives identical request bytes, with the commitment row in the header's sourceEventIds; ACP projection resolves the spilled attachment, refuses when the commitment row is absent from supplied history (evidence-inconsistent), when the ciphertext is modified (evidence-inconsistent) and when the object is deleted (payload-missing); cold derivation reports a modified object as evidence-inconsistent, recovers after restoring it, and reports a deleted commitment row as evidence-inconsistent; inventory/export/erase cover the two rows through one locator and post-erasure reads report missing (verifySpilledContent ok with 2 missing, 0 errors); above retention.maxBlobBytes refused with SessionSpillCapError naming the key and `amc ops sign`, nothing recorded, no object file; audio above the cap still SessionPayloadCapError; before any blob has provisioned the workspace key the spill prepare refuses (stage prepare, nothing recorded) and succeeds once a blob provisions it; a commitment refused at admission publishes no object and no attachment row (stage commit).",
+   "tests/sessionPayloadCap.test.ts (updated): the attachment case now asserts refusal-at-prepare with nothing recorded while no key exists, retention as commitment row + descriptor row (ref bytes = cap+1, maxInlineBytes = cap) after an ordinary blob provisions the key, and one inline row with no spill reference exactly at the cap; the inbox case is unchanged."
+  ],
+  "testResults": [
+   {
+    "command": "npx vitest run tests/sessionAttachmentSpill.test.ts (RED, before implementation)",
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts (after implementation, before cap-test update)",
+    "passed": 10,
+    "failed": 2,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts (GREEN)",
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run <19 files importing requestSources/deriveRequest/acpImageHistory/recordUserAttachment/sessionPayloadCap/spillPolicy/spillInput/ingestAttachment> (list in report)",
+    "passed": 293,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/sessionSpillCommitment.test.ts tests/sessionSpill.test.ts tests/spillLifecycle.test.ts tests/retentionSpill.test.ts tests/sessionSpillRead.test.ts tests/bundleSpill.test.ts tests/cliSpillCommands.test.ts tests/spillEncryption.test.ts tests/nativeSignedImagePublicInput.test.ts tests/nativeSignedAudioPublic.test.ts tests/nativeSignedAudioRuntime.test.ts tests/nativeSignedToolSubset.test.ts",
+    "passed": 211,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts tests/nativeSignedImageInput.test.ts tests/nativeAcpImageInput.test.ts tests/nativeSignedAudioInput.test.ts tests/attachmentIngest.test.ts (final code, after line-count compaction)",
+    "passed": 82,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "mutation M1 applied: npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts",
+    "passed": 10,
+    "failed": 2,
+    "skipped": 0
+   },
+   {
+    "command": "mutation M2 applied: npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts",
+    "passed": 10,
+    "failed": 2,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "Write side: the signed spill commitment row is durable before the encrypted object exists (commitment-before-materialization)",
+    "mutation": "M1 in SessionSpillPolicy.retainInput: call prepared.persist() before commitBeforeRetain(ref) and make the later persist a no-op",
+    "wentRed": true
+   },
+   {
+    "property": "Read side: a spilled attachment resolves only if a signed tool/spill-commitment row with the identical reference precedes it in the supplied session history",
+    "mutation": "M2 in resolveSpilledInputPayload: accept an absent/missing commitment row (commitmentEventId = null) instead of returning evidence-inconsistent",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "Final state: `npx tsc -p tsconfig.json --noEmit` exit 0; `npx tsc -p tsconfig.tests.json --noEmit` exit 0 (both re-run after the last compaction of sessionService.ts). `node scripts/architecture-boundaries-check.mjs`: src/session/sessionService.ts reported at 800 lines (cap 800, not over; it was 790 at base); the gate's only remaining failures are dist/cli.js and dist/api/index.js missing because `pnpm build` was not run (no test I ran needs dist/).",
+  "behaviorChanges": [
+   "SessionService.recordUserAttachment: an image or text attachment above retention.maxPayloadBytesPerEvent (64 KiB in the default signed ops policy) is no longer refused; its bytes are encrypted in memory, a signed `tool/spill-commitment` row (meta: turn, step, subject: \"user/attachment\", filename, spilled: SpillRef) is appended, the object is published only after that append returns, and the `user/attachment` row is recorded with a canonical `amc-spilled-input@1` descriptor as its payload (locator, contentSha256, bytes), the same SpillRef under `spilled`, `bytes` = original length and a slot digest over the original bytes. Rows at or below the cap are unchanged (no `spilled` key added).",
+   "Audio attachments above the cap still throw SessionPayloadCapError (unchanged message), because src/session/nativeAudioProvenance.ts (out of scope) compares an audio row's own payload with its inbox bundle.",
+   "New SessionSpillCapError (code AMC_SESSION_SPILL_CAP) refuses any attachment above min(retention.maxBlobBytes, 0xffffffff) before preparation, naming retention.maxBlobBytes and `amc ops sign`; nothing is recorded.",
+   "New SpilledInputRetentionError (code AMC_SESSION_SPILL_RETENTION, `stage`: prepare | commit | persist) is thrown when the spill store cannot retain an oversize attachment; nothing degrades to a preview. prepare: nothing recorded (e.g. no blob key provisioned yet, AMC_NO_SIGN, locked/absent vault, encryption disabled). commit: no object published, no attachment row. persist: the signed commitment remains as an explicitly missing object, no attachment row.",
+   "src/llm/request/requestSources.ts (send path and cold derivation): user/attachment rows are passed through resolveSpilledInputPayload with the projection prefix as history; resolved bytes become the part, the commitment row id joins sourceEventIds, `missing`/`key-unavailable` map to payload-missing and every other failure to evidence-inconsistent. Image and audio EncodablePart.sha256 is now the digest of the bytes carried (identical to the row digest for inline rows; the original-content digest for spilled rows, which the encoder re-hashes against).",
+   "src/acp/acpImageHistory.ts projectAcpAttachment(workspace, event, history?) gains an optional third parameter; spilled attachments are resolved (refusals: payload-missing, payload-key-unavailable, evidence-inconsistent). Its caller in src/acp/acpProjection.ts (out of scope) does not yet pass history, so that door verifies the row's own signed reference without the commitment-ordering check.",
+   "New public SessionSpillPolicy.retainInput(input, { what, cap }, commitBeforeRetain) in src/session/spill/spillPolicy.ts and new module src/session/spill/spillInput.ts (descriptor codec, SpilledInputRetentionError, resolveSpilledInputPayload, SPILL_COMMITMENT_EVENT_TYPE, SPILL_SUBJECT_META_KEY). New sessionSpillCap / assertSessionPayloadRetainable / attachmentPayloadRoute in src/session/sessionPayloadCap.ts.",
+   "Lifecycle: inventorySessionSpills lists one entry per spilled attachment with both event ids; exportSessionSpills exports it; eraseSessionSpills scoped to the session removes it; verifySpilledContent counts both rows and reports erasure as missing, not error. No lifecycle or retention code changed.",
+   "Unchanged: LoopInbox.insert still refuses above the per-event cap with SessionPayloadCapError; src/agent/inbox.ts and src/studio/nativeTaskService.ts were not modified."
+  ],
+  "decisions": [
+   "The worktree branch was at 3d6b8d4a (the merge-base), not at the stated integration commit; `git merge --ff-only 43f61d5e` moved my own worktree branch to 43f61d5e with a clean tree before any work (no reset, no checkout of another branch, no other worktree touched).",
+   "Inbox door left fail-closed (PARTIAL): src/agent/nativeImageMessage.ts, nativeOrderedMessage.ts and nativeAudioMessage.ts re-read and decode the loop/inbox row payload at claim time, and src/acp/acpHistoryContinuity.ts, src/session/nativeAudioProvenance.ts and src/studio/nativeTaskProjection.ts re-read it at replay/continuity time; all are outside this track's write scope, so a spilled inbox row would fail at claim time instead of at the door \u2014 a half-wired path. Because the inbox stays capped, the nativeTaskService queued-input cap helpers correctly keep advertising and enforcing sessionPayloadCap and were not changed.",
+   "Audio attachments stay fail-closed at the per-event cap for the same reason (nativeAudioProvenance compares the row payload with the bundle bytes).",
+   "The commitment row reuses the existing `tool/spill-commitment` event type with a `subject` meta key instead of a new `user/spill-commitment` type, because the event-type union lives in src/types.ts and src/session/sessionTypes.ts (out of scope) and the retention engine already treats every row of that type as a payload-free precommitment.",
+   "The descriptor is the attachment row's payload (not empty, not a preview) so surface.part.sha256 = payload_sha256 still holds, retention can still prune the blob, and the descriptor cross-checks the signed `spilled` meta; the SpillRef rides on both the commitment row and the attachment row exactly like tool commitment + tool/result, which is why inventory/erase/export/retention needed no change.",
+   "Input spills never degrade to an `unretrievable` preview (unlike tool output): an input whose bytes cannot be retained cannot be shown to the model, so each stage throws a typed error with an honest statement of what was recorded.",
+   "tests/sessionPayloadCap.test.ts's attachment case asserted exactly the behaviour this track was asked to change (refusal above the cap), so its contract was updated rather than the code being bent to keep it; the inbox case is untouched.",
+   "sessionService.ts grew from 790 to 830 lines, past the 800-line gate; instead of recording an exception in scripts/line-budgets.json, the routing decision moved into attachmentPayloadRoute in sessionPayloadCap.ts and the helper was compacted, landing at 799 (wc) / 800 (gate).",
+   "Scope of sessionService.ts changes is the recordUserAttachment path only: that method, one private helper it calls (retainOversizeAttachment, adjacent to it) and imports.",
+   "The first run of the new test file (10:02:25 local) modified the checkout's tracked .amc/keys/* and created four .previous-<sha> files; these were restored with `git restore -- .amc/keys` and the untracked files deleted. The effect did not recur in any later run that included the same file; attribution is not established (the since-removed test variant that stubbed AMC_VAULT_PASSPHRASE to undefined is the prime suspect). Reported below as a hygiene finding, not fixed (outside scope)."
+  ],
+  "blockers": [
+   "Inbox door not done (exact remaining steps, all outside this track's write scope except the last two): (1) add a `subject: \"loop/inbox\"` commitment lookup to src/agent/nativeImageMessage.ts, nativeOrderedMessage.ts and nativeAudioMessage.ts and resolve a descriptor payload through resolveSpilledInputPayload before decoding \u2014 loop/inbox meta is a fixed hash pre-image in src/session/loopEventMeta.ts, so the SpillRef must ride on the preceding commitment row rather than on the inbox row; (2) do the same in `originalBytes` of src/acp/acpHistoryContinuity.ts and src/session/nativeAudioProvenance.ts and in src/studio/nativeTaskProjection.ts; (3) then switch LoopInbox.insert (src/agent/inbox.ts) from assertSessionPayloadWithinCap to a route through a SessionService input-commitment method plus descriptor payload, and resolve in replayMessage; (4) then raise the nativeTaskService queued-input bound to min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap); (5) pass `events` from src/acp/acpProjection.ts to projectAcpAttachment so the ACP door also enforces commitment-before-attachment ordering; (6) optionally introduce a dedicated `user/spill-commitment` event type in src/types.ts and src/session/sessionTypes.ts.",
+   "Not exercised: `pnpm build` (so the boundaries gate still reports dist/ missing); the full suite; the JSONL session backend for spilled attachments (only the default sqlite backend); AMC_NO_SIGN=1 refusal; a text-kind attachment actually retained through spill (text is allowed by attachmentPayloadRoute but only the above-maxBlobBytes refusal used a text attachment \u2014 image was the retained kind in every green test); spilled attachments recorded with ordered (@2) or audio provenance (cannot occur while the inbox stays capped).",
+   "Test-hygiene finding for the owners of tests/: some test in the first run of tests/sessionAttachmentSpill.test.ts + tests/sessionPayloadCap.test.ts rotated the checkout's tracked .amc/keys/* (restored here); the code path that writes `<name>_history.json.previous-<sha>` was not located within budget."
+  ],
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1",
+  "reportMarkdown": "# IMPL-1 \u2014 large attachments through the encrypted spill store (PARTIAL)\n\n**Boundary.** Source commit 43f61d5eaabccc5652e1021e439cefbed6901eae (amc/gap-register-execution), worked in worktree branch `worktree-wf_e54e6c35-3e3-1` at `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1` (fast-forwarded from 3d6b8d4a, the merge-base, before any edit). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, `AMC_VAULT_PASSPHRASE` and `AMC_NO_SIGN` unset in the shell. `pnpm install --frozen-lockfile --prefer-offline` exit 0. No `pnpm build`, no generators, no commits. Every number below was produced in this session.\n\n## What was done (attachment door, end to end)\n\n- `src/session/spill/spillInput.ts` (new, 202 lines): descriptor codec (`amc-spilled-input@1`: locator, contentSha256, bytes; canonical-encoding check), `SpilledInputRetentionError` (stage prepare/commit/persist), `resolveSpilledInputPayload` (descriptor-vs-signed-ref cross-check, optional commitment-precedes-row check when history is supplied, then `inspectSpilledEvent` \u2014 row hash + monitor signature + object digest/length \u2014 plus a final digest/length recheck).\n- `src/session/spill/spillPolicy.ts`: `SessionSpillPolicy.retainInput` \u2014 prepare in memory, sync commitment callback, then publish; every failure throws with its stage (no preview degradation for inputs).\n- `src/session/sessionPayloadCap.ts`: `SessionSpillCapError`, `sessionSpillCap` = min(retention.maxBlobBytes, 0xffffffff), `assertSessionPayloadRetainable`, `attachmentPayloadRoute` (audio stays fail-closed at the per-event cap).\n- `src/session/sessionService.ts` (recordUserAttachment path only): above the cap, validated image/text bytes go through `retainOversizeAttachment` \u2192 signed `tool/spill-commitment` row (`subject: \"user/attachment\"`, filename, `spilled` ref) \u2192 object \u2192 `user/attachment` row with descriptor payload, `spilled` ref, original `bytes`, slot digest over original bytes. File is 799 lines (`wc`), 800 by the gate's count, cap 800; it was 790 at base.\n- `src/llm/request/requestSources.ts` (send + cold derive): resolves spilled attachments with the projection prefix as history; commitment row id joins `sourceEventIds`; image/audio part `sha256` is now the digest of the bytes carried.\n- `src/acp/acpImageHistory.ts`: `projectAcpAttachment(workspace, event, history?)` resolves spilled attachments; refusals `payload-missing` / `payload-key-unavailable` / `evidence-inconsistent`.\n- `docs/SESSION_SPILL_LIFECYCLE.md`: appended section \"Spilled user attachments\" (behaviour, failure states, what readers verify, what is not done).\n\n## Tests (measured)\n\n| Command | Result |\n|---|---|\n| `npx vitest run tests/sessionAttachmentSpill.test.ts` before implementation | 1 file failed to import (RED) |\n| `npx vitest run tests/sessionAttachmentSpill.test.ts tests/sessionPayloadCap.test.ts` after implementation, before updating the cap test's contract | 10 passed / 2 failed |\n| same, final | 12 passed / 0 failed |\n| 19 files importing requestSources/deriveRequest/acpImageHistory/recordUserAttachment/sessionPayloadCap/spillPolicy/spillInput/ingestAttachment (acpFailedTurnUpdates, agentLoopReconstructable, anthropicCacheBreakpoints, attachmentIngest, cosProduct05OllamaRuntime, cosProduct08Continuity, deepseekNativeIntegration, nativeAcpImageInput, nativeChatImageInput, nativeOrderedAcpImageInput, nativeResponsesImageInput, nativeSignedAudioColdHostile, nativeSignedAudioInput, nativeSignedImageInput, promptContext, providerToolNameBinding, sessionAttachmentSpill, sessionPayloadCap, surfaceHistoryCompaction) | 293 passed / 0 failed, 58.5 s |\n| 12 spill-group files (sessionSpillCommitment, sessionSpill, spillLifecycle, retentionSpill, sessionSpillRead, bundleSpill, cliSpillCommands, spillEncryption, nativeSignedImagePublicInput, nativeSignedAudioPublic, nativeSignedAudioRuntime, nativeSignedToolSubset) | 211 passed / 0 failed, 48.4 s |\n| final rerun after line-count compaction: sessionAttachmentSpill, sessionPayloadCap, nativeSignedImageInput, nativeAcpImageInput, nativeSignedAudioInput, attachmentIngest | 82 passed / 0 failed |\n| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` (final) | exit 0 / exit 0 |\n| `node scripts/architecture-boundaries-check.mjs` (final) | sessionService.ts 800 (not over cap); remaining failures only `dist/cli.js` and `dist/api/index.js` missing (no build run) |\n\nThe new file's live-request test drives the real `LlmRuntime` with a scripted Anthropic SSE transport (no live provider) and spawns a fresh process (`tests/fixtures/nativeSignedImageCold.ts`) that derives identical request bytes from the spilled row. The 19- and 12-file runs were executed on the code immediately before the final line-count compaction of `sessionService.ts`/`sessionPayloadCap.ts`; the 6-file run and both tsc profiles were executed on the final code. The full suite was not run.\n\n## Mutation verification\n\n- **M1** (`retainInput`: publish the object before the commitment callback, later persist a no-op): 2 failed / 10 passed \u2014 exactly \"a signed commitment row is durable before any object exists\u2026\" and \"a commitment refused at admission never publishes an object\u2026\". Restored; `grep -c MUTATION` = 0.\n- **M2** (`resolveSpilledInputPayload`: accept an absent commitment row): 2 failed / 10 passed \u2014 exactly the ACP \"commitment absent from supplied history\" assertion and the derive \"deleted commitment row\" assertion. Restored; `grep -c MUTATION` = 0.\n- Not mutated: the descriptor-vs-ref cross-check (reaching a mismatch requires rewriting both payload and `payload_sha256`, which the callers' payload-digest check and the row-hash check already refuse).\n\n## Not done / decisions\n\n- **Inbox door left fail-closed** (`LoopInbox.insert`, nativeTaskService cap helpers unchanged). All claim paths (`src/agent/nativeImageMessage.ts`, `nativeOrderedMessage.ts`, `nativeAudioMessage.ts`) and the continuity validators (`src/acp/acpHistoryContinuity.ts`, `src/session/nativeAudioProvenance.ts`, `src/studio/nativeTaskProjection.ts`) re-read and decode the inbox row payload and are outside this track's write scope; spilling at the door would fail at claim time. Exact remaining steps are listed in `blockers`.\n- Audio attachments stay fail-closed at the cap (same provenance reader).\n- `tool/spill-commitment` reused with a `subject` meta key; a dedicated type needs `src/types.ts`/`src/session/sessionTypes.ts`.\n- `tests/sessionPayloadCap.test.ts` attachment case updated: its old assertion was exactly the behaviour this track changes; the inbox case is unchanged.\n- **Hygiene finding:** the first run of the new test file (10:02:25 local) modified the checkout's tracked `.amc/keys/*` and created four `*.previous-<sha>` files; restored with `git restore -- .amc/keys` and deleted. Did not recur in later runs including the same file; cause not located within budget (prime suspect: the since-removed test variant stubbing `AMC_VAULT_PASSPHRASE` to undefined).\n\n## Not exercised\n\n`pnpm build`; full suite; JSONL backend for spilled attachments; `AMC_NO_SIGN=1` refusal; a text-kind attachment retained through spill (allowed by code; only the above-maxBlobBytes refusal used text); spilled rows with ordered/audio provenance (unreachable while the inbox stays capped). Source qualification of authored tests only \u2014 not package, platform or release acceptance."
+ }
+}
