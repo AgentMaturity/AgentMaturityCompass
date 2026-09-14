@@ -1,0 +1,140 @@
+{
+ "type": "result",
+ "key": "v2:605c244a47e6e51c7b79dd5f9b5b595e0daad2a09cb72b82a769c48a43061d6d",
+ "agentId": "acf86d70958883e1e",
+ "result": {
+  "issue": "AMC-1509",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Canonical README/CONTRIBUTING/docs/INSTALL.md source path uses packageManager-pinned pnpm with a frozen lockfile and never gives `npm ci` as a command",
+    "evidence": "README.md:170, README.md:729, README.md:884 (`pnpm install --frozen-lockfile`); CONTRIBUTING.md:28-31; docs/INSTALL.md:47-48 and :53 (`npm ci` only mentioned as the thing that fails); package.json:181 `\"packageManager\": \"pnpm@10.33.0\"`; grep for `npm ci` in README/CONTRIBUTING returned nothing; tests/cleanSourceDocs.test.ts:15-23 asserts this and passed",
+    "holds": true
+   },
+   {
+    "claim": "`npm run check:clean-source` is wired and runs scripts/clean-source-check.mjs",
+    "evidence": "package.json:82 `\"check:clean-source\": \"node scripts/clean-source-check.mjs\"`; tests/cleanSourceDocs.test.ts:28 asserts the exact string and passed",
+    "holds": true
+   },
+   {
+    "claim": "Lockfile regenerated so `pnpm install --frozen-lockfile` resolves @amc/core as a workspace link",
+    "evidence": "pnpm-lock.yaml:47-49 `'@amc/core': specifier: workspace:* version: link:packages/amc-core`; frozen install in this worktree completed in 1.7s (prefer-offline) and in the fresh clone made by the helper in 9.9s",
+    "holds": true
+   },
+   {
+    "claim": "docs/INSTALL.md states the source-runtime vs published-release boundary and the vendor/core build order",
+    "evidence": "docs/INSTALL.md:52-57 (pnpm workspace, why npm ci fails, vendored lib/ ships prebuilt, `npm run build:vendor` only if edited); docs/INSTALL.md:59-69 paragraph 'Source runtime vs published release' describing check:packed-install and check:clean-source",
+    "holds": true
+   },
+   {
+    "claim": "scripts/clean-source-check.mjs clones the committed tree, runs DOCUMENTED_SOURCE_COMMANDS verbatim, then doctor, init and a keyless agent-loop run with HOME pointed at an empty temp dir",
+    "evidence": "scripts/clean-source-check.mjs:31-34 DOCUMENTED_SOURCE_COMMANDS = [\"pnpm install --frozen-lockfile\",\"pnpm run build\"]; :104-105 clone + detach at HEAD; :106-109 run documented commands; :111-113 doctor/init/keyless stub turn; :85-93 temp work dir with empty home",
+    "holds": true
+   },
+   {
+    "claim": "Install/build/runtime share an isolated HOME/config with scrubbed settings; stub provider is explicit; the active Node executable is pinned (19ef96ac batch)",
+    "evidence": "scripts/clean-source-check.mjs:39-58 cleanSourceRuntimeEnvironment (only OS/tool-discovery vars carried, PATH rebuilt with dirname(process.execPath) at :46, empty npmrc files at :55-56); :93 same env used for all steps; :96 runCli uses process.execPath; :113 `--provider stub`; tests/installPersonaIsolation.test.ts:94-108 asserts hostile env keys are dropped and passed",
+    "holds": true
+   },
+   {
+    "claim": "JSON summaries plus the cold ledger/request verifier qualify a tool turn and the same session extended in another process (AMC-1511 cross-process resume)",
+    "evidence": "scripts/clean-source-check.mjs:97-101 verifyRun -> verifyPackedRun; :113 single-turn verification; :116-131 process A (--keep-open) then process B (--session <id>) with requests/events growth check and 2-turn verification; live run log at 6e7875f2 shows both `amc session verify --json` and `amc agent-loop verify --json` executed twice, all ok",
+    "holds": true
+   },
+   {
+    "claim": "Synthetic subprocess regressions reject bad ledger verification despite exit zero, missing resume extension, and install failure",
+    "evidence": "tests/cleanSourceDocs.test.ts:32-105 (fault modes ledger/resume/install at :101-105); all 8 tests in that file passed; mutation check: replacing scripts/clean-source-check.mjs:98 with `const verified = true` turned 2 tests red (`refuses ledger failure\u2026` and `isolates install/build/runtime\u2026`), 6 still passed; file restored (git diff 0 lines)",
+    "holds": true
+   },
+   {
+    "claim": "A CI job executes the clean-source check (not string-only assertions)",
+    "evidence": ".github/workflows/ci.yml:173-189 job `clean-source` on ubuntu-latest, pnpm 10.33.0, Node 24, step `node scripts/clean-source-check.mjs`. Present in source; the hosted run itself was NOT exercised from this environment",
+    "holds": true,
+    "note": "Existence verified at HEAD; hosted Ubuntu/Node 24 execution not observed here"
+   },
+   {
+    "claim": "Commits 2b737b3c, 98cd20e1, cef781ec, b3b13181 (local-complete batch) and 19ef96ac, 79f36cfd (helper isolation batch) are merged on the integration branch",
+    "evidence": "`git merge-base --is-ancestor <sha> HEAD` returned 0 for all six at HEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f; 2b737b3c = 'fix(install): the documented source path works on a clean clone (AMC-1509)', 19ef96ac = 'fix(install): isolate source setup and verify structured resume evidence'",
+    "holds": true
+   },
+   {
+    "claim": "The CLI's kernel-missing message no longer names a `build:workspace` script that does not exist",
+    "evidence": "2b737b3c changed only src/cli-agent-commands.ts (`npm install && npm run build:workspace` -> `pnpm install --frozen-lockfile && pnpm run build`). At HEAD two other kernel-missing messages still say `npm install && npm run build:workspace`: src/cli-composition-commands.ts:48 and src/approvals/approvalAskCommand.ts:56; `grep -c '\"build:workspace\"' package.json` = 0",
+    "holds": false,
+    "note": "Holds for the one file the commit touched; two sibling messages were never covered. Listed under defectsFound."
+   },
+   {
+    "claim": "Receipts exist at AMC_OS/RESEARCH/2026-09-08-dsh-pi/source-install-review.{md,json}, AMC_OS/RESEARCH/2026-09-09-clean-source-followthrough/README.md and AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1509)",
+    "evidence": ".gitignore:81 ignores `AMC_OS/`; `git ls-files AMC_OS/RESEARCH | grep -i 'source-install|clean-source|phase-a-reconciliation|2026-09-09-clean'` returned only AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/clean-source-process.json and clean-source.log; the three cited paths do not exist in this worktree",
+    "holds": false,
+    "note": "CANNOT_VERIFY from the 6e7875f2 checkout: the cited receipts are not tracked and not present. The historical numbers quoted in Linear (install 5.2s/3.2s, build 47.2s/58s, 24 signed events, suite 10,956/10,958) could not be re-read."
+   },
+   {
+    "claim": "Tracked acceptance receipt: the clean-source helper exited 0 on candidate a5987643 (Darwin 25.6.0 ARM64 / Node 22.22.0) as part of the attempt-3 full acceptance",
+    "evidence": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/clean-source.log ('clean-source check of a5987643 \u2026 15 ok lines, kept'); attempt-3/clean-source-process.json exitCode 0, command /opt/homebrew/opt/node@22/bin/node; attempt-3/result.md names commit, environment and what is not qualified; a5987643 is an ancestor of HEAD (rc=0) and 79f36cfd is an ancestor of a5987643 (rc=0), so the helper-isolation batch was inside that acceptance; between a5987643 and HEAD only CONTRIBUTING.md (1 line) and README.md (2 lines) changed among the AMC-1509 input files",
+    "holds": true,
+    "note": "Historical receipt with stated boundaries; its README says no issue moves to Done from that aggregate alone"
+   },
+   {
+    "claim": "Obsidian note `Evidence/2026-09-09 Clean Source Follow-through.md` exists",
+    "evidence": "/Users/sid/Documents/AMC/Evidence/2026-09-09 Clean Source Follow-through.md (read-only, 2150 bytes, dated 2026-09-09) with frontmatter source_revision 79f36cfd\u2026, linear_ids [AMC-1508, AMC-1509], evidence_status: source-implementation-acceptance-pending",
+    "holds": true,
+    "note": "Exists but predates 6e7875f2 and records acceptance as pending"
+   },
+   {
+    "claim": "Acceptance reproducible at 6e7875f2: clean isolated checkout install/build/doctor and keyless native loop smoke pass with no workspace dependency leakage",
+    "evidence": "Measured this run: `node scripts/clean-source-check.mjs` at 6e7875f2, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0 \u2014 exit 0, 56.8s wall; clone 3.0s, `pnpm install --frozen-lockfile` 9.9s, `pnpm run build` 32.5s, doctor 2.1s, init 1.0s, keyless native tool turn 0.8s, session verify + agent-loop verify (1 turn), process A/B resume, session verify + agent-loop verify (2 turns): 15/15 steps ok",
+    "holds": true
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/cleanSourceDocs.test.ts tests/installPersonaIsolation.test.ts",
+    "files": 2,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 0.402
+   },
+   {
+    "command": "node scripts/clean-source-check.mjs (equivalent of `npm run check:clean-source`; 15 helper steps: clone, checkout, pnpm install --frozen-lockfile, pnpm run build, doctor, init, keyless stub turn, session verify, agent-loop verify, 1-turn reconstruction, process A keep-open, process B resume, session verify, agent-loop verify, 2-turn reconstruction) \u2014 exit 0",
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "durationSeconds": 56.8
+   },
+   {
+    "command": "MUTATION CHECK (then restored): scripts/clean-source-check.mjs:98 `const verified = true`; npx vitest run tests/cleanSourceDocs.test.ts \u2014 expected red",
+    "files": 1,
+    "passed": 6,
+    "failed": 2,
+    "skipped": 0
+   }
+  ],
+  "missingForDone": [
+   "A tracked receipt for AMC-1509 at 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f naming commit, environment (Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0), exercised (helper 15/15, vitest 14/14, one mutation red) and not-exercised (hosted CI, Node 20/22, npm link, published-package path, real providers, Windows). This run's numbers exist only in this report; the only tracked helper receipt is attempt-3 at a5987643 on Node 22.22.0.",
+   "The receipts the Linear comments cite (AMC_OS/RESEARCH/2026-09-08-dsh-pi/source-install-review.{md,json}, 2026-09-09-clean-source-followthrough/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json) are untracked (AMC_OS/ is gitignored at .gitignore:81) and absent at HEAD; either force-add them (git add -f) or re-point the Linear comments at tracked receipts.",
+   "A Linear comment on AMC-1509 recording the 6e7875f2 result; the latest comment (2026-09-09) states no tests/build/install ran for that batch and acceptance was pending.",
+   "Obsidian note update: Evidence/2026-09-09 Clean Source Follow-through.md is pinned to 79f36cfd with evidence_status source-implementation-acceptance-pending; it needs the 6e7875f2 acceptance and boundaries recorded (brief \u00a79).",
+   "Fix or explicitly defer the two remaining kernel-missing messages that still tell users to run `npm install && npm run build:workspace` (src/cli-composition-commands.ts:48, src/approvals/approvalAskCommand.ts:56); package.json has no build:workspace script and npm cannot install the workspace:* protocol.",
+   "Named disposition of the hosted CI `clean-source` job (.github/workflows/ci.yml:173-189, ubuntu-latest / Node 24) for 6e7875f2 \u2014 not observable from this macOS/Node 25 environment; the issue's own text notes hosted Ubuntu CI remains separate.",
+   "Explicit statement in the closing comment that the acceptance bullet 'public npm/release install instructions remain tied to verified assets' is owned by AMC-7/AMC-483 and was not exercised under this issue."
+  ],
+  "defectsFound": [
+   {
+    "file": "src/cli-composition-commands.ts",
+    "line": 48,
+    "description": "Kernel-missing error message instructs users to run `npm install && npm run build:workspace`. `build:workspace` does not exist in package.json (0 matches) and `npm install` cannot resolve the workspace:* protocol the vendored @amc/* packages use, so the advice fails twice. 2b737b3c fixed the same text only in src/cli-agent-commands.ts. Correct text per docs/INSTALL.md:47-48 is `pnpm install --frozen-lockfile && pnpm run build`.",
+    "severity": "low"
+   },
+   {
+    "file": "src/approvals/approvalAskCommand.ts",
+    "line": 56,
+    "description": "Same stale guidance as src/cli-composition-commands.ts:48 \u2014 `approvals ask` kernel-missing message names the nonexistent `npm run build:workspace` and `npm install`, which cannot install this pnpm workspace.",
+    "severity": "low"
+   }
+  ],
+  "boundary": "Source: 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (fast-forwarded from 3d6b8d4a in the isolated worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_ce6263c9-c1b-1; worktree clean after the mutation was restored). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; `pnpm install --frozen-lockfile --prefer-offline` 1.7s; no `pnpm build` in the worktree itself (the helper builds its own fresh clone). Exercised: two vitest files (14 tests), one end-to-end run of scripts/clean-source-check.mjs (fresh clone of the committed HEAD tree, frozen install, build, doctor, init, keyless stub turn, cross-process resume, ledger/request verifiers \u2014 15/15 ok, 56.8s), one mutation of the helper's verification (2 tests red, restored), read-only inspection of the tracked attempt-3 receipt and of the Obsidian vault. Not exercised: the full suite, the release gate, the hosted CI clean-source job (ubuntu-latest/Node 24), Node 20/22 locally, the README `npm link` step, the published-package/curl install path (AMC-7/AMC-483), real providers or credentials, Windows. The three receipts cited in the Linear comments are untracked and absent at HEAD and could not be read. Verification is source qualification only; it is not package, platform or deployed-release qualification.",
+  "proposedLinearComment": "Phase A step 1 reconciliation at integration commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution), 2026-09-14, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, fresh worktree.\n\nVerified at HEAD: README.md:170/729/884, CONTRIBUTING.md:28-31 and docs/INSTALL.md:47-48 give `pnpm install --frozen-lockfile` + `pnpm run build`; `npm ci` appears only as the thing that fails (docs/INSTALL.md:53); package.json:181 pins pnpm@10.33.0 and :82 wires `check:clean-source`; pnpm-lock.yaml:47-49 links @amc/core; docs/INSTALL.md:59-69 states the source-runtime vs published-release boundary; .github/workflows/ci.yml:173-189 runs the helper on ubuntu-latest/Node 24. Commits 2b737b3c, 98cd20e1, cef781ec, b3b13181, 19ef96ac and 79f36cfd are all ancestors of HEAD.\n\nMeasured this run:\n- `npx vitest run tests/cleanSourceDocs.test.ts tests/installPersonaIsolation.test.ts`: 2 files, 14 passed, 0 failed, 0 skipped, 0.4s.\n- `node scripts/clean-source-check.mjs` at 6e7875f2: exit 0, 56.8s; clone 3.0s, frozen install 9.9s, build 32.5s, doctor 2.1s, init 1.0s, keyless stub turn 0.8s, session/agent-loop verifiers and request reconstruction for 1 turn, process A keep-open + process B resume, verifiers for 2 turns \u2014 15/15 steps ok.\n- Mutation: forcing the helper's `verified = true` (line 98) turned 2 of 8 tests in tests/cleanSourceDocs.test.ts red; file restored.\n\nNot exercised: full suite, release gate, the hosted CI job itself, Node 20/22, `npm link`, the published-package/curl path (AMC-7/AMC-483), real providers, Windows.\n\nGaps before Done:\n1. The receipts cited in earlier comments (2026-09-08-dsh-pi/source-install-review.*, 2026-09-09-clean-source-followthrough/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json) are untracked (AMC_OS/ is gitignored) and absent at HEAD \u2014 CANNOT_VERIFY; the only tracked helper receipt is attempt-3 at a5987643 on Node 22.22.0 (exit 0).\n2. No tracked receipt records the 6e7875f2 result above; needs one with commit/environment/exercised/not-exercised.\n3. Obsidian Evidence/2026-09-09 Clean Source Follow-through.md is pinned to 79f36cfd with status acceptance-pending; needs updating.\n4. Two kernel-missing messages still say `npm install && npm run build:workspace` (src/cli-composition-commands.ts:48, src/approvals/approvalAskCommand.ts:56); no build:workspace script exists. 2b737b3c fixed only src/cli-agent-commands.ts.\n5. Hosted CI disposition for 6e7875f2 not observed from this environment.\n\nVerdict: PARTIAL. Implementation is merged and the acceptance reproduces at HEAD; the durable records and the two stale messages are what remain. No Done transition requested by this comment."
+ }
+}
