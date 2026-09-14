@@ -229,6 +229,16 @@ child issue owns first-run).
 > plan text and both guides overstated what the policy gates ("every tool call"); corrected in
 > `b382967c`. The measured timings above are unaffected.
 
+### impl:gap-register — IMPL-6, REPORT_ONLY → `plans/amc-gap-register-2026-09.md` (DRAFT)
+
+Agent: `wf_550bf7a2-670`, 59 tool uses, 13.6 min, no repo writes. Records:
+`impl-gap-register/result.json`, `report.md`. Root verified the two evidence-boundary findings
+(damaged, unpinnable local dsh clone with ~25 empty package groups; worktree at `main`, AMC read
+via `git archive`), added three root-check rows (E-01, G-06, G-07) and wrote the register with a
+preamble. The 2026-09-08 dsh analysis cites GitHub at the pinned commit and stands. Re-cloning
+the comparator is a third-party download and awaits Sid. No superiority language; all
+"AMC-ahead" cells are mechanism-presence statements with caveats.
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |

@@ -1673,3 +1673,25 @@ gates ("every tool call" → "every workspace tool call"). Corrected in `b382967
 tests); the receipt carries a dated correction block and a correction is posted on AMC-1505.
 The measured timings stand. This was root's own receipt, an hour old, caught by reading the
 evidence rather than the summary.
+
+### 2026-09-14 — Phase C step 1: `plans/amc-gap-register-2026-09.md` written (DRAFT) from `impl:gap-register`
+
+Sixth sequential agent (`wf_550bf7a2-670`, research, REPORT_ONLY, 59 tool uses, 13.6 min) returned
+41 comparator rows (dsh `c389f96` / pi `b2602be7` vs AMC `d635a5e2`), the status of the five
+pi-deciding items and the §7a interactions with no AMC equivalent. Root wrote it to
+`plans/amc-gap-register-2026-09.md` with a verified preamble and three root-check rows. Two
+evidence-boundary findings: (1) the local dsh clone `/tmp/amc-competitor-20260908/deepseek-harness`
+has no `.git/HEAD` (index dated 2026-09-08 12:31, `.git` subdirectories re-created 2026-09-13
+00:02–00:03 — during the all-at-once fleet runs) and ~25 package groups hold no source
+(`session`/`llm`/`sandbox`/`shell` 0 `.ts`); the agent re-verified every load-bearing "dsh
+lacks X" row against GitHub at the pinned commit, and the 2026-09-08 analysis cites GitHub
+blob URLs, so no prior receipt is withdrawn; re-cloning is a third-party download left for
+Sid's go-ahead. (2) The harness provisions fleet worktrees at `main` (`3d6b8d4a`), so the
+agent read AMC from the pinned object via `git archive`. Root checks: `cli.ts` has no live
+`Math.random`; `gamingResistance.ts` is still the `existsSync` self-scan (wired, gated by
+`applicable`; already G1-16/17); the MCP client is wired (register row G-06 corrected); the
+`requireSignature:false` site is the read-only `native-extension inspect`. Measured by the
+agent: npm `agent-maturity-compass@latest` is 1.1.1 (modified 2026-07-15) vs 1.2.0 in source.
+Verified new gaps to file: prompt-cache marker emission absent in every adapter (0 hits, root
+re-checked), built-in tool breadth (no web fetch/search, ask_user, todo, plan tools; root
+re-checked). Market-breadth (§7a) is the next agent, `impl:harness-breadth`, now running.
