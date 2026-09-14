@@ -84,7 +84,7 @@ export function projectSessionUpdates(
       throw new Error("Session history payload is unavailable; cannot faithfully replay the conversation.");
     }
     const update = options.includeUser && event.event_type === "user/attachment"
-      ? projectAcpAttachment(workspace, event)
+      ? projectAcpAttachment(workspace, event, events)
       : options.includeUser && event.event_type === "user/message"
         ? userUpdate(workspace, event) : updateFor(workspace, event);
     if (update) {

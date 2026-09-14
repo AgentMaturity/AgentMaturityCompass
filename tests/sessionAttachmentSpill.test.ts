@@ -208,6 +208,8 @@ describe("user attachments above the per-event cap are retained through the sign
     // Read-side ordering: a spilled attachment whose commitment row is absent from the supplied history is refused.
     const withoutCommitment = events.filter(row => row.id !== commitment.id);
     expect(() => projectAcpAttachment(h.root, attachment, withoutCommitment)).toThrow(/cannot be replayed \(evidence-inconsistent\)/);
+    // The session/load door enforces the same ordering: the projection passes its own history to the attachment projector.
+    expect(() => projectSessionUpdates(h.root, withoutCommitment, 0, { includeUser: true })).toThrow(/evidence-inconsistent/);
     const path = resolveSpillPath(h.root, extractSpillRef(attachment.meta_json)!.locator!)!;
     const encoded = readFileSync(path);
     const flipped = Buffer.from(encoded); flipped[flipped.length - 1] ^= 0x01;
