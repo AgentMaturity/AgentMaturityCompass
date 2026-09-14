@@ -89,10 +89,19 @@ const replyTo = (sent: readonly Record<string, unknown>[], id: unknown) =>
 const errorOf = (m: Record<string, unknown> | undefined) => m?.["error"] as { code: number; message: string };
 const resultOf = (m: Record<string, unknown> | undefined) => m?.["result"] as Record<string, unknown>;
 
+/** Wait for the reply to request `id` (bounded), instead of a fixed pause that a loaded full-suite run can outlast. */
+async function replied(h: Harness, id: number, timeoutMs = 5_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (replyTo(h.sent, id) === undefined) {
+    if (Date.now() > deadline) throw new Error(`no reply to request ${id} within ${timeoutMs} ms`);
+    await settle();
+  }
+}
+
 async function initialized(): Promise<Harness> {
   const h = harness();
   h.send({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: 1, clientCapabilities: {} } });
-  await settle();
+  await replied(h, 0);
   return h;
 }
 

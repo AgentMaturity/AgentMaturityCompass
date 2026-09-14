@@ -169,7 +169,9 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     // The blocking fix comes first: a FAIL outranks a WARN.
     const firstFail = fixes.findIndex((fix) => fix.status === "FAIL");
     const firstWarn = fixes.findIndex((fix) => fix.status === "WARN");
-    expect(firstFail).toBeGreaterThanOrEqual(0);
+    // Under --strict the missing firewall policy is the FAIL, and it sorts first.
+    expect(firstFail).toBe(0);
+    expect(fixes[0]!.checkId).toBe("runtime-firewall-policy");
     expect(firstWarn === -1 || firstFail < firstWarn).toBe(true);
   });
 });
