@@ -1695,3 +1695,16 @@ agent: npm `agent-maturity-compass@latest` is 1.1.1 (modified 2026-07-15) vs 1.2
 Verified new gaps to file: prompt-cache marker emission absent in every adapter (0 hits, root
 re-checked), built-in tool breadth (no web fetch/search, ask_user, todo, plan tools; root
 re-checked). Market-breadth (§7a) is the next agent, `impl:harness-breadth`, now running.
+
+### 2026-09-14 — Register rows dispatched to Linear; root corrected L-02
+
+Root re-checked the register's two "verified new gaps" before filing: the cache-marker row was
+wrong — `src/llm/request/anthropicMessagesEncoder.ts:201-249` emits three deterministic
+`cache_control` breakpoints (v4 encoder, `tests/anthropicCacheBreakpoints.test.ts`), so L-02
+is partial (no `prompt_cache_key`/`cachePoint`, no hit-rate display), matching AMC-1514's own
+"do not reopen cacheless" note; the tool-breadth row holds (the only `web_search` hits are in
+`src/demo/demoRun.ts`). Filed AMC-1549 (governed web fetch/search, ask-user, todo, plan tools;
+Todo, P2, child of AMC-1505). Register rows posted as comments to their owners instead of new
+issues: AMC-1514 (L-01/L-02/L-04/L-05), AMC-483 (S-01/S-02/S-03/S-05), AMC-1512 (I-01/I-02/I-04
+and the §7a interaction list); summary and the dsh-clone boundary on AMC-1505. Register commits
+`25de30e6`, `00f229c5`.
