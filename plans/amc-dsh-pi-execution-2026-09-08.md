@@ -1745,3 +1745,23 @@ commands, the README `amc start` "checks your agent" wording (the action starts 
 daemon; scoring not found in its body, daemon not exercised), and a random `confidence` in
 `continuousRedTeam.ts`. The agent confirmed the five §2 facades are gone at `505a28ce`. Next
 agent: `readiness:b0-b1` (running).
+
+
+### 2026-09-14 — Phase B readiness audit (read-only) recorded: `4938dd8d`; stray tracked vault untracked: `7cfcb767`
+
+Ninth sequential agent (`readiness:b0-b1`, `wf_c844d75d-d8d`, 41 tool uses, 10.5 min, no repo
+writes) audited brief §6 B0/B1/B2 at `505a28ce` from a `git archive` export, running only
+install, build, `release:verify-version` (1.2.0 everywhere) and `release:prepack-check` (6/6
+sub-steps exit 0) there; no gate, packed-install, clean-source, suite, registry or credential
+was exercised. Findings (record `AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): the
+trust-root items are mostly mitigated in code (signed key-history envelope, explicit notary
+admission, signed `amc.config.yaml` for `isolated`), while `AMC_NO_SIGN` literal signatures,
+the `VITEST`-gated test passphrase and the labelled placeholder `zkPrivacy` remain; **no dated
+key-rotation proof exists in the repo** (§12 gate — Sid); Dockerfile default passphrases are
+gone; hygiene: the named artifacts are untracked except `mirofish-simulation/` (labelled
+synthetic, still tracked) and `qa/`; a new stray tracked workspace `--/.amc/` with a vault and
+evidence DB (added 2026-08-22) was found — root untracked it and added a `/--/` guard in
+`7cfcb767` (files kept; a history purge is a §12 decision); **no publish or deploy credentials are
+present in this shell** (§B1 — Sid); `~/.npmrc` holds one auth token whose identity is unknown.
+Phase B stays closed: Phase A is not Done and both gates are open. Brief §6 B0 bullets carry
+dated corrections. Next agent: `impl:inbox-spill`.

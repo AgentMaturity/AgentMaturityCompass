@@ -318,8 +318,10 @@ a single pinned commit.**
   "unsigned" signatures, the vault falls back to `amc-test-passphrase` under test,
   `zkPrivacy.ts` is placeholder crypto, `binderVerifier` shells raw `tar -xzf`,
   `amc.config.yaml` — which controls `trustBoundaryMode` — is unsigned).
+  > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): key-history JSON is now a signed envelope with explicit admission; notary responses no longer auto-append; `amc.config.yaml` signing exists and `isolated` is refused unsigned (default `shared` stays unsigned); `AMC_NO_SIGN=1` still writes literal "unsigned" (verify rejection not run-tested); the `amc-test-passphrase` fallback is gated to `VITEST` only but still shipped; `zkPrivacy.ts` remains placeholder, labelled; binderVerifier status is in the record. Static reads only.
 - Plaintext demo vault passphrase on disk; default passphrases baked into both Dockerfiles.
   **These must not reach a live deployment.**
+  > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): Dockerfile default passphrases are absent (secrets are file-mounted; only `*.txt.example` tracked); the demo passphrase is random and 0600; `.amc/local-vault-passphrase` has no `.gitignore` guard.
 - Public-repo hygiene, tracked and shipping: `COMPETITIVE_*_G0DM0D3.md`,
   `.tmp-gap-report.json` (`.gitignore` guards the wrong filename), `test_model.pkl`
   fake-malware fixture, `mirofish-simulation/` **fabricated practitioner testimonials**,
@@ -327,6 +329,7 @@ a single pinned commit.**
   `security-audit/` husks, the embedded `qa/` subproject, the OpenClaw persona stack
   (`HEARTBEAT.md` monitors a personal crypto bot). Remove these from the public surface
   before the repo or package is exposed. The fabricated testimonials are the most serious.
+  > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): G0DM0D3, `.tmp-gap-report.json`, `test_model.pkl`, tarballs, `..bfg-report/`, the fragment and the persona stack are no longer tracked; `mirofish-simulation/` (4 files, now labelled synthetic) and `qa/` (30 files) are still tracked; a NEW stray workspace `--/.amc/` (30 files incl. `vault.amcvault`, added 2026-08-22) was found and untracked in `7cfcb767` (history not purged). No dated key-rotation proof exists anywhere in the repo.
 
 ### B1 — Credentials check, up front
 

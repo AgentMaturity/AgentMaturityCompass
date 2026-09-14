@@ -259,6 +259,15 @@ Commander name in root, and corrected them (11 deprecated `amc wrap` recipes, `m
 10/10. Remaining dispositions and the "142 packs" count are AMC-1550. The agent confirmed the
 five §2 facades are absent at `505a28ce` (only history comments remain).
 
+### readiness:b0-b1 — REPORT_ONLY → `AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md` (`4938dd8d`)
+
+Agent: `wf_c844d75d-d8d`, 41 tool uses, 10.5 min. B0 trust root mostly mitigated in code with
+three residuals; no key-rotation proof in the repo; hygiene list re-verified (two named
+directories still tracked; one new stray tracked vault workspace, untracked by root in `7cfcb767`);
+B1 credentials all absent from the shell; B2 `release:verify-version` and `release:prepack-check`
+green on the exported tree. Nothing else exercised. Phase B remains closed behind Phase A and
+the two §12 gates.
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
