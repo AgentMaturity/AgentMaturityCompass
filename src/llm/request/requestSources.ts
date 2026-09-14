@@ -32,6 +32,7 @@ import { assertNativeImageBytes } from "../../attachments/nativeImageInput.js";
 import { assertNativeAudioBytes } from "../../attachments/nativeAudioInput.js";
 import { NativeAudioProvenanceError, validateNativeAudioProvenance } from "../../session/nativeAudioProvenance.js";
 import { snapshotRecordedGeminiPart, type RecordedGeminiPart } from "../../session/geminiPartMeta.js";
+import { resolveSpilledInputPayload } from "../../session/spill/spillInput.js";
 import { parseRequestHeaderMeta } from "../../session/requestHeaderMeta.js";
 import { bindProviderToolNames } from "./providerToolNames.js";
 import { OLLAMA_CALL_KEY_PREFIX, readOllamaCallKey } from "../providers/ollamaToolIdentity.js";
@@ -147,13 +148,13 @@ function toPart(entry: SurfaceEntry, event: EvidenceEvent, bytes: Buffer): Encod
       if (!Number.isSafeInteger(meta.bytes) || meta.bytes !== bytes.length) return { error: `image ${event.id} byte length disagrees with its signed metadata` };
       try { assertNativeImageBytes(bytes, meta.mimeType); }
       catch (error) { return { error: `image ${event.id}: ${error instanceof Error ? error.message : "invalid signed media type"}` }; }
-      return { kind: "image", sha256: entry.part.sha256, mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
+      return { kind: "image", sha256: sha256Hex(bytes), mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
     }
     case "audio": {
       if (event.event_type !== "user/attachment" || entry.role !== "user" || meta.bytes !== bytes.length) return { error: `audio ${event.id} is not its original signed user binary` };
       try { assertNativeAudioBytes(bytes, meta.mimeType); }
       catch (error) { return { error: `audio ${event.id}: ${error instanceof Error ? error.message : "invalid signed MIME"}` }; }
-      return { kind: "audio", sha256: entry.part.sha256, mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
+      return { kind: "audio", sha256: sha256Hex(bytes), mediaType: meta.mimeType, bytes: Buffer.from(bytes) };
     }
     case "tool_use": {
       const toolCallId = stringField(meta, "toolCallId");
@@ -268,9 +269,9 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     sourceEventIds.push(input.toolSchemaEventId);
   }
 
+  const prefix = input.events.slice(0, cutoffIndex + 1);
   let entries: readonly SurfaceEntry[];
   try {
-    const prefix = input.events.slice(0, cutoffIndex + 1);
     validateSurfaceCompactions(input.workspace, prefix);
     entries = foldSurfaceEntries(prefix);
   } catch (error) {
@@ -278,7 +279,7 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
   }
   const parts: { role: SurfaceEntry["role"]; part: EncodablePart }[] = [];
   try {
-    for (const id of validateNativeAudioProvenance(input.workspace, input.events.slice(0, cutoffIndex + 1), entries)) {
+    for (const id of validateNativeAudioProvenance(input.workspace, prefix, entries)) {
       if (!sourceEventIds.includes(id)) sourceEventIds.push(id);
     }
   } catch (error) {
@@ -301,7 +302,21 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     if ((entry.part.kind === "image" || entry.part.kind === "audio") && (sha256Hex(bytes) !== row.payload_sha256 || entry.part.sha256 !== row.payload_sha256)) {
       return failure("evidence-inconsistent", `${entry.part.kind} ${row.id} bytes or surface digest do not match the committed payload_sha256; refusing tampered binary input`, notes);
     }
-    const part = toPart(entry, row, bytes);
+    // An attachment above the per-event cap stores a descriptor as its payload and its original bytes in the
+    // spill store (src/session/spill/spillInput.ts). Resolve them against the row's signed reference, require
+    // the signed commitment row that preceded the object, and only then let them become a part.
+    let content = bytes;
+    if (row.event_type === "user/attachment") {
+      const spilled = resolveSpilledInputPayload({ workspace: input.workspace, event: row, payload: bytes, events: prefix });
+      if (spilled.status === "ok") {
+        content = spilled.bytes;
+        if (spilled.commitmentEventId !== null && !sourceEventIds.includes(spilled.commitmentEventId)) sourceEventIds.push(spilled.commitmentEventId);
+      } else if (spilled.status !== "not-spilled") {
+        return failure(spilled.status === "missing" || spilled.status === "key-unavailable" ? "payload-missing" : "evidence-inconsistent",
+          `spilled ${entry.part.kind} ${row.id}: ${spilled.detail}`, notes);
+      }
+    }
+    const part = toPart(entry, row, content);
     if ("error" in part) {
       return failure(entry.part.kind === "image" || entry.part.kind === "audio" ? "evidence-inconsistent" : "unreconstructable", part.error, notes);
     }

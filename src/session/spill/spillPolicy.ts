@@ -11,6 +11,7 @@
 import { sha256Hex } from "../../utils/hash.js";
 import { SessionSpillStore } from "./spillStore.js";
 import { resolveSpillPolicyConfig, type SpillPolicyConfig, type SpillRef } from "./spillTypes.js";
+import { encodeSpilledInputDescriptor, SpilledInputRetentionError, type SpilledInputStage } from "./spillInput.js";
 
 export interface SpillInput {
   /** Used only to make the object filename legible; never trusted as a path. */
@@ -173,5 +174,66 @@ export class SessionSpillPolicy {
       content: preview,
       ref: refFor()
     };
+  }
+
+  /**
+   * Retain INPUT bytes that cannot become one signed row (a user attachment above
+   * the per-event cap; see ./spillInput.ts).
+   *
+   * Unlike `apply` there is no threshold and no preview: the caller has already
+   * decided the bytes must spill, and the payload that replaces them is a canonical
+   * descriptor rather than a head/tail cut of binary media. And unlike `apply`
+   * nothing degrades: an input whose bytes the store cannot retain is an input the
+   * model can never be shown, so every failure is thrown naming its stage. The
+   * ordering is the one `apply` enforces — prepare in memory, sign the commitment,
+   * only then publish the object — so no unsigned side-channel file ever exists.
+   */
+  retainInput(
+    input: SpillInput,
+    context: { readonly what: string; readonly cap: number },
+    commitBeforeRetain: (ref: SpillRef) => void
+  ): { readonly ref: SpillRef; readonly descriptor: Buffer } {
+    const fail = (stage: SpilledInputStage, error: unknown): never => {
+      throw new SpilledInputRetentionError(context.what, input.content.byteLength, context.cap, stage,
+        error instanceof Error ? error.message : String(error));
+    };
+    const contentSha256 = sha256Hex(input.content);
+    let prepared: ReturnType<SessionSpillStore["prepare"]>;
+    try {
+      prepared = this.store.prepare(input.nameSeed, input.content);
+    } catch (error) {
+      return fail("prepare", error);
+    }
+    const descriptor = encodeSpilledInputDescriptor({ contentSha256, bytes: input.content.byteLength, locator: prepared.object.locator });
+    const ref: SpillRef = Object.freeze({
+      v: 2,
+      format: "amc-blob-v1",
+      keyVersion: prepared.object.keyVersion,
+      encodedBytes: prepared.object.encodedBytes,
+      encodedSha256: prepared.object.encodedSha256,
+      locator: prepared.object.locator,
+      contentSha256,
+      bytes: input.content.byteLength,
+      previewBytes: descriptor.byteLength,
+      maxInlineBytes: context.cap,
+      retrievalHint: this.config.retrievalHint,
+      unretrievable: null
+    });
+    if (typeof commitBeforeRetain !== "function") return fail("commit", new Error("spill requires a signed commitment before retention"));
+    try {
+      const commitment: unknown = commitBeforeRetain(ref);
+      if (commitment !== null && (typeof commitment === "object" || typeof commitment === "function") && "then" in commitment) {
+        void Promise.resolve(commitment).catch(() => undefined);
+        throw new Error("spill commitment must complete synchronously before retention");
+      }
+    } catch (error) {
+      return fail("commit", error);
+    }
+    try {
+      prepared.persist();
+    } catch (error) {
+      return fail("persist", error);
+    }
+    return { ref, descriptor };
   }
 }
