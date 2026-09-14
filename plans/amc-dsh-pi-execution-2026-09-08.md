@@ -1540,3 +1540,18 @@ unchanged after every run. Committed as `fa2ffac6` (nine paths). Receipt:
 suite, release gate, JSONL backend, `AMC_NO_SIGN=1`, a text attachment actually spilled.
 AMC-1547 stays In Progress with a comment; the fresh-clone re-acceptance runs once the
 implementation agents have all landed. Next agent: `impl:studio-token-scopes` at `fa2ffac6`.
+
+### 2026-09-14 — Root follow-ups while `impl:studio-token-scopes` runs: `83207148`, `06d084d7`
+
+`83207148` closes the one gap the spill agent named outside its scope: `projectSessionUpdates`
+now passes its own history to `projectAcpAttachment`, so the ACP `session/load` replay,
+history continuity and the Studio task projection refuse a spilled attachment whose signed
+commitment row is absent (new assertion red before, green after; 8 projection-caller files
+104/104; tsc clean). `06d084d7` closes two of the three AMC-1528 follow-ups: a behavioral test
+for a timed-out ("slow") persona install (recorded failed, `exitCode` null, spawn error in
+stderr, every consumer skipped naming `package-install`; the step runner `run` is now exported
+unchanged, so the script hash moves from `c1f410b3…` to `1831aaf7…`) and a runbook section
+describing the 2026-09-08 receipt schema. Mutation: a timed-out step reading as passed turned
+the new test red; restored. 4 persona/gate files 53/53. The stale tracked gate receipt stays
+open (refreshing it means running the gate, not allowed in the shared root). Receipt table:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`.

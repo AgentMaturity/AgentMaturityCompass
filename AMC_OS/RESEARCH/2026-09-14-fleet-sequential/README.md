@@ -63,3 +63,12 @@ the first run of the new test in the worktree rotated that checkout's tracked `.
 the agent restored them and could not attribute the cause within budget.
 
 Linear: AMC-1547 (retained spill lifecycle; state unchanged, comment posted with this receipt).
+
+### Root follow-ups landed between agents
+
+| Commit | Change | Verification in root |
+|---|---|---|
+| `83207148` | `projectSessionUpdates` passes its own history to `projectAcpAttachment`, so `session/load`, history continuity and the Studio task projection enforce commitment-before-attachment ordering (closes the spill agent's blocker item 5; `docs/SESSION_SPILL_LIFECYCLE.md` updated) | new assertion in `tests/sessionAttachmentSpill.test.ts` red before the change, green after; 8 projection-caller test files 104/104; both tsc profiles exit 0 |
+| `06d084d7` | AMC-1528 follow-ups: `scripts/install-persona-qa.mjs` exports its step runner `run` (behaviour unchanged; script SHA-256 now `1831aaf7b773aa81…`, superseding the `c1f410b3…` recorded on 2026-09-09); new test "records a slow install that hits its timeout as failed with the spawn error, and leaves every consumer unrun"; `docs/RELEASE_RUNBOOK.md` section "Install persona QA receipt (schema 2026-09-08)" | 4 persona/gate test files 53/53; mutation (a timed-out step reads as passed) turned the new test red, restored |
+
+Still open from AMC-1528: the tracked `.amc/release-gate/latest.json` (2026-08-25, schema 2026-05-23) embeds the retired rating text; refreshing it means running the gate, which must not happen in the shared root — left for the next fresh-clone gate run or an untrack decision.
