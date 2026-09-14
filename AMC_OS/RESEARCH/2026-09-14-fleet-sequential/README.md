@@ -268,6 +268,30 @@ B1 credentials all absent from the shell; B2 `release:verify-version` and `relea
 green on the exported tree. Nothing else exercised. Phase B remains closed behind Phase A and
 the two §12 gates.
 
+### impl:inbox-spill — IMPL-9, COMPLETE → integrated as `b76967e9`
+
+Agent: `wf_8777d01c-fc6`, worktree `.claude/worktrees/wf_8777d01c-fc6-1`, base `cb251cbe`, 96
+tool uses, 48.6 min. Records: `impl-inbox-spill/result.json`, `report.md`. Closes the inbox and
+audio doors `fa2ffac6` left fail-closed (13 files changed, `tests/sessionInboxSpill.test.ts`
+added). Root re-verification at `b76967e9`:
+
+| Check | Result |
+|---|---|
+| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` | exit 0 / exit 0 |
+| `node scripts/architecture-boundaries-check.mjs` | `failures: []` (`sessionService.ts` 799 lines by `wc`) |
+| `pnpm build` | exit 0 |
+| 31 files: three spill suites + every test importing a changed module + continuity, Studio task, media and provider files | 31 files, 474/474 passed, 120.7 s |
+| Mutation M2 — commitment no longer bound to the queued message id | 1 failed / 17 passed: exactly the descriptor-refusal test |
+| Mutation M3 — commitment no longer required to precede the row | 1 failed / 17 passed: exactly the descriptor-refusal test |
+| Mutation M4 — audio fail-closed exception restored | 2 failed / 16 passed: exactly the two audio-spill tests |
+| Mutation M5 — resolver failure returns the descriptor as bytes | 1 failed / 17 passed: exactly the descriptor-refusal test |
+| tracked `.amc/keys/*` after every run | unchanged |
+
+Not exercised in root: the agent's M1 (object before commitment; identical code path to the
+`fa2ffac6` mutation already red in root), full suite, release gate, fresh clone, JSONL backend.
+Key-rotation cause narrowed (see the execution log): first run in a fresh worktree creates a
+vault at cwd; root's vault exists, so root is unaffected. Linear: AMC-1547 (comment posted).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |

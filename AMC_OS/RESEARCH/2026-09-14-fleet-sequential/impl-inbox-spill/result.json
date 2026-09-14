@@ -1,0 +1,111 @@
+{
+ "type": "result",
+ "key": "v2:e9cf7b9c07b5dbb9c335663e5aa566df6995fb8c99d5c71a01ae7c4d23a24e66",
+ "agentId": "ac0655d0bf3b65a1c",
+ "result": {
+  "track": "IMPL-9",
+  "status": "COMPLETE",
+  "summary": "Queued inbox inputs and audio attachments above retention.maxPayloadBytesPerEvent now retain through the encrypted spill store behind a signed tool/spill-commitment row (subject \"loop/inbox\", bound to the queued messageId, durable before the object), with the loop/inbox row keeping its fixed meta and carrying an amc-spilled-input@1 descriptor payload. One resolver (resolveSpilledInboxPayload) plus readQueuedInputBytes is used by inbox replay, the three claim-time recorders, ACP ordered continuity and audio provenance; the native task service bound is raised to min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap). At cb251cbe on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0: RED 0/5 then GREEN 18/18 on the three spill suites, 403/403 across the 25 other affected files (13 of them after pnpm build), both tsc profiles clean, line-budget and docs-drift checks pass, five mutations each went red on exactly the tests written for that property and were restored.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/agent/inbox.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/agent/nativeImageMessage.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/agent/nativeOrderedMessage.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/agent/nativeAudioMessage.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/acp/acpHistoryContinuity.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/session/nativeAudioProvenance.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/session/sessionService.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/session/sessionPayloadCap.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/session/spill/spillInput.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/src/studio/nativeTaskService.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/tests/sessionPayloadCap.test.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/tests/sessionAttachmentSpill.test.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/docs/SESSION_SPILL_LIFECYCLE.md"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1/tests/sessionInboxSpill.test.ts"
+  ],
+  "testsAdded": [
+   "tests/sessionInboxSpill.test.ts: the loop/inbox commitment is durable before any object exists; the inbox row carries a descriptor and keeps its format; replay, claim, continuity and projection carry the original bytes",
+   "tests/sessionInboxSpill.test.ts: a descriptor row is never treated as bytes: no preceding loop/inbox commitment, another message's commitment, a later commitment or a modified object refuses",
+   "tests/sessionInboxSpill.test.ts: a queued audio input above the cap is retained, claimed into spilled audio attachment rows, and audio provenance validates end to end",
+   "tests/sessionInboxSpill.test.ts: a queued legacy image input above the cap is retained and claimed from the resolved bytes",
+   "tests/sessionInboxSpill.test.ts: above retention.maxBlobBytes a queued input is refused at the door with that key named, nothing recorded and the lane empty",
+   "tests/sessionPayloadCap.test.ts (updated inbox case): an oversize queued input is refused before the inbox row exists while the spill store has no key, then retained behind a signed loop/inbox commitment",
+   "tests/sessionAttachmentSpill.test.ts (replaced audio fail-closed case): an audio attachment above the per-event cap is retained behind a signed commitment and resolves to its original bytes"
+  ],
+  "testResults": [
+   {
+    "command": "npx vitest run tests/sessionInboxSpill.test.ts (RED, before any implementation)",
+    "passed": 0,
+    "failed": 5,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/sessionInboxSpill.test.ts tests/sessionPayloadCap.test.ts tests/sessionAttachmentSpill.test.ts (GREEN; run twice, before and after the mutation checks, same result)",
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run <25 files: every test importing a changed module + cosProduct08Continuity, cosProduct10NativeTaskService/Projection/Input, nativeSignedAudio*, nativeSignedImage*, nativeSignedToolSubset, native*Image* (12 files), nativeGeminiRuntime, cosProduct05OllamaRuntime, acpFailedTurnUpdates, studioNativeTaskValidation, nativeValidationOutcomeSurfaces> before pnpm build",
+    "passed": 390,
+    "failed": 13,
+    "skipped": 0
+   },
+   {
+    "command": "npx vitest run tests/nativeValidationOutcomeSurfaces.test.ts after pnpm build (the 13 earlier failures were all 'Cannot find module dist/...')",
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "Commitment row durable BEFORE any spill object exists (inbox and attachment doors)",
+    "mutation": "src/session/spill/spillPolicy.ts retainInput: inserted prepared.persist() before commitBeforeRetain(ref)",
+    "wentRed": true
+   },
+   {
+    "property": "A loop/inbox commitment is bound to the one queued message it retains bytes for",
+    "mutation": "src/session/spill/spillInput.ts resolveSpilledInboxPayload: dropped the meta[messageId] !== input.messageId check (only tests/sessionInboxSpill.test.ts:192 went red)",
+    "wentRed": true
+   },
+   {
+    "property": "The commitment must PRECEDE the inbox row in the supplied history",
+    "mutation": "src/session/spill/spillInput.ts resolveSpilledInboxPayload: scanned input.events instead of input.events.slice(0, index) (only tests/sessionInboxSpill.test.ts:193 went red)",
+    "wentRed": true
+   },
+   {
+    "property": "Audio routes to the spill store like image and text (no fail-closed exception)",
+    "mutation": "src/session/sessionPayloadCap.ts attachmentPayloadRoute: re-added `if (kind === \"audio\" && byteLength > cap) throw new SessionPayloadCapError` (exactly the two audio tests went red, 13 others stayed green)",
+    "wentRed": true
+   },
+   {
+    "property": "Readers never treat a descriptor as bytes; nothing degrades",
+    "mutation": "src/agent/inbox.ts readQueuedInputBytes: returned payload.bytes (the descriptor) when the resolver did not return ok (tests/sessionInboxSpill.test.ts:195 went red)",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "npx tsc -p tsconfig.json --noEmit: exit 0. npx tsc -p tsconfig.tests.json --noEmit: exit 0 (first run had 7 typing errors confined to the two test files I authored/edited; fixed, re-run clean). node scripts/architecture-boundaries-check.mjs: failures [] (src/session/sessionService.ts sits at exactly 800 split-on-newline lines, the cap, not over it; no other file near the cap). node scripts/docs-drift-check.mjs: passed, 301 files scanned. All at cb251cbe, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11.",
+  "behaviorChanges": [
+   "LoopInbox.insert no longer refuses a queued input above retention.maxPayloadBytesPerEvent: it appends a signed tool/spill-commitment row (meta: subject \"loop/inbox\", messageId, spilled SpillRef) BEFORE publishing the encrypted object, then the loop/inbox row whose payload is the canonical amc-spilled-input@1 descriptor and whose meta (including payloadFormat) is unchanged. Above retention.maxBlobBytes it throws SessionSpillCapError with nothing recorded; a store failure throws SpilledInputRetentionError naming its stage. SessionPayloadCapError is no longer thrown at either door (class still exported).",
+   "Every reader of a loop/inbox payload (inbox replay, recordNativeImageMessage, recordNativeOrderedMessage, recordNativeAudioMessage, validateAcpOrderedHistory, validateNativeAudioProvenance) resolves a descriptor through the preceding loop/inbox commitment (resolveSpilledInboxPayload) and refuses evidence-inconsistent / missing / unauthentic instead of decoding the descriptor; inbox replay now also digest-checks plain-text rows, which it previously did not.",
+   "validateAcpOrderedHistory and validateNativeAudioProvenance also resolve spilled user/attachment and user/message rows through resolveSpilledInputPayload with the full history, so an ordered/audio sequence whose individual image or audio part spilled at claim time still replays and validates.",
+   "Audio attachments above the per-event cap now spill (attachmentPayloadRoute no longer has the audio exception); a malformed WAV above the cap is still refused by assertNativeAudioBytes before any row exists.",
+   "Studio native task service: queued-input bound is min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap) = min(260096, 10485760) = 260096 bytes with the default policy (was sessionPayloadCap = 65536); advertised maxSerializedPartsBytes is that bound minus the pre-existing 512-byte wrapper slack = 259584 (was 65024); the 413 INPUT_TOO_LARGE message now names the prompt-frame bound and retention.maxBlobBytes instead of retention.maxPayloadBytesPerEvent.",
+   "SessionService: the private retainOversizeAttachment(what, filename, bytes, cap, turn, step) became the public retainOversizeInput(what, bytes, cap, subject: SpillCommitmentSubject); commitment meta for attachments is byte-identical to before (subject user/attachment + filename)."
+  ],
+  "decisions": [
+   "The worktree was created at 3d6b8d4a (an ancestor), not at cb251cbe as the brief stated, and the in-scope files did not exist there; since HEAD was an ancestor of cb251cbe I fast-forwarded my own worktree branch with `git merge --ff-only cb251cbe...` (no commit, reset, or branch switch) before doing anything else. All results are against cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb.",
+   "The SpillRef rides on the commitment row, not the inbox row: loop/inbox meta is a fixed hash pre-image (buildInboxRow in src/session/loopEventMeta.ts), so no loopEventMeta change was needed. Binding is subject=\"loop/inbox\" + messageId on the commitment plus descriptor{locator,contentSha256,bytes} == commitment SpillRef; the commitment row (the only signed row naming the object) is the one whose hash/signature inspectSpilledEvent authenticates.",
+   "sessionService.ts deviation from the letter of 'ONE new method plus imports, nothing else': the file is at exactly the 800-line cap (split-on-newline count, as scripts/architecture-boundaries-check.mjs measures), so adding a second method would have failed the line-budget gate. I instead generalized the adjacent private retainOversizeAttachment into one public retainOversizeInput(what, bytes, cap, subject) with net-zero lines; the only other touched lines are its single call site (recordUserAttachment) and the spillInput import line. No exception was recorded in line-budgets.json.",
+   "All queued inputs above the cap spill uniformly, including plain-text prompts (the brief's step 3 says 'switch LoopInbox.insert'); no reader other than the ones in scope joins on a loop/inbox payload (grep of src for loop/inbox: jsonlContinuation.ts reads meta only).",
+   "src/studio/nativeTaskProjection.ts was left unchanged: it decodes no inbox row itself and inherits the ordering checks through validateAcpOrderedHistory and projectSessionUpdates; the new test exercises readNativeTaskProjection over a spilled ordered-image session and a spilled audio session and asserts the committed attachment digests.",
+   "The native task service check compares the encoded queued payload against min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap) rather than sessionSpillCap alone so the wire-frame bound the constant encodes still holds; the advertised value keeps the existing 512-byte slack so an input at the advertised size plus the codec wrapper is never refused.",
+   "attachmentPayloadRoute keeps its `kind` parameter (now unused, `void kind`) so its call signature is stable; it delegates to the new queuedInputPayloadRoute.",
+   "During the first (RED) run of tests/sessionInboxSpill.test.ts at 13:28:16 the worktree's tracked .amc/keys/{auditor,lease,monitor,session}_{ed25519.pub,history.json} were rewritten and four .previous-<sha> backups created; later runs did not touch them again. I restored the eight tracked files from HEAD via `git show HEAD:<path> >` and removed the four untracked backups; the final git status shows only my intended changes. Not attributed within budget \u2014 flag for the integrator that some test path writes to the cwd .amc/keys on first use in a fresh worktree."
+  ],
+  "blockers": [],
+  "reportMarkdown": "# IMPL-9 \u2014 queued inbox inputs and audio attachments through the signed spill store\n\n**Commit:** cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb (worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1`, own branch fast-forwarded from 3d6b8d4a with `git merge --ff-only`; no commit made).\n**Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, `pnpm install --frozen-lockfile --prefer-offline`, `pnpm build` (needed only by tests/nativeValidationOutcomeSurfaces.test.ts).\n\n## What was done (all five steps of the brief)\n1. `src/session/spill/spillInput.ts` (additive): `SPILL_INBOX_SUBJECT`, `SPILL_INBOX_MESSAGE_META_KEY`, `SpillCommitmentSubject`, `spillCommitmentMeta`, `spillCommitmentNameSeed`, `resolveSpilledInboxPayload`; the object-read tail of `resolveSpilledInputPayload` is shared as private `readCommittedObject`.\n2. `src/session/sessionService.ts`: `retainOversizeInput(what, bytes, cap, subject)` (generalized from the adjacent private attachment method, net-zero lines \u2014 see decisions), import line, one call site.\n3. `src/session/sessionPayloadCap.ts` (additive `queuedInputPayloadRoute`; `attachmentPayloadRoute` no longer refuses audio).\n4. `src/agent/inbox.ts`: door routes through `queuedInputPayloadRoute` + `retainOversizeInput`, descriptor becomes the row payload, meta unchanged; replay resolves via new exported `readQueuedInputBytes`.\n5. `nativeImageMessage.ts`, `nativeOrderedMessage.ts`, `nativeAudioMessage.ts`: decode from `readQueuedInputBytes`; original refusal messages for pruned/missing/tampered preserved.\n6. `acpHistoryContinuity.ts`, `nativeAudioProvenance.ts`: `originalBytes(workspace, events, row)` resolves loop/inbox rows through the inbox resolver and attachment/message rows through `resolveSpilledInputPayload`.\n7. `nativeTaskService.ts`: bound = min(NATIVE_TASK_MAX_PARTS_BYTES, sessionSpillCap); advertised = bound \u2212 512; 413 names both bounds.\n8. Docs: `docs/SESSION_SPILL_LIFECYCLE.md` \"Not done\" paragraph replaced by a \"Spilled queued inputs\" section; audio sentence corrected.\n9. `nativeTaskProjection.ts` unchanged (decodes no inbox row); verified through the new test.\n\n## Measured results\n- RED first: `tests/sessionInboxSpill.test.ts` 0/5 before implementation.\n- GREEN: sessionInboxSpill + sessionPayloadCap + sessionAttachmentSpill = 18/18 (run before and after the mutation checks, identical).\n- 25 affected files (every importer of a changed module plus the named image/audio/continuity/task suites): 390 passed, 13 failed only for missing `dist/`; after `pnpm build` that file 13/13. Net 403/403.\n- `tsc -p tsconfig.json --noEmit` exit 0; `tsc -p tsconfig.tests.json --noEmit` exit 0.\n- `node scripts/architecture-boundaries-check.mjs` failures []; `sessionService.ts` = 800 split lines (at cap, not over). `node scripts/docs-drift-check.mjs` passed (301 files).\n\n## Mutation checks (each applied, run, restored; `grep MUTATION` = 0 afterwards)\n| Property | Mutation | Result |\n|---|---|---|\n| Commitment durable before object | persist() before commitBeforeRetain in spillPolicy.retainInput | red: 12 tests across both spill suites incl. the new inbox ordering test |\n| Commitment bound to messageId | drop messageId check in resolveSpilledInboxPayload | red: only sessionInboxSpill.test.ts:192 |\n| Commitment must precede the row | scan whole history instead of the prefix | red: only :193 |\n| Audio routes to spill | re-add audio SessionPayloadCapError | red: exactly the two audio tests |\n| Readers never degrade to the descriptor | return descriptor bytes on unresolvable | red: :195 (throw expected) |\n\n## Not exercised\n- Full suite; package, platform and release qualification; live providers.\n- JSONL session backend for spilled inbox rows (tests use the default store via `openSessionEventStore`).\n- ACP `session/load` over the wire (only `projectSessionUpdates`, `validateAcpOrderedHistory`, `readNativeTaskProjection` exercised directly).\n- No new test asserts the native task service's advertised `maxSerializedPartsBytes`; only the existing cosProduct10 suites ran green (they do not assert the old value).\n- Cold request derivation for an inbox-derived spilled **audio** attachment (the code path in requestSources.ts is shared with images, which fa2ffac6's tests cover).\n\n## Observation for the integrator\nThe first (RED) run of the new test rewrote the worktree's tracked `.amc/keys/*` (mtime 13:28:16) and left four `.previous-*` backups; I restored the eight files from HEAD and removed the backups, and later runs did not repeat it. Not attributed within budget."
+ }
+}

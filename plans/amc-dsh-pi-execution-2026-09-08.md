@@ -1765,3 +1765,27 @@ evidence DB (added 2026-08-22) was found — root untracked it and added a `/--/
 present in this shell** (§B1 — Sid); `~/.npmrc` holds one auth token whose identity is unknown.
 Phase B stays closed: Phase A is not Done and both gates are open. Brief §6 B0 bullets carry
 dated corrections. Next agent: `impl:inbox-spill`.
+
+### 2026-09-14 — impl:inbox-spill integrated as `b76967e9`: every spill door now open, fail-closed only above the blob cap
+
+Tenth sequential agent (`wf_8777d01c-fc6`, 96 tool uses, 48.6 min) returned COMPLETE: queued
+inputs (prompts, legacy image bundles, ordered and audio sequences) above
+`retention.maxPayloadBytesPerEvent` are retained through the encrypted spill store behind a
+signed `loop/inbox` commitment bound to the queued message id and durable before the object;
+the `loop/inbox` row keeps its fixed meta and carries the descriptor payload; one resolver behind
+`readQueuedInputBytes` serves inbox replay, the three claim-time recorders, ACP ordered
+continuity and audio provenance, refusing any descriptor without its preceding, matching
+commitment; audio attachments route to spill like image and text; the Studio queued-input bound
+is min(prompt frame, `retention.maxBlobBytes`). The agent kept `sessionService.ts` at its
+800-line cap by generalising the existing helper into `retainOversizeInput`. Root re-verified:
+tsc clean, boundaries clean, fresh build, 31 files 474/474, four mutations (message binding
+dropped, ordering dropped, audio exception restored, descriptor returned as bytes) each red then
+restored, tracked keys unchanged. Root's first mutation pass ran nothing because a zsh variable
+holding three file names did not word-split (brief §3); re-run with literal lists. With this,
+the 2026-09-12 payload-cap decision is fully superseded: no door refuses below
+`retention.maxBlobBytes`, and no cap was raised. Key-rotation cause narrowed: the rotation seen
+in three agent worktrees happens on the first test run in a fresh worktree, which has no
+gitignored `.amc/vault.amcvault`; the run creates one at cwd and `persistVault` rewrites the
+tracked key histories — root is unaffected because its vault exists (the 2026-09-12 fresh-clone
+receipt recorded the same effect). All ten non-reconciliation agents are done; next: the
+fresh-clone re-acceptance of the candidate, then the 41 reconciliations one at a time.

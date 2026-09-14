@@ -294,6 +294,7 @@ re-derive them from scratch:
   > 2026-09-14 correction: partly moved — `src/kernel/agentLoopRunner.ts:551` runs due schedules under an admission-checked schedule pass; `src/cli.ts:13960` `loop schedule` only prints cron/launchd/systemd config ("no automatic installation"), so no CLI manages signed schedules and no standing timer was found.
 - Spill writes plaintext, is invisible to retention/DSAR/export/backup, and a spill write can
   precede its signed commitment (ADR-0010) — close before spill carries regulated content.
+  > 2026-09-14 correction: the AMC-1547 work (encrypted v2 objects, commitment-before-materialization, authenticated inventory/erasure/export) plus `fa2ffac6` (attachments) and `b76967e9` (queued inputs, audio) mean every input and output door now spills behind a signed commitment durable before the object; mutation-verified in root. DSAR subject mapping and JSONL automatic retention remain not added (AMC-1547).
 - Coverage thresholds are all 0; `lint` aliases `typecheck`; Playwright e2e is unwired.
   > 2026-09-14 correction: `vitest.config.ts` thresholds are lines 65 / functions 75 / branches 59 / statements 64, not 0; `lint` still aliases `typecheck`; `test:e2e` runs `scripts/run-e2e.mjs` with `@playwright/test` declared — only the browser download (`npx playwright install`) is missing on this machine.
 - Number drift across three disagreeing scorers: tests 8,604 (badge) / ~4.2k / 5,031;
