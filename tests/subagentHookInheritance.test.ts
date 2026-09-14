@@ -9,6 +9,8 @@ import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidato
 import { openLedger } from "../src/ledger/ledger.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { createDriverRunner, type DriverRunnerInit } from "../src/agent/subagentRunner.js";
+import { spawnSubagent } from "../src/agent/subagentSpawn.js";
+import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { delegateTool } from "../src/agent/delegateTool.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { runComposedTurn, type ComposedToolSession } from "../src/kernel/agentLoopRunner.js";
@@ -184,5 +186,36 @@ describe("spawned children inherit the parent's hook control", () => {
         });
       }
     } finally { tools.close(); }
+  });
+});
+
+describe("a runner that declares no hook control is recorded as such in the parent's session", () => {
+  test("an injected runner leaves an undeclared-runner row in the parent; a driver runner declares its control and the parent records nothing", async () => {
+    const workspace = setup();
+    const parent = new SessionService(workspace);
+    parent.open({ agentId: "default", harnessVersion: "fixture", compositionDigest: "fixture", policyDigest: "fixture" });
+    try {
+      const foreign = await spawnSubagent({ workspace, parent: rootIdentity("default"), session: parent,
+        runner: async () => ({ ok: true, text: "foreign done" }),
+        request: { runAs: "foreign-child", goal: "Run outside the driver." }, mintSessionId: () => "foreign-child-session" });
+      expect(foreign.ok).toBe(true);
+      const recorded = hookControlRows(workspace, parent.sessionId);
+      expect(recorded).toHaveLength(1);
+      expect(recorded[0]!.writer_sig).not.toBe(UNSIGNED);
+      expect(JSON.parse(recorded[0]!.meta_json)).toMatchObject({ kind: "delegation/hook-control", version: 1, source: "undeclared-runner",
+        inherited: [], childRunAs: "foreign-child", childSessionId: "foreign-child-session", depth: 1 });
+      expect(hookControlRows(workspace, "foreign-child-session")).toHaveLength(0);
+
+      const driver = createDriverRunner(init(workspace, { hookControl: passThrough }));
+      expect(driver.hookControl).toBe("inherited");
+      expect(createDriverRunner(init(workspace)).hookControl).toBe("none");
+      const native = await spawnSubagent({ workspace, parent: rootIdentity("default"), session: parent, runner: driver,
+        request: { runAs: "native-child", goal: "Run under the driver." }, mintSessionId: () => "native-child-session" });
+      expect(native.ok).toBe(true);
+      expect(hookControlRows(workspace, parent.sessionId), "the driver runner declared itself; only the foreign spawn is recorded here").toHaveLength(1);
+      expect(hookControlRows(workspace, "native-child-session")).toHaveLength(1);
+    } finally {
+      parent.close({ reason: "completed" });
+    }
   });
 });

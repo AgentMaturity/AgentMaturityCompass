@@ -104,7 +104,17 @@ export interface SubagentRunResult {
   readonly continuation?: SubagentContinuation;
 }
 
-export type SubagentRunner = (ctx: SubagentRunContext) => Promise<SubagentRunResult>;
+/**
+ * Runs one child. A runner may DECLARE what hook control it installs on the
+ * child (`createDriverRunner` does: "inherited" when built on the parent's
+ * control, "none" otherwise). A runner that declares nothing — an injected or
+ * foreign runner — is recorded as such in the PARENT's session by
+ * `spawnSubagent`, so the absence of inherited control is never silent.
+ */
+export interface SubagentRunner {
+  (ctx: SubagentRunContext): Promise<SubagentRunResult>;
+  readonly hookControl?: "inherited" | "none";
+}
 
 export interface SubagentRequest {
   /** Names the child for evidence. Cannot affect what governs it. */
@@ -297,6 +307,17 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     childSessionId = mintSessionId();
     session.recordLoopEvent({ kind: "delegation-started", childRunAs: identity.runAs, childSessionId,
       governedAs: identity.governedAs, depth: identity.depth, packetId });
+    if (runner.hookControl === undefined) {
+      // The child's own session records the control it runs under only when the
+      // runner is a driver runner (./subagentRunner.ts). A runner that declares
+      // nothing gives the child no inherited control and writes no such row, so
+      // the parent records the absence here, before the runner is called.
+      session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: {
+        kind: "delegation/hook-control", version: 1, source: "undeclared-runner", inherited: [],
+        childRunAs: identity.runAs, childSessionId, governedAs: identity.governedAs, depth: identity.depth, packetId,
+        reason: "the injected runner declares no hook control; the parent's pre-step and turn-stopping hooks do not govern this child"
+      } });
+    }
   } catch (error) {
     removeHandoffPacket(workspace, packetId);
     throw error;

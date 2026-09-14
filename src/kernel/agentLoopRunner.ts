@@ -61,7 +61,7 @@ import { forkSession, resumeSession, type ResumeReport } from "../session/sessio
 import type { RecoveryClaimant } from "../session/sessionRecovery.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { rootIdentity } from "../agent/delegationIdentity.js";
-import type { SubagentRunner } from "../agent/subagentSpawn.js";
+import type { SubagentRunContext, SubagentRunner } from "../agent/subagentSpawn.js";
 import { parseSubagentStopConditions } from "../agent/subagentStopConditions.js";
 import type { ActionClass } from "../types.js";
 import { createDriverRunner } from "../agent/subagentRunner.js";
@@ -549,19 +549,22 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),
             ...(options.delegation.stopConditions === undefined ? {} : { stopConditions: options.delegation.stopConditions }) } })
         });
+        // The forwarding closure carries the driver runner's declaration, so a
+        // grandchild spawn is not recorded as an undeclared runner in its parent.
+        Object.assign(runNative, { hookControl: runner.hookControl });
       }
       if (options.schedulePass !== undefined) {
         const pass = options.schedulePass;
         const nativeRunner = runner;
         const scheduleResults = await runDueSchedules({
           workspace: options.workspace, parent: rootIdentity(options.agentId), session,
-          runner: async child => {
+          runner: Object.assign(async (child: SubagentRunContext) => {
             // Recheck each actual dispatch, including later rounds. Timers and
             // signed schedules cannot grandfather a replaced tools policy.
             assertNativeScheduleAdmission({ workspace: options.workspace, ...pass,
               approvalClass: options.approvalGate!.actionClass });
             return nativeRunner(child);
-          },
+          }, { hookControl: nativeRunner.hookControl }),
           mintSessionId: randomUUID, now: pass.now, parentSessionId: sessionId,
           expectedSchedulesDigest: pass.expectedSchedulesDigest,
           ...(pass.signal === undefined ? {} : { signal: pass.signal })

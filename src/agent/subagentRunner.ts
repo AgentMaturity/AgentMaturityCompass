@@ -213,7 +213,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
   const control = init.hookControl === undefined ? undefined
     : Object.freeze({ preStep: init.hookControl.preStep, turnStopping: init.hookControl.turnStopping });
 
-  return async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
+  const runChild = async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
     if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
     const scope = ctx.delegationScope === undefined ? undefined : [...ctx.delegationScope];
     if (scope !== undefined) {
@@ -364,4 +364,6 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       if (!keepAlive) release();
     }
   };
+  // Declared, so `spawnSubagent` can tell a driver runner from one that says nothing about control.
+  return Object.assign(runChild, { hookControl: (control === undefined ? "none" : "inherited") as "none" | "inherited" });
 }
