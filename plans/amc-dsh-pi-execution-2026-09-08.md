@@ -1803,3 +1803,17 @@ bounded poll; and the README/website test-file inventory drift 1,477 → 1,484 f
 files — regenerated in the clone and ported. No budget, cap or policy was widened. Receipt:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md` (candidate D). Candidate E is the
 commit that records this.
+
+
+### 2026-09-14 — Deferred validation accepted at candidate E `6e7875f2`
+
+Fresh clone at `6e7875f2` (Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0): install, build,
+both typechecks and the OpenAPI check passed; full suite **1,484/1,484 files, 14,101/14,101
+tests, 0 failed, 0 skipped** (349 s); release gate **14/14 executed checks passed, live-deploy-
+health skipped** (604 s); Python 290 passed, 21 failed (the known installed-wheel cases), 1
+skipped. The six fleet implementations and every root follow-up of today are therefore
+source-qualified at one pinned commit; this is not platform, published-package or deployed-
+release qualification and closes no AMC-1505 child by itself. Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md` (candidate E) with logs under
+`fresh-clone/candidate-e/`. Reconciliation phase starts now: 41 agents one at a time at
+`6e7875f2`, each posting its verified findings to its own issue.

@@ -48,7 +48,7 @@ this section in place and note the correction in the execution log.
 |---|---|
 | Repo root | `/Users/sid/AgentMaturityCompass` |
 | Branch | `amc/gap-register-execution` |
-| HEAD at brief authoring | `7bd1e8ce` (2026-09-12 correction: integration HEAD is `4d2d69e5`, unchanged since 2026-09-11) |
+| HEAD at brief authoring | `7bd1e8ce` (2026-09-12 correction: integration HEAD is `4d2d69e5`, unchanged since 2026-09-11; 2026-09-14: `6e7875f2`, fresh-clone accepted — suite 14,101/14,101, gate 14/14, receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`) |
 | Main | `3d6b8d4a` (root is ~197 commits ahead) |
 | Remote | `https://github.com/AgentMaturity/AgentMaturityCompass.git` |
 | Live plan | `plans/amc-dsh-pi-execution-2026-09-08.md` |
