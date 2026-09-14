@@ -1,0 +1,161 @@
+{
+ "type": "result",
+ "key": "v2:7085af1354134c4690b01dc1cc3a749b6c1db162e3b68754d5b5bb2b147fdb7d",
+ "agentId": "a4f49c5ea52fd7e08",
+ "result": {
+  "issue": "AMC-1510",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "src/kernel/amcRuntime.ts is the only module importing @amc/core and @amc/cordis; a second import site is forbidden by tests/kernelRuntimeBarrel.test.ts (mutation-verified).",
+    "evidence": "src/kernel/amcRuntime.ts:17-18 (the two re-exports); tests/kernelRuntimeBarrel.test.ts:20-26; scripts/architecture-boundaries-check.mjs:169-172 confines runtime @amc/core|cordis imports to src/kernel/. grep of src/ for static `from \"@amc/` outside the barrel finds only src/guide/frameworkGuide.ts string literals (documentation text) and src/cli-composition-commands.ts:24 (dynamic import, see defects). Mutation M1: appended `import { Context as __MutContext } from \"@amc/cordis\";` to src/kernel/agentLoopRunner.ts -> barrel test RED (AssertionError: expected ['src/kernel/agentLoopRunner.ts'] to deeply equal []); file restored, cmp identical.",
+    "holds": true
+   },
+   {
+    "claim": "scripts/bundle-kernel.mjs (esbuild, pinned devDependency) inlines the private closure into dist/kernel/amcRuntime.js \u2014 17 packages, ~380 KB \u2014 and writes amcRuntime.bundle.json, amcRuntime.js.LEGAL.txt and amcRuntime.js.NOTICES.md.",
+    "evidence": "pnpm build at 6e7875f2 (1 min 42 s wall) printed: `bundle-kernel: dist/kernel/amcRuntime.js 381 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp`; dist/kernel/amcRuntime.js = 390,435 bytes, amcRuntime.bundle.json 2,486 bytes, .LEGAL.txt 122 bytes, .NOTICES.md 17,844 bytes. Installed bundle.json: 17 packages, 0 without a declared licence. package.json devDependencies.esbuild = 0.28.2; scripts.build ends with `node scripts/bundle-kernel.mjs` (package.json:27).",
+    "holds": true
+   },
+   {
+    "claim": "The tarball keeps dist/** as the artifact and now ships THIRD_PARTY_NOTICES and LICENSE alongside the bundle and its notices.",
+    "evidence": "package.json files: [dist/**, !dist/sea/**, !dist/installers/**, scripts/postinstall.js, ..., README.md, THIRD_PARTY_NOTICES, LICENSE]; THIRD_PARTY_NOTICES (24,722 bytes) and LICENSE (1,079 bytes) exist at the root; `tar -tzf agent-maturity-compass-1.2.0.tgz` (6,229,312 bytes, 3,985 entries) lists package/LICENSE, package/THIRD_PARTY_NOTICES, package/dist/kernel/amcRuntime.js, amcRuntime.bundle.json, amcRuntime.js.NOTICES.md, amcRuntime.d.ts, amcRuntime.js.LEGAL.txt.",
+    "holds": true
+   },
+   {
+    "claim": "No resolution through checkout node_modules, workspace: dependencies or src imports: root dependencies carry no @amc/* or workspace: entries and @amc/core is not resolvable from the installed consumer.",
+    "evidence": "package.json dependencies filtered for @amc/* or workspace: -> [] (empty). The installed package.json carries four `workspace:*` entries (@amc/cordis, @amc/cordis-plugin-loader, @amc/core, @amc/schemastery) only under devDependencies, which `npm install --omit=dev` does not install; consumer/node_modules/@amc does not exist; packed-install-check step `@amc/core is not resolvable from the consumer directory` -> ok (scripts/packed-install-check.mjs:90-96 runs `node -e require.resolve('@amc/core')` with cwd=consumer and expects non-zero).",
+    "holds": true
+   },
+   {
+    "claim": "scripts/packed-install-check.mjs packs with --ignore-scripts, installs into a fresh directory outside the checkout with an empty HOME and its own npm cache, runs doctor/init and a keyless stub agent-loop turn, then requires both installed verifiers (session verify --json, agent-loop verify --json) to authenticate the evidence and reconstruct every request; a real provider is exercised only when AMC_PACKED_SMOKE_PROVIDER is set and otherwise reported skipped.",
+    "evidence": "Reproduced at 6e7875f2 with `node scripts/packed-install-check.mjs --no-build --keep` after pnpm build: ok npm pack 7.2 s; ok npm install (fresh dir, empty HOME) 24.6 s; ok @amc/core not resolvable; ok amc doctor 3.9 s; ok amc init --trust-boundary isolated 2.0 s; ok amc agent-loop run --provider stub --json 2.0 s; ok amc session verify --json 1.6 s; ok amc agent-loop verify --json 1.6 s; ok installed evidence and request reconstruction; `skip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)`; 43.2 s wall. Code: scripts/packed-install-check.mjs:37-50 (env scrubbing), 83-88 (pack --ignore-scripts), 89 (install --omit=dev), 99-103 (stub run + verifyRun), 104-111 (provider only when set). Structured verifier: scripts/packed-evidence-verification.mjs:10-37 (rejects non-idle, unsignedRows != 0, zero events/requests/toolCalls, non-complete or interrupted endings; requires ledger.ok, chain.ok, closed session, every request `reconstructed` with nonempty unique headerEventId). Temp work dir removed after inspection.",
+    "holds": true
+   },
+   {
+    "claim": "Wired as `npm run check:packed-install` and a CI job; the release gate also runs the packed-install step.",
+    "evidence": "package.json:84 `\"check:packed-install\": \"node scripts/packed-install-check.mjs\"`; .github/workflows/ci.yml:191-209 job `packed-install` (ubuntu-latest, pnpm 10.33.0, Node 24, `pnpm install --frozen-lockfile`, `node scripts/packed-install-check.mjs`); scripts/release-gate.mjs:171-172 runs `builtStep(\"packed-install\", \"node\", [\"scripts/packed-install-check.mjs\", \"--no-build\"])` in full mode and names the skip in quick mode; tests/releaseGateExecution.test.ts:58-60 asserts that wiring. The CI job itself (Linux/Node 24) and `pnpm release:gate` were not run here.",
+    "holds": true
+   },
+   {
+    "claim": "The SBOM appends the inlined packages as components marked amc:bundled-into; repeated bundling preserves output, inventory and notices.",
+    "evidence": "src/release/releaseSbom.ts:42-55 reads dist/kernel/amcRuntime.bundle.json and adds components with property {name: \"amc:bundled-into\", value: manifest.entry}; tests/kernelBundleSbom.test.ts (3 cases: bundled components marked, no manifest -> no invented components, repeated bundling byte-identical incl. execution of the fixture bundle) passed in this run. Not exercised: generating the real SBOM against the built artifact (only the fixture workspace), provenance/SEA/installer gates.",
+    "holds": true
+   },
+   {
+    "claim": "Bundle repeatability and gate review tests pass (\"16 cases across two suites\").",
+    "evidence": "At 6e7875f2 the two suites hold 17 cases: tests/kernelBundleSbom.test.ts 3 + tests/packedInstallVerification.test.ts 14 (5 `it` + 9 `it.each` kinds); all passed in the 42/42 run. The historical figure of 16 was stated at 68262e9d; the difference is a later added case, not a regression.",
+    "holds": true,
+    "note": "Count at HEAD is 17, not 16."
+   },
+   {
+    "claim": "Cold-reader fix (72a2f3d9) and the other cited commits (616b7a6b, f7e30f8c, 68262e9d, d1f2ee84, 7bd1e8ce) are on the integration branch.",
+    "evidence": "`git log --format='%h %s' HEAD | grep` matched all six: 616b7a6b feat(runtime): the published artifact delivers the governed native runtime (AMC-1510); f7e30f8c fix(deps): clear the runtime advisories the prepack release gate fails on; 72a2f3d9 fix(verification): read cold vault evidence without initializing trust (AMC-1525); 68262e9d fix(verification): reject native reports for nonexistent sessions (AMC-1525); d1f2ee84 test(workspaces): isolate assurance and policy fixtures from checkout; 7bd1e8ce fix(native): type validation file stats and selection fixtures.",
+    "holds": true
+   },
+   {
+    "claim": "The prepack release-gate dependency-audit failure was fixed by moving overrides under pnpm.overrides.",
+    "evidence": "package.json pnpm.overrides = {qs: \">=6.16.0\", fast-uri: \"^3.1.6\", \"@modelcontextprotocol/sdk>hono\": \"^4.13.5\"}; top-level overrides absent. The audit itself (`pnpm release:gate` / prepack) was not run.",
+    "holds": true,
+    "note": "Structure verified; audit result not exercised."
+   },
+   {
+    "claim": "agent-loop is no longer hidden/checkout-only in src/cli-agent-commands.ts.",
+    "evidence": "No `hidden`/`hideHelp` in src/cli-agent-commands.ts; `program.command(\"agent-loop\")` registered publicly at src/cli-agent-commands.ts:118-120; importRunner (lines 93-109) loads ./kernel/agentLoopRunner.js and on ERR_MODULE_NOT_FOUND reports 'The packaged native runtime could not be loaded. Reinstall AMC from a complete package.' The installed keyless run completed, so that path was not hit.",
+    "holds": true
+   },
+   {
+    "claim": "Receipts exist at AMC_OS/RESEARCH/2026-09-08-dsh-pi/qualified-packed-gate.json, .../native-final-qualification-3ea14e58/README.md, .../full-suite-qualified-d1f2ee84.{md,json} and AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json.",
+    "evidence": "None of these paths exist on disk or in `git ls-files` at 6e7875f2. .gitignore:81 ignores AMC_OS/; 472 files under AMC_OS/RESEARCH are force-tracked, but no directory dated 2026-09-08 and no 2026-09-09-phase-a-reconciliation directory is among them (tracked 2026-09-09 dirs: chat-on-steroids, closure-map, installed-retained-output-public-history, installed-spill-acceptance, native-history-batch, phase-a-acceptance, public-task-transport, spill-boundary-mutations, spill-lifecycle, worktree-audit). Only AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.md:69 references AMC-1510 (row: In Review, receipts `packed-install`, `source-install`, `standalone-summary`, 'public publication remains separate').",
+    "holds": false,
+    "note": "CANNOT_VERIFY: the cited receipts are not on the integration branch; they may exist uncommitted in the root checkout, which this agent must not read."
+   },
+   {
+    "claim": "Exact d1f2ee84 completed the isolated full suite with 11,092 passed / 0 failed / 0 pending across 1,321 files.",
+    "evidence": "The receipt AMC_OS/RESEARCH/2026-09-08-dsh-pi/full-suite-qualified-d1f2ee84.{md,json} is not tracked at HEAD, so the figure cannot be re-read; the full suite was not run in this task (forbidden). d1f2ee84 is an ancestor of HEAD but HEAD has moved since; HEAD's own record (AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md, commit 6e7875f2 'fresh-clone candidate D (6010f97c) not accepted \u2014 four failures classified and repaired') records that the most recent fresh-clone full-suite candidate was not accepted. No full-suite result at 6e7875f2 is known to this agent.",
+    "holds": false,
+    "note": "CANNOT_VERIFY at HEAD; historical claim unreachable and superseded by later candidates."
+   },
+   {
+    "claim": "Real-provider smoke was exercised without leaking keys.",
+    "evidence": "Not claimed by the issue (explicitly SKIPPED in every comment) and not exercised here: AMC_PACKED_SMOKE_PROVIDER unset, no credentials, and the task forbids depending on a real provider. The key-leak guard exists at scripts/packed-install-check.mjs:110 (`!/sk-[A-Za-z0-9]{8,}/.test(r.out)`) but only runs when a provider is configured.",
+    "holds": false,
+    "note": "Not exercised; tracked by AMC-1512 per the 2026-09-09 comment."
+   },
+   {
+    "claim": "Obsidian note updated for this issue.",
+    "evidence": "Read-only grep of /Users/sid/Documents/AMC finds 20 notes mentioning AMC-1510 (e.g. Evidence/2026-09-08 AMC DSH Pi Current-State Evidence.md, Research/2026-09-08 DSH and Pi Gap Plan.md, several 2026-09-09 Roadmap checkpoints). No Evidence note for a reconciliation at 6e7875f2 exists; contents were not reviewed.",
+    "holds": false,
+    "note": "PARTIAL: earlier notes exist; nothing dated for the current integration commit."
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/kernelRuntimeBarrel.test.ts tests/kernelBundleSbom.test.ts tests/packedInstallVerification.test.ts tests/releaseGateExecution.test.ts tests/installPersonaIsolation.test.ts",
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0,
+    "files": 5,
+    "durationSeconds": 1.26
+   },
+   {
+    "command": "pnpm build && node scripts/packed-install-check.mjs --no-build --keep  (9 ok steps: pack 7.2s, install 24.6s, @amc/core absent, doctor 3.9s, init 2.0s, agent-loop run stub 2.0s, session verify 1.6s, agent-loop verify 1.6s, evidence reconstruction; 1 skipped: real-provider smoke, AMC_PACKED_SMOKE_PROVIDER unset)",
+    "passed": 9,
+    "failed": 0,
+    "skipped": 1,
+    "files": 1,
+    "durationSeconds": 43.2
+   },
+   {
+    "command": "Mutation M1: append a second static @amc/cordis import to src/kernel/agentLoopRunner.ts; npx vitest run tests/kernelRuntimeBarrel.test.ts (expected RED, got RED; file restored)",
+    "passed": 1,
+    "failed": 1,
+    "skipped": 0,
+    "files": 1
+   },
+   {
+    "command": "Mutation M2: remove `summary.unsignedRows === 0` from scripts/packed-evidence-verification.mjs; npx vitest run tests/packedInstallVerification.test.ts (expected RED, got RED; file restored)",
+    "passed": 13,
+    "failed": 1,
+    "skipped": 0,
+    "files": 1
+   },
+   {
+    "command": "Mutation M3: remove `ledger.chain?.ok !== true` from scripts/packed-evidence-verification.mjs; npx vitest run tests/packedInstallVerification.test.ts (expected RED, SURVIVED; file restored)",
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "files": 1
+   }
+  ],
+  "missingForDone": [
+   "Receipt on the integration branch: the cited AMC_OS/RESEARCH/2026-09-08-dsh-pi/* and 2026-09-09-phase-a-reconciliation/reconciliation.json are not tracked at 6e7875f2 (AMC_OS/ is gitignored; needs `git add -f` from the checkout that holds them), or a fresh receipt for this run (commit 6e7875f2, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, the counts above, provider skipped) must be written and force-added.",
+   "Full-suite pass recorded at the merged commit in a fresh clone (DoD 3): not run here (task forbids); the historical 11,092/1,321 figure at d1f2ee84 is unreachable at HEAD and HEAD's own record says the latest fresh-clone candidate D (6010f97c) was not accepted.",
+   "`pnpm release:gate` disposition at the merged commit (DoD 4), including runtime-dependency-audit, SBOM against the real artifact, provenance/SEA/installer checks; only the packed-install step was reproduced here.",
+   "A test that isolates the `ledger.chain.ok` check in scripts/packed-evidence-verification.mjs:26 (mutation M3 survived: 14/14 stayed green with the check removed).",
+   "Scope decision for `amc composition`: src/cli-composition-commands.ts:24 still dynamically imports @amc/core outside the bundled seam and reports 'The composition kernel (@amc/core) is not installed' from the tarball; either bring it through src/kernel/amcRuntime.ts or record it as out of scope for AMC-1510.",
+   "Real-provider smoke via AMC_PACKED_SMOKE_PROVIDER (stays with AMC-1512 per the 2026-09-09 comment); public npm/website availability probes stay with AMC-7/AMC-483.",
+   "Linear: Done transition with a comment carrying the commit SHA and receipt path (DoD 6); Obsidian Evidence note dated for the accepted commit linking the receipt and AMC-1510 (DoD 7)."
+  ],
+  "defectsFound": [
+   {
+    "file": "scripts/packed-evidence-verification.mjs",
+    "line": 26,
+    "description": "Surviving mutation on a security verifier: removing the `ledger.chain?.ok !== true` condition from verifyPackedRun leaves tests/packedInstallVerification.test.ts at 14 passed / 0 failed. The only negative case for the session ledger (tests/packedInstallVerification.test.ts:28-32) sets ledger.ok=false and chain.ok=false together, so a `session verify` result with ok=true but chain.ok=false is never exercised. Per the brief \u00a72 rule 6 a surviving mutation is a missing test.",
+    "severity": "medium"
+   },
+   {
+    "file": "src/cli-composition-commands.ts",
+    "line": 24,
+    "description": "`amc composition` still resolves the private kernel with `await import(\"@amc/core\")` outside the single bundled seam (src/kernel/amcRuntime.ts). In the installed tarball this import fails (consumer dist/cli-composition-commands.js:14) and the command reports 'The composition kernel (@amc/core) is not installed', so one governed-runtime surface is still checkout-only. Neither tests/kernelRuntimeBarrel.test.ts (scans src/kernel only) nor scripts/architecture-boundaries-check.mjs (confines to src/kernel) flags it because the file sits outside src/kernel.",
+    "severity": "low"
+   },
+   {
+    "file": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/qualified-packed-gate.json",
+    "description": "Records defect: every receipt the issue and its 2026-09-09 reconciliation comment cite (2026-09-08-dsh-pi/qualified-packed-gate.json, native-final-qualification-3ea14e58/README.md, full-suite-qualified-d1f2ee84.{md,json}, 2026-09-09-phase-a-reconciliation/reconciliation.json) is absent from the integration branch at 6e7875f2 because AMC_OS/ is gitignored (.gitignore:81) and these paths were never force-added; the Linear evidence trail cannot be re-read from the merged commit.",
+    "severity": "medium"
+   }
+  ],
+  "boundary": "Source commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution) in a fresh worktree fast-forwarded from 3d6b8d4a; git status clean after all mutation restores (dist/ ignored). Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; `pnpm install --frozen-lockfile --prefer-offline`, `pnpm build` (tsc + copy-assets + bundle-kernel, 1 min 42 s). Exercised: the five targeted vitest files (42 cases), three mutations, the full packed-install acceptance (pack, isolated install with an empty HOME and fresh npm cache, @amc/core absence, doctor, init, keyless stub agent-loop turn, both installed verifiers), tarball and installed-manifest inspection, commit ancestry, gate/CI wiring by reading. Not exercised: real-provider smoke (no provider/credentials configured; forbidden), the full suite at this commit, `pnpm release:gate`/prepack (dependency audit, real-artifact SBOM, provenance/SEA/installer), the Linux/Node 24 CI job, npm/website availability probes, Obsidian note contents (read-only path grep only). This is local artifact qualification on one macOS host; it is not package publication, platform qualification or a deployed release.",
+  "proposedLinearComment": "Phase A step 1 reconciliation \u2014 2026-09-14, at integration commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution), fresh worktree fast-forwarded from 3d6b8d4a; Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; `pnpm install --frozen-lockfile --prefer-offline`, `pnpm build` (1 min 42 s). No Done transition requested.\n\nVerified at this commit:\n- Single seam holds: src/kernel/amcRuntime.ts is the only static `@amc` import under src/kernel; scripts/architecture-boundaries-check.mjs:169 confines runtime @amc/core|cordis imports to src/kernel. Mutation: a second static import added to src/kernel/agentLoopRunner.ts turns tests/kernelRuntimeBarrel.test.ts RED (offenders = [agentLoopRunner.ts]); restored.\n- `pnpm build` wrote dist/kernel/amcRuntime.js at 381 KB (390,435 bytes) with 17 packages inlined (9 @amc/* plus @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp), 0 without a declared licence, plus amcRuntime.bundle.json, .LEGAL.txt, .NOTICES.md.\n- `node scripts/packed-install-check.mjs --no-build --keep`: pack 7.2 s (agent-maturity-compass-1.2.0.tgz, 6,229,312 bytes, 3,985 entries; contains LICENSE, THIRD_PARTY_NOTICES, dist/kernel/amcRuntime.{js,bundle.json,js.NOTICES.md,js.LEGAL.txt}); install into a fresh dir with empty HOME 24.6 s; @amc/core not resolvable from the consumer (no node_modules/@amc; the four `workspace:*` entries in the installed package.json are devDependencies only, not installed with --omit=dev); doctor 3.9 s; init 2.0 s; keyless stub `agent-loop run` 2.0 s; `session verify --json` 1.6 s; `agent-loop verify --json` 1.6 s; installed evidence and request reconstruction ok. Real-provider smoke SKIPPED (AMC_PACKED_SMOKE_PROVIDER unset). 43.2 s wall; temp dir removed.\n- `npx vitest run tests/kernelRuntimeBarrel.test.ts tests/kernelBundleSbom.test.ts tests/packedInstallVerification.test.ts tests/releaseGateExecution.test.ts tests/installPersonaIsolation.test.ts`: 5 files, 42 passed / 0 failed / 0 skipped, 1.26 s. The two bundle/gate suites now hold 3 + 14 = 17 cases (the \"16 cases\" figure was at 68262e9d).\n- Mutations on scripts/packed-evidence-verification.mjs: dropping `unsignedRows === 0` -> 1 failed / 13 passed (RED). Dropping `ledger.chain?.ok !== true` -> 14 / 14 still pass (SURVIVED: the ledger-failure case sets ok and chain.ok false together, so the chain check is never isolated). Both restored.\n- Commits 616b7a6b, f7e30f8c, 72a2f3d9, 68262e9d, d1f2ee84, 7bd1e8ce are all ancestors of 6e7875f2. CI job `packed-install` (.github/workflows/ci.yml:191-209, ubuntu/Node 24) and the release-gate step (scripts/release-gate.mjs:171-172, `--no-build`) are wired; pnpm.overrides for qs / fast-uri / hono present. agent-loop is registered publicly (src/cli-agent-commands.ts:118-120), no hidden flag.\n\nNot exercised: real-provider smoke; the full suite at 6e7875f2; `pnpm release:gate`/prepack (dependency audit, real-artifact SBOM, provenance/SEA/installer); the Linux/Node 24 CI job; npm/website availability probes (AMC-7/AMC-483).\n\nNot reachable at this commit: the cited receipts AMC_OS/RESEARCH/2026-09-08-dsh-pi/{qualified-packed-gate.json, native-final-qualification-3ea14e58/README.md, full-suite-qualified-d1f2ee84.md/.json} and AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json are not tracked on the branch (AMC_OS/ is gitignored; the 472 force-added receipt files do not include them). The 11,092 / 1,321 full-suite figure therefore cannot be re-read here and predates HEAD; HEAD's own record (AMC_OS/RESEARCH/2026-09-14-fleet-sequential) says fresh-clone candidate D (6010f97c) was not accepted.\n\nFound while reading: (a) surviving mutation above \u2014 a test isolating `ledger.chain.ok` is missing; (b) `amc composition` still dynamically imports @amc/core outside the seam (src/cli-composition-commands.ts:24) and reports \"not installed\" from the tarball \u2014 needs an in/out-of-scope decision for this issue.\n\nRemaining for Done: force-add the cited receipts or write a fresh receipt for this run under AMC_OS/RESEARCH/; full-suite and `pnpm release:gate` results on a fresh clone of the accepted merged commit; the chain.ok test; the composition-command scope decision; real-provider smoke stays with AMC-1512; Done comment with SHA + receipt path and a dated Evidence note in the vault. Keep In Review."
+ }
+}
