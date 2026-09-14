@@ -81,17 +81,23 @@ the `export` line once; without it every signing command refuses with `Vault loc
 `amc firewall enable` run twice writes nothing the second time and says so; changing
 `--mode` writes a new signed revision.
 
-Measured on 2026-09-14 (Darwin 25.6.0 arm64, Node v25.5.0, source commit
-`910e6d97` plus the IMPL-5 first-run changes, built `dist/cli.js`, fresh temp
-workspace, stub provider): `init --minimal` 1.21 s, `firewall enable` 0.75 s, the
-stub turn 0.84 s, `agent-loop verify` 0.73 s — about 3.5 s of command time across
-four commands, well inside the five-minute target. Before `amc firewall enable`, the
-same stub turn exits 0 and its output does not say whether the `echo` tool call
-was denied; the recorded tool result is stored encrypted, so that receipt could not
-read it back. The guard's deny-by-default behaviour is covered separately by
-`tests/firewallDenyByDefault.test.ts` and `tests/agentToolsetWiring.test.ts`, and
-`amc doctor` is where the missing policy names its fix. This is one measured
-session on one machine, not a platform qualification.
+Measured on 2026-09-14 in the integrating root checkout at commit `d635a5e2` (Darwin
+25.6.0 arm64, Node v25.5.0, `dist/cli.js` built from that source, a fresh temporary
+workspace, stub provider; receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`):
+`init --minimal` 1.19 s, `amc doctor` before enabling 1.86 s (`runtime-firewall-policy`
+WARN naming the fix), `firewall enable` 0.94 s (revision 1) and 0.80 s when repeated
+("nothing was written"), the stub turn 0.85 s (1 turn, 2 steps, 1 tool call, 24 events),
+`agent-loop verify` 0.83 s reporting VERIFIED with 2/2 requests derived and the trust
+root UNANCHORED (internal consistency only, not authorship), `amc doctor` afterwards
+PASS — about 3.7 s of command time across the four operator commands, well inside the
+five-minute target. The fleet agent's earlier measurement in its worktree at `910e6d97`
+plus this change gave the same shape (1.21 / 0.75 / 0.84 / 0.73 s). Before
+`amc firewall enable`, the same stub turn exits 0 and its output does not say whether
+the `echo` tool call was denied; the recorded tool result is stored encrypted, so that
+receipt could not read it back. The guard's deny-by-default behaviour is covered
+separately by `tests/firewallDenyByDefault.test.ts` and `tests/agentToolsetWiring.test.ts`,
+and `amc doctor` is where the missing policy names its fix. These are single measured
+sessions on one machine, not a platform qualification.
 
 For a setup problem, `amc doctor` runs local diagnostics without issuing a
 diagnostic lease, contacting the notary or sending gateway model requests. Its
