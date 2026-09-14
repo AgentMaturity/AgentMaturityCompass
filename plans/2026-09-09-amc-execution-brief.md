@@ -321,7 +321,7 @@ a single pinned commit.**
   > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): key-history JSON is now a signed envelope with explicit admission; notary responses no longer auto-append; `amc.config.yaml` signing exists and `isolated` is refused unsigned (default `shared` stays unsigned); `AMC_NO_SIGN=1` still writes literal "unsigned" (verify rejection not run-tested); the `amc-test-passphrase` fallback is gated to `VITEST` only but still shipped; `zkPrivacy.ts` remains placeholder, labelled; binderVerifier status is in the record. Static reads only.
 - Plaintext demo vault passphrase on disk; default passphrases baked into both Dockerfiles.
   **These must not reach a live deployment.**
-  > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): Dockerfile default passphrases are absent (secrets are file-mounted; only `*.txt.example` tracked); the demo passphrase is random and 0600; `.amc/local-vault-passphrase` has no `.gitignore` guard.
+  > 2026-09-14 readiness audit at `505a28ce` (`AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md`): Dockerfile default passphrases are absent (secrets are file-mounted; only `*.txt.example` tracked); the demo passphrase is random and 0600; `.amc/local-vault-passphrase` is gitignored (`.gitignore:31` at `505a28ce`; the agent's contrary note was corrected by root).
 - Public-repo hygiene, tracked and shipping: `COMPETITIVE_*_G0DM0D3.md`,
   `.tmp-gap-report.json` (`.gitignore` guards the wrong filename), `test_model.pkl`
   fake-malware fixture, `mirofish-simulation/` **fabricated practitioner testimonials**,
