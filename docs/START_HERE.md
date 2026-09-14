@@ -12,6 +12,24 @@ The native guide does not contact a model, open a session or change configuratio
 
 See [the native task quickstart](QUICKSTART.md#run-a-native-task) for the commands and separate evidence verification step.
 
+**First governed turn, keyless.** A fresh workspace denies every native tool call
+until its Runtime Firewall policy is signed; `amc init` signs the tool allowlist but
+leaves that policy to you, and prints the three actions that follow it:
+
+```bash
+export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # signing commands read it from the shell
+amc init --minimal
+amc firewall enable                                       # creates + signs the policy; idempotent; explains what it wrote
+amc --agent default agent-loop run "Check recording with a local demonstration." --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512
+amc agent-loop verify <session-id>                        # the run prints the session id
+```
+
+`amc doctor` names each missing precondition and the exact command that fixes it
+(`runtime-firewall-policy` and `vault` are the two a fresh init leaves open); plain
+`amc doctor` warns, `amc doctor --strict` fails closed on the same checks. See
+[Quickstart](QUICKSTART.md#first-governed-turn-in-three-actions-keyless) for the
+measured timing of this path.
+
 For daily interactive use, run `amc agent-loop chat` with the same provider, model
 and credential reference. `--credentials-home` selects the shared skills directory
 at `<home>/skills` as well as the default credential-file location.

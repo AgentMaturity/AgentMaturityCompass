@@ -62,6 +62,37 @@ amc agent-loop guide --provider stub
 
 Follow the explicit stub/echo command it prints. This exercises local recording, not a real model or repository-editing task. Native commands pin the selected agent: explicit `--agent`, then `AMC_AGENT_ID`, the workspace's current agent, and finally `default`. See [Start here](START_HERE.md) for shared skills, credential-home/file selection and cumulative recorded usage.
 
+### First governed turn in three actions (keyless)
+
+A fresh workspace denies every native tool call with `missing-policy` until its
+Runtime Firewall policy is signed. `amc init` signs `tools.yaml` but leaves that
+policy to an explicit operator action, and prints the three actions below:
+
+```bash
+export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # every signing command reads it from the shell
+amc init --minimal                                        # 0. workspace, keys, signed tools.yaml
+amc firewall enable                                       # 1. create + sign the Runtime Firewall policy (idempotent; explains what it wrote)
+amc --agent default agent-loop run "Check recording with a local demonstration." --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512   # 2. governed keyless turn
+amc agent-loop verify <session-id>                        # 3. verify the recorded evidence (the run prints the session id)
+```
+
+If `AMC_VAULT_PASSPHRASE` is not set, `amc init --minimal` generates one and prints
+the `export` line once; without it every signing command refuses with `Vault locked`.
+`amc firewall enable` run twice writes nothing the second time and says so; changing
+`--mode` writes a new signed revision.
+
+Measured on 2026-09-14 (Darwin 25.6.0 arm64, Node v25.5.0, source commit
+`910e6d97` plus the IMPL-5 first-run changes, built `dist/cli.js`, fresh temp
+workspace, stub provider): `init --minimal` 1.21 s, `firewall enable` 0.75 s, the
+stub turn 0.84 s, `agent-loop verify` 0.73 s — about 3.5 s of command time across
+four commands, well inside the five-minute target. Before `amc firewall enable`, the
+same stub turn exits 0 and its output does not say whether the `echo` tool call
+was denied; the recorded tool result is stored encrypted, so that receipt could not
+read it back. The guard's deny-by-default behaviour is covered separately by
+`tests/firewallDenyByDefault.test.ts` and `tests/agentToolsetWiring.test.ts`, and
+`amc doctor` is where the missing policy names its fix. This is one measured
+session on one machine, not a platform qualification.
+
 For a setup problem, `amc doctor` runs local diagnostics without issuing a
 diagnostic lease, contacting the notary or sending gateway model requests. Its
 native SQLite probe uses only an in-memory database. `--strict` requires an
