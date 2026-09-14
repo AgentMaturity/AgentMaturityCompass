@@ -1789,3 +1789,17 @@ gitignored `.amc/vault.amcvault`; the run creates one at cwd and `persistVault` 
 tracked key histories — root is unaffected because its vault exists (the 2026-09-12 fresh-clone
 receipt recorded the same effect). All ten non-reconciliation agents are done; next: the
 fresh-clone re-acceptance of the candidate, then the 41 reconciliations one at a time.
+
+
+### 2026-09-14 — Deferred validation, candidate D `6010f97c`: not accepted; four failures repaired in `b3a0a71c`
+
+Fresh clone at `6010f97c`: install, build, both typechecks and the OpenAPI check passed; full
+suite **1,481/1,484 files, 14,097/14,101 tests, 4 failed, 0 skipped** (357 s); Python 290 passed /
+21 failed (the known installed-wheel cases) / 1 skipped; release gate 13/14 executed checks, the
+full-suite check failed, live-deploy-health skipped. Failures classified: a vacuous
+`toBeGreaterThanOrEqual(0)` added by the first-run agent (budget 81, count 82) — replaced with
+the concrete expectation; a fixed 20 ms ACP handshake wait outlasted under load — replaced with a
+bounded poll; and the README/website test-file inventory drift 1,477 → 1,484 from seven new test
+files — regenerated in the clone and ported. No budget, cap or policy was widened. Receipt:
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md` (candidate D). Candidate E is the
+commit that records this.

@@ -292,6 +292,33 @@ Not exercised in root: the agent's M1 (object before commitment; identical code 
 Key-rotation cause narrowed (see the execution log): first run in a fresh worktree creates a
 vault at cwd; root's vault exists, so root is unaffected. Linear: AMC-1547 (comment posted).
 
+### Fresh-clone acceptance, candidate D `6010f97c` — NOT accepted; repaired in `b3a0a71c`
+
+Reproduced per the brief's receipt rule with `fresh-clone/fresh-clone-validate.sh` (copied from
+the 2026-09-12 receipt): `git clone` of root into the scratchpad (`clone-d`), `git checkout
+6010f97c`, `pnpm install --frozen-lockfile --prefer-offline`, then every step below; Darwin
+25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. Logs: `fresh-clone/candidate-d/`.
+
+| Step | Result | Seconds |
+|---|---|---|
+| install / build / typecheck-src / typecheck-tests / openapi-check | all exit 0 | 2 / 36 / 29 / 41 / 0 |
+| full suite (`vitest run`) | **1,481/1,484 files, 14,097/14,101 tests, 4 failed, 0 skipped** | 357 |
+| Python lanes (`sdk/python`, built CLI) | 290 passed, **21 failed**, 1 skipped — the same `test_validation_installed.py` installed-wheel cases as on 2026-09-12 (pre-existing; not a regression) | 79 |
+| release gate (`pnpm release:gate`) | **13/14 executed checks passed, 1 failed (full suite), 1 skipped** (live-deploy-health: no `AMC_RELEASE_GATE_LIVE_URL`) | 619 |
+
+The four failures, classified and repaired in `b3a0a71c`: (1) `assertionQuality` — the first-run
+agent's `tests/firstRunDoctor.test.ts:172` added a standalone `toBeGreaterThanOrEqual(0)`, the
+82nd against a budget of 81 → replaced by the concrete expectation (FAIL at index 0,
+`runtime-firewall-policy`), budget untouched; (2) `acpAgentServer` "declares only what it can
+honour" — a fixed 20 ms handshake wait outlasted under full-suite load (passes 13/13 alone in
+root) → bounded poll for the reply; (3–4) `publicStatsDrift` ×2 — seven new test files moved
+the inventory 1,477 → 1,484 → counts regenerated in the clone and ported (10 generated files;
+the generator measured 143 registered assurance packs / 149 files, relevant to AMC-1550).
+After the run the clone's tracked `.amc/keys/*` were rewritten with `*.previous-*` backups —
+the same first-run-without-a-vault effect seen in every fresh checkout (see the log); the
+clone is not claimed clean after execution. No number here is a receipt for the repaired
+candidate; candidate E follows.
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |

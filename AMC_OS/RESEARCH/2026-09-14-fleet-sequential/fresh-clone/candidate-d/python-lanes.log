@@ -1,0 +1,1385 @@
+........................................................................ [ 23%]
+........................................................................ [ 46%]
+........................................................................ [ 69%]
+........................................................................ [ 92%]
+..FFFFFFFFFFFFFFFFFFFFFs                                                 [100%]
+=================================== FAILURES ===================================
+_ test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[not-requested] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p0')
+status = 'not-requested'
+
+    @pytest.mark.parametrize("status", ["not-requested", "pending", "passed", "failed", "unavailable"])
+    def test_installed_wheel_decodes_public_states_and_preserves_explicit_argv(tmp_path, status):
+        result = {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": wire(status)}}}
+>       report, argv = run_consumer(tmp_path, {"response": result, "options": {
+            "tools": "workspace", "expected_tools_digest": PIN, "validation_config": "reviewed checks.json",
+            "validation_config_sha256": DIGEST, "validate": ["unit", "lint"],
+            "approve_tools": "WRITE_LOW", "approve_risk": "low", "max_tokens": 64, "max_steps": 2,
+        }})
+
+tests/test_validation_installed.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p0')
+case = {'options': {'approve_risk': 'low', 'approve_tools': 'WRITE_LOW', 'expected_tools_digest': 'bbbbbbbbbbbbbbbbbbbbbbbbbb...alidation': {'checks': [], 'configSha256': None, 'status': 'not-requested', 'turn': None}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[pending] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p1')
+status = 'pending'
+
+    @pytest.mark.parametrize("status", ["not-requested", "pending", "passed", "failed", "unavailable"])
+    def test_installed_wheel_decodes_public_states_and_preserves_explicit_argv(tmp_path, status):
+        result = {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": wire(status)}}}
+>       report, argv = run_consumer(tmp_path, {"response": result, "options": {
+            "tools": "workspace", "expected_tools_digest": PIN, "validation_config": "reviewed checks.json",
+            "validation_config_sha256": DIGEST, "validate": ["unit", "lint"],
+            "approve_tools": "WRITE_LOW", "approve_risk": "low", "max_tokens": 64, "max_steps": 2,
+        }})
+
+tests/test_validation_installed.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p1')
+case = {'options': {'approve_risk': 'low', 'approve_tools': 'WRITE_LOW', 'expected_tools_digest': 'bbbbbbbbbbbbbbbbbbbbbbbbbb...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'pending', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[passed] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p2')
+status = 'passed'
+
+    @pytest.mark.parametrize("status", ["not-requested", "pending", "passed", "failed", "unavailable"])
+    def test_installed_wheel_decodes_public_states_and_preserves_explicit_argv(tmp_path, status):
+        result = {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": wire(status)}}}
+>       report, argv = run_consumer(tmp_path, {"response": result, "options": {
+            "tools": "workspace", "expected_tools_digest": PIN, "validation_config": "reviewed checks.json",
+            "validation_config_sha256": DIGEST, "validate": ["unit", "lint"],
+            "approve_tools": "WRITE_LOW", "approve_risk": "low", "max_tokens": 64, "max_steps": 2,
+        }})
+
+tests/test_validation_installed.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p2')
+case = {'options': {'approve_risk': 'low', 'approve_tools': 'WRITE_LOW', 'expected_tools_digest': 'bbbbbbbbbbbbbbbbbbbbbbbbbb...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[failed] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p3')
+status = 'failed'
+
+    @pytest.mark.parametrize("status", ["not-requested", "pending", "passed", "failed", "unavailable"])
+    def test_installed_wheel_decodes_public_states_and_preserves_explicit_argv(tmp_path, status):
+        result = {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": wire(status)}}}
+>       report, argv = run_consumer(tmp_path, {"response": result, "options": {
+            "tools": "workspace", "expected_tools_digest": PIN, "validation_config": "reviewed checks.json",
+            "validation_config_sha256": DIGEST, "validate": ["unit", "lint"],
+            "approve_tools": "WRITE_LOW", "approve_risk": "low", "max_tokens": 64, "max_steps": 2,
+        }})
+
+tests/test_validation_installed.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p3')
+case = {'options': {'approve_risk': 'low', 'approve_tools': 'WRITE_LOW', 'expected_tools_digest': 'bbbbbbbbbbbbbbbbbbbbbbbbbb...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'failed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[unavailable] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p4')
+status = 'unavailable'
+
+    @pytest.mark.parametrize("status", ["not-requested", "pending", "passed", "failed", "unavailable"])
+    def test_installed_wheel_decodes_public_states_and_preserves_explicit_argv(tmp_path, status):
+        result = {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": wire(status)}}}
+>       report, argv = run_consumer(tmp_path, {"response": result, "options": {
+            "tools": "workspace", "expected_tools_digest": PIN, "validation_config": "reviewed checks.json",
+            "validation_config_sha256": DIGEST, "validate": ["unit", "lint"],
+            "approve_tools": "WRITE_LOW", "approve_risk": "low", "max_tokens": 64, "max_steps": 2,
+        }})
+
+tests/test_validation_installed.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_wheel_decodes_p4')
+case = {'options': {'approve_risk': 'low', 'approve_tools': 'WRITE_LOW', 'expected_tools_digest': 'bbbbbbbbbbbbbbbbbbbbbbbbbb...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'unavailable', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+___ test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result0] ___
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc0')
+result = {'stopReason': 'end_turn'}
+
+    @pytest.mark.parametrize("result", [
+        {"stopReason": "end_turn"}, {"stopReason": "end_turn", "_meta": {}},
+        {"stopReason": "end_turn", "_meta": {EXTENSION: False}},
+        {"stopReason": "cancelled", "_meta": {EXTENSION: {"validation": {"status": "unavailable", "turn": None, "configSha256": None, "checks": []}}}},
+    ])
+    def test_installed_legacy_and_cancelled_metadata_never_infer_a_pass(tmp_path, result):
+>       report, argv = run_consumer(tmp_path, {"response": result})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_validation_installed.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc0')
+case = {'response': {'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+___ test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result1] ___
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc1')
+result = {'_meta': {}, 'stopReason': 'end_turn'}
+
+    @pytest.mark.parametrize("result", [
+        {"stopReason": "end_turn"}, {"stopReason": "end_turn", "_meta": {}},
+        {"stopReason": "end_turn", "_meta": {EXTENSION: False}},
+        {"stopReason": "cancelled", "_meta": {EXTENSION: {"validation": {"status": "unavailable", "turn": None, "configSha256": None, "checks": []}}}},
+    ])
+    def test_installed_legacy_and_cancelled_metadata_never_infer_a_pass(tmp_path, result):
+>       report, argv = run_consumer(tmp_path, {"response": result})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_validation_installed.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc1')
+case = {'response': {'_meta': {}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+___ test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result2] ___
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc2')
+result = {'_meta': {'dev.agentmaturity.amc': False}, 'stopReason': 'end_turn'}
+
+    @pytest.mark.parametrize("result", [
+        {"stopReason": "end_turn"}, {"stopReason": "end_turn", "_meta": {}},
+        {"stopReason": "end_turn", "_meta": {EXTENSION: False}},
+        {"stopReason": "cancelled", "_meta": {EXTENSION: {"validation": {"status": "unavailable", "turn": None, "configSha256": None, "checks": []}}}},
+    ])
+    def test_installed_legacy_and_cancelled_metadata_never_infer_a_pass(tmp_path, result):
+>       report, argv = run_consumer(tmp_path, {"response": result})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_validation_installed.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc2')
+case = {'response': {'_meta': {'dev.agentmaturity.amc': False}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+___ test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result3] ___
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc3')
+result = {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [], 'configSha256': None, 'status': 'unavailable', 'turn': None}}}, 'stopReason': 'cancelled'}
+
+    @pytest.mark.parametrize("result", [
+        {"stopReason": "end_turn"}, {"stopReason": "end_turn", "_meta": {}},
+        {"stopReason": "end_turn", "_meta": {EXTENSION: False}},
+        {"stopReason": "cancelled", "_meta": {EXTENSION: {"validation": {"status": "unavailable", "turn": None, "configSha256": None, "checks": []}}}},
+    ])
+    def test_installed_legacy_and_cancelled_metadata_never_infer_a_pass(tmp_path, result):
+>       report, argv = run_consumer(tmp_path, {"response": result})
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_validation_installed.py:187: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_legacy_and_canc3')
+case = {'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [], 'configSha256': None, 'status': 'unavailable', 'turn': None}}}, 'stopReason': 'cancelled'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[None] __
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_0')
+invalid = None
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_0')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': None}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[True] __
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_1')
+invalid = True
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_1')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': True}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid2] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_2')
+invalid = {}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_2')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid3] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_3')
+invalid = {'status': 'passed'}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_3')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'status': 'passed'}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid4] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_4')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': True}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_4')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': True}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid5] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_5')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_5')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid6] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_6')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_6')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid7] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_7')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': False, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_7')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid8] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_8')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': None, ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_8')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid9] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_9')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 2, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_9')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid10] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_10')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': 'event-unit', ...}, {'callId':....}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_10')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}, {......aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'status': 'passed', 'turn': 1}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+_ test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid11] _
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_11')
+invalid = {'checks': [{'callId': 'validation-unit', 'exitCode': 0, 'id': 'unit', 'outputEventId': 'event-unit', ...}], 'configSha256': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'extra': True, 'status': 'passed', ...}
+
+    @pytest.mark.parametrize("invalid", [None, True, {}, {"status": "passed"},
+        {**wire("passed"), "turn": True}, {**wire("passed"), "configSha256": "A" * 64},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "timedOut": "false"}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "exitCode": False}]},
+        {**wire("passed"), "checks": [{**wire("passed")["checks"][0], "outputEventId": None}]},
+        {**wire("passed"), "checks": wire("failed")["checks"]},
+        {**wire("passed"), "checks": wire("passed")["checks"] * 2},
+        {**wire("passed"), "extra": True},
+    ])
+    def test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child(tmp_path, invalid):
+>       report, _argv = run_consumer(tmp_path, {"expect_protocol_error": True,
+            "response": {"stopReason": "end_turn", "_meta": {EXTENSION: {"validation": invalid}}}})
+
+tests/test_validation_installed.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tmp_path = PosixPath('/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/pytest-of-sid/pytest-7/test_installed_malformed_wire_11')
+case = {'expect_protocol_error': True, 'response': {'_meta': {'dev.agentmaturity.amc': {'validation': {'checks': [{...}], 'co...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'extra': True, 'status': 'passed', ...}}}, 'stopReason': 'end_turn'}}
+
+    def run_consumer(tmp_path, case):
+        if os.name != "posix":
+            pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
+        interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
+        assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+        source = Path(__file__).resolve().parents[1] / "amc_sdk"
+        expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                    for name in ["__init__.py", "client.py"]}
+        peer, case_path, argv_path = tmp_path / "peer.py", tmp_path / "case.json", tmp_path / "argv.json"
+        peer.write_text(PEER, encoding="utf-8")
+        case_path.write_text(json.dumps(case), encoding="utf-8")
+        with subprocess.Popen(
+            [interpreter, "-I", "-c", CONSUMER, str(peer), str(case_path), str(argv_path), json.dumps(expected)],
+            cwd=tmp_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True,
+        ) as process:
+            try:
+                stdout, stderr = process.communicate(timeout=45)
+                try:
+                    os.killpg(process.pid, 0)
+                except ProcessLookupError:
+                    pass
+                else:
+                    raise AssertionError("consumer exited but its owned process group still exists")
+            except BaseException:
+                # Only this newly-created group; a forced cleanup remains a failure,
+                # not the malformed-wire outcome or a native acceptance result.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.communicate(timeout=5)
+                raise
+>       assert process.returncode == 0, stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "<string>", line 8, in <module>
+E             import amc_sdk
+E         ModuleNotFoundError: No module named 'amc_sdk'
+E         
+E       assert 1 == 0
+E        +  where 1 = <Popen: returncode: 1 args: ['/opt/homebrew/opt/python@3.14/bin/python3.14',...>.returncode
+
+tests/test_validation_installed.py:152: AssertionError
+=============================== warnings summary ===============================
+tests/test_P06_client.py::test_canonical_workspace_alias_and_fixed_root
+  /opt/homebrew/lib/python3.14/site-packages/pytest_asyncio/plugin.py:1190: DeprecationWarning: 'asyncio.get_event_loop_policy' is deprecated and slated for removal in Python 3.16
+    return asyncio.get_event_loop_policy()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[not-requested]
+FAILED tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[pending]
+FAILED tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[passed]
+FAILED tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[failed]
+FAILED tests/test_validation_installed.py::test_installed_wheel_decodes_public_states_and_preserves_explicit_argv[unavailable]
+FAILED tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result0]
+FAILED tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result1]
+FAILED tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result2]
+FAILED tests/test_validation_installed.py::test_installed_legacy_and_cancelled_metadata_never_infer_a_pass[result3]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[None]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[True]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid2]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid3]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid4]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid5]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid6]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid7]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid8]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid9]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid10]
+FAILED tests/test_validation_installed.py::test_installed_malformed_wire_refuses_settles_waiters_and_reaps_child[invalid11]
+21 failed, 290 passed, 1 skipped, 1 warning in 78.54s (0:01:18)
