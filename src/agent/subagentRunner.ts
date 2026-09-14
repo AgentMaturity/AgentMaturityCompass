@@ -4,7 +4,7 @@ import { deniedToolNamesForScope, intersectDelegationScopes, parseDelegationScop
 import { parseSubagentStopConditions } from "./subagentStopConditions.js";
 import { ApprovalSeam, type ApprovalSeamInit } from "../approvals/seam/approvalSeam.js";
 import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approvalGate.js";
-import type { AgentLoopConfig } from "./loopTypes.js";
+import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
 import { AgentDriver } from "./agentDriver.js";
@@ -79,6 +79,22 @@ export interface DriverRunnerInit {
   /** Existing policy and answerers, rebound to each actual child session. */
   readonly approvalGate?: ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised">;
   /**
+   * The parent loop's hook CONTROL, inherited by every child this runner builds
+   * (IMPL-3).
+   *
+   * Before this field existed no spawn path installed hooks on a child: the
+   * root loop ran under the composed `LoopHooks` and every child ran under
+   * `NO_HOOKS`, so a pre-step veto or a turn-stopping guard registered on the
+   * parent simply did not apply to work the parent delegated. The child driver
+   * is now built on exactly this control, and the child's own signed session
+   * carries a `delegation/hook-control` audit row naming what governed it —
+   * including, when this is absent, the fact that nothing did.
+   *
+   * Only the control half is inherited. `notify` carries no session identity,
+   * so a parent's live observer would see a child's steps as its own.
+   */
+  readonly hookControl?: LoopHookControl;
+  /**
    * Lets a child delegate further.
    *
    * Absent means children are leaves. When present, each child's toolset carries
@@ -116,6 +132,66 @@ function descendantStopConditions(
 }
 
 /**
+ * The hooks a child driver runs under, and the names an auditor will read.
+ *
+ * ONE SOURCE FOR BOTH. The driver's hooks and the recorded `inherited` list are
+ * derived from the same snapshot, so the row cannot name a control the driver
+ * was not built on, and a driver cannot be built on a control the row omits.
+ * Without a parent control the child runs under `NO_HOOKS` exactly as before,
+ * and the row says so (`source: "none"`, `inherited: []`) rather than being
+ * skipped — an absent row would be indistinguishable from a runner that
+ * predates this field.
+ */
+function childHooks(control: LoopHookControl | undefined): { readonly hooks: LoopHooks; readonly inherited: readonly string[] } {
+  if (control === undefined) return { hooks: NO_HOOKS, inherited: Object.freeze([]) };
+  const preStep = control.preStep;
+  const turnStopping = control.turnStopping;
+  const hooks: LoopHooks = {
+    preStep: (input, next) => preStep(input, next),
+    turnStopping: (input) => turnStopping(input),
+    notify: NO_HOOKS.notify
+  };
+  return { hooks: Object.freeze(hooks), inherited: Object.freeze(["preStep", "turnStopping"]) };
+}
+
+interface HookControlRecordInput {
+  readonly session: SessionService;
+  readonly ctx: SubagentRunContext;
+  readonly inherited: readonly string[];
+  readonly gate: (ToolApprovalGateOptions & Pick<ApprovalSeamInit, "answerers" | "onRaised">) | undefined;
+  readonly scope: readonly ActionClass[] | undefined;
+  readonly descendantScope: readonly ActionClass[] | undefined;
+  readonly descendantStops: readonly string[] | undefined;
+}
+
+/**
+ * Write the controls that govern this child into the CHILD's own signed session,
+ * before its first turn.
+ *
+ * An `audit` projection row, because that is the one sanctioned way evidence
+ * about a run enters the spine without widening `SessionService`. It names the
+ * inherited hook control, the approval gate the child's tools are wrapped in,
+ * the signed stop conditions and scope this child was declared under, and the
+ * narrower descendant limits it will pass on — so an auditor reading the child
+ * alone can see which controls applied, and which were absent.
+ */
+function recordHookControl(input: HookControlRecordInput): void {
+  const { ctx, gate } = input;
+  input.session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: {
+    kind: "delegation/hook-control", version: 1,
+    source: input.inherited.length === 0 ? "none" : "parent-loop",
+    inherited: [...input.inherited],
+    approvalGate: gate === undefined ? null
+      : { actionClass: gate.actionClass, riskTier: gate.riskTier, toolNames: gate.toolNames === undefined ? null : [...gate.toolNames] },
+    stopConditions: ctx.stopConditions === undefined ? null : [...ctx.stopConditions],
+    descendantStopConditions: input.descendantStops === undefined ? null : [...input.descendantStops],
+    delegationScope: input.scope === undefined ? null : [...input.scope],
+    descendantDelegationScope: input.descendantScope === undefined ? null : [...input.descendantScope],
+    governedAs: ctx.toolsetAgentId, runAs: ctx.identity.runAs, depth: ctx.identity.depth
+  } });
+}
+
+/**
  * Build the runner `spawnSubagent` calls.
  *
  * Returned as a closure rather than exported as a free function because the
@@ -132,6 +208,10 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
   const grant = init.grantDelegation === undefined ? undefined : { ...init.grantDelegation,
     ...(init.grantDelegation.delegationScope === undefined ? {} : { delegationScope: [...init.grantDelegation.delegationScope] }),
     ...(init.grantDelegation.stopConditions === undefined ? {} : { stopConditions: Object.freeze([...init.grantDelegation.stopConditions]) }) };
+  // The parent's control, captured once. A caller that later swaps its hooks
+  // does not change what an already composed run's children run under.
+  const control = init.hookControl === undefined ? undefined
+    : Object.freeze({ preStep: init.hookControl.preStep, turnStopping: init.hookControl.turnStopping });
 
   return async function runChild(ctx: SubagentRunContext): Promise<SubagentRunResult> {
     if (ctx.signal?.aborted) return { ok: false, text: "", reason: "parent cancelled before child execution" };
@@ -210,8 +290,13 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
         agentId: ctx.toolsetAgentId,
         ...(gate.answerers === undefined ? {} : { answerers: gate.answerers }),
         ...(gate.onRaised === undefined ? {} : { onRaised: gate.onRaised }) });
+      // Inherited control, recorded before the driver exists so no turn can
+      // precede the row that says what governed it. See `childHooks`.
+      const { hooks, inherited } = childHooks(control);
+      recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops });
       driver = new AgentDriver({ session, llm: init.makeLlm(session), route: init.route, systemPromptEventId,
         tools: approval === undefined || gate === undefined ? toolset.seam : gateToolCallsOnApproval(toolset.seam, approval, gate),
+        hooks,
         ...(config === undefined ? {} : { config }) });
       // Keep this subscription for the entire continuation lifetime, not just
       // the first turn. A parent's abort permanently prevents further followups.

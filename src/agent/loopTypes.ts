@@ -184,6 +184,19 @@ export interface LoopHooks {
   notify(notification: LoopNotification): void;
 }
 
+/**
+ * The CONTROL half of {@link LoopHooks}: what governs a run, as opposed to what
+ * observes it.
+ *
+ * `preStep` decides whether a step is entered and `turnStopping` decides whether
+ * a turn may end; both are load-bearing for the log (`loop/veto`, the steer rows).
+ * `notify` is excluded on purpose — it is a live mirror with no session identity
+ * in its payload, so forwarding a child's notifications to the parent's observer
+ * would present the child's steps as the parent's. A spawned child inherits this
+ * half from its parent (IMPL-3); see `./subagentRunner.ts`.
+ */
+export type LoopHookControl = Pick<LoopHooks, "preStep" | "turnStopping">;
+
 /** The hooks a driver runs under when nothing is registered. */
 export const NO_HOOKS: LoopHooks = Object.freeze({
   preStep: (_input: PreStepInput, next: () => Promise<PreStepDecision>): Promise<PreStepDecision> => next(),
