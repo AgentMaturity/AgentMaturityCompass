@@ -99,8 +99,13 @@ Root change on top of the agent's diff: the two route helpers moved into new
 Not exercised in root: the agent's M2/M5/M6 mutations (recorded in its `result.json` as red in
 its worktree), full suite, release gate, fresh clone, CLI paths, gateway/proxy/wire/hook
 scopes, browser. The agent's 14-file batch rotated its worktree's tracked `.amc/keys/*` once
-(restored there, not attributed to a file, not reproduced in root). Linear: AMC-1546 (state
-unchanged, comment posted).
+(restored there, not attributed to a file, not reproduced in root). Root bisect in that
+finished worktree afterwards: each of the 13 pre-existing files run alone (all green) left
+`.amc/` clean with no `*.previous-*` file, so the rotation is not a per-file effect; it was seen
+only in parallel multi-file batches in two agent worktrees (spill-attachments first run,
+token-scopes 14-file run) and never in any root batch. Open hygiene item: suspect a
+parallel-worker interaction that reaches `persistVault` with the checkout as workspace.
+Linear: AMC-1546 (state unchanged, comment posted).
 
 ### impl:hook-inheritance — IMPL-3, COMPLETE → integrated as `c3c46083`
 
