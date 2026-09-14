@@ -107,7 +107,7 @@ export function createPersonaEnvironment(base, temporary) {
   return isolated;
 }
 
-function run(command, args, options) {
+export function run(command, args, options) {
   const startedAt = new Date().toISOString();
   const result = spawnSync(command, args, {
     cwd: options.cwd,

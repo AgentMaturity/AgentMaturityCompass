@@ -30,6 +30,18 @@ What this validates:
 - secret scan passes on packaged artifact
 - `.amcrelease` can be packed and verified offline
 
+### Install persona QA receipt (schema `2026-09-08`)
+
+The gate's `install-persona-qa` step runs `npm run qa:install-personas` (`scripts/install-persona-qa.mjs`): it packs the built package once, then for each persona performs a real `npm install` of that tarball in an isolated temporary workspace (its own HOME, npm cache and npm config files, so no machine-level npm state is reused) and runs that persona's CLI commands and contract assertions against the installed binary. The gate consumes only the step's exit status; the receipt is written to the `--out` path (default `tmp/persona-install-qa/latest.json`, Markdown beside it).
+
+What the receipt is, and is not:
+
+- `measurementType` is `automated-contract-checks`. Every persona result is a count of automated checks (`planned`, `executed`, `passed`, `failed`, `skipped`), never a usability rating. The `rating` and `feedback` fields of the earlier `2026-05-23` schema were retired on 2026-09-08 because they read as human ease-of-use judgements while measuring only exit codes; a receipt still carrying them predates that change and its rating must not be quoted as usability evidence. Human first-use measurements are a separate protocol (`docs/HUMAN_FIRST_USE_STUDY.md`).
+- Every planned check is registered before anything runs, so a check that could not run is reported `skipped` with its `reason` (for example `package-install has not passed`), and the planned total never shrinks. A required assertion that fails appears as `failed` in the persona summary even when the command that produced its output exited zero; missing or malformed score output is a failed assertion, never an implied pass.
+- An install or command that exits non-zero, cannot be spawned, or outlives its deadline (120 s for the install, 60 s per command) is recorded `failed` with `exitCode` (null when there was no exit) and the spawn error in `stderr`; every consumer of that step stays `skipped`.
+- Each step's `durationMs` is command wall time measured by the runner; any `elapsedMs` inside a CLI's own JSON output is that CLI's diagnostic and is reported separately, never substituted for it.
+- Consumers of the structured receipt: only this script's own Markdown renderer reads the persona result objects; the release gate reads exit status. A future schema change bumps `schemaVersion` and is described here.
+
 ### Secret-scan coverage and refusals
 
 The release scanner inspects every accepted regular file, including files larger

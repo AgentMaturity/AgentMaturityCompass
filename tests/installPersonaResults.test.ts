@@ -81,6 +81,30 @@ describe("automated installation contract results", () => {
     expect(fixture("import", { "neutral-import": { status: "ready" } }).result.status).toBe("failed");
   });
 
+  it("records a slow install that hits its timeout as failed with the spawn error, and leaves every consumer unrun", () => {
+    const tmp = temporary();
+    // The real step runner against a process that outlives its deadline: no exit code, the spawn error in stderr.
+    const slow = qa.run(process.execPath, ["-e", "setTimeout(() => {}, 5000)"], { cwd: tmp, env: process.env, timeoutMs: 200 });
+    expect(slow.status).toBe("failed");
+    expect(slow.exitCode).toBeNull();
+    expect(slow.stderr).toMatch(/ETIMEDOUT/);
+    // Fed through the persona flow as the install step: it is reported failed with that error, nothing after it runs.
+    const calls: string[] = [];
+    const execute = (command: string, args: string[]) => {
+      calls.push(command === "npm" ? "package-install" : args.join(" "));
+      if (command !== "npm") throw new Error("a consumer ran after a timed-out install");
+      return { ...slow, command: [command, ...args].join(" ") };
+    };
+    const result = qa.runPersona({ id: "solo", name: "solo", agentId: "solo-agent", fixture: "node-cli", checks: roleChecks.solo },
+      "fixture.tgz", tmp, { baseEnv: { PATH: process.env.PATH }, execute });
+    expect(calls).toEqual(["package-install"]);
+    expect(result.status).toBe("failed");
+    expect(result.steps[0]).toMatchObject({ id: "package-install", status: "failed", exitCode: null, remediation: "Packed package installation failed." });
+    expect(result.steps[0].stderr).toMatch(/ETIMEDOUT/);
+    expect([...result.steps.slice(1), ...result.assertions].every((c: { status: string; reason: string }) => c.status === "skipped" && c.reason.includes("package-install"))).toBe(true);
+    expect(result.summary).toMatch(/0\/\d+ automated checks passed; 1 failed/);
+  });
+
   it("retains unrun checks after a failed installation and never executes a leftover bin", () => {
     const { result, calls } = fixture("solo", {}, ["package-install"]);
     expect(calls).toEqual(["package-install"]);
