@@ -1817,3 +1817,23 @@ release qualification and closes no AMC-1505 child by itself. Receipt:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md` (candidate E) with logs under
 `fresh-clone/candidate-e/`. Reconciliation phase starts now: 41 agents one at a time at
 `6e7875f2`, each posting its verified findings to its own issue.
+
+### 2026-09-14 — Reconciliation phase: seven posted; the remaining 35 run as one sequential workflow with skeptics
+
+Reconciliations posted to their issues so far, each with a root spot-check of what the agent
+could not reach from the integration commit: AMC-1528, 1506, 1507, 1508, 1509, 1510, 1511 — all
+PARTIAL. Root-side fixes they produced: `8baae594` (Pi importer rejects negative numeric
+timestamps like the generic mapper), `3749e1a2` (two kernel-missing messages named a
+non-existent `build:workspace` script), `e51115e5` (a case isolating the packed-evidence
+verifier's ledger-chain check; the reconciliation's mutation had survived because the only
+negative case broke `ok` and `chain.ok` together — a first attempt at the case refused for the
+wrong reason and was corrected before it was recorded). The recurring gap in every issue is
+that the 2026-09-08/09 receipts live under gitignored `AMC_OS/` and were never force-added; they
+exist on disk in root and stay a decision for Sid. Process notes: twice an empty shell variable
+made `vitest run` execute the whole suite in root under agent contention; the two throughput
+tests that failed there pass alone (2/2) and passed in the fresh clone — root suite runs are
+not receipts. On Sid's "Try again" with ultracode on, the remaining 35 reconciliations
+(AMC-1512…1548, minus the seven done) now run as ONE workflow (`wf_75d332bf-2ec`) that still
+executes them one at a time, adds an independent skeptic agent (budget 30) after any
+DECAYED verdict or reported defect (brief §2 rules 6 and 13), and streams each result to root
+through a journal monitor so every issue is still posted as it lands.

@@ -1935,3 +1935,12 @@ Every implementation, research and readiness track above is integrated or record
 records under `plans/` and `AMC_OS/RESEARCH/`). No fleet worktree is live; all ten are retained
 read-only. Next: fresh-clone re-acceptance of the candidate, then the 41 per-issue reconciliation
 agents one at a time (read-only in their worktrees; root posts each verified finding to its issue).
+
+### 2026-09-14 — Reconciliation workflow `wf_75d332bf-2ec`
+
+The 35 remaining reconciliation agents run inside one workflow, sequentially, each in its own fresh
+worktree at `6e7875f2` (read-only against root; they may run `pnpm install`, `pnpm build` and the
+issue's own test files in their worktree; no commits). A `refute:<issue>` skeptic follows any
+DECAYED verdict or reported defect. Root owns every write: receipt rows under
+`AMC_OS/RESEARCH/2026-09-14-fleet-sequential/reconcile/`, Linear comments, and any fix a verified
+defect needs. No other path is claimed.
