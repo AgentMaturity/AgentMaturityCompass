@@ -1723,3 +1723,25 @@ the track forbids. Root wrote the document with a preamble, re-ran three absence
 `src/enforce/egressProxy.ts` but not in the native sandbox path — noted in the file) and
 recorded no ranking. The market-breadth claim of §7a therefore stays unmade: documented
 capabilities only. Posted to AMC-1518. Next agent: `impl:docs-reading-order`.
+
+### 2026-09-14 — Phase C docs: `docs/READING_ORDER.md` landed and seven promoted guides corrected (`84c564ca`)
+
+Eighth sequential agent (`wf_3cdbc4a3-f55`, research, REPORT_ONLY, 62 tool uses, 17.8 min)
+returned the reading order (shortest path README → keyless verified turn in six reads and four
+commands; per-role paths; contributor and non-guide dispositions) and a retirement/fix list with
+file:line evidence at `505a28ce`. Root wrote `docs/READING_ORDER.md` and fixed, against
+registered commands verified in root, every promoted guide that documented a command not
+registered anywhere in non-test `src`: five adapter landing pages and six QUICKSTART recipes
+(deprecated `amc wrap <adapter>` with names `wrap` rejects → `amc adapters run --adapter <id>`),
+MEMORY_MATURITY (three unregistered `memory` subcommands removed), NOTARY (`log-verify`),
+SECTOR_PACKS (`pack list --domain`, `pack run --pack --baseline`), COMPLIANCE_FRAMEWORKS
+(`guide --frameworks`), GETTING_STARTED (`mcp config --ide`). Docs drift check passed (2,392
+files); public docs tests 10/10. Filed AMC-1550 (Todo, P2, child of AMC-1505) for the archive
+dispositions (EVIDENCE_CHAIN, CLI_WRAPPERS, VSCODE_EXTENSION, the audit/launch/council working
+papers inside `docs/`), the unmeasured "142 assurance packs" figure on five promoted pages and
+the README (149 files on disk; registered count to be measured in a built fresh clone), the
+promoted `score-history` page whose command does not exist, four unlisted guides with false
+commands, the README `amc start` "checks your agent" wording (the action starts the Studio
+daemon; scoring not found in its body, daemon not exercised), and a random `confidence` in
+`continuousRedTeam.ts`. The agent confirmed the five §2 facades are gone at `505a28ce`. Next
+agent: `readiness:b0-b1` (running).

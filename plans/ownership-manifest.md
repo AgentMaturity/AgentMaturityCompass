@@ -1918,7 +1918,8 @@ worktree or the shared stash. Root paths are integrated serially by this session
 | impl:first-run | `.claude/worktrees/wf_e71e93d9-c37-1` (done, read-only now) | AMC-1505 (§7 item 4) | `src/cli.ts` (firewall block and doctor wiring only), `src/doctor/**`, `src/workspace.ts` (guided init), `docs/START_HERE.md`, `docs/QUICKSTART.md`, `tests/firstRun*.test.ts` | finished 2026-09-14; integrated as `d635a5e2` (workspace.ts untouched by design); paths released to root |
 | impl:gap-register | `.claude/worktrees/wf_550bf7a2-670-1` (done, read-only) | AMC-1505 (Phase C) | none — returns `plans/amc-gap-register-2026-09.md` content | finished 2026-09-14 (REPORT_ONLY); register written by root as `plans/amc-gap-register-2026-09.md` (`25de30e6`, `00f229c5`); AMC-1549 filed |
 | impl:harness-breadth | `.claude/worktrees/wf_6fbda2c5-fe7-1` (done, read-only) | AMC-1505 (§7a) | none — returns `plans/research/harness-breadth-2026-09-12.md` content | finished 2026-09-14 (REPORT_ONLY); written by root as `plans/research/harness-breadth-2026-09-12.md` |
-| readiness:b0-b1 | own worktree | AMC-483 / AMC-7 | none — returns `AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md` content | queued (sequential, 2026-09-14) |
+| impl:docs-reading-order | `.claude/worktrees/wf_3cdbc4a3-f55-1` (done, read-only) | AMC-1505 (§7a docs) | none — returned `docs/READING_ORDER.md` content and a retirement list | finished 2026-09-14 (REPORT_ONLY); landed as `84c564ca`; AMC-1550 filed |
+| readiness:b0-b1 | `.claude/worktrees/wf_c844d75d-d8d-1` (live) | AMC-483 / AMC-7 | none — returns `AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md` content | queued (sequential, 2026-09-14) |
 
 Serial-only surfaces touched by impl agents (`src/cli.ts`, `src/studio/studioServer.ts`, the
 session spine) are merged into root only by this session, one change at a time, after review.

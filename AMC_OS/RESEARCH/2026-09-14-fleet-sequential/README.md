@@ -248,6 +248,17 @@ AMC absence per harness. Root spot-checked three absence greps at `505a28ce` and
 that AMC's application-level egress check (`src/enforce/egressProxy.ts`) exists outside the
 native sandbox path. No ranking language anywhere; "better than" appears only in the disclaimer.
 
+### impl:docs-reading-order — IMPL-8, REPORT_ONLY → `docs/READING_ORDER.md` + promoted-guide fixes (`84c564ca`)
+
+Agent: `wf_3cdbc4a3-f55`, 62 tool uses, 17.8 min, no repo writes. Records:
+`impl-docs-reading-order/result.json`, `report.md` (Document 2 is the retirement/fix list).
+Root wrote the reading order, verified each promoted false-command line against the registered
+Commander name in root, and corrected them (11 deprecated `amc wrap` recipes, `memory`,
+`notary log-verify`, `sector pack list/run`, `guide --frameworks`, `mcp config`). Checks in root:
+`scripts/docs-drift-check.mjs` passed (2,392 files), `publicDocsArtifact` + `publicDocsGraph`
+10/10. Remaining dispositions and the "142 packs" count are AMC-1550. The agent confirmed the
+five §2 facades are absent at `505a28ce` (only history comments remain).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
