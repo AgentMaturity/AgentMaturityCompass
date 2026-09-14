@@ -1,0 +1,156 @@
+{
+ "type": "result",
+ "key": "v2:ebc2a82cdfd7fcd75091e78e61a91eb3932b7842ccb8e85165538b3eac43a6b6",
+ "agentId": "a72acfe512d4453a4",
+ "result": {
+  "issue": "AMC-1507 \u2014 P1: Preserve nested failures and branch provenance when importing Pi v3 sessions (In Review, child of AMC-1505)",
+  "verdict": "PARTIAL",
+  "claims": [
+   {
+    "claim": "Implementation commits c050244a, 8defa070 and 1b89a573 (and qualification point d1f2ee84) are on the integration branch at 6e7875f2",
+    "evidence": "git merge-base --is-ancestor for each of c050244a, 8defa070, 1b89a573, d1f2ee84 against HEAD 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f: all four report ancestor=yes. git log on src/importers/piSessionImport.ts shows c050244a -> 8defa070 -> 1b89a573 -> bda990ac -> 822123d7 -> d3cae563.",
+    "holds": true
+   },
+   {
+    "claim": "Versioned Pi session JSONL is detected explicitly; v1/v2/other versions are refused by name with no generic-success fallback",
+    "evidence": "src/importers/piSessionImport.ts:87-102 (detectPiSession: header type 'session', version===3 supported, otherwise unsupported with named version; non-numeric version labelled 'with an invalid version field'), :134-138 (parseDetectedPiSession throws PiSessionFormatError on unsupported, never returns generic path); src/importers/neutralImporter.ts:528-532 (Pi parse happens before generic parseFile; PiSessionFormatError surfaces as an unsupported/malformed entry). tests/piSessionImport.test.ts:178-200 ('unsupported session version ... no generic fallback' for versions 1/2/4, and 'invalid version value ... without echoing source values') passed in this run.",
+    "holds": true
+   },
+   {
+    "claim": "Nested tool failures (message.isError) and model errors/cancellation (stopReason error/aborted, errorMessage) are preserved and reach the Watch failure index; length-truncation is flagged, not failed",
+    "evidence": "src/importers/piSessionImport.ts:32 (FAILED_STOP_REASONS = error, aborted), :314-317 and :328-329 (assistant error/errorMessage), :336 (truncated: stopReason==='length'), :350-358 (toolResult isError -> error + errorMessage). tests/piSessionImport.test.ts:76 'nested tool and model failures reach the Watch failure index' and :155 'aborted counts as a failure; length-truncated is flagged, not failed' passed.",
+    "holds": true
+   },
+   {
+    "claim": "Tool-call IDs, resolved tool names, provider/model identity and original entry/parent IDs are preserved",
+    "evidence": "src/importers/piSessionImport.ts:292-299 (entryId, parentId, ancestryComplete, onCurrentPath, sessionParent, sourceFormat in metadata), :333-334 (model, providerId), :342-349 and :362-363 (toolCallId, tool name from message.toolName or resolved from the calling assistant's toolCall block). tests/piSessionImport.test.ts:85 passed.",
+    "holds": true
+   },
+   {
+    "claim": "Structural header/label/compaction entries remain source metadata, never invented successful executions; discarded branches are kept as data but marked off the current path, not replayed as current context",
+    "evidence": "src/importers/piSessionImport.ts:27-30 (STRUCTURAL_TYPES), :224 (counted as entries.structural), :311-312 (traces derived only from type==='message'), :277-281 and :297 (leaf = last well-formed entry, onCurrentPath computed by walking parentId), :232 (offPathEntries). tests/piSessionImport.test.ts:104 'structural entries stay metadata' and :125 'a discarded branch is kept as data but marked off the current path' passed; :147 'a forked session keeps its parent provenance' passed (forkedFrom from header.parentSession, :235).",
+    "holds": true
+   },
+   {
+    "claim": "Missing timing stays unknown and is never presented as measured zero latency; ingestion average uses only measured samples",
+    "evidence": "src/importers/piSessionImport.ts:304-305 (durationMs: null, comment 'Pi persists timestamps, never durations'); src/agents/traceIngestion.ts:31 (durationMs: number | null), :33 (timestamp: number | null), :81 and :127 (avgLatencyMs: number | null, initial null), :139-140 (running mean over measuredLatencyCount only). Mutation: changing piSessionImport.ts 'durationMs: null' to 'durationMs: 0' made tests/piSessionImport.test.ts 'missing timing is unknown, never a measured zero' FAIL (1 failed | 10 passed); source restored and confirmed byte-identical. tests/traceIngestionTiming.test.ts 3/3 passed.",
+    "holds": true
+   },
+   {
+    "claim": "Imported data retains SELF_REPORTED provenance, redaction (including sanitized identities that do not leak secrets) and the source digest",
+    "evidence": "src/importers/neutralImporter.ts:666 (sourceTrust: 'SELF_REPORTED', evaluation: 'NOT_EVALUATED'); src/importers/piSessionImport.ts:172-204 (sanitizePiSession: ids that the redactor changed or that use the reserved prefix become namespace-separated sha256 markers; toolCallId and toolCall block ids handled). tests/piSessionImport.test.ts:202 'provenance stays self-reported and redacted, with the source digest' passed. Mutation: making safeId return the raw value made tests/piSessionImportBoundaries.test.ts fail 2 tests ('sanitized header, entry and tool IDs ... without leaking source secrets' and 'reserved safe-ID collisions ...'), 2 failed | 12 passed; source restored.",
+    "holds": true
+   },
+   {
+    "claim": "Cycle/duplicate-ID termination and orphan handling from the 2026-09-08 review are resolved: duplicates and cycles refuse import, orphans keep failures with incomplete ancestry",
+    "evidence": "src/importers/piSessionImport.ts:150-169 (inspectTree: duplicate id -> PiSessionFormatError; iterative bounded walk with per-entry path set -> cyclic ancestry refused; ancestryComplete map), :234 (orphanedEntries), :144 (orphan warning). tests/piSessionImportBoundaries.test.ts:50 'duplicate entry IDs are explicitly unsupported with no generic fallback' and :129 'an orphan retains its failure with incomplete ancestry and no inferred user input' passed.",
+    "holds": true
+   },
+   {
+    "claim": "Timestamp validity: malformed/rolled-over dates are rejected rather than parsed permissively; valid explicit epoch values (including zero) are retained",
+    "evidence": "src/importers/piSessionImport.ts:249-263 (entryTimestamp: strict ISO regex, calendar round-trip check rejects e.g. 2026-02-30 and 24:00, nested message.timestamp used as fallback). tests/piSessionImportBoundaries.test.ts test.each over [undefined, 'not-a-time', '2026-02-30T00:00:00.000Z', '2026-09-08T24:00:00.000Z', 1e100] passed (5 cases within the 14 in that file).",
+    "holds": true
+   },
+   {
+    "claim": "Watch indexes use schemaVersion 2026-09-08 with nullable event times and legacy 2026-05-22 indexes remain readable without rewriting",
+    "evidence": "src/watch/traceFailureIndex.ts:82 (schemaVersion: '2026-05-22' | '2026-09-08'), :362 (writer emits '2026-09-08'). tests/traceFailureUnknownTime.test.ts:9 'unknown event dates remain null, sort last and do not set cluster bounds' and :27 'legacy dated indexes remain readable alongside nullable indexes without rewriting old files' passed (2/2).",
+    "holds": true
+   },
+   {
+    "claim": "Operator contract documented in docs/TRACES_TO_EVIDENCE.md",
+    "evidence": "docs/TRACES_TO_EVIDENCE.md:31 '## Import Pi v3 sessions', :50-51 (timestamp number|null, durationMs null), :53 (Watch schemaVersion 2026-09-08, legacy readable), :55 (avgLatencyMs number|null). Content matches the source lines cited above.",
+    "holds": true
+   },
+   {
+    "claim": "Fixture tests cover branch/fork metadata, nested failures, aborted/truncated messages, malformed entries and unsupported version",
+    "evidence": "tests/piSessionImport.test.ts describe block lines 75-211 contains 11 tests covering each named area (nested failures :76, ids :85, timing :97, structural :104, discarded branch :125, fork :147, aborted/truncated :155, malformed :167, unsupported version :178, invalid version :189, provenance :202); tests/piSessionImportBoundaries.test.ts adds duplicate IDs, sanitized IDs, reserved-prefix collisions, orphans and invalid times. All 25 passed at 6e7875f2.",
+    "holds": true
+   },
+   {
+    "claim": "Later source evolution after 1b89a573 (bda990ac, 822123d7, d3cae563) did not regress the Pi importer",
+    "evidence": "git diff 1b89a573 HEAD on the importer files: piSessionImport.ts +15/-x (introduces PiSessionFormatError class, sanitizes the invalid-version label so non-numeric source values are not echoed), tests narrowed on the sourceFormat discriminant; neutralImporter.ts changed 268 lines (not line-reviewed in this run). The 47 scoped tests pass at HEAD.",
+    "holds": true,
+    "note": "Only the scoped suites were exercised; the 268-line neutralImporter.ts diff was not read line by line."
+   },
+   {
+    "claim": "'147 tests across 11 affected suites and source typecheck pass' (issue description, at 1b89a573)",
+    "evidence": "The exact 11-suite composition is not recorded in the issue or in any tracked file found at HEAD; this run executed 7 directly relevant suites = 47 tests (see testsRun). Typecheck was not run.",
+    "holds": false,
+    "note": "CANNOT_VERIFY the historical 147/11 figure as stated; the subset reproduced here is green."
+   },
+   {
+    "claim": "Receipt AMC_OS/RESEARCH/2026-09-08-dsh-pi/pi-session-import-review.md and full-suite-qualified-d1f2ee84.{md,json} exist as evidence",
+    "evidence": "find AMC_OS -iname '*dsh-pi*' and -iname 'full-suite-qualified-d1f2ee84*' return nothing; git ls-files AMC_OS/RESEARCH | grep dsh-pi returns nothing at 6e7875f2. .gitignore:81 ignores AMC_OS/ and other receipt dirs (2026-09-09-*) were force-added, so this one was never committed. Their content cannot be inspected from this worktree.",
+    "holds": false,
+    "note": "CANNOT_VERIFY the receipt content; DoD item 5 (receipt under AMC_OS/RESEARCH at the merged commit) is not satisfied on the integration branch."
+   },
+   {
+    "claim": "Reconciliation record AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1507) exists",
+    "evidence": "ls AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/ -> No such file or directory; not in git ls-files at 6e7875f2.",
+    "holds": false,
+    "note": "CANNOT_VERIFY; untracked or never written."
+   },
+   {
+    "claim": "Full suite at d1f2ee84: 11,092 passed / 0 failed / 0 pending across 1,321 files (and plans/amc-dsh-pi-execution-2026-09-08.md:148 'included in fdabeba9 whole suite: 11,107 passed')",
+    "evidence": "Neither receipt is tracked at HEAD; the full suite was not run in this task (instructed not to). The tracked AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/attempt-3/full-suite.json reports 12,262/12,262 for some later commit; commit 3439cda6's message claims 14,101/14,101 for candidate E 6e7875f2 -- neither was reproduced here.",
+    "holds": false,
+    "note": "CANNOT_VERIFY in this run; historical numbers are quoted only, not measured."
+   },
+   {
+    "claim": "Obsidian evidence note + Now/Roadmap updated",
+    "evidence": "No Obsidian vault directory exists in the repository (ls obsidian*/vault*/docs/obsidian* -> none); cannot inspect from this worktree.",
+    "holds": false,
+    "note": "CANNOT_VERIFY."
+   },
+   {
+    "claim": "Issue state / Linear completion record",
+    "evidence": "Linear: state In Review; three comments (2026-09-08 claim, 2026-09-08 local-complete, 2026-09-09 Phase A reconciliation) all explicitly say no Done transition is requested. Tracked AMC_OS/RESEARCH/2026-09-09-closure-map/closure-map.md:66 lists AMC-1507 In Review, needing 'Fresh candidate nested-failure, duplicate/cycle/orphan, redaction and unknown-time consumer evidence'.",
+    "holds": true,
+    "note": "Consistent with In Review; DoD item 6 (Done with SHA + receipt path) not yet done, by design."
+   }
+  ],
+  "testsRun": [
+   {
+    "command": "npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceIngestionTiming.test.ts tests/traceFailureUnknownTime.test.ts tests/neutralImportMapping.test.ts tests/importProvenance.test.ts tests/neutralImportReview.test.ts",
+    "passed": 47,
+    "failed": 0,
+    "skipped": 0,
+    "files": 7,
+    "durationSeconds": 2.71
+   },
+   {
+    "command": "[mutation 1: sanitizePiSession safeId returns raw value] npx vitest run tests/piSessionImportBoundaries.test.ts (expected RED; source restored afterwards, diff -q identical)",
+    "passed": 12,
+    "failed": 2,
+    "skipped": 0,
+    "files": 1
+   },
+   {
+    "command": "[mutation 2: piSessionTraces durationMs: null -> 0] npx vitest run tests/piSessionImport.test.ts (expected RED; source restored afterwards, diff -q identical)",
+    "passed": 10,
+    "failed": 1,
+    "skipped": 0,
+    "files": 1
+   }
+  ],
+  "missingForDone": [
+   "DoD 5: a receipt for this issue tracked under AMC_OS/RESEARCH/ at the merged commit. The cited AMC_OS/RESEARCH/2026-09-08-dsh-pi/{pi-session-import-review.md, full-suite-qualified-d1f2ee84.md, .json} and 2026-09-09-phase-a-reconciliation/reconciliation.json are absent from 6e7875f2 (AMC_OS/ is gitignored; they need git add -f). The receipt must name source commit, environment, exercised and not-exercised, and should include the fresh-candidate reproduction the closure map asks for (nested failure, duplicate/cycle/orphan, redaction, unknown-time consumer evidence) -- this run's 47/47 + two RED mutations at 6e7875f2 on Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0 / vitest 4.1.11 can seed it.",
+   "DoD 2/3: a single-commit full suite at 6e7875f2 (or the final merged candidate) recorded with pass/fail/pending counts in a tracked receipt attributable to this issue; commit 3439cda6's 14,101/14,101 claim and the tracked attempt-3 full-suite.json (12,262) were not tied to this issue or reproduced here.",
+   "DoD 4: pnpm release:gate disposition recorded for the candidate (not run in this task).",
+   "Source typecheck at HEAD for the importer path (claimed at 1b89a573, not run here).",
+   "DoD 6: Linear transition to Done with commit SHA and tracked receipt path.",
+   "DoD 7: Obsidian note update (cannot be verified from the repository).",
+   "Optional: qualify the 268-line neutralImporter.ts evolution after 1b89a573 (bda990ac/822123d7/d3cae563) beyond the scoped suites."
+  ],
+  "defectsFound": [
+   {
+    "file": "src/importers/piSessionImport.ts",
+    "line": 259,
+    "description": "entryTimestamp accepts any finite numeric timestamp, including negative (pre-1970) values, while the generic mapper traceMapping.traceTimestamp (src/importers/traceMapping.ts:18) rejects value < 0 and > 8.64e15. Pi writes ISO strings so numeric input is unlikely, but a Pi entry with timestamp -1 would be recorded as a valid 1969 event time by one mapper and as unknown by the other. Boundary inconsistency, no test covers negative numeric Pi timestamps.",
+    "severity": "low"
+   }
+  ],
+  "boundary": "Source commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f on a fresh git worktree (worktree-wf_8d677915-7b1-1) fast-forwarded from merge-base 3d6b8d4a; pnpm install --frozen-lockfile --prefer-offline succeeded. Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11. Exercised: 7 vitest suites (47 tests) run from source (no dist import; pnpm build not run); two source mutations (identity redaction disabled; durationMs fabricated as 0) each made the corresponding tests fail and the file was restored byte-identical (git status clean); ancestor checks for c050244a, 8defa070, 1b89a573, d1f2ee84; line-level read of piSessionImport.ts, traceMapping.ts, the Pi hooks in neutralImporter.ts, traceIngestion.ts typing, traceFailureIndex.ts schema lines, docs/TRACES_TO_EVIDENCE.md:31-55, Linear description and 3 comments. Not exercised: full suite, pnpm release:gate, typecheck, pnpm build, real Pi CLI-produced sessions (only synthetic fixtures), the other suites in the historical '11 affected suites', the 268-line neutralImporter.ts diff after 1b89a573, and the cited AMC_OS/RESEARCH/2026-09-08-dsh-pi receipts (not present at HEAD). No Obsidian access. Source-level qualification only; not package, platform or release qualification.",
+  "proposedLinearComment": "Phase A step 1 reconciliation \u2014 2026-09-14, at integration commit 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f (amc/gap-register-execution), fresh worktree, Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11.\n\nVerified at 6e7875f2: c050244a, 8defa070 and 1b89a573 are ancestors of the integration commit. Explicit v3 detection with v1/v2/other refused by name and no generic fallback (src/importers/piSessionImport.ts:87-138, neutralImporter.ts:528-532); nested isError / stopReason error|aborted / errorMessage preserved, length flagged truncated (:314-336, :350-358); toolCallId, resolved tool name, provider/model, entry/parent ids, onCurrentPath and parentSession in metadata (:292-299, :342-363); structural entries counted, never traced (:27-30, :311-312); duplicate IDs and cycles refuse import, orphans explicit (:150-169); strict timestamp validation (:249-263); durationMs null with measured-only avgLatencyMs (traceIngestion.ts:31,81,139-140); Watch schemaVersion 2026-09-08 with legacy readable (watch/traceFailureIndex.ts:82,362); operator contract at docs/TRACES_TO_EVIDENCE.md:31-55.\n\nRun: npx vitest run tests/piSessionImport.test.ts tests/piSessionImportBoundaries.test.ts tests/traceIngestionTiming.test.ts tests/traceFailureUnknownTime.test.ts tests/neutralImportMapping.test.ts tests/importProvenance.test.ts tests/neutralImportReview.test.ts -> 7 files, 47 passed / 0 failed / 0 skipped, 2.71s. Mutation checks: disabling identity sanitization made 2 boundary tests fail (2 failed | 12 passed); replacing durationMs null with 0 made 'missing timing is unknown, never a measured zero' fail (1 failed | 10 passed). Source restored byte-identical after each.\n\nNot exercised: full suite, release gate, typecheck, build, real Pi CLI sessions (synthetic fixtures only), the 268-line neutralImporter.ts evolution after 1b89a573 beyond these suites. The historical figures in this issue (147 tests / 11 suites; 11,092 at d1f2ee84; 11,107 at fdabeba9) were not reproduced.\n\nGaps against Done: the cited receipts AMC_OS/RESEARCH/2026-09-08-dsh-pi/* and 2026-09-09-phase-a-reconciliation/reconciliation.json are not tracked at 6e7875f2 (AMC_OS/ is gitignored; they need git add -f), so DoD item 5 is unmet on the integration branch; a single-commit full-suite count and release-gate disposition attributable to this issue, the Done comment with SHA + receipt path, and the Obsidian note remain. One low-severity note: piSessionImport.ts:259 accepts negative numeric timestamps whereas traceMapping.ts:18 rejects them.\n\nVerdict PARTIAL. No Done transition requested by this comment."
+ }
+}
