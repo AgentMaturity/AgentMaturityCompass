@@ -1,0 +1,21 @@
+
+> agent-maturity-compass@1.2.0 release:gate /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-e
+> node scripts/release-gate.mjs
+
+PARTIAL 14/14 executed checks passed; 0 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.
+Receipt: /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-e/.amc/release-gate/latest.json
+- PASSED console-js-syntax
+- PASSED openapi-parse
+- PASSED typecheck
+- PASSED typecheck-tests
+- PASSED build
+- PASSED packed-install
+- PASSED gap-0626-adversarial-regression
+- PASSED full-test-suite
+- PASSED command-inventory
+- PASSED architecture-boundaries
+- PASSED docs-drift-public-naming
+- PASSED runtime-dependency-audit
+- PASSED cli-and-domain-smoke
+- PASSED install-persona-qa
+- SKIPPED live-deploy-health

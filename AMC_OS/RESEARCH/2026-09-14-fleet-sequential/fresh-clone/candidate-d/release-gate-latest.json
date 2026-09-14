@@ -1,0 +1,207 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "release-gate",
+  "createdAt": "2026-09-14T09:04:48.068Z",
+  "workspace": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-d",
+  "quick": false,
+  "status": "failed",
+  "qualification": "failed",
+  "partial": true,
+  "counts": {
+    "executed": 14,
+    "passed": 13,
+    "failed": 1,
+    "skipped": 1,
+    "total": 15
+  },
+  "summary": "13/14 executed checks passed; 1 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:54:30.169Z",
+      "endedAt": "2026-09-14T08:54:30.226Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:54:30.226Z",
+      "endedAt": "2026-09-14T08:54:30.396Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:54:30.396Z",
+      "endedAt": "2026-09-14T08:54:57.696Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck\n> tsc -p tsconfig.json --noEmit\n\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:54:57.696Z",
+      "endedAt": "2026-09-14T08:55:38.324Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 typecheck:tests\n> tsc -p tsconfig.tests.json --noEmit\n\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:55:38.325Z",
+      "endedAt": "2026-09-14T08:56:08.784Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 prebuild\n> npm run clean\n\n\n> agent-maturity-compass@1.2.0 clean\n> node scripts/clean-dist.mjs\n\n\n> agent-maturity-compass@1.2.0 build\n> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs\n\n\n> agent-maturity-compass@1.2.0 copy-assets\n> node scripts/copy-build-assets.mjs\n\nbundle-kernel: dist/kernel/amcRuntime.js 381 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:56:08.784Z",
+      "endedAt": "2026-09-14T08:56:26.601Z",
+      "stdout": "packed-install check of agent-maturity-compass@1.2.0 in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-packed-install-lFuvpV\nnote: packing with --ignore-scripts; the prepack release gate is a separate gate, not exercised here\nok   npm pack --ignore-scripts (same files as publish) (2.7s)\nok   npm install <tarball> (fresh dir, empty HOME) (8.4s)\nok   @amc/core is not resolvable from the consumer directory\nok   amc doctor (2.7s)\nok   amc init (isolated workspace) (0.9s)\nok   amc agent-loop run (stub provider, keyless) (0.9s)\nok   amc session verify --json (0.7s)\nok   amc agent-loop verify --json (0.7s)\nok   installed evidence and request reconstruction\nskip real-provider smoke: AMC_PACKED_SMOKE_PROVIDER not set (keyless run only)\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-09-14T08:56:26.601Z",
+      "endedAt": "2026-09-14T08:56:30.390Z",
+      "stdout": "\n RUN  v4.1.11 /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-d\n\n\n Test Files  1 passed (1)\n      Tests  2 passed (2)\n   Start at  14:26:27\n   Duration  3.06s (transform 1.85s, setup 0ms, import 2.50s, tests 449ms, environment 0ms)\n\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --reporter=dot --reporter=json --outputFile.json=/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-d/tmp/release-gate/vitest-pONCMJ/results.json",
+      "status": "failed",
+      "startedAt": "2026-09-14T08:56:30.391Z",
+      "endedAt": "2026-09-14T09:02:19.685Z",
+      "stdout": "packCli.test.ts > pack CLI scaffolding and entry resolution > pack init scaffolds index.mjs and resolves it as the test entry point\n[kwame-test] Running against agent: test-agent (mode: sandbox)\n\n··················································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································\n\n Test Files  2 failed | 1482 passed (1484)\n      Tests  3 failed | 14098 passed (14101)\n   Start at  14:26:30\n   Duration  348.49s (transform 90.18s, setup 0ms, import 687.90s, tests 2889.39s, environment 138ms)\n\nJSON report written to /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-d/tmp/release-gate/vitest-pONCMJ/results.json\n",
+      "stderr": "+\n+ AMC now includes a scheduled GitHub Actions workflow that validates packaged CLI installs across a small OS/Node matrix and uploads JSON artifacts for inspection:\n+\n+ - workflow: `.github/workflows/nightly-compatibility-matrix.yml`\n+ - current matrix: `ubuntu-latest` + `macos-latest`, Node `20` + `22`\n+ - checks: packed install, top-level full score JSON, `doctor --json`, `lite-score --help`, `comms-check --help`\n+\n+ ### Workspace config profiles (MVP)\n+\n+ AMC now supports lightweight workspace config presets for `.amc/amc.config.yaml`:\n+\n+ ```bash\n+ amc init --minimal\n+ amc init --profile dev\n+ amc quickstart --minimal\n+ amc quickstart --startup-plan --answers-out amc-startup-answers.json\n+ amc quickstart --what-broken\n+ amc quickstart --profile ci\n+ amc config profile prod\n+ ```\n+\n+ Current MVP behavior:\n+ - `dev` → shared trust boundary, proxy env enabled\n+ - `ci` → isolated trust boundary, proxy env enabled\n+ - `prod` → isolated trust boundary, proxy env disabled\n+ - explicit `--trust-boundary` still overrides the profile when you need it\n+ - `--minimal` → startup-friendly setup without a vault prompt or immediate full-score prompt\n+ - `--startup-plan` → role-aware 10-minute startup plan, framework detection, and optional sample answer file\n+ - `--what-broken` → single-command startup blocker report without running the interactive score\n+\n+ ---\n+\n+ ## Contributing\n+\n+ AMC is MIT licensed. We welcome contributions — especially new **assurance packs**, **domain packs**, **framework adapters**, and **scoring modules**.\n+\n+ ```bash\n+ git clone https://github.com/AgentMaturity/AgentMaturityCompass.git\n+ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # 1,477 test source files; Vitest reports run outcomes\n+ ```\n+\n+ **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.\n+\n+ ### Good first contributions\n+\n+ - **New assurance pack** — model a new attack scenario ([guide](CONTRIBUTING.md#writing-an-assurance-pack))\n+ - **New domain pack** — add industry-specific questions ([guide](CONTRIBUTING.md#writing-a-domain-pack))\n+ - **New adapter** — support another agent framework ([guide](CONTRIBUTING.md#writing-an-adapter))\n+ - **Research paper → module** — turn arXiv findings into scoring logic ([guide](CONTRIBUTING.md#mapping-a-research-paper))\n+\n+ ---\n+\n+ ## License\n+\n+ **MIT** — public trust infrastructure for the age of AI agents.\n+\n+ ---\n+\n+  \n+    244 default diagnostic questions + 20 lifecycle expansion questions · 143 assurance packs · 41 domain packs · 16 adapters · 1,215 CLI command paths  \n+    Stop trusting. Start verifying. \n+  \n+\n\n ❯ tests/publicStatsDrift.test.ts:42:26\n     40|     for (const path of CURRENT_PUBLIC_FILES) {\n     41|       const body = readProjectFile(path).replace(/<[^>]*>/g, \" \");\n     42|       expect(body, path).toContain(CURRENT_TEST_FILE_COUNT);\n       |                          ^\n     43|       expect(body, path).toMatch(/test\\s+source\\s+files/i);\n     44|       expect(body, path).not.toMatch(/\\b\\d[\\d,]*\\s+(?:passing\\s+(?:Vit…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯\n\n FAIL  tests/publicStatsDrift.test.ts > public test-count claims > README badge labels a source-file inventory and links to CI outcomes\nAssertionError: expected Set{ 'test%20source%20files-1%2C477' } to deeply equal Set{ 'test%20source%20files-1%2C484' }\n\n- Expected\n+ Received\n\n  Set {\n-   \"test%20source%20files-1%2C484\",\n+   \"test%20source%20files-1%2C477\",\n  }\n\n ❯ tests/publicStatsDrift.test.ts:62:29\n     60|     const current = `test%20source%20files-${CURRENT_TEST_FILE_COUNT.r…\n     61|     const badges = [...readme.matchAll(/test%20source%20files-(?:\\d|,|…\n     62|     expect(new Set(badges)).toEqual(new Set([current]));\n       |                             ^\n     63|     expect(readme).not.toMatch(/tests-(?:\\d|,|%2c)+%20passing/i);\n     64|     expect(readme).toContain(\"https://github.com/AgentMaturity/AgentMa…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯\n\n",
+      "remediation": "Fix the full Vitest suite before release.",
+      "artifact": {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-d/tmp/release-gate/vitest-pONCMJ/results.json",
+        "produced": true,
+        "valid": false,
+        "sha256": "b48f0c321338c6282b0c806742c1c1037bbffcda051207943c9de8b8e58aa728",
+        "counts": {
+          "total": 14101,
+          "passed": 14098,
+          "failed": 3,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 4,
+          "pendingSuites": 0,
+          "files": 1484
+        },
+        "temporary": false,
+        "retained": true
+      }
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-4tkm6K/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:19.712Z",
+      "endedAt": "2026-09-14T09:02:20.538Z",
+      "stdout": "Command inventory written to /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-4tkm6K/CLI_COMMAND_INVENTORY.md\n",
+      "stderr": "",
+      "remediation": null,
+      "artifact": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-4tkm6K/CLI_COMMAND_INVENTORY.md",
+        "produced": true,
+        "temporary": true,
+        "retained": false
+      }
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:20.538Z",
+      "endedAt": "2026-09-14T09:02:21.962Z",
+      "stdout": "rc/vault/dsarCli.ts\": 171,\n    \"src/vault/honeytokens.ts\": 36,\n    \"src/vault/index.ts\": 34,\n    \"src/vault/invoiceFraud.ts\": 42,\n    \"src/vault/knowledgeRefreshLineage.ts\": 329,\n    \"src/vault/memoryTtl.ts\": 72,\n    \"src/vault/metadataScrubber.ts\": 61,\n    \"src/vault/passphraseStore.ts\": 145,\n    \"src/vault/privacyBudget.ts\": 27,\n    \"src/vault/ragGuard.ts\": 40,\n    \"src/vault/screenshotRedact.ts\": 83,\n    \"src/vault/secretsBroker.ts\": 115,\n    \"src/vault/undoLayer.ts\": 82,\n    \"src/vault/vault.ts\": 691,\n    \"src/vault/vaultCli.ts\": 69,\n    \"src/vault/vaultCrypto.ts\": 74,\n    \"src/vault/zkPrivacy.ts\": 756,\n    \"src/verify/verifyAll.ts\": 484,\n    \"src/version.ts\": 13,\n    \"src/watch/agentBus.ts\": 75,\n    \"src/watch/agentReadingTestLiveDrift.ts\": 364,\n    \"src/watch/aiReputationClaudeLiveDrift.ts\": 426,\n    \"src/watch/awesomeAgentMemoryLiveDrift.ts\": 359,\n    \"src/watch/behavioralProfiler.ts\": 354,\n    \"src/watch/bishengObservabilityLiveDrift.ts\": 518,\n    \"src/watch/braintrustLiveDrift.ts\": 211,\n    \"src/watch/continuousMonitor.ts\": 524,\n    \"src/watch/ctfAgentBenchmarkLiveDrift.ts\": 475,\n    \"src/watch/darwinGodelMachineLiveDrift.ts\": 532,\n    \"src/watch/dashboardFeed.ts\": 90,\n    \"src/watch/decibenchVoiceLiveDrift.ts\": 246,\n    \"src/watch/driftMath.ts\": 187,\n    \"src/watch/evidenceDrilldown.ts\": 64,\n    \"src/watch/evidenceRefs.ts\": 14,\n    \"src/watch/explainabilityPacket.ts\": 29,\n    \"src/watch/garageLiveDrift.ts\": 471,\n    \"src/watch/hookActionLifecycle.ts\": 364,\n    \"src/watch/hookHealthDiagnostics.ts\": 314,\n    \"src/watch/hostHardening.ts\": 79,\n    \"src/watch/index.ts\": 434,\n    \"src/watch/liveDriftAlerts.ts\": 10158,\n    \"src/watch/liveDriftTypes.ts\": 4436,\n    \"src/watch/llmFighterLiveDrift.ts\": 451,\n    \"src/watch/lmnrObservabilityLiveDrift.ts\": 431,\n    \"src/watch/multiTenantVerifier.ts\": 49,\n    \"src/watch/narrowTaskBroadMisalignmentLiveDrift.ts\": 425,\n    \"src/watch/observabilityBridge.ts\": 1158,\n    \"src/watch/openCompassLiveDrift.ts\": 491,\n    \"src/watch/outputAttestation.ts\": 34,\n    \"src/watch/overrideNearMissAnalytics.ts\": 473,\n    \"src/watch/paperReadSkillLiveDrift.ts\": 175,\n    \"src/watch/policyPacks.ts\": 89,\n    \"src/watch/proofDelegatedMonitor.ts\": 242,\n    \"src/watch/providerDriftAlerts.ts\": 5,\n    \"src/watch/ragTextGenerationLiveDrift.ts\": 354,\n    \"src/watch/railScoreLiveDrift.ts\": 492,\n    \"src/watch/realtimeAssurance.ts\": 709,\n    \"src/watch/reflexionAgentLiveDrift.ts\": 178,\n    \"src/watch/safetyTestkit.ts\": 260,\n    \"src/watch/sessionDriftProjection.ts\": 105,\n    \"src/watch/siemExporter.ts\": 173,\n    \"src/watch/skillMatchLiveDrift.ts\": 205,\n    \"src/watch/traceFailureIndex.ts\": 484,\n    \"src/watch/trismAgenticLiveDrift.ts\": 425,\n    \"src/wire/ndjsonFraming.ts\": 193,\n    \"src/wire/wireCli.ts\": 145,\n    \"src/wire/wireClient.ts\": 290,\n    \"src/wire/wireCodecs.ts\": 120,\n    \"src/wire/wireDispatcher.ts\": 211,\n    \"src/wire/wireJson.ts\": 278,\n    \"src/wire/wireListener.ts\": 249,\n    \"src/wire/wireMethods.ts\": 141,\n    \"src/wire/wireReply.ts\": 90,\n    \"src/wire/wireRpc.ts\": 154,\n    \"src/wire/workAcceptance.ts\": 244,\n    \"src/workflow/workflowPlan.ts\": 140,\n    \"src/workflow/workflowRunner.ts\": 167,\n    \"src/workflow/workflowTool.ts\": 96,\n    \"src/workorders/workorderCli.ts\": 23,\n    \"src/workorders/workorderEngine.ts\": 313,\n    \"src/workorders/workorderSchema.ts\": 34,\n    \"src/workspace.ts\": 782,\n    \"src/workspaces/hostAuth.ts\": 191,\n    \"src/workspaces/hostBootstrap.ts\": 116,\n    \"src/workspaces/hostCli.ts\": 177,\n    \"src/workspaces/hostDb.ts\": 1248,\n    \"src/workspaces/hostSchema.ts\": 33,\n    \"src/workspaces/workspaceContext.ts\": 8,\n    \"src/workspaces/workspaceId.ts\": 33,\n    \"src/workspaces/workspaceManager.ts\": 246,\n    \"src/workspaces/workspacePaths.ts\": 57,\n    \"src/workspaces/workspaceResolver.ts\": 43,\n    \"src/workspaces/workspaceRouter.ts\": 1778,\n    \"src/workspaces/workspaceRuntimeRegistry.ts\": 44,\n    \"src/workspaces/workspaceStudioProxy.ts\": 62\n  },\n  \"prefixBranchCount\": 2,\n  \"failures\": []\n}\n",
+      "stderr": "",
+      "remediation": null
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:21.962Z",
+      "endedAt": "2026-09-14T09:02:22.312Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 check:docs-drift\n> node scripts/docs-drift-check.mjs\n\nDocs drift check passed (302 files scanned).\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:22.312Z",
+      "endedAt": "2026-09-14T09:02:23.239Z",
+      "stdout": "\n> agent-maturity-compass@1.2.0 audit:runtime\n> pnpm audit --prod --audit-level moderate\n\nNo known vulnerabilities found\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:23.239Z",
+      "endedAt": "2026-09-14T09:02:24.566Z",
+      "stdout": "icense issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"privacy-security-mobility\",\n      \"name\": \"Privacy & Security\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"freight-3pl-warehouse\",\n      \"name\": \"Freight, 3PL & Warehouse Operations\",\n      \"domain\": \"mobility\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 8,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"cognition-to-intelligence\",\n      \"name\": \"Cognition to Intelligence\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"networked-ecosystems\",\n      \"name\": \"Connectivity to Networked Ecosystems\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"os-sustainable-outcomes\",\n      \"name\": \"Operating System for Sustainable Outcomes\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"infotainment\",\n      \"name\": \"Infotainment\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"partnerships-prosperity\",\n      \"name\": \"Partnerships for Peace & Prosperity\",\n      \"domain\": \"technology\",\n      \"riskLevel\": \"high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"digital-citizens-rights\",\n      \"name\": \"Digital Citizens & Rights\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"dance-of-democracy\",\n      \"name\": \"Dance of Democracy\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"critical\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"petition-to-law\",\n      \"name\": \"Petition to Law\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 14,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"citizen-services\",\n      \"name\": \"Citizen Services\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 13,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    },\n    {\n      \"packId\": \"public-private-collaboration\",\n      \"name\": \"Public and Private Collaboration\",\n      \"domain\": \"governance\",\n      \"riskLevel\": \"very-high\",\n      \"questionCount\": 15,\n      \"locked\": true,\n      \"description\": \"Commercial Industry Packs access is planned; public checkout and license issuance are not live yet.\"\n    }\n  ]\n}\n",
+      "stderr": "\n",
+      "remediation": null
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-09-14T09:02:24.566Z",
+      "endedAt": "2026-09-14T09:04:48.067Z",
+      "stdout": "nas/startup-founder/.amc/agents/founder-agent/runtime-runs/startup-founder-runtime/state.json.sig\\\"\\n}\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 682\n        },\n        {\n          \"id\": \"guide\",\n          \"command\": \"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-install-persona-qa-b2fhWr/personas/startup-founder/node_modules/.bin/amc guide\",\n          \"status\": \"passed\",\n          \"exitCode\": 0,\n          \"startedAt\": \"2026-09-14T09:04:37.495Z\",\n          \"endedAt\": \"2026-09-14T09:04:38.172Z\",\n          \"stdout\": \"\\n  🧭 Agent \\\"default\\\" has 244 gaps to close for L1 — Initial. 0/244 questions already at target.\\n\\n  1. AMC-3.1.1: Integrity (Alignment with North Star)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Completion Above Alignment\\\". Need \\\"Alignment Intent, Weak Practice\\\".\\n     Run: amc evidence collect\\n\\n  2. AMC-3.1.2: Ethics (Safety, Privacy, Fairness)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Ethics Ignored\\\". Need \\\"Ethics as Intent Only\\\".\\n     Run: amc evidence collect\\n\\n  3. AMC-3.1.3: Inspiration (Source of Improvement)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Trend Copying\\\". Need \\\"Benchmark Chasing\\\".\\n     Run: amc evidence collect\\n\\n  4. AMC-3.1.4: Innovation (Continuous Improvement Maturity)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Innovation Ignored\\\". Need \\\"Innovation When Forced\\\".\\n     Run: amc evidence collect\\n\\n  5. AMC-3.1.5: Optimization & Tradeoff Discipline\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Vanity Output Optimization\\\". Need \\\"Single-Metric Optimization\\\".\\n     Run: amc evidence collect\\n\\n  6. AMC-3.1.6: User Focus (Education → Ownership → Commitment)\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Basic Support Only\\\". Need \\\"Responsive Service\\\".\\n     Run: amc evidence collect\\n\\n  7. AMC-3.2.1: Role Positioning & Responsibility\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Role Confusion\\\". Need \\\"Role Stated, Not Enforced\\\".\\n     Run: amc evidence collect\\n\\n  8. AMC-3.2.2: Identity, Voice, and Trust Signals\\n     Culture & Alignment · L0 → L1\\n     Currently at \\\"Style Only / Inconsistent Persona\\\". Need \\\"Branded Tone, Weak Substance\\\".\\n     Run: amc evidence collect\\n\\n  ... and 236 more gaps. Use --export to see all.\\n\\n  Export all guides: amc guide --export\\n  Generate guardrails: amc guide --guardrails\\n  Apply to agent config: amc guide --apply\\n  Mechanic mode (pick & choose): amc guide --interactive\\n  Continuous monitoring: amc guide --watch\\n  Compare with previous: amc guide --diff\\n  List supported frameworks: amc guide --frameworks\\n  Target specific level: amc guide --target 4\\n\\n\",\n          \"stderr\": \"\",\n          \"remediation\": null,\n          \"durationMs\": 677\n        }\n      ],\n      \"assertions\": [\n        {\n          \"id\": \"amc-bin\",\n          \"status\": \"passed\",\n          \"details\": \"Installed CLI bin is present.\"\n        },\n        {\n          \"id\": \"full-score-contract\",\n          \"status\": \"passed\",\n          \"details\": \"questions=244; CLI-reported SLA met=true\"\n        },\n        {\n          \"id\": \"domain-pack-count\",\n          \"status\": \"passed\",\n          \"details\": \"packs=41\"\n        }\n      ],\n      \"status\": \"passed\",\n      \"checkCounts\": {\n        \"planned\": 10,\n        \"executed\": 10,\n        \"passed\": 10,\n        \"failed\": 0,\n        \"skipped\": 0\n      },\n      \"summary\": \"10/10 automated checks passed; 0 failed; 0 skipped.\",\n      \"measurements\": {\n        \"installWallMs\": 7255,\n        \"scoreCommandWallMs\": 1067,\n        \"cliReportedDiagnosticMs\": 343,\n        \"cliReportedSla\": {\n          \"targetMs\": 120000,\n          \"elapsedMs\": 343,\n          \"met\": true\n        }\n      },\n      \"evidence\": {\n        \"questionCount\": 244,\n        \"domainPackCount\": 41,\n        \"artifactStatus\": \"VALID\",\n        \"evidenceStatus\": \"INSUFFICIENT_EVIDENCE\",\n        \"claimEligible\": false\n      }\n    }\n  ]\n}\n",
+      "stderr": "npm warn Unknown env config \"npm-globalconfig\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"verify-deps-before-run\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"_jsr-registry\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"node-linker\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\nnpm warn Unknown env config \"link-workspace-packages\". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.\n",
+      "remediation": null
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-09-14T09:04:48.067Z",
+      "endedAt": "2026-09-14T09:04:48.067Z",
+      "stdout": "",
+      "stderr": "",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ],
+  "remediations": [
+    {
+      "id": "full-test-suite",
+      "status": "failed",
+      "remediation": "Fix the full Vitest suite before release."
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ]
+}

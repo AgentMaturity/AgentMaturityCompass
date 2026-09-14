@@ -319,6 +319,30 @@ the same first-run-without-a-vault effect seen in every fresh checkout (see the 
 clone is not claimed clean after execution. No number here is a receipt for the repaired
 candidate; candidate E follows.
 
+### Fresh-clone acceptance, candidate E `6e7875f2` — ACCEPTED (source and local-package qualification only)
+
+Reproduced per the brief's receipt rule with `fresh-clone/fresh-clone-validate.sh`: `git clone`
+of root into the scratchpad (`clone-e`), `git checkout 6e7875f2`, `pnpm install
+--frozen-lockfile --prefer-offline` (local store), then every step below. Environment: Darwin
+25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. Clean tree after checkout. Logs:
+`fresh-clone/candidate-e/`.
+
+| Step | Result | Seconds |
+|---|---|---|
+| install / build / typecheck-src / typecheck-tests / openapi-check | all exit 0 | 2 / 36 / 26 / 35 / 0 |
+| full suite (`npx vitest run`) | **1,484/1,484 files, 14,101/14,101 tests, 0 failed, 0 skipped** | 349 |
+| Python lanes (`sdk/python`, `pytest tests`, built CLI) | **290 passed, 21 failed, 1 skipped** — the failures are the same `test_validation_installed.py` installed-wheel cases recorded on 2026-09-12 (pre-existing; blocker for Sid, unchanged) | 76 |
+| release gate (`pnpm release:gate`) | **14/14 executed checks passed, 0 failed, 1 skipped** (live-deploy-health: no `AMC_RELEASE_GATE_LIVE_URL`) | 604 |
+
+After the run the clone's tracked `.amc/keys/*` were rewritten with `*.previous-*` backups (the
+first-run-without-a-vault effect); nothing else differed, and the clone is not claimed clean
+after execution. This qualifies the source and the locally packed package at `6e7875f2` on
+Darwin arm64 / Node v25.5.0; it is not platform, published-package or deployed-release
+qualification, and no AMC-1505 child moves to Done on its strength alone (the per-issue
+reconciliations follow). Candidate E contains every fleet integration of 2026-09-14
+(`fa2ffac6`…`b76967e9`), the root follow-ups, the research and readiness records and the
+candidate-D repairs.
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |

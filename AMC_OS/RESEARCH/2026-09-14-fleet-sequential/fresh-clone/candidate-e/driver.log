@@ -1,0 +1,21 @@
+=== clone: git clone -q /Users/sid/AgentMaturityCompass /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/clone-e --branch amc/gap-register-execution ===
+clone exit=0 seconds=3
+=== checkout: git checkout -q 6e7875f2 ===
+checkout exit=0 seconds=0
+=== install: pnpm install --frozen-lockfile --prefer-offline ===
+install exit=0 seconds=2
+=== build: pnpm build ===
+build exit=0 seconds=36
+=== typecheck-src: npx tsc -p tsconfig.json --noEmit ===
+typecheck-src exit=0 seconds=26
+=== typecheck-tests: npx tsc -p tsconfig.tests.json --noEmit ===
+typecheck-tests exit=0 seconds=35
+=== openapi-check: node scripts/update-native-task-openapi.mjs --check ===
+openapi-check exit=0 seconds=0
+=== full-suite: npx vitest run --reporter=default ===
+full-suite exit=0 seconds=349
+=== python-lanes: python3.14 -m pytest tests -q -p no:cacheprovider ===
+python-lanes exit=1 seconds=76
+=== release-gate: pnpm release:gate ===
+release-gate exit=0 seconds=604
+done
