@@ -195,6 +195,25 @@ describe("user attachments above the per-event cap are retained through the sign
     expect(rows[0], rows[0]!.detail ?? "no detail").toMatchObject({ status: "reconstructed", bytes: sent[0]!.body.toString("base64"), recordedDigest: sha256Hex(sent[0]!.body), derivedDigest: call.requestDigest });
   });
 
+  test("a text attachment above the cap is retained through spill and replays as its original text", () => {
+    const h = opened();
+    const text = Buffer.from(Array.from({ length: h.cap + 512 }, (_, i) => String.fromCharCode(0x61 + (i * 7) % 26)).join(""), "utf8");
+    const recorded = h.writer.recordUserAttachment({ filename: "notes.txt", content: text, mimeType: "text/plain", kind: "text" });
+    const events = h.writer.readEvents();
+    const { commitment, attachment } = attachmentRows(events);
+    expect(attachment.id).toBe(recorded.eventId);
+    expect(events.indexOf(commitment)).toBeLessThan(events.indexOf(attachment));
+    expect(extractSpillRef(attachment.meta_json)).toMatchObject({ bytes: text.byteLength, contentSha256: sha256Hex(text), maxInlineBytes: h.cap });
+    const payload = readEventPayload(h.root, attachment);
+    expect(payload.status).toBe("ok");
+    expect(decodeSpilledInputDescriptor((payload as { bytes: Buffer }).bytes)).toMatchObject({ contentSha256: sha256Hex(text), bytes: text.byteLength });
+    const resolved = resolveSpilledInputPayload({ workspace: h.root, event: attachment, payload: (payload as { bytes: Buffer }).bytes, events });
+    expect(resolved.status).toBe("ok");
+    expect((resolved as { bytes: Buffer }).bytes.equals(text)).toBe(true);
+    expect((resolved as { commitmentEventId: string | null }).commitmentEventId).toBe(commitment.id);
+    expect(projectAcpAttachment(h.root, attachment, events)).toEqual({ sessionUpdate: "user_message_chunk", content: { type: "text", text: text.toString("utf8") } });
+  });
+
   test("ACP history projection resolves the spilled attachment and refuses a modified, missing or uncommitted object", () => {
     const h = opened();
     const original = png(h.cap + 4096);
