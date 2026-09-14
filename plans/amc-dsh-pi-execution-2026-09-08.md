@@ -1629,3 +1629,14 @@ a machine probe". No launcher re-execs AMC under a profile yet, so the measureme
 unconfined everywhere today — measured, not assumed. Receipt:
 `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent: `impl:first-run` at
 `910e6d97`.
+
+### 2026-09-14 — Root follow-ups while `impl:first-run` runs: `8a66b5ef`, `97e1660b`
+
+`8a66b5ef` adds the text-attachment spill case the spill receipt listed as not exercised (10/10 in
+the file). `97e1660b` closes the hook-inheritance agent's first blocker: a `SubagentRunner` may
+now declare the hook control it installs, the driver runner and the kernel's wrappers declare
+it, and `spawnSubagent` records a runner that declares nothing as an `undeclared-runner` audit
+row in the parent session before calling it — so a foreign or injected runner can no longer
+leave the absence of inherited control unrecorded. Two mutations red (driver declaring nothing;
+kernel closure declaring nothing), restored; 30 delegation/loop/hook/schedule files 339/339; tsc
+and boundaries clean. Receipt table: `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`.

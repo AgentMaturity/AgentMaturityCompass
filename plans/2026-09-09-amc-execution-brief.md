@@ -286,7 +286,7 @@ re-derive them from scratch:
   humans, and read by nothing.
   > 2026-09-14 correction: moved — `src/agent/subagentSpawn.ts:268/426` parses them (`subagentStopConditions.ts`), passes them to the child runner, and `src/agent/subagentRunner.ts:145` composes descendant stop conditions from them; enforcement was not re-verified by a test in this session.
 - Hook control is not inherited by a spawned child; no spawn path installs it.
-  > 2026-09-14 correction: closed at `c3c46083` for native children (`createDriverRunner` builds every child on the parent's `LoopHookControl`; the kernel passes its composed hooks; a signed `delegation/hook-control` row records it). Foreign runners still bypass it.
+  > 2026-09-14 correction: closed at `c3c46083` for native children (`createDriverRunner` builds every child on the parent's `LoopHookControl`; the kernel passes its composed hooks; a signed `delegation/hook-control` row records it). Foreign or injected runners still bypass the inheritance, and since `97e1660b` the parent session records each such spawn as `undeclared-runner`.
 - `ToolsetReadiness.confined` is a machine probe, not a process property.
   > 2026-09-14 correction: closed at `910e6d97` — measured per process (one OS-refused or permitted create, attributed only after ordinary permissions are ruled out), tri-state with `unknown` never confined; no launcher re-execs AMC under a profile yet.
 - P6.1d: no CLI manages schedules; nothing calls `runDueSchedules` on a timer.
