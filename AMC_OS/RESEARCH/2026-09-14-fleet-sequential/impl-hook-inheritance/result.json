@@ -1,0 +1,102 @@
+{
+ "type": "result",
+ "key": "v2:9671fcd8c3da4baf33c1da86283d819dec7f42031f4cdc7124b7c54f630cb945",
+ "agentId": "a4a1e3098f5bf715c",
+ "result": {
+  "track": "IMPL-3",
+  "status": "COMPLETE",
+  "summary": "A spawned native child now runs under the parent loop's hook control (pre-step waterfall incl. vetoes, and turnStopping) instead of NO_HOOKS, and records a signed `audit` row (`kind: \"delegation/hook-control\"`, version 1) in its own session before its first turn naming the inherited controls, the approval gate, the signed stop conditions/scope it was declared under, and the narrower descendant limits it passes on; a child built with no control records `source: \"none\", inherited: []`. The kernel passes the same `hooks` object it composes for the root into `createDriverRunner`, so grandchildren inherit the same control. New tests (6) went RED before implementation, GREEN after; five mutations each went RED; 26 related test files / 279 tests green; both typechecks clean. Measured at 2eed9bee49587e1e7a2197d3b2c1c973b0e61728 on Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, scripted LLM adapter only.",
+  "filesChanged": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1/src/agent/subagentRunner.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1/src/agent/loopTypes.ts",
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1/src/kernel/agentLoopRunner.ts"
+  ],
+  "filesAdded": [
+   "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1/tests/subagentHookInheritance.test.ts"
+  ],
+  "testsAdded": [
+   "tests/subagentHookInheritance.test.ts: a parent pre-step veto governs the child: no model call, and the child's own loop/veto names the vetoing party",
+   "tests/subagentHookInheritance.test.ts: the parent's turn-stopping hook runs on the child's turn, under the child's turn number",
+   "tests/subagentHookInheritance.test.ts: the inheritance is recorded in the child's signed session before its first turn, naming every control that governed it",
+   "tests/subagentHookInheritance.test.ts: a child built with no hook control records the absence instead of claiming a control it does not have",
+   "tests/subagentHookInheritance.test.ts: a continued child records its controls once, at spawn, not once per turn",
+   "tests/subagentHookInheritance.test.ts: the production kernel hands its composed control to every native child, and a grandchild inherits the same control"
+  ],
+  "testResults": [
+   {
+    "command": "pnpm exec vitest run tests/subagentHookInheritance.test.ts  (before implementation, RED)",
+    "passed": 0,
+    "failed": 6,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/subagentHookInheritance.test.ts  (after implementation + typing fix)",
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run subagent delegat Delegat kernelDelegationGrant nativeChildStopOutput nativeDelegationInheritance agentLoop composedTurn  (26 files, final run after all edits)",
+    "passed": 279,
+    "failed": 0,
+    "skipped": 0
+   },
+   {
+    "command": "pnpm exec vitest run tests/subagent tests/delegat tests/Delegat tests/nativeDelegationInheritance.test.ts tests/nativeChildStopOutput.test.ts tests/kernelDelegationGrant.test.ts  (baseline at 2eed9bee before any edit; narrower filter set, 13 files)",
+    "passed": 142,
+    "failed": 0,
+    "skipped": 0
+   }
+  ],
+  "mutationChecks": [
+   {
+    "property": "The child driver is actually built on the inherited control (a parent pre-step veto blocks the child's model call; parent turnStopping runs on the child's turn)",
+    "mutation": "M1: removed `hooks,` from `new AgentDriver({...})` in src/agent/subagentRunner.ts (record still claimed inheritance)",
+    "wentRed": true
+   },
+   {
+    "property": "The inheritance (or its absence) is recorded in the child's signed session",
+    "mutation": "M2: removed the `recordHookControl(...)` call in src/agent/subagentRunner.ts",
+    "wentRed": true
+   },
+   {
+    "property": "The production kernel hands its composed control to native children and grandchildren",
+    "mutation": "M3: removed `hookControl: hooks,` from the createDriverRunner call in src/kernel/agentLoopRunner.ts",
+    "wentRed": true
+   },
+   {
+    "property": "A child built with no control records the absence rather than claiming a control it does not have",
+    "mutation": "M4: made childHooks() return inherited: [\"preStep\",\"turnStopping\"] when control is undefined",
+    "wentRed": true
+   },
+   {
+    "property": "The inherited preStep is invoked, not merely named (the record cannot outrun the driver)",
+    "mutation": "M5: replaced the child's preStep with `(_input, next) => next()` while leaving the record intact",
+    "wentRed": true
+   }
+  ],
+  "typecheck": "pnpm typecheck (tsc -p tsconfig.json --noEmit): exit 0. pnpm typecheck:tests (tsc -p tsconfig.tests.json --noEmit): exit 0. Both run at 2eed9bee + these edits, Node v25.5.0. (A first pass failed with TS7006 on the Object.freeze'd hook literal and TS2493 on a zero-arg vi.fn in the test; both fixed, re-run clean.)",
+  "behaviorChanges": [
+   "createDriverRunner accepts an optional `hookControl: LoopHookControl` (Pick<LoopHooks,'preStep'|'turnStopping'>); every child it builds runs under those hooks instead of NO_HOOKS. `notify` is deliberately NOT inherited (LoopNotification carries no session identity; forwarding would present child steps as the parent's).",
+   "Every native child session now carries one signed `audit` row before its first turn with meta {kind:'delegation/hook-control', version:1, source:'parent-loop'|'none', inherited:[...], approvalGate:{actionClass,riskTier,toolNames|null}|null, stopConditions, descendantStopConditions, delegationScope, descendantDelegationScope, governedAs, runAs, depth}. Continued children record it once at spawn, not per turn.",
+   "runComposedTurn (kernel) passes the same `hooks` object it composes for the root loop into the native createDriverRunner, so a parent pre-step veto now yields a `loop/veto` row in the child's session (by: <vetoing party>) and no request/header, and grandchildren inherit the same control through the recursive runner.",
+   "Row count per child session increases by one (the audit row); readAgentRunSummary's unsignedRows stays 0 (the row is written through recordProjectedEvidence, inside the spine, signed) \u2014 the runner's own unsigned-row refusal did not trigger in any test.",
+   "src/agent/delegateTool.ts was in scope but needed no change: control flows through the runner, not the tool."
+  ],
+  "decisions": [
+   "WORKTREE DISCREPANCY: the assigned worktree was at 3d6b8d4a (an old main commit; none of the scoped files or plans/ existed), not at 2eed9bee as stated. 3d6b8d4a is an ancestor of 2eed9bee, so I ran `git merge --ff-only 2eed9bee\u2026` on my OWN worktree branch (worktree-wf_453236ab-c47-1). No commit was created, no other branch/worktree/stash/.git internals touched; HEAD verified as 2eed9bee49587e1e7a2197d3b2c1c973b0e61728 before and after the work.",
+   "Recording the absence rather than refusing a hook-less child: refusing would break every direct createDriverRunner caller (foreign contract, cancellation, continuation tests) and the brief allowed either; the row's `source:'none'` makes the absence auditable, and M4 proves the record cannot lie about it.",
+   "Record via recordProjectedEvidence({eventType:'audit'}) with a `kind` discriminator, matching the existing nativeValidation / delegationEvidenceWriter convention \u2014 the only sanctioned way evidence enters the spine without widening SessionService (out of my write scope). No new LoopEventRecord kind was added (loopEventMeta.ts is out of scope).",
+   "Hooks and the recorded `inherited` list derive from one snapshot (childHooks) so the row and the driver cannot disagree; M1/M5 show the tests still catch a driver that drops or bypasses the hooks even when the record claims them.",
+   "Did not add an in-loop max-turns/timeout guard on the child: spawnSubagent already enforces the signed stop conditions and descendantStopConditions narrows them (AMC-1545); adding a second guard would be decoration (brief \u00a72 rule 7). The row records both the declared and the descendant limits instead.",
+   "Did not run `pnpm build` \u2014 all exercised tests import from src/, none needed dist/."
+  ],
+  "blockers": [
+   "Foreign runners (options.delegation.runner supplied, or src/ledger/monitor.ts spawnGovernedChild) do not pass through createDriverRunner, so a child executed by them gets neither the inherited control nor a hook-control row \u2014 the absence is NOT recorded on that path. Out of IMPL-3's write scope; next step: have spawnSubagent (src/agent/subagentSpawn.ts) write the absence into the parent's delegation-started row or require runners to declare their control.",
+   "The inherited preStep is the parent's composed waterfall, which includes contextPreStep bound to the PARENT's sessionId; when it runs under a child, context plugins refresh with the parent's session id. The injected context lands in the child's own inbox/session rows, but plugin-side attribution was not exercised by any test here. Next step: thread the child session id into a per-child prompt seam if plugin attribution matters.",
+   "Not exercised: the full vitest suite, `pnpm build`/dist, Playwright e2e, the CLI delegation flag end-to-end with a real provider (all runs used the scripted adapter + silent transport), and package/platform qualification. This is source qualification of one track only."
+  ],
+  "reportMarkdown": "## IMPL-3 \u2014 subagent hook-control inheritance\n\n**Commit:** 2eed9bee49587e1e7a2197d3b2c1c973b0e61728 (amc/gap-register-execution) + uncommitted edits in worktree `/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1`\n**Environment:** Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; `pnpm install --frozen-lockfile --prefer-offline` exit 0.\n**Worktree note:** the worktree was handed over at 3d6b8d4a (scoped files absent). Fast-forwarded my own worktree branch to 2eed9bee with `git merge --ff-only` (ancestor confirmed). No commit, no other tree touched.\n\n### What changed\n- `src/agent/loopTypes.ts` (+13): `export type LoopHookControl = Pick<LoopHooks, \"preStep\" | \"turnStopping\">` with a note on why `notify` is excluded.\n- `src/agent/subagentRunner.ts` (+87/\u22121): `DriverRunnerInit.hookControl?`; `childHooks(control)` builds the child's `LoopHooks` and the `inherited` list from one snapshot; `recordHookControl(...)` writes one signed `audit` row (`kind: \"delegation/hook-control\"`, `version: 1`) into the child's session before the driver exists; `new AgentDriver({... hooks ...})`.\n- `src/kernel/agentLoopRunner.ts` (+5): `hookControl: hooks` on the native `createDriverRunner` call \u2014 the same object the root loop runs under.\n- `tests/subagentHookInheritance.test.ts` (new, 6 tests).\n- `src/agent/delegateTool.ts`: in scope, unchanged (control flows via the runner).\n\n### Row shape (child session, before `turn/start`)\n`{kind, version:1, source:\"parent-loop\"|\"none\", inherited:[\"preStep\",\"turnStopping\"]|[], approvalGate:{actionClass,riskTier,toolNames|null}|null, stopConditions, descendantStopConditions, delegationScope, descendantDelegationScope, governedAs, runAs, depth}` \u2014 the signed declaration the child was spawned under plus the narrower limits it passes on (extends AMC-1545's `descendantStopConditions`).\n\n### Evidence (all produced this session)\n| Run | Result |\n|---|---|\n| New file before implementation | 6 failed / 0 passed (RED for the right reasons: child called the model, turnStopping not called, no row) |\n| New file after implementation | 6 passed |\n| Related set: `vitest run subagent delegat Delegat kernelDelegationGrant nativeChildStopOutput nativeDelegationInheritance agentLoop composedTurn` (26 files, enumerated) | 279 passed, 0 failed, 0 skipped, 34.5 s |\n| Baseline at 2eed9bee before edits (13-file subset) | 142 passed |\n| `pnpm typecheck` / `pnpm typecheck:tests` | exit 0 / exit 0 |\n\n**Mutations (each applied, run, restored byte-identical \u2014 `diff` against backup empty):**\nM1 drop `hooks` from AgentDriver \u2192 2 RED; M2 drop the record \u2192 4 RED; M3 drop `hookControl: hooks` in kernel \u2192 1 RED; M4 record claims inheritance when none \u2192 1 RED; M5 preStep passes through to `next()` \u2192 1 RED.\n\n### Not exercised / open\n- Foreign runners (`options.delegation.runner`, `ledger/monitor.ts spawnGovernedChild`) bypass `createDriverRunner`: no inherited control and no absence row on that path (out of scope; next step in `subagentSpawn.ts`).\n- The inherited `contextPreStep` refreshes plugins with the parent's sessionId when running under the child; plugin attribution not tested.\n- Full suite, `pnpm build`, e2e, real provider transport, package/platform qualification: not run.",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1"
+ }
+}

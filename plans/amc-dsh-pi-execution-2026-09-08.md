@@ -1595,3 +1595,18 @@ runner exist (no standing timer found); coverage thresholds are 65/75/59/64, not
 Playwright e2e runner is wired and only the browser download is missing. Unchanged: hook
 inheritance (agent running now), `ToolsetReadiness.confined` (queued agent), `lint` aliasing
 `typecheck`, the number drift, and the spill items closed by AMC-1547 plus today's `fa2ffac6`.
+
+### 2026-09-14 — impl:hook-inheritance integrated as `c3c46083`
+
+Third sequential agent (`wf_453236ab-c47`, 54 tool uses, 18.3 min) returned COMPLETE: spawned
+native children now run under the parent loop's hook control (pre-step waterfall with vetoes,
+turn-stopping) instead of `NO_HOOKS`, the kernel hands the same control to every child so
+grandchildren inherit it, and each child records a signed `delegation/hook-control` audit row
+before its first turn naming what governed it — or that nothing did. `notify` is deliberately
+not inherited. Named gaps: foreign runners bypass the driver runner and record nothing; the
+inherited pre-step waterfall carries the parent's session id into context-plugin refreshes.
+Root re-verified: tsc clean, boundaries clean, 27 files 290/290, three mutations (hooks
+dropped, kernel passing nothing, record claiming an absent control) red then restored, tracked
+keys unchanged. Closes the known-open item "hook control is not inherited by a spawned child".
+Receipt: `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`. Next agent:
+`impl:confinement-property` at `c3c46083`.

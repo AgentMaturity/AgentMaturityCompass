@@ -102,6 +102,39 @@ scopes, browser. The agent's 14-file batch rotated its worktree's tracked `.amc/
 (restored there, not attributed to a file, not reproduced in root). Linear: AMC-1546 (state
 unchanged, comment posted).
 
+### impl:hook-inheritance — IMPL-3, COMPLETE → integrated as `c3c46083`
+
+Agent: `wf_453236ab-c47`, worktree `.claude/worktrees/wf_453236ab-c47-1`, base `2eed9bee`
+(worktree provisioned at `3d6b8d4a`; the agent fast-forwarded its own branch), 54 tool uses,
+18.3 min. Records: `impl-hook-inheritance/result.json`, `report.md`.
+
+Done: `createDriverRunner` takes the parent loop's hook control (`LoopHookControl` =
+preStep + turnStopping) and builds every child driver on it instead of `NO_HOOKS`; the kernel
+passes the same hooks it composes for the root, so grandchildren inherit the same control;
+`notify` is not inherited (no session identity in its payload). Every native child records one
+signed `audit` row (`kind: delegation/hook-control`, v1) before its first turn naming the
+inherited controls, approval gate, signed stop conditions/scope and descendant limits; a child
+built with no control records `source: "none"`. Hooks and the recorded list derive from one
+snapshot. Not covered (recorded in `result.json` → `blockers`): foreign runners bypass
+`createDriverRunner` and record nothing; the inherited preStep is the parent's composed
+waterfall, so context plugins refresh under the parent's session id when run for a child.
+
+Root re-verification at `c3c46083`:
+
+| Check | Result |
+|---|---|
+| `npx tsc -p tsconfig.json --noEmit` / `npx tsc -p tsconfig.tests.json --noEmit` | exit 0 / exit 0 |
+| `node scripts/architecture-boundaries-check.mjs` | `failures: []` (`subagentRunner.ts` 367, `agentLoopRunner.ts` 668, `loopTypes.ts` 265 lines) |
+| `npx vitest run subagent delegat Delegat kernelDelegationGrant nativeChildStopOutput nativeDelegationInheritance agentLoop composedTurn hookControl` | 27 files, 290/290 passed, 33.3 s |
+| Mutation M1 — `hooks` dropped from the child `AgentDriver` | 2 failed / 4 passed: exactly the parent-veto and turn-stopping tests |
+| Mutation M3 — kernel passes no `hookControl` | 1 failed / 5 passed: exactly the kernel/grandchild test |
+| Mutation M4 — a control-less child records `inherited: ["preStep","turnStopping"]` | 1 failed / 5 passed: exactly the records-absence test |
+| tracked `.amc/keys/*` after every run | unchanged |
+
+Not exercised in root: the agent's M2/M5 mutations (red in its worktree per `result.json`), full
+suite, build, release gate, fresh clone, a real provider (scripted adapter only), plugin-side
+attribution under a child. Linear: AMC-1545 (state unchanged, comment posted).
+
 ### Root follow-ups landed between agents
 
 | Commit | Change | Verification in root |
