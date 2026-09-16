@@ -151,6 +151,24 @@ export {
   type RunLmnrObservabilityLiveDriftInput,
 } from './lmnrObservabilityLiveDrift.js';
 export {
+  BISHENG_OBSERVABILITY_METADATA,
+  buildBishengObservabilityScoreSurface,
+  buildBishengObservabilityShieldSurface,
+  buildBishengObservabilityWatchSurface,
+  runBishengObservabilityLiveDrift,
+  type BishengObservabilityDriftStatistic,
+  type BishengObservabilityLiveDriftResult,
+  type BishengObservabilityLiveDriftRow,
+  type BishengObservabilityMetadataProof,
+  type BishengObservabilityRowProof,
+  type BishengObservabilityScoreSurface,
+  type BishengObservabilityShieldSurface,
+  type BishengObservabilitySignal,
+  type BishengObservabilitySurface,
+  type BishengObservabilityWatchSurface,
+  type RunBishengObservabilityLiveDriftInput,
+} from './bishengObservabilityLiveDrift.js';
+export {
   buildLiveDriftWatchAlerts,
   defaultLiveDriftThresholds,
   runLiveScoreBehaviorDrift,

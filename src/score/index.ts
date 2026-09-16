@@ -121,6 +121,9 @@ export type {
   MetricValidationThresholdPolicy
 } from "./metricValidity.js";
 
+export { projectBishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
+export type { BishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
+
 export { generateFrameworkReport, listSupportedFrameworks } from "./crossFrameworkMapping.js";
 export type { FrameworkComplianceReport } from "./crossFrameworkMapping.js";
 
