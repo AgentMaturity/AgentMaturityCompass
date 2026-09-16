@@ -81,6 +81,37 @@ function runnerFor(dir: string, scripts: ReturnType<typeof textStep>[]) {
   });
 }
 
+/** Every row in the ledger, whatever session it names. */
+function allRows(dir: string): Array<{ event_type: string; meta_json: string }> {
+  const db = new Database(join(dir, ".amc", "evidence.sqlite"), { readonly: true });
+  try {
+    return db
+      .prepare("SELECT event_type, meta_json FROM evidence_events ORDER BY rowid")
+      .all() as Array<{ event_type: string; meta_json: string }>;
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * The last row of a session in WRITE order.
+ *
+ * By `rowid`, never by `id` — ids are uuids, so ordering by them sorts
+ * alphabetically and hides exactly the row this asks about: the one appended
+ * after the session was sealed.
+ */
+function lastRowType(dir: string, sessionId: string): string | undefined {
+  const db = new Database(join(dir, ".amc", "evidence.sqlite"), { readonly: true });
+  try {
+    const row = db
+      .prepare("SELECT event_type FROM evidence_events WHERE session_id = ? ORDER BY rowid DESC LIMIT 1")
+      .get(sessionId) as { event_type: string } | undefined;
+    return row?.event_type;
+  } finally {
+    db.close();
+  }
+}
+
 function sessionRows(dir: string, sessionId: string): Array<{ event_type: string; meta_json: string }> {
   const db = new Database(join(dir, ".amc", "evidence.sqlite"), { readonly: true });
   try {
@@ -311,15 +342,56 @@ describe("a child's tool evidence belongs to the child's session", () => {
     );
     expect(audits.length, "the child's governed call left evidence of its own").toBeGreaterThan(0);
 
-    // The claim, precisely: no row points at a session that was never started.
-    // NOT `errors).toEqual([])` — a delegation currently also leaves "Session
-    // <child> final hash mismatch", because `writeDelegationEvidence` appends
-    // the settled delegation's projected rows through the ledger AFTER
-    // `release()` has sealed the child's session. That is a different defect
-    // with a different cause (a row after a seal, not a row without a session),
-    // it reproduces with no tool call at all, and asserting zero errors here
-    // would tie this regression to fixing that one.
+    // The whole verdict, not a filtered slice of it. This assertion used to be
+    // narrowed to "missing session" because a delegation ALSO left "Session
+    // <child> final hash mismatch" — `writeDelegationEvidence` appended the
+    // settled delegation's projected rows into the child's session after
+    // `release()` had sealed it. Both were the same borrowed lifecycle, both are
+    // fixed, so the filter is gone: a delegation that leaves ANY verification
+    // error is a regression.
     const verified = await verifyLedgerIntegrity(dir);
-    expect(verified.chain.errors.filter((error) => error.includes("missing session"))).toEqual([]);
+    expect(verified.chain.errors).toEqual([]);
+  });
+
+  it("leaves a ledger that VERIFIES when the child called NO tool at all", async () => {
+    // The sharper form of the same claim, and the one that names the cause.
+    // `writeDelegationEvidence` used to append the settled delegation's
+    // projected rows into the CHILD's session, which `release()` had already
+    // sealed — so the seal's committed final hash no longer named the session's
+    // last row. No tool call is involved: the rows come from the delegation
+    // settling, so a child that only ever spoke reproduced it too. Keeping this
+    // beside the tool-evidence test stops a future reader reading the defect as
+    // something tools did.
+    const dir = workspace();
+    const parentSession = new SessionService(dir);
+    parentSession.open({
+      agentId: "payments-agent", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p"
+    });
+
+    const outcome = await spawnSubagent({
+      workspace: dir,
+      parent: rootIdentity("payments-agent"),
+      request: { runAs: "researcher", goal: "just answer", delegationScope: ["READ_ONLY"] },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      runner: runnerFor(dir, [textStep("I answered without any tool.")]),
+      mintSessionId: () => "child-no-tool"
+    });
+    parentSession.close({ reason: "completed" });
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+
+    // Non-vacuity: the projection really did write rows. Without this the test
+    // would pass just as well if the delegation had been projected nowhere.
+    const projected = allRows(dir).filter(
+      (row) => String((JSON.parse(row.meta_json) as { auditType?: string }).auditType ?? "")
+        === "DELEGATION_SETTLED"
+    );
+    expect(projected.length, "the settled delegation was projected somewhere").toBeGreaterThan(0);
+
+    // And the child's own sealed log did not grow a row after its seal.
+    expect(lastRowType(dir, "child-no-tool"), "the child's last row is still its close")
+      .toBe("session/close");
+
+    const verified = await verifyLedgerIntegrity(dir);
+    expect(verified.chain.errors).toEqual([]);
   });
 });

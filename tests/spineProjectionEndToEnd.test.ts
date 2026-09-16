@@ -7,6 +7,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { spawnSubagent } from "../src/agent/subagentSpawn.js";
 import { parseEvidenceEvent } from "../src/diagnostic/gates.js";
+import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { selectRelevantEvents } from "../src/diagnostic/runner.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { evaluateGate } from "../src/diagnostic/gates.js";
@@ -68,6 +69,28 @@ function allEvents(dir: string) {
     db.close();
   }
 }
+
+describe("the projection leaves a ledger that verifies", () => {
+  it("verifies even when the runner never opened a session at all", async () => {
+    // The other half of the same defect. `writeDelegationEvidence` used to write
+    // into the CHILD's session id, so what verification said depended entirely on
+    // what the runner happened to do with that session: a driver runner opens and
+    // SEALS it, giving "final hash mismatch"; this stub runner — a legal runner,
+    // the interface requires no session — opens none, giving "references missing
+    // session" instead. One cause, two error strings. The projection now owns the
+    // session it writes to, so neither depends on the runner any more.
+    const dir = workspace();
+    const outcome = await delegate(dir, "child-never-opened", ["READ_ONLY"]);
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+
+    // Non-vacuity: rows really were written.
+    const settled = allEvents(dir).filter((e) => e.meta["auditType"] === "DELEGATION_SETTLED");
+    expect(settled.length, "the delegation was projected").toBeGreaterThan(0);
+
+    const verified = await verifyLedgerIntegrity(dir);
+    expect(verified.chain.errors).toEqual([]);
+  });
+});
 
 describe("a scope-verified delegation scores", () => {
   it("counts toward AMC-2.15, where before it counted toward nothing", async () => {

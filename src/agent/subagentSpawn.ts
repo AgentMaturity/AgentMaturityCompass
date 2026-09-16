@@ -362,7 +362,7 @@ export async function spawnSubagent(init: SpawnSubagentInit): Promise<SubagentOu
     // the scoreable projection of the same fact; see
     // ../diagnostic/spineEvidenceProjection.ts for which question they bind, why,
     // and the ceiling that stops the binding inflating anything.
-    writeDelegationEvidence(init.workspace, childSessionId, {
+    writeDelegationEvidence(init.workspace, {
       settledAs,
       depth: identity.depth,
       packetId,
