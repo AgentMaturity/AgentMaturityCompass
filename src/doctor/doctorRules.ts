@@ -17,6 +17,7 @@ import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { signDigestWithPolicy } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
+import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { nativeModuleCheck } from "./nativeModuleProbe.js";
 import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
 
@@ -75,6 +76,60 @@ function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlug
       fixHint: row.installed ? undefined : `Install/enable ${row.adapterId} CLI or use generic-cli`
     });
   }
+}
+
+/**
+ * The runtime firewall policy is the precondition `amc init` leaves open:
+ * the guard composed onto every native tool call denies with `missing-policy`
+ * until a signed policy exists (ADR-0011, tests/firewallDenyByDefault). A
+ * workspace in that state cannot run a governed tool turn, so it is a FAIL
+ * that names the one command which creates and signs the policy.
+ */
+function pushRuntimeFirewallCheck(checks: DoctorCheck[], workspace: string, strict: boolean): void {
+  const id = "runtime-firewall-policy";
+  let inspected: ReturnType<typeof inspectRuntimeFirewallPolicy>;
+  try {
+    inspected = inspectRuntimeFirewallPolicy(workspace);
+  } catch (error) {
+    checks.push({ id, status: "FAIL", message: `Runtime Firewall policy could not be inspected: ${safeDoctorError(error, workspace)}`, fixHint: "Run: amc firewall status" });
+    return;
+  }
+  if (inspected.integrity === "uninitialized") {
+    // Plain `amc doctor` is the first-run diagnostic: it names the fix and
+    // keeps the exit code for broken artifacts. `--strict` requires a
+    // workspace that can already run a governed tool turn, so there it fails.
+    checks.push({
+      id,
+      status: strict ? "FAIL" : "WARN",
+      message: "Runtime Firewall policy missing: every tool call is denied (missing-policy) until a signed policy exists",
+      fixHint: "Run: amc firewall enable"
+    });
+    return;
+  }
+  if (inspected.integrity === "invalid" || inspected.policy === null) {
+    checks.push({
+      id,
+      status: "FAIL",
+      message: `Runtime Firewall policy invalid; every tool call is denied (invalid-policy): ${safeDoctorError(inspected.reason, workspace)}`,
+      fixHint: "Inspect with: amc firewall status. For a verified legacy policy run: amc firewall migrate-signature --approve-legacy-kind. Otherwise review .amc/firewall and re-create deliberately with: amc firewall enable"
+    });
+    return;
+  }
+  const revision = inspected.revision ?? "unknown";
+  if (!inspected.policy.enabled) {
+    checks.push({
+      id,
+      status: "WARN",
+      message: `Runtime Firewall policy signed but disabled (revision ${revision}); model traffic is not inspected`,
+      fixHint: "Run: amc firewall enable"
+    });
+    return;
+  }
+  checks.push({
+    id,
+    status: "PASS",
+    message: `Runtime Firewall policy signed and enabled (mode ${inspected.policy.mode}, revision ${revision}, fail-closed ${inspected.policy.failClosedOnMissingPolicy ? "on" : "off"})`
+  });
 }
 
 function safeDoctorError(error: unknown, workspace: string): string {
@@ -146,12 +201,24 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
       : { id: "studio-running", status: "INFO", message: "Studio is not running (optional — needed for dashboard/API)", fixHint: "Run: amc up" }
   );
 
+  // Signing commands (amc firewall enable, amc agent-loop run) read the
+  // passphrase from the shell; a process-local unlock never reaches them. Say
+  // which shell action makes them work rather than reporting "locked" as
+  // normal. The passphrase value itself is never rendered.
   const vault = vaultStatusNow(workspace);
+  const passphraseInShell = (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0;
   checks.push(
-    vault.unlocked
-      ? { id: "vault", status: "PASS", message: "Vault unlocked" }
-      : { id: "vault", status: "INFO", message: "Vault locked (normal for fresh install — needed for signing)", fixHint: "Run: amc vault unlock" }
+    vault.unlocked || passphraseInShell
+      ? { id: "vault", status: "PASS", message: passphraseInShell ? "Vault passphrase available from AMC_VAULT_PASSPHRASE; signing commands can run" : "Vault unlocked" }
+      : {
+        id: "vault",
+        status: "WARN",
+        message: "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
+        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock)"
+      }
   );
+
+  pushRuntimeFirewallCheck(checks, workspace, strict);
 
   pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", verifyActionPolicySignature(workspace));
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));

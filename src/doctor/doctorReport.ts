@@ -19,8 +19,11 @@ export function renderDoctorText(report: DoctorReport): string {
   if (report.mode === "INSTALL" && report.ok) {
     lines.push("  CLI installation is ready. Run `amc` to initialize this workspace and generate its first evidence result.");
   }
+  const warnWithFix = report.checks.filter(c => c.status === "WARN" && typeof c.fixHint === "string" && c.fixHint.length > 0);
   if (failCount > 0) {
     lines.push("  Review each failure below. A small failure count does not make an invalid trust policy or unavailable runtime safe.");
+  } else if (warnWithFix.length > 0) {
+    lines.push(`  ${warnWithFix.length} warning(s) name a precondition that is still missing and the command that fixes it; a governed turn may be refused until each is addressed.`);
   } else if (infoCount > 0) {
     lines.push(`  💡 All critical checks pass. Info items are optional enhancements.`);
   }

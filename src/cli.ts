@@ -36,6 +36,7 @@ import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
+import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
   buildCommandInventory,
   cliDiscoverabilityFooter,
@@ -575,6 +576,7 @@ import { listOrgRuns, loadOrgRun, orgRunRoleDefinitions, orgRunSummaryForUi, par
 import {
   evaluateRuntimeFirewall,
   exportRuntimeFirewallDecisions,
+  inspectRuntimeFirewallPolicy,
   listRuntimeFirewallDecisions,
   migrateRuntimeFirewallPolicySignature,
   renderRuntimeFirewallStatusText,
@@ -2141,8 +2143,14 @@ async function initializeMinimalStartupWorkspace(opts: {
   profile: "dev" | "ci" | "prod";
   trustBoundary?: "isolated" | "shared";
 }): Promise<void> {
+  // The vault keys are created with this passphrase and every later signing
+  // command (amc firewall enable, amc agent-loop run) needs it from the shell.
+  // A generated value that is never shown leaves the operator with a vault no
+  // command can unlock, so it is shown once, below, with the export to run.
+  let generatedPassphrase: string | null = null;
   if (!process.env.AMC_VAULT_PASSPHRASE) {
-    process.env.AMC_VAULT_PASSPHRASE = `minimal-startup-${Date.now()}`;
+    generatedPassphrase = `amc-local-${randomBytes(18).toString("base64url")}`;
+    process.env.AMC_VAULT_PASSPHRASE = generatedPassphrase;
   }
 
   const init = initWorkspace({
@@ -2167,14 +2175,20 @@ async function initializeMinimalStartupWorkspace(opts: {
   console.log(fmt.pass("Minimal startup workspace initialized"));
   console.log(fmt.info(`Location: ${init.workspacePath}`));
   console.log(fmt.info(`Profile: ${opts.profile}`));
-  console.log(fmt.nextSteps([
-    { cmd: "amc quickscore --rapid", desc: "Run a lightweight pulse check" },
-    { cmd: "amc quickscore --answers answers.json --json", desc: "Score headlessly from L0-L5 answers" },
-    { cmd: "amc guide --go", desc: "Generate and apply first guardrails" },
-    { cmd: "amc doctor", desc: "Check runtime and evidence-capture readiness" }
-  ]));
+  if (generatedPassphrase !== null) {
+    console.log(fmt.warn("No AMC_VAULT_PASSPHRASE was set, so one was generated for this vault. Save it; signing commands need it in the shell:"));
+    console.log(`    export AMC_VAULT_PASSPHRASE='${generatedPassphrase}'`);
+  }
+  printFirstRunActions(fmt);
+  console.log(fmt.colors.dim("  Also available: amc doctor (names each missing precondition and its fix), amc quickscore --rapid, amc guide --go."));
   console.log(fmt.colors.dim("  Minimal mode skips the vault prompt and immediate full-score prompt."));
   console.log("");
+}
+
+/** The three operator actions from an initialized workspace to a first governed, verified, keyless turn. */
+function printFirstRunActions(fmt: typeof import("./cliFormat.js")): void {
+  console.log(fmt.info("Three actions reach a first governed, verified turn without any provider key:"));
+  console.log(fmt.nextSteps(firstRunActions().map((action) => ({ cmd: action.cmd, desc: action.desc }))));
 }
 
 program
@@ -2258,6 +2272,7 @@ program
     console.log(fmt.logo());
     console.log(fmt.pass("Workspace initialized"));
     console.log(fmt.info(`Location: ${init.workspacePath}`));
+    printFirstRunActions(fmt);
     console.log(fmt.nextSteps([
       { cmd: "amc", desc: "Generate the full evidence score immediately" },
       { cmd: `amc config profile ${opts.profile}`, desc: "Re-apply the selected workspace config profile" },
@@ -2319,12 +2334,24 @@ program
     console.log(result.text);
     console.log("");
     const fmt = await import("./cliFormat.js");
+    // Every failing or warning check names its own fix; print those verbatim,
+    // blocking ones first, so the operator copies rather than hunts. A warning
+    // with a fix is still a missing precondition even when the exit code is 0.
+    const fixes = firstRunFixCommands({ ok: result.ok, checks: result.checks, mode: result.mode, workspaceInitialized: result.workspaceInitialized, strict: result.strict, liveProbes: result.liveProbes })
+      .map((fix) => ({ cmd: fix.cmd, desc: `[${fix.status}] ${fix.checkId}: ${fix.desc}` }));
     if (!result.ok) {
       console.log(fmt.nextSteps([
+        ...fixes,
         ...(result.workspaceInitialized
           ? [{ cmd: "amc doctor-fix", desc: "Auto-repair common workspace issues" }]
           : [{ cmd: "amc", desc: "Initialize this workspace and generate its first evidence result" }]),
         { cmd: "amc help", desc: "All available commands" },
+      ]));
+    } else if (fixes.length > 0) {
+      console.log(fmt.warn(`${fixes.length} precondition(s) still missing; each names its fix:`));
+      console.log(fmt.nextSteps([
+        ...fixes,
+        { cmd: "amc", desc: "Get your first full maturity score" },
       ]));
     } else {
       console.log(fmt.pass(result.workspaceInitialized ? "The listed diagnostic checks passed; this does not qualify a governed task or a release." : "CLI install checks passed."));
@@ -9612,23 +9639,61 @@ firewall
   .option("--fail-open", "do not fail closed when a required runtime policy is missing", false)
   .option("--json", "emit JSON output", false)
   .action((opts: { mode: string; failOpen?: boolean; json?: boolean }) => {
-    const out = writeRuntimeFirewallPolicy({
-      workspace: process.cwd(),
+    const workspace = process.cwd();
+    const requested = {
       mode: parseRuntimeFirewallModeCli(opts.mode),
       enabled: true,
       failClosedOnMissingPolicy: !opts.failOpen
-    });
-    if (opts.json) {
-      console.log(JSON.stringify(out, null, 2));
+    };
+    // Idempotent: a trusted policy that already says exactly what was asked
+    // for is reported, not re-journaled. Anything else (missing, invalid,
+    // disabled, or a different mode/fail-closed setting) is written and signed.
+    const before = inspectRuntimeFirewallPolicy(workspace);
+    const unchanged = before.integrity === "trusted"
+      && before.policy !== null
+      && before.policy.enabled === requested.enabled
+      && before.policy.mode === requested.mode
+      && before.policy.failClosedOnMissingPolicy === requested.failClosedOnMissingPolicy;
+    if (unchanged) {
+      if (opts.json) {
+        console.log(JSON.stringify({
+          changed: false,
+          policy: before.policy,
+          path: before.path,
+          signaturePath: before.signaturePath,
+          revision: before.revision,
+          checkpointPath: before.checkpointPath,
+          reason: before.reason
+        }, null, 2));
+        return;
+      }
+      console.log(chalk.green(`Runtime Firewall already enabled in ${requested.mode} mode (revision ${before.revision}); nothing was written.`));
+      console.log(`Policy: ${before.path}`);
+      console.log(`Signature: ${before.signaturePath}`);
+      if (before.checkpointPath) console.log(`Checkpoint: ${before.checkpointPath}`);
+      console.log("To change the mode deliberately: amc firewall enable --mode observe|warn|block. To inspect: amc firewall status.");
       return;
     }
-    console.log(chalk.green(`Runtime Firewall enabled in ${out.policy.mode} mode.`));
-    console.log(`Policy: ${out.path}`);
-    if (out.mirrorTrusted) {
-      console.log(`Signature: ${out.signaturePath}`);
-    } else if (out.mirrorWarning) {
-      console.log(chalk.yellow(out.mirrorWarning));
+    const out = writeRuntimeFirewallPolicy({ workspace, ...requested });
+    if (opts.json) {
+      console.log(JSON.stringify({ changed: true, previousIntegrity: before.integrity, ...out }, null, 2));
+      return;
     }
+    console.log(chalk.green(`Runtime Firewall enabled in ${out.policy.mode} mode (revision ${out.revision}).`));
+    console.log("What this wrote:");
+    console.log(`  Policy:     ${out.path}`);
+    if (out.mirrorTrusted) {
+      console.log(`  Signature:  ${out.signaturePath}`);
+    } else if (out.mirrorWarning) {
+      console.log(chalk.yellow(`  Signature:  ${out.mirrorWarning}`));
+    }
+    console.log(`  Checkpoint: ${out.checkpointPath} (signed journal revision ${out.revision})`);
+    console.log("What it means:");
+    console.log(before.integrity === "uninitialized"
+      ? "  Before this, every native tool call in this workspace was denied with missing-policy. Model requests and tool arguments are now evaluated against this signed policy."
+      : `  The previous policy state was ${before.integrity}; model requests and tool arguments are now evaluated against this signed policy.`);
+    console.log(`  Mode ${out.policy.mode}: ${out.policy.mode === "block" ? "matching traffic is blocked" : out.policy.mode === "warn" ? "matching traffic is recorded as would-block and allowed" : "matching traffic is recorded only"}. Fail-closed on a missing policy: ${out.policy.failClosedOnMissingPolicy ? "on" : "off"}.`);
+    console.log("To widen or narrow deliberately: amc firewall enable --mode block (enforce), amc firewall enable --mode observe (record only), amc firewall status (inspect), amc firewall disable (turn off; decisions then record mode disabled).");
   });
 
 firewall
