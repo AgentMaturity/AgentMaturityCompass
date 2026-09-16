@@ -6,6 +6,7 @@ export const STANDARD_SCHEMA_NAMES = [
   "amccert.schema.json",
   "amcaudit.schema.json",
   "amcpass.schema.json",
+  "amcproof.schema.json",
   "registry.bench.schema.json",
   "registry.passport.schema.json"
 ] as const;

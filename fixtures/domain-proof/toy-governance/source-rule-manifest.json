@@ -1,0 +1,67 @@
+{
+  "v": 1,
+  "manifestId": "srcmanifest_toy_governance_001",
+  "domainId": "governance",
+  "jurisdiction": "LOCAL_TOY",
+  "sourceTitle": "Toy Governance Eligibility Rules",
+  "sourceUrl": "file://fixtures/domain-proof/toy-governance/source-rules.md",
+  "sourceHash": "643ba5a1b34fb1356cce3daa2c2a0279138cb6250a39bd5732246005f98fef9d",
+  "effectiveDate": "2026-06-21",
+  "retrievedAt": "2026-06-21T00:00:00.000Z",
+  "clauses": [
+    {
+      "clauseId": "TG-1",
+      "sourceSpan": "## TG-1 Minimum Age\nAn applicant is eligible only if their age is at least 18.",
+      "formalClauseId": "toy.age.minimum",
+      "owner": "AMC Domain Proof Lane fixture",
+      "reviewer": "AMC fixture reviewer",
+      "ambiguityFlags": [],
+      "staleAfter": "2027-06-21",
+      "dependencies": [],
+      "exceptions": [],
+      "clauseHash": "889c73c113abae642818ef851a8780642871ac3e86624f50b5c1f1c197d71c8e"
+    },
+    {
+      "clauseId": "TG-2",
+      "sourceSpan": "## TG-2 Local Residency\nAn applicant is eligible only if their declared residency is local.",
+      "formalClauseId": "toy.residency.local",
+      "owner": "AMC Domain Proof Lane fixture",
+      "reviewer": "AMC fixture reviewer",
+      "ambiguityFlags": [],
+      "staleAfter": "2027-06-21",
+      "dependencies": [],
+      "exceptions": [],
+      "clauseHash": "0ad61034793b2e5e7bf5df715718e92cbde507a5be8bc294789828a7b393ac64"
+    },
+    {
+      "clauseId": "TG-3",
+      "sourceSpan": "## TG-3 Missing Facts Require Review\nIf age or residency facts are missing, the answer must be marked unsupported and routed to human review.",
+      "formalClauseId": "toy.review.required_for_missing_facts",
+      "owner": "AMC Domain Proof Lane fixture",
+      "reviewer": "AMC fixture reviewer",
+      "ambiguityFlags": [
+        "fixture-only",
+        "not-real-policy"
+      ],
+      "staleAfter": "2027-06-21",
+      "dependencies": [
+        "TG-1",
+        "TG-2"
+      ],
+      "exceptions": [],
+      "clauseHash": "0f51b2b547d976b1769db19453d61bc96380f010426db23d4e1a8dfa35926631"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewerRole": "AMC fixture maintainer",
+    "reviewedAt": "2026-06-21T00:00:00.000Z",
+    "notes": "Reviewed only for deterministic source-to-rule plumbing coverage.",
+    "nonLegalDisclaimer": "Toy Governance Eligibility Rules are a local AMC fixture and must not be used as legal, policy, benefits, or eligibility advice."
+  },
+  "proofCoverage": {
+    "sourceClauseCount": 3,
+    "formalizedCount": 3,
+    "reviewedCount": 3
+  }
+}

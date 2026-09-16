@@ -11,6 +11,24 @@
 
 ---
 
+## Domain Proof Lane API
+
+AMC exposes a bounded Domain Proof Lane through the existing REST API and CLI surfaces. It is not a ninth product surface; it maps to Enforce, Comply, Score, Vault, Watch, and later Fleet/Passport rollups.
+
+```bash
+amc proof check --domain governance \
+  --manifest fixtures/domain-proof/toy-governance/source-rule-manifest.json \
+  --input examples/domain-proof/toy-governance/proven.json \
+  --json
+```
+
+```http
+GET /api/v1/proof/status
+POST /api/v1/proof/check
+```
+
+`POST /api/v1/proof/check` accepts `domain`, `manifest`, and `input` paths and returns `result`, `ruleRefs`, `constraintsChecked`, optional `counterexample`, an `amcproof` artifact, and a non-claim boundary. Current P0 support is limited to the local toy governance fixture; unsupported correctness remains explicit as `unsupported`.
+
 ## CLI Commands
 
 AMC provides 1,140 public CLI command paths in the live command inventory.

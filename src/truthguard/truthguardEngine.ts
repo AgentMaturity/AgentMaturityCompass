@@ -1,5 +1,6 @@
 import { truthguardOutputSchema, truthguardResultSchema, type TruthguardOutput, type TruthguardResult } from "./truthguardSchema.js";
 import { SECRET_PATTERNS, CLAIM_ACTION_RE, allowedByPatterns, extractTaggedValues, redactSnippet } from "./truthguardRules.js";
+import { hasSufficientDomainProofRef, requiresDomainCorrectnessProof } from "../domainProof/domainProofSchema.js";
 
 export interface TruthguardValidationInput {
   output: unknown;
@@ -93,6 +94,33 @@ function verifyEvidenceRefs(params: {
   }
 }
 
+function verifyDomainCorrectnessProofClaims(params: {
+  output: TruthguardOutput;
+  out: TruthguardResult["violations"];
+}): void {
+  for (let i = 0; i < params.output.claims.length; i += 1) {
+    const claim = params.output.claims[i]!;
+    const path = `claims[${i}]`;
+    const claimsDomainCorrectness = requiresDomainCorrectnessProof(claim.text);
+    const claimsProvenStatus = claim.correctnessProofStatus === "proven";
+    if (!claimsDomainCorrectness && !claimsProvenStatus) {
+      continue;
+    }
+    if (hasSufficientDomainProofRef({
+      correctnessProofStatus: claim.correctnessProofStatus,
+      domainProofRefs: claim.domainProofRefs
+    })) {
+      continue;
+    }
+    params.out.push({
+      kind: "UNSUPPORTED_CORRECTNESS_PROOF",
+      path,
+      message: "domain-correctness proof claims require correctnessProofStatus=proven and at least one domainProofRefs amcproof artifact",
+      snippetRedacted: redactSnippet(claim.text)
+    });
+  }
+}
+
 export function validateTruthguardOutput(input: TruthguardValidationInput): TruthguardResult {
   const output = truthguardOutputSchema.parse(input.output);
   const violations: TruthguardResult["violations"] = [];
@@ -142,6 +170,10 @@ export function validateTruthguardOutput(input: TruthguardValidationInput): Trut
     knownEvidenceRefs: input.knownEvidenceRefs,
     out: violations,
     missingEvidenceRefs
+  });
+  verifyDomainCorrectnessProofClaims({
+    output,
+    out: violations
   });
 
   violations.sort((a, b) => {
