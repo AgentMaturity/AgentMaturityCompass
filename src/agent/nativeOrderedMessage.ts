@@ -1,9 +1,8 @@
 import { decodeNativeOrderedInput, encodeNativeOrderedInput, materializeNativeInputParts,
   NATIVE_ORDERED_INPUT_FORMAT } from "../attachments/nativeOrderedInput.js";
-import { readEventPayload } from "../session/eventPayload.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
-import { sha256Hex } from "../utils/hash.js";
+import { readQueuedInputBytes } from "./inbox.js";
 import type { InboxMessage } from "./loopTypes.js";
 
 /** Ordered claims cannot be rewritten, downgraded, duplicated or forged by a hook.
@@ -25,7 +24,7 @@ export function assertOrderedClaimDecision(claimed: readonly InboxMessage[], adm
 
 /** Validate the COMPLETE committed sequence before emitting even its first row. */
 export function recordNativeOrderedMessage(session: SessionService, message: InboxMessage): SessionEventRef {
-  const source = session.readEvents().find(event => event.id === message.inputEventId);
+  const events = session.readEvents(), source = events.find(event => event.id === message.inputEventId);
   const meta = source ? readLoopInboxMeta(source.meta_json) : null;
   if (!source || source.event_type !== "loop/inbox" || meta?.op !== "insert"
       || meta.payloadFormat !== NATIVE_ORDERED_INPUT_FORMAT || meta.messageIds.length !== 1
@@ -33,11 +32,10 @@ export function recordNativeOrderedMessage(session: SessionService, message: Inb
       || message.text !== "" || message.images !== undefined || message.parts === undefined) {
     throw new Error("Ordered input is not bound to this message's original signed inbox sequence.");
   }
-  const payload = readEventPayload(session.workspace, source);
-  if (payload.status !== "ok") throw new Error(`Ordered inbox payload is ${payload.status}; no part may be projected.`);
-  if (sha256Hex(payload.bytes) !== source.payload_sha256) throw new Error("Ordered inbox payload was tampered with.");
-  const committed = decodeNativeOrderedInput(payload.bytes);
-  if (encodeNativeOrderedInput(message.parts) !== payload.bytes.toString("utf8")) throw new Error("A claimed ordered sequence changed after its signed inbox commitment.");
+  // Above the cap the row's payload is a descriptor; the bytes come from the object its signed commitment names.
+  const bytes = readQueuedInputBytes(session.workspace, events, source, message.messageId, { what: "Ordered", consequence: "no part may be projected." });
+  const committed = decodeNativeOrderedInput(bytes);
+  if (encodeNativeOrderedInput(message.parts) !== bytes.toString("utf8")) throw new Error("A claimed ordered sequence changed after its signed inbox commitment.");
   const parts = materializeNativeInputParts(committed);
   let last: SessionEventRef | undefined, imageIndex = 0;
   parts.forEach((part, sourceContentIndex) => {

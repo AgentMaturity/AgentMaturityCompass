@@ -3,6 +3,7 @@ import { decodeNativeOrderedInput, materializeNativeInputParts, NATIVE_ORDERED_I
 import { readEventPayload } from "../session/eventPayload.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
 import { openHistoryReader } from "../session/sessionHistoryReader.js";
+import { resolveSpilledInboxPayload, resolveSpilledInputPayload } from "../session/spill/spillInput.js";
 import type { SessionLineage } from "../session/sessionApiTypes.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
 import type { EvidenceEvent } from "../types.js";
@@ -110,7 +111,7 @@ export function validateAcpOrderedHistory(workspace: string, events: readonly Ev
       refuse("ordered-history-interleaved");
     }
     let parts: readonly NativeInputPart[];
-    try { parts = materializeNativeInputParts(decodeNativeOrderedInput(originalBytes(workspace, source))); }
+    try { parts = materializeNativeInputParts(decodeNativeOrderedInput(originalBytes(workspace, events, source))); }
     catch (error) { if (error instanceof AcpFailure) throw error; return refuse("ordered-original-bundle-inconsistent"); }
     if (parts.length !== rows.length) refuse("ordered-content-omitted-or-duplicated");
     const firstEnvelope = extractEnvelope(rows[0]!.meta_json)!;
@@ -121,7 +122,7 @@ export function validateAcpOrderedHistory(workspace: string, events: readonly Ev
           || envelope.step !== firstEnvelope.step || surface?.op !== "append" || surface.role !== "user" || surface.part.kind !== part.type
           || surface.part.sha256 !== row.payload_sha256 || info.sourceInputEventId !== sourceId
           || info.sourceInputFormat !== NATIVE_ORDERED_INPUT_FORMAT || info.sourceContentIndex !== index) refuse("ordered-content-order-inconsistent");
-      const bytes = originalBytes(workspace, row);
+      const bytes = originalBytes(workspace, events, row);
       if (part.type === "text") {
         if (row.event_type !== "user/message" || info.sourceInputIndex !== undefined || !bytes.equals(Buffer.from(part.text, "utf8"))) refuse("ordered-text-rewritten");
       } else if (row.event_type !== "user/attachment" || info.sourceInputIndex !== imageIndex++ || info.filename !== part.image.filename
@@ -130,11 +131,17 @@ export function validateAcpOrderedHistory(workspace: string, events: readonly Ev
   }
 }
 
-function originalBytes(workspace: string, row: EvidenceEvent): Buffer {
+/** A row's ORIGINAL bytes: its payload, or the retained object its signed spill commitment names — never the descriptor. */
+function originalBytes(workspace: string, events: readonly EvidenceEvent[], row: EvidenceEvent): Buffer {
   const payload = readEventPayload(workspace, row);
   if (payload.status !== "ok") refuse(`payload-${payload.status}`);
   if (sha256Hex(payload.bytes) !== row.payload_sha256) refuse("payload-digest-inconsistent");
-  return payload.bytes;
+  const spilled = row.event_type === "loop/inbox"
+    ? resolveSpilledInboxPayload({ workspace, event: row, messageId: readLoopInboxMeta(row.meta_json)?.messageIds[0] ?? "", payload: payload.bytes, events })
+    : resolveSpilledInputPayload({ workspace, event: row, payload: payload.bytes, events });
+  if (spilled.status === "not-spilled") return payload.bytes;
+  if (spilled.status !== "ok") refuse(spilled.status === "missing" || spilled.status === "key-unavailable" ? "payload-missing" : "evidence-inconsistent");
+  return spilled.bytes;
 }
 function meta(row: EvidenceEvent): Record<string, unknown> {
   try { const value: unknown = JSON.parse(row.meta_json); return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {}; }

@@ -3,6 +3,7 @@ import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { readEventPayload } from "./eventPayload.js";
 import { readLoopInboxMeta } from "./loopEventMeta.js";
+import { resolveSpilledInboxPayload, resolveSpilledInputPayload } from "./spill/spillInput.js";
 import { extractEnvelope } from "./sessionTypes.js";
 import type { SurfaceEntry } from "./surfaceProjection.js";
 
@@ -16,11 +17,18 @@ function meta(event: EvidenceEvent): Record<string, unknown> {
   try { const value: unknown = JSON.parse(event.meta_json); return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {}; }
   catch { return {}; }
 }
-function originalBytes(workspace: string, event: EvidenceEvent): Buffer {
+/** A row's ORIGINAL bytes: its payload, or the retained object its signed spill commitment names — never the descriptor. */
+function originalBytes(workspace: string, events: readonly EvidenceEvent[], event: EvidenceEvent): Buffer {
   const payload = readEventPayload(workspace, event);
   if (payload.status !== "ok") throw new NativeAudioProvenanceError(payload.status === "pruned" ? "payload-pruned" : "payload-missing", `original payload ${event.id} is ${payload.status}`);
   if (sha256Hex(payload.bytes) !== event.payload_sha256) return inconsistent(`payload ${event.id} contradicts its committed digest`);
-  return payload.bytes;
+  const spilled = event.event_type === "loop/inbox"
+    ? resolveSpilledInboxPayload({ workspace, event, messageId: readLoopInboxMeta(event.meta_json)?.messageIds[0] ?? "", payload: payload.bytes, events })
+    : resolveSpilledInputPayload({ workspace, event, payload: payload.bytes, events });
+  if (spilled.status === "not-spilled") return payload.bytes;
+  if (spilled.status === "missing" || spilled.status === "key-unavailable") throw new NativeAudioProvenanceError("payload-missing", spilled.detail);
+  if (spilled.status !== "ok") return inconsistent(spilled.detail);
+  return spilled.bytes;
 }
 
 /** Validate complete live audio groups before ANY request or ACP replay prefix.
@@ -72,7 +80,7 @@ export function validateNativeAudioProvenance(workspace: string, events: readonl
         || prior.some(event => event.event_type === "loop/veto" && Array.isArray(meta(event).claimedMessageIds)
           && (meta(event).claimedMessageIds as unknown[]).includes(messageId))) return inconsistent("audio projection has no unique admitted inbox claim or follows an explicit veto");
     let parts: readonly NativeAudioPart[];
-    try { parts = materializeNativeAudioParts(decodeNativeAudioInput(originalBytes(workspace, source))); }
+    try { parts = materializeNativeAudioParts(decodeNativeAudioInput(originalBytes(workspace, events, source))); }
     catch (error) { if (error instanceof NativeAudioProvenanceError) throw error; return inconsistent(error instanceof Error ? error.message : "unsupported original bundle"); }
     if (rows.length !== parts.length) return inconsistent("audio projection omitted or added an original content part");
     const firstEnvelope = extractEnvelope(rows[0]!.meta_json)!;
@@ -83,7 +91,7 @@ export function validateNativeAudioProvenance(workspace: string, events: readonl
           || envelope.step !== firstEnvelope.step || surface?.op !== "append" || surface.role !== "user" || surface.part.kind !== part.type
           || surface.part.sha256 !== row.payload_sha256 || info.sourceContentIndex !== index
           || info.sourceInputEventId !== sourceId || info.sourceInputFormat !== NATIVE_AUDIO_INPUT_FORMAT) return inconsistent("content row's role/order/source commitment disagrees with its original audio bundle");
-      const bytes = originalBytes(workspace, row);
+      const bytes = originalBytes(workspace, events, row);
       if (part.type === "text") {
         if (row.event_type !== "user/message" || info.sourceInputIndex !== undefined || !bytes.equals(Buffer.from(part.text, "utf8"))) return inconsistent("original audio-sequence text was rewritten or downgraded");
       } else {

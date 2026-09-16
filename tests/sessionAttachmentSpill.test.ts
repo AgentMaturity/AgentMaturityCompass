@@ -16,7 +16,7 @@ import { openSessionEventStore } from "../src/persistence/openSessionEventStore.
 import type { SessionStoreAppendInput, SessionStoreAppendResult } from "../src/persistence/sessionEventStore.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
-import { SessionPayloadCapError, SessionSpillCapError, sessionPayloadCap, sessionSpillCap } from "../src/session/sessionPayloadCap.js";
+import { SessionSpillCapError, sessionPayloadCap, sessionSpillCap } from "../src/session/sessionPayloadCap.js";
 import { decodeSpilledInputDescriptor, resolveSpilledInputPayload, SPILL_COMMITMENT_EVENT_TYPE, SPILL_SUBJECT_META_KEY,
   SpilledInputRetentionError } from "../src/session/spill/spillInput.js";
 import { extractSpillRef, SPILL_META_KEY } from "../src/session/spill/spillTypes.js";
@@ -34,6 +34,7 @@ import type { HttpRequest, HttpResponse } from "../src/llm/adapter/transport.js"
 import { lockVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { wavBytes } from "./fixtures/nativeSignedAudio.js";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64");
 const PASSPHRASE = "disposable-attachment-spill-fixture-passphrase";
@@ -304,12 +305,31 @@ describe("user attachments above the per-event cap are retained through the sign
     expect(objectFiles(spillRoot(h.root))).toEqual([]);
   });
 
-  test("audio stays fail-closed at the per-event cap because its provenance validators read the row payload directly", () => {
+  test("an audio attachment above the per-event cap is retained behind a signed commitment and resolves to its original bytes", () => {
+    // Its provenance validator (src/session/nativeAudioProvenance.ts) now resolves descriptor rows, so audio takes the
+    // same door as image and text; tests/sessionInboxSpill.test.ts validates the full inbox-to-attachment sequence.
     const h = opened();
+    const audio = wavBytes(0xff81, h.cap + 2 - 44);
+    expect(audio.length).toBeGreaterThan(h.cap);
     const before = h.writer.readEvents().length;
-    expect(() => h.writer.recordUserAttachment({ filename: "long.wav", content: Buffer.alloc(h.cap + 1), mimeType: "audio/wav", kind: "audio",
-      sourceInputEventId: "x", sourceInputIndex: 0, sourceInputFormat: "amc-audio-input@1", sourceContentIndex: 0 })).toThrow(SessionPayloadCapError);
-    expect(h.writer.readEvents()).toHaveLength(before);
+    const ref = h.writer.recordUserAttachment({ filename: "long.wav", content: audio, mimeType: "audio/wav", kind: "audio",
+      sourceInputEventId: "x", sourceInputIndex: 0, sourceInputFormat: "amc-audio-input@1", sourceContentIndex: 0 });
+    const events = h.writer.readEvents();
+    expect(events).toHaveLength(before + 2);
+    const attachment = events.find(row => row.id === ref.eventId)!;
+    const commitment = events[events.indexOf(attachment) - 1]!;
+    expect(commitment.event_type).toBe(SPILL_COMMITMENT_EVENT_TYPE);
+    expect(JSON.parse(commitment.meta_json)).toMatchObject({ [SPILL_SUBJECT_META_KEY]: "user/attachment", filename: "long.wav" });
+    const payload = readEventPayload(h.root, attachment);
+    if (payload.status !== "ok") throw new Error(payload.status);
+    expect(decodeSpilledInputDescriptor(payload.bytes)).not.toBeNull();
+    const resolved = resolveSpilledInputPayload({ workspace: h.root, event: attachment, payload: payload.bytes, events });
+    expect(resolved.status).toBe("ok");
+    if (resolved.status === "ok") expect(resolved.bytes.equals(audio)).toBe(true);
+    // A malformed WAV above the cap is still refused by the media check before any row or object exists.
+    expect(() => h.writer.recordUserAttachment({ filename: "junk.wav", content: Buffer.alloc(h.cap + 1), mimeType: "audio/wav", kind: "audio",
+      sourceInputEventId: "x", sourceInputIndex: 0, sourceInputFormat: "amc-audio-input@1", sourceContentIndex: 0 })).toThrow();
+    expect(h.writer.readEvents()).toHaveLength(before + 2);
   });
 
   test("before any blob has provisioned the workspace key, the spill store cannot prepare and the attachment is refused with nothing recorded", () => {

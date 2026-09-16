@@ -14,9 +14,10 @@
  * retain the bytes, and the refusal names that policy key instead. Neither
  * check ever raises a limit: widening is an operator decision made by editing
  * and re-signing the ops policy, not something an input can talk its way past.
- * The inbox door still applies only the per-event cap: every path that claims a
- * queued message re-reads and decodes the inbox row itself, so a spilled inbox
- * row would fail at claim time rather than at the door.
+ * The inbox door takes the same two bounds: a queued input above the per-event
+ * cap is retained behind a signed `loop/inbox` commitment (spill/spillInput.ts),
+ * and every path that claims or replays a queued message resolves that
+ * commitment before decoding the row.
  */
 import { loadOpsPolicy } from "../ops/policy.js";
 
@@ -78,16 +79,26 @@ export function assertSessionPayloadRetainable(workspace: string, what: string, 
 /**
  * Which door an attachment's bytes take: one inline signed row, or the spill
  * store above the per-event cap. Both refusals happen here, before anything is
- * recorded. Audio stays fail-closed at the per-event cap because
- * ./nativeAudioProvenance.ts compares an audio row's own payload with its inbox
- * bundle and does not yet resolve a descriptor row.
+ * recorded. Audio routes like image and text: ./nativeAudioProvenance.ts and
+ * the ACP attachment projector resolve a descriptor row through its signed
+ * reference before comparing bytes.
  */
 export function attachmentPayloadRoute(
   workspace: string, what: string, kind: "text" | "image" | "audio", byteLength: number
 ): { readonly cap: number; readonly spill: boolean } {
+  void kind;
+  return queuedInputPayloadRoute(workspace, what, byteLength);
+}
+
+/**
+ * Which door a queued input's encoded bytes take: one inline signed `loop/inbox`
+ * row, or — above the per-event cap — a signed `loop/inbox` spill commitment
+ * plus a descriptor row. Above the blob cap the refusal happens here, before
+ * anything is queued or recorded.
+ */
+export function queuedInputPayloadRoute(workspace: string, what: string, byteLength: number): { readonly cap: number; readonly spill: boolean } {
   const cap = sessionPayloadCap(workspace);
   if (byteLength <= cap) return { cap, spill: false };
-  if (kind === "audio") throw new SessionPayloadCapError(what, byteLength, cap);
   assertSessionPayloadRetainable(workspace, what, byteLength);
   return { cap, spill: true };
 }
