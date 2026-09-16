@@ -534,6 +534,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           makeLlm: (childSession) => llmSeam.runtimeForSession(childSession),
           route: options.route,
           systemPrompt: prompt.render(),
+          // The SAME control the root loop is about to run under (IMPL-3): a
+          // child governed by a different waterfall than its parent is a child
+          // the parent's guards cannot see. `notify` is deliberately not part
+          // of it; see `LoopHookControl`.
+          hookControl: hooks,
           harnessVersion: amcVersion,
           compositionDigest: compositionDigestOf(options, profile),
           policyDigest: policyDigestOf(options),
