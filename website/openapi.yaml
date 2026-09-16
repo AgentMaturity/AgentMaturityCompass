@@ -7733,18 +7733,21 @@ paths:
     post:
       tags: [product]
       summary: Submit portal job
+      description: >-
+        The recorded submitter is taken from the authenticated caller. A
+        `submittedBy` field in the request body is rejected with 400 rather than
+        ignored, so attribution can never be self-asserted.
       requestBody:
         content:
           application/json:
             schema:
               type: object
-              required: [name, type, submittedBy]
+              additionalProperties: false
+              required: [name, type]
               properties:
                 name:
                   type: string
                 type:
-                  type: string
-                submittedBy:
                   type: string
                 payload:
                   oneOf:
@@ -7758,7 +7761,6 @@ paths:
                 value:
                   name: Support SLA value signal
                   type: value.signal
-                  submittedBy: ops-webhook
                   payload:
                     v: 1
                     sourceId: support.sla.webhook
@@ -7776,7 +7778,6 @@ paths:
                 value:
                   name: Brand lift outcome
                   type: outcome.signal
-                  submittedBy: growth-webhook
                   payload:
                     agentId: sales-agent
                     signalId: demo.followup.rate
@@ -7788,7 +7789,6 @@ paths:
                 value:
                   name: Generic routed event
                   type: integration.event
-                  submittedBy: integration-router
                   payload:
                     eventType: integration.delivery.failed
                     source: amc.integrations
@@ -7798,6 +7798,10 @@ paths:
       responses:
         '201':
           description: Job submitted
+        '400':
+          description: Invalid body, including a body that supplies `submittedBy`
+        '401':
+          description: No authenticated caller to attribute the job to
 
   /v1/product/portal/{jobId}:
     get:

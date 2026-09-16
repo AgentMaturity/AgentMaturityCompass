@@ -53,6 +53,7 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     return true;
   }
 
+  let principal: string | undefined;
   if (!isPublicApiRoute(params.pathname)) {
     const apiAuth = params.authenticate(params.req, params.workspace, params.token);
     if (!apiAuth) {
@@ -74,7 +75,16 @@ export async function handleStudioApiDelegation(params: StudioApiDelegationParam
     ) {
       return true;
     }
+    principal = apiAuth.username ?? apiAuth.agentId ?? undefined;
   }
 
-  return handleApiRoute(params.pathname, params.method, params.req, params.res, params.workspace, params.token);
+  return handleApiRoute(
+    params.pathname,
+    params.method,
+    params.req,
+    params.res,
+    params.workspace,
+    params.token,
+    principal
+  );
 }

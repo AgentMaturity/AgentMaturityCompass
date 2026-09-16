@@ -108,7 +108,9 @@ describe("public OpenAPI webhook schemas", () => {
     const payload = schema.properties.payload;
 
     expect(schema.$ref).toBeUndefined();
-    expect(schema.required).toEqual(["name", "type", "submittedBy"]);
+    expect(schema.required).toEqual(["name", "type"]);
+    expect(schema.properties.submittedBy).toBeUndefined();
+    expect(schema.additionalProperties).toBe(false);
     expect(payload.oneOf.map((row: any) => row.$ref)).toEqual([
       "#/components/schemas/PortalWebhookPayload",
       "#/components/schemas/OutcomeWebhookPayload",

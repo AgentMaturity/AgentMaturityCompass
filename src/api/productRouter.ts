@@ -5,16 +5,19 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
 import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam } from './apiHelpers.js';
+import type { ApiRouteContext } from './index.js';
 
 const createBatchBodySchema = z.object({
   name: z.string().trim().min(1),
   items: z.array(z.unknown()).min(1)
 }).strict();
 
+// `submittedBy` is deliberately absent: the submitter is taken from the
+// authenticated caller. `.strict()` therefore rejects a body that supplies it,
+// so a client cannot believe it set an attribution that was quietly discarded.
 const submitPortalBodySchema = z.object({
   name: z.string().trim().min(1),
   type: z.string().trim().min(1),
-  submittedBy: z.string().trim().min(1),
   payload: z.record(z.string(), z.unknown()).optional()
 }).strict();
 
@@ -23,6 +26,7 @@ export async function handleProductRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
+  context?: ApiRouteContext,
 ): Promise<boolean> {
   if (pathname === '/api/v1/product/status' && method === 'GET') {
     apiSuccess(res, { status: 'operational', module: 'product', capabilities: ['batch', 'portal'] });
@@ -77,11 +81,19 @@ export async function handleProductRoute(
   // ── Portal routes ─────────────────────────────────────────────
 
   if (pathname === '/api/v1/product/portal/submit' && method === 'POST') {
+    // Portal jobs carry no receipt, hash chain, or signature, so `submitted_by`
+    // is the only record of who asked for the work. Fail closed rather than
+    // record a job nobody is accountable for.
+    const submitter = context?.principal?.trim();
+    if (!submitter) {
+      apiError(res, 401, 'Portal submission requires an authenticated caller');
+      return true;
+    }
     try {
       const body = await bodyJsonSchema(req, submitPortalBodySchema);
       const { PortalManager } = await import('../product/portal.js');
       const pm = new PortalManager();
-      const job = pm.submitJob(body.name, body.type, body.submittedBy, body.payload);
+      const job = pm.submitJob(body.name, body.type, submitter, body.payload);
       apiSuccess(res, job, 201);
     } catch (err) {
       if (isRequestBodyError(err)) {

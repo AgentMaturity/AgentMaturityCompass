@@ -56,6 +56,12 @@ export type ApiValidationPolicy = 'schema-validated' | 'router-local' | 'passthr
 export interface ApiRouteContext {
   workspace: string;
   apiToken?: string;
+  /**
+   * Identity of the authenticated caller, supplied by the auth layer.
+   * Never populated from request input — routes that attribute a write to a
+   * person must read it from here rather than trusting a body field.
+   */
+  principal?: string;
 }
 
 export type ApiRouteHandler = (
@@ -292,7 +298,7 @@ export const API_ROUTE_REGISTRY: readonly ApiRouteDefinition[] = [
     methods: ['GET', 'POST'],
     auth: 'protected',
     validationPolicy: 'router-local',
-    handler: (pathname, method, req, res) => handleProductRoute(pathname, method, req, res)
+    handler: (pathname, method, req, res, context) => handleProductRoute(pathname, method, req, res, context)
   },
   {
     id: 'passport',
@@ -492,14 +498,15 @@ export async function handleApiRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
-  apiToken?: string
+  apiToken?: string,
+  principal?: string
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/')) return false;
 
   try {
     const route = matchApiRoute(pathname);
     if (route) {
-      const handled = await route.handler(pathname, method, req, res, { workspace, apiToken });
+      const handled = await route.handler(pathname, method, req, res, { workspace, apiToken, principal });
       if (handled) {
         return true;
       }
