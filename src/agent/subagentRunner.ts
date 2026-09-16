@@ -96,6 +96,11 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       workspace: init.workspace,
       // The root's id. Never ctx.identity.runAs — see subagentSpawn.ts.
       agentId: ctx.toolsetAgentId,
+      // The CHILD's session, which `session.open` below starts. The agent id is
+      // the root's on purpose, so keying the evidence off it would file a
+      // child's tool calls under a session that is not the child's — and, while
+      // `agentToolset` still defaulted, under one that did not exist at all.
+      sessionId: ctx.childSessionId,
       // A child that can itself delegate is given ITS OWN identity, so
       // `delegateTo` sees the real depth. Handing it the parent's would make
       // every generation look like depth 1 and turn `maxDepth` into a field

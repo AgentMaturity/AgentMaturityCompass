@@ -159,6 +159,11 @@ the methodology.
   session. Verified absent from `agentToolset.ts`. It does not affect the L1
   claim (L1 needs one session) but it must be fixed before any multi-session
   claim, and it is an integrity issue in its own right.
+  **Fixed 2026-08-28.** `agentToolset` now REQUIRES a `sessionId`, and each
+  caller passes the session whose turn produced the evidence — so tool rows
+  land in a session that exists and `amc verify` no longer reports "references
+  missing session" for a run that used its tools. Pinned by
+  `tests/toolEvidenceSessionBinding.test.ts`.
 - **`dayKey` is UTC**, so calls at 23:59 and 00:01 are two distinct days. Not
   load-bearing at L1; load-bearing for anything above it.
 - **`mapTracesToEvidence`** (`autoAnswer/traceEvidenceMapper.ts`, ~14KB) maps

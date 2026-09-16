@@ -92,10 +92,11 @@ describe("an agent can delegate from inside its own toolset", () => {
   it("offers `delegate` only when the capability is granted", () => {
     const dir = workspace();
 
-    const without = agentToolset({ workspace: dir, agentId: "payments-agent" });
+    const without = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "parent-session" });
     const withCap = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spyRunner().runner, session: recorder() }
     });
 
@@ -117,6 +118,7 @@ describe("an agent can delegate from inside its own toolset", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: {
         identity: rootIdentity("payments-agent"),
         runner: spyRunner("I checked 40 rows.").runner,
@@ -140,6 +142,7 @@ describe("an agent can delegate from inside its own toolset", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session: recorder() }
     });
 
@@ -171,6 +174,7 @@ describe("depth is read from the identity, not from agentId", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: deep, runner: spy.runner, session }
     });
 
@@ -192,6 +196,7 @@ describe("depth is read from the identity, not from agentId", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: first.identity, runner: spy.runner, session: recorder() }
     });
 
@@ -213,6 +218,7 @@ describe("the model's arguments are not trusted", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session }
     });
 
@@ -231,6 +237,7 @@ describe("the model's arguments are not trusted", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session: recorder() }
     });
 
@@ -257,6 +264,7 @@ describe("two parties must agree before an agent can delegate", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session }
     });
 
@@ -280,6 +288,7 @@ describe("the operator names the scope, not the model", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: {
         identity: rootIdentity("payments-agent"),
         runner: spy.runner,
@@ -307,6 +316,7 @@ describe("the operator names the scope, not the model", () => {
     const toolset = agentToolset({
       workspace: dir,
       agentId: "payments-agent",
+      sessionId: "parent-session",
       subagents: { identity: rootIdentity("payments-agent"), runner: spy.runner, session: recorder() }
     });
 

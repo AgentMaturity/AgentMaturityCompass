@@ -81,11 +81,9 @@ export interface AgentSession {
 export function openAgentSession(init: AgentSessionInit): AgentSession {
   const sessionId = init.sessionId ?? randomUUID();
   const session = new SessionService(init.workspace);
-  // The toolset writes its tool evidence into THIS session rather than into
-  // `agentToolset`'s default `toolset-<agentId>`, which nothing ever starts --
-  // so a run that actually called a tool left rows referencing a session with no
-  // row of its own, and `amc verify` reported "references missing session". Tool
-  // evidence also simply belongs to the session whose turn caused it.
+  // The toolset writes its tool evidence into THIS session: it belongs to the
+  // session whose turn caused it, and `agentToolset` now requires the id rather
+  // than defaulting to a `toolset-<agentId>` bucket nothing ever starts.
   const toolset = agentToolset({
     workspace: init.workspace,
     agentId: init.agentId,

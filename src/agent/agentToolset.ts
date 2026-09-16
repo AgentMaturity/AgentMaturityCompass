@@ -50,8 +50,20 @@ export interface AgentToolsetOptions {
    * every run in a chain shares `governedAs` by design.
    */
   readonly subagents?: SubagentCapability;
-  /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
-  readonly sessionId?: string;
+  /**
+   * Session the evidence rows belong to. REQUIRED, and deliberately so.
+   *
+   * This defaulted to `toolset-<agentId>`, which reads like a harmless bucket
+   * and is not one: `Ledger.startSession` is the only writer of the `sessions`
+   * table and nothing ever called it for that id, so every governed tool call
+   * wrote a row referencing a session with no row of its own and
+   * `verifyLedgerIntegrity` reported "references missing session" for each --
+   * a run that fails `amc verify` BECAUSE it used its tools. Two of the three
+   * call sites took that default. A caller now has to say where the evidence
+   * lands, which is also the honest answer: tool evidence belongs to the
+   * session whose turn caused it.
+   */
+  readonly sessionId: string;
 }
 
 /**
@@ -226,7 +238,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
           { ...execution, appliedGuards: registry.guardLabelsFor(execution) },
           outcome
         ).map((row) => ({
-          sessionId: options.sessionId ?? `toolset-${agentId}`,
+          sessionId: options.sessionId,
           runtime: "amc" as const,
           eventType: row.eventType,
           payload: row.payload,

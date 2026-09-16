@@ -38,6 +38,7 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import { readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
 import type { LlmRouteConfig } from "./llm/adapter/adapterRegistry.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
@@ -511,6 +512,11 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
+      // Minted HERE because the toolset is built before the turn opens and its
+      // evidence rows have to name the session they belong to. `runComposedTurn`
+      // would otherwise mint its own, leaving the tool rows pointing at a
+      // session id nothing started -- which is what `amc verify` reported.
+      const sessionId = randomUUID();
       let toolSeam: AgentToolSeam | null = null;
       let grantDelegation: ((capability: SubagentCapability) => void) | null = null;
       let foreignRunner: SubagentRunner | null = null;
@@ -519,6 +525,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const toolset = agentToolset({
           workspace: process.cwd(),
           agentId: "default",
+          sessionId,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
         });
         if (wantsDelegation) {
@@ -636,6 +643,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         const outcome = await runner.runComposedTurn({
           workspace: process.cwd(),
           agentId: "default",
+          sessionId,
           // No pinned `systemPrompt`: the prompt is ASSEMBLED, which is what
           // gives the run its identity and pulls the workspace's own AGENTS.md /
           // CLAUDE.md in as runtime context. A hardcoded string here — what this

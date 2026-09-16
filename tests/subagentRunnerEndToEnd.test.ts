@@ -13,6 +13,7 @@ import { rootIdentity } from "../src/agent/delegationIdentity.js";
 import { spawnSubagent } from "../src/agent/subagentSpawn.js";
 import { createDriverRunner } from "../src/agent/subagentRunner.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
+import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import {
   FixedCredentials,
   LOOP_MODEL,
@@ -272,5 +273,53 @@ describe("a child is a leaf", () => {
     const grandchild = sessionRows(dir, "child-leaf")
       .filter((r) => r.event_type === "agent_delegation_started");
     expect(grandchild, "a child cannot start a delegation of its own").toEqual([]);
+  });
+});
+
+describe("a child's tool evidence belongs to the child's session", () => {
+  it("leaves a ledger that VERIFIES after the child has called a tool", async () => {
+    // `agentToolset` used to default its evidence rows to `toolset-<agentId>`,
+    // and this runner passed no session — so a child that used a tool wrote rows
+    // naming a session nothing ever started, and `amc verify` failed with
+    // "references missing session" for a run whose only crime was using tools.
+    // The agent id here is the ROOT's by design, so it could never have been the
+    // right key for a CHILD's evidence either.
+    const dir = workspace();
+    const parentSession = new SessionService(dir);
+    parentSession.open({
+      agentId: "payments-agent", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p"
+    });
+
+    const outcome = await spawnSubagent({
+      workspace: dir,
+      parent: rootIdentity("payments-agent"),
+      request: { runAs: "researcher", goal: "read the ledger note" },
+      session: { recordLoopEvent: (r) => parentSession.recordLoopEvent(r) },
+      runner: runnerFor(dir, [
+        toolStep("call-1", "fs.read", JSON.stringify({ path: "workspace/note.txt" })),
+        textStep("I looked.")
+      ]),
+      mintSessionId: () => "child-tool-evidence"
+    });
+    parentSession.close({ reason: "completed" });
+    expect(outcome.ok, outcome.ok ? "" : outcome.reason).toBe(true);
+
+    // Non-vacuity: a governed call really was recorded, and in the CHILD's
+    // session. Allowed or denied does not matter — both are evidence.
+    const audits = sessionRows(dir, "child-tool-evidence").filter((row) =>
+      String((JSON.parse(row.meta_json) as { auditType?: string }).auditType ?? "").startsWith("TOOL_CALL_")
+    );
+    expect(audits.length, "the child's governed call left evidence of its own").toBeGreaterThan(0);
+
+    // The claim, precisely: no row points at a session that was never started.
+    // NOT `errors).toEqual([])` — a delegation currently also leaves "Session
+    // <child> final hash mismatch", because `writeDelegationEvidence` appends
+    // the settled delegation's projected rows through the ledger AFTER
+    // `release()` has sealed the child's session. That is a different defect
+    // with a different cause (a row after a seal, not a row without a session),
+    // it reproduces with no tool call at all, and asserting zero errors here
+    // would tie this regression to fixing that one.
+    const verified = await verifyLedgerIntegrity(dir);
+    expect(verified.chain.errors.filter((error) => error.includes("missing session"))).toEqual([]);
   });
 });

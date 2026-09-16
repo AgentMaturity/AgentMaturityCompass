@@ -62,6 +62,7 @@ function toolsetWith(dir: string, runner: (ctx: SubagentRunContext) => Promise<S
   return agentToolset({
     workspace: dir,
     agentId: "payments-agent",
+    sessionId: "parent-session",
     subagents: { identity: rootIdentity("payments-agent"), runner, session: recorder() }
   });
 }
@@ -86,7 +87,7 @@ const agent = (id: string, goal = `goal-${id}`) => ({ kind: "agent", id, runAs: 
 describe("two parties must agree before an agent can run a workflow", () => {
   it("is not offered unless the integrator composed the capability", () => {
     const dir = workspace();
-    const without = agentToolset({ workspace: dir, agentId: "payments-agent" });
+    const without = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "parent-session" });
     expect((without.seam.schemas() ?? []).map((s) => s.name)).not.toContain("workflow");
     without.close();
   });

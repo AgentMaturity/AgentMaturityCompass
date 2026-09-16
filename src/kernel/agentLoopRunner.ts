@@ -115,6 +115,15 @@ export interface ComposedTurnOptions {
   readonly workspace: string;
   readonly agentId: string;
   /**
+   * Pins the session id, rather than letting `SessionService` mint one.
+   *
+   * For a caller that has to build something session-scoped BEFORE the turn
+   * exists — `agentToolset`, whose evidence rows name the session they belong
+   * to. Minted by the caller and handed to both, the tool rows and the turn
+   * rows are one session; left to be minted here, the caller could only guess.
+   */
+  readonly sessionId?: string;
+  /**
    * Pins the exact `system/prompt` text, bypassing assembly.
    *
    * Registered as a `complete` section, so it REPLACES the assembled sections
@@ -328,6 +337,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   const profile = promptProfileFor(options);
   const session = new SessionService(options.workspace);
   session.open({
+    ...(options.sessionId === undefined ? {} : { sessionId: options.sessionId }),
     agentId: options.agentId,
     harnessVersion: amcVersion,
     compositionDigest: compositionDigestOf(options, profile),

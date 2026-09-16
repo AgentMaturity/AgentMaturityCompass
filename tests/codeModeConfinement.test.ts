@@ -54,7 +54,7 @@ describe("confinement is a property of the process, not of the machine", () => {
     // true. Nothing re-execs AMC under a profile, so there is no platform on
     // which this may honestly be true today.
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", mode: "code" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "s1", mode: "code" });
 
     expect(toolset.readiness.confined).toBe(false);
 
@@ -66,7 +66,7 @@ describe("confinement is a property of the process, not of the machine", () => {
     // fact, and it should keep being told. Splitting the two is the fix: one
     // question was answering for both.
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", mode: "code" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "s1", mode: "code" });
 
     const expected = process.platform === "darwin" && existsSync("/usr/bin/sandbox-exec");
     expect(toolset.readiness.sandboxBackendAvailable).toBe(expected);
@@ -76,7 +76,7 @@ describe("confinement is a property of the process, not of the machine", () => {
 
   it("refuses a Code Mode dispatch while the process is unconfined", async () => {
     const dir = workspace();
-    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", mode: "code" });
+    const toolset = agentToolset({ workspace: dir, agentId: "payments-agent", sessionId: "s1", mode: "code" });
 
     const outcome = await toolset.seam.execute({
       callId: "c1",
