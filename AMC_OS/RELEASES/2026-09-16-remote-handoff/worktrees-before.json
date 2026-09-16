@@ -1,0 +1,1092 @@
+[
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass",
+    "HEAD": "2035b20034984aec847607879828171c93f91f03",
+    "branch": "refs/heads/amc/gap-register-execution",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/private/tmp/amc-1541-archive-20260909",
+    "HEAD": "d018f15f7ff66c7f3a0eb6c8a069ea54516b4f77",
+    "branch": "refs/heads/codex/amc-1541-native-task-archive",
+    "prunable": "gitdir file points to non-existent location",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": "fatal: not a git repository (or any of the parent directories): .git"
+  },
+  {
+    "worktree": "/private/tmp/amc-1542-revocation-20260909",
+    "HEAD": "3c49ca9b45be57f8c0fb6515e23da7bbe736cd7e",
+    "branch": "refs/heads/codex/amc-1542-managed-revocation",
+    "prunable": "gitdir file points to non-existent location",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": "fatal: not a git repository (or any of the parent directories): .git"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+    "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+    "branch": "refs/heads/agent/domain-proof-lane",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      " M AMC_COMPLETE_KNOWLEDGE.md",
+      " M docs/API_REFERENCE.md",
+      " M docs/DOMAIN_PACKS.md",
+      " M docs/OPEN_STANDARD.md",
+      " M docs/TRUTHGUARD.md",
+      " M src/api/index.ts",
+      " M src/badge/badgeCli.ts",
+      " M src/cli.ts",
+      " M src/standard/standardGenerator.ts",
+      " M src/standard/standardSchema.ts",
+      " M src/truthguard/truthguardEngine.ts",
+      " M src/truthguard/truthguardSchema.ts",
+      " M tests/newProductModulesBatch2.test.ts",
+      " M website/compare.html",
+      "?? docs/DOMAIN_PROOF_LANE.md",
+      "?? examples/domain-proof/toy-governance/disproven.json",
+      "?? examples/domain-proof/toy-governance/proven.json",
+      "?? examples/domain-proof/toy-governance/unsupported.json",
+      "?? fixtures/domain-proof/toy-governance/source-rule-manifest.json",
+      "?? fixtures/domain-proof/toy-governance/source-rules.md",
+      "?? node_modules",
+      "?? src/api/domainProofRouter.ts",
+      "?? src/domainProof/domainProofArtifact.ts",
+      "?? src/domainProof/domainProofCheck.ts",
+      "?? src/domainProof/domainProofCli.ts",
+      "?? src/domainProof/domainProofSchema.ts",
+      "?? src/domainProof/index.ts",
+      "?? src/domainProof/sourceRuleManifestSchema.ts",
+      "?? src/domainProof/toyGovernanceRules.ts",
+      "?? tests/domainProofArtifact.test.ts",
+      "?? tests/domainProofCli.test.ts",
+      "?? tests/domainProofStatus.test.ts",
+      "?? tests/openCompassAmcProofStandard.test.ts",
+      "?? tests/sourceRuleManifest.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "26"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+    "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+    "branch": "refs/heads/agent/gap-0635",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      " M src/score/index.ts",
+      " M src/watch/index.ts",
+      "?? .changeset/amc-bisheng-observability-live-drift.md",
+      "?? docs/source-reviews/GAP-0635-bisheng-observability-live-drift.md",
+      "?? src/drift/bishengObservabilityLiveDrift.ts",
+      "?? src/score/bishengObservabilityLiveDriftScore.ts",
+      "?? src/watch/bishengObservabilityLiveDrift.ts",
+      "?? tests/bishengObservabilityLiveDrift.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "13"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+    "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+    "branch": "refs/heads/agent/gap-0636",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      " M src/api/benchmarkRouter.ts",
+      " M src/api/scoreRouter.ts",
+      " M src/api/shieldRouter.ts",
+      " M src/api/watchRouter.ts",
+      " M src/watch/index.ts",
+      "?? .changeset/gap-0636-helm-provider-drift.md",
+      "?? docs/source-reviews/GAP-0636-helm-provider-drift.md",
+      "?? src/benchmarks/helmProviderDrift.ts",
+      "?? src/watch/helmProviderDrift.ts",
+      "?? tests/helmProviderDrift.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "13"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+    "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+    "branch": "refs/heads/agent/gap-0637",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      "?? .changeset/amc-opencompass-live-drift-alerts.md",
+      "?? docs/source-reviews/GAP-0637-opencompass-live-drift-alerts.md",
+      "?? src/watch/openCompassLiveDrift.ts",
+      "?? tests/openCompassLiveDrift.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "13"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+    "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+    "branch": "refs/heads/agent/gap-0638",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      " M docs/SCORING_METHODOLOGY.md",
+      " M src/badge/badgeCli.ts",
+      " M src/diagnostic/methodologyVersioning.ts",
+      " M src/methodology/publicMethodology.ts",
+      " M tests/gap0620FactCheckingFactualityReview.test.ts",
+      " M tests/gap0629OpenAiEvalsPublicMethodology.test.ts",
+      " M tests/gap0630ChemGraphMetricValidity.test.ts",
+      " M tests/gap0633LmEvaluationHarnessMetricValidity.test.ts",
+      " M tests/publicMethodology.test.ts",
+      "?? .changeset/amc-pocketflow-public-methodology.md",
+      "?? docs/source-reviews/GAP-0638-pocketflow-public-methodology.md",
+      "?? tests/gap0638PocketFlowPublicMethodology.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "13"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+    "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+    "branch": "refs/heads/agent/gap-0639",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      " M docs/SCORING_METHODOLOGY.md",
+      " M src/badge/badgeCli.ts",
+      " M src/diagnostic/methodologyVersioning.ts",
+      " M src/methodology/publicMethodology.ts",
+      " M src/score/metricValidity.ts",
+      " M tests/gap0629OpenAiEvalsPublicMethodology.test.ts",
+      "?? .changeset/amc-openai-simple-evals-metric-validity.md",
+      "?? docs/source-reviews/GAP-0639-openai-simple-evals-metric-validity.md",
+      "?? tests/gap0639OpenAiSimpleEvalsMetricValidity.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "13"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0640",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0641",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0642",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0643",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0644",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0645",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0646",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0647",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+    "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+    "branch": "refs/heads/agent/gap-0648",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "14"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+    "HEAD": "a984023ec0a11d2229ab533fed5fdbb2699f2348",
+    "branch": "refs/heads/agent/gap-0649",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+    "HEAD": "98da12c0a15d4a281c55bd3a92e3e2a1bf5a9604",
+    "branch": "refs/heads/agent/gap-0650",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+    "HEAD": "0cbffc03df5c3d583c9fc3ae4f093516ab79a7c6",
+    "branch": "refs/heads/agent/gap-0651",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+    "HEAD": "d225299636418148b42217387fa82710aa86ebe3",
+    "branch": "refs/heads/agent/gap-0652",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+    "HEAD": "0020199ef90026390b95f2fe616b83f4c6739946",
+    "branch": "refs/heads/agent/gap-0653",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+    "HEAD": "2efcaa3e3c662afe0558dbc1065676a78b6a6e6c",
+    "branch": "refs/heads/agent/gap-0654",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+    "HEAD": "4af70f4d0fc97417b8ff954fca78cd7a69269aa2",
+    "branch": "refs/heads/agent/gap-0655",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+    "HEAD": "d7cf71b21ec215125ccd1945e1237f99485b3bb8",
+    "branch": "refs/heads/agent/gap-0656",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+    "HEAD": "39606508fb979cdb87eb98ea9658cc78c79935a6",
+    "branch": "refs/heads/agent/gap-0657",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+    "HEAD": "2f587bdc942c3b45e53c56d8808c2a53bf230b4a",
+    "branch": "refs/heads/agent/gap-0658",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "16"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+    "HEAD": "bfb4bbb2123cf87d72fd1dbb4b4517e0a496e004",
+    "branch": "refs/heads/agent/gap-0659",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+    "HEAD": "1cadbe4933350f4532c853fa870e5f36f3e5e76f",
+    "branch": "refs/heads/agent/gap-0660",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+    "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+    "branch": "refs/heads/agent/gap-0661",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      "?? .changeset/amc-gap-0661-trulens-metric-validity.md",
+      "?? docs/source-reviews/GAP-0661-trulens-metric-validity.md",
+      "?? tests/gap0661TrulensMetricValiditySourceReview.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "26"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+    "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+    "branch": "refs/heads/agent/gap-0662",
+    "exists": true,
+    "ancestor": false,
+    "status": [
+      "?? .changeset/amc-gap-0662-dspy-metric-validity.md",
+      "?? docs/source-reviews/GAP-0662-dspy-metric-validity.md",
+      "?? tests/gap0662DspyMetricValiditySourceReview.test.ts"
+    ],
+    "git_error": "",
+    "unique_count": "26"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+    "HEAD": "fca3c0736661258725fd8a619af348413f3d0899",
+    "branch": "refs/heads/agent/gap-0663",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+    "HEAD": "6f52c9079b606ebd672f58d5ca8ed09eee9805b6",
+    "branch": "refs/heads/agent/gap-0664",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+    "HEAD": "00f73fa1c65bb8d9c95cf72848a3714fc1a0e2f3",
+    "branch": "refs/heads/agent/gap-0665",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+    "HEAD": "b9d63bdb3facf3afed272c9c9d255f32727d1ff3",
+    "branch": "refs/heads/agent/gap-0666",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+    "HEAD": "c2d11191f120d9884290235fb1f3df20656d9744",
+    "branch": "refs/heads/agent/gap-0667",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "27"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+    "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+    "branch": "refs/heads/agent/gap-0668",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "26"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+    "HEAD": "6579367f7368d0e48b28873aac950b48fab6a858",
+    "branch": "refs/heads/hermes/knowledge-refresh-20260713",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M AMC_COMPLETE_KNOWLEDGE.md"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+    "HEAD": "ef5486c302c15d43504e30061cae3fc19b0f7784",
+    "branch": "refs/heads/hermes/state-of-art-20260713",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+    "HEAD": "360b41669cab760273f3199ba4eec2bc49d7f3ea",
+    "branch": "refs/heads/hermes/state-of-art-20260713-v2",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8",
+    "HEAD": "8ebe4b3b532cf2b74046eb22e25ef448a2dd1451",
+    "branch": "refs/heads/claude/admiring-gates-a751a8",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .agents/notes/0024-p52a-live-evidence-projection.md",
+      " M CONTRIBUTING.md",
+      " M README.md",
+      " M docs/content/reddit-launch-drafts.md",
+      " M docs/content/show-hn-draft.md",
+      " M docs/internal/competitive-landscape.md",
+      " M docs/internal/mirofish-simulation-council.md",
+      " M src/agent/agentSession.ts",
+      " M src/agent/agentToolset.ts",
+      " M src/agent/subagentRunner.ts",
+      " M src/cli-agent-commands.ts",
+      " M src/kernel/agentLoopRunner.ts",
+      " M tests/agentToolsetWiring.test.ts",
+      " M tests/codeModeConfinement.test.ts",
+      " M tests/delegateTool.test.ts",
+      " M tests/delegationScopeBinding.test.ts",
+      " M tests/subagentRunnerEndToEnd.test.ts",
+      " M tests/toolEvidenceRecording.test.ts",
+      " M tests/workflowTool.test.ts",
+      " M website/i18n.js",
+      " M website/index.html",
+      " M website/lite.html",
+      " M whitepaper/AMC_WHITEPAPER_v1.md",
+      "?? .changeset/amc-tool-evidence-session-binding.md",
+      "?? tests/toolEvidenceSessionBinding.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8",
+    "HEAD": "e4d1312add351a62a7a69de09694316d9c248671",
+    "branch": "refs/heads/claude/dreamy-moser-3bf7b8",
+    "exists": true,
+    "ancestor": false,
+    "status": [],
+    "git_error": "",
+    "unique_count": "21"
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9",
+    "HEAD": "12803a2e017898d2c91d88a3610bdc90849c2457",
+    "branch": "refs/heads/claude/interesting-haslett-d9efa9",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M CONTRIBUTING.md",
+      " M README.md",
+      " M docs/content/reddit-launch-drafts.md",
+      " M docs/content/show-hn-draft.md",
+      " M docs/internal/competitive-landscape.md",
+      " M docs/internal/mirofish-simulation-council.md",
+      " M src/agent/delegationEvidenceWriter.ts",
+      " M src/agent/subagentSpawn.ts",
+      " M tests/spineProjectionEndToEnd.test.ts",
+      " M tests/subagentRunnerEndToEnd.test.ts",
+      " M website/i18n.js",
+      " M website/index.html",
+      " M website/lite.html",
+      " M whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee",
+    "HEAD": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+    "branch": "refs/heads/claude/stoic-faraday-20e4ee",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M src/adapters/hookIntegration.ts",
+      " M src/leases/leaseCli.ts",
+      " M src/leases/leaseStore.ts",
+      "?? tests/leaseRevocationFailClosed.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c",
+    "HEAD": "b5e2ec773f5c03f16386e12c3281d8442dde56ea",
+    "branch": "refs/heads/claude/sweet-merkle-71246c",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M CONTRIBUTING.md",
+      " M README.md",
+      " M docs/content/reddit-launch-drafts.md",
+      " M docs/content/show-hn-draft.md",
+      " M docs/internal/competitive-landscape.md",
+      " M docs/internal/mirofish-simulation-council.md",
+      " M src/session/sessionService.ts",
+      " M src/session/sessionTypes.ts",
+      " M src/session/surfaceProjection.ts",
+      " M tests/surfaceCompaction.test.ts",
+      " M website/i18n.js",
+      " M website/index.html",
+      " M website/lite.html",
+      " M whitepaper/AMC_WHITEPAPER_v1.md",
+      "?? src/session/surfaceCompaction.ts",
+      "?? tests/surfaceHistoryAddressing.test.ts",
+      "?? tests/surfaceHistoryCompaction.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549",
+    "HEAD": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+    "branch": "refs/heads/claude/vigilant-merkle-2d8549",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M docs/API_SURFACES.md",
+      " M src/api/index.ts",
+      " M src/api/productRouter.ts",
+      " M src/studio/apiDelegation.ts",
+      " M tests/apiRouters.test.ts",
+      " M tests/openapiWebhookSchemas.test.ts",
+      " M website/openapi.yaml",
+      "?? tests/productPortalSubmitAttribution.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_0b845f07-2cd-4",
+    "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+    "detached": true,
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+      "?? sdk/python/build/lib/amc_sdk/__init__.py",
+      "?? sdk/python/build/lib/amc_sdk/client.py",
+      "?? sdk/python/build/lib/amc_sdk/proof.py",
+      "?? sdk/python/build/lib/amc_sdk/py.typed"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1",
+    "HEAD": "fa2ffac6733fb67ee525f64c2da436365fa7f697",
+    "detached": true,
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M src/studio/studioServer.ts",
+      " M src/studio/studioState.ts",
+      "?? tests/studioAgentTokenScopes.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1",
+    "HEAD": "2eed9bee49587e1e7a2197d3b2c1c973b0e61728",
+    "branch": "refs/heads/worktree-wf_453236ab-c47-1",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M src/agent/loopTypes.ts",
+      " M src/agent/subagentRunner.ts",
+      " M src/kernel/agentLoopRunner.ts",
+      "?? tests/subagentHookInheritance.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-15",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-15",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+      "?? sdk/python/build/lib/amc_sdk/__init__.py",
+      "?? sdk/python/build/lib/amc_sdk/client.py",
+      "?? sdk/python/build/lib/amc_sdk/proof.py",
+      "?? sdk/python/build/lib/amc_sdk/py.typed"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-16",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-16",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-20",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-20",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-21",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-21",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-22",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-22",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-23",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-23",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-24",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-24",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-5",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-5",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-6",
+    "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+    "branch": "refs/heads/worktree-wf_75d332bf-2ec-6",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_80ecc1f0-12d-5",
+    "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+    "branch": "refs/heads/worktree-wf_80ecc1f0-12d-5",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      "?? tests/subagentHookInheritance.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_870dd21b-f1e-5",
+    "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+    "detached": true,
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_870dd21b-f1e-6",
+    "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+    "detached": true,
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M .amc/keys/auditor_ed25519.pub",
+      " M .amc/keys/auditor_history.json",
+      " M .amc/keys/lease_ed25519.pub",
+      " M .amc/keys/lease_history.json",
+      " M .amc/keys/monitor_ed25519.pub",
+      " M .amc/keys/monitor_history.json",
+      " M .amc/keys/session_ed25519.pub",
+      " M .amc/keys/session_history.json",
+      "?? .amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+      "?? .amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+      "?? .amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+      "?? .amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1",
+    "HEAD": "cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb",
+    "branch": "refs/heads/worktree-wf_8777d01c-fc6-1",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M docs/SESSION_SPILL_LIFECYCLE.md",
+      " M src/acp/acpHistoryContinuity.ts",
+      " M src/agent/inbox.ts",
+      " M src/agent/nativeAudioMessage.ts",
+      " M src/agent/nativeImageMessage.ts",
+      " M src/agent/nativeOrderedMessage.ts",
+      " M src/session/nativeAudioProvenance.ts",
+      " M src/session/sessionPayloadCap.ts",
+      " M src/session/sessionService.ts",
+      " M src/session/spill/spillInput.ts",
+      " M src/studio/nativeTaskService.ts",
+      " M tests/sessionAttachmentSpill.test.ts",
+      " M tests/sessionPayloadCap.test.ts",
+      "?? tests/sessionInboxSpill.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1",
+    "HEAD": "c3c46083a8087b7c6fd6cfaad79b3180f9f7483f",
+    "branch": "refs/heads/worktree-wf_a2e7e6c6-6fc-1",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M src/agent/agentToolset.ts",
+      " M src/sandbox/processConfinement.ts",
+      "?? tests/toolsetConfinementProperty.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1",
+    "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+    "branch": "refs/heads/worktree-wf_e54e6c35-3e3-1",
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M docs/SESSION_SPILL_LIFECYCLE.md",
+      " M src/acp/acpImageHistory.ts",
+      " M src/llm/request/requestSources.ts",
+      " M src/session/sessionPayloadCap.ts",
+      " M src/session/sessionService.ts",
+      " M src/session/spill/spillPolicy.ts",
+      " M tests/sessionPayloadCap.test.ts",
+      "?? src/session/spill/spillInput.ts",
+      "?? tests/sessionAttachmentSpill.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1",
+    "HEAD": "910e6d9785a51ded454233aa24ec9f84de0e87e4",
+    "detached": true,
+    "exists": true,
+    "ancestor": true,
+    "status": [
+      " M docs/QUICKSTART.md",
+      " M docs/START_HERE.md",
+      " M src/cli.ts",
+      " M src/doctor/doctorReport.ts",
+      " M src/doctor/doctorRules.ts",
+      "?? src/doctor/firstRunPlan.ts",
+      "?? tests/firstRunDoctor.test.ts",
+      "?? tests/firstRunProtocol.test.ts"
+    ],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-operator",
+    "HEAD": "6ee3a0e0719f38b87b5177fbda17b46f1ffe3653",
+    "branch": "refs/heads/codex/amc-1545-stop-operator",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-runtime",
+    "HEAD": "0d1565d4cafe7aad2467a0d7f6ea6e7410a5d0e7",
+    "branch": "refs/heads/codex/amc-1545-stop-runtime",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests",
+    "HEAD": "7c18ce6490bfe391a42dbaf910d1fe8d38ad2e7a",
+    "branch": "refs/heads/codex/amc-1546-agent-auth-tests",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle",
+    "HEAD": "7f2e38e3ed027e2bf4d52bea950cff4d2bccad25",
+    "branch": "refs/heads/codex/amc-1547-spill-lifecycle",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep",
+    "HEAD": "f145ea1ee97b00db8643fb0de5e1355a9fd78228",
+    "branch": "refs/heads/codex/amc-1547-spill-mutation-prep",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-session-tests",
+    "HEAD": "603b9f37efd2a26369b791d060e6e6ae30d96bb3",
+    "branch": "refs/heads/codex/amc-1547-spill-session-tests",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-storage",
+    "HEAD": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+    "branch": "refs/heads/codex/amc-1547-spill-storage",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep",
+    "HEAD": "6c55771ca409ae34ef2efc2194e758f7995e4ebf",
+    "branch": "refs/heads/codex/amc-cancellation-candidate-prep",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep",
+    "HEAD": "3f955a338a2d0a011926f6d4fefd33aeb2aee1d1",
+    "branch": "refs/heads/codex/amc-stop-auth-mutation-prep",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map",
+    "HEAD": "4967f97541140fcd5d5b18360e9953006c061500",
+    "branch": "refs/heads/codex/cos-closure-map",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-human-first-use",
+    "HEAD": "0030c2b5cf087291384859f8d0238055a2caff49",
+    "branch": "refs/heads/codex/cos-human-first-use",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill",
+    "HEAD": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+    "branch": "refs/heads/codex/cos-installed-spill",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide",
+    "HEAD": "71a81a966188f044c124e09ccc6bca0a45ed9dfb",
+    "branch": "refs/heads/codex/cos-observer-guide",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries",
+    "HEAD": "491a5077e83d889cc7c333a027ec27bbcde718ed",
+    "branch": "refs/heads/codex/cos-spill-boundaries",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-commands",
+    "HEAD": "7c0f01bf73fb64845362bda20cd456e9bc6af31e",
+    "branch": "refs/heads/codex/cos-spill-commands",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  },
+  {
+    "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-study-capture",
+    "HEAD": "745893115193834ddbbadfd0accec37a69f71e72",
+    "branch": "refs/heads/codex/cos-study-capture",
+    "exists": true,
+    "ancestor": true,
+    "status": [],
+    "git_error": ""
+  }
+]

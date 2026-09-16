@@ -1,0 +1,3209 @@
+{
+  "audited_head": "2035b20034984aec847607879828171c93f91f03",
+  "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md",
+  "method": "Read-only status, SHA1 Git blob identity against rev-list --objects, branch tree comparison, source and test diff review. Historical blob identity proves prior integration, not current product parity by itself. Named successor implementation review supplies disposition. No runtime tests run by this audit; parent release gate owns verification.",
+  "summary": {
+    "worktrees": 82,
+    "dirty_worktrees": 28,
+    "files": 286,
+    "dispositions": {
+      "superseded": 87,
+      "integrated_historical_blob": 55,
+      "integrated_exact_current": 51,
+      "local_runtime_or_build_output": 93
+    }
+  },
+  "worktrees": [
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass",
+      "branch": "refs/heads/amc/gap-register-execution",
+      "HEAD": "2035b20034984aec847607879828171c93f91f03",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/private/tmp/amc-1541-archive-20260909",
+      "branch": "refs/heads/codex/amc-1541-native-task-archive",
+      "HEAD": "d018f15f7ff66c7f3a0eb6c8a069ea54516b4f77",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/private/tmp/amc-1542-revocation-20260909",
+      "branch": "refs/heads/codex/amc-1542-managed-revocation",
+      "HEAD": "3c49ca9b45be57f8c0fb6515e23da7bbe736cd7e",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+      "branch": "refs/heads/agent/domain-proof-lane",
+      "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs.",
+      "files": [
+        {
+          "status": " M",
+          "path": "AMC_COMPLETE_KNOWLEDGE.md",
+          "blob": "4900870c84a38b630564c148931dfba365dc4ffd",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "docs/API_REFERENCE.md",
+          "blob": "824d78fdff7ad9fefe4dd1bf35094ff1b32eadf5",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "docs/DOMAIN_PACKS.md",
+          "blob": "8229114fee3abdb2ff5bf30e4f6d0dc49af88792",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "docs/OPEN_STANDARD.md",
+          "blob": "0a8b3fae142ff254a7b869340148592c4031d729",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "docs/TRUTHGUARD.md",
+          "blob": "3150497c28661891b530f0293d4c77a619e05701",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/api/index.ts",
+          "blob": "0970ee9c196ef05d60aa307ece30457fe26add23",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/badge/badgeCli.ts",
+          "blob": "48ae197ed86d1573a8605e7a4c1aa01b643a0707",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/cli.ts",
+          "blob": "b6271b4c20a91ca0c4072079a89356f2e545d998",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/standard/standardGenerator.ts",
+          "blob": "1b1f336719922daee3eb24e1c3447bc7e9e9d42c",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/standard/standardSchema.ts",
+          "blob": "4ab07c7fc4efd331c89b42e7f6b11e5d5e3b33bf",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/truthguard/truthguardEngine.ts",
+          "blob": "cc97557da5030d222d38027062653083f8852d49",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "src/truthguard/truthguardSchema.ts",
+          "blob": "4dbdf8310a5169d212f61c88ea640001eb372294",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "tests/newProductModulesBatch2.test.ts",
+          "blob": "f80265062f1a303fbfb8bba9906611a424b8f4da",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": " M",
+          "path": "website/compare.html",
+          "blob": "dfd626cd5143099f46b01626a6caedcaf220fc25",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "docs/DOMAIN_PROOF_LANE.md",
+          "blob": "74f65e26c2a339822c4a58fc8cc5db01ef2f61bc",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "examples/domain-proof/toy-governance/disproven.json",
+          "blob": "e0e8970d313c548fee19202c57de200528abe587",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "examples/domain-proof/toy-governance/proven.json",
+          "blob": "340e5ac76dd633647e06de133031b6ec5d0d530e",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "examples/domain-proof/toy-governance/unsupported.json",
+          "blob": "f2b1faa3aacd074c411d311e471624aed64e0eb0",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "fixtures/domain-proof/toy-governance/source-rule-manifest.json",
+          "blob": "e680bd7f5315cb4a0025cebe45e65eb5dcaa2130",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "fixtures/domain-proof/toy-governance/source-rules.md",
+          "blob": "10fc7ab8492398b70e376147be19e690d6d0e3a3",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "node_modules",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "src/api/domainProofRouter.ts",
+          "blob": "2a2d3c6319c595252b77c8ada4c89e45a51a394d",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/domainProofArtifact.ts",
+          "blob": "3e125d69658f9abee06b63133c00802c064cde39",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/domainProofCheck.ts",
+          "blob": "32d2a74f8a961c76317592e14d3c52eba87298cf",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/domainProofCli.ts",
+          "blob": "6c5d9f5cc54c467a2fd9eedec20409f600df6831",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/domainProofSchema.ts",
+          "blob": "ca79cd6a530914bd01b7e8940468c2c3cf107b6c",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/index.ts",
+          "blob": "b0fe50146c8792b1e664a2cd095c9b1671c89c64",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/sourceRuleManifestSchema.ts",
+          "blob": "900cd2b573ebcc7b63166548f550b94be0491a61",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "src/domainProof/toyGovernanceRules.ts",
+          "blob": "066c446bb1d0c887b7345c9a824c42d961c9731a",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "tests/domainProofArtifact.test.ts",
+          "blob": "b20607610f180e0bff585294e16cc7d058b4c8ca",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "tests/domainProofCli.test.ts",
+          "blob": "2a22020beb9d3eb5d9b8ff5afd6088d221d28dff",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "tests/domainProofStatus.test.ts",
+          "blob": "af50d3e1f8bdd2bc7a1384cc2e3fc84d1a94a879",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "tests/openCompassAmcProofStandard.test.ts",
+          "blob": "0222261feeee895a17c3264283d6cfd5778334c0",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        },
+        {
+          "status": "??",
+          "path": "tests/sourceRuleManifest.test.ts",
+          "blob": "cfe6ba712a64d290937f44eeaa6b71aaaee0b04b",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Prototype implementation blobs are in current history; source-review feature tree exactly equals ece9624e. Current domainProof APIs add confinement, canonical manifests and binding. Do not restore outdated CLI/docs."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+      "branch": "refs/heads/agent/gap-0635",
+      "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/score/index.ts",
+          "blob": "e572cfecda4a816e78836a8e0f96380c0ab80348",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": " M",
+          "path": "src/watch/index.ts",
+          "blob": "444f5091b6cb56fbd8430e708e7b8c50631b1de3",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": ".changeset/amc-bisheng-observability-live-drift.md",
+          "blob": "9efa675c7881ef43b0f9ce2461cff013d355fd0d",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0635-bisheng-observability-live-drift.md",
+          "blob": "420c0cc6104b2cf11daf7cc96a05d57703059433",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": "src/drift/bishengObservabilityLiveDrift.ts",
+          "blob": "116a042aa058e343158c9a17c87ad0b8f1278573",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": "src/score/bishengObservabilityLiveDriftScore.ts",
+          "blob": "be669b6fff69963f15932e3d6320ef76f6b10f5c",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": "src/watch/bishengObservabilityLiveDrift.ts",
+          "blob": "b8dd0c7083f7aa4a70dffc15a1ef84136f63009e",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        },
+        {
+          "status": "??",
+          "path": "tests/bishengObservabilityLiveDrift.test.ts",
+          "blob": "d9506c44f95bf096056e478856f5418b059b713d",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Bisheng implementation and test blobs already in history; current exports evolved. f419839a hardens live drift evidence trust."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+      "branch": "refs/heads/agent/gap-0636",
+      "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/api/benchmarkRouter.ts",
+          "blob": "5a92d8244cb7c99d9e6f57ee4f91b1135fec2470",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": " M",
+          "path": "src/api/scoreRouter.ts",
+          "blob": "b627c5dfeb2730bc420d2ed558435f050579f2b9",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": " M",
+          "path": "src/api/shieldRouter.ts",
+          "blob": "54846d2ead9c81461b1f8aff4ba212d125b73301",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": " M",
+          "path": "src/api/watchRouter.ts",
+          "blob": "4f32e24760a2963e48cfdc836b07142d09fab402",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": " M",
+          "path": "src/watch/index.ts",
+          "blob": "a3aa6e75ca89c29f5e3001d89d4101f525fb09e5",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": "??",
+          "path": ".changeset/gap-0636-helm-provider-drift.md",
+          "blob": "6584fbda08a6f62b2f390664e9dc0387d26ee2e2",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0636-helm-provider-drift.md",
+          "blob": "bad270f83154f2be199ea377ecfdb91156c59f22",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": "??",
+          "path": "src/benchmarks/helmProviderDrift.ts",
+          "blob": "35d53b08d10c50856d68d9e1dfcee05aa134da6c",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": "??",
+          "path": "src/watch/helmProviderDrift.ts",
+          "blob": "4e334f135acb2c060793935428286d2410b56046",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        },
+        {
+          "status": "??",
+          "path": "tests/helmProviderDrift.test.ts",
+          "blob": "b415c14731d3d57cc10fcdf77c0807a3f43bd763",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "HELM API/benchmark/test blobs already in history; current watch exports and f419839a evidence validation supersede draft."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+      "branch": "refs/heads/agent/gap-0637",
+      "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+      "ancestor": false,
+      "disposition": "integrated",
+      "reason": "All four development blobs already reachable from current HEAD history.",
+      "files": [
+        {
+          "status": "??",
+          "path": ".changeset/amc-opencompass-live-drift-alerts.md",
+          "blob": "e7efe373214ab6d021453559690dac7a7c12f7ba",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four development blobs already reachable from current HEAD history."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0637-opencompass-live-drift-alerts.md",
+          "blob": "0b2fe640519e7aeab6b9422963a54b59eb72b8cd",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All four development blobs already reachable from current HEAD history."
+        },
+        {
+          "status": "??",
+          "path": "src/watch/openCompassLiveDrift.ts",
+          "blob": "ea43aa3f451e1f9a104dd58082acc723fc5e8ba8",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four development blobs already reachable from current HEAD history."
+        },
+        {
+          "status": "??",
+          "path": "tests/openCompassLiveDrift.test.ts",
+          "blob": "caf992c777eca23166852575a7f170531fe969c5",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four development blobs already reachable from current HEAD history."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+      "branch": "refs/heads/agent/gap-0638",
+      "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/SCORING_METHODOLOGY.md",
+          "blob": "11a2cac0b2db0ea04bc2da52f89fd07be04eed83",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "src/badge/badgeCli.ts",
+          "blob": "acc247c2ad325e2d03edfadbdcc63925a4f28bb3",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "src/diagnostic/methodologyVersioning.ts",
+          "blob": "e41db009731478ead70927d94b4d81aaa3579d1f",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "src/methodology/publicMethodology.ts",
+          "blob": "5ebffeb66fb963a9296692a16a13063237a9f37d",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "tests/gap0620FactCheckingFactualityReview.test.ts",
+          "blob": "314957be2e6cd1164fe8668ac877d521831dfc61",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "tests/gap0629OpenAiEvalsPublicMethodology.test.ts",
+          "blob": "dfbc9d4f9f6bba461a6e82a389a05c585be73aba",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "tests/gap0630ChemGraphMetricValidity.test.ts",
+          "blob": "dc8b878ae60330e32bce659a6b90ac7e1bea5c1b",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "tests/gap0633LmEvaluationHarnessMetricValidity.test.ts",
+          "blob": "b28ec2dc0c43f031a0403c70aec8b09fa25dd748",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": " M",
+          "path": "tests/publicMethodology.test.ts",
+          "blob": "4104405621cefa16f54caaacbf009f7c56b024d9",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": "??",
+          "path": ".changeset/amc-pocketflow-public-methodology.md",
+          "blob": "71b2f324b5f2809971f3da09b726bb8c736091cb",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0638-pocketflow-public-methodology.md",
+          "blob": "5981f0cce7a06bf67630c425cc827b594e5de951",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        },
+        {
+          "status": "??",
+          "path": "tests/gap0638PocketFlowPublicMethodology.test.ts",
+          "blob": "8b54f9407d8fc18717764a713f2e81a3f9d3d364",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test preserves PocketFlow history but checks r225 rather than obsolete r217; f419839a corrects date/version boundary."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+      "branch": "refs/heads/agent/gap-0639",
+      "HEAD": "0d19650e5445e1bdcdb7961e5d7a149e88f2e27a",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/SCORING_METHODOLOGY.md",
+          "blob": "8abd9ca55d502f564860c5f5d0b90cf9bede8a90",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": " M",
+          "path": "src/badge/badgeCli.ts",
+          "blob": "06fa2547d0dcc8a5b45bb08a76d3a106df26307d",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": " M",
+          "path": "src/diagnostic/methodologyVersioning.ts",
+          "blob": "dc4fdec972464245a3518e86aeddb500a53f5ada",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": " M",
+          "path": "src/methodology/publicMethodology.ts",
+          "blob": "54a57a4a27fc9f008840ec260f88dbeedf3be47f",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": " M",
+          "path": "src/score/metricValidity.ts",
+          "blob": "e5733f09ec9caefa773ebb50dfa7f3da008be614",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": " M",
+          "path": "tests/gap0629OpenAiEvalsPublicMethodology.test.ts",
+          "blob": "6c06e426e39bd4545d36b74c021732fdacf42a9b",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": "??",
+          "path": ".changeset/amc-openai-simple-evals-metric-validity.md",
+          "blob": "073d632c25ad833c6a39cbb978af78a5434566de",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0639-openai-simple-evals-metric-validity.md",
+          "blob": "253fed87e35d730452b634f62d7f961c838de09c",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        },
+        {
+          "status": "??",
+          "path": "tests/gap0639OpenAiSimpleEvalsMetricValidity.test.ts",
+          "blob": "8dd605c11f665833daabacdc52c241ab4245e4c5",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current same-named test checks r225 and additionally binds receipt methodology assurance hash; old draft would downgrade that contract."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+      "branch": "refs/heads/agent/gap-0640",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+      "branch": "refs/heads/agent/gap-0641",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+      "branch": "refs/heads/agent/gap-0642",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+      "branch": "refs/heads/agent/gap-0643",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+      "branch": "refs/heads/agent/gap-0644",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+      "branch": "refs/heads/agent/gap-0645",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+      "branch": "refs/heads/agent/gap-0646",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+      "branch": "refs/heads/agent/gap-0647",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+      "branch": "refs/heads/agent/gap-0648",
+      "HEAD": "84c2a1f22b0901cf74e652a60d71a49b946d5cd5",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+      "branch": "refs/heads/agent/gap-0649",
+      "HEAD": "a984023ec0a11d2229ab533fed5fdbb2699f2348",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+      "branch": "refs/heads/agent/gap-0650",
+      "HEAD": "98da12c0a15d4a281c55bd3a92e3e2a1bf5a9604",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+      "branch": "refs/heads/agent/gap-0651",
+      "HEAD": "0cbffc03df5c3d583c9fc3ae4f093516ab79a7c6",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+      "branch": "refs/heads/agent/gap-0652",
+      "HEAD": "d225299636418148b42217387fa82710aa86ebe3",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+      "branch": "refs/heads/agent/gap-0653",
+      "HEAD": "0020199ef90026390b95f2fe616b83f4c6739946",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+      "branch": "refs/heads/agent/gap-0654",
+      "HEAD": "2efcaa3e3c662afe0558dbc1065676a78b6a6e6c",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+      "branch": "refs/heads/agent/gap-0655",
+      "HEAD": "4af70f4d0fc97417b8ff954fca78cd7a69269aa2",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+      "branch": "refs/heads/agent/gap-0656",
+      "HEAD": "d7cf71b21ec215125ccd1945e1237f99485b3bb8",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+      "branch": "refs/heads/agent/gap-0657",
+      "HEAD": "39606508fb979cdb87eb98ea9658cc78c79935a6",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+      "branch": "refs/heads/agent/gap-0658",
+      "HEAD": "2f587bdc942c3b45e53c56d8808c2a53bf230b4a",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+      "branch": "refs/heads/agent/gap-0659",
+      "HEAD": "bfb4bbb2123cf87d72fd1dbb4b4517e0a496e004",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+      "branch": "refs/heads/agent/gap-0660",
+      "HEAD": "1cadbe4933350f4532c853fa870e5f36f3e5e76f",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+      "branch": "refs/heads/agent/gap-0661",
+      "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Current docs/source-reviews/GAP-0661-trulens-metric-validity.md and tests/gap0661TrulensMetricValidityBoundary.test.ts replace metadata-only SourceReview test with explicit no-integration/validation-table boundary.",
+      "files": [
+        {
+          "status": "??",
+          "path": ".changeset/amc-gap-0661-trulens-metric-validity.md",
+          "blob": "cfa122673df2c92317e07e2aeabf2fb6979347da",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0661-trulens-metric-validity.md and tests/gap0661TrulensMetricValidityBoundary.test.ts replace metadata-only SourceReview test with explicit no-integration/validation-table boundary."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0661-trulens-metric-validity.md",
+          "blob": "0add91c5134f9c48f0612200dae6619c99b8485e",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0661-trulens-metric-validity.md and tests/gap0661TrulensMetricValidityBoundary.test.ts replace metadata-only SourceReview test with explicit no-integration/validation-table boundary."
+        },
+        {
+          "status": "??",
+          "path": "tests/gap0661TrulensMetricValiditySourceReview.test.ts",
+          "blob": "9e8aed0a3a58ad4c520fff1a291e13405cd74b73",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0661-trulens-metric-validity.md and tests/gap0661TrulensMetricValidityBoundary.test.ts replace metadata-only SourceReview test with explicit no-integration/validation-table boundary."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+      "branch": "refs/heads/agent/gap-0662",
+      "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+      "ancestor": false,
+      "disposition": "superseded",
+      "reason": "Current docs/source-reviews/GAP-0662-dspy-metric-validity.md and tests/gap0662DspyMetricValidityBoundary.test.ts retain source boundary and distinguish existing generic DSPy export.",
+      "files": [
+        {
+          "status": "??",
+          "path": ".changeset/amc-gap-0662-dspy-metric-validity.md",
+          "blob": "8b6cc88432b72d071965b9bd6bd821bfeb6380ba",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0662-dspy-metric-validity.md and tests/gap0662DspyMetricValidityBoundary.test.ts retain source boundary and distinguish existing generic DSPy export."
+        },
+        {
+          "status": "??",
+          "path": "docs/source-reviews/GAP-0662-dspy-metric-validity.md",
+          "blob": "c678669df15d4f32f4134ce7d102b83725b87a85",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0662-dspy-metric-validity.md and tests/gap0662DspyMetricValidityBoundary.test.ts retain source boundary and distinguish existing generic DSPy export."
+        },
+        {
+          "status": "??",
+          "path": "tests/gap0662DspyMetricValiditySourceReview.test.ts",
+          "blob": "bae19e3eb00d0f539f9e844b05a32b4be09d56eb",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Current docs/source-reviews/GAP-0662-dspy-metric-validity.md and tests/gap0662DspyMetricValidityBoundary.test.ts retain source boundary and distinguish existing generic DSPy export."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+      "branch": "refs/heads/agent/gap-0663",
+      "HEAD": "fca3c0736661258725fd8a619af348413f3d0899",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+      "branch": "refs/heads/agent/gap-0664",
+      "HEAD": "6f52c9079b606ebd672f58d5ca8ed09eee9805b6",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+      "branch": "refs/heads/agent/gap-0665",
+      "HEAD": "00f73fa1c65bb8d9c95cf72848a3714fc1a0e2f3",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+      "branch": "refs/heads/agent/gap-0666",
+      "HEAD": "b9d63bdb3facf3afed272c9c9d255f32727d1ff3",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+      "branch": "refs/heads/agent/gap-0667",
+      "HEAD": "c2d11191f120d9884290235fb1f3df20656d9744",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+      "branch": "refs/heads/agent/gap-0668",
+      "HEAD": "b253cc171f35eab4c06b0ca323b8f8924962097b",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+      "branch": "refs/heads/hermes/knowledge-refresh-20260713",
+      "HEAD": "6579367f7368d0e48b28873aac950b48fab6a858",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Committed HEAD is ancestor. Single draft knowledge file is dated July and older than current native workflows. Prior audit explicitly rejects reinstating July snapshot.",
+      "files": [
+        {
+          "status": " M",
+          "path": "AMC_COMPLETE_KNOWLEDGE.md",
+          "blob": "79ce7a67c49b09e244eea7caf60c2e1afe7020f0",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Committed HEAD is ancestor. Single draft knowledge file is dated July and older than current native workflows. Prior audit explicitly rejects reinstating July snapshot."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+      "branch": "refs/heads/hermes/state-of-art-20260713",
+      "HEAD": "ef5486c302c15d43504e30061cae3fc19b0f7784",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+      "branch": "refs/heads/hermes/state-of-art-20260713-v2",
+      "HEAD": "360b41669cab760273f3199ba4eec2bc49d7f3ea",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/admiring-gates-a751a8",
+      "branch": "refs/heads/claude/admiring-gates-a751a8",
+      "HEAD": "8ebe4b3b532cf2b74046eb22e25ef448a2dd1451",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".agents/notes/0024-p52a-live-evidence-projection.md",
+          "blob": "95baae8a8bae10f400e0ee34f9d0e7f89b58de61",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "CONTRIBUTING.md",
+          "blob": "8bbc76829c057a073b9235fb2a8adeafbb149a0f",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "README.md",
+          "blob": "388840eebe81e4dfdfb607fc32dca9607a2a0415",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/reddit-launch-drafts.md",
+          "blob": "2eebc690f044079438b2f132d508854a40018799",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/show-hn-draft.md",
+          "blob": "40b3ade41ab0f55be48f871e807ba6fcc69659e2",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/competitive-landscape.md",
+          "blob": "5ca2c365a15ea92804a4abb6334a400c68ed778f",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "blob": "116dac16fd54fd0aa67f53fdfc0388c1d2bca07d",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/agentSession.ts",
+          "blob": "697ef85df7fa30659e65df1d984cce1f0cf65316",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/agentToolset.ts",
+          "blob": "ec30c755ed3eafc37f65f22cd0b07c511a6393b7",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/subagentRunner.ts",
+          "blob": "ee740d317ba9d7b3be78ebf745897ed2a668d978",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "src/cli-agent-commands.ts",
+          "blob": "13b3c33d1247e46202630ef6d7b6d66428c7817d",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "src/kernel/agentLoopRunner.ts",
+          "blob": "938bf34722617ca7b06d8f268352b7cadf483793",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/agentToolsetWiring.test.ts",
+          "blob": "25fd3caccc2ece58fee9b8b2fb1cd5b34873d675",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/codeModeConfinement.test.ts",
+          "blob": "124d5c9a0e2a927c977a2844cc45f197a08642c1",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/delegateTool.test.ts",
+          "blob": "8bc5dfae0be95a765c94d1f4b31096e680ecd844",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/delegationScopeBinding.test.ts",
+          "blob": "737bf41be8123c061869328c0841f8bde30c8cd1",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/subagentRunnerEndToEnd.test.ts",
+          "blob": "17bcdfb12cd2b573e4a1588fb68ba78e2aaebc89",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/toolEvidenceRecording.test.ts",
+          "blob": "810e33f52f4d2f548fe74cfbcfc5bea1e2f0b683",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "tests/workflowTool.test.ts",
+          "blob": "b9eba6abb6c614b6218e0bc7a6708c409e877993",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "website/i18n.js",
+          "blob": "798d3db5f91f2cd9d5f5f9a3f574b611009f9dea",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "website/index.html",
+          "blob": "45c626174dea666cf146d83352cff646dd995fbe",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "website/lite.html",
+          "blob": "a64f677daf1dfc5eefe484c8a16b078af1fd3fb2",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": " M",
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "blob": "4c6878d23ff06ee7dc71c674ac0e0d2004d2bc59",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": "??",
+          "path": ".changeset/amc-tool-evidence-session-binding.md",
+          "blob": "02fb8963ac624cd3e4c3b76b07d13e3e1c02e067",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        },
+        {
+          "status": "??",
+          "path": "tests/toolEvidenceSessionBinding.test.ts",
+          "blob": "18df025423e48e206d1ccde222d0f4f6dcbbc1d2",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Tool-session ownership and CLI evidence recovered by f537e29e,0f07c3b6,1f19cf53,e8448405 and current tests. Shared public-copy changes are old snapshots; preserve history without overlaying latest public proof claims."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/dreamy-moser-3bf7b8",
+      "branch": "refs/heads/claude/dreamy-moser-3bf7b8",
+      "HEAD": "e4d1312add351a62a7a69de09694316d9c248671",
+      "ancestor": false,
+      "disposition": "historical_branch",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/interesting-haslett-d9efa9",
+      "branch": "refs/heads/claude/interesting-haslett-d9efa9",
+      "HEAD": "12803a2e017898d2c91d88a3610bdc90849c2457",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits.",
+      "files": [
+        {
+          "status": " M",
+          "path": "CONTRIBUTING.md",
+          "blob": "4116ce499a54084c123b07282cd6d73293b7d36a",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "README.md",
+          "blob": "f61c642d7472023ed41d5c847be235cd298f74f1",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/reddit-launch-drafts.md",
+          "blob": "46fc7ae621cdd0aca943371b536ab73e62432516",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/show-hn-draft.md",
+          "blob": "a0d60f94b260969373007e54e85370b7492b6381",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/competitive-landscape.md",
+          "blob": "2d947b40ae6324b71c4061bc9cdf85c1ea7a104f",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "blob": "c12924a38f87e18ef4fd9b832c15d0acb4951ab8",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/delegationEvidenceWriter.ts",
+          "blob": "202f5f420b90a375130a8f60151b106e8128a471",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/subagentSpawn.ts",
+          "blob": "928d2b631b1b4280a3a7252f38ef650bad079d0a",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "tests/spineProjectionEndToEnd.test.ts",
+          "blob": "84af1f879e485c531658bd55e2f6f93c7479e5c9",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "tests/subagentRunnerEndToEnd.test.ts",
+          "blob": "e6878b6cf3617e991757886addfd83909b7f52b9",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "website/i18n.js",
+          "blob": "87edfdb0a37bf51fba6009cb5da0cb75cfdbb3dc",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "website/index.html",
+          "blob": "d9fd72f36e884505f17c36ef0e53a82035c6330a",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "website/lite.html",
+          "blob": "ebab24ccd55fd4eeae666fb5e0c6050843c3dcea",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        },
+        {
+          "status": " M",
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "blob": "e774f0db03af017d86f75d176543d5be7c64b1e0",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Delegation/spine evidence successor fixes f537e29e,0f07c3b6,1f19cf53 already in history. Current public copy supersedes duplicated older edits."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/stoic-faraday-20e4ee",
+      "branch": "refs/heads/claude/stoic-faraday-20e4ee",
+      "HEAD": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "2e3eac76 plus managed hook revocation repair; current tests/leaseRevocationFailClosed.test.ts covers malformed/tampered/deleted stores, hooks, bridge, router and gateway without draft fail-open initialization.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/adapters/hookIntegration.ts",
+          "blob": "e1a31b6c5c65aaa93c67d903214860dfa8c106cd",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "2e3eac76 plus managed hook revocation repair; current tests/leaseRevocationFailClosed.test.ts covers malformed/tampered/deleted stores, hooks, bridge, router and gateway without draft fail-open initialization."
+        },
+        {
+          "status": " M",
+          "path": "src/leases/leaseCli.ts",
+          "blob": "bdafa392f382c1d5477946b4009150b90048339d",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "2e3eac76 plus managed hook revocation repair; current tests/leaseRevocationFailClosed.test.ts covers malformed/tampered/deleted stores, hooks, bridge, router and gateway without draft fail-open initialization."
+        },
+        {
+          "status": " M",
+          "path": "src/leases/leaseStore.ts",
+          "blob": "5e00ca6e7fa66e3e1e2b89296906bdf4d0f2810a",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "2e3eac76 plus managed hook revocation repair; current tests/leaseRevocationFailClosed.test.ts covers malformed/tampered/deleted stores, hooks, bridge, router and gateway without draft fail-open initialization."
+        },
+        {
+          "status": "??",
+          "path": "tests/leaseRevocationFailClosed.test.ts",
+          "blob": "23c19efd45c99dd756a5af79d9d369af83d20796",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "2e3eac76 plus managed hook revocation repair; current tests/leaseRevocationFailClosed.test.ts covers malformed/tampered/deleted stores, hooks, bridge, router and gateway without draft fail-open initialization."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/sweet-merkle-71246c",
+      "branch": "refs/heads/claude/sweet-merkle-71246c",
+      "HEAD": "b5e2ec773f5c03f16386e12c3281d8442dde56ea",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite.",
+      "files": [
+        {
+          "status": " M",
+          "path": "CONTRIBUTING.md",
+          "blob": "4a958e26d93a180fc065c6718e3aada7ff73eaa8",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "README.md",
+          "blob": "14fe847ec0ac1492de78fc3998c4f9ea466b01c6",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/reddit-launch-drafts.md",
+          "blob": "73210fd4ceea84f904d7d208bd3b7f552367c21e",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "docs/content/show-hn-draft.md",
+          "blob": "f42b22af62d9652020537c89aff02dffdfb1b474",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/competitive-landscape.md",
+          "blob": "7fd9ef577b65a10f1ef089fb6e5f3a714a6bd553",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "blob": "75197f146f0ce1efc3e41167fdf5cbf605c0efa2",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionService.ts",
+          "blob": "937d038e4d507aff7ec24e145626e2ed4f98643e",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionTypes.ts",
+          "blob": "d07d4e945d05fbdd3da6cfb8892f7dad818c1ded",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "src/session/surfaceProjection.ts",
+          "blob": "e47bf688aa43beaab168a3dafb3fd1c694bfd5f0",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "tests/surfaceCompaction.test.ts",
+          "blob": "08ca70706cdb8e32ef9ec8fd53e92706b675c6f6",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "website/i18n.js",
+          "blob": "4c21e98e55a506c9caf745b77c119e2295dfd0dd",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "website/index.html",
+          "blob": "8e6d03204f279aeb4bbcf443299f96a4b65fa04e",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "website/lite.html",
+          "blob": "d200419c44cd2f24a21444abaf413315e71478cd",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": " M",
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "blob": "77865af78fee043e702bc38555447b98815d1723",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": "??",
+          "path": "src/session/surfaceCompaction.ts",
+          "blob": "c692485d3faab0aeba23496a0aac5a20b70129fe",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": "??",
+          "path": "tests/surfaceHistoryAddressing.test.ts",
+          "blob": "481102d097d0172e01446c7761f7ad433c3ee970",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        },
+        {
+          "status": "??",
+          "path": "tests/surfaceHistoryCompaction.test.ts",
+          "blob": "78e98dbc4e872e62ea83695047da953f34b3e0d7",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "bda990ac integrates origin addressing, current src/session/surfaceCompaction.ts explicitly credits sweet-merkle and authenticates actual bytes; tests/surfaceHistoryCompaction.test.ts covers repeated origin replacement, replay, range, tool pairing. Draft caller-declared replacedBytes is less safe. Old surfaceHistoryAddressing name is absorbed into behavior suite."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/vigilant-merkle-2d8549",
+      "branch": "refs/heads/claude/vigilant-merkle-2d8549",
+      "HEAD": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/API_SURFACES.md",
+          "blob": "cb0d18be57f5c3cfe2a3296ccd5e4e361f86abb2",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "src/api/index.ts",
+          "blob": "97fe65cb13cff7e6abdb2e4fa11e3af3b7f164f4",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "src/api/productRouter.ts",
+          "blob": "acc7e53851ee6a543abfcc6db7becc97e75c5890",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "src/studio/apiDelegation.ts",
+          "blob": "93393b9282bbf84bed4a70ed2e2887558b854b6b",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "tests/apiRouters.test.ts",
+          "blob": "43929d3d4814c805b2109ca2d97509a681ee5695",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "tests/openapiWebhookSchemas.test.ts",
+          "blob": "c37b5e4d47ecb0e7bf5932c2901dfaca54f47fa0",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": " M",
+          "path": "website/openapi.yaml",
+          "blob": "ec51882ad5c40a4729005c511f1780fb75e0b074",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        },
+        {
+          "status": "??",
+          "path": "tests/productPortalSubmitAttribution.test.ts",
+          "blob": "0a8759f73d924e115f1c0fe3157c0c40bee7bcae",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "47141f7a implements principal propagation; 79f36cfd tests/portalAttribution.test.ts validates real persistence and roles, replacing weaker productPortalSubmitAttribution test. API/OpenAPI blobs partly identical."
+        }
+      ],
+      "prior_audit": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/worktrees-audit.md"
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_0b845f07-2cd-4",
+      "branch": null,
+      "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/__init__.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/client.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/proof.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/py.typed",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cc93fba-030-1",
+      "branch": null,
+      "HEAD": "fa2ffac6733fb67ee525f64c2da436365fa7f697",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "2eed9bee integrates scopes. studioState and test byte-identical; studioServer helper bodies moved to src/studio/agentTokenScopeGuard.ts.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/studio/studioServer.ts",
+          "blob": "5cd78ef3bf6dfbddac29d4017a423d03e2f89fae",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "2eed9bee integrates scopes. studioState and test byte-identical; studioServer helper bodies moved to src/studio/agentTokenScopeGuard.ts."
+        },
+        {
+          "status": " M",
+          "path": "src/studio/studioState.ts",
+          "blob": "47ef6bfea8895210e1c9934dafa2d4697834badf",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "2eed9bee integrates scopes. studioState and test byte-identical; studioServer helper bodies moved to src/studio/agentTokenScopeGuard.ts."
+        },
+        {
+          "status": "??",
+          "path": "tests/studioAgentTokenScopes.test.ts",
+          "blob": "a28a98ca0e7a027c7fc0049bcdc6470d301d88f5",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "2eed9bee integrates scopes. studioState and test byte-identical; studioServer helper bodies moved to src/studio/agentTokenScopeGuard.ts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_453236ab-c47-1",
+      "branch": "refs/heads/worktree-wf_453236ab-c47-1",
+      "HEAD": "2eed9bee49587e1e7a2197d3b2c1c973b0e61728",
+      "ancestor": true,
+      "disposition": "integrated",
+      "reason": "All four dirty development blobs already reachable from current HEAD history; c3c46083 integrates hooks, 97e1660b records undeclared foreign control.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/agent/loopTypes.ts",
+          "blob": "548eb0de7f4f9e0f09532d24b16ac7bf7b838c93",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All four dirty development blobs already reachable from current HEAD history; c3c46083 integrates hooks, 97e1660b records undeclared foreign control."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/subagentRunner.ts",
+          "blob": "e0c52591d351ca0215e87767075294ef79c69248",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four dirty development blobs already reachable from current HEAD history; c3c46083 integrates hooks, 97e1660b records undeclared foreign control."
+        },
+        {
+          "status": " M",
+          "path": "src/kernel/agentLoopRunner.ts",
+          "blob": "29b5fa13df993b02636a8b41ccf055aa356252a7",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four dirty development blobs already reachable from current HEAD history; c3c46083 integrates hooks, 97e1660b records undeclared foreign control."
+        },
+        {
+          "status": "??",
+          "path": "tests/subagentHookInheritance.test.ts",
+          "blob": "60cc85e811d8552d1b04bd951d9fe6e649dbbdd0",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All four dirty development blobs already reachable from current HEAD history; c3c46083 integrates hooks, 97e1660b records undeclared foreign control."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-15",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-15",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/__init__.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/client.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/proof.py",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": "sdk/python/build/lib/amc_sdk/py.typed",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-16",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-16",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-20",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-20",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-21",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-21",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-22",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-22",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-23",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-23",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-24",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-24",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-5",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-5",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_75d332bf-2ec-6",
+      "branch": "refs/heads/worktree-wf_75d332bf-2ec-6",
+      "HEAD": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_80ecc1f0-12d-5",
+      "branch": "refs/heads/worktree-wf_80ecc1f0-12d-5",
+      "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Alternate hook test refers to obsolete hooks, readDelegationHookControl and DELEGATION_HOOK_CONTROL_AUDIT APIs. Current subagentHookInheritance tests exercise real child/grandchild/control absence; subagentRunner.ts lines 213-214 explicitly snapshots and freezes controls. No demonstrated missing behavior.",
+      "files": [
+        {
+          "status": "??",
+          "path": "tests/subagentHookInheritance.test.ts",
+          "blob": "678b1b7e3afd3e9879355d9b2e35b5039b550074",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Alternate hook test refers to obsolete hooks, readDelegationHookControl and DELEGATION_HOOK_CONTROL_AUDIT APIs. Current subagentHookInheritance tests exercise real child/grandchild/control absence; subagentRunner.ts lines 213-214 explicitly snapshots and freezes controls. No demonstrated missing behavior."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_870dd21b-f1e-5",
+      "branch": null,
+      "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_870dd21b-f1e-6",
+      "branch": null,
+      "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "Only local runtime/build outputs.",
+      "files": [
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/auditor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/lease_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/monitor_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_ed25519.pub",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": " M",
+          "path": ".amc/keys/session_history.json",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/auditor_history.json.previous-972c6c053bbef5808192078e1fc79d814c7638ddf073131b096964e55376922b",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/lease_history.json.previous-9d4b0ec461251abcd035827ecf14ddc02d129740e0e68ffeb8aad49954082981",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/monitor_history.json.previous-b4e2df59e0314209678369589bf1d288695faed74e763e0d840e08f777f7e015",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        },
+        {
+          "status": "??",
+          "path": ".amc/keys/session_history.json.previous-7344c815ed424ae3851d5d92a1f4368aef42a9e729e9d77043c97026de708a20",
+          "disposition": "local_runtime_or_build_output",
+          "reason": "Exclude from source snapshot/merge; generated keys/history, SDK build or dependency symlink are machine-local artifacts."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_8777d01c-fc6-1",
+      "branch": "refs/heads/worktree-wf_8777d01c-fc6-1",
+      "HEAD": "cb251cbe06e1e3aae4d42b0ea06724d60f09d1fb",
+      "ancestor": true,
+      "disposition": "integrated",
+      "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/SESSION_SPILL_LIFECYCLE.md",
+          "blob": "86262eb4023818e35901780183d385acd096123f",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/acp/acpHistoryContinuity.ts",
+          "blob": "98f6ae05c06305016526e5ed31c403f24579d337",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/inbox.ts",
+          "blob": "f806bc83e065d035dafdbf1501eaffd10aaccf71",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/nativeAudioMessage.ts",
+          "blob": "b74714fbf856d4364e45817683506489787399e2",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/nativeImageMessage.ts",
+          "blob": "915bebf8c712929bc3ba514c39de46f591576fbd",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/agent/nativeOrderedMessage.ts",
+          "blob": "98bc95c720e58a6c21ef988022a9f734309cf153",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/session/nativeAudioProvenance.ts",
+          "blob": "63df58996f15e602c70968355d82595fd9de01b6",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionPayloadCap.ts",
+          "blob": "38566669850bddc569d9466c133529e927d5711b",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionService.ts",
+          "blob": "3dc1842c9041c27b6c87a607ce674d03214968dc",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/session/spill/spillInput.ts",
+          "blob": "d883d6bc97f2c518c11145d5d6b04e3fe1ae4eac",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "src/studio/nativeTaskService.ts",
+          "blob": "9d6635e8871dfa360b438c377cd2111928b620e1",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "tests/sessionAttachmentSpill.test.ts",
+          "blob": "d202262e30278ce53a1a77ad4eb7147d33bea8e3",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": " M",
+          "path": "tests/sessionPayloadCap.test.ts",
+          "blob": "a8bd080f6da46891905ff7cd825d489f75c63bc8",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        },
+        {
+          "status": "??",
+          "path": "tests/sessionInboxSpill.test.ts",
+          "blob": "5e5e177095d44b1d467715cd915e70cb8f331df6",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All 14 dirty development files are byte-identical to audited current HEAD, including sessionInboxSpill tests."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_a2e7e6c6-6fc-1",
+      "branch": "refs/heads/worktree-wf_a2e7e6c6-6fc-1",
+      "HEAD": "c3c46083a8087b7c6fd6cfaad79b3180f9f7483f",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Both source blobs byte-identical. Test difference only replaces skipIf with conditional registration and mandatory platform contract test. 910e6d97 is current implementation.",
+      "files": [
+        {
+          "status": " M",
+          "path": "src/agent/agentToolset.ts",
+          "blob": "79fdb410739d2a447be566e69a1222523423c806",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Both source blobs byte-identical. Test difference only replaces skipIf with conditional registration and mandatory platform contract test. 910e6d97 is current implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/sandbox/processConfinement.ts",
+          "blob": "b12e4fa30e3197b2aa750d60f909f634aa651d5f",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Both source blobs byte-identical. Test difference only replaces skipIf with conditional registration and mandatory platform contract test. 910e6d97 is current implementation."
+        },
+        {
+          "status": "??",
+          "path": "tests/toolsetConfinementProperty.test.ts",
+          "blob": "6787a223c79b7b44954af28c1f21e9aa435e3aa7",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Both source blobs byte-identical. Test difference only replaces skipIf with conditional registration and mandatory platform contract test. 910e6d97 is current implementation."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e54e6c35-3e3-1",
+      "branch": "refs/heads/worktree-wf_e54e6c35-3e3-1",
+      "HEAD": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "ancestor": true,
+      "disposition": "integrated",
+      "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/SESSION_SPILL_LIFECYCLE.md",
+          "blob": "a883082d789dfded74f4e76dcf086a5c648adf5e",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/acp/acpImageHistory.ts",
+          "blob": "e87c86a4d368d975dcf563d52f211a67cc4680dd",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/llm/request/requestSources.ts",
+          "blob": "e7a971c5b1baba34a90bf9712d51cc9a52f33dfd",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionPayloadCap.ts",
+          "blob": "e09b7eff1a6d7520c70a0e3fa9b3e91bae2393ab",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/session/sessionService.ts",
+          "blob": "9e45ab8447d799794c5ac8d090ad3a95bbf5ad6b",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/session/spill/spillPolicy.ts",
+          "blob": "be1db8cf16bc26c99c08fa2aaa9f484ea4e86587",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": " M",
+          "path": "tests/sessionPayloadCap.test.ts",
+          "blob": "ffc23cd78a508c007c85a18d349917c48d838bdc",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": "??",
+          "path": "src/session/spill/spillInput.ts",
+          "blob": "e93fcda568ffb833fda87f1f1c7fe461e143c5f9",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        },
+        {
+          "status": "??",
+          "path": "tests/sessionAttachmentSpill.test.ts",
+          "blob": "96ab2ca85fd3f53d736167e4db504ff60936abab",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "All nine dirty development blobs reachable from current HEAD history; newer inbox-spill code refines same implementation."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_e71e93d9-c37-1",
+      "branch": null,
+      "HEAD": "910e6d9785a51ded454233aa24ec9f84de0e87e4",
+      "ancestor": true,
+      "disposition": "superseded",
+      "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation.",
+      "files": [
+        {
+          "status": " M",
+          "path": "docs/QUICKSTART.md",
+          "blob": "5fafc8f46186f8a6adaeafbcc101b90120b976b0",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": " M",
+          "path": "docs/START_HERE.md",
+          "blob": "f1c5fa9bc51445b7da1e188aac8cfc0c145e88eb",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/cli.ts",
+          "blob": "071211cd87c08ee18e736d7567ae3a186d1d1f32",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/doctor/doctorReport.ts",
+          "blob": "da52a3cfc074d04f56e9279ec31ee132679545e0",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": " M",
+          "path": "src/doctor/doctorRules.ts",
+          "blob": "71a731495f38bc26df7bbdfb2cbb8227e3f4ecc2",
+          "same_as_current": true,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_exact_current",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": "??",
+          "path": "src/doctor/firstRunPlan.ts",
+          "blob": "993bc9cff6210ae18d45e6bba4d2d59a9bea6573",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": "??",
+          "path": "tests/firstRunDoctor.test.ts",
+          "blob": "f99a975fcbcde82c833cda830fbf32cc8113a5c5",
+          "same_as_current": false,
+          "reachable_in_current_history": true,
+          "disposition": "integrated_historical_blob",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        },
+        {
+          "status": "??",
+          "path": "tests/firstRunProtocol.test.ts",
+          "blob": "9dd2ef59589f2321ac8f5e4fcd2196c8cae6a6b2",
+          "same_as_current": false,
+          "reachable_in_current_history": false,
+          "disposition": "superseded",
+          "reason": "Seven development blobs in current history. firstRunProtocol difference only conditional built-CLI registration plus mandatory first-run action contract test. d635a5e2 contains current implementation."
+        }
+      ],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-operator",
+      "branch": "refs/heads/codex/amc-1545-stop-operator",
+      "HEAD": "6ee3a0e0719f38b87b5177fbda17b46f1ffe3653",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1545-stop-runtime",
+      "branch": "refs/heads/codex/amc-1545-stop-runtime",
+      "HEAD": "0d1565d4cafe7aad2467a0d7f6ea6e7410a5d0e7",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1546-agent-auth-tests",
+      "branch": "refs/heads/codex/amc-1546-agent-auth-tests",
+      "HEAD": "7c18ce6490bfe391a42dbaf910d1fe8d38ad2e7a",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-lifecycle",
+      "branch": "refs/heads/codex/amc-1547-spill-lifecycle",
+      "HEAD": "7f2e38e3ed027e2bf4d52bea950cff4d2bccad25",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-mutation-prep",
+      "branch": "refs/heads/codex/amc-1547-spill-mutation-prep",
+      "HEAD": "f145ea1ee97b00db8643fb0de5e1355a9fd78228",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-session-tests",
+      "branch": "refs/heads/codex/amc-1547-spill-session-tests",
+      "HEAD": "603b9f37efd2a26369b791d060e6e6ae30d96bb3",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-1547-spill-storage",
+      "branch": "refs/heads/codex/amc-1547-spill-storage",
+      "HEAD": "e89f4842892c1eae4e4acf6996c7d0d31a4b229e",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-cancellation-candidate-prep",
+      "branch": "refs/heads/codex/amc-cancellation-candidate-prep",
+      "HEAD": "6c55771ca409ae34ef2efc2194e758f7995e4ebf",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/amc-stop-auth-mutation-prep",
+      "branch": "refs/heads/codex/amc-stop-auth-mutation-prep",
+      "HEAD": "3f955a338a2d0a011926f6d4fefd33aeb2aee1d1",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-closure-map",
+      "branch": "refs/heads/codex/cos-closure-map",
+      "HEAD": "4967f97541140fcd5d5b18360e9953006c061500",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-human-first-use",
+      "branch": "refs/heads/codex/cos-human-first-use",
+      "HEAD": "0030c2b5cf087291384859f8d0238055a2caff49",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-installed-spill",
+      "branch": "refs/heads/codex/cos-installed-spill",
+      "HEAD": "a5987643ef6c26b01f687226fbc6a6709fc182cb",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-observer-guide",
+      "branch": "refs/heads/codex/cos-observer-guide",
+      "HEAD": "71a81a966188f044c124e09ccc6bca0a45ed9dfb",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-boundaries",
+      "branch": "refs/heads/codex/cos-spill-boundaries",
+      "HEAD": "491a5077e83d889cc7c333a027ec27bbcde718ed",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-spill-commands",
+      "branch": "refs/heads/codex/cos-spill-commands",
+      "HEAD": "7c0f01bf73fb64845362bda20cd456e9bc6af31e",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    },
+    {
+      "worktree": "/Users/sid/AgentMaturityCompass/tmp/cos-study-capture",
+      "branch": "refs/heads/codex/cos-study-capture",
+      "HEAD": "745893115193834ddbbadfd0accec37a69f71e72",
+      "ancestor": true,
+      "disposition": "clean_ancestor",
+      "reason": "No dirty development edits.",
+      "files": [],
+      "prior_audit": null
+    }
+  ],
+  "branches": [
+    {
+      "branch": "feature/amc-1190-gbqa-metric-validity-relevance",
+      "disposition": "exact_squash_tree",
+      "proof": "git diff branch ece9624e is empty; ece9624e ancestor of audited HEAD."
+    },
+    {
+      "branch": "codex/amc-install-persona-readiness",
+      "disposition": "exact_squash_tree",
+      "proof": "git diff branch 2b4e35ff is empty; 2b4e35ff ancestor of audited HEAD."
+    },
+    {
+      "branch": "agent/* and cleanup/amc-source-review-2026-06-20",
+      "disposition": "superseded_source_review_history",
+      "proof": "Feature landed ece9624e; f419839a hardening and 68684dc8/c9ad4f00 deliberate duplicate-module deletions. Old draft exports/changesets must not restore consumed files."
+    },
+    {
+      "branch": "claude/dreamy-moser-3bf7b8",
+      "disposition": "superseded_port",
+      "proof": "bda990ac and 822123d7 recover tsconfig.tests.json, typecheck:tests package script and CI gate. Of 248 branch paths only three plans/tests-typecheck-*.md history notes absent; source interfaces evolved."
+    },
+    {
+      "branch": "claude/eager-boyd",
+      "disposition": "superseded_port",
+      "proof": "8ac56e3e and 77912a55 recover TypeDoc public API staged-site generation; current typedoc.json exists."
+    },
+    {
+      "branch": "claude/dreamy-heisenberg",
+      "disposition": "partial_superseded_port",
+      "proof": "9923d76c replaces three duplicate report files with canonical redirects. Parent audit_stash agent recovering remaining nist/soc2 redirects."
+    },
+    {
+      "branch": "claude/crazy-khorana",
+      "disposition": "reject_breaking_rename_preserve_history",
+      "proof": "d73f33e2 removes attribution and renames public promptfoo importer and exports to generic-eval; retain current supported API. Parent audit_stash agent recovers useful example.com PII fixture hygiene."
+    },
+    {
+      "branch": "dependabot/github_actions/actions/checkout-6",
+      "disposition": "integrated_behavior",
+      "proof": "All nine changed workflow files currently use actions/checkout@v6."
+    },
+    {
+      "branch": "codex/amc-expanded-research-5000-gaps",
+      "disposition": "patch_equivalent",
+      "proof": "git cherry audited HEAD branch returns - 4fde3913."
+    }
+  ],
+  "merge_recommendation": "Snapshot development edits excluding runtime/build output, preserve those snapshots in pushed ancestry, then merge reviewed superseded histories with ours strategy retaining latest root product state. Record explicit rejection of public importer rename and deliberate obsolete-file removals. No other demonstrated behavior recovery found."
+}

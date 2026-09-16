@@ -1,0 +1,835 @@
+{
+  "audited_head": "2035b20034984aec847607879828171c93f91f03",
+  "date": "2026-09-16",
+  "scope": "Local branches not associated with registered worktrees and existing stash. Repository changes limited to two legacy compliance redirect stubs and paired safe email fixture. No git commits, merges, cherry-picks or stash mutations.",
+  "counts": {
+    "all_local_branches": 189,
+    "unassociated_branches": 112,
+    "unassociated_nonancestors": 54
+  },
+  "exact_tree_checks": [
+    {
+      "left": "5a5c537b",
+      "right": "ece9624e",
+      "equal": true
+    },
+    {
+      "left": "220887d2",
+      "right": "2b4e35ff",
+      "equal": true
+    }
+  ],
+  "branches": [
+    {
+      "branch": "agent/gap-0590",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0591",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0592",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0593",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0594",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0595",
+      "sha": "ebeaa15c74cf221d3e9f6519ea084dafce0565ba",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0596",
+      "sha": "ebeaa15c74cf221d3e9f6519ea084dafce0565ba",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0597",
+      "sha": "ebeaa15c74cf221d3e9f6519ea084dafce0565ba",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0598",
+      "sha": "ebeaa15c74cf221d3e9f6519ea084dafce0565ba",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0599",
+      "sha": "ebeaa15c74cf221d3e9f6519ea084dafce0565ba",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0600",
+      "sha": "69578b23128b93fdc859cff89b74d95928215aaf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0601",
+      "sha": "69578b23128b93fdc859cff89b74d95928215aaf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0602",
+      "sha": "69578b23128b93fdc859cff89b74d95928215aaf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0603",
+      "sha": "69578b23128b93fdc859cff89b74d95928215aaf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0604",
+      "sha": "69578b23128b93fdc859cff89b74d95928215aaf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0605",
+      "sha": "6555ffaacfd5767f3ba34729e3448a0b708f20bf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0606",
+      "sha": "6555ffaacfd5767f3ba34729e3448a0b708f20bf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0607",
+      "sha": "6555ffaacfd5767f3ba34729e3448a0b708f20bf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0608",
+      "sha": "6555ffaacfd5767f3ba34729e3448a0b708f20bf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0609",
+      "sha": "6555ffaacfd5767f3ba34729e3448a0b708f20bf",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0610",
+      "sha": "ea020c46eb55dbc2384a1b1c85e810ca8779fc8b",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0611",
+      "sha": "ea020c46eb55dbc2384a1b1c85e810ca8779fc8b",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0612",
+      "sha": "ea020c46eb55dbc2384a1b1c85e810ca8779fc8b",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0613",
+      "sha": "ea020c46eb55dbc2384a1b1c85e810ca8779fc8b",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0614",
+      "sha": "ea020c46eb55dbc2384a1b1c85e810ca8779fc8b",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0615",
+      "sha": "c6cbb2066034f7a9881009e40ff14178f4c4181c",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0616",
+      "sha": "c6cbb2066034f7a9881009e40ff14178f4c4181c",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0617",
+      "sha": "c6cbb2066034f7a9881009e40ff14178f4c4181c",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0618",
+      "sha": "c6cbb2066034f7a9881009e40ff14178f4c4181c",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0619",
+      "sha": "c6cbb2066034f7a9881009e40ff14178f4c4181c",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0620",
+      "sha": "99840d35c7f80c21ffe700719aa3560564fc9a3e",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0621",
+      "sha": "99840d35c7f80c21ffe700719aa3560564fc9a3e",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0622",
+      "sha": "99840d35c7f80c21ffe700719aa3560564fc9a3e",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0623",
+      "sha": "99840d35c7f80c21ffe700719aa3560564fc9a3e",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0624",
+      "sha": "99840d35c7f80c21ffe700719aa3560564fc9a3e",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0625",
+      "sha": "1b6b52efa14e7979cb47028d485796ebbb5ccd38",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0626",
+      "sha": "1b6b52efa14e7979cb47028d485796ebbb5ccd38",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0627",
+      "sha": "1b6b52efa14e7979cb47028d485796ebbb5ccd38",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0628",
+      "sha": "1b6b52efa14e7979cb47028d485796ebbb5ccd38",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0629",
+      "sha": "1b6b52efa14e7979cb47028d485796ebbb5ccd38",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0630",
+      "sha": "1a0f2a02f36a33919a5a29abd607ae9ef4af040d",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0631",
+      "sha": "1a0f2a02f36a33919a5a29abd607ae9ef4af040d",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0632",
+      "sha": "1a0f2a02f36a33919a5a29abd607ae9ef4af040d",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0633",
+      "sha": "1a0f2a02f36a33919a5a29abd607ae9ef4af040d",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "agent/gap-0634",
+      "sha": "1a0f2a02f36a33919a5a29abd607ae9ef4af040d",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "claude/crazy-khorana",
+      "sha": "d73f33e24a68d3dc259b7053a2ab05db093860b4",
+      "merged_at_audit": false,
+      "disposition": "fixture_hygiene_recovered_unsafe_public_api_rename_excluded",
+      "reason": "Recovered paired example.com PII fixture hygiene in pack and test. Deliberately preserve current public promptfoo format and parsePromptfooEvalResults API and research attribution instead of legacy rename/removal proposal."
+    },
+    {
+      "branch": "claude/dazzling-brattain",
+      "sha": "d2ff20d7910a4bcd507050f8b9979874bccc00c6",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "claude/distracted-bardeen",
+      "sha": "d2ff20d7910a4bcd507050f8b9979874bccc00c6",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "claude/dreamy-heisenberg",
+      "sha": "1eb41863d8feb97c8b6c9a2f642ef66245075613",
+      "merged_at_audit": false,
+      "disposition": "useful_intent_recovered",
+      "reason": "Three deleted paths already were safe Moved redirects. Replaced remaining docs/compliance/compliance-nist.md and compliance-soc2.md generated duplicates with matching redirects to canonical reports. Preserve all five compatibility paths."
+    },
+    {
+      "branch": "claude/eager-boyd",
+      "sha": "33c4105ad8507a3e4f915946bc190773af834157",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Current typedoc.json, package docs:api and build:pages already provide evolved API generation and deployment; preserve current TypeDoc 0.28.20 and Node 22/pnpm workflow."
+    },
+    {
+      "branch": "claude/focused-visvesvaraya",
+      "sha": "25432a75e519968f6f322f206e466fee94b2546b",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "claude/happy-mcclintock",
+      "sha": "d2ff20d7910a4bcd507050f8b9979874bccc00c6",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "claude/intelligent-franklin",
+      "sha": "d2ff20d7910a4bcd507050f8b9979874bccc00c6",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "cleanup/amc-source-review-2026-06-20",
+      "sha": "d4af1e4bf73ff686ff214988c9d24ef250b6bb8a",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "codex/amc-expanded-research-5000-gaps",
+      "sha": "4fde3913c6bc4325b7f6aa8bb46be3bd88cc20af",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "git cherry HEAD reports exact patch-equivalent commit; landed via 35f5658b."
+    },
+    {
+      "branch": "codex/amc-install-persona-readiness",
+      "sha": "220887d285978f34042a25cf04a52b88857c1656",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Tip 220887d2 tree is identical to landed lifecycle squash 2b4e35ff."
+    },
+    {
+      "branch": "codex/reconcile-stale-worktrees",
+      "sha": "f419839a8dd9f703e8fb93bc8ffa66faaefdc051",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "dependabot/github_actions/actions/checkout-6",
+      "sha": "b2dbeb5f0fc20d97e2ca49ff8af9f2f47066d8b7",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "All nine touched workflow paths currently use actions/checkout@v6. Preserve subsequent workflow changes."
+    },
+    {
+      "branch": "feature/amc-1189-open-model-rag-question-explainability",
+      "sha": "6425c0e2baeb028a5c75cdf5662db27c6d728371",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "feature/amc-1190-gbqa-metric-validity-relevance",
+      "sha": "5a5c537b48bfe20bfc9e8f7c6a3b50cc26c83f75",
+      "merged_at_audit": false,
+      "disposition": "history_reconciliation_safe_preserve_current_source",
+      "reason": "Contained by feature/amc-1190 tip 5a5c537b; its tree is identical to landed squash ece9624e."
+    },
+    {
+      "branch": "fix/amc-47-cleanup-compliance-files",
+      "sha": "d2ff20d7910a4bcd507050f8b9979874bccc00c6",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "main",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_0b845f07-2cd-1",
+      "sha": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_0b845f07-2cd-2",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_0b845f07-2cd-3",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_0b845f07-2cd-4",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_0b845f07-2cd-5",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_3cc93fba-030-1",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_410a5044-c06-2",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_410a5044-c06-3",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_410a5044-c06-9",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-10",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-11",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-12",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-13",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-14",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-17",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-18",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-19",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-2",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-3",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-4",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-7",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-8",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_75d332bf-2ec-9",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_7e729cdc-322-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_80ecc1f0-12d-1",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_80ecc1f0-12d-3",
+      "sha": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_80ecc1f0-12d-4",
+      "sha": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_80ecc1f0-12d-6",
+      "sha": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_80ecc1f0-12d-7",
+      "sha": "43f61d5eaabccc5652e1021e439cefbed6901eae",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-10",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-2",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-5",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-6",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-7",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_870dd21b-f1e-8",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_8d677915-7b1-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_b4936e2d-bcd-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c2ee8227-abd-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-1",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-10",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-3",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-5",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-6",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-7",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-8",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_c8a6e5b1-57d-9",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_ce6263c9-c1b-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_e71e93d9-c37-1",
+      "sha": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    },
+    {
+      "branch": "worktree-wf_ed766c21-961-1",
+      "sha": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+      "merged_at_audit": true,
+      "disposition": "already_merged",
+      "reason": "Already ancestor of audited HEAD."
+    }
+  ],
+  "stash": {
+    "ref": "stash@{0}",
+    "sha": "152a61696f336f658893a72aa9357d58df8c5679",
+    "base": "77c855a1d6393e8fbabc188c8fe063e28387441f",
+    "files": [
+      ".amc/blobs/index.jsonl",
+      ".amc/blobs/index.jsonl.sig",
+      ".amc/dashboard/data.json",
+      ".amc/dashboard/evidenceIndex.json",
+      ".amc/dashboard/styles.css",
+      "compliance-eu_ai_act.json",
+      "compliance-eu_ai_act.md"
+    ],
+    "disposition": "Preserve locally; do not apply, publish or make merge parent. Obsolete runtime evidence and generated snapshots, with styling intent preserved in source templates.",
+    "observations": [
+      "Five .amc paths are now untracked and ignored runtime output.",
+      "Root EU AI Act markdown was deliberately removed by 08dc22bf. JSON was refreshed in b1c99d5e and reflects August evidence; stash contains March evidence.",
+      "Green accent colors and Space Mono changes in stashed dashboard stylesheet are present in src/dashboard/templates/styles.css.",
+      "Bounded secret-pattern scan of seven stash files found no private-key markers, GitHub tokens, OpenAI-style keys, AWS access keys or Google API keys. This is not exhaustive proof of absence of sensitive runtime data.",
+      "No untracked stash parent and no source/test changes."
+    ]
+  },
+  "verification": {
+    "targeted_test": "npx vitest run tests/assurance/piiDetectionLeakage.test.ts",
+    "result": "16 passed, 1 test file passed",
+    "redirect_targets_exist": true
+  }
+}
