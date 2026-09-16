@@ -4,7 +4,7 @@ import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
 import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
-import { processConfinementReason, processIsConfined } from "../sandbox/processConfinement.js";
+import { measureProcessConfinement, processConfinementReason, processIsConfined, type ConfinementMeasurement } from "../sandbox/processConfinement.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
@@ -102,8 +102,15 @@ export interface ToolsetReadiness {
    * Not the same question as {@link sandboxBackendAvailable}, and conflating
    * them is what let model-written code run unconfined on every Mac while the
    * system reported itself sandboxed.
+   *
+   * Derived from {@link confinement} by `processIsConfined`: true for the
+   * measured verdict "confined" and for nothing else. An "unknown" measurement
+   * is false here, so every consumer of this flag fails closed without having
+   * to know the tri-state exists.
    */
   readonly confined: boolean;
+  /** The measurement {@link confined} was derived from: verdict, the probe write, and why. */
+  readonly confinement: ConfinementMeasurement;
   /** Whether this MACHINE has a sandbox backend at all. Reported to the operator. */
   readonly sandboxBackendAvailable: boolean;
   readonly sandboxReason: string | null;
@@ -153,14 +160,21 @@ export function checkToolsetReadiness(workspace: string, options: {
 
   const sandbox = new SandboxRunner();
   const backend = sandbox.select();
+  // Measured once, here, and both `confined` and its reason derive from the
+  // same measurement so they cannot disagree. Code Mode reads the derived flag.
+  const confinement = measureProcessConfinement();
+  const confinementReason = processConfinementReason(confinement);
   return {
     ready: blockers.length === 0,
     blockers,
-    confined: processIsConfined(),
+    confined: processIsConfined(confinement),
+    confinement,
     sandboxBackendAvailable: backend !== null,
+    // The process measurement leads; the machine's missing backends are the
+    // second, different fact an operator can act on.
     sandboxReason: backend === null
-      ? sandbox.unavailableReasons().join("; ")
-      : processConfinementReason(),
+      ? `${confinementReason}; no sandbox backend on this machine: ${sandbox.unavailableReasons().join("; ")}`
+      : confinementReason,
     writeScope
   };
 }
