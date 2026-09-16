@@ -68,6 +68,11 @@ export function verifyLeaseRevocationsSignature(workspace: string): {
 } {
   const paths = leaseRevocationPaths(workspace);
   if (!pathExists(paths.file)) {
+    // A signature without its list means the list was deleted after signing. Treat
+    // that as tampering: an absent list must never read as "nothing is revoked".
+    if (pathExists(paths.sig)) {
+      return { valid: false, signatureExists: true, reason: "revocation list missing but signature present" };
+    }
     return { valid: true, signatureExists: false, reason: null };
   }
   if (!pathExists(paths.sig)) {
@@ -115,10 +120,29 @@ export function revokeLease(workspace: string, leaseId: string, reason: string):
   return next;
 }
 
+/**
+ * Raised when the revocation list cannot be verified. Callers MUST refuse the
+ * request rather than proceeding: an unverifiable list is not an empty one.
+ *
+ * This throws rather than returning null/empty on purpose. `verifyLeaseToken`
+ * takes `revokedLeaseIds?` and checks it with `?.has(...)`, so any absent value
+ * silently reads as "nothing is revoked" and admits every revoked lease. A
+ * thrown error cannot be collapsed into that fail-open shape by accident.
+ */
+export class LeaseRevocationUnverifiableError extends Error {
+  readonly reason: string;
+
+  constructor(reason: string) {
+    super(`lease revocation list is unverifiable: ${reason}`);
+    this.name = "LeaseRevocationUnverifiableError";
+    this.reason = reason;
+  }
+}
+
 export function revokedLeaseIdSet(workspace: string): Set<string> {
   const verify = verifyLeaseRevocationsSignature(workspace);
   if (!verify.valid) {
-    return new Set<string>();
+    throw new LeaseRevocationUnverifiableError(verify.reason ?? "unknown");
   }
   const revocations = loadLeaseRevocations(workspace);
   return new Set(revocations.revocations.map((row) => row.leaseId));

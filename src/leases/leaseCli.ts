@@ -1,6 +1,12 @@
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
-import { loadLeaseRevocations, revokeLease, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
+import {
+  LeaseRevocationUnverifiableError,
+  revokeLease,
+  revokedLeaseIdSet,
+  signLeaseRevocations,
+  verifyLeaseRevocationsSignature
+} from "./leaseStore.js";
 import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
@@ -65,10 +71,19 @@ export function verifyLeaseForCli(params: {
   workspace: string;
   token: string;
 }): { ok: boolean; payload: unknown; error?: string } {
+  let revokedLeaseIds: Set<string>;
+  try {
+    revokedLeaseIds = revokedLeaseIdSet(params.workspace);
+  } catch (error) {
+    if (error instanceof LeaseRevocationUnverifiableError) {
+      return { ok: false, payload: null, error: error.message };
+    }
+    throw error;
+  }
   const verify = verifyLeaseToken({
     workspace: params.workspace,
     token: params.token,
-    revokedLeaseIds: new Set(loadLeaseRevocations(params.workspace).revocations.map((row) => row.leaseId))
+    revokedLeaseIds
   });
   return {
     ok: verify.ok,
