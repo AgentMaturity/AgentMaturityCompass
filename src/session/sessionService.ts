@@ -22,9 +22,10 @@ import { assertNativeAudioBytes, snapshotNativeAudio, NATIVE_AUDIO_INPUT_FORMAT 
 import { snapshotRecordedGeminiPart } from "./geminiPartMeta.js";
 import type { LoopEventRecord } from "./loopEventMeta.js";
 import { SessionSpillPolicy } from "./spill/spillPolicy.js";
-import { assertSessionPayloadWithinCap } from "./sessionPayloadCap.js";
+import { attachmentPayloadRoute } from "./sessionPayloadCap.js";
+import { SPILL_COMMITMENT_EVENT_TYPE, SPILL_SUBJECT_META_KEY } from "./spill/spillInput.js";
 import { SessionSpillStore } from "./spill/spillStore.js";
-import { SPILL_META_KEY, type SpillPolicyConfig } from "./spill/spillTypes.js";
+import { SPILL_META_KEY, type SpillPolicyConfig, type SpillRef } from "./spill/spillTypes.js";
 import type {
   ApprovalRecord,
   AssistantBlockInput,
@@ -492,8 +493,9 @@ export class SessionService extends SessionEventWriter {
           || !Number.isSafeInteger(params.sourceContentIndex) || params.sourceContentIndex! < 0)) {
       throw new Error("Ordered image provenance requires its source inbox, format and nonnegative content index.");
     }
-    // Original bytes become one signed row; refuse an oversize attachment before it is recorded, naming the fix.
-    assertSessionPayloadWithinCap(this.workspace, `Attachment ${JSON.stringify(params.filename)}`, bytes.byteLength);
+    // Above the per-event cap, validated image/text bytes spill (./spill/spillInput.ts): commitment row first, then the object.
+    const what = `Attachment ${JSON.stringify(params.filename)}`;
+    const route = attachmentPayloadRoute(this.workspace, what, params.kind, bytes.byteLength);
     if (params.kind === "image") {
       assertNativeImageBytes(bytes, params.mimeType);
       snapshotNativeImages([{ filename: params.filename, bytes, mediaType: params.mimeType }]);
@@ -506,10 +508,11 @@ export class SessionService extends SessionEventWriter {
       assertNativeAudioBytes(bytes, params.mimeType);
       snapshotNativeAudio({ filename: params.filename, bytes, mediaType: params.mimeType });
     }
+    const retained = route.spill ? this.retainOversizeAttachment(what, params.filename, bytes, route.cap, turn, step) : null;
     return this.recordContent({
       eventType: "user/attachment",
-      content: bytes,
-      // Names BOTH: the digest makes the slot content-addressed, the filename
+      content: retained === null ? bytes : retained.descriptor,
+      // Names BOTH: the digest of the ORIGINAL bytes makes the slot content-addressed, the filename
       // keeps it legible to a person reading the log.
       slot: `attachment:${params.filename}:${sha256Hex(bytes).slice(0, 12)}`,
       role: "user",
@@ -521,11 +524,17 @@ export class SessionService extends SessionEventWriter {
         mimeType: params.mimeType,
         bytes: bytes.byteLength,
         ...(params.sourceInputEventId === undefined ? {} : { sourceInputEventId: params.sourceInputEventId, sourceInputIndex: params.sourceInputIndex }),
-        ...(params.sourceInputFormat === undefined ? {} : { sourceInputFormat: params.sourceInputFormat, sourceContentIndex: params.sourceContentIndex })
+        ...(params.sourceInputFormat === undefined ? {} : { sourceInputFormat: params.sourceInputFormat, sourceContentIndex: params.sourceContentIndex }),
+        ...(retained === null ? {} : { [SPILL_META_KEY]: retained.ref })
       }),
       turn,
       step
     });
+  }
+
+  private retainOversizeAttachment(what: string, filename: string, bytes: Buffer, cap: number, turn: number | null, step: number | null): { readonly ref: SpillRef; readonly descriptor: Buffer } {
+    return this.requireSpill().retainInput({ nameSeed: filename, content: bytes }, { what, cap }, (ref) => void this.appendSessionEvent({ eventType: SPILL_COMMITMENT_EVENT_TYPE,
+      surface: { op: "none" }, turn, step, typeMeta: { turn, step, [SPILL_SUBJECT_META_KEY]: "user/attachment", filename, [SPILL_META_KEY]: ref } }));
   }
 
   recordToolCall(call: ToolCallInput): SessionEventRef {
