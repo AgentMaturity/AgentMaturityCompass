@@ -34,6 +34,16 @@ export interface SurfaceEntry {
   // SurfacePartRef is unchanged, and the ConversationHistory view below does not
   // expose it, so no consumer of the projection sees a different value.
   readonly sourceEventId: string;
+  // Which row CREATED this position — the event whose `append` put it here.
+  // Unlike `sourceEventId` this never moves: a replace swaps the bytes and the
+  // provenance, and leaves the origin alone. That immutability is the whole
+  // point. It is what `replace_at`/`retract_at` address, so a position stays
+  // reachable however many times it has already been compacted, and it is what
+  // lets an OLD turn's user message be targeted at all — the recurring "user"
+  // slot names every user message ever appended and so identifies none of them.
+  // Fold STATE only, like `sourceEventId`: the signed SurfacePartRef and the
+  // ConversationHistory view are both unchanged.
+  readonly originEventId: string;
 }
 
 // The fold state: the ordered live entries. Exported because it is the state
@@ -100,8 +110,11 @@ export const surfaceProjection: ProjectionUnit<SurfaceProjectionState, Conversat
     // different role-grouping rule, a change to which rows contribute. Cached
     // state from an older version is discarded, never migrated. Bumped to 2 when
     // SurfaceEntry gained `sourceEventId`: a v1 cached state has no such field,
-    // and reading one back would hand derivation `undefined` provenance.
-    stateVersion: 2,
+    // and reading one back would hand derivation `undefined` provenance. Bumped
+    // to 3 when it gained `originEventId` and the fold learned `replace_at` /
+    // `retract_at`: a v2 cached state has no origins, so an origin-addressed op
+    // resumed on top of one would find no target and silently no-op.
+    stateVersion: 3,
     init: (): SurfaceProjectionState => [],
     apply: applySurfaceEvent,
     view: groupByRole
@@ -124,11 +137,27 @@ function applySurfaceOp(
       // replace/retract targeting — never whether an append collapses into a
       // prior one. That is what keeps a multi-turn conversation from folding all
       // its user messages onto a single slot.
-      return [...entries, { slot: op.slot, role: op.role, part: op.part, sourceEventId }];
+      //
+      // The flip side is that a recurring slot NAMES every one of its entries
+      // and so identifies none of them: `replace`/`retract` resolve to the most
+      // recent, which leaves every older turn unaddressable. `originEventId`
+      // below is the identity that does distinguish them, and `replace_at` /
+      // `retract_at` are how a caller uses it.
+      //
+      // A new position's origin is the row that opened it; at append time the
+      // two provenance fields agree, and only a later replace separates them.
+      return [
+        ...entries,
+        { slot: op.slot, role: op.role, part: op.part, sourceEventId, originEventId: sourceEventId }
+      ];
     case "replace":
       return replaceLastSlot(entries, op.slot, op.part, sourceEventId);
     case "retract":
       return retractLastSlot(entries, op.slot);
+    case "replace_at":
+      return replaceAtOrigin(entries, op.origin, op.part, sourceEventId);
+    case "retract_at":
+      return retractAtOrigin(entries, op.origin);
   }
 }
 
@@ -148,9 +177,56 @@ function replaceLastSlot(
   }
   // Provenance moves with the part: after a replace, the row that supplied the
   // new bytes is the row a reader must consult for that entry's meta.
-  return entries.map((entry, index) =>
-    index === targetIndex ? { slot: entry.slot, role: entry.role, part, sourceEventId } : entry
-  );
+  return entries.map((entry, index) => (index === targetIndex ? replaced(entry, part, sourceEventId) : entry));
+}
+
+// Swap the part of the entry that event `origin` appended, keeping its position,
+// role and origin. Absent origin is a no-op for the same reason replaceLastSlot
+// is: the projection stays total over any well-formed op sequence, and an entry
+// a prior retract removed is genuinely no longer on the surface to swap.
+function replaceAtOrigin(
+  entries: SurfaceProjectionState,
+  origin: string,
+  part: SurfacePartRef,
+  sourceEventId: string
+): SurfaceProjectionState {
+  const targetIndex = indexOfOrigin(entries, origin);
+  if (targetIndex === -1) {
+    return entries;
+  }
+  return entries.map((entry, index) => (index === targetIndex ? replaced(entry, part, sourceEventId) : entry));
+}
+
+// Remove the entry that event `origin` appended. Absent origin is a no-op,
+// mirroring retractLastSlot — and making a repeated retract idempotent rather
+// than an error, which is what a pruner re-run over the same history needs.
+function retractAtOrigin(entries: SurfaceProjectionState, origin: string): SurfaceProjectionState {
+  const targetIndex = indexOfOrigin(entries, origin);
+  if (targetIndex === -1) {
+    return entries;
+  }
+  return entries.filter((_, index) => index !== targetIndex);
+}
+
+// One entry with new bytes. Slot, role and ORIGIN are carried over; only the
+// part and its provenance move, because a replace changes what this position
+// holds and which row supplied it, never which row opened it.
+function replaced(entry: SurfaceEntry, part: SurfacePartRef, sourceEventId: string): SurfaceEntry {
+  return {
+    slot: entry.slot,
+    role: entry.role,
+    part,
+    sourceEventId,
+    originEventId: entry.originEventId
+  };
+}
+
+// Index of the one entry appended by event `origin`, or -1. At most one entry
+// can match: an origin is an event id, and one event appends at most one part,
+// so this scans forward and stops — there is no "last occurrence" question to
+// answer the way there is for a recurring slot name.
+function indexOfOrigin(entries: SurfaceProjectionState, origin: string): number {
+  return entries.findIndex((entry) => entry.originEventId === origin);
 }
 
 // Remove the most recently appended live entry for `slot`. Retract on an absent

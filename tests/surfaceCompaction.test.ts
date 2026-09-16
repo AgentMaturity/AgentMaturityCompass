@@ -8,6 +8,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { verifySessionChains } from "../src/ledger/sessionVerification.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { ANTHROPIC_MESSAGES_ENCODER_ID, prepareRequest } from "../src/llm/index.js";
 
 /**
  * Compaction shrinks what the model sees, never what the log says (plan P6.3).
@@ -221,6 +222,48 @@ describe("compaction refuses what it cannot do honestly", () => {
       replacedBytes: 4,
       reason: "pressure"
     })).toThrow(/smaller|larger/i);
+    session.close({ reason: "completed" });
+  });
+});
+
+describe("a compacted tool result is still the result of the call it answered", () => {
+  it("keeps its call id and its success", () => {
+    // Request derivation reads a tool_result part's identity from the ROW that
+    // supplied it -- `toolCallId` for the pairing, and `is_error` from the row's
+    // recorded `outcome`. A compaction BECOMES that row, so a compaction row
+    // that recorded neither would hand the model a result it cannot pair and,
+    // because a missing outcome is not "OK", would report a tool that succeeded
+    // as having failed.
+    const dir = workspace();
+    const session = openSession(dir);
+    const systemPrompt = session.recordSystemPrompt("You are a careful assistant.");
+    turnWithToolResult(session, "call-1", "x".repeat(4_000));
+    session.sealTurn();
+
+    session.compactToolResult({
+      toolCallId: "call-1", replacement: "[compacted]", replacedBytes: 4_000, reason: "pressure"
+    });
+
+    session.startTurn({ trigger: "user" });
+    session.startStep();
+    const prepared = prepareRequest(session, {
+      model: "claude-opus-4-8",
+      providerId: "anthropic",
+      encoderId: ANTHROPIC_MESSAGES_ENCODER_ID,
+      encoderVersion: 1,
+      params: { max_tokens: 1024, temperature: 0 },
+      systemPromptEventId: systemPrompt.eventId,
+      tools: []
+    });
+    const body = JSON.parse(prepared.toBytes().toString("utf8")) as {
+      messages: { content: { type: string; tool_use_id?: string; is_error?: boolean }[] }[];
+    };
+    const toolResult = body.messages
+      .flatMap((message) => message.content)
+      .find((part) => part.type === "tool_result");
+
+    expect(toolResult?.tool_use_id, "still paired with its call").toBe("call-1");
+    expect(toolResult?.is_error, "and the tool still succeeded").toBe(false);
     session.close({ reason: "completed" });
   });
 });

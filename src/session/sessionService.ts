@@ -4,6 +4,13 @@ import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore, SessionStoreAppendInput } from "../persistence/sessionEventStore.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
+import {
+  assertShrinks,
+  carriedIdentity,
+  describeLiveEntries,
+  requireLiveEntry
+} from "./surfaceCompaction.js";
+import type { LiveSurfaceEntry } from "./surfaceCompaction.js";
 import { createSessionProjections, type SessionProjections } from "./projection/sessionProjections.js";
 import {
   embedEnvelope,
@@ -559,50 +566,45 @@ export class SessionService {
    * `SurfacePartRef.sha256` equals the row's `payload_sha256` by construction,
    * so text that existed only in the projection could not be pointed at.
    */
-  compactToolResult(params: {
-    readonly toolCallId: string;
+  // The live surface, as a pruner sees it: one descriptor per entry the model
+  // would currently be sent, each carrying the `originEventId` that addresses
+  // it. A pruner cannot choose what to compact without this — the projection
+  // returns rendered messages, and slot names cannot tell two turns apart.
+  liveSurfaceEntries(): readonly LiveSurfaceEntry[] {
+    this.ensureUsable();
+    return describeLiveEntries(this.readEvents());
+  }
+
+  /**
+   * Replace one surface entry's content with something shorter.
+   *
+   * Addressed by ORIGIN — the id of the event whose append created the position
+   * — because that is the only identity that reaches an old turn. Conversation
+   * slots recur ("user" names every user message), so the slot-addressed
+   * `replace` that {@link compactToolResult} was built on can only reach the most
+   * recent turn, and history is exactly the part that is not recent.
+   *
+   * Append-only, like everything else here: this writes a NEW row whose surface
+   * op happens to change an older entry. The row that carried the original text
+   * is untouched and still in the chain, so an auditor replaying the log sees
+   * everything that was ever said and the model does not.
+   */
+  compactSurfaceEntry(params: {
+    readonly originEventId: string;
     readonly replacement: string;
     /**
-     * How many bytes the caller measured for what it is replacing.
-     *
-     * Declared rather than read here, because session payloads are blob-backed:
-     * `payload_inline` is null even for a two-byte row, so a size check against
-     * it could never fire. A check that cannot fire is worse than no check, and
-     * the pruner deciding WHAT to compact has already measured this.
+     * How many bytes the caller measured for what it is replacing. Declared
+     * rather than read here — see {@link assertShrinks} for why a size check
+     * against a blob-backed row could never fire.
      */
     readonly replacedBytes: number;
     readonly reason: string;
   }): SessionEventRef {
     this.ensureUsable();
-    const slot = `tool_result:${params.toolCallId}`;
-
-    // `replace` on a slot the projection does not hold is a silent no-op, so
-    // without this a caller would be told a compaction happened while the model
-    // saw no change. Read from this session's own rows rather than the
-    // projection handle, which exposes the rendered conversation and not the
-    // slots replace targets.
     const rows = this.readEvents();
-    const current = [...rows]
-      .reverse()
-      .find((row) =>
-        (row.event_type === "tool/result" || row.event_type === "loop/compact")
-        && metaToolCallId(row) === params.toolCallId);
-    if (current === undefined) {
-      throw new Error(
-        `cannot compact ${params.toolCallId}: no tool result for it is on this session's surface`
-      );
-    }
-
+    const entry = requireLiveEntry(rows, params.originEventId);
     const replacement = Buffer.from(params.replacement, "utf8");
-    if (replacement.byteLength >= params.replacedBytes) {
-      // Compaction that grows the surface is not compaction, and allowing it
-      // would spend a signed row and a slice of the context window making things
-      // worse.
-      throw new Error(
-        `refusing to compact ${params.toolCallId}: the replacement is ${replacement.byteLength} bytes, `
-        + `not smaller than the ${params.replacedBytes} it would replace`
-      );
-    }
+    assertShrinks(params.originEventId, replacement, params.replacedBytes);
 
     const payloadSha256 = sha256Hex(replacement);
     const turn = this.currentTurn;
@@ -612,15 +614,80 @@ export class SessionService {
       typeMeta: {
         turn,
         step,
-        toolCallId: params.toolCallId,
+        origin: params.originEventId,
         reason: params.reason,
         replacedBytes: params.replacedBytes,
-        replacementBytes: replacement.byteLength
+        replacementBytes: replacement.byteLength,
+        // Whatever request derivation needs to keep resolving this entry — a
+        // tool result's call id and outcome, a tool call's name. This row is
+        // about to BECOME the entry's source row, so the identity has to travel.
+        ...carriedIdentity(rows.find((row) => row.id === params.originEventId))
       },
-      surface: { op: "replace", slot, part: { kind: "tool_result", sha256: payloadSha256 } },
+      // The kind is carried over, never chosen: a tool_result that became a text
+      // part would leave the model with a tool_use no result ever answered.
+      surface: { op: "replace_at", origin: params.originEventId, part: { kind: entry.part.kind, sha256: payloadSha256 } },
       turn,
       step,
       payload: replacement
+    });
+  }
+
+  /**
+   * Drop one surface entry outright.
+   *
+   * The other half of compaction. Some content cannot be usefully summarised —
+   * a superseded directory listing, a stale plan — and replacing it with
+   * "[dropped]" still spends tokens on a message that says nothing. Retraction
+   * is still an APPEND: the row stays in the log, it just stops being projected.
+   *
+   * Pairing is the caller's problem, not this method's. Dropping a `tool_use`
+   * while its `tool_result` is still live leaves the model an answer to a
+   * question it was never asked, which providers reject — a pruner that drops
+   * one must drop the other.
+   */
+  dropSurfaceEntry(params: { readonly originEventId: string; readonly reason: string }): SessionEventRef {
+    this.ensureUsable();
+    requireLiveEntry(this.readEvents(), params.originEventId);
+    const turn = this.currentTurn;
+    const step = this.currentStep;
+    return this.appendSessionEvent({
+      eventType: "loop/compact",
+      typeMeta: { turn, step, origin: params.originEventId, reason: params.reason },
+      surface: { op: "retract_at", origin: params.originEventId, reason: params.reason },
+      turn,
+      step
+    });
+  }
+
+  /**
+   * Compact a tool result, addressed by the call it answers.
+   *
+   * A thin convenience over {@link compactSurfaceEntry}: `tool_result:<callId>`
+   * is unique, so a caller holding a call id can be spared resolving it to an
+   * origin. It delegates rather than duplicating, so tool results and
+   * conversation history compact through exactly one implementation — and the
+   * identity carry-forward that keeps a compacted result from reading back as a
+   * FAILURE applies to both.
+   */
+  compactToolResult(params: {
+    readonly toolCallId: string;
+    readonly replacement: string;
+    readonly replacedBytes: number;
+    readonly reason: string;
+  }): SessionEventRef {
+    this.ensureUsable();
+    const slot = `tool_result:${params.toolCallId}`;
+    const entry = describeLiveEntries(this.readEvents()).find((candidate) => candidate.slot === slot);
+    if (entry === undefined) {
+      throw new Error(
+        `cannot compact ${params.toolCallId}: no tool result for it is on this session's surface`
+      );
+    }
+    return this.compactSurfaceEntry({
+      originEventId: entry.originEventId,
+      replacement: params.replacement,
+      replacedBytes: params.replacedBytes,
+      reason: params.reason
     });
   }
 

@@ -65,15 +65,31 @@ export interface SurfacePartRef {
   readonly sha256: string;
 }
 
-// How a session event mutates the derived conversation surface. Slots are named
-// buckets; append adds a part to a role's slot, replace swaps a slot's part,
-// retract removes it, and none leaves the surface untouched (control events and
-// redaction-shadow events).
+// How a session event mutates the derived conversation surface.
+//
+// Two addressing modes, because a surface position has two useful identities.
+//
+//   - By SLOT (`replace` / `retract`). Slots are named buckets, and conversation
+//     slots RECUR: every user message is slot "user", and `assistant:0` is the
+//     first block of every response. Slot addressing resolves to the most recent
+//     occurrence, which is what redaction wants -- it replaces a slot its own
+//     append just created, in the same turn.
+//
+//   - By ORIGIN (`replace_at` / `retract_at`). `origin` is the id of the event
+//     whose `append` created the position. Event ids are unique and an entry's
+//     origin never changes, so this addresses ONE entry for the life of the
+//     session -- including an old turn's user message, which slot addressing
+//     cannot reach at all once a later turn appends its own. Compaction needs
+//     exactly that: its whole job is shrinking history that is no longer recent.
+//
+// `none` leaves the surface untouched (control events and redaction shadows).
 export type SurfaceOp =
   | { readonly op: "none" }
   | { readonly op: "append"; readonly slot: string; readonly role: SurfaceRole; readonly part: SurfacePartRef }
   | { readonly op: "replace"; readonly slot: string; readonly part: SurfacePartRef }
-  | { readonly op: "retract"; readonly slot: string; readonly reason: string };
+  | { readonly op: "retract"; readonly slot: string; readonly reason: string }
+  | { readonly op: "replace_at"; readonly origin: string; readonly part: SurfacePartRef }
+  | { readonly op: "retract_at"; readonly origin: string; readonly reason: string };
 
 // The envelope embedded in meta_json on every session event. The Session
 // service is the single writer for its own session, so it holds the per-session
@@ -232,6 +248,10 @@ function isSurfaceOp(value: unknown): value is SurfaceOp {
       return typeof candidate.slot === "string" && isSurfacePartRef(candidate.part);
     case "retract":
       return typeof candidate.slot === "string" && typeof candidate.reason === "string";
+    case "replace_at":
+      return typeof candidate.origin === "string" && isSurfacePartRef(candidate.part);
+    case "retract_at":
+      return typeof candidate.origin === "string" && typeof candidate.reason === "string";
     default:
       return false;
   }
