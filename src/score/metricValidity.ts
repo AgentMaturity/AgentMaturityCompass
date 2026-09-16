@@ -137,6 +137,29 @@ export function lmEvaluationHarnessMetricValidityRequirements(): string[] {
   return [...LM_EVALUATION_HARNESS_METRIC_VALIDITY_REQUIREMENTS];
 }
 
+export const OPENAI_SIMPLE_EVALS_METRIC_VALIDITY_SOURCE_REF = "github:openai/simple-evals";
+
+export const OPENAI_SIMPLE_EVALS_METRIC_VALIDITY_REQUIREMENTS = [
+  "live GitHub metadata relevance review",
+  "AMC-owned eval-pack manifest",
+  "validation table artifact",
+  "evaluator-suite proof using existing primitives",
+  "trace-evaluation proof when traces or Watch are claimed",
+  "fail-closed threshold policy",
+  "Score/Shield/Watch surface mapping",
+  "metric owner",
+  "sample size",
+  "confidence interval",
+  "signed evidence refs",
+  "artifact hashes",
+  "row hashes",
+  "no-copy/source-review boundary proof"
+] as const;
+
+export function openaiSimpleEvalsMetricValidityRequirements(): string[] {
+  return [...OPENAI_SIMPLE_EVALS_METRIC_VALIDITY_REQUIREMENTS];
+}
+
 export const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_SOURCE_REF = "doi:10.1039/d5sc09229a; openalex:W7131071926";
 
 export const DIGITAL_MATERIALS_ECOSYSTEM_METRIC_VALIDITY_REQUIREMENTS = [
