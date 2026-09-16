@@ -139,6 +139,18 @@ export {
   type TensorZeroProviderDriftWatchSurface,
 } from './tensorZeroProviderDrift.js';
 export {
+  HELM_PROVIDER_DRIFT_SOURCE_REFS,
+  runHelmProviderDrift,
+  type HelmProviderDriftMetadata,
+  type HelmProviderDriftProof,
+  type HelmProviderDriftResult,
+  type HelmProviderDriftScoreSurface,
+  type HelmProviderDriftShieldSurface,
+  type HelmProviderDriftSide,
+  type HelmProviderDriftWatchSurface,
+  type RunHelmProviderDriftInput,
+} from './helmProviderDrift.js';
+export {
   LMNR_OBSERVABILITY_METADATA,
   runLmnrObservabilityLiveDrift,
   type LmnrObservabilityDriftStatistic,
