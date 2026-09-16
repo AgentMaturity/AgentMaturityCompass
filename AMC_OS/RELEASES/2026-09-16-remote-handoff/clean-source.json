@@ -1,0 +1,16 @@
+{
+  "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:clean-source",
+  "cwd": "/Users/sid/AgentMaturityCompass",
+  "commit": "5ffdd596c484dcc8bb9d852fc8301aacfaddb1c9",
+  "node": "v22.22.0",
+  "pnpm": "10.33.0",
+  "platform": "Darwin",
+  "machine": "arm64",
+  "startedAt": "2026-09-16T01:09:03.556157+00:00",
+  "log": "/tmp/amc-handoff-clean-source.log",
+  "status": "passed",
+  "exitCode": 0,
+  "elapsedSeconds": 133.509,
+  "finishedAt": "2026-09-16T01:11:17.068842+00:00",
+  "rootHeadAfter": "5ffdd596c484dcc8bb9d852fc8301aacfaddb1c9"
+}

@@ -31,4 +31,13 @@ A fresh clone should not need this Mac's worktree directories, absolute symlinks
 
 ## Verification
 
-Validation and final remote synchronization are in progress. The completed receipt will be added before final delivery. Current Python results: platform 1,609 passed; SDK 311 passed and one optional native fixture lane skipped. These outcomes do not qualify real-provider operation, deployed health, all native platforms, or publication.
+Source checked: `5ffdd596c484dcc8bb9d852fc8301aacfaddb1c9`. Subsequent handoff changes contain records only.
+
+- Fresh-clone portability: all 15 checks passed on Node 22.22.0 / pnpm 10.33.0, including locked installation, build, keyless native execution, signed evidence and cross-process continuation.
+- Release checks: 13 passed. Full suite had 14,102 passing tests and one throughput benchmark at 142 events/second versus a 150 floor while another clone built in parallel. The unchanged benchmark passed both tests when rerun alone; thresholds were not weakened. Original failed receipt is retained as `release-gate-first-run.json`.
+- Both TypeScript typechecks, build, packed installation, install-persona QA, architecture/docs checks, CLI smoke, policy fixtures and prepack checks passed. Runtime dependency audit found no known vulnerabilities. Generated counts/question-bank/API reference and native-task OpenAPI checks passed.
+- Python platform: 1,609 passed. Python SDK: 311 passed, one optional native-fixture lane skipped.
+- Full coverage run was stopped at the user's explicit two-minute push deadline. Coverage thresholds are not verified by this handoff. Rerun `npm run test:coverage -- --maxWorkers=4` when time permits.
+- Deployed health was not configured and remains unverified. This handoff does not qualify real providers, the full native platform matrix, or public release readiness.
+
+All 191 current local branch tips and all 82 registered worktree heads were included in the consolidated ancestry. The remote handoff publishes both `main` and `amc/gap-register-execution`; final GitHub SHA verification is performed after pushing. See `validation-summary.json` and the adjacent receipts for exact scope and retained failures.

@@ -1,0 +1,316 @@
+{
+  "v": 1,
+  "generatedTs": 1789521171927,
+  "status": "PASS",
+  "summary": {
+    "scannedTargets": 5,
+    "findings": 34,
+    "highFindings": 0
+  },
+  "targets": [
+    {
+      "target": "/Users/sid/AgentMaturityCompass/dist",
+      "status": "PASS",
+      "findings": 26,
+      "kind": "repo"
+    },
+    {
+      "target": "/Users/sid/AgentMaturityCompass/docs",
+      "status": "PASS",
+      "findings": 8,
+      "kind": "repo"
+    },
+    {
+      "target": "/Users/sid/AgentMaturityCompass/deploy/helm",
+      "status": "PASS",
+      "findings": 0,
+      "kind": "repo"
+    },
+    {
+      "target": "/Users/sid/AgentMaturityCompass/scripts",
+      "status": "PASS",
+      "findings": 0,
+      "kind": "repo"
+    },
+    {
+      "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-plugin-scan-Hx6PUO",
+      "status": "PASS",
+      "findings": 0,
+      "kind": "plugin_fixture"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "adapters/builtins/claudeCli.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "adapters/builtins/genericCli.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "cli-agent-options.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "cli-business-commands.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "cli.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "config/amcConfigCli.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.d.ts",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.d.ts",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***Key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "eval/llmApiIntegration.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "gateway/config.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "gateway/server.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "providers/providerTemplates.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "setup/nativeFirstUseGuide.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "setup/quickSetup.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "shield/redaction/secretPatterns.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "shield/validators/index.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ant***key",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "studio/connectWizard.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "studio/nativeTaskService.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "tools/builtin/bashTool.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "utils/providerKeys.d.ts",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "utils/providerKeys.js",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/dist"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "adapters/claude-code.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "adapters/claude-code.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "NATIVE_ACP_IMAGE_INPUT.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "NATIVE_ACP_IMAGE_INPUT.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "NATIVE_AGENT_WORKFLOW.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "NATIVE_STUDIO_TASKS.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "source-reviews/GAP-0929-brv-bench-public-methodology.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "ANTHROPIC_TOKEN_HINT",
+      "path": "ZERO_KEYS.md",
+      "pattern": "\\b(?:anthropic|claude)[-_]?(?:api)?[_-]?key\\b",
+      "snippetRedacted": "ANT***KEY",
+      "target": "/Users/sid/AgentMaturityCompass/docs"
+    }
+  ]
+}

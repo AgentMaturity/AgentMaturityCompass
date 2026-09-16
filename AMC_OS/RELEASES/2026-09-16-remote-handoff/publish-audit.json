@@ -1,0 +1,779 @@
+{
+  "head": "5ffdd596c484dcc8bb9d852fc8301aacfaddb1c9",
+  "origin_main": "3d6b8d4a0c010c9fcd6e0abd410cb4635a218268",
+  "commits": 782,
+  "scanned_blobs": 6766,
+  "scanned_bytes": 286443710,
+  "oversized_blobs": [],
+  "largest_blob": {
+    "oid": "5d807791bb2989c84c2fd83aa3ca2a071697c1a3",
+    "bytes": 5639421,
+    "path": "AMC_OS/RESEARCH/2026-09-14-fleet-sequential/fresh-clone/candidate-d/full-suite.log"
+  },
+  "findings": [
+    {
+      "path": ".agents/notes/0026-p53-one-redaction-table.md",
+      "type": "PRIVATE_KEY_MARKER",
+      "instances": 10,
+      "lines": [
+        56,
+        57,
+        58,
+        59,
+        60
+      ],
+      "classification": "redaction documentation markers without key payload"
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "type": "BASIC_AUTH_URI",
+      "instances": 5,
+      "lines": [
+        130,
+        235,
+        266
+      ],
+      "classification": "workflow/documentation credential-variable URL template"
+    },
+    {
+      "path": "docs/PUBLISHING.md",
+      "type": "BASIC_AUTH_URI",
+      "instances": 2,
+      "lines": [
+        195,
+        200
+      ],
+      "classification": "workflow/documentation credential-variable URL template"
+    },
+    {
+      "path": "tests/adapterDetectionEnvFence.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        74,
+        79,
+        84,
+        89
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/amc1470ControlSimulation.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 20,
+      "lines": [
+        148,
+        149,
+        155,
+        159,
+        192,
+        193,
+        199,
+        203,
+        402,
+        403,
+        409,
+        413,
+        433,
+        434,
+        440,
+        444
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/amc1479PolicyFixturesCi.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 21,
+      "lines": [
+        70,
+        71,
+        294,
+        295,
+        308,
+        309,
+        317,
+        318,
+        382,
+        383,
+        432,
+        433,
+        442,
+        443
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/assuranceLab.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        108
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/bashTool.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        119
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/claudeCliProvider.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        107,
+        111
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/codeMode.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        255,
+        257
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/compassCanonCgxTruthguard.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        327,
+        328
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/core/settings.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        71,
+        75,
+        77,
+        80
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/cosBatch1ProviderIntegration.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        101
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/cosBatch1ProviderIntegration.test.ts",
+      "type": "BASIC_AUTH_URI",
+      "instances": 1,
+      "lines": [
+        90
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/credentialsSeamNegative.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        112
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/credentialsStoreSecrecy.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        29,
+        32
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/enforce-full.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 6,
+      "lines": [
+        100,
+        168,
+        242
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/execOutputCollector.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        77
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/execProcessTree.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        183,
+        212
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/gatewayCredentialIsolation.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 3,
+      "lines": [
+        22,
+        56,
+        61
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/helpers/agentLoopHarness.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        44,
+        45
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/llmRuntimeDispatch.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 9,
+      "lines": [
+        55,
+        56,
+        57,
+        416,
+        418,
+        419,
+        421,
+        423,
+        424
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/monitorSessionId.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        115,
+        125
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/monitorSubstrateFold.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        116
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/monitorVersionProbe.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        44,
+        45
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/nativeProviderCacheReport.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        135,
+        143
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/neutralImporter.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 14,
+      "lines": [
+        43,
+        44,
+        45,
+        46,
+        48,
+        50,
+        161,
+        163,
+        173,
+        175,
+        191,
+        221,
+        280,
+        310
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/piSessionImport.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        190,
+        195,
+        203,
+        208
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/piSessionImportBoundaries.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 15,
+      "lines": [
+        59,
+        60,
+        85,
+        88,
+        93,
+        96,
+        101,
+        104
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/providerNeutralHookIngress.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 6,
+      "lines": [
+        69,
+        234,
+        238
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/reasoningMemory.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 4,
+      "lines": [
+        235,
+        241
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/scanPatternFindings.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        30,
+        37
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "PRIVATE_KEY_MARKER",
+      "instances": 16,
+      "lines": [
+        20,
+        39,
+        78,
+        79,
+        80,
+        81,
+        82,
+        178,
+        179,
+        180,
+        181,
+        192,
+        193,
+        194,
+        195,
+        196
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "GITHUB_TOKEN",
+      "instances": 4,
+      "lines": [
+        24,
+        25,
+        33,
+        34
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 3,
+      "lines": [
+        26,
+        35,
+        161
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "GOOGLE_API_KEY",
+      "instances": 1,
+      "lines": [
+        18
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "XAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        19
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "AWS_ACCESS_KEY",
+      "instances": 6,
+      "lines": [
+        23,
+        31,
+        121,
+        127,
+        150,
+        161
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "SLACK_TOKEN",
+      "instances": 1,
+      "lines": [
+        36
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "JWT_TOKEN",
+      "instances": 2,
+      "lines": [
+        27,
+        38
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretRedaction.test.ts",
+      "type": "DATABASE_CREDENTIAL_URI",
+      "instances": 1,
+      "lines": [
+        40
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/secretScanPathReporting.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 1,
+      "lines": [
+        19
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/shieldValidatorsCoverage.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        47,
+        167
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/traceFailureIndex.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 6,
+      "lines": [
+        44,
+        144,
+        177
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/vibeCodeAudit.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 3,
+      "lines": [
+        63,
+        101,
+        129
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    },
+    {
+      "path": "tests/zeroKeyLeaseBudgetDriftBom.test.ts",
+      "type": "OPENAI_STYLE_KEY",
+      "instances": 2,
+      "lines": [
+        325,
+        682
+      ],
+      "classification": "intentional test/redaction/negative-input fixture"
+    }
+  ],
+  "archive_snapshots": [
+    {
+      "commit": "baf8021c82b5ed4a42571c4afba6758b5b671d2a",
+      "subject": "chore(archive): preserve wf_e71e93d9-c37-1 worktree source",
+      "changed_paths": 8,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "092820d95996c36805c1ad9cd2c8bc51bff63918",
+      "subject": "chore(archive): preserve wf_a2e7e6c6-6fc-1 worktree source",
+      "changed_paths": 3,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "caf14584750877e2468800e71365c236000543b1",
+      "subject": "chore(archive): preserve wf_e54e6c35-3e3-1 worktree source",
+      "changed_paths": 9,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "14f62e6a74c66a71a646cd54a1c6dddf971cee38",
+      "subject": "chore(archive): preserve wf_80ecc1f0-12d-5 worktree source",
+      "changed_paths": 1,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "2c4ad98b7892f715585d828089d0df0cefd4853a",
+      "subject": "chore(archive): preserve wf_8777d01c-fc6-1 worktree source",
+      "changed_paths": 14,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "828df0dc6a7d652b2db0e6ba7035dd32c76e81f4",
+      "subject": "chore(archive): preserve sweet-merkle-71246c worktree source",
+      "changed_paths": 17,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "952ce02eb7245c968f1c87815851ac71da2a8ba4",
+      "subject": "chore(archive): preserve vigilant-merkle-2d8549 worktree source",
+      "changed_paths": 8,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "7ffcb14e6431b26baf253e9482af8b34658e3d9d",
+      "subject": "chore(archive): preserve wf_3cc93fba-030-1 worktree source",
+      "changed_paths": 3,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "2ff425e8e39602cd19e2a84210c61f1be2c3afe3",
+      "subject": "chore(archive): preserve wf_453236ab-c47-1 worktree source",
+      "changed_paths": 4,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "b95dc64ab5565df694d5dde8c81655e1b129c2a9",
+      "subject": "chore(archive): preserve admiring-gates-a751a8 worktree source",
+      "changed_paths": 25,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "ed98e4335d56c519600e07767e9cd04a2e36ee2c",
+      "subject": "chore(archive): preserve interesting-haslett-d9efa9 worktree source",
+      "changed_paths": 14,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "0b43bb5e9622db4d4154616a9411db5858d4d2fe",
+      "subject": "chore(archive): preserve stoic-faraday-20e4ee worktree source",
+      "changed_paths": 4,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "dc839606c8f70c0206d61d22a6a91e6211e054a8",
+      "subject": "chore(archive): preserve gap-0638 worktree source",
+      "changed_paths": 12,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "d05356313a2f9120aeeba64134fbc7b205c55766",
+      "subject": "chore(archive): preserve gap-0639 worktree source",
+      "changed_paths": 9,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "17f595e252db6001031d016770bb345ac5fc179b",
+      "subject": "chore(archive): preserve gap-0661 worktree source",
+      "changed_paths": 3,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "15b5c0263beba6910fb78a222c5180e932b63fe0",
+      "subject": "chore(archive): preserve gap-0662 worktree source",
+      "changed_paths": 3,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "987f0de7a2ac87f64dbef61b7e5380b0a9ed974c",
+      "subject": "chore(archive): preserve hermes-knowledge-refresh-20260713 worktree source",
+      "changed_paths": 1,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "3157fe22b01ec9e09563870afe08dabed86de51b",
+      "subject": "chore(archive): preserve domain-proof-lane worktree source",
+      "changed_paths": 33,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "ef23ca72a27f907d37eaee72e190f933510f15dd",
+      "subject": "chore(archive): preserve gap-0635 worktree source",
+      "changed_paths": 8,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "827e5d25ec00d0f9f0618b9f556e5ec8d78673f4",
+      "subject": "chore(archive): preserve gap-0636 worktree source",
+      "changed_paths": 10,
+      "runtime_or_dependency_paths": []
+    },
+    {
+      "commit": "beec6117aaf0169d7d17922c649fbb9f00828b3e",
+      "subject": "chore(archive): preserve gap-0637 worktree source",
+      "changed_paths": 4,
+      "runtime_or_dependency_paths": []
+    }
+  ],
+  "runtime_or_dependency_new_blob_paths": [
+    "--/.amc/action-policy.yaml.sig",
+    "--/.amc/adapters.yaml.sig",
+    "--/.amc/budgets.yaml.sig",
+    "--/.amc/evidence.sqlite",
+    "--/.amc/evidence.sqlite-shm",
+    "--/.amc/keys/auditor_ed25519.pub",
+    "--/.amc/keys/auditor_history.json",
+    "--/.amc/keys/lease_ed25519.pub",
+    "--/.amc/keys/lease_history.json",
+    "--/.amc/keys/monitor_ed25519.pub",
+    "--/.amc/keys/monitor_history.json",
+    "--/.amc/keys/session_ed25519.pub",
+    "--/.amc/keys/session_history.json",
+    "--/.amc/targets/default.target.json",
+    "--/.amc/tools.yaml",
+    "--/.amc/tools.yaml.sig",
+    "--/.amc/trust.yaml.sig",
+    "--/.amc/vault.amcvault",
+    "--/.amc/vault.amcvault.meta.json",
+    ".amc/agents/pr-22/context-graph.json",
+    ".amc/amc.config.yaml",
+    ".amc/release-gate/latest.json",
+    ".amc/standard/meta.json",
+    ".amc/standard/schemas/amcaudit.schema.json",
+    ".amc/standard/schemas/amcbench.schema.json",
+    ".amc/standard/schemas/amccert.schema.json",
+    ".amc/standard/schemas/amcpass.schema.json",
+    ".amc/standard/schemas/amcprompt.schema.json",
+    ".amc/standard/schemas/amcproof.schema.json",
+    ".amc/standard/schemas/registry.bench.schema.json",
+    ".amc/standard/schemas/registry.passport.schema.json",
+    ".amc/transparency/log.jsonl",
+    ".amc/transparency/log.seal.json"
+  ],
+  "suspicious_filename_paths": [
+    "deploy/compose/.env.example"
+  ],
+  "finding_summary": {
+    "instances": 207,
+    "by_type": {
+      "PRIVATE_KEY_MARKER": 26,
+      "BASIC_AUTH_URI": 8,
+      "OPENAI_STYLE_KEY": 157,
+      "GITHUB_TOKEN": 4,
+      "GOOGLE_API_KEY": 1,
+      "XAI_STYLE_KEY": 1,
+      "AWS_ACCESS_KEY": 6,
+      "SLACK_TOKEN": 1,
+      "JWT_TOKEN": 2,
+      "DATABASE_CREDENTIAL_URI": 1
+    },
+    "path_type_groups": 46,
+    "apparent_plaintext_credentials": 0,
+    "actual_private_key_payload_blocks": 0
+  },
+  "status": "PASS_WITH_HISTORICAL_ENCRYPTED_VAULT_CAVEAT",
+  "scope_note": "Scanned every newly reachable raw blob from origin/main..audited HEAD, including archived snapshot ancestry. No decryptions or build/test runs. Regex screening is heuristic; encrypted payload contents were not inspected.",
+  "historical_scratch_workspace": {
+    "introduced_commit": "521f21e794f412e4182431aa940352db2397805e",
+    "removed_commit": "7cfcb767ec8aa7c8e214d79912df0895d9fa0eb2",
+    "both_reachable_from_original_head": "2035b20034984aec847607879828171c93f91f03",
+    "introduced_by_current_reconciliation": false,
+    "tracked_at_current_head": false,
+    "encrypted_vault": {
+      "path": "--/.amc/vault.amcvault",
+      "bytes": 1164,
+      "kdf": "PBKDF2-SHA256",
+      "cipher": "AES-256-GCM",
+      "decrypted": false,
+      "metadata": "created-at and monitor/auditor/lease/session role key fingerprints only"
+    },
+    "evidence_sqlite": {
+      "path": "--/.amc/evidence.sqlite",
+      "bytes": 270336,
+      "session_count": 1,
+      "event_count": 2,
+      "event_type": "stdout",
+      "runtime": "generic",
+      "payload_lengths": [
+        5,
+        11
+      ],
+      "runs": 0,
+      "assurance_runs": 0,
+      "claims": 0,
+      "bridge_request_usage": 0,
+      "inspection": "Only schema/count/shape metadata queried using a temporary in-memory header copy to avoid missing historical WAL sidecars. No credential values extracted."
+    },
+    "provenance": "Added alongside a workspace trust-root adversarial proof. Existing repository readiness audit records accidental scratch workspace and unresolved history purge consideration. This supports test/scratch provenance but does not establish decrypted vault contents.",
+    "existing_audit": "AMC_OS/RESEARCH/2026-09-12-release-readiness/README.md:62",
+    "recommendation": "Preserve explicit disclosure of pre-existing encrypted vault in unpushed historical commits; no apparent plaintext/live operator credential was found. Any decision to rewrite this prior history is separate from source snapshot cleanup."
+  },
+  "archive_summary": {
+    "snapshots_checked": 21,
+    "snapshots_with_amc_or_node_modules_additions": 0,
+    "node_modules_blob_paths": 0
+  },
+  "suspicious_filename_classification": {
+    "deploy/compose/.env.example": "example template; no credential-pattern findings"
+  }
+}

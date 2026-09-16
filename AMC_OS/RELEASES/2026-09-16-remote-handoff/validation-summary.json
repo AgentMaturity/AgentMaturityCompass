@@ -1,0 +1,38 @@
+{
+  "sourceCommit": "5ffdd596c484dcc8bb9d852fc8301aacfaddb1c9",
+  "status": "source checks completed; coverage stopped at user deadline",
+  "releaseGate": {
+    "passed": 13,
+    "failed": 1,
+    "skipped": 1,
+    "failure": "Throughput benchmark 142 events/second vs 150 floor while concurrent fresh-clone build ran",
+    "resolution": "Unchanged performance suite rerun alone: 2 tests passed",
+    "skippedCheck": "live-deploy-health"
+  },
+  "fullSuite": {
+    "passed": 14102,
+    "failed": 1,
+    "total": 14103,
+    "skipped": 0
+  },
+  "coverage": {
+    "status": "interrupted at explicit user request to push within two minutes",
+    "completedPassingCaseMarkers": 4415,
+    "failureMarkersObserved": 0,
+    "thresholdsVerified": false
+  },
+  "python": {
+    "platformPassed": 1609,
+    "sdkPassed": 311,
+    "sdkSkipped": 1
+  },
+  "cleanSource": "passed 15 checks at sourceCommit",
+  "policyFixtures": "passed 3 cases",
+  "runtimeDependencyAudit": "No known vulnerabilities found",
+  "prepack": "passed",
+  "securityScan": {
+    "highFindings": 0
+  },
+  "unmergedBranchesAfterIntegration": 0,
+  "all82WorktreeHeadsInAncestry": true
+}
