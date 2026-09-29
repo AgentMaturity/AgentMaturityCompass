@@ -11,7 +11,7 @@
 
 ## Option A: Verified GitHub Release Install
 
-The published npm package and GitHub release are **1.1.1**. The current repository is **1.2.0 source**; use [Option B](#option-b-from-github-development) for its native agent workflow and to continue development on another device. Public 1.1.1 installation does not provide the current `agent-loop guide` or chat workflow. See [publication evidence](../website/publication-status.json).
+The published npm package and GitHub release are **1.1.1**. The current repository is **1.2.0 source**; use [Option B](#option-b-from-github-development) for its native agent workflow and to continue development on another device. Public 1.1.1 installation does not provide the current `agent-loop guide` or chat workflow. See [publication evidence](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/website/publication-status.json).
 
 macOS or Linux:
 
@@ -108,7 +108,7 @@ cp secrets/amc_owner_username.txt.example secrets/amc_owner_username.txt
 cp secrets/amc_owner_password.txt.example secrets/amc_owner_password.txt
 ```
 
-Replace all three template values with your own vault passphrase, owner username and owner password before starting. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](../docker/README.md#studio-with-persistent-state). Then run:
+Replace all three template values with your own vault passphrase, owner username and owner password before starting. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docker/README.md#studio-with-persistent-state). Then run:
 
 ```bash
 docker compose up -d --build
@@ -118,7 +118,7 @@ Studio available at `http://localhost:3212`. Gateway at `http://localhost:3210`.
 
 For TLS termination (production):
 
-Configure `AMC_TLS_HOST` and the additional notary secret files using the [Compose prerequisites and TLS instructions](../deploy/compose/README.md) before starting this stack.
+Configure `AMC_TLS_HOST` and the additional notary secret files using the [Compose prerequisites and TLS instructions](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/deploy/compose/README.md) before starting this stack.
 
 ```bash
 docker compose -f docker-compose.tls.yml up -d --build

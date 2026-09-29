@@ -37,7 +37,7 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-The hosted installer pins the published 1.1.1 GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. npm also publishes 1.1.1; the Homebrew tap is not publicly available. See [publication evidence](../website/publication-status.json).
+The hosted installer pins the published 1.1.1 GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. npm also publishes 1.1.1; the Homebrew tap is not publicly available. See [publication evidence](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/website/publication-status.json).
 
 ## Your First Full Score (2 minutes)
 
