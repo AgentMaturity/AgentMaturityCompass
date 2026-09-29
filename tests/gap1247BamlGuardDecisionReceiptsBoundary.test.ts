@@ -1,6 +1,7 @@
+import { closeSqlitePool } from "../src/storage/sqlitePool.js";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
@@ -41,13 +42,14 @@ const hash = (value: unknown): string => sha256Hex(canonicalize(value));
 beforeEach(() => {
   closeGuardDb();
   tempDir = mkdtempSync(join(tmpdir(), "amc-gap-1247-"));
-  process.env.AMC_GUARD_EVENTS_DB_PATH = join(tempDir, "guard_events.sqlite");
+  process.env.AMC_GUARD_EVENTS_DB_PATH = join(tempDir, ".amc", "guard_events.sqlite");
   process.env.AMC_GUARD_RECEIPTS_WORKSPACE = tempDir;
 });
 
 afterEach(() => {
   closeGuardDb();
   if (tempDir) {
+    closeSqlitePool(`ledger:${resolve(tempDir)}:${join(tempDir, ".amc", "evidence.sqlite")}`);
     rmSync(tempDir, { recursive: true, force: true });
     tempDir = null;
   }

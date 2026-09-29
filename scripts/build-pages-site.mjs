@@ -13,6 +13,7 @@ import {
 } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { verifyPublishedInstallerVersion } from "./lib/published-installer-version.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repositoryRoot = resolve(dirname(scriptPath), "..");
@@ -208,6 +209,8 @@ function sourceRevision() {
 }
 
 export async function buildPagesSite({ output = defaultOutput, explicit = false } = {}) {
+  // A source version bump must not deploy installer URLs for unpublished assets.
+  verifyPublishedInstallerVersion(repositoryRoot);
   const resolvedOutput = resolve(output);
   prepareOutput(resolvedOutput, explicit);
   copyWebsite(resolvedOutput);

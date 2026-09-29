@@ -1,9 +1,10 @@
+import { closeSqlitePool } from "../src/storage/sqlitePool.js";
 import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
 import { emitGuardEvent, readGuardEvents, closeGuardDb } from '../src/enforce/evidenceEmitter.js';
 import { collectEvidenceFromLedger } from '../src/score/evidenceCollector.js';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 const previousGuardDbPath = process.env.AMC_GUARD_EVENTS_DB_PATH;
 let tempDir: string | null = null;
@@ -11,12 +12,13 @@ let tempDir: string | null = null;
 beforeEach(() => {
   closeGuardDb();
   tempDir = mkdtempSync(join(tmpdir(), 'amc-guard-events-'));
-  process.env.AMC_GUARD_EVENTS_DB_PATH = join(tempDir, 'guard_events.sqlite');
+  process.env.AMC_GUARD_EVENTS_DB_PATH = join(tempDir, '.amc', 'guard_events.sqlite');
 });
 
 afterEach(() => {
   closeGuardDb();
   if (tempDir) {
+    closeSqlitePool(`ledger:${resolve(tempDir)}:${join(tempDir, ".amc", "evidence.sqlite")}`);
     try { rmSync(tempDir, { recursive: true, force: true }); } catch (_) { /* ok */ }
     tempDir = null;
   }

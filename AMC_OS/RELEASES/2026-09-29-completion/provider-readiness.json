@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-09-29T08:48:39.141563+00:00",
+  "status": "not_configured",
+  "credentialReferenceInspection": "amc credentials list --json returned an empty credentials array; values were not requested",
+  "providerEnvironmentPresence": {
+    "OPENAI_API_KEY": false,
+    "ANTHROPIC_API_KEY": false,
+    "GOOGLE_API_KEY": false,
+    "GEMINI_API_KEY": false,
+    "OPENROUTER_API_KEY": false
+  },
+  "realProviderAcceptance": "not_run",
+  "missingInputs": [
+    "provider and model route",
+    "credential or reachable local model endpoint"
+  ],
+  "scope": "Default AMC credential layers and named environment references only; other applications and stores were not searched."
+}

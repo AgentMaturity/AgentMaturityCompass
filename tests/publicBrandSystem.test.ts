@@ -137,9 +137,11 @@ describe("AMC public brand system", () => {
     expect(docsIndex.slice(0, 1600)).toContain('src="https://agentmaturity.co/og-card.png"');
   });
 
-  test("keeps unavailable package channels out of public navigation", () => {
+  test("keeps the older registry release separate from current-source navigation", () => {
     const channel = JSON.parse(read("website/install-channel.json"));
-    expect(channel.channels.npm.status).toBe("unavailable");
+    const publication = JSON.parse(read("website/publication-status.json"));
+    expect(channel.channels.npm.status).toBe("available");
+    expect(channel.channels.npm.version).toBe(publication.channels.npm.version);
     expect(channel.channels.homebrew.status).toBe("unavailable");
 
     const homepage = read("website/index.html");

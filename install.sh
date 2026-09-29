@@ -2,7 +2,8 @@
 # Agent Maturity Compass verified release installer for macOS and Linux.
 set -eu
 
-PINNED_AMC_RELEASE_VERSION="1.2.0"
+# Matches the published GitHub release in install-channel.json, not package.json.
+PINNED_AMC_RELEASE_VERSION="1.1.1"
 REQUESTED_AMC_RELEASE_VERSION=${AMC_RELEASE_VERSION:-}
 REQUESTED_AMC_RELEASE_BASE_URL=${AMC_RELEASE_BASE_URL:-}
 AMC_RELEASE_VERSION="$PINNED_AMC_RELEASE_VERSION"
@@ -76,12 +77,12 @@ package_root="amc-${AMC_RELEASE_VERSION}-${platform}"
 tmp_dir=$(mktemp -d "${TMPDIR:-/tmp}/amc-install.XXXXXX")
 trap 'rm -rf "$tmp_dir"' 0 HUP INT TERM
 
-download "${AMC_RELEASE_BASE_URL}/SHA256SUMS" "$tmp_dir/SHA256SUMS"
-download "${AMC_RELEASE_BASE_URL}/${archive_name}" "$tmp_dir/${archive_name}"
+download "${AMC_RELEASE_BASE_URL}/SHA256SUMS" "$tmp_dir/SHA256SUMS" || fail "published release ${AMC_RELEASE_VERSION} checksum manifest is unavailable at ${AMC_RELEASE_BASE_URL}/SHA256SUMS; no installation attempted"
 
 expected=$(awk -v asset="$archive_name" '$2 == asset { print $1 }' "$tmp_dir/SHA256SUMS")
 [ -n "$expected" ] || fail "SHA256SUMS does not contain ${archive_name}"
 printf '%s' "$expected" | grep -Eq '^[0-9a-fA-F]{64}$' || fail "invalid SHA-256 entry for ${archive_name}"
+download "${AMC_RELEASE_BASE_URL}/${archive_name}" "$tmp_dir/${archive_name}" || fail "published release archive ${archive_name} is unavailable; no installation attempted"
 actual=$(sha256_file "$tmp_dir/${archive_name}")
 [ "$actual" = "$expected" ] || fail "checksum mismatch for ${archive_name}"
 

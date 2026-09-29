@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "startedAt": "2026-09-29T08:46:23.853Z",
+  "release": "1.1.1",
+  "runtime": "v22.22.0",
+  "sourceWrapper": "/Users/sid/AgentMaturityCompass/website/install.sh",
+  "sourceWrapperSha256": "3151f42b013ec890b5c2625951ded63c73d6fa157fb350b8dd3eb385f5e07b07",
+  "archive": {
+    "releaseUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1",
+    "archiveSha256": "d7c7a7e5f3ed98d1dd243fad89c8e212fee67aad8ed0b6a7d1faddbc9cfb9e94",
+    "expectedSha256": "d7c7a7e5f3ed98d1dd243fad89c8e212fee67aad8ed0b6a7d1faddbc9cfb9e94",
+    "githubAssetDigestVerified": true,
+    "checksumVerified": true,
+    "archiveMembers": 16,
+    "inspectedAt": "2026-09-29T08:44:17.939011+00:00",
+    "archiveBytes": 4677324,
+    "symlinks": []
+  },
+  "environment": {
+    "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "HOME": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home",
+    "USERPROFILE": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home",
+    "TMPDIR": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/tmp",
+    "TMP": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/tmp",
+    "TEMP": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/tmp",
+    "XDG_CONFIG_HOME": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home",
+    "XDG_CACHE_HOME": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/npm-cache",
+    "AMC_INSTALL_PREFIX": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/prefix",
+    "AMC_HOME": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home/.amc",
+    "AMC_WORKSPACE_DIR": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/work",
+    "npm_config_prefix": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/prefix",
+    "npm_config_cache": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/npm-cache",
+    "npm_config_userconfig": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home/.npmrc",
+    "npm_config_globalconfig": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/home/global.npmrc",
+    "CI": "1",
+    "NO_COLOR": "1"
+  },
+  "commands": [
+    {
+      "label": "01-install",
+      "exe": "/bin/sh",
+      "args": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/corrected-install.sh"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 1229
+    },
+    {
+      "label": "02-version",
+      "exe": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/prefix/bin/amc",
+      "args": [
+        "--version"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 1777
+    },
+    {
+      "label": "03-help",
+      "exe": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/prefix/bin/amc",
+      "args": [
+        "--help"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 1779
+    }
+  ],
+  "limits": [
+    "Qualifies the published1.1.1 hosted installer only; no native1.2.0 workflow parity claim.",
+    "Uses the corrected repository wrapper in production mode against real published GitHub assets; the deployed wrapper remains a separate deployment check."
+  ],
+  "installedExecutable": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-hosted-installer-20260929-k3gdk148/prefix/lib/node_modules/agent-maturity-compass/dist/cli.js",
+  "version": "1.1.1",
+  "endedAt": "2026-09-29T08:49:03.267Z"
+}

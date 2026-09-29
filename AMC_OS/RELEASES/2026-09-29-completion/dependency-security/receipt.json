@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-29T08:37:00.681Z",
+  "baselineSourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+  "runtime": {
+    "node": "v22.22.0",
+    "npm": "10.9.4",
+    "pnpm": "10.33.0"
+  },
+  "openAlertsBefore": 10,
+  "alerts": [
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-rpw4-54j3-4h4q",
+      "manifest": "qa/package-lock.json",
+      "number": 80,
+      "package": "ip-address",
+      "patched": "10.5.1",
+      "range": "<= 10.5.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/80"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-rpw4-54j3-4h4q",
+      "manifest": "pnpm-lock.yaml",
+      "number": 79,
+      "package": "ip-address",
+      "patched": "10.5.1",
+      "range": "<= 10.5.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/79"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-2vr4-cq9g-pvrc",
+      "manifest": "pnpm-lock.yaml",
+      "number": 78,
+      "package": "ip-address",
+      "patched": "10.5.1",
+      "range": ">= 10.2.0, <= 10.5.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/78"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-2vr4-cq9g-pvrc",
+      "manifest": "qa/package-lock.json",
+      "number": 77,
+      "package": "ip-address",
+      "patched": "10.5.1",
+      "range": ">= 10.2.0, <= 10.5.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/77"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-4mjr-xmp4-gh2g",
+      "manifest": "qa/package-lock.json",
+      "number": 68,
+      "package": "qs",
+      "patched": "6.16.0",
+      "range": ">= 2.2.5, < 6.16.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/68"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-x5fp-wj9c-mxmx",
+      "manifest": "qa/package-lock.json",
+      "number": 64,
+      "package": "qs",
+      "patched": "6.16.0",
+      "range": ">= 6.14.2, <= 6.15.3",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/64"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-mwp4-54f8-5fhr",
+      "manifest": "qa/package-lock.json",
+      "number": 51,
+      "package": "ip-address",
+      "patched": "10.3.1",
+      "range": "<= 10.3.0",
+      "scope": "runtime",
+      "severity": "high",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/51"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-4xrf-jv44-h6hh",
+      "manifest": "qa/package-lock.json",
+      "number": 48,
+      "package": "ip-address",
+      "patched": "10.2.2",
+      "range": ">= 10.1.1, <= 10.2.1",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/48"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-22jq-vg5j-6vgg",
+      "manifest": "qa/package-lock.json",
+      "number": 46,
+      "package": "ip-address",
+      "patched": "10.2.1",
+      "range": ">= 10.1.1, <= 10.2.0",
+      "scope": "runtime",
+      "severity": "medium",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/46"
+    },
+    {
+      "ecosystem": "npm",
+      "ghsa": "GHSA-v422-hmwv-36x6",
+      "manifest": "qa/package-lock.json",
+      "number": 38,
+      "package": "body-parser",
+      "patched": "2.3.0",
+      "range": ">= 2.0.0, < 2.3.0",
+      "scope": "runtime",
+      "severity": "low",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/security/dependabot/38"
+    }
+  ],
+  "patches": [
+    {
+      "manifest": "pnpm-lock.yaml",
+      "package": "ip-address",
+      "from": "10.5.0",
+      "to": "10.5.1"
+    },
+    {
+      "manifest": "qa/package-lock.json",
+      "package": "ip-address",
+      "from": "10.2.0",
+      "to": "10.5.1"
+    },
+    {
+      "manifest": "qa/package-lock.json",
+      "package": "qs",
+      "from": "6.15.2",
+      "to": "6.16.0"
+    },
+    {
+      "manifest": "qa/package-lock.json",
+      "package": "body-parser",
+      "from": "2.2.2",
+      "to": "2.3.0"
+    }
+  ],
+  "qaTransitiveVersionDelta": [
+    {
+      "path": "node_modules/body-parser",
+      "before": "2.2.2",
+      "after": "2.3.0"
+    },
+    {
+      "path": "node_modules/ip-address",
+      "before": "10.2.0",
+      "after": "10.5.1"
+    },
+    {
+      "path": "node_modules/qs",
+      "before": "6.15.2",
+      "after": "6.16.0"
+    },
+    {
+      "path": "node_modules/side-channel",
+      "before": "1.1.0",
+      "after": "1.1.1"
+    },
+    {
+      "path": "node_modules/side-channel-list",
+      "before": "1.0.0",
+      "after": "1.0.1"
+    },
+    {
+      "path": "node_modules/type-is",
+      "before": "2.0.1",
+      "after": "2.1.0"
+    },
+    {
+      "path": "node_modules/body-parser/node_modules/content-type",
+      "before": null,
+      "after": "2.1.0"
+    },
+    {
+      "path": "node_modules/type-is/node_modules/content-type",
+      "before": null,
+      "after": "2.1.0"
+    }
+  ],
+  "reachability": [
+    {
+      "package": "ip-address",
+      "fact": "Root runtime graph: @modelcontextprotocol/sdk -> express-rate-limit -> ip-address. QA directly uses express-rate-limit, which invokes IPv6 subnet-key methods rather than affected address classifiers.",
+      "sourcePaths": [
+        "src/mcp/amcMcpServer.ts",
+        "src/mcp/nativeMcpClient.ts",
+        "src/mcp/nativeMcpHttpTransport.ts",
+        "qa/src/index.ts",
+        "node_modules/express-rate-limit/dist/index.mjs",
+        "qa/node_modules/express-rate-limit/dist/index.mjs"
+      ],
+      "conclusion": "No affected classifier used by inspected application callsites; patch vulnerable runtime dependency anyway."
+    },
+    {
+      "package": "qs",
+      "fact": "QA Express has its default simple query parser and no application qs.stringify or comma:true parsing calls.",
+      "sourcePaths": [
+        "qa/src/index.ts",
+        "qa/node_modules/express/lib/application.js"
+      ],
+      "conclusion": "No advisory-specific parse/stringify or comma-array path demonstrated; patch vulnerable runtime dependency anyway."
+    },
+    {
+      "package": "body-parser",
+      "fact": "QA JSON parser uses fixed valid limit 1mb.",
+      "sourcePaths": [
+        "qa/src/index.ts:22"
+      ],
+      "conclusion": "Invalid limit precondition absent in current configuration; patch vulnerable runtime dependency anyway."
+    }
+  ],
+  "scope": "All reported alerts are npm/runtime; no open Python or development-only alerts were returned. QA is outside the pnpm workspace and root runtime audit.",
+  "lockfiles": {
+    "pnpm-lock.yaml": {
+      "sha256": "9e3869422d2828b034d56ff1987ec6545547dd9f663140cfb8ae583ca6df8efc"
+    },
+    "qa/package-lock.json": {
+      "sha256": "d251641a417bccaa65911cca53570c5fb35de61ae959f4ee73705c849eb9661c"
+    }
+  },
+  "checks": [
+    {
+      "command": "pnpm install --frozen-lockfile --ignore-scripts --lockfile-only",
+      "scope": "isolated root manifests plus reviewed lock",
+      "exitCode": 0
+    },
+    {
+      "command": "npm ci --ignore-scripts --no-audit --no-fund",
+      "scope": "isolated QA source plus reviewed lock",
+      "exitCode": 0
+    },
+    {
+      "command": "pnpm audit --prod --audit-level=low --json",
+      "scope": "root reviewed lock",
+      "exitCode": 0,
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "dependencies": 192,
+        "devDependencies": 0,
+        "optionalDependencies": 0,
+        "totalDependencies": 192
+      }
+    },
+    {
+      "command": "npm audit --package-lock-only --audit-level=low --json",
+      "scope": "QA full reviewed lock, includes development dependencies",
+      "exitCode": 0,
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 112,
+          "dev": 42,
+          "optional": 28,
+          "peer": 0,
+          "peerOptional": 0,
+          "total": 154
+        }
+      }
+    },
+    {
+      "command": "npm test",
+      "scope": "isolated QA source and freshly installed reviewed lock",
+      "exitCode": 0,
+      "tests": {
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    {
+      "command": "Node 22 bounded advisory and existing-config regressions",
+      "scope": "fresh isolated QA dependencies",
+      "exitCode": 0,
+      "assertions": 14,
+      "details": [
+        "Exact ip-address 10.5.1, qs 6.16.0, body-parser 2.3.0 versions",
+        "Leading-zero Address4 rejected; CIDR and mapped/NAT64 loopback classification corrected; fe81:: link-local and local NAT64 private classification corrected",
+        "qs hostile constructor parse/stringify does not throw; comma bracket array limit is enforced",
+        "Invalid body limit rejected; existing 1mb JSON parser and IPv6 subnet-key generation remain valid"
+      ]
+    }
+  ],
+  "caveats": [
+    "GitHub alert closure is asynchronous and must be verified after push; no alert was dismissed.",
+    "Root node_modules was not changed by this task. Parent owns frozen root dependency refresh and final integration validation.",
+    "No live QA server, database, or production deployment was exercised."
+  ],
+  "readOnlyReview": {
+    "result": "No additional actionable dependency or CI candidate findings. New acceptance process cleanup step runs on the existing Ubuntu Node22/24 matrix.",
+    "remainingScope": "Root releasegate only audits root production dependencies; repeat the separate QA lock audit for QA dependency changes."
+  }
+}

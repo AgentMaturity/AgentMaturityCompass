@@ -45,11 +45,11 @@ python3 -m pytest tests/ -q    # 1,586 tests
 ```bash
 npm test                                          # full suite
 npx vitest run tests/myNewTest.test.ts            # single file
-npx vitest run --grep "my test name"              # by name
+npx vitest run -t "my test name"                  # by name
 cd platform/python && python3 -m pytest tests/ -q # Python
 ```
 
-The root suite contains <!-- amc:count:testFiles -->1,486<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
+The root suite contains <!-- amc:count:testFiles -->1,489<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
 
 All tests must pass before submitting a PR.
 

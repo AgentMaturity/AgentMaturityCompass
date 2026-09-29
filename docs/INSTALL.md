@@ -11,6 +11,8 @@
 
 ## Option A: Verified GitHub Release Install
 
+The published npm package and GitHub release are **1.1.1**. The current repository is **1.2.0 source**; use [Option B](#option-b-from-github-development) for its native agent workflow and to continue development on another device. Public 1.1.1 installation does not provide the current `agent-loop guide` or chat workflow. See [publication evidence](../website/publication-status.json).
+
 macOS or Linux:
 
 ```bash
@@ -23,7 +25,7 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both hosted installers pin the release version, fetch the platform archive and `SHA256SUMS` from GitHub Releases, and refuse to execute the packaged installer when integrity verification fails. The downloaded archive then verifies its included package tarball before npm installs that local file. The public npm registry and Homebrew tap are not live, so AMC does not advertise those channels.
+Both hosted installers pin the published 1.1.1 release, fetch the platform archive and `SHA256SUMS` from GitHub Releases, and refuse to execute the packaged installer when integrity verification fails. The downloaded archive then verifies its included package tarball before npm installs that local file. npm also publishes 1.1.1; the Homebrew tap is not publicly available.
 
 After installation:
 
@@ -41,7 +43,10 @@ Use Node 22 or 24 LTS. Node 20 reached end of life on April 30, 2026; the packag
 
 ## Option B: From GitHub (Development)
 
+Install Node.js 22 or 24 first. Enable Corepack so the repository's `packageManager` field selects pnpm 10.33.0; if Corepack is unavailable, use `npm install --global pnpm@10.33.0` instead.
+
 ```bash
+corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile
@@ -49,12 +54,13 @@ pnpm run build
 npm link            # makes `amc` available globally
 ```
 
-AMC is a pnpm workspace (`packageManager` pins the version; `corepack enable` or
-`npm i -g pnpm@10` installs it). `npm ci` cannot resolve the `workspace:*`
+AMC is a pnpm workspace (`packageManager` pins the version). `npm ci` cannot resolve the `workspace:*`
 protocol the vendored `@amc/*` packages use, so it fails here by design.
 `pnpm run build` compiles the CLI; the vendored packages and `@amc/core` ship
 their compiled `lib/` in the tree, so no separate vendor build is needed unless
 you edit them (`npm run build:vendor`).
+
+A fresh source clone restores committed development work, not private runtime state or credentials. Configure a real provider/model on the new device using [the native workflow guide](NATIVE_AGENT_WORKFLOW.md), or explicitly select `stub` for a local recording demonstration. Session recovery does not grant cross-host takeover; review the [session ownership limits](SESSION_RESUME.md) before attempting runtime continuation.
 
 **Source runtime vs published release.** The native governed agent loop is
 built on the composition kernel `@amc/core` and the vendored `@amc/cordis`
@@ -96,7 +102,15 @@ See `docs/DESKTOP_PACKAGES.md` for user install commands, manifest hashes, and l
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass/deploy/compose
-cp .env.example .env    # edit secrets, ports, volumes
+cp .env.example .env    # edit ports and deployment settings
+cp secrets/amc_vault_passphrase.txt.example secrets/amc_vault_passphrase.txt
+cp secrets/amc_owner_username.txt.example secrets/amc_owner_username.txt
+cp secrets/amc_owner_password.txt.example secrets/amc_owner_password.txt
+```
+
+Replace all three template values with your own vault passphrase, owner username and owner password before starting. These are untracked runtime files, not `.env` settings. Keep them private on the host and readable by container UID 10001, as described in [the container guide](../docker/README.md#studio-with-persistent-state). Then run:
+
+```bash
 docker compose up -d --build
 ```
 
@@ -104,8 +118,10 @@ Studio available at `http://localhost:3212`. Gateway at `http://localhost:3210`.
 
 For TLS termination (production):
 
+Configure `AMC_TLS_HOST` and the additional notary secret files using the [Compose prerequisites and TLS instructions](../deploy/compose/README.md) before starting this stack.
+
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d --build
+docker compose -f docker-compose.tls.yml up -d --build
 ```
 
 ## Option E: Kubernetes (Helm)

@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 
-$PinnedAmcReleaseVersion = "1.2.0"
+# Matches the published GitHub release in install-channel.json, not package.json.
+$PinnedAmcReleaseVersion = "1.1.1"
 $RequestedAmcReleaseVersion = $env:AMC_RELEASE_VERSION
 $AmcReleaseVersion = $PinnedAmcReleaseVersion
 $AmcReleaseBaseUrl = "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v$AmcReleaseVersion"
@@ -57,8 +58,11 @@ try {
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
   $SumsPath = Join-Path $TemporaryDirectory "SHA256SUMS"
   $ArchivePath = Join-Path $TemporaryDirectory $ArchiveName
-  Invoke-WebRequest -UseBasicParsing -Uri "$AmcReleaseBaseUrl/SHA256SUMS" -OutFile $SumsPath
-  Invoke-WebRequest -UseBasicParsing -Uri "$AmcReleaseBaseUrl/$ArchiveName" -OutFile $ArchivePath
+  try {
+    Invoke-WebRequest -UseBasicParsing -Uri "$AmcReleaseBaseUrl/SHA256SUMS" -OutFile $SumsPath
+  } catch {
+    Fail-AmcInstall "published release $AmcReleaseVersion checksum manifest is unavailable at $AmcReleaseBaseUrl/SHA256SUMS; no installation attempted"
+  }
 
   $EscapedArchive = [regex]::Escape($ArchiveName)
   $Match = Get-Content $SumsPath | Where-Object { $_ -match "^([0-9a-fA-F]{64})\s+$EscapedArchive$" }
@@ -66,6 +70,11 @@ try {
     Fail-AmcInstall "SHA256SUMS does not contain exactly one valid entry for $ArchiveName"
   }
   $Expected = ([regex]::Match($Match, "^([0-9a-fA-F]{64})")).Groups[1].Value.ToLowerInvariant()
+  try {
+    Invoke-WebRequest -UseBasicParsing -Uri "$AmcReleaseBaseUrl/$ArchiveName" -OutFile $ArchivePath
+  } catch {
+    Fail-AmcInstall "published release archive $ArchiveName is unavailable; no installation attempted"
+  }
   $Actual = (Get-FileHash -Algorithm SHA256 -Path $ArchivePath).Hash.ToLowerInvariant()
   if ($Actual -ne $Expected) {
     Fail-AmcInstall "checksum mismatch for $ArchiveName"

@@ -15,11 +15,16 @@
     "githubRelease": {
       "status": "available",
       "integrity": "SHA-256 release manifest",
-      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/releases"
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1",
+      "version": "1.1.1",
+      "reason": "The hosted installers select the verified published 1.1.1 assets. Current 1.2.0 source features require the documented source installation.",
+      "packageTarballSha256": "dfc370a884803159a7d8b8a42830c3f8303747a8f2caaa0c5f00513d74f9fbf6",
+      "checksumsUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/releases/download/v1.1.1/SHA256SUMS"
     },
     "npm": {
-      "status": "unavailable",
-      "reason": "The public npm package has not been published. AMC does not advertise npx or global registry installs until the registry confirms availability."
+      "status": "available",
+      "version": "1.1.1",
+      "reason": "The public registry contains 1.1.1, which predates the current 1.2.0 source package. Registry availability does not establish current source feature parity."
     },
     "homebrew": {
       "status": "unavailable",
@@ -29,5 +34,6 @@
       "status": "available",
       "url": "https://github.com/AgentMaturity/AgentMaturityCompass"
     }
-  }
+  },
+  "asOf": "2026-09-29"
 }

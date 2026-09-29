@@ -12,6 +12,8 @@ on:
       - 'typedoc.json'
       - 'tsconfig.json'
       - 'scripts/build-pages-site.mjs'
+      - 'scripts/lib/published-installer-version.mjs'
+      - 'install.sh'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/pages.yml'

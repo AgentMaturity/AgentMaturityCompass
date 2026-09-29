@@ -3,7 +3,7 @@
 // Example: node scripts/installed-crash-recovery-check.mjs --artifact FILE
 // --artifact-sha256 HASH --cli-sha256 HASH --source COMMIT --source-tree DIR --out NEW_DIR
 import assert from "node:assert/strict";
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -11,10 +11,12 @@ import { hostname } from "node:os";
 import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
+import { runOwnedCommand } from "./lib/ownedProcessCommand.mjs";
 
 const { values } = parseArgs({ options: Object.fromEntries(["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out", "npm"].map(name => [name, { type: "string" }])) });
 for (const key of ["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out"]) assert.ok(values[key], `--${key} is required`);
 assert.match(process.version, /^v22\./, "qualification requires Node 22");
+assert.notEqual(process.platform, "win32", "this acceptance runner requires POSIX process-group cleanup");
 for (const key of ["artifact-sha256", "cli-sha256"]) assert.match(values[key], /^[a-f0-9]{64}$/);
 assert.match(values.source, /^[a-f0-9]{40}$/);
 const sha = value => createHash("sha256").update(value).digest("hex");
@@ -25,7 +27,8 @@ assert.equal(git(["rev-parse", "HEAD"]), values.source);
 assert.equal(git(["status", "--porcelain", "--untracked-files=no"]), "", "source must be committed and tracked-clean");
 const runner = fileURLToPath(import.meta.url), helper = fileURLToPath(new URL("./lib/installedCrashMcpServer.mjs", import.meta.url));
 const sourceFiles = {};
-for (const [relative, path] of [["scripts/installed-crash-recovery-check.mjs", runner], ["scripts/lib/installedCrashMcpServer.mjs", helper]]) {
+for (const [relative, path] of [["scripts/installed-crash-recovery-check.mjs", runner], ["scripts/lib/installedCrashMcpServer.mjs", helper],
+  ["scripts/lib/ownedProcessCommand.mjs", fileURLToPath(new URL("./lib/ownedProcessCommand.mjs", import.meta.url))]]) {
   const committed = execFileSync("git", ["-C", sourceTree, "show", `${values.source}:${relative}`]);
   assert.deepEqual(readFileSync(path), committed, `orchestration differs from committed ${relative}`);
   sourceFiles[relative] = sha(committed);
@@ -70,30 +73,34 @@ const save = () => writeFileSync(join(root, "receipt.json"), scrub(JSON.stringif
 const check = (name, details = {}) => { receipt.checks.push({ name, ok: true, ...details }); save(); };
 const wait = ms => new Promise(done => setTimeout(done, ms));
 const lines = path => existsSync(path) ? readFileSync(path, "utf8").trim().split("\n").filter(Boolean).map(line => JSON.parse(line)) : [];
-const clients = [], commandChildren = new Set(), writerPids = new Set();
+const clients = [], commandRuns = new Set(), writerPids = new Set(), shutdown = new AbortController();
 const effectsPath = join(root, "private", "effects.jsonl"), processLog = join(root, "private", "mcp-processes.jsonl");
 let cli, Native, sessionId, monitor;
+const stopForSignal = signal => {
+  receipt.interruptedBy = signal; receipt.ok = false; process.exitCode = 1;
+  shutdown.abort(new Error(`Acceptance interrupted by ${signal}`));
+  // Close only SDK clients started by this runner. The finally block awaits
+  // their idempotent closure and verifies observed writer/helper process exits.
+  for (const client of clients) void client.close().catch(() => {});
+};
+const onSigint = () => stopForSignal("SIGINT"), onSigterm = () => stopForSignal("SIGTERM");
+process.on("SIGINT", onSigint); process.on("SIGTERM", onSigterm);
 async function command(label, args, { cwd = workspace, input, timeoutMs = 60_000, install = false } = {}) {
-  const child = spawn(process.execPath, install ? args : [cli, ...args], { cwd, env, stdio: ["pipe", "pipe", "pipe"] });
-  commandChildren.add(child); child.stdin.on("error", () => {}); child.stdin.end(input);
-  let stdout = "", stderr = "", overflow = false;
-  const timer = setTimeout(() => child.kill("SIGKILL"), timeoutMs);
-  for (const [stream, append] of [[child.stdout, value => { stdout += value; }], [child.stderr, value => { stderr += value; }]]) {
-    stream.on("data", bytes => { append(bytes.toString()); if (stdout.length + stderr.length > 4 * 1024 * 1024) { overflow = true; child.kill("SIGKILL"); } });
-  }
-  const result = await new Promise((resolveResult, reject) => {
-    child.once("error", reject); child.once("close", (code, signal) => resolveResult({ code, signal }));
-  }).finally(() => { clearTimeout(timer); commandChildren.delete(child); });
+  const running = runOwnedCommand(process.execPath, install ? args : [cli, ...args], { cwd, env, input, timeoutMs, signal: shutdown.signal });
+  commandRuns.add(running);
+  const { stdout, stderr, ...result } = await running.finally(() => commandRuns.delete(running));
   if (existsSync(tokenFile)) secretValues.push(readFileSync(tokenFile, "utf8").trim());
   writeFileSync(join(root, "logs", `${label}.stdout`), scrub(stdout)); writeFileSync(join(root, "logs", `${label}.stderr`), scrub(stderr));
-  receipt.commands.push({ label, args, ...result, overflow }); save();
+  receipt.commands.push({ label, args, ...result }); save();
+  assert.equal(result.cleanupError, undefined, `${label}: ${result.cleanupError}`);
+  assert.equal(result.stopReason, undefined, `${label}: ${result.stopReason}`);
   assert.equal(result.signal, null, `${label} was interrupted`); assert.equal(result.code, 0, `${label}: ${scrub(stderr).slice(-1200)}`);
   try { return JSON.parse(stdout); } catch { return stdout; }
 }
 const dead = pid => { try { process.kill(pid, 0); return false; } catch (error) { if (error.code === "ESRCH") return true; throw error; } };
-async function until(label, condition, timeoutMs = 15_000) {
+async function until(label, condition, timeoutMs = 15_000, cleanup = false) {
   const deadline = Date.now() + timeoutMs;
-  for (;;) { const result = await condition(); if (result) return result; assert.ok(Date.now() < deadline, `${label} timed out`); await wait(50); }
+  for (;;) { if (!cleanup) shutdown.signal.throwIfAborted(); const result = await condition(); if (result) return result; assert.ok(Date.now() < deadline, `${label} timed out`); await wait(50); }
 }
 function history() { return Native.loadSessionEventHistory({ workspace, sessionId, agentId: "default", expectedMonitorFingerprint: monitor }); }
 function owner() {
@@ -104,7 +111,7 @@ function owner() {
   writerPids.add(current.pid); return { first, current };
 }
 async function start(options) {
-  const client = await Native.AMCNativeClient.start(options); clients.push(client); return client;
+  const client = await Native.AMCNativeClient.start({ ...options, startupSignal: shutdown.signal }); clients.push(client); return client;
 }
 try {
   save(); writeFileSync(join(consumer, "package.json"), '{"name":"amc-installed-crash-consumer","private":true,"type":"module"}\n');
@@ -203,15 +210,18 @@ try {
   receipt.ok = true;
 } catch (error) { receipt.error = scrub(error.stack ?? String(error)); process.exitCode = 1; }
 finally {
-  for (const child of commandChildren) child.kill("SIGKILL");
+  shutdown.abort(new Error("Acceptance cleanup"));
+  await Promise.allSettled([...commandRuns]);
   for (const client of clients.reverse()) {
     try { await client.close(); } catch (error) { receipt.ok = false; receipt.clientClosureError = scrub(error); process.exitCode = 1; }
   }
   try {
     const helperPids = [...new Set(lines(processLog).filter(row => row.kind === "started" && row.runId === runId).map(row => row.pid))];
-    await until("all owned processes closed", () => [...writerPids, ...helperPids].every(dead), 10_000);
+    await until("all owned processes closed", () => [...writerPids, ...helperPids].every(dead), 10_000, true);
     receipt.closedProcesses = { writerPids: [...writerPids], helperPids, allObservedGone: true };
   } catch (error) { receipt.ok = false; receipt.processClosureError = scrub(error); process.exitCode = 1; }
+  if (receipt.interruptedBy) { receipt.ok = false; process.exitCode = 1; }
+  process.off("SIGINT", onSigint); process.off("SIGTERM", onSigterm);
   receipt.endedAt = new Date().toISOString(); save();
   console.log(JSON.stringify({ ok: receipt.ok, receipt: join(root, "receipt.json"), checks: receipt.checks.length }));
 }

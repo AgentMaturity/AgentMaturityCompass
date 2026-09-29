@@ -2,6 +2,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { verifyPublishedInstallerVersion } from "./lib/published-installer-version.mjs";
 
 const root = resolve(process.cwd());
 const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
@@ -14,17 +15,10 @@ if (!existsSync(pnpmLockPath)) {
   fail("pnpm-lock.yaml is missing; the workspace install is not reproducible.");
 }
 const channel = JSON.parse(readFileSync(resolve(root, "website/install-channel.json"), "utf8"));
-const unixInstaller = readFileSync(resolve(root, "website/install.sh"), "utf8");
-const windowsInstaller = readFileSync(resolve(root, "website/install.ps1"), "utf8");
+const publishedInstallers = verifyPublishedInstallerVersion(root);
 
 function fail(message) {
   throw new Error(message);
-}
-
-function matchVersion(source, pattern, label) {
-  const match = pattern.exec(source);
-  if (!match?.[1]) fail(`${label} does not declare a pinned release version`);
-  return match[1];
 }
 
 const builtCli = spawnSync(process.execPath, [resolve(root, "dist/cli.js"), "--version"], {
@@ -40,8 +34,6 @@ const versions = {
   packageJson: packageJson.version,
   builtCli: builtCli.stdout.trim(),
   installChannel: channel.packageVersion,
-  unixInstaller: matchVersion(unixInstaller, /PINNED_AMC_RELEASE_VERSION="([^"]+)"/, "Unix installer"),
-  windowsInstaller: matchVersion(windowsInstaller, /\$PinnedAmcReleaseVersion = "([^"]+)"/, "Windows installer")
 };
 
 const expected = packageJson.version;
@@ -56,4 +48,4 @@ if (tag && tag !== `v${expected}`) {
   fail(`release tag mismatch: ${tag} expected=v${expected}`);
 }
 
-console.log(JSON.stringify({ status: "passed", version: expected, sources: versions, tag: tag ?? null }, null, 2));
+console.log(JSON.stringify({ status: "passed", version: expected, sources: versions, publishedInstallers, tag: tag ?? null }, null, 2));

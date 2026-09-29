@@ -1,0 +1,50 @@
+[
+  {
+    "command": "npm run check:architecture-boundaries",
+    "exitCode": 0,
+    "log": "check-architecture-boundaries.log",
+    "sha256": "83dc1b4eea481721ebeade3fbdc95e53a218ce74e5b0d640f8de4581547e068f"
+  },
+  {
+    "command": "npm run check:vendor-links",
+    "exitCode": 0,
+    "log": "check-vendor-links.log",
+    "sha256": "7e42c945d6376ca2c7cf69949d54b5cb83d31af85f1e89b414a83e612f0cf733"
+  },
+  {
+    "command": "npm run check:vendor-rescope",
+    "exitCode": 0,
+    "log": "check-vendor-rescope.log",
+    "sha256": "22e8f4eaa7b3147abace9e517594f4319116b9cfc85fb3698fac196154f450c2"
+  },
+  {
+    "command": "npm run check:third-party-notices",
+    "exitCode": 0,
+    "log": "check-third-party-notices.log",
+    "sha256": "fe7afaf99d7e2c1d9596fc3f6ee1ca30381690664ac80d06f2741f8df1c2a5e4"
+  },
+  {
+    "command": "npm run check:incident-readiness",
+    "exitCode": 0,
+    "log": "check-incident-readiness.log",
+    "sha256": "3979a3302470e5cc6f144ec1d3f873de4f3e7ac1acaf2e88a925297a284f7988"
+  },
+  {
+    "command": "npm run check:compliance-freshness",
+    "exitCode": 0,
+    "log": "check-compliance-freshness.log",
+    "sha256": "2f7ff129097ecf42a89fcf27f9626be6b1bbedba77e73b9fbefa4d3e1ca81eda"
+  },
+  {
+    "command": "npm run check:evidence-paths",
+    "exitCode": 0,
+    "log": "check-evidence-paths.log",
+    "sha256": "ca59338bb6fa380c2631a410c7942ca3922f029d58bcf700efdef5d78e845e08"
+  },
+  {
+    "command": "npm run check:changelog-page",
+    "exitCode": 0,
+    "log": "check-changelog-page.log",
+    "sha256": "12d60f30cbe04a95d23f60e4c1547530f8758b33cd6b35129a599a2d080d8647"
+  }
+]

@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C486-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C489-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -38,7 +38,7 @@ Its native runtime owns the model loop, workspace tools, approvals, streaming ch
 
 ## Run a native agent task
 
-For the native workflow in this checkout, start by inspecting your setup:
+The native workflow requires the current 1.2.0 source build; follow [From source](#from-source) first. The published npm package and GitHub release are 1.1.1 and do not contain this workflow. Then inspect your setup:
 
 ```bash
 amc agent-loop guide
@@ -154,7 +154,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Each installer pins the AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. npm and Homebrew registry commands are intentionally not advertised until those public channels are live.
+Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current 1.2.0 native workflow. The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
 
 **Docker**
 ```bash
@@ -713,7 +713,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both scripts install a pinned GitHub release only after SHA-256 verification. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) for exercised environments. The npm registry and Homebrew tap are not public yet, so AMC does not present those channels as available.
+Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current 1.2.0 source workflow. The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
 
 ### Docker
 ```bash
@@ -724,10 +724,19 @@ docker run -it --rm amc-quickstart amc
 Use the local build command unless a GHCR package has been verified public.
 
 ### From source
+
+Use this path to continue development on another device or run the current native workflow. Install Node.js 22 or 24 and enable Corepack before the frozen install; `package.json` pins pnpm 10.33.0.
+
 ```bash
+corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && pnpm run build && npm link
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile
+pnpm run build
+npm link
 ```
+
+If Corepack is unavailable, install the pinned manager with `npm install --global pnpm@10.33.0`. Keep provider credentials and runtime workspaces local to the new device; a source clone does not configure a provider or restore private session data.
 
 ---
 
@@ -735,7 +744,7 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && pnpm run build && n
 
 | Platform | Deploy |
 |----------|--------|
-| **Docker Compose** | `cd docker && docker compose up` |
+| **Docker Compose** | Create the three runtime secret files described in [the container guide](docker/README.md#studio-with-persistent-state), then `cd docker && docker compose up --build` |
 | **Vercel** | [![Deploy](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AgentMaturity/AgentMaturityCompass) |
 | **Railway** | [![Deploy](https://railway.app/button.svg)](https://railway.app/template?referralCode=amc&repo=https://github.com/AgentMaturity/AgentMaturityCompass) |
 
@@ -847,8 +856,8 @@ The build path is wired in and produces SEA artifacts plus a manifest. Runtime v
 AMC now includes a scheduled GitHub Actions workflow that validates packaged CLI installs across a small OS/Node matrix and uploads JSON artifacts for inspection:
 
 - workflow: `.github/workflows/nightly-compatibility-matrix.yml`
-- current matrix: `ubuntu-latest` + `macos-latest`, Node `20` + `22`
-- checks: packed install, top-level full score JSON, `doctor --json`, `lite-score --help`, `comms-check --help`
+- current matrix: `ubuntu-latest`, `macos-latest` and `windows-latest`, Node `22` + `24`
+- checks: fresh installed artifact, private-kernel absence, guide, initialization, signed native tool turn, cold verification and launcher restoration; see [platform qualification](docs/PLATFORM_QUALIFICATION.md) for the 13-step receipt scope
 
 ### Workspace config profiles (MVP)
 
@@ -881,7 +890,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,486<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,489<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

@@ -103,8 +103,9 @@ afterEach(() => {
 });
 
 describe("truthful public distribution and brand contract", () => {
-  test("declares GitHub release installers as live and registry channels as unavailable", () => {
+  test("distinguishes the published installer and registry release from the source candidate", () => {
     const channel = JSON.parse(read("website/install-channel.json"));
+    const publication = JSON.parse(read("website/publication-status.json"));
     const pkg = JSON.parse(read("package.json"));
 
     expect(channel.schemaVersion).toBe("2026-07-10");
@@ -112,16 +113,20 @@ describe("truthful public distribution and brand contract", () => {
     expect(channel.primary.unix.command).toBe("curl -fsSL https://agentmaturity.co/install.sh | sh");
     expect(channel.primary.windows.command).toBe("irm https://agentmaturity.co/install.ps1 | iex");
     expect(channel.channels.githubRelease.status).toBe("available");
-    expect(channel.channels.npm.status).toBe("unavailable");
+    expect(channel.channels.githubRelease.version).toBe(publication.channels.githubRelease.version);
+    expect(channel.channels.githubRelease.version).toBe("1.1.1");
+    expect(channel.channels.npm.status).toBe("available");
+    expect(channel.channels.npm.version).toBe(publication.channels.npm.version);
     expect(channel.channels.homebrew.status).toBe("unavailable");
   });
 
   test("keeps the repository-local Homebrew formula bound to a real checksummed release", () => {
     const formula = read("Formula/amc.rb");
-    const pkg = JSON.parse(read("package.json"));
+    const release = JSON.parse(read("website/install-channel.json")).channels.githubRelease;
 
-    expect(formula).toContain(`releases/download/v${pkg.version}/agent-maturity-compass-${pkg.version}.tgz`);
-    expect(formula).toMatch(/sha256 "[a-f0-9]{64}"/);
+    expect(formula).toContain(`releases/download/v${release.version}/agent-maturity-compass-${release.version}.tgz`);
+    expect(formula).toContain(`sha256 "${release.packageTarballSha256}"`);
+    expect(release.packageTarballSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(formula).not.toContain("registry.npmjs.org");
     expect(formula).not.toContain("PLACEHOLDER_SHA256");
   });
@@ -305,6 +310,26 @@ describe("truthful public distribution and brand contract", () => {
 
     expect(result.code).not.toBe(0);
     expect(`${result.stdout}\n${result.stderr}`).toContain("checksum mismatch");
+    expect(existsSync(fixture.marker)).toBe(false);
+  });
+
+  test.each(["manifest", "archive"])("explains an unavailable release %s without executing an installer", async (missing) => {
+    const directory = temporaryDirectory();
+    const version = "9.9.7";
+    const fixture = writeUnixFixture(directory, version);
+    rmSync(join(directory, missing === "manifest" ? "SHA256SUMS" : `amc-${version}-${fixture.platform}.tar.gz`));
+
+    const result = await withFixtureServer(directory, async baseUrl => await runInstaller({
+      AMC_INSTALL_TEST_MODE: "1",
+      AMC_RELEASE_BASE_URL: baseUrl,
+      AMC_RELEASE_VERSION: version,
+      AMC_INSTALL_PLATFORM: fixture.platform,
+      AMC_TEST_MARKER: fixture.marker,
+    }));
+
+    expect(result.code).not.toBe(0);
+    expect(result.stderr).toContain("unavailable");
+    expect(result.stderr).toContain("no installation attempted");
     expect(existsSync(fixture.marker)).toBe(false);
   });
 });

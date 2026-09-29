@@ -8,7 +8,22 @@ AMC (Agent Maturity Compass) scores your AI agent's trustworthiness from actual 
 
 ## Install
 
-**Prerequisites:** Node.js ≥ 20. AMC uses `better-sqlite3` which includes prebuilt binaries for most platforms. If prebuilds aren't available for your OS/arch, you'll need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode CLI tools on macOS).
+**Prerequisites:** Node.js 22 or 24 for production qualification; Node 20 is only the package compatibility floor. AMC uses `better-sqlite3` which includes prebuilt binaries for most platforms. If prebuilds aren't available for your OS/arch, you'll need Python 3 and a C++ compiler (`build-essential` on Linux, Xcode CLI tools on macOS).
+
+This guide describes the current **1.2.0 source**. The published npm package and GitHub release are **1.1.1**, which predates the native agent workflow. For current behavior or development on a new device, follow [the source installation](INSTALL.md#option-b-from-github-development):
+
+```bash
+corepack enable
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+cd AgentMaturityCompass
+pnpm install --frozen-lockfile
+pnpm run build
+npm link
+```
+
+If Corepack is unavailable, install pnpm with `npm install --global pnpm@10.33.0`. After installation, change to the agent project you want to assess. Provider credentials and private runtime state are configured separately; they are not part of a Git clone.
+
+To install the older published **1.1.1** release instead:
 
 macOS or Linux:
 
@@ -22,7 +37,7 @@ Windows PowerShell:
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-The hosted installer pins a GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. AMC does not advertise npm or Homebrew registry channels until they are public.
+The hosted installer pins the published 1.1.1 GitHub release and verifies the downloaded platform archive against `SHA256SUMS` before it runs the packaged installer. npm also publishes 1.1.1; the Homebrew tap is not publicly available. See [publication evidence](../website/publication-status.json).
 
 ## Your First Full Score (2 minutes)
 

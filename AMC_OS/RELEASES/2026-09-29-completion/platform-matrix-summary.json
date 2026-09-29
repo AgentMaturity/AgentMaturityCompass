@@ -1,0 +1,89 @@
+{
+  "runUrl": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36542131466",
+  "results": [
+    {
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "v22.23.2",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "7d203ed511122ccdec9bd190b80db8ef9d17b27280256628e2a49467e85f8c2b",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    },
+    {
+      "platform": "darwin",
+      "arch": "arm64",
+      "node": "v24.20.0",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "7d203ed511122ccdec9bd190b80db8ef9d17b27280256628e2a49467e85f8c2b",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    },
+    {
+      "platform": "linux",
+      "arch": "x64",
+      "node": "v22.23.2",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "7d203ed511122ccdec9bd190b80db8ef9d17b27280256628e2a49467e85f8c2b",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    },
+    {
+      "platform": "win32",
+      "arch": "x64",
+      "node": "v24.21.0",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "6fe9ed5a6c089f3189719f196b780bc4505ec4821afe8e99b97c6b278a9227f3",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    },
+    {
+      "platform": "win32",
+      "arch": "x64",
+      "node": "v22.23.2",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "6fe9ed5a6c089f3189719f196b780bc4505ec4821afe8e99b97c6b278a9227f3",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    },
+    {
+      "platform": "linux",
+      "arch": "x64",
+      "node": "v24.21.0",
+      "status": "passed",
+      "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+      "sourceDirty": false,
+      "packageSha256": "7d203ed511122ccdec9bd190b80db8ef9d17b27280256628e2a49467e85f8c2b",
+      "scope": "local npm artifact, Node entry point, keyless native SQLite/signing and cold verification",
+      "limitations": [
+        "No real-provider task, desktop installer, OS shell sandbox, global npm shim or published release qualification."
+      ],
+      "steps": 13
+    }
+  ]
+}

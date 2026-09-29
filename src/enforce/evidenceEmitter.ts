@@ -202,6 +202,13 @@ export function verifyGuardDecisionReceipt(
   return { ok: reasons.length === 0, reasons, payload };
 }
 
+function guardEventsDbPath(): string {
+  const legacyPath = process.env.AMC_GUARD_EVENTS_DB_PATH
+    ? resolve(process.env.AMC_GUARD_EVENTS_DB_PATH)
+    : join(process.cwd(), '.amc', 'guard_events.sqlite');
+  return currentStage() === 'CUTOVER' ? join(dirname(legacyPath), 'evidence.sqlite') : legacyPath;
+}
+
 function getDb(): import('better-sqlite3').Database | null {
   try {
     // P2.1 consolidation. Under CUTOVER the emitter opens the evidence store
@@ -209,12 +216,7 @@ function getDb(): import('better-sqlite3').Database | null {
     // chain verifier, the retention prune — follows without knowing about the
     // move. The legacy file is left untouched and complete, which is what makes
     // reverting a setting change rather than a restore.
-    const legacyPath = process.env.AMC_GUARD_EVENTS_DB_PATH
-      ? resolve(process.env.AMC_GUARD_EVENTS_DB_PATH)
-      : join(process.cwd(), '.amc', 'guard_events.sqlite');
-    const desiredPath = currentStage() === 'CUTOVER'
-      ? join(dirname(legacyPath), 'evidence.sqlite')
-      : legacyPath;
+    const desiredPath = guardEventsDbPath();
     const dir = dirname(desiredPath);
     if (_db && _dbPath === desiredPath) {
       return _db;
@@ -388,9 +390,11 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
   id: string; agent_id: string; module_code: string; decision: string;
   reason: string; severity: string; meta_json: string | null; created_at: string;
 }> {
+  let db: import('better-sqlite3').Database | undefined;
   try {
-    const db = getDb();
-    if (!db) return [];
+    // Assessment reads must not initialize or migrate the assessed workspace.
+    // Missing or legacy-incompatible stores yield no evidence, not a new store.
+    db = new Database(guardEventsDbPath(), { readonly: true, fileMustExist: true });
     let sql = 'SELECT * FROM amc_guard_events';
     const params: unknown[] = [];
     const clauses: string[] = [];
@@ -404,6 +408,8 @@ export function readGuardEvents(agentId?: string, windowHours?: number): Array<{
     return db.prepare(sql).all(...params) as Array<{ id: string; agent_id: string; module_code: string; decision: string; reason: string; severity: string; meta_json: string | null; created_at: string; }>;
   } catch (_e) {
     return [];
+  } finally {
+    db?.close();
   }
 }
 

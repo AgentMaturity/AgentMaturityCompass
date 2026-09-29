@@ -1,5 +1,7 @@
 # Your first native AMC workflow
 
+This workflow requires the current **1.2.0 source build**. Follow [the source installation](INSTALL.md#option-b-from-github-development) first; the published npm package and GitHub release are 1.1.1 and predate these native commands.
+
 AMC runs its own model loop with workspace tools, approval gates, sessions, context compaction and MCP connections. It does not need DSH, Pi or another agent runtime. Use this path to request an answer, work with explicitly permitted files, continue a recorded conversation and inspect its evidence. A first score is a baseline; it is not an agent task.
 
 For a browser workflow, open **Native Tasks** in Studio. It runs the same native AMC runtime with selected-agent ownership, bounded turns, cancellation, approval links and resumable sessions. See [Run native AMC tasks in Studio](NATIVE_STUDIO_TASKS.md) for setup, recovery and the browser's tool boundaries.
@@ -16,7 +18,7 @@ amc agent-loop guide
 
 Choose a provider by rerunning the guide with `--provider`, or open `amc agent-loop chat` and answer its terminal prompts. The guide inspects local workspace markers and credential metadata. It creates no workspace, opens no session, starts no service or watcher, and makes no provider call. A `ready` result means local configuration is present, not that a credential authenticates or a model is available. `--json` returns structured next-action arguments and their working directory.
 
-If the guide reports a missing workspace, initialize explicitly with `amc init --minimal`, then rerun it. For installation options, see [Getting Started](GETTING_STARTED.md).
+If the guide reports a missing workspace, initialize explicitly with `amc init --minimal`, then rerun it. For installation, use [the source build instructions](INSTALL.md#option-b-from-github-development).
 
 | Provider choice | Meaning | Default credential reference |
 |---|---|---|
@@ -77,7 +79,7 @@ These built-in slash commands prompt for any needed inputs. Loaded extension com
 
 Resume an eligible session with `agent-loop run --session SESSION_ID` or `agent-loop chat --session SESSION_ID`, alongside your chosen provider/model options. A one-shot run normally seals its session; add `--keep-open` when you intend a later handoff. Chat uses that option for its turns. There is no separate `session release` CLI command: native run cleanup performs the signed handoff when requested. `amc session verify` reports an authenticated completed handoff as `released` even after it ages; `interrupted` means the unclosed session has no accepted completed handoff and needs inspection. A release does not seal the session or hide an unfinished turn. Applications using the [native SDK](NATIVE_SDK.md) can explicitly call `session.release()` before closing the client.
 
-A live writer cannot be displaced by a second process. Closed sessions cannot resume; `--fork-from SESSION_ID` starts a new child from a verified parent reference. JSONL resume/recovery remains refused; supported SQLite ownership and evidence checks control admission. Recovery of a dead owner's incomplete turn preserves unknown outcomes and does not retry a possibly executed tool. Read [Session Resume](SESSION_RESUME.md) before using recovery options; `--force` does not override a live or unknown owner.
+A live writer cannot be displaced by a second process. Closed sessions cannot resume; `--fork-from SESSION_ID` starts a new child from a verified parent reference. The current source supports eligible native SQLite and JSONL resume/recovery under their original backend, signed ownership, agent, configuration and evidence checks. It does not migrate a session between backends or accept unsupported ownership history. Recovery of a demonstrably dead local owner's incomplete turn preserves unknown outcomes and does not retry a possibly executed tool. Read [Session Resume](SESSION_RESUME.md) before using recovery options; `--force` does not override a live or unknown owner.
 
 Verification checks the recorded evidence and its trust anchor. It does not judge the answer correct, certify policy compliance or award maturity by itself. Keep artifact validity, execution outcome and score readiness separate. See [Evidence Trust](EVIDENCE_TRUST.md) and [After the First Score](AFTER_FIRST_SCORE.md).
 

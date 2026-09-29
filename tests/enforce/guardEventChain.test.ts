@@ -1,7 +1,8 @@
+import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import Database from "better-sqlite3";
 import {
   emitGuardEvent,
@@ -25,16 +26,19 @@ import {
  */
 describe("guard event chain", () => {
   let dir: string;
+  const previousGuardDbPath = process.env.AMC_GUARD_EVENTS_DB_PATH;
 
   beforeEach(() => {
     dir = mkdtempSync(join(tmpdir(), "amc-guard-"));
-    process.env.AMC_GUARD_EVENTS_DB_PATH = join(dir, "guard_events.sqlite");
+    process.env.AMC_GUARD_EVENTS_DB_PATH = join(dir, ".amc", "guard_events.sqlite");
     closeGuardDb();
   });
 
   afterEach(() => {
     closeGuardDb();
-    delete process.env.AMC_GUARD_EVENTS_DB_PATH;
+    if (previousGuardDbPath === undefined) delete process.env.AMC_GUARD_EVENTS_DB_PATH;
+    else process.env.AMC_GUARD_EVENTS_DB_PATH = previousGuardDbPath;
+    closeSqlitePool(`ledger:${resolve(dir)}:${join(dir, ".amc", "evidence.sqlite")}`);
     rmSync(dir, { recursive: true, force: true });
   });
 
@@ -62,7 +66,7 @@ describe("guard event chain", () => {
     emit("second");
     closeGuardDb();
 
-    const db = new Database(join(dir, "guard_events.sqlite"));
+    const db = new Database(join(dir, ".amc", "guard_events.sqlite"));
     db.prepare("UPDATE amc_guard_events SET reason = ? WHERE reason = ?").run("tampered", "first");
     db.close();
 
@@ -74,7 +78,7 @@ describe("guard event chain", () => {
   it("reports pre-migration rows as unchained rather than verified", () => {
     emit("chained");
     closeGuardDb();
-    const db = new Database(join(dir, "guard_events.sqlite"));
+    const db = new Database(join(dir, ".amc", "guard_events.sqlite"));
     // A row as written before the chain existed.
     db.prepare(
       `INSERT INTO amc_guard_events (id, agent_id, module_code, decision, reason, severity, meta_json, created_at)
@@ -92,7 +96,7 @@ describe("guard event chain", () => {
   it("prunes events older than a cutoff", () => {
     emit("keep me");
     closeGuardDb();
-    const db = new Database(join(dir, "guard_events.sqlite"));
+    const db = new Database(join(dir, ".amc", "guard_events.sqlite"));
     db.prepare(
       `INSERT INTO amc_guard_events (id, agent_id, module_code, decision, reason, severity, meta_json, created_at, prev_hash, event_hash)
        VALUES ('old', 'default', 'm', 'allow', 'ancient', 'low', NULL, '2020-01-01T00:00:00.000Z', 'x', 'y')`

@@ -20,11 +20,14 @@ export interface ProductionReadinessResult {
 
 function hasEvidenceAcrossThreeSessions(): boolean {
   try {
-    const ledger = openLedger(process.cwd());
-    const runs = ledger.listRuns();
-    const sessions = ledger.getSessionsBetween(0, Date.now());
-    ledger.close();
-    return runs.length >= 3 || sessions.length >= 3;
+    const ledger = openLedger(process.cwd(), { readonly: true });
+    try {
+      const runs = ledger.listRuns();
+      const sessions = ledger.getSessionsBetween(0, Date.now());
+      return runs.length >= 3 || sessions.length >= 3;
+    } finally {
+      ledger.close();
+    }
   } catch (_error) {
     return false;
   }
@@ -41,9 +44,13 @@ function parseJson(value: string | null | undefined): unknown {
 
 function hasAdversarialAssurance(agentId: string): boolean {
   try {
-    const ledger = openLedger(process.cwd());
-    const runs = ledger.listAssuranceRuns(agentId);
-    ledger.close();
+    const ledger = openLedger(process.cwd(), { readonly: true });
+    let runs: AssuranceRunRecord[];
+    try {
+      runs = ledger.listAssuranceRuns(agentId);
+    } finally {
+      ledger.close();
+    }
     const adversarial = new Set([
       "injection",
       "exfiltration",
@@ -79,9 +86,13 @@ function hasActiveEnforcement(agentId: string): boolean {
 
 function hasErrorHandling(): boolean {
   try {
-    const ledger = openLedger(process.cwd());
-    const events = ledger.getAllEvents() as EvidenceEvent[];
-    ledger.close();
+    const ledger = openLedger(process.cwd(), { readonly: true });
+    let events: EvidenceEvent[];
+    try {
+      events = ledger.getAllEvents() as EvidenceEvent[];
+    } finally {
+      ledger.close();
+    }
     const retryOrCircuit = new Set([
       "CIRCUIT_BREAKER_OPENED",
       "CIRCUIT_BREAKER_HALF_OPEN",

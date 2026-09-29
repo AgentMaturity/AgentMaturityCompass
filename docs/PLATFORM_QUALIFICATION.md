@@ -13,7 +13,7 @@ Run through npm so its actual JavaScript entry point is available on all support
 
 The report records actual OS/architecture/Node, source commit and dirty state, packed artifact digest, executed steps, raw local command artifacts and their hashes. A failure or missing prerequisite does not become a pass. A successful run on an unsupported Node major is inconclusive. Successful scratch installations are removed; unsuccessful ones are retained with the path in the receipt. The nightly workflow is configured for Ubuntu, macOS and Windows on both LTS majors and uploads receipts even when a job fails.
 
-This source implementation awaits the final combined validation pass. No workflow has been dispatched as part of implementation. Existing earlier Linux-container and Darwin Node 25 receipts retain their original scopes.
+On September 29, 2026, the [hosted compatibility matrix](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36542131466) passed all six Ubuntu/macOS/Windows and Node 22/24 combinations at source commit `5dd437c3e4af3b20952124dfd57d2c55e1863cb2`. Each receipt reports a clean source tree and 13 completed qualification steps. The [receipt summary](../AMC_OS/RELEASES/2026-09-29-completion/platform-matrix-summary.json) records runtime versions and artifact digests. Later source revisions require their own qualification; earlier Linux-container and Darwin Node 25 receipts retain their original scopes.
 
 The runner does not qualify desktop installers, global npm command shims, real providers, OS shell sandbox enforcement, process-tree cleanup after a forced timeout or a published release. Launcher recovery here means restoring the exact privately installed Node entry point and re-verifying existing evidence. Desktop installation, uninstall/upgrade rollback and actual shell sandbox probes remain separately scoped acceptance work.
 
@@ -36,5 +36,5 @@ This is output-creation ownership, not a filesystem sandbox against concurrent
 hostile ancestor replacement after admission. Existing status, measured-platform,
 cleanup and unsupported-runtime distinctions remain unchanged. The corresponding
 synthetic regressions in `tests/platformQualificationOutputOwnership.test.ts`
-are authored only. No qualification, import, test or fixture execution is
-authorized by this addendum.
+passed in the September 29 full suite (14,119 tests at `5dd437c3`). The hosted
+matrix above separately exercises real fresh-output qualification runs.

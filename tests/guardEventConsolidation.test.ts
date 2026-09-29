@@ -1,6 +1,7 @@
+import { closeSqlitePool } from "../src/storage/sqlitePool.js";
 import { mkdtempSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import Database from "better-sqlite3";
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
@@ -44,6 +45,7 @@ describe("guard event consolidation", () => {
     else process.env["AMC_GUARD_EVENTS_DB_PATH"] = priorPath;
     if (priorStage === undefined) delete process.env["AMC_GUARD_EVENTS_STAGE"];
     else process.env["AMC_GUARD_EVENTS_STAGE"] = priorStage;
+    closeSqlitePool(`ledger:${resolve(workspace)}:${join(workspace, ".amc", "evidence.sqlite")}`);
     rmSync(workspace, { recursive: true, force: true });
   });
 
