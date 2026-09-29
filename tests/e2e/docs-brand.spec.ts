@@ -30,12 +30,15 @@ test.describe("AMC Docs brand shell", () => {
       topbarHeight: document.querySelector(".topbar")?.getBoundingClientRect().height,
       mainLeft: document.querySelector(".main")?.getBoundingClientRect().left,
       publicGuideCount: Number(document.querySelector(".stat-card .num")?.textContent || "0"),
+      sidebarGuideIds: Array.from(document.querySelectorAll("#sidebar-nav [data-doc]"), link => link.getAttribute("data-doc")),
       firstCategoryCount: Number(document.querySelector(".sidebar-section .sidebar-count")?.textContent || "0")
     }));
     expect(layout.documentWidth).toBe(layout.viewportWidth);
     expect(layout.topbarHeight).toBe(56);
     expect(layout.mainLeft).toBe(280);
-    expect(layout.publicGuideCount).toBe(173);
+    expect(layout.publicGuideCount).toBeGreaterThan(0);
+    expect(new Set(layout.sidebarGuideIds).size).toBe(layout.sidebarGuideIds.length);
+    expect(layout.publicGuideCount).toBe(layout.sidebarGuideIds.length);
     expect(layout.firstCategoryCount).toBeLessThanOrEqual(10);
 
     await page.screenshot({ path: testInfo.outputPath("amc-docs-desktop.png"), fullPage: true });

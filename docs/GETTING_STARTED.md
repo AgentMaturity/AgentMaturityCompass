@@ -267,7 +267,7 @@ amc score calibration-gap
 # Evidence density — are there blind spots?
 amc score density-map
 
-# Gaming resistance — can someone cheat the scores?
+# Score-control source inventory — behavioral gaming resistance is unmeasured
 amc score gaming-resistance
 ```
 
@@ -508,7 +508,7 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc score calibration-gap` | Confidence vs reality |
 | `amc score evidence-conflict` | Internal evidence consistency |
 | `amc score density-map` | Evidence blind spots |
-| `amc score gaming-resistance` | Score manipulation resistance |
+| `amc score gaming-resistance` | Source-control inventory; behavioral resistance is unmeasured |
 | `amc score sleeper-detection` | Hidden behavioral triggers |
 | `amc score audit-depth` | Audit trail completeness |
 | `amc score policy-consistency` | Policy enforcement reliability |

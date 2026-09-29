@@ -148,10 +148,9 @@ if (improvements.length > 0) {
 // otherwise `npm install agent-maturity-compass` produces a CLI that throws
 // ERR_MODULE_NOT_FOUND on first use.
 //
-// The rule: only src/kernel/** and the composition command module may name
-// them, and both are reached exclusively through `amc composition` or a
-// composed runtime, which only exist in a repository checkout.
-const KERNEL_IMPORT_ALLOWED = [/^src\/kernel\//, /^src\/cli-composition-commands\.ts$/];
+// Only the runtime seam may import these packages. The build bundles that
+// module for both installed native execution and composition inspection.
+const KERNEL_IMPORT_ALLOWED = [/^src\/kernel\/amcRuntime\.ts$/];
 
 function walkSources(dir, out = []) {
   for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {

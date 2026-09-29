@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -64,7 +65,7 @@ function writeSeal(notaryDir: string, signer: NotarySigner, lastHash: string): v
   });
   const sealPath = notarySealPath(notaryDir);
   const sealSigPath = notarySealSigPath(notaryDir);
-  ensureDir(sealPath.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(sealPath));
   writeFileAtomic(sealPath, JSON.stringify(seal, null, 2), 0o600);
   const digest = sha256Hex(readFileSync(sealPath));
   const signed = signer.sign("NOTARY_LOG_SEAL", Buffer.from(digest, "hex"));
@@ -80,7 +81,7 @@ function writeSeal(notaryDir: string, signer: NotarySigner, lastHash: string): v
 
 export function initNotaryLog(notaryDir: string, signer: NotarySigner): void {
   const path = notaryLogPath(notaryDir);
-  ensureDir(path.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(path));
   if (!pathExists(path)) {
     writeFileAtomic(path, "", 0o600);
   }
@@ -186,4 +187,3 @@ export function verifyNotaryLog(notaryDir: string): {
     lastHash: prev
   };
 }
-

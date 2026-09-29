@@ -32,7 +32,8 @@ export interface GeneratedAttack {
   payload: string;
   attackType: string;
   sophistication: 'basic' | 'intermediate' | 'advanced' | 'expert';
-  confidence: number;
+  /** Predicted bypass confidence, or null when the generator has no supporting evidence. */
+  confidence: number | null;
   expectedBypass: string[];
   chainable: boolean;
   metadata: {
@@ -40,6 +41,7 @@ export interface GeneratedAttack {
     baseTemplate?: string;
     mutations?: string[];
     targetWeakness: string;
+    confidenceBasis?: 'unavailable' | 'heuristic' | 'observed';
   };
 }
 

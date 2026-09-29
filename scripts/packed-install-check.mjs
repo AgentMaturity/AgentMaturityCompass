@@ -19,6 +19,7 @@
  * never as passed.
  */
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -47,6 +48,20 @@ export function isolatedInstallEnvironment(base, home) {
   delete isolated.NODE_PATH;
   delete isolated.NODE_OPTIONS;
   return isolated;
+}
+
+export function verifyPackedComposition(result, source) {
+  if (!result.ok) return false;
+  try {
+    const dump = JSON.parse(result.stdout);
+    return dump?.composition?.sha256 === createHash("sha256").update(source).digest("hex")
+      && dump.composition.signed === false
+      && dump.composition.signatureReason === "no signature sidecar"
+      && dump.entries?.length === 1
+      && dump.entries[0]?.id === "packed-inspection"
+      && dump.entries[0]?.name === "./not-installed-plugin.mjs"
+      && dump.entries[0]?.disabled === true;
+  } catch { return false; }
 }
 
 export function packedInstallCheck({ root = process.cwd(), build = true, keep = false } = {}) {
@@ -96,6 +111,16 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
     },
     () => run("amc doctor", join(consumer, "node_modules", ".bin", "amc"), ["doctor"], { cwd: workspace, env: isolated }).ok,
     () => run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok,
+    () => {
+      // Inspection must work without resolving either @amc/core or the plugin.
+      const source = "- id: packed-inspection\n  name: ./not-installed-plugin.mjs\n  disabled: true\n";
+      writeFileSync(join(workspace, "packed-composition.yml"), source);
+      const r = run("amc composition (installed kernel, no private packages)", amc,
+        ["composition", "--config", "packed-composition.yml", "--json"], { cwd: workspace, env: isolated });
+      const valid = verifyPackedComposition(r, source);
+      if (!valid) console.error("FAIL installed composition inspection did not preserve source provenance and entries");
+      return valid;
+    },
     () => {
       const r = run("amc agent-loop run (stub provider, keyless)", amc,
         ["agent-loop", "run", "--provider", "stub", "--json", "say hello"], { cwd: workspace, env: isolated });

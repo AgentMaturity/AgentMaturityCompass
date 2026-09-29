@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -55,7 +56,7 @@ export function signFileWithAuditor(workspace: string, path: string): string {
     envelope: signed.envelope
   };
   const sigPath = `${path}.sig`;
-  ensureDir(sigPath.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(sigPath));
   writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
   return sigPath;
 }

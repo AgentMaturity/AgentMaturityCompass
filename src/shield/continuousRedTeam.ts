@@ -186,11 +186,11 @@ function generateIndependentAttack(
   mutationRate: number,
   crossoverRate: number,
 ): GeneratedAttack {
-  // Strategy selection: weighted by what's worked before
+  // Strategy selection is random; successful prior payloads only inform crossover.
   const strategies = Object.keys(ATTACK_TEMPLATES);
   const strategy = strategies[Math.floor(Math.random() * strategies.length)]!;
   const templates = ATTACK_TEMPLATES[strategy]!;
-  let template = templates[Math.floor(Math.random() * templates.length)]!;
+  const template = templates[Math.floor(Math.random() * templates.length)]!;
 
   // Fill template variables
   const instruction = MALICIOUS_INSTRUCTIONS[Math.floor(Math.random() * MALICIOUS_INSTRUCTIONS.length)]!;
@@ -222,32 +222,40 @@ function generateIndependentAttack(
   }
 
   // Mutation: randomly alter the payload
+  const mutations: string[] = [];
   if (Math.random() < mutationRate) {
-    payload = mutatePayload(payload);
+    const mutatedPayload = mutatePayload(payload);
+    if (mutatedPayload !== payload) mutations.push("payload_mutation");
+    payload = mutatedPayload;
   }
 
   // Crossover: combine with a successful elite attack
+  let crossoverApplied = false;
   if (Math.random() < crossoverRate && elitePool.length > 0) {
     const elite = elitePool[Math.floor(Math.random() * elitePool.length)]!;
-    payload = crossoverPayloads(payload, elite.payload);
+    const crossedPayload = crossoverPayloads(payload, elite.payload);
+    crossoverApplied = crossedPayload !== payload;
+    if (crossoverApplied) mutations.push("payload_crossover");
+    payload = crossedPayload;
   }
-
-  const mutationApplied = Math.random() < mutationRate;
-  const crossoverApplied = Math.random() < crossoverRate && elitePool.length > 0;
 
   return {
     id: `ind_${strategy}_${randomBytes(4).toString("hex")}`,
     payload,
     attackType: strategy,
     sophistication: determineSophistication(payload),
-    confidence: 0.3 + Math.random() * 0.5,
+    // Prior elite attacks are selected successes, not a calibrated prediction
+    // for this new payload. The evaluator records observed bypass evidence
+    // separately in AttackResult.bypassConfidence.
+    confidence: null,
     expectedBypass: [`${strategy}_bypass`],
     chainable: false,
     metadata: {
       generationMethod: crossoverApplied ? "evolutionary" as const : "template" as const,
       baseTemplate: template.slice(0, 50),
-      mutations: mutationApplied ? ["payload_mutation"] : [],
+      mutations,
       targetWeakness: strategy,
+      confidenceBasis: "unavailable",
     },
   };
 }

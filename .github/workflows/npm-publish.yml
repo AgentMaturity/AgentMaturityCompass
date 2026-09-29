@@ -30,6 +30,7 @@ jobs:
   # Gate: full test + build must pass before any release action
   test-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
         with:
@@ -57,7 +58,19 @@ jobs:
         run: npm run typecheck:tests
 
       - name: Test
-        run: npm test
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          mkdir -p tmp/ci-tests
+          npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log
+
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: npm-publish-test-diagnostics
+          path: tmp/ci-tests/
+          if-no-files-found: ignore
 
       - name: Build
         run: npm run build

@@ -10632,8 +10632,8 @@ ci
   .option("--evil-mcp", "include built-in Evil MCP agent-provider scenarios")
   .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all)")
   .option("--min-mcp-score <n>", "minimum Evil MCP score to pass (0-100)", "80")
-  .option("--no-gaming-resistance", "skip score-gaming resistance check")
-  .option("--min-gaming-score <n>", "minimum gaming-resistance score to pass (0-100)", "80")
+  .option("--no-gaming-resistance", "disable the currently unmeasured gaming-resistance gate; grants no score-gaming assurance")
+  .option("--min-gaming-score <n>", "required gaming-resistance score (0-100); unavailable evidence fails at any threshold", "80")
   .option("--no-sign", "run red-team evidence as UNSIGNED_VALID local evidence")
   .option("--json", "output JSON result", false)
   .action(async (agentId: string | undefined, opts: {
@@ -10694,7 +10694,10 @@ ci
           console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
         }
         if (result.gamingResistance) {
-          console.log(`  Gaming resistance: ${result.gamingResistance.score}/100 (min: ${result.thresholds.minGamingResistanceScore0to100})`);
+          console.log("  Gaming resistance: unavailable (no behavioral measurement)");
+          console.log(`  Source inventory only: ${result.gamingResistance.controlInventory.score}/100`);
+        } else {
+          console.log("  Gaming resistance: disabled; this gate provides no score-gaming assurance");
         }
         if (result.reasons.length > 0) {
           console.log(chalk.red("\n  Failure reasons:"));
@@ -22773,26 +22776,19 @@ score
 
 score
   .command("gaming-resistance")
-  .description("Test whether adversarial evidence injection can inflate scores")
+  .description("Inventory AMC source controls; behavioral gaming resistance is not measured")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreGamingResistance } = await import("./score/gamingResistance.js");
-      const { reportControlSurfaceScopeSkip } = await import(
-        "./score/controlSurfaceScope.js"
-      );
-      // Grades AMC's own control surface; refuses to emit a number for a
-      // directory it cannot actually assess. See controlSurfaceScope.ts.
-      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreGamingResistance(process.cwd());
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
-      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Flooding:"), result.floodingResistance.score);
-      console.log(chalk.gray("Selective:"), result.selectiveResistance.score);
-      console.log(chalk.gray("Temporal:"), result.temporalResistance.score);
-      console.log(chalk.gray("Context:"), result.contextResistance.score);
-      console.log(chalk.gray("Formula:"), result.formulaResistance.score);
+      console.log(chalk.yellow(result.assessmentReason));
+      console.log(chalk.gray("Source inventory only:"), result.controlInventory.score, "/100");
+      if (!result.controlInventory.applicable) {
+        console.log(chalk.yellow(result.controlInventory.notApplicableReason));
+      }
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 

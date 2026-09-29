@@ -9,6 +9,7 @@ import {
   sign
 } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { z } from "zod";
 import {
   notaryPublicKeyPath,
@@ -141,8 +142,8 @@ export function initFileSealedNotaryKey(params: {
   const publicKeyPem = keyPair.publicKey.export({ format: "pem", type: "spki" }).toString();
   const keyPath = notarySealedKeyPath(params.notaryDir);
   const pubPath = notaryPublicKeyPath(params.notaryDir);
-  ensureDir(keyPath.replace(/\/[^/]+$/, ""));
-  ensureDir(pubPath.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(keyPath));
+  ensureDir(dirname(pubPath));
   writeFileAtomic(keyPath, JSON.stringify(encryptPrivateKeyPem(privateKeyPem, passphrase), null, 2), 0o600);
   writeFileAtomic(pubPath, publicKeyPem, 0o644);
   return {

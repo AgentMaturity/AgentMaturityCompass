@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { loadOrgConfig, verifyOrgConfigSignature } from "./orgStore.js";
 import { computeOrgScorecard, nodeHierarchy, recomputeAndPersistOrgScorecard, scorecardNodeComparison, summarizeNodeForUi } from "./orgEngine.js";
@@ -62,7 +62,7 @@ export function renderOrgNodeReportFile(params: {
   });
   const markdown = renderOrgNodeReportMarkdown(scorecard, params.nodeId);
   const outFile = join(params.workspace, params.outFile);
-  ensureDir(outFile.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(outFile));
   writeFileAtomic(outFile, markdown, 0o644);
   return { outFile, markdown, scorecard };
 }
@@ -83,7 +83,7 @@ export function renderOrgCompareReportFile(params: {
     window: params.window ?? "14d"
   });
   const outFile = join(params.workspace, params.outFile);
-  ensureDir(outFile.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(outFile));
   if (params.format === "json") {
     const payload = scorecardNodeComparison(scorecard, params.nodeA, params.nodeB);
     writeFileAtomic(outFile, JSON.stringify(payload, null, 2), 0o644);
@@ -108,7 +108,7 @@ export function renderOrgSystemicReport(params: {
   });
   const markdown = renderOrgSystemicMarkdown(scorecard);
   const outFile = join(params.workspace, params.outFile);
-  ensureDir(outFile.replace(/\/[^/]+$/, ""));
+  ensureDir(dirname(outFile));
   writeFileAtomic(outFile, markdown, 0o644);
   return {
     outFile,

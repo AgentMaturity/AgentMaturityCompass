@@ -1,0 +1,10 @@
+{
+  "asOf": "2026-09-29",
+  "worktrees": 67,
+  "accessibleWorktrees": 65,
+  "allWorktreeHeadsMerged": true,
+  "localBranches": 191,
+  "unmergedLocalBranches": [],
+  "newDirtyPathsOutsideMain": [],
+  "remainingDirt": "Only previously recorded generated runtime key history, Python build files, and dependency link; preserved locally. Two old /private/tmp registrations remain inaccessible with merged heads."
+}

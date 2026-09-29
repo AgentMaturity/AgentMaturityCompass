@@ -1,67 +1,27 @@
 import { test, expect } from './fixtures.js';
-import { INDEX_URL } from './urls.js';
+import { INDEX_URL, PLAYGROUND_URL } from './urls.js';
 
 test.describe('Theme', () => {
   test('homepage is dark-only with no light-theme toggle', async ({ page }) => {
     await page.goto(INDEX_URL);
-    const toggle = page.locator('#themeToggle, .theme-toggle');
-    expect(await toggle.count()).toBe(0);
+    await expect(page.locator('#themeToggle, .theme-toggle')).toHaveCount(0);
   });
 
-  test('switching theme changes CSS variables', async ({ page }) => {
-    await page.goto(INDEX_URL);
-
-    // Get initial background
-    const initialBg = await page.evaluate(() =>
-      getComputedStyle(document.body).backgroundColor
-    );
-
-    const toggle = page.locator('#themeToggle, .theme-toggle');
-    if (await toggle.count() > 0) {
-      await toggle.first().click();
-      await page.waitForTimeout(300);
-
-      const newBg = await page.evaluate(() =>
-        getComputedStyle(document.body).backgroundColor
-      );
-
-      // Background should change if theme was applied
-      // (clean-theme sets --bg to white)
-      if (newBg !== initialBg) {
-        expect(newBg).not.toBe(initialBg);
-      }
-    }
+  test('switching Playground theme changes the background and button state', async ({ page }) => {
+    await page.goto(PLAYGROUND_URL);
+    const initial = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    await page.getByRole('button', { name: 'Switch to light theme', exact: true }).click();
+    await expect(page.locator('#themeToggle')).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(initial);
   });
 
-  test('theme persists across reload', async ({ page }) => {
-    await page.goto(INDEX_URL);
-
-    const toggle = page.locator('#themeToggle, .theme-toggle');
-    if (await toggle.count() === 0) {
-      test.skip();
-      return;
-    }
-
-    // Toggle theme
-    await toggle.first().click();
-    await page.waitForTimeout(300);
-
-    // Check if body has clean-theme class
-    const hasClean = await page.evaluate(() =>
-      document.body.classList.contains('clean-theme')
-    );
-
-    // Reload
+  test('switching back to dark persists across reload', async ({ page }) => {
+    await page.goto(PLAYGROUND_URL);
+    await page.getByRole('button', { name: 'Switch to light theme', exact: true }).click();
+    await page.getByRole('button', { name: 'Switch to dark theme', exact: true }).click();
+    expect(await page.evaluate(() => localStorage.getItem('amc-theme'))).toBe('terminal');
     await page.reload();
-    await page.waitForTimeout(500);
-
-    // Check persistence via localStorage
-    const storedTheme = await page.evaluate(() =>
-      localStorage.getItem('amc-theme') || localStorage.getItem('theme')
-    );
-
-    if (storedTheme) {
-      expect(storedTheme).toBeTruthy();
-    }
+    await expect(page.locator('body')).not.toHaveClass(/clean-theme/);
+    await expect(page.locator('#themeToggle')).toHaveAttribute('aria-pressed', 'false');
   });
 });

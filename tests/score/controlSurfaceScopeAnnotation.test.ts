@@ -12,8 +12,9 @@ import { scoreOWASPLLMCoverage } from "../../src/score/owaspLLMCoverage.js";
  * with nothing marking it as meaningless, so an API consumer or a report could
  * present "0/10 OWASP risks covered" as a finding about the customer's agent.
  *
- * The contract asserted here: outside an AMC checkout the result must carry
- * applicable:false plus a reason, and inside one it must score normally.
+ * Outside an AMC checkout the result must carry applicable:false plus a
+ * reason. Gaming resistance is unmeasured even inside an AMC checkout; its
+ * source inventory is explicitly separate from a behavioral assessment.
  */
 describe("control-surface scorers declare when they do not apply", () => {
   let foreign: string;
@@ -43,7 +44,6 @@ describe("control-surface scorers declare when they do not apply", () => {
   }
 
   const inRepo = [
-    ["gamingResistance", () => scoreGamingResistance(process.cwd())],
     ["monitorBypassResistance", () => scoreMonitorBypassResistance(process.cwd())],
     ["owaspLLMCoverage", () => scoreOWASPLLMCoverage(process.cwd())]
   ] as const;
@@ -56,4 +56,13 @@ describe("control-surface scorers declare when they do not apply", () => {
       expect(result.score).toBeGreaterThan(0);
     });
   }
+
+  it("gaming resistance remains unmeasured inside the AMC checkout", () => {
+    const result = scoreGamingResistance(process.cwd());
+    expect(result.applicable).toBe(false);
+    expect(result.assessmentStatus).toBe("not_measured");
+    expect(result.score).toBeNull();
+    expect(result.controlInventory.applicable).toBe(true);
+    expect(result.controlInventory.score).toBeGreaterThan(0);
+  });
 });

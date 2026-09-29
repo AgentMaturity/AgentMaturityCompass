@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { createHash } from "node:crypto";
 import { verifyPackedRun } from "../scripts/packed-evidence-verification.mjs";
-import { isolatedInstallEnvironment } from "../scripts/packed-install-check.mjs";
+import { isolatedInstallEnvironment, verifyPackedComposition } from "../scripts/packed-install-check.mjs";
 
 function fixture() {
   return {
@@ -15,6 +16,21 @@ function fixture() {
 }
 
 describe("packed runtime evidence gate", () => {
+  it("requires real composition provenance and entries from the installed command", () => {
+    const source = "- id: packed-inspection\n  name: ./not-installed-plugin.mjs\n  disabled: true\n";
+    const dump = { composition: { sha256: createHash("sha256").update(source).digest("hex"),
+      signed: false, signatureReason: "no signature sidecar" },
+    entries: [{ id: "packed-inspection", name: "./not-installed-plugin.mjs", disabled: true }] };
+    const result = { ok: true, stdout: JSON.stringify(dump) };
+    expect(verifyPackedComposition(result, source)).toBe(true);
+    expect(verifyPackedComposition({ ...result, ok: false }, source)).toBe(false);
+    expect(verifyPackedComposition({ ok: true, stdout: "inspection succeeded" }, source)).toBe(false);
+    expect(verifyPackedComposition(result, `${source}# changed\n`)).toBe(false);
+    expect(verifyPackedComposition({ ok: true, stdout: JSON.stringify({ ...dump, entries: [] }) }, source)).toBe(false);
+    expect(verifyPackedComposition({ ok: true, stdout: JSON.stringify({ ...dump,
+      composition: { ...dump.composition, signed: true } }) }, source)).toBe(false);
+  });
+
   it("invokes both cold verifiers for the exact completed tool session", () => {
     const f = fixture();
     const calls: string[][] = [];

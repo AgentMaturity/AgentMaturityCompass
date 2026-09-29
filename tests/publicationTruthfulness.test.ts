@@ -17,17 +17,23 @@ describe("public distribution and pricing truthfulness", () => {
     const status = JSON.parse(text("website/publication-status.json")) as {
       schemaVersion: string;
       asOf: string;
-      channels: Record<string, { status: string; evidence: string }>;
+      sourceRevision: string;
+      sourceVersion: string;
+      channels: Record<string, { status: string; evidence: string; version?: string }>;
     };
 
     expect(status.schemaVersion).toBe("amc.publication-status.v1");
     expect(status.asOf).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(status.sourceRevision).toMatch(/^[a-f0-9]{40}$/);
+    expect(status.sourceVersion).toBe(JSON.parse(text("package.json")).version);
     expect(status.channels.githubRelease?.status).toBe("live");
     expect(status.channels.website?.status).toBe("live");
-    expect(status.channels.npm?.status).toBe("not_live");
+    expect(status.channels.npm?.status).toBe("live_stale");
+    expect(status.channels.npm?.version).toBe("1.1.1");
+    expect(status.channels.npm?.version).not.toBe(status.sourceVersion);
     expect(status.channels.homebrew?.status).toBe("not_live");
     expect(status.channels.industryPacksCheckout?.status).toBe("not_live");
-    expect(status.channels.npm?.evidence).toMatch(/404|not found/i);
+    expect(status.channels.npm?.evidence).toMatch(/HTTP 200 with version 1\.1\.1/i);
     expect(status.channels.industryPacksCheckout?.evidence).toMatch(/404|not configured/i);
   });
 
@@ -52,7 +58,7 @@ describe("public distribution and pricing truthfulness", () => {
     expect(combined).not.toContain("$9.99/month unlock");
   });
 
-  test("current examples and integration guides do not advertise the unpublished npm package", () => {
+  test("current examples and integration guides keep using reviewed source installation", () => {
     const files = [
       ...currentGuideFiles("examples"),
       ...currentGuideFiles("integrations"),

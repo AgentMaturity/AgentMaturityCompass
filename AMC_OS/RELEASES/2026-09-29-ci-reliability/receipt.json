@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-29",
+  "scope": "CI workflow reliability and installed composition inspection",
+  "old_head": "af43e3aaf494b33208339b781bf5a8f8ef500736",
+  "ci_run": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/35043962992",
+  "publish_run": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/35043962995",
+  "findings": [
+    {
+      "job": "clean-source",
+      "result": "underlying check passed; setup-node cache post-step failed",
+      "evidence": "2026-09-16T01:25:45.5724703Z Path Validation Error: Path(s) specified in the action for caching do(es) not exist, hence no cache is being saved.",
+      "cause": "setup-node caches the outer pnpm store; the clean-source script uses and removes an isolated HOME/store"
+    },
+    {
+      "jobs": [
+        104629673736,
+        104629673742,
+        104629674312
+      ],
+      "result": "cancelled at GitHub six-hour maximum",
+      "available_evidence": "All three job API records have empty steps; CI archive has only six other jobs; npm Publish log archive is empty; direct job log requests return404; no test artifacts exist.",
+      "root_cause": "Unknown. These records do not establish that a specific test, test process, build or setup step hung."
+    },
+    {
+      "surface": "amc composition",
+      "result": "source imported unpublished private @amc/core directly and refused npm installs",
+      "fix": "Use the bundled kernel runtime seam; installed-package checker now validates actual composition entries, unsigned status and source hash."
+    }
+  ],
+  "workflow_changes": {
+    "clean_source_cache": "disabled including automatic package-manager cache",
+    "test_step_minutes": 30,
+    "coverage_step_minutes": 45,
+    "ci_job_minutes": 90,
+    "publish_test_job_minutes": 60,
+    "diagnostics": [
+      "default reporter",
+      "JSON report",
+      "hanging-process reporter",
+      "tee log with bash pipefail",
+      "always-upload artifacts"
+    ],
+    "coverage_thresholds": "unchanged"
+  },
+  "verification": {
+    "focused_test_command": "node node_modules/vitest/vitest.mjs run tests/cliCompositionCommands.test.ts tests/packedInstallVerification.test.ts tests/publishedManifestInstallable.test.ts tests/releaseGateExecution.test.ts tests/cleanSourceDocs.test.ts --reporter=default --reporter=json --reporter=hanging-process",
+    "tests": 48,
+    "passed": 48,
+    "failed": 0,
+    "files": 5,
+    "workflow_yaml": "parsed both workflows and asserted cache disablement and diagnostic steps",
+    "intentional_negative_pipeline_probe": "failing synthetic test retained JSON/log and returned shell status1 through tee with bash -eo pipefail",
+    "git_diff_check": "passed"
+  },
+  "remaining": [
+    "Parent must rebuild shared dist after runtime seam export addition, then run packed-install-check --no-build and final qualification.",
+    "New hosted CI execution is needed to identify any six-hour stall cause. No runner orchestration code was changed without evidence."
+  ]
+}

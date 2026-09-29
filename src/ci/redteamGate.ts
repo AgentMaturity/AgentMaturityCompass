@@ -1,6 +1,5 @@
 import { runRedTeam, type RedTeamReport, type RunRedTeamInput } from "../redteam/runner.js";
 import { scoreGamingResistance, type GamingResistanceReport } from "../score/gamingResistance.js";
-import { detectControlSurfaceScope } from "../score/controlSurfaceScope.js";
 
 export interface RedTeamCiGateThresholds {
   minScore0to100: number;
@@ -91,17 +90,14 @@ export async function runRedTeamCiGate(input: RunRedTeamCiGateInput): Promise<Re
     );
   }
 
-  // Gaming resistance grades AMC's own control surface by looking for AMC
-  // source files. Running it against a consumer workspace scored their repo for
-  // not being AMC, which would fail every external CI gate for the wrong
-  // reason. Skip it where it cannot apply.
-  const gamingScope = detectControlSurfaceScope(input.workspace);
-  const gamingResistance = input.includeGamingResistance === false || !gamingScope.applicable
+  // A source inventory cannot satisfy a requested behavioral security gate,
+  // including at a zero threshold or outside an AMC checkout.
+  const gamingResistance = input.includeGamingResistance === false
     ? undefined
     : scoreGamingResistance(input.workspace);
-  if (gamingResistance && gamingResistance.score < thresholds.minGamingResistanceScore0to100) {
+  if (gamingResistance) {
     reasons.push(
-      `Gaming resistance score ${gamingResistance.score} is below minimum ${thresholds.minGamingResistanceScore0to100}.`
+      `${gamingResistance.assessmentReason} The requested gaming-resistance gate cannot pass without measured evidence.`
     );
   }
 

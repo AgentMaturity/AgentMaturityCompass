@@ -221,6 +221,10 @@ function initAnchors(){
       if(!target) return;
       e.preventDefault();
       target.scrollIntoView({behavior:'smooth',block:'start'});
+      if(a.classList.contains('skip-link')){
+        if(!target.hasAttribute('tabindex')) target.setAttribute('tabindex','-1');
+        target.focus({preventScroll:true});
+      }
       var mob=document.querySelector('.nav-mobile');
       if(mob) mob.classList.remove('open');
     });

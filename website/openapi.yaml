@@ -7637,10 +7637,59 @@ paths:
   /v1/security/gaming-resistance:
     get:
       tags: [security]
-      summary: Test adversarial evidence injection
+      summary: Inventory score-gaming source controls; behavioral resistance is unmeasured
       responses:
-        '200':
-          description: Gaming resistance result
+        '422':
+          description: No behavioral gaming-resistance evidence is available, including in an AMC source checkout. The source inventory cannot satisfy a security threshold.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, error, data]
+                properties:
+                  ok:
+                    type: boolean
+                    enum: [false]
+                  error:
+                    type: string
+                  data:
+                    type: object
+                    required: [applicable, assessmentStatus, assessmentReason, score, level, controlInventory]
+                    properties:
+                      applicable:
+                        type: boolean
+                        enum: [false]
+                      assessmentStatus:
+                        type: string
+                        enum: [not_measured]
+                      assessmentReason:
+                        type: string
+                      notApplicableReason:
+                        type: string
+                      score:
+                        type: number
+                        nullable: true
+                        enum: [null]
+                      level:
+                        type: integer
+                        nullable: true
+                        enum: [null]
+                      gaps:
+                        type: array
+                        items:
+                          type: string
+                      controlInventory:
+                        type: object
+                        description: Source-path inventory only. Each control group lists presentPaths and missingPaths; none is a behavioral measurement.
+                        required: [applicable, score, flooding, selectiveEvidence, temporal, context, formula]
+                        properties:
+                          applicable:
+                            type: boolean
+                          score:
+                            type: number
+                            minimum: 0
+                            maximum: 100
+                            description: Source inventory points, not gaming resistance.
 
   /v1/security/insider/report:
     get:

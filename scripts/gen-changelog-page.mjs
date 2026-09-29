@@ -83,7 +83,7 @@ const entry = `    <article class="release-entry" aria-labelledby="release-${slu
 ${groups
   .map(
     (group) => `
-      <section class="change-group" aria-labelledby="${group.kind.toLowerCase()}-changes-${slug}">
+      <section class="change-group" aria-labelledby="release-${slug} ${group.kind.toLowerCase()}-changes-${slug}">
         <h3 id="${group.kind.toLowerCase()}-changes-${slug}">${group.kind} changes</h3>
         <ul>
 ${group.bullets.map((b) => `          <li>${renderInline(b)}</li>`).join("\n")}

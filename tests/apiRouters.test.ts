@@ -220,7 +220,14 @@ const m = vi.hoisted(() => ({
   checkThreatIntel: vi.fn(() => ({ malicious: false })),
   detectInjection: vi.fn(() => ({ detected: false })),
   scoreSleeperDetection: vi.fn(() => ({ anomalies: [] })),
-  scoreGamingResistance: vi.fn(() => ({ score: 84 })),
+  scoreGamingResistance: vi.fn(() => ({
+    applicable: false,
+    assessmentStatus: "not_measured",
+    assessmentReason: "Gaming resistance is not measured: source paths are not behavioral evidence.",
+    score: null,
+    level: null,
+    controlInventory: { applicable: true, score: 100 },
+  })),
   generateInsiderRiskReport: vi.fn(() => ({ risks: [] })),
   renderInsiderRiskMarkdown: vi.fn(() => "# insider report"),
   getInsiderAlerts: vi.fn(() => [{ id: "alert-1" }]),
@@ -1526,14 +1533,24 @@ describe("AMC API routers", () => {
     // These scorers grade AMC's own control surface by looking for AMC source
     // files. In a temp workspace they must report not-applicable (422) rather
     // than scoring the consumer's repo for not being AMC.
-    for (const pathname of [
-      "/api/v1/security/sleeper-detection",
-      "/api/v1/security/gaming-resistance"
-    ]) {
+    for (const pathname of ["/api/v1/security/sleeper-detection"]) {
       const result = await callRoute(handleSecurityRoute, { pathname, method: "GET", workspace: ws });
       expect(result.handled).toBe(true);
       expect(result.status).toBe(422);
       expect(String(result.json?.error ?? "")).toMatch(/AMC's own control surface/i);
+    }
+
+    for (const inventoryRoot of [ws, process.cwd()]) {
+      const result = await callRoute(handleSecurityRoute, {
+        pathname: "/api/v1/security/gaming-resistance", method: "GET", workspace: inventoryRoot,
+      });
+      expect(result.handled).toBe(true);
+      expect(result.status).toBe(422);
+      expect(result.json?.ok).toBe(false);
+      expect(String(result.json?.error ?? "")).toMatch(/not measured/);
+      expect(result.json?.data).toMatchObject({
+        assessmentStatus: "not_measured", score: null, level: null, controlInventory: { score: 100 },
+      });
     }
 
     // Lab packs pose scenarios to the real agent under test. With no agent

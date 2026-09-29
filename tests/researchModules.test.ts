@@ -239,17 +239,22 @@ describe("levelTransition", () => {
 // ─── Gaming Resistance ───
 
 describe("gamingResistance", () => {
-  it("scores AMC repo gaming resistance", () => {
+  it("inventories AMC source controls without claiming measured gaming resistance", () => {
     const result = scoreGamingResistance(ROOT);
-    expect(result.score).toBeGreaterThan(0);
-    expect(result.floodingResistance.score).toBeGreaterThanOrEqual(0);
-    expect(result.contextResistance.score).toBeGreaterThanOrEqual(0);
+    expect(result.assessmentStatus).toBe("not_measured");
+    expect(result.score).toBeNull();
+    expect(result.level).toBeNull();
+    expect(result.controlInventory.applicable).toBe(true);
+    expect(result.controlInventory.score).toBeGreaterThan(0);
+    expect(result.controlInventory.flooding.presentPaths).toContain("src/evidence");
   });
 
-  it("empty repo has no gaming resistance", () => {
+  it("does not confuse an empty inventory with observed vulnerability", () => {
     const result = scoreGamingResistance("/tmp/empty-repo-" + Date.now());
-    expect(result.score).toBe(0);
-    expect(result.level).toBe(0);
+    expect(result.score).toBeNull();
+    expect(result.level).toBeNull();
+    expect(result.controlInventory.applicable).toBe(false);
+    expect(result.controlInventory.score).toBe(0);
     expect(result.gaps.length).toBeGreaterThan(0);
   });
 });

@@ -33,7 +33,7 @@ describe("published manifest is installable by npm", () => {
 
   test("the composition kernel stays a dev dependency", () => {
     // It is private and re-exports the vendored Cordis tree, so it cannot be
-    // published; `amc composition` degrades with an explanation instead.
+    // published; composition inspection uses the bundled runtime seam instead.
     expect(manifest.dependencies?.["@amc/core"]).toBeUndefined();
     expect(manifest.devDependencies?.["@amc/core"]).toBeDefined();
   });

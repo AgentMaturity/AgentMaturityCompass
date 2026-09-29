@@ -36,6 +36,7 @@ jobs:
 
   build-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     strategy:
       matrix:
         node-version: ["22", "24"]
@@ -68,7 +69,19 @@ jobs:
         run: npm run typecheck:tests
 
       - name: Test
-        run: npm test
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          mkdir -p tmp/ci-tests
+          npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log
+
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-diagnostics-node-${{ matrix.node-version }}
+          path: tmp/ci-tests/
+          if-no-files-found: ignore
 
       - name: Build
         run: npm run build
@@ -103,7 +116,21 @@ jobs:
       # Coverage thresholds were pinned at 0, so the gate could never fail and
       # whole subsystems could lose their tests silently. Now enforced.
       - name: Coverage thresholds
-        run: npm run test:coverage
+        timeout-minutes: 45
+        shell: bash
+        run: |
+          mkdir -p tmp/ci-coverage
+          npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log
+
+      - name: Upload coverage diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-diagnostics-node-${{ matrix.node-version }}
+          path: |
+            tmp/ci-coverage/
+            coverage/coverage-summary.json
+          if-no-files-found: ignore
 
       - name: Docs drift
         run: npm run check:docs-drift
@@ -184,7 +211,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
-          cache: pnpm
+          # The check installs inside an isolated HOME and deletes its store.
+          # No outer pnpm store exists for setup-node's cache post-step to save.
+          package-manager-cache: false
       - name: Clean-source check
         run: node scripts/clean-source-check.mjs
 

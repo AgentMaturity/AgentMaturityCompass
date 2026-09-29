@@ -108,19 +108,13 @@ export async function handleSecurityRoute(
     return true;
   }
 
-  // GET /api/v1/security/gaming-resistance — test adversarial evidence injection
+  // GET /api/v1/security/gaming-resistance — inventory only; behavioral evidence unavailable
   if (pathname === '/api/v1/security/gaming-resistance' && method === 'GET') {
     try {
       const { scoreGamingResistance } = await import('../score/gamingResistance.js');
-      const { detectControlSurfaceScope } = await import('../score/controlSurfaceScope.js');
-      const scope = detectControlSurfaceScope(workspace);
-      if (!scope.applicable) {
-        // Grades AMC's own control surface; not applicable to an arbitrary workspace.
-        apiError(res, 422, scope.reason);
-        return true;
-      }
       const result = scoreGamingResistance(workspace);
-      apiSuccess(res, result);
+      res.writeHead(422, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: false, error: result.assessmentReason, data: result }));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Gaming resistance check failed');
     }

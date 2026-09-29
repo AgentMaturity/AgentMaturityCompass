@@ -1,4 +1,4 @@
-import { mkdtempSync } from "node:fs";
+import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -26,7 +26,7 @@ afterAll(async () => {
 });
 
 describe("red-team CI gate", () => {
-  it("passes with permissive thresholds and includes Evil MCP plus gaming resistance evidence", async () => {
+  it("passes the selected red-team and Evil MCP gates when gaming resistance is explicitly disabled", async () => {
     const workspace = initializedWorkspace("amc-ci-redteam-pass-");
 
     const result = await runRedTeamCiGate({
@@ -36,7 +36,7 @@ describe("red-team CI gate", () => {
       strategies: ["direct"],
       evilMcp: true,
       mcpAttackCategories: ["tool_poison"],
-      includeGamingResistance: true,
+      includeGamingResistance: false,
       thresholds: {
         minScore0to100: 0,
         maxVulnerabilities: 999,
@@ -51,11 +51,48 @@ describe("red-team CI gate", () => {
     expect(result.reasons).toEqual([]);
     expect(result.report.evilMcp?.source).toBe("built-in-mcp-agent-provider");
     expect(result.report.evilMcp?.testedCategories).toContain("tool-poisoning");
-    // Gaming resistance grades AMC's own control surface by looking for AMC
-    // source files. This workspace is a temp dir, so the gate must skip it
-    // rather than scoring the consumer's repo for not being AMC.
+    // An explicit opt-out supplies no gaming-resistance assurance.
     expect(result.gamingResistance).toBeUndefined();
     expect(result.severityCounts.total).toBe(result.report.vulnerabilities.length);
+  });
+
+  it.each([false, true])("fails a requested gaming gate with unavailable evidence, source markers=%s", async (spoofSource) => {
+    const workspace = initializedWorkspace("amc-ci-redteam-inventory-");
+    if (spoofSource) {
+      // Even empty directories with source-file names earned a perfect score
+      // before source inventory was separated from behavioral evidence.
+      for (const path of [
+        "src/score", "src/diagnostic", "src/ledger", "src/evidence", "src/vault",
+        "src/score/evidenceCoverageGap.ts", "src/diagnostic/questionBank.ts",
+        "src/score/operationalIndependence.ts", "src/score/claimExpiry.ts",
+        "src/score/confidenceDrift.ts", "src/gateway", "src/assurance/packs",
+        "src/score/behavioralTransparency.ts", "tests", "src/score/simplicityScoring.ts",
+        "src/score/predictiveValidity.ts",
+      ]) mkdirSync(join(workspace, path), { recursive: true });
+    }
+    const result = await runRedTeamCiGate({
+      workspace,
+      agentId: "default",
+      plugins: ["injection"],
+      strategies: ["direct"],
+      // The default is a required gaming-resistance gate.
+      thresholds: {
+        minScore0to100: 0,
+        maxVulnerabilities: 999,
+        maxCritical: 999,
+        maxHigh: 999,
+        minGamingResistanceScore0to100: 0,
+      },
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.reasons).toHaveLength(1);
+    expect(result.reasons[0]).toMatch(/gaming-resistance gate cannot pass without measured evidence/);
+    expect(result.gamingResistance?.assessmentStatus).toBe("not_measured");
+    expect(result.gamingResistance?.score).toBeNull();
+    expect(result.gamingResistance?.level).toBeNull();
+    expect(result.gamingResistance?.controlInventory.applicable).toBe(spoofSource);
+    expect(result.gamingResistance?.controlInventory.score).toBe(spoofSource ? 100 : 0);
   });
 
   it("fails closed when vulnerability thresholds are exceeded", async () => {

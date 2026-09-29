@@ -72,3 +72,8 @@ Operational caveat:
 # REV_DEVOPS_ENGINEER — Remote GitHub handoff — 2026-09-16
 
 Reviewed all 82 worktrees and 189 initial branches; preserved 193 development paths in 21 snapshot commits, recovered remaining compliance redirects and safe PII fixtures, and joined all historical branch tips without restoring superseded implementations. Artifact: `AMC_OS/RELEASES/2026-09-16-remote-handoff/README.md`. All 191 final branch tips are integrated. Fresh clone and 13 release checks passed; one load-sensitive throughput failure passed unchanged in isolation. Python platform 1,609 passed; SDK 311 passed with one optional skip. Coverage was stopped at the user's two-minute push deadline. Continue from GitHub main with Node 22 and pnpm 10.33.0; rerun coverage and review remote CI. Local generated runtime files and the historical stash remain preserved locally. Existing product reconciliation tasks remain open.
+
+
+# REV_DEVOPS_ENGINEER — CI and installed composition — 2026-09-29
+
+Fixed clean-source cache cleanup and installed composition's unpublished workspace import. Added bounded test/coverage steps with retained diagnostics; thresholds and assertions unchanged. Evidence: `AMC_OS/RELEASES/2026-09-29-ci-reliability/receipt.json`. Focused verification: 48 tests across 5 files passed, workflow YAML and script syntax valid, negative test pipeline preserved exit1. Historical six-hour job logs are unavailable; no specific hang cause is claimed. Parent owns shared build, packed-install acceptance and fresh hosted CI.

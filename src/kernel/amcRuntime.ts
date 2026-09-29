@@ -14,5 +14,5 @@
  * still allows `@amc` runtime imports only under src/kernel/, which is where
  * this file lives.
  */
-export { AmcSeam, defineSeam } from "@amc/core";
+export { AmcSeam, defineSeam, loadComposition, dumpComposition, renderCompositionDump } from "@amc/core";
 export { Context } from "@amc/cordis";

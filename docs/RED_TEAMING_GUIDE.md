@@ -99,10 +99,8 @@ A built-in MCP agent-provider test harness, plus an optional standalone maliciou
 
 **What it covers:** `data_exfil`, `tool_poison`, `priv_esc`, `rug_pull`, `prompt_inject`, `resource_exhaust`
 
-### Layer 3: Adversarial Score Testing
-Systematically attempts to inflate AMC maturity scores without real implementation. Proves the evidence system is resistant to gaming.
-
-**What it covers:** `keyword_stuffing`, `mock_execution`, `hardcoded_output`, `execution_proof_defense`
+### Layer 3: Score-Gaming Control Inventory
+Lists AMC source paths associated with scoring controls. It does not execute adversarial evidence injection or prove resistance to score manipulation. Behavioral resistance is reported as `not_measured`, with no score or maturity level.
 
 **Primary command:** `amc score gaming-resistance --json`
 
@@ -138,7 +136,7 @@ amc redteam run default --plugins injection --strategies direct --evil-mcp --mcp
 # 3. Analyze a proposed runtime action before execution
 amc shield analyze-runtime --agent default --action "export customer ticket" --tool external-api --parameters '{"ticketId":"T-100"}' --sensitive-fields customerEmail,ssn --credential-age-minutes 45 --json
 
-# 4. Test whether the maturity score itself can be inflated
+# 4. Inspect source controls (behavioral gaming resistance remains unmeasured)
 amc score gaming-resistance --json
 
 # 5. Run deterministic assurance packs for deeper signed evidence
@@ -147,6 +145,8 @@ amc assurance run --scope workspace --pack all
 # 6. Add a fail-closed CI regression gate
 amc ci redteam default --plugins injection --strategies direct --evil-mcp --mcp-attacks tool_poison --no-sign
 ```
+
+The CI command above fails while its requested gaming-resistance assessment is unavailable. An explicit `--no-gaming-resistance` runs the other selected gates without claiming score-gaming assurance.
 
 ### Understanding the Output
 
@@ -378,7 +378,7 @@ server = EvilMCPServer(config)
 
 ## Adversarial Score Testing
 
-Behavioral red-team runs answer "can the agent be compromised?" Score-gaming checks answer "can the agent or evaluator inflate the maturity score without real evidence?" Run both before making L4/L5 claims.
+Behavioral red-team runs exercise an agent under attack. Determining whether evidence injection can inflate maturity scores requires a separate behavioral experiment. The command below only inventories source paths; it does not perform that experiment.
 
 Primary CLI:
 
@@ -389,53 +389,18 @@ amc score gaming-resistance --json
 
 The JSON report includes:
 
-| Field | What It Tests |
+| Field | What It Reports |
 |-------|---------------|
-| `floodingResistance` | Whether large volumes of low-quality evidence can inflate scores |
-| `selectiveResistance` | Whether cherry-picked evidence can hide weak dimensions |
-| `temporalResistance` | Whether evidence bursts right before evaluation can inflate scores |
-| `contextResistance` | Whether agents can behave well only in evaluation contexts |
-| `formulaResistance` | Whether scoring edge cases can be exploited |
-| `gaps` | Specific score-gaming weaknesses to fix before relying on the maturity level |
+| `assessmentStatus` | Always `not_measured`: no behavioral gaming-resistance test ran |
+| `score`, `level` | `null`; unavailable evidence is neither a passing score nor an observed vulnerability |
+| `assessmentReason` | Why source-path inventory cannot establish resistance |
+| `controlInventory.applicable` | Whether AMC source markers exist in the scanned directory |
+| `controlInventory.score` | Source-path inventory points only; never a security threshold |
+| `controlInventory.flooding`, `.selectiveEvidence`, `.temporal`, `.context`, `.formula` | Present and missing source paths grouped by intended control purpose |
 
-Why this belongs in red teaming: evaluation-context behavior can create a false sense of safety. Sleeper Agents-style findings show that unsafe behavior can persist through safety training and that adversarial training can teach a model to recognize triggers rather than remove the underlying behavior. AMC therefore treats gaming resistance as meta-assurance: testing the test.
+Even empty directories named after every expected source file can produce 100 inventory points. That result must not become a behavioral score. The CI gate rejects unavailable gaming-resistance evidence at every threshold, including zero. The API returns HTTP 422 with the explicit unmeasured report in `data`.
 
-### Attack Strategies Tested
-
-#### 1. Keyword Stuffing Attack
-
-**What it does:** Floods answers with every rubric keyword to artificially inflate scores.
-
-```bash
-amc score gaming-resistance --json
-```
-
-**Why it fails:** The EvidenceCollector requires execution-proof artifacts (signed traces, hashes, receipts), not just keyword presence.
-
-#### 2. Execution Proof Defense
-
-**What it does:** Re-scores the same keyword-stuffed text through the EvidenceCollector pipeline.
-
-**Why it fails:** Without real execution artifacts, the evidence multiplier is effectively zero. Keywords without proof = L1 at best.
-
-#### 3. Mock Execution Attack
-
-**What it does:** Patches `sys.modules` with `MagicMock` objects to fake imports and execution.
-
-**Why it fails:** Evidence artifacts require specific signatures and chain-of-custody verification. Mocked objects don't produce valid signatures.
-
-#### 4. Hardcoded Output Attack
-
-**What it does:** Directly forges `EvidenceArtifact` objects with fabricated data.
-
-**Why it fails:** The notary system verifies artifact provenance. Forged artifacts fail attestation checks.
-
-### Running the Full Suite
-
-```bash
-amc score gaming-resistance
-amc score adversarial default --json
-```
+Keyword stuffing, mocked execution, forged artifacts, selective evidence and temporal bursts are relevant future qualification scenarios. This command does not execute them, and its report supplies no result about whether they succeed or fail.
 
 ---
 
@@ -551,11 +516,9 @@ rules:
 
 **Scenario:** An organization wants to appear L4 on AMC's maturity scale. They write elaborate descriptions of security practices, stuffing every rubric keyword into their responses, but haven't actually implemented any of them.
 
-**How AMC catches it:**
-- `amc score gaming-resistance --json` reports whether evidence flooding, cherry-picking, temporal bursts, context manipulation, or formula edge cases can inflate scores
-- `src/score/gamingResistance.ts` keeps the score-gaming checks in the same CLI surface that operators already use for maturity scoring
-- The `EvidenceCollector` requires execution-proof artifacts: signed traces, hashes, receipts
-- Without real implementation, the trust multiplier drops scores to L1 regardless of how many keywords are present
+**Available evidence:**
+- `amc score gaming-resistance --json` lists source controls and explicitly reports behavioral resistance as unmeasured.
+- Establishing whether this attack inflates a score requires observed scoring results for authentic and manipulated evidence. The source inventory does not supply those results.
 
 **Evidence model:** AMC's scoring system uses `TRUST_MULTIPLIERS` that weight evidence by type. Self-reported claims get the lowest multiplier. Signed execution traces get the highest.
 
@@ -589,7 +552,7 @@ One-time testing is necessary but insufficient. Agents change. Tools change. Thr
 
 ### CI Red-Team Gate
 
-Use `amc ci redteam` when a build should fail if red-team regressions, Evil MCP failures, or score-gaming weaknesses exceed thresholds.
+Use `amc ci redteam` when a build should fail if red-team or Evil MCP thresholds are exceeded, or required gaming-resistance evidence is unavailable.
 
 ```bash
 amc ci redteam default \
@@ -612,7 +575,7 @@ For CI systems that need machine-readable evidence:
 amc ci redteam default --plugins injection --strategies direct --evil-mcp --mcp-attacks tool_poison --no-sign --json
 ```
 
-The command exits `0` only when every configured gate passes. It exits `1` with explicit reasons when the red-team score is too low, vulnerability thresholds are exceeded, Evil MCP score falls below threshold, or score-gaming resistance is weak. Use `--no-gaming-resistance` only when a separate job already checks `amc score gaming-resistance`.
+The command exits `0` only when every selected gate passes. It exits `1` when red-team or Evil MCP thresholds fail, or requested gaming-resistance evidence is unavailable. Gaming resistance currently remains unmeasured in every workspace, including AMC source checkouts; `--min-gaming-score 0` cannot turn missing evidence into a pass. `--no-gaming-resistance` explicitly disables that requirement and grants no score-gaming assurance. Running `amc score gaming-resistance` in another job does not qualify it.
 
 ### Setting Up Continuous Assurance
 
