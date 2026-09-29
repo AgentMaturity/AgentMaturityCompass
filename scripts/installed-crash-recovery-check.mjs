@@ -116,7 +116,12 @@ async function start(options) {
 try {
   save(); writeFileSync(join(consumer, "package.json"), '{"name":"amc-installed-crash-consumer","private":true,"type":"module"}\n');
   await command("00-install", [npm, "install", "--no-audit", "--no-fund", "--loglevel=error", artifact], { cwd: consumer, install: true, timeoutMs: 300_000 });
-  const require = createRequire(join(consumer, "package.json")), entry = realpathSync(require.resolve("agent-maturity-compass/sdk/native"));
+  // The public native SDK has an ESM-only export. Resolve with import conditions
+  // from the fresh consumer, rather than applying CommonJS require conditions.
+  const resolveBridge = join(consumer, "resolve-native.mjs");
+  writeFileSync(resolveBridge, 'export const nativeUrl = import.meta.resolve("agent-maturity-compass/sdk/native");\n');
+  const { nativeUrl } = await import(pathToFileURL(resolveBridge).href);
+  const entry = realpathSync(fileURLToPath(nativeUrl));
   const packageRoot = realpathSync(join(consumer, "node_modules", "agent-maturity-compass"));
   assert.ok(entry.startsWith(packageRoot + sep), "public export must resolve inside this fresh installed package");
   cli = join(packageRoot, "dist", "cli.js"); assert.equal(sha(readFileSync(cli)), values["cli-sha256"]);
