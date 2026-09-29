@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "5dd437c3e4af3b20952124dfd57d2c55e1863cb2",
+  "supersededBy": "5e87d9bbd520b02e5728c100d256259e61e0cbe0",
+  "cancellation": {
+    "requestedAt": "2026-09-29T08:58:11Z",
+    "reason": "Parent authorized cancellation of these two obsolete prior-checkpoint runs after their configured 30-minute Test budgets had elapsed. Current candidate runs must remain active.",
+    "requests": [
+      {
+        "runId": 36542131371,
+        "command": "gh run cancel 36542131371 --repo AgentMaturity/AgentMaturityCompass",
+        "exitCode": 0
+      },
+      {
+        "runId": 36542131335,
+        "command": "gh run cancel 36542131335 --repo AgentMaturity/AgentMaturityCompass",
+        "exitCode": 0
+      }
+    ],
+    "forceCancelIssued": false,
+    "forceCancelReason": "Ordinary cancellation completed before the authorized 09:04Z force-cancel fallback deadline."
+  },
+  "diagnosticStatus": "Completed/cancelled. Archived run logs retrieved successfully, but the CI archive omits both build-test jobs and the npm archive is empty. Direct completed-job log endpoints return HTTP 404; no test diagnostics artifact was uploaded.",
+  "localRawLogs": "/tmp/amc-gh-5dd-cancelled",
+  "claimBoundary": "Explicit cancellation is not evidence of product or test failure. No timeout cause, test hang or resource exhaustion is asserted without diagnostics.",
+  "checkedAt": "2026-09-29T09:09:31Z",
+  "runs": [
+    {
+      "runId": 36542131371,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36542131371",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "archive": {
+        "localFile": "/tmp/amc-gh-5dd-cancelled/ci-36542131371.zip",
+        "sha256": "92168872bd4006da921a7bb8323f7780ba182c954695b8e35e2f0df1c1e3046b",
+        "bytes": 238319,
+        "entryCount": 73,
+        "uncompressedBytes": 1211390,
+        "topLevelEntries": [
+          "0_security-scan-lite.txt",
+          "1_e2e-smoke-local.txt",
+          "2_docker-smoke.txt",
+          "3_packed-install.txt",
+          "4_helm-lint-template.txt",
+          "7_clean-source.txt",
+          "clean-source",
+          "docker-smoke",
+          "e2e-smoke-local",
+          "helm-lint-template",
+          "packed-install",
+          "security-scan-lite"
+        ]
+      },
+      "artifacts": {
+        "artifacts": [
+          {
+            "expired": false,
+            "id": 11020913528,
+            "name": "security-scan-lite",
+            "size_in_bytes": 19529
+          },
+          {
+            "expired": false,
+            "id": 11020843424,
+            "name": "helm-template",
+            "size_in_bytes": 1943
+          },
+          {
+            "expired": false,
+            "id": 11020448534,
+            "name": "docker-smoke",
+            "size_in_bytes": 1672
+          },
+          {
+            "expired": false,
+            "id": 11020158934,
+            "name": "e2e-smoke-local",
+            "size_in_bytes": 1047
+          }
+        ],
+        "total_count": 4
+      },
+      "jobs": [
+        {
+          "jobId": 109319814393,
+          "name": "build-test (24)",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "startedAt": "2026-09-29T08:20:47Z",
+          "completedAt": "2026-09-29T09:03:09Z",
+          "testStep": {
+            "name": "Test",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 9,
+            "started_at": "2026-09-29T08:23:23Z",
+            "completed_at": null
+          },
+          "diagnosticsUploadStep": {
+            "name": "Upload test diagnostics",
+            "status": "pending",
+            "conclusion": null,
+            "number": 10,
+            "started_at": null,
+            "completed_at": null
+          },
+          "completedJobLogHttpStatus": 404,
+          "annotations": [
+            {
+              "level": "failure",
+              "message": "The run was canceled by @AgentMaturity."
+            },
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        },
+        {
+          "jobId": 109319814449,
+          "name": "build-test (22)",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "startedAt": "2026-09-29T08:20:47Z",
+          "completedAt": "2026-09-29T09:03:09Z",
+          "testStep": {
+            "name": "Test",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 9,
+            "started_at": "2026-09-29T08:23:37Z",
+            "completed_at": null
+          },
+          "diagnosticsUploadStep": {
+            "name": "Upload test diagnostics",
+            "status": "pending",
+            "conclusion": null,
+            "number": 10,
+            "started_at": null,
+            "completed_at": null
+          },
+          "completedJobLogHttpStatus": 404,
+          "annotations": [
+            {
+              "level": "failure",
+              "message": "The run was canceled by @AgentMaturity."
+            },
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "runId": 36542131335,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36542131335",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "archive": {
+        "localFile": "/tmp/amc-gh-5dd-cancelled/npm-36542131335.zip",
+        "sha256": "8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85",
+        "bytes": 22,
+        "entryCount": 0,
+        "uncompressedBytes": 0,
+        "topLevelEntries": []
+      },
+      "artifacts": {
+        "artifacts": [],
+        "total_count": 0
+      },
+      "jobs": [
+        {
+          "jobId": 109319813809,
+          "name": "test-build",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "startedAt": "2026-09-29T08:20:48Z",
+          "completedAt": "2026-09-29T09:03:11Z",
+          "testStep": {
+            "name": "Test",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 8,
+            "started_at": "2026-09-29T08:22:48Z",
+            "completed_at": null
+          },
+          "diagnosticsUploadStep": {
+            "name": "Upload test diagnostics",
+            "status": "pending",
+            "conclusion": null,
+            "number": 9,
+            "started_at": null,
+            "completed_at": null
+          },
+          "completedJobLogHttpStatus": 404,
+          "annotations": [
+            {
+              "level": "failure",
+              "message": "The run was canceled by @AgentMaturity."
+            },
+            {
+              "level": "notice",
+              "message": "\"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748\""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "All three cancelled jobs retain an in_progress Test step with null completion/conclusion in GitHub job metadata; diagnostics uploads and subsequent steps remain pending.",
+    "Check annotations identify explicit owner cancellation and an Ubuntu image migration notice only.",
+    "No test summary, last-test output, hanging-process report, timeout annotation, runner crash report, or out-of-memory evidence is available from these archived runs."
+  ],
+  "causeAssessment": "Undetermined. The available evidence does not distinguish slow execution, a test or descendant-process hang, runner loss, or missing log retention. No product/test failure or resource-exhaustion claim is justified.",
+  "nextDiagnosticBoundary": "Use terminal evidence from current candidate runs before changing orchestration. Do not extend timeouts or weaken assertions based on these cancelled runs."
+}

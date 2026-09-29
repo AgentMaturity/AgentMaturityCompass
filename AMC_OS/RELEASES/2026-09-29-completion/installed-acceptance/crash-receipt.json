@@ -1,0 +1,309 @@
+{
+  "schemaVersion": "amc-installed-crash-recovery/v1",
+  "ok": true,
+  "startedAt": "2026-09-29T09:09:25.353Z",
+  "runId": "017cbdc2-132c-41ff-a1f7-392bd27375cb",
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "sourceFiles": {
+    "scripts/installed-crash-recovery-check.mjs": "7b7a2cbcb4985b71e48f81cf523d92a461f55e84b7a9b01d77388b07bc8412b7",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+  },
+  "artifactSha256": "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+  "expectedCliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+  "runtime": {
+    "node": "v22.22.0",
+    "executable": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "nodeSha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "checks": [
+    {
+      "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+      "ok": true,
+      "sessionId": "3ec8a611-8484-4843-b733-dd418406ff63",
+      "approvalId": "apprreq_c298dcf8f95f476497aac4677273119d",
+      "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+      "callId": "stub-call-1",
+      "killedPid": 31942,
+      "effects": 1,
+      "toolResultsBeforeKill": 0,
+      "originalPrefixSha256": "8acc650899f7af34f88d5c55027eb1b3e56e24c296b4ec8df0f5b9d0b5bc3eb9",
+      "effectSha256": "6b5708f6df6e7c31edaade22ca0732e6e3e28a84eca1a432bc24f8a13fbe1ab0",
+      "pendingWriteLow": 1
+    },
+    {
+      "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+      "ok": true,
+      "unknownToolOutcomes": 1,
+      "automaticModelCalls": 0,
+      "effectCount": 1
+    },
+    {
+      "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+      "ok": true,
+      "finalModelCalls": 2,
+      "finalToolCalls": 1,
+      "effectCount": 1,
+      "pendingWriteLow": 1,
+      "payloads": "verified",
+      "historySha256": "d64c979f89f0ff9819df8c46087f679a41b0cbfc1354ad7d492487b5f5a7ed28"
+    }
+  ],
+  "commands": [
+    {
+      "label": "00-install",
+      "args": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--loglevel=error",
+        "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact/agent-maturity-compass-1.2.0.tgz"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31888
+    },
+    {
+      "label": "01-bootstrap",
+      "args": [
+        "bootstrap"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31928
+    },
+    {
+      "label": "02-initialize",
+      "args": [
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31929
+    },
+    {
+      "label": "03-firewall",
+      "args": [
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31931
+    },
+    {
+      "label": "04-budget-sign",
+      "args": [
+        "budgets",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31936
+    },
+    {
+      "label": "05-owner-login",
+      "args": [
+        "approvals",
+        "login",
+        "--username",
+        "crash-owner",
+        "--token-file",
+        "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/crash-installed/private/approval-token",
+        "--password-stdin",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31937
+    },
+    {
+      "label": "06-mcp-catalog",
+      "args": [
+        "agent-loop",
+        "mcp-catalog",
+        "--config",
+        "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/crash-installed/private/mcp.json",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31939
+    },
+    {
+      "label": "07-tools-sign",
+      "args": [
+        "tools",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31941
+    },
+    {
+      "label": "08-pending-1",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31945
+    },
+    {
+      "label": "09-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_c298dcf8f95f476497aac4677273119d"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31946
+    },
+    {
+      "label": "10-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_c298dcf8f95f476497aac4677273119d",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "d4f9ed8c-16e6-48bf-9217-a1d4a7878da3",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/crash-installed/private/approval-token",
+        "--expect-request-digest",
+        "d171c94fa70ca9e2183d903e93ad55d4de0577322ac19712c8612216864e155b"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31947
+    },
+    {
+      "label": "11-budget-before-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31953
+    },
+    {
+      "label": "12-budget-after-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31956
+    },
+    {
+      "label": "13-cold-native-verification",
+      "args": [
+        "agent-loop",
+        "verify",
+        "3ec8a611-8484-4843-b733-dd418406ff63",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31959
+    },
+    {
+      "label": "14-cold-ledger-verification",
+      "args": [
+        "session",
+        "verify",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31960
+    },
+    {
+      "label": "15-final-budget",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 31965
+    }
+  ],
+  "limits": [
+    "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+    "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+    "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."
+  ],
+  "installed": {
+    "publicNativeExport": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/crash-installed/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+    "publicNativeExportSha256": "1dc8b26ef78467b96e8223e770e68bed0a9641679620052dd2b00a949e7ec818",
+    "cliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c"
+  },
+  "preExecutionMonitorSha256": "039093b99f77480d821db373ec43c3836c72fa1dddec44fd1e1daa0f692592a0",
+  "closedProcesses": {
+    "writerPids": [
+      31954
+    ],
+    "helperPids": [
+      31940,
+      31944,
+      31955
+    ],
+    "allObservedGone": true
+  },
+  "endedAt": "2026-09-29T09:09:43.920Z"
+}

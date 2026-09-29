@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "amc-candidate-installed-acceptance/v1",
+  "ok": true,
+  "completedAt": "2026-09-29T09:12:57.374170+00:00",
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "sourceTree": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+  "sourceTrackedCleanAfterLink": true,
+  "artifactPath": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact/agent-maturity-compass-1.2.0.tgz",
+  "artifactSha256": "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+  "cliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+  "packagedFilesMatched": 3985,
+  "runtime": {
+    "node": {
+      "path": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+      "sha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e"
+    },
+    "npm": {
+      "path": "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+      "sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7"
+    },
+    "browser": {
+      "path": "/Users/sid/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+      "sha256": "a596b1cfc6353e987fcec8d71a23a28cd6a9e7a6b4e20b908e4c4fcffe51158e"
+    },
+    "nodeVersion": "v22.22.0",
+    "playwrightVersion": "1.62.1",
+    "chromiumRevision": "1234"
+  },
+  "cleanSource": {
+    "commit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+    "passed": true,
+    "durationSeconds": 39.407
+  },
+  "currentCandidateRebuild": {
+    "passed": true,
+    "durationSeconds": 25.304,
+    "transition": {
+      "oldCommit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+      "newCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "changedPaths": [
+        "scripts/installed-crash-recovery-check.mjs"
+      ],
+      "independentGitMetadata": true,
+      "trackedClean": true,
+      "transitionedAt": "2026-09-29T09:05:17.468044+00:00"
+    }
+  },
+  "browser": {
+    "passed": true,
+    "scenarios": 13,
+    "sessions": 7,
+    "coldVerifiers": 8,
+    "allColdValid": true,
+    "sentinelPreserved": true,
+    "allCleanupPassed": true,
+    "screenshotsVisuallyReviewed": 4
+  },
+  "crashRecovery": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+        "ok": true,
+        "sessionId": "3ec8a611-8484-4843-b733-dd418406ff63",
+        "approvalId": "apprreq_c298dcf8f95f476497aac4677273119d",
+        "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+        "callId": "stub-call-1",
+        "killedPid": 31942,
+        "effects": 1,
+        "toolResultsBeforeKill": 0,
+        "originalPrefixSha256": "8acc650899f7af34f88d5c55027eb1b3e56e24c296b4ec8df0f5b9d0b5bc3eb9",
+        "effectSha256": "6b5708f6df6e7c31edaade22ca0732e6e3e28a84eca1a432bc24f8a13fbe1ab0",
+        "pendingWriteLow": 1
+      },
+      {
+        "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+        "ok": true,
+        "unknownToolOutcomes": 1,
+        "automaticModelCalls": 0,
+        "effectCount": 1
+      },
+      {
+        "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+        "ok": true,
+        "finalModelCalls": 2,
+        "finalToolCalls": 1,
+        "effectCount": 1,
+        "pendingWriteLow": 1,
+        "payloads": "verified",
+        "historySha256": "d64c979f89f0ff9819df8c46087f679a41b0cbfc1354ad7d492487b5f5a7ed28"
+      }
+    ],
+    "allObservedProcessesGone": true,
+    "knownFixtureSecretsAbsentFromPublicReceiptsAndLogs": true
+  },
+  "npmLink": {
+    "passed": true,
+    "prefix": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/link-isolated/prefix",
+    "executableTarget": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout/dist/cli.js",
+    "version": "1.2.0",
+    "guideStatus": "choose-provider",
+    "guideCode": "PROVIDER_REQUIRED"
+  },
+  "allCommandGroupsClosed": true,
+  "receiptDigests": {
+    "artifact-provenance.json": "d6d984a28e80eaadc5b7ead047c1f79237c8ed8f88bc513f7346ec97d848e732",
+    "browser-installed/fixture-run-receipt.json": "124887ba3758ad437ea21510048863864146ccacd353a0e0c1e32d1c6f8fd46b",
+    "browser-installed/browser/receipt.json": "1e6b9e5b29a1a94ea01c8f7f1f8723acc67f2f186c2dd57467eab75b99d7ef64",
+    "crash-installed/receipt.json": "39a52ee5ae9ed22c4ee916a75320f774e06d56b0810160a8c79fc79fbce61244",
+    "screenshot-review.json": "22ef01c9673f668c81d43f86c589eeb9324a2231b2e4183d8646a0b8f485bc44"
+  },
+  "limits": [
+    "Current installed acceptance ran on macOS arm64 with Node22.22.0 and Chromium1234. Native Windows/Linux execution remains CI scope.",
+    "Native task turns use the explicit deterministic stub provider; this establishes installed integration and evidence behavior, not live-model quality.",
+    "MCP crash fixture is an operator-trusted local tool; no OS confinement claim.",
+    "Pre-execution monitor pins establish local workspace-key consistency, not independent external trust anchoring.",
+    "Crash private credentials/workspace/consumer are retained under a restricted output root; share only reviewed receipts and logs."
+  ]
+}

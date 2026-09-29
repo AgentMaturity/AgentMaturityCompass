@@ -1,0 +1,10 @@
+{
+  "oldCommit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+  "newCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "changedPaths": [
+    "scripts/installed-crash-recovery-check.mjs"
+  ],
+  "independentGitMetadata": true,
+  "trackedClean": true,
+  "transitionedAt": "2026-09-29T09:05:17.468044+00:00"
+}

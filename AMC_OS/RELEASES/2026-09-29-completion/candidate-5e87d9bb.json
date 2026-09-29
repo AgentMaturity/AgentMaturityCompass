@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "5e87d9bbd520b02e5728c100d256259e61e0cbe0",
+  "gitTree": "07de6a30940ed52d31f330a1a597a829ad3d7837",
+  "createdAt": "2026-09-29T08:53:14.183205+00:00",
+  "trackedStatusAtGateStart": "clean",
+  "runtime": {
+    "node": "22.22.0",
+    "npm": "10.9.4",
+    "pnpm": "10.33.0"
+  },
+  "lockfiles": {
+    "pnpm-lock.yaml": "9e3869422d2828b034d56ff1987ec6545547dd9f663140cfb8ae583ca6df8efc",
+    "qa/package-lock.json": "d251641a417bccaa65911cca53570c5fb35de61ae959f4ee73705c849eb9661c"
+  },
+  "validationScope": "Local release gate, coverage and installed acceptance. Deployment and real providers require separate receipts."
+}

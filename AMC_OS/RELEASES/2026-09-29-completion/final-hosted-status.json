@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-29T09:15:24Z",
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "commitScope": {
+    "currentHead": "421859b0c9c3b961731f847870b35b9dfecca96d",
+    "documentationCommit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+    "productCandidateCommit": "5e87d9bbd520b02e5728c100d256259e61e0cbe0",
+    "currentHeadChange": "Installed crash-recovery harness ESM public-export resolution only; six insertions and one deletion in scripts/installed-crash-recovery-check.mjs."
+  },
+  "workflows": {
+    "ci": {
+      "runId": 36546756293,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546756293",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "status": "in_progress",
+      "conclusion": null,
+      "updatedAt": "2026-09-29T09:04:27Z",
+      "retrievedAt": "2026-09-29T09:13:52Z",
+      "jobs": [
+        {
+          "name": "docker-smoke",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "clean-source",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "build-test (24)",
+          "status": "in_progress",
+          "conclusion": null,
+          "activeSteps": [
+            "Test"
+          ]
+        },
+        {
+          "name": "e2e-smoke-local",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "build-test (22)",
+          "status": "in_progress",
+          "conclusion": null,
+          "activeSteps": [
+            "Test"
+          ]
+        },
+        {
+          "name": "helm-lint-template",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "security-scan-lite",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "packed-install",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        },
+        {
+          "name": "changeset",
+          "status": "completed",
+          "conclusion": "skipped",
+          "activeSteps": []
+        }
+      ]
+    },
+    "npmPublish": {
+      "runId": 36546756499,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546756499",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "status": "pending",
+      "conclusion": null,
+      "updatedAt": "2026-09-29T09:04:16Z",
+      "retrievedAt": "2026-09-29T09:13:53Z",
+      "jobs": []
+    },
+    "dockerRunnerImage": {
+      "runId": 36546756452,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546756452",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "status": "completed",
+      "conclusion": "success",
+      "updatedAt": "2026-09-29T09:06:37Z",
+      "retrievedAt": "2026-09-29T09:13:55Z",
+      "jobs": [
+        {
+          "name": "build-and-push",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        }
+      ],
+      "relevantSteps": [
+        {
+          "name": "Build runtime image",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Smoke test",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Push qualified image",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    "latestPages": {
+      "runId": 36546300057,
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546300057",
+      "sourceCommit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+      "status": "completed",
+      "conclusion": "success",
+      "updatedAt": "2026-09-29T09:01:59Z",
+      "retrievedAt": "2026-09-29T09:13:57Z",
+      "jobs": [
+        {
+          "name": "deploy",
+          "status": "completed",
+          "conclusion": "success",
+          "activeSteps": []
+        }
+      ]
+    }
+  },
+  "npmQueueContext": {
+    "observedAt": "2026-09-29T09:13:13Z",
+    "priorRun": {
+      "databaseId": 36546300083,
+      "headSha": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+      "status": "in_progress",
+      "conclusion": "",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546300083"
+    },
+    "workflowConcurrency": "npm-publish-${{ github.ref }} with cancel-in-progress false; current head is pending behind the active prior run."
+  },
+  "pagesScope": "The latest Pages deployment is the documentation commit 3f4780f6. The later harness-only 421859b0 commit does not match the Pages workflow push-path filters. The live source manifest matches the deployed documentation commit, not current HEAD.",
+  "live": [
+    {
+      "name": "manifest",
+      "url": "https://agentmaturity.co/docs/content-manifest.json",
+      "retrievedAt": "2026-09-29T09:13:50Z",
+      "httpStatus": 200,
+      "sha256": "269fc3b59e638c79ac0b058ec13b60dfe43fba84fda215b19652db62ba8c12cf",
+      "bytes": 48007,
+      "sourceRevision": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+      "guideCount": 197
+    },
+    {
+      "name": "unix",
+      "url": "https://agentmaturity.co/install.sh",
+      "retrievedAt": "2026-09-29T09:13:50Z",
+      "httpStatus": 200,
+      "sha256": "3151f42b013ec890b5c2625951ded63c73d6fa157fb350b8dd3eb385f5e07b07",
+      "bytes": 4392,
+      "sourcePath": "website/install.sh",
+      "exactBytesMatch": true,
+      "pinnedPublishedVersion": "1.1.1"
+    },
+    {
+      "name": "powershell",
+      "url": "https://agentmaturity.co/install.ps1",
+      "retrievedAt": "2026-09-29T09:13:50Z",
+      "httpStatus": 200,
+      "sha256": "ecc9b6aa4ba978faa37c71df8a07c25f89f76e1b00c07dab92d246957205784a",
+      "bytes": 4759,
+      "sourcePath": "website/install.ps1",
+      "exactBytesMatch": true,
+      "pinnedPublishedVersion": "1.1.1"
+    },
+    {
+      "name": "installChannel",
+      "url": "https://agentmaturity.co/install-channel.json",
+      "retrievedAt": "2026-09-29T09:13:50Z",
+      "httpStatus": 200,
+      "sha256": "42c71e3371893dbaadd045d11d67362d9727ba1c3c070c06ce0a94c456dbd42b",
+      "bytes": 1466,
+      "sourcePath": "website/install-channel.json",
+      "exactBytesMatch": true,
+      "sourcePackageVersion": "1.2.0",
+      "publishedGithubReleaseVersion": "1.1.1",
+      "publishedNpmVersion": "1.1.1"
+    }
+  ],
+  "publication": {
+    "npmLatest": {
+      "url": "https://registry.npmjs.org/agent-maturity-compass/latest",
+      "retrievedAt": "2026-09-29T09:14:35Z",
+      "httpStatus": 200,
+      "name": "agent-maturity-compass",
+      "version": "1.1.1"
+    },
+    "githubLatest": {
+      "html_url": "https://github.com/AgentMaturity/AgentMaturityCompass/releases/tag/v1.1.1",
+      "name": "v1.1.1",
+      "published_at": "2026-07-10T02:43:52Z",
+      "tag_name": "v1.1.1",
+      "target_commitish": "main",
+      "retrievedAt": "2026-09-29T09:14:36Z"
+    },
+    "sourcePackageVersion": "1.2.0",
+    "interpretation": "Hosted installers and the public npm/GitHub channels remain at 1.1.1. The pending npm workflow does not establish publication of current 1.2.0 source.",
+    "currentSourcePublicationVerified": false
+  },
+  "dependabot": {
+    "retrievedAt": "2026-09-29T09:13:14Z",
+    "openAlertCount": 0,
+    "query": "GET /repos/AgentMaturity/AgentMaturityCompass/dependabot/alerts?state=open&per_page=100",
+    "priorFixedAlertReceipt": "post-push-verification.json"
+  },
+  "unknowns": [
+    "Current Node 22/24 CI Test jobs have no terminal result in this snapshot; full CI success is not established.",
+    "Current npm Publish run is pending and has no jobs yet; its eventual validation/release result is unknown.",
+    "Docker Runner Image build, smoke, and push workflow completed successfully; this refresh did not independently pull or run the published registry image.",
+    "Installer bytes were fetched and compared, not executed by this read-only refresh.",
+    "Previously cancelled 5dd runs have no retained test logs or test-diagnostics artifacts; cause remains undetermined in older-ci-diagnostics.json.",
+    "This snapshot does not establish external model-provider or production deployment acceptance."
+  ],
+  "scope": "One bounded read-only GitHub/API and HTTP refresh; no run cancellation, workflow dispatch, publication, installer execution, local build, or test. Existing receipts preserved.",
+  "finalReadOnlyRefresh": {
+    "retrievedAt": "2026-09-29T09:34:06.736114+00:00",
+    "scope": "Read-only refresh of the tested candidate421859b0; final documentation commit will have its own workflows.",
+    "ci": {
+      "runId": 36546756293,
+      "conclusion": "",
+      "status": "in_progress",
+      "updatedAt": "2026-09-29T09:04:27Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546756293"
+    },
+    "npmPublish": {
+      "runId": 36546756499,
+      "conclusion": "",
+      "status": "pending",
+      "updatedAt": "2026-09-29T09:04:16Z",
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/36546756499"
+    }
+  }
+}

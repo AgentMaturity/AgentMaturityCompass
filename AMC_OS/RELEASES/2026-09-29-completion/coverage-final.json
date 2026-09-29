@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "recordedAt": "2026-09-29T09:22:56.635615+00:00",
+  "command": "npm run test:coverage -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile.json=/tmp/amc-coverage-421859b0-20260929.json",
+  "runtime": {
+    "node": "22.22.0",
+    "npm": "10.9.4",
+    "pnpm": "10.33.0"
+  },
+  "exitCode": 0,
+  "durationSeconds": 546.36,
+  "tests": {
+    "success": true,
+    "numTotalTests": 14130,
+    "numPassedTests": 14130,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "testFiles": 1489,
+  "coverage": {
+    "lines": {
+      "total": 140375,
+      "covered": 98282,
+      "skipped": 0,
+      "pct": 70.01
+    },
+    "statements": {
+      "total": 155396,
+      "covered": 107141,
+      "skipped": 0,
+      "pct": 68.94
+    },
+    "functions": {
+      "total": 27558,
+      "covered": 21553,
+      "skipped": 0,
+      "pct": 78.2
+    },
+    "branches": {
+      "total": 123131,
+      "covered": 79001,
+      "skipped": 0,
+      "pct": 64.16
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "thresholds": {
+    "lines": 65,
+    "functions": 75,
+    "branches": 59,
+    "statements": 64
+  },
+  "thresholdsChanged": false,
+  "allThresholdsPassed": true,
+  "coverageScope": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "tests/**",
+      "src/console/**",
+      "src/dashboard/**"
+    ]
+  },
+  "localEvidence": {
+    "/tmp/amc-coverage-421859b0-20260929.json": {
+      "sha256": "6f7a56af66047a4924eb0e3803fda96d4534bd5097fa020745b7d5339ccd9c9c",
+      "bytes": 46282418
+    },
+    "/tmp/amc-coverage-421859b0-20260929.log": {
+      "sha256": "b74123ad487ec924752ccd0dc3d7d4e6087088fa5007f5cdb7e0063e71ff3dd3",
+      "bytes": 5443042
+    },
+    "coverage/coverage-summary.json": {
+      "sha256": "ae9a411ed26af4abf2c74b1bcea9826b4e47bb1ce3e88859301eb02d501ba6e6",
+      "bytes": 583120
+    }
+  },
+  "worktreeAfterRun": "Only ten explicitly staged installed-acceptance receipt files; no tracked source/runtime modifications.",
+  "limitations": [
+    "Instrumentation covers the configured TypeScript core only; it is not whole-product or browser/Python coverage.",
+    "No real provider, production endpoint, human outcome or hosted CI result is inferred."
+  ]
+}

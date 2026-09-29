@@ -1,0 +1,14 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "acceptance-summary.json": "e430a2c745f5191ab14ca76cd4b9aa192e8e10076f4f78c8298e707ed9c5214c",
+    "artifact-provenance.json": "d6d984a28e80eaadc5b7ead047c1f79237c8ed8f88bc513f7346ec97d848e732",
+    "browser-receipt.json": "bf4894a0db0be5284ea74f6ba20ff9d3219f850be260d9a9a35929d152d36f51",
+    "candidate-transition.json": "60436a20a8fecd4af905a59ba7c52678b01e7efaeced5bfecb7c53749bef93c2",
+    "command-receipts.json": "382f5bedc35b6d588f495497950ca007e7352df9eaba8a61b99beb89e60f7bef",
+    "crash-receipt.json": "39a52ee5ae9ed22c4ee916a75320f774e06d56b0810160a8c79fc79fbce61244",
+    "npm-link-receipt.json": "1c58e767c9324807c43f0993298a0b33c0583edff02f23fb4751332e8061fc4d",
+    "screenshot-review.json": "22ef01c9673f668c81d43f86c589eeb9324a2231b2e4183d8646a0b8f485bc44"
+  },
+  "note": "Hashes cover the curated JSON files except this hash index itself. README is a human-readable path and scope map."
+}

@@ -77,3 +77,10 @@ Reviewed all 82 worktrees and 189 initial branches; preserved 193 development pa
 # REV_DEVOPS_ENGINEER — CI and installed composition — 2026-09-29
 
 Fixed clean-source cache cleanup and installed composition's unpublished workspace import. Added bounded test/coverage steps with retained diagnostics; thresholds and assertions unchanged. Evidence: `AMC_OS/RELEASES/2026-09-29-ci-reliability/receipt.json`. Focused verification: 48 tests across 5 files passed, workflow YAML and script syntax valid, negative test pipeline preserved exit1. Historical six-hour job logs are unavailable; no specific hang cause is claimed. Parent owns shared build, packed-install acceptance and fresh hosted CI.
+
+
+---
+
+# REV_DEVOPS_ENGINEER Handoff — 2026-09-29
+
+Candidate `421859b0` passed both full suites (14,130 tests), existing coverage thresholds, all 14 executed release checks and installed Studio/crash/non-replay/npm-link acceptance. All worktree heads and local branch tips are integrated. Source and public distribution remain distinct: native 1.2.0 requires the source build; public installers now correctly fetch the available 1.1.1 release. The exact receipts, remote setup commands, current CI scope and external blockers are in [the completion handoff](../RELEASES/2026-09-29-completion/README.md). Live deployment health remains skipped; real model access, publication/deployment inputs and Linear reconnection are still needed. Private runtime files are preserved locally.

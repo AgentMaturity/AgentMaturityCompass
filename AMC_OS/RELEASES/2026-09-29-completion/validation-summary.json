@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-09-29T09:32:41.271715+00:00",
+  "testedSourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "sourceVersion": "1.2.0",
+  "currentPublicVersion": "1.1.1",
+  "localStatus": "passed",
+  "deploymentQualification": "partial",
+  "releaseGate": {
+    "executed": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 1,
+    "total": 15
+  },
+  "coverageTests": {
+    "success": true,
+    "numTotalTests": 14130,
+    "numPassedTests": 14130,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "coverage": {
+    "lines": {
+      "total": 140375,
+      "covered": 98282,
+      "skipped": 0,
+      "pct": 70.01
+    },
+    "statements": {
+      "total": 155396,
+      "covered": 107141,
+      "skipped": 0,
+      "pct": 68.94
+    },
+    "functions": {
+      "total": 27558,
+      "covered": 21553,
+      "skipped": 0,
+      "pct": 78.2
+    },
+    "branches": {
+      "total": 123131,
+      "covered": 79001,
+      "skipped": 0,
+      "pct": 64.16
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "websiteTests": {
+    "startTime": "2026-09-29T09:30:45.301Z",
+    "duration": 31965.845999999998,
+    "expected": 57,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "installedAcceptance": "installed-acceptance/acceptance-summary.json",
+  "platformMatrix": "platform-matrix-5e87d9bb.json",
+  "worktreeAudit": "worktree-status-421859b0.json",
+  "hostedStatus": "final-hosted-status.json",
+  "remainingScope": "README.md#remaining-boundaries-and-next-required-inputs",
+  "externalNotesUpdated": [
+    "/Users/sid/Documents/AMC/AMC Home.md",
+    "/Users/sid/Documents/AMC/Projects/AMC/AMC Roadmap.md"
+  ],
+  "finalCommitScope": "Evidence, plans and handoff only; runtime/source remains tested candidate421859b0.",
+  "handoffChecks": {
+    "docsDrift": {
+      "status": "passed",
+      "filesScanned": 2418
+    },
+    "sourceCounts": "passed",
+    "stagedWhitespace": "passed",
+    "installedReceiptIndependentReview": "passed; no actionable findings"
+  }
+}

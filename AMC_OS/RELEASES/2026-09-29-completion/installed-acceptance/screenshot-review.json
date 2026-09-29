@@ -1,0 +1,10 @@
+{
+  "reviewedAt": "2026-09-29T09:10:09.771039+00:00",
+  "review": "Visually inspected all four screenshots: only disposable fixture usernames, run IDs and synthetic prompts are visible; no credential values or unrelated user content are visible. Desktop and mobile task forms, recorded transcript and demo approval refusal are readable.",
+  "files": {
+    "native-committed-transcript.png": "11071fe60313b3badfb435dd859baec50b95b0e523f6a8a10ee11eaa9a3a46d5",
+    "native-demo-approval-refused-390.png": "e440614a632bef462382a8dd3a0539919f1da93da1cc77ba8a5222770a125519",
+    "native-setup-1280.png": "0b8318cfb24d90ddf9e18a311b436a53ead555409b96653761f14ae05c2404f6",
+    "native-setup-390.png": "e4417208a5eccbd319ce02cf561ef1bb8c45dfcf8710b3f5c29f10fa2dae3d93"
+  }
+}

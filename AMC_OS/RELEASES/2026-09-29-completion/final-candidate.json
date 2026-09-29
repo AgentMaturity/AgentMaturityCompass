@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "gitTree": "a0fa491d64dacaa4f6d4b403db2bb2fd8f951788",
+  "createdAt": "2026-09-29T09:22:56.674330+00:00",
+  "trackedStatusAtGateStart": "Product/source unchanged from candidate; only reviewed installed-acceptance evidence staged.",
+  "runtime": {
+    "node": "22.22.0",
+    "npm": "10.9.4",
+    "pnpm": "10.33.0"
+  },
+  "lockfiles": {
+    "pnpm-lock.yaml": "9e3869422d2828b034d56ff1987ec6545547dd9f663140cfb8ae583ca6df8efc",
+    "qa/package-lock.json": "d251641a417bccaa65911cca53570c5fb35de61ae959f4ee73705c849eb9661c"
+  },
+  "validationScope": "Full coverage and release gate at this candidate; clean-source and platform receipts retain their explicitly documented earlier commits. Installed browser/crash/npm-link receipt pins this candidate. Live deployment and real providers require separate acceptance."
+}

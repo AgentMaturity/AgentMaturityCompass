@@ -1,0 +1,247 @@
+{
+  "schemaVersion": "amc-installed-acceptance-command-receipts/v1",
+  "commands": [
+    {
+      "label": "01-clean-source",
+      "sourceCommit": "3f4780f65688be3ac039444701ae315d6bdcc30d",
+      "originalReceipt": "commands/01-clean-source.receipt.json",
+      "originalReceiptSha256": "dc63cfdaf946560e34c6bc9306daf220a2af5542de21feec88843dae1b618f57",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "cwd": "/Users/sid/AgentMaturityCompass",
+        "startedAt": "2026-09-29T09:01:37.586568+00:00",
+        "ok": true,
+        "pid": 30474,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 39.407,
+        "endedAt": "2026-09-29T09:02:16.993388+00:00"
+      },
+      "stdoutSha256": "87c81a7cd1f785be28ea8e7f410d6cd5e01128bb0d29bcfffafbae74cf9eb4eb"
+    },
+    {
+      "label": "02-final-build",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/02-final-build.receipt.json",
+      "originalReceiptSha256": "ab452b795806a8aabbf6cb5775efccb9e1dc4f11026910cdf52778778f6bc5d1",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/bin/pnpm",
+          "run",
+          "build"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+        "startedAt": "2026-09-29T09:05:17.543285+00:00",
+        "ok": true,
+        "pid": 31169,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 25.304,
+        "endedAt": "2026-09-29T09:05:42.847431+00:00"
+      },
+      "stdoutSha256": "271e36e9626e19fcba022a8721dff78e230ac898ee103f455b3168edd115f699"
+    },
+    {
+      "label": "03-pack",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/03-pack.receipt.json",
+      "originalReceiptSha256": "e0f9d7d6bf6aa63573afffbb46aee9cf3c78cc14d4dd86e5388552584b5c82d6",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+        "startedAt": "2026-09-29T09:06:03.179432+00:00",
+        "ok": true,
+        "pid": 31313,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 2.332,
+        "endedAt": "2026-09-29T09:06:05.510982+00:00"
+      },
+      "stdoutSha256": "8014d7c4ea1b04b2e18e1e5a1f3deae9f2c2aeece7f737aa9185cc66537fc63e"
+    },
+    {
+      "label": "04-browser",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/04-browser.receipt.json",
+      "originalReceiptSha256": "54053debbf908ff114b1c60327bedf902e4f9a62c868b6e4f6605cf01a5fcf80",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/bin/python3",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout/scripts/installed-studio-browser-check.py",
+          "--artifact",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact/agent-maturity-compass-1.2.0.tgz",
+          "--artifact-sha256",
+          "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+          "--source",
+          "421859b0c9c3b961731f847870b35b9dfecca96d",
+          "--source-tree",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+          "--shared-checkout",
+          "/Users/sid/AgentMaturityCompass",
+          "--node",
+          "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+          "--node-sha256",
+          "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+          "--node-version",
+          "v22.22.0",
+          "--npm",
+          "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+          "--npm-sha256",
+          "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+          "--cli-sha256",
+          "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+          "--dependency-root",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+          "--browser-executable",
+          "/Users/sid/Library/Caches/ms-playwright/chromium-1234/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+          "--browser-sha256",
+          "a596b1cfc6353e987fcec8d71a23a28cd6a9e7a6b4e20b908e4c4fcffe51158e",
+          "--out",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/browser-installed"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+        "startedAt": "2026-09-29T09:07:44.468181+00:00",
+        "ok": true,
+        "pid": 31524,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 48.417,
+        "endedAt": "2026-09-29T09:08:32.884803+00:00"
+      },
+      "stdoutSha256": "769aa34a71c0862d192578837e264e2d6963b3e807366a8cdbca0166508fcc47"
+    },
+    {
+      "label": "05-crash",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/05-crash.receipt.json",
+      "originalReceiptSha256": "c433165772f07a9b53045142475499529bed99bcd73a0dabf24247fd20724e96",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout/scripts/installed-crash-recovery-check.mjs",
+          "--artifact",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact/agent-maturity-compass-1.2.0.tgz",
+          "--artifact-sha256",
+          "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+          "--cli-sha256",
+          "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+          "--source",
+          "421859b0c9c3b961731f847870b35b9dfecca96d",
+          "--source-tree",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+          "--out",
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/crash-installed",
+          "--npm",
+          "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+        "startedAt": "2026-09-29T09:09:25.230488+00:00",
+        "ok": true,
+        "pid": 31867,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 18.729,
+        "endedAt": "2026-09-29T09:09:43.959037+00:00"
+      },
+      "stdoutSha256": "346c61b5d865275a8de52d20fa595fe0589bd8c521e38f1b1c446fa97fad7c22"
+    },
+    {
+      "label": "06-npm-link",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/06-npm-link.receipt.json",
+      "originalReceiptSha256": "93c65c300cae1a15a1a25a85c1bb3043d9c51e95559926ff0d94a523f9a2c5f6",
+      "receipt": {
+        "argv": [
+          "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+          "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+          "link",
+          "--no-audit",
+          "--no-fund"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+        "startedAt": "2026-09-29T09:10:54.287257+00:00",
+        "ok": true,
+        "pid": 32115,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 0.314,
+        "endedAt": "2026-09-29T09:10:54.600812+00:00"
+      },
+      "stdoutSha256": "c8f7a2f2115d2f68554509fce998fc80dccef87b4bc89394267c46694e1af893"
+    },
+    {
+      "label": "07-linked-version",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/07-linked-version.receipt.json",
+      "originalReceiptSha256": "782b0c4af1afc9a2b1454ae2a3676570211e589aceb2d2dabd612369646940c1",
+      "receipt": {
+        "argv": [
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/link-isolated/prefix/bin/amc",
+          "--version"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/link-isolated/workspace",
+        "startedAt": "2026-09-29T09:11:17.568087+00:00",
+        "ok": true,
+        "pid": 32177,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 1.501,
+        "endedAt": "2026-09-29T09:11:19.068863+00:00"
+      },
+      "stdoutSha256": "1e5b51cde515396a9fa762909cf8ca6584ccc564b325d2eebeea76175fe95c4d"
+    },
+    {
+      "label": "08-linked-guide",
+      "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+      "originalReceipt": "commands/08-linked-guide.receipt.json",
+      "originalReceiptSha256": "d0b054965617a0e3b7a7f7148adc2d7a84a46cf741da811bf4afbbbf972ca1d1",
+      "receipt": {
+        "argv": [
+          "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/link-isolated/prefix/bin/amc",
+          "agent-loop",
+          "guide",
+          "--json"
+        ],
+        "cwd": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/link-isolated/workspace",
+        "startedAt": "2026-09-29T09:11:19.095565+00:00",
+        "ok": true,
+        "pid": 32181,
+        "exitCode": 0,
+        "processGroupClosed": true,
+        "durationSeconds": 0.615,
+        "endedAt": "2026-09-29T09:11:19.710175+00:00"
+      },
+      "stdoutSha256": "b799315fa0fd991f8a145b382ecf4d8de4dcaee98f77ca98ca16db7c4e0d60f0"
+    }
+  ],
+  "sourceBuildEnvironment": {
+    "HOME": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home",
+    "TMPDIR": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp",
+    "PATH": "/opt/homebrew/Cellar/node@22/22.22.0/bin:/opt/homebrew/opt/node@22/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "USERPROFILE": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home",
+    "APPDATA": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/AppData/Roaming",
+    "LOCALAPPDATA": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/AppData/Local",
+    "XDG_CONFIG_HOME": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.config",
+    "XDG_CACHE_HOME": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.cache",
+    "XDG_DATA_HOME": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.local/share",
+    "npm_config_cache": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.npm",
+    "npm_config_userconfig": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.npmrc",
+    "npm_config_globalconfig": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/home/.npmrc-global",
+    "npm_config_global": "false",
+    "CI": "1"
+  },
+  "sourceBuildEnvironmentNote": "Only path/isolation controls included; synthetic vault passphrase omitted. The clean-source helper itself establishes its isolated clone, HOME and workspace.",
+  "cleanSourceStdout": "clean-source check of 3f4780f6 in /private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk\nok   git clone (committed tree only) (2.0s)\nok   git checkout pinned commit (0.3s)\nok   pnpm install --frozen-lockfile (4.5s)\nok   pnpm run build (25.8s)\nok   amc doctor (1.2s)\nok   amc init (isolated workspace) (0.8s)\nok   keyless native tool turn (0.7s)\nok   amc session verify --json (0.6s)\nok   amc agent-loop verify --json (0.6s)\nok   signed evidence and request reconstruction (1 expected turns)\nok   process A: leave a completed turn open for resume (0.7s)\nok   process B: resume and seal the same session (0.7s)\nok   amc session verify --json (0.6s)\nok   amc agent-loop verify --json (0.6s)\nok   signed evidence and request reconstruction (2 expected turns)\nkept: /private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk\n"
+}

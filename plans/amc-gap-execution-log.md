@@ -1,5 +1,13 @@
 # AMC Gap Register — Execution Log
 
+## Current source and installed status — 2026-09-29
+
+This dated update supersedes earlier current-state wording below while preserving the historical receipts. Candidate `421859b0c9c3b961731f847870b35b9dfecca96d` passed 14,130/14,130 tests in both normal and coverage runs, with zero skips; all unchanged coverage floors passed. The release gate passed all 14 executed checks, with live deployment health explicitly skipped. Actual Ubuntu/macOS/Windows × Node 22/24 source qualification passed at product commit `5e87d9bb`; the later changes are documentation and acceptance-harness corrections.
+
+The installed candidate passed 13 Studio browser scenarios, cold verification, real approved tool-effect/crash/resume non-replay and isolated npm-link setup. Composition packaging, red-team metadata, gaming-gate false assurance, test isolation, runtime advisories and the broken public installer pins are corrected. All 67 registered worktree heads and 191 local branch tips are merged; existing private/runtime state is preserved.
+
+[Completion evidence and remote-development instructions](../AMC_OS/RELEASES/2026-09-29-completion/README.md) contain the exact artifact hashes and limitations. Source 1.2.0 is qualified in these scopes; public npm/GitHub installers still serve 1.1.1. Real provider/model access, deployed governed-turn acceptance, independent human/comparative outcomes, historical production-key rotation and specification licensing remain unresolved. Behavioral gaming resistance is unavailable, not a passing score. Linear authorization was unavailable, so historical tracker counts and the 35-reconciliation queue are not current status; no external issue transitions were made. Deferred roadmap/maintenance rows retain the dispositions in the handoff.
+
 Tracks execution of the **289 original gaps plus G8-17b: 290 registered IDs** in [amc-gap-register.md](amc-gap-register.md), with supplemental discoveries recorded separately.
 Historical execution branch: `amc/gap-register-execution`. Historical baseline: `f419839a` (typecheck clean).
 

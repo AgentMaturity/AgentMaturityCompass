@@ -1,0 +1,19 @@
+{
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "sourceTree": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout",
+  "sourceTrackedClean": true,
+  "artifactPath": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/artifact/agent-maturity-compass-1.2.0.tgz",
+  "artifactSha256": "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+  "cliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+  "packageVersion": "1.2.0",
+  "npmIntegrity": "sha512-VpiYL0jjBSDqqAuBOqWdKyd6H48P530kbs/aekUZto+CG+DpV+CzZuQYDwhG0ZsiT+jGoFWv0ziHb6dTyPYC7g==",
+  "regularFilesCompared": 3985,
+  "allPackageFilesMatchBuiltClone": true,
+  "packageManifestComparedSemantically": true,
+  "packagedFilePinsSha256": "e6cc0be9a0394203a93853b18f39133da1ca94729567314791ee291813e4d00e",
+  "lockfiles": {
+    "pnpm-lock.yaml": "9e3869422d2828b034d56ff1987ec6545547dd9f663140cfb8ae583ca6df8efc",
+    "package-lock.json": null
+  },
+  "recordedAt": "2026-09-29T09:07:18.214080+00:00"
+}

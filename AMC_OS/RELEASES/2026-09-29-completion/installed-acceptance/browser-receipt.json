@@ -1,0 +1,490 @@
+{
+  "ok": true,
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "artifactSha256": "ac77c45bd07e186dc42fcb4d9a5e27044e388b5faeec47b9b6a55c691a7580d2",
+  "installedCliSha256": "8e3b67d600a3559b940888f8e58634e1358cd022cb28c7cdd502f12d4405946c",
+  "startedAt": "2026-09-29T09:07:44.642660+00:00",
+  "finishedAt": "2026-09-29T09:08:32.870932+00:00",
+  "harnessHashes": {
+    "scripts/studio-native-browser-check.mjs": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "tests/e2e/native-tasks-page.mjs": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "scripts/lib/nativeStudioBrowserReceipt.mjs": "2624565f6d09c28f66ce750ac53e6b12f2e92a1f3997db47035aa10ab54bce5e",
+    "scripts/installed-studio-browser-check.py": "f54022a76d8b9ae4a8fa1a11abe9cd81bedba1fd9b46b3de372dbd7e4ef5dd36"
+  },
+  "nodeSha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+  "nodeVersion": "v22.22.0",
+  "browserExecutableSha256": "a596b1cfc6353e987fcec8d71a23a28cd6a9e7a6b4e20b908e4c4fcffe51158e",
+  "helperSha256": "f54022a76d8b9ae4a8fa1a11abe9cd81bedba1fd9b46b3de372dbd7e4ef5dd36",
+  "trustBoundary": "Local pre-execution workspace key consistency; not independent external anchoring",
+  "preExecutionMonitorSha256": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+  "browserExitCode": 0,
+  "sentinelPreserved": true,
+  "browserReceiptComplete": true,
+  "cleanup": [
+    {
+      "resource": "owned demo daemon",
+      "signalCommandExit": 0,
+      "knownPid": 31580,
+      "groupId": 31580,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "owned foreground Studio",
+      "exitCode": 0,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "private fixture credentials/workspaces/raw log",
+      "ok": true
+    }
+  ],
+  "schemaVersion": "amc-installed-browser-curated-receipt/v1",
+  "curation": "Exact selected fields from both original receipts; cold verifier JSON output strings parsed into objects. HTTP request records and setup commands omitted; full receipt SHA-256 values retained.",
+  "originalReceipts": {
+    "browser-installed/fixture-run-receipt.json": "124887ba3758ad437ea21510048863864146ccacd353a0e0c1e32d1c6f8fd46b",
+    "browser-installed/browser/receipt.json": "1e6b9e5b29a1a94ea01c8f7f1f8723acc67f2f186c2dd57467eab75b99d7ef64"
+  },
+  "browser": {
+    "qualification": "browser-slice-passed",
+    "node": {
+      "version": "v22.22.0",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "browser": {
+      "engine": "chromium",
+      "version": "151.0.7922.34"
+    },
+    "checks": [
+      {
+        "name": "owner-login-and-missing-credential",
+        "status": "passed",
+        "elapsedMs": 858,
+        "details": {
+          "actorMode": "owner cookie",
+          "nondefaultAgent": "browser-agent",
+          "providerInspectedOnly": "openai"
+        }
+      },
+      {
+        "name": "rendered-layout-keyboard-and-home-handoff",
+        "status": "passed",
+        "elapsedMs": 1354,
+        "details": {
+          "widths": [
+            1280,
+            390
+          ],
+          "clipboardAgent": "browser-agent"
+        }
+      },
+      {
+        "name": "selected-agent-committed-task-and-follow-up",
+        "status": "passed",
+        "elapsedMs": 3644,
+        "details": {
+          "taskId": "3c605800baa1585aea71cd3f87945896dde6b687b5ab316ca09facb59ce6e4b0",
+          "sessionId": "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+          "revision": 2,
+          "evidence": "committed; full verification separate"
+        }
+      },
+      {
+        "name": "release-reload-explicit-resume",
+        "status": "passed",
+        "elapsedMs": 1288,
+        "details": {
+          "sessionId": "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+          "reloadMutationCount": 0
+        }
+      },
+      {
+        "name": "lost-create-acknowledgement-never-replayed",
+        "status": "passed",
+        "elapsedMs": 983,
+        "details": {
+          "taskId": "9eef57522e97be03c8ac0d2fea42eee7cd2b69f7244e57e7066b9188a1611a9a",
+          "requestId": "1d805725-f26a-48fd-9f30-be2427e78b67",
+          "browserPosts": 1,
+          "acceptedTasks": 1,
+          "editedDraftPreserved": true
+        }
+      },
+      {
+        "name": "unreceived-create-explicit-identical-retry",
+        "status": "passed",
+        "elapsedMs": 2699,
+        "details": {
+          "taskId": "0393643d09b84aebc6baea65815263397fb9eff6d14bde3c45eb84c1be53fc58",
+          "sessionId": "8754e569-4bdf-4e1a-9470-b0aa06f39a59",
+          "requestId": "b07de13d-2633-40f5-be94-83cb8fb68f31",
+          "attempts": 3,
+          "requestBodyIdentical": true,
+          "revisedDraftPreserved": true,
+          "firstAttemptReachedServer": false,
+          "refusedRetry": "real CSRF check",
+          "failedRefreshRecoverable": true
+        }
+      },
+      {
+        "name": "unreceived-turn-explicit-identical-retry",
+        "status": "passed",
+        "elapsedMs": 4183,
+        "details": {
+          "taskId": "52d8f51cde98a03dd3376ce4e93748fd59784b1846ad7219bb47a40094b61ad7",
+          "sessionId": "21ff39ed-feeb-4b86-99ee-535a38edbc2f",
+          "requestId": "d4517f2f-37f3-4ee0-9ca3-b5109250bdc8",
+          "attempts": 3,
+          "requestBodyIdentical": true,
+          "revisedDraftPreserved": true,
+          "firstAttemptReachedServer": false,
+          "refusedRetry": "real CSRF check",
+          "failedRefreshRecoverable": true
+        }
+      },
+      {
+        "name": "real-pending-approval-link-and-denial",
+        "status": "passed",
+        "elapsedMs": 3392,
+        "details": {
+          "taskId": "fbeef904486bd30e28b9ca36c371f56fdd3e08a923ec5d4bea4e901fc3c2bb97",
+          "sessionId": "c2cc5497-1d4b-4907-9a25-cbf5309c0475",
+          "approvalRequestId": "apprreq_bab38249c15d4c4c9461d4b913b4a40a",
+          "quorum": 2,
+          "decision": "DENY",
+          "note": "Stub requests a synthetic argument shape; no successful coding/editing effect is claimed."
+        }
+      },
+      {
+        "name": "cancel-actual-turn-waiting-for-approval",
+        "status": "passed",
+        "elapsedMs": 3714,
+        "details": {
+          "taskId": "5e4357fc847114eb31ebd68a088a9a4f1b79cc72f86fcc900036eda0ab0a0bad",
+          "sessionId": "0271f5c4-9955-4096-90e9-023eb32b3601",
+          "ending": "cancelled"
+        }
+      },
+      {
+        "name": "browser-verification-control-reports-actual-verdict",
+        "status": "passed",
+        "elapsedMs": 192,
+        "details": {
+          "sessionId": "0271f5c4-9955-4096-90e9-023eb32b3601",
+          "verification": "failed",
+          "note": "Checks faithful presentation of the actual verifier result; cold cryptographic acceptance is independently required after shutdown."
+        }
+      },
+      {
+        "name": "explicit-closed-task-archive-retains-inspection",
+        "status": "passed",
+        "elapsedMs": 3243,
+        "details": {
+          "taskId": "351694bccf2d3fa96538d56b6fc98b4d42c4e89b4a5f2225450ef326c395baea",
+          "sessionId": "d791b840-f18f-4b8e-bc84-4a4497876969",
+          "revision": 1,
+          "signedHistoryRetained": true,
+          "defaultListExcluded": true,
+          "explicitArchivedInspection": true,
+          "reloadMutationCount": 0,
+          "evidenceVerification": "failed"
+        }
+      },
+      {
+        "name": "native-write-browser-proof-and-agent-binding",
+        "status": "passed",
+        "elapsedMs": 1,
+        "details": {
+          "nativeRequests": 25,
+          "cookieCsrfPresent": true,
+          "agentId": "browser-agent"
+        }
+      },
+      {
+        "name": "demo-stub-only-and-approval-refusal",
+        "status": "passed",
+        "elapsedMs": 1338,
+        "details": {
+          "taskId": "a32c9519ee00a9284fe913ac9e9b0280603990686b04c37894e8758e69d399f7",
+          "provider": "stub",
+          "tools": "none",
+          "approvalStatus": 403
+        }
+      }
+    ],
+    "sessionIds": [
+      "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+      "29848deb-385c-4db5-b618-333d5deec701",
+      "8754e569-4bdf-4e1a-9470-b0aa06f39a59",
+      "21ff39ed-feeb-4b86-99ee-535a38edbc2f",
+      "c2cc5497-1d4b-4907-9a25-cbf5309c0475",
+      "0271f5c4-9955-4096-90e9-023eb32b3601",
+      "d791b840-f18f-4b8e-bc84-4a4497876969"
+    ],
+    "cleanup": [
+      {
+        "resource": "owned browser",
+        "ok": true
+      }
+    ],
+    "counts": {
+      "planned": 13,
+      "passed": 13,
+      "failed": 0,
+      "notExercised": 0
+    },
+    "limits": [
+      "Actual browser with installed AMC server; provider is the explicit local deterministic stub.",
+      "No real model coding-quality claim. Workspace stub tool arguments are synthetic; denial/cancellation are the exercised tool behaviors.",
+      "Browser service workers are blocked for deterministic lost-response interception; offline/service-worker behavior is not qualified.",
+      "Cold cryptographic verification must be run separately after orderly Studio shutdown; a live gateway can make whole-workspace verification refuse.",
+      "No HAR/trace or credential values are retained."
+    ],
+    "harness": {
+      "scriptSha256": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+      "pageModuleSha256": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+      "playwright": {
+        "path": "/private/tmp/amc-candidate-acceptance-20260929-k6a8f925/tmp/amc-clean-source-jQvkqk/checkout/node_modules/@playwright/test/package.json",
+        "version": "1.62.1"
+      }
+    }
+  },
+  "coldVerifiers": [
+    {
+      "sessionId": "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "b64f1b07-c6f5-47b8-904c-78f5256cf96d",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "3748c3ed-ca32-4833-875d-288d003242cd",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "29848deb-385c-4db5-b618-333d5deec701",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "29848deb-385c-4db5-b618-333d5deec701",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "09ea48cf-18d3-4975-b157-f12be688bd88",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "8754e569-4bdf-4e1a-9470-b0aa06f39a59",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "8754e569-4bdf-4e1a-9470-b0aa06f39a59",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "d8146674-86bf-4003-aa90-d3d8d817e7a6",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "21ff39ed-feeb-4b86-99ee-535a38edbc2f",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "21ff39ed-feeb-4b86-99ee-535a38edbc2f",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "b2ff3737-1f6e-4e2e-9878-54289997c3ef",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "0c1a93eb-3649-46ec-9298-5b2b8c659741",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "c2cc5497-1d4b-4907-9a25-cbf5309c0475",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "c2cc5497-1d4b-4907-9a25-cbf5309c0475",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "ef707769-9625-4d65-b611-2a10d20a9991",
+            "status": "reconstructed",
+            "detail": null
+          },
+          {
+            "headerEventId": "9ea17b20-2ab1-4d7c-a741-02d7fcaf294d",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "0271f5c4-9955-4096-90e9-023eb32b3601",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "0271f5c4-9955-4096-90e9-023eb32b3601",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "f6570175-2ccc-4a63-baa4-f1b24422dac4",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "sessionId": "d791b840-f18f-4b8e-bc84-4a4497876969",
+      "exitCode": 0,
+      "valid": true,
+      "kind": "native request reconstruction",
+      "result": {
+        "sessionId": "d791b840-f18f-4b8e-bc84-4a4497876969",
+        "ok": true,
+        "ledgerOk": true,
+        "ledgerErrors": [],
+        "sessionChainErrors": [],
+        "unsignedRowIds": [],
+        "requests": [
+          {
+            "headerEventId": "71c8f8ea-9f4c-4274-a010-89f21e3008c6",
+            "status": "reconstructed",
+            "detail": null
+          }
+        ],
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        }
+      }
+    },
+    {
+      "exitCode": 0,
+      "valid": true,
+      "kind": "ledger",
+      "result": {
+        "ok": true,
+        "errors": [],
+        "chain": {
+          "ok": true,
+          "errors": []
+        },
+        "governance": {
+          "ok": true,
+          "errors": []
+        },
+        "trustRoot": {
+          "anchored": true,
+          "monitorFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74",
+          "expectedFingerprint": "be30085bff7fca587b59426dfdbb2bcfd164b1b7911df03bbe1aba3903ff3c74"
+        },
+        "sessions": {
+          "open": [],
+          "released": [
+            "01cc6baa-a3e3-4e79-9ab3-1b8e5246e0e1",
+            "29848deb-385c-4db5-b618-333d5deec701",
+            "8754e569-4bdf-4e1a-9470-b0aa06f39a59",
+            "21ff39ed-feeb-4b86-99ee-535a38edbc2f",
+            "c2cc5497-1d4b-4907-9a25-cbf5309c0475",
+            "0271f5c4-9955-4096-90e9-023eb32b3601"
+          ],
+          "interrupted": [],
+          "closed": [
+            "d791b840-f18f-4b8e-bc84-4a4497876969"
+          ]
+        }
+      }
+    }
+  ]
+}

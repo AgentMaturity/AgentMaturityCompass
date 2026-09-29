@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "421859b0c9c3b961731f847870b35b9dfecca96d",
+  "command": "pnpm exec playwright test --config tests/e2e/playwright.config.ts --reporter=json",
+  "exitCode": 0,
+  "stats": {
+    "startTime": "2026-09-29T09:30:45.301Z",
+    "duration": 31965.845999999998,
+    "expected": 57,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "errors": [],
+  "report": {
+    "localPath": "/tmp/amc-website-421859b0-20260929.json",
+    "sha256": "ce466aab5dfd619b4af01c61b35b60158cbff3018e99aff6ca907b2dfae9be1a"
+  },
+  "browser": "Chromium 151.0.7922.34, Playwright revision 1234",
+  "scope": "All public website Playwright tests; installed Studio is qualified separately."
+}
