@@ -1,44 +1,204 @@
 {
   "track": "S2",
   "status": "COMPLETE",
-  "statusReason": "all acceptance checks pass; package.json script entries are optional and given as ready-to-wire; report.md was refused by the subagent harness (no report .md files), so its content is in the structured result notesForMonitor",
+  "statusReason": "repair round 1: the three paths were moved into the claimed globs; the presence check meets the planner's --json contract (exit 1, six keys {present, requiredFor, configureAt}, canary 0); the runbook and platform-config tests were added and mutation-verified",
   "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-2",
   "branch": "worktree-wf_5210e2f4-3ea-2",
   "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
-  "commits": ["fa7b6f38", "a89508b2", "d6a0beec"],
-  "environment": { "os": "darwin 25.6.0", "arch": "arm64", "node": "v25.5.0", "pnpm": "10.33.0", "vitest": "4.1.11" },
+  "commits": [
+    "fa7b6f38",
+    "a89508b2",
+    "d6a0beec",
+    "1d67aecf",
+    "314d9de6",
+    "327c712d",
+    "e94ec4ea",
+    "895d7fb5",
+    "ddfda721"
+  ],
+  "environment": {
+    "os": "darwin 25.6.0",
+    "arch": "arm64",
+    "node": "v25.5.0",
+    "pnpm": "10.33.0",
+    "vitest": "4.1.11"
+  },
   "filesChanged": [
     "scripts/deploy-verify.mjs",
-    "scripts/release-credentials-check.mjs",
+    "scripts/credentials-presence-check.mjs",
+    "src/deployVerify/platformDeployConfig.ts",
     "railway.json",
     "docs/RELEASE_RUNBOOK.md",
-    "docs/DEPLOYMENT_VERIFICATION.md",
+    "docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md",
     "tests/deployVerify.test.ts",
     "tests/deployVerifyConfig.test.ts",
-    "tests/releaseCredentialsCheck.test.ts"
+    "tests/credentialPresence.test.ts",
+    "tests/platformDeployConfig.test.ts",
+    "tests/deploymentConfirmationRunbook.test.ts"
   ],
   "tests": {
-    "red": "3 files failed, 18 failed / 1 passed (vercel config test holds at HEAD)",
-    "green": "tests/deployVerify.test.ts + tests/releaseCredentialsCheck.test.ts 17/17; tests/deployVerifyConfig.test.ts 2/2"
+    "threeFileCommand": "pnpm vitest run tests/deployVerify.test.ts tests/credentialPresence.test.ts tests/deployVerifyConfig.test.ts → 18/18 (9+7+2; the presence suite was rewritten to 7 tests for the planner's contract, hence not 19)",
+    "allS2": "5 files 25/25 (adds platformDeployConfig 4, deploymentConfirmationRunbook 3)"
   },
-  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests 0 error TS",
   "mutations": [
-    { "guard": "signature failure fails", "mutation": "return ok || true ? ...", "red": "1 failed / 8 passed (wrong-key test)", "restoredGreen": "9/9" },
-    { "guard": "credentials never print a value", "mutation": "append process.env[name] to text line", "red": "2 failed / 6 passed", "restoredGreen": "8/8" },
-    { "guard": "missing required check fails run", "mutation": "drop missingChecks.length === 0", "red": "1 failed / 8 passed", "restoredGreen": "9/9" },
-    { "guard": "no-pinned-key early return", "mutation": "deleted", "red": "stayed GREEN 9/9 (decoration)", "restoredGreen": "guard removed in a89508b2" }
+    {
+      "guard": "signature failure fails",
+      "mutation": "return ok || true ? ...",
+      "red": "1 failed / 8 passed (wrong-key test)",
+      "restoredGreen": "9/9"
+    },
+    {
+      "guard": "credentials never print a value",
+      "mutation": "append process.env[name] to text line",
+      "red": "2 failed / 6 passed",
+      "restoredGreen": "8/8"
+    },
+    {
+      "guard": "missing required check fails run",
+      "mutation": "drop missingChecks.length === 0",
+      "red": "1 failed / 8 passed",
+      "restoredGreen": "9/9"
+    },
+    {
+      "guard": "no-pinned-key early return",
+      "mutation": "deleted",
+      "red": "stayed GREEN 9/9 (decoration)",
+      "restoredGreen": "guard removed in a89508b2"
+    },
+    {
+      "guard": "presence JSON carries no value",
+      "mutation": "buildReport adds value: env[name]",
+      "red": "credentialPresence 2 failed / 5 passed",
+      "restoredGreen": "7/7"
+    },
+    {
+      "guard": "npmrc comment lines ignored",
+      "mutation": "drop the [;#] comment filter",
+      "red": "1 failed / 6 passed",
+      "restoredGreen": "7/7"
+    },
+    {
+      "guard": "tsx classified devDependency-only",
+      "mutation": "classifyBinary reads dependencies only",
+      "red": "platformDeployConfig 3 failed / 1 passed",
+      "restoredGreen": "4/4"
+    },
+    {
+      "guard": "undocumented builder flagged",
+      "mutation": "builder guard → false",
+      "red": "3 failed / 1 passed",
+      "restoredGreen": "4/4"
+    },
+    {
+      "guard": "'wait for an explicit yes' under B4",
+      "mutation": "delete the phrase under B4 (and separately: move it into B3)",
+      "red": "runbook 1 failed / 2 passed (both variants)",
+      "restoredGreen": "3/3"
+    }
   ],
   "liveRuns": [
-    { "target": "local Studio 127.0.0.1:49159 + gateway :49160 (harness PID 70120, Studio PID 70263)", "pass": true, "exit": 0, "receiptId": "e7d04b9a-52cc-41c2-983b-7cf0e15e1cde", "durationMs": 147, "verifierCommit": "a89508b2", "closed": true },
-    { "target": "same, wrong pinned key", "pass": false, "exit": 1, "failed": ["receipt-signature", "receipt-binding"] },
-    { "target": "npm run api:start on :43213 (PIDs 60640/60711/60757)", "pass": false, "exit": 1, "reason": "lite API has no /healthz, /readyz, gateway or receipts", "closed": true },
-    { "target": "http://127.0.0.1:1", "pass": false, "exit": 1 }
+    {
+      "target": "local Studio 127.0.0.1:49159 + gateway :49160 (harness PID 70120, Studio PID 70263)",
+      "pass": true,
+      "exit": 0,
+      "receiptId": "e7d04b9a-52cc-41c2-983b-7cf0e15e1cde",
+      "durationMs": 147,
+      "verifierCommit": "a89508b2",
+      "closed": true
+    },
+    {
+      "target": "same, wrong pinned key",
+      "pass": false,
+      "exit": 1,
+      "failed": [
+        "receipt-signature",
+        "receipt-binding"
+      ]
+    },
+    {
+      "target": "npm run api:start on :43213 (PIDs 60640/60711/60757)",
+      "pass": false,
+      "exit": 1,
+      "reason": "lite API has no /healthz, /readyz, gateway or receipts",
+      "closed": true
+    },
+    {
+      "target": "http://127.0.0.1:1",
+      "pass": false,
+      "exit": 1
+    }
   ],
-  "b1": { "measuredAt": "2026-10-03T16:22:54Z", "githubRepoSecrets": [], "localShellUnset": ["NPM_TOKEN", "CHANGESETS_GITHUB_TOKEN", "AMC_RELEASE_SIGNING_KEY", "GITHUB_TOKEN", "RAILWAY_TOKEN", "VERCEL_TOKEN", "HOMEBREW_TAP_TOKEN", "AMC_DEPLOY_VERIFY_LEASE"] },
-  "readyToWire": { "package.json scripts": { "deploy:verify": "node scripts/deploy-verify.mjs", "release:credentials": "node scripts/release-credentials-check.mjs" } },
+  "b1": {
+    "measuredAt": "2026-10-03T16:22:54Z",
+    "githubRepoSecrets": [],
+    "localShellUnset": [
+      "NPM_TOKEN",
+      "CHANGESETS_GITHUB_TOKEN",
+      "AMC_RELEASE_SIGNING_KEY",
+      "GITHUB_TOKEN",
+      "RAILWAY_TOKEN",
+      "VERCEL_TOKEN",
+      "HOMEBREW_TAP_TOKEN",
+      "AMC_DEPLOY_VERIFY_LEASE"
+    ],
+    "remeasuredAt": "2026-10-03T17:53:13Z",
+    "presenceCheckThisShell": {
+      "NPMRC_AUTH_TOKEN_LINE": true,
+      "NPM_TOKEN": false,
+      "CHANGESETS_GITHUB_TOKEN": false,
+      "AMC_RELEASE_SIGNING_KEY": false,
+      "HOMEBREW_TAP_TOKEN": false,
+      "GHCR_TOKEN": false,
+      "RAILWAY_TOKEN": false,
+      "VERCEL_TOKEN": false,
+      "AMC_DEPLOY_VERIFY_LEASE": false,
+      "exit": 1
+    }
+  },
+  "readyToWire": {
+    "package.json scripts": {
+      "deploy:verify": "node scripts/deploy-verify.mjs",
+      "check:credentials-presence": "node scripts/credentials-presence-check.mjs"
+    }
+  },
   "sources": [
-    { "title": "Railway Config as Code reference", "url": "https://docs.railway.com/reference/config-as-code", "retrievedAt": "2026-10-03" },
-    { "title": "Railway Healthchecks guide", "url": "https://docs.railway.com/guides/healthchecks", "retrievedAt": "2026-10-03" },
-    { "title": "Railway Nixpacks reference (deprecation status unverified)", "url": "https://docs.railway.com/reference/nixpacks", "retrievedAt": "2026-10-03" }
-  ]
+    {
+      "title": "Railway Config as Code reference",
+      "url": "https://docs.railway.com/reference/config-as-code",
+      "retrievedAt": "2026-10-03",
+      "note": "re-fetched 2026-10-03 in repair round: builders RAILPACK (default), DOCKERFILE; NIXPACKS not listed; deploy.healthcheckPath documented"
+    },
+    {
+      "title": "Railway Healthchecks guide",
+      "url": "https://docs.railway.com/guides/healthchecks",
+      "retrievedAt": "2026-10-03"
+    },
+    {
+      "title": "Railway Nixpacks reference (deprecation status unverified)",
+      "url": "https://docs.railway.com/reference/nixpacks",
+      "retrievedAt": "2026-10-03"
+    },
+    {
+      "title": "GitHub Docs — Working with the Container registry (PAT classic with write:packages locally; GITHUB_TOKEN in Actions)",
+      "url": "https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry",
+      "retrievedAt": "2026-10-03"
+    }
+  ],
+  "round1Head": "314d9de697d36c151336f0b6cf6d429703469e4a",
+  "renames": {
+    "scripts/release-credentials-check.mjs": "scripts/credentials-presence-check.mjs",
+    "tests/releaseCredentialsCheck.test.ts": "tests/credentialPresence.test.ts",
+    "docs/DEPLOYMENT_VERIFICATION.md": "docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md"
+  },
+  "acceptance": {
+    "presenceContract": "HOME=$(mktemp -d) NPM_TOKEN= CHANGESETS_GITHUB_TOKEN= node scripts/credentials-presence-check.mjs --json → exit=1; NPM_TOKEN, CHANGESETS_GITHUB_TOKEN, RAILWAY_TOKEN, VERCEL_TOKEN, GHCR_TOKEN, NPMRC_AUTH_TOKEN_LINE each {present:false, requiredFor, configureAt}; plus AMC_RELEASE_SIGNING_KEY, HOMEBREW_TAP_TOKEN, AMC_DEPLOY_VERIFY_LEASE with the same shape",
+    "canary": "HOME=$(mktemp -d) NPM_TOKEN=s2-canary-value-9f3 node scripts/credentials-presence-check.mjs --json | grep -c s2-canary-value-9f3 → 0",
+    "platformConfig": "committed findings exactly [devDependency-only-start-binary (tsx, package.json:172), undocumented-builder (NIXPACKS)]; healthcheckPath present; package.json sha256 unchanged",
+    "runbook": "pnpm vitest run tests/deploymentConfirmationRunbook.test.ts 3/3; pnpm check:docs-drift passed (327 files)",
+    "noSideEffect": "diff stat on package.json api/index.ts deploy docker .github → 0; publish/deploy grep → 0",
+    "dirtyPaths": "0",
+    "architecture": "node scripts/architecture-boundaries-check.mjs → failures []"
+  },
+  "acceptedDivergenceRequested": "the governed turn is a leased gateway chat completion with an Ed25519 receipt (src/gateway/server.ts:1638-1662), not native-task + /verify"
 }
