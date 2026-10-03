@@ -58,7 +58,8 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // Statutes, programmes and guidance not checked in this review
   unverified("us-ada", "Americans with Disabilities Act of 1990 (42 U.S.C. §12101 et seq.)", "US", "law", ["ADA", "Americans with Disabilities Act (ADA)", "Americans with Disabilities Act"]),
   unverified("us-hitech", "HITECH Act (2009)", "US", "law", ["HITECH Act", "HITECH"]),
-  unverified("us-cures", "21st Century Cures Act (2016)", "US", "law", ["21st Century Cures Act"]),
+  verified("us-cures", "21st Century Cures Act (Public Law 114-255)", "US", "law", "in-force", "https://www.govinfo.gov/content/pkg/PLAW-114publ255/html/PLAW-114publ255.htm",
+    ["21st Century Cures Act"], { effectiveDate: "2016-12-13", note: "Enacted text read on govinfo.gov; information blocking is §4004, interoperability §4003." }),
   unverified("us-fda-510k", "FDA premarket notification (510(k)), 21 CFR Part 807 Subpart E", "US", "law", ["FDA 510(k)"]),
   unverified("us-fda-samd", "FDA guidance on Software as a Medical Device", "US", "guidance", ["FDA SaMD Guidance", "FDA Software as a Medical Device (SaMD) Guidance", "FDA SaMD"]),
   unverified("us-dscsa", "Drug Supply Chain Security Act (2013)", "US", "law", ["FDA DSCSA"]),
