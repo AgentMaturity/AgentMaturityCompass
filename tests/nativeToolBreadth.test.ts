@@ -11,6 +11,9 @@ import type { ToolDefinition } from "../src/tools/toolTypes.js";
 import { webSearchTool, type WebSearchProvider, type WebSearchReceipt } from "../src/tools/builtin/webSearchTool.js";
 import { todoTool, readSessionTodo } from "../src/tools/builtin/todoTool.js";
 import { planTool, readSessionPlan } from "../src/tools/builtin/planTool.js";
+import { webFetchTool } from "../src/tools/builtin/webFetchTool.js";
+import { sessionListPath } from "../src/tools/builtin/nativeToolBreadth/sessionListTool.js";
+import { writeSignedRecord } from "../src/tools/builtin/nativeToolBreadth/signedSessionRecords.js";
 
 /**
  * web_search, todo and plan (AMC-1549).
@@ -58,6 +61,15 @@ const jsonProvider = (endpoint: string): WebSearchProvider => ({
     const response = await get(`${endpoint}?q=${encodeURIComponent(query)}`);
     return JSON.parse(response.body) as { title: string; url: string; snippet: string }[];
   }
+});
+
+describe("action class", () => {
+  // The egress guard, NETWORK_EXTERNAL budget metering and the signed-policy
+  // class match all key on actionClass; READ_ONLY would silently drop them.
+  it("web_fetch and web_search are NETWORK_EXTERNAL", () => {
+    expect(webFetchTool({ record: () => undefined }).actionClass).toBe("NETWORK_EXTERNAL");
+    expect(webSearchTool({ record: () => undefined }).actionClass).toBe("NETWORK_EXTERNAL");
+  });
 });
 
 describe("web_search", () => {
@@ -145,6 +157,15 @@ describe("todo and plan records", () => {
     const outcome = await pipeline(dir, todoTool({ sessionId: "sess-c" }), "agent-two")({ items: [] });
     expect(outcome.ok).toBe(false);
     expect(outcome.output).toContain("bound to");
+  });
+
+  it("a reader refuses a validly signed record of another kind or session placed at the todo path", () => {
+    const dir = workspace();
+    const header = { schemaVersion: "2026-10-03", agentId: "default", revision: 1, previousSha256: null, callId: "c1", updatedAt: 1 };
+    writeSignedRecord(dir, sessionListPath(dir, "sess-k", "todo.json"), { ...header, kind: "amc.native.plan", sessionId: "sess-k", summary: "s", steps: [] }, "monitor");
+    expect(() => readSessionTodo(dir, "sess-k")).toThrow(/native tool record is bound to amc\.native\.plan\/sess-k/);
+    writeSignedRecord(dir, sessionListPath(dir, "sess-m", "todo.json"), { ...header, kind: "amc.native.todo", sessionId: "sess-other", items: [] }, "monitor");
+    expect(() => readSessionTodo(dir, "sess-m")).toThrow(/native tool record is bound to amc\.native\.todo\/sess-other/);
   });
 
   it("refuses an unsafe session id, at construction or when a resolver yields one", async () => {
