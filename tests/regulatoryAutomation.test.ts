@@ -172,3 +172,69 @@ describe("getRegulatoryChanges", () => {
     expect(all).toHaveLength(2);
   });
 });
+
+describe("DEFAULT_REGULATORY_FEEDS contract (no fake feeds)", () => {
+  it("every feed declares a contract, authority and recorded reachability", () => {
+    for (const feed of DEFAULT_REGULATORY_FEEDS) {
+      expect(["live", "manual-review-required"], feed.id).toContain(feed.contract);
+      expect(typeof feed.official, feed.id).toBe("boolean");
+      expect(feed.reachability?.checkedAt, feed.id).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+    }
+  });
+
+  it("a live feed is enabled, official, https, machine-readable and was reachable", () => {
+    const live = DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract === "live");
+    expect(live.length).toBeGreaterThanOrEqual(4);
+    for (const feed of live) {
+      expect(feed.enabled, feed.id).toBe(true);
+      expect(feed.official, feed.id).toBe(true);
+      expect(feed.url, feed.id).toMatch(/^https:\/\//);
+      expect(["rss", "api"], feed.id).toContain(feed.type);
+      expect(feed.reachability?.status, feed.id).toBe(200);
+      expect(feed.selector, feed.id).toBeUndefined();
+    }
+  });
+
+  it("a feed that is not a live official source is disabled and says why", () => {
+    for (const feed of DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract !== "live")) {
+      expect(feed.enabled, feed.id).toBe(false);
+      expect(feed.manualReviewReason, feed.id).toBeTruthy();
+    }
+  });
+
+  it("the default monitor polls only live feeds", () => {
+    const monitor = new RegulatoryMonitor({ jurisdictions: ["GLOBAL", "EU", "US", "UK", "SG", "CN"] });
+    const enabled = monitor.getFeeds().filter((f) => f.enabled).map((f) => f.id).sort();
+    expect(enabled).toEqual(DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract === "live").map((f) => f.id).sort());
+  });
+});
+
+describe("parsed changes do not invent legal dates", () => {
+  const feed = (type: "rss" | "api") => ({
+    id: `t-${type}`, name: "T", framework: "EU_AI_ACT", type, url: "https://example.invalid/feed",
+    pollIntervalMs: 1, lastChecked: 0, lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["EU"],
+  });
+  async function changesFor(type: "rss" | "api", body: string) {
+    const monitor = new RegulatoryMonitor({ feeds: [], jurisdictions: ["EU"] });
+    const hooked = monitor as unknown as { _fetchHook: () => Promise<string> };
+    const f = feed(type);
+    hooked._fetchHook = async () => "baseline";
+    await monitor.checkFeed(f);
+    hooked._fetchHook = async () => body;
+    return (await monitor.checkFeed(f)).changes;
+  }
+
+  it("marks an RSS item's effective date as an estimate", async () => {
+    const [change] = await changesFor("rss", "<rss><item><title>AI Act guidance</title><pubDate>Tue, 19 May 2026 10:37:49 +0000</pubDate></item></rss>");
+    expect(change!.effectiveDateEstimated).toBe(true);
+  });
+
+  it("reads Federal Register API fields and keeps a stated effective date", async () => {
+    const body = JSON.stringify({ results: [{ title: "Artificial intelligence rule", abstract: "AI risk", html_url: "https://www.federalregister.gov/d/x", publication_date: "2026-09-01", effective_on: "2026-12-01" }] });
+    const [change] = await changesFor("api", body);
+    expect(change!.source).toBe("https://www.federalregister.gov/d/x");
+    expect(change!.publishedDate).toBe(Date.parse("2026-09-01"));
+    expect(change!.effectiveDate).toBe(Date.parse("2026-12-01"));
+    expect(change!.effectiveDateEstimated).toBe(false);
+  });
+});
