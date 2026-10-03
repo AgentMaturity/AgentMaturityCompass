@@ -37,8 +37,9 @@ import { selfAssessPack, type PackSelfAssessment } from "./packSelfAssessment.js
  * /2 (P0-21): the overall pass flag and its threshold gave way to the self-assessment fields.
  * /3 (P0-20): a `signature` field; `receiptHash` now excludes it, so a /2 reader recomputing over
  * everything but `receiptHash` would fail on a /3 file, and a no-answer baseline is `synthetic_example`.
+ * /5 (P1-42, S4): a `currency` section inside the hashed body.
  */
-export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/4";
+export const INDUSTRY_PACK_AUDIT_SCHEMA_VERSION = "amc.industry-pack-audit/5";
 
 export const AUDIT_FRAMEWORKS = ["EU AI Act", "NIST AI RMF", "ISO 42001", "SOC 2", "Sector"] as const;
 export type AuditFramework = (typeof AUDIT_FRAMEWORKS)[number];
@@ -81,6 +82,101 @@ export interface AuditControl {
   remediation: AuditRemediation | null;
 }
 
+/* ── Regulatory currency ───────────────────────────────────────────────────
+ * PackCurrencyFields v1 is the contract with the pack-schema track: optional
+ * fields a pack MAY carry. They are declared structurally here (not imported)
+ * and read defensively, so packs without them compile and audit as "undated".
+ */
+export interface PackRegulatoryReference {
+  citation: string;
+  jurisdiction?: string;
+  url?: string;
+  effectiveDate?: string;
+  lastReviewed?: string;
+  status?: "in-force" | "applies-from" | "proposed" | "repealed" | "unverified";
+}
+
+export interface PackCurrencyFields {
+  version?: string;
+  lastReviewed?: string;
+  regulatoryReferences?: readonly PackRegulatoryReference[];
+}
+
+export type CurrencyStatus = "current" | "stale" | "undated" | "unverified";
+
+export interface AuditCurrency {
+  /** Worst finding wins: undated > stale > unverified > current. */
+  status: CurrencyStatus;
+  staleAfterDays: number;
+  packVersion: string | null;
+  packLastReviewed: string | null;
+  packAgeDays: number | null;
+  /** Currency fields absent, unparseable, or dated after `now`. */
+  missing: Array<"version" | "lastReviewed" | "regulatoryReferences">;
+  referenceCount: number;
+  staleReferences: Array<{ citation: string; lastReviewed: string; ageDays: number }>;
+  undatedReferences: string[];
+  unverifiedReferences: string[];
+}
+
+export const DEFAULT_STALE_AFTER_DAYS = 365;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Whole days from an ISO date to `now`; null when unparseable or in the future. */
+function ageInDays(date: unknown, now: number): number | null {
+  if (typeof date !== "string") return null;
+  const parsed = Date.parse(date);
+  if (!Number.isFinite(parsed) || parsed > now) return null;
+  return Math.floor((now - parsed) / DAY_MS);
+}
+
+export function computePackCurrency(
+  pack: IndustryPack & PackCurrencyFields,
+  now: number,
+  options: { staleAfterDays?: number } = {},
+): AuditCurrency {
+  const staleAfterDays = options.staleAfterDays ?? DEFAULT_STALE_AFTER_DAYS;
+  if (!Number.isFinite(staleAfterDays) || staleAfterDays <= 0) {
+    throw new RangeError(`staleAfterDays must be a positive number of days, got ${staleAfterDays}`);
+  }
+  const missing: AuditCurrency["missing"] = [];
+  const packVersion = typeof pack.version === "string" && pack.version.trim() ? pack.version : null;
+  if (packVersion === null) missing.push("version");
+  const packAgeDays = ageInDays(pack.lastReviewed, now);
+  if (packAgeDays === null) missing.push("lastReviewed");
+  const references = Array.isArray(pack.regulatoryReferences) ? pack.regulatoryReferences : [];
+  if (references.length === 0) missing.push("regulatoryReferences");
+
+  const staleReferences: AuditCurrency["staleReferences"] = [];
+  const undatedReferences: string[] = [];
+  const unverifiedReferences: string[] = [];
+  for (const ref of references) {
+    const citation = String(ref?.citation ?? "(uncited reference)");
+    if (ref?.status === "unverified") unverifiedReferences.push(citation);
+    const ageDays = ageInDays(ref?.lastReviewed, now);
+    if (ageDays === null) undatedReferences.push(citation);
+    else if (ageDays > staleAfterDays) staleReferences.push({ citation, lastReviewed: ref.lastReviewed as string, ageDays });
+  }
+
+  const status: CurrencyStatus =
+    packAgeDays === null || references.length === 0 ? "undated"
+      : packAgeDays > staleAfterDays || staleReferences.length > 0 ? "stale"
+        : unverifiedReferences.length > 0 ? "unverified"
+          : "current";
+  return {
+    status,
+    staleAfterDays,
+    packVersion,
+    packLastReviewed: packAgeDays === null ? null : (pack.lastReviewed as string),
+    packAgeDays,
+    missing,
+    referenceCount: references.length,
+    staleReferences,
+    undatedReferences,
+    unverifiedReferences,
+  };
+}
+
 export interface IndustryPackAudit {
   schemaVersion: string;
   packId: string;
@@ -104,6 +200,7 @@ export interface IndustryPackAudit {
     gapCount: number;
   };
   frameworkCoverage: Array<{ framework: AuditFramework; controls: number }>;
+  currency: AuditCurrency;
   controls: AuditControl[];
   /** Unkeyed sha256 over the canonical audit without `receiptHash` and `signature`: a checksum, not a signature. */
   receiptHash: string;
@@ -259,10 +356,13 @@ export interface BuildIndustryPackAuditInput {
   responses: Record<string, number>;
   now: number;
   frameworkFilter?: AuditFramework;
+  /** Age in days after which a review date counts as stale (default 365). */
+  staleAfterDays?: number;
 }
 
 export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): IndustryPackAudit {
   const { pack, responses, now, frameworkFilter } = input;
+  const currency = computePackCurrency(pack, now, { staleAfterDays: input.staleAfterDays });
   const controls: AuditControl[] = [];
   const { answers, ...assessed } = selfAssessPack(pack, responses, now);
   let passCount = 0;
@@ -324,6 +424,7 @@ export function buildIndustryPackAudit(input: BuildIndustryPackAuditInput): Indu
       gapCount,
     },
     frameworkCoverage,
+    currency,
     controls,
   };
   const receiptHash = sha256Hex(canonicalize(body));
@@ -501,6 +602,7 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
     lines.push(`| ${f.framework} | ${f.controls} |`);
   }
   lines.push("");
+  lines.push(...renderCurrencyMarkdown(audit.currency));
   lines.push("## Controls");
   for (const c of audit.controls) {
     lines.push("");
@@ -521,4 +623,17 @@ export function renderIndustryPackAuditMarkdown(audit: IndustryPackAudit): strin
   }
   lines.push("", "## How to read claim kinds", "", renderClaimLegend("markdown"), "");
   return lines.join("\n");
+}
+
+function renderCurrencyMarkdown(c: AuditCurrency): string[] {
+  const lines = ["## Regulatory currency", ""];
+  lines.push(`- Status: **${c.status}** (stale after ${c.staleAfterDays} days)`);
+  lines.push(`- Pack version: ${c.packVersion ?? "none"} · last reviewed: ${c.packLastReviewed ?? "none"}${c.packAgeDays === null ? "" : ` (${c.packAgeDays} days ago)`}`);
+  lines.push(`- Missing: ${c.missing.length > 0 ? c.missing.join(", ") : "none"}`);
+  lines.push(`- References: ${c.referenceCount} · stale ${c.staleReferences.length} · undated ${c.undatedReferences.length} · unverified ${c.unverifiedReferences.length}`);
+  for (const ref of c.staleReferences) lines.push(`  - stale: ${ref.citation} (last reviewed ${ref.lastReviewed}, ${ref.ageDays} days)`);
+  for (const citation of c.undatedReferences) lines.push(`  - undated: ${citation}`);
+  for (const citation of c.unverifiedReferences) lines.push(`  - unverified: ${citation}`);
+  lines.push("");
+  return lines;
 }
