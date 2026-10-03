@@ -24,6 +24,10 @@ config:
   imageTag:
     type: string
     default: latest
+  imageDigest:
+    type: string
+    default: ""
+    description: Optional sha256:<64 hex> image digest; when set it wins over imageTag.
   imagePullPolicy:
     type: string
     default: IfNotPresent

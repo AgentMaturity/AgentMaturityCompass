@@ -14,13 +14,15 @@ helm lint ./deploy/helm/amc
 
 ## Install
 
-Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default.
+Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default. `bootstrap.createSecret=true` renders it from `bootstrap.values` instead; every value is then required and a `change-me` value is refused.
 
 ```bash
 helm install amc ./deploy/helm/amc \
   --set image.repository=ghcr.io/your-org/amc-studio \
   --set image.tag=latest
 ```
+
+Pin the image with `--set image.digest=sha256:<64 hex>` (wins over the tag; `image.requireDigest=true` refuses a render without it). After install, `helm test amc --logs` runs one governed native turn and verifies its evidence.
 
 Production guide: `docs/KUBERNETES_HELM_DEPLOYMENT.md`.
 
@@ -49,7 +51,7 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-persist
 - Non-root runtime (`runAsUser: 10001`)
 - Read-only root filesystem
 - Persistent workspace PVC (`/data/amc`)
-- Bootstrap from an existing Kubernetes Secret (no Secret is rendered)
+- Bootstrap from an existing Kubernetes Secret (no Secret is rendered unless `bootstrap.createSecret=true`)
 - Startup/liveness `/healthz` and readiness `/readyz` probes
 - One replica with `strategy: Recreate` (single-writer workspace; other `replicaCount` values are refused)
 - TLS ingress support

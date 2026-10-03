@@ -11,6 +11,7 @@ locals {
     image = {
       repository = var.image_repository
       tag        = var.image_tag
+      digest     = var.image_digest
       pullPolicy = var.image_pull_policy
     }
     ingress = {
