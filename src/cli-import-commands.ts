@@ -2,18 +2,28 @@ import { resolve } from "node:path";
 import type { Command } from "commander";
 import chalk from "chalk";
 
-function renderNormalization(plan: import("./importers/neutralImporter.js").NeutralImportPlan): void {
+const shellWord = (value: string): string => /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
+
+/** `next` selects the receipt's own reviewed actions (preview), an inspection pointer (applied) or nothing (show). */
+function renderNormalization(plan: import("./importers/neutralImporter.js").NeutralImportPlan, next: "actions" | "inspect" | "none"): void {
   const receipt = plan.normalization;
   if (!receipt) { console.log("  Normalization: legacy receipt; mapping losses and unknown timing were not recorded."); return; }
   const count = receipt.counts;
   console.log(`  Source trust: ${receipt.sourceTrust}; evaluation: ${receipt.evaluation}`);
   console.log(`  Mapping: ${count.normalizedTraces} traces; ${count.failureTraces} reported failures`);
+  const records = receipt.recordMapping?.counts;
+  if (records) console.log(`  Records: ${records.records} (${records.mapped} mapped, ${records.retainedOnly} retained only, ${records.malformed} malformed, ${records.unsupported} unsupported)`);
   console.log(`  Files skipped: ${count.skippedFiles} (${count.malformedFiles} malformed, ${count.unsupportedFiles} unsupported, ${count.oversizedFiles} oversized)`);
   console.log(`  Unknown timing: ${count.unknownTimestamps} event times; ${count.unknownDurations} durations`);
   console.log(`  Normalizer: ${receipt.normalizerVersion}; semantic digest: ${receipt.semanticDigest}`);
   for (const loss of receipt.losses) console.log(chalk.gray(`  ${loss}`));
-  for (const candidate of plan.candidates) console.log(`  Source: ${candidate.path}; SHA-256 ${candidate.digest}; format ${candidate.sourceFormat?.version ?? candidate.format}`);
-  console.log("  Next: inspect the JSON receipt before applying, or use amc imports show <import-id> after applying.");
+  for (const candidate of plan.candidates) {
+    const format = candidate.sourceFormat ? `${candidate.sourceFormat.name} v${candidate.sourceFormat.version} (${candidate.format})` : candidate.format;
+    console.log(`  Source: ${candidate.path}; SHA-256 ${candidate.digest}; format ${format}`);
+  }
+  // Receipts written before nextActions existed carry none; print nothing rather than invent one.
+  if (next === "actions") for (const action of receipt.nextActions ?? []) console.log(`  Next: ${action.label}: ${action.argv.map(shellWord).join(" ")}`);
+  if (next === "inspect") console.log(`  Next: inspect with amc imports show ${plan.importId}`);
 }
 
 export function registerNeutralImportCommands(program: Command, activeAgent: (p: Command) => string | undefined): void {
@@ -47,7 +57,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Artifacts: ${result.plan.candidateCount}`);
         console.log(`  Categories: ${result.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${result.plan.redactionCount}`);
-        renderNormalization(result.plan);
+        renderNormalization(result.plan, result.applied ? "inspect" : "actions");
         if (!result.applied) {
           console.log(chalk.gray("  Dry run only. Re-run without --dry-run or --validate to write AMC evidence."));
           for (const path of result.plan.wouldWrite.slice(0, 8)) {
@@ -144,7 +154,7 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
         console.log(`  Source: ${manifest.sourcePath}`);
         console.log(`  Categories: ${manifest.plan.categories.join(", ") || "-"}`);
         console.log(`  Redactions: ${manifest.plan.redactionCount}`);
-        renderNormalization(manifest.plan);
+        renderNormalization(manifest.plan, "none");
         for (const path of manifest.externalEvidencePaths ?? []) console.log(`  Portable evidence: ${path}`);
       } catch (error) {
         console.error(chalk.red(error instanceof Error ? error.message : String(error)));
