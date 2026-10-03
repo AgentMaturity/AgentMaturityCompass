@@ -1,0 +1,54 @@
+# HEAD 903c19fe4e5b218fcd7361f821805481da042248
+$ git diff --name-only 8f57ce63..HEAD
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/green-after-fix.log
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/mutations.json
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/red-before-fix.log
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/report.md
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/result.json
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/rollback-check.log
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/validate-after-fix.log
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/validate-before-fix.log
+deploy/helm/amc/Chart.yaml
+deploy/helm/amc/README.md
+deploy/helm/amc/examples/values-persistent-bootstrap.yaml
+deploy/helm/amc/files/governed-turn-probe.mjs
+deploy/helm/amc/templates/NOTES.txt
+deploy/helm/amc/templates/_helpers.tpl
+deploy/helm/amc/templates/deployment.yaml
+deploy/helm/amc/templates/networkpolicy.yaml
+deploy/helm/amc/templates/secret.yaml
+deploy/helm/amc/templates/tests/governed-turn.yaml
+deploy/helm/amc/values.schema.json
+deploy/helm/amc/values.yaml
+deploy/k8s/README.md
+deploy/k8s/deployment.yaml
+deploy/k8s/secret.example.yaml
+deploy/pulumi/helm-release/Pulumi.yaml
+deploy/pulumi/helm-release/README.md
+deploy/pulumi/helm-release/index.ts
+deploy/terraform/helm-release/README.md
+deploy/terraform/helm-release/main.tf
+deploy/terraform/helm-release/terraform.tfvars.example
+deploy/terraform/helm-release/variables.tf
+docker/docker-compose.yml
+docs/KUBERNETES_HELM_DEPLOYMENT.md
+scripts/deploy/deploy-pack-check.mjs
+scripts/deploy/governed-turn-probe.mjs
+scripts/deploy/rollback-check.mjs
+scripts/deploy/rollback-drill.mjs
+scripts/deploy/validate-assets.mjs
+tests/deployPackCheck.test.ts
+tests/deployPackProbe.test.ts
+tests/helmChartSecrets.test.ts
+tests/helmChartVersion.test.ts
+tests/helpers/deployPackFixtures.ts
+tests/k8sManifestsSecrets.test.ts
+tests/rollbackDrill.test.ts
+$ tests/ paths outside claimed globs (tests/deployPack*.test.ts tests/helmChart*.test.ts tests/k8sManifests*.test.ts tests/rollbackDrill*.test.ts tests/helpers/deployPack*.ts):
+(none)
+$ intersection with codex-dirty-paths.json
+(none) of 306 dirty entries
+$ hard-forbidden paths touched
+(none)
+$ git diff --name-only 8f57ce63...HEAD | grep -F -x -f <(sed "s/^...//; s#/$##" codex-dirty-root-20261003.txt) | wc -l
+       0

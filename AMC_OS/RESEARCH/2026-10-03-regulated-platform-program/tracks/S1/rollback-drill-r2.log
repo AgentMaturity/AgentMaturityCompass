@@ -1,0 +1,9 @@
+# 2026-10-03T18:01:38Z
+$ docker info --format {{.ServerVersion}}
+
+failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
+exit=1
+$ node scripts/deploy/rollback-drill.mjs --image-a amc-studio:s1-a --image-b amc-studio:s1-b --secrets-dir <scratch> --out <scratch>/receipt.json
+rollback-drill: docker daemon unavailable
+exit=2
+receipt written: no (drill NOT executed: daemon down)

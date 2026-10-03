@@ -1,0 +1,165 @@
+[
+ {
+  "guard": "M-R1 secret.yaml if-wrapper deleted",
+  "file": "deploy/helm/amc/templates/secret.yaml",
+  "test": "tests/helmChartSecrets.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  2 failed | 4 passed (6)",
+   "failing": [
+    "helm chart bootstrap secret > default render must contain no Secret: secret.yaml is wholly guarded by bootstrap.createSecret (default false)",
+    "helm chart bootstrap secret > finds no literal secret in Helm values, templates, k8s manifests or docker assets"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  6 passed (6)"
+  }
+ },
+ {
+  "guard": "M-R2 bootstrapValue helper: required replaced by bare value",
+  "file": "deploy/helm/amc/templates/_helpers.tpl",
+  "test": "tests/helmChartSecrets.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 5 passed (6)",
+   "failing": [
+    "helm chart bootstrap secret > createSecret without values must refuse: every key is required and refuses change-me"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  6 passed (6)"
+  }
+ },
+ {
+  "guard": "M-R3 values.schema.json change-me pattern removed",
+  "file": "deploy/helm/amc/values.schema.json",
+  "test": "tests/helmChartSecrets.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 5 passed (6)",
+   "failing": [
+    "helm chart bootstrap secret > schema rejects change-me bootstrap values and accepts the shipped values files"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  6 passed (6)"
+  }
+ },
+ {
+  "guard": "M-R4 values.schema.json requireDigest->digest dependency removed",
+  "file": "deploy/helm/amc/values.schema.json",
+  "test": "tests/helmChartVersion.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 4 passed (5)",
+   "failing": [
+    "helm chart version and image pinning > requireDigest without digest refuses (template fail and schema)"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  5 passed (5)"
+  }
+ },
+ {
+  "guard": "M-R5 deployment.yaml always renders repository:tag",
+  "file": "deploy/helm/amc/templates/deployment.yaml",
+  "test": "tests/helmChartVersion.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 4 passed (5)",
+   "failing": [
+    "helm chart version and image pinning > digest renders repository@digest in every chart container, tag otherwise"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  5 passed (5)"
+  }
+ },
+ {
+  "guard": "M-R6 rollback-drill accepts any image id",
+  "file": "scripts/deploy/rollback-drill.mjs",
+  "test": "tests/rollbackDrill.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 3 passed (4)",
+   "failing": [
+    "rollback drill > refuses non-digest ids"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  4 passed (4)"
+  }
+ },
+ {
+  "guard": "M-R7 rollback-drill marks passed when a probe failed",
+  "file": "scripts/deploy/rollback-drill.mjs",
+  "test": "tests/rollbackDrill.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 3 passed (4)",
+   "failing": [
+    "rollback drill > fails closed on probe failure"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  4 passed (4)"
+  }
+ },
+ {
+  "guard": "M-R8 governed-turn probe returns verified after a 2xx /readyz",
+  "file": "scripts/deploy/governed-turn-probe.mjs",
+  "test": "tests/deployPackProbe.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  3 failed | 1 passed (4)",
+   "failing": [
+    "governed-turn probe > fails when Studio's verification verdict is not a verified scope",
+    "governed-turn probe > liveness-only server is not verified: 200 on /healthz and /readyz, 503 on native tasks",
+    "governed-turn probe > verifies only a completed stub turn whose evidence Studio verified"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  4 passed (4)"
+  }
+ },
+ {
+  "guard": "M-R9 deploy/k8s secret.example key renamed vaultPassphrase->vault_passphrase",
+  "file": "deploy/k8s/secret.example.yaml",
+  "test": "tests/k8sManifestsSecrets.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed (1)",
+   "failing": [
+    "raw k8s manifests: bootstrap secret contract > raw k8s secret example matches the secret the deployment mounts"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  1 passed (1)"
+  }
+ },
+ {
+  "guard": "M-R10 deploy-pack-check reports an absent tool as passed under --require-tools",
+  "file": "scripts/deploy/deploy-pack-check.mjs",
+  "test": "tests/deployPackCheck.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 6 passed (7)",
+   "failing": [
+    "deploy-pack-check > --require-tools fails when a tool is absent (injected), passes the skip list through"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  7 passed (7)"
+  }
+ }
+]

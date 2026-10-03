@@ -1,4 +1,94 @@
-# Track S1 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
+# Track S1 — deployment pack, round 2 (repair after monitor rejection)
+
+- Status: **PARTIAL**. Every monitor fix is in. Helm render, kubeconform and the docker drill are still blocked: binary absent / daemon down, and tool install is not authorized (root-decisions.md).
+- Branch `worktree-wf_5210e2f4-3ea-1`, base `8f57ce63`, round-2 code commit `903c19fe`, followed by the receipt commit.
+- Environment: macOS Darwin 25.6.0 arm64, Node v25.5.0, Terraform v1.14.4. helm, kubectl, kustomize, kubeconform, pulumi and the docker compose plugin are not installed. The Docker daemon is not running.
+
+## Monitor fixes
+
+1. `tests/deploymentPack.test.ts` is back to its 8f57ce63 content: `git diff 8f57ce63 HEAD` on that file is empty, and the test passes. `templates/secret.yaml` is restored and wrapped in `{{- if .Values.bootstrap.createSecret }}`, which defaults to `false` in `values.yaml`. Each of the five values goes through the `amc.bootstrapValue` helper in `_helpers.tpl`. The helper applies `required` and calls `fail` on a `change-me` prefix (case-insensitive). The Secret carries `helm.sh/resource-policy: keep`. The new `values.schema.json` rejects `^change-?me` bootstrap values. With `image.requireDigest` set, it also requires `image.digest` to match `^sha256:[a-f0-9]{64}$`. Deleting the if-wrapper turns `tests/helmChartSecrets.test.ts` RED (M-R1).
+2. `tests/deployAssets.test.ts` is split into claimed names: `tests/helmChartVersion.test.ts`, `tests/helmChartSecrets.test.ts`, `tests/k8sManifestsSecrets.test.ts` and `tests/deployPackCheck.test.ts`. New files are `tests/deployPackProbe.test.ts`, `tests/rollbackDrill.test.ts` and `tests/helpers/deployPackFixtures.ts`. In `git diff --name-only 8f57ce63..HEAD`, no tests/ path falls outside the claimed globs (`path-discipline-r2.log`).
+3. Image digest. `image.digest` and `image.requireDigest` are in `values.yaml`. Both containers in `deployment.yaml`, and the test pod, render `repository@digest` when a digest is set and `repository:tag` otherwise. A template `fail` refuses `requireDigest` without a digest. Terraform has `image_digest`, with a validation regex, passed to `image.digest`. Pulumi has `imageDigest`, which is validated and passed through. The tests are static template assertions plus Ajv. **Helm rendering was not exercised** because helm is absent.
+4. `scripts/deploy/deploy-pack-check.mjs` supports `--json` and `--require-tools` and reuses `validate-assets.mjs`. When helm is present, `validate-assets.mjs` now also runs `helm lint` and refuses these renders: createSecret without values, a change-me value, requireDigest without a digest, and replicaCount=2. It also checks that a digest renders as repository@digest. On this host the check prints `passed helm:binary absent,kubeconform:binary absent`, and `--require-tools` exits 1.
+5. `scripts/deploy/governed-turn-probe.mjs` is plain Node with no dependencies. It follows the existing contract:
+   - check `/healthz` and `/readyz`
+   - `POST /auth/login`, then read the native CSRF token from `/auth/me`
+   - `GET /api/v1/native-tasks/options`: execution must not be blocked and `stub` must be admitted
+   - `POST /api/v1/native-tasks` with `{provider:"stub", tools:"none"}`, sending `x-amc-native-intent: task-workspace-v1`, the CSRF header and Origin (docs/NATIVE_STUDIO_TASKS.md:98)
+   - poll until the task is `idle`
+   - `POST /:taskId/verify`; a pass needs `workspace-key-consistency` or `externally-anchored`
+
+   Against a stub that answers 200 on `/healthz` and `/readyz` and 503 on `/api/v1/native-tasks*`, the probe returns `failed` and the CLI exits 1. In mutation M-R8 the probe returns verified right after a 2xx `/readyz`; 3 tests go RED. The probe is wired into `templates/tests/governed-turn.yaml`: a ConfigMap and Pod with `helm.sh/hook: test`, using the chart image and the read-only owner credentials. The chart copy `files/governed-turn-probe.mjs` is byte-identical to the script, and a test enforces this. `networkpolicy.yaml` admits the test pod on the Studio port by its component label. The script is also wired into `docker/docker-compose.yml` as the `amc-verify` service under the `verify` profile.
+6. `scripts/deploy/rollback-drill.mjs`:
+   - preflight: `docker info`; resolve both image ids, which must match `/^sha256:[a-f0-9]{64}$/`
+   - six steps: `deploy-a`, `probe-a`, `upgrade-b`, `probe-b`, `rollback-a` (by sha256 id) and `probe-after-rollback`, all on one volume
+   - fails closed: a failed step fails the drill and skips the remaining steps
+   - output: a JSON receipt with both ids and every step's status
+   - without a daemon: exits 2 with `docker daemon unavailable`
+
+   `tests/rollbackDrill.test.ts` uses an injected docker runner and covers step order, 'refuses non-digest ids', 'fails closed on probe failure' and the unavailable daemon. **The drill was not executed on this host because the daemon is down.** The CLI exited 2 (`rollback-drill-r2.log`).
+7. The boundary paragraph in `docs/KUBERNETES_HELM_DEPLOYMENT.md` ("What was exercised") now cites official pages, retrieved 2026-10-03:
+   - kubernetes.io Deployments: selector immutability, `rollout undo --to-revision`, revisionHistoryLimit, Recreate
+   - kubernetes.io Persistent Volumes: no PVC shrink
+   - helm.sh tips: resource-policy keep
+   - helm.sh chart tests
+   - helm.sh charts schema files
+   - kubernetes.io Images: digest
+
+   It also states that immutability of `accessModes`, `storageClassName` and `volumeName` on a bound claim was **not** re-verified.
+8. `result.json` lists the items that are still blocked, with the reason `binary absent / daemon down — tool install not authorized (root-decisions.md)`: helm render/lint/test, kubeconform, drill execution and the compose verify run.
+
+## Commands (round 2)
+- `pnpm vitest run` on 9 files (`tests/helmChartVersion.test.ts`, `tests/helmChartSecrets.test.ts`, `tests/k8sManifestsSecrets.test.ts`, `tests/deployPackCheck.test.ts`, `tests/deployPackProbe.test.ts`, `tests/rollbackDrill.test.ts`, `tests/deploymentPack.test.ts`, `tests/pulumiHelmRelease.test.ts`, `tests/containerSourceBuild.test.ts`) gave 9 files and 54 tests passed (`green-r2.log`).
+- `pnpm typecheck:tests` exited 0. `pnpm check:docs-drift` passed (327 files). `terraform fmt -check -recursive deploy/terraform` exited 0.
+- `node scripts/deploy/deploy-pack-check.mjs --json` printed `passed helm:binary absent,kubeconform:binary absent`. With `--require-tools` it exited 1 (`deploy-pack-check-r2.log`).
+- `node scripts/deploy/rollback-drill.mjs ...` exited 2 with `docker daemon unavailable` (`rollback-drill-r2.log`).
+- Path discipline: 0 intersections with codex-dirty-paths.json (306 entries) and with codex-dirty-root-20261003.txt. No hard-forbidden path was touched. No tests/ path is outside the claimed globs.
+
+## Mutation checks (round 2, `mutations-r2.json`)
+
+Each mutation was applied, run RED, reverted with `git checkout`, and run GREEN again.
+
+- M-R1: deleting the secret.yaml if-wrapper → 2 failed ('default render must contain no Secret', 'finds no literal secret').
+- M-R2: replacing `required` in the helper with the bare value → 1 failed ('createSecret without values must refuse').
+- M-R3: removing the schema change-me pattern → 1 failed ('schema rejects change-me').
+- M-R4: removing the schema requireDigest→digest dependency → 1 failed ('requireDigest without digest refuses').
+- M-R5: always rendering repository:tag → 1 failed ('digest renders repository@digest').
+- M-R6: making the drill accept any id → 1 failed ('refuses non-digest ids').
+- M-R7: marking the drill passed after a failed probe → 1 failed ('fails closed on probe failure').
+- M-R8: probe returns verified after a 2xx /readyz → 3 failed (including 'liveness-only server is not verified').
+- M-R9: renaming a k8s secret.example key → 1 failed.
+- M-R10: dropping the `--require-tools` failure → 1 failed.
+
+Round-1 guards were re-verified against the split files (`mutations-r1-recheck.json`): appVersion, values literal secret, k8s Recreate and the readiness path. Each went RED and then GREEN again.
+
+## Not exercised
+- `helm template`, `helm lint`, schema validation by Helm itself, and `helm test`. helm is absent. The schema was checked with Ajv; the templates were checked as text.
+- kubeconform (absent).
+- The docker rollback drill and the compose `verify` profile: the daemon is down and the compose plugin is absent. The governed-turn probe ran only against stub HTTP servers, never against a real Studio.
+- Whether Studio's Origin check accepts `http://<release>-amc:3212` from the test pod. The probe sends Origin equal to its base URL and Host. This was not exercised in a cluster.
+- terraform validate/plan, because init downloads providers. Pulumi is not installed.
+
+## Not delivered (planner scope, outside the monitor's fix list)
+- SHA256SUMS verification in `docker/Dockerfile.quickstart`.
+- `scripts/deploy/record-image-digest.mjs`.
+- A kubeconform step in `.github/workflows/docker-build.yml`.
+
+## Ready to wire (root session; package.json and ci.yml are forbidden here)
+- `package.json` scripts:
+  - `"check:deploy-pack": "node scripts/deploy/deploy-pack-check.mjs"`
+  - `"deploy:rollback-drill": "node scripts/deploy/rollback-drill.mjs"`
+- CI: after pinned `azure/setup-helm` and kubeconform installs, run `node scripts/deploy/deploy-pack-check.mjs --require-tools` (with `AMC_KUBECONFORM_SCHEMA_LOCATION` for offline schemas).
+
+## Blockers / escalations
+- **SECURITY** (pre-existing at 8f57ce63, owner decision): chart 0.1.0 rendered `amc-bootstrap` with literal `change-me-*` values, so any workspace bootstrapped by a plain `helm install` used a published vault passphrase. There is no `amc vault` passphrase-change command at this revision. The exposure and the upgrade step are documented in docs/KUBERNETES_HELM_DEPLOYMENT.md, "Upgrading from chart 0.1.0".
+- Tool installs (helm, kubeconform, Docker daemon) are not authorized (root-decisions.md). The acceptance items above stay blocked until Sid approves them or CI runs them.
+- The round-1 blocker "the governed-turn probe needs a new Studio endpoint" was wrong (the monitor refuted it). The probe uses the existing native-task routes.
+
+---
+
+# Round 1 report (superseded where round 2 differs)
+
 
 - Status (self-report): **PARTIAL**
 - Branch: `worktree-wf_5210e2f4-3ea-1`; HEAD before `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da` → after `1cc80aab414d983c0245523606580d62b5794750`

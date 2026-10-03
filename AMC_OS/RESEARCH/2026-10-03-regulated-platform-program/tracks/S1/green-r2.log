@@ -1,0 +1,10 @@
+# 2026-10-03T18:01:38Z HEAD 903c19fe4e5b218fcd7361f821805481da042248
+ Test Files  9 passed (9)
+      Tests  54 passed (54)
+$ git diff --stat 8f57ce63 HEAD -- tests/deploymentPack.test.ts (empty = unmodified)
+$ pnpm check:docs-drift
+Docs drift check passed (327 files scanned).
+$ pnpm typecheck:tests
+exit=0
+$ terraform fmt -check -recursive deploy/terraform
+exit=0
