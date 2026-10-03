@@ -1,3 +1,6 @@
+{{- if ne (int .Values.replicaCount) 1 }}
+{{- fail "replicaCount must be 1: the AMC workspace (SQLite ledger on a ReadWriteOnce volume) has a single writer" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,6 +9,9 @@ metadata:
     {{- include "amc.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # Recreate: a rolling update would run two pods against one workspace.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "amc.name" . }}
@@ -13,8 +19,6 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "amc.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
         {{- include "amc.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "amc.serviceAccountName" . }}
@@ -45,8 +49,10 @@ spec:
               value: /run/secrets/amc_owner_username
             - name: AMC_BOOTSTRAP_OWNER_PASSWORD_FILE
               value: /run/secrets/amc_owner_password
+            {{- if .Values.notary.enabled }}
             - name: AMC_NOTARY_AUTH_SECRET_FILE
               value: /run/secrets/amc_notary_auth_secret
+            {{- end }}
           ports:
             - name: studio
               containerPort: {{ .Values.service.port }}
@@ -54,18 +60,28 @@ spec:
               containerPort: {{ .Values.service.gatewayPort }}
             - name: proxy
               containerPort: {{ .Values.service.proxyPort }}
+          # startup covers `amc bootstrap`; readiness gates traffic on signed-policy
+          # trust and ledger reachability; liveness only checks the process answers.
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: studio
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /readyz
               port: studio
-            initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /healthz
               port: studio
-            initialDelaySeconds: 20
             periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 6
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -126,20 +142,22 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        # Secrets are created out of band (see docs/KUBERNETES_HELM_DEPLOYMENT.md);
+        # the chart only references them, so no default value can be rendered.
         - name: secrets
-          secret:
-            secretName: {{ .Values.bootstrap.vaultPassphraseSecret.name }}
-            items:
-              - key: {{ .Values.bootstrap.vaultPassphraseSecret.key }}
-                path: amc_vault_passphrase
-              - key: {{ .Values.bootstrap.ownerUsernameSecret.key }}
-                path: amc_owner_username
-              - key: {{ .Values.bootstrap.ownerPasswordSecret.key }}
-                path: amc_owner_password
-              - key: {{ .Values.notary.passphraseSecret.key }}
-                path: amc_notary_passphrase
-              - key: {{ .Values.notary.authSecret.key }}
-                path: amc_notary_auth_secret
+          projected:
+            sources:
+              {{- $refs := list (list .Values.bootstrap.vaultPassphraseSecret "amc_vault_passphrase") (list .Values.bootstrap.ownerUsernameSecret "amc_owner_username") (list .Values.bootstrap.ownerPasswordSecret "amc_owner_password") }}
+              {{- if .Values.notary.enabled }}
+              {{- $refs = concat $refs (list (list .Values.notary.passphraseSecret "amc_notary_passphrase") (list .Values.notary.authSecret "amc_notary_auth_secret")) }}
+              {{- end }}
+              {{- range $refs }}
+              - secret:
+                  name: {{ (index . 0).name }}
+                  items:
+                    - key: {{ (index . 0).key }}
+                      path: {{ index . 1 }}
+              {{- end }}
         {{- if .Values.notary.enabled }}
         - name: notary
           {{- if .Values.notary.persistence.enabled }}

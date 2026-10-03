@@ -102,4 +102,5 @@ const release = new k8s.helm.v3.Release(
 export const amcReleaseName = release.name;
 export const amcNamespace = release.namespace;
 export const amcChart = chartPath;
-export const amcLocalPortForward = pulumi.interpolate`kubectl -n ${release.namespace} port-forward svc/${release.name} 3212:3212`;
+// The chart names resources "<release>-amc" (templates/_helpers.tpl amc.fullname).
+export const amcLocalPortForward = pulumi.interpolate`kubectl -n ${release.namespace} port-forward svc/${release.name}-amc 3212:3212`;
