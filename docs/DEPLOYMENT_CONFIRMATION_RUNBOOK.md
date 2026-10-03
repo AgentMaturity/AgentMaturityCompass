@@ -1,11 +1,29 @@
-# Deployment Verification
+# Deployment Confirmation Runbook
+
+What Sid is shown before each owner-confirmation gate, and how a deployment is
+verified afterwards. The gates themselves (B0–B4) are in
+[`RELEASE_RUNBOOK.md`](./RELEASE_RUNBOOK.md); `tests/deploymentConfirmationRunbook.test.ts`
+keeps the B3/B4 wording there verbatim to the execution brief.
+
+## What to show before each confirmation
+
+| Gate | Show Sid | Then |
+| --- | --- | --- |
+| B1 | `node scripts/credentials-presence-check.mjs` output (present/absent only) and `gh secret list` names | If anything is absent: stop, list what is needed and where it goes, and wait |
+| B3 publish | version, artifact SHA256, release-gate result (every skipped check named), B0 disposition | Do not run `pnpm release` or push a tag until he has said yes |
+| B4 deploy | target, image digest, rollback drill result, no-default-passphrase proof | Wait for an explicit yes; deploy only that digest |
+
+After a deploy, record: live URL, deployed commit, image digest, and the
+`deploy-verify` result JSON path and its SHA-256.
+
+## Post-deploy verification
 
 A deployment is **unverified until a governed turn succeeds against it**. A
 `200` from a health route proves a process is listening; it does not prove the
 gateway leases, records and signs work. `scripts/deploy-verify.mjs` checks the
 second thing.
 
-## What the verifier does
+### What the verifier does
 
 ```bash
 AMC_DEPLOY_VERIFY_LEASE="$(cat lease.token)" \
@@ -47,7 +65,7 @@ Design decisions:
 
 Exit codes: `0` pass, `1` fail (result JSON still written), `2` usage error.
 
-## What it does not prove
+### What it does not prove
 
 - The receipt's `event_hash` is not anchored to the target's ledger. That needs
   ledger access (`amc verify all --json` on the host), not an HTTP probe.
@@ -56,7 +74,7 @@ Exit codes: `0` pass, `1` fail (result JSON still written), `2` usage error.
 - Tool execution, streaming responses, approvals and the dashboard are not
   exercised.
 
-## Which deploy targets can pass
+### Which deploy targets can pass
 
 | Target | Serves | Can a governed turn pass? |
 | --- | --- | --- |
@@ -75,16 +93,20 @@ A standalone API build (`scripts/build-standalone-api.mjs`,
 edits to `api/index.ts` were in progress in the root checkout when this was
 written. Once they land, re-check that `railway.json`'s `startCommand` and
 `vercel.json`'s `builds` still match `package.json` at that commit;
-`tests/deployVerifyConfig.test.ts` fails if they drift. If the standalone API
+`tests/deployVerifyConfig.test.ts` fails if they drift, and
+`tests/platformDeployConfig.test.ts` (over `src/deployVerify/platformDeployConfig.ts`)
+re-derives the findings below from the committed files. If the standalone API
 is meant to serve governed turns, it must expose `/healthz`, `/readyz` and a
 leased gateway route with receipts before this verifier can pass against it.
 
-Open questions:
+Static findings and open questions (`checkRepoPlatformDeployConfig` reports the
+first two from the committed files; it reads them and changes nothing):
 
 - `railway.json` pins `"builder": "NIXPACKS"`. Railway's current config-as-code
   reference (retrieved 2026-10-03) lists only `RAILPACK` (the default) and
   `DOCKERFILE`. Whether `NIXPACKS` is still honoured is unknown.
-- `tsx`, which `api:start` runs, is a devDependency. Whether Railway's build
+- `tsx`, which `api:start` runs, is declared only in `devDependencies`
+  (`package.json` `api:start` is `tsx api/index.ts`). Whether Railway's build
   keeps devDependencies at runtime is unknown.
 - `api/index.ts`'s `/api/health` returns hard-coded `version: "1.0.0"` and
   fixed counts (package version is `1.2.0` at `8f57ce63`). That file belongs to
