@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../toolTypes.js";
 import { readSessionList, sessionListTool, type SessionListHeader } from "./nativeToolBreadth/sessionListTool.js";
+import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
  * `todo` — the agent's working checklist as a signed, session-bound record
@@ -29,7 +30,7 @@ export type TodoRecord = SessionListHeader & TodoPayload;
 const KIND = "amc.native.todo";
 const FILE = "todo.json";
 
-export function todoTool(options: { readonly sessionId: string }): ToolDefinition {
+export function todoTool(options: { readonly sessionId: SessionIdSource }): ToolDefinition {
   return sessionListTool<TodoPayload>({
     name: "todo",
     kind: KIND,

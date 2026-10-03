@@ -40,6 +40,22 @@ export function assertSessionId(sessionId: string): string {
   return sessionId;
 }
 
+/**
+ * A session id, or a resolver read at CALL time. `agentToolset`'s `sessionId`
+ * is a getter that a fork or resume rebinds after the toolset is built, so a
+ * tool that captured it at construction would write to the wrong session (or
+ * throw before any session is bound).
+ */
+export type SessionIdSource = string | (() => string);
+
+export function sessionIdResolver(source: SessionIdSource): () => string {
+  if (typeof source === "string") {
+    assertSessionId(source);
+    return () => source;
+  }
+  return () => assertSessionId(source());
+}
+
 export function sessionRecordDir(workspace: string, sessionId: string): string {
   return join(workspace, ".amc", "native-tools", assertSessionId(sessionId));
 }

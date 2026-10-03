@@ -147,8 +147,23 @@ describe("todo and plan records", () => {
     expect(outcome.output).toContain("bound to");
   });
 
-  it("refuses an unsafe session id", () => {
+  it("refuses an unsafe session id, at construction or when a resolver yields one", async () => {
     expect(() => todoTool({ sessionId: "../escape" })).toThrow(/session id/);
+    const outcome = await pipeline(workspace(), todoTool({ sessionId: () => "../escape" }))({ items: [] });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("session id");
+  });
+
+  it("reads a session resolver at call time, as agentToolset's rebindable sessionId requires", async () => {
+    const dir = workspace();
+    let current = "sess-first";
+    const run = pipeline(dir, todoTool({ sessionId: () => current }));
+    await run({ items: [{ id: "1", content: "first", status: "pending" }] });
+    current = "sess-forked";
+    await run({ items: [{ id: "1", content: "forked", status: "pending" }] });
+    expect(readSessionTodo(dir, "sess-first")?.items[0]?.content).toBe("first");
+    expect(readSessionTodo(dir, "sess-forked")?.items[0]?.content).toBe("forked");
+    expect(readSessionTodo(dir, "sess-forked")?.revision).toBe(1);
   });
 
   it("plan is the same signed store with its own record kind", async () => {

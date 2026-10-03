@@ -7,10 +7,11 @@ import { NativeToolRefusal } from "./nativeToolBreadth/originPolicy.js";
 import {
   recordDigest,
   sessionRecordDir,
+  sessionIdResolver,
   signRecord,
-  assertSessionId,
   verifyRecord,
-  writeSignedRecord
+  writeSignedRecord,
+  type SessionIdSource
 } from "./nativeToolBreadth/signedSessionRecords.js";
 import { writeFileAtomic } from "../../utils/fs.js";
 
@@ -121,14 +122,14 @@ function awaitAnswer(answerer: AskUserAnswerer, question: AskUserQuestion, signa
 }
 
 export interface AskUserToolOptions {
-  readonly sessionId: string;
+  readonly sessionId: SessionIdSource;
   /** Omitted means no human is reachable, and every call refuses. */
   readonly answerer?: AskUserAnswerer;
   readonly timeoutMs?: number;
 }
 
 export function askUserTool(options: AskUserToolOptions): ToolDefinition {
-  const sessionId = assertSessionId(options.sessionId);
+  const currentSession = sessionIdResolver(options.sessionId);
   return defineTool({
     name: "ask_user",
     actionClass: "READ_ONLY",
@@ -148,6 +149,7 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       const answerer = options.answerer;
       if (!answerer) throw new NativeToolRefusal("ask_user", "no human answerer is composed for this session; ask_user never auto-answers");
 
+      const sessionId = currentSession();
       const dir = join(sessionRecordDir(execution.workspace, sessionId), "ask-user");
       const record: AskUserQuestionRecord = {
         schemaVersion: "2026-10-03",

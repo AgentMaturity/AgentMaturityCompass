@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../toolTypes.js";
 import { readSessionList, sessionListTool, type SessionListHeader } from "./nativeToolBreadth/sessionListTool.js";
+import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
  * `plan` — the agent's declared plan as a signed, session-bound record
@@ -28,7 +29,7 @@ export type PlanRecord = SessionListHeader & PlanPayload;
 const KIND = "amc.native.plan";
 const FILE = "plan.json";
 
-export function planTool(options: { readonly sessionId: string }): ToolDefinition {
+export function planTool(options: { readonly sessionId: SessionIdSource }): ToolDefinition {
   return sessionListTool<PlanPayload>({
     name: "plan",
     kind: KIND,

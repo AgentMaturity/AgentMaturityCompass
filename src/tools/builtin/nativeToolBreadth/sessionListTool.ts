@@ -2,7 +2,7 @@ import { join } from "node:path";
 import type { z } from "zod";
 import { defineTool } from "../../toolRegistry.js";
 import type { ToolDefinition } from "../../toolTypes.js";
-import { assertSessionId, readSignedRecord, sessionRecordDir, writeSignedRecord } from "./signedSessionRecords.js";
+import { readSignedRecord, sessionIdResolver, sessionRecordDir, writeSignedRecord, type SessionIdSource } from "./signedSessionRecords.js";
 
 /**
  * The shared shape of `todo` and `plan` (AMC-1549): a whole-list replace,
@@ -49,8 +49,8 @@ export function readSessionList<P extends object>(workspace: string, sessionId: 
   return stored.record;
 }
 
-export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sessionId: string): ToolDefinition {
-  assertSessionId(sessionId);
+export function sessionListTool<P extends object>(spec: SessionListSpec<P>, session: SessionIdSource): ToolDefinition {
+  const currentSession = sessionIdResolver(session);
   return defineTool({
     name: spec.name,
     actionClass: "READ_ONLY",
@@ -62,6 +62,7 @@ export function sessionListTool<P extends object>(spec: SessionListSpec<P>, sess
       if (execution.effectiveMode === "SIMULATE") {
         return { output: `${rendered}\n[amc: SIMULATE ${spec.name}; not recorded]` };
       }
+      const sessionId = currentSession();
       const path = sessionListPath(execution.workspace, sessionId, spec.fileName);
       const previous = readSignedRecord<SessionListHeader>(execution.workspace, path, "monitor");
       if (previous && (previous.record.kind !== spec.kind || previous.record.sessionId !== sessionId
