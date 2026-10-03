@@ -87,6 +87,7 @@ export function deepseekHarnessCoverage() {
     schemaVersion: 1,
     sourceFormat: "deepseek-harness@c389f96bf3a9b6807cb71ed6bdad5849be0df6d8",
     process: { status: "capture_configured", stdout: "bounded_redacted_final_output", stderr: "byte_count_only_reasoning_omitted" },
+    launchPin: { status: "hashed_before_spawn", boundary: "Approved executable/entrypoint bytes are hashed at configuration, version probe and launch preparation; the child is then started by path, so a write to those paths after the last hash and before exec is not detected." },
     provider: { status: "unverified", boundary: "Only actual traffic received by the signed AMC gateway is observed model evidence." },
     proxy: { status: "unverified", boundary: "Proxy environment is advisory; direct traffic and other provider plugins may bypass it." },
     nativeEvents: { status: "unavailable", boundary: "No DSH tool, approval, sandbox or session hook is installed by this adapter." },
