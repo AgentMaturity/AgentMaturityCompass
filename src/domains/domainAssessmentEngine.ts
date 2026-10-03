@@ -4,6 +4,7 @@ import {
 } from "../score/units.js";
 import { getDomainMetadata, type Domain, type DomainMetadata } from "./domainRegistry.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
+import { getIndustryPacksByStation } from "./industryPacks.js";
 
 export interface DomainAssessmentInput {
   agentId: string;
@@ -25,6 +26,20 @@ export interface DomainAssessmentResult {
   activeModules: ActiveModuleProfile[];
   roadmap: DomainRoadmapItem[];
   regulatoryWarnings: string[];
+  euAIActClassification: EuAIActClassification;
+}
+
+/** Station-level EU AI Act category plus each station pack's Annex III classification. */
+export interface EuAIActClassification {
+  domainCategory: DomainMetadata["euAIActCategory"];
+  packs: Array<{
+    packId: string;
+    packName: string;
+    classification: string;
+    /** Annex III points (1-8) named in the classification text. */
+    annexIIIPoints: number[];
+    generalPurpose: boolean;
+  }>;
 }
 
 export interface ComplianceGap {
@@ -210,6 +225,37 @@ function buildRegulatoryWarnings(complianceGaps: ComplianceGap[]): string[] {
   return [...warnings];
 }
 
+const ANNEX_III_POINT_COUNT = 8;
+
+/** Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]) and whether GPAI is declared. */
+export function parseAnnexIIIPoints(classification: string): { points: number[]; generalPurpose: boolean } {
+  const annexAt = classification.indexOf("Annex III");
+  const points = new Set<number>();
+  if (annexAt >= 0) {
+    for (const match of classification.slice(annexAt).matchAll(/§\s*(\d+)/g)) {
+      const point = Number(match[1]);
+      if (point >= 1 && point <= ANNEX_III_POINT_COUNT) points.add(point);
+    }
+  }
+  return { points: [...points].sort((a, b) => a - b), generalPurpose: /General Purpose AI/i.test(classification) };
+}
+
+function buildEuAIActClassification(domain: Domain, metadata: DomainMetadata): EuAIActClassification {
+  return {
+    domainCategory: metadata.euAIActCategory,
+    packs: getIndustryPacksByStation(domain).map((pack) => {
+      const parsed = parseAnnexIIIPoints(pack.euAIActClassification);
+      return {
+        packId: pack.id,
+        packName: pack.name,
+        classification: pack.euAIActClassification,
+        annexIIIPoints: parsed.points,
+        generalPurpose: parsed.generalPurpose
+      };
+    })
+  };
+}
+
 export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResult {
   const metadata = getDomainMetadata(input.domain);
   const questions = getDomainPackQuestions(input.domain);
@@ -232,6 +278,7 @@ export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResu
     complianceGaps,
     activeModules,
     roadmap,
-    regulatoryWarnings
+    regulatoryWarnings,
+    euAIActClassification: buildEuAIActClassification(input.domain, metadata)
   };
 }
