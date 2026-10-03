@@ -176,7 +176,7 @@ describe("web_fetch origin allowlist", () => {
 });
 
 describe("web_fetch size caps", () => {
-  it("refuses a body over the cap declared by content-length", async () => {
+  it("refuses a body over the signed cap when content-length declares it", async () => {
     const dir = workspace();
     signPolicy(dir, "web_fetch", ["docs.example.test"], { maxBytes: 64 });
     const { run, receipts } = harness(dir, { fetch: stubFetch("x".repeat(65), { headers: { "content-length": "65", "content-type": "text/plain" } }) });

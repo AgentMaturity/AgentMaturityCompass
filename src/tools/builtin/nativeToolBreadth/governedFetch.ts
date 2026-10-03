@@ -5,9 +5,9 @@ import { NativeToolRefusal, type OriginPolicy } from "./originPolicy.js";
  * The one outbound GET the native web tools make (AMC-1549).
  *
  * Every refusal here happens BEFORE `fetch` is called, except the two that
- * can only be known from the response (redirect, oversize body), and those
- * cancel the body rather than read it. Node's built-in fetch only — no
- * dependency.
+ * can only be known from the response: a redirect (body cancelled unread) and
+ * an oversize body (cancelled within one chunk of the cap). Node's built-in
+ * fetch only — no dependency.
  *
  * NO CALLER HEADERS. The request carries a fixed accept and user-agent and
  * nothing the model chose, so there is no way to attach a cookie or an
@@ -60,12 +60,13 @@ export function admitUrl(tool: string, raw: string, policy: OriginPolicy): URL {
   return url;
 }
 
+/**
+ * Counts bytes as they arrive and cancels at the cap. There is deliberately no
+ * separate content-length pre-check: a mutation removing one was survived by
+ * every test, because this loop already stops within one chunk of the cap
+ * whatever the server declares — the pre-check was decoration, not defence.
+ */
 async function readCapped(tool: string, response: Response, maxBytes: number): Promise<Buffer> {
-  const declared = Number(response.headers.get("content-length") ?? "NaN");
-  if (Number.isFinite(declared) && declared > maxBytes) {
-    await response.body?.cancel().catch(() => undefined);
-    throw new NativeToolRefusal(tool, `response of ${declared} bytes exceeds the ${maxBytes}-byte cap`);
-  }
   const chunks: Buffer[] = [];
   let total = 0;
   const reader = response.body?.getReader();
