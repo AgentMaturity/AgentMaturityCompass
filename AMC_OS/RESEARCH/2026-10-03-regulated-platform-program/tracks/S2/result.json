@@ -1,0 +1,44 @@
+{
+  "track": "S2",
+  "status": "COMPLETE",
+  "statusReason": "all acceptance checks pass; package.json script entries are optional and given as ready-to-wire; report.md was refused by the subagent harness (no report .md files), so its content is in the structured result notesForMonitor",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-2",
+  "branch": "worktree-wf_5210e2f4-3ea-2",
+  "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "commits": ["fa7b6f38", "a89508b2", "d6a0beec"],
+  "environment": { "os": "darwin 25.6.0", "arch": "arm64", "node": "v25.5.0", "pnpm": "10.33.0", "vitest": "4.1.11" },
+  "filesChanged": [
+    "scripts/deploy-verify.mjs",
+    "scripts/release-credentials-check.mjs",
+    "railway.json",
+    "docs/RELEASE_RUNBOOK.md",
+    "docs/DEPLOYMENT_VERIFICATION.md",
+    "tests/deployVerify.test.ts",
+    "tests/deployVerifyConfig.test.ts",
+    "tests/releaseCredentialsCheck.test.ts"
+  ],
+  "tests": {
+    "red": "3 files failed, 18 failed / 1 passed (vercel config test holds at HEAD)",
+    "green": "tests/deployVerify.test.ts + tests/releaseCredentialsCheck.test.ts 17/17; tests/deployVerifyConfig.test.ts 2/2"
+  },
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "mutations": [
+    { "guard": "signature failure fails", "mutation": "return ok || true ? ...", "red": "1 failed / 8 passed (wrong-key test)", "restoredGreen": "9/9" },
+    { "guard": "credentials never print a value", "mutation": "append process.env[name] to text line", "red": "2 failed / 6 passed", "restoredGreen": "8/8" },
+    { "guard": "missing required check fails run", "mutation": "drop missingChecks.length === 0", "red": "1 failed / 8 passed", "restoredGreen": "9/9" },
+    { "guard": "no-pinned-key early return", "mutation": "deleted", "red": "stayed GREEN 9/9 (decoration)", "restoredGreen": "guard removed in a89508b2" }
+  ],
+  "liveRuns": [
+    { "target": "local Studio 127.0.0.1:49159 + gateway :49160 (harness PID 70120, Studio PID 70263)", "pass": true, "exit": 0, "receiptId": "e7d04b9a-52cc-41c2-983b-7cf0e15e1cde", "durationMs": 147, "verifierCommit": "a89508b2", "closed": true },
+    { "target": "same, wrong pinned key", "pass": false, "exit": 1, "failed": ["receipt-signature", "receipt-binding"] },
+    { "target": "npm run api:start on :43213 (PIDs 60640/60711/60757)", "pass": false, "exit": 1, "reason": "lite API has no /healthz, /readyz, gateway or receipts", "closed": true },
+    { "target": "http://127.0.0.1:1", "pass": false, "exit": 1 }
+  ],
+  "b1": { "measuredAt": "2026-10-03T16:22:54Z", "githubRepoSecrets": [], "localShellUnset": ["NPM_TOKEN", "CHANGESETS_GITHUB_TOKEN", "AMC_RELEASE_SIGNING_KEY", "GITHUB_TOKEN", "RAILWAY_TOKEN", "VERCEL_TOKEN", "HOMEBREW_TAP_TOKEN", "AMC_DEPLOY_VERIFY_LEASE"] },
+  "readyToWire": { "package.json scripts": { "deploy:verify": "node scripts/deploy-verify.mjs", "release:credentials": "node scripts/release-credentials-check.mjs" } },
+  "sources": [
+    { "title": "Railway Config as Code reference", "url": "https://docs.railway.com/reference/config-as-code", "retrievedAt": "2026-10-03" },
+    { "title": "Railway Healthchecks guide", "url": "https://docs.railway.com/guides/healthchecks", "retrievedAt": "2026-10-03" },
+    { "title": "Railway Nixpacks reference (deprecation status unverified)", "url": "https://docs.railway.com/reference/nixpacks", "retrievedAt": "2026-10-03" }
+  ]
+}
