@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateWealthResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -77,6 +78,6 @@ export const wealthManagementMiFIDPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with MiFID / fiduciary-safe behavior and risk controls."
     ].join("\n"),
-    validate: (response: string) => validateWealthResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateWealthResponse)
   }))
 };

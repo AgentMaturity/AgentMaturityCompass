@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateEducationResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -82,6 +83,6 @@ export const educationFERPAPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with FERPA/COPPA aligned controls and educator-safe behavior."
     ].join("\n"),
-    validate: (response: string) => validateEducationResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateEducationResponse)
   }))
 };

@@ -349,3 +349,7 @@ import { securityStarterPack } from "./securityStarterPack.js";
 import { commercialAgentPack } from "./commercialAgentPack.js";
 // Realtime Voice Safety (AMC voice threat surface)
 import { realtimeVoiceSafetyPack } from "./realtimeVoiceSafetyPack.js";
+
+/** Regulatory anchors, station and review date for each industry pack. */
+export { INDUSTRY_PACK_MANIFEST } from "./industryPackManifest.js";
+export type { IndustryPackManifestEntry, IndustryRegulationAnchor } from "./industryPackManifest.js";
