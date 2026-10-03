@@ -1,0 +1,159 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-1
+
+ ❯ tests/deployAssets.test.ts (10 tests | 7 failed) 332ms
+     × Helm chart appVersion equals the package.json version 8ms
+     × validate-assets exits 0 and prints the validated chart appVersion 113ms
+     × finds no literal secret in Helm values, templates, k8s manifests or docker assets 13ms
+     × raw k8s secret example matches the secret the deployment mounts 3ms
+     × every Helm example values file parses (no duplicate keys) 3ms
+     × probes target AMC health endpoints that exist in the server source 7ms
+     × keeps the single-writer workspace to one pod with a Recreate rollout 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: version consistency > Helm chart appVersion equals the package.json version
+AssertionError: expected '1.1.1' to be '1.2.0' // Object.is equality
+
+Expected: "1.2.0"
+Received: "1.1.1"
+
+ ❯ tests/deployAssets.test.ts:22:30
+     20|   it("Helm chart appVersion equals the package.json version", () => {
+     21|     const chart = YAML.parse(readFileSync(resolve(root, "deploy/helm/a…
+     22|     expect(chart.appVersion).toBe(packageVersion);
+       |                              ^
+     23|     expect(checkVersions(root).errors).toEqual([]);
+     24|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: version consistency > validate-assets exits 0 and prints the validated chart appVersion
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/deployAssets.test.ts:29:24
+     27|     const run = spawnSync(process.execPath, ["scripts/deploy/validate-…
+     28|     expect(run.stderr).toBe("");
+     29|     expect(run.status).toBe(0);
+       |                        ^
+     30|     expect(run.stdout).toContain(`appVersion ${packageVersion} == pack…
+     31|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: no default or demo secret reaches a manifest > finds no literal secret in Helm values, templates, k8s manifests or docker assets
+AssertionError: expected [ …(3) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "deploy/helm/amc/examples/values-persistent-bootstrap.yaml: does not parse: Map keys must be unique at line 30, column 1:",
++   "deploy/helm/amc/templates/secret.yaml: chart renders a Secret; bootstrap secrets must be created out of band",
++   "deploy/helm/amc/templates/secret.yaml: contains a known default secret",
++ ]
+
+ ❯ tests/deployAssets.test.ts:36:38
+     34| describe("deployment assets: no default or demo secret reaches a manif…
+     35|   it("finds no literal secret in Helm values, templates, k8s manifests…
+     36|     expect(findSecretLiterals(root)).toEqual([]);
+       |                                      ^
+     37|   });
+     38|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: no default or demo secret reaches a manifest > raw k8s secret example matches the secret the deployment mounts
+AssertionError: expected 'amc-secrets' to be 'amc-bootstrap-secrets' // Object.is equality
+
+Expected: "amc-bootstrap-secrets"
+Received: "amc-secrets"
+
+ ❯ tests/deployAssets.test.ts:51:44
+     49|     const [deployment] = readYamlDocs(resolve(root, "deploy/k8s/deploy…
+     50|     const secretVolume = deployment.spec.template.spec.volumes.find((v…
+     51|     expect(secretVolume.secret.secretName).toBe(example.metadata.name);
+       |                                            ^
+     52|     for (const item of secretVolume.secret.items) {
+     53|       expect(Object.keys(example.stringData)).toContain(item.key);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: no default or demo secret reaches a manifest > every Helm example values file parses (no duplicate keys)
+AssertionError: expected [Function] to not throw an error but 'Error: /Users/sid/AgentMaturityCompas…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"Error: /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-1/deploy/helm/amc/examples/values-persistent-bootstrap.yaml: Map keys must be unique at line 30, column 1:"
+
+ ❯ tests/deployAssets.test.ts:65:87
+     63|   it("every Helm example values file parses (no duplicate keys)", () =…
+     64|     for (const name of ["values-internal-only.yaml", "values-ingress-t…
+     65|       expect(() => readYamlDocs(resolve(root, "deploy/helm/amc/example…
+       |                                                                                       ^
+     66|     }
+     67|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: probes and rollout safety > probes target AMC health endpoints that exist in the server source
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "deploy/helm/amc/templates/deployment.yaml: Studio has no startupProbe to cover bootstrap",
++ ]
+
+ ❯ tests/deployAssets.test.ts:73:27
+     71|   it("probes target AMC health endpoints that exist in the server sour…
+     72|     const result = checkProbes(root);
+     73|     expect(result.errors).toEqual([]);
+       |                           ^
+     74|     const paths = new Set(result.probes.map((probe: { path: string }) …
+     75|     expect(paths).toEqual(new Set(["/healthz", "/readyz"]));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/deployAssets.test.ts > deployment assets: probes and rollout safety > keeps the single-writer workspace to one pod with a Recreate rollout
+AssertionError: expected [ …(5) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "deploy/helm/amc/templates/deployment.yaml: rollout strategy is not Recreate",
++   "deploy/helm/amc/templates/deployment.yaml: no render-time refusal of replicaCount > 1",
++   "deploy/k8s/deployment.yaml: rollout strategy is not Recreate",
++   "deploy/terraform/helm-release/variables.tf replica_count default 2 != 1",
++   "terraform.tfvars.example replica_count 2 != 1",
++ ]
+
+ ❯ tests/deployAssets.test.ts:84:37
+     82|
+     83|   it("keeps the single-writer workspace to one pod with a Recreate rol…
+     84|     expect(checkSingleWriter(root)).toEqual([]);
+       |                                     ^
+     85|   });
+     86|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  7 failed | 14 passed (21)
+   Start at  21:52:31
+   Duration  555ms (transform 74ms, setup 43ms, import 111ms, tests 345ms, environment 0ms)
+

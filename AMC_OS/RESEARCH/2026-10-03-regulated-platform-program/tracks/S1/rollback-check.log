@@ -1,0 +1,4 @@
+rollback-check: from 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da to WORKTREE
+helm: not on PATH; chart revisions NOT rendered (raw manifests only)
+k8s (kustomization resources): 7 -> 7 objects; added [] removed [] changed [Deployment/amc-studio]
+hazards: 0

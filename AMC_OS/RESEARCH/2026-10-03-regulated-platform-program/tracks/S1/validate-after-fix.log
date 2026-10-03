@@ -1,0 +1,9 @@
+chart amc 0.2.0 appVersion 1.2.0 == package.json 1.2.0
+quickstart AMC_VERSION 1.1.1 (published GitHub release pin)
+probe amc-studio startupProbe /healthz -> src/studio/studioServer.ts:1729
+probe amc-studio readinessProbe /readyz -> src/studio/studioServer.ts:1768
+probe amc-studio livenessProbe /healthz -> src/studio/studioServer.ts:1729
+probe amc-notary readinessProbe /readyz -> src/notary/notaryServer.ts:149
+probe amc-notary livenessProbe /healthz -> src/notary/notaryServer.ts:144
+helm: not on PATH; chart template rendering NOT exercised (static checks only)
+validate-assets: OK

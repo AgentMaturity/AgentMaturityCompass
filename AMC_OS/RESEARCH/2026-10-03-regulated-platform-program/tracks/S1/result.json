@@ -1,0 +1,31 @@
+{
+  "track": "S1",
+  "status": "PARTIAL",
+  "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "branch": "worktree-wf_5210e2f4-3ea-1",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-1",
+  "commits": ["e05bcb7d", "a0ed68d0", "3ca024d0"],
+  "environment": "macOS Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, Terraform v1.14.4; helm/kubectl/kustomize/kubeconform/pulumi not installed; Docker daemon not running",
+  "acceptance": {
+    "validateAssets": "exit 0; chart amc 0.2.0 appVersion 1.2.0 == package.json 1.2.0; helm rendering NOT exercised (helm not on PATH)",
+    "vitest": "tests/deploymentPack.test.ts tests/deployAssets.test.ts tests/pulumiHelmRelease.test.ts tests/containerSourceBuild.test.ts: 4 files, 37 tests passed",
+    "secretGrep": "2 non-value hits: docker/README.md:40 (bind-mount path), docker/docker-compose.yml:54 (compose secret name); no rendered or committed manifest value",
+    "helmTemplate": "not run: helm not installed; scratch text/template approximation rendered defaults + 3 examples with 0 YAML errors, 0 Secrets; replicaCount=2 refused",
+    "probes": {
+      "studio /healthz": "src/studio/studioServer.ts:1729 (payload src/api/health.ts:12)",
+      "studio /readyz": "src/studio/studioServer.ts:1768 (buildReadiness :568)",
+      "notary /healthz": "src/notary/notaryServer.ts:144",
+      "notary /readyz": "src/notary/notaryServer.ts:149"
+    },
+    "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+    "rollbackCheck": "--from 8f57ce63 --to WORKTREE: exit 0, hazards 0, k8s changed [Deployment/amc-studio], helm not rendered"
+  },
+  "mutations": "see mutations.json (M1-M11) plus M12 Secret-removal hazard: RED 1 failed -> restored 1 passed",
+  "partialBecause": [
+    "helm not installed: helm template/lint and the helm branches of validate-assets.mjs and rollback-check.mjs were not exercised",
+    "probes do not exercise a governed turn; a governed-turn endpoint requires src/studio/studioServer.ts (forbidden)",
+    "chart 0.1.0 installs used published vault passphrase change-me-vault-passphrase; no amc vault passphrase-change command exists at this revision"
+  ],
+  "logs": ["red-before-fix.log", "validate-before-fix.log", "green-after-fix.log", "validate-after-fix.log", "rollback-check.log", "mutations.json"],
+  "reportMd": "not written: the subagent harness refused report .md files; full report returned in the structured result"
+}
