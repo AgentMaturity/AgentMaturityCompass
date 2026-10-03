@@ -1,12 +1,12 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { getAssurancePack, listAssurancePacks } from "../src/assurance/packs/index.js";
+import { getAssurancePack, listAssurancePacks } from "../../src/assurance/packs/index.js";
 import {
   INDUSTRY_PACK_MANIFEST,
   INDUSTRY_PACK_MAX_REVIEW_AGE_DAYS
-} from "../src/assurance/packs/industryPackManifest.js";
-import { listDomainMetadata } from "../src/domains/domainRegistry.js";
+} from "../../src/assurance/packs/industryPackManifest.js";
+import { listDomainMetadata } from "../../src/domains/domainRegistry.js";
 
 /**
  * The industry pack source files, named independently of the manifest so that
@@ -68,7 +68,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const DAY_MS = 86_400_000;
 
 describe("industry pack manifest", () => {
-  const packDir = join(__dirname, "..", "src", "assurance", "packs");
+  const packDir = join(__dirname, "..", "..", "src", "assurance", "packs");
   const registered = new Map(listAssurancePacks().map((pack) => [pack.id, pack] as const));
   const manifestIds = INDUSTRY_PACK_MANIFEST.map((entry) => entry.id);
 
