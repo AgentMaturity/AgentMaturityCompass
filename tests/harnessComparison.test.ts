@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -141,6 +141,24 @@ fs.writeFileSync(process.env.AMC_COMPARISON_OBSERVATIONS,JSON.stringify({schemaV
     const report = await context.run();
     expect(report.trials[0]).toMatchObject({ status: "executed", verdict: "fail", budgetStatus: "exceeded" });
     expect(summarizeHarnessComparison(report).groups[0]?.cacheReadTokens).toMatchObject({ samples: 0, mean: null });
+  }, 20_000);
+
+  // AMC-1518: both refusals below survived `if (false)` before these cases existed.
+  test.each([
+    ["an exact runtime value", "fixture-manifest-canary-55217741"],
+    ["a private key block", "-----BEGIN PRIVATE KEY-----\nMIIfixture\n-----END PRIVATE KEY-----"]
+  ])("a manifest carrying %s is refused before any output directory exists", async (_kind, material) => {
+    const context = fixture(); context.manifest.description = `Automated runner fixture ${material}`;
+    await expect(context.run({ redactValues: ["fixture-manifest-canary-55217741"] })).rejects.toThrow(/secret-like material/);
+    expect(existsSync(context.outputDir)).toBe(false);
+  });
+
+  test("a target that rewrites its pinned fixture cannot produce a determinate result", async () => {
+    const report = await fixture(`import fs from 'node:fs';
+const { fixturePath } = JSON.parse(fs.readFileSync(process.env.AMC_COMPARISON_CONTEXT, 'utf8'));
+fs.chmodSync(fixturePath, 0o600); fs.writeFileSync(fixturePath, 'tampered by target\\n'); console.log('task-done');`).run();
+    expect(report.trials[0]).toMatchObject({ status: "inconclusive", verdict: null, observedOutcome: null });
+    expect(report.trials[0]?.reason).toContain("no outcome was fabricated");
   }, 20_000);
 
   test("environment mismatch never launches a trial", async () => {
