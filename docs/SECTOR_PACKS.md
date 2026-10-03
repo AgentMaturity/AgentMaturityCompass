@@ -2,7 +2,18 @@
 
 **Industry-specific, regulatory-grounded assessment packs for enterprise AI deployments.**
 
-AMC Sector Packs extend the base 138-question AMC rubric with deep vertical expertise — covering regulated industries, critical infrastructure, and public institutions. Each pack is authored against specific regulatory articles (not vague references), calibrated to real-world risk, and mapped to international standards.
+AMC Sector Packs extend the 244-question base AMC rubric with deep vertical expertise — covering regulated industries, critical infrastructure, and public institutions. Each pack is authored against specific regulatory articles (not vague references), calibrated to real-world risk, and mapped to international standards.
+
+The counts on this page are derived from the source, not maintained by hand. Re-derive them from a checkout with:
+
+```bash
+# Base rubric size: questionBank.length in src/diagnostic/questionBank.ts
+./node_modules/.bin/tsx -e 'import { questionBank } from "./src/diagnostic/questionBank.ts"; console.log(questionBank.length)' < /dev/null
+# Sector pack and question totals
+./node_modules/.bin/tsx -e 'import { listIndustryPacks } from "./src/domains/industryPacks.ts"; const p = listIndustryPacks(); console.log(p.length, p.reduce((n, x) => n + x.questions.length, 0))' < /dev/null
+```
+
+Measured at commit `8f57ce63` (2026-10-03): the base count above, across 5 layers; 41 sector packs holding 600 questions. `tests/domainReport.test.ts` fails if this page drifts from those sources.
 
 ---
 
@@ -10,7 +21,7 @@ AMC Sector Packs extend the base 138-question AMC rubric with deep vertical expe
 
 | Layer | Coverage |
 |---|---|
-| **Base AMC** | 138 questions, 5 dimensions — mandatory for all agents |
+| **Base AMC** | The base rubric above, 5 layers — mandatory for all agents |
 | **Domain Packs** | 7 canonical domain stations with CLI aliases (health, education, environment, mobility, governance, technology, wealth) |
 | **Sector Packs** | 41 packs across 7 stations — granular industry sub-verticals |
 
@@ -29,7 +40,7 @@ Use `amc domain list` for the full alias table, then run `amc domain modules --d
 
 ---
 
-## The 7 Stations — 41 Packs, 390 Questions
+## The 7 Stations — 41 Packs, 600 Questions
 
 ### 🌿 Environment (6 packs)
 
@@ -188,9 +199,13 @@ Each pack has a minimum score threshold for certification readiness, calibrated 
 
 ## Scoring Model
 
+Domain assessment (`assessDomain` in `src/domains/domainAssessmentEngine.ts`) combines the base and domain-pack scores:
+
 ```
-Composite Score = (base_score × 0.5) + (domain_score × 0.3) + (sector_score × 0.2)
+Composite Score = round(base_score × 0.6 + domain_score × 0.4)
 ```
+
+Sector packs are not weighted into that composite; each pack is scored on its own. A domain is certification-ready when the composite is `>=` the station threshold and no critical control sits at L1; domain reports print the threshold, whether it was met, and any blocking controls, next to each station pack's EU AI Act Annex III classification.
 
 Pack scoring uses weighted question responses (L1–L5):
 
@@ -252,7 +267,7 @@ const result = scoreIndustryPack("clinical-trials", responses);
 
 // Station summary
 const summary = getStationSummary("governance");
-// { stationId: "governance", packCount: 5, totalQuestions: 37, frameworks: [...] }
+// { stationId: "governance", packCount: 5, totalQuestions: 71, frameworks: [...] }
 ```
 
 ---
