@@ -69,8 +69,9 @@ function section(md: string, heading: string): string {
 describe("industry deployment guides", () => {
   test("a README and one guide per station exist, and nothing else is unaccounted for", () => {
     for (const f of guideFiles) expect(existsSync(join(dir, f)), f).toBe(true);
-    const extra = readdirSync(dir).filter((f) => !guideFiles.includes(f));
+    const extra = readdirSync(dir).filter((f) => !guideFiles.includes(f) && f !== "_data");
     expect(extra).toEqual([]);
+    expect(readdirSync(join(dir, "_data"))).toEqual(["regulatory-milestones.json"]);
   });
 
   test.each(stations)("%s guide has every required section", (station) => {

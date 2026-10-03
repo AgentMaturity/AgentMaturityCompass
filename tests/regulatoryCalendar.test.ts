@@ -3,12 +3,13 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { renderCalendar } from "../scripts/gen-regulatory-calendar.mjs";
-import { GLOBAL_FRAMEWORKS } from "../src/compliance/globalRegulatory.js";
+import { renderCalendar, validateMilestones } from "../scripts/lib/regulatoryCalendarRender.mjs";
+import { EU_AI_ACT_RISK_MATRIX, GLOBAL_FRAMEWORKS } from "../src/compliance/globalRegulatory.js";
 
 const root = process.cwd();
 const script = join(root, "scripts/gen-regulatory-calendar.mjs");
 const committed = join(root, "docs/REGULATORY_CALENDAR.md");
+const sidecar = JSON.parse(readFileSync(join(root, "docs/industries/_data/regulatory-milestones.json"), "utf8"));
 
 function run(args: string[]) {
   return spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: "utf8", timeout: 60_000 });
@@ -81,9 +82,65 @@ describe("regulatory calendar renderer", () => {
     expect(() => renderCalendar([{ name: "no id" }] as never)).toThrow(/frameworkId/);
   });
 
-  test("the committed calendar is exactly the render of the source register", () => {
-    expect(readFileSync(committed, "utf8")).toBe(renderCalendar(GLOBAL_FRAMEWORKS));
-    expect(readFileSync(committed, "utf8")).toContain(`${GLOBAL_FRAMEWORKS.length} frameworks`);
+  test("the committed calendar is exactly the render of the source register and the sidecar", () => {
+    const md = renderCalendar(GLOBAL_FRAMEWORKS, { euRiskMatrix: EU_AI_ACT_RISK_MATRIX, milestones: sidecar.milestones });
+    expect(readFileSync(committed, "utf8")).toBe(md);
+  });
+
+  test.each([
+    ["the committed calendar", () => readFileSync(committed, "utf8")],
+    ["a fresh render", () => renderCalendar(GLOBAL_FRAMEWORKS, { euRiskMatrix: EU_AI_ACT_RISK_MATRIX, milestones: sidecar.milestones })]
+  ])("the header of %s states counts derived from the imported register, not literals", (_name, load) => {
+    const md = load();
+    const reqs = GLOBAL_FRAMEWORKS.reduce((n, f) => n + f.keyRequirements.length, 0);
+    const header = md.split("\n").find((l) => l.startsWith("Source:")) ?? "";
+    expect(header).toContain(`${GLOBAL_FRAMEWORKS.length} frameworks, ${reqs} key requirements, ${EU_AI_ACT_RISK_MATRIX.length} EU AI Act risk-matrix rows`);
+    expect(header).toContain(`Curated milestones: ${sidecar.milestones.length}`);
+    expect(header).toContain("src/compliance/globalRegulatory.ts");
+    const matrixRows = md.split("## EU AI Act risk matrix")[1].split("\n## ")[0].split("\n").filter((l) => l.startsWith("| ") && !l.startsWith("| Sector"));
+    expect(matrixRows).toHaveLength(EU_AI_ACT_RISK_MATRIX.length);
+  });
+
+  test("no marketing or superiority language in the rendered calendar", () => {
+    expect(readFileSync(committed, "utf8")).not.toMatch(/10x|industry[- ]standard|superior|better than|best[- ]in[- ]class|world[- ]class|unmatched|leading /i);
+  });
+});
+
+const official = {
+  instrument: "Test Act", date: "2025-11-14", label: "Rules notified", status: "notified",
+  source: { title: "Official page", url: "https://www.pib.gov.in/x", retrievedAt: "2026-10-03" }
+};
+
+describe("curated milestones sidecar", () => {
+  test("every committed milestone has an official-host source and an ISO retrievedAt, and each renders one row", () => {
+    expect(() => validateMilestones(sidecar.milestones)).not.toThrow();
+    expect(sidecar.milestones.length).toBeGreaterThan(0);
+    const section = readFileSync(committed, "utf8").split("## Externally sourced milestones (curated)")[1].split("\n## ")[0];
+    const rows = section.split("\n").filter((l) => /^\| \d{4}-\d{2}-\d{2} \|/.test(l));
+    expect(rows).toHaveLength(sidecar.milestones.length);
+    for (const m of sidecar.milestones) expect(section).toContain(`retrieved ${m.source.retrievedAt}`);
+  });
+
+  test.each([
+    ["missing retrievedAt", { ...official, source: { ...official.source, retrievedAt: undefined } }, /retrievedAt/],
+    ["non-ISO retrievedAt", { ...official, source: { ...official.source, retrievedAt: "3 Oct 2026" } }, /retrievedAt/],
+    ["non-official host", { ...official, source: { ...official.source, url: "https://example.com/law" } }, /official host/],
+    ["look-alike host", { ...official, source: { ...official.source, url: "https://nist.gov.example.com/x" } }, /official host/],
+    ["plain http", { ...official, source: { ...official.source, url: "http://www.nist.gov/x" } }, /official host/],
+    ["missing date", { ...official, date: "" }, /ISO date/],
+    ["no instrument or frameworkId", { ...official, instrument: undefined }, /neither/]
+  ])("render() fails closed on a milestone with %s", (_name, bad, message) => {
+    expect(() => renderCalendar(bare, { milestones: [official, bad] })).toThrow(message);
+  });
+
+  test("a register obligation wins over the same sidecar milestone, which is marked superseded by source", () => {
+    const register = [{ ...bare[0], obligations: [{ appliesFrom: "2025-11-14", title: "Rules apply" }] }];
+    const same = { ...official, frameworkId: "b-law" };
+    const other = { ...official, frameworkId: "b-law", date: "2026-01-01", label: "Other" };
+    const md = renderCalendar(register, { milestones: [same, other] });
+    expect(md).toMatch(/\| 2025-11-14 \| Test Act \| Rules notified \| superseded by source \(`b-law` obligation\) \|/);
+    expect(md).toMatch(/\| 2026-01-01 \| Test Act \| Other \| notified \|/);
+    expect(md).toContain("| 2025-11-14 | `b-law` | Rules apply |");
   });
 });
 
@@ -116,6 +173,15 @@ describe("gen-regulatory-calendar CLI", () => {
     expect(run(["--data", data, "--out", out]).status).toBe(0);
     expect(readFileSync(out, "utf8")).toBe(renderCalendar(dated));
     expect(run(["--check", "--data", data, "--out", out]).status).toBe(0);
+  });
+
+  test("--milestones with an unsourced entry fails closed with exit 2", () => {
+    const dir = scratch();
+    const bad = join(dir, "milestones.json");
+    writeFileSync(bad, JSON.stringify({ milestones: [{ ...official, source: { ...official.source, url: "https://example.com" } }] }));
+    const r = run(["--check", "--milestones", bad, "--out", join(dir, "x.md")]);
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/official host/);
   });
 
   test("malformed --data fails closed with exit 2", () => {

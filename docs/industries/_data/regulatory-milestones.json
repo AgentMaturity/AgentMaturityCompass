@@ -1,0 +1,91 @@
+{
+  "schema": "amc.regulatory-milestones/1",
+  "note": "Curated milestones the register (src/compliance/globalRegulatory.ts) does not carry. Each entry was read at source.url on source.retrievedAt. This file is not register data; scripts/lib/regulatoryCalendarRender.mjs refuses any entry without an official-host URL and an ISO retrievedAt, and marks an entry superseded when the register carries the same frameworkId and date.",
+  "milestones": [
+    {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
+      "date": "2025-02-02",
+      "label": "Chapters I and II apply",
+      "status": "applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified",
+      "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
+      "date": "2025-08-02",
+      "label": "Chapter III Section 4, Chapters V, VII and XII, and Article 78 apply (Article 101 excluded)",
+      "status": "applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified",
+      "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
+      "date": "2026-08-02",
+      "label": "General date of application",
+      "status": "applies; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified",
+      "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
+      "date": "2027-12-02",
+      "label": "High-risk obligations for Article 6(2) and Annex III systems apply",
+      "status": "scheduled; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified",
+      "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "EU AI Act (Regulation (EU) 2024/1689), Art. 113 as amended",
+      "date": "2028-08-02",
+      "label": "High-risk obligations for Article 6(1) and Annex I systems apply",
+      "status": "scheduled; amended text per EC AI Act Service Desk, OJ citation of the amending act unverified",
+      "source": { "title": "EC AI Act Service Desk, Article 113", "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "Colorado SB24-205, Consumer Protections for Artificial Intelligence",
+      "date": "2024-05-17",
+      "label": "Signed by the Governor; developer and deployer obligations originally on and after 2026-02-01",
+      "status": "enacted",
+      "source": { "title": "Colorado General Assembly, SB24-205", "url": "https://leg.colorado.gov/bills/sb24-205", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "Colorado SB24-205 as amended by SB25B-004",
+      "date": "2026-06-30",
+      "label": "SB24-205 requirements take effect (SB25B-004, signed 2025-08-28, extends the date to June 30, 2026)",
+      "status": "scheduled",
+      "source": { "title": "Colorado General Assembly, SB25B-004", "url": "https://leg.colorado.gov/bills/sb25b-004", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "US Executive Order 14148",
+      "date": "2025-01-20",
+      "label": "Section 2(ggg) revokes Executive Order 14110 (Safe, Secure, and Trustworthy Development and Use of AI)",
+      "status": "revoked",
+      "source": { "title": "Federal Register FR Doc. 2025-01901 (govinfo)", "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-28/html/2025-01901.htm", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "frameworkId": "india-dpdp",
+      "instrument": "India Digital Personal Data Protection Rules, 2025",
+      "date": "2025-11-14",
+      "label": "DPDP Rules, 2025 notified, operationalising the DPDP Act, 2023",
+      "status": "notified",
+      "source": { "title": "PIB explainer: DPDP Rules, 2025 Notified (posted 17 Nov 2025)", "url": "https://www.pib.gov.in/PressNoteDetails.aspx?NoteId=156054&ModuleId=3&reg=3&lang=2", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "Canada Bill C-27 (44th Parliament, 1st session)",
+      "date": "2025-01-06",
+      "label": "Session ended with the bill at committee consideration in the House of Commons; no Royal Assent",
+      "status": "not enacted",
+      "source": { "title": "LEGISinfo, Bill C-27 (44-1)", "url": "https://www.parl.ca/legisinfo/en/bill/44-1/c-27", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "NIST AI Risk Management Framework",
+      "date": "2023-01-26",
+      "label": "AI RMF 1.0 released",
+      "status": "published (voluntary)",
+      "source": { "title": "NIST, AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "retrievedAt": "2026-10-03" }
+    },
+    {
+      "instrument": "NIST AI 600-1",
+      "date": "2024-07-26",
+      "label": "Generative AI Profile released",
+      "status": "published (voluntary)",
+      "source": { "title": "NIST, AI Risk Management Framework", "url": "https://www.nist.gov/itl/ai-risk-management-framework", "retrievedAt": "2026-10-03" }
+    }
+  ]
+}
