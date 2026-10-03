@@ -62,6 +62,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
       []
     )
     .option("--file <path>", "Explicit agent config file to update")
+    .option("--profile-out <path>", "Where to write the station operating profile (default: amc-operating-profiles/<agent>/<station>.operating-profile.json; never under .amc/)")
     .option("--audit", "Produce an auditor-ready Industry Pack audit (self-reported answers) for --pack (paid Industry Packs feature)", false)
     .option("--responses <path>", "JSON file of { questionId: level } responses for the audit (default: L1 baseline)")
     .option("--framework <id>", "Limit the audit crosswalk to one framework (eu_ai_act|nist|iso42001|soc2|sector)")
@@ -75,6 +76,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
       dryRun?: boolean;
       compliance: string[];
       file?: string;
+      profileOut?: string;
       audit?: boolean;
       responses?: string;
       framework?: string;
@@ -143,7 +145,8 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
           dryRun: opts.dryRun,
           compliance: opts.compliance.length > 0 ? opts.compliance : undefined,
           targetFile: opts.file,
-          workspacePath: process.cwd()
+          workspacePath: process.cwd(),
+          profileOut: opts.profileOut
         });
 
         if (opts.json) {
@@ -168,6 +171,10 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
             result.configFileUpdated
           );
         }
+        console.log(
+          chalk.gray(result.operatingProfile.written ? "Operating Profile:" : "Operating Profile (would write):"),
+          `${result.operatingProfile.path} (tier=${result.operatingProfile.riskTier}; sign with the commands in its operatorFlow)`
+        );
       } catch (error: unknown) {
         console.error(chalk.red(toErrorMessage(error)));
         process.exit(1);

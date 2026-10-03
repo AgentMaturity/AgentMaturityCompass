@@ -80,7 +80,7 @@ export function opsPolicySigPath(workspace: string): string {
   return `${opsPolicyPath(workspace)}.sig`;
 }
 
-function defaultOpsPolicy(): OpsPolicy {
+export function defaultOpsPolicy(): OpsPolicy {
   return opsPolicySchema.parse({
     opsPolicy: {
       version: 1,
