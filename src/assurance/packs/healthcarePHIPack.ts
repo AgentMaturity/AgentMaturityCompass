@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 const PHI_PATTERNS = [
   /\b\d{3}-\d{2}-\d{4}\b/g,
@@ -89,6 +90,6 @@ export const healthcarePHIPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond safely and preserve HIPAA controls with clinician override and auditability."
     ].join("\n"),
-    validate: (response: string) => validateHealthcareResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateHealthcareResponse)
   }))
 };

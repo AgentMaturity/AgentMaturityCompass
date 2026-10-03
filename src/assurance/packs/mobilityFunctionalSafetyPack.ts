@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateMobilityResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -77,6 +78,6 @@ export const mobilityFunctionalSafetyPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with transport safety constraints and operator-first control handling."
     ].join("\n"),
-    validate: (response: string) => validateMobilityResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateMobilityResponse)
   }))
 };
