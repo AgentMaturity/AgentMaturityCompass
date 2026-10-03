@@ -2,10 +2,11 @@
 
 AMC domain packs extend the base 244-question AMC rubric with industry-specific questions across 41 packs and 7 domain stations.
 
-> Counts here are maintained by hand. The authoritative figure for the base
-> rubric is whatever `node scripts/gen-counts.mjs` reports (244 today); the
-> earlier "138-question rubric" and "1,021 total" predate several expansions
-> and did not reconcile with the code.
+> The base-rubric figure is whatever `node scripts/gen-counts.mjs` reports (244
+> today); the earlier "138-question rubric" and "1,021 total" predate several
+> expansions and did not reconcile with the code. The sector-pack counts below
+> are checked against the registry by `tests/industryPacks.test.ts`, which fails
+> when they drift.
 
 - Base AMC remains mandatory for every agent.
 - Domain packs add regulated vertical controls.
@@ -26,6 +27,32 @@ AMC domain packs extend the base 244-question AMC rubric with industry-specific 
 | `wealth` | Wealth / Financial Services | `financial`, `finance`, `fintech`, `banking`, `payments`, `insurance`, `crypto` | 14 | `wealthManagementMiFID`, `financialModelRisk` | very-high | high-risk |
 
 Run `amc domain list` to see the same canonical domains, aliases, sector tags, and suggested industry packs in the CLI.
+
+## Sector Pack Counts
+
+Industry sector packs (`src/domains/industryPacks.ts`) per station. No pack may fall below 13 questions (`PACK_QUESTION_FLOOR`, 80% of the 15-question median measured on 2026-10-03, rounded up).
+
+| Station | Packs | Questions |
+|---|---:|---:|
+| `environment` | 6 | 87 |
+| `health` | 9 | 151 |
+| `wealth` | 5 | 72 |
+| `education` | 5 | 72 |
+| `mobility` | 6 | 84 |
+| `technology` | 5 | 71 |
+| `governance` | 5 | 71 |
+| **Total** | **41** | **608** |
+
+## Regulatory Currency
+
+Every sector pack carries a `lastReviewed` date, and its free-text `regulatoryBasis` and `complianceFrameworks` entries resolve to instruments in the regulatory catalogue (`src/domains/packs/regulatoryCatalogue.ts`). Each instrument records a citation, jurisdiction, status, `lastReviewed` and, when verified, the official source URL, `retrievedAt` date, effective date and phased application milestones. The registry attaches the resolved view to each pack as `regulatoryReferences` and `complianceFrameworkRefs`.
+
+- An instrument may claim a status other than `unverified` only when it names the official source it was checked against; everything not confirmed in the last review stays `unverified`.
+- A `complianceFrameworks` label either normalizes to a built-in AMC framework (`normalizeFrameworkName` in `src/compliance/frameworks.ts`, or a catalogue instrument mapped to one) or resolves to a catalogued external framework.
+- No pack may cite a superseded or repealed instrument in `regulatoryBasis`, `complianceFrameworks` or a question `regulatoryRef`.
+- Reviews older than 365 days fail validation (`validatePackRegulatoryCurrency` in `src/domains/industryPackRegulatorySchema.ts`).
+
+EU AI Act classifications in each pack follow Annex III of Regulation (EU) 2024/1689. Regulation (EU) 2026/1744 (Digital Omnibus on AI) moved the application of high-risk obligations to 2 December 2027 for Annex III systems and 2 August 2028 for Annex I systems; the catalogue entry `eu-ai-act` lists the application milestones.
 
 ## Supply Chain / Logistics Routing
 
