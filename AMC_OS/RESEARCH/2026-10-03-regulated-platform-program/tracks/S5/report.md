@@ -1,3 +1,44 @@
+# Track S5 — repair round 1 (2026-10-03, after monitor REJECTED c6b0d19b)
+
+- Branch `worktree-wf_5210e2f4-3ea-5`; base 8f57ce63 is an ancestor; repair commit d7a77cc5 on top of c6b0d19b; receipt commit follows.
+- Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; same worktree, not a fresh clone.
+
+## Fixes (monitor's required list, in order)
+1. Path discipline: `git mv src/compliance/regulatoryRegister -> src/compliance/regulatory` (index.ts, feeds.ts, register.json); imports updated in regulatoryAutomation.ts (:14, :148), euAiActClassifier.ts header, globalRegulatory.ts (registerId doc), scripts/check-regulatory-currency.mjs (DEFAULT_REGISTER_PATH), tests and both docs. `tests/euAiAct.test.ts` renamed to `tests/euAiActTimeline.test.ts`; `tests/globalRegulatory.test.ts` folded into `tests/regulatoryCurrency.test.ts` and deleted. `git diff --name-only 8f57ce63..HEAD` now lists only claimed paths (17 paths incl. the two receipts).
+2. `getDpiaAssessment()` returns a deep copy and no longer stamps `Date.now()`; template `dpoApproval: false`, `lastReviewDate`/`nextReviewDate: null` (type widened to `number | null`; only tests consume it). New assertion in `tests/regulatoryClaimsHonesty.test.ts` under a fake clock (2030-01-01).
+3. Five legacy `GLOBAL_FRAMEWORKS` entries now `mappingStatus: "partial"` (comment says why). `tests/round4Gaps.test.ts` R4-06 'all complete' lock replaced by 'every entry has registerId, >=1 source with retrievedAt and a lastReviewed'; R4-10 now expects `dpoApproval` false and null review dates (was locking `true` and `nextReviewDate > now`).
+4. `docs/wave4-regulatory-audit.md:3` banner: "Superseded on 2026-10-03 by `src/compliance/regulatory/register.json`"; historical text unchanged.
+5. `scripts/check-regulatory-currency.mjs`: strict `parseArgs` (unknown flag or missing value -> exit 1), `--now` alias of `--as-of`; `--json` prints `entries:[{id,status,verified,lastReviewed,windowDays,currency,sources[{url,retrievedAt}]}]`, `allowedHosts`, `counts`; every source host must be in `policy.officialHosts` (register.json), exported from the register module as `OFFICIAL_SOURCE_HOSTS` / `isOfficialSourceUrl()` (`src/compliance/regulatory/index.ts`). The script reads the same JSON list, so there is one allowlist.
+6. `RegulatoryMonitor` takes a public `fetchImpl?: FeedFetch` config option (`regulatoryAutomation.ts:136`, used by `fetchFeedContent` :348-364); the private `_fetchHook` is gone. `tests/regulatoryAutomation.test.ts` injects `fetchImpl` everywhere and stubs the global fetch to reject in beforeEach, so a bypass fails instead of reaching the network.
+
+## Verification
+- `pnpm vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts` -> Test Files 7 passed (7); Tests 142 passed (142); 0 skipped
+- `pnpm vitest run tests/publicBrandSystem.test.ts` (references wave4-regulatory-audit) -> passed
+- `pnpm typecheck` exit 0; `pnpm typecheck:tests` exit 0
+- `node scripts/check-regulatory-currency.mjs` -> entries=17 verified=11 unverified=6 asOf=2026-10-03, exit 0
+- `node scripts/check-regulatory-currency.mjs --now 2027-06-01` -> exit 1 (17 'policy window is 90 days' FAIL lines)
+- `node scripts/check-regulatory-currency.mjs --bogus` -> exit 1 'unknown argument'; `--as-of` with no value -> exit 1
+- `node scripts/check-regulatory-currency.mjs --json` -> exit 0; planner host check over the JSON prints OK
+- `grep -n 'example.com\|globalThis.fetch' tests/regulatoryAutomation.test.ts` -> nothing; `grep -n Superseded docs/wave4-regulatory-audit.md` -> line 3
+- `pnpm run check:docs-drift` -> passed (327 files)
+- `node scripts/architecture-boundaries-check.mjs` -> only failures 'dist/cli.js is missing' and 'dist/api/index.js is missing' (no build); regulatoryAutomation.ts 802 -> 707; regulatory/index.ts 100, feeds.ts 186 lines (register.json is 440 lines of data; the 400-line cap in the acceptance applies to *.ts)
+
+## Mutation checks (each restored and re-run green)
+- Restore `copy.lastReviewDate = Date.now()` + nextReviewDate in getDpiaAssessment -> regulatoryClaimsHonesty 1 failed | 4 passed
+- Template `dpoApproval: true` -> regulatoryClaimsHonesty + round4Gaps 2 failed | 51 passed
+- china-pipl `mappingStatus: "complete"` -> round4Gaps 1 failed | 47 passed
+- eu-ai-act source url -> https://artificialintelligenceact.eu/ -> script exit 1 ('is not on an official host'); regulatoryCurrency 5 failed
+- Remove the `--now` alias -> `--now 2027-06-01` exits 1 as unknown flag; regulatoryCurrency 2 failed | 19 passed
+- fetchFeedContent ignores config.fetchImpl -> regulatoryAutomation 4 failed | 18 passed (the stubbed global fetch rejects; no network)
+
+## Not changed in this round (monitor low findings outside the required list)
+- appliesFrom is still per classification (`applicationDates`), not per finding; EU_AI_ACT_TIMELINE constants still rely on register parity for their sources.
+- RSS changes still carry an estimated effectiveDate (publishedDate + 90 d, flagged `effectiveDateEstimated: true`) and `feed.lastContentHash` is still updated in place.
+- Feed contract field remains `contract: live | manual-review-required` (not `fetchContract`); no separate tests/regulatoryFeeds.test.ts was created — feed contract tests stay in tests/regulatoryAutomation.test.ts.
+- Single 90-day review window (no per-status windows).
+
+---
+
 # Track S5 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
 
 - Status (self-report): **COMPLETE**
