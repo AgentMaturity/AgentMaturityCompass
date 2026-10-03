@@ -1,7 +1,7 @@
 # EU AI Act Compliance Framework — AMC Dimension Mapping
 
-Version: 1.1 | Date: 2026-07-10
-Regulation: EU AI Act (Regulation (EU) 2024/1689) — current high-risk timeline: 2027-12-02 for Annex III systems and 2028-08-02 for product-integrated systems
+Version: 1.2 | Date: 2026-10-03
+Regulation: EU AI Act (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744, the Digital Omnibus on AI, in force 2026-07-27) — high-risk timeline: 2027-12-02 for Annex III systems and 2028-08-02 for product-integrated systems (Art. 113(c))
 Status: Engineering compliance mapping — not legal advice
 
 ---
@@ -206,16 +206,31 @@ AMC does not perform the conformity assessment itself — that requires a notifi
 
 ## 5. Timeline Context
 
-| Date | Milestone |
-|---|---|
-| 2024-08-01 | Regulation entered into force |
-| 2025-02-02 | Chapters I and II applicable |
-| 2025-08-02 | Chapter III Section 4, Chapter V (GPAI) applicable |
-| 2026-08-02 | Relevant Article 50 transparency obligations apply; GPAI enforcement powers also enter application |
-| **2027-12-02** | **Annex III high-risk rules apply under the current AI Omnibus political agreement timeline** |
-| **2028-08-02** | **High-risk rules apply to systems integrated into regulated products under the current timeline** |
+Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatoryRegister/register.json`); `tests/euAiAct.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
 
-The timeline can change. Verify it against the European Commission's [high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
+| Date | Milestone | Provision |
+|---|---|---|
+| 2024-08-01 | Regulation entered into force | Art. 113 |
+| 2025-02-02 | Chapters I and II apply (definitions, AI literacy, Art. 5 prohibitions) | Art. 113(a) |
+| 2025-08-02 | Chapter III Section 4, Chapter V (GPAI), Chapters VII and XII and Art. 78 apply, except Art. 101 | Art. 113(b) |
+| 2026-07-27 | Regulation (EU) 2026/1744 entered into force; Arts. 102-110 apply | Art. 113(d) |
+| 2026-08-02 | General date of application, including Art. 50 transparency obligations | Art. 113 |
+| 2026-12-02 | New prohibitions Art. 5(1)(ba), (bb), 5(1a), 5(1b) apply; Art. 50(2) deadline for synthetic-content systems placed on the market before 2026-08-02 | Art. 113(a), Art. 111(4) |
+| 2027-08-02 | GPAI models placed on the market before 2025-08-02 must comply | Art. 111(3) |
+| **2027-12-02** | **Chapter III Sections 1-3 apply to Annex III high-risk systems (Art. 6(2))** | Art. 113(c)(i) |
+| **2028-08-02** | **Chapter III Sections 1-3 apply to Annex I product-integrated high-risk systems (Art. 6(1))** | Art. 113(c)(ii) |
+
+`amc comply risk-classify --json` now returns `applicationDates` for the tier it assigns (Art. 5, Art. 50, Annex III or Annex I basis).
+
+Sources (all retrieved 2026-10-03):
+
+- AI Act Service Desk, Article 113: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113
+- AI Act Service Desk, Article 111: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111
+- AI Act Service Desk, implementation timeline: https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act
+- European Commission AI Act policy page (last updated 2026-08-03): https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+- Regulation (EU) 2026/1744 on EUR-Lex: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng — EUR-Lex answered automated requests with a bot challenge, so the text was read through the Service Desk; title and date (8 July 2026) come from the EUR-Lex index.
+
+The timeline can change again. Verify it against the European Commission's [high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
 ---
 
@@ -239,7 +254,9 @@ This maps directly to Art. 14 human oversight requirements — the EU AI Act req
 
 ## References
 
-- EU AI Act text: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
+- EU AI Act text: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689 (bot challenge on 2026-10-03; consolidated text read at https://ai-act-service-desk.ec.europa.eu/en/ai-act-explorer, retrieved 2026-10-03)
+- Digital Omnibus on AI, Regulation (EU) 2026/1744: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (index entry seen 2026-10-03)
+- AMC regulatory currency register: `src/compliance/regulatoryRegister/register.json` (checked by `scripts/check-regulatory-currency.mjs`)
 - European Commission high-risk guidance: https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems
 - European Commission AI Act policy page: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
