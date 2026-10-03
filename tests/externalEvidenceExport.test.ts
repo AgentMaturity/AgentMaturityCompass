@@ -8,7 +8,7 @@ import { verifyExternalEvidence } from "../src/standard/externalEvidenceProfile.
 
 const ingestedAt = "2026-10-03T00:00:00.000Z";
 const candidate = (overrides: Partial<NeutralImportCandidate> = {}): NeutralImportCandidate => ({
-  category: "traces", path: "/fixture/traces.jsonl", format: "jsonl", digest: "d".repeat(64), bytes: 1, recordCount: 1,
+  category: "trace-jsonl", path: "/fixture/traces.jsonl", format: "jsonl", digest: "d".repeat(64), bytes: 1, recordCount: 1,
   confidence: 1, summary: "synthetic", redactionCount: 0, ...overrides
 });
 const trace = (overrides: Partial<ProductionTrace> = {}): ProductionTrace => ({
