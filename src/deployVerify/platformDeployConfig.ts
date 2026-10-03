@@ -1,5 +1,5 @@
 /**
- * Static correctness check of the Railway and Vercel deploy targets against
+ * Static correctness check of the Railway and Vercel targets against
  * the committed package.json. Reads files only; never writes, installs or
  * deploys. Findings describe the committed state so a reviewer can decide what
  * to change; nothing here edits a config.

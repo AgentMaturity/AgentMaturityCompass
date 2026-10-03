@@ -28,7 +28,7 @@ const GH_SECRET = "GitHub repo secret (Settings > Secrets and variables > Action
 export const CREDENTIALS = {
   NPM_TOKEN: {
     actions: ["publish"],
-    requiredFor: "B3 publish: npm-publish.yml and release.yml pass it as NODE_AUTH_TOKEN to changeset/npm publish",
+    requiredFor: "B3 publish: npm-publish.yml and release.yml pass it as NODE_AUTH_TOKEN to the npm registry publish step",
     configureAt: `${GH_SECRET}; an npm granular access token with publish rights from npmjs.com`
   },
   CHANGESETS_GITHUB_TOKEN: {
@@ -64,7 +64,7 @@ export const CREDENTIALS = {
   },
   VERCEL_TOKEN: {
     actions: ["deploy-vercel"],
-    requiredFor: "B4 Vercel deploy via the Vercel CLI (vercel.json target); no workflow references it",
+    requiredFor: "B4 deployment to Vercel via the Vercel CLI (vercel.json target); no workflow references it",
     configureAt: "shell env: a Vercel access token (Vercel Account Settings > Tokens)"
   },
   AMC_DEPLOY_VERIFY_LEASE: {
