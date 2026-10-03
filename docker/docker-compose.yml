@@ -42,6 +42,33 @@ services:
       - amc_owner_username
       - amc_owner_password
 
+  # One-shot governed-turn check: `docker compose -f docker/docker-compose.yml --profile verify run --rm amc-verify`.
+  # Same probe as the Helm test pod (scripts/deploy/governed-turn-probe.mjs); exits 0 only on a verified turn.
+  amc-verify:
+    profiles: ["verify"]
+    image: amc-studio:local
+    depends_on:
+      amc-studio:
+        condition: service_healthy
+    entrypoint: ["node", "/probe/governed-turn-probe.mjs"]
+    command:
+      - --base-url
+      - http://amc-studio:3212
+      - --username-file
+      - /run/secrets/amc_owner_username
+      - --password-file
+      - /run/secrets/amc_owner_password
+      - --ready-timeout-ms
+      - "60000"
+    volumes:
+      - ../scripts/deploy/governed-turn-probe.mjs:/probe/governed-turn-probe.mjs:ro
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    secrets:
+      - amc_owner_username
+      - amc_owner_password
+
 volumes:
   amc-data:
     driver: local

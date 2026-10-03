@@ -1,5 +1,6 @@
 image_repository = "ghcr.io/your-org/amc-studio"
 image_tag        = "latest"
+# image_digest   = "sha256:<64 hex>"  # wins over image_tag when set
 replica_count    = 1
 
 # Optional production overrides:

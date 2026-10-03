@@ -56,6 +56,7 @@ Common stack config keys:
 | `chartPath` | `../../helm/amc` | Local AMC Helm chart path |
 | `imageRepository` | `ghcr.io/your-org/amc-studio` | AMC image repository |
 | `imageTag` | `latest` | AMC image tag |
+| `imageDigest` | empty | `sha256:<64 hex>`; when set the chart deploys `repository@digest` and ignores `imageTag` |
 | `bootstrapSecretName` | `amc-bootstrap` | Existing Kubernetes Secret with bootstrap keys |
 | `ingressEnabled` | `false` | Enable chart ingress |
 | `ingressHost` | `amc.example.com` | Hostname for ingress |

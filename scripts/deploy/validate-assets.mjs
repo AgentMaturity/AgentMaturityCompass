@@ -8,9 +8,13 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
+import { verifyPublishedInstallerVersion } from "../lib/published-installer-version.mjs";
 
 const SECRET_KEY = /(passphrase|password|secret|token|api[_-]?key)$/i;
 const KNOWN_DEFAULTS = /change-?me|amc-test-passphrase/i;
+// The only Secret the chart may render: wrapped whole in the createSecret switch (default false).
+const SECRET_GUARD = /^\{\{-? if \.Values\.bootstrap\.createSecret \}\}\n[\s\S]*\n\{\{-? end \}\}\n?$/;
+const REFUSAL_ACTION = /\{\{-?\s*if\s+hasPrefix\s+"[^"]*"[^}]*\}\}/g;
 const HELM_DEPLOYMENT = "deploy/helm/amc/templates/deployment.yaml";
 const K8S_DEPLOYMENT = "deploy/k8s/deployment.yaml";
 // Container name -> server source that must handle every probe path it uses.
@@ -34,12 +38,17 @@ export function checkVersions(root) {
     errors.push(`deploy/helm/amc/Chart.yaml appVersion ${chart.appVersion} != package.json ${packageVersion}`);
   }
   if (!/^\d+\.\d+\.\d+$/.test(String(chart.version))) errors.push(`Chart.yaml version ${chart.version} is not semver`);
-  // The quickstart installs a published GitHub release tarball, so it pins the
-  // latest release recorded in the publication status, not the unreleased source version.
-  const release = JSON.parse(read(root, "website/publication-status.json")).channels?.githubRelease;
+  // The quickstart installs a published GitHub release tarball, so it pins the same
+  // observed published release as the hosted installers, not the unreleased source version.
   const quickstart = /^ARG AMC_VERSION=(\S+)$/m.exec(read(root, "docker/Dockerfile.quickstart"))?.[1];
-  if (!release || release.status !== "live" || quickstart !== release.version) {
-    errors.push(`docker/Dockerfile.quickstart AMC_VERSION ${quickstart} != published githubRelease ${release?.version} (${release?.status})`);
+  let published = null;
+  try {
+    published = verifyPublishedInstallerVersion(root).version;
+  } catch (error) {
+    errors.push(`published installer version: ${error.message}`);
+  }
+  if (published !== null && quickstart !== published) {
+    errors.push(`docker/Dockerfile.quickstart AMC_VERSION ${quickstart} != published installer version ${published}`);
   }
   return { errors, packageVersion, chartVersion: String(chart.version), appVersion: String(chart.appVersion), quickstartVersion: quickstart };
 }
@@ -78,11 +87,15 @@ export function findSecretLiterals(root) {
       errors.push(`${file}: does not parse: ${error.message.split(": ").slice(1).join(": ")}`);
     }
   }
-  for (const name of readdirSync(resolve(root, helmDir, "templates"))) {
+  for (const name of readdirSync(resolve(root, helmDir, "templates"), { recursive: true })) {
     const file = `${helmDir}/templates/${name}`;
+    if (!/\.(ya?ml|tpl|txt)$/.test(name)) continue;
     const text = read(root, file);
-    if (/^kind:\s*Secret\s*$/m.test(text)) errors.push(`${file}: chart renders a Secret; bootstrap secrets must be created out of band`);
-    if (KNOWN_DEFAULTS.test(text)) errors.push(`${file}: contains a known default secret`);
+    if (/^kind:\s*Secret\s*$/m.test(text) && !SECRET_GUARD.test(text)) {
+      errors.push(`${file}: renders a Secret without the {{- if .Values.bootstrap.createSecret }} guard`);
+    }
+    // A placeholder named inside a refusal (`if hasPrefix "change-me" ...`) is a guard, not a value.
+    if (KNOWN_DEFAULTS.test(text.replace(REFUSAL_ACTION, ""))) errors.push(`${file}: contains a known default secret`);
   }
   for (const name of readdirSync(resolve(root, "deploy/k8s")).filter((f) => f.endsWith(".yaml") && !f.endsWith(".example.yaml"))) {
     const file = `deploy/k8s/${name}`;
@@ -209,8 +222,24 @@ function checkHelmRender(root) {
       errors.push(error.message);
     }
   }
-  const refused = spawnSync("helm", ["template", "amc", chartDir, "--set", "replicaCount=2"], { encoding: "utf8" });
-  if (refused.status === 0) errors.push("helm template --set replicaCount=2 rendered; it must refuse");
+  const digest = `sha256:${"0".repeat(64)}`;
+  const mustRefuse = [
+    ["--set", "replicaCount=2"],
+    ["--set", "bootstrap.createSecret=true"],
+    ["--set", "bootstrap.createSecret=true", "--set", "bootstrap.values.vaultPassphrase=change-me-x"],
+    ["--set", "image.requireDigest=true"]
+  ];
+  for (const args of mustRefuse) {
+    if (spawnSync("helm", ["template", "amc", chartDir, ...args], { encoding: "utf8" }).status === 0) errors.push(`helm template ${args.join(" ")} rendered; it must refuse`);
+  }
+  try {
+    const images = helmRender(chartDir, ["--set", `image.digest=${digest}`]).flatMap((doc) => doc.spec?.template?.spec?.containers ?? []).map((c) => c.image);
+    if (!images.length || images.some((image) => image !== `amc-studio@${digest}`)) errors.push(`helm template --set image.digest: images ${images.join(",")} are not repository@digest`);
+  } catch (error) {
+    errors.push(error.message);
+  }
+  const lint = spawnSync("helm", ["lint", chartDir], { encoding: "utf8" });
+  if (lint.status !== 0) errors.push(`helm lint failed: ${lint.stdout.trim()} ${lint.stderr.trim()}`);
   return { errors, note: `helm: rendered defaults + ${variants.length - 1} example values files` };
 }
 

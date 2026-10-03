@@ -1,6 +1,9 @@
 {{- if ne (int .Values.replicaCount) 1 }}
 {{- fail "replicaCount must be 1: the AMC workspace (SQLite ledger on a ReadWriteOnce volume) has a single writer" }}
 {{- end }}
+{{- if and .Values.image.requireDigest (not .Values.image.digest) }}
+{{- fail "image.requireDigest is true but image.digest is empty: deploy by sha256 digest" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,7 +29,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: amc-studio
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-lc"]
           args:
@@ -94,7 +97,7 @@ spec:
               mountPath: /tmp
       {{- if .Values.notary.enabled }}
         - name: amc-notary
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["amc"]
           args: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "{{ .Values.workspace.mountPath }}"]

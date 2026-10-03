@@ -26,3 +26,16 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- default "default" .Values.serviceAccount.name -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+A bootstrap Secret value: required, and never a published placeholder.
+Usage: include "amc.bootstrapValue" (list "<values key>" <value>)
+*/}}
+{{- define "amc.bootstrapValue" -}}
+{{- $name := index . 0 -}}
+{{- $value := toString (required (printf "bootstrap.values.%s is required when bootstrap.createSecret=true" $name) (index . 1)) -}}
+{{- if hasPrefix "change-me" (lower $value) -}}
+{{- fail (printf "bootstrap.values.%s starts with the published placeholder prefix; supply a real value" $name) -}}
+{{- end -}}
+{{- $value | quote -}}
+{{- end -}}
