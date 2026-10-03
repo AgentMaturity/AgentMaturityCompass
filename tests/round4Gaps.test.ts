@@ -20,6 +20,7 @@ import {
   CONSTRUCT_VALIDITY_DATA,
   AMC_EVALUATION_DPIA, getDpiaAssessment,
 } from "../src/compliance/globalRegulatory.js";
+import { getRegisterEntry } from "../src/compliance/regulatory/index.js";
 
 // ─── R4-01: Real-time Monitoring Dashboard ──────────
 
@@ -250,9 +251,14 @@ describe("R4-06 Global Regulatory Coverage", () => {
     expect(ids).toContain("japan-appi");
   });
 
-  test("all frameworks have complete mapping status", () => {
+  test("every entry has registerId, >=1 source with retrievedAt and a lastReviewed", () => {
     for (const f of GLOBAL_FRAMEWORKS) {
-      expect(f.mappingStatus).toBe("complete");
+      expect(f.mappingStatus, f.frameworkId).not.toBe("complete");
+      const entry = getRegisterEntry(f.registerId ?? "");
+      expect(entry, f.frameworkId).toBeDefined();
+      expect(entry!.lastReviewed, f.frameworkId).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(entry!.sources.length, f.frameworkId).toBeGreaterThan(0);
+      for (const s of entry!.sources) expect(s.retrievedAt, `${f.frameworkId} ${s.url}`).toMatch(/^\d{4}-\d{2}-\d{2}/);
     }
   });
 
@@ -351,10 +357,10 @@ describe("R4-09 Formal Construct Validity", () => {
 // ─── R4-10: Evaluation Data DPIA ───────────────────
 
 describe("R4-10 Evaluation Data DPIA", () => {
-  test("DPIA assessment exists with low residual risk", () => {
+  test("DPIA template exists with low residual risk and no DPO approval", () => {
     const dpia = getDpiaAssessment();
     expect(dpia.residualRiskLevel).toBe("low");
-    expect(dpia.dpoApproval).toBe(true);
+    expect(dpia.dpoApproval).toBe(false);
   });
 
   test("4 data flows documented", () => {
@@ -378,7 +384,8 @@ describe("R4-10 Evaluation Data DPIA", () => {
     }
   });
 
-  test("next review date is future", () => {
-    expect(getDpiaAssessment().nextReviewDate).toBeGreaterThan(Date.now());
+  test("template review dates are not stamped from the clock", () => {
+    expect(getDpiaAssessment().lastReviewDate).toBeNull();
+    expect(getDpiaAssessment().nextReviewDate).toBeNull();
   });
 });

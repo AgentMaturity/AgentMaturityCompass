@@ -3,12 +3,22 @@
  * Unit tests for src/compliance/regulatoryAutomation.ts
  */
 
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import {
   DEFAULT_REGULATORY_FEEDS,
   RegulatoryMonitor,
   getRegulatoryChanges,
+  type FeedFetch,
 } from "../src/compliance/regulatoryAutomation.js";
+
+// No test in this file may reach the network: the global fetch throws, so a
+// feed read that bypasses the injected fetchImpl fails loudly.
+beforeEach(() => {
+  vi.stubGlobal("fetch", () => Promise.reject(new Error("network disabled in tests; inject fetchImpl")));
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("DEFAULT_REGULATORY_FEEDS", () => {
   it("should have at least 8 feeds", () => {
@@ -70,28 +80,41 @@ describe("RegulatoryMonitor", () => {
     expect(monitor).toBeDefined();
   });
 
-  it("checkAllFeeds should return an array", async () => {
-    // This uses network calls but we can at least check it returns the right type
-    // We timeout quickly here; in real environments it would make HTTP calls
+  it("checkAllFeeds reads feeds through the injected fetchImpl, never the network", async () => {
+    const calls: string[] = [];
+    const fetchImpl: FeedFetch = async (url, init) => {
+      calls.push(url);
+      expect(init.signal).toBeInstanceOf(AbortSignal);
+      return { ok: true, status: 200, text: async () => "<rss></rss>" };
+    };
     const monitor = new RegulatoryMonitor({
       feeds: [{
-        id: "test-feed",
-        name: "Test Feed",
-        framework: "TEST",
-        type: "rss",
-        url: "https://example.com/feed.xml",
-        pollIntervalMs: 3600000,
-        lastChecked: 0,
-        lastContentHash: "",
-        enabled: true,
-        failureCount: 0,
-        jurisdictions: ["GLOBAL"],
+        id: "test-feed", name: "Test Feed", framework: "TEST", type: "rss",
+        url: "https://feeds.test.invalid/feed.xml", pollIntervalMs: 3600000, lastChecked: 0,
+        lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["GLOBAL"],
       }],
       jurisdictions: ["GLOBAL"],
+      fetchImpl,
     });
     const results = await monitor.checkAllFeeds();
-    expect(Array.isArray(results)).toBe(true);
-  }, 15000);
+    expect(calls).toEqual(["https://feeds.test.invalid/feed.xml"]);
+    expect(results.map((r) => [r.feedId, r.status])).toEqual([["test-feed", "new_content"]]);
+  });
+
+  it("reports an HTTP error from fetchImpl as a feed failure", async () => {
+    const monitor = new RegulatoryMonitor({
+      feeds: [{
+        id: "down-feed", name: "Down", framework: "TEST", type: "rss",
+        url: "https://feeds.test.invalid/down.xml", pollIntervalMs: 3600000, lastChecked: 0,
+        lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["GLOBAL"],
+      }],
+      jurisdictions: ["GLOBAL"],
+      fetchImpl: async () => ({ ok: false, status: 503, text: async () => "" }),
+    });
+    const [result] = await monitor.checkAllFeeds();
+    expect(result!.status).toBe("error");
+    expect(result!.error).toContain("HTTP 503");
+  });
 
   it("should be an EventEmitter (has .on method)", () => {
     const monitor = new RegulatoryMonitor();
@@ -215,12 +238,11 @@ describe("parsed changes do not invent legal dates", () => {
     pollIntervalMs: 1, lastChecked: 0, lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["EU"],
   });
   async function changesFor(type: "rss" | "api", body: string) {
-    const monitor = new RegulatoryMonitor({ feeds: [], jurisdictions: ["EU"] });
-    const hooked = monitor as unknown as { _fetchHook: () => Promise<string> };
+    const bodies = ["baseline", body];
+    const fetchImpl: FeedFetch = async () => ({ ok: true, status: 200, text: async () => bodies.shift() ?? body });
+    const monitor = new RegulatoryMonitor({ feeds: [], jurisdictions: ["EU"], fetchImpl });
     const f = feed(type);
-    hooked._fetchHook = async () => "baseline";
     await monitor.checkFeed(f);
-    hooked._fetchHook = async () => body;
     return (await monitor.checkFeed(f)).changes;
   }
 

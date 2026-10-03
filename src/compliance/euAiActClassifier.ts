@@ -12,8 +12,8 @@
  * Application dates (Art. 113 and Art. 111 as amended by Regulation (EU)
  * 2026/1744), read on 2026-10-03 from the Commission's AI Act Service Desk.
  * Each key must equal the verified keyDate of the same id in the regulatory
- * register entry "eu-ai-act" (src/compliance/regulatoryRegister/register.json);
- * tests/euAiAct.test.ts enforces the parity.
+ * register entry "eu-ai-act" (src/compliance/regulatory/register.json);
+ * tests/euAiActTimeline.test.ts enforces the parity.
  */
 export const EU_AI_ACT_TIMELINE = {
   entryIntoForce: "2024-08-01",

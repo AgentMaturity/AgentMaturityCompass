@@ -1,5 +1,7 @@
 # Wave 4 Regulatory Audit — AMC (Agent Maturity Compass)
 
+> **Superseded on 2026-10-03 by `src/compliance/regulatory/register.json`.** The sourced regulatory register (official sources with `retrievedAt`, `lastReviewed`, per-fact `verified` flags; checked by `node scripts/check-regulatory-currency.mjs`) is now the authority for regulatory dates and status. This audit is kept unchanged as a historical record of the 2026-02-22 review; do not rely on its dates.
+
 - Date: 2026-02-22
 - Auditor: Wave4 Agent 7 (engineering compliance review)
 - Scope: repository evidence in `src/`, `docs/`, `tests/` only

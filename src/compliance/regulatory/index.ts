@@ -65,11 +65,30 @@ export interface RegulatoryRegisterEntry {
 
 export interface RegulatoryRegister {
   schemaVersion: 1;
-  policy: { reviewWindowDays: number; note: string };
+  policy: { reviewWindowDays: number; note: string; officialHostsNote: string; officialHosts: string[] };
   entries: RegulatoryRegisterEntry[];
 }
 
 export const REGULATORY_REGISTER = registerData as RegulatoryRegister;
+
+/**
+ * Official-host allowlist (regulators, legislatures, official journals,
+ * standards bodies). scripts/check-regulatory-currency.mjs reads the same
+ * list from register.json and fails on any source outside it.
+ */
+export const OFFICIAL_SOURCE_HOSTS: readonly string[] = Object.freeze([...REGULATORY_REGISTER.policy.officialHosts]);
+
+/** True when the URL is https and its hostname is an allowlisted host or a subdomain of one. */
+export function isOfficialSourceUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  const host = parsed.hostname.toLowerCase();
+  return parsed.protocol === "https:" && OFFICIAL_SOURCE_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+}
 
 export function getRegisterEntry(id: string): RegulatoryRegisterEntry | undefined {
   return REGULATORY_REGISTER.entries.find((entry) => entry.id === id);
