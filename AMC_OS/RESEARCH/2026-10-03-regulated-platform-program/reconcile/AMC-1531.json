@@ -1,0 +1,33 @@
+{
+  "issue": "AMC-1531",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits d8d65853, d3cae563, 609269ed and 6d141588 are ancestors of HEAD.",
+    "package.json runtime dependencies contain no DSH or Pi package, and no src import resolves to one.",
+    "docs/NATIVE_AGENT_WORKFLOW.md exists and states the native path needs no DSH, Pi or other agent runtime.",
+    "Receipts exist, untracked: native-standalone-readiness.md, native-final-qualification-d8d65853/README.md, installed-native-editing-acceptance/README.md.",
+    "Native delegation/runtime focused set: 10 files, 122/122 passed.",
+    "Mutation: child approval-gate inheritance removed -> 2 failures in nativeDelegationInheritance; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Fresh installed standalone artifact acceptance at HEAD",
+    "real provider runs",
+    "full suite / release gate (the 11,484-test d8 result is quoted from its receipt, not re-run)",
+    "AMC-1545 remains In Progress and blocks this issue"
+  ],
+  "mutation": "src/agent/subagentRunner.ts:298 child tools `approval === undefined || gate === undefined ? toolset.seam : gateToolCallsOnApproval(...)` -> `toolset.seam`: RED (nativeDelegationInheritance 7/9, 'grandchildren retain approval gates...' and 'production kernel grants actual recursive children with child-bound approval rows' failed); restored, sha prefix 70d45fefc05ab0f2.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/delegationScopeBinding.test.ts tests/kernelDelegationGrant.test.ts tests/nativeChildStopOutput.test.ts tests/nativeDelegationInheritance.test.ts tests/subagentHookInheritance.test.ts tests/subagentRunnerEndToEnd.test.ts tests/subagentContinuable.test.ts tests/subagentForeignContract.test.ts tests/subagentStopConditions.test.ts tests/nativeRecoveryControl.test.ts",
+      "result": "10 files, 122/122 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-final-qualification-d8d65853/README.md (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

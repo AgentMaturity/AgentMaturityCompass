@@ -1,0 +1,31 @@
+{
+  "issue": "AMC-1532",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits d3cae563 and fc5f30df are ancestors of HEAD.",
+    "src/acp/acpAgentServer.ts retires a failed turn's withheld tail with flush(entry, sessionId, false) before throwing (line ~455).",
+    "tests/acpFailedTurnUpdates.test.ts and docs/NATIVE_SDK.md exist; the regression described as AUTHORED UNEXECUTED now passes 11/11.",
+    "installed-native-sdk-tools-acceptance/manifest.json sha256 9d37d533c34948ece671f2343576f9506a745d69c1dea16bf147c8d091fc3de2 matches the issue (untracked, root); installed-native-budget-acceptance/ has 187 files.",
+    "Mutation: tail retirement removed -> 4 failures; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Current combined installed CLI/SDK/ACP tool, approval, quota, cancellation and cold-verification acceptance",
+    "Python wheel lifecycle",
+    "full suite / release gate"
+  ],
+  "mutation": "src/acp/acpAgentServer.ts failed-turn branch `flush(entry, request.sessionId, false);` removed: RED (7/11; SQLite and JSONL tail-retirement, partial-delivery and forged-terminal-row cases failed); restored, sha prefix 610e6133606ed5bd.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/acpFailedTurnUpdates.test.ts",
+      "result": "11/11 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-sdk-tools-acceptance/README.md (untracked, root; manifest sha256 matches)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

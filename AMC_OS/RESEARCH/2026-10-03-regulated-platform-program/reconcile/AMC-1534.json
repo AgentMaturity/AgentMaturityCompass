@@ -1,0 +1,33 @@
+{
+  "issue": "AMC-1534",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits 08829be5, 90855cf7, e7900221 and 6d141588 are ancestors of HEAD.",
+    "src/budgets/nativeBudgetAdmission.ts refuses tool, request, token and known-cost limits before dispatch (lines 41-54).",
+    "Installed final receipt digest 28bca6e3e60f828e7a307e2e1fbd0d23b9b91cf9e3774e7e5e2d528aeff37722 is installed-native-budget-acceptance/attempt3/acceptance.json and is listed in receipt-digests.json (untracked, root).",
+    "native-budget-cli-exit-correction/receipt.json, native-budget-correction/receipt.json and native-final-qualification-e7900221/README.md exist (untracked).",
+    "nativeBudgets 25/25 and budgetsEvaluateStatus 9/9 passed. The issue's '92 focused cases across 8 suites' set was not reconstructed; only these 2 files were run.",
+    "Mutation: request-cap admission disabled -> 2 failures; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Installed quota/race/cold-verification repeat at HEAD",
+    "latest-turn CLI exit status on an installed package",
+    "full suite / release gate",
+    "real provider usage or price"
+  ],
+  "mutation": "src/budgets/nativeBudgetAdmission.ts:45 request-limit condition -> `if (false)`: RED (nativeBudgets 23/25; 'blocks the next provider dispatch at the request limit before transport' and 'reserves the final slot before overlapping independent session dispatches' failed); restored, sha prefix 5c39db72dffdb8b4.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/nativeBudgets.test.ts tests/budgetsEvaluateStatus.test.ts",
+      "result": "34/34 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-budget-acceptance/attempt3/acceptance.json (untracked, root, sha256 matches)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

@@ -1,0 +1,36 @@
+{
+  "issue": "AMC-1536",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits b8e82167, 0ac9be93 and 1bff37ce are ancestors of HEAD.",
+    "docs/NATIVE_STUDIO_TASKS.md exists; src/studio/nativeAdmission.ts enforces intent header, same-origin and CSRF proof for cookie-authenticated native mutations.",
+    "native-studio-task-acceptance/final-disposition.json sha256 079ac61f48cd80077ee2769b594d720fbada1ca423216bb179d04533a669ff66 matches (untracked, root); studio-native-browser-acceptance/ (25 files) and native-studio-graphify-b8e82167/ (21 files) exist.",
+    "11 Studio native-task files: 108 passed and 10 skipped before build; after pnpm build, tests/studioNativeTaskService.test.ts 10/10 passed, so 118/118 across the set.",
+    "Mutation: CSRF proof check disabled -> 4 failures; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Chromium browser scenarios",
+    "installed package",
+    "full suite / release gate",
+    "positive browser file editing, offline, mobile, live deployment"
+  ],
+  "mutation": "src/studio/nativeAdmission.ts:102 `if (!sameProof(...))` -> `if (false && !sameProof(...))`: RED (studioNativeTaskAdmission 33/36, cosProduct10NativeTasksRouter 6/7); restored, sha prefix 6aba5f1c646ccf3d.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run <11 Studio native-task files, see README>",
+      "result": "108 passed, 10 skipped (needs build)"
+    },
+    {
+      "command": "pnpm build && pnpm exec vitest run tests/studioNativeTaskService.test.ts",
+      "result": "build exit 0; 10/10 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-studio-task-acceptance/final-disposition.json (untracked, root, sha256 matches)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

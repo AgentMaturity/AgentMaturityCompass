@@ -1,0 +1,33 @@
+{
+  "issue": "AMC-1529",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits 883b5d75, 94371330, 1bff37ce and de7a0f81 are ancestors of HEAD.",
+    "src/crypto/signing/signer.ts:97 declares payloadSha256 = sha256Hex(payloadBytes), the checksum of the bytes actually sent.",
+    "deploy/compose/docker-compose.tls.yml passes `--bind 0.0.0.0` to the notary, has a healthcheck and a `condition: service_healthy` dependency; NET_BIND_SERVICE is added for Caddy only; Caddyfile uses `tls internal` and matched handle blocks.",
+    "optional-notary-tls-acceptance/manifest.json exists (untracked) and its sha256 is 8d2bc9adc901961dcf0a7b0c72ff6b441811b0f5290815e3525bbe36b7db4a00, matching the issue.",
+    "2026-09-10 notary replay regressions described as AUTHORED UNEXECUTED now run: notaryAuthReplay 6/6, notaryComposeIntegration 10/10, notaryTrust 5/5.",
+    "Mutation: reintroducing the original checksum bug fails the real-producer test; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Current image build and repeat of the optional TLS/notary stack",
+    "secret-absence log probe (the issue records it never executed; still not executed)",
+    "private-CA/public-CA/hardware notary",
+    "full suite / release gate"
+  ],
+  "mutation": "src/crypto/signing/signer.ts:97 `payloadSha256: sha256Hex(payloadBytes)` -> `payloadSha256: params.digestHex`: RED (notaryComposeIntegration 9/10, 'signs the original digest through the actual CLI service and policy producer' failed); restored, sha prefix c341a1308a9a3f19 before and after.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/notaryAuthReplay.test.ts tests/notaryComposeIntegration.test.ts tests/notaryTrust.test.ts",
+      "result": "21/21 passed (6 + 10 + 5)"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/optional-notary-tls-acceptance/manifest.json (untracked, root, sha256 matches)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

@@ -1,0 +1,40 @@
+{
+  "issue": "AMC-1530",
+  "linearState": "In Progress",
+  "verdict": "OWNER_INPUT",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits fda6e7ff, 91b2ad3b, d3cae563, 7834ac21 and a6d5e2e3 are ancestors of HEAD.",
+    "scripts/package-desktop-installers.mjs captures $LASTEXITCODE after both npm branches and throws before printing success (lines 114-122).",
+    ".github/workflows/release.yml selects Node 24; ci.yml matrix is [22, 24]; docs/INSTALL.md recommends 22 or 24 with the >=20 engine floor stated separately.",
+    "src/doctor/nativeModuleProbe.ts (described as uncommitted on 2026-09-10) is committed and opens/queries/closes an in-memory database; tests/doctorNativeModuleProbe.test.ts 9/9 passed.",
+    "Receipt digests (untracked, root): amc-win-installer-pwsh-m6q6saqc/result.json abf79b53... matches; macos-node24-platform-de7-d8/receipt.json 96a01ef8... matches; linux-amd64-node24-preflight-blocked/manifest.json is 25925adb41adb4f427d89bd1c4a3316e631940a849f3c2391e27e049508f5c53, which matches the issue text once its 'SHA' prefix is separated from the digest; macos-node22-platform-d3cae563/ has 20 files."
+  ],
+  "defects": [
+    {
+      "file": "scripts/package-desktop-installers.mjs",
+      "line": 120,
+      "severity": "MEDIUM",
+      "description": "No automated regression covers the fda6e7ff npm-failure propagation. Disabling `if ($InstallExitCode -ne 0)` left desktopLauncherRuntime, publicDistributionTruth, desktopAppThemePackaging, publishedInstallerVersion and doctorNativeModuleProbe green (34/34). The only evidence is a one-off PowerShell 7.6.5 run on macOS; pwsh is not on PATH on this host now."
+    }
+  ],
+  "notExercised": [
+    "Native Windows (PowerShell 5.1, install.cmd, real npm install)",
+    "Linux AMD64 (needs an x86_64 host or binfmt; the 2026-09-08 lane was blocked)",
+    "Node 22/24 installs on this host (host Node is v25.5.0)",
+    "GUI launchers",
+    "full suite / release gate"
+  ],
+  "mutation": "scripts/package-desktop-installers.mjs:120 `if ($InstallExitCode -ne 0)` -> `if ($false -and $InstallExitCode -ne 0)`: SURVIVED (34/34 green across 5 installer/doctor files); restored, sha prefix a1add2202892eda4 before and after.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/desktopLauncherRuntime.test.ts tests/publicDistributionTruth.test.ts tests/desktopAppThemePackaging.test.ts tests/doctorNativeModuleProbe.test.ts tests/publishedInstallerVersion.test.ts",
+      "result": "unmutated 34/34 passed; under mutation 34/34 passed (survived)"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/amc-win-installer-pwsh-m6q6saqc/result.json (untracked, root, sha256 matches)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

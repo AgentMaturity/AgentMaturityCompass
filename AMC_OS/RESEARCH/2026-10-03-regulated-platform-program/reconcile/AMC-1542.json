@@ -1,0 +1,40 @@
+{
+  "issue": "AMC-1542",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits 3c49ca9b, 580cf211, 2e3eac76 and f59ed037 are ancestors of HEAD; the stoic-faraday source commit 3d6b8d4a is also an ancestor.",
+    "Managed hooks now read revocations through revokedLeaseIdSet in src/adapters/managedHookLease.ts (hookIntegration.ts no longer calls the raw loader).",
+    "src/leases/leaseStore.ts:72-73 refuses a missing list whose signature survives; revokeLease authenticates the prior snapshot before writing.",
+    "tests/leaseRevocationWriterIntegrity.test.ts and docs/LEASES.md exist; leaseRevocationFailClosed 25/25 and leaseRevocationWriterIntegrity 10/10 passed (the latter described as AUTHORED UNEXECUTED).",
+    "Receipts exist, untracked: 2026-09-09-worktree-audit/{inventory.json,README.md}, 2026-09-09-managed-revocation-recovery/README.md.",
+    "Mutation: missing-list refusal disabled -> 9 failures, covering hooks, CLI/Bridge, router and gateway; restored."
+  ],
+  "defects": [
+    {
+      "file": "src/bridge/bridgeAuth.ts",
+      "line": 214,
+      "severity": "LOW",
+      "description": "PLAUSIBLE, not reproduced: Bridge (bridgeAuth.ts:214), workspace router (workspaceRouter.ts:671), wire dispatcher (wireDispatcher.ts:206) and Studio (studioServer.ts:1152) call verifyLeaseRevocationsSignature and then re-read the list with loadLeaseRevocations. That is two reads, so a concurrent workspace writer could swap the list between check and use. revokedLeaseIdSet and the hardened writer authenticate one snapshot instead."
+    }
+  ],
+  "notExercised": [
+    "Fresh clean installed clone",
+    "real hook installation",
+    "the check/use race above",
+    "full suite / release gate"
+  ],
+  "mutation": "src/leases/leaseStore.ts:72 `if (pathExists(paths.sig))` -> `if (false && pathExists(paths.sig))`: RED (leaseRevocationFailClosed 17/25, leaseRevocationWriterIntegrity 9/10); restored, sha prefix 1b2f842ab17b69ed.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/leaseRevocationFailClosed.test.ts tests/leaseRevocationWriterIntegrity.test.ts",
+      "result": "35/35 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-09-managed-revocation-recovery/README.md (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

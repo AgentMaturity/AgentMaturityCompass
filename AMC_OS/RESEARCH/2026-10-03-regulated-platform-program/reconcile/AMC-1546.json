@@ -1,0 +1,41 @@
+{
+  "issue": "AMC-1546",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits 288e210f, b889cd4f, 7c18ce64, d668d841, c16492c1 and 2eed9bee are ancestors of HEAD.",
+    "/toolhub/execute (studioServer.ts:6389-6431) refuses intent/agent mismatch, verifies the execution lease for the intent's agent, and checks the static-token action class before executeIntent.",
+    "src/studio/agentTokenScopeGuard.ts and tests/studioAgentTokenScopes.test.ts exist; studioServer.ts is 8,849 lines, as the 2026-09-14 comment states.",
+    "studioAgentCredentialBinding 20/20 (the 2026-09-09 baseline recorded 20 setup failures at :54; they now pass) and studioAgentTokenScopes 10/10.",
+    "Receipts: 2026-09-09-studio-agent-credentials/README.md (untracked); 2026-09-09-phase-a-acceptance/stop-auth-mutations-c16492c1-01/README.md (tracked).",
+    "Second mutation: action-class guard disabled -> 1 failure; restored."
+  ],
+  "defects": [
+    {
+      "file": "src/studio/studioServer.ts",
+      "line": 6406,
+      "severity": "LOW",
+      "description": "No test isolates the intent-owner refusal placed before executeIntent. Removing it left 30/30 passing. The mixed static-A/lease-B case is refused 401 at credential authentication, and the lease check binds expectedAgentId to the intent's agent. Under brief rule 7 this guard is either decoration or lacks a test where it alone decides."
+    }
+  ],
+  "notExercised": [
+    "Gateway/proxy/wire/hook scopes",
+    "CLI paths",
+    "browser",
+    "fresh pinned candidate",
+    "full suite / release gate"
+  ],
+  "mutation": "Probe 1: studioServer.ts:6406 intent-owner refusal -> `if (false && ...)`: SURVIVED (30/30). Probe 2: studioServer.ts:6427 `if (!classCheck.ok)` -> `if (false && ...)`: RED (studioAgentTokenScopes 9/10). Both restored, sha prefix 29c1b1ce86930c8a.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/studioAgentCredentialBinding.test.ts tests/studioAgentTokenScopes.test.ts",
+      "result": "30/30 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-09-studio-agent-credentials/README.md (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

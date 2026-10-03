@@ -1,0 +1,43 @@
+{
+  "issue": "AMC-1543",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits 33c4105a, 8ac56e3e, 1161fc92 and a5987643 are ancestors of HEAD.",
+    "typedoc.json covers 5 public entry points; the docs:api script and typedoc 0.28.20 devDependency are present; output goes to tmp/ (gitignored); pages.yml triggers on typedoc.json and scripts/build-pages-site.mjs.",
+    "The two a598 defects (media/api self-link and provider-payload hierarchy anchors) were addressed after a598 by 77912a55 (includeHierarchySummary false), and tests/publicDocsArtifact.test.ts asserts both.",
+    "In a fresh scratch clone at HEAD (outside the root tree), publicDocsArtifact passed 4/4; pagesWorkflowRuntime 3/3 in the worktree.",
+    "public-artifacts-a598/inspection.json is tracked; 2026-09-09-api-reference-recovery/{README.md,source.json} are untracked.",
+    "Mutation in the scratch clone: includeHierarchySummary true -> 1 failure ('not to contain hierarchy.html#'); restored."
+  ],
+  "defects": [
+    {
+      "file": "tests/publicDocsArtifact.test.ts",
+      "line": 156,
+      "severity": "LOW",
+      "description": "The test depends on its environment. In this git worktree nested under the root checkout, TypeDoc wrote no source URLs: reflection.json has 0 'url' fields, so `/blob/<revision>/` was missing and the test failed 3/4. The same commit passed 4/4 in a standalone clone. A generator run from a nested worktree would silently publish the API reference without source links."
+    }
+  ],
+  "notExercised": [
+    "Full suite / release gate",
+    "public Pages deployment (Phase B, needs owner confirmation)",
+    "a full link crawl of the generated artifact (only the test's assertions)"
+  ],
+  "mutation": "typedoc.json includeHierarchySummary false -> true (scratch clone at HEAD): RED (publicDocsArtifact 3/4); restored, clone status clean.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/publicDocsArtifact.test.ts tests/pagesWorkflowRuntime.test.ts (worktree)",
+      "result": "6/7: publicDocsArtifact 3/4 (missing source-revision links, environment), pagesWorkflowRuntime 3/3"
+    },
+    {
+      "command": "fresh scratch clone at HEAD: pnpm exec vitest run tests/publicDocsArtifact.test.ts",
+      "result": "4/4 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-09-phase-a-acceptance/public-artifacts-a598/inspection.json (tracked)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

@@ -1,0 +1,34 @@
+{
+  "issue": "AMC-1525",
+  "linearState": "In Review",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits be4261ec, 5c8bb044, 72a2f3d9, 68262e9d, 92e0e254 and d1f2ee84 are ancestors of HEAD (git merge-base --is-ancestor).",
+    "docs/KEY_HISTORY.md exists (50 lines).",
+    "src/crypto/keyHistoryEnvelope.ts verifyKeyHistoryEnvelope requires a domain-separated Ed25519 admission signature by the current role key (line 102) after the hash-chain check.",
+    "Receipts exist, all untracked: key-history-probe.json, cold-vault-readonly-followup.{md,json}, full-suite-qualified-d1f2ee84.{md,json}, 2026-09-09-phase-a-reconciliation/reconciliation.json.",
+    "6 focused files, 67/67 passed (keyHistoryAdmission 22, keyHistoryForgery 4, keyHistoryBundleCertificate 15, ledgerVerificationReadOnly 10, ledgerLegacyReadOnly 11, trustAnchorIntegrity 5).",
+    "Mutation: admission signature check disabled -> 7 failures across 3 files, including 'key history forgery rejects a correctly hash-chained attacker key while the live key stays unchanged'; restored, hash re-checked."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Full suite at HEAD (historical d1f2ee84 run of 11,092 tests is quoted from the receipt, not re-run)",
+    "release gate",
+    "installed-tarball cold-vault checks",
+    "migration/notary/portable-consumer mutations named in the reconciliation row",
+    "Linux/Windows, Node 22/24"
+  ],
+  "mutation": "src/crypto/keyHistoryEnvelope.ts:102 `if (!verify(...))` -> `if (false && !verify(...))`: RED (34/41 pass, 7 fail in keyHistoryAdmission, keyHistoryForgery, keyHistoryBundleCertificate); restored via git checkout, sha256 prefix 80162fd555f99727 before and after.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/crypto/keyHistoryAdmission.test.ts tests/crypto/keyHistoryForgery.test.ts tests/keyHistoryBundleCertificate.test.ts tests/ledgerVerificationReadOnly.test.ts tests/ledgerLegacyReadOnly.test.ts tests/trustAnchorIntegrity.test.ts",
+      "result": "6 files, 67/67 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-08-dsh-pi/full-suite-qualified-d1f2ee84.json (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

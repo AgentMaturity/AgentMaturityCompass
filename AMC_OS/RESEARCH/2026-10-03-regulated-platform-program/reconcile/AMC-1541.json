@@ -1,0 +1,39 @@
+{
+  "issue": "AMC-1541",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Backend d018f15f and UI/OpenAPI f00fd254 are ancestors of HEAD.",
+    "src/studio/nativeTaskService.ts archive() exists with ARCHIVE_BUSY, ARCHIVE_UNCERTAIN, NO_SESSION, EVIDENCE_UNAVAILABLE and ARCHIVE_NOT_CLOSED refusals; admission still caps at 256 unarchived descriptors (line 375); new turns and resume refuse archived tasks.",
+    "src/api/nativeTasksRouter.ts exposes POST .../archive and includeArchived listing (the issue's seam name; the file is under src/api, not src/studio).",
+    "studioNativeTaskService (after build) 10/10, including 'archive frees a current-history slot while retaining sealed evidence and all dedup identities after restart'.",
+    "Receipt 2026-09-09-native-task-archive/README.md exists (untracked)."
+  ],
+  "defects": [
+    {
+      "file": "src/studio/nativeTaskService.ts",
+      "line": 475,
+      "severity": "MEDIUM",
+      "description": "Acceptance requires active, pending and unsealed tasks to refuse archival, but no test fails when the guards are removed. Disabling ARCHIVE_NOT_CLOSED (an open native session) left 69/69 passing across 5 files; disabling ARCHIVE_UNCERTAIN (line 470, pending submission) left 62/62 passing across 4 files. No test references ARCHIVE_BUSY, ARCHIVE_UNCERTAIN or ARCHIVE_NOT_CLOSED. The descriptor schema refinement (nativeTaskDescriptors.ts:33) may still reject an archived descriptor that has a pendingTurn, but nothing asserts that either."
+    }
+  ],
+  "notExercised": [
+    "Chromium archive scenarios",
+    "cross-owner and tampered archive refusals were not individually mutated",
+    "crash/restart beyond the service test",
+    "full suite / release gate"
+  ],
+  "mutation": "src/studio/nativeTaskService.ts:475 `if (!projection.closed) throw ARCHIVE_NOT_CLOSED` -> `if (false && ...)`: SURVIVED (69/69); second probe line 470 ARCHIVE_UNCERTAIN: SURVIVED (62/62); both restored, sha prefix 8a30d4a368238f64.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/studioNativeTaskService.test.ts tests/studioNativeTaskAdmission.test.ts tests/studioNativeTaskDescriptors.test.ts tests/cosProduct10NativeTaskService.test.ts tests/cosProduct10NativeTasksRouter.test.ts",
+      "result": "69/69 passed unmutated and under both mutations"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-09-native-task-archive/README.md (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

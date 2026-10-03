@@ -1,0 +1,33 @@
+{
+  "issue": "AMC-1548",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Baseline 240a0f0b and implementation 8301f4bc are ancestors of HEAD.",
+    "runDueSchedules now has a production caller (src/kernel/agentLoopRunner.ts), and the `native-schedule` CLI group is registered (src/cli-native-schedule-commands.ts:44, imported by cli-agent-commands.ts:64).",
+    "scheduleStore.ts takes an exclusive lock that is never stolen, refuses inconsistent claim state, and binds completion to the owned claimId (line 299).",
+    "Regressions described as AUTHORED UNEXECUTED now run: scheduleStore 15/15, nativeScheduleLifecycle 26/26, nativeScheduleCli 7/7.",
+    "AMC_OS/RESEARCH/2026-09-10-native-schedule-implementation/ exists (12 files, untracked).",
+    "Mutation: claim-token binding removed -> 2 failures; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "Real workspace schedule activation",
+    "foreground watch on a live workspace",
+    "installed package",
+    "full suite / release gate"
+  ],
+  "mutation": "src/autonomy/scheduleStore.ts:299 `entry.inFlightSince === null || !claimId || entry.claimId !== claimId` -> `entry.inFlightSince === null`: RED (nativeScheduleLifecycle 24/26; 'refuses wrong, repeated and stale completions' failed); restored, sha prefix 1a9e4b8f6ee672dc.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run tests/scheduleStore.test.ts tests/nativeScheduleLifecycle.test.ts tests/nativeScheduleCli.test.ts",
+      "result": "48/48 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-10-native-schedule-implementation/ (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}

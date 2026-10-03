@@ -1,0 +1,33 @@
+{
+  "issue": "AMC-1545",
+  "linearState": "In Progress",
+  "verdict": "PARTIAL",
+  "head": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": "Darwin 25.6.0 arm64; Node v25.5.0 (outside the supported 22/24 production pair, so these runs are source observations, not platform qualification); pnpm 10.33.0; vitest 4.1.11; isolated git worktree nested under the root checkout; pnpm install --frozen-lockfile --prefer-offline exit 0; pnpm build exit 0 (run once, needed by tests/studioNativeTaskService.test.ts)",
+  "receiptsNote": "Receipts were checked read-only in the ROOT checkout (/Users/sid/AgentMaturityCompass). AMC_OS/ is gitignored (.gitignore:81); 'untracked' = present on disk only, 'tracked' = committed with git add -f and present in HEAD.",
+  "doneContract": "Done contract per reconciliation comment (AMC_OS/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json): fresh merged-candidate acceptance, single-commit full suite, named release-gate disposition and durable Linear/Obsidian records. None of these were run here (the task forbids the full suite and the gate).",
+  "claimsVerified": [
+    "Commits cf89a532, 288e210f, 14fba22c, eb034de5, 6d141588 and c3c46083 are ancestors of HEAD.",
+    "The described gap is closed in source. src/agent/subagentSpawn.ts enforces max-turns (line 385) and a monotonic timeout-ms deadline (lines 329, 382-383, 440), and src/autonomy/goalRounds.ts now says stopConditions are enforced by spawnSubagent.",
+    "tests/nativeChildStopOutput.test.ts and docs/NATIVE_DELEGATION_LIMITS.md exist; nativeChildStopOutput 9/9 (described as AUTHORED UNEXECUTED), subagentStopConditions 39/39, subagentHookInheritance 7/7.",
+    "Receipts: 2026-09-09-delegation-stop-conditions/README.md and 2026-09-10-native-child-budget-implementation/* are untracked; 2026-09-14-fleet-sequential/README.md is tracked.",
+    "Mutation: max-turns admission limit disabled -> 5 failures; restored."
+  ],
+  "defects": [],
+  "notExercised": [
+    "The '27 files 290/290' set from the 2026-09-14 comment was not reconstructed (10 files / 122 tests run)",
+    "lifetime-deadline and condition-validation mutations (only admission limit run)",
+    "foreign runners",
+    "installed-source receipt",
+    "full suite / release gate"
+  ],
+  "mutation": "src/agent/subagentSpawn.ts:385 `limitReached = () => stops.maxTurns !== undefined && turns >= stops.maxTurns` -> `() => false`: RED (subagentStopConditions 34/39); restored, sha prefix aeac568da3816b53.",
+  "testsRun": [
+    {
+      "command": "pnpm exec vitest run <10 delegation files, shared with AMC-1531>",
+      "result": "122/122 passed"
+    }
+  ],
+  "primaryReceipt": "AMC_OS/RESEARCH/2026-09-09-delegation-stop-conditions/README.md (untracked, root)",
+  "method": "Read the issue and all comments through Linear MCP, read-only. Commits checked with git merge-base --is-ancestor; files read at HEAD; named tests run focused through vitest JSON reporter; one break/RED/restore mutation per issue, restored with git checkout -- <file>, sha re-checked. No Linear writes."
+}
