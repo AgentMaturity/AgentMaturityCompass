@@ -1,0 +1,87 @@
+{
+  "track": "F3",
+  "title": "Industry certification runs: composed conformance of packs, assurance packs and scenario packs with a binder-ready result",
+  "status": "PARTIAL",
+  "statusReason": "Track acceptance met (16/16 tests, typecheck clean, mutation-verified). Binder ingestion and a CLI verb stop at a ready-to-wire boundary because src/audit/** and src/cli.ts are not claimable by this track.",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_fc54d4b0-c89-3",
+  "branch": "worktree-wf_fc54d4b0-c89-3",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "codeCommit": "44ba1d9d",
+  "environment": {
+    "os": "Darwin 25.6.0 (macOS 26.6.2)",
+    "arch": "arm64",
+    "node": "v25.5.0",
+    "pnpm": "10.33.0",
+    "vitest": "4.1.11"
+  },
+  "filesChanged": [
+    "src/domains/certification/certificationSchema.ts",
+    "src/domains/certification/environment.ts",
+    "src/domains/certification/certificationRequirements.ts",
+    "src/domains/certification/certificationEvidence.ts",
+    "src/domains/certification/certificationRun.ts",
+    "src/domains/certification/certificationExport.ts",
+    "src/domains/certification/index.ts",
+    "tests/industryCertification.test.ts",
+    "docs/INDUSTRY_CERTIFICATION.md",
+    "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F3/report.md",
+    "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F3/result.json"
+  ],
+  "lineCounts": {
+    "src/domains/certification/certificationSchema.ts": 123,
+    "src/domains/certification/environment.ts": 56,
+    "src/domains/certification/certificationRequirements.ts": 127,
+    "src/domains/certification/certificationEvidence.ts": 227,
+    "src/domains/certification/certificationRun.ts": 261,
+    "src/domains/certification/certificationExport.ts": 104,
+    "src/domains/certification/index.ts": 60,
+    "tests/industryCertification.test.ts": 553
+  },
+  "testsRun": [
+    { "command": "pnpm vitest run tests/industryCertification.test.ts (before implementation)", "result": "Test Files 1 failed (1); Tests no tests — module import unresolved (RED)" },
+    { "command": "pnpm vitest run tests/industryCertification.test.ts (after implementation)", "result": "Tests 16 passed (16); Duration 10.96s" },
+    { "command": "pnpm vitest run tests/industryCertification.test.ts (committed state 44ba1d9d)", "result": "Tests 16 passed (16); Start at 22:22:15; Duration 12.38s" },
+    { "command": "pnpm typecheck", "result": "exit 0" },
+    { "command": "pnpm typecheck:tests", "result": "exit 0" }
+  ],
+  "acceptance": [
+    { "check": "pnpm vitest run tests/industryCertification.test.ts → all pass", "observed": "16 passed (16)", "pass": true },
+    { "check": "health fixture with one evidence item missing reports NOT_CERTIFIED and lists the missing requirement", "observed": "test 13: status NOT_CERTIFIED, notEvaluatedRequirementIds == [\"scenario-pack:injection\"], failedRequirementIds == []; test 3: one dropped pack response → counts.notEvaluated == 1 and the question id is named", "pass": true },
+    { "check": "exported JSON carries sourceCommit, environment and per-requirement evidence ids", "observed": "test 13: written JSON has sourceCommit 8f57ce63…, environment {platform, arch, node}, assurance-run + ledger-session + 3×scenarioCount ledger-event ids on assurance-pack:healthcarePHI, ledger-session + pack-response on a sector question; verifyCertificationExport ok", "pass": true }
+  ],
+  "mutationChecks": [
+    { "guard": "certificationStatusFrom: NOT_EVALUATED is not a pass (certificationRun.ts:53)", "mutation": "drop '&& notEvaluatedRequirementIds.length === 0' from the CERTIFIED condition", "red": "5 failed | 11 passed (tests 3, 6, 8, 13, 14: expected 'CERTIFIED' to be 'NOT_CERTIFIED')", "restoredGreen": "16 passed" },
+    { "guard": "assertAssuranceReportProvenance sessionId check (certificationEvidence.ts:50-52)", "mutation": "remove the sessionId throw", "red": "1 failed | 15 passed (test 9: expected error to be instance of CertificationProvenanceError) — the sealed report passed the existing seal guard, so that guard does not cover this case", "restoredGreen": "16 passed" },
+    { "guard": "assertAssuranceReportProvenance evidenceEventIds check (certificationEvidence.ts:58)", "mutation": "condition replaced by if (false)", "red": "1 failed | 15 passed (test 10: expected [Function] to throw an error)", "restoredGreen": "16 passed" },
+    { "guard": "eventsBelongToSession ledger lookup (certificationRun.ts:127)", "mutation": "early return null", "red": "1 failed | 15 passed (test 14: expected ['tampered.json'] to deeply equal ['phantom-events.json', …])", "restoredGreen": "16 passed" }
+  ],
+  "provenanceMeasurement": {
+    "AssuranceReport": "sessionId + reportJsonSha256/runSealSig + per-scenario evidenceEventIds (types.ts:4200, assuranceRunner.ts:617) — accepted after seal, session and ledger-event checks",
+    "AssurancePackResult": "no session or run id (types.ts:4189); latestAssuranceByPack strips the report — not an input",
+    "v1 run/findings/traceRefs": "runId only; eventHashes/receiptIds written empty (assuranceSchema.ts, assuranceRunner.ts:243,262) — not an input",
+    "RedTeamReport": "no sessionId; evidenceEventIds: [] on every scenario; verification always UNSIGNED_VALID (redteam/runner.ts:125,453-463,516,539) — refused",
+    "runDomainAssurance": "grades a hard-coded SAFE_ASSURANCE_RESPONSE (domainCliIntegration.ts:105,189) — not an input",
+    "scoreIndustryPack": "defaults a missing response to L1 (industryPacks.ts:2451) — not consumed"
+  },
+  "readyToWire": [
+    "src/audit/binderSchema.ts: optional sections.industryCertification {status, certificationRunId, station, counts, reportJsonSha256, notes}",
+    "src/audit/binderCollector.ts: read latest reports/certification/*.json via verifyCertificationExport; INSUFFICIENT when none verifies",
+    "src/audit/binderArtifact.ts: write checks/industry-certification.json and summaries/industry-certification.md into the tarball",
+    "src/cli.ts: amc certify --station <id> --responses <file.json> calling runIndustryCertification"
+  ],
+  "sources": [],
+  "researchInputs": "research/{health,education,environment}/ were empty directories at run time; no digest.json present; not used",
+  "notExercised": [
+    "live agent / amc assurance run / any amc CLI invocation",
+    "pack-response sessionId existence in the ledger (only non-emptiness checked)",
+    "maxEvidenceAgeMs freshness refusal (implemented, default off, untested)",
+    "stations other than health; a real F1 station profile",
+    "full suite, release gate, generators, fresh-clone reproduction",
+    "scripts/architecture-boundaries-check.mjs"
+  ],
+  "blockers": [],
+  "sideEffects": {
+    "keyRotation": "none — .amc/keys unchanged, 0 *.previous-* files after every run",
+    "pathsOutsideClaims": "none"
+  }
+}
