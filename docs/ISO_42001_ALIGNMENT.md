@@ -195,8 +195,22 @@ Technical controls are strong. Management-system formalization (signed policy do
 
 ## References
 
-- ISO/IEC 42001:2023: https://www.iso.org/standard/81230.html
-- ISO/IEC 42005:2025: https://www.iso.org/standard/44546.html
-- ISO/IEC 42006:2025: https://www.iso.org/standard/44547.html
+| Standard | Catalogue page | Status on 2026-10-03 |
+|---|---|---|
+| ISO/IEC 42001:2023 | https://www.iso.org/standard/81230.html | unverified — iso.org answered with a bot challenge (HTTP 403 to the fetcher) |
+| ISO/IEC 42005:2025 | https://www.iso.org/standard/44546.html | unverified — same |
+| ISO/IEC 42006:2025 | https://www.iso.org/standard/44547.html | unverified — same |
+
+The ISO texts are sold by ISO and were not read for this mapping. The clause
+families above follow the published clause structure (4-10) and the mappings
+in `src/compliance/builtInMappings.ts` carry no `sources` entries, so a control
+crosswalk receipt over them cites whatever sources its caller supplies rather
+than a clause-level ISO citation. Mapping count, measured at commit `de349bee`
+(2026-10-03): 11 `ISO_42001` mappings, as stated in section 1.
+
+Related changes on 2026-10-03: `normalizeFrameworkName` resolves pack strings
+such as `ISO/IEC 42001:2023` to `ISO_42001`, and `coverageScore` gives UNKNOWN
+controls no credit (see `docs/COMPLIANCE_MAPS.md`).
+
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
 - AMC AIMS Manual (Draft): `docs/compliance/iso-42001-aims-manual.md`
