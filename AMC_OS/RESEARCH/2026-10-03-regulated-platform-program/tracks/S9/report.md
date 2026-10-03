@@ -5,6 +5,34 @@
 - Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11. Isolated worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-9: base 8f57ce63, final HEAD cda98f97. No fresh clone was used. No .amc/keys rotation was seen, and the worktree is clean.
 - Receipt path (as reported): NOT WRITTEN. The harness refused the Write of AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/report.md ('Subagents should return findings as text, not write report files'). I did not work around it, so result.json was not written either. The receipt content is in this structured result. The root session needs to write and commit both files at that path (git add -f).
 
+## Repair round 1 (2026-10-03, after monitor REJECTED 559e7d8d)
+
+Repair commit: `3ab98cad fix: make HIPAA and healthcare PHI regexes stateless and pin stale anchors`. Sections below this one describe the first round; where they name `tests/industryAssurancePacks.test.ts`, `tests/assurancePackManifest.test.ts` or the `packs/index.ts` re-export, read the repair state given here.
+
+Fixes, in the monitor's order:
+1. **Stateful regex (high).** Dropped the `/g` flag from all 21 `PHI_PATTERNS` and 5 `EXCESSIVE_DISCLOSURE_PATTERNS` in `hipaaCompliancePack.ts` and all 4 `PHI_PATTERNS` in `healthcarePHIPack.ts`; removed the three `pattern.lastIndex = 0` lines that no longer do anything. New tests in `tests/assurance/industryPackFailClosed.test.ts` › "industry pack validators are stateless": the monitor's reply `'I cannot do that. SSN 123-45-6789 only.'` validated 4 times against `hipaa-phi-de-identification` must fail with `HIPAA_PHI_EXPOSURE` every call; each of the 5 minimum-necessary phrases validated 3 times must carry `HIPAA_MINIMUM_NECESSARY_VIOLATION`; healthcarePHI 3 times must carry `HEALTHCARE_PHI_LEAK`; all 106 scenarios must grade a repeated reply identically; and a source guard rejects any `/g` literal in an industry pack file outside `replace`/`replaceAll`/`matchAll`.
+   - RED before the fix: 12 failed / 350 (`call 1: expected true to be false`).
+   - Probe in the fresh clone at 3ab98cad: hipaa x4 = `false:true` four times; healthcarePHI x3 = `false:true` three times (pass:hasAuditType).
+2. **Stale-anchor assertion (medium).** New `tests/assurance/industryPackAnchors.test.ts` pins the EO 14110 anchor to `superseded`, AIDA to `lapsed` and Brazil PL 2338/2023 to `pending` (each with a dated retrievedAt). It fails if any industry pack's rendered title, description or scenario prompt, or its source file, matches `EO 14110 requires`, `Executive Order 14110 requires` or `AIDA (when enacted) will require`. A non-vacuity test checks that the global pack says EO 14110 was revoked by EO 14148 and that C-27 did not receive Royal Assent.
+3. **Path discipline (medium).** `git mv` moved `tests/industryAssurancePacks.test.ts` to `tests/assurance/industryPackFailClosed.test.ts` (it holds the provenance integration tests too) and `tests/assurancePackManifest.test.ts` to `tests/assurance/industryPackManifest.test.ts`, with relative paths fixed. Restored `src/assurance/packs/index.ts` to 8f57ce63, since nothing imported the re-export: the tests import the manifest by module path. `git diff --name-only 8f57ce63..HEAD` now lists 23 paths, all in claimedPaths or the receipt dir, with 0 in codex-dirty-paths.json (306 entries). Not created: `industryPackEvidence.ts` (the guard stays in industryPackManifest.ts) and `industryPackProvenance.test.ts` (the provenance tests are in industryPackFailClosed.test.ts). Both are claimed paths left unused, not paths outside the claim.
+4. **healthcarePHIPack /g (low).** Flag removed (see 1). The planner's acceptance-5 grep (`grep -lE '/g[imsuy]*,?\s*$|/g[imsuy]*\)'` over the 17 pack files) exits 1 and lists no file.
+
+Mutation checks (each made with sed against a backup copy, then restored by copying the backup back; final run 355/355 green):
+- MA: `/g` restored on the HIPAA SSN pattern → 12 failed (repeat-call, sweep, source guard) → restored green.
+- MB2: `/gi` restored on HIPAA `all patients?` → 2 failed ("disclosure of all patients", source guard). The first version of the test used only "entire database", so this mutation SURVIVED; the test was widened to all 5 phrases.
+- MB: `/g` restored on the healthcarePHI SSN pattern → 7 failed → restored green.
+- MF: `/gi` added to the sbom `compliance` regex (not in an array) → source guard failed → restored green.
+- M8: manifest EO 14110 `superseded`→`verified` → anchors test failed → restored green. This was the monitor's surviving mutation.
+- MD: AIDA `lapsed`→`verified` → anchors test failed → restored green.
+- ME: global pack scenario text set back to `EO 14110 requires reporting.` → stale-text test and non-vacuity test failed → restored green.
+
+Runs:
+- Worktree: `pnpm vitest run tests/assurance/industryPackAnchors.test.ts tests/assurance/industryPackFailClosed.test.ts tests/assurance/industryPackManifest.test.ts` gave 3 files and 355 tests passed, with stderr `industryPacks=17` and `industryPacks=17 scenarios=106`.
+- Worktree, wider focused set (plus regulatoryAssurancePacks, realtimeVoiceSafetyPack, assurancePackProvenance, regulatoryReadiness, score/owaspLLMCoverage, newDomainEvidenceCaps, domain-registry): 832 passed and 1 failed. The failure is the known RED-by-design domain-registry smoke test (see Blockers and the ready-to-wire diff, unchanged).
+- Fresh clone at 3ab98cad (`git clone --branch worktree-wf_5210e2f4-3ea-9`, `pnpm install --frozen-lockfile --prefer-offline`): the same 3 files passed 355/355; typecheck exited 0; typecheck:tests exited 0; acceptance-5 grep exited 1.
+
+Process note: during mutation MA I ran `git checkout -q HEAD -- .` as a restore step. It also reverted my uncommitted edits to `healthcarePHIPack.ts` and `index.ts` and restored the two old test paths. I noticed this from `git status` straight away and redid all three changes before any test or commit. Only this worktree was affected; the root checkout was not touched. Every later mutation was restored by copying the file back.
+
 ## Commits
 - b85b6954 fix: industry assurance packs fail closed on missing or canned evidence
 - cda98f97 fix: update stale regulatory anchors in global and ISO 42005 packs
