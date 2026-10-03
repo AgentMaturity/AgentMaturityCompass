@@ -13,6 +13,8 @@ import {
   type IndustryPackQuestion,
   INDUSTRY_PACKS
 } from "./industryPacks.js";
+import { emitOperatingProfile, resolveOperatingProfilePath } from "./operatingProfiles/operatingProfileEmit.js";
+import type { OperatingProfileConsistency, ProfileRiskTier } from "./operatingProfiles/operatingProfileTypes.js";
 
 export interface DomainApplyOptions {
   agentId: string;
@@ -22,6 +24,16 @@ export interface DomainApplyOptions {
   compliance?: string[];
   targetFile?: string;
   workspacePath?: string;
+  /** Where to write the station operating profile; defaults to amc-operating-profiles/<agent>/<station>.operating-profile.json. Never under .amc/. */
+  profileOut?: string;
+}
+
+export interface DomainApplyOperatingProfileSummary {
+  station: Domain;
+  riskTier: ProfileRiskTier;
+  path: string;
+  written: boolean;
+  consistency: OperatingProfileConsistency;
 }
 
 export interface DomainApplyResult {
@@ -34,6 +46,7 @@ export interface DomainApplyResult {
   complianceFrameworks: string[];
   assessmentScore: { composite: number; level: string; gaps: number };
   dryRun: boolean;
+  operatingProfile: DomainApplyOperatingProfileSummary;
 }
 
 function normalizeText(value: string): string {
@@ -195,6 +208,8 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
   assertIndustryPackAccess(workspacePath);
   const { domain, packs } = resolveDomainAndPacks(opts);
   const dryRun = opts.dryRun === true;
+  // Refuse a profile target under .amc/ before anything else is written.
+  const profilePath = resolveOperatingProfilePath({ workspacePath, agentId, station: domain, outputPath: opts.profileOut });
 
   const assessment = assessDomainForAgent({ agentId, domain }).result;
   const gapDimensions = assessment.complianceGaps.map((gap) => gap.dimension);
@@ -254,6 +269,19 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
     writeFileAtomic(agentPaths.guardrails, YAML.stringify(nextGuardrails), 0o644);
   }
 
+  // The operating profile is a proposal outside .amc/; the operator signs it
+  // with the existing commands listed in the profile's operatorFlow.
+  const emitted = emitOperatingProfile({
+    workspacePath,
+    station: domain,
+    agentId,
+    dryRun,
+    outputPath: profilePath
+  });
+  if (!emitted.consistency.ok) {
+    throw new Error(`Operating profile for ${domain} is inconsistent with its risk tier: ${emitted.consistency.violations.join("; ")}`);
+  }
+
   return {
     agentId,
     domain,
@@ -267,6 +295,13 @@ export async function applyDomainToAgent(opts: DomainApplyOptions): Promise<Doma
       level: assessment.level,
       gaps: assessment.complianceGaps.length
     },
-    dryRun
+    dryRun,
+    operatingProfile: {
+      station: emitted.station,
+      riskTier: emitted.riskTier,
+      path: emitted.path,
+      written: emitted.written,
+      consistency: emitted.consistency
+    }
   };
 }
