@@ -1,5 +1,67 @@
 # Track S10 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
 
+## Repair round 1 (2026-10-03, after the monitor's REJECTED verdict on 1b529a2a)
+
+- Status: **COMPLETE** for both required fixes. One item still needs a root ruling: whether the calendar header must name a commit (see fix 2).
+- Branch `worktree-wf_5210e2f4-3ea-10`. Repair commit `30f9103b5cf501cbf14c952707cea5ef88d30bef` on top of 1b529a2a. 8f57ce63 is an ancestor.
+- Environment: Darwin arm64, Node v25.5.0. Fresh clone at `/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/s10/fresh-30f9103b` (HEAD 30f9103b, no dist/).
+
+### Fix 1: the sidecar exists, and the renderer fails closed and gives the register precedence
+- `docs/industries/_data/regulatory-milestones.json` holds 12 milestones. Each one was read at its official URL during this session, `retrievedAt` 2026-10-03:
+  - EU AI Act Art. 113 as amended (EC AI Act Service Desk): 2025-02-02, 2025-08-02, 2026-08-02, 2027-12-02, 2028-08-02. The status says the OJ citation of the amending act is unverified.
+  - Colorado SB24-205 signed 2024-05-17 (leg.colorado.gov). Its obligations take effect 2026-06-30, per SB25B-004.
+  - EO 14148 §2(ggg), which revokes EO 14110, signed 2025-01-20 (govinfo.gov).
+  - India DPDP Rules, 2025 notified 2025-11-14 (pib.gov.in). WebFetch got HTTP 403, so the page was read with curl. The page says "Posted On: 17 NOV 2025" and states the rules were "notified on 14 November 2025".
+  - Canada C-27 not enacted; the session ended 2025-01-06 (parl.ca).
+  - NIST AI RMF 1.0 released 2023-01-26, and AI 600-1 released 2024-07-26 (nist.gov).
+  - meity.gov.in returned 403 and was not used.
+- The pure renderer now lives in `scripts/lib/regulatoryCalendarRender.mjs` (200 lines):
+  - `validateMilestones` throws on any milestone that lacks an ISO `date`, a label, a status or a source title, or that names neither `frameworkId` nor `instrument`. It also throws when the source URL is not https on an `OFFICIAL_HOSTS` host or a subdomain of one, or when `source.retrievedAt` is not an ISO date.
+  - `supersededBy` gives the register precedence: if the register carries an obligation with the same frameworkId and date, the sidecar row renders as "superseded by source".
+- `scripts/gen-regulatory-calendar.mjs` is now a 98-line CLI:
+  - It reads the sidecar by default.
+  - `--milestones <file>` overrides the sidecar; `--data` fixtures carry their own `milestones`.
+  - An invalid milestone exits 2.
+- The planner's acceptance-7 command prints `milestones 12 bad 0`, and the curated section has 12 rows. The test asserts this count.
+
+### Fix 2: the header states the risk-matrix count
+- The header now reads: `5 frameworks, 18 key requirements, 12 EU AI Act risk-matrix rows; 5 of 5 frameworks are unverified. Curated milestones: 12`. For comparison, the tsx run prints 5 18 12.
+- The risk matrix is rendered "as recorded" with a note that it is not checked against the Regulation text.
+- The test asserts all three counts against the imported `GLOBAL_FRAMEWORKS` and `EU_AI_ACT_RISK_MATRIX`, both on the committed file and on a fresh render, and also checks the number of matrix rows.
+- `node scripts/gen-regulatory-calendar.mjs --check` exits 0.
+- **Commit in the header: root ruling needed, and not changed here.** Putting HEAD in the header would make `--check` drift on every commit. The other choice, the last commit that touched globalRegulatory.ts, changes under rebase or cherry-pick. `tests/regulatoryCalendar.test.ts` still asserts that the output contains no 40-hex SHA. If root requires a version marker, a sha256 of `src/compliance/globalRegulatory.ts` would stay deterministic.
+
+### Line budget
+The generator is 98 lines (limit 150) and the renderer is 200 lines (limit 300), which resolves the monitor's third defect.
+
+### Commands (repair round)
+- RED before regenerating: `pnpm vitest run tests/regulatoryCalendar.test.ts`. 4 failed / 18 passed, all because the committed calendar was stale.
+- `pnpm vitest run tests/regulatoryCalendar.test.ts tests/industryGuides.test.ts tests/domainDocs.test.ts tests/regulatoryClaimsHonesty.test.ts tests/round4Gaps.test.ts`: 5 files, 123 passed, 0 skipped.
+- `node scripts/gen-regulatory-calendar.mjs --check`: exit 0.
+- Fresh clone at 30f9103b (`pnpm install --frozen-lockfile --prefer-offline`, no dist/):
+  - both test files: 70 passed
+  - `--check`: exit 0
+  - `git status` clean
+- `pnpm typecheck` exit 0; `pnpm typecheck:tests` exit 0, 0 `error TS`.
+- The banned-language grep over docs/industries and the calendar exits 1, meaning no matches.
+- `node scripts/architecture-boundaries-check.mjs` exits 1. Its only failures are the same pre-existing 'dist/cli.js is missing' and 'dist/api/index.js is missing'.
+- `tests/industryGuides.test.ts` now allows exactly one `_data/regulatory-milestones.json` under docs/industries.
+
+### Mutation checks (repair round; each restored and green afterwards)
+| Guard | Mutation | RED |
+|---|---|---|
+| Fail closed on retrievedAt (planner #2) | `if (!ISO_DATE.test(...retrievedAt...)) throw` → `if (false) throw` | 2 failed (missing / non-ISO retrievedAt) |
+| Fail closed on host (planner #2) | `if (!isOfficialHost(...)) throw` → `if (false) throw` | 4 failed (example.com, look-alike nist.gov.example.com, plain http, CLI --milestones exit 2) |
+| Register precedence (planner #3) | `return hit ? "superseded…"` → `return false ? …` | 1 failed (superseded-by-source case) |
+| Derived risk-matrix count (planner #7) | header `${euRiskMatrix.length}` → literal `6` | 3 failed (fresh-render header, committed = render, CLI --check) |
+| Sidecar drift | sidecar date 2026-06-30 → 2026-07-01 | `--check` exit 1 |
+| Sidecar provenance | delete milestone #0 `source.retrievedAt` | `--check` exit 2 ("has no ISO source.retrievedAt"); 6 tests failed |
+
+### Not exercised (repair round)
+- I did not run `pnpm build` or the dist/ fallback.
+- The official pages were read through WebFetch's summariser, and through curl for PIB. No primary Official Journal text was read, and the EU amending act's OJ citation stays unverified.
+- I did not check DPDP Rules commencement phases. Only the notification date is recorded.
+
 - Status (self-report): **PARTIAL**
 - Branch: `worktree-wf_5210e2f4-3ea-10`; HEAD before `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da` → after `3282678f15b63745f36b31fa14173508d02ef9f3`
 - Environment: Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, tsx 4.23.12. Worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-10, base 8f57ce63, head 3282678f. Fresh clone: /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/s10/fresh-3282678f. Date 2026-10-03.
