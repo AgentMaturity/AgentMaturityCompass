@@ -1,20 +1,22 @@
 #!/usr/bin/env node
 /**
- * Regulatory currency check for src/compliance/regulatoryRegister/register.json.
+ * Regulatory currency check for src/compliance/regulatory/register.json.
  *
  * Fails (exit 1) when any entry is malformed, has no source with a URL and
- * retrievedAt, carries a verified flag its contents do not support, or was last
- * reviewed longer ago than policy.reviewWindowDays. Prints
- * `entries=N verified=M unverified=K` either way.
+ * retrievedAt, cites a host outside policy.officialHosts, carries a verified
+ * flag its contents do not support, or was last reviewed longer ago than
+ * policy.reviewWindowDays. Prints `entries=N verified=M unverified=K` either
+ * way; --json prints every entry with its currency and sources instead.
+ * Unknown flags are rejected (exit 1).
  *
- * Usage: node scripts/check-regulatory-currency.mjs [--register <path>] [--as-of YYYY-MM-DD] [--json]
+ * Usage: node scripts/check-regulatory-currency.mjs [--register <path>] [--as-of|--now YYYY-MM-DD] [--json]
  */
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-export const DEFAULT_REGISTER_PATH = join(root, "src/compliance/regulatoryRegister/register.json");
+export const DEFAULT_REGISTER_PATH = join(root, "src/compliance/regulatory/register.json");
 
 export const STATIONS = ["health", "education", "environment", "mobility", "governance", "technology", "wealth"];
 export const STATUSES = ["in-force", "partially-applicable", "enacted-not-yet-applicable", "published", "proposed", "superseded"];
@@ -34,7 +36,18 @@ export function parseRegisterDate(value) {
 
 const isText = (v) => typeof v === "string" && v.trim().length > 0;
 
-function checkEntry(entry, asOfMs, windowDays) {
+/** Same rule as isOfficialSourceUrl in src/compliance/regulatory/index.ts. */
+export function isOfficialHost(url, officialHosts) {
+  let host;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return officialHosts.some((h) => host === h || host.endsWith(`.${h}`));
+}
+
+function checkEntry(entry, asOfMs, windowDays, officialHosts) {
   const errs = [];
   const at = (msg) => errs.push(`${entry?.id ?? "<no id>"}: ${msg}`);
   for (const key of ["id", "jurisdiction", "instrument", "citation", "lastReviewed"]) if (!isText(entry[key])) at(`missing ${key}`);
@@ -62,6 +75,7 @@ function checkEntry(entry, asOfMs, windowDays) {
   for (const s of sources) {
     if (!isText(s.title) || !isText(s.publisher) || typeof s.fetched !== "boolean") at(`source ${JSON.stringify(s.url)} needs title, publisher and boolean fetched`);
     if (!isText(s.url) || !/^https:\/\/[^\s]+$/.test(s.url)) at(`source url ${JSON.stringify(s.url)} must be https`);
+    else if (!isOfficialHost(s.url, officialHosts)) at(`source ${s.url} is not on an official host (policy.officialHosts)`);
     const got = parseRegisterDate(s.retrievedAt);
     if (Number.isNaN(got)) at(`source ${s.url} lacks a valid retrievedAt`);
     else if (got > asOfMs + DAY_MS) at(`source ${s.url} retrievedAt ${s.retrievedAt} is in the future`);
@@ -93,25 +107,61 @@ export function checkRegulatoryCurrency(register, { asOf } = {}) {
   if (register?.schemaVersion !== 1) errors.push("schemaVersion must be 1");
   const windowDays = register?.policy?.reviewWindowDays;
   if (!Number.isInteger(windowDays) || windowDays <= 0) errors.push("policy.reviewWindowDays must be a positive integer");
+  const rawHosts = register?.policy?.officialHosts;
+  const officialHosts = Array.isArray(rawHosts) && rawHosts.length > 0 && rawHosts.every((h) => /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(h)) ? rawHosts : [];
+  if (officialHosts.length === 0) errors.push("policy.officialHosts must be a non-empty list of lower-case hostnames");
   const entries = Array.isArray(register?.entries) ? register.entries : [];
   if (entries.length === 0) errors.push("register has no entries");
   const ids = new Set();
+  const report = [];
   for (const entry of entries) {
     if (ids.has(entry?.id)) errors.push(`duplicate entry id ${entry.id}`);
     ids.add(entry?.id);
-    if (!Number.isNaN(asOfMs)) errors.push(...checkEntry(entry ?? {}, asOfMs, windowDays));
+    const entryErrors = Number.isNaN(asOfMs) ? [] : checkEntry(entry ?? {}, asOfMs, windowDays, officialHosts);
+    errors.push(...entryErrors);
+    report.push({
+      id: entry?.id ?? null,
+      status: entry?.status ?? null,
+      verified: entry?.verified === true,
+      lastReviewed: entry?.lastReviewed ?? null,
+      windowDays: Number.isInteger(windowDays) ? windowDays : null,
+      currency: entryErrors.length === 0 ? "current" : entryErrors.some((e) => e.includes("days old; policy window")) ? "stale" : "invalid",
+      sources: (Array.isArray(entry?.sources) ? entry.sources : []).map((s) => ({ url: s?.url ?? null, retrievedAt: s?.retrievedAt ?? null })),
+    });
   }
   const verified = entries.filter((e) => e?.verified === true).length;
-  return { ok: errors.length === 0, errors, entries: entries.length, verified, unverified: entries.length - verified, asOf: Number.isNaN(asOfMs) ? null : new Date(asOfMs).toISOString().slice(0, 10) };
+  return {
+    ok: errors.length === 0, errors, entries: entries.length, verified, unverified: entries.length - verified,
+    asOf: Number.isNaN(asOfMs) ? null : new Date(asOfMs).toISOString().slice(0, 10),
+    allowedHosts: officialHosts, entryReports: report,
+  };
 }
 
-function arg(argv, name) {
-  const i = argv.indexOf(name);
-  return i >= 0 ? argv[i + 1] : undefined;
+const VALUE_FLAGS = { "--register": "register", "--as-of": "asOf", "--now": "asOf" };
+
+/** Parse argv strictly: unknown flags, stray values and missing values are errors. */
+export function parseArgs(argv) {
+  const opts = { json: false };
+  for (let i = 0; i < argv.length; i += 1) {
+    const flag = argv[i];
+    if (flag === "--json") opts.json = true;
+    else if (flag in VALUE_FLAGS) {
+      const value = argv[i + 1];
+      if (value === undefined || value.startsWith("--")) return { error: `${flag} needs a value` };
+      opts[VALUE_FLAGS[flag]] = value;
+      i += 1;
+    } else return { error: `unknown argument ${JSON.stringify(flag)}; usage: [--register <path>] [--as-of|--now YYYY-MM-DD] [--json]` };
+  }
+  return { opts };
 }
 
 export function main(argv = process.argv.slice(2)) {
-  const path = arg(argv, "--register") ?? DEFAULT_REGISTER_PATH;
+  const parsed = parseArgs(argv);
+  if (parsed.error) {
+    console.error(`regulatory-currency: ${parsed.error}`);
+    return 1;
+  }
+  const path = parsed.opts.register ?? DEFAULT_REGISTER_PATH;
   let register;
   try {
     register = JSON.parse(readFileSync(path, "utf8"));
@@ -119,8 +169,11 @@ export function main(argv = process.argv.slice(2)) {
     console.error(`regulatory-currency: cannot read ${path}: ${err instanceof Error ? err.message : String(err)}`);
     return 1;
   }
-  const result = checkRegulatoryCurrency(register, { asOf: arg(argv, "--as-of") });
-  if (argv.includes("--json")) console.log(JSON.stringify(result, null, 2));
+  const result = checkRegulatoryCurrency(register, { asOf: parsed.opts.asOf });
+  if (parsed.opts.json) {
+    const { entryReports, ...summary } = result;
+    console.log(JSON.stringify({ ...summary, entries: entryReports, counts: { entries: result.entries, verified: result.verified, unverified: result.unverified } }, null, 2));
+  }
   else {
     console.log(`entries=${result.entries} verified=${result.verified} unverified=${result.unverified} asOf=${result.asOf}`);
     for (const e of result.errors) console.error(`  FAIL ${e}`);

@@ -348,12 +348,14 @@ To add a new framework or extend existing mappings:
 
 ## Regulatory Currency Register
 
-`src/compliance/regulatoryRegister/register.json` is the sourced list of instruments that govern AI agents across the seven stations (health, education, environment, mobility, governance, technology, wealth). Each entry records the instrument, obligations relevant to agents, key dates, official sources with `retrievedAt`, `lastReviewed`, and per-fact `verified` flags. An entry is `verified` only when every date and obligation it encodes was read from an official source and nothing is left open; otherwise its `openQuestions` say what was not confirmed. It replaces the five 2020-2023 `GLOBAL_FRAMEWORKS` records as the authority for dates and status; `GLOBAL_FRAMEWORKS` remains as a legacy view and links each record by `registerId`.
+`src/compliance/regulatory/register.json` is the sourced list of instruments that govern AI agents across the seven stations (health, education, environment, mobility, governance, technology, wealth). Each entry records the instrument, obligations relevant to agents, key dates, official sources with `retrievedAt`, `lastReviewed`, and per-fact `verified` flags. An entry is `verified` only when every date and obligation it encodes was read from an official source and nothing is left open; otherwise its `openQuestions` say what was not confirmed. It replaces the five 2020-2023 `GLOBAL_FRAMEWORKS` records as the authority for dates and status; `GLOBAL_FRAMEWORKS` remains as a legacy view and links each record by `registerId`.
 
 ```bash
-node scripts/check-regulatory-currency.mjs            # exit 1 if any entry is malformed, unsourced or older than 90 days
-node scripts/check-regulatory-currency.mjs --as-of 2027-01-15 --json
+node scripts/check-regulatory-currency.mjs            # exit 1 if any entry is malformed, unsourced, cites a non-official host or is older than 90 days
+node scripts/check-regulatory-currency.mjs --now 2027-01-15 --json   # --now is an alias of --as-of; unknown flags exit 1
 ```
+
+`--json` lists every entry with `status`, `lastReviewed`, `windowDays`, `currency` and its sources (`url`, `retrievedAt`), plus `allowedHosts`. Source hosts must be on `policy.officialHosts` in the register (regulators, legislatures, official journals, standards bodies), exported as `OFFICIAL_SOURCE_HOSTS` from `src/compliance/regulatory/index.ts`.
 
 Register as reviewed on 2026-10-03 (17 entries, 11 verified, 6 unverified):
 
@@ -381,7 +383,7 @@ Unverified entries and why: NIS2 (reporting stages and sector scope not on the p
 
 ### Regulatory feeds
 
-`DEFAULT_REGULATORY_FEEDS` (`src/compliance/regulatoryRegister/feeds.ts`) lists six live official feeds — AI Act Service Desk RSS, Commission digital-strategy RSS, EDPB news RSS, NIST news RSS, Federal Register API v1, FCA news RSS — each with the HTTP status and time of a GET made on 2026-10-03. ISO, OWASP, MITRE ATLAS, AI Verify and TC260 are web pages or non-regulators: they are kept as `manual-review-required` and disabled, with the reason recorded. A feed change is a prompt for human review, never a legal date; RSS items carry `effectiveDateEstimated: true`.
+`DEFAULT_REGULATORY_FEEDS` (`src/compliance/regulatory/feeds.ts`) lists six live official feeds — AI Act Service Desk RSS, Commission digital-strategy RSS, EDPB news RSS, NIST news RSS, Federal Register API v1, FCA news RSS — each with the HTTP status and time of a GET made on 2026-10-03. ISO, OWASP, MITRE ATLAS, AI Verify and TC260 are web pages or non-regulators: they are kept as `manual-review-required` and disabled, with the reason recorded. A feed change is a prompt for human review, never a legal date; RSS items carry `effectiveDateEstimated: true`.
 
 ## References
 

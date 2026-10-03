@@ -2,7 +2,7 @@
  * Regulatory Automation Engine for AMC Comply
  *
  * Polling regulatory monitor with:
- * - Feed ingestion from RSS and JSON APIs (web pages are listed but disabled; see regulatoryRegister/feeds.ts)
+ * - Feed ingestion from RSS and JSON APIs (web pages are listed but disabled; see regulatory/feeds.ts)
  * - Automatic change detection with diff analysis
  * - Impact scoring and prioritized gap analysis
  * - Dynamic policy adjustment recommendations
@@ -11,7 +11,7 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
-import { DEFAULT_REGULATORY_FEEDS } from "./regulatoryRegister/feeds.js";
+import { DEFAULT_REGULATORY_FEEDS } from "./regulatory/feeds.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -132,12 +132,20 @@ export interface RegulatoryMonitorConfig {
   maxFeedFailures: number;
   /** Jurisdictions to monitor */
   jurisdictions: string[];
+  /** HTTP client used to read feeds; defaults to globalThis.fetch. Inject one in tests so nothing reaches the network. */
+  fetchImpl?: FeedFetch;
 }
 
-// ── Built-in Regulatory Feeds ──────────────────────────────────────────────
-// Data, fetch contract and recorded reachability live in regulatoryRegister/feeds.ts.
+/** The subset of the WHATWG fetch signature the monitor needs. */
+export type FeedFetch = (
+  url: string,
+  init: { signal: AbortSignal; headers: Record<string, string> },
+) => Promise<{ ok: boolean; status: number; text(): Promise<string> }>;
 
-export { DEFAULT_REGULATORY_FEEDS } from "./regulatoryRegister/feeds.js";
+// ── Built-in Regulatory Feeds ──────────────────────────────────────────────
+// Data, fetch contract and recorded reachability live in regulatory/feeds.ts.
+
+export { DEFAULT_REGULATORY_FEEDS } from "./regulatory/feeds.js";
 
 // ── AMC Control → Module Mapping ───────────────────────────────────────────
 
@@ -211,6 +219,7 @@ export class RegulatoryMonitor extends EventEmitter {
       notifyOnCritical: config?.notifyOnCritical ?? true,
       maxFeedFailures: config?.maxFeedFailures ?? 5,
       jurisdictions: config?.jurisdictions ?? ["GLOBAL", "EU", "US"],
+      fetchImpl: config?.fetchImpl,
     };
 
     this.feeds = new Map();
@@ -336,37 +345,23 @@ export class RegulatoryMonitor extends EventEmitter {
     };
   }
 
-  /**
-   * Fetch content from a feed URL with global fetch (30 s timeout);
-   * tests may inject `_fetchHook` instead.
-   */
+  /** Fetch a feed body with config.fetchImpl (default globalThis.fetch) and a 30 s timeout. */
   private async fetchFeedContent(feed: RegulatoryFeed): Promise<string> {
-    // Real implementation would use fetch/axios
-    // For now, we provide a hook for the caller to supply content
-    const fetchHook = (this as unknown as { _fetchHook?: (url: string) => Promise<string> })._fetchHook;
-    if (fetchHook) {
-      return fetchHook(feed.url);
+    const fetchImpl: FeedFetch | undefined = this.config.fetchImpl
+      ?? (typeof globalThis.fetch === "function" ? globalThis.fetch.bind(globalThis) : undefined);
+    if (!fetchImpl) throw new Error(`No fetch implementation available for feed ${feed.id}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetchImpl(feed.url, {
+        signal: controller.signal,
+        headers: { "User-Agent": "AMC-Comply-Monitor/1.0" },
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.text();
+    } finally {
+      clearTimeout(timeout);
     }
-
-    // Default: attempt native fetch if available
-    if (typeof globalThis.fetch === "function") {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000);
-      try {
-        const response = await globalThis.fetch(feed.url, {
-          signal: controller.signal,
-          headers: { "User-Agent": "AMC-Comply-Monitor/1.0" },
-        });
-        clearTimeout(timeout);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.text();
-      } catch (err) {
-        clearTimeout(timeout);
-        throw err;
-      }
-    }
-
-    throw new Error(`No fetch implementation available for feed ${feed.id}`);
   }
 
   private hashContent(content: string): string {

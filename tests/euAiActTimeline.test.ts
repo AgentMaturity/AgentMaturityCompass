@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EU_AI_ACT_TIMELINE, classifyEuAiActRisk } from "../src/compliance/euAiActClassifier.js";
-import { getRegisterEntry } from "../src/compliance/regulatoryRegister/index.js";
+import { getRegisterEntry } from "../src/compliance/regulatory/index.js";
 
 const euEntry = getRegisterEntry("eu-ai-act")!;
 const registerDate = (id: string) => euEntry.keyDates.find((k) => k.id === id);

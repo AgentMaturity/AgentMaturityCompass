@@ -2,7 +2,15 @@
   "schemaVersion": 1,
   "policy": {
     "reviewWindowDays": 90,
-    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice."
+    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice.",
+    "officialHostsNote": "Every source URL's hostname must equal an officialHosts entry or be a subdomain of one: regulators, legislatures, official journals and standards bodies. Secondary or commentary sites are not sources.",
+    "officialHosts": [
+      "europa.eu", "nist.gov", "iso.org", "federalregister.gov", "hhs.gov", "healthit.gov", "fda.gov",
+      "nerc.com", "ferc.gov", "sec.gov", "ed.gov", "nhtsa.gov", "transportation.gov",
+      "leg.colorado.gov", "capitol.texas.gov", "leginfo.legislature.ca.gov", "gov.ca.gov", "cppa.ca.gov",
+      "msit.go.kr", "law.go.kr", "pcisecuritystandards.org",
+      "cac.gov.cn", "planalto.gov.br", "pib.gov.in", "indiacode.nic.in", "ppc.go.jp", "japaneselawtranslation.go.jp"
+    ]
   },
   "entries": [
     {

@@ -206,7 +206,7 @@ AMC does not perform the conformity assessment itself — that requires a notifi
 
 ## 5. Timeline Context
 
-Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatoryRegister/register.json`); `tests/euAiAct.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
+Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatory/register.json`); `tests/euAiActTimeline.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
 
 | Date | Milestone | Provision |
 |---|---|---|
@@ -256,7 +256,7 @@ This maps directly to Art. 14 human oversight requirements — the EU AI Act req
 
 - EU AI Act text: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689 (bot challenge on 2026-10-03; consolidated text read at https://ai-act-service-desk.ec.europa.eu/en/ai-act-explorer, retrieved 2026-10-03)
 - Digital Omnibus on AI, Regulation (EU) 2026/1744: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (index entry seen 2026-10-03)
-- AMC regulatory currency register: `src/compliance/regulatoryRegister/register.json` (checked by `scripts/check-regulatory-currency.mjs`)
+- AMC regulatory currency register: `src/compliance/regulatory/register.json` (checked by `scripts/check-regulatory-currency.mjs`)
 - European Commission high-risk guidance: https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems
 - European Commission AI Act policy page: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
