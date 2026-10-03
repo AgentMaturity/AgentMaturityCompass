@@ -1,0 +1,90 @@
+import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import YAML from "yaml";
+import { afterEach, describe, expect, it } from "vitest";
+import { initWorkspace } from "../src/workspace.js";
+import { initBudgets } from "../src/budgets/budgets.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { loadToolsConfig, signToolsConfig, toolsConfigPath } from "../src/toolhub/toolhubValidators.js";
+import { agentToolset } from "../src/agent/agentToolset.js";
+
+// Scratch-only proof that the S8 wiring diff keeps the tools deny-by-default.
+const dirs: string[] = [];
+afterEach(() => { for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true }); });
+
+function ready(): string {
+  process.env["AMC_VAULT_PASSPHRASE"] = process.env["AMC_VAULT_PASSPHRASE"] ?? "s8-wire-pass";
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-s8-wire-")));
+  dirs.push(dir);
+  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  initBudgets(dir, "default");
+  writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
+  return dir;
+}
+
+function grant(dir: string, entries: Record<string, unknown>[]): void {
+  const config = loadToolsConfig(dir);
+  for (const entry of entries) config.tools.allowedTools.push(entry as (typeof config.tools.allowedTools)[number]);
+  writeFileSync(toolsConfigPath(dir), YAML.stringify(config));
+  signToolsConfig(dir);
+}
+
+const call = (name: string, args: unknown, n = 1) => ({
+  callId: `c-${name}-${n}`, toolName: name, rawArguments: JSON.stringify(args), sessionId: "s1", turn: 1, step: n,
+  parentToken: null, dispatch: "native" as const, signal: new AbortController().signal
+});
+
+const NEW = ["web_fetch", "web_search", "ask_user", "todo", "plan"];
+
+describe("S8 wiring stays deny-by-default", () => {
+  it("shipped signed policy: none offered, every call denied", async () => {
+    const toolset = agentToolset({ workspace: ready(), agentId: "default", sessionId: "s8-wire-session" });
+    const names = (toolset.seam.schemas() ?? []).map((s) => s.name);
+    for (const name of NEW) expect(names, name).not.toContain(name);
+    for (const [name, args] of [["web_fetch", { url: "http://127.0.0.1:1/" }], ["web_search", { query: "x" }], ["ask_user", { question: "q?" }], ["todo", { items: [] }], ["plan", { steps: [] }]] as const) {
+      const result = await toolset.seam.execute(call(name, args));
+      expect(result.outcome, `${name}: ${String(result.content)}`).toBe("DENIED");
+    }
+    toolset.close();
+  });
+
+  it("granted in signed policy: offered; todo works; web_fetch with empty allowlist and ask_user without answerer refuse", async () => {
+    const dir = ready();
+    grant(dir, [
+      { name: "web_fetch", actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: [] } },
+      { name: "web_search", actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: ["search.example.test"] } },
+      { name: "ask_user", actionClass: "READ_ONLY" },
+      { name: "todo", actionClass: "READ_ONLY" },
+      { name: "plan", actionClass: "READ_ONLY" }
+    ]);
+    const toolset = agentToolset({ workspace: dir, agentId: "default", sessionId: "s8-wire-session" });
+    const names = (toolset.seam.schemas() ?? []).map((s) => s.name);
+    for (const name of NEW) expect(names, name).toContain(name);
+    const todo = await toolset.seam.execute(call("todo", { items: [{ id: "1", content: "wired", status: "pending" }] }));
+    expect(todo.outcome, String(todo.content)).toBe("OK");
+    const fetchResult = await toolset.seam.execute(call("web_fetch", { url: "http://127.0.0.1:1/" }, 2));
+    expect(fetchResult.outcome, String(fetchResult.content)).not.toBe("OK");
+    const ask = await toolset.seam.execute(call("ask_user", { question: "ship?" }, 3));
+    expect(ask.outcome, String(ask.content)).not.toBe("OK");
+    const search = await toolset.seam.execute(call("web_search", { query: "x" }, 4));
+    expect(search.outcome, String(search.content)).not.toBe("OK");
+    console.log("S8-WIRING-OUTCOMES", JSON.stringify({ todo: todo.outcome, fetch: [fetchResult.outcome, String(fetchResult.content)], ask: [ask.outcome, String(ask.content)], search: [search.outcome, String(search.content)] }));
+    toolset.close();
+  });
+
+  it("a configured provider passes the egress guard via its declared origin; an unlisted one is denied", async () => {
+    const dir = ready();
+    grant(dir, [{ name: "web_search", actionClass: "NETWORK_EXTERNAL", allow: { hostAllowlist: ["search.example.test"] } }]);
+    const provider = (origin: string) => ({ id: "static", origin, search: async () => [{ title: "t", url: "https://search.example.test/r", snippet: "s" }] });
+    const ok = agentToolset({ workspace: dir, agentId: "default", sessionId: "s8-wire-session", webSearchProvider: provider("https://search.example.test") });
+    const allowed = await ok.seam.execute(call("web_search", { query: "x" }));
+    expect(allowed.outcome, String(allowed.content)).toBe("OK");
+    ok.close();
+    const bad = agentToolset({ workspace: dir, agentId: "default", sessionId: "s8-wire-session", webSearchProvider: provider("https://evil.example.test") });
+    const denied = await bad.seam.execute(call("web_search", { query: "x" }, 2));
+    expect(denied.outcome, String(denied.content)).toBe("DENIED");
+    console.log("S8-WIRING-SEARCH", JSON.stringify([allowed.outcome, denied.outcome, String(denied.content)]));
+    bad.close();
+  });
+});

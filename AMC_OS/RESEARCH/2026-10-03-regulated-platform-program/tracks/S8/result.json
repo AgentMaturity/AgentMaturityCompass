@@ -1,0 +1,46 @@
+{
+  "track": "S8",
+  "linear": "AMC-1549",
+  "status": "PARTIAL",
+  "statusReason": "Tools implemented, tested and mutation-verified; registration requires src/agent/nativeToolCapabilities.ts (other session's dirty list), src/agent/agentToolset.ts and src/tools/guards/policyGuards.ts (unclaimed). Tools are UNREACHABLE until wiring.diff (this directory) is applied.",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-8",
+  "branch": "worktree-wf_5210e2f4-3ea-8",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "codeHead": "fb4cd7e7e9447e13ac5a9a7189bef405b7919160",
+  "commits": [
+    "15a92e92 test: specify deny-by-default web fetch, search, ask-user, todo and plan tools (AMC-1549)",
+    "7caecc48 feat: add refuse-by-default web_fetch, web_search, ask_user, todo and plan native tools (AMC-1549)",
+    "fa58d6dd refactor: drop the content-length pre-check a mutation proved redundant with the streaming cap",
+    "0e0b14d3 feat: bind each web_search provider to the one origin it declares",
+    "c7e64864 fix: resolve native tool session ids at call time so forks and resumes bind correctly",
+    "fb4cd7e7 docs: describe the native web, ask-user, todo and plan tools and their unregistered state (AMC-1549)"
+  ],
+  "environment": "Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; worktree source qualification only (not package/platform/release; no fresh clone)",
+  "tests": {
+    "red": "pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts -> Test Files 3 failed (3), no tests (modules missing) at 15a92e92",
+    "final": "pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts -> exit 0, Test Files 3 passed (3), Tests 33 passed (33)"
+  },
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "wiring": {
+    "diff": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/wiring.diff",
+    "applyCheck": "git apply --check -v wiring.diff at worktree HEAD -> exit 0 (3 files)",
+    "scratchTsc": "tsc -p tsconfig.json --noEmit with diff applied in a git-archive scratch copy -> exit 0",
+    "scratchTests": [
+      "s8WiringProof + agentToolsetWiring + networkEgressGuard + toolPolicyGuards -> 4 files, 35 passed",
+      "studioNativeTaskPolicyPin + nativeSignedToolSubset + toolhubPipelineTools + nativeSandboxPolicyBinding + 3 S8 files -> 7 files, 75 passed"
+    ],
+    "proofTest": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/s8WiringProof.test.ts.txt",
+    "notCheckedAgainst": "the other session's uncommitted src/agent/nativeToolCapabilities.ts in the root checkout"
+  },
+  "mutations": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/mutations.log (M1-M13 all RED then restored GREEN; M2a content-length pre-check SURVIVED in an earlier revision and was removed as redundant)",
+  "reportMd": "NOT WRITTEN: the harness refused writing a report .md file (\"Subagents should return findings as text\"); the report content is in the structured result returned to the orchestrator.",
+  "sources": [],
+  "notExercised": [
+    "full suite, release gate, fresh-clone reproduction",
+    "budget guard metering of these tools",
+    "real HTTPS to a public origin",
+    "non-text content-type descriptor path",
+    "CLI/Studio ask_user answerer and Studio rendering of todo/plan",
+    "any OS other than macOS arm64"
+  ]
+}

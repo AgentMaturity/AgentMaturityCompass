@@ -1,0 +1,49 @@
+M1-origin-allowlist MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  4 failed | 10 passed (14)']
+    × refuses http://127.0.0.1:1/ with an empty signed allowlist and never calls fetch 429ms
+    × opens no socket for a non-allowlisted origin, with the real fetch 403ms
+    × refuses an origin that is not listed, and matches scheme and port exactly 301ms
+    × SIMULATE checks policy and opens no connection 200ms
+M1-origin-allowlist RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M2-body-cap MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  3 failed | 11 passed (14)']
+    × refuses a body over the signed cap when content-length declares it 824ms
+    × refuses a streamed body that grows past the cap with no content-length 689ms
+    × lets a call narrow the cap but never widen the signed one 513ms
+M2-body-cap RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M3-redaction MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 13 passed (14)']
+    × redacts secret-looking content in the output and the receipt 333ms
+M3-redaction RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M4-redirect MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 13 passed (14)']
+    × does not follow a redirect, even to an allowlisted origin 209ms
+M4-redirect RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M5-url-credentials MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 13 passed (14)']
+    × refuses credentials in the url and any caller-supplied headers 405ms
+M5-url-credentials RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M6-ask-user-signature MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  3 failed | 6 passed (9)']
+    × returns no answer for an unsigned or garbage-signed answer 204ms
+    × returns no answer when the signed text is tampered after signing 240ms
+    × returns no answer for an answer signed with the monitor (machine) key 239ms
+M6-ask-user-signature RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  9 passed (9)']
+M6b-ask-user-auditor-role MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 8 passed (9)']
+    × returns no answer for an answer signed with the monitor (machine) key 396ms
+M6b-ask-user-auditor-role RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  9 passed (9)']
+M7-record-signature-verify MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
+    × refuses to build on a tampered record 253ms
+M7-record-signature-verify RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
+M8-search-no-default-provider MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
+    × refuses until a provider is configured — there is no default 795ms
+M8-search-no-default-provider RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
+M9-receipt-required MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 13 passed (14)']
+    × returns no content when the receipt cannot be recorded 238ms
+M9-receipt-required RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  14 passed (14)']
+M10-todo-agent-binding MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
+    × refuses a record that belongs to a different agent 254ms
+M10-todo-agent-binding RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
+M11-ask-user-question-binding MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 8 passed (9)']
+    × returns no answer for a validly signed answer to a DIFFERENT question 233ms
+M11-ask-user-question-binding RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  9 passed (9)']
+M12-search-declared-origin MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
+    × refuses a provider request to an origin other than the one it declared, even if allowlisted 305ms
+M12-search-declared-origin RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
+M13-session-resolved-per-call MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
+    × reads a session resolver at call time, as agentToolset's rebindable sessionId requires 216ms
+M13-session-resolved-per-call RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
