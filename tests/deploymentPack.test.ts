@@ -60,7 +60,6 @@ describe("deployment pack assets", () => {
       "deploy/helm/amc/templates/service.yaml",
       "deploy/helm/amc/templates/ingress.yaml",
       "deploy/helm/amc/templates/configmap.yaml",
-      "deploy/helm/amc/templates/secret.yaml",
       "deploy/helm/amc/templates/pvc.yaml",
       "deploy/helm/amc/templates/serviceaccount.yaml",
       "deploy/helm/amc/templates/networkpolicy.yaml",
@@ -70,6 +69,8 @@ describe("deployment pack assets", () => {
     for (const path of required) {
       expect(existsSync(resolve(workspace, path))).toBe(true);
     }
+    // Bootstrap secrets are created out of band; the chart must not ship a default Secret.
+    expect(existsSync(resolve(workspace, "deploy/helm/amc/templates/secret.yaml"))).toBe(false);
     expect(existsSync(resolve(workspace, "deploy/helm/amc/examples/values-internal-only.yaml"))).toBe(true);
     expect(existsSync(resolve(workspace, "deploy/helm/amc/examples/values-ingress-tls.yaml"))).toBe(true);
     expect(existsSync(resolve(workspace, "deploy/helm/amc/examples/values-persistent-bootstrap.yaml"))).toBe(true);

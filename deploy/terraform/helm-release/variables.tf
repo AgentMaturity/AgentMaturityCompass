@@ -54,8 +54,8 @@ variable "image_pull_policy" {
 
 variable "replica_count" {
   type        = number
-  description = "Number of AMC Studio replicas."
-  default     = 2
+  description = "Number of AMC Studio replicas. Must be 1: the workspace has a single writer and the chart refuses other values."
+  default     = 1
 }
 
 variable "workspace_storage_size" {

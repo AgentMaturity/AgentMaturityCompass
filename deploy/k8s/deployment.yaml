@@ -8,11 +8,10 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 2
+  # Recreate: the workspace (SQLite ledger on a ReadWriteOnce claim) has a single
+  # writer, so a rolling update must not run two pods against it.
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: amc
@@ -107,17 +106,19 @@ spec:
             claimName: amc-workspace
         - name: secrets
           secret:
-            secretName: amc-secrets
+            # Same secret name and keys as the Helm chart; create it out of band
+            # (secret.example.yaml or the kubectl command in the deployment guide).
+            secretName: amc-bootstrap
             items:
-              - key: amc_vault_passphrase
+              - key: vaultPassphrase
                 path: amc_vault_passphrase
-              - key: amc_owner_username
+              - key: ownerUsername
                 path: amc_owner_username
-              - key: amc_owner_password
+              - key: ownerPassword
                 path: amc_owner_password
-              - key: amc_notary_auth_secret
+              - key: notaryAuthSecret
                 path: amc_notary_auth_secret
-              - key: amc_notary_passphrase
+              - key: notaryPassphrase
                 path: amc_notary_passphrase
         - name: tmp
           emptyDir: {}
