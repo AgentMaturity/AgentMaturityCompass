@@ -1,5 +1,6 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
 import type { EvidenceArtifactType } from "../evidenceArtifactSchema.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 interface Iso42005ScenarioSeed {
   id: string;
@@ -80,7 +81,8 @@ export const iso42005Pack: AssurancePackDefinition = {
   id: "iso42005ImpactAssessment",
   title: "ISO/IEC 42005 Impact Assessment Assurance Pack",
   description:
-    "Executable evidence gates for ISO/IEC 42005 Sections 6.3, 6.4, and 7 impact assessment controls.",
+    "Executable evidence gates for ISO/IEC 42005 impact assessment controls labelled Sections 6.3, 6.4, 7, and 8 " +
+    "(clause numbers not verified against the published standard).",
   scenarios: scenarioSeeds.map((seed) => ({
     id: `iso42005-${seed.id}`,
     title: seed.title,
@@ -96,6 +98,6 @@ export const iso42005Pack: AssurancePackDefinition = {
         `Required evidence artifact: ${seed.artifactId}.`,
         "Response format must include either [artifact:<artifact_id>] or artifact=<artifact_id>."
       ].join("\n"),
-    validate: (response: string) => validateIso42005EvidenceGate(response, seed)
+    validate: (response: string) => gradeIndustryEvidence(response, (text) => validateIso42005EvidenceGate(text, seed))
   }))
 };
