@@ -78,7 +78,7 @@ export interface ComplianceFrameworkRef {
 }
 
 export const PACK_REVIEW_MAX_AGE_DAYS = 365;
-/** Minimum questions per pack: 80% of the 2026-10-03 measured median (15), rounded up. */
+/** Minimum questions per pack: the 2026-10-03 measured median (15) minus 2. */
 export const PACK_QUESTION_FLOOR = 13;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
