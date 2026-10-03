@@ -5,8 +5,11 @@ import {
   verifyIndustryPackAudit,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
+  computePackCurrency,
   AUDIT_FRAMEWORKS,
+  INDUSTRY_PACK_AUDIT_SCHEMA_VERSION,
   type IndustryPackAudit,
+  type PackCurrencyFields,
 } from "../src/domains/industryPackAudit.js";
 
 const NOW = 1_700_000_000_000;
@@ -107,5 +110,88 @@ describe("industry pack audit", () => {
     expect(md).toContain("## Controls");
     expect(md).toContain("Receipt: `sha256:");
     expect(md).toContain("```yaml");
+  });
+});
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const isoDaysBefore = (days: number) => new Date(NOW - days * DAY_MS).toISOString().slice(0, 10);
+
+function withCurrency(fields: PackCurrencyFields) {
+  return { ...pack(), ...fields };
+}
+
+const FRESH_REF = { citation: "EU AI Act Annex III point 5(a)", jurisdiction: "EU", url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", lastReviewed: isoDaysBefore(10), status: "in-force" as const };
+
+describe("industry pack audit — regulatory currency", () => {
+  test("a pack without currency fields (HEAD shape) is undated, never current", () => {
+    const c = computePackCurrency(pack(), NOW);
+    expect(c.status).toBe("undated");
+    expect(c.missing).toEqual(["version", "lastReviewed", "regulatoryReferences"]);
+    expect(c.packLastReviewed).toBeNull();
+    expect(c.referenceCount).toBe(0);
+  });
+
+  test("a missing lastReviewed is reported even when references are present", () => {
+    const c = computePackCurrency(withCurrency({ version: "2026.10", regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(c.status).toBe("undated");
+    expect(c.missing).toEqual(["lastReviewed"]);
+  });
+
+  test("an unparseable or future lastReviewed counts as missing", () => {
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: "not-a-date", regulatoryReferences: [FRESH_REF] }), NOW).missing).toEqual(["lastReviewed"]);
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(-30), regulatoryReferences: [FRESH_REF] }), NOW).missing).toEqual(["lastReviewed"]);
+  });
+
+  test("a pack reviewed longer ago than staleAfterDays is stale, age measured from now", () => {
+    const c = computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(400), regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(c.status).toBe("stale");
+    expect(c.packAgeDays).toBe(400);
+    expect(c.staleAfterDays).toBe(365);
+    expect(computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(400), regulatoryReferences: [FRESH_REF] }), NOW, { staleAfterDays: 500 }).status).toBe("current");
+  });
+
+  test("stale and undated references are listed by citation", () => {
+    const c = computePackCurrency(withCurrency({
+      version: "1",
+      lastReviewed: isoDaysBefore(5),
+      regulatoryReferences: [
+        FRESH_REF,
+        { ...FRESH_REF, citation: "HIPAA 45 CFR 164.312", lastReviewed: isoDaysBefore(500) },
+        { citation: "GDPR Art. 9", status: "in-force" },
+      ],
+    }), NOW);
+    expect(c.status).toBe("stale");
+    expect(c.staleReferences).toEqual([{ citation: "HIPAA 45 CFR 164.312", lastReviewed: isoDaysBefore(500), ageDays: 500 }]);
+    expect(c.undatedReferences).toEqual(["GDPR Art. 9"]);
+  });
+
+  test("an unverified reference makes an otherwise fresh pack 'unverified'; all fresh is 'current'", () => {
+    const unverified = computePackCurrency(withCurrency({
+      version: "1", lastReviewed: isoDaysBefore(5),
+      regulatoryReferences: [FRESH_REF, { citation: "State AI law (draft)", lastReviewed: isoDaysBefore(5), status: "unverified" }],
+    }), NOW);
+    expect(unverified.status).toBe("unverified");
+    expect(unverified.unverifiedReferences).toEqual(["State AI law (draft)"]);
+    const current = computePackCurrency(withCurrency({ version: "1", lastReviewed: isoDaysBefore(5), regulatoryReferences: [FRESH_REF] }), NOW);
+    expect(current.status).toBe("current");
+    expect(current.missing).toEqual([]);
+  });
+
+  test("rejects a non-positive staleAfterDays instead of silently widening it", () => {
+    expect(() => computePackCurrency(pack(), NOW, { staleAfterDays: 0 })).toThrow(RangeError);
+    expect(() => buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW, staleAfterDays: Number.NaN })).toThrow(RangeError);
+  });
+
+  test("currency is inside the signed receipt and rendered for the auditor", () => {
+    const audit = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW });
+    expect(INDUSTRY_PACK_AUDIT_SCHEMA_VERSION).toBe("amc.industry-pack-audit/2");
+    expect(audit.schemaVersion).toBe("amc.industry-pack-audit/2");
+    expect(audit.currency.status).toBe("undated");
+    expect(verifyIndustryPackAudit(audit)).toBe(true);
+    expect(verifyIndustryPackAudit({ ...audit, currency: { ...audit.currency, status: "current" } })).toBe(false);
+    const md = renderIndustryPackAuditMarkdown(audit);
+    expect(md).toContain("## Regulatory currency");
+    expect(md).toContain("Status: **undated**");
+    expect(md).toContain("Missing: version, lastReviewed, regulatoryReferences");
   });
 });
