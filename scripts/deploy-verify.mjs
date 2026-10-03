@@ -32,7 +32,7 @@ const RECEIPT_CLOCK_SKEW_MS = 5 * 60 * 1000;
 /** Pass only when every required check is present and exactly PASS. */
 export function evaluateChecks(checks) {
   const missingChecks = REQUIRED_CHECKS.filter((name) => !checks.some((check) => check.name === name));
-  const pass = missingChecks.length === 0 && checks.length > 0 && checks.every((check) => check.status === "PASS");
+  const pass = missingChecks.length === 0 && checks.every((check) => check.status === "PASS");
   return { pass, missingChecks };
 }
 
@@ -52,7 +52,6 @@ export function verifyReceiptSignature(receipt, publicKeysPem) {
   } catch {
     return { ok: false, error: "receipt payload is not JSON" };
   }
-  if (publicKeysPem.length === 0) return { ok: false, error: "no pinned monitor public key supplied" };
   const ok = publicKeysPem.some((pem) => {
     try {
       return verify(null, payloadBytes, pem, signature);
