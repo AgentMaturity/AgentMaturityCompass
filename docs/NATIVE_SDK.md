@@ -49,7 +49,7 @@ not replace execution-time digest, approval or budget checks, and it does not
 undo a request or side effect already dispatched. This schema-admission correction
 landed on 2026-09-10. Its source regressions (`tests/nativePinnedToolSchemas.test.ts`)
 were executed from a source checkout of commit 8f57ce63 on 2026-10-03 (macOS arm64,
-Node 25.5.0; receipt: `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/report.md`). That is source
+Node 25.5.0; receipt: `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/result.json`). That is source
 qualification only; installed-package qualification remains unexecuted.
 
 `newSession()` establishes an accepted conversation. A turn starts `submitted`, becomes `receiving` if committed updates arrive, and produces a `completed` result or a failure. Submission is not an acknowledgement that a model request has started. ACP `end_turn` is not a task-success verdict: read metadata for lossy mappings. Every response remains `not-verified` until a separate cold verifier returns a consistent receipt. `workspace-key-consistency` proves consistency against the workspace's own key; only `externally-anchored` includes an expected external fingerprint. Neither proves the answer correct.
