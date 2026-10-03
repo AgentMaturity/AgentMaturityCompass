@@ -1,8 +1,8 @@
 /**
  * Regulatory Automation Engine for AMC Comply
  *
- * Real-time regulatory monitoring with:
- * - Feed ingestion from multiple sources (RSS, API, web scraping)
+ * Polling regulatory monitor with:
+ * - Feed ingestion from RSS and JSON APIs (web pages are listed but disabled; see regulatoryRegister/feeds.ts)
  * - Automatic change detection with diff analysis
  * - Impact scoring and prioritized gap analysis
  * - Dynamic policy adjustment recommendations
@@ -11,6 +11,7 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
+import { DEFAULT_REGULATORY_FEEDS } from "./regulatoryRegister/feeds.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -34,6 +35,8 @@ export interface RegulatoryChange {
   humanReviewed: boolean;
   /** Hash of the source content for change detection */
   contentHash: string;
+  /** True when the source gave no effective date and effectiveDate is a placeholder (publication + 90 days), not a legal date. */
+  effectiveDateEstimated?: boolean;
 }
 
 export interface RegulatoryFeed {
@@ -53,6 +56,13 @@ export interface RegulatoryFeed {
   failureCount: number;
   /** Jurisdictions this feed covers */
   jurisdictions: string[];
+  /** "live": official machine-readable endpoint, polled. "manual-review-required": listed for humans, disabled. */
+  contract?: "live" | "manual-review-required";
+  /** Published by a regulator, legislature, standards body or government. */
+  official?: boolean;
+  /** Last recorded HTTP status of a GET to `url` (null when it did not answer). */
+  reachability?: { status: number | null; checkedAt: string };
+  manualReviewReason?: string;
 }
 
 export interface FeedCheckResult {
@@ -125,115 +135,9 @@ export interface RegulatoryMonitorConfig {
 }
 
 // ── Built-in Regulatory Feeds ──────────────────────────────────────────────
+// Data, fetch contract and recorded reachability live in regulatoryRegister/feeds.ts.
 
-export const DEFAULT_REGULATORY_FEEDS: RegulatoryFeed[] = [
-  {
-    id: "eu-ai-act-rss",
-    name: "EU AI Act Updates",
-    framework: "EU_AI_ACT",
-    type: "rss",
-    url: "https://artificialintelligenceact.eu/feed/",
-    pollIntervalMs: 3600000, // 1 hour
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["EU"],
-  },
-  {
-    id: "nist-ai-rss",
-    name: "NIST AI Publications",
-    framework: "NIST_AI_RMF",
-    type: "rss",
-    url: "https://www.nist.gov/news-events/news/rss.xml",
-    selector: "artificial-intelligence",
-    pollIntervalMs: 3600000,
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["US"],
-  },
-  {
-    id: "iso-updates-api",
-    name: "ISO AI Standards",
-    framework: "ISO_42001",
-    type: "api",
-    url: "https://www.iso.org/cms/render/live/en/sites/isoorg/contents/data/standard/08/12/81230.html",
-    pollIntervalMs: 86400000, // Daily
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["GLOBAL"],
-  },
-  {
-    id: "fca-ai-guidance",
-    name: "FCA AI & Machine Learning",
-    framework: "FCA_AI",
-    type: "web_scrape",
-    url: "https://www.fca.org.uk/firms/artificial-intelligence",
-    selector: ".content-block",
-    pollIntervalMs: 86400000,
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["UK"],
-  },
-  {
-    id: "owasp-llm-top10",
-    name: "OWASP LLM Top 10",
-    framework: "OWASP_LLM",
-    type: "web_scrape",
-    url: "https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/",
-    pollIntervalMs: 604800000, // Weekly
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["GLOBAL"],
-  },
-  {
-    id: "mitre-atlas",
-    name: "MITRE ATLAS Updates",
-    framework: "MITRE_ATLAS",
-    type: "web_scrape",
-    url: "https://atlas.mitre.org/updates",
-    pollIntervalMs: 604800000,
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["GLOBAL"],
-  },
-  {
-    id: "singapore-ai-verify",
-    name: "Singapore AI Verify",
-    framework: "SG_AI_VERIFY",
-    type: "web_scrape",
-    url: "https://aiverifyfoundation.sg/",
-    pollIntervalMs: 604800000,
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["SG"],
-  },
-  {
-    id: "china-tc260-ai",
-    name: "China TC260 AI Standards",
-    framework: "CN_TC260",
-    type: "web_scrape",
-    url: "https://www.tc260.org.cn/",
-    pollIntervalMs: 604800000,
-    lastChecked: 0,
-    lastContentHash: "",
-    enabled: true,
-    failureCount: 0,
-    jurisdictions: ["CN"],
-  },
-];
+export { DEFAULT_REGULATORY_FEEDS } from "./regulatoryRegister/feeds.js";
 
 // ── AMC Control → Module Mapping ───────────────────────────────────────────
 
@@ -433,8 +337,8 @@ export class RegulatoryMonitor extends EventEmitter {
   }
 
   /**
-   * Fetch content from a feed URL.
-   * In production: uses fetch(). Here: returns structured data for testability.
+   * Fetch content from a feed URL with global fetch (30 s timeout);
+   * tests may inject `_fetchHook` instead.
    */
   private async fetchFeedContent(feed: RegulatoryFeed): Promise<string> {
     // Real implementation would use fetch/axios
@@ -507,7 +411,8 @@ export class RegulatoryMonitor extends EventEmitter {
             changeType: this.inferChangeType(title + " " + desc),
             title,
             description: desc.slice(0, 500),
-            effectiveDate: publishedDate + 90 * 86400000, // Default: 90 days from publication
+            effectiveDate: publishedDate + 90 * 86400000, // Placeholder: RSS carries no effective date
+            effectiveDateEstimated: true,
             publishedDate,
             impactedControls,
             source: link,
@@ -530,6 +435,9 @@ export class RegulatoryMonitor extends EventEmitter {
             const title = item.title ?? item.name ?? "Untitled";
             const desc = item.description ?? item.summary ?? item.abstract ?? "";
             if (!this.isRelevantContent(title + " " + desc, feed.framework)) continue;
+            // Federal Register API v1 uses effective_on / publication_date / html_url.
+            const effective = item.effectiveDate ?? item.effective_on;
+            const published = item.publishedDate ?? item.publication_date;
 
             changes.push({
               id: randomUUID(),
@@ -537,10 +445,11 @@ export class RegulatoryMonitor extends EventEmitter {
               changeType: this.inferChangeType(title + " " + desc),
               title,
               description: String(desc).slice(0, 500),
-              effectiveDate: item.effectiveDate ? new Date(item.effectiveDate).getTime() : Date.now() + 90 * 86400000,
-              publishedDate: item.publishedDate ? new Date(item.publishedDate).getTime() : Date.now(),
+              effectiveDate: effective ? new Date(effective).getTime() : Date.now() + 90 * 86400000,
+              effectiveDateEstimated: !effective,
+              publishedDate: published ? new Date(published).getTime() : Date.now(),
               impactedControls: this.inferImpactedControls(title + " " + desc, feed.framework),
-              source: item.url ?? feed.url,
+              source: item.url ?? item.html_url ?? feed.url,
               sourceType: "api",
               severity: this.inferSeverity(title + " " + desc),
               jurisdictions: feed.jurisdictions,
@@ -564,6 +473,7 @@ export class RegulatoryMonitor extends EventEmitter {
           title: `${feed.name} — content updated`,
           description: `Content at ${feed.url} has changed since last check. Manual review recommended.`,
           effectiveDate: Date.now(),
+          effectiveDateEstimated: true,
           publishedDate: Date.now(),
           impactedControls: this.inferImpactedControls(content.slice(0, 2000), feed.framework),
           source: feed.url,
