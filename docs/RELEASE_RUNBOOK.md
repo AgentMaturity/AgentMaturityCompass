@@ -24,17 +24,21 @@ rotated, **stop and ask Sid**.
 ### B1 — Credentials check, up front
 
 ```bash
-node scripts/release-credentials-check.mjs --for publish,sign-release,push-image
-node scripts/release-credentials-check.mjs --for deploy-railway   # or deploy-vercel
+node scripts/credentials-presence-check.mjs                      # every credential; exit 1 if any is absent
+node scripts/credentials-presence-check.mjs --for publish,sign-release
+node scripts/credentials-presence-check.mjs --for deploy-railway  # or deploy-vercel, push-image
 gh secret list --repo AgentMaturity/AgentMaturityCompass          # names only; GitHub never returns values
 ```
 
-The script reports `SET`/`UNSET` for each name, never a value. It exits 1 and
-prints `missing for <action>: <names>` when any credential the action needs is
-unset. It also lists every `secrets.NAME` the workflows reference. It reads the
-shell it runs in. CI secrets live in the repository settings, so check those
-with `gh secret list`. **If any credential is absent: stop, list what is needed
-and where it goes (the script prints both), and wait.**
+The script reports `present`/`absent` for each name, what needs it and where
+it is configured, and never a value. `--json` prints
+`{ NAME: { present, requiredFor, configureAt } }`. `NPMRC_AUTH_TOKEN_LINE` is
+whether `$HOME/.npmrc` has an `_authToken` line; the line is never printed. It
+exits 1 and prints `missing for <action>: <names>` when a required credential
+is absent. It reads the shell it runs in. CI secrets live in the repository
+settings, so check those with `gh secret list`. **If any credential is absent:
+stop, list what is needed and where it goes (the script prints both), and
+wait.**
 
 ### B2 — Release candidate
 
@@ -79,12 +83,12 @@ After deploying, the deploy counts as verified only when a governed turn passes
 against it:
 
 ```bash
-node scripts/release-credentials-check.mjs --for deploy-verify
+node scripts/credentials-presence-check.mjs --for deploy-verify
 node scripts/deploy-verify.mjs --target <studio-url> --gateway <gateway-url> \
   --monitor-pubkey <pinned monitor_ed25519.pub> --out tmp/deploy-verify/<version>.json
 ```
 
-See [`DEPLOYMENT_VERIFICATION.md`](./DEPLOYMENT_VERIFICATION.md) for what this
+See [`DEPLOYMENT_CONFIRMATION_RUNBOOK.md`](./DEPLOYMENT_CONFIRMATION_RUNBOOK.md) for what this
 proves and what it does not. The `railway.json` and `vercel.json` targets serve
 only the lightweight scoring API, which cannot pass this check. Live
 deployment health has been an explicitly skipped gate in every prior receipt,
