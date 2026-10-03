@@ -5,6 +5,29 @@
 - Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. Worktree source qualification only: not package, platform or deployed-release qualification, and no fresh clone.
 - Receipt path (as reported): /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-8/AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/result.json
 
+## Repair round (2026-10-03, after the monitor REJECTED 93d73bdd)
+
+Every required fix has been addressed, in the order given:
+
+1. **actionClass pin.** Added `tests/nativeToolBreadth.test.ts` "action class > web_fetch and web_search are NETWORK_EXTERNAL". It asserts `webFetchTool(...).actionClass === "NETWORK_EXTERNAL"` and `webSearchTool(...).actionClass === "NETWORK_EXTERNAL"`.
+   - M14: `webFetchTool.ts:67` mutated to `"READ_ONLY"`. `pnpm vitest run tests/webFetchTool.test.ts tests/nativeToolBreadth.test.ts` went RED with 1 failed and 25 passed (26). After `git checkout`, it was GREEN with 26 passed (26).
+   - M15: `webSearchTool.ts:83` mutated the same way. Same command, same RED, then GREEN after restore.
+   - The monitor previously reported 24 passed. Under these mutations the result is now RED.
+2. **readSessionList binding.** Added "a reader refuses a validly signed record of another kind or session placed at the todo path". It writes a monitor-signed record at `<ws>/.amc/native-tools/<sid>/todo.json` twice:
+   - once with kind `amc.native.plan`;
+   - once with kind `amc.native.todo` but `sessionId: "sess-other"`.
+
+   In both cases it asserts that `readSessionTodo` throws `native tool record is bound to …`.
+   - M16: `sessionListTool.ts:46` mutated to `if (false)`. `pnpm vitest run tests/nativeToolBreadth.test.ts` went RED with 1 failed and 11 passed (12). After restore, it was GREEN with 12 passed (12).
+   - The read-side check is now pinned, so it is not recorded as redundant.
+3. **Default template and nativeInteractiveSession.** Added the section "Default template: a second change, owned by the root serial step" to `docs/NATIVE_TOOLS.md`, with a pointer from the status banner. It covers two files:
+   - **`src/toolhub/toolsSchema.ts`:** reachability in a default-template workspace also needs five entries (`web_fetch`, `web_search`, `ask_user`, `todo`, `plan`) in `defaultToolsConfig()`. They go next to the native-loop built-ins `fs.edit`/`glob`/`grep`/`bash` at `src/toolhub/toolsSchema.ts:118-148`. The monitor cited `:118-140`; the `bash` entry actually closes at `:148`. `.amc/tools.yaml` must also be re-signed. Both are owned by the root serial step and were not edited here. `wiring.diff` is unchanged.
+   - **`src/setup/nativeInteractiveSession.ts`:** needs no change. It names no individual tool. It only selects `--tools none|echo|workspace` (`:197-199`) for the child `agent-loop run`, which builds the toolset through `agentToolset(...)` (`src/cli-agent-commands.ts:464-470`).
+
+Path-discipline defect (low): no code change is implied. The 13 source, test and doc paths match the root ownership manifest's S8 claim exactly, but they lie outside `map/planner-tracks.json`'s S8 globs. The root needs to settle which registry applies.
+
+Final run: `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts` gave Test Files 3 passed (3) and Tests 35 passed (35), with 0 skipped. `pnpm typecheck` exited 0. `pnpm typecheck:tests` exited 0.
+
 ## Commits
 - 15a92e92 test: specify deny-by-default web fetch, search, ask-user, todo and plan tools (AMC-1549)
 - 7caecc48 feat: add refuse-by-default web_fetch, web_search, ask_user, todo and plan native tools (AMC-1549)
@@ -35,7 +58,7 @@
 
 ## Commands run
 - `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts (RED, before implementation, at 15a92e92)` → Test Files 3 failed (3), no tests: the modules did not exist yet
-- `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts (final)` → exit 0; Test Files 3 passed (3); Tests 33 passed (33)
+- `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts (final)` → exit 0; Test Files 3 passed (3); Tests 33 passed (33) at 2b89c614; 35 passed (35) after the repair round
 - `scratch copy (git archive HEAD + wiring.diff applied, node_modules symlinked): vitest run tests/s8WiringProof.test.ts tests/agentToolsetWiring.test.ts tests/networkEgressGuard.test.ts tests/toolPolicyGuards.test.ts` → Test Files 4 passed (4); Tests 35 passed (35)
 - `scratch copy: vitest run tests/studioNativeTaskPolicyPin.test.ts tests/nativeSignedToolSubset.test.ts tests/toolhubPipelineTools.test.ts tests/nativeSandboxPolicyBinding.test.ts plus the 3 S8 test files` → Test Files 7 passed (7); Tests 75 passed (75)
 - `git apply --check -v AMC_OS/.../tracks/S8/wiring.diff (at worktree HEAD)` → exit 0; all 3 files check
@@ -45,7 +68,7 @@
 pnpm typecheck exit 0; pnpm typecheck:tests exit 0 (both run at final code head fb4cd7e7; the receipt commit changes no TypeScript)
 
 ## Acceptance self-report
-- [x] The three focused test files all pass — `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts` → exit 0, Test Files 3 passed (3), Tests 33 passed (33)
+- [x] The three focused test files all pass — `pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts` → exit 0, Test Files 3 passed (3), Tests 33 passed (33) at 2b89c614; 35 passed (35) after the repair round
 - [x] A request to http://127.0.0.1:1/ with an empty allowlist is refused and no socket is opened — `pnpm vitest run tests/webFetchTool.test.ts` → Two tests pass. (1) 'refuses http://127.0.0.1:1/ with an empty signed allowlist and never calls fetch': a stubbed fetch records calls and calls stays []. (2) 'opens no socket for a non-allowlisted origin, with the real fetch': a net server counts connections and stays at 0 while the real global fetch is pointed at it. Mutation M1 (allowlist check removed) turns both RED.
 - [ ] The report contains the exact registration diff and states the tools are unreachable until it is applied — `cat AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/wiring.diff; jq .statusReason result.json` → The exact diff is committed as wiring.diff and is reproduced in notesForMonitor. result.json statusReason and docs/NATIVE_TOOLS.md both say the tools are UNREACHABLE until it is applied. report.md itself was NOT written: the harness refused the Write with 'Subagents should return findings as text, not write report files', so its content is in this structured result instead.
 - [x] Worktree is clean — `git status --porcelain` → empty output
@@ -66,6 +89,10 @@ pnpm typecheck exit 0; pnpm typecheck:tests exit 0 (both run at final code head 
 - web_search provider limited to its declared origin (webSearchTool.ts:105) — mutation: Changed the condition to `if (false)` — RED: 1 failed: the declared-origin test — restored: 10 passed
 - Receipt is required before content is returned (webFetchTool.ts:98) — mutation: Wrapped options.record in try/catch — RED: 1 failed: the receipt-failure test — restored: 14 passed
 - Session id resolved per call (signedSessionRecords.ts:51) — mutation: Captured the resolver result once — RED: 1 failed: the call-time resolver test — restored: 10 passed
+
+- web_fetch actionClass (webFetchTool.ts:67), repair round — mutation: `"NETWORK_EXTERNAL"` changed to `"READ_ONLY"` — RED: 1 failed | 25 passed (26), on the actionClass pin — restored: 26 passed (26)
+- web_search actionClass (webSearchTool.ts:83), repair round — mutation: `"NETWORK_EXTERNAL"` changed to `"READ_ONLY"` — RED: 1 failed | 25 passed (26) — restored: 26 passed (26)
+- readSessionList kind/session binding (sessionListTool.ts:46), repair round — mutation: `if (false)` — RED: 1 failed | 11 passed (12), on the foreign-record reader test — restored: 12 passed (12)
 
 ## Sources
 

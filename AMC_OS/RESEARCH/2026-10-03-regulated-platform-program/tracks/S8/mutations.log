@@ -47,3 +47,32 @@ M12-search-declared-origin RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  1
 M13-session-resolved-per-call MUTATED rc= 1 ['Test Files  1 failed (1)', 'Tests  1 failed | 9 passed (10)']
     × reads a session resolver at call time, as agentToolset's rebindable sessionId requires 216ms
 M13-session-resolved-per-call RESTORED rc= 0 ['Test Files  1 passed (1)', 'Tests  10 passed (10)']
+# repair round 2026-10-03: pins requested by the S8 monitor
+M14-webfetch-actionclass webFetchTool.ts:67 NETWORK_EXTERNAL->READ_ONLY diff:  1 file changed, 1 insertion(+), 1 deletion(-)
+M14-webfetch-actionclass MUTATED
+     × web_fetch and web_search are NETWORK_EXTERNAL 4ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 25 passed (26)
+M14-webfetch-actionclass RESTORED
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+M15-websearch-actionclass webSearchTool.ts:83 NETWORK_EXTERNAL->READ_ONLY diff:  1 file changed, 1 insertion(+), 1 deletion(-)
+M15-websearch-actionclass MUTATED
+     × web_fetch and web_search are NETWORK_EXTERNAL 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 25 passed (26)
+M15-websearch-actionclass RESTORED
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+M16-readSessionList-binding sessionListTool.ts:46 -> if (false) diff:  1 file changed, 1 insertion(+), 1 deletion(-)
+M16-readSessionList-binding MUTATED
+     × a reader refuses a validly signed record of another kind or session placed at the todo path 180ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 passed (12)
+M16-readSessionList-binding RESTORED
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+porcelain-after-restore(src): 0

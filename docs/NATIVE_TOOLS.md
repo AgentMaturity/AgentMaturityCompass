@@ -8,6 +8,9 @@ and `src/tools/builtin/nativeToolBreadth/`.
 > `src/agent/agentToolset.ts` do not register them. The registration diff is in
 > `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/wiring.diff`,
 > and the track report explains it. Until someone applies it, the tools cannot be reached.
+> A default-template workspace also needs the tools listed in
+> `src/toolhub/toolsSchema.ts` and a re-signed `.amc/tools.yaml`. See
+> [Default template](#default-template-a-second-change-owned-by-the-root-serial-step).
 
 Each tool refuses unless a signed policy or a composed dependency explicitly
 permits the call. Registering a tool does not grant it. After registration, a
@@ -52,6 +55,34 @@ To grant them, an operator adds entries like these and runs `amc tools sign`:
 - name: plan
   actionClass: READ_ONLY
 ```
+
+### Default template: a second change, owned by the root serial step
+
+`wiring.diff` makes the tools *registered*. That alone does not make them
+*reachable* in a workspace built from the default template. `initToolsConfig`
+writes `defaultToolsConfig()` from `src/toolhub/toolsSchema.ts`, and that
+function lists the native-loop built-ins by name: `fs.edit`, `glob`, `grep` and
+`bash`, at `src/toolhub/toolsSchema.ts:118-148`. None of the five tools here
+appear in that list. So the allowlist guard denies them until one of two things
+happens: an operator hand-edits and re-signs `.amc/tools.yaml` as shown above,
+or the template gains five entries.
+
+That second change has two parts, both outside this track's claimed paths and
+both owned by the root serial step:
+
+1. Add five entries (`web_fetch`, `web_search`, `ask_user`, `todo`, `plan`)
+   after the `bash` entry in `src/toolhub/toolsSchema.ts`. Whether they ship
+   in the default at all is a policy decision. A web entry with an empty
+   `hostAllowlist` grants no origin, because the tool body refuses an empty
+   list.
+2. Re-sign `.amc/tools.yaml` (`amc tools sign`). An existing workspace keeps
+   its signed policy until then.
+
+`src/setup/nativeInteractiveSession.ts` needs no change. It names no
+individual tool. It only picks a profile (`--tools none|echo|workspace`, lines
+197-199) and passes that to the child `agent-loop run`. The child builds the
+workspace profile with `agentToolset(...)` (`src/cli-agent-commands.ts:464-470`),
+and `wiring.diff` extends that toolset.
 
 How the web tools read `hostAllowlist` entries (`nativeToolBreadth/originPolicy.ts`):
 
