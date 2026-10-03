@@ -28,7 +28,7 @@ kubectl -n amc-system create secret generic amc-bootstrap \
 ## Verify
 
 ```bash
-kubectl -n amc-system rollout status deploy/amc
+kubectl -n amc-system rollout status deploy/amc-amc
 kubectl -n amc-system get pods,svc,ingress,pvc
 ```
 

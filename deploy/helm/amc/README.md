@@ -14,6 +14,8 @@ helm lint ./deploy/helm/amc
 
 ## Install
 
+Create the `amc-bootstrap` secret first (see `docs/KUBERNETES_HELM_DEPLOYMENT.md`). The chart references it and never renders a default.
+
 ```bash
 helm install amc ./deploy/helm/amc \
   --set image.repository=ghcr.io/your-org/amc-studio \
@@ -47,8 +49,9 @@ helm template amc ./deploy/helm/amc -f ./deploy/helm/amc/examples/values-persist
 - Non-root runtime (`runAsUser: 10001`)
 - Read-only root filesystem
 - Persistent workspace PVC (`/data/amc`)
-- Bootstrap from Kubernetes Secret values
-- Readiness/liveness probes (`/readyz`, `/healthz`)
+- Bootstrap from an existing Kubernetes Secret (no Secret is rendered)
+- Startup/liveness `/healthz` and readiness `/readyz` probes
+- One replica with `strategy: Recreate` (single-writer workspace; other `replicaCount` values are refused)
 - TLS ingress support
 - NetworkPolicy with ingress-controller-only ingress and DNS/upstream egress controls
 - PDB + ServiceAccount templates

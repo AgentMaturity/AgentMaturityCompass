@@ -73,9 +73,9 @@ pulumi config set --path 'valuesFiles[0]' ../../helm/amc/examples/values-ingress
 ## Verify
 
 ```bash
-kubectl -n amc-system rollout status deploy/amc
+kubectl -n amc-system rollout status deploy/amc-amc
 kubectl -n amc-system get pods,svc,ingress,pvc
-kubectl -n amc-system port-forward svc/amc 3212:3212
+kubectl -n amc-system port-forward svc/amc-amc 3212:3212
 ```
 
 Then open `http://127.0.0.1:3212/console`.
