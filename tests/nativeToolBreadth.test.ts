@@ -53,6 +53,7 @@ function pipeline(dir: string, tool: ToolDefinition, agentId = "default") {
 
 const jsonProvider = (endpoint: string): WebSearchProvider => ({
   id: "test-json",
+  origin: new URL(endpoint).origin,
   async search({ query, get }) {
     const response = await get(`${endpoint}?q=${encodeURIComponent(query)}`);
     return JSON.parse(response.body) as { title: string; url: string; snippet: string }[];
@@ -93,6 +94,18 @@ describe("web_search", () => {
     expect(outcome.output).not.toContain("ghp_abcdefghijklmnopqrstuvwxyz0123456789");
     expect(receipts[0]).toMatchObject({ auditType: "NATIVE_WEB_SEARCH", provider: "test-json", resultCount: 1, redactions: { github_token: 1 } });
     expect(JSON.stringify(receipts[0])).not.toContain("ghp_abcdefghijklmnopqrstuvwxyz0123456789");
+  });
+
+  it("refuses a provider request to an origin other than the one it declared, even if allowlisted", async () => {
+    const dir = workspace();
+    signPolicy(dir, ["search.example.test", "other.example.test"]);
+    const calls: string[] = [];
+    const fetchStub = (async (input: unknown) => { calls.push(String(input)); return new Response("[]"); }) as typeof fetch;
+    const provider: WebSearchProvider = { ...jsonProvider("https://other.example.test/api"), origin: "https://search.example.test" };
+    const outcome = await pipeline(dir, webSearchTool({ provider, record: () => undefined, fetch: fetchStub }))({ query: "x" });
+    expect(outcome.ok).toBe(false);
+    expect(outcome.output).toContain("declared origin");
+    expect(calls).toEqual([]);
   });
 });
 

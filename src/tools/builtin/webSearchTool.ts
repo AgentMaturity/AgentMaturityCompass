@@ -15,6 +15,11 @@ import { loadOriginPolicy, NativeToolRefusal } from "./nativeToolBreadth/originP
  * `web_fetch` — so a provider cannot reach an origin the policy did not grant.
  * Provider credentials, if a vendor needs them, are the composition's concern
  * and are never accepted from the model.
+ *
+ * A provider DECLARES its `origin` and may only request that origin. The
+ * declaration is what `networkEgressGuard` can check before the body runs —
+ * a search call has no `url` argument for it to read (see the wiring diff in
+ * docs/NATIVE_TOOLS.md).
  */
 
 const MAX_PROVIDER_REQUESTS = 3;
@@ -41,6 +46,8 @@ export interface WebSearchProviderRequest {
 
 export interface WebSearchProvider {
   readonly id: string;
+  /** The one origin this provider talks to, e.g. `https://search.example.org`. */
+  readonly origin: string;
   search(request: WebSearchProviderRequest): Promise<readonly WebSearchResult[]>;
 }
 
@@ -94,6 +101,9 @@ export function webSearchTool(options: WebSearchToolOptions): ToolDefinition {
       const get: WebSearchProviderRequest["get"] = async (url) => {
         if (requests.length >= MAX_PROVIDER_REQUESTS) {
           throw new NativeToolRefusal("web_search", `provider exceeded ${MAX_PROVIDER_REQUESTS} requests for one search`);
+        }
+        if (URL.canParse(url) && new URL(url).origin !== provider.origin) {
+          throw new NativeToolRefusal("web_search", `provider ${provider.id} may only request its declared origin ${provider.origin}`);
         }
         // One byte budget across all of a search's requests, not one each.
         const response = await governedGet({
