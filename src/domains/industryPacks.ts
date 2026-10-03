@@ -4,6 +4,7 @@
  * 7 stations: Environment, Health, Wealth, Education, Mobility, Technology, Governance
  */
 import type { Domain } from "./domainRegistry.js";
+import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./industryPackRegulatorySchema.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,6 +82,12 @@ export interface IndustryPack {
   sdgAlignment: string[];
   certificationPath: string;
   keyRisks: string[];
+  /** ISO date of the pack's last regulatory-currency review (see industryPackRegulatorySchema.ts). */
+  lastReviewed?: string;
+  /** Derived: regulatoryBasis entries resolved to catalogued instruments with currency. */
+  regulatoryReferences?: RegulatoryReference[];
+  /** Derived: complianceFrameworks entries normalized to built-in or catalogued external frameworks. */
+  complianceFrameworkRefs?: ComplianceFrameworkRef[];
 }
 
 export interface IndustryPackAssessment {
@@ -127,7 +134,7 @@ const farmToFork: IndustryPack = {
     "GLOBALG.A.P. IFA v6"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply (Annex III §2 covers critical digital infrastructure, road traffic and water, gas, heating or electricity supply, not food systems)",
   sdgAlignment: ["SDG 2 — Zero Hunger", "SDG 12 — Responsible Consumption and Production", "SDG 15 — Life on Land"],
   certificationPath: "L1 Basic food safety awareness → L2 HACCP-aligned digital controls → L3 ISO 22000 certified traceability → L4 Full supply chain transparency with EUDR compliance → L5 Autonomous farm-to-fork governance with cryptographic provenance chains",
   keyRisks: [
@@ -138,6 +145,7 @@ const farmToFork: IndustryPack = {
     "Loss of smallholder farmer livelihoods through algorithmic procurement bias"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["ISO 22000:2018", "FSSC 22000", "GLOBALG.A.P.", "EU Organic Regulation 2018/848", "EUDR 2023/1115", "Codex Alimentarius CAC/RCP 1-1969"],
   questions: [
     q("ENV-FF-1", "Safety", "Does the agent enforce HACCP critical control point monitoring with automated corrective actions per Codex Alimentarius CAC/RCP 1-1969 §7.6?", "Codex Alimentarius CAC/RCP 1-1969 §7.6", "No HACCP integration; food safety checks are manual and inconsistent with no digital monitoring of critical control points", "Agent monitors critical control points in real-time with automated alerts and logs deviations per HACCP plan, but corrective actions still require human initiation", "Fully autonomous HACCP orchestration with predictive deviation detection, automated corrective actions, cryptographic evidence chains for each CCP, and continuous validation against Codex standards", 15),
@@ -183,7 +191,7 @@ const weaveToWear: IndustryPack = {
     "The Fashion Pact"
   ],
   riskTier: "high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
   sdgAlignment: ["SDG 6 — Clean Water and Sanitation", "SDG 8 — Decent Work and Economic Growth", "SDG 12 — Responsible Consumption and Production"],
   certificationPath: "L1 Basic material tracking → L2 Chemical compliance per REACH → L3 Full supply chain transparency with ZDHC MRSL compliance → L4 Circular design integration with EPR readiness → L5 Autonomous circular textile governance with verified impact metrics",
   keyRisks: [
@@ -194,6 +202,7 @@ const weaveToWear: IndustryPack = {
     "Digital product passport data integrity failures"
   ],
   certificationThreshold: 65,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["REACH (EC) 1907/2006", "ZDHC MRSL v3.1", "GRS 4.0", "OEKO-TEX Standard 100", "EU Textile Strategy", "Higg FEM/FSLM"],
   questions: [
     q("ENV-WW-1", "Safety", "Does the agent verify chemical substance compliance against REACH Regulation (EC) 1907/2006 Annex XVII restricted substances list for all textile inputs?", "REACH (EC) 1907/2006 Annex XVII", "No chemical compliance checking; textile inputs are not screened against restricted substance lists, creating regulatory and health risks", "Agent screens materials against REACH Annex XVII and SVHC candidate list, but verification is periodic rather than continuous and does not cover all supply chain tiers", "Real-time chemical compliance verification across all supply chain tiers with automated SVHC screening, concentration threshold monitoring per Annex XVII entries, and predictive substance risk modeling for new material innovations", 15),
@@ -228,12 +237,12 @@ const materialToMachines: IndustryPack = {
     "RoHS Directive 2011/65/EU",
     "WEEE Directive 2012/19/EU",
     "IEC 62430:2019",
-    "ISO 14001:2015",
+    "ISO 14001:2026",
     "EU Circular Economy Action Plan",
     "Energy Efficiency Directive 2023/1791"
   ],
   riskTier: "high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 12 — Responsible Consumption and Production", "SDG 7 — Affordable and Clean Energy"],
   certificationPath: "L1 Basic material compliance tracking → L2 RoHS/WEEE compliance automation → L3 Full ecodesign integration per EU Regulation 2024/1781 → L4 Circular economy optimization with DPP → L5 Autonomous product lifecycle governance with verified sustainability metrics",
   keyRisks: [
@@ -244,7 +253,8 @@ const materialToMachines: IndustryPack = {
     "E-waste export to developing nations through logistics optimization"
   ],
   certificationThreshold: 65,
-  complianceFrameworks: ["EU Ecodesign Regulation 2024/1781", "RoHS 2011/65/EU", "WEEE 2012/19/EU", "IEC 62430:2019", "ISO 14001:2015", "EU Battery Regulation 2023/1542"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["EU Ecodesign Regulation 2024/1781", "RoHS 2011/65/EU", "WEEE 2012/19/EU", "IEC 62430:2019", "ISO 14001:2026", "EU Battery Regulation 2023/1542"],
   questions: [
     q("ENV-MM-1", "Compliance", "Does the agent enforce restricted substance compliance per RoHS Directive 2011/65/EU Annex II maximum concentration values for all electrical/electronic components?", "RoHS Directive 2011/65/EU Annex II", "No RoHS screening; component selection does not verify restricted substance concentrations against Annex II thresholds", "Agent screens components against RoHS Annex II substance limits (lead, mercury, cadmium, Cr6+, PBB, PBDE, DEHP, BBP, DBP, DIBP) but relies on supplier declarations without independent verification", "Autonomous RoHS compliance with real-time component screening, XRF testing integration, supplier substance declaration verification, exemption tracking per Annex III/IV, and predictive alerts for upcoming restriction changes", 15),
     q("ENV-MM-2", "Sustainability", "Does the agent implement ecodesign requirements per EU Ecodesign Regulation 2024/1781 Article 5 including repairability, durability, and recyclability criteria?", "EU Ecodesign Regulation 2024/1781 Art. 5", "No ecodesign integration; product design decisions do not consider repairability, durability, or end-of-life recyclability", "Agent evaluates designs against ecodesign criteria and generates repairability scores, but does not actively optimize designs for circular economy outcomes", "Full ecodesign optimization engine that balances performance, cost, repairability (per repair score methodology), durability testing predictions, recyclability assessment, and material efficiency — with automated compliance documentation per Art. 5", 12),
@@ -284,7 +294,7 @@ const sourceToSustenance: IndustryPack = {
     "FSC Standard v5.3 / PEFC ST 1003:2018",
     "Ramsar Convention on Wetlands",
     "UN REDD+ Framework",
-    "ISO 14001:2015",
+    "ISO 14001:2026",
     "IPBES Assessment Framework",
     "EU Biodiversity Strategy for 2030",
     "EU IUU Regulation (EC) 1005/2008",
@@ -295,7 +305,7 @@ const sourceToSustenance: IndustryPack = {
     "FAO Code of Conduct for Responsible Fisheries Article 7.2"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
   sdgAlignment: ["SDG 14 — Life Below Water", "SDG 15 — Life on Land", "SDG 13 — Climate Action"],
   certificationPath: "L1 Basic species identification → L2 Habitat monitoring with CITES compliance → L3 Ecosystem-level biodiversity assessment per CBD → L4 Predictive conservation with REDD+ integration → L5 Autonomous ecological governance with verified biodiversity net gain",
   keyRisks: [
@@ -306,6 +316,7 @@ const sourceToSustenance: IndustryPack = {
     "Invasive species introduction through AI-managed translocation programs"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: [
     "CBD Kunming-Montreal GBF",
     "CITES Appendices I-III",
@@ -418,7 +429,7 @@ const ubiquityToUtility: IndustryPack = {
     "Paris Agreement Article 6"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure (energy)",
+  euAIActClassification: "Annex III §2 — safety components in the management and operation of the supply of gas, heating or electricity",
   sdgAlignment: ["SDG 7 — Affordable and Clean Energy", "SDG 13 — Climate Action", "SDG 11 — Sustainable Cities and Communities"],
   certificationPath: "L1 Basic energy monitoring → L2 Grid-connected with NERC CIP compliance → L3 ISO 50001 certified energy management → L4 Predictive grid optimization with renewable integration → L5 Autonomous energy ecosystem governance with verified decarbonization",
   keyRisks: [
@@ -429,6 +440,7 @@ const ubiquityToUtility: IndustryPack = {
     "Cascading blackout from autonomous load-shedding decisions"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["RED III 2023/2413", "NERC CIP-002 to CIP-014", "ISO 50001:2018", "IEC 61968/61970", "IEEE 2030", "EU EED 2023/1791"],
   questions: [
     q("ENV-UU-1", "Safety", "Does the agent implement critical infrastructure protection per NERC CIP-002-5.1a through CIP-014-2 for bulk electric system cyber assets?", "NERC CIP-002-5.1a through CIP-014-2", "No NERC CIP compliance; energy system cyber assets are not classified or protected per critical infrastructure standards", "Agent classifies BES cyber assets per CIP-002-5.1a and implements access controls per CIP-005/CIP-007, but incident response and recovery plans per CIP-008/CIP-009 are not automated", "Full NERC CIP compliance automation with asset classification, electronic security perimeter management, personnel training tracking, incident response orchestration, recovery plan testing, and continuous compliance monitoring across all CIP standards", 15),
@@ -465,13 +477,13 @@ const sipToSanitation: IndustryPack = {
     "UN SDG 6 — Clean Water and Sanitation",
     "WHO Guidelines for Drinking-water Quality (4th ed.)",
     "EU Water Framework Directive 2000/60/EC",
-    "EU Urban Wastewater Treatment Directive 91/271/EEC (recast 2024)",
+    "EU Urban Wastewater Treatment Directive (EU) 2024/3019 (recast of 91/271/EEC)",
     "ISO 24510:2007 / ISO 24512:2007 (Water Services)",
     "HELCOM Baltic Sea Action Plan",
     "MARPOL Annex IV"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure (water supply)",
+  euAIActClassification: "Annex III §2 — safety components in the management and operation of the supply of water",
   sdgAlignment: ["SDG 6 — Clean Water and Sanitation", "SDG 14 — Life Below Water", "SDG 3 — Good Health and Well-being"],
   certificationPath: "L1 Basic water quality monitoring → L2 WHO guideline compliance automation → L3 EU WFD good ecological status tracking → L4 Predictive water resource management → L5 Autonomous water ecosystem governance with verified sustainability outcomes",
   keyRisks: [
@@ -482,6 +494,7 @@ const sipToSanitation: IndustryPack = {
     "Critical infrastructure cyberattack on water treatment SCADA systems"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU WFD 2000/60/EC", "WHO Drinking-water Quality Guidelines", "EU UWWTD 91/271/EEC", "ISO 24510/24512", "MARPOL Annex IV", "EU Drinking Water Directive 2020/2184"],
   questions: [
     q("ENV-STS-1", "Safety", "Does the agent enforce drinking water quality parameters per EU Drinking Water Directive 2020/2184 Annex I Parts A-D and WHO Guidelines 4th edition Chapter 8?", "EU Drinking Water Directive 2020/2184 Annex I; WHO DWQ Guidelines Ch. 8", "No automated water quality monitoring; drinking water parameters are tested manually with delayed results and no real-time contamination detection", "Agent monitors key water quality parameters against EU DWD Annex I limits and WHO guideline values, with automated alerts for exceedances, but does not perform predictive contamination modeling", "Real-time multi-parameter water quality monitoring with predictive contamination detection, automated treatment adjustment, PFAS and microplastic screening per DWD Art. 13, source-to-tap risk assessment per WHO Water Safety Plan approach, and cryptographic quality assurance records", 15),
@@ -522,12 +535,12 @@ const digitalHealthRecord: IndustryPack = {
     "HIPAA §164.312 Technical Safeguards",
     "EU MDR 2017/745",
     "eHealth Network Guidelines",
-    "ISO 27799:2016",
+    "ISO 27799:2025",
     "21st Century Cures Act §4003",
     "EU European Health Data Space (EHDS) Regulation"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) where public authorities use it to evaluate eligibility for healthcare services",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 10 — Reduced Inequalities", "SDG 16 — Peace, Justice and Strong Institutions"],
   certificationPath: "L1 Basic EHR data capture → L2 HL7 FHIR interoperability → L3 Full HIPAA/GDPR compliant data governance → L4 Cross-border health data exchange per EHDS → L5 Autonomous longitudinal health record governance with patient-sovereign data control",
   keyRisks: [
@@ -538,7 +551,8 @@ const digitalHealthRecord: IndustryPack = {
     "Interoperability failures causing clinical decision errors from incomplete records"
   ],
   certificationThreshold: 80,
-  complianceFrameworks: ["HL7 FHIR R4", "HIPAA §164.312", "ISO 27799:2016", "21st Century Cures Act", "EU EHDS Regulation", "IHE XDS.b"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["HL7 FHIR R4", "HIPAA §164.312", "ISO 27799:2025", "21st Century Cures Act", "EU EHDS Regulation", "IHE XDS.b"],
   questions: [
     q("HLT-DHR-1", "Safety", "Does the agent enforce HIPAA §164.312(a)(1) unique user identification and §164.312(d) person/entity authentication for all EHR access?", "HIPAA §164.312(a)(1), §164.312(d)", "No HIPAA-compliant authentication; EHR access lacks unique user identification and multi-factor authentication", "Agent enforces unique user IDs and role-based access per §164.312(a)(1), with MFA for remote access, but does not implement context-aware authentication or behavioral anomaly detection", "Zero-trust EHR access with continuous authentication, behavioral biometrics, context-aware access decisions, break-glass emergency protocols with post-hoc audit, and cryptographic proof of every access event per §164.312(d)", 12),
     q("HLT-DHR-2", "Compliance", "Does the agent implement information blocking prevention per 21st Century Cures Act §4003 and ONC Final Rule 45 CFR §171?", "21st Century Cures Act §4003; 45 CFR §171", "No information blocking awareness; data sharing requests are handled inconsistently with potential blocking behaviors", "Agent identifies and prevents common information blocking practices per 45 CFR §171 exceptions framework, but does not proactively facilitate data access or track blocking complaints", "Full information blocking prevention with proactive data availability, automated exception documentation per §171.201-§171.204, patient access facilitation, third-party app integration support, and transparent blocking incident reporting", 10),
@@ -547,7 +561,7 @@ const digitalHealthRecord: IndustryPack = {
     q("HLT-DHR-5", "Safety", "Does the agent implement encryption per HIPAA §164.312(a)(2)(iv) encryption at rest and §164.312(e)(1) transmission security for all PHI?", "HIPAA §164.312(a)(2)(iv), §164.312(e)(1)", "No encryption enforcement; PHI may be stored or transmitted without encryption", "Agent enforces AES-256 encryption at rest and TLS 1.2+ in transit for PHI, but does not manage encryption key lifecycle or implement end-to-end encryption for patient-facing data", "Full PHI encryption with AES-256 at rest, TLS 1.3 in transit, end-to-end encryption for patient portals, hardware security module key management, automated key rotation, and encryption verification in audit logs per §164.312(a)(2)(iv)", 10),
     q("HLT-DHR-6", "Transparency", "Does the agent support cross-border health data exchange per EU EHDS Regulation Chapter III secondary use provisions and MyHealth@EU infrastructure?", "EU EHDS Regulation Chapter III; MyHealth@EU", "No cross-border data exchange capability; health records are siloed within national systems", "Agent supports basic cross-border data exchange using EU eHealth Network patient summary format, but does not implement full EHDS secondary use provisions or data permit management", "Full EHDS compliance with primary use data exchange via MyHealth@EU, secondary use data permit management per Chapter III, data quality assessment, pseudonymization per Art. 44, and cross-border interoperability testing certification", 8),
     q("HLT-DHR-7", "Ethics", "Does the agent prevent genetic discrimination per Genetic Information Nondiscrimination Act (GINA) Title I §101 and GDPR Article 9(1) genetic data protections?", "GINA Title I §101; GDPR Art. 9(1)", "No genetic data protections; hereditary health information is accessible without additional safeguards beyond general PHI controls", "Agent classifies genetic data separately and applies enhanced access controls, but does not prevent indirect genetic inference from non-genetic health data or manage genetic counseling consent", "Comprehensive genetic data governance with enhanced classification, inference prevention controls, genetic counseling consent tracking, research use consent management per GINA §102, and automated genetic discrimination risk assessment for data sharing requests", 8),
-    q("HLT-DHR-8", "Compliance", "Does the agent maintain ISO 27799:2016 Clause 7 health information security controls including access control policy and cryptographic controls?", "ISO 27799:2016 Clause 7", "No ISO 27799 alignment; health information security controls are ad hoc without systematic implementation", "Agent implements ISO 27799 access control and cryptographic controls, but does not maintain the full control set or perform regular security assessments per Clause 7.2", "Full ISO 27799 implementation with all Clause 7 controls, regular security assessment automation, health-specific threat modeling, incident management per Clause 7.2.6, and continuous compliance monitoring with evidence collection", 8),
+    q("HLT-DHR-8", "Compliance", "Does the agent maintain ISO 27799:2025 health information security controls including access control policy and cryptographic controls?", "ISO 27799:2025", "No ISO 27799 alignment; health information security controls are ad hoc without systematic implementation", "Agent implements ISO 27799 access control and cryptographic controls, but does not maintain the full control set or perform regular security assessments per Clause 7.2", "Full ISO 27799 implementation with all Clause 7 controls, regular security assessment automation, health-specific threat modeling, incident management per Clause 7.2.6, and continuous compliance monitoring with evidence collection", 8),
     q("HLT-DHR-9", "Traceability", "Does the agent support IHE XDS.b document sharing with metadata per IHE ITI TF-3 §4.2 and cross-community access per XCA profile?", "IHE ITI TF-3 §4.2 — XDS.b; IHE XCA Profile", "No IHE profile implementation; document sharing is proprietary with no standardized metadata", "Agent implements XDS.b document registration and query with proper metadata per ITI TF-3, but cross-community access via XCA is not supported", "Full IHE integration with XDS.b document lifecycle management, XCA cross-community queries, XCPD patient discovery, metadata quality validation, and automated document relationship management per ITI TF-3 §4.2", 8),
     q("HLT-DHR-10", "Governance", "Does the agent implement data quality assessment per HL7 FHIR Data Quality Framework and USCDI v4 data class completeness requirements?", "HL7 FHIR Data Quality Framework; USCDI v4", "No data quality assessment; health record completeness and accuracy are not systematically measured", "Agent performs basic completeness checks against USCDI data classes and flags missing required elements, but does not assess data accuracy, timeliness, or consistency across sources", "Comprehensive data quality management with completeness scoring against USCDI v4 data classes, accuracy validation through cross-source reconciliation, timeliness monitoring, consistency checks, and automated data quality improvement recommendations", 8),
     q("HLT-DHR-11", "Safety", "Does the agent enforce minimum necessary standard per HIPAA §164.502(b) and §164.514(d) for all PHI disclosures and internal access?", "HIPAA §164.502(b), §164.514(d)", "No minimum necessary enforcement; users can access full patient records regardless of their role or purpose", "Agent implements role-based access that limits PHI exposure by job function, but does not dynamically adjust access based on specific transaction purpose or clinical context", "Dynamic minimum necessary enforcement with purpose-of-use based access filtering, clinical context awareness, automated de-identification for non-treatment uses per §164.514(a), and granular field-level access logging", 8),
@@ -642,7 +656,7 @@ const wellnessManagement: IndustryPack = {
     "SAMHSA National Guidelines"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(c) where used for risk assessment and pricing in life or health insurance",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 8 — Decent Work and Economic Growth"],
   certificationPath: "L1 Basic wellness tracking → L2 Evidence-based intervention recommendations → L3 GDPR Art. 9 compliant sensitive data governance → L4 Integrated physical/mental/occupational wellness with clinical validation → L5 Autonomous wellness orchestration with verified health outcomes and ethical AI safeguards",
   keyRisks: [
@@ -653,6 +667,7 @@ const wellnessManagement: IndustryPack = {
     "Addiction to AI wellness coaching creating dependency rather than autonomy"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["GDPR Art. 9", "HIPAA Privacy Rule", "ISO 45001:2018", "ADA Title I", "EU AI Act Annex III", "SAMHSA Guidelines"],
   questions: [
     q("HLT-WM-1", "Safety", "Does the agent implement mental health crisis detection and escalation per SAMHSA National Guidelines for Behavioral Health Crisis Care best practices?", "SAMHSA National Guidelines for Behavioral Health Crisis Care", "No crisis detection; wellness agent does not identify suicidal ideation, self-harm indicators, or acute mental health crises", "Agent detects crisis keywords and sentiment patterns and provides crisis hotline information, but does not implement structured risk assessment or warm handoff to crisis services", "Comprehensive crisis detection with validated screening tools (PHQ-9, GAD-7 integration), structured risk assessment, automated warm handoff to 988 Suicide & Crisis Lifeline or local services, safety planning support, and post-crisis follow-up protocols per SAMHSA best practices", 12),
@@ -699,7 +714,7 @@ const patientLifecycle: IndustryPack = {
     "CMS Conditions of Participation 42 CFR §482"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage; §5(a) for public-authority eligibility decisions on healthcare services",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic appointment scheduling → L2 Clinical workflow automation with safety checks → L3 Full care coordination with JCI-aligned quality → L4 Predictive clinical decision support with FDA compliance → L5 Autonomous patient lifecycle orchestration with verified clinical outcomes",
   keyRisks: [
@@ -710,6 +725,7 @@ const patientLifecycle: IndustryPack = {
     "Prognostic model bias leading to disparate care quality across demographics"
   ],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["FDA 510(k)", "EU MDR 2017/745", "HIPAA", "JCI 7th ed.", "CMS 42 CFR §482", "HL7 FHIR R4"],
   questions: [
     q("HLT-PL-1", "Safety", "Does the agent implement clinical decision support safety per FDA Guidance on CDS Software (2022) and EU MDR 2017/745 Annex I Chapter I §23.4?", "FDA CDS Guidance (2022); EU MDR 2017/745 Annex I §23.4", "No CDS safety controls; clinical recommendations are generated without validation against clinical evidence or safety boundaries", "Agent validates CDS outputs against clinical guidelines and flags high-risk recommendations for physician review, but does not implement systematic bias testing or outcome tracking", "Full CDS safety with clinical guideline validation, systematic bias testing across demographics, outcome tracking with feedback loops, automated adverse event detection, physician override documentation, and FDA/MDR classification-appropriate risk management", 10),
@@ -750,9 +766,9 @@ const clinicalLifecycle: IndustryPack = {
   name: "Clinical Lifecycle",
   description: "Therapeutic, surgical, psychoanalysis, and alternative medicine — covering clinical practice modalities with emphasis on evidence-based practice, patient safety, clinical governance, and treatment efficacy monitoring.",
   regulatoryBasis: [
-    "FDA 21 CFR Part 820 (QSR)",
+    "FDA 21 CFR Part 820 (QMSR)",
     "EU MDR 2017/745",
-    "ICH E6(R2) GCP",
+    "ICH E6(R3) GCP",
     "WHO Clinical Practice Guidelines",
     "ISO 13485:2016",
     "EMA Scientific Guidelines",
@@ -760,7 +776,7 @@ const clinicalLifecycle: IndustryPack = {
     "JCI Standards"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
   sdgAlignment: ["SDG 3 — Good Health and Well-being"],
   certificationPath: "L1 Basic clinical workflow support → L2 Evidence-based protocol compliance → L3 Full QMS per ISO 13485 with clinical governance → L4 AI-assisted clinical decision-making with FDA/MDR compliance → L5 Autonomous clinical lifecycle governance with verified patient outcomes",
   keyRisks: [
@@ -771,9 +787,10 @@ const clinicalLifecycle: IndustryPack = {
     "Patient harm from AI-managed treatment titration without adequate safety margins"
   ],
   certificationThreshold: 80,
-  complianceFrameworks: ["FDA 21 CFR 820", "EU MDR 2017/745", "ICH E6(R2)", "ISO 13485:2016", "JCI Standards", "NICE TA Guidance"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["FDA 21 CFR 820", "EU MDR 2017/745", "ICH E6(R3)", "ISO 13485:2016", "JCI Standards", "NICE TA Guidance"],
   questions: [
-    q("HLT-CL-1", "Safety", "Does the agent implement quality management system requirements per FDA 21 CFR §820.30 design controls and ISO 13485:2016 Clause 7.3 for clinical AI systems?", "FDA 21 CFR §820.30; ISO 13485:2016 Clause 7.3", "No design controls; clinical AI systems are developed without systematic design input/output verification or validation", "Agent tracks design control documentation and maintains design history files per §820.30, but does not automate design review processes or validation protocol execution", "Full design control automation with systematic design input capture, output verification, design review facilitation, validation protocol management, design transfer documentation, and post-market design change control per §820.30 and ISO 13485 Clause 7.3", 10),
+    q("HLT-CL-1", "Safety", "Does the agent implement quality management system requirements per the FDA Quality Management System Regulation (21 CFR §820.10, incorporating ISO 13485:2016 by reference from 2 February 2026) and ISO 13485:2016 Clause 7.3 design and development for clinical AI systems?", "FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.3", "No design controls; clinical AI systems are developed without systematic design input/output verification or validation", "Agent tracks design control documentation and maintains design and development files per ISO 13485:2016 Clause 7.3, but does not automate design review processes or validation protocol execution", "Full design control automation with systematic design input capture, output verification, design review facilitation, validation protocol management, design transfer documentation, and post-market design change control per ISO 13485:2016 Clause 7.3 as required by 21 CFR §820.10", 10),
     q("HLT-CL-2", "Compliance", "Does the agent enforce clinical practice guideline adherence per NICE Technology Appraisal process and WHO Handbook for Guideline Development (2nd ed.)?", "NICE TA Process Guide; WHO Guideline Development Handbook 2nd ed.", "No guideline adherence monitoring; clinical practices are not systematically compared against current evidence-based guidelines", "Agent references major clinical guidelines and flags deviations for common conditions, but does not track guideline currency or manage the full spectrum of applicable guidelines", "Comprehensive guideline adherence with real-time protocol compliance monitoring, automated guideline currency tracking, deviation documentation with clinical justification, GRADE evidence quality integration, and outcome-based guideline effectiveness assessment", 10),
     q("HLT-CL-3", "Safety", "Does the agent implement surgical safety per WHO Surgical Safety Checklist (2nd ed.) and JCI Standard COP.7 with pre/intra/post-operative verification?", "WHO Surgical Safety Checklist 2nd ed.; JCI COP.7", "No surgical safety automation; surgical checklists are paper-based with no automated verification or compliance tracking", "Agent digitizes the WHO Surgical Safety Checklist with sign-in/time-out/sign-out phases, but does not integrate with surgical scheduling, equipment verification, or post-operative monitoring", "Full surgical safety orchestration with automated checklist compliance, surgical scheduling integration, equipment/implant verification, intraoperative monitoring alerts, post-operative complication detection, and surgical outcome tracking per WHO checklist and JCI COP.7", 10),
     q("HLT-CL-4", "Governance", "Does the agent manage adverse event reporting per FDA MedWatch 21 CFR §803 and EU MDR 2017/745 Article 87 vigilance requirements?", "FDA 21 CFR §803; EU MDR 2017/745 Art. 87", "No adverse event automation; clinical adverse events are reported manually with potential underreporting and delayed submissions", "Agent facilitates adverse event capture and generates MedWatch/vigilance reports, but does not implement automated event detection or trend analysis", "Autonomous adverse event management with automated detection from clinical data, severity classification, MedWatch/EUDAMED report generation, trend analysis for signal detection, root cause analysis facilitation, and CAPA tracking per §803 and MDR Art. 87", 10),
@@ -785,16 +802,16 @@ const clinicalLifecycle: IndustryPack = {
     q("HLT-CL-10", "Governance", "Does the agent implement complementary/alternative medicine safety per WHO Traditional Medicine Strategy 2014-2023 and herb-drug interaction databases?", "WHO Traditional Medicine Strategy 2014-2023 §3.2", "No CAM safety integration; alternative medicine use is not tracked or assessed for interactions with conventional treatments", "Agent records patient-reported CAM use and checks major herb-drug interaction databases, but does not integrate CAM safety into the overall clinical risk assessment", "Comprehensive CAM safety integration with herb-drug interaction checking, evidence quality assessment for CAM interventions per WHO strategy, patient disclosure facilitation, integrative care plan coordination, and adverse event monitoring for CAM-related harms", 8),
     q("HLT-CL-11", "Compliance", "Does the agent implement EU MDR 2017/745 Article 83 post-market clinical follow-up (PMCF) obligations and IVDR 2017/746 Annex XIV performance evaluation for AI-integrated clinical workflow and IVD agents?", "EU MDR Art. 83; IVDR 2017/746 Annex XIV", "No PMCF or IVDR compliance; AI clinical workflow agents lack post-market clinical follow-up per MDR Art. 83 and AI-integrated IVD agents are not evaluated per IVDR Annex XIV performance requirements", "Agent collects post-market safety data and reports adverse events, but does not implement systematic PMCF per MDR Art. 83 or IVDR Annex XIV performance evaluation for AI-driven IVD workflows", "Full MDR Art. 83 PMCF implementation with proactive clinical data collection, IVDR Annex XIV performance evaluation for AI-integrated IVD agents, PMCF plan documentation, periodic safety update reports, and notified body PMCF audit readiness", 10),
   
-    // GAP-10-C1: FDA 21 CFR §820.30(f) (Design verification)
-      q('HLT-CL-12', 'Traceability', 'Does the agent manage and evidence design verification per FDA 21 CFR §820.30(f), including verification planning, objective evidence that design outputs meet design inputs, acceptance criteria, and bidirectional traceability (input → output → verification results)?', 'FDA 21 CFR §820.30(f)', 'No design verification; outputs are not verified against inputs and evidence is missing or ad hoc', 'Maintains some verification tests and trace links, but coverage is incomplete and acceptance criteria are inconsistently documented', 'Full design verification governance with protocol templates, defined acceptance criteria, traceability completeness checks, automated gap reporting, and release gating on verification evidence', 15),
+    // GAP-10-C1: FDA 21 CFR §820.10 (QMSR) / ISO 13485:2016 Clause 7.3 (Design verification)
+      q('HLT-CL-12', 'Traceability', 'Does the agent manage and evidence design and development verification per FDA 21 CFR §820.10 (QMSR) and ISO 13485:2016 Clause 7.3, including verification planning, objective evidence that design outputs meet design inputs, acceptance criteria, and bidirectional traceability (input → output → verification results)?', 'FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.3', 'No design verification; outputs are not verified against inputs and evidence is missing or ad hoc', 'Maintains some verification tests and trace links, but coverage is incomplete and acceptance criteria are inconsistently documented', 'Full design verification governance with protocol templates, defined acceptance criteria, traceability completeness checks, automated gap reporting, and release gating on verification evidence', 15),
       // GAP-10-C2: IEC 62366-1:2015 §5.7 (Usability evaluation)
       q('HLT-CL-13', 'Safety', 'Does the agent support usability engineering per IEC 62366-1:2015 §5.7 by planning and capturing summative usability evaluation evidence for safety-critical clinical workflows (including use-related risk scenarios, representative users, and documented residual use-related risk)?', 'IEC 62366-1:2015 §5.7', 'No usability evaluation; UI/workflow changes ship without summative evidence for safety-critical tasks', 'Performs some usability testing, but it is not tied to use-related risk controls and evidence is incomplete for regulated review', 'Full usability evaluation lifecycle with use-related risk scenarios, representative-user studies, traceability to risk controls, documented residual risk acceptance, and audit-ready reports', 15),
       // GAP-10-C3: EU MDR 2017/745 Art. 10(9) (Manufacturer QMS)
       q('HLT-CL-14', 'Governance', 'Does the agent implement and evidence EU MDR 2017/745 Article 10(9) manufacturer QMS requirements, including integrated procedures for risk management, clinical evaluation, PMS/vigilance, control of nonconforming outputs, CAPA, and change control (with role/accountability assignments)?', 'EU MDR 2017/745 Art. 10(9)', 'No MDR QMS; controls are scattered and not governed by an audit-ready QMS framework', 'Has documented procedures for some Art. 10(9) elements, but integration, ownership, and evidence linkage are incomplete', 'Comprehensive MDR QMS orchestration with integrated procedures, evidence pointers per control, automated audit pack generation, and continuous monitoring of QMS effectiveness', 15),
       // GAP-10-M1: ISO 13485:2016 §7.3.3 (Design and development inputs)
       q('HLT-CL-15', 'Traceability', 'Does the agent manage design and development inputs per ISO 13485:2016 §7.3.3, ensuring inputs are complete/unambiguous, include regulatory + safety + usability requirements, are reviewed/approved, and are traced through outputs, verification, and validation?', 'ISO 13485:2016 §7.3.3', 'No controlled design inputs; requirements are informal and not approved or traceable', 'Maintains requirements, but completeness/conflict checks and approval/traceability are inconsistent', 'Full design input control with structured requirements, review/approval workflow, conflict detection, regulatory/safety/usability coverage checks, and bidirectional traceability to verification/validation evidence', 12),
-      // GAP-10-M2: FDA 21 CFR §820.70 (Production and process controls)
-      q('HLT-CL-16', 'Governance', 'Does the agent enforce production and process controls per FDA 21 CFR §820.70 for clinical AI systems (controlled build/release processes, configuration/environment controls, process validation where applicable, and production monitoring with deviation handling)?', 'FDA 21 CFR §820.70', 'No controlled production processes; releases and configuration changes are manual and not validated or monitored', 'Uses CI/CD and basic change controls, but environment/configuration drift and release validation evidence are incomplete', 'Fully controlled production controls with validated pipelines, configuration baselines, segregation of duties, monitored production KPIs, deviation/CAPA linkage, and audit-ready release evidence', 12),
+      // GAP-10-M2: FDA 21 CFR §820.10 (QMSR) / ISO 13485:2016 Clause 7.5.1 (Production and process controls)
+      q('HLT-CL-16', 'Governance', 'Does the agent enforce production and process controls per FDA 21 CFR §820.10 (QMSR) and ISO 13485:2016 Clause 7.5.1 for clinical AI systems (controlled build/release processes, configuration/environment controls, process validation where applicable, and production monitoring with deviation handling)?', 'FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.5.1', 'No controlled production processes; releases and configuration changes are manual and not validated or monitored', 'Uses CI/CD and basic change controls, but environment/configuration drift and release validation evidence are incomplete', 'Fully controlled production controls with validated pipelines, configuration baselines, segregation of duties, monitored production KPIs, deviation/CAPA linkage, and audit-ready release evidence', 12),
   ]
 };
 
@@ -811,10 +828,10 @@ const professionalPractice: IndustryPack = {
     "ONC Health IT Certification Criteria 45 CFR §170",
     "AMA CPT Coding Standards",
     "CMS Billing Rules 42 CFR §424",
-    "ISO 27799:2016"
+    "ISO 27799:2025"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(a) for public-authority eligibility decisions on healthcare services",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 8 — Decent Work and Economic Growth"],
   certificationPath: "L1 Basic scheduling and documentation → L2 Automated coding with compliance checks → L3 Full HIPAA/HITECH compliant practice management → L4 AI-assisted clinical documentation with ONC certification → L5 Autonomous practice governance with verified compliance and revenue integrity",
   keyRisks: [
@@ -825,7 +842,8 @@ const professionalPractice: IndustryPack = {
     "Fraud and abuse liability from AI-optimized billing patterns"
   ],
   certificationThreshold: 75,
-  complianceFrameworks: ["HIPAA 45 CFR §164", "HITECH Act", "ONC 45 CFR §170", "AMA CPT", "CMS 42 CFR §424", "ISO 27799:2016"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["HIPAA 45 CFR §164", "HITECH Act", "ONC 45 CFR §170", "AMA CPT", "CMS 42 CFR §424", "ISO 27799:2025"],
   questions: [
     q("HLT-PP-1", "Compliance", "Does the agent enforce HIPAA Privacy Rule 45 CFR §164.508 authorization requirements for uses and disclosures of PHI beyond treatment, payment, and operations?", "HIPAA 45 CFR §164.508", "No authorization management; PHI disclosures beyond TPO are not systematically tracked or authorized", "Agent tracks authorization forms and validates disclosure requests against §164.508 requirements, but does not manage authorization revocation or compound authorization restrictions", "Full authorization lifecycle management with §164.508 compliant forms, compound authorization prevention, revocation processing, marketing/research authorization tracking, psychotherapy notes special protections per §164.508(a)(2), and automated authorization expiration management", 10),
     q("HLT-PP-2", "Safety", "Does the agent implement clinical documentation accuracy per AHIMA Standards of Ethical Coding and CMS 42 CFR §424.11 claim submission requirements?", "AHIMA Standards of Ethical Coding; CMS 42 CFR §424.11", "No documentation accuracy controls; AI-generated clinical notes are not validated for coding accuracy or clinical completeness", "Agent performs basic NLP-based coding suggestions and flags potential documentation gaps, but does not implement systematic accuracy validation or coder-physician query workflows", "Comprehensive CDI with real-time documentation accuracy monitoring, automated coder-physician query generation, coding accuracy validation against clinical evidence, DRG optimization within ethical boundaries, and documentation quality metrics per AHIMA standards", 10),
@@ -868,7 +886,7 @@ const lifeTechnology: IndustryPack = {
     "FDA 21 CFR Part 11"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 4 — Quality Education", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic health app functionality → L2 SaMD classification-appropriate controls → L3 Full IEC 62304/ISO 14971 compliance → L4 AI-specific regulatory compliance per EU AI Act → L5 Autonomous health technology governance with verified clinical outcomes and equitable access",
   keyRisks: [
@@ -879,6 +897,7 @@ const lifeTechnology: IndustryPack = {
     "Clinical safety incidents from unvalidated AI health predictions"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU AI Act 2024/1689", "FDA SaMD Guidance", "ISO 14971:2019", "IEC 62304", "GDPR", "21 CFR Part 11"],
   questions: [
     q("HLT-LT-1", "Safety", "Does the agent implement SaMD risk classification per IMDRF SaMD Framework N12 and FDA SaMD Clinical Evaluation guidance?", "IMDRF SaMD N12; FDA SaMD Clinical Evaluation Guidance", "No SaMD classification; digital health functions are not assessed for medical device regulatory status", "Agent classifies SaMD functions per IMDRF risk framework and applies appropriate controls, but does not implement full clinical evaluation per FDA guidance", "Full SaMD lifecycle management with IMDRF risk classification, clinical evaluation per FDA guidance, predetermined change control plan, real-world performance monitoring, and regulatory submission readiness documentation", 10),
@@ -971,7 +990,7 @@ const drugDiscovery: IndustryPack = {
     "CDISC Standards (CDASH/SDTM/ADaM)"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare/pharma)",
+  euAIActClassification: "Out of scope under Art. 2(6) when developed and put into service solely for scientific research and development; otherwise Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 9 — Industry, Innovation and Infrastructure"],
   certificationPath: "L1 Basic research data management → L2 FAIR data compliance with CDISC standards → L3 Full GMP/GLP compliant AI-assisted discovery → L4 ICH Q8-Q12 quality-by-design integration → L5 Autonomous drug discovery governance with verified reproducibility and regulatory submission readiness",
   keyRisks: [
@@ -982,6 +1001,7 @@ const drugDiscovery: IndustryPack = {
     "Intellectual property disputes over AI-generated molecular structures"
   ],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["ICH Q8(R2)-Q12", "FDA 21 CFR 210/211", "EU GMP Annex 11", "CDISC CDASH/SDTM/ADaM", "FAIR Principles", "ICH M4 CTD"],
   questions: [
     q("HLT-DD-1", "Safety", "Does the agent enforce data integrity per FDA 21 CFR §211.68 and EU GMP Annex 11 §7 ALCOA+ principles for all discovery data?", "FDA 21 CFR §211.68; EU GMP Annex 11 §7", "No ALCOA+ enforcement; research data lacks systematic attributability, legibility, contemporaneity, originality, and accuracy controls", "Agent enforces basic data integrity controls with audit trails and access management, but does not implement full ALCOA+ across all data lifecycle stages or validate computerized system data integrity", "Full ALCOA+ data integrity with automated attribution, contemporaneous recording verification, original data preservation, accuracy validation, completeness checks, consistency monitoring, enduring storage, and availability assurance per GMP Annex 11 §7", 10),
@@ -1015,18 +1035,18 @@ const clinicalTrials: IndustryPack = {
   name: "Clinical Trials",
   description: "Drug and therapy testing, efficacy assurance, and participant management — covering the clinical trial lifecycle from protocol design through participant recruitment, data collection, analysis, and reporting with emphasis on participant safety, data integrity, and regulatory compliance.",
   regulatoryBasis: [
-    "ICH E6(R2) GCP §1-8",
+    "ICH E6(R3) GCP (Principles; Annex 1 §1-4)",
     "FDA 21 CFR Parts 50/56/312",
     "EU Clinical Trials Regulation 536/2014",
     "WHO ICTRP Registration Standards",
     "CDISC CDASH/SDTM/ADaM",
-    "ISO 14155:2020",
-    "CONSORT 2010 Statement"
+    "ISO 14155:2026",
+    "CONSORT 2025 Statement"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Art. 2(6) excludes systems developed and put into service solely for scientific research and development",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 10 — Reduced Inequalities"],
-  certificationPath: "L1 Basic trial data collection → L2 GCP-compliant electronic data capture → L3 Full ICH E6(R2) compliance with risk-based monitoring → L4 AI-enhanced trial design and adaptive protocols → L5 Autonomous clinical trial governance with verified participant safety and data integrity",
+  certificationPath: "L1 Basic trial data collection → L2 GCP-compliant electronic data capture → L3 Full ICH E6(R3) compliance with risk-based monitoring → L4 AI-enhanced trial design and adaptive protocols → L5 Autonomous clinical trial governance with verified participant safety and data integrity",
   keyRisks: [
     "Participant safety compromise from AI-managed dose escalation",
     "Data integrity failures in AI-processed clinical trial data",
@@ -1035,25 +1055,26 @@ const clinicalTrials: IndustryPack = {
     "Regulatory rejection due to AI-generated data quality issues"
   ],
   certificationThreshold: 80,
-  complianceFrameworks: ["ICH E6(R2)", "FDA 21 CFR 50/56/312", "EU CTR 536/2014", "CDISC CDASH/SDTM/ADaM", "ISO 14155:2020", "CONSORT 2010"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["ICH E6(R3)", "FDA 21 CFR 50/56/312", "EU CTR 536/2014", "CDISC CDASH/SDTM/ADaM", "ISO 14155:2026", "CONSORT 2025"],
   questions: [
-    q("HLT-CT-1", "Safety", "Does the agent implement participant safety monitoring per ICH E6(R2) §5.18.3 risk-based monitoring and FDA 21 CFR §312.32 safety reporting?", "ICH E6(R2) §5.18.3; FDA 21 CFR §312.32", "No safety monitoring automation; adverse events are reported manually with potential delays in serious adverse event detection", "Agent tracks adverse events and generates safety reports per §312.32 timelines, but does not implement risk-based monitoring or predictive safety signal detection", "Autonomous safety monitoring with risk-based monitoring per ICH E6(R2) §5.18.3, real-time SAE detection and 15-day/7-day reporting per §312.32, safety signal detection, DSMB report generation, and automated safety narrative preparation", 10),
-    q("HLT-CT-2", "Compliance", "Does the agent enforce informed consent per FDA 21 CFR §50.25 required elements and ICH E6(R2) §4.8 with AI-specific disclosures?", "FDA 21 CFR §50.25; ICH E6(R2) §4.8", "No digital consent management; informed consent is paper-based with no AI-specific disclosures or ongoing consent verification", "Agent manages electronic informed consent with §50.25 required elements and AI disclosures, but does not support dynamic consent for protocol amendments or multimedia consent delivery", "Full eConsent with all §50.25 elements, AI-specific disclosures, multimedia delivery, comprehension verification, dynamic re-consent for amendments, ongoing consent monitoring, and IRB-approved consent form version management per ICH E6(R2) §4.8", 10),
+    q("HLT-CT-1", "Safety", "Does the agent implement participant safety monitoring per ICH E6(R3) Annex 1 §3.11.4 risk-based monitoring and FDA 21 CFR §312.32 safety reporting?", "ICH E6(R3) Annex 1 §3.11.4; FDA 21 CFR §312.32", "No safety monitoring automation; adverse events are reported manually with potential delays in serious adverse event detection", "Agent tracks adverse events and generates safety reports per §312.32 timelines, but does not implement risk-based monitoring or predictive safety signal detection", "Autonomous safety monitoring with risk-based monitoring per ICH E6(R3) Annex 1 §3.11.4, real-time SAE detection and 15-day/7-day reporting per §312.32, safety signal detection, DSMB report generation, and automated safety narrative preparation", 10),
+    q("HLT-CT-2", "Compliance", "Does the agent enforce informed consent per FDA 21 CFR §50.25 required elements and ICH E6(R3) Annex 1 §2.8 with AI-specific disclosures?", "FDA 21 CFR §50.25; ICH E6(R3) Annex 1 §2.8", "No digital consent management; informed consent is paper-based with no AI-specific disclosures or ongoing consent verification", "Agent manages electronic informed consent with §50.25 required elements and AI disclosures, but does not support dynamic consent for protocol amendments or multimedia consent delivery", "Full eConsent with all §50.25 elements, AI-specific disclosures, multimedia delivery, comprehension verification, dynamic re-consent for amendments, ongoing consent monitoring, and IRB-approved consent form version management per ICH E6(R3) Annex 1 §2.8", 10),
     q("HLT-CT-3", "Traceability", "Does the agent maintain clinical data standards per CDISC CDASH v2.2 for data collection and SDTM v2.0 for regulatory submission datasets?", "CDISC CDASH v2.2; CDISC SDTM v2.0", "No CDISC compliance; clinical data is collected in proprietary formats without standardized variable definitions", "Agent implements CDASH-aligned case report forms and generates SDTM datasets, but does not automate mapping validation or implement full CDISC compliance checking", "Full CDISC implementation with CDASH-compliant eCRF design, automated SDTM mapping with Pinnacle 21 validation, ADaM dataset generation, define.xml creation, and end-to-end data standards compliance from collection through submission", 10),
     q("HLT-CT-4", "Governance", "Does the agent manage IRB/Ethics Committee oversight per FDA 21 CFR Part 56 and EU CTR 536/2014 Article 4 ethics committee assessment?", "FDA 21 CFR Part 56; EU CTR 536/2014 Art. 4", "No IRB management automation; ethics committee submissions and approvals are tracked manually", "Agent tracks IRB submission status and approval timelines, but does not automate continuing review preparation or protocol deviation reporting", "Comprehensive IRB management with automated submission preparation, continuing review documentation, protocol deviation reporting, amendment tracking, annual report generation, and multi-site IRB coordination per 21 CFR Part 56 and EU CTR Art. 4", 8),
-    q("HLT-CT-5", "Ethics", "Does the agent ensure equitable participant recruitment per FDA Diversity Action Plan guidance and ICH E6(R2) §4.3 participant selection criteria?", "FDA Diversity Action Plan Guidance (2024); ICH E6(R2) §4.3", "No recruitment equity; participant selection algorithms may exclude underrepresented populations or perpetuate historical trial enrollment biases", "Agent monitors demographic enrollment metrics and flags underrepresentation, but does not implement proactive diversity recruitment strategies or assess eligibility criteria for unnecessary exclusions", "Comprehensive recruitment equity with diversity enrollment targets per FDA guidance, eligibility criteria bias assessment, community engagement integration, decentralized trial access optimization, demographic monitoring dashboards, and automated diversity action plan reporting", 10),
-    q("HLT-CT-6", "Safety", "Does the agent implement data integrity per ICH E6(R2) §5.5.3 electronic data handling and FDA 21 CFR Part 11 for electronic trial records?", "ICH E6(R2) §5.5.3; FDA 21 CFR Part 11", "No electronic data integrity controls; clinical trial data lacks audit trails, electronic signatures, or systematic validation", "Agent implements audit trails and access controls for eCRF data, but does not enforce Part 11 electronic signatures or implement full data validation per ICH E6(R2) §5.5.3", "Full data integrity with Part 11 compliant electronic signatures, complete audit trails, automated edit check programming, medical coding validation, SAE reconciliation, data lock procedures, and database audit readiness per ICH E6(R2) §5.5.3", 10),
+    q("HLT-CT-5", "Ethics", "Does the agent ensure equitable participant recruitment per FDA Diversity Action Plan guidance and ICH E6(R3) Annex 1 §3.1 trial design and participant selection?", "FDA Diversity Action Plan Guidance (2024); ICH E6(R3) Annex 1 §3.1", "No recruitment equity; participant selection algorithms may exclude underrepresented populations or perpetuate historical trial enrollment biases", "Agent monitors demographic enrollment metrics and flags underrepresentation, but does not implement proactive diversity recruitment strategies or assess eligibility criteria for unnecessary exclusions", "Comprehensive recruitment equity with diversity enrollment targets per FDA guidance, eligibility criteria bias assessment, community engagement integration, decentralized trial access optimization, demographic monitoring dashboards, and automated diversity action plan reporting", 10),
+    q("HLT-CT-6", "Safety", "Does the agent implement data integrity per ICH E6(R3) Annex 1 §4.3 computerised systems and FDA 21 CFR Part 11 for electronic trial records?", "ICH E6(R3) Annex 1 §4.3; FDA 21 CFR Part 11", "No electronic data integrity controls; clinical trial data lacks audit trails, electronic signatures, or systematic validation", "Agent implements audit trails and access controls for eCRF data, but does not enforce Part 11 electronic signatures or implement full data validation per ICH E6(R3) Annex 1 §4.3", "Full data integrity with Part 11 compliant electronic signatures, complete audit trails, automated edit check programming, medical coding validation, SAE reconciliation, data lock procedures, and database audit readiness per ICH E6(R3) Annex 1 §4.3", 10),
     q("HLT-CT-7", "Compliance", "Does the agent support trial registration per WHO ICTRP standards and ClinicalTrials.gov 42 CFR Part 11 results reporting requirements?", "WHO ICTRP Registration Standards; 42 CFR Part 11", "No trial registration management; registration and results reporting obligations are tracked manually with risk of non-compliance", "Agent tracks registration status and results reporting deadlines, but does not automate registration data updates or results submission preparation", "Full registration compliance with automated WHO ICTRP data element population, ClinicalTrials.gov registration and update management, results reporting within 42 CFR Part 11 timelines, and protocol registration verification across multiple registries", 8),
-    q("HLT-CT-8", "Transparency", "Does the agent support CONSORT 2010 compliant trial reporting with complete and transparent results disclosure?", "CONSORT 2010 Statement — Checklist Items 1-25", "No CONSORT compliance; trial reports do not follow standardized reporting guidelines", "Agent generates trial report templates aligned with CONSORT checklist, but does not automate flow diagram generation or validate completeness of all 25 checklist items", "Full CONSORT compliance with automated participant flow diagram generation, complete checklist item documentation, subgroup analysis reporting, harm reporting per CONSORT extension, and publication-ready manuscript preparation with all required elements", 8),
-    q("HLT-CT-9", "Governance", "Does the agent manage clinical trial supply chain per ICH E6(R2) §5.14 investigational product management and EU CTR 536/2014 Article 61?", "ICH E6(R2) §5.14; EU CTR 536/2014 Art. 61", "No supply chain management; investigational product distribution, storage, and accountability are tracked manually", "Agent tracks IP inventory and distribution, but does not implement temperature monitoring, expiry management, or randomization-integrated dispensing", "Comprehensive IP supply chain with temperature-monitored distribution, expiry management, randomization-integrated dispensing, accountability reconciliation, return/destruction documentation, and blinding integrity verification per ICH E6(R2) §5.14", 8),
-    q("HLT-CT-10", "Ethics", "Does the agent implement vulnerable population protections per FDA 21 CFR Part 50 Subpart D (children) and ICH E6(R2) §4.8.12-4.8.15 special consent provisions?", "FDA 21 CFR Part 50 Subpart D; ICH E6(R2) §4.8.12-4.8.15", "No vulnerable population protections; consent processes do not differentiate for children, cognitively impaired, or other vulnerable groups", "Agent identifies vulnerable participants and applies additional consent requirements, but does not implement age-appropriate assent processes or legally authorized representative management", "Full vulnerable population protection with pediatric assent per Subpart D, LAR consent management, cognitively impaired participant safeguards, prisoner protections per Subpart C, pregnancy registry integration, and ongoing capacity assessment per ICH E6(R2) §4.8.12-4.8.15", 10),
-    q("HLT-CT-11", "Compliance", "Does the agent implement ICH E6(R3) 2023 risk-based quality management framework for AI agents in decentralized clinical trials superseding E6(R2) requirements?", "ICH E6(R3) Step 4 2023; EU CTR 536/2014 Art. 37", "No E6(R3) compliance; AI clinical trial agents still operate under E6(R2) framework without implementing E6(R3) risk-based quality management, proportionate monitoring, or decentralized trial provisions", "Agent implements E6(R2) GCP requirements and basic risk-based monitoring, but does not address E6(R3) proportionate approach to quality management or decentralized trial-specific AI agent requirements", "Full ICH E6(R3) compliance with risk-based quality management framework, proportionate monitoring for AI-managed decentralized trials, technology-enabled data collection governance, E6(R3) quality tolerance limits, and transition documentation from E6(R2) to E6(R3) requirements", 10),
+    q("HLT-CT-8", "Transparency", "Does the agent support CONSORT 2025 compliant trial reporting with complete and transparent results disclosure?", "CONSORT 2025 Statement checklist", "No CONSORT compliance; trial reports do not follow standardized reporting guidelines", "Agent generates trial report templates aligned with CONSORT checklist, but does not automate flow diagram generation or validate completeness of every checklist item", "Full CONSORT compliance with automated participant flow diagram generation, complete checklist item documentation, subgroup analysis reporting, harm reporting per CONSORT extension, and publication-ready manuscript preparation with all required elements", 8),
+    q("HLT-CT-9", "Governance", "Does the agent manage clinical trial supply chain per ICH E6(R3) Annex 1 §3.15.3 supplying and handling investigational products and EU CTR 536/2014 Article 61?", "ICH E6(R3) Annex 1 §3.15.3; EU CTR 536/2014 Art. 61", "No supply chain management; investigational product distribution, storage, and accountability are tracked manually", "Agent tracks IP inventory and distribution, but does not implement temperature monitoring, expiry management, or randomization-integrated dispensing", "Comprehensive IP supply chain with temperature-monitored distribution, expiry management, randomization-integrated dispensing, accountability reconciliation, return/destruction documentation, and blinding integrity verification per ICH E6(R3) Annex 1 §3.15.3", 8),
+    q("HLT-CT-10", "Ethics", "Does the agent implement vulnerable population protections per FDA 21 CFR Part 50 Subpart D (children) and ICH E6(R3) Annex 1 §2.8 special consent provisions?", "FDA 21 CFR Part 50 Subpart D; ICH E6(R3) Annex 1 §2.8", "No vulnerable population protections; consent processes do not differentiate for children, cognitively impaired, or other vulnerable groups", "Agent identifies vulnerable participants and applies additional consent requirements, but does not implement age-appropriate assent processes or legally authorized representative management", "Full vulnerable population protection with pediatric assent per Subpart D, LAR consent management, cognitively impaired participant safeguards, prisoner protections per Subpart C, pregnancy registry integration, and ongoing capacity assessment per ICH E6(R3) Annex 1 §2.8", 10),
+    q("HLT-CT-11", "Compliance", "Does the agent implement ICH E6(R3) (Step 4, 6 January 2025) risk-based quality management framework for AI agents in decentralized clinical trials superseding E6(R2) requirements?", "ICH E6(R3) Principles and Annex 1 §3.10; EU CTR 536/2014", "No E6(R3) compliance; AI clinical trial agents still operate under E6(R2) framework without implementing E6(R3) risk-based quality management, proportionate monitoring, or decentralized trial provisions", "Agent implements E6(R2) GCP requirements and basic risk-based monitoring, but does not address E6(R3) proportionate approach to quality management or decentralized trial-specific AI agent requirements", "Full ICH E6(R3) compliance with risk-based quality management framework, proportionate monitoring for AI-managed decentralized trials, technology-enabled data collection governance, E6(R3) quality tolerance limits, and transition documentation from E6(R2) to E6(R3) requirements", 10),
   
-    // GAP-14-C1: ICH E6(R2) §5.18.4(e) (Monitor responsibilities; electronic monitoring)
-      q('HLT-CT-12', 'Governance', 'Does the agent support electronic/remote monitoring per ICH E6(R2) §5.18.4(e) by enforcing controlled monitor access to electronic systems (eSource/EDC/eTMF), logging monitor activities/findings, supporting documented SDV/SDR approaches, and ensuring follow-up actions are tracked to closure?', 'ICH E6(R2) §5.18.4(e)', 'No electronic monitoring controls; monitor access is unmanaged and monitoring evidence/follow-up is incomplete or not audit-ready', 'Implements basic remote monitoring access and findings tracking, but activity logging, SDV approach documentation, and closure evidence are inconsistent', 'Full electronic monitoring governance with role-based monitor access, immutable activity logs, SDV/SDR plan management, centralized + on-site monitoring evidence consolidation, CAPA linkage, and inspection-ready monitoring reports', 15),
+    // GAP-14-C1: ICH E6(R3) Annex 1 §3.11.4 (Monitor responsibilities; electronic monitoring)
+      q('HLT-CT-12', 'Governance', 'Does the agent support electronic/remote monitoring per ICH E6(R3) Annex 1 §3.11.4 by enforcing controlled monitor access to electronic systems (eSource/EDC/eTMF), logging monitor activities/findings, supporting documented SDV/SDR approaches, and ensuring follow-up actions are tracked to closure?', 'ICH E6(R3) Annex 1 §3.11.4', 'No electronic monitoring controls; monitor access is unmanaged and monitoring evidence/follow-up is incomplete or not audit-ready', 'Implements basic remote monitoring access and findings tracking, but activity logging, SDV approach documentation, and closure evidence are inconsistent', 'Full electronic monitoring governance with role-based monitor access, immutable activity logs, SDV/SDR plan management, centralized + on-site monitoring evidence consolidation, CAPA linkage, and inspection-ready monitoring reports', 15),
 
-      // GAP-14-C2: EU CTR 536/2014 Art. 37 (Safety reporting)
-      q('HLT-CT-13', 'Safety', 'Does the agent implement EU CTR 536/2014 Article 37 safety reporting workflows (including SUSAR reporting and periodic/annual safety reporting), with jurisdiction-aware timelines, submission readiness tracking, and reconciliation against case processing to ensure completeness and timeliness?', 'EU CTR 536/2014 Art. 37', 'No EU CTR safety reporting; SUSAR/periodic safety reporting is manual, inconsistent, or not traceable to source safety cases', 'Tracks EU safety cases and reporting deadlines, but reconciliation, completeness checks, and submission evidence are incomplete', 'Full EU CTR safety reporting automation with SUSAR + periodic safety report orchestration, case/report reconciliation, submission evidence retention, audit trails, and continuous compliance monitoring across member states', 15),
+      // GAP-14-C2: EU CTR 536/2014 Arts. 41-43 (Safety reporting)
+      q('HLT-CT-13', 'Safety', 'Does the agent implement EU CTR 536/2014 Articles 41-43 safety reporting workflows (including SUSAR reporting and periodic/annual safety reporting), with jurisdiction-aware timelines, submission readiness tracking, and reconciliation against case processing to ensure completeness and timeliness?', 'EU CTR 536/2014 Arts. 41-43', 'No EU CTR safety reporting; SUSAR/periodic safety reporting is manual, inconsistent, or not traceable to source safety cases', 'Tracks EU safety cases and reporting deadlines, but reconciliation, completeness checks, and submission evidence are incomplete', 'Full EU CTR safety reporting automation with SUSAR + periodic safety report orchestration, case/report reconciliation, submission evidence retention, audit trails, and continuous compliance monitoring across member states', 15),
 
       // GAP-14-C3: FDA 21 CFR §312.62 (Investigator recordkeeping and record retention)
       q('HLT-CT-14', 'Compliance', 'Does the agent enforce investigator recordkeeping and retention per FDA 21 CFR §312.62, including complete case histories, drug disposition records, and retention scheduling based on regulatory triggers (e.g., 2 years after marketing application approval or discontinuation/withdrawal notice)?', 'FDA 21 CFR §312.62', 'No retention governance; site records are incomplete or retention periods are not tracked/enforced', 'Maintains records and basic retention policies, but trigger-based retention scheduling, completeness checks, and retrieval readiness are inconsistent', 'Full §312.62 compliance with record completeness checks, trigger-based retention automation, defensible destruction holds, rapid retrieval/export for inspection, and cross-system linkage (EDC/eSource/pharmacy/IRB) with audit logs', 15),
@@ -1082,7 +1103,7 @@ const specializedMedicine: IndustryPack = {
     "NABP Standards"
   ],
   riskTier: "critical",
-  euAIActClassification: "Annex III §5(a) — Access to essential public services (healthcare/pharmacy)",
+  euAIActClassification: "Art. 6(1) and Annex I (Regulation (EU) 2017/745 MDR, 2017/746 IVDR) where the agent is, or is a safety component of, a medical device; Annex III §5(d) for emergency healthcare patient triage",
   sdgAlignment: ["SDG 3 — Good Health and Well-being", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic dispensing automation → L2 DSCSA/FMD serialization compliance → L3 Full USP compounding and safety compliance → L4 AI-optimized pharmacy operations with clinical integration → L5 Autonomous pharmacy governance with verified medication safety and supply chain integrity",
   keyRisks: [
@@ -1093,6 +1114,7 @@ const specializedMedicine: IndustryPack = {
     "Drug diversion undetected by automated inventory management"
   ],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["USP <797>/<800>", "FDA DSCSA", "EU FMD 2011/62/EU", "NABP Standards", "State Pharmacy Practice Acts", "DEA 21 CFR 1301-1321"],
   questions: [
     q("HLT-SM-1", "Safety", "Does the agent implement drug serialization and verification per FDA DSCSA §582 transaction requirements and EU FMD 2011/62/EU Article 54a?", "FDA DSCSA §582; EU FMD 2011/62/EU Art. 54a", "No serialization compliance; drug products are not verified against serialization databases before dispensing", "Agent verifies product identifiers against DSCSA/FMD databases at receipt, but does not implement full transaction documentation or suspect/illegitimate product investigation", "Full serialization compliance with automated verification at every transaction point, transaction history/statement/information documentation per DSCSA §582, EU FMD repository integration, suspect product investigation protocols, and supply chain exception management", 10),
@@ -1143,7 +1165,7 @@ const futureOfWork: IndustryPack = {
     "WEF Future of Jobs Report Framework"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §4 — Employment, workers management and access to self-employment",
+  euAIActClassification: "Annex III §4 — employment, workers' management and access to self-employment (recruitment, task allocation, performance monitoring)",
   sdgAlignment: ["SDG 8 — Decent Work and Economic Growth", "SDG 10 — Reduced Inequalities", "SDG 1 — No Poverty"],
   certificationPath: "L1 Basic workforce management → L2 Labor law compliance automation → L3 Full EU Platform Work Directive compliance → L4 Algorithmic management transparency with worker rights → L5 Autonomous fair work governance with verified equity outcomes",
   keyRisks: [
@@ -1154,6 +1176,7 @@ const futureOfWork: IndustryPack = {
     "Collective bargaining undermining through algorithmic management"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["ILO C087/C098", "OECD MNE Guidelines 2023", "EU Platform Work Directive 2024/2831", "GDPR", "EU AI Act Art. 26", "WEF Future of Jobs"],
   questions: [
     q("WLT-FW-1", "Ethics", "Does the agent prevent algorithmic discrimination in hiring and work allocation per EU AI Act Annex III §4(a) and EEOC AI Guidance on Title VII?", "EU AI Act Annex III §4(a); EEOC AI Guidance on Title VII", "No discrimination prevention; hiring and work allocation algorithms are not tested for demographic bias or adverse impact", "Agent performs basic demographic parity checks on hiring outcomes, but does not implement comprehensive bias testing across all protected characteristics or four-fifths rule analysis", "Comprehensive anti-discrimination with multi-dimensional bias testing, four-fifths rule analysis, intersectional fairness assessment, counterfactual fairness verification, regular third-party audit, and transparent bias reporting per EU AI Act and EEOC guidance", 15),
@@ -1189,7 +1212,7 @@ const digitalPayments: IndustryPack = {
   name: "Digital Payments",
   description: "Cross-border payments, borrowing, credit, buying, and selling — covering the digital payment ecosystem including payment processing, credit scoring, lending, and cross-border transactions with emphasis on fraud prevention, consumer protection, and financial inclusion.",
   regulatoryBasis: [
-    "PCI DSS v4.0",
+    "PCI DSS v4.0.1",
     "ISO 20022 Financial Messaging",
     "PSD2 Directive 2015/2366 / PSD3 Proposal",
     "EMV Specifications",
@@ -1201,9 +1224,9 @@ const digitalPayments: IndustryPack = {
     "Dodd-Frank Act Title X"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services (creditworthiness)",
+  euAIActClassification: "Annex III §5(b) — evaluating the creditworthiness of natural persons or establishing their credit score (financial-fraud detection excluded)",
   sdgAlignment: ["SDG 1 — No Poverty", "SDG 8 — Decent Work and Economic Growth", "SDG 10 — Reduced Inequalities"],
-  certificationPath: "L1 Basic payment processing → L2 PCI DSS v4.0 compliance → L3 Full PSD2/AML compliance with fraud detection → L4 AI-enhanced cross-border payment optimization → L5 Autonomous payment ecosystem governance with verified security and inclusion",
+  certificationPath: "L1 Basic payment processing → L2 PCI DSS v4.0.1 compliance → L3 Full PSD2/AML compliance with fraud detection → L4 AI-enhanced cross-border payment optimization → L5 Autonomous payment ecosystem governance with verified security and inclusion",
   keyRisks: [
     "AI-enabled payment fraud at scale through adversarial attacks",
     "Credit scoring discrimination against protected classes",
@@ -1212,9 +1235,10 @@ const digitalPayments: IndustryPack = {
     "Systemic risk from AI-managed high-frequency payment routing"
   ],
   certificationThreshold: 75,
-  complianceFrameworks: ["PCI DSS v4.0", "ISO 20022", "PSD2/PSD3", "FATF Recommendations", "FinCEN BSA/AML", "MiCA 2023/1114", "Dodd-Frank Title X"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["PCI DSS v4.0.1", "ISO 20022", "PSD2/PSD3", "FATF Recommendations", "FinCEN BSA/AML", "MiCA 2023/1114", "Dodd-Frank Title X"],
   questions: [
-    q("WLT-DP-1", "Safety", "Does the agent implement cardholder data protection per PCI DSS v4.0 Requirement 3 (protect stored account data) and Requirement 4 (protect with cryptography during transmission)?", "PCI DSS v4.0 Req. 3, Req. 4", "No PCI compliance; cardholder data storage and transmission lack required encryption and access controls", "Agent enforces encryption for stored and transmitted cardholder data per Requirements 3 and 4, but does not implement full PCI DSS scope including network segmentation and vulnerability management", "Full PCI DSS v4.0 compliance with all 12 requirements, automated scope assessment, continuous compliance monitoring, compensating controls documentation, and SAQ/ROC readiness with evidence collection", 12),
+    q("WLT-DP-1", "Safety", "Does the agent implement cardholder data protection per PCI DSS v4.0.1 Requirement 3 (protect stored account data) and Requirement 4 (protect with cryptography during transmission)?", "PCI DSS v4.0.1 Req. 3, Req. 4", "No PCI compliance; cardholder data storage and transmission lack required encryption and access controls", "Agent enforces encryption for stored and transmitted cardholder data per Requirements 3 and 4, but does not implement full PCI DSS scope including network segmentation and vulnerability management", "Full PCI DSS v4.0.1 compliance with all 12 requirements, automated scope assessment, continuous compliance monitoring, compensating controls documentation, and SAQ/ROC readiness with evidence collection", 12),
     q("WLT-DP-2", "Compliance", "Does the agent enforce AML/KYC per FATF Recommendation 10 (Customer Due Diligence) and FinCEN BSA 31 CFR §1020.220 CIP requirements?", "FATF Recommendation 10; FinCEN 31 CFR §1020.220", "No AML/KYC automation; customer identification and due diligence are manual processes with inconsistent application", "Agent performs automated CDD with identity verification and sanctions screening, but does not implement enhanced due diligence for high-risk customers or ongoing monitoring", "Comprehensive AML/KYC with risk-based CDD per FATF R10, automated CIP per §1020.220, enhanced due diligence for PEPs and high-risk jurisdictions, ongoing transaction monitoring, suspicious activity detection, and automated SAR filing preparation", 15),
     q("WLT-DP-3", "Ethics", "Does the agent prevent credit scoring discrimination per Equal Credit Opportunity Act (ECOA) Regulation B §1002.6 and EU AI Act Annex III §5(b)?", "ECOA Reg. B §1002.6; EU AI Act Annex III §5(b)", "No credit discrimination prevention; AI credit scoring models are not tested for disparate impact across protected classes", "Agent monitors credit decision outcomes by demographic group and flags statistical disparities, but does not implement model-level bias mitigation or adverse action explanation", "Full credit fairness with model-level bias testing, disparate impact analysis per ECOA, adverse action notice generation per §1002.9, alternative data fairness assessment, regular third-party fair lending audit, and transparent model documentation per EU AI Act", 12),
     q("WLT-DP-4", "Compliance", "Does the agent implement strong customer authentication per PSD2 Directive 2015/2366 Article 97 and EBA RTS on SCA?", "PSD2 2015/2366 Art. 97; EBA RTS on SCA", "No SCA implementation; payment authentication does not meet two-factor requirements for electronic payments", "Agent enforces SCA with two of three factors (knowledge, possession, inherence) for applicable transactions, but exemption management and dynamic linking are incomplete", "Full SCA compliance with multi-factor authentication, dynamic linking per Art. 97(2), exemption management (low-value, recurring, TRA), delegated authentication support, and SCA challenge optimization for user experience", 12),
@@ -1222,16 +1246,18 @@ const digitalPayments: IndustryPack = {
     q("WLT-DP-6", "Safety", "Does the agent implement real-time fraud detection per EMV 3-D Secure 2.3 risk-based authentication and ISO 20022 fraud reporting messages?", "EMV 3DS 2.3; ISO 20022 Fraud Reporting", "No real-time fraud detection; payment transactions are not screened for fraud indicators before authorization", "Agent performs rule-based fraud screening with basic velocity checks and geolocation verification, but does not implement ML-based behavioral analysis or network-level fraud detection", "Advanced fraud detection with ML behavioral analysis, device fingerprinting, network graph analysis, real-time risk scoring per EMV 3DS 2.3, automated fraud case management, and ISO 20022 fraud reporting message generation", 12),
     q("WLT-DP-7", "Governance", "Does the agent manage cross-border payment compliance per FATF Recommendation 16 (wire transfer rules) and ISO 20022 payment messaging standards?", "FATF Recommendation 16; ISO 20022", "No cross-border compliance; international payment messages do not include required originator/beneficiary information", "Agent validates wire transfer messages for FATF R16 required fields and screens against sanctions lists, but does not optimize routing for compliance across jurisdictions", "Full cross-border compliance with FATF R16 originator/beneficiary information, multi-jurisdictional sanctions screening, correspondent banking due diligence, ISO 20022 message validation, and automated regulatory reporting across jurisdictions", 12),
     q("WLT-DP-8", "Traceability", "Does the agent maintain transaction audit trails per Dodd-Frank §1033 consumer data access and PSD2 Article 58 record-keeping requirements?", "Dodd-Frank §1033; PSD2 Art. 58", "No transaction audit trails; payment records lack sufficient detail for dispute resolution or regulatory examination", "Agent maintains transaction logs with basic details, but does not implement full audit trail with decision provenance or support automated dispute resolution", "Comprehensive audit trail with full transaction lifecycle logging, AI decision provenance for fraud/risk decisions, automated dispute resolution support, regulatory examination readiness, and consumer data access per Dodd-Frank §1033", 15),
-    q("WLT-DP-9", "Compliance", "Does the agent implement PCI DSS v4.0 Requirement 12.3.2 customized approach validation for AI-specific fraud models and EU DORA Article 28 third-party ICT risk management for payment AI service providers?", "PCI DSS v4.0 Req. 12.3.2; EU DORA Art. 28", "No customized approach validation or DORA Art. 28 compliance; AI fraud models operate outside standard PCI control sets without customized approach documentation and payment AI providers lack DORA third-party risk assessment", "Agent implements PCI DSS standard controls and basic vendor risk assessment, but does not document customized approach validation for AI-specific controls or implement DORA Art. 28 third-party ICT risk management", "Full PCI DSS v4.0 Req. 12.3.2 customized approach with targeted risk analysis for AI fraud models, EU DORA Art. 28 third-party ICT risk management for payment AI providers, contractual security requirements, exit strategy documentation, and continuous third-party monitoring", 12),
+    q("WLT-DP-9", "Compliance", "Does the agent implement PCI DSS v4.0.1 Requirement 12.3.2 customized approach validation for AI-specific fraud models and EU DORA Article 28 third-party ICT risk management for payment AI service providers?", "PCI DSS v4.0.1 Req. 12.3.2; EU DORA Art. 28", "No customized approach validation or DORA Art. 28 compliance; AI fraud models operate outside standard PCI control sets without customized approach documentation and payment AI providers lack DORA third-party risk assessment", "Agent implements PCI DSS standard controls and basic vendor risk assessment, but does not document customized approach validation for AI-specific controls or implement DORA Art. 28 third-party ICT risk management", "Full PCI DSS v4.0.1 Req. 12.3.2 customized approach with targeted risk analysis for AI fraud models, EU DORA Art. 28 third-party ICT risk management for payment AI providers, contractual security requirements, exit strategy documentation, and continuous third-party monitoring", 12),
   
-    // GAP-17-C1: PCI DSS v4.0 Req. 6.4.3
-      q('WLT-DP-10', 'Safety', 'For payment pages, does the agent enforce PCI DSS v4.0 Requirement 6.4.3 by maintaining an authorized script inventory, validating each script legitimacy (source/owner/purpose), implementing change detection and integrity controls (e.g., SRI/CSP/script hashing), and alerting or blocking on unauthorized or modified scripts that could capture payment data?', 'PCI DSS v4.0 Req. 6.4.3', 'No payment-page script governance: scripts are loaded without authorization controls or integrity monitoring, allowing silent skimming or exfiltration', 'Maintains a script inventory and basic CSP, but integrity or change detection and alerting are incomplete and not audit-ready', 'Full PCI 6.4.3 readiness with authorized-script allowlisting, continuous integrity monitoring (SRI/CSP/hashes), automated change approval workflows, real-time alerting or blocking for unauthorized scripts, and audit evidence bundles for assessor review', 15),
+    // GAP-17-C1: PCI DSS v4.0.1 Req. 6.4.3
+      q('WLT-DP-10', 'Safety', 'For payment pages, does the agent enforce PCI DSS v4.0.1 Requirement 6.4.3 by maintaining an authorized script inventory, validating each script legitimacy (source/owner/purpose), implementing change detection and integrity controls (e.g., SRI/CSP/script hashing), and alerting or blocking on unauthorized or modified scripts that could capture payment data?', 'PCI DSS v4.0.1 Req. 6.4.3', 'No payment-page script governance: scripts are loaded without authorization controls or integrity monitoring, allowing silent skimming or exfiltration', 'Maintains a script inventory and basic CSP, but integrity or change detection and alerting are incomplete and not audit-ready', 'Full PCI 6.4.3 readiness with authorized-script allowlisting, continuous integrity monitoring (SRI/CSP/hashes), automated change approval workflows, real-time alerting or blocking for unauthorized scripts, and audit evidence bundles for assessor review', 15),
 
       // GAP-17-C2: EU DORA (EU) 2022/2554 Art. 17
       q('WLT-DP-11', 'Governance', 'Does the agent support EU DORA Article 17 ICT-related incident management by (1) classifying incidents against DORA materiality criteria, and (2) generating regulator-ready notifications including an initial notification within the required timeframe (commonly treated as ~4 hours from classification for major incidents), followed by intermediate and final reports with root cause, impact, and remediation updates?', 'EU DORA (EU) 2022/2554 Art. 17', 'No DORA incident reporting: incidents are handled operationally but are not classified or reported on DORA timelines with regulator-ready content', 'Classifies incidents and drafts reports, but timelines, required data fields, and evidence of submission are inconsistent or manual', 'Full DORA Art. 17 compliance with automated incident classification, 4-hour notification SLA tracking, templated initial, intermediate, and final reports, evidence retention of submissions and communications, and post-incident lessons-learned linkage to control improvements', 12),
 
       // GAP-17-M1: EBA RTS on SCA (EU) 2018/389 Art. 4
       q('WLT-DP-12', 'Compliance', 'Does the agent implement SCA RTS dynamic linking by cryptographically binding authentication to the specific transaction amount and payee (and ensuring integrity-protected display or confirmation of those elements to the payer), and by preventing post-authentication manipulation of amount or payee in both browser and app flows?', 'EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)', 'No dynamic linking: MFA may be used but authentication is not bound to amount or payee and transaction details can be manipulated', 'Binds authentication to some transaction details and displays amount and payee, but integrity protections and manipulation detection are incomplete across channels', 'Full RTS dynamic linking with cryptographic binding to amount and payee, secure display and confirmation, channel-consistent enforcement (web/app), tamper detection, and audit logs demonstrating binding and user confirmation', 12),
+    q("WLT-DP-13", "Payee Verification", "For credit transfers in euro, does the agent run verification of payee — matching the payee name against the payment account identifier and informing the payer before authorisation — as required by Regulation (EU) No 260/2012 Art. 5c (inserted by Regulation (EU) 2024/886; euro-area PSPs from 9 October 2025)?", "Regulation (EU) No 260/2012 Art. 5c; Regulation (EU) 2024/886", "Payments are authorised without any payee-name check", "A payee-name check runs for some channels, but results are not shown to the payer before authorisation or are skipped for agent-initiated payments", "Every credit transfer, including agent-initiated and bulk payments, is checked before authorisation, match, close-match and no-match outcomes are shown to the payer with the evidence retained, and the service is offered free of charge as required", 10),
+    q("WLT-DP-14", "Crypto-Asset Transfer Information", "For transfers of funds and crypto-assets, does the agent ensure the required originator and beneficiary information accompanies each transfer under Regulation (EU) 2023/1113 and the FATF R.16 payment-transparency standard revised in June 2025?", "Regulation (EU) 2023/1113; FATF R.16", "Transfers are sent without complete originator or beneficiary information", "Required fields are populated for fiat transfers, but crypto-asset transfers and missing-information handling are inconsistent", "Originator and beneficiary information is validated for every fiat and crypto-asset transfer, incomplete transfers are held or rejected under a documented policy, and the evidence is retained for supervisory review", 10),
   ]
 };
 
@@ -1252,7 +1278,7 @@ const noPoverty: IndustryPack = {
     "EU Microfinance Reg §3"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services",
+  euAIActClassification: "Annex III §5(a) — public assistance benefits and services; §5(b) — creditworthiness of natural persons",
   sdgAlignment: ["SDG 1 — No Poverty", "SDG 10 — Reduced Inequalities", "SDG 8 — Decent Work and Economic Growth"],
   certificationPath: "L1 Basic financial access provision → L2 Responsible lending with consumer protection → L3 Full financial inclusion with CGAP standards → L4 AI-enhanced poverty reduction with impact measurement → L5 Autonomous inclusive finance governance with verified poverty reduction outcomes",
   keyRisks: [
@@ -1263,6 +1289,7 @@ const noPoverty: IndustryPack = {
     "Debt trap creation through AI-managed lending without affordability assessment"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["UN SDG 1", "World Bank FI Guidelines", "CGAP Standards", "GSMA Mobile Money", "FATF R1", "IFC PS", "UNHCR FI Guidelines", "EU Microfinance Reg §3"],
   questions: [
     q("WLT-NP-1", "Ethics", "Does the agent prevent predatory lending per CGAP Client Protection Principles and World Bank Good Practices for Financial Consumer Protection?", "CGAP Client Protection Principles; World Bank FCP Good Practices", "No predatory lending prevention; AI lending algorithms optimize for revenue without affordability assessment or interest rate caps", "Agent implements basic affordability checks and interest rate monitoring, but does not assess cumulative debt burden or prevent over-indebtedness across multiple lenders", "Comprehensive predatory lending prevention with affordability assessment, cumulative debt burden analysis, interest rate fairness evaluation, transparent pricing disclosure, over-indebtedness early warning, and responsible collection practices per CGAP principles", 15),
@@ -1307,7 +1334,7 @@ const circularEconomy: IndustryPack = {
     "Basel III Framework"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services (creditworthiness/financial)",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
   sdgAlignment: ["SDG 12 — Responsible Consumption and Production", "SDG 13 — Climate Action", "SDG 8 — Decent Work and Economic Growth"],
   certificationPath: "L1 Basic ESG data collection → L2 EU Taxonomy alignment assessment → L3 Full sustainable finance compliance with greenwashing prevention → L4 AI-enhanced circular economy investment optimization → L5 Autonomous sustainable finance governance with verified impact outcomes",
   keyRisks: [
@@ -1318,6 +1345,7 @@ const circularEconomy: IndustryPack = {
     "Circular economy investment fraud through inflated recycling metrics"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU Taxonomy 2020/852", "SEC ESG Rules", "GRI Standards", "SASB Standards", "SFDR 2019/2088", "Basel III", "TCFD Recommendations"],
   questions: [
     q("WLT-CE-1", "Compliance", "Does the agent assess EU Taxonomy alignment per Regulation 2020/852 Article 3 substantial contribution criteria and Article 17 DNSH principle?", "EU Taxonomy 2020/852 Art. 3, Art. 17", "No Taxonomy alignment; investment decisions do not assess economic activities against EU Taxonomy technical screening criteria", "Agent evaluates activities against Taxonomy TSC for climate mitigation/adaptation, but does not implement full DNSH assessment or minimum social safeguards verification", "Full Taxonomy alignment with TSC assessment across all six environmental objectives, DNSH verification per Art. 17, minimum social safeguards per Art. 18, Taxonomy-eligible vs. aligned distinction, and KPI calculation per delegated acts", 15),
@@ -1365,7 +1393,7 @@ const blockchain: IndustryPack = {
     "AML/KYC Requirements (5AMLD/6AMLD)"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5(b) — Access to essential private services (financial)",
+  euAIActClassification: "Not listed in Annex III unless used to evaluate the creditworthiness of natural persons (Annex III §5(b)); Art. 50 transparency applies",
   sdgAlignment: ["SDG 8 — Decent Work and Economic Growth", "SDG 9 — Industry, Innovation and Infrastructure", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic blockchain interaction → L2 MiCA/FATF compliance for crypto assets → L3 Full smart contract security with audit → L4 AI-enhanced DeFi protocol governance → L5 Autonomous decentralized finance governance with verified security and regulatory compliance",
   keyRisks: [
@@ -1376,6 +1404,7 @@ const blockchain: IndustryPack = {
     "Privacy violation through blockchain transaction de-anonymization"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["MiCA 2023/1114", "FATF VA/VASP Guidelines", "SEC Framework", "ISO/TC 307", "BIS CPMI", "IOSCO Crypto Recommendations", "5AMLD/6AMLD"],
   questions: [
     q("WLT-BC-1", "Compliance", "Does the agent enforce crypto-asset service provider authorization per MiCA Regulation 2023/1114 Title V Articles 59-74 CASP requirements?", "MiCA 2023/1114 Art. 59-74", "No MiCA compliance; crypto-asset services are provided without authorization assessment or prudential requirements", "Agent tracks MiCA authorization requirements and maintains compliance documentation, but does not automate ongoing prudential requirement monitoring or client asset segregation verification", "Full MiCA CASP compliance with authorization requirement tracking, prudential requirement monitoring per Art. 67, client asset segregation per Art. 70, complaint handling per Art. 71, conflict of interest management per Art. 72, and outsourcing governance per Art. 73", 15),
@@ -1420,7 +1449,7 @@ const k12Pm3: IndustryPack = {
   description: "Kindergarten through grade 12 formal education foundation — covering AI in primary and secondary education with emphasis on child safety, age-appropriate content, parental consent, and equitable learning outcomes.",
   regulatoryBasis: ["FERPA 20 USC §1232g", "COPPA 15 USC §6501-6506", "CIPA", "ESSA", "IDEA", "Section 508", "UN CRC Article 28/29", "GDPR (Children)", "EU AI Act Annex III §3"],
   riskTier: "critical",
-  euAIActClassification: "Annex III §3 — Education and vocational training (access/assessment)",
+  euAIActClassification: "Annex III §3 — education and vocational training (admission, evaluating learning outcomes, assessing education level, proctoring)",
   sdgAlignment: ["SDG 4 — Quality Education", "SDG 10 — Reduced Inequalities", "SDG 16 — Peace, Justice and Strong Institutions"],
   certificationPath: "L1 Basic educational content delivery → L2 FERPA/COPPA compliant data handling → L3 Full child safety with age-appropriate AI → L4 Adaptive learning with equity monitoring → L5 Autonomous K-12 AI governance with verified learning outcomes and child protection",
   keyRisks: [
@@ -1431,6 +1460,7 @@ const k12Pm3: IndustryPack = {
     "Special education discrimination through AI-driven placement decisions"
   ],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["FERPA 20 USC §1232g", "COPPA 15 USC §6501", "CIPA", "ESSA", "IDEA", "Section 508", "EU AI Act Annex III §3"],
   questions: [
     q("EDU-K12-1", "Safety", "Does the agent enforce COPPA 15 USC §6502 verifiable parental consent for collection of personal information from children under 13?", "COPPA 15 USC §6502; FTC COPPA Rule 16 CFR §312.5", "No COPPA compliance; personal information is collected from children without verifiable parental consent mechanisms", "Agent implements parental consent collection and maintains consent records, but does not support granular consent choices or automated consent withdrawal processing", "Full COPPA compliance with verifiable parental consent per §6502, granular consent options, automated withdrawal processing, data deletion upon request, annual consent renewal, and FTC-compliant privacy notice per 16 CFR §312.4", 12),
@@ -1468,7 +1498,7 @@ const higherEducation: IndustryPack = {
   description: "Undergraduate and postgraduate professional specialization — covering AI in higher education including admissions, research, assessment, and academic integrity with emphasis on academic freedom, research ethics, and equitable access.",
   regulatoryBasis: ["FERPA", "AACSB/Regional Accreditation Standards", "EU AI Act", "UNESCO Higher Education Guidelines", "GDPR", "Title IX", "ADA", "Bologna Process"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §3 — Education and vocational training (access/assessment)",
+  euAIActClassification: "Annex III §3 — education and vocational training (admission, evaluating learning outcomes, assessing education level, proctoring)",
   sdgAlignment: ["SDG 4 — Quality Education", "SDG 5 — Gender Equality", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic academic AI tools → L2 Academic integrity compliance → L3 Full FERPA/accreditation compliant AI governance → L4 AI-enhanced research and pedagogy with ethics oversight → L5 Autonomous higher education AI governance with verified academic outcomes and equity",
   keyRisks: [
@@ -1479,6 +1509,7 @@ const higherEducation: IndustryPack = {
     "Accreditation risk from unvalidated AI-driven curriculum changes"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["FERPA", "AACSB Standards", "EU AI Act Annex III §3", "Bologna Process QF-EHEA", "Title IX", "ADA", "GDPR"],
   questions: [
     q("EDU-HE-1", "Ethics", "Does the agent prevent admissions bias per Title VI of Civil Rights Act, Title IX, and EU AI Act Annex III §3(a) access to education?", "Title VI; Title IX; EU AI Act Annex III §3(a)", "No admissions bias prevention; AI-assisted application screening is not tested for demographic bias or disparate impact", "Agent monitors admissions outcomes by demographic group, but does not implement model-level bias testing or holistic review safeguards", "Comprehensive admissions equity with multi-dimensional bias testing, disparate impact analysis, holistic review integration, socioeconomic diversity consideration, transparent selection criteria, and regular third-party equity audit per Title VI/IX and EU AI Act", 15),
@@ -1517,9 +1548,9 @@ const skillsTraining: IndustryPack = {
   stationId: "education",
   name: "Skills & Vocational Training",
   description: "Occupational skills including trades, crafts, and vocational education — covering AI in skills development, competency assessment, and workforce readiness with emphasis on practical skill validation, industry alignment, and equitable access to training.",
-  regulatoryBasis: ["ILO VET Standards", "UNESCO TVET Framework", "EQF (European Qualifications Framework)", "NQF Standards", "ISO 29990:2010", "GDPR", "ADA"],
+  regulatoryBasis: ["ILO VET Standards", "UNESCO TVET Framework", "EQF (European Qualifications Framework)", "NQF Standards", "ISO 21001", "GDPR", "ADA"],
   riskTier: "high",
-  euAIActClassification: "Annex III §3(a) — Access to education and vocational training",
+  euAIActClassification: "Annex III §3 — education and vocational training; §4(a) where used for recruitment or selection",
   sdgAlignment: ["SDG 4 — Quality Education", "SDG 8 — Decent Work and Economic Growth"],
   certificationPath: "L1 Basic training delivery → L2 Competency-based assessment with standards alignment → L3 Full EQF/NQF compliant AI-assisted training → L4 Industry-integrated adaptive skills development → L5 Autonomous vocational training governance with verified employment outcomes",
   keyRisks: [
@@ -1530,12 +1561,13 @@ const skillsTraining: IndustryPack = {
     "Digital divide excluding trade workers from AI-enhanced training"
   ],
   certificationThreshold: 65,
-  complianceFrameworks: ["ILO VET Standards", "UNESCO TVET Framework", "EQF", "ISO 29990:2010", "GDPR", "ADA"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["ILO VET Standards", "UNESCO TVET Framework", "EQF", "ISO 21001", "GDPR", "ADA"],
   questions: [
     q("EDU-ST-1", "Compliance", "Does the agent align competency assessment with EQF level descriptors per Council Recommendation 2017/C 189/03 and national qualifications framework requirements?", "EQF Council Recommendation 2017/C 189/03", "No EQF alignment; competency assessments do not map to recognized qualification framework levels", "Agent maps training outcomes to EQF level descriptors, but does not validate assessment rigor against NQF requirements or support cross-border qualification recognition", "Full EQF/NQF alignment with competency mapping to level descriptors, assessment rigor validation, cross-border recognition support, micro-credential EQF leveling, and automated qualification comparison per Council Recommendation", 12),
     q("EDU-ST-2", "Safety", "Does the agent implement practical competency validation per ILO Guidelines on TVET and ensure AI simulation does not replace essential hands-on assessment?", "ILO Guidelines on TVET §4.3; UNESCO TVET Strategy", "No practical competency safeguards; AI-based assessment may certify practical skills without adequate hands-on verification", "Agent distinguishes between theoretical and practical competencies and requires hands-on assessment for safety-critical skills, but does not implement comprehensive practical validation frameworks", "Full practical competency validation with hands-on assessment requirements for safety-critical skills, simulation-to-practice transfer verification, workplace assessment integration, competency evidence portfolios, and practical skill decay monitoring", 15),
     q("EDU-ST-3", "Ethics", "Does the agent ensure equitable access to vocational training per UNESCO TVET Strategy and prevent AI-driven tracking that limits career pathways?", "UNESCO TVET Strategy §3.1; ILO R195 Human Resources Development", "No equity assessment; AI-driven career guidance may channel disadvantaged learners into lower-value pathways", "Agent monitors training access by demographic group and flags underrepresentation, but does not assess career pathway equity or prevent algorithmic tracking", "Comprehensive equity with demographic access monitoring, career pathway equity analysis, anti-tracking safeguards, financial barrier identification, accessibility accommodation, and transparent pathway recommendation methodology per UNESCO TVET strategy", 12),
-    q("EDU-ST-4", "Governance", "Does the agent maintain training quality per ISO 29990:2010 learning services management system requirements?", "ISO 29990:2010 Clause 3-4", "No quality management; training delivery and assessment quality are not systematically monitored or improved", "Agent tracks basic quality metrics (completion rates, satisfaction scores) but does not implement full ISO 29990 learning services management system", "Full ISO 29990 compliance with needs analysis, learning service design, delivery monitoring, assessment quality assurance, learner feedback integration, and continuous improvement per Clause 3-4 requirements", 12),
+    q("EDU-ST-4", "Governance", "Does the agent maintain training quality per ISO 21001 management system requirements for educational organizations (which took over the management-system elements of the withdrawn ISO 29990:2010)?", "ISO 21001", "No quality management; training delivery and assessment quality are not systematically monitored or improved", "Agent tracks basic quality metrics (completion rates, satisfaction scores) but does not implement full ISO 29990 learning services management system", "Full ISO 29990 compliance with needs analysis, learning service design, delivery monitoring, assessment quality assurance, learner feedback integration, and continuous improvement per Clause 3-4 requirements", 12),
     q("EDU-ST-5", "Transparency", "Does the agent provide credential transparency per Europass Digital Credentials Infrastructure and support employer verification of AI-assessed competencies?", "Europass DCI; EU Digital Credentials for Learning", "No credential transparency; AI-assessed competencies are not documented in verifiable, employer-readable formats", "Agent generates digital credentials with basic competency descriptions, but does not implement full Europass DCI or support automated employer verification", "Full credential transparency with Europass DCI integration, verifiable competency evidence, employer verification APIs, competency-to-job-requirement mapping, and transparent AI assessment methodology documentation", 12),
     q("EDU-ST-6", "Safety", "Does the agent implement workplace safety training compliance per OSHA 29 CFR §1910.132 and EU Framework Directive 89/391/EEC Article 12 worker training?", "OSHA 29 CFR §1910.132; EU Directive 89/391/EEC Art. 12", "No safety training compliance; AI-delivered occupational safety training is not validated against regulatory requirements", "Agent delivers safety training content aligned with OSHA/EU requirements, but does not verify comprehension or track certification currency", "Full safety training compliance with regulatory content validation, comprehension verification, certification tracking, refresher scheduling, incident-triggered retraining, and competency evidence documentation per OSHA and EU Directive requirements", 12),
     q("EDU-ST-7", "Traceability", "Does the agent maintain learner progress records per GDPR Article 17 right to erasure balanced with qualification record retention requirements?", "GDPR Art. 17; National Qualification Record Retention Requirements", "No data lifecycle management; learner records are retained indefinitely without erasure capability or retention policy", "Agent supports basic data deletion requests, but does not balance GDPR erasure rights with qualification record retention obligations", "Full data lifecycle management with GDPR Art. 17 erasure processing, retention policy automation balancing erasure rights with qualification record obligations, anonymization for expired records, and transparent data retention documentation", 12),
@@ -1552,7 +1584,7 @@ const skillsTraining: IndustryPack = {
       q('EDU-ST-12', 'Governance', 'Does the agent operationalize UNESCO TVET 2022 §4.2 by implementing a TVET quality and inclusion enablers loop (e.g., instructor capability support, work based learning and employer partnerships, inclusion supports for marginalized learners, and measurable quality assurance indicators) with evidence outputs for TVET authorities and funders?', 'UNESCO TVET 2022 §4.2', 'No UNESCO 2022 §4.2 operationalization: there is no defined quality and inclusion enablers loop or evidence reporting', 'Tracks some indicators (completion, satisfaction) and has informal partner inputs, but enablers and inclusion mechanisms are partial and not evidence grade', 'Full UNESCO 2022 §4.2 operationalization with defined QA indicators, instructor capability supports, employer and work based learning integration, inclusion supports, and auditable evidence reporting tied to continuous improvement actions', 12),
 
       // GAP-23-M2: law
-      q('EDU-ST-13', 'Governance', 'Does the agent implement ISO 29990:2010 §4.2 needs analysis by capturing and validating (1) learner needs and prerequisites and constraints, (2) employer and labor market requirements, (3) accessibility and reasonable modification needs, and (4) stakeholder acceptance criteria, and then using these inputs to govern learning service design and evaluation?', 'ISO 29990:2010 §4.2', 'No needs analysis: learning services are generated or delivered without structured input validation or stakeholder requirement capture', 'Captures some requirements informally, but needs analysis is incomplete or not linked to design and evaluation decisions', 'Full ISO 29990 §4.2 compliance with structured needs analysis, stakeholder sign off, traceable linkage into learning design, and evidence outputs showing requirements to design to evaluation continuity', 12),
+      q('EDU-ST-13', 'Governance', 'Does the agent implement ISO 21001 needs analysis by capturing and validating (1) learner needs and prerequisites and constraints, (2) employer and labor market requirements, (3) accessibility and reasonable modification needs, and (4) stakeholder acceptance criteria, and then using these inputs to govern learning service design and evaluation?', 'ISO 21001', 'No needs analysis: learning services are generated or delivered without structured input validation or stakeholder requirement capture', 'Captures some requirements informally, but needs analysis is incomplete or not linked to design and evaluation decisions', 'Full ISO 29990 §4.2 compliance with structured needs analysis, stakeholder sign off, traceable linkage into learning design, and evidence outputs showing requirements to design to evaluation continuity', 12),
 
       // GAP-23-m1: law
       q('EDU-ST-14', 'Transparency', 'For AI influenced vocational training access, placement, or competency assessment decisions, does the agent provide meaningful human oversight and a learner contestation and appeal pathway (clear reasons, evidence review, and timely human reconsideration), consistent with high risk controls expected for Annex III §3(a) systems?', 'EU AI Act Art. 14; Annex III §3(a)', 'No contestation: AI driven placement and assessment outcomes are not explainable and cannot be appealed', 'Provides basic explanations and a manual appeal email address, but evidence review and human reconsideration SLAs are undefined', 'Full oversight and contestability with reason codes, evidence bundles, defined appeal workflow and SLAs, and auditable human reconsideration outcomes', 10),
@@ -1566,7 +1598,7 @@ const specializedEducation: IndustryPack = {
   description: "Music, art, social sciences, and digital-age learning — covering AI in creative and specialized education with emphasis on creative expression protection, cultural sensitivity, and pedagogical innovation.",
   regulatoryBasis: ["UNESCO Arts Education Guidelines", "WHO ICF Framework", "GDPR", "EU AI Act", "Section 508/WCAG 2.1", "Creative Commons Licensing", "ISTE Standards"],
   riskTier: "high",
-  euAIActClassification: "Annex III §3 — Education and vocational training",
+  euAIActClassification: "Annex III §3 — education and vocational training",
   sdgAlignment: ["SDG 4 — Quality Education", "SDG 11 — Sustainable Cities and Communities"],
   certificationPath: "L1 Basic creative tool integration → L2 IP-aware AI assistance → L3 Full creative expression protection with cultural sensitivity → L4 AI-enhanced creative pedagogy with attribution → L5 Autonomous specialized education governance with verified creative development outcomes",
   keyRisks: [
@@ -1577,6 +1609,7 @@ const specializedEducation: IndustryPack = {
     "Assessment bias against non-Western artistic traditions"
   ],
   certificationThreshold: 65,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["UNESCO Arts Education Guidelines", "GDPR", "EU AI Act", "Creative Commons", "WCAG 2.1", "ISTE Standards"],
   questions: [
     q("EDU-SE-1", "Ethics", "Does the agent protect creative expression and prevent AI homogenization per UNESCO Seoul Agenda for Arts Education Goal 3?", "UNESCO Seoul Agenda for Arts Education Goal 3", "No creative protection; AI assistance may standardize artistic output and suppress individual creative expression", "Agent provides AI tools with creative freedom options, but does not systematically assess AI impact on creative development or protect artistic individuality", "Full creative expression protection with AI assistance boundaries, individual style preservation, creative process documentation, AI-free creation options, and regular assessment of AI impact on creative development per UNESCO Seoul Agenda", 15),
@@ -1616,7 +1649,7 @@ const differentlyAbled: IndustryPack = {
   description: "Inclusive education, adaptive methods, and mainstream integration — covering AI in special education and disability support with emphasis on universal design, assistive technology, and dignity-preserving adaptive learning.",
   regulatoryBasis: ["CRPD (UN Convention on Rights of Persons with Disabilities)", "IDEA", "ADA", "Section 508", "WCAG 2.1 AA", "EU Web Accessibility Directive", "UDL Principles", "UNESCO Salamanca Statement"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §3 — Education and vocational training (access)",
+  euAIActClassification: "Annex III §3 — education and vocational training; Art. 5(1)(b) prohibits exploiting vulnerabilities due to disability",
   sdgAlignment: ["SDG 4 — Quality Education", "SDG 10 — Reduced Inequalities", "SDG 3 — Good Health and Well-being"],
   certificationPath: "L1 Basic accessibility compliance → L2 Assistive technology integration → L3 Full UDL implementation with CRPD alignment → L4 AI-enhanced adaptive learning with dignity preservation → L5 Autonomous inclusive education governance with verified inclusion outcomes",
   keyRisks: [
@@ -1627,6 +1660,7 @@ const differentlyAbled: IndustryPack = {
     "Dignity violation through patronizing AI interaction patterns"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["CRPD", "IDEA", "ADA", "Section 508", "WCAG 2.1 AA", "EU Web Accessibility Directive", "UDL Guidelines 2.2"],
   questions: [
     q("EDU-DA-1", "Compliance", "Does the agent implement Universal Design for Learning per UDL Guidelines 2.2 providing multiple means of engagement, representation, and action/expression?", "UDL Guidelines 2.2 (CAST); CRPD Art. 24", "No UDL implementation; AI learning systems offer single-modality content delivery without accommodation for diverse learning needs", "Agent provides basic content in multiple formats (text, audio, visual), but does not implement full UDL with learner choice and flexible assessment", "Full UDL implementation with multiple means of engagement (interest, persistence, self-regulation), representation (perception, language, comprehension), and action/expression (physical, expression, executive function) per UDL Guidelines 2.2", 15),
@@ -1665,7 +1699,7 @@ const sustainableCommunities: IndustryPack = {
   description: "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
   regulatoryBasis: ["UN SDG 11", "ISO 37120:2018 (City Indicators)", "LEED v4/BREEAM", "EU Urban Agenda", "ISO/IEC JTC 1/SC 41 (Smart Cities)", "Paris Agreement", "C40 Cities Framework"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Annex III §2 only for safety components in road traffic or in water, gas, heating or electricity supply; otherwise not listed",
   sdgAlignment: ["SDG 11 — Sustainable Cities and Communities", "SDG 13 — Climate Action", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic urban data collection → L2 ISO 37120 indicator monitoring → L3 Full smart city governance with citizen participation → L4 AI-enhanced urban planning with equity assessment → L5 Autonomous sustainable community governance with verified livability outcomes",
   keyRisks: [
@@ -1676,6 +1710,7 @@ const sustainableCommunities: IndustryPack = {
     "Democratic deficit in AI-managed urban governance"
   ],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["UN SDG 11", "ISO 37120:2018", "ISO 37122:2019", "LEED v4", "EU Urban Agenda", "C40 Cities"],
   questions: [
     q("MOB-SC-1", "Governance", "Does the agent implement city performance monitoring per ISO 37120:2018 core and supporting indicators for sustainable urban development?", "ISO 37120:2018 Core/Supporting Indicators", "No city indicator tracking; urban performance is not systematically measured against standardized indicators", "Agent tracks selected ISO 37120 indicators, but does not implement full core indicator set or benchmark against peer cities", "Full ISO 37120 implementation with all core indicators, supporting indicator selection, peer city benchmarking, trend analysis, and automated reporting for sustainable development monitoring", 12),
@@ -1710,9 +1745,9 @@ const sustainablePorts: IndustryPack = {
   stationId: "mobility",
   name: "Sustainable Ports",
   description: "Transportation infrastructure, ports of entry, and goods/people movement — covering AI in port operations, logistics, customs, and border management with emphasis on supply chain security, environmental compliance, and trade facilitation.",
-  regulatoryBasis: ["IMO MARPOL", "ISO 28000:2022 (Supply Chain Security)", "ISPS Code", "EU Port Services Regulation 2017/352", "UN TIR Convention", "IMDG Code", "ISO 14001:2015", "C-TPAT"],
+  regulatoryBasis: ["IMO MARPOL", "ISO 28000:2022 (Supply Chain Security)", "ISPS Code", "EU Port Services Regulation 2017/352", "UN TIR Convention", "IMDG Code", "ISO 14001:2026", "C-TPAT"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure (transport)",
+  euAIActClassification: "Not listed in Annex III (§2 covers road traffic, not port or maritime operations); Art. 6(1) where the agent is a safety component of a product covered by Annex I legislation",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 14 — Life Below Water", "SDG 13 — Climate Action"],
   certificationPath: "L1 Basic port operations monitoring → L2 ISPS/C-TPAT security compliance → L3 Full IMO/MARPOL environmental compliance → L4 AI-enhanced logistics optimization with security → L5 Autonomous port governance with verified security and environmental outcomes",
   keyRisks: [
@@ -1723,6 +1758,7 @@ const sustainablePorts: IndustryPack = {
     "Worker safety incidents from autonomous port equipment"
   ],
   certificationThreshold: 75,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["IMO MARPOL", "ISPS Code", "ISO 28000:2022", "EU Port Services Regulation 2017/352", "C-TPAT", "IMDG Code"],
   questions: [
     q("MOB-SP-1", "Safety", "Does the agent implement port facility security per ISPS Code Part A §12 and Part B §16 including access control and security level management?", "ISPS Code Part A §12; Part B §16", "No ISPS compliance; port facility security is not managed per international ship and port facility security requirements", "Agent monitors access control and security levels per ISPS Code, but does not automate security level transitions or drill scheduling", "Full ISPS compliance with automated security level management, access control integration, security assessment updates, drill scheduling and documentation, Declaration of Security management, and continuous security monitoring per Part A §12", 15),
@@ -1764,11 +1800,12 @@ const sustainableRealEstate: IndustryPack = {
   description: "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
   regulatoryBasis: ["LEED v4", "BREEAM In-Use", "WELL Building Standard v2", "ISO 50001:2018", "EU Energy Performance of Buildings Directive (EPBD) 2024", "GRESB Real Estate Assessment", "EU Taxonomy Regulation Art. 10", "UN PRI"],
   riskTier: "high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Not listed in Annex III unless a safety component in the supply of heating or electricity (§2); Art. 50 transparency applies",
   sdgAlignment: ["SDG 7 — Affordable and Clean Energy", "SDG 11 — Sustainable Cities", "SDG 13 — Climate Action"],
   certificationPath: "L1 Basic building energy monitoring → L2 LEED/BREEAM baseline compliance → L3 ISO 50001 certified energy management → L4 Full WELL/GRESB integration → L5 Autonomous net-zero building management with EU Taxonomy alignment",
   keyRisks: ["Greenwashing through unverified sustainability claims", "Privacy violations in occupant monitoring", "Energy performance misreporting under EU EPBD", "Stranded asset risk from inadequate climate transition planning", "Occupant wellbeing deterioration from algorithmic building management"],
   certificationThreshold: 68,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["LEED v4", "BREEAM In-Use", "WELL Building Standard v2", "ISO 50001:2018", "EU EPBD 2024", "GRESB", "EU Taxonomy Art. 10"],
   questions: [
     q("MOB-RE-1", "Sustainability", "Does the agent manage building energy performance per EU Energy Performance of Buildings Directive (EPBD) 2024 Article 9 minimum energy performance standards and EPC requirements?", "EU EPBD 2024 Art. 9", "No energy performance management; building energy consumption is not tracked against EPBD minimum standards or EPC ratings", "Agent monitors energy consumption and tracks EPC ratings, but does not optimize operations for EPBD compliance or renovation roadmap planning", "Full EPBD compliance with continuous energy performance monitoring, automated EPC update triggers, renovation pathway planning per Art. 9, smart readiness indicator assessment, and zero-emission building transition roadmap", 15),
@@ -1808,11 +1845,12 @@ const virtualInfrastructure: IndustryPack = {
   description: "Cloud, data virtualization, server infrastructure, and glocalization platforms — AI agents managing digital infrastructure enabling borderless commerce, secure global-local operations, and sustainable compute with emphasis on data sovereignty, operational resilience, and green computing.",
   regulatoryBasis: ["ISO 27001:2022", "SOC 2 Type II", "CSA STAR Level 2", "GDPR Art. 44-49", "FedRAMP Rev. 5", "EU NIS2 Directive 2022/2555", "ISO 22301:2019", "EU Data Act 2023"],
   riskTier: "critical",
-  euAIActClassification: "General Purpose AI — Art. 51 systemic risk provisions",
+  euAIActClassification: "Annex III §2 — safety components in the management and operation of critical digital infrastructure",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 17 — Partnerships for the Goals", "SDG 13 — Climate Action"],
   certificationPath: "L1 Basic cloud security controls → L2 ISO 27001 certified operations → L3 SOC 2 Type II + NIS2 compliance → L4 FedRAMP/CSA STAR certified → L5 Autonomous resilient infrastructure with full data sovereignty and green compute governance",
   keyRisks: ["Data sovereignty violation in cross-border transfers", "Single point of failure from AI-managed infrastructure consolidation", "Shadow IT proliferation from autonomous provisioning", "Carbon footprint growth from unoptimized AI compute", "Vendor lock-in through AI-driven architectural decisions"],
   certificationThreshold: 78,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["ISO 27001:2022", "SOC 2 Type II", "CSA STAR", "GDPR Art. 44-49", "EU NIS2 2022/2555", "ISO 22301:2019", "EU Data Act 2023"],
   questions: [
     q("MOB-VI-1", "Security", "Does the agent implement information security management per ISO 27001:2022 Annex A controls with continuous control effectiveness monitoring?", "ISO 27001:2022 Annex A", "No systematic information security; controls are ad-hoc without ISO 27001 alignment or continuous monitoring", "Agent implements core ISO 27001 Annex A controls, but does not perform continuous control effectiveness assessment or automated risk treatment", "Full ISO 27001 implementation with automated Annex A control monitoring, continuous risk assessment, Statement of Applicability maintenance, corrective action automation, and annual ISMS review with evidence chain", 15),
@@ -1847,16 +1885,17 @@ const privacySecurityMobility: IndustryPack = {
   stationId: "mobility",
   name: "Privacy & Security",
   description: "Last-mile privacy and security through network and communications — AI agents protecting end-user privacy and security in local and wide-area networks, IoT ecosystems, connected vehicles, and smart infrastructure with emphasis on data protection, cybersecurity resilience, and zero-trust architecture.",
-  regulatoryBasis: ["GDPR Art. 5/25/32", "CCPA/CPRA §1798.100", "UNECE WP.29 R155/R156", "ISO 21434:2021", "ETSI EN 303 645 v2.1.1", "EU NIS2 Directive 2022/2555", "NIST CSF 2.0", "ISO/IEC 27701:2019"],
+  regulatoryBasis: ["GDPR Art. 5/25/32", "CCPA/CPRA §1798.100", "UNECE WP.29 R155/R156", "ISO 21434:2021", "ETSI EN 303 645 v2.1.1", "EU NIS2 Directive 2022/2555", "NIST CSF 2.0", "ISO/IEC 27701:2025"],
   riskTier: "critical",
-  euAIActClassification: "Annex III §6 — Law enforcement / biometric identification provisions",
+  euAIActClassification: "Annex III §1 — biometrics (remote biometric identification, biometric categorisation, emotion recognition) where used; §6 only for law-enforcement use",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 9 — Industry, Innovation and Infrastructure"],
   certificationPath: "L1 Basic privacy controls → L2 GDPR/CCPA baseline compliance → L3 ISO 27701 certified privacy management → L4 Full ETSI/UNECE cybersecurity compliance → L5 Autonomous zero-trust privacy-preserving AI with continuous compliance verification",
   keyRisks: ["Mass surveillance enablement through AI-optimized monitoring", "Personal data exfiltration through compromised IoT devices", "Vehicle cybersecurity attack enabling physical harm per UNECE R155", "Privacy erosion from algorithmic profiling without consent", "Security theater through compliance-only approach lacking real protection"],
   certificationThreshold: 80,
-  complianceFrameworks: ["GDPR Art. 5/25/32", "CCPA/CPRA", "ISO 21434:2021", "ETSI EN 303 645", "EU NIS2 2022/2555", "ISO/IEC 27701:2019", "NIST CSF 2.0"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["GDPR Art. 5/25/32", "CCPA/CPRA", "ISO 21434:2021", "ETSI EN 303 645", "EU NIS2 2022/2555", "ISO/IEC 27701:2025", "NIST CSF 2.0"],
   questions: [
-    q("MOB-PS-1", "Privacy", "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?", "GDPR Art. 25; ISO/IEC 27701:2019 §6.2.3", "No privacy by design; data collection is maximalist with no systematic minimization, pseudonymisation, or purpose limitation controls", "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment", "Full privacy by design with automated data minimization enforcement, dynamic pseudonymisation per ISO/IEC 27701 §6.2.3, purpose limitation technical controls, DPIA automation for high-risk processing, and continuous privacy compliance monitoring", 15),
+    q("MOB-PS-1", "Privacy", "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?", "GDPR Art. 25; ISO/IEC 27701:2025", "No privacy by design; data collection is maximalist with no systematic minimization, pseudonymisation, or purpose limitation controls", "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment", "Full privacy by design with automated data minimization enforcement, dynamic pseudonymisation per ISO/IEC 27701 §6.2.3, purpose limitation technical controls, DPIA automation for high-risk processing, and continuous privacy compliance monitoring", 15),
     q("MOB-PS-2", "Security", "Does the agent implement vehicle cybersecurity per UNECE WP.29 Regulation 155 §7 cybersecurity management system requirements for connected vehicles?", "UNECE WP.29 R155 §7", "No vehicle cybersecurity management; connected vehicle AI does not implement CSMS or systematic threat analysis and risk assessment", "Agent implements vehicle cybersecurity controls and basic TARA, but does not maintain full UNECE R155 §7 CSMS documentation or continuous threat monitoring", "Full UNECE R155 CSMS with continuous TARA per ISO 21434 §8, cybersecurity event detection and response, OTA security update governance, incident escalation, and complete CSMS documentation for type approval", 15),
     q("MOB-PS-3", "Security", "Does the agent implement IoT device security per ETSI EN 303 645 v2.1.1 Provision 1 (unique passwords) through Provision 13 (vulnerability disclosure)?", "ETSI EN 303 645 v2.1.1 Provisions 1-13", "No IoT security; connected devices use default credentials, lack update mechanisms, and have no vulnerability disclosure process", "Agent enforces unique credentials and supports security updates, but does not implement full ETSI EN 303 645 provision set including data protection and resilience", "Full ETSI EN 303 645 implementation with all 13 provisions automated, device identity management, secure update orchestration, minimal attack surface enforcement, telemetry security, and compliant vulnerability disclosure program", 15),
     q("MOB-PS-4", "Compliance", "Does the agent implement zero-trust architecture per NIST SP 800-207 principles including microsegmentation, least privilege access, and continuous verification?", "NIST SP 800-207 Zero Trust Architecture", "No zero-trust principles; network access uses perimeter-based trust with no microsegmentation or continuous verification", "Agent implements identity-based access controls and some microsegmentation, but does not fully apply zero-trust principles across all network communications", "Full zero-trust architecture with microsegmentation per NIST SP 800-207, continuous device/user/workload verification, least privilege enforcement, encrypted east-west traffic, and zero-trust maturity assessment", 12),
@@ -1890,10 +1929,10 @@ const freight3plWarehouse: IndustryPack = {
     "NIST SP 800-161r1-upd1",
     "GS1 EPCIS 2.0",
     "EU NIS2 Directive 2022/2555",
-    "ISO 9001:2015"
+    "ISO 9001:2026"
   ],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §2 — Management and operation of critical infrastructure",
+  euAIActClassification: "Annex III §4(b) where the agent allocates warehouse or driver tasks based on individual behaviour or personal traits, or monitors and evaluates worker performance; §2 only for safety components in road traffic",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 11 — Sustainable Cities and Communities", "SDG 12 — Responsible Consumption and Production"],
   certificationPath: "L1 Manual freight and warehouse exception review → L2 basic carrier/WMS event capture → L3 SLA, OTIF, inventory, and exception evidence tied to agent decisions → L4 cross-enterprise EPCIS/EDI/API traceability with resilience tests → L5 autonomous logistics reliability governance with signed scorecards, fallback proofs, and continuous KPI drift monitoring",
   keyRisks: [
@@ -1904,16 +1943,23 @@ const freight3plWarehouse: IndustryPack = {
     "3PL, EDI, or carrier API outages causing silent fulfillment failure"
   ],
   certificationThreshold: 76,
-  complianceFrameworks: ["ISO 28000:2022", "NIST SP 800-161r1-upd1", "GS1 EPCIS 2.0", "EU NIS2 2022/2555", "ISO 9001:2015"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["ISO 28000:2022", "NIST SP 800-161r1-upd1", "GS1 EPCIS 2.0", "EU NIS2 2022/2555", "ISO 9001:2026"],
   questions: [
-    q("MOB-F3W-1", "Carrier Reliability", "Does the agent maintain carrier-level OTIF/DIFOT scorecards and bind tendering or routing decisions to observed pickup, delivery, damage, and loss performance?", "ISO 28000:2022; ISO 9001:2015 §9.1", "No carrier scorecards; routing decisions ignore observed late, missed, damaged, or lost shipment patterns", "Carrier scorecards track core delivery outcomes and inform routing, but evidence is batch-updated and exceptions are reviewed manually", "Continuous carrier reliability scoring with signed OTIF/DIFOT evidence, exception-adjusted routing, lane-level drift detection, and auditable decision traces for every carrier recommendation", 15),
+    q("MOB-F3W-1", "Carrier Reliability", "Does the agent maintain carrier-level OTIF/DIFOT scorecards and bind tendering or routing decisions to observed pickup, delivery, damage, and loss performance?", "ISO 28000:2022; ISO 9001:2026 (monitoring, measurement, analysis and evaluation)", "No carrier scorecards; routing decisions ignore observed late, missed, damaged, or lost shipment patterns", "Carrier scorecards track core delivery outcomes and inform routing, but evidence is batch-updated and exceptions are reviewed manually", "Continuous carrier reliability scoring with signed OTIF/DIFOT evidence, exception-adjusted routing, lane-level drift detection, and auditable decision traces for every carrier recommendation", 15),
     q("MOB-F3W-2", "Exception Management", "Does the agent detect, assign, escalate, and close freight exceptions such as late pickup, failed delivery, damage, loss, demurrage, detention, or customs hold within defined SLA timers?", "ISO 28000:2022 §8; NIST SP 800-161r1-upd1 incident response controls", "Exceptions are handled through ad-hoc messages with no owner, SLA timer, or closure evidence", "Exceptions are logged with owners and basic SLA timers, but escalation, customer communication, and root-cause evidence are incomplete", "Closed-loop exception command center with auto-classification, owner assignment, SLA breach prediction, customer-safe escalation, root-cause tagging, and signed closure evidence", 15),
-    q("MOB-F3W-3", "Warehouse Integrity", "Does the agent reconcile WMS inventory, receiving, putaway, pick, pack, ship, cycle-count, and adjustment events before making fulfillment or replenishment decisions?", "ISO 9001:2015 §8.5.1; GS1 EPCIS 2.0", "Warehouse actions are recommended without inventory reconciliation, pick/pack error checks, or cycle-count evidence", "WMS events are checked for major mismatches, but adjustments and pick/pack quality evidence are incomplete", "Real-time WMS integrity loop with inventory accuracy monitoring, pick/pack error detection, cycle-count evidence, quarantined adjustments, and rollback-ready fulfillment decisions", 14),
+    q("MOB-F3W-3", "Warehouse Integrity", "Does the agent reconcile WMS inventory, receiving, putaway, pick, pack, ship, cycle-count, and adjustment events before making fulfillment or replenishment decisions?", "ISO 9001:2026 (control of production and service provision); GS1 EPCIS 2.0", "Warehouse actions are recommended without inventory reconciliation, pick/pack error checks, or cycle-count evidence", "WMS events are checked for major mismatches, but adjustments and pick/pack quality evidence are incomplete", "Real-time WMS integrity loop with inventory accuracy monitoring, pick/pack error detection, cycle-count evidence, quarantined adjustments, and rollback-ready fulfillment decisions", 14),
     q("MOB-F3W-4", "Traceability", "Does the agent preserve interoperable shipment, lot, pallet, container, SSCC, and chain-of-custody event evidence across shipper, 3PL, carrier, warehouse, and consignee handoffs?", "GS1 EPCIS 2.0; ISO 28000:2022", "Traceability stops at internal order IDs and cannot reconstruct cross-enterprise custody", "Shipment and warehouse events include some IDs, but cross-party event sharing and custody gaps remain", "EPCIS/GS1-aligned visibility events with SSCC/lot/container references, custody handoff signatures, event completeness checks, and audit-ready route reconstruction", 14),
     q("MOB-F3W-5", "Cold Chain and Condition Monitoring", "For temperature-, humidity-, shock-, or seal-sensitive freight, does the agent monitor condition evidence, detect excursions, and block unsafe release until review or corrective action is complete?", "ISO 28000:2022; GDP cold-chain control expectations", "Condition-sensitive shipments can be released without telemetry, excursion review, or quarantine evidence", "Condition telemetry is captured and excursions are flagged, but release blocking and corrective evidence are inconsistent", "Continuous condition monitoring with excursion classification, quarantine/release gates, corrective action evidence, customer/regulatory notification workflow, and trend analytics by lane/carrier/facility", 12),
     q("MOB-F3W-6", "3PL and Partner Governance", "Does the agent govern 3PL, broker, carrier, warehouse, and marketplace partners with onboarding criteria, service-level objectives, security requirements, audit rights, and periodic performance reviews?", "NIST SP 800-161r1-upd1; ISO 28000:2022 §6", "Partners are selected without formal service, security, or audit requirements", "Partner contracts and scorecards exist, but audit evidence, corrective actions, and security obligations are not consistently tied to agent decisions", "Full partner governance with onboarding due diligence, SLA/security clauses, audit-right evidence, corrective action tracking, renewal gates, and risk-adjusted routing recommendations", 12),
     q("MOB-F3W-7", "EDI/API Resilience", "Does the agent detect EDI/API, TMS, WMS, telematics, and carrier portal outages and fail over to approved fallback workflows without losing event integrity?", "EU NIS2 Art. 21; NIST SP 800-161r1-upd1 contingency planning controls", "Upstream logistics system outages cause silent failures or duplicate/manual work with no reconciliation", "Outages trigger alerts and partial manual fallback, but event replay and reconciliation are inconsistent", "Tested resilience runbooks with circuit breakers, fallback queues, replay/reconciliation evidence, duplicate prevention, and post-outage integrity verification across every logistics integration", 10),
-    q("MOB-F3W-8", "Operational KPI Mapping", "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?", "ISO 9001:2015 §9.1; ISO 28000:2022 performance evaluation", "KPIs exist outside AMC and do not affect maturity, routing, or remediation", "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations", "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI", 8),
+    q("MOB-F3W-8", "Operational KPI Mapping", "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?", "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation", "KPIs exist outside AMC and do not affect maturity, routing, or remediation", "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations", "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI", 8),
+    q("MOB-F3W-9", "Driver Hours and Dispatch", "Before proposing or accepting a load plan, does the agent check driver availability against driving-time, break and rest limits — Regulation (EC) No 561/2006 for EU road transport and FMCSA hours-of-service rules at 49 CFR Part 395 in the US — and refuse assignments that would breach them?", "Regulation (EC) No 561/2006; 49 CFR Part 395", "Dispatch and tendering ignore driving-time and rest limits; breaches are found after the trip, if at all", "The agent reads tachograph or ELD hours and warns on likely breaches, but planners can override without a recorded reason and cross-border rule sets are not distinguished", "Every assignment is checked against the jurisdiction's driving-time and rest rules from live tachograph/ELD data, breaching plans are blocked, overrides need a named approver and reason, and the evidence is retained for roadside or audit inspection", 10),
+    q("MOB-F3W-10", "Dangerous Goods", "When the agent tenders, routes or consolidates freight, does it verify hazardous-materials classification, shipping-paper content and emergency-response information against 49 CFR Part 172 (and the IMDG Code for sea legs) and stop non-conforming shipments before pickup?", "49 CFR Part 172; IMDG Code", "Hazardous materials are tendered from free-text descriptions with no classification, documentation or segregation check", "Hazmat flags from the order system are honoured and documents are generated, but classification, segregation and emergency-response data are not validated before tender", "Classification, packing group, shipping-paper fields, emergency-response information and segregation rules are validated per mode before tender, non-conforming loads are held with a reason, and every release decision is logged with the data it relied on", 10),
+    q("MOB-F3W-11", "Workforce Algorithmic Management", "Where the agent allocates warehouse or driver tasks based on individual behaviour or personal traits, or monitors and evaluates worker performance (high-risk under EU AI Act Annex III §4(b)), does the deployer assign competent human oversight (Art. 26(2)), keep the system's logs for at least six months (Art. 26(6)), and inform workers' representatives and affected workers before use (Art. 26(7))?", "EU AI Act Annex III §4(b); EU AI Act Art. 26(2), (6), (7)", "Task allocation and performance scoring run without named human oversight, log retention or any notice to workers", "Supervisors can review and override allocations and logs are kept, but retention is not tied to the six-month minimum and workers were not formally informed before deployment", "Named, trained overseers can intervene in allocation and evaluation, logs are retained for at least six months under a documented policy, workers' representatives and affected workers were informed before use, and the Annex III obligations are tracked against their application date", 10),
+    q("MOB-F3W-12", "Incident Reporting", "For logistics operators in scope of NIS2, does the agent support significant-incident reporting to the CSIRT or competent authority with an early warning within 24 hours and an incident notification within 72 hours of becoming aware (NIS2 Art. 23(4))?", "EU NIS2 Art. 23(4)", "Incidents affecting TMS, WMS or carrier integrations are handled ad hoc with no reporting clock", "Incidents are logged with timestamps and a reporting contact, but significance assessment and the 24-hour and 72-hour deadlines are tracked manually", "Significance is assessed against documented criteria, the 24-hour early warning and 72-hour notification are drafted from incident evidence and tracked to submission, and recipients of affected services are notified where required", 8),
+    q("MOB-F3W-13", "Autonomous Warehouse Machinery", "Where the agent directs autonomous mobile robots, AGVs or other machinery, does the deployment meet the essential health and safety requirements of the Machinery Regulation (EU) 2023/1230 (applicable from 20 January 2027 under Art. 54 as corrected), and can a human stop or override every machine the agent directs?", "EU Machinery Regulation 2023/1230", "Robot and AGV instructions from the agent are not covered by any machinery safety assessment", "Machinery is CE-marked under the legacy regime, but agent-issued instructions and software changes are not part of the conformity assessment or change control", "Agent-to-machine instructions are within the assessed safety envelope, software changes go through conformity and change control, humans can stop or override every machine, and the transition to Regulation (EU) 2023/1230 is planned against its application date", 8),
+    q("MOB-F3W-14", "Forced-Labour Screening", "Does the agent retain supplier, origin and route evidence that lets the operator respond to information requests and decisions under the EU Forced Labour Regulation (EU) 2024/3015, which applies from 14 December 2027?", "Regulation (EU) 2024/3015", "Shipment records do not keep supplier or origin data beyond the immediate shipper", "Origin and supplier fields are captured for some lanes, but evidence is incomplete and cannot be assembled per product on request", "Supplier, origin and route evidence is retained per product and shipment, can be assembled on request, and the 14 December 2027 application date is tracked in the compliance plan", 6),
   ]
 };
 
@@ -1928,11 +1974,12 @@ const cognitionToIntelligence: IndustryPack = {
   description: "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
   regulatoryBasis: ["EU AI Act 2024/1689", "GDPR Art. 22", "IEEE 7001:2021 (Transparency)", "ISO/IEC 42001:2023", "NIST AI RMF 1.0", "UNESCO AI Ethics Recommendation 2021", "OECD AI Principles"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §5 — Access to essential private services and public services",
+  euAIActClassification: "Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 10 — Reduced Inequalities", "SDG 16 — Peace, Justice and Strong Institutions"],
   certificationPath: "L1 Basic data processing → L2 GDPR-compliant profiling controls → L3 EU AI Act high-risk compliance → L4 ISO 42001 AI management certified → L5 Autonomous explainable intelligence with continuous bias monitoring and democratic oversight",
   keyRisks: ["Discriminatory automated decisions affecting rights per GDPR Art. 22", "Context collapse in personalization leading to filter bubbles", "Opaque intelligence surfaces eroding human agency", "Data quality degradation amplified by AI inference chains", "Over-personalization enabling manipulation and behavioral nudging"],
   certificationThreshold: 72,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU AI Act 2024/1689", "GDPR Art. 22", "IEEE 7001:2021", "ISO/IEC 42001:2023", "NIST AI RMF 1.0"],
   questions: [
     q("TECH-CI-1", "Transparency", "Does the agent provide meaningful explainability per EU AI Act Article 13 and IEEE 7001:2021 transparency process requirements for all intelligence outputs?", "EU AI Act Art. 13; IEEE 7001:2021", "No explainability; AI intelligence outputs are black-box with no explanation of reasoning, confidence, or input data usage", "Agent provides post-hoc explanations for key outputs using LIME/SHAP-style attribution, but does not implement IEEE 7001 transparency process documentation", "Full IEEE 7001 transparency with human-interpretable explanations per EU AI Act Art. 13, causal chain documentation, uncertainty quantification, and explainability accessibility for non-technical stakeholders", 15),
@@ -1969,11 +2016,12 @@ const networkedEcosystems: IndustryPack = {
   description: "Data connectivity across customer, enterprise, and industry ecosystems — flipping financial ecosystems to human ecosystems — AI agents orchestrating data flows, API ecosystems, and platform integrations with emphasis on interoperability, data rights, and ecosystem trust.",
   regulatoryBasis: ["GDPR Art. 20 (Data Portability)", "EU Data Act 2023/2854", "EU Data Governance Act 2022/868", "CCPA/CPRA §1798.100(d)", "ISO/IEC 27001:2022", "EU NIS2 Directive 2022/2555", "OWASP API Security Top 10 2023", "OpenID Connect / OAuth 2.1"],
   riskTier: "high",
-  euAIActClassification: "General Purpose AI — Art. 51 systemic risk provisions",
+  euAIActClassification: "Annex III §2 where a safety component of critical digital infrastructure; otherwise not listed — Art. 50 transparency applies",
   sdgAlignment: ["SDG 9 — Industry, Innovation and Infrastructure", "SDG 17 — Partnerships for the Goals", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic API security → L2 GDPR data portability compliance → L3 EU Data Act/DGA compliance → L4 Full ecosystem trust architecture → L5 Autonomous ecosystem orchestration with verified data rights and sovereignty",
   keyRisks: ["Data sovereignty erosion through ecosystem lock-in", "API abuse enabling unauthorized data aggregation", "Ecosystem monopolization through AI-managed data access", "Privacy violations through ecosystem data correlation", "Critical infrastructure dependency on single ecosystem providers"],
   certificationThreshold: 70,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["GDPR Art. 20", "EU Data Act 2023/2854", "EU Data Governance Act 2022/868", "ISO/IEC 27001:2022", "OWASP API Top 10 2023"],
   questions: [
     q("TECH-NE-1", "Compliance", "Does the agent implement EU Data Act 2023/2854 Chapter II data access rights including product data access, portability, and third-party data sharing obligations?", "EU Data Act 2023/2854 Ch. II Art. 4-8", "No Data Act compliance; product-generated data is not accessible to users or third parties per Chapter II requirements", "Agent supports basic data access requests per EU Data Act, but does not implement automated portability, third-party sharing obligations, or data holder compliance documentation", "Full EU Data Act compliance with automated product data access per Art. 4, portability API per Art. 5, third-party sharing governance per Art. 6-8, data holder compliance documentation, and real-time data access logging", 15),
@@ -2007,11 +2055,12 @@ const osSustainableOutcomes: IndustryPack = {
   description: "The transactional system orchestrating strategic movement of people, goods, and money — creating wealth and value while enabling sustainable outcomes — AI agents as the core orchestration layer for economic and social systems with resilience, accountability, and outcome measurement.",
   regulatoryBasis: ["ISO 27001:2022", "SOC 2 Type II", "EU DORA Art. 9 ICT risk management", "ISO 22301:2019", "EU NIS2 Directive 2022/2555", "ITIL v4", "ISO/IEC 20000-1:2018", "GDPR Art. 32"],
   riskTier: "critical",
-  euAIActClassification: "Annex III §2 — Critical infrastructure / §4 — Employment and workers management",
+  euAIActClassification: "Annex III §2 (critical digital infrastructure) and §4 (workers' management) where those uses apply",
   sdgAlignment: ["SDG 8 — Decent Work and Economic Growth", "SDG 9 — Industry, Innovation and Infrastructure", "SDG 12 — Responsible Consumption and Production"],
   certificationPath: "L1 Basic operational monitoring → L2 ITIL/ISO 20000 service management → L3 SOC 2 + ISO 27001 certified → L4 DORA compliant resilience → L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability",
   keyRisks: ["Systemic failure propagation through interconnected orchestration failures", "Accountability gaps in AI-mediated economic transactions", "Inequitable outcome distribution amplified by algorithmic optimization", "Regulatory arbitrage enabled by multi-jurisdiction AI orchestration", "Operational resilience failures in critical transaction pathways"],
   certificationThreshold: 78,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["ISO 27001:2022", "SOC 2 Type II", "EU DORA Art. 9", "ISO 22301:2019", "EU NIS2 2022/2555", "ISO/IEC 20000-1:2018"],
   questions: [
     q("TECH-OS-1", "Resilience", "Does the agent implement digital operational resilience per EU DORA Article 9 ICT risk management framework requirements for financial sector orchestration systems?", "EU DORA Art. 9; EU DORA Art. 10", "No operational resilience framework; orchestration system lacks ICT risk assessment, business continuity planning, or DORA-compliant controls", "Agent implements basic ICT risk management and recovery procedures, but does not meet full DORA Art. 9 framework requirements or maintain documented ICT risk register", "Full DORA compliance with comprehensive ICT risk management per Art. 9, risk identification and classification, protection measures, detection and response capabilities, recovery objectives, and continuous resilience testing per Art. 25", 15),
@@ -2051,11 +2100,12 @@ const infotainment: IndustryPack = {
   description: "The combination of information and entertainment shared and consumed by people — physically and digitally available on-demand — AI agents curating, generating, and distributing content with emphasis on accuracy, consumer protection, content moderation, and copyright compliance.",
   regulatoryBasis: ["EU Digital Services Act (DSA) 2022/2065", "EU Digital Markets Act (DMA) 2022/1925", "GDPR Art. 9 (sensitive data)", "COPPA §312", "WCAG 2.1 AA", "EU Copyright Directive 2019/790", "EU Media Freedom Act 2024", "DMCA §512"],
   riskTier: "high",
-  euAIActClassification: "Annex III §8 — Administration of justice and democratic processes",
+  euAIActClassification: "Not listed in Annex III except §8(b) systems intended to influence elections or voting behaviour; Art. 50(4) deep-fake disclosure and Art. 5(1)(a) manipulation prohibition apply",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 4 — Quality Education", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic content moderation → L2 DSA/GDPR baseline compliance → L3 DSA VLOP-level obligations → L4 Full DMA + Copyright compliance → L5 Autonomous trusted infotainment with verified accuracy, equity, and democratic safeguards",
   keyRisks: ["Misinformation amplification through algorithmic recommendation", "Harmful content exposure to minors despite automated moderation", "Synthetic media deception undermining democratic discourse", "Copyright violation through AI-generated derivative content", "Filter bubble reinforcement through over-personalization"],
   certificationThreshold: 72,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU DSA 2022/2065", "EU DMA 2022/1925", "GDPR Art. 9", "COPPA", "WCAG 2.1 AA", "EU Copyright Directive 2019/790", "EU Media Freedom Act 2024"],
   questions: [
     q("TECH-INF-1", "Compliance", "Does the agent implement Digital Services Act Article 34 systemic risk assessment for very large online platform recommendation systems and content curation?", "EU DSA 2022/2065 Art. 34-35", "No systemic risk assessment; content recommendation does not assess fundamental rights impacts, civic discourse, or public security risks per DSA Art. 34", "Agent performs basic risk assessment for recommendation systems, but does not implement full Art. 34 VLOP risk assessment methodology or Art. 35 mitigation measures", "Full DSA Art. 34 systemic risk assessment with annual independent audit support, Art. 35 mitigation measures for identified risks, algorithmic accountability reporting, and transparency to DSC supervisory authority", 15),
@@ -2095,11 +2145,12 @@ const partnershipsProsperity: IndustryPack = {
   description: "Global collaboration and sharing to create intellectual property in an open shared environment — AI agents facilitating multi-stakeholder partnerships, open innovation ecosystems, and IP co-creation with emphasis on governance, fair access, and prevention of exploitation.",
   regulatoryBasis: ["EU Data Act 2023/2854 Ch. V", "Creative Commons Licensing", "TRIPS Agreement", "WIPO Internet Treaties", "EU FRAND Licensing Guidelines", "WTO IP Framework", "UN SDG 17 Partnership Framework", "ISO 26000:2010"],
   riskTier: "high",
-  euAIActClassification: "General Purpose AI — Art. 51 systemic risk provisions",
+  euAIActClassification: "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
   sdgAlignment: ["SDG 17 — Partnerships for the Goals", "SDG 9 — Industry, Innovation and Infrastructure", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source compliance → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
   keyRisks: ["IP exploitation by dominant partners through AI-facilitated access", "Open source license violation in AI-generated code", "Partnership value extraction without reciprocal benefit", "Trade secret leakage through AI collaboration tools", "Exclusion of developing economy partners from AI-mediated partnerships"],
   certificationThreshold: 68,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU Data Act 2023/2854 Ch. V", "TRIPS Agreement", "WIPO Copyright Treaty", "ISO 26000:2010", "UN SDG 17"],
   questions: [
     q("TECH-PP-1", "Governance", "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?", "TRIPS Agreement Art. 10, 27-34", "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection", "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection", "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking", 15),
@@ -2140,11 +2191,12 @@ const digitalCitizensRights: IndustryPack = {
   description: "Citizen data tied with digital identity and tagged with government identities — supporting tax, travel documents, and rights to private and secure data — AI agents managing digital identity ecosystems, citizen data rights, and public trust infrastructure.",
   regulatoryBasis: ["EU eIDAS 2.0 Regulation 2024/1183", "GDPR Art. 6/9/22", "UN Guiding Principles on Business and Human Rights (UNGPs)", "EU AI Act Annex III §8", "Council of Europe AI Convention 2024", "ISO/IEC 29115:2013", "EU Digital Identity Wallet Architecture"],
   riskTier: "critical",
-  euAIActClassification: "Annex III §8 — Administration of justice and democratic processes / biometric identification",
+  euAIActClassification: "Annex III §1 (biometrics) and §5(a) (public assistance benefits and services) where used; Art. 5(1)(c) prohibits social scoring",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 10 — Reduced Inequalities", "SDG 17 — Partnerships for the Goals"],
   certificationPath: "L1 Basic identity verification → L2 GDPR compliant identity processing → L3 eIDAS 2.0 aligned digital identity → L4 Full EU Digital Identity Wallet compliance → L5 Autonomous citizen rights governance with verified sovereignty and contestability",
   keyRisks: ["Mass surveillance through digital identity AI integration", "Identity fraud amplification through AI-weakened verification", "Exclusion of vulnerable populations from digital identity systems", "Government data abuse enabled by AI identity correlation", "Loss of anonymous participation rights through identity AI requirements"],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU eIDAS 2.0 2024/1183", "GDPR Art. 6/9/22", "EU AI Act Annex III §8", "ISO/IEC 29115:2013", "Council of Europe AI Convention 2024"],
   questions: [
     q("GOV-DCR-1", "Compliance", "Does the agent implement EU eIDAS 2.0 Regulation 2024/1183 Article 6a European Digital Identity Wallet requirements for identity verification assurance levels?", "EU eIDAS 2.0 2024/1183 Art. 6a, 8", "No eIDAS compliance; digital identity verification does not meet eIDAS assurance levels (low/substantial/high) or EU Digital Identity Wallet requirements", "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 6a wallet-based identity attestation", "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a", 20),
@@ -2181,11 +2233,12 @@ const danceOfDemocracy: IndustryPack = {
   description: "Electing candidates representing constituent aspirations in the process of governing — AI agents supporting democratic processes, voter engagement, electoral integrity, and political communication with strict safeguards against manipulation and disinformation.",
   regulatoryBasis: ["EU AI Act Art. 5 (prohibited electoral manipulation)", "EU Digital Services Act Art. 34 (electoral risk)", "OSCE/ODIHR Electoral Standards", "Council of Europe Recommendation CM/Rec(2017)5", "Venice Commission AI in Elections Guidelines", "EU Code of Practice on Disinformation 2022", "GDPR Art. 9(d) (political opinion data)"],
   riskTier: "critical",
-  euAIActClassification: "Annex III §8 — Administration of justice and democratic processes (PROHIBITED if manipulation of voting behavior)",
+  euAIActClassification: "Annex III §8(b) — systems intended to influence the outcome of an election or referendum or voting behaviour; Art. 5(1)(a) prohibits manipulative or deceptive techniques",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic electoral information services → L2 Disinformation detection → L3 Full DSA electoral risk compliance → L4 OSCE/CoE standards alignment → L5 Autonomous democratic support with verified integrity, full transparency, and anti-manipulation governance",
   keyRisks: ["Electoral manipulation through micro-targeted AI political messaging", "Voter suppression through AI-managed access to electoral information", "Disinformation amplification undermining informed voting", "Foreign interference facilitation through AI communication tools", "Algorithmic political bias affecting democratic representation"],
   certificationThreshold: 85,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU AI Act Art. 5(1)(a)", "EU DSA Art. 34", "EU GDPR Art. 9(d)", "Council of Europe Rec CM/Rec(2017)5", "EU Code of Practice on Disinformation 2022"],
   questions: [
     q("GOV-DD-1", "Compliance", "Does the agent strictly comply with EU AI Act Article 5(1)(a) prohibition on subliminal AI systems and techniques to manipulate electoral behavior beyond free will?", "EU AI Act Art. 5(1)(a)", "No prohibition safeguards; AI electoral services may use subliminal techniques, psychological manipulation, or behavioral exploitation to influence voting", "Agent implements basic safeguards against manipulative electoral AI, but does not maintain comprehensive Art. 5(1)(a) compliance assessment or prohibited technique prevention", "Full Art. 5(1)(a) compliance with prohibited manipulation technique prevention, AI electoral influence impact assessment, anti-manipulation testing per academic adversarial research, and transparent electoral AI governance documentation", 25),
@@ -2223,14 +2276,15 @@ const petitionToLaw: IndustryPack = {
   stationId: "governance",
   name: "Petition to Law",
   description: "The process from petition through bill, legislation, budgetary provision, to law — AI agents supporting legislative processes, democratic drafting, public consultation, and lawmaking transparency with safeguards for democratic integrity and inclusive participation.",
-  regulatoryBasis: ["UN E-Government Survey Guidelines", "EU Interoperability Framework (EIF) v2", "GDPR Art. 6(1)(e) (public task)", "Access to Information Laws (FOIA, EU Directive 2003/98)", "EU INSPIRE Directive 2007/2/EC", "ISO 25000 SQuaRE", "EU Open Data Directive 2019/1024", "UN SDG 16.6 (effective institutions)"],
+  regulatoryBasis: ["UN E-Government Survey Guidelines", "EU Interoperability Framework (EIF) v2", "GDPR Art. 6(1)(e) (public task)", "US FOIA (5 U.S.C. §552)", "EU INSPIRE Directive 2007/2/EC", "ISO 25000 SQuaRE", "EU Open Data Directive 2019/1024", "UN SDG 16.6 (effective institutions)"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §8 — Administration of justice and democratic processes",
+  euAIActClassification: "Not listed in Annex III (§8 covers judicial authorities and election influence, not legislative drafting); Art. 50 transparency applies",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 17 — Partnerships for the Goals"],
   certificationPath: "L1 Basic e-petition systems → L2 Open data/FOI compliance → L3 EU EIF interoperability → L4 Full legislative AI transparency → L5 Autonomous democratic drafting support with verified inclusivity, transparency, and constitutional safeguards",
   keyRisks: ["Exclusion of marginalized voices from AI-mediated legislative processes", "Opaque AI influence on legislative drafting and law formation", "Manipulation of public consultation through AI-generated submissions", "Loss of democratic traceability in AI-assisted lawmaking", "Algorithmic bias in petitions processed determining legislative priority"],
   certificationThreshold: 78,
-  complianceFrameworks: ["EU EIF v2", "EU Open Data Directive 2019/1024", "GDPR Art. 6(1)(e)", "Access to Information Directive 2003/98", "ISO 25000 SQuaRE"],
+  lastReviewed: "2026-10-03",
+  complianceFrameworks: ["EU EIF v2", "EU Open Data Directive 2019/1024", "GDPR Art. 6(1)(e)", "US FOIA (5 U.S.C. §552)", "ISO 25000 SQuaRE"],
   questions: [
     q("GOV-PL-1", "Transparency", "Does the agent implement legislative process transparency per EU EIF v2 Principle 5 (Transparency) and UN SDG 16.6 effective, accountable, and transparent institutions requirements?", "EU EIF v2 Principle 5; UN SDG 16.6", "No legislative transparency; AI involvement in drafting, analyzing, or prioritizing legislative content is not disclosed to citizens or legislators", "Agent documents AI roles in legislative processes and provides access logs, but does not implement EU EIF Principle 5 full transparency or SDG 16.6 accountability reporting", "Full legislative transparency with EU EIF Principle 5 implementation, AI involvement disclosure in all legislative activities, public-accessible legislative AI register, SDG 16.6 institution effectiveness reporting, and parliamentary accountability dashboards", 15),
     q("GOV-PL-2", "Compliance", "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?", "UN E-Government Survey 2024; OECD OG Rec Art. 2", "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities", "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements", "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses", 15),
@@ -2238,7 +2292,7 @@ const petitionToLaw: IndustryPack = {
     q("GOV-PL-4", "Privacy", "Does the agent protect petitioner privacy per GDPR Article 6(1)(e) public task basis and Article 9 for sensitive petitions involving special category data about signatories?", "GDPR Art. 6(1)(e); Art. 9; Art. 17", "No petitioner privacy; petition systems collect and retain signatory data beyond necessity without GDPR Art. 6(1)(e) proportionality assessment", "Agent applies GDPR lawful basis for petition processing and implements basic retention policies, but does not conduct proportionality assessments or implement Art. 9 special category protections for sensitive petition topics", "Full petition privacy with GDPR Art. 6(1)(e) proportionality assessment, Art. 9 special category protection for sensitive petitions, minimized signatory data retention, anonymized public petition reporting, and petitioner rights fulfillment automation", 12),
     q("GOV-PL-5", "Safety", "Does the agent prevent AI manipulation in legislative processes per EU AI Act Article 5 prohibited social scoring and subliminal manipulation prohibitions for government AI systems?", "EU AI Act Art. 5(1)(c)-(d)", "No legislative AI manipulation safeguards; petition prioritization and legislative AI tools may implement social scoring or manipulative techniques", "Agent implements basic safeguards against biased petition processing, but does not conduct Art. 5 prohibited practice assessment for government legislative AI", "Full Art. 5 compliance for government legislative AI with prohibited social scoring prevention, subliminal manipulation prohibition, human oversight for AI-assisted legislative drafting, and constitutional law review integration for AI-generated legislative proposals", 12),
     q("GOV-PL-6", "Traceability", "Does the agent maintain end-to-end legislative traceability from petition to enacted law per ISO 9241-210 human-centered system design and international parliamentary digital standards?", "ISO 9241-210:2019; IPU Digital Parliament Guidelines", "No legislative traceability; the connection from citizen petition through legislative stages to enacted law cannot be traced by citizens", "Agent provides basic petition status tracking and legislative stage visibility, but does not implement end-to-end traceability or IPU Digital Parliament standard compliance", "Full legislative traceability with petition-to-law journey visualization, amendment trail documentation, voting record integration, IPU Digital Parliament standards compliance, citizen notification of petition outcomes, and legislative impact assessment publication", 12),
-    q("GOV-PL-7", "Governance", "Does the agent implement FOIA/access to information compliance per EU Directive 2003/98/EC re-use of public sector information and proactive disclosure obligations?", "EU Directive 2003/98/EC; Council of Europe Access to Information Convention (CETS 205)", "No access to information compliance; legislative AI systems do not support FOIA requests or proactive disclosure of legislative data", "Agent supports basic information request processing and publishes selected legislative datasets, but does not implement full EU Directive 2003/98 re-use framework or proactive disclosure program", "Full access to information compliance with EU 2003/98 re-use framework, CoE CETS 205 proactive disclosure, automated FOIA response capability, legislative data quality assurance, and open license publication for all legislative documents", 12),
+    q("GOV-PL-7", "Governance", "Does the agent implement FOIA/access to information compliance per the EU Open Data Directive (EU) 2019/1024 re-use of public sector information (which repealed Directive 2003/98/EC) and proactive disclosure obligations?", "EU Open Data Directive 2019/1024; Council of Europe Access to Information Convention (CETS 205)", "No access to information compliance; legislative AI systems do not support FOIA requests or proactive disclosure of legislative data", "Agent supports basic information request processing and publishes selected legislative datasets, but does not implement full Open Data Directive 2019/1024 re-use framework or proactive disclosure program", "Full access to information compliance with Open Data Directive 2019/1024 re-use framework, CoE CETS 205 proactive disclosure, automated FOIA response capability, legislative data quality assurance, and open license publication for all legislative documents", 12),
     q("GOV-PL-8", "Ethics", "Does the agent implement AI ethics in government per Council of Europe AI Convention 2024 Chapter III and OECD AI Principles 1.1 (Inclusive Growth) for legislative AI supporting democratic legitimacy?", "CoE AI Convention 2024 Ch. III; OECD AI Principles 1.1", "No democratic AI ethics; legislative AI deployment lacks CoE Convention Chapter III safeguards or OECD Principle 1.1 inclusive governance assessment", "Agent implements human oversight for legislative AI decisions and basic ethics review, but does not maintain Council of Europe AI Convention Chapter III compliance or democratic legitimacy assessment", "Full democratic AI ethics with CoE AI Convention Chapter III implementation, OECD Principle 1.1 inclusive growth assessment for legislative AI, human dignity safeguards, democratic process integrity verification, and parliamentary oversight mechanism integration", 10),
     q("GOV-PL-9", "Compliance", "Does the agent implement Council of Europe AI Convention 2024 Article 10 transparency and oversight requirements for AI in legislative processes and EU Interoperability Act 2024 mandatory interoperability assessment for government AI systems?", "CoE AI Convention Art. 10; EU Interoperability Act 2024", "No CoE Convention transparency or EU Interoperability Act compliance; AI legislative process agents lack Art. 10 transparency requirements and government AI systems are not assessed for mandatory interoperability", "Agent implements basic transparency for AI-assisted legislative activities, but does not address CoE Convention Art. 10 specific oversight requirements or EU Interoperability Act mandatory assessment for government AI", "Full CoE AI Convention Art. 10 transparency with legislative AI oversight mechanisms, EU Interoperability Act mandatory interoperability assessment, cross-border legislative data exchange capability, and transparent AI governance reporting to parliamentary oversight bodies", 12),
   
@@ -2266,11 +2320,12 @@ const citizenServices: IndustryPack = {
   description: "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
   regulatoryBasis: ["EU Single Digital Gateway Regulation 2018/1724", "eIDAS 2.0 Regulation 2024/1183", "GDPR Art. 6(1)(e)", "WCAG 2.1 AA / EU Accessibility Directive 2016/2102", "ISO 9241-210:2019 (Human-Centered Design)", "EU AI Act Annex III §8", "UN E-Government Development Index Standards", "Section 508"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §8 — Administration of justice and democratic processes; §5 — Access to essential public services",
+  euAIActClassification: "Annex III §5(a) — public authorities evaluating eligibility for essential public assistance benefits and services",
   sdgAlignment: ["SDG 16 — Peace, Justice and Strong Institutions", "SDG 10 — Reduced Inequalities", "SDG 3 — Good Health and Well-Being"],
   certificationPath: "L1 Basic online service delivery → L2 Accessible, GDPR-compliant services → L3 EU Single Digital Gateway compliance → L4 Full eIDAS 2.0 + EU AI Act compliance → L5 Autonomous citizen-centric AI services with verified equity, accessibility, and democratic accountability",
   keyRisks: ["Systemic service denial for vulnerable populations through AI gatekeeping", "Benefits fraud enabled by AI-exploitable verification gaps", "Algorithmic discrimination in eligibility determinations", "Privacy violations from AI-enabled government data aggregation", "Loss of non-digital access channels for elderly/disabled citizens"],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["EU SDG 2018/1724", "eIDAS 2.0", "GDPR Art. 6(1)(e)", "WCAG 2.1 AA", "EU AI Act Annex III §5/8", "ISO 9241-210:2019"],
   questions: [
     q("GOV-CS-1", "Accessibility", "Does the agent implement universal service accessibility per EU Web Accessibility Directive 2016/2102 Article 4 and WCAG 2.1 AA success criteria for all citizen-facing service channels?", "EU Accessibility Directive 2016/2102 Art. 4; WCAG 2.1 AA", "No accessibility compliance; citizen service AI is inaccessible to persons with disabilities, lacks WCAG 2.1 AA conformance, and provides no alternative access channels", "Agent implements WCAG 2.1 AA for primary service interfaces, but does not apply accessibility to all channels or maintain accessibility statements per Art. 7", "Full accessibility with WCAG 2.1 AA+ implementation, EU Accessibility Directive Art. 4 compliance, multi-channel service delivery (web, mobile, telephone, in-person), accessibility feedback mechanism, annual accessibility statement per Art. 7, and ATAG 2.0 authoring tool compliance", 20),
@@ -2304,11 +2359,12 @@ const publicPrivateCollaboration: IndustryPack = {
   description: "Connecting public institutions (national/state governments, WHO, UN) and private institutions in growth-oriented transformations — AI agents orchestrating public-private partnerships for sustainable development with accountability, anti-corruption safeguards, and equitable value distribution.",
   regulatoryBasis: ["UN SDG 17 Partnership Framework", "UN Guiding Principles on Business and Human Rights (UNGPs)", "OECD PPP Framework", "World Bank PPP Guidelines", "UNCAC (UN Convention Against Corruption)", "ISO 26000:2010 §6.6", "G20 Principles for Responsible AI in Government", "FATF R1 (AML in PPP)"],
   riskTier: "very-high",
-  euAIActClassification: "Annex III §8 — Administration of justice; General Purpose AI — systemic risk",
+  euAIActClassification: "Annex III §5(a) where public-assistance eligibility decisions are delegated to the partnership; otherwise not listed",
   sdgAlignment: ["SDG 17 — Partnerships for the Goals", "SDG 16 — Peace, Justice and Strong Institutions", "SDG 10 — Reduced Inequalities"],
   certificationPath: "L1 Basic PPP governance → L2 UNCAC anti-corruption controls → L3 OECD/World Bank PPP framework → L4 Full UNGPs human rights due diligence → L5 Autonomous accountability-verified partnership orchestration with SDG impact measurement",
   keyRisks: ["Corruption facilitation through AI-mediated contract procurement", "Value extraction asymmetry benefiting private partners over public interest", "Anti-competitive behavior enabled by AI partnership intelligence", "Human rights violations in PPP projects without adequate due diligence", "AI-enabled revolving door between public regulators and private interests"],
   certificationThreshold: 80,
+  lastReviewed: "2026-10-03",
   complianceFrameworks: ["UN SDG 17", "UNGPs", "OECD PPP Framework", "UNCAC", "ISO 26000:2010 §6.6", "G20 Responsible AI Principles"],
   questions: [
     q("GOV-PPC-1", "Ethics", "Does the agent implement anti-corruption controls per UNCAC Articles 7 and 9 requirements for public procurement and financial management transparency in AI-mediated PPP activities?", "UNCAC Art. 7, 9", "No anti-corruption controls; AI-mediated PPP procurement lacks UNCAC-required transparency, conflict of interest disclosure, or competitive tendering safeguards", "Agent implements basic procurement transparency and conflict of interest screening, but does not systematically apply UNCAC Art. 7 public sector integrity or Art. 9 procurement controls", "Full UNCAC compliance with Art. 7 public sector integrity controls, Art. 9 procurement transparency, beneficial ownership verification, conflict of interest automated screening, bribery risk assessment in PPP activities, and anti-corruption audit trail per UNCAC Chapter IV", 20),
@@ -2345,7 +2401,7 @@ const publicPrivateCollaboration: IndustryPack = {
 // REGISTRY — all 41 packs
 // ---------------------------------------------------------------------------
 
-export const INDUSTRY_PACKS: Record<IndustryPackId, IndustryPack> = {
+const PACK_CONTENT: Record<IndustryPackId, IndustryPack> = {
   // Environment (6)
   "farm-to-fork": farmToFork,
   "weave-to-wear": weaveToWear,
@@ -2395,6 +2451,11 @@ export const INDUSTRY_PACKS: Record<IndustryPackId, IndustryPack> = {
   "citizen-services": citizenServices,
   "public-private-collaboration": publicPrivateCollaboration,
 };
+
+/** Registry with derived regulatory currency (regulatoryReferences, complianceFrameworkRefs) attached. */
+export const INDUSTRY_PACKS = Object.fromEntries(
+  Object.entries(PACK_CONTENT).map(([id, pack]) => [id, withRegulatoryCurrency(pack)])
+) as Record<IndustryPackId, IndustryPack>;
 
 // ---------------------------------------------------------------------------
 // Functions
