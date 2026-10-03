@@ -1,4 +1,4 @@
-import type { ComplianceMapping, ComplianceMapsFile } from "./mappingSchema.js";
+import type { ComplianceMapping, ComplianceMappingSource, ComplianceMapsFile } from "./mappingSchema.js";
 
 function mapping(params: ComplianceMapping): ComplianceMapping {
   return params;
@@ -9,6 +9,28 @@ const commonSecurityDenylist = [
   "EXECUTE_WITHOUT_TICKET_ATTEMPTED",
   "LEASE_INVALID_OR_MISSING"
 ];
+
+// Official texts the DORA, NIS2 and HTI-1 clauses below were read from on retrievedAt.
+const DORA_TEXT: ComplianceMappingSource = {
+  title: "Regulation (EU) 2022/2554 (DORA), OJ L 333, 27.12.2022 — EU Publications Office",
+  url: "https://publications.europa.eu/resource/celex/32022R2554",
+  retrievedAt: "2026-10-03"
+};
+const NIS2_TEXT: ComplianceMappingSource = {
+  title: "Directive (EU) 2022/2555 (NIS 2 Directive), OJ L 333, 27.12.2022 — EU Publications Office",
+  url: "https://publications.europa.eu/resource/celex/32022L2555",
+  retrievedAt: "2026-10-03"
+};
+const HTI1_CFR_TEXT: ComplianceMappingSource = {
+  title: "45 CFR 170.315(b)(11) Decision support interventions — eCFR, point-in-time 2026-10-01",
+  url: "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-D/part-170/subpart-C/section-170.315",
+  retrievedAt: "2026-10-03"
+};
+const HTI1_RULE: ComplianceMappingSource = {
+  title: "HTI-1 final rule, 89 FR 1192 (2024-01-09), effective 2024-02-08",
+  url: "https://www.federalregister.gov/documents/2024/01/09/2023-28857/health-data-technology-and-interoperability-certification-program-updates-algorithm-transparency-and",
+  retrievedAt: "2026-10-03"
+};
 
 export const builtInComplianceMappings: ComplianceMapping[] = [
   mapping({
@@ -1549,7 +1571,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
       { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "pii-detection-leakage", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.6", "AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
@@ -1579,7 +1601,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Business associate contracts and group health plan requirements for AI systems processing PHI on behalf of covered entities.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.4 },
-      { type: "requires_assurance_pack", packId: "delegation_trust_chain", minScore: 75, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "delegationTrustChain", minScore: 75, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.5", "AMC-2.1"],
@@ -1608,8 +1630,8 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "§164.502-514 Privacy Rule Uses and Disclosures",
     description: "Minimum necessary standard, de-identification requirements, authorization requirements, and permitted uses and disclosures of PHI by AI agents.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "pii_detection_leakage", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "context_leakage", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "pii-detection-leakage", minScore: 90, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "context-leakage", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-OINT-1"],
@@ -1745,7 +1767,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Batch processing, job scheduling, backup/recovery, and operational monitoring for AI agents in financial workflows.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
-      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.1", "AMC-4.6"],
@@ -1759,8 +1781,8 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "Segregation of Duties",
     description: "Separation of AI agent capabilities to prevent single-agent control over conflicting financial functions.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "excessive_agency", minScore: 85, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "approval_theater", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "excessive-agency", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "approval-theater", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.5", "AMC-2.1", "AMC-5.15"],
@@ -1822,7 +1844,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.7 },
       { type: "requires_assurance_pack", packId: "exfiltration", minScore: 90, maxSucceeded: 0 },
-      { type: "requires_assurance_pack", packId: "stepup_approval_bypass", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "stepup-approval-bypass", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.8", "AMC-4.6", "AMC-5.15"],
@@ -1882,7 +1904,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Contingency plan, training, testing, backup, recovery, and reconstitution for AI-dependent federal services.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.5 },
-      { type: "requires_assurance_pack", packId: "circuit_breaker_reliability", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-4.1", "AMC-SPORT-1"],
@@ -1897,7 +1919,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "User, device, and service identification and authentication for AI agent endpoints and API consumers.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "agent_identity_spoofing", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "agentIdentitySpoofing", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-1.8", "AMC-3.3.1"],
@@ -1942,7 +1964,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Application partitioning, information in shared resources, cryptographic protection, and boundary protection for AI system communications.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["audit", "tool_action"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 85, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sandboxBoundary", minScore: 85, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-3.3.1", "AMC-3.3.4", "AMC-1.8"],
@@ -1957,7 +1979,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     description: "Flaw remediation, malicious code protection, information handling, memory protection, and software integrity for AI components.",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["test", "audit"], minObservedRatio: 0.6 },
-      { type: "requires_assurance_pack", packId: "sbom_supply_chain", minScore: 80, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sbom-supply-chain", minScore: 80, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-5.12", "AMC-5.8", "AMC-1.1"],
@@ -2016,13 +2038,314 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     category: "Req 11 Test Security Regularly",
     description: "Regular security testing of AI components. AMC assurance packs provide automated adversarial testing with signed evidence.",
     evidenceRequirements: [
-      { type: "requires_assurance_pack", packId: "sandbox_boundary", minScore: 60, maxSucceeded: 0 }
+      { type: "requires_assurance_pack", packId: "sandboxBoundary", minScore: 60, maxSucceeded: 0 }
     ],
     related: {
       questions: ["AMC-5.10", "AMC-5.12"],
       packs: ["sandbox_boundary", "compound_threats", "advanced_threats"],
       configs: []
     }
+  }),
+
+  // ── DORA (Regulation (EU) 2022/2554), applies from 17 January 2025 (Art. 64) ──
+  // AMC evidence covers the agent as an ICT asset; entity-level duties (management body
+  // approval, authority reporting, TLPT under Art. 26) are outside what these signals show.
+  mapping({
+    id: "dora_art5_governance",
+    framework: "DORA",
+    category: "Art. 5 Governance and organisation",
+    description: "Signals that ICT risk arrangements for the agent have an accountable, recorded approver. Does not evidence the management body's own approval and oversight under Art. 5(2).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["review", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "approval-theater", minScore: 75, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-4.1", "AMC-4.9"], packs: ["approval-theater"], configs: ["approval-policy.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art8_identification",
+    framework: "DORA",
+    category: "Art. 8 Identification",
+    description: "Signals that the agent's tools, models and data dependencies are identified and documented (Art. 8(1) asks for ICT assets and their dependencies to be classified and reviewed at least yearly).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["artifact", "audit"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "sbom-supply-chain", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.5", "AMC-1.4"], packs: ["sbom-supply-chain"], configs: ["tools.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art9_protection_prevention",
+    framework: "DORA",
+    category: "Art. 9 Protection and prevention",
+    description: "Signals that the agent's actions are continuously monitored and controlled and that policy bypass and data exfiltration are resisted (Art. 9(1)-(2)).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["tool_action", "audit"], minObservedRatio: 0.7 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "exfiltration", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-4.6", "AMC-5.13"], packs: ["governance_bypass", "exfiltration"], configs: ["action-policy.yaml", "tools.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art10_detection",
+    framework: "DORA",
+    category: "Art. 10 Detection",
+    description: "Signals that anomalous agent behaviour is detected promptly through metrics and trace correlation, with alert thresholds (Art. 10(1)-(2)).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["metric", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["TRACE_CORRELATION_LOW", "DRIFT_REGRESSION_DETECTED"] }
+    ],
+    related: { questions: ["AMC-1.7", "AMC-2.4"], packs: [], configs: ["alerts.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art11_response_recovery",
+    framework: "DORA",
+    category: "Art. 11 Response and recovery",
+    description: "Signals that the agent degrades safely and recovers (circuit breakers, model fallback) in support of an ICT business continuity policy (Art. 11(1)-(2)). Does not evidence the policy itself.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["metric", "test"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-5.7", "AMC-1.7"], packs: ["circuit-breaker-reliability"], configs: ["budgets.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art17_incident_management",
+    framework: "DORA",
+    category: "Art. 17 ICT-related incident management process",
+    description: "Signals that agent incidents are recorded with an intact audit trail and followed up to root cause (Art. 17(1)-(2)).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "review"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["AUDIT_TRAIL_MISSING"] }
+    ],
+    related: { questions: ["AMC-2.7", "AMC-4.1", "AMC-4.2"], packs: [], configs: ["alerts.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art19_major_incident_reporting",
+    framework: "DORA",
+    category: "Art. 19 Reporting of major ICT-related incidents",
+    description: "Signals that incident records are exportable as signed artifacts to support reporting. AMC does not classify incidents as major (Art. 18) or submit reports to the competent authority (Art. 19(1)).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "artifact"], minObservedRatio: 0.5 }
+    ],
+    related: { questions: ["AMC-2.7", "AMC-3.3.1"], packs: [], configs: [] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art24_25_resilience_testing",
+    framework: "DORA",
+    category: "Art. 24-25 Digital operational resilience testing",
+    description: "Signals that the agent is covered by a recurring testing programme including scenario-based and adversarial tests (Art. 24(1), Art. 25(1)). Threat-led penetration testing (Art. 26) is not covered.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "injection", minScore: 70, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "sandboxBoundary", minScore: 60, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-4.6", "AMC-5.12", "AMC-1.9"], packs: ["injection", "sandboxBoundary"], configs: [] },
+    sources: [DORA_TEXT]
+  }),
+  mapping({
+    id: "dora_art28_third_party_risk",
+    framework: "DORA",
+    category: "Art. 28 ICT third-party risk management",
+    description: "Signals that third-party models, tools and MCP servers used by the agent are governed as ICT third-party risk (Art. 28(1)). Contract terms (Art. 30) and the register of information are not evidenced.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["tool_action", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "supply-chain-integrity", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.5", "AMC-5.12"], packs: ["supply-chain-integrity"], configs: ["tools.yaml"] },
+    sources: [DORA_TEXT]
+  }),
+
+  // ── NIS2 (Directive (EU) 2022/2555), applied by Member States from 18 October 2024 (Art. 41) ──
+  // National transposition can add requirements; these map the Directive's own text only.
+  mapping({
+    id: "nis2_art20_governance",
+    framework: "NIS2",
+    category: "Art. 20 Governance",
+    description: "Signals that cybersecurity risk-management measures for the agent are approved and overseen by an accountable reviewer (Art. 20(1)). Management-body training (Art. 20(2)) is not evidenced.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["review", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "approval-theater", minScore: 75, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-4.1", "AMC-4.9"], packs: ["approval-theater"], configs: ["approval-policy.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2a_risk_policies",
+    framework: "NIS2",
+    category: "Art. 21(2)(a) Risk analysis and information system security policies",
+    description: "Signals that the agent runs under documented, enforced security policy and that policy bypass is resisted.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["artifact", "audit"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-4.6", "AMC-2.4"], packs: ["governance_bypass"], configs: ["action-policy.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2b_incident_handling",
+    framework: "NIS2",
+    category: "Art. 21(2)(b) Incident handling",
+    description: "Signals that agent incidents are recorded with an intact audit trail and reviewed.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "review"], minObservedRatio: 0.6 },
+      { type: "requires_no_audit", auditTypesDenylist: ["AUDIT_TRAIL_MISSING"] }
+    ],
+    related: { questions: ["AMC-2.7", "AMC-4.1", "AMC-4.2"], packs: [], configs: ["alerts.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2c_business_continuity",
+    framework: "NIS2",
+    category: "Art. 21(2)(c) Business continuity and crisis management",
+    description: "Signals that the agent degrades safely and recovers. Backup management and disaster recovery of the hosting estate are not evidenced.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["metric", "test"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "circuit-breaker-reliability", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-5.7", "AMC-1.7"], packs: ["circuit-breaker-reliability"], configs: ["budgets.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2d_supply_chain",
+    framework: "NIS2",
+    category: "Art. 21(2)(d) Supply chain security",
+    description: "Signals that the agent's direct suppliers (models, tools, MCP servers) are inventoried and resist supply-chain attack (Art. 21(2)(d), 21(3)).",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["tool_action", "audit"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "sbom-supply-chain", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.5", "AMC-5.12"], packs: ["sbom-supply-chain", "supply-chain-integrity"], configs: ["tools.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2e_secure_development",
+    framework: "NIS2",
+    category: "Art. 21(2)(e) Secure acquisition, development and maintenance",
+    description: "Signals that agent changes are tested and that injection vulnerabilities are handled before release.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "injection", minScore: 75, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.9", "AMC-5.12", "AMC-5.8"], packs: ["injection"], configs: [] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2f_effectiveness",
+    framework: "NIS2",
+    category: "Art. 21(2)(f) Effectiveness assessment of risk-management measures",
+    description: "Signals that control effectiveness is measured over time and that regressions are absent.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "metric"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: ["DRIFT_REGRESSION_DETECTED"] }
+    ],
+    related: { questions: ["AMC-4.2", "AMC-1.7", "AMC-4.6"], packs: [], configs: [] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art21_2i_access_control",
+    framework: "NIS2",
+    category: "Art. 21(2)(i) Human resources security, access control and asset management",
+    description: "Signals that the agent's privileged actions require step-up approval and that access-control bypass is resisted. Human-resources security is not evidenced.",
+    evidenceRequirements: [
+      { type: "requires_assurance_pack", packId: "stepup-approval-bypass", minScore: 80, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 85, maxSucceeded: 0 },
+      { type: "requires_no_audit", auditTypesDenylist: commonSecurityDenylist }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-4.6", "AMC-3.3.4"], packs: ["stepup-approval-bypass", "governance_bypass"], configs: ["approval-policy.yaml"] },
+    sources: [NIS2_TEXT]
+  }),
+  mapping({
+    id: "nis2_art23_reporting",
+    framework: "NIS2",
+    category: "Art. 23 Reporting obligations",
+    description: "Signals that timestamped incident records exist to support the 24-hour early warning, 72-hour notification and one-month final report (Art. 23(4)). AMC does not notify the CSIRT or competent authority.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "artifact"], minObservedRatio: 0.5 }
+    ],
+    related: { questions: ["AMC-2.7", "AMC-3.3.1"], packs: [], configs: [] },
+    sources: [NIS2_TEXT]
+  }),
+
+  // ── ONC HTI-1: 45 CFR 170.315(b)(11) decision support interventions ──
+  // A certification criterion for health IT modules; applies to an agent acting as a Predictive DSI.
+  // Proposed rule 90 FR 60970 (2025-12-29) may revise this criterion; its finalization was not verified.
+  mapping({
+    id: "hti1_dsi_feedback",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(ii)(C) Intervention feedback",
+    description: "Signals that user feedback on interventions is captured with intervention, action taken, user and date, and is exportable.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["review", "audit"], minObservedRatio: 0.5 }
+    ],
+    related: { questions: ["AMC-4.2", "AMC-4.9", "AMC-3.3.2"], packs: [], configs: [] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
+  }),
+  mapping({
+    id: "hti1_dsi_source_attributes",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(iv) Source attributes",
+    description: "Signals that the agent's intended use, out-of-scope uses, validity and fairness measures are documented as Predictive DSI source attributes (iv)(B)(1)-(9) and that its outputs are truthful.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["artifact", "audit"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "truthfulness", minScore: 75, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-2.9", "AMC-3.3.1", "AMC-3.4.1", "AMC-3.4.3"], packs: ["truthfulness"], configs: [] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
+  }),
+  mapping({
+    id: "hti1_dsi_source_attribute_access",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(v) Source attribute access and modification",
+    description: "Signals that source-attribute documentation is accessible to a limited set of identified users and that changes to it are audited.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["artifact", "review"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: ["AUDIT_TRAIL_MISSING"] }
+    ],
+    related: { questions: ["AMC-2.9", "AMC-1.8"], packs: [], configs: [] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
+  }),
+  mapping({
+    id: "hti1_dsi_risk_analysis",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(vi)(A) Risk analysis",
+    description: "Signals that the agent is analysed for validity, reliability, robustness, fairness, safety and security risks through tests and adversarial packs.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "metric"], minObservedRatio: 0.5 },
+      { type: "requires_assurance_pack", packId: "hallucination", minScore: 70, maxSucceeded: 0 },
+      { type: "requires_assurance_pack", packId: "injection", minScore: 70, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-4.6", "AMC-4.3", "AMC-3.4.1", "AMC-3.4.2", "AMC-3.4.3"], packs: ["hallucination", "injection"], configs: [] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
+  }),
+  mapping({
+    id: "hti1_dsi_risk_mitigation",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(vi)(B) Risk mitigation",
+    description: "Signals that identified risks have reviewed mitigations and that performance regressions are absent.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["test", "review"], minObservedRatio: 0.5 },
+      { type: "requires_no_audit", auditTypesDenylist: ["DRIFT_REGRESSION_DETECTED"] }
+    ],
+    related: { questions: ["AMC-4.6", "AMC-2.4"], packs: [], configs: [] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
+  }),
+  mapping({
+    id: "hti1_dsi_governance",
+    framework: "ONC_HTI_1",
+    category: "§170.315(b)(11)(vi)(C) Governance",
+    description: "Signals that policies and implemented controls govern the agent's data acquisition, management and use, and that they cannot be bypassed.",
+    evidenceRequirements: [
+      { type: "requires_evidence_event", eventTypes: ["audit", "review"], minObservedRatio: 0.6 },
+      { type: "requires_assurance_pack", packId: "governance_bypass", minScore: 80, maxSucceeded: 0 }
+    ],
+    related: { questions: ["AMC-1.8", "AMC-3.2.3", "AMC-1.5"], packs: ["governance_bypass"], configs: ["action-policy.yaml"] },
+    sources: [HTI1_CFR_TEXT, HTI1_RULE]
   }),
 ];
 

@@ -42,6 +42,13 @@ export const complianceEvidenceRequirementSchema = z.discriminatedUnion("type", 
   })
 ]);
 
+// Official text a mapping's clause was read from; retrievedAt is the calendar date it was read.
+export const complianceMappingSourceSchema = z.object({
+  title: z.string().min(1),
+  url: z.string().url(),
+  retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+});
+
 export const complianceMappingSchema = z.object({
   id: z.string().min(1),
   framework: frameworkEnum,
@@ -52,7 +59,8 @@ export const complianceMappingSchema = z.object({
     questions: z.array(questionEnum).default([]),
     packs: z.array(z.string().min(1)).default([]),
     configs: z.array(z.string().min(1)).default([])
-  })
+  }),
+  sources: z.array(complianceMappingSourceSchema).min(1).optional()
 });
 
 export const complianceMapsSchema = z.object({
@@ -64,6 +72,7 @@ export const complianceMapsSchema = z.object({
 
 export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceRequirementSchema>;
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
+export type ComplianceMappingSource = z.infer<typeof complianceMappingSourceSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;
 
 export type ComplianceCategoryStatus = "SATISFIED" | "PARTIAL" | "MISSING" | "UNKNOWN";

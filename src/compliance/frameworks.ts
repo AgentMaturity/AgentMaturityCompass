@@ -1,4 +1,4 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS";
+export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS" | "DORA" | "NIS2" | "ONC_HTI_1";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -189,7 +189,75 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "Req 11 Test Security Regularly",
       "Req 12 Support Information Security with Organizational Policies"
     ]
+  },
+  {
+    // Categories are the article headings of Regulation (EU) 2022/2554, applicable from 17 January 2025 (Art. 64).
+    framework: "DORA",
+    displayName: "DORA (Regulation (EU) 2022/2554) — Digital Operational Resilience",
+    categories: [
+      "Art. 5 Governance and organisation",
+      "Art. 6 ICT risk management framework",
+      "Art. 8 Identification",
+      "Art. 9 Protection and prevention",
+      "Art. 10 Detection",
+      "Art. 11 Response and recovery",
+      "Art. 12 Backup policies and procedures, restoration and recovery",
+      "Art. 17 ICT-related incident management process",
+      "Art. 19 Reporting of major ICT-related incidents",
+      "Art. 24-25 Digital operational resilience testing",
+      "Art. 28 ICT third-party risk management",
+      "Art. 30 Key contractual provisions"
+    ]
+  },
+  {
+    // Categories follow Directive (EU) 2022/2555 Art. 20, Art. 21(2)(a)-(j) and Art. 23; Member States apply it from 18 October 2024 (Art. 41).
+    framework: "NIS2",
+    displayName: "NIS2 (Directive (EU) 2022/2555) — Cybersecurity Risk Management",
+    categories: [
+      "Art. 20 Governance",
+      "Art. 21(2)(a) Risk analysis and information system security policies",
+      "Art. 21(2)(b) Incident handling",
+      "Art. 21(2)(c) Business continuity and crisis management",
+      "Art. 21(2)(d) Supply chain security",
+      "Art. 21(2)(e) Secure acquisition, development and maintenance",
+      "Art. 21(2)(f) Effectiveness assessment of risk-management measures",
+      "Art. 21(2)(g) Cyber hygiene and cybersecurity training",
+      "Art. 21(2)(h) Cryptography and encryption",
+      "Art. 21(2)(i) Human resources security, access control and asset management",
+      "Art. 21(2)(j) Multi-factor authentication and secured communications",
+      "Art. 23 Reporting obligations"
+    ]
+  },
+  {
+    // Categories follow the decision support interventions criterion added by HTI-1 (89 FR 1192, 2024-01-09).
+    framework: "ONC_HTI_1",
+    displayName: "ONC HTI-1 (45 CFR Part 170) — Decision Support Interventions §170.315(b)(11)",
+    categories: [
+      "§170.315(b)(11)(ii)(C) Intervention feedback",
+      "§170.315(b)(11)(iv) Source attributes",
+      "§170.315(b)(11)(v) Source attribute access and modification",
+      "§170.315(b)(11)(vi)(A) Risk analysis",
+      "§170.315(b)(11)(vi)(B) Risk mitigation",
+      "§170.315(b)(11)(vi)(C) Governance"
+    ]
   }
+];
+
+// Versioned or clause-qualified names as industry packs cite them ("GDPR Art. 9", "PCI DSS v4.0").
+// Each pattern is anchored at the start so a different instrument ("NIST CSF 2.0") stays unresolved.
+const frameworkNamePatterns: Array<[RegExp, ComplianceFramework]> = [
+  [/^(eu )?gdpr\b/, "GDPR"],
+  [/^eu ai act\b/, "EU_AI_ACT"],
+  [/^hipaa\b/, "HIPAA"],
+  [/^iso(\/iec)? ?27001\b/, "ISO_27001"],
+  [/^iso(\/iec)? ?42001\b/, "ISO_42001"],
+  [/^nist ai rmf\b/, "NIST_AI_RMF"],
+  [/^owasp api (security )?top ?10\b/, "OWASP_API_TOP10"],
+  [/^pci ?dss\b/, "PCI_DSS"],
+  [/^soc ?2\b/, "SOC2"],
+  [/^(eu )?dora\b/, "DORA"],
+  [/^(eu )?nis ?2\b/, "NIS2"],
+  [/^(onc )?(hti-1\b|45 cfr (§ ?|part )?170\b)/, "ONC_HTI_1"],
 ];
 
 export function frameworkChoices(): ComplianceFramework[] {
@@ -215,8 +283,12 @@ export function normalizeFrameworkName(input: string): ComplianceFramework | nul
     "mitre": "MITRE_ATLAS", "mitre-atlas": "MITRE_ATLAS",
     "owasp": "OWASP_API_TOP10", "owasp-llm": "OWASP_API_TOP10", "owasp-api": "OWASP_API_TOP10",
     "pci": "PCI_DSS", "pci-dss": "PCI_DSS", "pcidss": "PCI_DSS", "pci_dss": "PCI_DSS",
+    "nis-2": "NIS2", "onc-hti-1": "ONC_HTI_1",
   };
-  return aliases[input.toLowerCase()] ?? null;
+  const alias = aliases[input.toLowerCase()];
+  if (alias) return alias;
+  const spaced = input.toLowerCase().replace(/\s+/g, " ").trim();
+  return frameworkNamePatterns.find(([pattern]) => pattern.test(spaced))?.[1] ?? null;
 }
 
 export function getFrameworkFamily(framework: ComplianceFramework | string): ComplianceFrameworkFamily {

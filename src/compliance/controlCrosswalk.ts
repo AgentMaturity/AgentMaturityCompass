@@ -75,6 +75,21 @@ function evidenceTypesFor(mapping: ComplianceMapping): string[] {
   return [...values].sort((a, b) => a.localeCompare(b));
 }
 
+function sourceIdFor(url: string): string {
+  return `src-${sha256Hex(url).slice(0, 16)}`;
+}
+
+/** One crosswalk citation per distinct official source carried by the mappings. */
+export function mappingSourceCitations(mappings: ComplianceMapping[]): ControlCrosswalkSourceCitation[] {
+  const byUrl = new Map<string, ControlCrosswalkSourceCitation>();
+  for (const source of mappings.flatMap((mapping) => mapping.sources ?? [])) {
+    if (!byUrl.has(source.url)) {
+      byUrl.set(source.url, { sourceId: sourceIdFor(source.url), title: source.title, url: source.url, retrievedAt: source.retrievedAt });
+    }
+  }
+  return [...byUrl.values()];
+}
+
 function isSha256(value: string | undefined): boolean {
   return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 }
@@ -109,6 +124,11 @@ export function buildControlCrosswalkReceipt(input: {
     const evidenceRefs = input.evidenceByMappingId[mapping.id] ?? [];
     const exception = exceptionByMappingId.get(mapping.id);
     const evidenceTypes = evidenceTypesFor(mapping);
+    // A mapping that names its own official sources cites exactly those; others cite every receipt source.
+    const ownSourceIds = mappingSourceCitations([mapping]).map((citation) => citation.sourceId);
+    if (ownSourceIds.some((id) => !sourceCitationIds.includes(id))) {
+      failClosedReasons.push(`${mapping.id}:sourceCitations:unlisted`);
+    }
     const baseRow: Omit<ControlCrosswalkRow, "rowHash"> = {
       mappingId: mapping.id,
       framework: mapping.framework,
@@ -118,7 +138,7 @@ export function buildControlCrosswalkReceipt(input: {
       owner,
       exceptionState: exception?.state ?? "none",
       exceptionId: exception?.exceptionId ?? null,
-      sourceCitationIds,
+      sourceCitationIds: ownSourceIds.length > 0 ? ownSourceIds : sourceCitationIds,
       evidenceRefs,
       evidenceChainHash: sha256Hex(canonicalize(evidenceRefs)),
     };
