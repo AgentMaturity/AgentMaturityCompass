@@ -3,7 +3,35 @@
  *
  * Classifies AI agents into EU AI Act risk tiers based on Article 6 criteria:
  * UNACCEPTABLE | HIGH | LIMITED | MINIMAL
+ *
+ * Article references follow Regulation (EU) 2024/1689 as amended by
+ * Regulation (EU) 2026/1744 (Digital Omnibus on AI).
  */
+
+/**
+ * Application dates (Art. 113 and Art. 111 as amended by Regulation (EU)
+ * 2026/1744), read on 2026-10-03 from the Commission's AI Act Service Desk.
+ * Each key must equal the verified keyDate of the same id in the regulatory
+ * register entry "eu-ai-act" (src/compliance/regulatoryRegister/register.json);
+ * tests/euAiAct.test.ts enforces the parity.
+ */
+export const EU_AI_ACT_TIMELINE = {
+  entryIntoForce: "2024-08-01",
+  prohibitionsAndAiLiteracy: "2025-02-02",
+  gpaiObligationsAndGovernance: "2025-08-02",
+  omnibusEntryIntoForce: "2026-07-27",
+  generalApplication: "2026-08-02",
+  newProhibitionsAndArt50_2Transition: "2026-12-02",
+  gpaiLegacyModelsDeadline: "2027-08-02",
+  annexIIIHighRisk: "2027-12-02",
+  article6_1AnnexIHighRisk: "2028-08-02",
+} as const;
+
+export interface EuAiActApplicationDate {
+  basis: "Art. 5" | "Art. 6(2) + Annex III" | "Art. 6(1) + Annex I" | "Art. 50";
+  /** YYYY-MM-DD from EU_AI_ACT_TIMELINE. */
+  appliesFrom: string;
+}
 
 export type EuAiActRiskTier = "UNACCEPTABLE" | "HIGH" | "LIMITED" | "MINIMAL";
 
@@ -65,6 +93,8 @@ export interface EuAiActClassification {
   findings: EuAiActFinding[];
   remediation: EuAiActRemediationItem[];
   summary: string;
+  /** When the obligations behind this tier apply (empty for MINIMAL). */
+  applicationDates?: EuAiActApplicationDate[];
   classifiedAt: number;
 }
 
@@ -100,8 +130,8 @@ export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActCla
     {
       flag: "socialScoring",
       article: "Art. 5(1)(c)",
-      title: "Social scoring by public authorities",
-      description: "Systems that evaluate or classify persons based on social behaviour are prohibited."
+      title: "Social scoring",
+      description: "Systems that evaluate or classify persons based on social behaviour or personal characteristics, leading to detrimental or unfavourable treatment, are prohibited."
     },
     {
       flag: "subliminalManipulation",
@@ -117,7 +147,7 @@ export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActCla
     },
     {
       flag: "realtimeBiometricPublicSpaces",
-      article: "Art. 5(1)(d)",
+      article: "Art. 5(1)(h)",
       title: "Real-time remote biometric identification in public spaces",
       description: "Real-time remote biometric identification in publicly accessible spaces by law enforcement is prohibited (with narrow exceptions)."
     }
@@ -223,13 +253,13 @@ export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActCla
       flag: "emotionRecognition",
       article: "Art. 50(3)",
       title: "Emotion recognition disclosure",
-      description: "Emotion recognition systems must inform persons being processed."
+      description: "Deployers of emotion recognition systems must inform persons exposed to them. Emotion recognition is also an Annex III point 1(c) high-risk use, and inferring emotions in the workplace or education is prohibited by Art. 5(1)(f) save for medical or safety reasons."
     },
     {
       flag: "humanInteraction",
-      article: "Art. 50(4)",
-      title: "Deep-fake disclosure",
-      description: "AI generating deep-fakes must label content as artificially created or manipulated."
+      article: "Art. 50(1)",
+      title: "Disclosure of interaction with an AI system",
+      description: "Providers must design AI systems intended to interact directly with natural persons so those persons are informed they are interacting with an AI system, unless obvious from context."
     }
   ];
 
@@ -258,8 +288,23 @@ function buildResult(
     findings,
     remediation,
     summary,
+    applicationDates: buildApplicationDates(tier, articles),
     classifiedAt: Date.now()
   };
+}
+
+function buildApplicationDates(tier: EuAiActRiskTier, articles: Set<string>): EuAiActApplicationDate[] {
+  if (tier === "UNACCEPTABLE") return [{ basis: "Art. 5", appliesFrom: EU_AI_ACT_TIMELINE.prohibitionsAndAiLiteracy }];
+  if (tier === "LIMITED") return [{ basis: "Art. 50", appliesFrom: EU_AI_ACT_TIMELINE.generalApplication }];
+  if (tier !== "HIGH") return [];
+  const dates: EuAiActApplicationDate[] = [];
+  if ([...articles].some((a) => a.includes("Annex III"))) {
+    dates.push({ basis: "Art. 6(2) + Annex III", appliesFrom: EU_AI_ACT_TIMELINE.annexIIIHighRisk });
+  }
+  if (articles.has("Art. 6(1)")) {
+    dates.push({ basis: "Art. 6(1) + Annex I", appliesFrom: EU_AI_ACT_TIMELINE.article6_1AnnexIHighRisk });
+  }
+  return dates;
 }
 
 function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[]): EuAiActRemediationItem[] {
