@@ -188,6 +188,16 @@ helm history amc --namespace amc-system
 helm rollback amc <revision> --namespace amc-system --wait --timeout 10m
 ```
 
+### Upgrading from chart 0.1.0
+
+Chart 0.1.0 rendered its own `amc-bootstrap` Secret with fixed `change-me-*` values. Chart 0.2.0 renders no Secret, so a plain upgrade makes Helm delete that Secret and the new pod cannot mount it. Before upgrading, keep the Secret and replace its values:
+
+```bash
+kubectl -n amc-system annotate secret amc-bootstrap helm.sh/resource-policy=keep
+```
+
+A workspace bootstrapped by chart 0.1.0 used the published vault passphrase `change-me-vault-passphrase`; treat its vault as exposed. The `amc vault` commands at this revision (`init`, `unlock`, `lock`, `status`, `forget`) include no passphrase change, so moving that workspace to a new passphrase is an open operator decision, not a documented step.
+
 `--atomic` rolls back a failed upgrade automatically. A rollback restores manifests, not workspace data: the ledger on the claim keeps whatever the newer version wrote. Snapshot the volume before an upgrade if you need to restore data too.
 
 Raw manifests:

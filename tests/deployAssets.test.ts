@@ -96,6 +96,7 @@ describe("deployment assets: probes and rollout safety", () => {
     expect(rollbackHazards([pvc("20Gi")], [pvc("10Gi")])[0]).toMatch(/shrink/);
     expect(rollbackHazards([pvc("10Gi")], [pvc("10Gi", ["ReadWriteMany"])])[0]).toMatch(/accessModes/);
     expect(rollbackHazards([pvc("10Gi")], [])[0]).toMatch(/removed/);
+    expect(rollbackHazards([{ kind: "Secret", metadata: { name: "amc-bootstrap" } }], [])[0]).toMatch(/resource-policy=keep/);
   });
 
   it("rollback-check renders HEAD and the working tree and finds no rollback hazard", () => {

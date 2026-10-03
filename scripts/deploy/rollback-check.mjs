@@ -34,6 +34,10 @@ export function rollbackHazards(fromDocs, toDocs) {
       hazards.push(`${id(before)} removed: Helm deletes it on upgrade and the workspace data with it`);
       continue;
     }
+    if (before.kind === "Secret" && !after) {
+      hazards.push(`${id(before)} removed: Helm deletes it on upgrade unless annotated helm.sh/resource-policy=keep`);
+      continue;
+    }
     if (!after) continue;
     if (before.kind === "Deployment" && !same(before.spec?.selector, after.spec?.selector)) {
       hazards.push(`${id(before)} spec.selector changed: immutable, the upgrade and the rollback across it both fail`);
