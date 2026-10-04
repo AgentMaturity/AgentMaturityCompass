@@ -205,4 +205,6 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-nist-sp800-82", "NIST SP 800-82 Rev. 3, Guide to Operational Technology (OT) Security (September 2023)", "US", "guidance", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
     ["NIST SP 800-82 Rev. 3", "NIST SP 800-82r3"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "CSRC page read: Rev. 3 final supersedes Rev. 2; a Rev. 4 initial public draft is open for comment." }),
+  verified("nist-sp-800-207", "NIST SP 800-207 Zero Trust Architecture", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/207/final",
+    ["NIST SP 800-207"], { note: "Final, August 2020 (csrc page read)." }),
 ];
