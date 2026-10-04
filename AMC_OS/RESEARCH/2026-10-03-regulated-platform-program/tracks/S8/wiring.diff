@@ -1,0 +1,135 @@
+--- a/src/agent/nativeToolCapabilities.ts
++++ b/src/agent/nativeToolCapabilities.ts
+@@ -14,7 +14,15 @@
+   { name: "fs.edit", actionClass: "WRITE_LOW" },
+   { name: "glob", actionClass: "READ_ONLY" },
+   { name: "grep", actionClass: "READ_ONLY" },
+-  { name: "bash", actionClass: "WRITE_HIGH" }
++  { name: "bash", actionClass: "WRITE_HIGH" },
++  // AMC-1549. Each still refuses in its own body until the signed policy grants
++  // it origins (web_*) or the caller composes its dependency (ask_user: an
++  // answerer; web_search: a provider). Listing here is identity, not permission.
++  { name: "web_fetch", actionClass: "NETWORK_EXTERNAL" },
++  { name: "web_search", actionClass: "NETWORK_EXTERNAL" },
++  { name: "ask_user", actionClass: "READ_ONLY" },
++  { name: "todo", actionClass: "READ_ONLY" },
++  { name: "plan", actionClass: "READ_ONLY" }
+ ].map(capability => Object.freeze(capability as NativeToolCapability)));
+ 
+ /** These become executable only when a caller also supplies the delegation capability. */
+--- a/src/agent/agentToolset.ts
++++ b/src/agent/agentToolset.ts
+@@ -9,6 +9,12 @@
+ import { fsTools } from "../tools/builtin/fsTools.js";
+ import { ReadBeforeEditLedger } from "../tools/builtin/readBeforeEdit.js";
+ import { searchTools } from "../tools/builtin/searchTools.js";
++import { webFetchTool } from "../tools/builtin/webFetchTool.js";
++import { webSearchTool, type WebSearchProvider } from "../tools/builtin/webSearchTool.js";
++import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.js";
++import { todoTool } from "../tools/builtin/todoTool.js";
++import { planTool } from "../tools/builtin/planTool.js";
++import type { ToolExecution } from "../tools/toolTypes.js";
+ import {
+   budgetGuard,
+   networkEgressGuard,
+@@ -56,6 +62,10 @@
+    * every run in a chain shares `governedAs` by design.
+    */
+   readonly subagents?: SubagentCapability;
++  /** Human answerer for `ask_user` (AMC-1549). Absent: every ask_user call refuses. */
++  readonly askUser?: AskUserAnswerer;
++  /** Search provider for `web_search` (AMC-1549). Absent: every web_search call refuses; there is no default. */
++  readonly webSearchProvider?: WebSearchProvider;
+   /** Session the evidence rows belong to. Defaults to a per-agent bucket. */
+   /**
+    * The session tool evidence belongs to. REQUIRED, and deliberately so.
+@@ -240,6 +250,24 @@
+       }
+     }
+   }) : bashTool({ scrubValues: options.scrubValues }));
++  // AMC-1549 receipts take the bash receipt's path: the native session writer
++  // when bound, else the raw ledger. A failed write fails the call.
++  const recordNativeReceipt = (receipt: object): void => {
++    const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: { ...receipt } as Record<string, unknown> };
++    if (options.recorder) options.recorder.recordProjectedEvidence(row);
++    else {
++      ledgerHandle ??= openLedger(workspace);
++      ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
++    }
++  };
++  // The session getter is rebound by fork/resume after construction, so these
++  // read it per call rather than capturing it now.
++  const currentSessionId = (): string => options.sessionId;
++  registry.define(webFetchTool({ record: recordNativeReceipt }));
++  registry.define(webSearchTool({ record: recordNativeReceipt, ...(options.webSearchProvider ? { provider: options.webSearchProvider } : {}) }));
++  registry.define(askUserTool({ sessionId: currentSessionId, ...(options.askUser ? { answerer: options.askUser } : {}) }));
++  registry.define(todoTool({ sessionId: currentSessionId }));
++  registry.define(planTool({ sessionId: currentSessionId }));
+   if (options.subagents !== undefined) {
+     // Both tools, from one capability. `delegate` is one child; `workflow` is a
+     // declared plan of them. Each is still gated a second time by the operator's
+@@ -258,8 +286,13 @@
+   // CLI binds the native writer after constructing the toolset; forks can
+   // replace it. Resolve the current session only when the guard executes.
+   registry.guard("budgets", execution => budgetGuard(workspace, options.sessionId)(execution));
+-  registry.guard("network-egress", networkEgressGuard(workspace));
+-  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest));
++  // web_search names no url; both host checks read its composed provider's
++  // declared origin instead. Unconfigured, it carries no url and is denied.
++  const governedArguments = (execution: ToolExecution): Readonly<Record<string, unknown>> =>
++    execution.name === "web_search" && options.webSearchProvider
++      ? { ...execution.arguments, url: options.webSearchProvider.origin } : execution.arguments;
++  registry.guard("network-egress", networkEgressGuard(workspace, governedArguments));
++  registry.guard("tool-allowlist", toolhubAllowlistGuard(workspace, execution => registry.visible(execution.agentId).get(execution.name), options.expectedToolsDigest, governedArguments));
+   registry.guard("native-tool-identity", execution => {
+     const identity = nativeIdentities.get(execution.name);
+     if (!identity) return undefined; // Late reviewed extensions retain their own mount and policy guards.
+--- a/src/tools/guards/policyGuards.ts
++++ b/src/tools/guards/policyGuards.ts
+@@ -26,6 +26,14 @@
+  */
+ 
+ /**
++ * The arguments a host check reads. Defaults to the call's own; a composition
++ * supplies a destination a tool does not take as an argument (AMC-1549:
++ * `web_search` reaches its provider's declared origin, never a model-chosen url).
++ */
++export type GovernedArguments = (execution: ToolExecution) => Readonly<Record<string, unknown>>;
++const ownArguments: GovernedArguments = (execution) => execution.arguments;
++
++/**
+  * The Runtime Firewall over the call's arguments.
+  *
+  * After ADR-0011 an unconfigured workspace blocks, so composing this guard in
+@@ -85,7 +93,7 @@
+  */
+ export function toolhubAllowlistGuard(workspace: string,
+   visibleDefinition?: (execution: ToolExecution) => ToolDefinition | undefined,
+-  expectedToolsDigest?: string): ToolGuard {
++  expectedToolsDigest?: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
+   return (execution) => {
+     // The Code Mode transport is presentation infrastructure, not a
+     // capability, and the allowlist has nothing useful to say about it. What
+@@ -114,7 +122,7 @@
+     const verdict = validateToolRequest({
+       workspace,
+       tool: definition,
+-      args: execution.arguments as Record<string, unknown>,
++      args: argumentsFor(execution) as Record<string, unknown>,
+       nativeSandboxPermit: snapshot.digestSha256
+         ? admitNativeSandboxPolicy(visibleDefinition?.(execution), execution, definition, snapshot.digestSha256)
+         : undefined
+@@ -148,11 +156,11 @@
+  * allowlist, and "we could not tell where this was going" is not a reason to
+  * let it go.
+  */
+-export function networkEgressGuard(workspace: string): ToolGuard {
++export function networkEgressGuard(workspace: string, argumentsFor: GovernedArguments = ownArguments): ToolGuard {
+   return (execution) => {
+     if (execution.actionClass !== "NETWORK_EXTERNAL") return undefined;
+ 
+-    const raw = execution.arguments["url"];
++    const raw = argumentsFor(execution)["url"];
+     if (typeof raw !== "string" || raw.length === 0) {
+       return `${execution.name} is a network tool but named no url to check against the allowlist`;
+     }

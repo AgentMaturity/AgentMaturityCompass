@@ -1,0 +1,61 @@
+{
+  "track": "S8",
+  "linear": "AMC-1549",
+  "status": "PARTIAL",
+  "statusReason": "Tools implemented, tested and mutation-verified; registration requires src/agent/nativeToolCapabilities.ts (other session's dirty list), src/agent/agentToolset.ts and src/tools/guards/policyGuards.ts (unclaimed). Tools are UNREACHABLE until wiring.diff (this directory) is applied. A default-template workspace also needs the five tools added to src/toolhub/toolsSchema.ts defaultToolsConfig() and a re-signed .amc/tools.yaml (root serial step).",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-8",
+  "branch": "worktree-wf_5210e2f4-3ea-8",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "codeHead": "fb4cd7e7e9447e13ac5a9a7189bef405b7919160",
+  "commits": [
+    "15a92e92 test: specify deny-by-default web fetch, search, ask-user, todo and plan tools (AMC-1549)",
+    "7caecc48 feat: add refuse-by-default web_fetch, web_search, ask_user, todo and plan native tools (AMC-1549)",
+    "fa58d6dd refactor: drop the content-length pre-check a mutation proved redundant with the streaming cap",
+    "0e0b14d3 feat: bind each web_search provider to the one origin it declares",
+    "c7e64864 fix: resolve native tool session ids at call time so forks and resumes bind correctly",
+    "fb4cd7e7 docs: describe the native web, ask-user, todo and plan tools and their unregistered state (AMC-1549)"
+  ],
+  "environment": "Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; worktree source qualification only (not package/platform/release; no fresh clone)",
+  "tests": {
+    "red": "pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts -> Test Files 3 failed (3), no tests (modules missing) at 15a92e92",
+    "final": "pnpm vitest run tests/nativeToolBreadth.test.ts tests/webFetchTool.test.ts tests/askUserTool.test.ts -> exit 0, Test Files 3 passed (3), Tests 35 passed (35), 0 skipped (repair round)"
+  },
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "wiring": {
+    "diff": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/wiring.diff",
+    "applyCheck": "git apply --check -v wiring.diff at worktree HEAD -> exit 0 (3 files)",
+    "scratchTsc": "tsc -p tsconfig.json --noEmit with diff applied in a git-archive scratch copy -> exit 0",
+    "scratchTests": [
+      "s8WiringProof + agentToolsetWiring + networkEgressGuard + toolPolicyGuards -> 4 files, 35 passed",
+      "studioNativeTaskPolicyPin + nativeSignedToolSubset + toolhubPipelineTools + nativeSandboxPolicyBinding + 3 S8 files -> 7 files, 75 passed"
+    ],
+    "proofTest": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/s8WiringProof.test.ts.txt",
+    "notCheckedAgainst": "the other session's uncommitted src/agent/nativeToolCapabilities.ts in the root checkout"
+  },
+  "mutations": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/mutations.log (M1-M16 all RED then restored GREEN; M14/M15 actionClass pins and M16 readSessionList binding added in the repair round; M2a content-length pre-check SURVIVED in an earlier revision and was removed as redundant)",
+  "reportMd": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/report.md (backfilled by root at 93d73bdd; repair-round section added by the worker)",
+  "sources": [],
+  "notExercised": [
+    "full suite, release gate, fresh-clone reproduction",
+    "budget guard metering of these tools",
+    "real HTTPS to a public origin",
+    "non-text content-type descriptor path",
+    "CLI/Studio ask_user answerer and Studio rendering of todo/plan",
+    "any OS other than macOS arm64"
+  ],
+  "defaultTemplate": {
+    "statement": "Reachability under the default template also needs five entries (web_fetch, web_search, ask_user, todo, plan) added to defaultToolsConfig() in src/toolhub/toolsSchema.ts beside the native-loop built-ins at :118-148, plus a re-signed .amc/tools.yaml. Owned by the root serial step; not edited here and not part of wiring.diff.",
+    "nativeInteractiveSession": "src/setup/nativeInteractiveSession.ts needs no change: no tool-name enumeration; it only selects --tools none|echo|workspace (:197-199) for the child agent-loop run, which builds the toolset via agentToolset(...) at src/cli-agent-commands.ts:464-470.",
+    "documentedIn": "docs/NATIVE_TOOLS.md section 'Default template: a second change, owned by the root serial step'"
+  },
+  "repairRound": {
+    "date": "2026-10-03",
+    "fixes": [
+      "tests/nativeToolBreadth.test.ts: pin webFetchTool/webSearchTool actionClass === NETWORK_EXTERNAL (M14, M15 RED->GREEN)",
+      "tests/nativeToolBreadth.test.ts: readSessionTodo refuses a monitor-signed record of another kind or sessionId at the todo path (M16 RED->GREEN)",
+      "docs/NATIVE_TOOLS.md + result.json + report.md: toolsSchema.ts default-template second change and nativeInteractiveSession.ts no-change statement"
+    ],
+    "pathDiscipline": "No code change: paths match the root ownership manifest S8 claim; registry disagreement with map/planner-tracks.json is for root to settle.",
+    "reverified": "2026-10-04: M14/M15/M16 re-run at 4b76dba5 with the monitor's commands, each RED then GREEN after git checkout; focused suite 35/35 passed, 0 skipped/todo (JSON reporter); pnpm typecheck exit 0; pnpm typecheck:tests exit 0; all paths in git diff 8f57ce63..HEAD inside the root manifest S8 claim; worktree clean."
+  }
+}
