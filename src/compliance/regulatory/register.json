@@ -24,7 +24,9 @@
         { "ref": "Art. 50(1)-(4)", "summary": "Transparency: providers disclose direct interaction with an AI system (1) and mark synthetic audio, image, video or text output (2); deployers inform people exposed to emotion recognition or biometric categorisation (3) and disclose deep fakes (4).", "verified": true, "basis": "copied from S5 register.json (S5 review 2026-10-03)" },
         { "ref": "Art. 73", "summary": "Providers report serious incidents of high-risk AI systems to market surveillance authorities.", "verified": true, "basis": "Article 73 heading in OJ text (CELEX 32024R1689) read 2026-10-04: Reporting of serious incidents" },
         { "ref": "Art. 86", "summary": "Affected persons may obtain an explanation of individual decisions taken on the basis of Annex III high-risk system output.", "verified": true, "basis": "Article 86 heading in OJ text (CELEX 32024R1689) read 2026-10-04: Right to explanation of individual decision-making" },
-        { "ref": "Art. 111(2) (as amended)", "summary": "Providers and deployers of high-risk AI systems intended for use by public authorities comply by 2 August 2030.", "verified": true, "basis": "phrase found in OJ text (CELEX 32026R1744) read 2026-10-04" }
+        { "ref": "Art. 111(2) (as amended)", "summary": "Providers and deployers of high-risk AI systems intended for use by public authorities comply by 2 August 2030.", "verified": true, "basis": "phrase found in OJ text (CELEX 32026R1744) read 2026-10-04" },
+        { "ref": "Art. 111(3)", "summary": "Providers of general-purpose AI models placed on the market before 2 August 2025 must comply by 2 August 2027.", "verified": true, "basis": "restored from 67d73223 src/compliance/regulatory/register.json (S5 review 2026-10-03, verified there); source AI Act Service Desk Article 111 (https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111, retrieved 2026-10-03); the date matches keyDate gpaiLegacyModelsDeadline read in OJ text CELEX 32024R1689 2026-10-04" },
+        { "ref": "Art. 111(4)", "summary": "Providers of systems generating synthetic content placed on the market before 2 August 2026 must comply with Art. 50(2) by 2 December 2026.", "verified": true, "basis": "restored from 67d73223 src/compliance/regulatory/register.json (S5 review 2026-10-03, verified there); source AI Act Service Desk Article 111 (https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111, retrieved 2026-10-03); the date matches keyDate newProhibitionsAndArt50_2Transition read in OJ text CELEX 32026R1744 2026-10-04" }
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-08-01", "event": "Regulation (EU) 2024/1689 entered into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1689", "retrievedAt": "2026-10-04T05:06:55Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
@@ -202,9 +204,11 @@
       "stations": ["health"],
       "agentObligations": [
         { "ref": "MDR Art. 10", "summary": "Manufacturers of software medical devices (incl. AI) meet general obligations: QMS, risk management, clinical evaluation, post-market surveillance.", "verified": true, "basis": "Article 10 heading in OJ text (CELEX 32017R0745) read 2026-10-04: General obligations of manufacturers" },
-        { "ref": "MDR Art. 10a (Reg. 2024/1860)", "summary": "Manufacturers notify at least six months ahead of an anticipated supply interruption or discontinuation.", "verified": true, "basis": "phrase found in OJ text (CELEX 32024R1860) read 2026-10-04" }
+        { "ref": "MDR Art. 10a (Reg. 2024/1860)", "summary": "Manufacturers notify at least six months ahead of an anticipated supply interruption or discontinuation.", "verified": true, "basis": "phrase found in OJ text (CELEX 32024R1860) read 2026-10-04" },
+        { "ref": "AI Act Art. 6(1) link", "summary": "Both Regulations are listed in AI Act Annex I, Section A (items 11 and 12), so AI that is such a device or its safety component can be high-risk under AI Act Art. 6(1); those AI Act obligations apply from 2 August 2028.", "verified": true, "basis": "restored from 67d73223 src/compliance/regulatory/register.json (S5 review 2026-10-03, verified there); source AI Act Service Desk Annex I (https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-1) and Article 113, retrieved 2026-10-03" }
       ],
       "keyDates": [
+        { "id": "mdrApplication", "date": "2021-05-26", "event": "MDR applies", "verified": true, "url": "https://health.ec.europa.eu/medical-devices-sector/new-regulations_en", "retrievedAt": "2026-10-03", "basis": "restored from 67d73223 src/compliance/regulatory/register.json (S5 review 2026-10-03, verified there); source European Commission, Medical devices — new regulations" },
         { "id": "ivdrApplication", "date": "2022-05-26", "event": "IVDR applies (Art. 113(2))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32017R0746", "retrievedAt": "2026-10-04T05:07:04Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "reg2023_607EntryIntoForce", "date": "2023-03-20", "event": "Regulation (EU) 2023/607 (MDR transition extension) in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32023R0607", "retrievedAt": "2026-10-04T05:07:00Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "art10aApplies", "date": "2025-01-10", "event": "Art. 10a supply-interruption notice applies", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1860", "retrievedAt": "2026-10-04T05:07:03Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
@@ -436,10 +440,10 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "Art. 7", "summary": "Legal bases for processing personal data.", "verified": true },
-        { "ref": "Art. 33", "summary": "International transfer of personal data only in listed cases.", "verified": true },
-        { "ref": "Art. 38", "summary": "The national authority may require a data protection impact report.", "verified": true },
-        { "ref": "Art. 46", "summary": "Technical and administrative security measures.", "verified": true }
+        { "ref": "Art. 7", "summary": "Legal bases for processing personal data.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 33", "summary": "International transfer of personal data only in listed cases.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 38", "summary": "The national authority may require a data protection impact report.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 46", "summary": "Technical and administrative security measures.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." }
       ],
       "keyDates": [
         { "id": "anpdProvisions", "date": "2018-12-28", "event": "ANPD provisions (Arts. 55-A to 55-L, 58-A, 58-B) in force — Art. 65(I)", "verified": true, "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm", "retrievedAt": "2026-10-03T16:25:04Z", "basis": "S5 review 2026-10-03: Lei nº 13.709, de 14 de agosto de 2018" },
@@ -451,7 +455,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Art. 65(II) as read says 24 months after publication; the 2020-09-18 day depends on Lei 14.058/2020, which was not read in this review."]
+      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "Art. 65(II) as read says 24 months after publication; the 2020-09-18 day depends on Lei 14.058/2020, which was not read in this review."]
     },
     {
       "id": "in-dpdp",
@@ -462,9 +466,8 @@
       "status": "partially-applicable",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "Rules: consent notices", "summary": "Data Fiduciaries issue standalone, clear consent notices stating the specific purpose.", "verified": true },
-        { "ref": "Significant Data Fiduciaries", "summary": "Enhanced obligations: independent audits, impact assessments, due diligence on deployed technologies, data restrictions including localisation where required.", "verified": true },
-        { "ref": "s. 10 / s. 16", "summary": "Section 10 additional obligations of Significant Data Fiduciaries; section 16 transfer restrictions outside India (from India Code search index, page not read).", "verified": false }
+        { "ref": "Rules: consent notices", "summary": "Data Fiduciaries issue standalone, clear consent notices stating the specific purpose.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Significant Data Fiduciaries", "summary": "Enhanced obligations: independent audits, impact assessments, due diligence on deployed technologies, data restrictions including localisation where required.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." }
       ],
       "keyDates": [
         { "id": "rulesNotified", "date": "2025-11-14", "event": "DPDP Rules, 2025 notified; 18-month phased compliance timeline", "verified": true, "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190014&reg=3&lang=2", "retrievedAt": "2026-10-03T16:24:43Z", "basis": "S5 review 2026-10-03: Government notifies DPDP Rules to empower citizens and protect privacy (PIB, 14 Nov 2025)" }
@@ -475,7 +478,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["The dates of each phase of the 18-month timeline were not on the page read.", "Assent date of the Act (2023-08-11 in the legacy entry) was not re-read."]
+      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "The dates of each phase of the 18-month timeline were not on the page read.", "Assent date of the Act (2023-08-11 in the legacy entry) was not re-read."]
     },
     {
       "id": "jp-appi",

@@ -14,8 +14,8 @@
     "before": { "entries": 17, "verified": 11, "unverified": 6, "jurisdictions": 8, "officialHosts": 27 },
     "after": {
       "entries": 176, "verified": 108, "unverified": 68, "jurisdictions": 20, "officialHosts": 57,
-      "keyDates": 439, "keyDatesVerified": 392, "keyDatesVerifiedOnReceiptBasis": 56, "observationKeyDates": 3,
-      "obligations": 302, "obligationsVerified": 257, "sources": 305, "sourcesNotFetched": 37,
+      "keyDates": 440, "keyDatesVerified": 393, "keyDatesVerifiedOnReceiptBasis": 56, "observationKeyDates": 3,
+      "obligations": 304, "obligationsVerified": 254, "sources": 305, "sourcesNotFetched": 37,
       "status": { "in-force": 93, "published": 45, "enacted-not-yet-applicable": 13, "partially-applicable": 11, "proposed": 8, "superseded": 6 },
       "byJurisdiction": { "EU": [61, 45], "US": [59, 52], "International (ISO)": [22, 0], "US-CA": [9, 4], "US-CO": [3, 3], "CN": [3, 0], "JP": [2, 0], "International (Council of Europe)": [2, 0], "International (OECD)": [2, 1], "US-TX": [2, 2], "US-IL": [2, 0], "BR": [1, 0], "IN": [1, 0], "UK": [1, 0], "KR": [1, 0], "SG": [1, 0], "US-NY": [1, 0], "US-OH": [1, 0], "US-UT": [1, 0], "US-NYC": [1, 1] },
       "byJurisdictionNote": "[entries, verified]"
@@ -57,7 +57,6 @@
   ],
   "followUps": [
     "Script owner: add 'withdrawn' to STATUSES in scripts/check-regulatory-currency.mjs and RegisterStatus, then move eu-ai-liability-directive, us-eo-14110, us-eeoc-ai-ta and SEC S7-12-23 off 'superseded'.",
-    "Root ruling conflict outside both batches: br-lgpd and in-dpdp are verified:false but still assert obligations marked verified:true (map/root-decisions.md: 'no obligations asserted'); neither batch touched them.",
     "Calendar pass: skip keyDates with observation:true; apply the US build.py inwin() fix; regenerate docs/REGULATORY_CALENDAR.md and docs/industries/** (not touched here).",
     "policy.reviewWindowDays is still a single 90 days; the root ruling accepted 180 in-force / 90 proposed — script change, out of scope.",
     "6 kept S5 entries carry no affectedPacks (neither batch mapped them).",
@@ -68,5 +67,40 @@
     "Full test suite, release gate, calendar generator, fresh-clone reproduction.",
     "Legacy GLOBAL_FRAMEWORKS left unchanged: all five already link to register entries by registerId (globalRegulatory.ts:113-152); both batch summaries say keep the rows as the export-compatible view."
   ],
-  "notLegalAdvice": true
+  "notLegalAdvice": true,
+  "repairRound": {
+    "source": "monitor verdict apply/refute-register.json (REJECTED at 9d263653), required_fixes 1-3",
+    "tool": "apply/register/repair-round.mjs (same serialiser as apply-register.mjs; untouched entries byte-identical)",
+    "rootRulingBRIN": "map/root-decisions.md:26 (China, Brazil, India, Japan: verified:false, no obligations asserted) now applied to br-lgpd and in-dpdp: br-lgpd Art. 7/33/38/46 and in-dpdp 'Rules: consent notices'/'Significant Data Fiduciaries' set verified:false with a basis naming the ruling and the official page they were recorded from (Planalto; PIB 14 Nov 2025); in-dpdp 's. 10 / s. 16' removed (India Code search index only, page not read: no official source); the ruling added to both entries' openQuestions. Test widened to CN, BR, IN, JP; docs/COMPLIANCE_FRAMEWORKS.md and doc-rows.mjs state the ruling's full scope.",
+    "droppedFactsRestored": [
+      "eu-ai-act obligation Art. 111(3) (GPAI models placed before 2025-08-02 comply by 2027-08-02): verified:true in S5 register at 67d73223; restored with source AI Act Service Desk Article 111 (retrieved 2026-10-03, still in the entry's sources); date matches keyDate gpaiLegacyModelsDeadline read in OJ CELEX 32024R1689 2026-10-04",
+      "eu-ai-act obligation Art. 111(4) (synthetic-content systems placed before 2026-08-02 meet Art. 50(2) by 2026-12-02): verified:true at 67d73223; restored, same source; date matches keyDate newProhibitionsAndArt50_2Transition read in OJ CELEX 32026R1744 2026-10-04",
+      "eu-mdr-ivdr keyDate mdrApplication 2021-05-26 (MDR applies): verified:true at 67d73223; restored with url health.ec.europa.eu/medical-devices-sector/new-regulations_en, retrievedAt 2026-10-03 (the S5 source, still in the entry's sources)",
+      "eu-mdr-ivdr obligation 'AI Act Art. 6(1) link' (Annex I Section A items 11-12; AI Act obligations from 2028-08-02): verified:true at 67d73223; restored with source AI Act Service Desk Annex I and Article 113 (retrieved 2026-10-03)"
+    ],
+    "countDelta": "keyDates 439->440 (verified 392->393); obligations 302->304 (+3 restored, -1 in-dpdp s.10/s.16); obligationsVerified 257->254 (+3 restored, -6 BR/IN); entries/verified/unverified unchanged (176/108/68: br-lgpd, in-dpdp, eu-mdr-ivdr were already unverified, eu-ai-act stays verified)",
+    "testsRun": [
+      {
+        "command": "npx vitest run tests/regulatoryCurrencyRegister.test.ts against the 9d263653 register.json (widened ruling test + restored-facts test)",
+        "result": "RED: 2 failed | 10 passed (12)"
+      },
+      {
+        "command": "same, repaired register.json",
+        "result": "12 passed"
+      },
+      {
+        "command": "npx vitest run tests/regulatoryCurrency.test.ts tests/regulatoryCurrencyRegister.test.ts tests/euAiActTimeline.test.ts tests/round4Gaps.test.ts tests/complyRiskClassifyDocs.test.ts",
+        "result": "5 files passed, 96 tests passed"
+      },
+      {
+        "command": "node scripts/check-regulatory-currency.mjs",
+        "result": "entries=176 verified=108 unverified=68 asOf=2026-10-04, exit 0"
+      },
+      {
+        "command": "pnpm typecheck:tests",
+        "result": "exit 0"
+      }
+    ],
+    "notExercised": "No source URL was re-fetched in this round; restored facts carry the S5 review's official sources and retrievedAt. pnpm typecheck (src) not re-run (no .ts under src changed). 6 kept S5 entries still have no affectedPacks (low, unchanged follow-up)."
+  }
 }
