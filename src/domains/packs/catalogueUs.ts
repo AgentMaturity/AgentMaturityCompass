@@ -4,7 +4,7 @@
  * each part on the review date; statutes and guidance that were not checked
  * are recorded as "unverified".
  */
-import type { RegulatoryInstrument } from "../industryPackRegulatorySchema.js";
+import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { cfr, milestones, unverified, verified } from "./catalogueHelpers.js";
 
 const FR = "https://www.federalregister.gov/documents";
@@ -36,7 +36,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     `${FR}/2026/09/29/2026-19929/recodification-of-title-ix-rules`,
     ["Title IX", "34 CFR Part 106"], { effectiveDate: "2026-09-29", note: "FR 2026-19929 repealed the vacated 2024 rule and restored the earlier regulatory text." }),
   cfr("us-idea", 34, 300, "Individuals with Disabilities Education Act Part B regulations (34 CFR Part 300)", ["IDEA", "34 CFR Part 300"]),
-  verified("us-ada-title-ii-web", "ADA Title II web and mobile app accessibility rule (28 CFR Part 35, Subpart H)", "US", "law", "in-force-phased",
+  verified("us-ada-title-ii-web", "ADA Title II web and mobile app accessibility rule (28 CFR Part 35, Subpart H)", "US", "law", "in-force",
     `${FR}/2026/04/20/2026-07663/extension-of-compliance-dates-for-nondiscrimination-on-the-basis-of-disability-accessibility-of-web`,
     ["ADA Title II", "28 CFR Part 35"], {
       effectiveDate: "2024-06-24",

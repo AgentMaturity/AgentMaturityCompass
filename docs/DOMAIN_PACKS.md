@@ -45,12 +45,14 @@ Industry sector packs (`src/domains/industryPacks.ts`) per station. No pack may 
 
 ## Regulatory Currency
 
-Every sector pack carries a `lastReviewed` date, and its free-text `regulatoryBasis` and `complianceFrameworks` entries resolve to instruments in the regulatory catalogue (`src/domains/packs/regulatoryCatalogue.ts`). Each instrument records a citation, jurisdiction, status, `lastReviewed` and, when verified, the official source URL, `retrievedAt` date, effective date and phased application milestones. The registry attaches the resolved view to each pack as `regulatoryReferences` and `complianceFrameworkRefs`.
+Every sector pack carries a content `version` (`2026.10`, stamped at registry build) and a `lastReviewed` date, and its free-text `regulatoryBasis` and `complianceFrameworks` entries resolve to instruments in the regulatory catalogue (`src/domains/packs/regulatoryCatalogue.ts`). Each instrument records a citation, jurisdiction, status, `lastReviewed` and, when verified, the official source URL, `retrievedAt` date, effective date and phased application milestones. The registry attaches the resolved view to each pack as `regulatoryReferences` and `complianceFrameworkRefs`.
 
-- An instrument may claim a status other than `unverified` only when it names the official source it was checked against; everything not confirmed in the last review stays `unverified`.
+`version`, `lastReviewed` and `regulatoryReferences` follow the "PackCurrencyFields v1" contract read by the pack audit: each reference has a required `citation` and `jurisdiction`, optional `url`, `effectiveDate` and `lastReviewed`, and a `status` of `in-force`, `applies-from`, `proposed`, `repealed` or `unverified`. A law in force whose obligations apply in stages stays `in-force` and lists the stages as milestones; the current edition of a standard is `in-force`; a superseded edition is `repealed` with `supersededBy`.
+
+- An instrument may claim a status other than `unverified` only when it names the official source it was checked against: an https URL on the official-source host allowlist (`OFFICIAL_SOURCE_HOSTS`) plus a `retrievedAt` date. An `unverified` instrument carries no URL, `retrievedAt` or effective date.
 - A `complianceFrameworks` label either normalizes to a built-in AMC framework (`normalizeFrameworkName` in `src/compliance/frameworks.ts`, or a catalogue instrument mapped to one) or resolves to a catalogued external framework.
-- No pack may cite a superseded or repealed instrument in `regulatoryBasis`, `complianceFrameworks` or a question `regulatoryRef`.
-- Reviews older than 365 days fail validation (`validatePackRegulatoryCurrency` in `src/domains/industryPackRegulatorySchema.ts`).
+- No pack may cite a repealed instrument (including a superseded edition) in `regulatoryBasis`, `complianceFrameworks` or a question `regulatoryRef`.
+- Reviews older than 365 days fail validation (`validatePackRegulatoryCurrency` in `src/domains/packs/regulatorySchema.ts`). The rules are tested by `tests/industryPackSchema.test.ts`, `tests/industryPackFrameworkNormalization.test.ts` and `tests/industryPackRegulatoryRefresh.test.ts`.
 
 EU AI Act classifications in each pack follow Annex III of Regulation (EU) 2024/1689. Regulation (EU) 2026/1744 (Digital Omnibus on AI) moved the application of high-risk obligations to 2 December 2027 for Annex III systems and 2 August 2028 for Annex I systems; the catalogue entry `eu-ai-act` lists the application milestones.
 

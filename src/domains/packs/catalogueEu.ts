@@ -5,11 +5,11 @@
  * acts). Policy communications and guidance that were not checked are
  * recorded as "unverified".
  */
-import type { RegulatoryInstrument } from "../industryPackRegulatorySchema.js";
+import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { eu, milestones, unverified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
-  eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force-phased", "2024-08-01",
+  eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
     ["EU AI Act", "AI Act", "Regulation (EU) 2024/1689", "EU AIA", "EU Artificial Intelligence Act"], {
       frameworkId: "EU_AI_ACT",
       milestones: milestones(
@@ -27,14 +27,19 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-gdpr", "reg/2016/679", "Regulation (EU) 2016/679 (General Data Protection Regulation)", "in-force", "2018-05-25",
     ["GDPR", "EU GDPR", "General Data Protection Regulation", "Regulation (EU) 2016/679"], { frameworkId: "GDPR" }),
   eu("eu-nis2", "dir/2022/2555", "Directive (EU) 2022/2555 (NIS2)", "in-force", "2023-01-16",
-    ["EU NIS2 Directive 2022/2555", "EU NIS2 2022/2555", "EU NIS2", "NIS2", "Directive (EU) 2022/2555"]),
+    ["EU NIS2 Directive 2022/2555", "EU NIS2 2022/2555", "EU NIS2", "NIS2", "Directive (EU) 2022/2555"], {
+      milestones: milestones(["2024-10-17", "Transposition deadline; NIS1 repealed as from 2024-10-18"]),
+      note: "Transposition and repeal dates read from the Commission NIS2 page (digital-strategy.ec.europa.eu/en/policies/nis2-directive) on the review date.",
+    }),
   eu("eu-dora", "reg/2022/2554", "Regulation (EU) 2022/2554 (Digital Operational Resilience Act)", "in-force", "2025-01-17",
-    ["EU DORA", "DORA", "Regulation (EU) 2022/2554", "EU DORA (EU) 2022/2554"]),
+    ["EU DORA", "DORA", "Regulation (EU) 2022/2554", "EU DORA (EU) 2022/2554"], {
+      note: "Application date 17 Jan 2025 also read from the EIOPA DORA page (eiopa.europa.eu/digital-operational-resilience-act-dora_en) on the review date.",
+    }),
   eu("eu-dsa", "reg/2022/2065", "Regulation (EU) 2022/2065 (Digital Services Act)", "in-force", "2022-11-16",
     ["EU DSA", "EU Digital Services Act", "DSA", "Regulation (EU) 2022/2065"]),
   eu("eu-dma", "reg/2022/1925", "Regulation (EU) 2022/1925 (Digital Markets Act)", "in-force", "2023-05-02",
     ["EU DMA", "EU Digital Markets Act", "DMA", "Regulation (EU) 2022/1925"]),
-  eu("eu-data-act", "reg/2023/2854", "Regulation (EU) 2023/2854 (Data Act)", "in-force-phased", "2025-09-12",
+  eu("eu-data-act", "reg/2023/2854", "Regulation (EU) 2023/2854 (Data Act)", "in-force", "2025-09-12",
     ["EU Data Act", "Regulation (EU) 2023/2854"], {
       milestones: milestones(
         ["2025-09-12", "General application (Art. 50)"],
@@ -46,9 +51,15 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["EU Data Governance Act", "Data Governance Act", "Regulation (EU) 2022/868"]),
   eu("eu-eidas2", "reg/2024/1183", "Regulation (EU) 2024/1183 amending Regulation (EU) No 910/2014 (European Digital Identity Framework, eIDAS 2.0)", "in-force", "2024-05-20",
     ["EU eIDAS 2.0", "eIDAS 2.0", "EU eIDAS", "eIDAS", "Regulation (EU) 2024/1183"]),
-  eu("eu-ehds", "reg/2025/327", "Regulation (EU) 2025/327 (European Health Data Space)", "in-force-phased", "2025-03-26",
+  eu("eu-ehds", "reg/2025/327", "Regulation (EU) 2025/327 (European Health Data Space)", "in-force", "2025-03-26",
     ["EU EHDS Regulation", "EU European Health Data Space (EHDS) Regulation", "EU EHDS", "EHDS", "Regulation (EU) 2025/327"], {
-      milestones: milestones(["2027-03-26", "Application date (CELLAR metadata; scope not read)"], ["2029-03-26", "Application date (CELLAR metadata; scope not read)"], ["2031-03-26", "Application date (CELLAR metadata; scope not read)"], ["2035-03-26", "Application date (CELLAR metadata; scope not read)"]),
+      milestones: milestones(
+        ["2027-03-26", "Deadline for key Commission implementing acts (CELLAR metadata; Commission EHDS page)"],
+        ["2029-03-26", "Key parts apply, including primary-use exchange of Patient Summaries and ePrescriptions/eDispensations (CELLAR metadata; Commission EHDS page)"],
+        ["2031-03-26", "Application date (CELLAR metadata; scope not read)"],
+        ["2035-03-26", "Application date (CELLAR metadata; scope not read)"],
+      ),
+      note: "Entry into force 26 Mar 2025 and the 2027/2029 stages read from the Commission EHDS page (health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en) on the review date.",
     }),
   eu("eu-mdr", "reg/2017/745", "Regulation (EU) 2017/745 (Medical Devices Regulation)", "in-force", "2017-05-25",
     ["EU MDR", "MDR", "Regulation (EU) 2017/745"], { note: "Amended in 2024-2026 (incl. Regulation (EU) 2024/1860 on Eudamed roll-out)." }),
@@ -58,21 +69,26 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["EU CTR 536/2014", "EU Clinical Trials Regulation 536/2014", "EU CTR", "Regulation (EU) No 536/2014"]),
   eu("eu-mica", "reg/2023/1114", "Regulation (EU) 2023/1114 (Markets in Crypto-Assets)", "in-force", "2024-12-30",
     ["MiCA", "MiCA Regulation 2023/1114", "MiCA 2023/1114", "Regulation (EU) 2023/1114"], {
-      milestones: milestones(["2024-06-30", "Earlier application date (CELLAR metadata; scope not read)"], ["2024-12-30", "Application date (CELLAR metadata)"]),
+      milestones: milestones(
+        ["2024-06-30", "Earlier application date (CELLAR metadata; scope not read)"],
+        ["2024-12-30", "Full application (CELLAR metadata; ESMA MiCA page)"],
+        ["2026-07-01", "End of the Art. 143(3) grandfathering period for CASPs operating under national law (ESMA MiCA page)"],
+      ),
+      note: "Transitional dates read from the ESMA MiCA page (esma.europa.eu/esmas-activities/digital-finance-and-innovation/markets-crypto-assets-regulation-mica) on the review date.",
     }),
   eu("eu-tfr", "reg/2023/1113", "Regulation (EU) 2023/1113 (information accompanying transfers of funds and certain crypto-assets)", "in-force", "2024-12-30",
     ["EU TFR", "Regulation (EU) 2023/1113", "EU Transfer of Funds Regulation"]),
-  eu("eu-sepa-instant", "reg/2024/886", "Regulation (EU) 2024/886 (instant credit transfers in euro), inserting Art. 5c verification of payee into Regulation (EU) No 260/2012", "in-force-phased", "2024-04-08",
+  eu("eu-sepa-instant", "reg/2024/886", "Regulation (EU) 2024/886 (instant credit transfers in euro), inserting Art. 5c verification of payee into Regulation (EU) No 260/2012", "in-force", "2024-04-08",
     ["Regulation (EU) 2024/886", "EU Instant Payments Regulation", "Regulation (EU) No 260/2012"], {
       milestones: milestones(["2025-01-09", "Euro-area PSPs receive instant credit transfers"], ["2025-10-09", "Euro-area PSPs send instant credit transfers and offer verification of payee (Art. 5c)"], ["2027-01-09", "Non-euro Member States: receiving obligations"]),
       note: "Art. 5c and compliance dates read from the Official Journal text.",
     }),
-  eu("eu-psd2", "dir/2015/2366", "Directive (EU) 2015/2366 (PSD2)", "unverified", "2016-01-12",
+  eu("eu-psd2", "dir/2015/2366", "Directive (EU) 2015/2366 (PSD2)", "unverified", undefined,
     ["PSD2", "PSD2 Directive 2015/2366", "Directive (EU) 2015/2366", "PSD2 2015/2366"], {
       url: undefined, retrievedAt: undefined,
       note: "CELLAR metadata reports in-force=true but end-of-validity 2026-06-18 with no repealing act listed; no adopted PSD3/PSR act found in OJ metadata on the review date. Status left unverified.",
     }),
-  eu("eu-amlr", "reg/2024/1624", "Regulation (EU) 2024/1624 (Anti-Money Laundering Regulation)", "adopted-not-yet-applicable", "2027-07-10",
+  eu("eu-amlr", "reg/2024/1624", "Regulation (EU) 2024/1624 (Anti-Money Laundering Regulation)", "applies-from", "2027-07-10",
     ["Regulation (EU) 2024/1624", "EU AMLR"]),
   eu("eu-amld5", "dir/2018/843", "Directive (EU) 2018/843 (5th Anti-Money Laundering Directive)", "in-force", "2018-07-09",
     ["5AMLD", "AML/KYC Requirements (5AMLD", "Directive (EU) 2018/843"], { note: "End of validity 2027-07-09 in CELLAR metadata (AML package of 2024)." }),
@@ -82,11 +98,15 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["Directive (EU) 2018/1673"]),
   eu("eu-platform-work", "dir/2024/2831", "Directive (EU) 2024/2831 (Platform Work Directive)", "in-force", "2024-12-01",
     ["EU Platform Work Directive", "Directive (EU) 2024/2831"]),
-  eu("eu-eudr", "reg/2023/1115", "Regulation (EU) 2023/1115 (Deforestation Regulation), as amended by Regulations (EU) 2024/3234 and 2025/2650", "in-force-phased", "2023-06-29",
+  eu("eu-eudr", "reg/2023/1115", "Regulation (EU) 2023/1115 (Deforestation Regulation), as amended by Regulations (EU) 2024/3234 and 2025/2650", "in-force", "2023-06-29",
     ["EUDR", "EU Deforestation Regulation", "Regulation (EU) 2023/1115"], {
-      milestones: milestones(["2026-12-30", "Application date as amended (CELLAR metadata; scope not read)"], ["2027-06-30", "Later application date as amended (CELLAR metadata; scope not read)"]),
+      milestones: milestones(
+        ["2026-12-30", "Applies to large and medium operators, and to micro and small operators already covered by the EUTR (Commission EUDR page)"],
+        ["2027-06-30", "Applies to micro and small operators (Commission EUDR page)"],
+      ),
+      note: "Application dates read from the Commission EUDR page (environment.ec.europa.eu/topics/forests/deforestation/regulation-deforestation-free-products_en) on the review date.",
     }),
-  eu("eu-batteries", "reg/2023/1542", "Regulation (EU) 2023/1542 (Batteries Regulation), as amended by Regulation (EU) 2025/1561", "in-force-phased", "2023-08-17",
+  eu("eu-batteries", "reg/2023/1542", "Regulation (EU) 2023/1542 (Batteries Regulation), as amended by Regulation (EU) 2025/1561", "in-force", "2023-08-17",
     ["EU Battery Regulation", "EU Batteries Regulation", "Regulation (EU) 2023/1542"]),
   eu("eu-espr", "reg/2024/1781", "Regulation (EU) 2024/1781 (Ecodesign for Sustainable Products Regulation)", "in-force", "2024-07-18",
     ["EU Ecodesign Regulation", "ESPR", "Regulation (EU) 2024/1781"]),
@@ -106,7 +126,7 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["EU CSDDD", "CSDDD", "Directive (EU) 2024/1760"]),
   eu("eu-uwwtd-1991", "dir/1991/271", "Council Directive 91/271/EEC (Urban Waste-Water Treatment)", "in-force", "1991-05-29",
     ["EU UWWTD 91/271/EEC", "Council Directive 91/271/EEC"], { note: "Repealed by Directive (EU) 2024/3019 with end of validity 2027-07-31 in CELLAR metadata." }),
-  eu("eu-uwwtd-2024", "dir/2024/3019", "Directive (EU) 2024/3019 (Urban Wastewater Treatment, recast)", "in-force-phased", "2025-01-01",
+  eu("eu-uwwtd-2024", "dir/2024/3019", "Directive (EU) 2024/3019 (Urban Wastewater Treatment, recast)", "in-force", "2025-01-01",
     ["EU Urban Wastewater Treatment Directive (EU) 2024/3019", "Directive (EU) 2024/3019", "EU UWWTD (EU) 2024/3019"]),
   eu("eu-dwd", "dir/2020/2184", "Directive (EU) 2020/2184 (Drinking Water Directive, recast)", "in-force", "2021-01-12",
     ["EU Drinking Water Directive", "EU DWD", "Directive (EU) 2020/2184"]),
@@ -126,7 +146,7 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["European Accessibility Act", "EU European Accessibility Act", "EU Accessibility Act", "Directive (EU) 2019/882"]),
   eu("eu-cdsm", "dir/2019/790", "Directive (EU) 2019/790 (Copyright in the Digital Single Market)", "in-force", "2019-06-06",
     ["EU Copyright Directive", "Directive (EU) 2019/790"]),
-  eu("eu-emfa", "reg/2024/1083", "Regulation (EU) 2024/1083 (European Media Freedom Act)", "in-force-phased", "2024-05-07",
+  eu("eu-emfa", "reg/2024/1083", "Regulation (EU) 2024/1083 (European Media Freedom Act)", "in-force", "2024-05-07",
     ["EU Media Freedom Act", "EMFA", "Regulation (EU) 2024/1083"]),
   eu("eu-political-ads", "reg/2024/900", "Regulation (EU) 2024/900 (transparency and targeting of political advertising)", "in-force", "2025-10-10",
     ["EU Political Advertising Regulation", "Regulation (EU) 2024/900"]),
@@ -154,17 +174,17 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["Interoperable Europe Act", "Regulation (EU) 2024/903"]),
   eu("eu-inspire", "dir/2007/2", "Directive 2007/2/EC (INSPIRE)", "in-force", "2007-05-15",
     ["EU INSPIRE", "Directive 2007/2/EC"]),
-  eu("eu-cra", "reg/2024/2847", "Regulation (EU) 2024/2847 (Cyber Resilience Act)", "in-force-phased", "2024-12-10",
+  eu("eu-cra", "reg/2024/2847", "Regulation (EU) 2024/2847 (Cyber Resilience Act)", "in-force", "2024-12-10",
     ["EU CRA", "EU Cyber Resilience Act", "Regulation (EU) 2024/2847"], {
       milestones: milestones(["2026-06-11", "Chapter IV (notification of conformity assessment bodies) applies (Art. 71)"], ["2026-09-11", "Art. 14 reporting obligations apply (Art. 71)"], ["2027-12-11", "General application (Art. 71)"]),
     }),
   eu("eu-pld", "dir/2024/2853", "Directive (EU) 2024/2853 (Product Liability Directive)", "in-force", "2024-12-08",
     ["EU Product Liability Directive", "Directive (EU) 2024/2853"]),
-  eu("eu-machinery", "reg/2023/1230", "Regulation (EU) 2023/1230 (Machinery Regulation)", "in-force-phased", "2023-07-19",
+  eu("eu-machinery", "reg/2023/1230", "Regulation (EU) 2023/1230 (Machinery Regulation)", "in-force", "2023-07-19",
     ["EU Machinery Regulation", "Regulation (EU) 2023/1230"], {
       milestones: milestones(["2027-01-20", "General application (Art. 54, as corrected by the corrigendum in OJ L 169, 4.7.2023)"]),
     }),
-  eu("eu-forced-labour", "reg/2024/3015", "Regulation (EU) 2024/3015 (prohibiting products made with forced labour)", "adopted-not-yet-applicable", "2027-12-14",
+  eu("eu-forced-labour", "reg/2024/3015", "Regulation (EU) 2024/3015 (prohibiting products made with forced labour)", "applies-from", "2027-12-14",
     ["EU Forced Labour Regulation", "Regulation (EU) 2024/3015"], { note: "Applies from 2027-12-14 (Art. 39); certain articles from 2024-12-13." }),
   eu("eu-driving-times", "reg/2006/561", "Regulation (EC) No 561/2006 (driving times, breaks and rest periods)", "in-force", "2007-04-11",
     ["Regulation (EC) No 561/2006", "Regulation (EC) 561/2006"], { note: "Amended by Regulations (EU) 2020/1054 and 2024/1258; CELLAR end-of-validity field (2014-02-28) conflicts with in-force=true." }),

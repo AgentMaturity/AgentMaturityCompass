@@ -1,50 +1,51 @@
 /**
  * International standards, treaties, frameworks and guidance cited by industry
- * packs. Editions marked current/superseded were checked against the issuing
+ * packs. Editions marked in-force (current edition) or repealed (superseded
+ * edition, with supersededBy) were checked against the issuing
  * body's own catalogue or page on the review date (iso.org listings: the page
  * body returns HTTP 403 to automated fetches, so the edition is taken from the
  * iso.org catalogue title). Everything else is "unverified".
  */
-import type { RegulatoryInstrument } from "../industryPackRegulatorySchema.js";
+import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { milestones, unverified, verified } from "./catalogueHelpers.js";
 
 const ISO_NOTE = "Edition and status taken from the iso.org catalogue listing on the review date.";
 
-function iso(id: string, citation: string, status: "current" | "superseded", url: string, aliases: string[], supersededBy?: string): RegulatoryInstrument {
+function iso(id: string, citation: string, status: "in-force" | "repealed", url: string, aliases: string[], supersededBy?: string): RegulatoryInstrument {
   return verified(id, citation, "INT", "standard", status, url, aliases, { note: ISO_NOTE, ...(supersededBy ? { supersededBy } : {}) });
 }
 
 export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // ISO / IEC management-system and sector standards
-  iso("iso-9001-2026", "ISO 9001:2026 Quality management systems — Requirements", "current", "https://www.iso.org/standard/9001", ["ISO 9001:2026", "ISO 9001"]),
-  iso("iso-9001-2015", "ISO 9001:2015 Quality management systems — Requirements", "superseded", "https://www.iso.org/standard/62085.html", ["ISO 9001:2015"], "iso-9001-2026"),
-  iso("iso-14001-2026", "ISO 14001:2026 Environmental management systems", "current", "https://www.iso.org/news/2026/04/iso-14001-2026-published", ["ISO 14001:2026", "ISO 14001"]),
-  iso("iso-14001-2015", "ISO 14001:2015 Environmental management systems", "superseded", "https://www.iso.org/standard/60857.html", ["ISO 14001:2015"], "iso-14001-2026"),
-  iso("iso-13485", "ISO 13485:2016 Medical devices — Quality management systems", "current", "https://www.iso.org/standard/59752.html", ["ISO 13485:2016", "ISO 13485"]),
-  iso("iso-14971", "ISO 14971:2019 Medical devices — Application of risk management", "current", "https://www.iso.org/standard/72704.html", ["ISO 14971:2019", "ISO 14971"]),
-  iso("iso-14155-2026", "ISO 14155:2026 Clinical investigation of medical devices for human subjects — Good clinical practice", "current", "https://www.iso.org/standard/14155", ["ISO 14155:2026", "ISO 14155"]),
-  iso("iso-14155-2020", "ISO 14155:2020 Clinical investigation of medical devices for human subjects — Good clinical practice", "superseded", "https://www.iso.org/standard/71690.html", ["ISO 14155:2020"], "iso-14155-2026"),
-  verified("iso-27001", "ISO/IEC 27001:2022 Information security management systems (with Amd 1:2024)", "INT", "standard", "current", "https://www.iso.org/standard/27001",
+  iso("iso-9001-2026", "ISO 9001:2026 Quality management systems — Requirements", "in-force", "https://www.iso.org/standard/9001", ["ISO 9001:2026", "ISO 9001"]),
+  iso("iso-9001-2015", "ISO 9001:2015 Quality management systems — Requirements", "repealed", "https://www.iso.org/standard/62085.html", ["ISO 9001:2015"], "iso-9001-2026"),
+  iso("iso-14001-2026", "ISO 14001:2026 Environmental management systems", "in-force", "https://www.iso.org/news/2026/04/iso-14001-2026-published", ["ISO 14001:2026", "ISO 14001"]),
+  iso("iso-14001-2015", "ISO 14001:2015 Environmental management systems", "repealed", "https://www.iso.org/standard/60857.html", ["ISO 14001:2015"], "iso-14001-2026"),
+  iso("iso-13485", "ISO 13485:2016 Medical devices — Quality management systems", "in-force", "https://www.iso.org/standard/59752.html", ["ISO 13485:2016", "ISO 13485"]),
+  iso("iso-14971", "ISO 14971:2019 Medical devices — Application of risk management", "in-force", "https://www.iso.org/standard/72704.html", ["ISO 14971:2019", "ISO 14971"]),
+  iso("iso-14155-2026", "ISO 14155:2026 Clinical investigation of medical devices for human subjects — Good clinical practice", "in-force", "https://www.iso.org/standard/14155", ["ISO 14155:2026", "ISO 14155"]),
+  iso("iso-14155-2020", "ISO 14155:2020 Clinical investigation of medical devices for human subjects — Good clinical practice", "repealed", "https://www.iso.org/standard/71690.html", ["ISO 14155:2020"], "iso-14155-2026"),
+  verified("iso-27001", "ISO/IEC 27001:2022 Information security management systems (with Amd 1:2024)", "INT", "standard", "in-force", "https://www.iso.org/standard/27001",
     ["ISO/IEC 27001:2022", "ISO 27001:2022", "ISO/IEC 27001", "ISO 27001"], { frameworkId: "ISO_27001", note: ISO_NOTE }),
-  iso("iso-27701-2025", "ISO/IEC 27701:2025 Privacy information management systems — Requirements and guidance", "current", "https://www.iso.org/standard/27701", ["ISO/IEC 27701:2025", "ISO 27701:2025"]),
-  iso("iso-27701-2019", "ISO/IEC 27701:2019 Extension to ISO/IEC 27001 and ISO/IEC 27002 for privacy information management", "superseded", "https://www.iso.org/standard/71670.html", ["ISO/IEC 27701:2019", "ISO 27701:2019"], "iso-27701-2025"),
-  iso("iso-27799-2025", "ISO 27799:2025 Health informatics — Information security controls in health based on ISO/IEC 27002", "current", "https://www.iso.org/standard/84647.html", ["ISO 27799:2025", "ISO 27799"]),
-  iso("iso-27799-2016", "ISO 27799:2016 Health informatics — Information security management in health using ISO/IEC 27002", "superseded", "https://www.iso.org/standard/62777.html", ["ISO 27799:2016"], "iso-27799-2025"),
-  verified("iso-42001", "ISO/IEC 42001:2023 Artificial intelligence — Management system", "INT", "standard", "current", "https://www.iso.org/standard/42001",
+  iso("iso-27701-2025", "ISO/IEC 27701:2025 Privacy information management systems — Requirements and guidance", "in-force", "https://www.iso.org/standard/27701", ["ISO/IEC 27701:2025", "ISO 27701:2025"]),
+  iso("iso-27701-2019", "ISO/IEC 27701:2019 Extension to ISO/IEC 27001 and ISO/IEC 27002 for privacy information management", "repealed", "https://www.iso.org/standard/71670.html", ["ISO/IEC 27701:2019", "ISO 27701:2019"], "iso-27701-2025"),
+  iso("iso-27799-2025", "ISO 27799:2025 Health informatics — Information security controls in health based on ISO/IEC 27002", "in-force", "https://www.iso.org/standard/84647.html", ["ISO 27799:2025", "ISO 27799"]),
+  iso("iso-27799-2016", "ISO 27799:2016 Health informatics — Information security management in health using ISO/IEC 27002", "repealed", "https://www.iso.org/standard/62777.html", ["ISO 27799:2016"], "iso-27799-2025"),
+  verified("iso-42001", "ISO/IEC 42001:2023 Artificial intelligence — Management system", "INT", "standard", "in-force", "https://www.iso.org/standard/42001",
     ["ISO/IEC 42001:2023", "ISO/IEC 42001", "ISO 42001"], { frameworkId: "ISO_42001", note: ISO_NOTE }),
-  iso("iso-28000", "ISO 28000:2022 Security and resilience — Security management systems (with Amd 1:2024)", "current", "https://www.iso.org/standard/79612.html", ["ISO 28000:2022", "ISO 28000"]),
-  iso("iso-22301", "ISO 22301:2019 Security and resilience — Business continuity management systems (with Amd 1:2024)", "current", "https://www.iso.org/standard/88412.html", ["ISO 22301:2019", "ISO 22301"]),
-  iso("iso-45001", "ISO 45001:2018 Occupational health and safety management systems (with Amd 1:2024)", "current", "https://www.iso.org/standard/45001", ["ISO 45001:2018", "ISO 45001"]),
-  iso("iso-50001", "ISO 50001:2018 Energy management systems (with Amd 1:2024)", "current", "https://www.iso.org/standard/88430.html", ["ISO 50001:2018", "ISO 50001"]),
-  iso("iso-21434", "ISO/SAE 21434:2021 Road vehicles — Cybersecurity engineering", "current", "https://www.iso.org/standard/70918.html", ["ISO/SAE 21434:2021", "ISO 21434:2021", "ISO 21434"]),
-  iso("iso-9241-210", "ISO 9241-210:2019 Human-centred design for interactive systems", "current", "https://www.iso.org/standard/77520.html", ["ISO 9241-210:2019", "ISO 9241-210"]),
-  iso("iso-20000-1", "ISO/IEC 20000-1:2018 Service management system requirements", "current", "https://www.iso.org/standard/70636.html", ["ISO/IEC 20000-1:2018", "ISO/IEC 20000-1"]),
-  iso("iso-29115", "ISO/IEC 29115:2013 Entity authentication assurance framework", "current", "https://www.iso.org/standard/45138.html", ["ISO/IEC 29115:2013", "ISO/IEC 29115"]),
-  iso("iso-14044", "ISO 14044:2006 Life cycle assessment — Requirements and guidelines (with amendments 2017, 2020)", "current", "https://www.iso.org/standard/38498.html", ["ISO 14044:2006", "ISO 14044"]),
-  iso("iso-29990", "ISO 29990:2010 Learning services for non-formal education and training", "superseded", "https://www.iso.org/contents/data/standard/05/33/53392.html", ["ISO 29990:2010", "ISO 29990"], "iso-21001"),
+  iso("iso-28000", "ISO 28000:2022 Security and resilience — Security management systems (with Amd 1:2024)", "in-force", "https://www.iso.org/standard/79612.html", ["ISO 28000:2022", "ISO 28000"]),
+  iso("iso-22301", "ISO 22301:2019 Security and resilience — Business continuity management systems (with Amd 1:2024)", "in-force", "https://www.iso.org/standard/88412.html", ["ISO 22301:2019", "ISO 22301"]),
+  iso("iso-45001", "ISO 45001:2018 Occupational health and safety management systems (with Amd 1:2024)", "in-force", "https://www.iso.org/standard/45001", ["ISO 45001:2018", "ISO 45001"]),
+  iso("iso-50001", "ISO 50001:2018 Energy management systems (with Amd 1:2024)", "in-force", "https://www.iso.org/standard/88430.html", ["ISO 50001:2018", "ISO 50001"]),
+  iso("iso-21434", "ISO/SAE 21434:2021 Road vehicles — Cybersecurity engineering", "in-force", "https://www.iso.org/standard/70918.html", ["ISO/SAE 21434:2021", "ISO 21434:2021", "ISO 21434"]),
+  iso("iso-9241-210", "ISO 9241-210:2019 Human-centred design for interactive systems", "in-force", "https://www.iso.org/standard/77520.html", ["ISO 9241-210:2019", "ISO 9241-210"]),
+  iso("iso-20000-1", "ISO/IEC 20000-1:2018 Service management system requirements", "in-force", "https://www.iso.org/standard/70636.html", ["ISO/IEC 20000-1:2018", "ISO/IEC 20000-1"]),
+  iso("iso-29115", "ISO/IEC 29115:2013 Entity authentication assurance framework", "in-force", "https://www.iso.org/standard/45138.html", ["ISO/IEC 29115:2013", "ISO/IEC 29115"]),
+  iso("iso-14044", "ISO 14044:2006 Life cycle assessment — Requirements and guidelines (with amendments 2017, 2020)", "in-force", "https://www.iso.org/standard/38498.html", ["ISO 14044:2006", "ISO 14044"]),
+  iso("iso-29990", "ISO 29990:2010 Learning services for non-formal education and training", "repealed", "https://www.iso.org/contents/data/standard/05/33/53392.html", ["ISO 29990:2010", "ISO 29990"], "iso-21001"),
   unverified("iso-21001", "ISO 21001 Educational organizations — Management systems (edition not confirmed)", "INT", "standard", ["ISO 21001"],
     "iso.org lists ISO 21001:2018 and its Amd 1:2024; whether a newer edition replaced it was not confirmed."),
-  verified("iec-62304", "IEC 62304:2006 + Amd 1:2015 Medical device software — Software life cycle processes", "INT", "standard", "current", "https://www.iso.org/standard/64686.html",
+  verified("iec-62304", "IEC 62304:2006 + Amd 1:2015 Medical device software — Software life cycle processes", "INT", "standard", "in-force", "https://www.iso.org/standard/64686.html",
     ["IEC 62304:2006/AMD1:2015", "IEC 62304:2006", "IEC 62304"], { note: "Edition 2 (health software) is in development per IEC SC 62A documents; not yet published on the review date." }),
   unverified("iso-22000", "ISO 22000:2018 Food safety management systems", "INT", "standard", ["ISO 22000:2018", "ISO 22000"]),
   unverified("iso-26000", "ISO 26000:2010 Guidance on social responsibility", "INT", "guidance", ["ISO 26000:2010", "ISO 26000"]),
@@ -66,17 +67,17 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("unece-r155-r156", "UN Regulations No. 155 (cybersecurity) and No. 156 (software updates), UNECE WP.29", "INT", "law", ["UNECE WP.29"]),
 
   // NIST, W3C, payment-card and security frameworks
-  verified("nist-ai-rmf", "NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0)", "US", "framework", "current", "https://www.nist.gov/itl/ai-risk-management-framework",
+  verified("nist-ai-rmf", "NIST AI 100-1 Artificial Intelligence Risk Management Framework (AI RMF 1.0)", "US", "framework", "in-force", "https://www.nist.gov/itl/ai-risk-management-framework",
     ["NIST AI RMF 1.0", "NIST AI RMF", "NIST AI 100-1"], { frameworkId: "NIST_AI_RMF" }),
-  verified("nist-csf-2", "NIST Cybersecurity Framework 2.0", "US", "framework", "current", "https://www.nist.gov/cyberframework", ["NIST CSF 2.0", "NIST CSF"]),
-  verified("nist-sp-800-161", "NIST SP 800-161 Rev. 1 (update 1, 2024-11-01) Cybersecurity Supply Chain Risk Management Practices", "US", "standard", "current",
+  verified("nist-csf-2", "NIST Cybersecurity Framework 2.0", "US", "framework", "in-force", "https://www.nist.gov/cyberframework", ["NIST CSF 2.0", "NIST CSF"]),
+  verified("nist-sp-800-161", "NIST SP 800-161 Rev. 1 (update 1, 2024-11-01) Cybersecurity Supply Chain Risk Management Practices", "US", "standard", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final", ["NIST SP 800-161r1-upd1", "NIST SP 800-161"]),
-  verified("w3c-wcag-21", "W3C Web Content Accessibility Guidelines 2.1", "INT", "standard", "current", "https://www.w3.org/TR/WCAG22/",
+  verified("w3c-wcag-21", "W3C Web Content Accessibility Guidelines 2.1", "INT", "standard", "in-force", "https://www.w3.org/TR/WCAG22/",
     ["WCAG 2.1 AA", "WCAG 2.1"], { note: "W3C states WCAG 2.2 does not deprecate or supersede WCAG 2.1 and advises WCAG 2.2 as the conformance target." }),
-  verified("w3c-wcag-22", "W3C Web Content Accessibility Guidelines 2.2", "INT", "standard", "current", "https://www.w3.org/TR/WCAG22/", ["WCAG 2.2 AA", "WCAG 2.2"]),
-  verified("pci-dss-401", "PCI DSS v4.0.1", "INT", "standard", "current", "https://www.pcisecuritystandards.org/document_library/",
+  verified("w3c-wcag-22", "W3C Web Content Accessibility Guidelines 2.2", "INT", "standard", "in-force", "https://www.w3.org/TR/WCAG22/", ["WCAG 2.2 AA", "WCAG 2.2"]),
+  verified("pci-dss-401", "PCI DSS v4.0.1", "INT", "standard", "in-force", "https://www.pcisecuritystandards.org/document_library/",
     ["PCI DSS v4.0.1", "PCI DSS"], { frameworkId: "PCI_DSS" }),
-  verified("pci-dss-40", "PCI DSS v4.0", "INT", "standard", "superseded", "https://www.pcisecuritystandards.org/document_library/",
+  verified("pci-dss-40", "PCI DSS v4.0", "INT", "standard", "repealed", "https://www.pcisecuritystandards.org/document_library/",
     ["PCI DSS v4.0"], { frameworkId: "PCI_DSS", supersededBy: "pci-dss-401", note: "The PCI SSC document library lists v4.0.1 as current, with a v4.0 to v4.0.1 summary of changes." }),
   unverified("soc2", "AICPA SOC 2 (Trust Services Criteria)", "US", "framework", ["SOC 2 Type II", "SOC 2"]),
   unverified("owasp-api-2023", "OWASP API Security Top 10 (2023)", "INT", "guidance", ["OWASP API Security Top 10 2023", "OWASP API Top 10 2023", "OWASP API"]),
@@ -87,16 +88,16 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("oidc-oauth21", "OpenID Connect / OAuth 2.1", "INT", "standard", ["OpenID Connect / OAuth 2.1", "OAuth 2.1"], "OAuth 2.1 was an IETF draft when last checked; not confirmed in this review."),
 
   // Health and life-sciences standards and guidance
-  verified("ich-e6-r3", "ICH E6(R3) Guideline for Good Clinical Practice", "INT", "guidance", "current", "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
+  verified("ich-e6-r3", "ICH E6(R3) Guideline for Good Clinical Practice", "INT", "guidance", "in-force", "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
     ["ICH E6(R3)"], {
       effectiveDate: "2025-01-06",
       milestones: milestones(["2025-07-23", "Principles and Annex 1 effective in the EU"], ["2027-01-15", "Annex 2 effective in the EU"]),
       note: "Step 4 date and section numbering read from the ICH Step 4 guideline (database.ich.org); EU dates from the EMA page.",
     }),
-  verified("ich-e6-r2", "ICH E6(R2) Guideline for Good Clinical Practice", "INT", "guidance", "superseded", "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
+  verified("ich-e6-r2", "ICH E6(R2) Guideline for Good Clinical Practice", "INT", "guidance", "repealed", "https://www.ema.europa.eu/en/ich-e6-good-clinical-practice-scientific-guideline",
     ["ICH E6(R2)"], { supersededBy: "ich-e6-r3" }),
-  verified("consort-2025", "CONSORT 2025 Statement", "INT", "guidance", "current", "https://www.consort-spirit.org/published-statements", ["CONSORT 2025"]),
-  verified("consort-2010", "CONSORT 2010 Statement", "INT", "guidance", "superseded", "https://www.consort-spirit.org/published-statements", ["CONSORT 2010"], { supersededBy: "consort-2025" }),
+  verified("consort-2025", "CONSORT 2025 Statement", "INT", "guidance", "in-force", "https://www.consort-spirit.org/published-statements", ["CONSORT 2025"]),
+  verified("consort-2010", "CONSORT 2010 Statement", "INT", "guidance", "repealed", "https://www.consort-spirit.org/published-statements", ["CONSORT 2010"], { supersededBy: "consort-2025" }),
   unverified("ich-q8-q12", "ICH Q8(R2)-Q12 quality guidelines", "INT", "guidance", ["ICH Q8(R2)-Q12", "ICH Q8(R2)"]),
   unverified("ich-m4", "ICH M4 Common Technical Document", "INT", "guidance", ["ICH M4 CTD", "ICH M4"]),
   unverified("cdisc", "CDISC CDASH / SDTM / ADaM", "INT", "standard", ["CDISC"]),
@@ -111,7 +112,7 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("nqf", "NQF standards", "US", "standard", ["NQF Standards"]),
 
   // Financial-sector frameworks
-  verified("fatf-recs", "FATF Recommendations (R.16 revised June 2025)", "INT", "framework", "current",
+  verified("fatf-recs", "FATF Recommendations (R.16 revised June 2025)", "INT", "framework", "in-force",
     "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/update-Recommendation-16-payment-transparency-june-2025.html",
     ["FATF Recommendations", "FATF Recommendation", "FATF R1", "FATF R16", "FATF R.16"], { note: "Update title read from fatf-gafi.org search listing; the page body returned HTTP 403." }),
   unverified("fatf-va-guidance", "FATF Updated Guidance for a Risk-Based Approach to Virtual Assets and VASPs (2021)", "INT", "guidance", ["FATF VA/VASP Guidelines"]),
@@ -150,7 +151,7 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("gs1-epcis", "GS1 EPCIS 2.0", "INT", "standard", ["GS1 EPCIS 2.0", "GS1 EPCIS"]),
 
   // Treaties, conventions and intergovernmental principles
-  verified("oecd-ai", "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03", "INT", "guidance", "current",
+  verified("oecd-ai", "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03", "INT", "guidance", "in-force",
     "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449", ["OECD AI Principles", "OECD AI"], { note: "Amendment date read from the OECD legal-instruments listing." }),
   unverified("coe-ai-convention", "Council of Europe Framework Convention on Artificial Intelligence (CETS No. 225)", "INT", "treaty", ["Council of Europe AI Convention 2024", "CoE AI Convention", "CoE AI"],
     "Entry into force requires five ratifications incl. three CoE member States; ratification status was not read from the treaty office page (HTTP 403)."),

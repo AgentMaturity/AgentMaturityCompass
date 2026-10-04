@@ -1,4 +1,4 @@
-import type { RegulatoryInstrument } from "../industryPackRegulatorySchema.js";
+import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { EU_INSTRUMENTS } from "./catalogueEu.js";
 import { INTL_INSTRUMENTS } from "./catalogueIntl.js";
 import { US_INSTRUMENTS } from "./catalogueUs.js";
