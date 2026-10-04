@@ -1,0 +1,77 @@
+{
+  "track": "F2",
+  "title": "Regulated-agent blueprints: pack-driven agent definitions with guardrails, tool scopes and evidence requirements",
+  "status": "PARTIAL",
+  "statusReason": "Library, CLI command module, tests and docs complete and green; src/cli.ts registration and .amc/agents.yaml registration are unclaimable surfaces and are left at the ready-to-wire boundary.",
+  "date": "2026-10-03",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_fc54d4b0-c89-2",
+  "branch": "worktree-wf_fc54d4b0-c89-2",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "commits": [
+    "d35ccbb6 feat: regulated-agent blueprints derived from industry packs",
+    "c25bc23a docs: industry blueprints guide with measured results and ready-to-wire diffs"
+  ],
+  "receiptCommitNote": "The receipt commit (report.md + result.json) follows the two commits above; its SHA is in the orchestrator's structured result.",
+  "environment": "Darwin 25.6.0 arm64, Node v25.5.0, vitest v4.1.11, pnpm install --frozen-lockfile --prefer-offline exit 0",
+  "filesChanged": [
+    "src/domains/blueprints/blueprintTypes.ts",
+    "src/domains/blueprints/stationProfile.ts",
+    "src/domains/blueprints/blueprintCompose.ts",
+    "src/domains/blueprints/blueprintRender.ts",
+    "src/domains/blueprints/blueprintPreset.ts",
+    "src/domains/blueprints/blueprintCli.ts",
+    "src/domains/blueprints/index.ts",
+    "tests/industryBlueprints.test.ts",
+    "docs/INDUSTRY_BLUEPRINTS.md",
+    "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F2/report.md",
+    "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F2/result.json"
+  ],
+  "measurements": {
+    "presetSchemaTopLevelFields": 11,
+    "presetSchemaDelegateFields": 6,
+    "industryPacks": 41,
+    "packQuestions": 600,
+    "questionsWithEmptyRegulatoryRef": 0,
+    "duplicateQuestionIds": 0,
+    "assurancePacksRegistered": 143,
+    "stations": 7,
+    "blueprintsComposedInTest": 48,
+    "healthStationGuardrails": 27,
+    "healthStationOmittedQuestionIds": 124,
+    "healthClinicalTrialsGuardrails": 16
+  },
+  "testsRun": [
+    { "command": "pnpm vitest run tests/industryBlueprints.test.ts (before implementation)", "result": "Test Files 1 failed; Tests no tests (module missing, RED)" },
+    { "command": "pnpm vitest run tests/industryBlueprints.test.ts", "result": "Tests 14 passed (14); stdout stations=7 blueprints=48" }
+  ],
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "lineBudget": "node scripts/architecture-boundaries-check.mjs exit 1 solely for missing dist/cli.js and dist/api/index.js (no build run); new files 58/177/60/116/139/29/108 lines per the checker, all under cap 800; no existing file modified",
+  "acceptance": [
+    { "check": "pnpm vitest run tests/industryBlueprints.test.ts all pass and prints stations=7 blueprints=N", "observed": "14 passed; stations=7 blueprints=48", "pass": true },
+    { "check": "health blueprint >= 8 guardrails each with derivedFrom pointing to an existing pack question id", "observed": "27 guardrails; test asserts each questionId is in the 600-id set and the text contains it", "pass": true },
+    { "check": "a refused blueprint names the station profile rule that refused it", "observed": "BlueprintRefusedError.refusals[].rule and message carry e.g. station-profile/critical/write-high-requires-approval; CLI prints it and exits 1", "pass": true }
+  ],
+  "mutationChecks": [
+    { "guard": "WRITE_HIGH-without-approval refusal (stationProfile.ts:88)", "mutation": "condition -> if (false)", "red": "Tests 2 failed | 12 passed (14)", "restoredGreen": "Tests 14 passed (14)" },
+    { "guard": "derivedFrom question-id lookup (blueprintCompose.ts:52)", "mutation": "questionId: question.id -> question.id + \"-x\"", "red": "Tests 2 failed | 12 passed (14)", "restoredGreen": "Tests 14 passed (14)" },
+    { "guard": "forbidden-class refusal (stationProfile.ts:79)", "mutation": "condition -> if (false)", "red": "Tests 2 failed | 12 passed (14)", "restoredGreen": "Tests 14 passed (14)" },
+    { "guard": "zero-quota refusal (stationProfile.ts:73)", "mutation": "condition -> if (false)", "red": "Tests 2 failed | 12 passed (14)", "restoredGreen": "Tests 14 passed (14)" },
+    { "guard": ".amc/ write refusal (blueprintRender.ts:28)", "mutation": "condition -> if (false)", "red": "Tests 1 failed | 13 passed (14)", "restoredGreen": "Tests 14 passed (14)" },
+    { "guard": "entitlement gate (blueprintRender.ts:100)", "mutation": "assertIndustryPackAccess(workspace); -> void workspace;", "red": "Tests 1 failed | 13 passed (14)", "restoredGreen": "Tests 14 passed (14)" }
+  ],
+  "sources": [],
+  "sourcesNote": "No regulatory text encoded. Rendered blueprints cite pack-provided regulatoryBasis/regulatoryRef strings with verified:false; research digests under research/health and research/cross-framework were empty/absent at run time.",
+  "notExercised": [
+    "src/cli.ts registration (unclaimable; diff in docs)",
+    "savePresets() into a real .amc/agents.yaml (needs auditor keys); preset shape asserted only, presetSchema not exported so zod parse not run here",
+    "running an agent from a blueprint preset",
+    "F1 operating-profiles module (absent at HEAD); only the StationProfileSource injection seam is tested with a stub",
+    "full suite, release gate, generators, pnpm build",
+    "fresh-clone reproduction of the test run"
+  ],
+  "blockers": [],
+  "readyToWire": {
+    "srcCli": "import { registerBlueprintCommand } from \"./domains/blueprints/index.js\"; ... registerBlueprintCommand(program); (next to registerDomainApplyCommand(domainCmd) at src/cli.ts:657 and :22245)",
+    "agentsYaml": "savePresets(workspace, [...readPresets(workspace).presets, toAgentPreset(composeBlueprint({ station, packId }), { model, providerId })]) — validated by the strict presetSchema and signed by the auditor key; the YAML is printed at the end of every *.summary.md"
+  }
+}
