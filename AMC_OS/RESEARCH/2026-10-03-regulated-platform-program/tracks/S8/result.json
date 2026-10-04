@@ -55,6 +55,7 @@
       "tests/nativeToolBreadth.test.ts: readSessionTodo refuses a monitor-signed record of another kind or sessionId at the todo path (M16 RED->GREEN)",
       "docs/NATIVE_TOOLS.md + result.json + report.md: toolsSchema.ts default-template second change and nativeInteractiveSession.ts no-change statement"
     ],
-    "pathDiscipline": "No code change: paths match the root ownership manifest S8 claim; registry disagreement with map/planner-tracks.json is for root to settle."
+    "pathDiscipline": "No code change: paths match the root ownership manifest S8 claim; registry disagreement with map/planner-tracks.json is for root to settle.",
+    "reverified": "2026-10-04: M14/M15/M16 re-run at 4b76dba5 with the monitor's commands, each RED then GREEN after git checkout; focused suite 35/35 passed, 0 skipped/todo (JSON reporter); pnpm typecheck exit 0; pnpm typecheck:tests exit 0; all paths in git diff 8f57ce63..HEAD inside the root manifest S8 claim; worktree clean."
   }
 }

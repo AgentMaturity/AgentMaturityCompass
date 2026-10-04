@@ -76,3 +76,8 @@ M16-readSessionList-binding RESTORED
  Test Files  1 passed (1)
       Tests  12 passed (12)
 porcelain-after-restore(src): 0
+# repair round re-verification 2026-10-04 (independent re-run at 4b76dba5, same commands)
+M14-webfetch-actionclass webFetchTool.ts:67 NETWORK_EXTERNAL->READ_ONLY; pnpm vitest run tests/webFetchTool.test.ts tests/nativeToolBreadth.test.ts -> RED Tests 1 failed | 25 passed (26); git checkout -> GREEN 26 passed (26)
+M15-websearch-actionclass webSearchTool.ts:83 NETWORK_EXTERNAL->READ_ONLY; same command -> RED Tests 1 failed | 25 passed (26); git checkout -> GREEN 26 passed (26)
+M16-readSessionList-binding sessionListTool.ts:46 -> if (false); pnpm vitest run tests/nativeToolBreadth.test.ts -> RED Tests 1 failed | 11 passed (12); git checkout -> GREEN 12 passed (12)
+porcelain-after-restore: 0
