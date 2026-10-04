@@ -1,10 +1,14 @@
 {
   "education": {
-    "questionCount": 10,
+    "questionCount": 16,
     "regulations": [
       "EU AI Act",
       "FERPA",
-      "COPPA"
+      "COPPA",
+      "PPRA",
+      "IDEA",
+      "ADA Title II",
+      "Title IX"
     ],
     "station": "education",
     "unverifiedSources": 0

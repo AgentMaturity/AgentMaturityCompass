@@ -1,5 +1,6 @@
 /**
- * Hand-written deep questions. Education station: EU AI Act Annex III point 3 and Art. 5/26, FERPA (34 CFR Part 99) and COPPA (16 CFR Part 312).
+ * Hand-written deep questions. Education station: EU AI Act Annex III point 3 and Art. 5/26, FERPA (34 CFR Part 99),
+ * COPPA (16 CFR Part 312), PPRA (34 CFR Part 98), IDEA (34 CFR Part 300), ADA Title II (28 CFR §35.200) and Title IX (34 CFR Part 106).
  * Each question anchors one provision and lists the industry packs it applies to.
  */
 
@@ -105,4 +106,77 @@ export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
     levels: levels("Children's data kept indefinitely, including chat transcripts", "Retention policy exists but omits agent data", "Written policy covers all agent data with purposes, need and timeframe, and is published", "Deletion jobs verified against the policy each cycle", "Derived data, embeddings and backups included in verified deletion"),
     evidenceTypes: ["retention_policy", "online_notice", "deletion_job_log", "backup_inventory"],
     source: readOn(cfrSource(16, 1, "312.10", "Data retention and deletion requirements", 2026), REPAIR_RETRIEVED_AT),
-  },];
+  },
+  // Round 2 (2026-10-04): round2/content/education/deep-questions.json, renumbered after education-deep-10;
+  // its proposed 16 CFR §312.10 and Annex III 3(d) items were dropped as duplicates of education-deep-10 and -07.
+  {
+    id: "education-deep-11", industry: "education", station: "education",
+    packIds: ["k12-pm3"],
+    regulation: "COPPA", section: "16 CFR §312.8(b) — written information security program",
+    question: "Does the operator maintain a written information security program for children's personal information handled by the agent, with a designated coordinator, at-least-annual risk assessments, safeguards, regular testing and monitoring, and an at-least-annual evaluation of the program?",
+    evaluationCriteria: ["Program is written and names a coordinator", "Risk assessment covers the agent's data flows and third parties", "Safeguards mapped to assessed risks", "Testing and monitoring records exist", "Program evaluated at least annually"],
+    levels: levels("No written program", "Program written but no coordinator or risk assessment", "Coordinator named and risk assessment covers the agent", "Safeguard testing and monitoring records kept", "Annual evaluation updates the program after changes or incidents"),
+    evidenceTypes: ["security_program", "risk_assessment", "control_test_record"],
+    source: readOn(cfrSource(16, 1, "312.8", "Confidentiality, security, and integrity of personal information collected from children", 2026), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "education-deep-12", industry: "education", station: "education",
+    packIds: ["k12-pm3"],
+    regulation: "PPRA", section: "34 CFR §98.4(a) — prior consent before psychological examination or testing",
+    question: "Is the agent prevented from requiring a student, without prior consent, to take part in a psychological examination or test — including an AI-led wellbeing check-in — whose primary purpose is to reveal information in a PPRA-protected category?",
+    evaluationCriteria: ["Protected categories detected in prompts and flows", "Consent status checked before elicitation", "Refusal or redirect path when consent is absent", "Protected responses segregated and access-logged"],
+    levels: levels("Agent asks about protected categories freely", "Topic list exists but consent is not checked", "Elicitation gated on recorded consent", "Gating tested on each release with seeded prompts", "Protected responses segregated with access logs reviewed each term"),
+    evidenceTypes: ["consent_record", "prompt_policy", "test_run", "access_log"],
+    source: readOn(cfrSource(34, 1, "98.4", "Protection of students' privacy in examination, testing, or treatment", 2025), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "education-deep-13", industry: "education", station: "education",
+    packIds: ["k12-pm3", "differently-abled"],
+    regulation: "IDEA", section: "34 CFR §300.614 — record of access",
+    question: "When a party other than a parent or an authorized employee of the participating agency — for example the agent's vendor — obtains access to special-education records through the agent, is a record kept naming the party, the date access was given and the purpose for which the party is authorized to use the records?",
+    evaluationCriteria: ["Every non-exempt access through the agent recorded", "Party, date and purpose captured", "Record retrievable for parents", "Access by unauthorized parties denied and logged"],
+    levels: levels("Vendor or agent access to IEP or evaluation data is not recorded", "Access is in general system logs without purpose", "Per-access record with party, date and purpose", "Records reconciled against agent activity each term", "Access records exportable to parents on request with tamper evidence"),
+    evidenceTypes: ["access_record", "activity_log", "parent_export"],
+    source: readOn(cfrSource(34, 2, "300.614", "Record of access", 2025), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "education-deep-14", industry: "education", station: "education",
+    packIds: ["k12-pm3", "higher-education", "differently-abled"],
+    regulation: "ADA Title II", section: "28 CFR §35.200 — web content and mobile apps (WCAG 2.1 Level A and AA)",
+    question: "For a public school or university, do the agent's web and mobile interfaces and generated content — including content provided through contractual, licensing or other arrangements — conform to WCAG 2.1 Level A and AA by the entity's compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 for smaller entities and special districts)?",
+    evaluationCriteria: ["Entity's compliance date identified", "Interfaces tested to WCAG 2.1 A/AA", "Generated content tested", "Contracted and licensed content in scope", "Remediation tracked"],
+    levels: levels("No conformance evidence", "Interfaces partially tested; generated content untested", "Interfaces and generated content tested to WCAG 2.1 A/AA", "Testing runs each release with assistive-technology checks", "Conformance reports per release and defects closed before the compliance date"),
+    evidenceTypes: ["conformance_report", "test_run", "remediation_ticket"],
+    source: readOn(source(
+      "28 CFR §35.200 Requirements for web and mobile accessibility (CFR 2025 edition)",
+      "https://www.govinfo.gov/content/pkg/CFR-2025-title28-vol1/xml/CFR-2025-title28-vol1-sec35-200.xml",
+      "The 2025 edition shows the original dates (2026-04-24 and 2027-04-26); the interim final rule FR 2026-07663 (govinfo FR-2026-04-20) extended them to 2027-04-26 and 2028-04-26 without changing the WCAG 2.1 Level AA standard. Both read 2026-10-04.",
+      true,
+    ), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "education-deep-15", industry: "education", station: "education",
+    packIds: ["k12-pm3", "higher-education", "skills-training"],
+    regulation: "EU AI Act", section: "Art. 26(6) — deployer retention of automatically generated logs",
+    question: "Does the deploying institution keep the logs automatically generated by each high-risk education AI system under its control for at least six months, or longer where Union or national law requires?",
+    evaluationCriteria: ["High-risk education uses inventoried", "Retention period configured at six months or more", "Longer legal retention identified where applicable", "Retention verified"],
+    levels: levels("Logs not retained or provider defaults unknown", "Retention set for some uses only", "Six-month minimum configured for all high-risk uses", "Retention verified each term", "Retention policy tied to a legal-retention register with alerts on deletion before expiry"),
+    evidenceTypes: ["retention_config", "use_inventory", "log_sample"],
+    source: readOn(aiActSource("article-26", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "education-deep-16", industry: "education", station: "education",
+    packIds: ["higher-education"],
+    regulation: "Title IX", section: "34 CFR §106.45(b)(7)(i) — written determination by a decision-maker who is not the Coordinator or investigator",
+    question: "If the agent supports Title IX grievance processing, is every written determination issued by a human decision-maker who is not the Title IX Coordinator or an investigator, with the agent limited to support functions and the records kept for seven years (§106.45(b)(10))?",
+    evaluationCriteria: ["Agent cannot issue determinations", "Decision-maker role separated from coordinator and investigator", "Determination authored and signed by the decision-maker", "Records kept for seven years"],
+    levels: levels("Agent output is used as the determination", "A person signs but role separation is not enforced", "Role separation enforced and agent limited to support", "Records retained seven years with access logs", "Periodic audit confirms no agent-authored determinations"),
+    evidenceTypes: ["role_matrix", "determination_record", "retention_policy"],
+    source: readOn(source(
+      "34 CFR §106.45 Grievance process for formal complaints of sexual harassment (CFR 2023 edition)",
+      "https://www.govinfo.gov/content/pkg/CFR-2023-title34-vol1/xml/CFR-2023-title34-vol1-sec106-45.xml",
+      "The 2023 edition holds the text in force before 2024-04-29, which FR 2026-19929 (govinfo FR-2026-09-29, effective 2026-09-29) restored after repealing the vacated 2024 rule. Both read 2026-10-04.",
+      true,
+    ), REPAIR_RETRIEVED_AT),
+  },
+];
