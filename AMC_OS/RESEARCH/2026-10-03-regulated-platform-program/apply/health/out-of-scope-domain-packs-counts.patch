@@ -1,0 +1,18 @@
+--- a/docs/DOMAIN_PACKS.md	2026-10-04 18:01:19
++++ b/docs/DOMAIN_PACKS.md	2026-10-04 18:01:19
+@@ -35,13 +35,13 @@
+ | Station | Packs | Questions |
+ |---|---:|---:|
+ | `environment` | 6 | 91 |
+-| `health` | 9 | 151 |
++| `health` | 9 | 149 |
+ | `wealth` | 5 | 75 |
+ | `education` | 5 | 75 |
+ | `mobility` | 6 | 90 |
+ | `technology` | 5 | 75 |
+ | `governance` | 5 | 75 |
+-| **Total** | **41** | **632** |
++| **Total** | **41** | **630** |
+ 
+ ## Regulatory Currency
+ 
