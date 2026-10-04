@@ -10,11 +10,18 @@
     "unverifiedSources": 0
   },
   "environment": {
-    "questionCount": 10,
+    "questionCount": 17,
     "regulations": [
       "EU AI Act",
       "NIS2",
-      "CER Directive"
+      "CER Directive",
+      "NERC CIP-015-1",
+      "NERC CIP-013-2",
+      "FDA Food Traceability Rule",
+      "SDWA Section 1433 (42 U.S.C. 300i-2)",
+      "Directive (EU) 2024/825",
+      "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650",
+      "Cyber Resilience Act (Regulation (EU) 2024/2847)"
     ],
     "station": "environment",
     "unverifiedSources": 3

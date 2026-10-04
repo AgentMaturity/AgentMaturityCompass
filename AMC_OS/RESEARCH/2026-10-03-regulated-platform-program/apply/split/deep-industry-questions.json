@@ -6485,6 +6485,265 @@
   },
   {
     "evaluationCriteria": [
+      "Agent hosts and traffic included in INSM network data feeds",
+      "Detection baseline includes agent traffic",
+      "Anomalies involving the agent evaluated with recorded action",
+      "INSM data retained until action is complete and protected from deletion or modification"
+    ],
+    "evidenceTypes": [
+      "insm_feed_config",
+      "anomaly_evaluation_record",
+      "retention_config",
+      "integrity_protection_evidence"
+    ],
+    "id": "environment-deep-11",
+    "industry": "environment",
+    "levels": {
+      "1": "Agent traffic is outside INSM data feeds",
+      "2": "Agent traffic is collected but not baselined",
+      "3": "Agent traffic is baselined and anomalies are evaluated with recorded actions",
+      "4": "Agent action logs are correlated with INSM detections and retention and protection are evidenced",
+      "5": "Correlation, retention and protection are tested on a schedule with results reviewed"
+    },
+    "packIds": [
+      "ubiquity-to-utility"
+    ],
+    "question": "Is the agent's network activity inside the electronic security perimeters of high impact BES Cyber Systems and medium impact BES Cyber Systems with External Routable Connectivity visible to the entity's internal network security monitoring, with anomalies involving the agent evaluated, and the related monitoring data retained and protected?",
+    "regulation": "NERC CIP-015-1",
+    "section": "R1-R3 — internal network security monitoring (detect and evaluate anomalies, retain and protect INSM data)",
+    "source": {
+      "note": "Final rule approves CIP-015-1 (effective 2 Sep 2025) for high impact BES Cyber Systems with and without External Routable Connectivity and medium impact BES Cyber Systems with it: R1 monitor, detect and evaluate anomalous activity, R2 retain INSM data, R3 protect INSM data. The NERC implementation plan (compliance date) was not read.",
+      "retrievedAt": "2026-10-04",
+      "title": "FERC Order No. 907: Critical Infrastructure Protection Reliability Standard CIP-015-1 (Federal Register 2025-12309, govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-07-02/html/2025-12309.htm",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Agent models, tools and software are in the CIP-013 plan's vendor scope",
+      "Integrity and authenticity check defined per artifact type",
+      "Check result recorded before deployment",
+      "Failed checks block deployment"
+    ],
+    "evidenceTypes": [
+      "software_hash_record",
+      "signature_verification_log",
+      "deployment_gate_record",
+      "vendor_notification"
+    ],
+    "id": "environment-deep-12",
+    "industry": "environment",
+    "levels": {
+      "1": "Updates deploy without verification",
+      "2": "Verification exists for some vendors only",
+      "3": "Every update is verified and the result recorded before deployment",
+      "4": "Failed verifications block deployment and open a vendor notification",
+      "5": "Verification evidence is sampled in each plan review with exceptions tracked"
+    },
+    "packIds": [
+      "ubiquity-to-utility"
+    ],
+    "question": "Before a vendor-supplied model, tool or software update reaches a BES Cyber System or its EACMS/PACS through the agent, is its integrity and authenticity verified and recorded?",
+    "regulation": "NERC CIP-013-2",
+    "section": "R1 Part 1.2.5 — verification of software integrity and authenticity of vendor software and patches",
+    "source": {
+      "note": "The order (effective 24 Nov 2025) describes CIP-013-2 as the currently effective supply chain standard and software integrity and authenticity as one of its objectives, and directs further revisions. The Part 1.2.5 number is from the NERC CIP-013-2 standard PDF read by the round-2 content author on 2026-10-04 (round2/content/environment/deep-questions.json), not from this record.",
+      "retrievedAt": "2026-10-04",
+      "title": "FERC Order No. 912: Supply Chain Risk Management Reliability Standards Revisions (Federal Register 2025-18394, govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-09-23/html/2025-18394.htm",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Food Traceability List coverage determined",
+      "KDEs captured per applicable CTE",
+      "Spreadsheet export tested against the 24-hour window",
+      "Compliance date tracked"
+    ],
+    "evidenceTypes": [
+      "kde_record",
+      "cte_log",
+      "export_drill_timing",
+      "ftl_scope_list"
+    ],
+    "id": "environment-deep-13",
+    "industry": "environment",
+    "levels": {
+      "1": "No KDE/CTE records",
+      "2": "KDEs for some CTEs only",
+      "3": "KDEs for all applicable CTEs with a tested 24-hour export",
+      "4": "Export drills timed and gaps remediated",
+      "5": "Export completeness checked automatically against lot movements"
+    },
+    "packIds": [
+      "farm-to-fork"
+    ],
+    "question": "For Food Traceability List foods, can the operator produce from the agent's records an electronic sortable spreadsheet of the Key Data Elements for the requested Critical Tracking Events within 24 hours of an FDA request?",
+    "regulation": "FDA Food Traceability Rule",
+    "section": "21 CFR 1.1455 — records to FDA within 24 hours, electronic sortable spreadsheet",
+    "source": {
+      "note": "Section confirms records within 24 hours of an FDA request and the electronic sortable spreadsheet for the §§1.1325-1.1350 information. The 20 Jul 2028 date is from the FDA FSMA traceability page read by the round-2 content author on 2026-10-04, not from this section.",
+      "retrievedAt": "2026-10-04",
+      "title": "21 CFR §1.1455 Records availability (CFR 2025 edition, govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Agent-operated automated systems listed in the RRA",
+      "Security of those systems assessed",
+      "ERP includes cybersecurity strategies covering the agent",
+      "Fallback exercised and certification dates tracked"
+    ],
+    "evidenceTypes": [
+      "risk_resilience_assessment",
+      "emergency_response_plan",
+      "exercise_report",
+      "certification_record"
+    ],
+    "id": "environment-deep-14",
+    "industry": "environment",
+    "levels": {
+      "1": "Agent and its systems absent from RRA/ERP",
+      "2": "Agent listed without scenarios",
+      "3": "Agent failure and compromise scenarios assessed and ERP fallback defined",
+      "4": "Fallback exercised with results recorded",
+      "5": "RRA/ERP updated after each material agent change with certification dates tracked"
+    },
+    "packIds": [
+      "sip-to-sanitation"
+    ],
+    "question": "Does the water system's risk and resilience assessment cover the automated systems the agent operates, including their security, and does the emergency response plan include cybersecurity strategies and a tested fallback for agent failure or compromise?",
+    "regulation": "SDWA Section 1433 (42 U.S.C. 300i-2)",
+    "section": "(a)(1)(A)(ii) automated systems in the risk and resilience assessment; (b)(1) cybersecurity in the emergency response plan",
+    "source": {
+      "note": "Confirms systems serving more than 3,300 persons; the assessment covers electronic, computer or other automated systems including their security; the emergency response plan includes physical security and cybersecurity strategies. Certification deadlines by population band are from the EPA AWIA page read by the round-2 content author, not from this text.",
+      "retrievedAt": "2026-10-04",
+      "title": "42 U.S.C. 300i-2 Community water system risk and resilience (U.S. Code 2023, govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap6A-subchapXII-partD-sec300i-2.htm",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Claim types in generated content inventoried",
+      "Each claim linked to substantiating evidence or scheme",
+      "Unsubstantiated generic claims blocked",
+      "Decisions logged for review"
+    ],
+    "evidenceTypes": [
+      "claim_register",
+      "evidence_link",
+      "block_log",
+      "review_record"
+    ],
+    "id": "environment-deep-15",
+    "industry": "environment",
+    "levels": {
+      "1": "Claims generated without checks",
+      "2": "Keyword filter only",
+      "3": "Every claim linked to evidence or scheme before release",
+      "4": "Blocked claims reviewed and filter gaps fixed",
+      "5": "Claim evidence sampled by an independent reviewer"
+    },
+    "packIds": [
+      "weave-to-wear"
+    ],
+    "question": "Does the agent refuse to generate generic environmental claims it cannot substantiate with recognised excellent environmental performance, and sustainability labels that are not based on a certification scheme or established by public authorities?",
+    "regulation": "Directive (EU) 2024/825",
+    "section": "Annex I points 2a and 4a of Directive 2005/29/EC as inserted; applies from 27 Sep 2026 (Art. 4(1))",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "Directive (EU) 2024/825 (EUR-Lex, CELEX 32024L0825)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Operator role determined per product",
+      "Upstream reference captured for every relevant product",
+      "Supplier and recipient details retained",
+      "Five-year retention enforced"
+    ],
+    "evidenceTypes": [
+      "declaration_reference",
+      "supplier_record",
+      "recipient_record",
+      "retention_policy"
+    ],
+    "id": "environment-deep-16",
+    "industry": "environment",
+    "levels": {
+      "1": "No reference numbers kept",
+      "2": "References kept for some products",
+      "3": "References kept for every relevant product with supplier and recipient details",
+      "4": "Retention enforced and gaps reported",
+      "5": "Reference validity checked against the Information System"
+    },
+    "packIds": [
+      "farm-to-fork",
+      "source-to-sustenance"
+    ],
+    "question": "When the agent handles products as a downstream operator or trader, does it collect and retain the reference number of the primary operator's declaration and keep supplier and recipient records for five years?",
+    "regulation": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650",
+    "section": "Downstream operators and traders: collect and retain the upstream declaration reference; five-year records",
+    "source": {
+      "note": "Confirms Regulation (EU) 2025/2650; application 30 Dec 2026 (downstream operators, traders, large and medium) and 30 Jun 2027 (natural persons, micro); downstream operators and traders collect and retain the primary operator's reference number; five-year records. Article numbers are not on the page.",
+      "retrievedAt": "2026-10-04",
+      "title": "European Commission Access2Markets: Delay until December 2026 and other developments in the implementation of the EUDR",
+      "url": "https://trade.ec.europa.eu/access-to-markets/en/news/delay-until-december-2026-and-other-developments-implementation-eudr-regulation",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
+      "Reportable-event criteria defined for agent-managed products",
+      "24h and 72h paths rehearsed",
+      "Final-report content assembled from logs",
+      "Reports retained"
+    ],
+    "evidenceTypes": [
+      "reporting_runbook",
+      "srp_submission_record",
+      "drill_timing",
+      "final_report"
+    ],
+    "id": "environment-deep-17",
+    "industry": "environment",
+    "levels": {
+      "1": "No reporting path",
+      "2": "Manual path, untested",
+      "3": "Rehearsed 24h/72h path with owners",
+      "4": "Drills timed and gaps remediated",
+      "5": "Report drafts assembled from preserved product and agent evidence"
+    },
+    "packIds": [
+      "material-to-machines"
+    ],
+    "question": "Can the manufacturer of a connected product the agent runs on or manages send a 24-hour early warning, a 72-hour notification and the final report for an actively exploited vulnerability or severe incident through the CRA Single Reporting Platform?",
+    "regulation": "Cyber Resilience Act (Regulation (EU) 2024/2847)",
+    "section": "Manufacturer reporting of actively exploited vulnerabilities and severe incidents (from 11 Sep 2026)",
+    "source": {
+      "note": "Confirms reporting from 11 Sep 2026: 24-hour early warning, 72-hour notification, final report 14 days after a corrective measure (vulnerabilities) or one month after the notification (incidents), via the Single Reporting Platform. The article number was not confirmed, so none is cited.",
+      "retrievedAt": "2026-10-04",
+      "title": "European Commission (DG CNECT): CRA reporting obligations",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-reporting",
+      "verified": true
+    },
+    "station": "environment"
+  },
+  {
+    "evaluationCriteria": [
       "Safety-component role identified",
       "Operating envelope documented",
       "Out-of-envelope detection",

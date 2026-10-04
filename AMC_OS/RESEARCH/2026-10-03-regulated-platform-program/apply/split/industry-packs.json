@@ -3730,31 +3730,21 @@
       {
         "dimension": "Safety",
         "id": "ENV-FF-1",
-        "l1": "No HACCP integration; food safety checks are manual and inconsistent with no digital monitoring of critical control points",
-        "l3": "Agent monitors critical control points in real-time with automated alerts and logs deviations per HACCP plan, but corrective actions still require human initiation",
-        "l5": "Fully autonomous HACCP orchestration with predictive deviation detection, automated corrective actions, cryptographic evidence chains for each CCP, and continuous validation against Codex standards",
-        "regulatoryRef": "Codex Alimentarius CAC/RCP 1-1969 §7.6",
-        "text": "Does the agent enforce HACCP critical control point monitoring with automated corrective actions per Codex Alimentarius CAC/RCP 1-1969 §7.6?",
-        "weight": 15
-      },
-      {
-        "dimension": "Traceability",
-        "id": "ENV-FF-2",
-        "l1": "No digital traceability; paper-based records with gaps in supply chain visibility beyond immediate supplier",
-        "l3": "Batch-level traceability across major supply chain nodes with digital records, but gaps exist in sub-supplier and smallholder farm-level data",
-        "l5": "Item-level cryptographic traceability from seed/feed origin through every transformation and logistics step to point of sale, with immutable audit trail and sub-second recall capability",
-        "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 18",
-        "text": "Can the agent provide end-to-end supply chain traceability from farm origin to consumer per EU General Food Law Regulation (EC) 178/2002 Article 18?",
+        "l1": "No CCP monitoring linked to the HACCP plan; deviations are not recorded by the agent",
+        "l3": "CCP readings are checked against the plan's critical limits and deviations are logged with alerts, but corrective-action records are missing or not linked to the deviation record",
+        "l5": "Every CCP deviation record carries timestamp, measured value, critical limit, responsible person, corrective action taken, human sign-off and verification result; records for the retention period are retrievable on request and sampled at internal audit",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 4-7",
+        "text": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 4-7?",
         "weight": 15
       },
       {
         "dimension": "Sustainability",
         "id": "ENV-FF-3",
-        "l1": "No deforestation risk assessment; sourcing decisions made without geolocation verification or land-use change analysis",
-        "l3": "Agent performs periodic geolocation checks against deforestation databases for high-risk commodities, but verification is not continuous and covers only tier-1 suppliers",
-        "l5": "Continuous satellite-integrated deforestation monitoring for all commodity sourcing tiers, automated due diligence statements per EUDR Art. 4, with predictive land-use change modeling and supplier risk scoring",
-        "regulatoryRef": "EUDR 2023/1115 Art. 3",
-        "text": "Does the agent verify deforestation-free sourcing compliance per EU Deforestation Regulation (EUDR) 2023/1115 Article 3?",
+        "l1": "Sourcing decisions are made without plot geolocation or a deforestation/legality check",
+        "l3": "Plot geolocation is collected and checked against a deforestation dataset for some suppliers or commodities; uncovered lots are listed",
+        "l5": "Every relevant-product lot is linked to plot geolocation, a dated deforestation check (dataset and version recorded) and legality evidence; lots without a passing check are blocked from placing or export",
+        "regulatoryRef": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
+        "text": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 for large and medium operators and 30 Jun 2027 for micro and small)?",
         "weight": 12
       },
       {
@@ -3762,7 +3752,7 @@
         "id": "ENV-FF-4",
         "l1": "No organic compliance tracking; certification status managed manually with risk of non-compliant input usage",
         "l3": "Agent tracks organic certification status and flags non-compliant inputs, but does not proactively manage the full certification lifecycle or audit readiness",
-        "l5": "Autonomous organic compliance management including input substance verification against Annex II permitted lists, contamination risk modeling, group certification coordination, and automated audit evidence generation",
+        "l5": "Each input substance is checked against the authorised-substance lists applicable under Regulation (EU) 2018/848 before use, the result is linked to the lot, non-authorised inputs are blocked, and a control-body evidence export exists",
         "regulatoryRef": "EU Organic Regulation 2018/848 Art. 9-12",
         "text": "Does the agent manage organic certification compliance per EU Organic Regulation 2018/848 Articles 9-12 including input substance verification?",
         "weight": 10
@@ -3780,21 +3770,21 @@
       {
         "dimension": "Transparency",
         "id": "ENV-FF-6",
-        "l1": "No nutritional profiling capability; nutritional data is static and not validated against actual product composition changes",
-        "l3": "Agent calculates nutritional profiles for products and generates Nutri-Score ratings, but does not dynamically update when formulations or sourcing change",
-        "l5": "Dynamic nutritional profiling that auto-updates with formulation changes, integrates with reformulation optimization to improve health outcomes, and provides transparent methodology documentation for consumer trust",
-        "regulatoryRef": "EU Farm to Fork Strategy — Nutritional Labeling Initiative",
-        "text": "Does the agent support nutritional profiling and front-of-pack labeling accuracy per EU Farm to Fork Strategy Nutri-Score framework?",
+        "l1": "Nutrition declarations are static and not recalculated when formulation or sourcing changes",
+        "l3": "The declaration is generated from recipe data and checked for the mandatory nutrients, but recalculation after formulation changes is manual",
+        "l5": "Every formulation or supplier change triggers regeneration and check of the declaration with version history; any front-of-pack scheme output is computed from the same data with the scheme rule version recorded",
+        "regulatoryRef": "Regulation (EU) No 1169/2011 Art. 30-35",
+        "text": "Does the agent generate and validate the mandatory nutrition declaration from current recipe data per Regulation (EU) No 1169/2011 Art. 30-34 and, where a voluntary front-of-pack scheme is used, compute it from the same data under Art. 35, recalculating both on every formulation change?",
         "weight": 10
       },
       {
         "dimension": "Ethics",
         "id": "ENV-FF-7",
-        "l1": "No fair trade assessment; procurement algorithms optimize purely on cost without considering farmer welfare or equitable pricing",
-        "l3": "Agent includes fair trade certification status in procurement decisions and tracks minimum price guarantees, but does not assess broader socioeconomic impact on farming communities",
-        "l5": "Comprehensive farmer welfare integration with living income benchmarking, equitable pricing algorithms, smallholder inclusion metrics, and transparent impact reporting aligned with FAO VGGT principles",
-        "regulatoryRef": "FAO VGGT Principle 3",
-        "text": "Does the agent assess fair trade and smallholder farmer impact per FAO Voluntary Guidelines on Responsible Governance of Tenure (VGGT) Principle 3?",
+        "l1": "Procurement automation can issue late payments, short-notice cancellations or unilateral changes with no check",
+        "l3": "Payment-term and cancellation rules are enforced for some flows; exceptions are handled manually without a record",
+        "l5": "Every automated order, payment run and change is checked against the prohibited-practice list before issue; blocked actions and overrides are logged with approver and reason; the check list is versioned against the national transposition",
+        "regulatoryRef": "Directive (EU) 2019/633 Art. 3",
+        "text": "Does the agent prevent the unfair trading practices prohibited by Directive (EU) 2019/633 (payment later than 30 days for perishable and 60 days for other agri-food products, short-notice cancellation of perishables, unilateral contract changes) in automated procurement?",
         "weight": 10
       },
       {
@@ -3802,7 +3792,7 @@
         "id": "ENV-FF-8",
         "l1": "No systematic documentation; food safety records are fragmented across systems with no automated evidence collection",
         "l3": "Agent generates and stores food safety documentation with structured templates, but evidence collection requires manual triggers and cross-referencing",
-        "l5": "Fully automated food safety management system with continuous evidence collection, prerequisite program monitoring, audit-ready documentation generation, and real-time compliance dashboards per ISO 22000 Clause 7.5",
+        "l5": "All documented information required by ISO 22000:2018 Clause 7.5 is created, version-controlled and retrievable; monitoring records and verification results are collected from integrated systems with completeness checks and an audit-ready export",
         "regulatoryRef": "ISO 22000:2018 Clause 7.5",
         "text": "Does the agent maintain food safety management system documentation per ISO 22000:2018 Clause 7.5 with automated evidence collection?",
         "weight": 15
@@ -3810,11 +3800,11 @@
       {
         "dimension": "Compliance",
         "id": "ENV-FF-9",
-        "l1": "No FSMA compliance; AI food safety agents operate without preventive control plans, hazard analysis, or supply chain program requirements per 21 CFR §117 Subpart C",
-        "l3": "Agent implements hazard analysis and preventive controls for primary food safety risks, but does not automate supply chain program verification per §117.415 or maintain FSMA §204 traceability records for high-risk foods",
-        "l5": "Full FSMA compliance with automated hazard analysis per §117.130, preventive control management per §117.135-145, supply chain program verification per §117.415, FSMA §204 Key Data Element traceability for FDA-designated high-risk foods, and corrective action automation per §117.150",
-        "regulatoryRef": "FDA FSMA 21 CFR §117; FDA FSMA §204 Food Traceability Rule",
-        "text": "Does the agent implement FDA FSMA 21 CFR §117 Preventive Controls for Human Food requirements for AI agents managing food safety plans in US-market manufacturing facilities?",
+        "l1": "No food safety plan records are produced or maintained by the agent",
+        "l3": "Food safety plan, hazard analysis (§117.130) and preventive controls (§117.135) are recorded, but monitoring (§117.145), corrective-action (§117.150) or verification records are incomplete",
+        "l5": "Records for §117.126-§117.190 are complete and linked: each preventive control has monitoring, corrective-action, verification and validation (§117.160) records, reanalysis (§117.170) is triggered on change, and implementation records (§117.190) are retrievable",
+        "regulatoryRef": "21 CFR Part 117 Subpart C (§117.126-§117.190)",
+        "text": "Does the agent maintain the food safety plan, hazard analysis, preventive controls, monitoring and corrective-action records required by 21 CFR Part 117 Subpart C for US-market facilities it supports?",
         "weight": 12
       },
       {
@@ -3833,8 +3823,8 @@
         "l1": "No systematic hazard analysis; hazards/control measures are implicit or undocumented and CCP/OPRP choices are not validated",
         "l3": "Performs documented hazard analysis and proposes CCP/OPRP assignments with evidence references, but validation is periodic and requires substantial manual review",
         "l5": "Continuously maintained hazard analysis with automated evidence ingestion (process changes, incidents, supplier changes), validated CCP/OPRP logic, and on-change revalidation workflows with signed approvals",
-        "regulatoryRef": "Codex CAC/RCP 1-1969 §3.2",
-        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CAC/RCP 1-1969 §3.2?",
+        "regulatoryRef": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 1-2",
+        "text": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 1-2?",
         "weight": 15
       },
       {
@@ -3870,11 +3860,11 @@
       {
         "dimension": "Compliance",
         "id": "ENV-FF-15",
-        "l1": "No due diligence statements are generated or retained; products are placed without required declarations",
-        "l3": "Generates due diligence statements for some products/suppliers, but coverage is incomplete and supporting evidence is not consistently retained",
-        "l5": "Automated due diligence statement generation and retention for all relevant products with evidence linkage (geolocation, risk assessment, mitigation) and audit-ready exports",
-        "regulatoryRef": "EUDR 2023/1115 Art. 4(2), Art. 5",
-        "text": "Does the agent operate an EUDR due diligence system and generate/retain due diligence statements for relevant products before placing them on the EU market per EUDR 2023/1115 Article 4(2) and Article 5?",
+        "l1": "The agent assumes every operator files its own statement, or no statement or reference is handled",
+        "l3": "Operator role is recorded per product and statements or upstream references are captured for some flows; the five-year retention is not enforced",
+        "l5": "Every placed or exported lot carries its own statement/declaration identifier or the upstream reference number; role decisions are logged; supplier and recipient records are retained five years; readiness is dated to 30 Dec 2026 / 30 Jun 2027",
+        "regulatoryRef": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (due diligence statements and declarations)",
+        "text": "Does the agent determine each operator's EUDR role per product and apply the matching duty — primary operators submit the due diligence statement (or the one-time simplified declaration where eligible), downstream operators and traders collect and retain the upstream reference number — and keep supplier and recipient records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
         "weight": 12
       },
       {
@@ -3886,6 +3876,26 @@
         "regulatoryRef": "EU Regulation (EC) 178/2002 Art. 19(1)-(3)",
         "text": "Does the agent support rapid product withdrawal/recall decisioning and competent authority notification workflows per EU General Food Law Regulation (EC) 178/2002 Article 19(1)–(3)?",
         "weight": 8
+      },
+      {
+        "dimension": "Sustainability",
+        "id": "ENV-FF-17",
+        "l1": "No food-waste data is recorded",
+        "l3": "Food-waste quantities are recorded per site, but the measurement method varies between sites or periods",
+        "l5": "Food waste is measured per site and stage with one documented method, reduction is tracked against the 2030 targets (-10% processing/manufacturing; -30% per capita retail and consumption) and the data is exportable for national reporting",
+        "regulatoryRef": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (food waste reduction targets)",
+        "text": "Does the agent measure food waste generated at the processing/manufacturing or retail/food-service stages it supports, with a consistent method, so the operator can report against the 2030 reduction targets set by Directive (EU) 2025/1892?",
+        "weight": 10
+      },
+      {
+        "dimension": "Traceability",
+        "id": "ENV-FF-18",
+        "l1": "No KDE/CTE records are kept for Food Traceability List foods",
+        "l3": "KDEs are recorded for some CTEs (e.g. shipping, receiving), but the sortable spreadsheet cannot be produced within 24 hours",
+        "l5": "KDEs are recorded for every applicable CTE (harvesting, cooling, initial packing, first land-based receiving, shipping, receiving, transformation) and a test request produces the sortable spreadsheet within 24 hours; the 20 Jul 2028 enforcement date is tracked",
+        "regulatoryRef": "21 CFR Part 1 Subpart S",
+        "text": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028)?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -5858,8 +5868,8 @@
         "id": "ENV-MM-1",
         "l1": "No RoHS screening; component selection does not verify restricted substance concentrations against Annex II thresholds",
         "l3": "Agent screens components against RoHS Annex II substance limits (lead, mercury, cadmium, Cr6+, PBB, PBDE, DEHP, BBP, DBP, DIBP) but relies on supplier declarations without independent verification",
-        "l5": "Autonomous RoHS compliance with real-time component screening, XRF testing integration, supplier substance declaration verification, exemption tracking per Annex III/IV, and predictive alerts for upcoming restriction changes",
-        "regulatoryRef": "RoHS Directive 2011/65/EU Annex II",
+        "l5": "Every component is screened against Annex II maximum concentration values with supplier declarations and test (e.g. XRF) evidence linked, exemptions under Annex III/IV are tracked with expiry dates, and components without evidence cannot be released",
+        "regulatoryRef": "Directive 2011/65/EU (RoHS) Annex II",
         "text": "Does the agent enforce restricted substance compliance per RoHS Directive 2011/65/EU Annex II maximum concentration values for all electrical/electronic components?",
         "weight": 15
       },
@@ -5884,13 +5894,13 @@
         "weight": 12
       },
       {
-        "dimension": "Safety",
+        "dimension": "Transparency",
         "id": "ENV-MM-4",
-        "l1": "No energy efficiency verification; product energy performance is not systematically tested or labeled",
-        "l3": "Agent calculates energy efficiency ratings and generates energy labels per applicable delegated regulations, but does not optimize product design for energy performance",
-        "l5": "Predictive energy performance modeling integrated into design process, automated energy label generation with test protocol compliance, energy efficiency optimization across product portfolio, and real-time market surveillance readiness",
-        "regulatoryRef": "Energy Efficiency Directive 2023/1791 Art. 4",
-        "text": "Does the agent verify product energy efficiency per Energy Efficiency Directive 2023/1791 Article 4 and applicable energy labeling delegated regulations?",
+        "l1": "No energy-label generation or EPREL registration support",
+        "l3": "Labels are generated from test results, but EPREL registration and test-report linkage are manual",
+        "l5": "Every model has its label and information sheet generated from linked test reports under the applicable delegated regulation, EPREL registration is completed before release, and label changes are versioned",
+        "regulatoryRef": "Regulation (EU) 2017/1369 and applicable delegated regulations",
+        "text": "Does the agent generate energy labels and product information sheets from test results under the applicable delegated regulation and register each model in EPREL before it is placed on the market, per Regulation (EU) 2017/1369?",
         "weight": 12
       },
       {
@@ -5908,9 +5918,9 @@
         "id": "ENV-MM-6",
         "l1": "No DPP capability; product information is not structured for machine-readable access",
         "l3": "Agent generates basic DPPs with material composition and compliance data, but interoperability with EU DPP infrastructure and data carrier standards is incomplete",
-        "l5": "Full DPP implementation with all mandatory data attributes per delegated acts, interoperable data carriers (QR/RFID), integration with EU DPP registry, lifecycle data updates, and consumer/recycler access interfaces",
-        "regulatoryRef": "EU Ecodesign Regulation 2024/1781 Art. 8",
-        "text": "Does the agent support Digital Product Passport generation per EU Ecodesign Regulation 2024/1781 Article 8 with interoperable data carrier requirements?",
+        "l5": "For each product group with an adopted delegated act, every mandatory DPP attribute is populated with a source-evidence link, the data carrier resolves to the current record, lifecycle updates are versioned, and consumer and recycler views are available",
+        "regulatoryRef": "Regulation (EU) 2024/1781 Art. 9-11",
+        "text": "Does the agent maintain Digital Product Passport data per Regulation (EU) 2024/1781 Art. 9-11 for product groups covered by an adopted delegated act, with an interoperable data carrier and lifecycle updates?",
         "weight": 10
       },
       {
@@ -5936,21 +5946,21 @@
       {
         "dimension": "Security",
         "id": "ENV-MM-9",
-        "l1": "No OT/ICS security framework; AI-managed industrial control systems lack IEC 62443 security level implementation or EU Machinery Regulation 2023/1230 conformity for self-evolving machinery AI",
-        "l3": "Agent implements basic IEC 62443 zone/conduit segmentation and access controls, but does not achieve target security levels per IEC 62443-3-3 or address EU Machinery Regulation Art. 16 AI-specific conformity requirements",
-        "l5": "Full IEC 62443-3-3 implementation with target security level achievement, zone/conduit architecture, EU Machinery Regulation 2023/1230 Art. 16 conformity for AI-integrated machinery, self-evolving AI behavior boundary enforcement, and continuous OT security monitoring with incident response",
-        "regulatoryRef": "IEC 62443-3-3; EU Machinery Reg 2023/1230 Art. 16",
-        "text": "Does the agent implement IEC 62443-3-3 system security requirements and EU Machinery Regulation 2023/1230 Article 16 conformity assessment for AI-managed industrial control systems?",
+        "l1": "No zone/conduit model or target security level for systems the agent touches",
+        "l3": "Zones and conduits are defined and basic access controls applied, but achieved security level is not assessed against SL-T",
+        "l5": "Each zone and conduit has a documented SL-T, the achieved level is assessed against the IEC 62443-3-3 system requirements with gaps tracked, and agent changes to OT systems are re-assessed before deployment",
+        "regulatoryRef": "IEC 62443-3-3:2013",
+        "text": "Does the agent's deployment in industrial control systems meet the target security level (SL-T) for its zones and conduits per IEC 62443-3-3:2013 system security requirements?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "ENV-MM-10",
-        "l1": "No EHSR mapping; safety requirements are not traced to design controls or update/release decisions",
-        "l3": "Maintains an EHSR checklist and basic traceability to design controls, but software/AI changes are not consistently re-assessed for safety impact",
-        "l5": "Continuous EHSR compliance-by-design with requirements traceability, safety-function validation for software/AI changes, change-impact assessment gates, and authority-ready technical documentation updates aligned to Annex III",
-        "regulatoryRef": "EU Machinery Regulation (EU) 2023/1230 Art. 10; Annex III (EHSR)",
-        "text": "Does the agent verify that machinery design, integration changes, and software/AI updates maintain conformity with the EU Machinery Regulation (EU) 2023/1230 Article 10 obligation to meet Essential Health and Safety Requirements (EHSR) (Annex III), including safety of control systems and foreseeable misuse?",
+        "l1": "No EHSR mapping; safety functions changed by software or ML updates are not re-assessed",
+        "l3": "An EHSR checklist exists and major updates are reviewed, but ML/software updates to safety functions are not consistently gated",
+        "l5": "Every update touching a safety function passes a recorded EHSR impact assessment before release, self-evolving safety components have a notified-body assessment plan, and the technical documentation is updated per release",
+        "regulatoryRef": "Regulation (EU) 2023/1230 Art. 10, Annex III (EHSR), Annex I Part A",
+        "text": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 20 Jan 2027)?",
         "weight": 15
       },
       {
@@ -5979,8 +5989,8 @@
         "l1": "No repairability controls; design decisions do not manage spare parts, disassembly, or repair information availability",
         "l3": "Generates repairability guidance and partial spare-parts lists, but compliance is not enforced as a release gate and evidence is incomplete",
         "l5": "Repairability-by-design with enforceable constraints, automated spare-parts availability rules, disassembly time/steps scoring, repair information publication workflows, and compliance evidence packs aligned to delegated-act requirements",
-        "regulatoryRef": "EU Ecodesign Regulation (EU) 2024/1781 Art. 7",
-        "text": "Does the agent operationalize repairability requirements per EU Ecodesign Regulation (EU) 2024/1781 Article 7 (repair access, spare parts/consumables availability, repair information, and design for disassembly), and gate design releases against repairability constraints?",
+        "regulatoryRef": "Regulation (EU) 2024/1781 Art. 5(1), Art. 7",
+        "text": "Does the agent apply the repairability parameters set under Regulation (EU) 2024/1781 Art. 5(1) and the related Art. 7 information requirements (spare parts, repair information, disassembly) for product groups with an adopted delegated act, and gate design releases on them?",
         "weight": 10
       },
       {
@@ -6002,6 +6012,16 @@
         "regulatoryRef": "WEEE Directive 2012/19/EU Art. 15",
         "text": "Does the agent provide treatment facilities with the reuse and treatment information required by WEEE Directive 2012/19/EU Article 15 (components, materials and the location of dangerous substances) for each new type of electrical and electronic equipment within one year of placing it on the market?",
         "weight": 8
+      },
+      {
+        "dimension": "Security",
+        "id": "ENV-MM-16",
+        "l1": "No path to report vulnerabilities or incidents in agent-managed products",
+        "l3": "A manual reporting path to the Single Reporting Platform exists, but timing has not been tested",
+        "l5": "Detection-to-report is rehearsed and timed against 24h/72h, final-report content (corrective measure, root cause) is assembled from agent and product logs, and each report is retained",
+        "regulatoryRef": "Regulation (EU) 2024/2847 (manufacturer reporting of actively exploited vulnerabilities and severe incidents)",
+        "text": "Can the manufacturer report an actively exploited vulnerability or severe incident affecting a connected product the agent runs on or manages through the CRA Single Reporting Platform within the Cyber Resilience Act deadlines (24h early warning, 72h notification, final report) applying from 11 Sep 2026?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -8907,20 +8927,20 @@
         "dimension": "Safety",
         "id": "ENV-STS-1",
         "l1": "No automated water quality monitoring; drinking water parameters are tested manually with delayed results and no real-time contamination detection",
-        "l3": "Agent monitors key water quality parameters against EU DWD Annex I limits and WHO guideline values, with automated alerts for exceedances, but does not perform predictive contamination modeling",
-        "l5": "Real-time multi-parameter water quality monitoring with predictive contamination detection, automated treatment adjustment, PFAS and microplastic screening per DWD Art. 13, source-to-tap risk assessment per WHO Water Safety Plan approach, and cryptographic quality assurance records",
-        "regulatoryRef": "EU Drinking Water Directive 2020/2184 Annex I; WHO DWQ Guidelines Ch. 8",
-        "text": "Does the agent enforce drinking water quality parameters per EU Drinking Water Directive 2020/2184 Annex I Parts A-D and WHO Guidelines 4th edition Chapter 8?",
+        "l3": "Key parameters are monitored against Annex I parametric values with automated exceedance alerts, but remedial-action and consumer-information decisions are not recorded",
+        "l5": "All Annex I parameters in the monitoring programme are checked against parametric values with results linked to sampling records, and every exceedance opens a documented remedial action and consumer-information decision",
+        "regulatoryRef": "EU Drinking Water Directive 2020/2184 Annex I",
+        "text": "Does the agent enforce drinking water quality parameters per EU Drinking Water Directive 2020/2184 Annex I Parts A-D?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "ENV-STS-2",
-        "l1": "No wastewater compliance automation; treatment plant performance is monitored manually with delayed reporting",
-        "l3": "Agent tracks effluent quality against UWWTD discharge limits for BOD, COD, and suspended solids, and flags non-compliance, but nutrient removal (N, P) optimization is not automated",
-        "l5": "Autonomous wastewater treatment optimization with real-time effluent monitoring, predictive process control for nutrient removal per Art. 5 sensitive area requirements, energy-efficient aeration management, and automated compliance reporting to competent authorities",
-        "regulatoryRef": "EU UWWTD 91/271/EEC Art. 4-5",
-        "text": "Does the agent manage wastewater treatment compliance per EU Urban Wastewater Treatment Directive 91/271/EEC Article 4-5 including nutrient removal requirements?",
+        "l1": "Effluent compliance is monitored manually; recast obligations are not mapped",
+        "l3": "Effluent quality is tracked against current discharge limits including nutrients, and plants are mapped to recast obligations, but recast monitoring (e.g. micropollutants, PFAS) is not yet in the data model",
+        "l5": "Every plant's current-limit compliance is evidenced from sampling records, recast obligations are mapped with their application dates, recast monitoring parameters are in the data model, and reports to the competent authority are generated from the same records",
+        "regulatoryRef": "Directive (EU) 2024/3019 (recast)",
+        "text": "Does the agent evidence wastewater treatment compliance with the discharge requirements that apply until the recast Directive (EU) 2024/3019 repeals Council Directive 91/271/EEC, and map each plant to the recast's monitoring and reporting obligations?",
         "weight": 15
       },
       {
@@ -8934,22 +8954,12 @@
         "weight": 12
       },
       {
-        "dimension": "Governance",
-        "id": "ENV-STS-4",
-        "l1": "No water safety plan integration; hazard identification is reactive rather than systematic",
-        "l3": "Agent maintains a digital water safety plan with identified hazards and control measures, but risk assessment is static and not updated with real-time operational data",
-        "l5": "Dynamic water safety plan with continuous hazard identification, real-time risk assessment updated with operational and environmental data, automated control measure verification, incident escalation protocols, and periodic WSP review documentation",
-        "regulatoryRef": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans",
-        "text": "Does the agent implement water safety plan methodology per WHO Guidelines Chapter 4 with hazard identification and risk assessment from catchment to consumer?",
-        "weight": 12
-      },
-      {
         "dimension": "Traceability",
         "id": "ENV-STS-5",
         "l1": "No MARPOL compliance tracking; vessel discharge and waste management is not monitored by the agent",
         "l3": "Agent tracks vessel discharge records and flags potential MARPOL violations, but does not integrate with AIS or port state control systems for comprehensive monitoring",
         "l5": "Comprehensive MARPOL compliance with real-time discharge monitoring, AIS-integrated vessel tracking, port reception facility coordination, garbage management plan automation, and automated reporting to flag state authorities",
-        "regulatoryRef": "MARPOL Annex IV Reg. 11; Annex V Reg. 4-6",
+        "regulatoryRef": "MARPOL Annex IV Reg. 11, Annex V Reg. 4-6",
         "text": "Does the agent monitor marine pollution per MARPOL Annex IV sewage discharge regulations and Annex V garbage management for vessel operations?",
         "weight": 10
       },
@@ -8968,9 +8978,9 @@
         "id": "ENV-STS-7",
         "l1": "No performance benchmarking; water utility operations are not measured against standardized service indicators",
         "l3": "Agent calculates key performance indicators per ISO 24510 (service quality, reliability, customer satisfaction) but does not benchmark against peer utilities or identify improvement priorities",
-        "l5": "Full performance benchmarking with ISO 24510/24512 indicator calculation, peer utility comparison, trend analysis, improvement priority identification, customer satisfaction integration, and transparent public reporting of service performance",
-        "regulatoryRef": "ISO 24510:2007; ISO 24512:2007",
-        "text": "Does the agent support water service performance benchmarking per ISO 24510:2007 service assessment guidelines and ISO 24512:2007 management of drinking water utilities?",
+        "l5": "Full performance benchmarking with ISO 24510 indicator calculation, peer utility comparison, trend analysis, improvement priority identification, customer satisfaction integration, and transparent public reporting of service performance",
+        "regulatoryRef": "ISO 24510:2007",
+        "text": "Does the agent support water service performance benchmarking per ISO 24510:2007 service assessment guidelines?",
         "weight": 12
       },
       {
@@ -8978,29 +8988,29 @@
         "id": "ENV-STS-8",
         "l1": "No OT cybersecurity; water treatment SCADA systems are not protected by AI-managed security controls",
         "l3": "Agent monitors SCADA network traffic for anomalies and enforces access controls per NIST SP 800-82, but incident response and recovery for OT systems is not automated",
-        "l5": "Comprehensive OT cybersecurity with real-time SCADA threat detection, automated incident response per NIS2 Art. 21, IT/OT segmentation enforcement, supply chain security assessment, and regular penetration testing coordination per NIST SP 800-82 Rev. 3",
-        "regulatoryRef": "NIST SP 800-82 Rev. 3; EU NIS2 Directive Annex I §4",
-        "text": "Does the agent implement SCADA/ICS cybersecurity for water infrastructure per NIST SP 800-82 Rev. 3 and EU NIS2 Directive Annex I essential entity requirements?",
+        "l5": "OT network monitoring covers the SCADA systems the agent touches, IT/OT segmentation and access controls are enforced and tested, and OT incident response for agent-touched systems is exercised with results recorded",
+        "regulatoryRef": "NIST SP 800-82 Rev. 3",
+        "text": "Does the agent implement SCADA/ICS cybersecurity for water infrastructure per NIST SP 800-82 Rev. 3 (OT network monitoring, IT/OT segmentation and access control)?",
         "weight": 14
       },
       {
         "dimension": "Governance",
         "id": "ENV-STS-9",
-        "l1": "No WSP framework implementation; AI water treatment agents do not manage hazard-event-control matrices or monitor PFAS parametric values per EU DWD 2020/2184 Annex I updated limits",
-        "l3": "Agent monitors key water quality parameters and maintains basic hazard registers, but does not implement full WHO WSP hazard-event-control chain or EU DWD Annex I PFAS compound monitoring at updated 2026 parametric values",
-        "l5": "Full WHO WSP implementation with hazard-event-control chain automation, risk-based monitoring per WSP Annex 2, EU DWD 2020/2184 Annex I PFAS parametric value monitoring (effective Jan 2026), automated exceedance alerting, and WSP audit documentation for regulatory review",
-        "regulatoryRef": "WHO WSP Framework Annex 2; EU DWD 2020/2184 Annex I Part B",
-        "text": "Does the agent implement WHO Water Safety Plan (WSP) framework hazard-event-control chain management and EU Drinking Water Directive 2020/2184 Annex I PFAS parametric value monitoring for AI-managed treatment systems?",
+        "l1": "No PFAS parameter logic",
+        "l3": "PFAS results are checked against the parametric values, but analytical-method performance is not validated and exceedance follow-up is manual",
+        "l5": "PFAS results carry validated analytical-method data, exceedances trigger recorded remedial measures and public-information decisions, and monitoring results are reported to the competent authority from the same records",
+        "regulatoryRef": "Directive (EU) 2020/2184 Annex I Part B (PFAS Total, Sum of PFAS)",
+        "text": "Does the agent monitor the PFAS parameters in Annex I Part B of Directive (EU) 2020/2184 (PFAS Total and/or Sum of PFAS), applicable since 12 Jan 2026, with exceedance alerts, remedial-action records and reporting of results to the competent authority?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "ENV-STS-10",
-        "l1": "No US EPA PFAS MCL compliance; AI water treatment agents do not monitor PFAS compounds against April 2024 NPDWR maximum contaminant levels for US-market water systems",
-        "l3": "Agent monitors PFAS levels and tracks EU DWD parametric values, but does not implement US EPA NPDWR April 2024 MCLs or differentiate PFOA/PFOS 4 ppt threshold from PFNA/PFHxS 10 ppt thresholds",
-        "l5": "Full US EPA NPDWR April 2024 compliance with automated MCL monitoring for all six regulated PFAS compounds, treatment technique triggers, public notification automation, compliance schedule tracking, and state regulatory integration for systems with elevated PFAS detection",
-        "regulatoryRef": "US EPA NPDWR April 2024; 40 CFR Part 141",
-        "text": "Does the agent implement US EPA National Primary Drinking Water Regulation (NPDWR) April 2024 maximum contaminant levels for PFAS compounds including PFOA/PFOS at 4 ppt and PFNA, PFHxS, HFPO-DA at 10 ppt?",
+        "l1": "PFAS limits are hard-coded with no regulatory-state tracking",
+        "l3": "PFOA/PFOS limits are applied and the other limits are flagged as proposed for rescission, but effective dates are not versioned",
+        "l5": "Each PFAS limit carries its legal status and effective date, rule changes are applied when final with the change logged, and monitoring and reporting continue under the rule in force",
+        "regulatoryRef": "40 CFR Part 141 Subpart Z (PFAS NPDWR, April 2024)",
+        "text": "Does the agent track the current US PFAS drinking-water regulatory state (the April 2024 NPDWR in 40 CFR Part 141 Subpart Z, plus EPA's two 20 May 2026 proposed rules: exemptions extending PFOA/PFOS MCL compliance from 26 Apr 2029 to 26 Apr 2031, and rescission of the PFHxS, PFNA, HFPO-DA and mixture determinations) and apply only the requirements in force?",
         "weight": 10
       },
       {
@@ -9008,9 +9018,9 @@
         "id": "ENV-STS-11",
         "l1": "No risk assessment/risk management workflow; compliance relies on periodic testing without a documented risk-based assessment or managed control measures",
         "l3": "Maintains a documented risk assessment and some risk management actions, but updates are periodic/manual and control verification evidence is incomplete or not audit-ready",
-        "l5": "End-to-end Art. 10 compliance automation: continuous system risk assessment (catchment-to-tap), risk management measure selection/verification, change-triggered review, evidence pack generation for competent authority review, and linkage to monitoring plans and incident response",
-        "regulatoryRef": "EU DWD 2020/2184 Art. 10",
-        "text": "Does the agent implement the EU Drinking Water Directive 2020/2184 risk-based approach by supporting and evidencing water supply system risk assessment and risk management measures (including documentation, review frequency, and control verification) per Article 10?",
+        "l5": "Each stage has a documented, dated risk assessment and risk-management measures with verification evidence, reviews are triggered by change and by schedule, and an evidence pack for competent-authority review is generated from the same records",
+        "regulatoryRef": "Directive (EU) 2020/2184 (risk-based approach: catchment, supply system, domestic distribution)",
+        "text": "Does the agent support and evidence the Directive (EU) 2020/2184 risk-based approach — risk assessment and risk management of catchment areas (due July 2027) and of the supply system and domestic distribution (due January 2029) — including documentation, review frequency and control verification?",
         "weight": 15
       },
       {
@@ -9052,6 +9062,36 @@
         "regulatoryRef": "EU WFD 2000/60/EC Art. 8",
         "text": "Does the agent feed water-quality decisions from monitoring data that follow the Water Framework Directive 2000/60/EC Article 8 surveillance, operational and investigative monitoring programmes (Annex V), and flag water bodies whose monitoring coverage is incomplete?",
         "weight": 8
+      },
+      {
+        "dimension": "Security",
+        "id": "ENV-STS-16",
+        "l1": "The agent and the systems it operates are outside the RRA and ERP",
+        "l3": "The agent is listed in the RRA and the ERP names a manual fallback, but agent failure and compromise scenarios are not assessed",
+        "l5": "Agent failure and compromise scenarios are assessed in the RRA, the ERP fallback is exercised with results recorded, and RRA/ERP certification dates for the system's population band are tracked",
+        "regulatoryRef": "SDWA Section 1433 (AWIA 2018 Section 2013)",
+        "text": "For US community water systems serving more than 3,300 people, does the agent support the SDWA Section 1433 risk and resilience assessment (including the electronic, computer or other automated systems it operates and their security) and the emergency response plan's cybersecurity strategies, with certification dates tracked?",
+        "weight": 12
+      },
+      {
+        "dimension": "Governance",
+        "id": "ENV-STS-17",
+        "l1": "No determination whether the agent is a safety component in water supply",
+        "l3": "Classification documented and dosing/pressure actions logged, but override, stop and fail-safe are untested",
+        "l5": "Classification recorded with reasoning, Art. 12 logs retained and protected from alteration, override/stop and fail-safe exercised in drills with results recorded, and the evidence pack dated against 2 Dec 2027",
+        "regulatoryRef": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e), Art. 15(4)",
+        "text": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and have a backup or fail-safe plan (Art. 15(4)), ready for the 2 Dec 2027 application date?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "ENV-STS-18",
+        "l1": "Agent vendors are outside the NIS2 risk-management measures and agent incidents have no reporting path",
+        "l3": "Agent vendors are in the supplier register with security requirements, but incident reporting on the NIS2 timeline is not rehearsed",
+        "l5": "Supply-chain security covers agent vendors with evidence, and significant-incident reporting is rehearsed against the 24h early warning / 72h notification / one-month final report timeline with timings recorded",
+        "regulatoryRef": "Directive (EU) 2022/2555 (NIS2) Annex I drinking water and waste water sectors, Art. 21, Art. 23",
+        "text": "Where the operator is an essential entity in the drinking water or waste water sector, do its NIS2 cybersecurity risk-management measures cover the agent's vendors, and can a significant incident involving the agent be reported on the 24h early warning / 72h notification / one-month final report timeline?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -9510,11 +9550,11 @@
       {
         "dimension": "Safety",
         "id": "ENV-SS-1",
-        "l1": "No CITES integration; species trade decisions are made without automated identification or appendix verification",
-        "l3": "Agent cross-references trade requests against CITES appendices and flags restricted species, but identification relies on manual input rather than automated taxonomic verification",
-        "l5": "Autonomous CITES compliance with AI-powered species identification (image/DNA), real-time appendix verification, automated permit validation, trade route risk assessment, and cryptographic chain of custody for legal specimens",
-        "regulatoryRef": "CITES Resolution Conf. 12.3 (Rev. CoP19)",
-        "text": "Does the agent enforce CITES Appendix I/II/III trade restrictions with species identification verification per CITES Resolution Conf. 12.3 (Rev. CoP19)?",
+        "l1": "Trade decisions are made without appendix checks or permit validation",
+        "l3": "Appendix listing is checked and permit fields validated, but authority checks are spot checks and identification relies on unrecorded manual input",
+        "l5": "Every trade record carries the appendix check (list version date), permit validation result incl. authority confirmation, identification method and evidence, and a hold decision; failed or incomplete checks block the trade",
+        "regulatoryRef": "CITES Resolution Conf. 12.3 (Rev. CoP20)",
+        "text": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3 (Rev. CoP20)?",
         "weight": 15
       },
       {
@@ -9522,19 +9562,19 @@
         "id": "ENV-SS-2",
         "l1": "No biodiversity monitoring; ecological health indicators are not tracked or reported",
         "l3": "Agent tracks basic biodiversity metrics (species counts, habitat area) against 30x30 targets, but lacks ecosystem-level health assessment and trend analysis",
-        "l5": "Comprehensive biodiversity monitoring with multi-trophic indicators, ecosystem integrity indices, real-time remote sensing integration, trend prediction modeling, and automated reporting against GBF targets and EU Nature Restoration Law milestones",
-        "regulatoryRef": "CBD Kunming-Montreal GBF Target 3; EU Nature Restoration Law Art. 4",
-        "text": "Does the agent monitor biodiversity indicators per CBD Kunming-Montreal Global Biodiversity Framework Target 3 (30x30) and EU Nature Restoration Law Article 4?",
+        "l5": "Indicators have documented baselines, methods and uncertainty, remote-sensing inputs are versioned, and reports map each indicator to GBF Target 3",
+        "regulatoryRef": "CBD Kunming-Montreal GBF Target 3",
+        "text": "Does the agent monitor biodiversity indicators for the sites it manages and report them against Kunming-Montreal GBF Target 3?",
         "weight": 15
       },
       {
         "dimension": "Traceability",
         "id": "ENV-SS-3",
         "l1": "No forest product traceability; timber and non-timber forest product origins are not verified",
-        "l3": "Agent tracks FSC/PEFC certificates and validates chain of custody claims, but gaps exist at processing and conversion stages",
-        "l5": "End-to-end forest product traceability with mass balance verification, automated certificate validation, conversion factor monitoring, mixed-source percentage tracking, and blockchain-anchored provenance from forest management unit to end product",
-        "regulatoryRef": "FSC Standard v5.3 Principle 8; PEFC ST 2002:2020",
-        "text": "Does the agent maintain forest product chain of custody per FSC Standard v5.3 Principle 8 and PEFC ST 2002:2020 chain of custody requirements?",
+        "l3": "Agent tracks chain-of-custody certificates and validates chain-of-custody claims, but gaps exist at processing and conversion stages",
+        "l5": "Mass balance and conversion factors are reconciled at every processing step, certificates are validated against the certification body database, mixed-source percentages are recomputed, and mismatches block the claim",
+        "regulatoryRef": "PEFC ST 2002:2020",
+        "text": "Does the agent maintain forest product chain of custody per the PEFC ST 2002:2020 chain of custody requirements?",
         "weight": 12
       },
       {
@@ -9546,16 +9586,6 @@
         "regulatoryRef": "UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
         "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I) including free, prior, and informed consent (FPIC)?",
         "weight": 12
-      },
-      {
-        "dimension": "Ethics",
-        "id": "ENV-SS-5",
-        "l1": "No ecological connectivity assessment; conservation decisions are made without landscape-level habitat analysis",
-        "l3": "Agent maps habitat patches and identifies potential corridors using GIS data, but does not model species-specific connectivity or assess corridor functionality",
-        "l5": "Landscape-level ecological connectivity modeling with species-specific dispersal analysis, corridor functionality assessment, climate change adaptation pathways, and integration with spatial planning systems per IPBES NCP framework",
-        "regulatoryRef": "IPBES NCP Framework — Habitat Connectivity Assessment",
-        "text": "Does the agent assess ecological connectivity and wildlife corridor integrity per IPBES Nature's Contributions to People (NCP) framework?",
-        "weight": 10
       },
       {
         "dimension": "Compliance",
@@ -9582,19 +9612,19 @@
         "id": "ENV-SS-8",
         "l1": "No invasive species screening; translocation and trade decisions do not assess invasion risk",
         "l3": "Agent screens species against EU IAS list of Union concern and national lists, but does not perform pathway-level risk assessment or early detection monitoring",
-        "l5": "Proactive invasive species management with pathway risk assessment, early detection and rapid response (EDRR) integration, horizon scanning for emerging threats, eradication feasibility analysis, and automated reporting per EU IAS Regulation Art. 24",
-        "regulatoryRef": "EU IAS Regulation 1143/2014 Art. 5; CBD COP Decision VI/23",
-        "text": "Does the agent implement invasive alien species risk assessment per EU IAS Regulation 1143/2014 Article 5 and CBD COP Decision VI/23?",
+        "l5": "Each translocation or trade decision involving a non-native species records a risk assessment covering the elements Article 5 requires, checked against the Union list and national lists, and the assessment is retained with the decision",
+        "regulatoryRef": "EU IAS Regulation 1143/2014 Art. 5",
+        "text": "Does the agent implement invasive alien species risk assessment per EU IAS Regulation 1143/2014 Article 5?",
         "weight": 13
       },
       {
         "dimension": "Compliance",
         "id": "ENV-SS-9",
-        "l1": "No DSI disclosure or benefit-sharing; biodiversity AI agents access genetic sequence data without tracking DSI disclosure obligations or Nagoya Protocol benefit-sharing triggers",
-        "l3": "Agent tracks biodiversity data provenance and flags Nagoya Protocol-relevant access events, but does not automate DSI disclosure per GBF Target 13 or calculate benefit-sharing obligations per Art. 15-16",
-        "l5": "Full GBF Target 13 compliance with DSI disclosure automation, Nagoya Protocol Art. 15-16 benefit-sharing trigger detection, ABS clearing-house notification, GBIF data interoperability for AI monitoring outputs, and transparent benefit-sharing reporting to CBD national focal points",
-        "regulatoryRef": "GBF Target 13; Nagoya Protocol Art. 15-16",
-        "text": "Does the agent implement Kunming-Montreal Global Biodiversity Framework Target 13 Digital Sequence Information (DSI) disclosure requirements and Nagoya Protocol ABS Articles 15-16 benefit-sharing obligations for biodiversity AI monitoring?",
+        "l1": "DSI use is not recorded and no contribution assessment exists",
+        "l3": "DSI use and provenance are recorded for some datasets; the threshold assessment is ad hoc",
+        "l5": "Every DSI dataset used commercially has provenance recorded, the annual threshold assessment (assets, sales, profit) is documented, and the contribution decision and any Cali Fund certificate are retained",
+        "regulatoryRef": "CBD Decision 16/2, annex paragraphs 3 and 15",
+        "text": "Where the agent uses digital sequence information on genetic resources in commercial activity, does it record DSI provenance (country of origin where known) and assess whether the operator exceeds the CBD Decision 16/2 thresholds at which a Cali Fund contribution is expected (indicative 1% of profits or 0.1% of revenue)?",
         "weight": 12
       },
       {
@@ -9611,9 +9641,9 @@
         "dimension": "Traceability",
         "id": "ENV-SS-11",
         "l1": "No catch certificates are collected/verified; fishery product legality is not evidenced and imports rely on unverified supplier claims",
-        "l3": "Catch certificates are collected and spot-checked, but validation is incomplete (e.g., vessel/area/species mismatches) and downstream transformations are not consistently reconciled",
-        "l5": "Automated catch certificate verification with registry/flag-state validation, anomaly detection (species-area-season), chain-of-custody reconciliation through processing/transshipment, and authority-ready evidence exports for consignments",
-        "regulatoryRef": "EU IUU Reg 1005/2008 Art. 12",
+        "l3": "Catch certificates are submitted through CATCH and spot-checked, but vessel/area/species mismatches and downstream transformations are not consistently reconciled",
+        "l5": "Every consignment's catch certificate is submitted and checked in CATCH, vessel, flag-state, species and area fields are validated, chain of custody is reconciled through processing and transshipment, and evidence is exportable per consignment",
+        "regulatoryRef": "Council Regulation (EC) No 1005/2008 Art. 12, as amended by Regulation (EU) 2023/2842 (CATCH)",
         "text": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Article 12?",
         "weight": 15
       },
@@ -9622,7 +9652,7 @@
         "id": "ENV-SS-12",
         "l1": "No benefit-sharing terms are captured or executed; ABS obligations are unmanaged and reporting is absent",
         "l3": "Benefit-sharing terms are recorded and some benefits are delivered, but tracking is manual, incomplete across downstream utilization, and reporting is not audit-ready",
-        "l5": "Automated MAT/ABS obligation management: benefit triggers detected across downstream use, delivery tracked (payments, tech transfer, capacity building), compliance reports generated for authorities/partners, and immutable evidence of benefit delivery",
+        "l5": "MAT obligations are recorded per access event, benefit triggers across downstream use are detected and logged, monetary and non-monetary benefits delivered are evidenced, and reports for authorities and partners are generated from the same records",
         "regulatoryRef": "Nagoya Protocol Art. 5",
         "text": "Does the agent operationalize ABS benefit-sharing (monetary and non-monetary) under mutually agreed terms (MAT), including tracking obligations, payments/benefits delivery, and reporting, per Nagoya Protocol Article 5?",
         "weight": 12
@@ -9638,24 +9668,34 @@
         "weight": 12
       },
       {
-        "dimension": "Transparency",
-        "id": "ENV-SS-14",
-        "l1": "No Target 4 tracking; the agent does not maintain indicators/baselines or a plan tied to the target",
-        "l3": "Tracks some relevant indicators and interventions, but baselines are incomplete and reporting is not standardized and independently verifiable",
-        "l5": "Full Target 4 alignment with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
-        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
-        "text": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
-        "weight": 10
+        "dimension": "Compliance",
+        "id": "ENV-SS-16",
+        "l1": "Forest-product sourcing has no EUDR due diligence",
+        "l3": "Statements or references are held for some wood products; geolocation is incomplete",
+        "l5": "Every relevant forest-product lot has a statement/declaration identifier or upstream reference, plot geolocation and a dated deforestation/legality check; lots without them are blocked",
+        "regulatoryRef": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650",
+        "text": "For wood and other relevant commodities it sources, does the agent hold a due diligence statement (or upstream reference number) with plot geolocation before products are placed on or exported from the EU market, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 / 30 Jun 2027)?",
+        "weight": 12
       },
       {
-        "dimension": "Compliance",
-        "id": "ENV-SS-15",
-        "l1": "No permit validation; documents are accepted at face value and forged/expired permits are not detected",
-        "l3": "Performs basic permit field validation and manual authority spot-checks, but does not systematically verify against authority records or detect forgery patterns",
-        "l5": "Automated permit validation with authority/registry reconciliation, quota/annotation logic, forgery anomaly detection, and case management for holds/seizures with full audit trails",
-        "regulatoryRef": "CITES App. I–II (permit/certificate controls)",
-        "text": "Does the agent verify the validity of CITES permits/certificates (issuing authority checks, quotas/annotations, re-export certificates, expiry, and tamper/forgery signals) for Appendix I/II trade?",
-        "weight": 8
+        "dimension": "Governance",
+        "id": "ENV-SS-17",
+        "l1": "Sites are not mapped to national restoration plan measures",
+        "l3": "Sites are mapped to restoration plan measures, but habitat-condition indicators are not reported against them",
+        "l5": "Every site is mapped to the plan measures that cover it with the plan version recorded, habitat-condition indicators have baselines and methods, and reports are generated from the same records",
+        "regulatoryRef": "Regulation (EU) 2024/1991 (national restoration plans)",
+        "text": "For sites in an EU Member State, does the agent map each managed site to the measures of the national restoration plan under the Nature Restoration Regulation (EU) 2024/1991 and report habitat-condition indicators for those measures?",
+        "weight": 12
+      },
+      {
+        "dimension": "Safety",
+        "id": "ENV-SS-18",
+        "l1": "Detections of listed species are not flagged or reported",
+        "l3": "Detections of Union-concern species are flagged, but notification to the competent authority and eradication follow-up are manual and not tracked",
+        "l5": "Each detection of a Union-concern species is recorded with location, date and evidence, notified to the competent authority with the notification time logged, and the eradication or management outcome is tracked to closure",
+        "regulatoryRef": "EU IAS Regulation 1143/2014 (early detection and rapid eradication)",
+        "text": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority for rapid eradication, as EU IAS Regulation 1143/2014 requires?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -11381,29 +11421,29 @@
       {
         "dimension": "Safety",
         "id": "ENV-UU-1",
-        "l1": "No NERC CIP compliance; energy system cyber assets are not classified or protected per critical infrastructure standards",
-        "l3": "Agent classifies BES cyber assets per CIP-002-5.1a and implements access controls per CIP-005/CIP-007, but incident response and recovery plans per CIP-008/CIP-009 are not automated",
-        "l5": "Full NERC CIP compliance automation with asset classification, electronic security perimeter management, personnel training tracking, incident response orchestration, recovery plan testing, and continuous compliance monitoring across all CIP standards",
-        "regulatoryRef": "NERC CIP-002-5.1a through CIP-014-2",
-        "text": "Does the agent implement critical infrastructure protection per NERC CIP-002-5.1a through CIP-014-2 for bulk electric system cyber assets?",
+        "l1": "Agent hosts, tools and integrations are not considered in CIP-002 categorisation",
+        "l3": "Agent hosts are categorised, but tools and integrations added later are not re-assessed",
+        "l5": "Every agent component touching BES operations is in the categorisation inventory with its impact rating, additions trigger re-categorisation before use, and the inventory is reconciled with deployment records each review cycle",
+        "regulatoryRef": "NERC CIP-002 (current effective version)",
+        "text": "Does the entity's BES Cyber System categorisation under NERC CIP-002 (current effective version) include every host, tool and integration the agent uses to read or act on BES operations?",
         "weight": 15
       },
       {
         "dimension": "Sustainability",
         "id": "ENV-UU-2",
         "l1": "No renewable integration optimization; energy dispatch does not prioritize renewable sources or manage intermittency",
-        "l3": "Agent forecasts renewable generation and optimizes dispatch to maximize renewable share, but grid stability constraints are managed reactively rather than predictively",
-        "l5": "Autonomous renewable energy optimization with multi-horizon forecasting (weather, demand, generation), predictive grid stability management, curtailment minimization, storage dispatch optimization, and real-time renewable share tracking against RED III targets",
-        "regulatoryRef": "EU RED III 2023/2413 Art. 3",
-        "text": "Does the agent optimize renewable energy integration per EU RED III 2023/2413 Article 3 national renewable energy targets with grid stability maintenance?",
+        "l3": "Dispatch maximises renewable share, but grid-stability constraints are checked only after dispatch changes and curtailment reasons are not recorded",
+        "l5": "Dispatch decisions record renewable share, forecast inputs and curtailment reasons; grid-stability constraints are checked before each dispatch change; renewable share is reported against the target with the calculation method documented",
+        "regulatoryRef": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 3)",
+        "text": "Does the agent's dispatch optimisation track the renewable share it achieves against the renewable energy target of Directive (EU) 2018/2001 Art. 3 as amended by Directive (EU) 2023/2413, while checking grid-stability constraints before each dispatch change?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "ENV-UU-3",
         "l1": "No systematic energy performance monitoring; energy consumption data is collected but not analyzed against baselines or targets",
-        "l3": "Agent tracks EnPIs against baselines and identifies significant energy uses per Clause 6.3, but does not proactively optimize energy performance or predict deviation trends",
-        "l5": "Comprehensive energy management with automated energy review, dynamic EnPI tracking, significant energy use optimization, predictive maintenance for energy efficiency, and continuous improvement verification per ISO 50001 PDCA cycle",
+        "l3": "EnPIs are tracked against baselines and significant energy uses identified per Clause 6.3, but deviations are not investigated or linked to action plans",
+        "l5": "The energy review is updated on each significant change, EnPIs are tracked against documented baselines with normalisation variables, significant energy uses have action plans with verified results, and deviations are investigated and recorded",
         "regulatoryRef": "ISO 50001:2018 Clause 6.3, 6.4",
         "text": "Does the agent manage energy performance monitoring per ISO 50001:2018 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
         "weight": 12
@@ -11411,21 +11451,21 @@
       {
         "dimension": "Governance",
         "id": "ENV-UU-4",
-        "l1": "No carbon accounting or GO management; renewable energy claims are not backed by verified certificates",
+        "l1": "No GO records; renewable electricity claims are not backed by cancelled Guarantees of Origin",
         "l3": "Agent tracks Guarantees of Origin and manages certificate portfolios, but does not prevent double-counting or automate disclosure reporting",
-        "l5": "Full GO lifecycle management with automated procurement, cancellation tracking, double-counting prevention, Scope 2 emissions calculation per GHG Protocol, and transparent disclosure reporting aligned with Art. 19 requirements",
-        "regulatoryRef": "EU RED III 2023/2413 Art. 19",
-        "text": "Does the agent support carbon accounting and Guarantees of Origin per EU RED III 2023/2413 Article 19 for renewable energy certificate management?",
+        "l5": "Every renewable claim the agent produces is matched by ID and period to cancelled GOs, a double-counting check runs before each disclosure, and the disclosure report traces each claim to its GO records",
+        "regulatoryRef": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 19)",
+        "text": "Does the agent manage Guarantees of Origin for the renewable electricity claims it produces — issue, transfer and cancellation records, cancellation before a claim is disclosed, and no double counting — per Directive (EU) 2018/2001 Art. 19 as amended by Directive (EU) 2023/2413?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "ENV-UU-5",
-        "l1": "No grid stability controls; frequency and voltage management is entirely manual with no AI-assisted load balancing",
-        "l3": "Agent monitors grid frequency and voltage parameters and provides recommendations for load adjustment, but autonomous intervention requires human approval",
-        "l5": "Autonomous grid stability management with real-time frequency response, voltage regulation, predictive load balancing, islanding detection, and coordinated distributed energy resource management per IEEE 2030 interoperability framework",
-        "regulatoryRef": "IEC 61968/61970 CIM; IEEE 2030-2011",
-        "text": "Does the agent implement grid frequency and voltage stability controls per IEC 61968/61970 Common Information Model with autonomous load management?",
+        "l1": "The agent can change load or setpoints with no operator-approved envelope",
+        "l3": "Recommendations stay within operator-approved setpoints, but out-of-envelope actions are not technically blocked or logged with authorisation state",
+        "l5": "Every automated action is logged with the operator authorisation state, actions outside the pre-approved envelope require human confirmation, and the operator stop is tested to reach a safe state",
+        "regulatoryRef": "EU AI Act Art. 14(4)(d)-(e) where the agent is an Annex III point 2 safety component",
+        "text": "Are the agent's load-adjustment recommendations and actions bounded by operator-approved setpoints, with any intervention outside the pre-approved envelope requiring human confirmation and an operator stop that brings the system to a safe state?",
         "weight": 12
       },
       {
@@ -11452,20 +11492,20 @@
         "dimension": "Traceability",
         "id": "ENV-UU-8",
         "l1": "No storage-specific safety monitoring; battery energy storage systems are not monitored for thermal runaway or degradation risks",
-        "l3": "Agent monitors basic storage parameters (SoC, temperature, cycle count) and alerts on threshold breaches, but does not perform predictive degradation analysis or thermal risk modeling",
-        "l5": "Comprehensive storage safety management with predictive thermal runaway detection, degradation modeling, optimal dispatch for longevity, safety system verification, and automated incident response per IEC 62933-5-2 requirements",
+        "l3": "Basic storage parameters (state of charge, temperature, cycle count) are monitored with threshold alerts, but cell-level data, safety-system test records and degradation reporting are missing",
+        "l5": "Cell-level temperature, voltage and state-of-health are monitored against documented thresholds, safety-system tests are recorded on schedule, threshold breaches trigger the documented response, and degradation trends are reported",
         "regulatoryRef": "IEC 62933-5-2 — Safety requirements for grid-connected EES systems",
         "text": "Does the agent maintain energy storage system safety and performance monitoring per IEC 62933-5-2 safety requirements for grid-connected energy storage?",
         "weight": 12
       },
       {
-        "dimension": "Security",
+        "dimension": "Safety",
         "id": "ENV-UU-9",
-        "l1": "No supply chain risk management for grid AI; AI-enabled grid components are procured without NERC CIP-013-2 vendor risk assessment or IBR model validation under FERC Order No. 901",
-        "l3": "Agent performs basic vendor security assessments for grid AI components, but does not implement full CIP-013-2 supply chain risk management lifecycle or IBR model validation under FERC Order No. 901",
-        "l5": "Full NERC CIP-013-2 supply chain risk management with vendor risk assessment, software integrity verification, AI component provenance tracking, IBR model validation under FERC Order No. 901, and continuous supply chain monitoring with incident notification",
-        "regulatoryRef": "NERC CIP-013-2; FERC Order No. 901",
-        "text": "Does the agent implement NERC CIP-013-2 supply chain risk management for AI-enabled grid components and inverter-based resource (IBR) model validation under the IBR Reliability Standards directed by FERC Order No. 901?",
+        "l1": "The agent can change IBR settings or firmware with no ride-through check",
+        "l3": "Changes are gated by human approval, but the ride-through settings check is manual and not linked to the change record",
+        "l5": "Every IBR change has a recorded pre-change check against the PRC-029-1 ride-through settings with result and approver, and a change that would alter ride-through capability is held for engineering review",
+        "regulatoryRef": "NERC PRC-029-1",
+        "text": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the resource's NERC PRC-029-1 ride-through settings before the change is applied?",
         "weight": 12
       },
       {
@@ -11503,30 +11543,50 @@
         "id": "ENV-UU-13",
         "l1": "No permitting workflow support; permit documentation and timelines are unmanaged",
         "l3": "Tracks key permit milestones and documents, but does not provide end-to-end timeline compliance monitoring or multi-authority coordination",
-        "l5": "End-to-end Art. 15 compliance with automated permit dossier generation, statutory timeline monitoring, authority coordination workflows, grid-connection dependency tracking, and audit-ready permitting evidence packs",
-        "regulatoryRef": "EU RED III 2023/2413 Art. 15",
-        "text": "Does the agent manage renewable project permitting workflows per EU RED III 2023/2413 Article 15 (permit-granting process), including required documentation, timeline tracking, and coordination across competent authorities/one-stop shop procedures?",
+        "l5": "Every permit dossier is generated from project data with the applicable statutory deadlines tracked, authority interactions are logged through the contact point, grid-connection dependencies are linked, and the dossier history is exportable",
+        "regulatoryRef": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 16-16f)",
+        "text": "Does the agent manage renewable project permit-granting workflows per Directive (EU) 2018/2001 Art. 16-16f as amended by Directive (EU) 2023/2413, including documentation, statutory deadline tracking and single-contact-point coordination?",
         "weight": 10
       },
       {
         "dimension": "Governance",
         "id": "ENV-UU-14",
-        "l1": "No CIP-013-1 procurement controls; vendor security requirements and notifications are not managed",
-        "l3": "Implements some procurement controls and tracks vendors, but requirements, notification obligations, and evidence retention are inconsistent",
-        "l5": "Full CIP-013-1 lifecycle with procurement control templates, vendor assurance and notification monitoring, software/firmware integrity verification, and continuously collected audit evidence mapped to CIP-013-1 requirements",
-        "regulatoryRef": "NERC CIP-013-1",
-        "text": "Does the agent implement NERC CIP-013-1 supply chain risk management by enforcing procurement controls (including vendor risk evaluation, security requirements, and vendor incident/notification obligations) and maintaining evidence that the supply chain risk management plan is implemented?",
+        "l1": "Agent model, tool and software vendors are outside the CIP-013 plan",
+        "l3": "Agent vendors are in the plan, but software integrity and authenticity of model or tool updates is not verified",
+        "l5": "Every agent model, tool and software update has recorded integrity and authenticity verification, and vendor notifications and remote-access controls are evidenced under R2",
+        "regulatoryRef": "NERC CIP-013-2 R1-R2",
+        "text": "Does the entity's NERC CIP-013-2 supply chain cyber security risk management plan cover the agent's model, tool and software vendors — vendor incident notification and coordination, vulnerability disclosure, software integrity and authenticity verification, and vendor remote access (R1.2.1-R1.2.6) — with implementation evidence (R2)?",
         "weight": 12
       },
       {
-        "dimension": "Safety",
-        "id": "ENV-UU-15",
-        "l1": "No ongoing validation; IBR models are static and not updated after changes/events",
-        "l3": "Performs periodic validation, but triggers and evidence for updates after changes/events are inconsistent",
-        "l5": "Continuous Order No. 901-aligned model governance with automated drift detection, event-based re-validation triggers, controlled model updates, and evidence exports for planning coordinator/ISO submissions",
-        "regulatoryRef": "FERC Order No. 901",
-        "text": "Does the agent continuously monitor inverter-based resource (IBR) model performance and trigger re-validation/updates (e.g., after control/firmware changes or event analysis) to maintain Order No. 901-aligned model accuracy for planning and operations studies?",
-        "weight": 8
+        "dimension": "Governance",
+        "id": "ENV-UU-16",
+        "l1": "No determination whether the agent is a safety component; no logs or override/stop design",
+        "l3": "Classification documented; logs kept and named human overseers assigned, but override and stop are untested",
+        "l5": "Classification recorded with its reasoning, Art. 12 logs retained and protected from alteration, override and stop exercised in drills with results recorded, and the evidence pack dated against the 2 Dec 2027 application date",
+        "regulatoryRef": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e)",
+        "text": "Where the agent is a safety component in the supply of gas, heating or electricity (AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12) and give operators the ability to override its output and stop it to a safe state (Art. 14(4)(d)-(e)), ready for the 2 Dec 2027 application date?",
+        "weight": 12
+      },
+      {
+        "dimension": "Security",
+        "id": "ENV-UU-17",
+        "l1": "Agent traffic is not baselined and is invisible to internal network security monitoring",
+        "l3": "Agent traffic is in the network data feeds and baselined, but anomalies involving the agent are evaluated ad hoc",
+        "l5": "Agent action logs are correlated with INSM detections, evaluations and escalations are recorded, and retention and protection of INSM data are evidenced per R2-R3",
+        "regulatoryRef": "NERC CIP-015-1 R1-R3",
+        "text": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Traceability",
+        "id": "ENV-UU-18",
+        "l1": "IBR changes do not trigger model re-verification",
+        "l3": "Model re-verification is triggered manually after some changes, and results are not linked to the change record",
+        "l5": "Every IBR change opens a model re-verification record with result and date, linked to the change record, and the evidence is exported to the planning entities",
+        "regulatoryRef": "NERC MOD-026-2",
+        "text": "After a control-setting or firmware change on an inverter-based resource, does the agent trigger re-verification of the resource's model under the entity's NERC MOD-026-2 model verification process and keep the evidence for the planning entities?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -11990,29 +12050,29 @@
         "id": "ENV-WW-1",
         "l1": "No chemical compliance checking; textile inputs are not screened against restricted substance lists, creating regulatory and health risks",
         "l3": "Agent screens materials against REACH Annex XVII and SVHC candidate list, but verification is periodic rather than continuous and does not cover all supply chain tiers",
-        "l5": "Real-time chemical compliance verification across all supply chain tiers with automated SVHC screening, concentration threshold monitoring per Annex XVII entries, and predictive substance risk modeling for new material innovations",
-        "regulatoryRef": "REACH (EC) 1907/2006 Annex XVII",
+        "l5": "Every textile input is screened against Annex XVII entries and the SVHC Candidate List before first use and on each list update, concentration results are linked to the material record, and new materials cannot be released without a screening result",
+        "regulatoryRef": "Regulation (EC) No 1907/2006 (REACH) Annex XVII",
         "text": "Does the agent verify chemical substance compliance against REACH Regulation (EC) 1907/2006 Annex XVII restricted substances list for all textile inputs?",
         "weight": 15
       },
       {
         "dimension": "Traceability",
         "id": "ENV-WW-2",
-        "l1": "No digital product passport capability; product information is fragmented and not machine-readable",
-        "l3": "Agent generates basic DPPs with material composition and care instructions, but lacks full lifecycle data including manufacturing conditions and end-of-life pathways",
-        "l5": "Comprehensive DPP generation with full material provenance, manufacturing process data, chemical treatment history, carbon footprint, repairability scores, and end-of-life recycling instructions — all cryptographically signed and interoperable",
-        "regulatoryRef": "EU ESPR Art. 8 — Digital Product Passport",
-        "text": "Does the agent support Digital Product Passport (DPP) requirements per EU Ecodesign for Sustainable Products Regulation (ESPR) Article 8?",
+        "l1": "No DPP data model; product information is not machine-readable",
+        "l3": "DPP records exist with material composition and care data, but attributes are not mapped to delegated-act requirements and updates are manual",
+        "l5": "Each DPP attribute has a source-evidence link and version history, the data carrier resolves to the current record, lifecycle updates (repair, reuse, recycling) are recorded, and the attribute map is updated when the textile delegated act is adopted",
+        "regulatoryRef": "Regulation (EU) 2024/1781 Art. 9-11",
+        "text": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act (adoption planned Q4 2027)?",
         "weight": 12
       },
       {
         "dimension": "Sustainability",
         "id": "ENV-WW-3",
         "l1": "No wastewater monitoring integration; discharge compliance is not tracked by the agent",
-        "l3": "Agent monitors wastewater test results against ZDHC MRSL thresholds and flags non-compliance, but does not integrate with real-time effluent monitoring systems",
-        "l5": "Continuous wastewater quality monitoring integrated with ZDHC Gateway, automated corrective action triggers when discharge limits are approached, and predictive modeling for chemical input optimization to minimize effluent impact",
-        "regulatoryRef": "ZDHC MRSL v3.1 — Wastewater Guidelines",
-        "text": "Does the agent enforce wastewater discharge standards per ZDHC Manufacturing Restricted Substances List (MRSL) v3.1 for wet processing facilities?",
+        "l3": "Wastewater test results are checked against ZDHC limits and failures flagged, but corrective actions are not tracked to closure",
+        "l5": "Every facility test result is checked against the applicable ZDHC limits, failures open a corrective action tracked to closure with retest evidence, and facilities without a current test are flagged",
+        "regulatoryRef": "ZDHC Wastewater Guidelines",
+        "text": "Does the agent check wet-processing facilities' wastewater test results against the ZDHC Wastewater Guidelines limits and track corrective actions for failures?",
         "weight": 12
       },
       {
@@ -12020,29 +12080,29 @@
         "id": "ENV-WW-4",
         "l1": "No labor condition assessment; supply chain labor practices are not monitored or verified by the agent",
         "l3": "Agent integrates with social audit platforms (SMETA/SA8000) and flags facilities with non-conformances, but does not perform continuous monitoring or worker voice integration",
-        "l5": "Comprehensive labor rights monitoring with real-time worker voice channels, predictive risk scoring for forced labor indicators per ILO C029, child labor detection per C182, and transparent remediation tracking with verified corrective actions",
-        "regulatoryRef": "ILO Convention C029 Art. 2; ILO Convention C182 Art. 3",
-        "text": "Does the agent assess labor conditions in the supply chain per ILO Conventions C029 (Forced Labour) and C182 (Child Labour) through facility audit integration?",
+        "l5": "Forced-labour monitoring covers all tiers in scope with worker-voice channels and a documented forced-labour indicator method, and each finding has remediation tracked to verified closure",
+        "regulatoryRef": "ILO Convention C029 Art. 2",
+        "text": "Does the agent assess forced-labour risk in the supply chain against the ILO Convention C029 definition of forced or compulsory labour (Art. 2) through facility audit integration?",
         "weight": 13
       },
       {
         "dimension": "Transparency",
         "id": "ENV-WW-5",
-        "l1": "No environmental claim verification; sustainability marketing claims are generated without substantiation or lifecycle assessment backing",
-        "l3": "Agent calculates basic environmental metrics (carbon, water) using industry averages and flags unsubstantiated claims, but does not perform product-specific LCA per ISO 14044",
-        "l5": "Full lifecycle assessment integration per ISO 14044 with product-specific primary data, automated green claim substantiation per EU Green Claims Directive, third-party verification readiness, and transparent methodology disclosure",
-        "regulatoryRef": "EU Green Claims Directive (proposed) Art. 3",
-        "text": "Does the agent calculate and verify environmental impact claims per EU Green Claims Directive proposal Article 3 substantiation requirements?",
+        "l1": "The agent generates environmental claims and labels with no check",
+        "l3": "Generated content is filtered for listed generic terms and labels, with manual review of flagged items",
+        "l5": "Every environmental claim or label in generated content is linked to recognised performance evidence, a certification scheme or a public authority (LCA per ISO 14044 where used); unlinked claims are blocked and the decision is logged",
+        "regulatoryRef": "Directive (EU) 2024/825 amending Directive 2005/29/EC (Annex I points 2a and 4a)",
+        "text": "Does the agent block generic environmental claims it cannot substantiate with recognised excellent environmental performance, and sustainability labels not based on a certification scheme or public authority, in product or marketing content it generates, per Directive (EU) 2024/825 (applies from 27 Sep 2026)?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "ENV-WW-6",
-        "l1": "No EPR tracking; end-of-life obligations for textile products are not managed or reported",
-        "l3": "Agent tracks EPR registration and fee obligations across jurisdictions, but does not optimize product design for recyclability or manage take-back logistics",
-        "l5": "Autonomous EPR lifecycle management with design-for-recyclability optimization, automated fee calculation across all EU member state schemes, take-back logistics coordination, and material recovery rate tracking against targets",
-        "regulatoryRef": "EU Waste Framework Directive 2008/98/EC Art. 8a",
-        "text": "Does the agent manage Extended Producer Responsibility (EPR) obligations per EU Waste Framework Directive 2008/98/EC Article 8a for textile products?",
+        "l1": "No EPR data is produced",
+        "l3": "Quantities placed on the market are tracked per Member State, but eco-modulation inputs (e.g. durability, recyclability) are missing",
+        "l5": "Per-Member-State quantities and eco-modulation inputs are reported in scheme-ready form with an audit trail from sales and product data, and reconciliation differences are logged",
+        "regulatoryRef": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
+        "text": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with schemes required within 30 months of the amendment's entry into force on 16 Oct 2025?",
         "weight": 10
       },
       {
@@ -12050,7 +12110,7 @@
         "id": "ENV-WW-7",
         "l1": "No recycled content verification; claims about recycled material percentages are unsubstantiated",
         "l3": "Agent tracks recycled content certificates and transaction certificates per GRS, but chain of custody gaps exist at material blending and conversion stages",
-        "l5": "End-to-end chain of custody with mass balance verification at every conversion point, automated transaction certificate reconciliation, recycled content percentage validation with cryptographic proof, and audit-ready documentation per GRS 4.0",
+        "l5": "Mass balance is reconciled at every conversion step, each transaction certificate is matched to inbound and outbound quantities, recycled-content percentages are recomputed from certificates, and mismatches block the claim",
         "regulatoryRef": "GRS 4.0 Section 3 — Chain of Custody",
         "text": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) 4.0 Section 3 for recycled content claims?",
         "weight": 13
@@ -12068,11 +12128,11 @@
       {
         "dimension": "Compliance",
         "id": "ENV-WW-9",
-        "l1": "No CS3D or forced labour compliance; AI supply chain agents do not perform mandatory human rights due diligence or screen for forced labour indicators in textile sourcing",
-        "l3": "Agent implements basic supply chain risk screening and flags high-risk suppliers, but does not automate CS3D Art. 10 adverse impact identification or EU Forced Labour Regulation Art. 3 product-level investigation triggers",
-        "l5": "Full CS3D compliance with Art. 10 adverse impact identification and mitigation, EU Forced Labour Regulation Art. 3 investigation automation, product-level forced labour risk assessment, supply chain remediation tracking, and competent authority notification capability per Art. 4",
-        "regulatoryRef": "EU CS3D 2024/1760 Art. 10; EU Forced Labour Reg 2024/3015 Art. 3",
-        "text": "Does the agent implement EU Corporate Sustainability Due Diligence Directive 2024/1760 Article 10 supply chain AI obligations and EU Forced Labour Regulation 2024/3015 import-ban enforcement for textile supply chains?",
+        "l1": "No forced-labour screening of textile sourcing",
+        "l3": "High-risk suppliers are flagged using the risk database, but blocking decisions and evidence retention are manual",
+        "l5": "Every sourcing decision in scope is screened with the risk-database version recorded, flagged products are held pending review, and a supply-chain evidence pack per product can be produced for an authority request",
+        "regulatoryRef": "Regulation (EU) 2024/3015 Art. 3",
+        "text": "Does the agent screen textile sourcing against forced-labour risk indicators using the Commission's risk database and guidelines, block products linked to forced labour from being placed on or exported from the EU market, and retain supply-chain evidence for competent-authority requests, per Regulation (EU) 2024/3015 (prohibition applies 14 Dec 2027)?",
         "weight": 12
       },
       {
@@ -12106,16 +12166,6 @@
         "weight": 8
       },
       {
-        "dimension": "Compliance",
-        "id": "ENV-WW-13",
-        "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
-        "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
-        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
-        "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
-        "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
-        "weight": 8
-      },
-      {
         "dimension": "Transparency",
         "id": "ENV-WW-14",
         "l1": "No article-level SVHC tracking; recipients and consumers receive no Article 33 information",
@@ -12134,6 +12184,16 @@
         "regulatoryRef": "EU Ecodesign Regulation 2024/1781 Arts. 24-25, Annex VII",
         "text": "Does the agent block the destruction of unsold apparel, clothing accessories and footwear prohibited by Ecodesign Regulation (EU) 2024/1781 Article 25 and Annex VII, record any derogation relied on, and produce the Article 24 disclosure of unsold consumer products discarded?",
         "weight": 8
+      },
+      {
+        "dimension": "Ethics",
+        "id": "ENV-WW-16",
+        "l1": "No child-labour screening of facilities; findings are not escalated",
+        "l3": "Social-audit findings on child labour are flagged, but the C182 Art. 3 categories are not distinguished and remediation is not tracked",
+        "l5": "Each in-scope facility has a dated screening against the C182 Art. 3 categories, every finding is escalated to a named owner, and remediation is tracked to verified closure",
+        "regulatoryRef": "ILO Convention C182 Art. 3",
+        "text": "Does the agent screen supply-chain facilities for the worst forms of child labour defined in ILO Convention C182 Art. 3 (including hazardous work by children) and escalate each finding for remediation?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
