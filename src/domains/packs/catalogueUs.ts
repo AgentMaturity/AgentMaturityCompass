@@ -100,4 +100,10 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2024-09-26",
       note: "Federal Register API read 2026-10-04: agency FEC, published and effective 2024-09-26; the abstract does not mention AI.",
     }),
+  verified("us-hava-21081", "Help America Vote Act, voting systems standards (52 U.S.C. §21081)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title52/html/USCODE-2023-title52-subtitleII-chap209-subchapIII-partA-sec21081.htm",
+    ["HAVA 52 U.S.C. §21081", "HAVA 52 U.S.C. 21081", "52 U.S.C. §21081", "52 U.S.C. 21081"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "govinfo.gov (US Code 2023 edition) read 2026-10-04: section heading and (a)(3) 'Accessibility for individuals with disabilities'.",
+    }),
 ];
