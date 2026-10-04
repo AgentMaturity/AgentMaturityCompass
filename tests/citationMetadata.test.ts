@@ -1,6 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
+import { listIndustryPacks } from "../src/domains/industryPacks.js";
+
+// Counts are derived from the compiled registry so the test cannot drift from the product
+// the way the former literals ("600 sector-specific", "844 questions") did.
+const DEFAULT_QUESTION_COUNT = 244;
+const SECTOR_PACK_COUNT = listIndustryPacks().length;
+const SECTOR_QUESTION_COUNT = listIndustryPacks().reduce((sum, pack) => sum + pack.questions.length, 0);
+const TOTAL_QUESTION_COUNT = DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT;
 
 const readProjectFile = (path: string): string => readFileSync(join(process.cwd(), path), "utf8");
 
@@ -40,9 +48,11 @@ describe("citation metadata", () => {
   test("whitepaper sector-pack totals match the current compiled catalog claim", () => {
     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
 
-    expect(whitepaper).toContain("41 industry-specific sector packs");
-    expect(whitepaper).toContain("600 sector-specific diagnostic questions");
-    expect(whitepaper).toContain("844 questions (244 default + 600 sector-specific)");
+    expect(whitepaper).toContain(`${SECTOR_PACK_COUNT} industry-specific sector packs`);
+    expect(whitepaper).toContain(`${SECTOR_QUESTION_COUNT} sector-specific diagnostic questions`);
+    expect(whitepaper).toContain(
+      `${TOTAL_QUESTION_COUNT} questions (${DEFAULT_QUESTION_COUNT} default + ${SECTOR_QUESTION_COUNT} sector-specific)`,
+    );
     expect(whitepaper).not.toContain("40 industry-specific sector packs");
     expect(whitepaper).not.toContain("593 sector-specific diagnostic questions");
     expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
