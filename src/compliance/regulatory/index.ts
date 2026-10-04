@@ -37,12 +37,21 @@ export interface RegisterKeyDate {
   date: string;
   event: string;
   verified: boolean;
+  /** Official page the date was read from (or sought on, when verified is false). */
+  url: string;
+  /** YYYY-MM-DD or UTC date-time when `url` was read; a named program receipt's date when `basis` cites one. */
+  retrievedAt: string;
+  basis?: string;
+  note?: string;
+  /** A retrieval observation (e.g. "page returns 404"), not a legal date; calendars skip it. */
+  observation?: boolean;
 }
 
 export interface RegisterObligation {
   ref: string;
   summary: string;
   verified: boolean;
+  basis?: string;
 }
 
 export interface RegulatoryRegisterEntry {
@@ -61,6 +70,20 @@ export interface RegulatoryRegisterEntry {
   /** True only when every encoded date and obligation was verified and nothing is open. */
   verified: boolean;
   openQuestions: string[];
+  /** Industry pack ids (industryPacks.ts / industryPackManifest.ts); prefixed ids name code surfaces (assurance:, compliance:, score:). */
+  affectedPacks?: string[];
+  /** Finer status where `status` is coarse: "superseded" covers revoked and withdrawn instruments. */
+  taskStatus?: "in force" | "applies from" | "proposed" | "withdrawn" | "superseded";
+  /** Register entry ids this entry replaces; reciprocal with `supersededBy`. */
+  supersedes?: string[];
+  supersededBy?: string;
+  /** Predecessor instruments that have no register entry. */
+  supersedesInstruments?: string[];
+  codeSurfaces?: string[];
+  catalogueIds?: string[];
+  /** Program receipt rows the entry was built from. */
+  digestRows?: string[];
+  provenance?: string[];
 }
 
 export interface RegulatoryRegister {

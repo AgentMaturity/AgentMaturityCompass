@@ -17,7 +17,7 @@ const SCRIPT = "scripts/check-regulatory-currency.mjs";
 const REGISTER_PATH = "src/compliance/regulatory/register.json";
 // Pinned so these tests do not change verdict with the wall clock; the script
 // itself (no --as-of) is the dated gate.
-const AS_OF = "2026-10-03";
+const AS_OF = "2026-10-04";
 const register = () => JSON.parse(readFileSync(REGISTER_PATH, "utf8"));
 const dir = mkdtempSync(join(tmpdir(), "amc-regcurrency-"));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
@@ -138,8 +138,8 @@ describe("register validation rules", () => {
 });
 
 describe("regulatory register schema", () => {
-  it("validates cleanly as of its review date", () => {
-    const result = checkRegulatoryCurrency(REGULATORY_REGISTER, { asOf: "2026-10-03" });
+  it("validates cleanly as of the 2026-10-04 apply (sources read that day)", () => {
+    const result = checkRegulatoryCurrency(REGULATORY_REGISTER, { asOf: "2026-10-04" });
     expect(result.errors).toEqual([]);
     expect(result.entries).toBe(REGULATORY_REGISTER.entries.length);
   });
