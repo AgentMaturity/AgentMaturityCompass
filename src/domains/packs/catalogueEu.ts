@@ -229,4 +229,9 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
     ["Directive (EU) 2024/825"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", milestones: milestones(["2026-09-27", "Member State measures apply (Art. 4(1)), incl. Annex I points 2a and 4a of Directive 2005/29/EC"]),
     note: "EUR-Lex CELEX HTML read 2026-10-04 (Annex I points 2a, 4a; Art. 4(1)). Entry-into-force date not recorded here." }),
+  verified("eu-gsr", "Regulation (EU) 2019/2144 (General Safety Regulation for motor vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32019R2144", ["Regulation (EU) 2019/2144", "EU General Safety Regulation"], {
+      milestones: milestones(["2026-07-07", "Advanced safety requirements apply to all new passenger cars and vans (Commission news of 2026-07-08)"]),
+      note: "Arts. 6 and 11 read; entry-into-force date not recorded here. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
 ];
