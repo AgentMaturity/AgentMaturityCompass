@@ -1,0 +1,241 @@
+{
+  "inputs": {
+    "dora": {
+      "mappingJsonSha256": "cd851f95d2bf689109142bc69dd61b06d85353999a94299f260b99d8aea50a57",
+      "reviewJsonSha256": "8be965e61568ed11885c2ff460f7988240ddad7ea9663069b6e733c785199777"
+    },
+    "nis2": {
+      "mappingJsonSha256": "e5ac7980b1eec94fa5254824f9946b2d238fac306f3adc544df4e1e43e64945c",
+      "reviewJsonSha256": "6d5c2cbac214576b841e4f97f9433add89ba361a37f36e5d5fb6c4aa33e62279"
+    },
+    "nist-ai-600-1": {
+      "mappingJsonSha256": "0564cb632f1c989297bfa94fda73f639ecbe3a510c2f927c0125f179008e4aec",
+      "reviewJsonSha256": "87dc69f0a664d21d65e8e238b5edf12eeb27427743f65eeb34c136a23afff30a"
+    },
+    "us-state-ai-laws": {
+      "mappingJsonSha256": "110e3b252944e3833f72ac88076bfe46611531e0a3d804c440b548ec87eb04a9",
+      "reviewJsonSha256": "5528a06f80ceadb5502bf13bb4c386a5c5a1111d95f82ff2ee351a6994591ed1"
+    },
+    "hhs-onc-fda": {
+      "mappingJsonSha256": "51ac744188bdb63be9f4d3960dc94e6488831832881a263b337fc0c57229b963",
+      "reviewJsonSha256": "7aeeddd00ef4716771409cd675773b49f8cb7eab1380756e62503c5508abe7b3"
+    }
+  },
+  "skipped": {
+    "dora": [],
+    "nis2": [],
+    "nist-ai-600-1": [],
+    "us-state-ai-laws": [
+      "IL-775ILCS5-2-102(L)(1): framework 'IL_HRA_AI' is not applied from us-state-ai-laws",
+      "IL-775ILCS5-2-102(L)(2): framework 'IL_HRA_AI' is not applied from us-state-ai-laws",
+      "NYC-20-871(a)(1): framework 'NYC_LL144' is not applied from us-state-ai-laws",
+      "NYC-20-871(a)(2): framework 'NYC_LL144' is not applied from us-state-ai-laws",
+      "NYC-20-871(b)(1)-(2): framework 'NYC_LL144' is not applied from us-state-ai-laws",
+      "NYC-20-871(b)(3): framework 'NYC_LL144' is not applied from us-state-ai-laws"
+    ],
+    "hhs-onc-fda": [
+      "FDCA-515C(a): framework None is not applied from hhs-onc-fda",
+      "FDCA-515C(b): framework None is not applied from hhs-onc-fda",
+      "FDCA-515C(a)(3)/(b)(3): framework None is not applied from hhs-onc-fda",
+      "FDCA-515C(c): framework None is not applied from hhs-onc-fda",
+      "FDA-PCCP-AIDSF-1: framework None is not applied from hhs-onc-fda",
+      "FDA-PCCP-AIDSF-2: framework None is not applied from hhs-onc-fda",
+      "FDA-PCCP-MD-DRAFT: framework None is not applied from hhs-onc-fda",
+      "FDA-AIDSF-DRAFT-1: framework None is not applied from hhs-onc-fda",
+      "FDA-AIDSF-DRAFT-2: framework None is not applied from hhs-onc-fda",
+      "FDA-AIDSF-DRAFT-3: framework None is not applied from hhs-onc-fda",
+      "FDA-AIDSF-DRAFT-4: framework None is not applied from hhs-onc-fda",
+      "FDA-AIDSF-DRAFT-5: framework None is not applied from hhs-onc-fda",
+      "FDA-MLMD-TRANSPARENCY: framework None is not applied from hhs-onc-fda"
+    ]
+  },
+  "fixes": {
+    "dora": [
+      "coverage 'supporting' redefined (mappingSchema.ts frameworkControlSchema comment) to cover same-framework mappings written for another clause; counts split into other-framework-only vs same-framework-supporting (refuter fix 1)",
+      "amcControls line refs, S3/S6 commit pins and gap strings are not carried; mapping ids are checked against this HEAD by tests/frameworksControls.test.ts (refuter fixes 3-5)",
+      "RTS-2025/1190 paraphrase set verified:false with its reason (paraphrase cannot be string-checked; HHS refuter convention)",
+      "calendar not carried, so the CDR 2024/1502 Art. 7 application-date and CDR 2024/1505 source fixes (2, 6) have no registry text to correct; recorded in docs/COMPLIANCE_MAPS.md"
+    ],
+    "nis2": [
+      "IR rows carry only the EUR-Lex OJ PDF they were read from; the truncated cellar XHTML is dropped (refuter fix 3)",
+      "obligations-for-agents.json not applied (OBL-16/17/19 and mapsTo fixes have no registry target)"
+    ],
+    "nist-ai-600-1": [
+      "'uncommitted-s6' statuses, S6 pins and counts labels are not carried; every mapping id is checked against this HEAD (refuter fixes 2-3)",
+      "textExtraction 'raw' pinpoints and the EO 14434 row are not carried (refuter fixes 1, 4)",
+      "rows roll up as the author declared: risk rows -> NIST_AI_600_1 risk categories, subcategory rows -> NIST_AI_RMF functions",
+      "coverage 'indirect' -> 'supporting' (same definition: adjacent signal only)"
+    ],
+    "us-state-ai-laws": [
+      "NYC_LL144 (4 rows) and IL_HRA_AI (2 rows) not applied: neither is a framework id; IL has no verified row; a new family needs tests/frameworkBreadth.test.ts, outside this run's write scope",
+      "the IL-AIPA alias and NYC rule title fixes therefore have no registry target",
+      "coverage 'indirect' -> 'supporting'"
+    ],
+    "hhs-onc-fda": [
+      "same-framework 'supporting' rows kept under the amended definition (refuter fix 1, option b)",
+      "trailing ' [..]' dropped from HTI1-170.315(b)(11)(v)(A) (refuter fix 4)",
+      "FDA rows (13) not applied: no FDA framework id",
+      "HIPAA rows carry status 'proposed' (Security Rule NPRM, 90 FR 898)",
+      "obligations-for-agents.json not applied"
+    ]
+  },
+  "byFramework": {
+    "CA_AI_LAWS": {
+      "controls": 15,
+      "mapped": 9,
+      "unmapped": 6,
+      "mappedWithPartial": 7,
+      "supportingOnlyWithSameFrameworkMapping": 1,
+      "supportingOnlyOtherFrameworksOnly": 1,
+      "verified": 15,
+      "unverified": 0,
+      "textKind": {
+        "verbatim-excerpt": 15
+      },
+      "distinctMappingIds": 15
+    },
+    "CO_AI_ACT": {
+      "controls": 11,
+      "mapped": 8,
+      "unmapped": 3,
+      "mappedWithPartial": 5,
+      "supportingOnlyWithSameFrameworkMapping": 0,
+      "supportingOnlyOtherFrameworksOnly": 3,
+      "verified": 11,
+      "unverified": 0,
+      "textKind": {
+        "verbatim-excerpt": 11
+      },
+      "distinctMappingIds": 13
+    },
+    "DORA": {
+      "controls": 56,
+      "mapped": 31,
+      "unmapped": 25,
+      "mappedWithPartial": 15,
+      "supportingOnlyWithSameFrameworkMapping": 9,
+      "supportingOnlyOtherFrameworksOnly": 7,
+      "verified": 55,
+      "unverified": 1,
+      "textKind": {
+        "verbatim": 18,
+        "verbatim-excerpt": 37,
+        "paraphrase": 1
+      },
+      "distinctMappingIds": 23
+    },
+    "HHS_HTI_1": {
+      "controls": 19,
+      "mapped": 15,
+      "unmapped": 4,
+      "mappedWithPartial": 12,
+      "supportingOnlyWithSameFrameworkMapping": 2,
+      "supportingOnlyOtherFrameworksOnly": 1,
+      "verified": 19,
+      "unverified": 0,
+      "textKind": {
+        "verbatim": 14,
+        "verbatim-excerpt": 5
+      },
+      "distinctMappingIds": 15
+    },
+    "HIPAA": {
+      "controls": 29,
+      "mapped": 22,
+      "unmapped": 7,
+      "mappedWithPartial": 17,
+      "supportingOnlyWithSameFrameworkMapping": 1,
+      "supportingOnlyOtherFrameworksOnly": 4,
+      "verified": 29,
+      "unverified": 0,
+      "textKind": {
+        "verbatim-excerpt": 25,
+        "verbatim": 4
+      },
+      "distinctMappingIds": 20
+    },
+    "NIS2": {
+      "controls": 89,
+      "mapped": 43,
+      "unmapped": 46,
+      "mappedWithPartial": 43,
+      "supportingOnlyWithSameFrameworkMapping": 0,
+      "supportingOnlyOtherFrameworksOnly": 0,
+      "verified": 89,
+      "unverified": 0,
+      "textKind": {
+        "verbatim": 89
+      },
+      "distinctMappingIds": 32
+    },
+    "NIST_AI_600_1": {
+      "controls": 12,
+      "mapped": 7,
+      "unmapped": 5,
+      "mappedWithPartial": 5,
+      "supportingOnlyWithSameFrameworkMapping": 0,
+      "supportingOnlyOtherFrameworksOnly": 2,
+      "verified": 12,
+      "unverified": 0,
+      "textKind": {
+        "verbatim": 12
+      },
+      "distinctMappingIds": 19
+    },
+    "NIST_AI_RMF": {
+      "controls": 49,
+      "mapped": 43,
+      "unmapped": 6,
+      "mappedWithPartial": 33,
+      "supportingOnlyWithSameFrameworkMapping": 3,
+      "supportingOnlyOtherFrameworksOnly": 7,
+      "verified": 49,
+      "unverified": 0,
+      "textKind": {
+        "verbatim": 49
+      },
+      "distinctMappingIds": 55
+    },
+    "TX_TRAIGA": {
+      "controls": 10,
+      "mapped": 6,
+      "unmapped": 4,
+      "mappedWithPartial": 5,
+      "supportingOnlyWithSameFrameworkMapping": 0,
+      "supportingOnlyOtherFrameworksOnly": 1,
+      "verified": 10,
+      "unverified": 0,
+      "textKind": {
+        "verbatim-excerpt": 10
+      },
+      "distinctMappingIds": 8
+    }
+  },
+  "files": {
+    "dora.ts": {
+      "rows": 56,
+      "lines": 63
+    },
+    "nis2.ts": {
+      "rows": 89,
+      "lines": 96
+    },
+    "nistAi600_1.ts": {
+      "rows": 61,
+      "lines": 68
+    },
+    "usStateAiLaws.ts": {
+      "rows": 36,
+      "lines": 43
+    },
+    "hhsHti1Hipaa.ts": {
+      "rows": 48,
+      "lines": 55
+    }
+  },
+  "total": {
+    "controls": 290,
+    "verified": 289,
+    "mapped": 184
+  }
+}
