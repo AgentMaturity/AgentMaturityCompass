@@ -1,6 +1,6 @@
 # Mobility station: regulated deployment guide
 
-This guide maps what AMC source provides for an agent deployed in the `mobility` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `8f57ce63`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
+This guide maps what AMC source provides for an agent deployed in the `mobility` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `726be0ca`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
 
 It does not say what any regulation requires, and it is not legal advice. Framework names below are strings that appear in AMC source; their presence means a pack refers to them, not that AMC satisfies them.
 
@@ -23,14 +23,14 @@ Packs whose `stationId` is `mobility`, as returned by `getIndustryPacksByStation
 
 | Pack | Name | Questions | Risk tier | Certification threshold |
 |---|---|---|---|---|
-| `sustainable-communities` | Sustainable Communities | 14 | very-high | 70 |
-| `sustainable-ports` | Sustainable Ports | 14 | very-high | 75 |
+| `sustainable-communities` | Sustainable Communities | 15 | very-high | 70 |
+| `sustainable-ports` | Sustainable Ports | 15 | very-high | 75 |
 | `sustainable-real-estate` | Sustainable Real Estate | 15 | high | 68 |
-| `virtual-infrastructure` | Sustainable Virtual Infrastructure | 14 | critical | 78 |
-| `privacy-security-mobility` | Privacy & Security | 13 | critical | 80 |
-| `freight-3pl-warehouse` | Freight, 3PL & Warehouse Operations | 8 | very-high | 76 |
+| `virtual-infrastructure` | Sustainable Virtual Infrastructure | 15 | critical | 78 |
+| `privacy-security-mobility` | Privacy & Security | 15 | critical | 80 |
+| `freight-3pl-warehouse` | Freight, 3PL & Warehouse Operations | 15 | very-high | 76 |
 
-Total: 6 packs, 78 questions.
+Total: 6 packs, 90 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -38,13 +38,13 @@ Run one with `amc domain pack run --pack <id>` [C8]. The command requires the in
 
 - Station `regulatoryBasis` [C12]: `NHTSA AV Guidelines`, `ISO 26262`, `UNECE WP.29`, `ISO 21448`, `IEC 61508`, `EU AI Act`.
 - Station `complianceFrameworks` [C13]: `ISO 26262`, `UNECE R155`, `UNECE R156`, `ISO 21448`, `IEC 61508`, `SAE J3016`, `DO-178C`.
-- The station's packs name 52 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `UN SDG 11`, `ISO 37120:2018 (City Indicators)`, `LEED v4/BREEAM`, `EU Urban Agenda`, `ISO/IEC JTC 1/SC 41 (Smart Cities)`, `Paris Agreement`, `C40 Cities Framework`, `ISO 37120:2018`, `ISO 37122:2019`, `LEED v4`, `C40 Cities`, `IMO MARPOL`, `ISO 28000:2022 (Supply Chain Security)`, `ISPS Code`, `EU Port Services Regulation 2017/352`, `UN TIR Convention`, `IMDG Code`, `ISO 14001:2015`, `C-TPAT`, `ISO 28000:2022`, `BREEAM In-Use`, `WELL Building Standard v2`, `ISO 50001:2018`, `EU Energy Performance of Buildings Directive (EPBD) 2024`, `GRESB Real Estate Assessment`, `EU Taxonomy Regulation Art. 10`, `UN PRI`, `EU EPBD 2024`, `GRESB`, `EU Taxonomy Art. 10`, `ISO 27001:2022`, `SOC 2 Type II`, `CSA STAR Level 2`, `GDPR Art. 44-49`, `FedRAMP Rev. 5`, `EU NIS2 Directive 2022/2555`, `ISO 22301:2019`, `EU Data Act 2023`, `CSA STAR`, `EU NIS2 2022/2555`, `GDPR Art. 5/25/32`, `CCPA/CPRA §1798.100`, `UNECE WP.29 R155/R156`, `ISO 21434:2021`, `ETSI EN 303 645 v2.1.1`, `NIST CSF 2.0`, `ISO/IEC 27701:2019`, `CCPA/CPRA`, `ETSI EN 303 645`, `NIST SP 800-161r1-upd1`, `GS1 EPCIS 2.0`, `ISO 9001:2015`.
+- The station's packs name 52 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `UN SDG 11`, `ISO 37120:2018 (City Indicators)`, `LEED v4/BREEAM`, `EU Urban Agenda`, `ISO/IEC JTC 1/SC 41 (Smart Cities)`, `Paris Agreement`, `C40 Cities Framework`, `ISO 37120:2018`, `ISO 37122:2019`, `LEED v4`, `C40 Cities`, `IMO MARPOL`, `ISO 28000:2022 (Supply Chain Security)`, `ISPS Code`, `EU Port Services Regulation 2017/352`, `UN TIR Convention`, `IMDG Code`, `ISO 14001:2026`, `C-TPAT`, `ISO 28000:2022`, `BREEAM In-Use`, `WELL Building Standard v2`, `ISO 50001:2018`, `EU Energy Performance of Buildings Directive (EPBD) 2024`, `GRESB Real Estate Assessment`, `EU Taxonomy Regulation Art. 10`, `UN PRI`, `EU EPBD 2024`, `GRESB`, `EU Taxonomy Art. 10`, `ISO 27001:2022`, `SOC 2 Type II`, `CSA STAR Level 2`, `GDPR Art. 44-49`, `FedRAMP Rev. 5`, `EU NIS2 Directive 2022/2555`, `ISO 22301:2019`, `EU Data Act 2023`, `CSA STAR`, `EU NIS2 2022/2555`, `GDPR Art. 5/25/32`, `CCPA/CPRA §1798.100`, `UNECE WP.29 R155/R156`, `ISO 21434:2021`, `ETSI EN 303 645 v2.1.1`, `NIST CSF 2.0`, `ISO/IEC 27701:2025`, `CCPA/CPRA`, `ETSI EN 303 645`, `NIST SP 800-161r1-upd1`, `GS1 EPCIS 2.0`, `ISO 9001:2026`.
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C15], resolved by `normalizeFrameworkName` [C16]; an unresolved name is rejected [C17]. Of the 62 framework strings above (station and packs together):
 
-- None resolves as written.
-- 1 resolves only after spaces and hyphens are replaced with `_`: `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects it.
-- 61 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 7 resolve as written: `EU AI Act` → `EU_AI_ACT`, `ISO 27001:2022` → `ISO_27001`, `SOC 2 Type II` → `SOC2`, `GDPR Art. 44-49` → `GDPR`, `EU NIS2 Directive 2022/2555` → `NIS2`, `EU NIS2 2022/2555` → `NIS2`, `GDPR Art. 5/25/32` → `GDPR`.
+- None resolves only after replacing spaces and hyphens with `_`.
+- 55 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries, where the register has them, are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C18].
 
@@ -105,15 +105,15 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 14; the station has 6 packs and 78 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
-- 61 of 62 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- The registry's `questionCount` for this station is 14; the station has 6 packs and 90 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
+- 55 of 62 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
 - Pack scores from `amc domain pack run` are self-assessments (see Sector packs).
 
 ## Verification appendix
 
-- Source commit: `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da`. Measured on Darwin arm64, Node v25.5.0, 2026-10-03.
+- Source commit: `726be0ca11e31224b2c93ae13a439f8cb2393e64`. Measured on Darwin arm64, Node v25.5.0, 2026-10-04.
 - Exercised: reading source and running the commands below. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.
 - `pnpm vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.
 - Pack counts by hand: `node_modules/.bin/tsx -e 'import {getIndustryPacksByStation} from "./src/domains/industryPacks.ts"; const p=getIndustryPacksByStation("mobility"); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'`
@@ -127,18 +127,18 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:81` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:82` | `questionCount: 14` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:78` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2403` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:79` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:85` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:71` | `regulatoryBasis: string[];` |
-| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:1` | `export type ComplianceFramework ` |
-| C16 | Framework name resolution | `src/compliance/frameworks.ts:199` | `export function normalizeFrameworkName` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+| C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
-| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:100` | `export const GLOBAL_FRAMEWORKS` |
+| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C19 | Station assurancePacks | `src/domains/domainRegistry.ts:83` | `assurancePacks:` |
 | C20 | Assurance pack registry listing | `src/assurance/packs/index.ts:274` | `export function listAssurancePacks` |
 | C21 | Domain assurance command | `src/cli-domain-product-commands.ts:507` | `Run domain-specific assurance packs` |

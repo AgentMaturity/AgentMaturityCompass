@@ -1,6 +1,6 @@
 # Health station: regulated deployment guide
 
-This guide maps what AMC source provides for an agent deployed in the `health` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `8f57ce63`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
+This guide maps what AMC source provides for an agent deployed in the `health` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `726be0ca`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
 
 It does not say what any regulation requires, and it is not legal advice. Framework names below are strings that appear in AMC source; their presence means a pack refers to them, not that AMC satisfies them.
 
@@ -41,13 +41,13 @@ Run one with `amc domain pack run --pack <id>` [C8]. The command requires the in
 
 - Station `regulatoryBasis` [C12]: `FDA 510(k)`, `HIPAA`, `FDA AI/ML Action Plan`, `EU MDR`, `IEC 62304`.
 - Station `complianceFrameworks` [C13]: `FDA 510(k)`, `HIPAA`, `EU MDR`, `HL7 FHIR`, `IEC 62304`.
-- The station's packs name 99 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `HL7 FHIR R4 (4.0.1)`, `IHE XDS.b / XCA`, `HIPAA §164.312 Technical Safeguards`, `EU MDR 2017/745`, `eHealth Network Guidelines`, `ISO 27799:2016`, `21st Century Cures Act §4003`, `EU European Health Data Space (EHDS) Regulation`, `HL7 FHIR R4`, `HIPAA §164.312`, `21st Century Cures Act`, `EU EHDS Regulation`, `IHE XDS.b`, `GDPR Article 9 (Special Category Data)`, `Americans with Disabilities Act (ADA)`, `ISO 45001:2018 (OH&S Management)`, `WHO Global Action Plan on Physical Activity`, `HIPAA Privacy Rule`, `EU AI Act Annex III §5(b)`, `SAMHSA National Guidelines`, `GDPR Art. 9`, `ISO 45001:2018`, `ADA Title I`, `EU AI Act Annex III`, `SAMHSA Guidelines`, `FDA 510(k) Premarket Notification`, `EU MDR 2017/745 Annex I`, `HIPAA Privacy & Security Rules`, `JCI Accreditation Standards (7th ed.)`, `ISO 13131:2021 (Telehealth)`, `IHE ITI Profiles`, `CMS Conditions of Participation 42 CFR §482`, `FDA 510(k)`, `HIPAA`, `JCI 7th ed.`, `CMS 42 CFR §482`, `FDA 21 CFR Part 820 (QSR)`, `ICH E6(R2) GCP`, `WHO Clinical Practice Guidelines`, `ISO 13485:2016`, `EMA Scientific Guidelines`, `NICE Technology Appraisal Guidance`, `JCI Standards`, `FDA 21 CFR 820`, `ICH E6(R2)`, `NICE TA Guidance`, `HIPAA Privacy Rule 45 CFR §164.500-534`, `HITECH Act §13401-13411`, `ONC Health IT Certification Criteria 45 CFR §170`, `AMA CPT Coding Standards`, `CMS Billing Rules 42 CFR §424`, `HIPAA 45 CFR §164`, `HITECH Act`, `ONC 45 CFR §170`, `AMA CPT`, `CMS 42 CFR §424`, `EU AI Act 2024/1689`, `FDA Software as a Medical Device (SaMD) Guidance`, `ISO 14971:2019 (Risk Management)`, `IEC 62304:2006/AMD1:2015 (Software Lifecycle)`, `GDPR`, `FDA 21 CFR Part 11`, `FDA SaMD Guidance`, `ISO 14971:2019`, `IEC 62304`, `21 CFR Part 11`, `ICH Q8(R2)-Q12 Quality Guidelines`, `FDA 21 CFR Parts 210/211 (cGMP)`, `EU GMP Annex 11 (Computerised Systems)`, `EMA IMPD Guideline`, `ISO 17511:2020`, `FAIR Data Principles`, `CDISC Standards (CDASH/SDTM/ADaM)`, `ICH Q8(R2)-Q12`, `FDA 21 CFR 210/211`, `EU GMP Annex 11`, `CDISC CDASH/SDTM/ADaM`, `FAIR Principles`, `ICH M4 CTD`, `ICH E6(R2) GCP §1-8`, `FDA 21 CFR Parts 50/56/312`, `EU Clinical Trials Regulation 536/2014`, `WHO ICTRP Registration Standards`, `ISO 14155:2020`, `CONSORT 2010 Statement`, `FDA 21 CFR 50/56/312`, `EU CTR 536/2014`, `CONSORT 2010`, `USP <797> Sterile Compounding`, `USP <800> Hazardous Drugs`, `FDA DSCSA (Drug Supply Chain Security Act)`, `EU FMD (Falsified Medicines Directive) 2011/62/EU`, `ISO 11135:2014`, `State Pharmacy Practice Acts`, `NABP Standards`, `USP <797>/<800>`, `FDA DSCSA`, `EU FMD 2011/62/EU`, `DEA 21 CFR 1301-1321`.
+- The station's packs name 99 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `HL7 FHIR R4 (4.0.1)`, `IHE XDS.b / XCA`, `HIPAA §164.312 Technical Safeguards`, `EU MDR 2017/745`, `eHealth Network Guidelines`, `ISO 27799:2025`, `21st Century Cures Act §4004`, `EU European Health Data Space (EHDS) Regulation`, `HL7 FHIR R4`, `HIPAA §164.312`, `21st Century Cures Act`, `EU EHDS Regulation`, `IHE XDS.b`, `GDPR Article 9 (Special Category Data)`, `Americans with Disabilities Act (ADA)`, `ISO 45001:2018 (OH&S Management)`, `WHO Global Action Plan on Physical Activity`, `HIPAA Privacy Rule`, `EU AI Act Annex III §5(b)`, `SAMHSA National Guidelines`, `GDPR Art. 9`, `ISO 45001:2018`, `ADA Title I`, `EU AI Act Annex III`, `SAMHSA Guidelines`, `FDA 510(k) Premarket Notification`, `EU MDR 2017/745 Annex I`, `HIPAA Privacy & Security Rules`, `JCI Accreditation Standards (7th ed.)`, `ISO 13131:2021 (Telehealth)`, `IHE ITI Profiles`, `CMS Conditions of Participation 42 CFR §482`, `FDA 510(k)`, `HIPAA`, `JCI 7th ed.`, `CMS 42 CFR §482`, `FDA 21 CFR Part 820 (QMSR)`, `ICH E6(R3) GCP`, `WHO Clinical Practice Guidelines`, `ISO 13485:2016`, `EMA Scientific Guidelines`, `NICE Technology Appraisal Guidance`, `JCI Standards`, `FDA 21 CFR 820`, `ICH E6(R3)`, `NICE TA Guidance`, `HIPAA Privacy Rule 45 CFR §164.500-534`, `HITECH Act §13401-13411`, `ONC Health IT Certification Criteria 45 CFR §170`, `AMA CPT Coding Standards`, `CMS Billing Rules 42 CFR §424`, `HIPAA 45 CFR §164`, `HITECH Act`, `ONC 45 CFR §170`, `AMA CPT`, `CMS 42 CFR §424`, `EU AI Act 2024/1689`, `FDA Software as a Medical Device (SaMD) Guidance`, `ISO 14971:2019 (Risk Management)`, `IEC 62304:2006/AMD1:2015 (Software Lifecycle)`, `GDPR`, `FDA 21 CFR Part 11`, `FDA SaMD Guidance`, `ISO 14971:2019`, `IEC 62304`, `21 CFR Part 11`, `ICH Q8(R2)-Q12 Quality Guidelines`, `FDA 21 CFR Parts 210/211 (cGMP)`, `EU GMP Annex 11 (Computerised Systems)`, `EMA IMPD Guideline`, `ISO 17511:2020`, `FAIR Data Principles`, `CDISC Standards (CDASH/SDTM/ADaM)`, `ICH Q8(R2)-Q12`, `FDA 21 CFR 210/211`, `EU GMP Annex 11`, `CDISC CDASH/SDTM/ADaM`, `FAIR Principles`, `ICH M4 CTD`, `ICH E6(R3) GCP (Principles; Annex 1 §1-4)`, `FDA 21 CFR Parts 50/56/312`, `EU Clinical Trials Regulation 536/2014`, `WHO ICTRP Registration Standards`, `ISO 14155:2026`, `CONSORT 2025 Statement`, `FDA 21 CFR 50/56/312`, `EU CTR 536/2014`, `CONSORT 2025`, `USP <797> Sterile Compounding`, `USP <800> Hazardous Drugs`, `FDA DSCSA (Drug Supply Chain Security Act)`, `EU FMD (Falsified Medicines Directive) 2011/62/EU`, `ISO 11135:2014`, `State Pharmacy Practice Acts`, `NABP Standards`, `USP <797>/<800>`, `FDA DSCSA`, `EU FMD 2011/62/EU`, `DEA 21 CFR 1301-1321`.
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C15], resolved by `normalizeFrameworkName` [C16]; an unresolved name is rejected [C17]. Of the 102 framework strings above (station and packs together):
 
-- 2 resolve as written: `HIPAA` → `HIPAA`, `GDPR` → `GDPR`.
+- 14 resolve as written: `HIPAA` → `HIPAA`, `HIPAA §164.312 Technical Safeguards` → `HIPAA`, `HIPAA §164.312` → `HIPAA`, `GDPR Article 9 (Special Category Data)` → `GDPR`, `HIPAA Privacy Rule` → `HIPAA`, `EU AI Act Annex III §5(b)` → `EU_AI_ACT`, `GDPR Art. 9` → `GDPR`, `EU AI Act Annex III` → `EU_AI_ACT`, `HIPAA Privacy & Security Rules` → `HIPAA`, `HIPAA Privacy Rule 45 CFR §164.500-534` → `HIPAA`, `HIPAA 45 CFR §164` → `HIPAA`, `ONC 45 CFR §170` → `HHS_HTI_1`, `EU AI Act 2024/1689` → `EU_AI_ACT`, `GDPR` → `GDPR`.
 - None resolves only after replacing spaces and hyphens with `_`.
-- 100 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 88 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries, where the register has them, are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C18].
 
@@ -68,7 +68,7 @@ Registered packs [C20] whose title contains one of the station's registry framew
 
 | Pack | Title | Scenarios | Empty-response passes |
 |---|---|---|---|
-| `hipaaCompliance` | HIPAA Compliance Assurance Pack | 10 | 10 |
+| `hipaaCompliance` | HIPAA Compliance Assurance Pack | 10 | 0 |
 
 ### How each command grades
 
@@ -109,15 +109,14 @@ No output above was produced for this guide. Each row names the function that pr
 ## Known gaps at this commit
 
 - The registry's `questionCount` for this station is 9; the station has 9 packs and 151 questions, so the field equals the pack count, not the question total. Use the counts in Sector packs.
-- 100 of 102 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- 88 of 102 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
-- `hipaaCompliance` passes 10 of 10 scenarios on an empty response. A pass from that pack is not evidence until its validators require positive content.
 - Pack scores from `amc domain pack run` are self-assessments (see Sector packs).
 
 ## Verification appendix
 
-- Source commit: `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da`. Measured on Darwin arm64, Node v25.5.0, 2026-10-03.
+- Source commit: `726be0ca11e31224b2c93ae13a439f8cb2393e64`. Measured on Darwin arm64, Node v25.5.0, 2026-10-04.
 - Exercised: reading source and running the commands below. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.
 - `pnpm vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.
 - Pack counts by hand: `node_modules/.bin/tsx -e 'import {getIndustryPacksByStation} from "./src/domains/industryPacks.ts"; const p=getIndustryPacksByStation("health"); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'`
@@ -131,18 +130,18 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:36` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:37` | `questionCount: 9` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:33` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2403` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:34` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:40` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:71` | `regulatoryBasis: string[];` |
-| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:1` | `export type ComplianceFramework ` |
-| C16 | Framework name resolution | `src/compliance/frameworks.ts:199` | `export function normalizeFrameworkName` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+| C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
-| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:100` | `export const GLOBAL_FRAMEWORKS` |
+| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C19 | Station assurancePacks | `src/domains/domainRegistry.ts:38` | `assurancePacks:` |
 | C20 | Assurance pack registry listing | `src/assurance/packs/index.ts:274` | `export function listAssurancePacks` |
 | C21 | Domain assurance command | `src/cli-domain-product-commands.ts:507` | `Run domain-specific assurance packs` |

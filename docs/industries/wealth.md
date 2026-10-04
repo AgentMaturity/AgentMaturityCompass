@@ -1,6 +1,6 @@
 # Wealth station: regulated deployment guide
 
-This guide maps what AMC source provides for an agent deployed in the `wealth` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `8f57ce63`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
+This guide maps what AMC source provides for an agent deployed in the `wealth` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `726be0ca`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
 
 It does not say what any regulation requires, and it is not legal advice. Framework names below are strings that appear in AMC source; their presence means a pack refers to them, not that AMC satisfies them.
 
@@ -23,13 +23,13 @@ Packs whose `stationId` is `wealth`, as returned by `getIndustryPacksByStation` 
 
 | Pack | Name | Questions | Risk tier | Certification threshold |
 |---|---|---|---|---|
-| `future-of-work` | Future of Work | 14 | very-high | 70 |
-| `digital-payments` | Digital Payments | 12 | very-high | 75 |
-| `no-poverty` | No Poverty | 14 | very-high | 70 |
+| `future-of-work` | Future of Work | 15 | very-high | 70 |
+| `digital-payments` | Digital Payments | 15 | very-high | 75 |
+| `no-poverty` | No Poverty | 15 | very-high | 70 |
 | `circular-economy` | Circular Economy Finance | 15 | very-high | 70 |
 | `blockchain` | Blockchain & DeFi | 15 | very-high | 70 |
 
-Total: 5 packs, 70 questions.
+Total: 5 packs, 75 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -37,13 +37,13 @@ Run one with `amc domain pack run --pack <id>` [C8]. The command requires the in
 
 - Station `regulatoryBasis` [C12]: `SR 11-7`, `BSA/AML`, `SEC Rule 17a-4`, `UDAAP/ECOA`, `MiFID II`, `CFTC`, `FINRA`, `Dodd-Frank`, `FCA SYSC`, `GDPR`.
 - Station `complianceFrameworks` [C13]: `SR 11-7`, `BSA/AML`, `SEC 17a-4`, `ECOA`, `MiFID II`, `FINRA 2111`, `SEC Reg BI`, `CFTC 1.73`, `GDPR`, `CCPA`.
-- The station's packs name 66 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `ILO Conventions C087/C098 (Freedom of Association)`, `OECD Guidelines for Multinational Enterprises (2023)`, `EU Platform Work Directive 2024/2831`, `Gig Economy Regulations (various jurisdictions)`, `GDPR (Worker Data)`, `EU AI Act Art. 26 (Deployer Obligations)`, `WEF Future of Jobs Report Framework`, `ILO C087/C098`, `OECD MNE Guidelines 2023`, `GDPR`, `EU AI Act Art. 26`, `WEF Future of Jobs`, `PCI DSS v4.0`, `ISO 20022 Financial Messaging`, `PSD2 Directive 2015/2366 / PSD3 Proposal`, `EMV Specifications`, `SWIFT Customer Security Programme`, `FinCEN AML/BSA`, `FATF Recommendations`, `MiCA Regulation 2023/1114`, `Dodd-Frank Act Title X`, `ISO 20022`, `PSD2/PSD3`, `FinCEN BSA/AML`, `MiCA 2023/1114`, `Dodd-Frank Title X`, `UN SDG 1 — No Poverty`, `World Bank Financial Inclusion Guidelines`, `CGAP Microfinance Standards`, `GSMA Mobile Money Guidelines`, `FATF Recommendation 1 (Risk-Based Approach)`, `IFC Performance Standards`, `UNHCR Guidelines on Financial Inclusion`, `EU Microfinance Reg §3`, `UN SDG 1`, `World Bank FI Guidelines`, `CGAP Standards`, `GSMA Mobile Money`, `FATF R1`, `IFC PS`, `UNHCR FI Guidelines`, `SEC ESG Disclosure Rules`, `EU Taxonomy Regulation 2020/852`, `GRI Standards 201-207`, `SASB Standards`, `ISO 14044:2006 (LCA)`, `Ellen MacArthur Foundation CE Principles`, `Basel III Framework`, `EU Taxonomy 2020/852`, `SEC ESG Rules`, `GRI Standards`, `SFDR 2019/2088`, `Basel III`, `TCFD Recommendations`, `FATF VA/VASP Guidelines (2021)`, `SEC Howey Test Framework`, `ISO/TC 307 Blockchain Standards`, `BIS CPMI Guidance on Stablecoins`, `IOSCO Policy Recommendations for Crypto`, `AML/KYC Requirements (5AMLD/6AMLD)`, `FATF VA/VASP Guidelines`, `SEC Framework`, `ISO/TC 307`, `BIS CPMI`, `IOSCO Crypto Recommendations`, `5AMLD/6AMLD`.
+- The station's packs name 66 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `ILO Conventions C087/C098 (Freedom of Association)`, `OECD Guidelines for Multinational Enterprises (2023)`, `EU Platform Work Directive 2024/2831`, `Gig Economy Regulations (various jurisdictions)`, `GDPR (Worker Data)`, `EU AI Act Art. 26 (Deployer Obligations)`, `WEF Future of Jobs Report Framework`, `ILO C087/C098`, `OECD MNE Guidelines 2023`, `GDPR`, `EU AI Act Art. 26`, `WEF Future of Jobs`, `PCI DSS v4.0.1`, `ISO 20022 Financial Messaging`, `PSD2 Directive 2015/2366 / PSD3 Proposal`, `EMV Specifications`, `SWIFT Customer Security Programme`, `FinCEN AML/BSA`, `FATF Recommendations`, `MiCA Regulation 2023/1114`, `Dodd-Frank Act Title X`, `ISO 20022`, `PSD2/PSD3`, `FinCEN BSA/AML`, `MiCA 2023/1114`, `Dodd-Frank Title X`, `UN SDG 1 — No Poverty`, `World Bank Financial Inclusion Guidelines`, `CGAP Microfinance Standards`, `GSMA Mobile Money Guidelines`, `FATF Recommendation 1 (Risk-Based Approach)`, `IFC Performance Standards`, `UNHCR Guidelines on Financial Inclusion`, `EU Microfinance Reg §3`, `UN SDG 1`, `World Bank FI Guidelines`, `CGAP Standards`, `GSMA Mobile Money`, `FATF R1`, `IFC PS`, `UNHCR FI Guidelines`, `SEC ESG Disclosure Rules`, `EU Taxonomy Regulation 2020/852`, `GRI Standards 201-207`, `SASB Standards`, `ISO 14044:2006 (LCA)`, `Ellen MacArthur Foundation CE Principles`, `Basel III Framework`, `EU Taxonomy 2020/852`, `SEC ESG Rules`, `GRI Standards`, `SFDR 2019/2088`, `Basel III`, `TCFD Recommendations`, `FATF VA/VASP Guidelines (2021)`, `SEC Howey Test Framework`, `ISO/TC 307 Blockchain Standards`, `BIS CPMI Guidance on Stablecoins`, `IOSCO Policy Recommendations for Crypto`, `AML/KYC Requirements (5AMLD/6AMLD)`, `FATF VA/VASP Guidelines`, `SEC Framework`, `ISO/TC 307`, `BIS CPMI`, `IOSCO Crypto Recommendations`, `5AMLD/6AMLD`.
 
 `amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C15], resolved by `normalizeFrameworkName` [C16]; an unresolved name is rejected [C17]. Of the 81 framework strings above (station and packs together):
 
-- 1 resolves as written: `GDPR` → `GDPR`.
+- 5 resolve as written: `GDPR` → `GDPR`, `GDPR (Worker Data)` → `GDPR`, `EU AI Act Art. 26 (Deployer Obligations)` → `EU_AI_ACT`, `EU AI Act Art. 26` → `EU_AI_ACT`, `PCI DSS v4.0.1` → `PCI_DSS`.
 - None resolves only after replacing spaces and hyphens with `_`.
-- 80 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 76 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries, where the register has them, are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C18].
 
@@ -104,15 +104,15 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 14; the station has 5 packs and 70 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
-- 80 of 81 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- The registry's `questionCount` for this station is 14; the station has 5 packs and 75 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
+- 76 of 81 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
 - Pack scores from `amc domain pack run` are self-assessments (see Sector packs).
 
 ## Verification appendix
 
-- Source commit: `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da`. Measured on Darwin arm64, Node v25.5.0, 2026-10-03.
+- Source commit: `726be0ca11e31224b2c93ae13a439f8cb2393e64`. Measured on Darwin arm64, Node v25.5.0, 2026-10-04.
 - Exercised: reading source and running the commands below. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.
 - `pnpm vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.
 - Pack counts by hand: `node_modules/.bin/tsx -e 'import {getIndustryPacksByStation} from "./src/domains/industryPacks.ts"; const p=getIndustryPacksByStation("wealth"); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'`
@@ -126,18 +126,18 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:126` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:127` | `questionCount: 14` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:123` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2403` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:124` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:130` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:71` | `regulatoryBasis: string[];` |
-| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:1` | `export type ComplianceFramework ` |
-| C16 | Framework name resolution | `src/compliance/frameworks.ts:199` | `export function normalizeFrameworkName` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+| C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
-| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:100` | `export const GLOBAL_FRAMEWORKS` |
+| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C19 | Station assurancePacks | `src/domains/domainRegistry.ts:128` | `assurancePacks:` |
 | C20 | Assurance pack registry listing | `src/assurance/packs/index.ts:274` | `export function listAssurancePacks` |
 | C21 | Domain assurance command | `src/cli-domain-product-commands.ts:507` | `Run domain-specific assurance packs` |
