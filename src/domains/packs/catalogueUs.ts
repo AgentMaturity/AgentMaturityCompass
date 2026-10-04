@@ -82,4 +82,42 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+
+  // Wealth station, round-2 review (2026-10-04); receipt round2/content/wealth/questions.json catalogueAdditions.
+  // eCFR text was read through the eCFR versioner API as of 2026-09-30. Pages read on hosts outside
+  // OFFICIAL_SOURCE_HOSTS (nyc.gov, federalreserve.gov, leginfo.legislature.ca.gov) are recorded "unverified"
+  // with the page named in the note, as the evidence rule requires.
+  verified("us-ugesp", "29 CFR 1607.4(D) (Uniform Guidelines on Employee Selection Procedures, four-fifths rule)", "US", "law", "in-force",
+    "https://www.ecfr.gov/current/title-29/section-1607.4", ["29 CFR 1607.4", "29 CFR Part 1607"],
+    { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "§1607.4(D) four-fifths rule text read via the eCFR versioner API as of 2026-09-30." }),
+  verified("us-ada-title-i-regs", "29 CFR 1630.11 (ADA Title I regulations, administration of tests)", "US", "law", "in-force",
+    "https://www.ecfr.gov/current/title-29/section-1630.11", ["29 CFR 1630.11", "29 CFR Part 1630"],
+    { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "§1630.11 read via the eCFR versioner API as of 2026-09-30." }),
+  verified("us-ada-title-i", "Americans with Disabilities Act, 42 U.S.C. 12112(b)(5)-(7)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap126-subchapI-sec12112.htm", ["42 U.S.C. 12112"],
+    { lastReviewed: "2026-10-04", note: "Statute text read on govinfo (2023 edition) on 2026-10-03." }),
+  verified("us-reg-b", "Regulation B (12 CFR Part 1002), as amended by CFPB final rule 91 FR 21620 (effective 2026-07-21)", "US", "law", "in-force",
+    "https://www.ecfr.gov/current/title-12/section-1002.6", ["12 CFR 1002.6", "12 CFR 1002.9", "12 CFR Part 1002", "ECOA Reg. B"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      milestones: milestones(["2026-07-21", "Final rule 91 FR 21620 effective: §1002.6(a) states the Act does not provide that the effects test applies"]),
+      note: "§§1002.6 and 1002.9 read via the eCFR versioner API as of 2026-09-30; §1002.9 also read on govinfo (CFR 2026 edition, title 12 vol. 8) on 2026-10-04.",
+    }),
+  verified("us-ecoa", "Equal Credit Opportunity Act, 15 U.S.C. 1691(a)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap41-subchapIV-sec1691.htm", ["15 U.S.C. 1691"],
+    { lastReviewed: "2026-10-04", note: "Statute text read on govinfo (2023 edition) on 2026-10-03." }),
+  verified("us-reg-e-remittance", "12 CFR 1005.31 (Regulation E, remittance transfer disclosures)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2026-title12-vol8/xml/CFR-2026-title12-vol8-sec1005-31.xml", ["12 CFR 1005.31"],
+    { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "CFR 2026 edition read on govinfo 2026-10-04: §1005.31(b)(1) pre-payment disclosure elements; (e)(1) given when the sender requests the transfer and before payment." }),
+  verified("us-sec-names-rule", "SEC Investment Company Names Rule, 17 CFR 270.35d-1 (as amended 2023)", "US", "law", "in-force",
+    "https://www.govinfo.gov/link/cfr/17/270?sectionnum=35d-1&year=mostrecent&link-type=xml", ["17 CFR 270.35d-1", "SEC Rule 35d-1"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      milestones: milestones(["2026-06-11", "Compliance date, fund groups with net assets of $1 billion or more"], ["2026-12-11", "Compliance date, smaller fund groups"]),
+      note: "CFR text read on govinfo 2026-10-04 (80% investment policy for names suggesting particular characteristics including ESG terms; quarterly review; 90-day return to compliance). Compliance dates from federalregister.gov document 2025-04705 per the station digest (research/wealth/digest.json, US-SEC-NAMES).",
+    }),
+  unverified("us-nyc-ll144", "NYC Local Law 144 of 2021 (NYC Admin Code §20-870 et seq.) and DCWP rules", "US-NYC", "law", ["NYC Local Law 144"],
+    "Read on 2026-10-03: https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page (bias audit within one year of use, public summary, notices; enforcement from 2023-07-05). Unverified only because www.nyc.gov is not in OFFICIAL_SOURCE_HOSTS."),
+  unverified("us-sr-26-2", "Federal Reserve SR 26-2 / OCC / FDIC Revised Guidance on Model Risk Management (supersedes SR 11-7 and SR 21-8)", "US", "guidance", ["SR 26-2"],
+    "Read on 2026-10-04: https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm (dated 2026-04-17; supersedes SR 11-7 and SR 21-8) and attachment SR2602a1.pdf, page 3 footnote 3: generative and agentic AI models are not within the scope of the guidance. Unverified only because www.federalreserve.gov is not in OFFICIAL_SOURCE_HOSTS."),
+  unverified("us-ca-sb253", "California Health and Safety Code §38532 (SB 253, Climate Corporate Data Accountability Act)", "US-CA", "law", ["California Health and Safety Code §38532"],
+    "Read on 2026-10-04: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=38532; CARB program page gives the first scope 1 and 2 report deadline as 2026-11-10. Unverified only because leginfo.legislature.ca.gov is not in OFFICIAL_SOURCE_HOSTS."),
 ];
