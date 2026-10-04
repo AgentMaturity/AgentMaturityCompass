@@ -84,4 +84,9 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
   verified("nist-sp-800-207", "NIST SP 800-207 Zero Trust Architecture", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/207/final",
     ["NIST SP 800-207"], { note: "Final, August 2020 (csrc page read)." }),
+  verified("nist-sp-800-218", "NIST SP 800-218 Secure Software Development Framework (SSDF) Version 1.1", "US", "standard", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/218/final", ["NIST SP 800-218"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "Final, published 2022-02-03 (csrc page read 2026-10-04, no supersession shown). SP 800-218 Rev. 1 (SSDF 1.2) is an initial public draft of 2025-12-17, seen in a nist.gov search listing and not opened; not final on the review date.",
+    }),
 ];
