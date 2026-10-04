@@ -36,6 +36,8 @@ export interface EuAIActClassification {
     /** Annex III points (1-8) named in the classification text. */
     annexIIIPoints: number[];
     generalPurpose: boolean;
+    /** The classification carries a PROHIBITED qualifier (an Art. 5 practice is possible in this pack's use). */
+    prohibitedFlag: boolean;
   }>;
 }
 
@@ -279,8 +281,11 @@ function evaluateCertification(
 
 const ANNEX_III_POINT_COUNT = 8;
 
-/** Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]) and whether GPAI is declared. */
-export function parseAnnexIIIPoints(classification: string): { points: number[]; generalPurpose: boolean } {
+/**
+ * Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]), whether GPAI is declared, and
+ * whether the text carries a PROHIBITED qualifier (kept separate: Art. 5 practices are not an Annex III point).
+ */
+export function parseAnnexIIIPoints(classification: string): { points: number[]; generalPurpose: boolean; prohibitedFlag: boolean } {
   const annexAt = classification.indexOf("Annex III");
   const points = new Set<number>();
   if (annexAt >= 0) {
@@ -289,7 +294,11 @@ export function parseAnnexIIIPoints(classification: string): { points: number[];
       if (point >= 1 && point <= ANNEX_III_POINT_COUNT) points.add(point);
     }
   }
-  return { points: [...points].sort((a, b) => a - b), generalPurpose: /General Purpose AI/i.test(classification) };
+  return {
+    points: [...points].sort((a, b) => a - b),
+    generalPurpose: /General Purpose AI/i.test(classification),
+    prohibitedFlag: /\bPROHIBITED\b/.test(classification)
+  };
 }
 
 function buildEuAIActClassification(domain: Domain, metadata: DomainMetadata): EuAIActClassification {
@@ -302,7 +311,8 @@ function buildEuAIActClassification(domain: Domain, metadata: DomainMetadata): E
         packName: pack.name,
         classification: pack.euAIActClassification,
         annexIIIPoints: parsed.points,
-        generalPurpose: parsed.generalPurpose
+        generalPurpose: parsed.generalPurpose,
+        prohibitedFlag: parsed.prohibitedFlag
       };
     })
   };
