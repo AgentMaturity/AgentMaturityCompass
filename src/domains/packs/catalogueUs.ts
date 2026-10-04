@@ -191,4 +191,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["Colorado SB26-189"],
     "Bill page read on leg.colorado.gov 2026-10-04 per round2/content/education/questions.json: act effective 2026-05-14; developer documentation duties from 2027-01-01; deployer-duty start date not stated; enacted text not read. Host is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."),
     lastReviewed: "2026-10-04" },
+  verified("us-fsma-traceability", "FDA Requirements for Additional Traceability Records for Certain Foods (21 CFR Part 1, Subpart S)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+    ["21 CFR Part 1 Subpart S", "21 CFR Part 1, Subpart S"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "21 CFR 1.1455 (CFR 2025 edition) read: records to FDA within 24 hours; electronic sortable spreadsheet. Compliance date not confirmed on an official-host page in this review." }),
 ];
