@@ -88,4 +88,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // Technology station round 2 (2026-10-04): cited by TECH-PP-18.
   verified("nist-sp-800-218a", "NIST SP 800-218A Secure Software Development Practices for Generative AI and Dual-Use Foundation Models: An SSDF Community Profile", "US", "standard", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/218/a/final", ["NIST SP 800-218A"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2024-07-26", note: "Final 26 July 2024 (csrc.nist.gov page)." }),
+  // Technology station round 2 (2026-10-04): cited by TECH-CI-17.
+  { ...unverified("us-ca-cppa-admt", "Cal. Code Regs. tit. 11 §§7200-7222 (CPPA automated decisionmaking technology regulations), effective 1 January 2026", "US-CA", "law", ["CPPA ADMT regulations"],
+    "Read on cppa.ca.gov 2026-10-04 (approved text PDF) by the technology round-2 content pass: §7200(b) compliance by 1 January 2027, §7220 Pre-use Notice, §7221 opt-out; cppa.ca.gov is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."), lastReviewed: "2026-10-04" },
 ];
