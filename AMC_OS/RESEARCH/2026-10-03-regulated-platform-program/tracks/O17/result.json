@@ -1,0 +1,54 @@
+{
+  "track": "O17",
+  "title": "MCP server tools for industry packs (existing APIs only)",
+  "date": "2026-10-04",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "codeCommit": "c490140748338e47a7e9c02dae19c6a59dd05984",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cbab9c8-0f5-17",
+  "branch": "worktree-wf_3cbab9c8-0f5-17",
+  "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, @modelcontextprotocol/sdk 1.30.0, zod 4.4.3",
+  "receiptKind": "worktree run, not a fresh-clone receipt (brief section 4)",
+  "filesChanged": [
+    "src/mcp/industryPackTools.ts (new, 161 lines)",
+    "src/mcp/amcMcpServer.ts (+3 lines: 1 import, 1 registration call, 1 blank; 744 -> 747; not listed in scripts/line-budgets.json, so the cap of 800 applies)",
+    "tests/industryPackMcpTools.test.ts (new, 303 lines)",
+    "tests/industryPackMcpToolsWiring.test.ts (new, 83 lines)",
+    "docs/MCP_INDUSTRY_PACKS.md (new, 49 lines)"
+  ],
+  "domainsApiUsed": [
+    "INDUSTRY_PACKS, getIndustryPacksByStation, getStationSummary, listIndustryPackIds, scoreIndustryPack (src/domains/industryPacks.ts)",
+    "listDomainIds (src/domains/domainRegistry.ts)",
+    "getIndustryPackEntitlement, toIndustryPackCatalogItem, formatIndustryPackPaywallMessage (src/domains/industryPackEntitlement.ts)"
+  ],
+  "tests": [
+    { "command": "pnpm vitest run tests/industryPackMcpTools.test.ts (before implementation)", "result": "RED: module ../src/mcp/industryPackTools.js missing, 1 file failed" },
+    { "command": "pnpm vitest run tests/industryPackMcpTools.test.ts tests/industryPackMcpToolsWiring.test.ts", "result": "2 files passed, 21 tests passed" },
+    { "command": "pnpm vitest run tests/mcpServer.test.ts tests/mcpTools.test.ts", "result": "2 files passed, 18 tests passed" },
+    { "command": "pnpm typecheck", "result": "exit 0" },
+    { "command": "pnpm typecheck:tests", "result": "exit 0 (both new test files are in the tsconfig.tests.json file list)" }
+  ],
+  "mutations": [
+    "M1 hasOwn pack lookup -> bracket lookup: RED",
+    "M2 get unknown-pack refusal removed: RED",
+    "M3 get entitlement gate removed: RED",
+    "M4 score entitlement gate removed: RED",
+    "M5 unknown question refusal disabled: RED",
+    "M6 .strict() removed from list schema: RED",
+    "M7 .int() removed from levels: RED",
+    "M8 station frameworks shown while locked: RED",
+    "M9 list leaks regulatoryBasis while locked: RED",
+    "M10 beforeCall refusal rethrows: RED",
+    "M11 score unknown-pack refusal code changed: RED",
+    "M12 registration line removed from amcMcpServer.ts: RED",
+    "M13 rate limiter not passed at registration: RED",
+    "restored: GREEN, 21 passed"
+  ],
+  "notExercised": [
+    "fresh-clone reproduction",
+    "a real stdio client (the wiring test swaps StdioServerTransport for an in-memory pair)",
+    "a real Ed25519 license or a workspace entitlement file (the active path uses an HMAC license made in memory for each test)",
+    "MCP_TOOL_METADATA / amc mcp tool listing (tests/mcpServer.test.ts pins it at 10; not changed)",
+    "pnpm build, dist/, full suite, release gate, architecture-boundaries-check"
+  ],
+  "observedOutOfScope": "The existing amc_score_sector_pack tool checks packs with INDUSTRY_PACKS[packId] (src/mcp/amcMcpServer.ts:416 at 8f57ce63), so with an active entitlement packId \"__proto__\" passes the unknown-pack check and is expected to fail later inside scoreIndustryPack as 'Scoring failed' (read from source, not run). getPackById (src/domains/industryPacks.ts:2419-2421) uses the same lookup. Neither file was changed in this track."
+}
