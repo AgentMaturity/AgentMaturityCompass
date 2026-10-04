@@ -70,7 +70,30 @@ export const complianceMapsSchema = z.object({
   })
 });
 
-export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceRequirementSchema>;
+// One clause of an official text (src/compliance/frameworks/controls.ts). verified means the text was
+// string-checked against sourceUrl as read on retrievedAt, so a paraphrase is never verified.
+// A mapping's coverage is "partial" when its evidence addresses part of the clause and "supporting"
+// when it only overlaps it (a mapping written for another clause or another framework).
+export const frameworkControlSchema = z
+  .object({
+    controlId: z.string().min(1),
+    framework: frameworkEnum,
+    category: z.string().min(1).nullable(),
+    title: z.string().min(1),
+    text: z.string().min(1),
+    textKind: z.enum(["verbatim", "verbatim-excerpt", "paraphrase"]),
+    status: z.enum(["law", "proposed", "guidance"]),
+    sourceUrl: z.string().url(),
+    retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    verified: z.boolean(),
+    unverifiedReason: z.string().min(1).optional(),
+    mappings: z.array(z.object({ mappingId: z.string().min(1), coverage: z.enum(["partial", "supporting"]) }))
+  })
+  .refine((row) => row.textKind !== "paraphrase" || !row.verified, { message: "a paraphrase cannot be verified against its source" })
+  .refine((row) => row.verified || row.unverifiedReason !== undefined, { message: "an unverified control must say why" });
+
+export type FrameworkControl = z.infer<typeof frameworkControlSchema>;
+export type ComplianceEvidenceRequirement =z.infer<typeof complianceEvidenceRequirementSchema>;
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
 export type ComplianceMappingSource = z.infer<typeof complianceMappingSourceSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;

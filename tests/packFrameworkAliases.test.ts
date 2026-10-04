@@ -71,7 +71,25 @@ const STATION_FAMILY_NAMES: Record<string, string> = {
   "PCI DSS v4.0.1": "PCI_DSS",
 };
 
+// Regulatory register ids (src/compliance/regulatory/register.json) and official instrument
+// names from the round-2 framework mappings (2026-10-04).
+const REGISTER_AND_OFFICIAL_NAMES: Record<string, string> = {
+  "eu-dora": "DORA",
+  "Regulation (EU) 2022/2554": "DORA",
+  "Digital Operational Resilience Act": "DORA",
+  "eu-nis2": "NIS2",
+  "Directive (EU) 2022/2555": "NIS2",
+  "Implementing Regulation (EU) 2024/2690": "NIS2",
+  "us-nist-ai-600-1": "NIST_AI_600_1",
+  "us-co-sb24-205": "CO_AI_ACT",
+  "us-co-sb26-189": "CO_AI_ACT",
+};
+
 describe("normalizeFrameworkName", () => {
+  test.each(Object.entries(REGISTER_AND_OFFICIAL_NAMES))("register/official name %s -> %s", (input, expected) => {
+    expect(normalizeFrameworkName(input)).toBe(expected);
+  });
+
   test.each(Object.entries(PACK_STRINGS_FOR_SUPPORTED_FRAMEWORKS))("%s -> %s", (input, expected) => {
     expect(normalizeFrameworkName(input)).toBe(expected);
   });

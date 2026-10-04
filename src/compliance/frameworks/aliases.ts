@@ -15,6 +15,10 @@ export const frameworkAliases: Readonly<Record<string, ComplianceFramework>> = {
   "hti-1": "HHS_HTI_1", "onc-hti-1": "HHS_HTI_1", "onc_hti_1": "HHS_HTI_1", "hhs-hti-1": "HHS_HTI_1",
   "nist-ai-600-1": "NIST_AI_600_1", "colorado-ai-act": "CO_AI_ACT", "traiga": "TX_TRAIGA",
   "ca-ai-laws": "CA_AI_LAWS", "korea-ai-basic-act": "KR_AI_BASIC_ACT",
+  // Regulatory register ids (src/compliance/regulatory/register.json) and official instrument names.
+  "eu-dora": "DORA", "regulation (eu) 2022/2554": "DORA", "digital operational resilience act": "DORA",
+  "eu-nis2": "NIS2", "directive (eu) 2022/2555": "NIS2", "implementing regulation (eu) 2024/2690": "NIS2",
+  "us-nist-ai-600-1": "NIST_AI_600_1", "us-co-sb24-205": "CO_AI_ACT", "us-co-sb26-189": "CO_AI_ACT",
 };
 
 // Versioned or clause-qualified names as industry packs cite them ("GDPR Art. 9", "PCI DSS v4.0").
