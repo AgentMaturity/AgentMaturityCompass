@@ -17,11 +17,11 @@ Source: `GLOBAL_FRAMEWORKS` and `EU_AI_ACT_RISK_MATRIX` in `src/compliance/globa
 
 | Effective date | Framework | Jurisdiction | Register status | Last reviewed | Verification | Declared mapping |
 |---|---|---|---|---|---|---|
-| 2020-09-18 | Brazil Lei Geral de Proteção de Dados (LGPD) (`brazil-lgpd`) | Brazil | — | — | unverified (no source in register) | complete |
-| 2021-11-01 | China Personal Information Protection Law (PIPL) (`china-pipl`) | China | — | — | unverified (no source in register) | complete |
-| 2022-04-01 | Japan Act on Protection of Personal Information (APPI) (`japan-appi`) | Japan | — | — | unverified (no source in register) | complete |
-| 2023-08-11 | India Digital Personal Data Protection Act (DPDP) (`india-dpdp`) | India | — | — | unverified (no source in register) | complete |
-| 2023-08-15 | China Generative AI Management Measures (`china-genai`) | China | — | — | unverified (no source in register) | complete |
+| 2020-09-18 | Brazil Lei Geral de Proteção de Dados (LGPD) (`brazil-lgpd`) | Brazil | — | — | unverified (no source in register) | partial |
+| 2021-11-01 | China Personal Information Protection Law (PIPL) (`china-pipl`) | China | — | — | unverified (no source in register) | partial |
+| 2022-04-01 | Japan Act on Protection of Personal Information (APPI) (`japan-appi`) | Japan | — | — | unverified (no source in register) | partial |
+| 2023-08-11 | India Digital Personal Data Protection Act (DPDP) (`india-dpdp`) | India | — | — | unverified (no source in register) | partial |
+| 2023-08-15 | China Generative AI Management Measures (`china-genai`) | China | — | — | unverified (no source in register) | partial |
 
 ## Externally sourced milestones (curated)
 
@@ -52,13 +52,13 @@ Default risk levels and annex references are the register's own entries, copied 
 | HR | Employee training recommendation | limited | N/A | Affects promotion decisions → high |
 | Finance | Credit scoring | high | Annex III, 5(b) | — |
 | Finance | Fraud detection | limited | N/A | Auto-blocks transactions → high |
-| Healthcare | Clinical decision support | high | Annex III, 5(a) | — |
+| Healthcare | Clinical decision support | high | Art. 6(1) + Annex I (Regulation (EU) 2017/745) | — |
 | Healthcare | Administrative scheduling | minimal | N/A | — |
-| Law Enforcement | Predictive policing | high | Annex III, 6(a) | Real-time biometric → unacceptable |
-| Education | Student assessment scoring | high | Annex III, 3(a) | — |
+| Law Enforcement | Predictive policing | high | Annex III, 6(d) | Real-time biometric → unacceptable |
+| Education | Student assessment scoring | high | Annex III, 3(b) | — |
 | Education | Content recommendation | minimal | N/A | Minors involved → limited |
-| Critical Infrastructure | Energy grid management | high | Annex III, 2(a) | — |
-| Customer Service | Chatbot | limited | Article 52 | Handles complaints affecting rights → high |
+| Critical Infrastructure | Energy grid management | high | Annex III, 2 | — |
+| Customer Service | Chatbot | limited | Article 50 | Handles complaints affecting rights → high |
 | General | Internal productivity tool | minimal | N/A | — |
 
 ## Frameworks
@@ -100,9 +100,9 @@ Default risk levels and annex references are the register's own entries, copied 
 
 | Requirement | Article | Title | AMC mapping (declared) | Evidence type | Declared status |
 |---|---|---|---|---|---|
-| `appi-17` | Article 17 | Proper Acquisition | `governance.dataAcquisition` | acquisition-records | mapped |
-| `appi-24` | Article 24 | Cross-Border Transfer | `governance.crossBorderTransfer` | ppc-equivalency-assessment | mapped |
-| `appi-23` | Article 23 | Restriction on Third-Party Provision | `governance.thirdPartySharing` | sharing-consent-records | mapped |
+| `appi-20` | Article 20 | Proper Acquisition | `governance.dataAcquisition` | acquisition-records | mapped |
+| `appi-28` | Article 28 | Cross-Border Transfer | `governance.crossBorderTransfer` | ppc-equivalency-assessment | mapped |
+| `appi-27` | Article 27 | Restriction on Third-Party Provision | `governance.thirdPartySharing` | sharing-consent-records | mapped |
 
 ### India Digital Personal Data Protection Act (DPDP) (`india-dpdp`)
 
@@ -116,7 +116,7 @@ Default risk levels and annex references are the register's own entries, copied 
 | `dpdp-4` | Section 4 | Consent for Processing | `governance.consentManagement` | consent-records | mapped |
 | `dpdp-8` | Section 8 | Obligations of Data Fiduciary | `governance.fiduciaryObligations` | policy-document | mapped |
 | `dpdp-16` | Section 16 | Cross-Border Transfer Restrictions | `governance.crossBorderTransfer` | transfer-assessment | mapped |
-| `dpdp-9` | Section 9 | Significant Data Fiduciary Obligations | `governance.dpiaRequired` | dpia-document | mapped |
+| `dpdp-10` | Section 10 | Significant Data Fiduciary Obligations | `governance.dpiaRequired` | dpia-document | mapped |
 
 ### China Generative AI Management Measures (`china-genai`)
 
@@ -129,4 +129,4 @@ Default risk levels and annex references are the register's own entries, copied 
 |---|---|---|---|---|---|
 | `genai-4` | Article 4 | Content Safety | `safety.contentFiltering` | safety-test-results | mapped |
 | `genai-7` | Article 7 | Training Data Compliance | `governance.trainingDataGovernance` | data-lineage-audit | mapped |
-| `genai-12` | Article 12 | User Identity Verification | `auth.userIdentification` | auth-config | mapped |
+| `genai-12` | Article 12 | Labelling of Generated Content | `transparency.contentLabelling` | labelling-config | mapped |
