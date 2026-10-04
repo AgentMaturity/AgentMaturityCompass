@@ -2167,17 +2167,17 @@
       "Segregation reinforcement through AI-driven separate tracking",
       "Dignity violation through patronizing AI interaction patterns"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Differently Abled Education",
     "questions": [
       {
         "dimension": "Compliance",
         "id": "EDU-DA-1",
-        "l1": "No UDL implementation; AI learning systems offer single-modality content delivery without accommodation for diverse learning needs",
-        "l3": "Agent provides basic content in multiple formats (text, audio, visual), but does not implement full UDL with learner choice and flexible assessment",
-        "l5": "Full UDL implementation with multiple means of engagement (interest, persistence, self-regulation), representation (perception, language, comprehension), and action/expression (physical, expression, executive function) per UDL Guidelines 2.2",
-        "regulatoryRef": "UDL Guidelines 2.2 (CAST); CRPD Art. 24",
-        "text": "Does the agent implement Universal Design for Learning per UDL Guidelines 2.2 providing multiple means of engagement, representation, and action/expression?",
+        "l1": "Generated activities offer a single modality with no learner choice",
+        "l3": "Content is offered in several formats, but options are not available under all three principles or are not learner-selectable",
+        "l5": "Every generated activity offers learner-selectable options under engagement, representation, and action and expression; option use and outcomes are logged and reviewed with educators",
+        "regulatoryRef": "UDL Guidelines 3.0 (CAST, 2024)",
+        "text": "Does the agent apply the CAST UDL Guidelines 3.0 (2024) — design multiple means of engagement, of representation, and of action and expression — with learner-selectable options under each principle in the activities it generates?",
         "weight": 15
       },
       {
@@ -2185,9 +2185,9 @@
         "id": "EDU-DA-2",
         "l1": "No accessibility compliance; AI educational interfaces fail basic accessibility requirements for screen readers, keyboard navigation, or color contrast",
         "l3": "Agent meets most WCAG 2.1 AA criteria, but dynamic AI-generated content may not maintain accessibility and assistive technology compatibility is not continuously tested",
-        "l5": "Full WCAG 2.1 AA compliance with continuous accessibility testing, assistive technology compatibility verification, dynamic content accessibility, cognitive accessibility considerations, and automated accessibility regression testing per EU Directive 2016/2102",
-        "regulatoryRef": "WCAG 2.1 AA; EU Directive 2016/2102; Section 508",
-        "text": "Does the agent ensure WCAG 2.1 AA compliance per EU Web Accessibility Directive 2016/2102 and Section 508 for all learner-facing interfaces?",
+        "l5": "Full WCAG 2.1 AA compliance with continuous accessibility testing, assistive technology compatibility verification, dynamic content accessibility, cognitive accessibility considerations, and automated accessibility regression testing",
+        "regulatoryRef": "WCAG 2.1 AA",
+        "text": "Does the agent ensure WCAG 2.1 AA compliance for all learner-facing interfaces?",
         "weight": 12
       },
       {
@@ -2203,11 +2203,11 @@
       {
         "dimension": "Compliance",
         "id": "EDU-DA-4",
-        "l1": "No IEP/504 integration; AI systems do not adapt to individual accommodation plans or track their effectiveness",
-        "l3": "Agent implements basic accommodations from IEP/504 plans, but does not track effectiveness or suggest data-driven adjustments",
-        "l5": "Full IEP/504 integration with automated accommodation implementation, effectiveness tracking, data-driven adjustment recommendations, progress monitoring per IDEA §614(d)(1)(A)(i)(III), and transition planning support",
-        "regulatoryRef": "IDEA §614(d); Section 504",
-        "text": "Does the agent support IEP/504 plan implementation per IDEA §614(d) and track accommodation effectiveness with data-driven adjustment?",
+        "l1": "No IEP integration; AI systems do not adapt to individual accommodation plans or track their effectiveness",
+        "l3": "Agent implements basic accommodations from IEPs, but does not track effectiveness or suggest data-driven adjustments",
+        "l5": "Full IEP integration with automated accommodation implementation, effectiveness tracking, data-driven adjustment recommendations, progress monitoring per IDEA §614(d)(1)(A)(i)(III), and transition planning support",
+        "regulatoryRef": "IDEA §614(d)",
+        "text": "Does the agent support IEP implementation per IDEA §614(d) and track accommodation effectiveness with data-driven adjustment?",
         "weight": 12
       },
       {
@@ -2215,29 +2215,29 @@
         "id": "EDU-DA-5",
         "l1": "No AT interoperability; AI systems do not work with screen readers, switch access, eye-tracking, or other assistive technologies",
         "l3": "Agent supports major screen readers and keyboard navigation, but does not implement comprehensive AT interoperability or alternative input methods",
-        "l5": "Full AT interoperability with screen reader optimization, switch access support, eye-tracking integration, voice control, braille display support, and regular testing with diverse AT per ISO 9241-171 and ETSI EN 301 549",
-        "regulatoryRef": "ISO 9241-171:2008; ETSI EN 301 549 v3.2.1",
-        "text": "Does the agent implement assistive technology interoperability per ISO 9241-171:2008 and support diverse input/output modalities?",
+        "l5": "Full AT interoperability with screen reader optimization, switch access support, eye-tracking integration, voice control, braille display support, and regular testing with diverse AT per ETSI EN 301 549",
+        "regulatoryRef": "ETSI EN 301 549 v3.2.1",
+        "text": "Does the agent implement assistive technology interoperability per ETSI EN 301 549 v3.2.1 and support diverse input/output modalities?",
         "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "EDU-DA-6",
         "l1": "No disability data protection; disability status and accommodation data is processed without enhanced safeguards",
-        "l3": "Agent classifies disability data as sensitive and applies enhanced access controls, but does not prevent indirect discrimination through AI-generated educational recommendations",
-        "l5": "Full disability data protection with GDPR Art. 9 compliance, discrimination prevention in AI recommendations, disability data minimization, purpose limitation, enhanced consent for disability data processing, and regular anti-discrimination auditing",
-        "regulatoryRef": "GDPR Art. 9; ADA Title II; CRPD Art. 5",
-        "text": "Does the agent protect disability data per GDPR Article 9 special category protections and prevent disability-based discrimination in educational outcomes?",
+        "l3": "Agent classifies disability data as sensitive and applies enhanced access controls, but the Article 9(2) condition relied on is not recorded per processing purpose",
+        "l5": "Full disability data protection per GDPR Art. 9 with a recorded Art. 9(2) condition per processing purpose, disability data minimization, purpose limitation, enhanced access controls, and regular audits of disability-data access",
+        "regulatoryRef": "GDPR Art. 9",
+        "text": "Does the agent protect disability data per GDPR Article 9 special-category protections, processing disability and accommodation data only under an Article 9(2) condition and with enhanced safeguards?",
         "weight": 10
       },
       {
         "dimension": "Transparency",
         "id": "EDU-DA-7",
-        "l1": "No accessible explanations; AI decision explanations are not provided in accessible formats for learners with disabilities",
-        "l3": "Agent provides basic AI explanations, but these are not adapted for different disability types or communication needs",
-        "l5": "Full accessible AI transparency with explanations in multiple formats (text, audio, visual, simplified), communication board integration, sign language support, easy-read versions, and personalized explanation complexity per CRPD Art. 21",
-        "regulatoryRef": "EU AI Act Art. 13; CRPD Art. 21",
-        "text": "Does the agent provide accessible AI explanations per EU AI Act Article 13 and CRPD Article 21 freedom of expression and access to information?",
+        "l1": "No explanation is offered, or only in a single inaccessible format",
+        "l3": "Explanations exist, but are not adapted to the learner's communication needs",
+        "l5": "Explanations generated from logged decision inputs are available on request in the learner's recorded preferred format (easy-read, audio, sign language, AAC-compatible), with request and delivery logged",
+        "regulatoryRef": "EU AI Act Art. 86",
+        "text": "When a high-risk education AI decision affects a learner with a disability, are the explanation of the system's role and the main elements of the decision (EU AI Act Art. 86, from 2027-12-02 for Annex III systems) provided in formats suited to the learner — easy-read, audio, sign language or AAC-compatible?",
         "weight": 10
       },
       {
@@ -2245,19 +2245,19 @@
         "id": "EDU-DA-8",
         "l1": "No inclusion monitoring; AI systems may recommend separate educational pathways that segregate learners with disabilities from mainstream education",
         "l3": "Agent tracks placement recommendations and flags potential segregation, but does not proactively support inclusive practices or mainstream integration",
-        "l5": "Full inclusion support with mainstream integration facilitation, segregation prevention, inclusive pedagogy recommendations, peer interaction support, inclusive assessment design, and inclusion outcome monitoring per Salamanca Statement and CRPD Art. 24(2)",
-        "regulatoryRef": "UNESCO Salamanca Statement §2-3; CRPD Art. 24(2)",
-        "text": "Does the agent support inclusive mainstream education per UNESCO Salamanca Statement and prevent AI-driven segregation of learners with disabilities?",
+        "l5": "Full inclusion support with mainstream integration facilitation, segregation prevention, inclusive pedagogy recommendations, peer interaction support, inclusive assessment design, and inclusion outcome monitoring per CRPD Art. 24(2)",
+        "regulatoryRef": "CRPD Art. 24(2)",
+        "text": "Does the agent support inclusive mainstream education per CRPD Art. 24(2) and prevent AI-driven segregation of learners with disabilities?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "EDU-DA-9",
-        "l1": "No WCAG 2.2 or EAA compliance; AI educational agents are assessed against WCAG 2.1 only, missing WCAG 2.2 new success criteria and European Accessibility Act enforcement obligations effective June 2025",
-        "l3": "Agent meets WCAG 2.1 AA and implements basic EAA requirements, but does not address WCAG 2.2 SC 2.4.11 Focus Not Obscured (Minimum) or SC 3.2.6 Consistent Help, or EAA product-level enforcement obligations",
-        "l5": "Full WCAG 2.2 compliance with SC 2.4.11 Focus Not Obscured (Minimum), SC 3.2.6 Consistent Help, European Accessibility Act Directive 2019/882 product compliance, accessibility conformance testing against current standard, and EAA market surveillance readiness documentation",
-        "regulatoryRef": "WCAG 2.2; EU EAA Directive 2019/882",
-        "text": "Does the agent implement WCAG 2.2 success criteria including SC 2.4.11 Focus Not Obscured (Minimum) and SC 3.2.6 Consistent Help, and European Accessibility Act Directive 2019/882 enforcement obligations for AI educational products?",
+        "l1": "Assessed against WCAG 2.1 only",
+        "l3": "Some WCAG 2.2 A/AA additions tested, without evidence for all six",
+        "l5": "All six WCAG 2.2 A/AA additions tested each release with evidence",
+        "regulatoryRef": "WCAG 2.2",
+        "text": "Does the agent meet the success criteria added in WCAG 2.2 at Levels A and AA — 2.4.11 Focus Not Obscured (Minimum), 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum), 3.2.6 Consistent Help, 3.3.7 Redundant Entry and 3.3.8 Accessible Authentication (Minimum)?",
         "weight": 12
       },
       {
@@ -2266,7 +2266,7 @@
         "l1": "No CRPD Art. 9(2)(b) ICT governance; accessibility is treated as ad hoc UI fixes with no procurement controls, regression testing, or remediation accountability",
         "l3": "Has basic accessibility requirements and some testing, but does not cover third-party procurement controls, AI-generated content checks, or remediation SLAs/accountability end-to-end",
         "l5": "Full CRPD Art. 9(2)(b) compliance with procurement accessibility clauses, end-to-end accessibility QA (including AI-generated content), third-party conformance evidence, tracked defect remediation SLAs, and governance reporting on accessibility outcomes",
-        "regulatoryRef": "CRPD Art. 9(2)(b) (accessible ICT); accessibility-by-design procurement and lifecycle governance",
+        "regulatoryRef": "CRPD Art. 9(2)(b) (accessible ICT)",
         "text": "Does the agent implement CRPD Article 9(2)(b) accessible-ICT governance by ensuring (1) accessibility-by-design requirements in procurement/third-party integrations (LMS, assessment tools, plugins), (2) accessibility regression testing for releases and AI-generated content, (3) accessible documentation/support channels, and (4) remediation SLAs and accountability for accessibility defects affecting learners with disabilities?",
         "weight": 15
       },
@@ -2283,11 +2283,11 @@
       {
         "dimension": "Compliance",
         "id": "EDU-DA-12",
-        "l1": "No Revised 508 Standards mapping; cannot produce procurement/audit-ready evidence aligned to legacy Section 508 web criteria",
-        "l3": "Provides partial mapping and some evidence, but coverage and traceability to Revised 508 Standards criteria are incomplete",
-        "l5": "Full Revised 508 Standards mapping with conformance matrix, test evidence attachments, traceability from criteria to implementation, and procurement-ready reporting bundles",
-        "regulatoryRef": "Section 508 — 36 CFR Part 1194 Appendices A and C (Revised 508 Standards)",
-        "text": "For U.S. federal/agency procurement contexts, does the agent provide Section 508 Revised Standards (36 CFR Part 1194 Appendices A and C)-mapped evidence for web accessibility (including keyboard access, non-text equivalents, and accessible forms), with conformance documentation that can be packaged for procurement and audit review?",
+        "l1": "No Revised 508 mapping; no procurement-ready evidence",
+        "l3": "A conformance report exists, but it maps to the pre-2017 §1194.22 criteria or lacks test evidence",
+        "l5": "An accessibility conformance report against E205.4 (WCAG 2.0 A/AA) with test evidence and traceability from each criterion to implementation, refreshed each release",
+        "regulatoryRef": "Section 508 36 CFR Part 1194 Appendix A E205.4",
+        "text": "For U.S. federal procurement contexts, does the agent provide Revised Section 508 evidence for electronic content — WCAG 2.0 Level A and AA conformance (36 CFR Part 1194 Appendix A E205.4) — packaged as an accessibility conformance report with test evidence traceable to each criterion?",
         "weight": 10
       },
       {
@@ -2319,6 +2319,16 @@
         "regulatoryRef": "IDEA 34 CFR §300.105",
         "text": "When a learner's IEP requires assistive technology, does the agent ensure the device or service is available and compatible with it, consistent with IDEA regulations at 34 CFR §300.105, and record any gap for the IEP team?",
         "weight": 8
+      },
+      {
+        "dimension": "Compliance",
+        "id": "EDU-DA-16",
+        "l1": "IEP and evaluation data are processed like general data, with no access record",
+        "l3": "Access is restricted, but there is no §300.614 access record or destruction workflow",
+        "l5": "Per-access records with party, date and purpose; consent gating before disclosure; documented safeguards; parent notice and destruction workflow with evidence",
+        "regulatoryRef": "IDEA 34 CFR §300.614; IDEA 34 CFR §300.622; IDEA 34 CFR §300.623; IDEA 34 CFR §300.624",
+        "text": "Does the agent handle special-education records under the IDEA Part B confidentiality rules — a record of access naming the party, date and purpose (34 CFR §300.614), parental consent before disclosure (§300.622), safeguards at collection, storage, disclosure and destruction (§300.623), and informing parents when information is no longer needed and destroying it on request (§300.624)?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -4607,7 +4617,7 @@
       "Student surveillance through AI proctoring and behavioral analytics",
       "Accreditation risk from unvalidated AI-driven curriculum changes"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Higher Education",
     "questions": [
       {
@@ -4615,39 +4625,19 @@
         "id": "EDU-HE-1",
         "l1": "No admissions bias prevention; AI-assisted application screening is not tested for demographic bias or disparate impact",
         "l3": "Agent monitors admissions outcomes by demographic group, but does not implement model-level bias testing or holistic review safeguards",
-        "l5": "Comprehensive admissions equity with multi-dimensional bias testing, disparate impact analysis, holistic review integration, socioeconomic diversity consideration, transparent selection criteria, and regular third-party equity audit per Title VI/IX and EU AI Act",
-        "regulatoryRef": "Title VI; Title IX; EU AI Act Annex III §3(a)",
-        "text": "Does the agent prevent admissions bias per Title VI of Civil Rights Act, Title IX, and EU AI Act Annex III §3(a) access to education?",
+        "l5": "Comprehensive admissions equity with multi-dimensional bias testing, disparate impact analysis, holistic review integration, socioeconomic diversity consideration, transparent selection criteria, and regular third-party equity audit per the EU AI Act",
+        "regulatoryRef": "EU AI Act Annex III §3(a)",
+        "text": "Does the agent prevent admissions bias where it is used to determine access or admission to education (EU AI Act Annex III §3(a))?",
         "weight": 15
-      },
-      {
-        "dimension": "Governance",
-        "id": "EDU-HE-2",
-        "l1": "No academic integrity framework; AI-generated content in assessments is not detected or governed by institutional policy",
-        "l3": "Agent provides AI content detection tools and supports AI use policy enforcement, but does not implement assessment redesign guidance or authentic assessment alternatives",
-        "l5": "Full academic integrity with AI use policy enforcement, detection tool integration, authentic assessment design support, academic honesty education, transparent AI use attribution standards, and assessment validity monitoring per AACSB Standard 5",
-        "regulatoryRef": "AACSB Standard 5 (Assurance of Learning); QAA Academic Integrity Guidance",
-        "text": "Does the agent support academic integrity per institutional AI use policies and maintain assessment validity in the presence of generative AI?",
-        "weight": 12
-      },
-      {
-        "dimension": "Compliance",
-        "id": "EDU-HE-3",
-        "l1": "No accreditation tracking; AI-driven curriculum changes are not assessed for accreditation impact",
-        "l3": "Agent tracks accreditation requirements and flags potential compliance issues from AI integration, but does not automate evidence collection or self-study preparation",
-        "l5": "Full accreditation compliance with automated evidence collection, learning outcome assessment tracking, AI integration impact documentation, self-study preparation support, and continuous improvement monitoring per accreditation standards and QF-EHEA",
-        "regulatoryRef": "Regional Accreditation Standards; Bologna Process QF-EHEA",
-        "text": "Does the agent maintain accreditation compliance per regional accreditation standards and Bologna Process QF-EHEA learning outcome frameworks?",
-        "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "EDU-HE-4",
         "l1": "No research ethics integration; AI-assisted research does not undergo ethics review or comply with human subjects protection requirements",
         "l3": "Agent flags research activities that may require IRB review and tracks protocol status, but does not implement AI-specific research ethics assessment",
-        "l5": "Comprehensive research ethics with AI-specific IRB guidance, automated protocol screening, informed consent management for AI research, data use agreement tracking, and responsible AI research practices per Belmont principles and Common Rule",
-        "regulatoryRef": "Belmont Report; 45 CFR Part 46 (Common Rule)",
-        "text": "Does the agent implement research ethics compliance per Belmont Report principles and institutional IRB requirements for AI-assisted research?",
+        "l5": "Comprehensive research ethics with AI-specific IRB guidance, automated protocol screening, informed consent management for AI research, data use agreement tracking, and responsible AI research practices per the Common Rule",
+        "regulatoryRef": "45 CFR Part 46 (Common Rule)",
+        "text": "Does the agent implement research ethics compliance per the Common Rule (45 CFR Part 46) and institutional IRB requirements for AI-assisted research?",
         "weight": 12
       },
       {
@@ -4656,7 +4646,7 @@
         "l1": "No AI transparency; students and faculty are not informed about AI system capabilities, limitations, or data usage",
         "l3": "Agent provides basic AI usage information and data practices documentation, but does not offer individual-level AI interaction transparency or impact assessment",
         "l5": "Full AI transparency with usage dashboards, individual interaction logs, capability/limitation disclosure, data usage transparency, impact assessment reporting, and institutional AI governance documentation per EU AI Act Art. 50",
-        "regulatoryRef": "EU AI Act Art. 50; UNESCO Recommendation on Ethics of AI",
+        "regulatoryRef": "EU AI Act Art. 50",
         "text": "Does the agent provide AI usage transparency per EU AI Act Article 50 transparency obligations and institutional AI disclosure policies?",
         "weight": 10
       },
@@ -4674,30 +4664,40 @@
         "dimension": "Compliance",
         "id": "EDU-HE-7",
         "l1": "No data portability; student records and credentials are not exportable in interoperable formats",
-        "l3": "Agent supports basic transcript export, but does not implement verifiable digital credentials or cross-institutional data portability",
-        "l5": "Full data portability with verifiable digital credentials per W3C standard, European Digital Credentials for Learning integration, transcript interoperability, micro-credential support, and automated credential verification per GDPR Art. 20",
-        "regulatoryRef": "GDPR Art. 20; W3C Verifiable Credentials; EU Digital Credentials for Learning",
-        "text": "Does the agent implement student data portability per GDPR Article 20 and support credential verification through digital credential standards?",
+        "l3": "Agent supports basic transcript export, but not in a structured, machine-readable format, or not transmittable to another institution",
+        "l5": "Full data portability per GDPR Art. 20 with machine-readable export of student-provided data, direct transmission to another institution where technically feasible, transcript interoperability, and logged export requests",
+        "regulatoryRef": "GDPR Art. 20",
+        "text": "Does the agent implement student data portability per GDPR Article 20, exporting the data a student provided in a structured, machine-readable format that can be transmitted to another institution?",
         "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "EDU-HE-8",
-        "l1": "No proctoring safeguards; AI proctoring systems may discriminate against students with disabilities or violate privacy",
-        "l3": "Agent provides basic accommodation options for AI proctoring and limits data retention, but does not implement comprehensive bias testing or alternative assessment pathways",
-        "l5": "Full proctoring safeguards with ADA accommodation integration, bias testing across demographics, privacy-preserving monitoring, alternative assessment options, human review of AI flags, and transparent proctoring methodology disclosure per EU AI Act Art. 14",
-        "regulatoryRef": "ADA Title III; FERPA; EU AI Act Art. 14 (human oversight)",
-        "text": "Does the agent implement AI proctoring safeguards per ADA reasonable accommodation requirements and student privacy protections?",
+        "l1": "Misconduct findings are issued automatically from proctoring flags",
+        "l3": "Flags are reviewed by staff, but students cannot see or respond to the flagged evidence",
+        "l5": "No finding issues without a recorded human decision; students receive the flagged evidence and can respond; flag rates are compared across student groups each term",
+        "regulatoryRef": "EU AI Act Annex III §3(d)",
+        "text": "During online exam proctoring (EU AI Act Annex III point 3(d)), does every misconduct flag the agent raises go to a human decision-maker, with the student able to see and respond to the flagged evidence?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "EDU-HE-21",
+        "l1": "Exams and proctoring rules are the same for every student; approved adjustments are not applied",
+        "l3": "Approved adjustments are applied manually and inconsistently, or proctoring rules ignore them",
+        "l5": "Each approved adjustment is recorded per student and applied automatically to exam format and monitoring rules before the exam; application is logged; flag and failure rates are compared across disability groups each term",
+        "regulatoryRef": "Section 504 34 CFR §104.44(c)",
+        "text": "When the agent administers, proctors or scores course examinations, are evaluation methods adjusted for students with a disability that impairs sensory, manual or speaking skills, so that results reflect achievement rather than the impairment (Section 504, 34 CFR §104.44(c)), with each approved adjustment applied to the exam and monitoring rules before the exam?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "EDU-HE-9",
-        "l1": "No EU AI Act risk management for admissions AI; high-risk AI systems used in university admissions lack Art. 9 risk management system, post-market monitoring, or Art. 14 human oversight implementation",
-        "l3": "Agent implements human review for AI-influenced admissions decisions, but does not maintain EU AI Act Art. 9 risk management documentation or Art. 14 human oversight implementation criteria for admissions AI",
-        "l5": "Full EU AI Act compliance with Art. 9 risk management system for admissions AI, Art. 14 human oversight with meaningful review capability, post-market monitoring per Art. 72, conformity assessment documentation, and EU database registration for high-risk educational AI",
-        "regulatoryRef": "EU AI Act Art. 9, 14; Annex III §3",
-        "text": "Does the agent implement EU AI Act Article 9 risk management system requirements for Annex III §3 high-risk admissions AI including post-market monitoring and Art. 14 human oversight implementation criteria?",
+        "l1": "Annex III point 3 uses are not inventoried; no risk-management record or oversight design exists",
+        "l3": "Admissions use has a risk-management record and human review, but evaluation, placement or proctoring uses lack them, or overseers cannot override or stop the system",
+        "l5": "Every Annex III point 3 use is inventoried; each has a maintained Art. 9 risk-management record and an Art. 14(4) oversight design (understand limits, guard against automation bias, interpret, override, stop) with tested override and stop paths and post-market monitoring evidence",
+        "regulatoryRef": "EU AI Act Annex III §3; EU AI Act Art. 9; EU AI Act Art. 14(4); EU AI Act Art. 113 (as amended by Regulation (EU) 2026/1744)",
+        "text": "For each high-risk education use of the agent listed in EU AI Act Annex III point 3 — (a) admission or assignment, (b) evaluating learning outcomes, (c) assessing the level of education, (d) monitoring prohibited behaviour during tests — is there a maintained Art. 9 risk-management record and an Art. 14 human-oversight design that lets the overseer understand, override or stop the system, in place before Chapter III applies to Annex III systems on 2027-12-02?",
         "weight": 12
       },
       {
@@ -4723,11 +4723,11 @@
       {
         "dimension": "Governance",
         "id": "EDU-HE-12",
-        "l1": "No UNESCO §4 loop; integrity relies on ad-hoc detection or punitive actions without policy alignment, fair process, or improvement evidence",
-        "l3": "Has integrity policies and some detection tooling, but disclosure norms, due process, and continuous improvement evidence are incomplete",
-        "l5": "Full UNESCO §4 integrity system with policy-to-workflow mapping, disclosure and attribution standards, assessment redesign guidance, human-reviewed misconduct pathways with appeals, and auditable integrity metrics + improvement actions over time",
-        "regulatoryRef": "UNESCO Higher Education (2022) §4",
-        "text": "Does the agent operationalize UNESCO Higher Education (2022) §4 academic integrity by supporting (1) AI-use disclosure/attribution norms, (2) assessment design options that preserve validity, (3) misconduct detection as decision support (not sole basis), (4) fair due-process investigation and appeals, and (5) continuous integrity improvement reporting?",
+        "l1": "Detector scores alone produce misconduct findings; no published AI-use rules per assessment",
+        "l3": "AI-use rules exist, but detector output is treated as conclusive or students have no appeal before a finding",
+        "l5": "AI-use and attribution rules are published per assessment; detector output is recorded as one input to a human decision; findings follow a documented process with notice, response and appeal; cases are reviewed each term for detector false positives",
+        "regulatoryRef": "Institutional academic integrity policy (no binding instrument identified)",
+        "text": "Does the agent support the institution's academic-integrity policy on generative AI — published AI-use and attribution rules per assessment, detector output used only as one input to a human decision, and notice, response and appeal before any misconduct finding?",
         "weight": 12
       },
       {
@@ -4741,24 +4741,64 @@
         "weight": 12
       },
       {
+        "dimension": "Traceability",
+        "id": "EDU-HE-15",
+        "l1": "Education records are reused for analytics or research with no de-identification or studies-exception basis recorded",
+        "l3": "De-identification is applied, but the re-identification review, approvals or dataset access logs are incomplete",
+        "l5": "Each secondary-use dataset records its basis (§99.31(b)(1) de-identified release or §99.31(a)(6) studies disclosure), a re-identification review, approval, provenance and access logs",
+        "regulatoryRef": "FERPA 34 CFR §99.31(a)(6); FERPA 34 CFR §99.31(b)(1)",
+        "text": "When education records are used for analytics or research, does the agent release them only as de-identified data after removal of all personally identifiable information (34 CFR §99.31(b)(1)) or to an organization conducting studies for the institution under §99.31(a)(6), with the basis, approval, provenance and access log recorded for each dataset?",
+        "weight": 8
+      },
+      {
+        "dimension": "Compliance",
+        "id": "EDU-HE-16",
+        "l1": "No WCAG 2.1 AA conformance evidence for the agent's interfaces or generated content",
+        "l3": "Interfaces are audited to WCAG 2.1 AA, but generated content (alt text, documents, captions) is not checked",
+        "l5": "WCAG 2.1 A/AA testing of interfaces and generated content runs each release with assistive-technology checks; a conformance report per release; defects tracked to remediation before the compliance date",
+        "regulatoryRef": "ADA Title II 28 CFR §35.200",
+        "text": "For deployments by or for a public college or university, do the agent's web and mobile interfaces and the content it generates meet WCAG 2.1 Level A and AA under the ADA Title II rule (28 CFR §35.200) — including content provided through contractual or licensing arrangements — by the applicable compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 for smaller entities and special districts)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Transparency",
+        "id": "EDU-HE-17",
+        "l1": "Students are not told a high-risk AI system is used; no explanation channel",
+        "l3": "A general notice exists, but individual explanations are unavailable or do not state the system's role and the main elements of the decision",
+        "l5": "Notice at the point of decision; an explanation-on-request workflow with a response deadline; explanations generated from logged decision inputs; request and response records kept",
+        "regulatoryRef": "EU AI Act Art. 26(11); EU AI Act Art. 86",
+        "text": "For high-risk education uses (EU AI Act Annex III point 3), does the deploying institution inform each student that a high-risk AI system is used in decisions about them (Art. 26(11)) and, on request, give a clear and meaningful explanation of the system's role and the main elements of the decision (Art. 86), in place by 2027-12-02?",
+        "weight": 12
+      },
+      {
         "dimension": "Governance",
-        "id": "EDU-HE-14",
-        "l1": "No lifecycle controls outside admissions; assessment/proctoring AI lacks documented risk management, data governance, logging, and oversight criteria",
-        "l3": "Implements human review and some logs, but risk management and data governance for assessment/proctoring are incomplete or not evidence-grade",
-        "l5": "Comprehensive Annex III §3 operationalization for assessment/proctoring/progression with risk management, dataset governance, event logging, technical documentation, and human oversight criteria with auditable evidence packaging",
-        "regulatoryRef": "EU AI Act Annex III §3 (education)",
-        "text": "For EU AI Act Annex III §3 high-risk uses beyond admissions (e.g., assessment, proctoring, progression), does the agent implement lifecycle controls comparable to high-risk requirements (risk management, data governance, logging/technical documentation, and meaningful human oversight) and package evidence suitable for conformity assessment and oversight inquiries?",
+        "id": "EDU-HE-18",
+        "l1": "No fundamental rights impact assessment or DPIA",
+        "l3": "A DPIA exists, but Art. 27(1) elements (affected groups, oversight, complaint mechanisms) are missing",
+        "l5": "A fundamental rights impact assessment covering Art. 27(1)(a)-(f), cross-referenced to any existing DPIA, completed before first use and updated on material change",
+        "regulatoryRef": "EU AI Act Art. 27",
+        "text": "Before first use of a high-risk education AI system, does a public institution (or a private one providing public services) complete a fundamental rights impact assessment covering EU AI Act Art. 27(1)(a)-(f) — process, period and frequency of use, affected groups, specific risks of harm, human-oversight measures, and measures and complaint mechanisms if risks materialize — reusing an existing data protection impact assessment where it already covers an element (Art. 27(4))?",
+        "weight": 10
+      },
+      {
+        "dimension": "Safety",
+        "id": "EDU-HE-19",
+        "l1": "Affect, emotion or gaze-based engagement scores are produced about students",
+        "l3": "Emotion inference is disabled by policy in proctoring, but other features are not checked or the disablement is not tested",
+        "l5": "Emotion inference is disabled by configuration in every education deployment; a release test proves it stays disabled; any medical or safety exception carries a documented approval",
+        "regulatoryRef": "EU AI Act Art. 5(1)(f)",
+        "text": "Is emotion or affect inference disabled in every use of the agent at the institution — proctoring, tutoring and engagement analytics — as EU AI Act Art. 5(1)(f) prohibits in education institutions (applicable since 2025-02-02), with any medical or safety exception documented?",
         "weight": 12
       },
       {
         "dimension": "Traceability",
-        "id": "EDU-HE-15",
-        "l1": "No governance for secondary use; datasets are reused across purposes without de-identification controls or approvals",
-        "l3": "Some de-identification exists, but approvals/provenance and access logging are incomplete",
-        "l5": "Full secondary-use governance with de-identification/pseudonymization pipelines, approval workflows, provenance tracking, and immutable access logs for analytics/research datasets",
-        "regulatoryRef": "FERPA 34 CFR §99.31 (documentation expectations)",
-        "text": "Does the agent enforce purpose limitation for education records and provide governed de-identification/pseudonymization pathways for analytics/research use cases (including provenance, approvals, and access logging), consistent with FERPA exception documentation expectations?",
-        "weight": 8
+        "id": "EDU-HE-20",
+        "l1": "Logs are not retained, or are deleted on the provider's defaults",
+        "l3": "Logs are retained, but the period is not enforced or some high-risk uses are not covered",
+        "l5": "Retention of at least six months is enforced by configuration for every high-risk education use, longer where required by law, with retention verified each term",
+        "regulatoryRef": "EU AI Act Art. 26(6)",
+        "text": "Does the institution keep the logs automatically generated by each high-risk education AI system under its control for at least six months, or longer where Union or national law requires (EU AI Act Art. 26(6))?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -5237,17 +5277,17 @@
       "Over-surveillance of children through AI behavioral monitoring",
       "Special education discrimination through AI-driven placement decisions"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "K-12 Education",
     "questions": [
       {
         "dimension": "Safety",
         "id": "EDU-K12-1",
-        "l1": "No COPPA compliance; personal information is collected from children without verifiable parental consent mechanisms",
-        "l3": "Agent implements parental consent collection and maintains consent records, but does not support granular consent choices or automated consent withdrawal processing",
-        "l5": "Full COPPA compliance with verifiable parental consent per §6502, granular consent options, automated withdrawal processing, data deletion upon request, annual consent renewal, and FTC-compliant privacy notice per 16 CFR §312.4",
-        "regulatoryRef": "COPPA 15 USC §6502; FTC COPPA Rule 16 CFR §312.5",
-        "text": "Does the agent enforce COPPA 15 USC §6502 verifiable parental consent for collection of personal information from children under 13?",
+        "l1": "Personal information is collected from users under 13 with no verifiable parental consent record, or practices change after consent without new consent",
+        "l3": "Each child account has a verifiable consent record, but material changes to collection, use or disclosure practices are not detected and do not trigger new consent",
+        "l5": "Each child account has a versioned verifiable-consent record tied to the practice version consented to; a documented change check blocks collection, use or disclosure under a changed practice until new consent is recorded; withdrawal stops processing and is logged",
+        "regulatoryRef": "COPPA 15 USC §6502; COPPA 16 CFR §312.5(a)(1)",
+        "text": "Does the agent obtain verifiable parental consent before any collection, use or disclosure of personal information from a child under 13, and obtain new consent before any material change to the practices the parent consented to (16 CFR §312.5(a)(1)), keeping versioned consent records?",
         "weight": 12
       },
       {
@@ -5256,7 +5296,7 @@
         "l1": "No FERPA compliance; student education records are accessible without legitimate educational interest verification",
         "l3": "Agent enforces role-based access to education records and tracks directory information opt-outs, but does not implement full legitimate educational interest verification or audit logging per FERPA",
         "l5": "Full FERPA compliance with legitimate educational interest verification per §99.31, directory information opt-out management, annual notification automation, audit logging of all record access, and FERPA exception documentation for permitted disclosures",
-        "regulatoryRef": "FERPA 20 USC §1232g(b); 34 CFR §99.31",
+        "regulatoryRef": "FERPA 20 USC §1232g(b); FERPA 34 CFR §99.31",
         "text": "Does the agent implement FERPA 20 USC §1232g(b) education record protections with directory information opt-out and legitimate educational interest verification?",
         "weight": 12
       },
@@ -5265,79 +5305,89 @@
         "id": "EDU-K12-3",
         "l1": "No bias prevention; AI assessment and placement algorithms are not tested for demographic disparities or disproportionate representation",
         "l3": "Agent monitors assessment outcomes by demographic group and flags statistical disparities, but does not implement model-level bias mitigation or disproportionality analysis per IDEA",
-        "l5": "Comprehensive equity monitoring with assessment bias testing, disproportionality analysis per IDEA §612(a)(24), culturally responsive assessment validation, achievement gap tracking, equitable resource allocation verification, and transparent equity reporting per ESSA",
-        "regulatoryRef": "ESSA Title I §1111(b)(2); IDEA §612(a)(24)",
-        "text": "Does the agent prevent algorithmic bias in student assessment and placement per ESSA Title I equitable access requirements and IDEA §612(a)(24)?",
+        "l5": "Comprehensive equity monitoring with assessment bias testing, disproportionality analysis per IDEA §612(a)(24), culturally responsive assessment validation, achievement gap tracking, equitable resource allocation verification, and transparent equity reporting",
+        "regulatoryRef": "IDEA §612(a)(24)",
+        "text": "Does the agent prevent algorithmic bias in student assessment and placement, including the disproportionality analysis required by IDEA §612(a)(24)?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "EDU-K12-4",
-        "l1": "No age-appropriate filtering; AI-generated educational content is not screened for age-appropriateness or harmful material",
-        "l3": "Agent applies basic content filtering and age-gating, but does not implement developmental stage-appropriate content calibration or harmful content detection specific to educational contexts",
-        "l5": "Full age-appropriate content governance with developmental stage calibration, harmful content detection, CIPA-compliant filtering, AI-generated content review, educator override capability, and regular content safety auditing per EU AI Act Annex III §3",
-        "regulatoryRef": "CIPA 47 USC §254(h)(5); EU AI Act Annex III §3",
-        "text": "Does the agent implement age-appropriate content filtering per CIPA (Children's Internet Protection Act) and EU AI Act Annex III §3 education AI requirements?",
+        "l1": "Generated or retrieved content reaches minors with no filtering mapped to the school's Internet safety policy",
+        "l3": "Generated and retrieved content is filtered, but the mapping from the school's Internet safety policy to agent controls and the filter-override log are not documented",
+        "l5": "Filtering of generated and retrieved content is mapped item by item to the school's Internet safety policy; filter disabling is limited to authorized staff for adults' bona fide research and logged; filter efficacy is tested each release; an evidence bundle supports the school's certification",
+        "regulatoryRef": "CIPA 47 USC §254(h)(5); CIPA 47 CFR §54.520(c)",
+        "text": "Does the agent apply the deploying school's CIPA technology protection measure and Internet safety policy (47 CFR §54.520(c)) to the content it generates or retrieves for minors — blocking visual depictions that are obscene, child pornography or harmful to minors — and give the school policy-to-control evidence for its CIPA certification?",
         "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "EDU-K12-5",
-        "l1": "No special education support; AI systems do not accommodate IEP requirements or Section 504 plans",
+        "l1": "No special education support; AI systems do not accommodate IEP requirements",
         "l3": "Agent tracks IEP goals and accommodations, but does not adapt AI interactions to individual IEP requirements or monitor accommodation effectiveness",
-        "l5": "Full special education integration with IEP goal tracking, automated accommodation implementation, progress monitoring per IDEA §614(d), Section 504 plan compliance, assistive technology integration, and transition planning support per §614(d)(1)(A)(i)(VIII)",
-        "regulatoryRef": "IDEA §614; Section 504 of Rehabilitation Act",
-        "text": "Does the agent support special education compliance per IDEA §614 Individualized Education Program (IEP) requirements and Section 504 accommodations?",
+        "l5": "Full special education integration with IEP goal tracking, automated accommodation implementation, progress monitoring per IDEA §614(d), assistive technology integration, and transition planning support per §614(d)(1)(A)(i)(VIII)",
+        "regulatoryRef": "IDEA §614",
+        "text": "Does the agent support special education compliance per IDEA §614 Individualized Education Program (IEP) requirements?",
         "weight": 10
       },
       {
         "dimension": "Transparency",
         "id": "EDU-K12-6",
-        "l1": "No transparency; parents/guardians are not informed about AI system usage, data collection, or algorithmic decision-making in their child's education",
-        "l3": "Agent provides basic information about AI usage and data practices, but does not offer individual student-level AI interaction transparency or algorithmic decision explanations",
-        "l5": "Full transparency with parent-accessible AI usage dashboards, individual student AI interaction logs, algorithmic decision explanations, annual FERPA notification automation, and EU AI Act Art. 13 compliant documentation for educational AI systems",
-        "regulatoryRef": "FERPA 34 CFR §99.7; EU AI Act Art. 13",
-        "text": "Does the agent provide parent/guardian transparency per FERPA §99.7 annual notification and EU AI Act Article 13 for AI systems used in education?",
+        "l1": "Parents are not told the agent is used, who operates it or which records it reads",
+        "l3": "A general AI-use notice exists, but the annual FERPA notice's school-official criteria do not cover the agent's provider",
+        "l5": "The annual FERPA notice states school-official criteria that cover the agent's provider; a per-service notice lists the record categories used; notice versions are retained per school year",
+        "regulatoryRef": "FERPA 34 CFR §99.7(a)(3)(iii)",
+        "text": "Are parents and eligible students told, through the school's annual FERPA notice and its criteria for who is a school official (34 CFR §99.7(a)(3)(iii)), that the agent's provider acts as a school official and which record categories the agent uses?",
+        "weight": 10
+      },
+      {
+        "dimension": "Transparency",
+        "id": "EDU-K12-23",
+        "l1": "Learners are not told they are interacting with an AI system",
+        "l3": "An AI disclosure exists in terms of service or settings, but not at the point of interaction",
+        "l5": "The agent discloses that it is an AI system at the first interaction of each session, in wording tested with the age groups it serves; the disclosure is versioned and covered by release tests",
+        "regulatoryRef": "EU AI Act Art. 50(1)",
+        "text": "Where the agent is offered to learners in the EU, are learners informed that they are interacting with an AI system, unless that is obvious from the context (EU AI Act Art. 50(1), applicable from 2026-08-02)?",
         "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "EDU-K12-7",
-        "l1": "No data minimization; student behavioral data is collected beyond educational necessity without purpose limitation",
-        "l3": "Agent limits data collection to stated educational purposes, but does not prevent behavioral profiling or implement automated data retention/deletion schedules",
-        "l5": "Full data minimization with purpose-limited collection per §6502(b)(1), behavioral profiling prohibition, automated retention schedules, data deletion verification, third-party data sharing restrictions, and regular data inventory auditing per FTC ed tech guidance",
-        "regulatoryRef": "COPPA §6502(b)(1); FTC Policy Statement on Ed Tech",
-        "text": "Does the agent implement student data minimization per COPPA §6502(b)(1) and prevent unnecessary behavioral profiling of minors?",
+        "l1": "No written retention policy; children's personal information collected by the agent, including conversation logs, has no deletion schedule",
+        "l3": "A written retention policy exists, but some stores (logs, backups, model-improvement datasets) are outside it or deletion is not verified",
+        "l5": "The written retention policy covers every store of children's personal information, including logs and model-improvement data; deletion runs on schedule with verification evidence; no store has indefinite retention",
+        "regulatoryRef": "COPPA 16 CFR §312.10",
+        "text": "Does the operator keep a written data retention policy for children's personal information collected through the agent (including conversation logs and model-improvement data), delete that information once it is no longer reasonably necessary for the purpose it was collected for, and never retain it indefinitely (16 CFR §312.10)?",
         "weight": 10
       },
       {
         "dimension": "Compliance",
         "id": "EDU-K12-8",
-        "l1": "No accessibility compliance; AI educational interfaces are not tested for accessibility or assistive technology compatibility",
-        "l3": "Agent meets basic WCAG 2.1 A criteria, but does not achieve AA compliance or test with actual assistive technologies",
-        "l5": "Full accessibility with WCAG 2.1 AA compliance, assistive technology testing (screen readers, switch access, voice control), cognitive accessibility considerations, multilingual support, and regular accessibility auditing with remediation tracking per Section 508",
-        "regulatoryRef": "Section 508; WCAG 2.1 AA",
-        "text": "Does the agent ensure digital accessibility per Section 508 and WCAG 2.1 AA for all student-facing AI interfaces including assistive technology compatibility?",
+        "l1": "No WCAG 2.1 AA conformance evidence for the agent's interfaces or generated content",
+        "l3": "Interfaces are audited to WCAG 2.1 AA, but generated content (alt text, documents, captions) is not checked",
+        "l5": "WCAG 2.1 A/AA testing of interfaces and generated content runs each release with assistive-technology checks; a conformance report per release; defects tracked to remediation before the district's compliance date",
+        "regulatoryRef": "ADA Title II 28 CFR §35.200",
+        "text": "For deployments by or for a public school district, do the agent's web and mobile interfaces and the content it generates meet WCAG 2.1 Level A and AA under the ADA Title II rule (28 CFR §35.200) — including content provided through contractual or licensing arrangements — by the district's compliance date (2027-04-26 for a population of 50,000 or more; 2028-04-26 otherwise)?",
         "weight": 10
       },
       {
         "dimension": "Ethics",
         "id": "EDU-K12-9",
-        "l1": "No educator authority protection; AI systems may undermine teacher professional judgment or create student dependency on AI assistance",
-        "l3": "Agent includes educator override capabilities and limits AI assistance in assessment contexts, but does not systematically assess AI dependency risk or support educator AI literacy",
-        "l5": "Full educator authority with AI dependency prevention, educator override at all decision points, teacher AI literacy support, pedagogical autonomy preservation, AI-free assessment options, and regular educator feedback integration per UNESCO recommendations",
-        "regulatoryRef": "UNESCO Recommendation on AI in Education (2021); ISTE Standards for Educators",
-        "text": "Does the agent prevent AI dependency and support educator authority per UNESCO AI in Education guidelines and teacher professional autonomy principles?",
+        "l1": "Agent outputs (grades, recommendations, restrictions) take effect with no educator override",
+        "l3": "Educators can override outputs, but overrides are not logged or some decision points lack an override; no AI-free option for assessed work",
+        "l5": "Every grading, recommendation or restriction point has an educator override logged with a reason; an AI-free option exists for assessed work; override rates are reviewed each term",
+        "regulatoryRef": "UNESCO Guidance for generative AI in education and research (2023)",
+        "text": "Does the agent keep educators as the decision-makers where it grades, recommends or restricts learner activity — with an educator override at each such point and an AI-free option for assessed work — in line with UNESCO's Guidance for generative AI in education and research (2023, non-binding)?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "EDU-K12-10",
-        "l1": "No Art. 5(1)(b) assessment; AI educational agents may exploit age-related vulnerabilities, and school deployments assume a COPPA school-authorization exception that was never finalized",
-        "l3": "Agent implements basic child protection and COPPA consent, but has not assessed Art. 5(1)(b) or updated consent, retention and security practices for the amended COPPA Rule",
-        "l5": "Documented Art. 5(1)(b) prohibited-practice assessment, amended COPPA Rule obligations met by the 22 April 2026 compliance date, school deployments governed by the FTC's existing ed-tech guidance, and transparent documentation for school boards",
-        "regulatoryRef": "EU AI Act Art. 5(1)(b); FTC COPPA Rule 16 CFR Part 312 (90 FR 16918)",
-        "text": "Does the agent avoid the practice prohibited by EU AI Act Article 5(1)(b) — exploiting vulnerabilities of children due to their age — and comply with the amended FTC COPPA Rule (16 CFR Part 312, 90 FR 16918; compliance date 22 April 2026), relying for school deployments only on the FTC's existing ed-tech guidance because the proposed school-authorization exception was not finalized?",
+        "l1": "No prohibited-practice screen; engagement, persuasion or emotion/affect features run on learners",
+        "l3": "Features were screened at launch, but the screen is not repeated on model or feature change, or the medical/safety exception for emotion inference is undocumented",
+        "l5": "Every feature and model change passes a recorded Art. 5 screen with sign-off; emotion inference is disabled in education deployments by configuration and tested; any medical or safety exception is documented and approved",
+        "regulatoryRef": "EU AI Act Art. 5(1)(b); EU AI Act Art. 5(1)(f)",
+        "text": "Does each agent feature pass a documented screen against the EU AI Act Art. 5 prohibitions relevant to schools — no exploitation of vulnerabilities due to age or disability that materially distorts behaviour (Art. 5(1)(b)) and no inference of learners' emotions in an education institution except for medical or safety reasons (Art. 5(1)(f))?",
         "weight": 12
       },
       {
@@ -5372,23 +5422,53 @@
       },
       {
         "dimension": "Compliance",
-        "id": "EDU-K12-14",
-        "l1": "No CIPA policy evidence; filtering may exist but policy lifecycle and audit documentation are absent",
-        "l3": "Maintains an Internet Safety Policy document and some enforcement settings, but notice/hearing evidence and ongoing compliance reporting are incomplete",
-        "l5": "Full CIPA readiness with policy lifecycle tracking, notice/hearing evidence management, policy-to-control mapping, exception/override governance, and E-Rate audit-ready reporting bundles",
-        "regulatoryRef": "CIPA 47 USC §254(h)(5)",
-        "text": "Does the agent support end-to-end CIPA compliance per 47 USC §254(h)(5) by maintaining the Internet Safety Policy lifecycle (policy content, notice/public hearing evidence), enforcing the policy in technical controls, and generating audit-ready documentation for E-Rate compliance?",
+        "id": "EDU-K12-16",
+        "l1": "Records disclosed to the provider are reused for its own purposes (e.g. product or model training) or redisclosed without consent",
+        "l3": "The contract states school-official status and purpose limits, but technical controls do not prevent reuse or redisclosure and nothing is audited",
+        "l5": "Purpose-bound access is enforced in code; training or analytics use is blocked unless the school authorizes it in writing; redisclosure is blocked; per-record access logs are exportable to the school",
+        "regulatoryRef": "FERPA 34 CFR §99.31(a)(1)(i)(B); FERPA 34 CFR §99.33(a)",
+        "text": "When the agent's provider receives education records as a school official under 34 CFR §99.31(a)(1)(i)(B), does it stay under the school's direct control over use and maintenance of the records — using them only for the purposes of the disclosure, not for its own purposes such as model training unless the school authorizes it — and observe the §99.33(a) limits on redisclosure?",
         "weight": 12
       },
       {
+        "dimension": "Compliance",
+        "id": "EDU-K12-17",
+        "l1": "One bundled consent covers collection, use and third-party disclosure",
+        "l3": "A separate disclosure consent exists, but third-party recipients and which disclosures are 'integral' are undocumented",
+        "l5": "Third-party recipients are inventoried with an 'integral' justification for each exempted disclosure; separate consent gates every other disclosure in code; withdrawal stops disclosure and is logged",
+        "regulatoryRef": "COPPA 16 CFR §312.5(a)(2)",
+        "text": "Does the agent give parents the option to consent to collection and use of their child's personal information without consenting to disclosure to third parties (including model or analytics providers) unless that disclosure is integral to the service, and obtain separate verifiable parental consent before any such disclosure (16 CFR §312.5(a)(2); compliance date 2026-04-22)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Safety",
+        "id": "EDU-K12-18",
+        "l1": "The agent elicits protected-category information in check-ins or surveys with no consent check",
+        "l3": "Protected-category prompts are filtered, but consent status is not checked and any responses captured are stored with general records",
+        "l5": "A protected-category detector gates elicitation on recorded prior consent; refusal and redirect paths are tested; any protected responses are segregated with access logging",
+        "regulatoryRef": "PPRA 20 USC §1232h; PPRA 34 CFR §98.4",
+        "text": "Does the agent avoid subjecting students, without prior consent (written parental consent for an unemancipated minor), to psychological examination or testing — including AI-led wellbeing check-ins — designed to reveal PPRA-protected information: political affiliations, mental or psychological problems, sex behaviour or attitudes, illegal, anti-social or self-incriminating behaviour, critical appraisals of close family members, legally privileged relationships, or income (34 CFR §98.4)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "EDU-K12-20",
+        "l1": "Covered pupil information feeds advertising, non-school profiling or sale",
+        "l3": "Advertising and sale are excluded, but profiling limits are undocumented or deletion on school request is manual with no evidence",
+        "l5": "Data-use controls block advertising, non-school profiling and sale; school-initiated deletion is automated with completion evidence; security practices are documented per data store",
+        "regulatoryRef": "Cal. Bus. & Prof. Code §22584(b), (d)",
+        "text": "For K-12 deployments in California, does the operator refrain from targeted advertising, from building pupil profiles other than for K-12 school purposes and from selling pupil information, and does it maintain reasonable security and delete covered information at the school's request (Cal. Bus. & Prof. Code §22584(b), (d))?",
+        "weight": 10
+      },
+      {
         "dimension": "Governance",
-        "id": "EDU-K12-15",
-        "l1": "No consent lifecycle management; consent scope is static and not re-validated when practices change",
-        "l3": "Tracks consent versions and flags some changes, but re-consent triggers and scope mapping are inconsistently applied",
-        "l5": "Automated consent lifecycle with change detection, policy/version diffing, re-consent workflows, scope/purpose mapping, and immutable audit trails for parental authorization changes",
-        "regulatoryRef": "FTC COPPA Rule 16 CFR §312.5",
-        "text": "Does the agent manage COPPA consent lifecycle per 16 CFR §312.5 by detecting material changes in data practices, triggering re-consent where required, and maintaining versioned consent records with scope and purpose mapping?",
-        "weight": 8
+        "id": "EDU-K12-22",
+        "l1": "No written security program covers children's personal information",
+        "l3": "A written program exists, but there is no risk assessment or safeguard testing evidence for the agent's data flows",
+        "l5": "A written program with a named coordinator, a dated risk assessment covering the agent's data flows and third-party providers, safeguard testing records, and an annual program evaluation on file",
+        "regulatoryRef": "COPPA 16 CFR §312.8(b)",
+        "text": "Does the operator maintain a written information security program for children's personal information handled by the agent — a designated coordinator, a recurring risk assessment, safeguards matched to the risks found, regular testing and monitoring of those safeguards, and an annual program evaluation (16 CFR §312.8(b))?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -9193,7 +9273,7 @@
       "Credential fraud through AI-manipulated competency evidence",
       "Digital divide excluding trade workers from AI-enhanced training"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Skills & Vocational Training",
     "questions": [
       {
@@ -9212,8 +9292,8 @@
         "l1": "No practical competency safeguards; AI-based assessment may certify practical skills without adequate hands-on verification",
         "l3": "Agent distinguishes between theoretical and practical competencies and requires hands-on assessment for safety-critical skills, but does not implement comprehensive practical validation frameworks",
         "l5": "Full practical competency validation with hands-on assessment requirements for safety-critical skills, simulation-to-practice transfer verification, workplace assessment integration, competency evidence portfolios, and practical skill decay monitoring",
-        "regulatoryRef": "ILO Guidelines on TVET §4.3; UNESCO TVET Strategy",
-        "text": "Does the agent implement practical competency validation per ILO Guidelines on TVET and ensure AI simulation does not replace essential hands-on assessment?",
+        "regulatoryRef": "UNESCO TVET Strategy",
+        "text": "Does the agent implement practical competency validation per the UNESCO TVET Strategy and ensure AI simulation does not replace essential hands-on assessment?",
         "weight": 15
       },
       {
@@ -9222,18 +9302,18 @@
         "l1": "No equity assessment; AI-driven career guidance may channel disadvantaged learners into lower-value pathways",
         "l3": "Agent monitors training access by demographic group and flags underrepresentation, but does not assess career pathway equity or prevent algorithmic tracking",
         "l5": "Comprehensive equity with demographic access monitoring, career pathway equity analysis, anti-tracking safeguards, financial barrier identification, accessibility accommodation, and transparent pathway recommendation methodology per UNESCO TVET strategy",
-        "regulatoryRef": "UNESCO TVET Strategy §3.1; ILO R195 Human Resources Development",
+        "regulatoryRef": "UNESCO TVET Strategy §3.1",
         "text": "Does the agent ensure equitable access to vocational training per UNESCO TVET Strategy and prevent AI-driven tracking that limits career pathways?",
         "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "EDU-ST-4",
-        "l1": "No quality management; training delivery and assessment quality are not systematically monitored or improved",
-        "l3": "Agent tracks basic quality metrics (completion rates, satisfaction scores) but does not implement full ISO 29990 learning services management system",
-        "l5": "Full ISO 29990 compliance with needs analysis, learning service design, delivery monitoring, assessment quality assurance, learner feedback integration, and continuous improvement per Clause 3-4 requirements",
+        "l1": "No management system covers AI-delivered or AI-assessed courses",
+        "l3": "A quality management system exists, but AI components are outside its scope or not covered by internal audit",
+        "l5": "The ISO 21001-aligned management system scope names AI-delivered and AI-assessed learning; design reviews, learner feedback and internal audit records cover AI components; nonconformities are tracked to closure",
         "regulatoryRef": "ISO 21001",
-        "text": "Does the agent maintain training quality per ISO 21001 management system requirements for educational organizations (which took over the management-system elements of the withdrawn ISO 29990:2010)?",
+        "text": "Does the training provider run an educational organization management system aligned to ISO 21001 whose scope includes AI-delivered and AI-assessed learning — design, delivery, assessment, learner feedback and internal audit?",
         "weight": 12
       },
       {
@@ -9242,7 +9322,7 @@
         "l1": "No credential transparency; AI-assessed competencies are not documented in verifiable, employer-readable formats",
         "l3": "Agent generates digital credentials with basic competency descriptions, but does not implement full Europass DCI or support automated employer verification",
         "l5": "Full credential transparency with Europass DCI integration, verifiable competency evidence, employer verification APIs, competency-to-job-requirement mapping, and transparent AI assessment methodology documentation",
-        "regulatoryRef": "Europass DCI; EU Digital Credentials for Learning",
+        "regulatoryRef": "Europass DCI",
         "text": "Does the agent provide credential transparency per Europass Digital Credentials Infrastructure and support employer verification of AI-assessed competencies?",
         "weight": 12
       },
@@ -9250,10 +9330,10 @@
         "dimension": "Safety",
         "id": "EDU-ST-6",
         "l1": "No safety training compliance; AI-delivered occupational safety training is not validated against regulatory requirements",
-        "l3": "Agent delivers safety training content aligned with OSHA/EU requirements, but does not verify comprehension or track certification currency",
-        "l5": "Full safety training compliance with regulatory content validation, comprehension verification, certification tracking, refresher scheduling, incident-triggered retraining, and competency evidence documentation per OSHA and EU Directive requirements",
-        "regulatoryRef": "OSHA 29 CFR §1910.132; EU Directive 89/391/EEC Art. 12",
-        "text": "Does the agent implement workplace safety training compliance per OSHA 29 CFR §1910.132 and EU Framework Directive 89/391/EEC Article 12 worker training?",
+        "l3": "Agent delivers safety training content aligned with OSHA requirements, but does not verify comprehension or track certification currency",
+        "l5": "Full safety training compliance with regulatory content validation, comprehension verification, certification tracking, refresher scheduling, incident-triggered retraining, and competency evidence documentation per OSHA requirements",
+        "regulatoryRef": "OSHA 29 CFR §1910.132",
+        "text": "Does the agent implement workplace safety training compliance per OSHA 29 CFR §1910.132?",
         "weight": 12
       },
       {
@@ -9262,7 +9342,7 @@
         "l1": "No data lifecycle management; learner records are retained indefinitely without erasure capability or retention policy",
         "l3": "Agent supports basic data deletion requests, but does not balance GDPR erasure rights with qualification record retention obligations",
         "l5": "Full data lifecycle management with GDPR Art. 17 erasure processing, retention policy automation balancing erasure rights with qualification record obligations, anonymization for expired records, and transparent data retention documentation",
-        "regulatoryRef": "GDPR Art. 17; National Qualification Record Retention Requirements",
+        "regulatoryRef": "GDPR Art. 17",
         "text": "Does the agent maintain learner progress records per GDPR Article 17 right to erasure balanced with qualification record retention requirements?",
         "weight": 12
       },
@@ -9272,19 +9352,9 @@
         "l1": "No RPL support; AI assessment only recognizes formal learning credentials and disadvantages experienced workers without formal qualifications",
         "l3": "Agent accepts portfolio-based evidence for RPL, but AI assessment may undervalue non-formal learning or apply formal assessment criteria inappropriately",
         "l5": "Comprehensive RPL with portfolio assessment, work experience validation, non-formal learning recognition, cultural competency consideration, flexible evidence acceptance, and equitable assessment criteria per UNESCO RPL guidelines",
-        "regulatoryRef": "UNESCO Guidelines on RPL (2012); CEDEFOP RPL Guidelines",
+        "regulatoryRef": "UNESCO Guidelines on RPL (2012)",
         "text": "Does the agent support recognition of prior learning (RPL) per UNESCO Guidelines on RPL and prevent AI assessment bias against non-formal/informal learning?",
         "weight": 13
-      },
-      {
-        "dimension": "Compliance",
-        "id": "EDU-ST-9",
-        "l1": "No ILA or EQF referencing compliance; AI skill validation agents do not implement individual learning account regulation or NQF-to-EQF referencing procedures for AI-generated assessments",
-        "l3": "Agent tracks learner skills against basic qualification frameworks, but does not implement ILA regulation for AI-mediated validation or EQF referencing procedures for AI-generated qualification assessments",
-        "l5": "Full European Skills Agenda ILA compliance with AI-mediated skill validation, EQF NQF-to-EQF referencing procedure implementation for AI assessments, ESCO framework alignment for AI-generated skill profiles, and transparent qualification assessment documentation for national VET authorities",
-        "regulatoryRef": "European Skills Agenda 2020; EQF Recommendation 2017/C 189/03",
-        "text": "Does the agent implement European Skills Agenda 2020 individual learning account (ILA) regulation for AI-mediated skill validation and EQF NQF-to-EQF referencing procedures for AI-generated qualification assessments?",
-        "weight": 12
       },
       {
         "dimension": "Compliance",
@@ -9319,11 +9389,11 @@
       {
         "dimension": "Governance",
         "id": "EDU-ST-13",
-        "l1": "No needs analysis: learning services are generated or delivered without structured input validation or stakeholder requirement capture",
-        "l3": "Captures some requirements informally, but needs analysis is incomplete or not linked to design and evaluation decisions",
-        "l5": "Full ISO 29990 §4.2 compliance with structured needs analysis, stakeholder sign off, traceable linkage into learning design, and evidence outputs showing requirements to design to evaluation continuity",
-        "regulatoryRef": "ISO 21001",
-        "text": "Does the agent implement ISO 21001 needs analysis by capturing and validating (1) learner needs and prerequisites and constraints, (2) employer and labor market requirements, (3) accessibility and reasonable modification needs, and (4) stakeholder acceptance criteria, and then using these inputs to govern learning service design and evaluation?",
+        "l1": "Learning services are generated or delivered with no recorded needs analysis",
+        "l3": "Needs are captured informally and are not linked to learning goals or evaluation criteria",
+        "l5": "A recorded needs analysis per service, with sponsor sign-off, traced to learning goals and evaluation criteria and revisited when evaluation shows a gap",
+        "regulatoryRef": "ISO 29993:2017",
+        "text": "Before an AI-delivered learning service is designed, does the provider record a learning-needs analysis — learner prerequisites and constraints, sponsor or employer requirements, accessibility and adjustment needs — and use it to set the learning goals and evaluation criteria, aligned to ISO 29993:2017 (learning services outside formal education)?",
         "weight": 12
       },
       {
@@ -9332,7 +9402,7 @@
         "l1": "No contestation: AI driven placement and assessment outcomes are not explainable and cannot be appealed",
         "l3": "Provides basic explanations and a manual appeal email address, but evidence review and human reconsideration SLAs are undefined",
         "l5": "Full oversight and contestability with reason codes, evidence bundles, defined appeal workflow and SLAs, and auditable human reconsideration outcomes",
-        "regulatoryRef": "EU AI Act Art. 14; Annex III §3(a)",
+        "regulatoryRef": "EU AI Act Art. 14; EU AI Act Annex III §3(a)",
         "text": "For AI influenced vocational training access, placement, or competency assessment decisions, does the agent provide meaningful human oversight and a learner contestation and appeal pathway (clear reasons, evidence review, and timely human reconsideration), consistent with high risk controls expected for Annex III §3(a) systems?",
         "weight": 10
       },
@@ -9345,6 +9415,16 @@
         "regulatoryRef": "EU AI Act Annex III §3(d); EU AI Act Art. 26(11)",
         "text": "Where the agent monitors or detects prohibited behaviour of learners during tests (EU AI Act Annex III point 3(d)), does the deployer inform each learner that a high-risk AI system is being used, as Article 26(11) requires, and route every flag to a human reviewer before any sanction?",
         "weight": 8
+      },
+      {
+        "dimension": "Transparency",
+        "id": "EDU-ST-16",
+        "l1": "No notice, explanation, correction or human-review path",
+        "l3": "Notice exists; adverse-outcome descriptions and human review are manual and untracked",
+        "l5": "Automated notice at interaction; adverse-outcome descriptions issued within 30 days; tracked correction and human-reconsideration requests; records kept at least 3 years",
+        "regulatoryRef": "Colorado SB26-189",
+        "text": "Where the agent is used in decisions about access to or eligibility for education or training for Colorado consumers, does the deployer support the Colorado SB26-189 deployer duties (act signed 2026-05-14; developer documentation duties from 2027-01-01): notice at the point of interaction, a plain-language description of the technology's role within 30 days after an adverse outcome, correction of factually inaccurate personal data, meaningful human reconsideration on request, and records kept at least 3 years?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -9861,37 +9941,37 @@
       "Loss of traditional art forms through AI-driven curriculum modernization",
       "Assessment bias against non-Western artistic traditions"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Specialized Education",
     "questions": [
       {
         "dimension": "Ethics",
         "id": "EDU-SE-1",
-        "l1": "No creative protection; AI assistance may standardize artistic output and suppress individual creative expression",
-        "l3": "Agent provides AI tools with creative freedom options, but does not systematically assess AI impact on creative development or protect artistic individuality",
-        "l5": "Full creative expression protection with AI assistance boundaries, individual style preservation, creative process documentation, AI-free creation options, and regular assessment of AI impact on creative development per UNESCO Seoul Agenda",
-        "regulatoryRef": "UNESCO Seoul Agenda for Arts Education Goal 3",
-        "text": "Does the agent protect creative expression and prevent AI homogenization per UNESCO Seoul Agenda for Arts Education Goal 3?",
+        "l1": "No AI-free mode; educators cannot see how much of a student's work is AI-generated",
+        "l3": "An AI-free mode exists, but the AI-generated share is not reported per portfolio",
+        "l5": "An AI-free mode is available for every creative tool; the AI-generated share is computed from logged contributions and reported per portfolio; educators can require AI-free work per assignment",
+        "regulatoryRef": "UNESCO Seoul Agenda (2010) Goal 3 (non-binding)",
+        "text": "Does the agent offer an AI-free creation mode and report to educators the share of AI-generated content in each student's portfolio, so educators can evaluate individual expression?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "EDU-SE-2",
-        "l1": "No IP management; AI-assisted creative works have unclear ownership and attribution",
-        "l3": "Agent tracks AI contribution to creative works and applies basic licensing, but does not implement comprehensive IP governance or training data attribution",
-        "l5": "Full IP governance with AI contribution tracking, clear ownership determination, Creative Commons licensing support, training data attribution, fair use assessment, and transparent IP policy for AI-assisted creative works per EU Copyright Directive",
-        "regulatoryRef": "EU Copyright Directive 2019/790 Art. 17; Creative Commons License Framework",
-        "text": "Does the agent manage intellectual property in AI-assisted creative works per EU Copyright Directive 2019/790 Article 17 and Creative Commons licensing?",
+        "l1": "Protected works are reproduced or adapted for learners with no teaching-exception scope check or source record",
+        "l3": "Sources are recorded, but there is no check that use stays within illustration for teaching or is non-commercial",
+        "l5": "Each use of a protected work is checked against the Art. 5 scope (illustration for teaching, non-commercial, under the establishment's responsibility), the source is recorded and shown to learners, and out-of-scope uses are blocked or routed for licensing",
+        "regulatoryRef": "Directive (EU) 2019/790 Art. 5",
+        "text": "When the agent reproduces or adapts protected works for learners, does it stay within the EU teaching exception — digital use for the sole purpose of illustration for teaching, to the extent justified by the non-commercial purpose (Directive (EU) 2019/790 Art. 5) — and record the source of each work used?",
         "weight": 12
       },
       {
         "dimension": "Ethics",
         "id": "EDU-SE-3",
-        "l1": "No cultural sensitivity; AI-generated content may appropriate or misrepresent cultural traditions without context or attribution",
-        "l3": "Agent includes cultural context information and attribution for cultural references, but does not implement comprehensive cultural sensitivity assessment or community consultation",
-        "l5": "Comprehensive cultural sensitivity with community consultation integration, cultural context preservation, attribution requirements, cultural appropriation detection, diverse cultural representation, and cultural heritage protection per UNESCO Convention Art. 7",
-        "regulatoryRef": "UNESCO Convention on Cultural Diversity 2005 Art. 7",
-        "text": "Does the agent ensure cultural sensitivity and prevent cultural appropriation per UNESCO Convention on Cultural Diversity 2005 Article 7?",
+        "l1": "Generated content uses cultural motifs with no attribution and no restriction mechanism",
+        "l3": "Attribution is generated, but restricted-motif lists are not configurable or overrides are not logged",
+        "l5": "Cultural sources are attributed in every generated work; restricted-motif lists are configured with named community stakeholders; overrides are logged and reviewed",
+        "regulatoryRef": "UNESCO Convention on the Protection and Promotion of the Diversity of Cultural Expressions (2005) Art. 7 (non-binding on providers)",
+        "text": "Does the agent attribute cultural sources in generated creative content, apply configurable restricted-motif lists agreed with community stakeholders, and log overrides?",
         "weight": 12
       },
       {
@@ -9908,30 +9988,40 @@
         "dimension": "Safety",
         "id": "EDU-SE-5",
         "l1": "No content safety; AI creative tools may generate inappropriate content or fail to label AI-generated works",
-        "l3": "Agent applies basic content filtering and AI content labeling, but does not implement age-appropriate creative tool configurations or comprehensive content safety",
-        "l5": "Full content safety with age-appropriate tool configuration, AI content labeling per Art. 50, harmful content prevention, creative freedom within safety boundaries, and transparent content moderation for educational creative contexts",
-        "regulatoryRef": "EU AI Act Art. 50; COPPA (if minors)",
-        "text": "Does the agent implement content safety for creative AI tools per EU AI Act Article 50 transparency for AI-generated content and age-appropriate safeguards?",
+        "l3": "Agent applies basic content filtering and AI content labeling, but does not implement comprehensive content safety",
+        "l5": "Full content safety with AI content labeling per Art. 50, harmful content prevention, creative freedom within safety boundaries, and transparent content moderation for educational creative contexts",
+        "regulatoryRef": "EU AI Act Art. 50",
+        "text": "Does the agent implement content safety for creative AI tools per EU AI Act Article 50 transparency for AI-generated content?",
+        "weight": 12
+      },
+      {
+        "dimension": "Safety",
+        "id": "EDU-SE-18",
+        "l1": "Children under 13 can upload or record work with no age screen and no verifiable parental consent record",
+        "l3": "An age screen routes under-13 users to parental consent, but uploads, recordings or images are collected before consent is recorded",
+        "l5": "Every under-13 account has a verifiable parental consent record before any collection; uploads, recordings and images are blocked until consent is recorded; withdrawal stops processing and is logged",
+        "regulatoryRef": "COPPA 16 CFR §312.5(a)(1)",
+        "text": "Where the agent's creative tools are offered to children under 13 in the US, does the operator obtain verifiable parental consent before any collection, use or disclosure of a child's personal information, including uploaded creative works, voice or images (COPPA, 16 CFR §312.5(a)(1))?",
         "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "EDU-SE-6",
-        "l1": "No pedagogical transparency; teachers cannot understand or control how AI tools influence creative learning processes",
-        "l3": "Agent provides basic documentation of AI tool capabilities, but does not support teacher AI literacy or pedagogical integration guidance",
-        "l5": "Full pedagogical transparency with teacher AI literacy support, pedagogical integration guidance, learning outcome alignment documentation, AI tool capability/limitation disclosure, and educator feedback integration per ISTE standards",
-        "regulatoryRef": "ISTE Standards for Educators §1-2",
-        "text": "Does the agent provide pedagogical transparency per ISTE Standards for Educators and support teacher understanding of AI creative tools?",
+        "l1": "Educators get no description of capabilities or limits and no session logs",
+        "l3": "A capability sheet exists, but per-session logs or the educator override are missing",
+        "l5": "A versioned capability and limitation sheet, per-session interaction logs available to the educator, and a documented, tested educator override",
+        "regulatoryRef": "EU AI Act Art. 13 (where the tool is a high-risk AI system)",
+        "text": "Does the agent publish, for educators, a capability and limitation sheet and per-session AI interaction logs for its creative tools, with a documented educator override?",
         "weight": 12
       },
       {
         "dimension": "Traceability",
         "id": "EDU-SE-7",
-        "l1": "No process documentation; the creative process including AI assistance is not recorded for assessment or attribution",
-        "l3": "Agent logs AI interactions during creative work, but does not integrate with portfolio assessment or provide comprehensive process documentation",
-        "l5": "Full creative process documentation with AI interaction logging, portfolio integration, attribution tracking, creative development timeline, process-over-product assessment support, and transparent AI contribution disclosure",
-        "regulatoryRef": "Portfolio Assessment Best Practices; EU AI Act Art. 50",
-        "text": "Does the agent maintain creative process documentation per portfolio-based assessment requirements and support attribution of AI-assisted elements?",
+        "l1": "Generated outputs carry no machine-readable marking",
+        "l3": "Outputs carry a visible label, but no machine-readable marking, or the marking is not tested for detectability",
+        "l5": "Every generated output carries machine-readable marking that a detector test confirms on each release",
+        "regulatoryRef": "EU AI Act Art. 50(2)",
+        "text": "Does the agent mark its generated or manipulated outputs in a machine-readable, detectable way (EU AI Act Art. 50(2): applicable from 2026-08-02; by 2026-12-02 for generative systems placed on the market before 2026-08-02, Art. 111)?",
         "weight": 13
       },
       {
@@ -9940,8 +10030,18 @@
         "l1": "No accessibility for creative tools; AI creative interfaces are not accessible to learners with disabilities",
         "l3": "Agent meets basic accessibility standards, but creative tool interfaces may not support alternative input methods or sensory accommodations",
         "l5": "Full accessibility with WCAG 2.1 AA creative tool compliance, alternative input support (switch, voice, eye-tracking), sensory accommodation, multimodal creative expression, and regular accessibility testing with diverse learner groups",
-        "regulatoryRef": "WCAG 2.1 AA; Section 508; EU Web Accessibility Directive",
+        "regulatoryRef": "WCAG 2.1 AA",
         "text": "Does the agent ensure digital accessibility for specialized education per WCAG 2.1 AA and support diverse learning modalities in creative contexts?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "EDU-SE-17",
+        "l1": "No accessibility statement covers the creative tools and learners have no way to report accessibility problems",
+        "l3": "An accessibility statement exists, but it does not list the tools' non-accessible content and alternatives, or the feedback mechanism is not answered",
+        "l5": "The accessibility statement lists each tool's non-accessible content, alternatives and contacts and is updated each release; feedback requests are logged and answered, and inaccessible content is provided on request",
+        "regulatoryRef": "Directive (EU) 2016/2102",
+        "text": "Where the agent's creative tools are provided on a website or mobile app of a public sector body in scope of the EU Web Accessibility Directive (EU) 2016/2102, does the body publish an accessibility statement that covers the tools — non-accessible content, alternatives and contacts — and offer a feedback mechanism through which learners can flag accessibility problems or request inaccessible content?",
         "weight": 12
       },
       {
@@ -9950,29 +10050,19 @@
         "l1": "No TDM exception compliance; AI educational agents train on student creative works without assessing Art. 4 TDM exception boundaries or implementing Recital 18 machine-readable opt-out reservation mechanism",
         "l3": "Agent respects basic copyright for published works, but does not implement Art. 4 TDM exception boundary assessment or Recital 18 opt-out reservation detection for student creative works used in AI training",
         "l5": "Full EU Copyright Directive Art. 4 compliance with TDM exception boundary enforcement, Recital 18 machine-readable opt-out detection, student creative work provenance tracking, AI training data licensing documentation, and transparent copyright governance for educational AI",
-        "regulatoryRef": "EU Copyright Directive 2019/790 Art. 4; Recital 18",
+        "regulatoryRef": "EU Copyright Directive 2019/790 Art. 4; EU Copyright Directive 2019/790 Recital 18",
         "text": "Does the agent implement EU Copyright Directive 2019/790 Article 4 text and data mining exception boundaries including Recital 18 machine-readable opt-out reservation for AI training on student creative works?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "EDU-SE-10",
-        "l1": "No Revised 508 Standards coverage; creative tools may be unusable with keyboard or assistive technologies despite surface WCAG claims",
-        "l3": "Meets some Revised 508 Standards expectations (keyboard and focus) but programmatic exposure/assistive technology testing and complex creative controls remain partially inaccessible",
-        "l5": "Full Revised 508 Standards conformance with keyboard-only workflows, robust focus management, programmatic UI exposure for assistive technology, accessible complex controls (timelines/canvases), regression testing, and documented VPAT-ready evidence",
-        "regulatoryRef": "Section 508 — 36 CFR Part 1194 Appendices A and C (Revised 508 Standards)",
-        "text": "Does the agent ensure Section 508 software/application accessibility under 36 CFR Part 1194 Appendices A and C (Revised 508 Standards) for specialized education creative tools (e.g., keyboard operability, focus indication, programmatic access to UI elements for assistive technology, no reliance on color alone, and accessible dialogs/controls) in addition to WCAG content conformance?",
+        "l1": "No Revised 508 evidence; creative tools may be unusable with keyboard or assistive technology",
+        "l3": "A conformance report exists but is based on the pre-2017 §1194.21 criteria, or assistive-technology interoperability (502) is untested",
+        "l5": "An accessibility conformance report against the Revised 508 Standards, with WCAG 2.0 A/AA and 502-504 test evidence for each creative tool and regression testing each release",
+        "regulatoryRef": "Section 508 36 CFR Part 1194 Appendix A E207.2; Section 508 36 CFR Part 1194 Appendix C Chapter 5",
+        "text": "For U.S. federal procurement contexts, do the agent's creative tools meet the Revised Section 508 Standards for software — WCAG 2.0 Level A and AA for user-interface components and content (36 CFR Part 1194 Appendix A E207.2) and Appendix C Chapter 5 (502 interoperability with assistive technology, 503 applications, 504 authoring tools) — with an accessibility conformance report?",
         "weight": 15
-      },
-      {
-        "dimension": "Governance",
-        "id": "EDU-SE-11",
-        "l1": "No Goal 2 support; arts education capacity-building is not planned or evidenced, and programs depend on ad-hoc tooling rather than sustainable capability",
-        "l3": "Supports some professional development resources and partnership suggestions, but capacity-building is not measurable, resourcing is not tracked, and equity outcomes are not monitored",
-        "l5": "Full Goal 2 operationalization with professional development pathways, partnership MoU templates, resource/capability maturity tracking, equitable access monitoring, and audit-ready governance outputs showing capacity growth over time",
-        "regulatoryRef": "UNESCO Seoul Agenda (2010) - Goal 2",
-        "text": "Does the agent support UNESCO Seoul Agenda 2010 Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
-        "weight": 12
       },
       {
         "dimension": "Safety",
@@ -9983,16 +10073,6 @@
         "regulatoryRef": "WHO ICF - b117 Intellectual functions",
         "text": "Does the agent implement ICF-informed educational supports by recognizing and accommodating learner functioning profiles, including WHO ICF b117 (intellectual functions), through adjustable cognitive load, memory supports, pacing controls, comprehension checks, and non-stigmatizing scaffolds with documented effectiveness monitoring?",
         "weight": 12
-      },
-      {
-        "dimension": "Transparency",
-        "id": "EDU-SE-13",
-        "l1": "No 1b support; educators lack structured learning/feedback loops and professional learning network support for AI creative pedagogy",
-        "l3": "Provides some guidance and resources, but feedback loops and evidence of professional learning/network participation are inconsistent or manual",
-        "l5": "Full 1b support with structured reflective practice, feedback collection, professional learning network participation workflows, measurable professional development outcomes, and evidence exports for instructional leadership",
-        "regulatoryRef": "ISTE Standards (2023) - 1b",
-        "text": "Does the agent operationalize ISTE Standards 2023 1b by supporting educator learning and networked practice (e.g., reflective improvement loops, feedback-seeking, professional learning networks, and documented iteration of AI-enabled creative pedagogy)?",
-        "weight": 10
       },
       {
         "dimension": "Compliance",
@@ -10006,13 +10086,13 @@
       },
       {
         "dimension": "Governance",
-        "id": "EDU-SE-15",
-        "l1": "No scope gating; accessibility claims are generic and evidence artifacts are missing or mismatched by jurisdiction",
-        "l3": "Maintains a manual matrix, but rollout gating and evidence retention are inconsistent across products and regions",
-        "l5": "Automated scope gating with jurisdiction mapping, VPAT/evidence bundle generation, and release checks that block deployment until locale-appropriate accessibility obligations are met",
-        "regulatoryRef": "Accessibility scope gating",
-        "text": "Does the program maintain a jurisdictional accessibility compliance matrix (e.g., U.S. Revised Section 508 Standards/VPAT vs EU accessibility directives), and gate rollout/procurement on completion of the correct evidence bundle for each deployment context?",
-        "weight": 6
+        "id": "EDU-SE-16",
+        "l1": "No AI literacy material or training for educators using the tools",
+        "l3": "Generic AI material exists, but it is not specific to the tools or roles, or uptake is not recorded",
+        "l5": "Role-specific literacy material per tool version, uptake recorded per educator, and content refreshed when capabilities change",
+        "regulatoryRef": "EU AI Act Art. 4",
+        "text": "Do educators who use the agent's creative tools benefit from measures the provider and deploying institution take to support their AI literacy (EU AI Act Art. 4(1) as amended by Regulation (EU) 2026/1744) — role-specific material on the tools' capabilities, limits, marking of AI output and when to override?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
