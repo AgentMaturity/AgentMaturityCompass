@@ -1,4 +1,10 @@
-import type { ComplianceGap, DomainAssessmentResult, DomainRoadmapItem } from "./domainAssessmentEngine.js";
+import type {
+  CertificationOutcome,
+  ComplianceGap,
+  DomainAssessmentResult,
+  DomainRoadmapItem,
+  EuAIActClassification
+} from "./domainAssessmentEngine.js";
 
 export interface ExecutiveSummary {
   domain: string;
@@ -29,6 +35,8 @@ export interface DomainReport {
   complianceGapAnalysis: ComplianceGapGroup[];
   roadmap: DomainRoadmapItem[];
   regulatoryWarnings: string[];
+  euAIActClassification: EuAIActClassification;
+  certification: CertificationOutcome;
   markdown: string;
 }
 
@@ -57,17 +65,41 @@ function moduleRows(result: DomainAssessmentResult): ModuleActivationRow[] {
   }));
 }
 
-function renderExecutiveSummary(summary: ExecutiveSummary): string {
+function renderExecutiveSummary(summary: ExecutiveSummary, certification: CertificationOutcome): string {
   return [
     "## Executive Summary",
     `- Domain: ${summary.domain}`,
     `- Level: ${summary.level}`,
     `- Certification Readiness: ${summary.certificationReadiness ? "yes" : "no"}`,
+    `- Certification Threshold: composite ${certification.comparison} ${certification.threshold} and no critical control at L1`,
+    `- Threshold Met: ${certification.meetsThreshold ? "yes" : "no"} (composite ${certification.compositeScore})`,
+    `- Blocking Critical Gaps: ${certification.blockingGaps.length > 0 ? certification.blockingGaps.join(", ") : "none"}`,
     `- Base Score: ${summary.baseScore}`,
     `- Domain Score: ${summary.domainScore}`,
     `- Composite Score: ${summary.compositeScore}`,
     ""
   ].join("\n");
+}
+
+function renderEuAIActClassification(classification: EuAIActClassification): string {
+  const lines = [
+    "## EU AI Act Classification",
+    `- Station category: ${classification.domainCategory}`,
+    "",
+    "| Pack | Classification | Annex III Points | General Purpose AI |",
+    "|---|---|---|---|"
+  ];
+  for (const pack of classification.packs) {
+    lines.push(
+      `| ${pack.packId} | ${pack.classification.replace(/\|/g, "\\|")} | ${pack.annexIIIPoints.join(", ") || "-"} | ${pack.generalPurpose ? "yes" : "no"} |`
+    );
+  }
+  const prohibited = classification.packs.filter((pack) => pack.prohibitedFlag).map((pack) => pack.packId);
+  if (prohibited.length > 0) {
+    lines.push("", `- Art. 5 prohibition flagged (check the use against Art. 5): ${prohibited.join(", ")}`);
+  }
+  lines.push("");
+  return lines.join("\n");
 }
 
 function renderModuleActivationTable(rows: ModuleActivationRow[]): string {
@@ -138,8 +170,8 @@ function renderRegulatoryWarnings(warnings: string[]): string {
   ].join("\n");
 }
 
-export function renderDomainReportMarkdown(result: DomainAssessmentResult): string {
-  const summary: ExecutiveSummary = {
+function executiveSummary(result: DomainAssessmentResult): ExecutiveSummary {
+  return {
     domain: result.domainMetadata.name,
     level: result.level,
     certificationReadiness: result.certificationReadiness,
@@ -147,12 +179,16 @@ export function renderDomainReportMarkdown(result: DomainAssessmentResult): stri
     domainScore: result.domainScore,
     compositeScore: result.compositeScore
   };
+}
 
+/** `now` (epoch ms) makes the rendered report deterministic; it defaults to the current time. */
+export function renderDomainReportMarkdown(result: DomainAssessmentResult, now: number = Date.now()): string {
   const sections = [
     `# AMC Domain Report: ${result.domainMetadata.name}`,
-    `Generated: ${new Date().toISOString()}`,
+    `Generated: ${new Date(now).toISOString()}`,
     "",
-    renderExecutiveSummary(summary),
+    renderExecutiveSummary(executiveSummary(result), result.certification),
+    renderEuAIActClassification(result.euAIActClassification),
     renderModuleActivationTable(moduleRows(result)),
     renderComplianceGaps(groupGapsByRegulation(result.complianceGaps)),
     renderRoadmap(result.roadmap),
@@ -162,21 +198,16 @@ export function renderDomainReportMarkdown(result: DomainAssessmentResult): stri
   return sections.join("\n");
 }
 
-export function buildDomainReport(result: DomainAssessmentResult): DomainReport {
+export function buildDomainReport(result: DomainAssessmentResult, now: number = Date.now()): DomainReport {
   return {
-    generatedAt: new Date().toISOString(),
-    executiveSummary: {
-      domain: result.domainMetadata.name,
-      level: result.level,
-      certificationReadiness: result.certificationReadiness,
-      baseScore: result.baseScore,
-      domainScore: result.domainScore,
-      compositeScore: result.compositeScore
-    },
+    generatedAt: new Date(now).toISOString(),
+    executiveSummary: executiveSummary(result),
     moduleActivationTable: moduleRows(result),
     complianceGapAnalysis: groupGapsByRegulation(result.complianceGaps),
     roadmap: [...result.roadmap],
     regulatoryWarnings: [...result.regulatoryWarnings],
-    markdown: renderDomainReportMarkdown(result)
+    euAIActClassification: result.euAIActClassification,
+    certification: result.certification,
+    markdown: renderDomainReportMarkdown(result, now)
   };
 }
