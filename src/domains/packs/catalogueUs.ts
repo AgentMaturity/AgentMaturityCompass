@@ -82,4 +82,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+  verified("us-ppra", "Protection of Pupil Rights Amendment (20 U.S.C. §1232h) and regulations (34 CFR Part 98)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2025-title34-vol1/xml/CFR-2025-title34-vol1-sec98-4.xml",
+    ["PPRA"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "34 CFR §98.4 read on govinfo (CFR 2025 edition, revised as of 2025-07-01); the statute was not read (uscode.house.gov maintenance page on 2026-10-03)." }),
 ];
