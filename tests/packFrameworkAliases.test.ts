@@ -1,6 +1,11 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { listIndustryPacks } from "../src/domains/industryPacks.js";
-import { frameworkChoices, getFrameworkFamily, normalizeFrameworkName } from "../src/compliance/frameworks.js";
+import { classifyFrameworkString, frameworkChoices, getFrameworkFamily, normalizeFrameworkName } from "../src/compliance/frameworks.js";
+
+const unresolvedFixture = JSON.parse(
+  readFileSync(new URL("./fixtures/packFrameworkStrings.unresolved.json", import.meta.url), "utf8")
+) as { reason: string; strings: string[] };
 
 // Every string below was taken verbatim from an industry pack's complianceFrameworks
 // at 8f57ce63 and names a framework AMC has control mappings for.
@@ -35,7 +40,7 @@ const PACK_STRINGS_FOR_SUPPORTED_FRAMEWORKS: Record<string, string> = {
   "SOC 2 Type II": "SOC2",
   "EU DORA Art. 9": "DORA",
   "EU NIS2 2022/2555": "NIS2",
-  "ONC 45 CFR §170": "ONC_HTI_1",
+  "ONC 45 CFR §170": "HHS_HTI_1",
 };
 
 // Pack strings that look close to a supported framework but are different instruments.
@@ -50,6 +55,21 @@ const MUST_NOT_RESOLVE = [
   "EU Data Act 2023/2854",
   "CCPA/CPRA",
 ];
+
+// Names an operator or a future pack may use for the families added for the stations.
+const STATION_FAMILY_NAMES: Record<string, string> = {
+  "NIST AI 600-1": "NIST_AI_600_1",
+  "Colorado AI Act": "CO_AI_ACT",
+  "SB26-189": "CO_AI_ACT",
+  "Texas HB 149": "TX_TRAIGA",
+  "TRAIGA": "TX_TRAIGA",
+  "California SB 53": "CA_AI_LAWS",
+  "AB 2013": "CA_AI_LAWS",
+  "CCPA ADMT regulations": "CA_AI_LAWS",
+  "Korea AI Basic Act": "KR_AI_BASIC_ACT",
+  "HHS HTI-1": "HHS_HTI_1",
+  "PCI DSS v4.0.1": "PCI_DSS",
+};
 
 describe("normalizeFrameworkName", () => {
   test.each(Object.entries(PACK_STRINGS_FOR_SUPPORTED_FRAMEWORKS))("%s -> %s", (input, expected) => {
@@ -67,20 +87,42 @@ describe("normalizeFrameworkName", () => {
     expect(normalizeFrameworkName("pci-dss")).toBe("PCI_DSS");
     expect(normalizeFrameworkName("dora")).toBe("DORA");
     expect(normalizeFrameworkName("nis2")).toBe("NIS2");
-    expect(normalizeFrameworkName("hti-1")).toBe("ONC_HTI_1");
+    expect(normalizeFrameworkName("hti-1")).toBe("HHS_HTI_1");
     expect(normalizeFrameworkName("nis-2")).toBe("NIS2");
-    expect(normalizeFrameworkName("onc-hti-1")).toBe("ONC_HTI_1");
+    expect(normalizeFrameworkName("onc-hti-1")).toBe("HHS_HTI_1");
+    expect(normalizeFrameworkName("ONC_HTI_1")).toBe("HHS_HTI_1");
+  });
+
+  test.each(Object.entries(STATION_FAMILY_NAMES))("%s -> %s", (input, expected) => {
+    expect(normalizeFrameworkName(input)).toBe(expected);
   });
 
   test("new frameworks are first-class families", () => {
-    for (const id of ["DORA", "NIS2", "ONC_HTI_1"]) {
+    for (const id of ["DORA", "NIS2", "HHS_HTI_1", "NIST_AI_600_1", "CO_AI_ACT", "TX_TRAIGA", "CA_AI_LAWS", "KR_AI_BASIC_ACT"]) {
       expect(frameworkChoices()).toContain(id);
       expect(getFrameworkFamily(id).categories.length).toBeGreaterThan(0);
     }
   });
 });
 
+describe("classifyFrameworkString", () => {
+  test("says how each string resolved", () => {
+    expect(classifyFrameworkString("DORA")).toEqual({ framework: "DORA", reason: "exact" });
+    expect(classifyFrameworkString("soc-2")).toEqual({ framework: "SOC2", reason: "alias" });
+    expect(classifyFrameworkString("SOC 2 Type II")).toEqual({ framework: "SOC2", reason: "pattern" });
+    expect(classifyFrameworkString("NIST CSF 2.0")).toEqual({ framework: null, reason: "sector-standard-not-modelled" });
+  });
+});
+
 describe("industry pack framework strings", () => {
+  test("the unresolved set equals the committed fixture, each classified as not modelled", () => {
+    const strings = new Set(listIndustryPacks().flatMap((pack) => pack.complianceFrameworks));
+    const unresolved = [...strings].filter((value) => classifyFrameworkString(value).framework === null).sort();
+    expect(unresolvedFixture.reason).toBe("sector-standard-not-modelled");
+    expect(unresolved).toEqual([...unresolvedFixture.strings].sort());
+    for (const value of unresolved) expect(classifyFrameworkString(value).reason).toBe("sector-standard-not-modelled");
+  });
+
   test("every pack string either resolves to a supported framework or is reported as external", () => {
     const citedBy = new Map<string, string[]>();
     for (const pack of listIndustryPacks()) {

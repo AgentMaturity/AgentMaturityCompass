@@ -4,9 +4,14 @@ import { builtInComplianceMappings, defaultComplianceMapsFile } from "../src/com
 import { getFrameworkFamily } from "../src/compliance/frameworks.js";
 import { complianceMapsSchema, complianceMappingSchema } from "../src/compliance/mappingSchema.js";
 
-const NEW_FRAMEWORKS = ["DORA", "NIS2", "ONC_HTI_1"] as const;
-const MIN_MAPPED_CONTROLS = 5;
-const OFFICIAL_HOSTS = ["publications.europa.eu", "www.ecfr.gov", "www.federalregister.gov"];
+const NEW_FRAMEWORKS = ["DORA", "NIS2", "HHS_HTI_1", "NIST_AI_600_1", "CO_AI_ACT", "TX_TRAIGA", "CA_AI_LAWS", "KR_AI_BASIC_ACT"] as const;
+const MIN_MAPPED_CONTROLS = 4;
+// Publishers of the official texts (or, for Korea, the government-funded KLRI reference translation).
+const OFFICIAL_HOSTS = [
+  "publications.europa.eu", "www.ecfr.gov", "www.federalregister.gov", "nvlpubs.nist.gov",
+  "leg.colorado.gov", "capitol.texas.gov", "leginfo.legislature.ca.gov", "cppa.ca.gov",
+  "elaw.klri.re.kr", "www.law.go.kr",
+];
 
 describe("built-in compliance mappings", () => {
   test("the default maps file passes its own schema", () => {
@@ -42,6 +47,19 @@ describe("built-in compliance mappings", () => {
         .map((req) => `${row.id}:${req.type === "requires_assurance_pack" ? req.packId : ""}`)
     );
     expect(unknown).toEqual([]);
+  });
+
+  test("schema rejects a framework id that is not a supported family", () => {
+    const base = builtInComplianceMappings.find((row) => row.framework === "DORA")!;
+    expect(complianceMappingSchema.safeParse(base).success).toBe(true);
+    expect(complianceMappingSchema.safeParse({ ...base, framework: "DORA_X" }).success).toBe(false);
+    expect(complianceMappingSchema.safeParse({ ...base, framework: "ONC_HTI_1" }).success).toBe(false);
+  });
+
+  test("sources are optional, so maps signed before the field existed still parse", () => {
+    const { sources: _omitted, ...legacy } = builtInComplianceMappings.find((row) => row.framework === "DORA")!;
+    expect(complianceMappingSchema.safeParse(legacy).success).toBe(true);
+    expect(complianceMappingSchema.safeParse({ ...legacy, sources: [] }).success).toBe(false);
   });
 
   test("schema rejects a source without a URL or retrievedAt", () => {

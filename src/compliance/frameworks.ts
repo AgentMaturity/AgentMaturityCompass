@@ -1,4 +1,9 @@
-export type ComplianceFramework = "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS" | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS" | "DORA" | "NIS2" | "ONC_HTI_1";
+import { frameworkAliases, frameworkNamePatterns } from "./frameworks/aliases.js";
+
+export type ComplianceFramework =
+  | "SOC2" | "NIST_AI_RMF" | "ISO_27001" | "ISO_42001" | "EU_AI_ACT" | "GDPR" | "MITRE_ATLAS"
+  | "OWASP_API_TOP10" | "HIPAA" | "SOX" | "FEDRAMP" | "PCI_DSS" | "DORA" | "NIS2" | "HHS_HTI_1"
+  | "NIST_AI_600_1" | "CO_AI_ACT" | "TX_TRAIGA" | "CA_AI_LAWS" | "KR_AI_BASIC_ACT";
 
 export interface ComplianceFrameworkFamily {
   framework: ComplianceFramework;
@@ -174,7 +179,7 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
   },
   {
     framework: "PCI_DSS",
-    displayName: "PCI DSS v4.0 (Payment Card Industry Data Security Standard)",
+    displayName: "PCI DSS v4.0.1 (Payment Card Industry Data Security Standard)",
     categories: [
       "Req 1 Install and Maintain Network Security Controls",
       "Req 2 Apply Secure Configurations",
@@ -230,8 +235,8 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
   },
   {
     // Categories follow the decision support interventions criterion added by HTI-1 (89 FR 1192, 2024-01-09).
-    framework: "ONC_HTI_1",
-    displayName: "ONC HTI-1 (45 CFR Part 170) — Decision Support Interventions §170.315(b)(11)",
+    framework: "HHS_HTI_1",
+    displayName: "HHS HTI-1 (45 CFR Part 170) — Decision Support Interventions §170.315(b)(11)",
     categories: [
       "§170.315(b)(11)(ii)(C) Intervention feedback",
       "§170.315(b)(11)(iv) Source attributes",
@@ -240,24 +245,76 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "§170.315(b)(11)(vi)(B) Risk mitigation",
       "§170.315(b)(11)(vi)(C) Governance"
     ]
+  },
+  {
+    // The twelve GAI risks of NIST AI 600-1 (July 2024), §2.1-§2.12, named as the profile names them.
+    framework: "NIST_AI_600_1",
+    displayName: "NIST AI 600-1 (AI RMF Generative AI Profile, July 2024) — GAI Risks",
+    categories: [
+      "2.1 CBRN Information or Capabilities",
+      "2.2 Confabulation",
+      "2.3 Dangerous, Violent, or Hateful Content",
+      "2.4 Data Privacy",
+      "2.5 Environmental Impacts",
+      "2.6 Harmful Bias and Homogenization",
+      "2.7 Human-AI Configuration",
+      "2.8 Information Integrity",
+      "2.9 Information Security",
+      "2.10 Intellectual Property",
+      "2.11 Obscene, Degrading, and/or Abusive Content",
+      "2.12 Value Chain and Component Integration"
+    ]
+  },
+  {
+    // SB26-189 repealed and reenacted C.R.S. 6-1-1701 to 6-1-1709 (signed 2026-05-14; takes effect 2027-01-01).
+    framework: "CO_AI_ACT",
+    displayName: "Colorado SB26-189 (C.R.S. 6-1-1701 to 1709) — ADMT in Consequential Decisions",
+    categories: [
+      "§6-1-1702 Developer documentation",
+      "§6-1-1702(4), §6-1-1703 Record keeping",
+      "§6-1-1704 Deployer notice and post-adverse outcome disclosure",
+      "§6-1-1705 Correction, human review and reconsideration"
+    ]
+  },
+  {
+    // Texas HB 149 (89th Leg.), Business & Commerce Code ch. 552; takes effect 2026-01-01.
+    framework: "TX_TRAIGA",
+    displayName: "Texas TRAIGA (HB 149, Bus. & Com. Code ch. 552)",
+    categories: [
+      "§552.051 Disclosure to consumers",
+      "§552.052 Manipulation of human behavior",
+      "§552.056 Unlawful discrimination",
+      "§552.057 Sexually explicit content",
+      "§552.103 Civil investigative demand documentation"
+    ]
+  },
+  {
+    // SB 53 (2025, B&P ch. 25.1), AB 2013 (2024, Civ. Code §3111) and the CCPA ADMT regulations (11 CCR §7200-7222).
+    framework: "CA_AI_LAWS",
+    displayName: "California AI statutes — SB 53, AB 2013, CCPA ADMT regulations",
+    categories: [
+      "SB 53 B&P §22757.12(a) Frontier AI framework",
+      "SB 53 B&P §22757.12(c) Transparency report",
+      "SB 53 B&P §22757.13 Critical safety incident reporting",
+      "AB 2013 Civ. Code §3111 Training data documentation",
+      "11 CCR §7220 ADMT pre-use notice",
+      "11 CCR §7221 ADMT opt-out and human appeal",
+      "11 CCR §7222 ADMT access"
+    ]
+  },
+  {
+    // Act No. 20676 (2025-01-21), amended by Act No. 21311 (2026-01-20); in force 2026-01-22.
+    framework: "KR_AI_BASIC_ACT",
+    displayName: "Korea AI Basic Act (Act No. 20676) — High-Impact and Generative AI Duties",
+    categories: [
+      "Art. 31 Transparency",
+      "Art. 32 Safety",
+      "Art. 33 High-impact AI confirmation",
+      "Art. 34 High-impact AI operator measures",
+      "Art. 35 Fundamental-rights impact assessment",
+      "Art. 36 Domestic representative"
+    ]
   }
-];
-
-// Versioned or clause-qualified names as industry packs cite them ("GDPR Art. 9", "PCI DSS v4.0").
-// Each pattern is anchored at the start so a different instrument ("NIST CSF 2.0") stays unresolved.
-const frameworkNamePatterns: Array<[RegExp, ComplianceFramework]> = [
-  [/^(eu )?gdpr\b/, "GDPR"],
-  [/^eu ai act\b/, "EU_AI_ACT"],
-  [/^hipaa\b/, "HIPAA"],
-  [/^iso(\/iec)? ?27001\b/, "ISO_27001"],
-  [/^iso(\/iec)? ?42001\b/, "ISO_42001"],
-  [/^nist ai rmf\b/, "NIST_AI_RMF"],
-  [/^owasp api (security )?top ?10\b/, "OWASP_API_TOP10"],
-  [/^pci ?dss\b/, "PCI_DSS"],
-  [/^soc ?2\b/, "SOC2"],
-  [/^(eu )?dora\b/, "DORA"],
-  [/^(eu )?nis ?2\b/, "NIS2"],
-  [/^(onc )?(hti-1\b|45 cfr (§ ?|part )?170\b)/, "ONC_HTI_1"],
 ];
 
 export function frameworkChoices(): ComplianceFramework[] {
@@ -272,23 +329,20 @@ export function normalizeFrameworkName(input: string): ComplianceFramework | nul
   const upper = input.toUpperCase().replace(/-/g, "_");
   const caseMatch = complianceFrameworkFamilies.find((row) => row.framework === upper);
   if (caseMatch) return caseMatch.framework;
-  // Common aliases
-  const aliases: Record<string, ComplianceFramework> = {
-    "hipaa": "HIPAA", "sox": "SOX", "fedramp": "FEDRAMP",
-    "soc2": "SOC2", "soc-2": "SOC2", "gdpr": "GDPR",
-    "eu-ai-act": "EU_AI_ACT", "eu_ai_act": "EU_AI_ACT",
-    "nist": "NIST_AI_RMF", "nist-ai-rmf": "NIST_AI_RMF", "nist_ai_rmf": "NIST_AI_RMF",
-    "iso-42001": "ISO_42001", "iso42001": "ISO_42001",
-    "iso-27001": "ISO_27001", "iso27001": "ISO_27001",
-    "mitre": "MITRE_ATLAS", "mitre-atlas": "MITRE_ATLAS",
-    "owasp": "OWASP_API_TOP10", "owasp-llm": "OWASP_API_TOP10", "owasp-api": "OWASP_API_TOP10",
-    "pci": "PCI_DSS", "pci-dss": "PCI_DSS", "pcidss": "PCI_DSS", "pci_dss": "PCI_DSS",
-    "nis-2": "NIS2", "onc-hti-1": "ONC_HTI_1",
-  };
-  const alias = aliases[input.toLowerCase()];
+  const alias = frameworkAliases[input.toLowerCase()];
   if (alias) return alias;
   const spaced = input.toLowerCase().replace(/\s+/g, " ").trim();
   return frameworkNamePatterns.find(([pattern]) => pattern.test(spaced))?.[1] ?? null;
+}
+
+export type FrameworkStringReason = "exact" | "alias" | "pattern" | "sector-standard-not-modelled";
+
+/** Says how a framework string resolved; a string naming an instrument AMC has no mappings for is reported, not silently null. */
+export function classifyFrameworkString(input: string): { framework: ComplianceFramework | null; reason: FrameworkStringReason } {
+  const framework = normalizeFrameworkName(input);
+  if (framework === null) return { framework, reason: "sector-standard-not-modelled" };
+  if (framework === input || framework === input.toUpperCase().replace(/-/g, "_")) return { framework, reason: "exact" };
+  return { framework, reason: frameworkAliases[input.toLowerCase()] ? "alias" : "pattern" };
 }
 
 export function getFrameworkFamily(framework: ComplianceFramework | string): ComplianceFrameworkFamily {
