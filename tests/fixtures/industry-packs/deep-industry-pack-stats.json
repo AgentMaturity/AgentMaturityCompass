@@ -31,21 +31,30 @@
     "unverifiedSources": 3
   },
   "finance": {
-    "questionCount": 50,
+    "questionCount": 56,
     "regulations": [
       "SOX",
+      "MiCA",
+      "DORA",
+      "Regulation B",
+      "Instant Payments Regulation",
+      "TFR",
+      "Consumer Credit Directive",
+      "Regulation S-P",
       "Basel III",
       "AML",
       "MiFID II",
       "MAR"
     ],
     "station": "wealth",
-    "unverifiedSources": 20
+    "unverifiedSources": 19
   },
   "government": {
-    "questionCount": 50,
+    "questionCount": 56,
     "regulations": [
       "FedRAMP",
+      "EU AI Act",
+      "NIST SP 800-63B-4",
       "FISMA"
     ],
     "station": "governance",
@@ -86,13 +95,17 @@
     "unverifiedSources": 3
   },
   "technology": {
-    "questionCount": 10,
+    "questionCount": 16,
     "regulations": [
       "EU AI Act",
       "Cyber Resilience Act",
       "Digital Services Act",
       "Data Act",
-      "GDPR"
+      "GDPR",
+      "Digital Markets Act",
+      "NIS2 Directive",
+      "Copyright in the Digital Single Market Directive",
+      "COPPA Rule"
     ],
     "station": "technology",
     "unverifiedSources": 0
