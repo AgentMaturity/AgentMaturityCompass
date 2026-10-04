@@ -1,0 +1,342 @@
+{
+ "track": "S6",
+ "status": "PARTIAL",
+ "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-6",
+ "branch": "worktree-wf_5210e2f4-3ea-6",
+ "headBefore": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+ "headAfter": "8fc76bd45bb80e95ea68055a39fa4baa858958c3",
+ "commits": [
+  "de349beed7b9f34787cc60893bc1a6fbe9c36c80 feat: add sourced DORA, NIS2 and HTI-1 crosswalks and resolve pack framework names",
+  "5045b665762b0b31d590f0099d60228ebee2d2c5 docs: consolidate duplicate compliance reports and date crosswalk sources",
+  "f007629b feat: add sourced NIST AI 600-1, Colorado, Texas, California and Korea crosswalks",
+  "d65cff85 docs: document new crosswalk families and date the stale compliance reports",
+  "088ca501 fix: name Texas TRAIGA categories after the statute's section headings"
+ ],
+ "filesChanged": [
+  "src/compliance/frameworks.ts",
+  "src/compliance/frameworks/aliases.ts (new)",
+  "src/compliance/builtInMappings.ts",
+  "src/compliance/mappingSchema.ts (round 1)",
+  "src/compliance/controlCrosswalk.ts (round 1)",
+  "src/compliance/coverageScorer.ts (round 1)",
+  "tests/packFrameworkAliases.test.ts (renamed from frameworks.test.ts)",
+  "tests/mappingSources.test.ts (renamed from complianceMapping.test.ts)",
+  "tests/frameworkBreadth.test.ts (from controlCrosswalk.test.ts + coverageScorer.test.ts)",
+  "tests/fixtures/packFrameworkStrings.unresolved.json (new)",
+  "docs/COMPLIANCE_MAPS.md",
+  "docs/ISO_42001_ALIGNMENT.md",
+  "docs/compliance/README.md",
+  "docs/compliance/compliance-*.md (12 generated reports: window-age header)"
+ ],
+ "testsRun": [
+  {
+   "command": "pnpm vitest run tests/frameworkBreadth.test.ts tests/packFrameworkAliases.test.ts tests/mappingSources.test.ts",
+   "result": "3 files, 90 passed, 0 skipped"
+  },
+  {
+   "command": "pnpm vitest run <24 files importing controlCrosswalk/frameworks/builtInMappings/mappingSchema/coverageScorer, incl. 19 gap10xx boundary tests>",
+   "result": "24 files, 176 passed"
+  },
+  {
+   "command": "pnpm build && pnpm vitest run <3 new + gdprAccountabilityMapping, compliance/complianceMatrix, complianceReportReadability, complyReportFrameworkSelection, 7 gap10*ControlCrosswalkBoundary, apiRouters, federationComplianceIntegrationMerkle, dataResidency, compliance/dataResidencyPersistence, auditBinderComplianceMaps>",
+   "result": "build exit 0; 19 files, 222 passed"
+  },
+  {
+   "command": "npx tsx count script (frameworkChoices + defaultComplianceMapsFile)",
+   "result": "20 false DORA:9:true NIS2:9:true NIST_AI_600_1:5:true ISO_42005:0:true HHS_HTI_1:6:true CO_AI_ACT:4:true TX_TRAIGA:4:true CA_AI_LAWS:7:true KR_AI_BASIC_ACT:4:true 149"
+  },
+  {
+   "command": "node scripts/architecture-boundaries-check.mjs",
+   "result": "exit 0, failures []"
+  },
+  {
+   "command": "pnpm run check:docs-drift",
+   "result": "passed (327 files)"
+  }
+ ],
+ "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0, 0 error TS",
+ "acceptanceSelfReport": [
+  {
+   "check": "4 named test files pass",
+   "command": "pnpm vitest run tests/frameworks.test.ts tests/controlCrosswalk.test.ts tests/complianceMapping.test.ts tests/coverageScorer.test.ts",
+   "observed": "Test Files 4 passed (4); Tests 60 passed (60)",
+   "pass": true
+  },
+  {
+   "check": "a test prints unresolvedPackFrameworkStrings and lists remaining external ones",
+   "command": "pnpm vitest run tests/frameworks.test.ts --reporter=verbose | grep -E 'unresolvedPack|^external:'",
+   "observed": "unresolvedPackFrameworkStrings=193 resolvedPackFrameworkStrings=31 distinct=224, then 193 lines `external: \"<string>\" citedBy=<pack ids> (no AMC control mappings; official source not catalogued)`. These name instruments AMC has no framework for (ISO 22000, NIST CSF 2.0, FDA 21 CFR 820, MiCA, WCAG 2.1, ...). Each is listed with the packs citing it, NOT with an official source URL; every string naming a supported framework (29 pinned + GDPR/HIPAA) resolves.",
+   "pass": true
+  },
+  {
+   "check": "ls docs/compliance shows one canonical file per framework and no duplicate pair",
+   "command": "ls docs/compliance",
+   "observed": "README.md SOC2_TYPE_II_CONTROLS_MAPPING.md compliance-eu_ai_act.md compliance-fedramp.md compliance-gdpr.md compliance-hipaa.md compliance-iso_27001.md compliance-iso_42001.md compliance-mitre_atlas.md compliance-nist_ai_rmf.md compliance-owasp.md compliance-pci_dss.md compliance-soc2.md compliance-sox.md eu-ai-act-checklist.md iso-42001-aims-manual.md nist-rmf-profile.md - no hyphen/underscore pair, compliance-nist.md gone; README maps former names to canonical ones",
+   "pass": true
+  },
+  {
+   "check": "every added mapping row has a source URL and retrievedAt",
+   "command": "pnpm vitest run tests/complianceMapping.test.ts",
+   "observed": "All 24 DORA/NIS2/ONC_HTI_1 mappings carry sources with https URL on publications.europa.eu / www.ecfr.gov / www.federalregister.gov and retrievedAt 2026-10-03; schema rejects a source missing url or retrievedAt; 7 passed",
+   "pass": true
+  }
+ ],
+ "mutationChecks": [
+  {
+   "guard": "framework alias resolves pack strings (frameworks.ts frameworkNamePatterns)",
+   "mutation": "deleted [/^soc ?2\\b/, \"SOC2\"]",
+   "red": "tests/frameworks.test.ts: 2 failed | 41 passed (SOC 2 Type II -> SOC2; live-pack test)",
+   "restoredGreen": "43 passed"
+  },
+  {
+   "guard": "coverageScorer refuses empty control id (coverageScorer.ts:12)",
+   "mutation": "if (false && row.id.trim() === \"\")",
+   "red": "tests/coverageScorer.test.ts: 2 failed | 3 passed (\"\" and \"   \" cases)",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "UNKNOWN earns no credit (coverageScorer.ts:22)",
+   "mutation": "re-added + counts.unknown * 0.25",
+   "red": "1 failed | 4 passed",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "crosswalk fails closed when a row's own source is absent from receipt citations (controlCrosswalk.ts:129)",
+   "mutation": "if (false && ownSourceIds.some(...))",
+   "red": "tests/controlCrosswalk.test.ts: 1 failed | 4 passed",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "required assurance packIds are registered packs",
+   "mutation": "reverted packId sandboxBoundary -> sandbox_boundary",
+   "red": "tests/complianceMapping.test.ts: 1 failed | 6 passed (lists fedramp_system_communications, pci_dss_vulnerability_mgmt, dora_art24_25_resilience_testing)",
+   "restoredGreen": "7 passed"
+  },
+  {
+   "guard": "every added mapping carries sources",
+   "mutation": "removed sources from dora_art10_detection",
+   "red": "1 failed | 6 passed (DORA has sourced control mappings)",
+   "restoredGreen": "7 passed"
+  },
+  {
+   "guard": "schema rejects unknown framework",
+   "mutation": "mappingSchema.ts:6 frameworkEnum -> z.string()",
+   "red": "1 failed | 89 passed",
+   "restoredGreen": "90 passed"
+  },
+  {
+   "guard": "non-empty related.questions",
+   "mutation": "dora_art10_detection related.questions []",
+   "red": "3 failed | 87 passed",
+   "restoredGreen": "90 passed"
+  },
+  {
+   "guard": "PCI label",
+   "mutation": "displayName back to 'PCI DSS v4.0 ('",
+   "red": "1 failed | 89 passed",
+   "restoredGreen": "90 passed"
+  },
+  {
+   "guard": "classifyFrameworkString reason",
+   "mutation": "unresolved returns reason 'pattern'",
+   "red": "2 failed | 88 passed",
+   "restoredGreen": "90 passed"
+  },
+  {
+   "guard": "unresolved fixture lock",
+   "mutation": "removed 'NIST CSF 2.0' from fixture",
+   "red": "1 failed | 89 passed",
+   "restoredGreen": "90 passed"
+  }
+ ],
+ "notExercised": [
+  "fresh clone",
+  "amc comply report CLI for new ids (vault passphrase)",
+  "assurance run proving new requirements pass on real evidence",
+  "signed Colorado act PDF (size limit; final act read)",
+  "ISO/IEC 42005 (text unreadable)"
+ ],
+ "receiptPath": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/{report.md,result.json}",
+ "environment": "Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0; worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-6 (not a fresh clone)",
+ "blockers": [
+  "ISO_42005: root must record a descope for S6 or provide a licensed copy; S5 must not emit frameworkRef ISO_42005 meanwhile",
+  "coverageScorer UNKNOWN 0.25 -> 0 still needs root ratification (carried from round 1)"
+ ],
+ "sources": [
+  {
+   "title": "Regulation (EU) 2022/2554 (DORA), OJ L 333, 27.12.2022 - EU Publications Office (article headings; Art. 5, 6, 8-12, 17, 19, 24, 25, 28, 30 text; Art. 64 applies from 17 January 2025)",
+   "url": "https://publications.europa.eu/resource/celex/32022R2554",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "Directive (EU) 2022/2555 (NIS 2), OJ L 333, 27.12.2022 - EU Publications Office (Art. 20, 21(2)(a)-(j), 23(4) 24h/72h/one month, Art. 41 apply from 18 October 2024)",
+   "url": "https://publications.europa.eu/resource/celex/32022L2555",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "45 CFR 170.315(b)(11) Decision support interventions - eCFR point-in-time 2026-10-01 (read via eCFR versioner API)",
+   "url": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-D/part-170/subpart-C/section-170.315",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "HTI-1 final rule, 89 FR 1192, published 2024-01-09, effective 2024-02-08 (Federal Register API metadata)",
+   "url": "https://www.federalregister.gov/documents/2024/01/09/2023-28857/health-data-technology-and-interoperability-certification-program-updates-algorithm-transparency-and",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "ASTP/ONC Deregulatory Actions proposed rule, 90 FR 60970, 2025-12-29 (pending; finalization for (b)(11) unverified)",
+   "url": "https://www.federalregister.gov/documents/2025/12/29/2025-23896/health-data-technology-and-interoperability-astponc-deregulatory-actions-to-unleash-prosperity",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "Regulation (EU) 2024/1689 (EU AI Act) - title check only",
+   "url": "https://publications.europa.eu/resource/celex/32024R1689",
+   "retrievedAt": "2026-10-03",
+   "verified": true
+  },
+  {
+   "title": "NIST AI RMF page / NIST AI 100-1 / NIST AI 600-1 - reachability only (HTTP 200), nothing encoded",
+   "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+   "retrievedAt": "2026-10-03",
+   "verified": false
+  },
+  {
+   "title": "ISO/IEC 42001:2023, 42005:2025, 42006:2025 catalogue pages - bot challenge, unverified",
+   "url": "https://www.iso.org/standard/81230.html",
+   "retrievedAt": "2026-10-03",
+   "verified": false
+  }
+ ],
+ "notesForMonitor": "RECEIPT CONTENT (the file could not be written; please persist it as tracks/S6/report.md).\n\nMEASURE at 8f57ce63: 12 frameworks (incl. SOX; the brief said 11), 101 mappings (SOC2 5, NIST_AI_RMF 4, ISO_42001 11, ISO_27001 5, EU_AI_ACT 12, GDPR 13, MITRE_ATLAS 8, OWASP_API_TOP10 10, HIPAA 10, SOX 9, FEDRAMP 10, PCI_DSS 4); 41 packs cite 224 distinct framework strings; 222 failed normalizeFrameworkName. Also found: 10 of 17 required assurance packIds in builtInMappings were not registered ids (sandbox_boundary, circuit_breaker_reliability, approval_theater, sbom_supply_chain, delegation_trust_chain, stepup_approval_bypass, pii_detection_leakage, context_leakage, excessive_agency, agent_identity_spoofing). complianceEngine.ts:269 matches exact ids, so those requirements could never pass.\n\nCHANGES (file:line at 5045b665):\n- frameworks.ts:1 adds DORA|NIS2|ONC_HTI_1. :193-243 adds the 3 families, with official headings as category names. :248-261 anchored frameworkNamePatterns for versioned or clause-qualified names. :286 adds aliases nis-2 and onc-hti-1. :291 falls back to the patterns. NIST CSF 2.0, ISO/IEC 27701, HITECH, ISO 27799 and CCPA/CPRA are asserted to stay null. I reused the existing enum ids so S3 can normalize pack strings to those ids.\n- builtInMappings.ts:14-33 holds the source constants. :2050-2353 adds 24 mappings (DORA 9, NIS2 9, ONC_HTI_1 6), each with sources {title,url,retrievedAt 2026-10-03}. Each description names what AMC evidence does not show (management-body approval, CSIRT or authority notification, contracts, TLPT, HR security, national transposition). The 10 broken packIds are corrected to registered ids with thresholds unchanged. related.packs is untouched.\n- mappingSchema.ts:46-50 adds complianceMappingSourceSchema. :63 adds optional sources (min 1), so existing signed maps still parse.\n- controlCrosswalk.ts:83 adds mappingSourceCitations(). :126-131 and :141: a row with its own sources cites only those, and fails closed with <id>:sourceCitations:unlisted when they are missing from the receipt. Mappings without sources behave as before (the 19 gap tests are green).\n- coverageScorer.ts:11-14 throws on a blank or whitespace control id. :21-22 makes UNKNOWN weigh 0 (was 0.25). The zod id.min(1) does not cover whitespace or direct callers; the RED run proved that.\n- docs/compliance: the canonical name is what `amc comply report` writes (compliance-<id lowercase>.md, src/cli.ts:12623). The 4 hyphenated reports were git mv'd onto the underscore names with blob hashes identical. The 4 Moved stubs and compliance-nist.md were removed. README.md indexes every file and maps former names. COMPLIANCE_MAPS.md has a new crosswalk section: counts measured at de349bee, a dated sources table, normalization and scoring rules. ISO_42001_ALIGNMENT.md has a dated references table with the ISO pages marked unverified.\n\nEUR-Lex returned HTTP 202 with an empty body (bot challenge), so the EU texts were read from publications.europa.eu by CELEX number. iso.org returned a challenge or 403.\n\nFOR ROOT SESSION: (1) Write and commit the receipt (git add -f). (2) Engine defect (complianceEngine.ts:375-383): a vacuous requires_no_audit pass on an empty ledger gives PARTIAL. (3) S3: pack strings resolve when given as enum ids or in the patterned forms. 193 external strings stay unresolved by design; the list is printed by tests/frameworks.test.ts. (4) Linear: 'Framework crosswalk breadth' can cite commits de349bee and 5045b665.\n\nThe 193 external strings start with \"21 CFR Part 11\" (life-technology), \"21st Century Cures Act\" (digital-health-record), \"5AMLD/6AMLD\" (blockchain), and so on. Full list: run `pnpm vitest run tests/frameworks.test.ts --reporter=verbose | grep '^external:'`.",
+ "readyToWireDiff": "None. All changes are inside S6 claimed paths.",
+ "kind": "code",
+ "id": "S6",
+ "workflow": "wf_5210e2f4-3ea",
+ "label": "code:S6",
+ "repairRound": 1,
+ "repairDate": "2026-10-04",
+ "requiredFixes": [
+  {
+   "fix": "PCI DSS v4.0.1 label",
+   "done": true,
+   "evidence": "grep -n 'PCI DSS v4.0 ' src/compliance/frameworks.ts prints nothing; frameworkBreadth pins it"
+  },
+  {
+   "fix": "unknown-framework rejection test",
+   "done": true,
+   "evidence": "tests/mappingSources.test.ts; M7 RED 1 failed/89"
+  },
+  {
+   "fix": "non-empty related.questions test",
+   "done": true,
+   "evidence": "tests/frameworkBreadth.test.ts; M9 RED 3 failed/87"
+  },
+  {
+   "fix": "missing families",
+   "done": "partial",
+   "evidence": "NIST_AI_600_1 5, CO_AI_ACT 4, TX_TRAIGA 4, CA_AI_LAWS 7, KR_AI_BASIC_ACT 4, all sourced with questions; ISO_42005 not added (clause text unreadable) - root descope or licensed copy needed"
+  },
+  {
+   "fix": "ONC_HTI_1 -> HHS_HTI_1",
+   "done": true,
+   "evidence": "union, family, 6 mappings, pattern, tests, docs; ONC_HTI_1 is an input alias only and fails schema as a framework id"
+  },
+  {
+   "fix": "claimed test names + fixture",
+   "done": true,
+   "evidence": "git diff --name-only 8f57ce63..HEAD lists only claimed paths"
+  }
+ ],
+ "round1": {
+  "status": "PARTIAL",
+  "headAfter": "5045b665762b0b31d590f0099d60228ebee2d2c5",
+  "commits": [
+   "de349beed7b9f34787cc60893bc1a6fbe9c36c80 feat: add sourced DORA, NIS2 and HTI-1 crosswalks and resolve pack framework names",
+   "5045b665762b0b31d590f0099d60228ebee2d2c5 docs: consolidate duplicate compliance reports and date crosswalk sources"
+  ],
+  "filesChanged": [
+   "src/compliance/frameworks.ts",
+   "src/compliance/builtInMappings.ts",
+   "src/compliance/mappingSchema.ts",
+   "src/compliance/controlCrosswalk.ts",
+   "src/compliance/coverageScorer.ts",
+   "tests/frameworks.test.ts (new)",
+   "tests/complianceMapping.test.ts (new)",
+   "tests/controlCrosswalk.test.ts (new)",
+   "tests/coverageScorer.test.ts (new)",
+   "docs/COMPLIANCE_MAPS.md",
+   "docs/ISO_42001_ALIGNMENT.md",
+   "docs/compliance/README.md (new)",
+   "docs/compliance/compliance-eu_ai_act.md (content moved from compliance-eu-ai-act.md, blob e9bbb532 identical)",
+   "docs/compliance/compliance-iso_42001.md (from compliance-iso-42001.md, blob cc6dd7f9 identical)",
+   "docs/compliance/compliance-nist_ai_rmf.md (from compliance-nist-ai-rmf.md, blob c4628f58 identical)",
+   "docs/compliance/compliance-soc2.md (from compliance-soc-2.md, blob f0c7bf6d identical)",
+   "docs/compliance/compliance-eu-ai-act.md (deleted)",
+   "docs/compliance/compliance-iso-42001.md (deleted)",
+   "docs/compliance/compliance-nist-ai-rmf.md (deleted)",
+   "docs/compliance/compliance-soc-2.md (deleted)",
+   "docs/compliance/compliance-nist.md (deleted, was a Moved stub)"
+  ],
+  "mutationChecks": [
+   {
+    "guard": "framework alias resolves pack strings (frameworks.ts frameworkNamePatterns)",
+    "mutation": "deleted [/^soc ?2\\b/, \"SOC2\"]",
+    "red": "tests/frameworks.test.ts: 2 failed | 41 passed (SOC 2 Type II -> SOC2; live-pack test)",
+    "restoredGreen": "43 passed"
+   },
+   {
+    "guard": "coverageScorer refuses empty control id (coverageScorer.ts:12)",
+    "mutation": "if (false && row.id.trim() === \"\")",
+    "red": "tests/coverageScorer.test.ts: 2 failed | 3 passed (\"\" and \"   \" cases)",
+    "restoredGreen": "5 passed"
+   },
+   {
+    "guard": "UNKNOWN earns no credit (coverageScorer.ts:22)",
+    "mutation": "re-added + counts.unknown * 0.25",
+    "red": "1 failed | 4 passed",
+    "restoredGreen": "5 passed"
+   },
+   {
+    "guard": "crosswalk fails closed when a row's own source is absent from receipt citations (controlCrosswalk.ts:129)",
+    "mutation": "if (false && ownSourceIds.some(...))",
+    "red": "tests/controlCrosswalk.test.ts: 1 failed | 4 passed",
+    "restoredGreen": "5 passed"
+   },
+   {
+    "guard": "required assurance packIds are registered packs",
+    "mutation": "reverted packId sandboxBoundary -> sandbox_boundary",
+    "red": "tests/complianceMapping.test.ts: 1 failed | 6 passed (lists fedramp_system_communications, pci_dss_vulnerability_mgmt, dora_art24_25_resilience_testing)",
+    "restoredGreen": "7 passed"
+   },
+   {
+    "guard": "every added mapping carries sources",
+    "mutation": "removed sources from dora_art10_detection",
+    "red": "1 failed | 6 passed (DORA has sourced control mappings)",
+    "restoredGreen": "7 passed"
+   }
+  ],
+  "notExercised": [
+   "Receipt files AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/report.md and result.json: NOT written or committed - the harness refused the Write ('Subagents should return findings as text, not write report files'); I did not route around that guard. Full receipt content is in notesForMonitor.",
+   "No fresh-clone reproduction; all runs in this worktree (Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0).",
+   "Full suite, release gate, generators: not run (program rule).",
+   "CLI `amc comply report --framework DORA` blocked by required AMC_VAULT_PASSPHRASE; same engine path exercised in-process in a scratch workspace with a throwaway passphrase and an empty ledger. No mapping observed reaching SATISFIED against real evidence.",
+   "The 10 corrected packIds were checked against listAssurancePacks(); no assurance run executed to show those requirements now pass.",
+   "docs/compliance generated reports were not regenerated; README marks them Feb/Mar 2026 snapshots.",
+   "193 external pack strings have no official URL catalogued (listed with citing packs only).",
+   "ISO/IEC 42001/42005/42006 iso.org pages: unverified (bot challenge, WebFetch HTTP 403).",
+   "HTI-1 (b)(11): whether proposed rule 90 FR 60970 (2025-12-29) was finalized for this criterion is unverified; eCFR point-in-time 2026-10-01 still contains it.",
+   "Not added: NIST AI 600-1 (no pack cites it; time box), Colorado AI Act (no pack cites it; current effective date not verified from legislature), separate ISO/IEC 42005 (already an ISO_42001 category; text paywalled).",
+   "Research digests: research/ had only empty education/, environment/, health/ dirs at last check; none cited."
+  ],
+  "blockers": [
+   "Receipt report.md/result.json could not be written: the Write tool refused it as a subagent report file. The orchestrator or root session needs to write and commit the receipt from notesForMonitor (git add -f under AMC_OS/).",
+   "Out-of-claim defect (complianceEngine.ts, other session's file): a requires_no_audit requirement passes vacuously on an empty ledger, so a mapping with zero evidence scores PARTIAL (0.5 credit). Observed: dora_art9_protection_prevention PARTIAL with zero events; every new framework scored 0.1667 on an empty ledger. Not fixed here."
+  ]
+ },
+ "headAfterNote": "receipt commit following 088ca501 (see git log on worktree-wf_5210e2f4-3ea-6)"
+}

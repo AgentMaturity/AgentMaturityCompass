@@ -1,5 +1,7 @@
 # AMC Compliance Report (ISO_27001)
 
+> **Snapshot.** Evidence window ended 2026-03-17, 201 days before 2026-10-04 — older than the 180-day review window. Generated before the 2026-10-03 mapping changes; regenerate with `amc comply report` before relying on it. See [README.md](./README.md).
+
 - Agent: default
 - Window: 2026-02-15T12:23:07.482Z -> 2026-03-17T12:23:07.482Z
 - Config trusted: NO (compliance maps missing)

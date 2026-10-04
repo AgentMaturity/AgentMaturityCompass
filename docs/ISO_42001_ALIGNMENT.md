@@ -195,8 +195,24 @@ Technical controls are strong. Management-system formalization (signed policy do
 
 ## References
 
-- ISO/IEC 42001:2023: https://www.iso.org/standard/81230.html
-- ISO/IEC 42005:2025: https://www.iso.org/standard/44546.html
-- ISO/IEC 42006:2025: https://www.iso.org/standard/44547.html
+| Standard | Catalogue page | Status |
+|---|---|---|
+| ISO/IEC 42001:2023 | https://www.iso.org/standard/81230.html | unverified — iso.org answered HTTP 403 to every fetch on 2026-10-03 and 2026-10-04 |
+| ISO/IEC 42005:2025 | https://webstore.iec.ch/en/publication/107659 (IEC co-publishes ISO/IEC standards) | read 2026-10-04: title, one-line abstract, published 2025-05-28, edition 1.0. Clause text not available. The iso.org catalogue number was not reached, so no iso.org URL is given |
+| ISO/IEC 42006:2025 | iso.org page not reached | unverified — catalogue number not confirmed; scoped to bodies that audit and certify AI management systems |
+
+The ISO texts are sold by ISO and were not read for this mapping. The clause
+families above follow the published clause structure (4-10) and the mappings
+in `src/compliance/builtInMappings.ts` carry no `sources` entries, so a control
+crosswalk receipt over them cites whatever sources its caller supplies rather
+than a clause-level ISO citation. Mapping count, measured at commit `de349bee`
+(2026-10-03): 11 `ISO_42001` mappings, as stated in section 1.
+
+Related changes on 2026-10-03/04: `normalizeFrameworkName` resolves pack
+strings such as `ISO/IEC 42001:2023` to `ISO_42001`, and `coverageScore` gives
+UNKNOWN controls no credit (see `docs/COMPLIANCE_MAPS.md`). ISO/IEC 42005 was
+not split into its own framework family because its clauses could not be read;
+it stays the "ISO 42005 Impact Assessment" category of `ISO_42001`.
+
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
 - AMC AIMS Manual (Draft): `docs/compliance/iso-42001-aims-manual.md`
