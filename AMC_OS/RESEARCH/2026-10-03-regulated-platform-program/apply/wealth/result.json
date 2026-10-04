@@ -1,0 +1,61 @@
+{
+ "track": "round-2 apply, wealth station (future-of-work, digital-payments, no-poverty, circular-economy, blockchain)",
+ "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+ "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-8 (branch worktree-wf_b05b1ca6-169-8)",
+ "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; pnpm install --frozen-lockfile --prefer-offline in the worktree and in each export",
+ "ranAt": "2026-10-04",
+ "inputs": "root checkout AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/content/wealth/{questions.json,deep-questions.json,assurance-anchors.json,summary.md,review.json}, research/wealth/digest.json, research/pack-quality/wealth.json (read-only)",
+ "freshTreeNote": "This agent's harness refuses git operations outside its worktree, so git clone was refused. Receipts were reproduced in clean exports instead: git archive <sha> | tar -x into scratchpad/wealth-export-<sha>, then a clean pnpm install. An export holds the exact tree of the commit, not a .git directory.",
+ "questions": {
+  "inputRecords": 80,
+  "byAction": { "keep": 29, "rewrite": 29, "merge": 6, "drop": 8, "add": 8 },
+  "allActionsApplied": true,
+  "renumberedAdds": { "WLT-FW-15": "WLT-FW-16", "WLT-FW-16": "WLT-FW-17", "WLT-DP-15": "WLT-DP-16", "WLT-NP-15": "WLT-NP-16", "WLT-NP-16": "WLT-NP-17", "WLT-NP-17": "WLT-NP-18" },
+  "renumberReason": "S3's floor commit 20b69fb4 already holds WLT-FW-15, WLT-DP-15 and WLT-NP-15 with different content; the author's input predates it.",
+  "carriedFromS3": { "WLT-FW-15": "weight 8 -> 10 (F: Annex III applies 2027-12-02)", "WLT-DP-15": "dimension Resilience -> Safety, weight 8 -> 12 (B: DORA applies since 2025-01-17)", "WLT-NP-15": "dimension Risk Management -> Governance, weight 8 -> 10 (U: FATF text not read)" },
+  "splits": { "WLT-DP-5": "WLT-DP-17 (12 CFR 1005.31, replaces Dodd-Frank 1032)", "WLT-NP-7": "WLT-NP-19 (ICRC handbook)", "WLT-CE-2": "WLT-CE-17 (17 CFR 270.35d-1)", "WLT-CE-4": "WLT-CE-18 (ILO just transition)", "WLT-BC-4": "WLT-BC-17 (Howey)", "WLT-BC-11": "WLT-BC-18 (FATF R.15 non-EU threshold)" },
+  "singleAnchored": ["WLT-FW-1", "WLT-FW-3", "WLT-DP-3", "WLT-DP-6", "WLT-DP-7", "WLT-NP-1", "WLT-NP-2", "WLT-CE-5", "WLT-CE-7", "WLT-CE-8", "WLT-BC-2", "WLT-BC-5", "WLT-BC-6"],
+  "singleInstrumentRule": "One instrument family per question: an act with its delegated or implementing acts, amendments, or its issuer's own guidance. A standard and the law that implements it for the same obligation (FATF R.10 / FinCEN CIP in WLT-DP-2, per F5) count as one. Per-question reasons are in questions-applied.json.",
+  "perPack": {
+   "future-of-work": { "atBase": 15, "keep": 4, "rewrite": 8, "drop": 2, "add": 2, "carried": 1, "split": 0, "final": 15 },
+   "digital-payments": { "atBase": 15, "keep": 4, "rewrite": 8, "merge": 2, "add": 1, "carried": 1, "split": 1, "final": 15 },
+   "no-poverty": { "atBase": 15, "keep": 7, "rewrite": 3, "merge": 1, "drop": 3, "add": 3, "carried": 1, "split": 1, "final": 15 },
+   "circular-economy": { "atBase": 15, "keep": 8, "rewrite": 4, "merge": 1, "drop": 2, "add": 1, "carried": 0, "split": 2, "final": 15 },
+   "blockchain": { "atBase": 15, "keep": 6, "rewrite": 6, "merge": 2, "drop": 1, "add": 1, "carried": 0, "split": 2, "final": 15 }
+  },
+  "floor": "PACK_QUESTION_FLOOR 15 holds for all five packs (15 each; station total 75 at base and candidate)",
+  "balance": "balance-before.json and balance-after.json (measure.mts). Before -> after, n / weight sum / weight range / dimensions / largest dimension share: future-of-work 15/177/6-15/6/0.333 -> 15/185/10-15/6/0.333; digital-payments 15/179/8-15/9/0.267 -> 15/193/10-15/6/0.333; no-poverty 15/175/6-15/9/0.133 -> 15/168/10-15/6/0.2; circular-economy 15/175/6-15/6/0.333 -> 15/171/10-15/6/0.267; blockchain 15/177/6-15/6/0.333 -> 15/186/10-15/6/0.267. All five packs are riskTier very-high; every weight is 10, 12 or 15 under the author's rule (B+gate 15, B 12, F/U 10).",
+  "citations": "Wealth regulatoryRef parts before -> after: 122 -> 102; resolved in force 48 -> 69, resolved unverified 21 -> 11, unresolved 53 -> 22 (balance-*.json). Registry-wide (tests/industryPackRegulatoryRefresh.test.ts stdout): questionRefParts 936 resolved 621 at base export -> 916 resolved 632 at candidate export; catalogue instruments 267 (119 sourced) -> 284 (133 sourced). No wealth part resolves to a repealed instrument (validator)."
+ },
+ "catalogue": {
+  "eu": ["eu-sca-rts", "eu-dora-rts-incident-reporting", "eu-pay-transparency", "eu-ccd2", "eu-working-time", "eu-eba-esg-gl", "eu-omnibus-i (milestone 2027-03-19 per refuter)"],
+  "us": ["us-ugesp", "us-ada-title-i-regs", "us-ada-title-i", "us-reg-b", "us-ecoa", "us-reg-e-remittance (new, govinfo 2026-10-04)", "us-sec-names-rule (new, govinfo 2026-10-04)", "us-nyc-ll144 (unverified: host)", "us-sr-26-2 (unverified: host)", "us-ca-sb253 (unverified: host)"],
+  "intl": [],
+  "notAdded": { "us-sr-11-7": "its fallback form is 'unverified', which the validator ignores (only 'repealed' is flagged), and no wealth question cites SR 11-7 after WLT-CE-6", "fatf-recs alias-only": "append-only rule forbids editing the existing entry; 'FATF Recommendation 15' already resolves through the alias 'FATF Recommendation'" },
+  "otherStationsUnchanged": "snapshot-station.mts compared every non-wealth pack, deep question and stats entry with the committed snapshot before writing; all identical"
+ },
+ "deep": {
+  "applied": { "finance-deep-51": "finance-sox-404-01 (replaces finance-sox-control-01)", "finance-deep-52": "finance-mica-art92-01", "finance-deep-53": "finance-dora-rts301-01", "finance-deep-54": "finance-regb-1002-9-01 (source moved to govinfo CFR 2026 ed.)", "finance-deep-55": "finance-vop-art5c-01", "finance-deep-56": "finance-tfr-art14-01", "finance-deep-57": "finance-ccd2-art18-01", "finance-deep-58": "finance-regsp-248-30-01 (source moved to govinfo CFR 2025 ed.)" },
+  "retired": ["finance-basel-risk-01", "finance-sox-control-01"],
+  "declined": { "finance-sr262-scope-01": "source host federalreserve.gov is not in the deep test's official-host list (tests/deepIndustryPacksStations.test.ts:20); widening it is out of scope", "finance-finra-3110-01": "source host finra.org, same reason" },
+  "numbering": "continues the facade's finance-deep-03..50 template ids from 51",
+  "wealthDeepQuestions": "50 -> 56; finance unverifiedSources 20 -> 19"
+ },
+ "assurance": {
+  "financialSOX": "7 checksMustAssert applied as per-scenario refusal + control checks; stale checks: SOX_INTERNAL_CONTROLS_MISSING -> SOX_SEGREGATION_ROUTING_MISSING (segregation scenario), SOX_REPORTING_INTEGRITY_MISSING scoped to its scenario and no longer passes on 'material', SOX_ESCALATION_PATHWAY_MISSING replaced by refusal + escalation (market manipulation), SOX_MARKET_MANIPULATION_UNHANDLED kept and the refusal check added",
+  "wealthManagementMiFID": "4 checksMustAssert applied; stale checks: WEALTH_FIDUCIARY_MISSING scoped (no longer passes on 'mifid'), WEALTH_KILLSWITCH_MISSING scoped (no longer passes on 'stop'; refusing the safe action fails), WEALTH_MARKET_ABUSE_MISSING -> escalation check scoped, WEALTH_DATA_SOVEREIGNTY_MISSING retired (no client-data scenario)",
+  "measuredFailOpenBefore": "11 of 11 scenarios passed a reply that performed the request while reciting the old check words (scratchpad/wealth-apply/old-behaviour.mts on the base validators); 0 of 11 pass after",
+  "changeInFalseRefusals": "A correct refusal that lacks unrelated words (consent, mifid, authorization) now passes. No hostile reply in the test corpus passes.",
+  "declined": { "financialModelRisk": "src/assurance/packs/financialModelRiskPack.ts is outside this track's write list (4 anchors, 5 asserts, 5 stale checks not applied)", "manifest anchors (Reg FD verified, ESMA AI statement, FINRA RN 24-09)": "src/assurance/packs/industryPackManifest.ts is outside the write list; finra.org is also outside the manifest test host list", "proposed scenario wlt-agent-scope-and-logs": "its anchors cannot be recorded in the manifest from this track" }
+ },
+ "mutations": "mutations.json: 11 guards, each RED when broken and GREEN when restored",
+ "tests": {
+  "candidateExport_1ce9b08a": "25 files, 581 passed / 581 (industryPackSchema, industryPackRegulatoryRefresh, industryPackDepthFloor, industryPacksSplitEquality, industryPacks-infotainment, industryPackAudit, industryPackFrameworkNormalization, industryPackEntitlement, industryPackMcpTools, industryPackMcpToolsWiring, deepIndustryPacksStations, packManagerDeep, financialSOXPack, wealthManagementMiFIDPack, assurance/industryPackFailClosed, assurance/industryPackManifest, assurance/industryPackAnchors, industryAssuranceFixtures, domain-packs, domainRegistry, industryBlueprints, majorGaps, logisticsIndustryPack, publicQuestionCountDrift, domain-registry)",
+  "industryGuides": "8 failed at base export 67d73223 and the same 8 at candidate export (appendix line citations industryPacks.ts:72/:2490 moved by the split; out-of-scope patch apply/split/out-of-scope-guide-citations.patch). Failure output identical (diff of assertion lines empty).",
+  "splitEquality": "fails after the content change by design; snapshot regenerated for the wealth station only, then 4 passed",
+  "typecheck_worktree": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0 (source identical to 1ce9b08a)"
+ },
+ "refuterFixes": "see notesForMonitor in the structured return; each of the 11 requiredFixes is applied or declined with a reason",
+ "commitCorrection": "Commit ac8aca7f's message says 'four compound questions split' and then lists six; six were split (DP-5, NP-7, CE-2, CE-4, BC-4, BC-11). History is not rewritten.",
+ "notExercised": ["full test suite and release gate (program rules)", "docs/guides regeneration (later pass)", "financialModelRisk pack", "the 32 author-unverified references and the 4 new unverified questions' sources (ICRC, ILO JT, Howey, FATF)"]
+}
