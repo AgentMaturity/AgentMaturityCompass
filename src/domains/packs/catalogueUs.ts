@@ -88,4 +88,8 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-section-504", "Section 504 of the Rehabilitation Act of 1973 (29 U.S.C. §794) and Department of Education regulations (34 CFR Part 104)", "US", "law", "in-force",
     "https://www.govinfo.gov/content/pkg/CFR-2025-title34-vol1/xml/CFR-2025-title34-vol1-sec104-44.xml",
     ["Section 504", "Section 504 of Rehabilitation Act"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "34 CFR §104.44 (Subpart E, postsecondary education) read on govinfo (CFR 2025 edition); other subparts and the statute were not read." }),
+  { ...unverified("us-ca-sopipa", "California Student Online Personal Information Protection Act (Bus. & Prof. Code §22584), as amended by AB 801 (2024)", "US-CA", "law",
+    ["Cal. Bus. & Prof. Code §22584"],
+    "Read on the Legislature's official code site (leginfo.legislature.ca.gov, codes_displaySection BPC 22584) on 2026-10-04 per round2/content/education/questions.json; that host is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."),
+    lastReviewed: "2026-10-04" },
 ];
