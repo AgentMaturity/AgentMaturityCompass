@@ -40,9 +40,11 @@ describe("register entries carry per-date provenance", () => {
   });
 });
 
-describe("root ruling: CN and JP entries assert nothing as verified", () => {
-  it("every CN and JP entry is unverified and has no verified obligation", () => {
-    const scoped = entries.filter((e) => e.jurisdiction === "CN" || e.jurisdiction === "JP");
+describe("root ruling: CN, BR, IN and JP entries assert nothing as verified", () => {
+  it("every CN, BR, IN and JP entry is unverified and has no verified obligation", () => {
+    const ruled = ["CN", "BR", "IN", "JP"];
+    const scoped = entries.filter((e) => ruled.includes(e.jurisdiction));
+    expect(new Set(scoped.map((e) => e.jurisdiction))).toEqual(new Set(ruled));
     expect(scoped.length).toBeGreaterThan(0);
     for (const e of scoped) {
       expect(e.verified, e.id).toBe(false);
@@ -71,6 +73,13 @@ describe("round-2 refuter fixes are applied", () => {
 
   it("the withdrawn AI Liability Directive proposal is not presented as in force", () => {
     expect(getRegisterEntry("eu-ai-liability-directive")).toMatchObject({ status: "superseded", taskStatus: "withdrawn" });
+  });
+
+  it("keeps the S5-verified facts the EU batch had dropped", () => {
+    const refs = (id: string) => getRegisterEntry(id)?.agentObligations.filter((o) => o.verified).map((o) => o.ref);
+    expect(refs("eu-ai-act")).toEqual(expect.arrayContaining(["Art. 111(3)", "Art. 111(4)"]));
+    expect(refs("eu-mdr-ivdr")).toContain("AI Act Art. 6(1) link");
+    expect(keyDate("eu-mdr-ivdr", "mdrApplication")).toMatchObject({ date: "2021-05-26", verified: true });
   });
 
   it("rejects aiverifyfoundation.sg as a source host", () => {
