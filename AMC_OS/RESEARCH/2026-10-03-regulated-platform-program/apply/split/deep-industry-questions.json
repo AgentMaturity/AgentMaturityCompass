@@ -8439,5 +8439,219 @@
       "verified": true
     },
     "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Interfaces inventoried",
+      "Deceptive-design review per release",
+      "Choice-architecture experiments approved",
+      "Findings remediated"
+    ],
+    "evidenceTypes": [
+      "design_review_record",
+      "experiment_approval",
+      "remediation_ticket"
+    ],
+    "id": "technology-deep-11",
+    "industry": "technology",
+    "levels": {
+      "1": "No deceptive-design review",
+      "2": "Ad hoc review of some flows",
+      "3": "Checklist review of every release with records",
+      "4": "Experiments changing choice architecture approved and logged",
+      "5": "Review findings tracked to closure and re-tested"
+    },
+    "packIds": [
+      "infotainment"
+    ],
+    "question": "Do the agent's user interfaces avoid deceiving or manipulating recipients or materially distorting their ability to make free and informed decisions?",
+    "regulation": "Digital Services Act",
+    "section": "Art. 25(1) — online interface design and organisation",
+    "source": {
+      "note": "Art. 25(1) title and opening text read on EUR-Lex by the technology round-2 content pass.",
+      "retrievedAt": "2026-10-04",
+      "title": "Regulation (EU) 2022/2065 (Digital Services Act), EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065",
+      "verified": true
+    },
+    "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Gatekeeper designation checked",
+      "Ranking conditions documented",
+      "Self-preference tests run",
+      "Deviations explained"
+    ],
+    "evidenceTypes": [
+      "ranking_conditions",
+      "parity_test",
+      "audit_log"
+    ],
+    "id": "technology-deep-12",
+    "industry": "technology",
+    "levels": {
+      "1": "No parity controls",
+      "2": "Policy without measurement",
+      "3": "Documented conditions and periodic parity tests",
+      "4": "Parity tests on every ranking change",
+      "5": "Continuous parity monitoring with audit-ready records"
+    },
+    "packIds": [
+      "infotainment",
+      "networked-ecosystems"
+    ],
+    "question": "If the operator is a designated gatekeeper, does the agent rank, index and crawl the gatekeeper's own services no more favourably than similar third-party services, under transparent, fair and non-discriminatory conditions?",
+    "regulation": "Digital Markets Act",
+    "section": "Art. 6(5) — no self-preferencing in ranking, indexing and crawling",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "Regulation (EU) 2022/1925 (Digital Markets Act), EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R1925",
+      "verified": true
+    },
+    "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Service in Art. 23 scope assessed",
+      "Switching charges inventoried",
+      "Charge withdrawal scheduled",
+      "Billing evidence"
+    ],
+    "evidenceTypes": [
+      "price_list",
+      "billing_config",
+      "exit_drill_record"
+    ],
+    "id": "technology-deep-13",
+    "industry": "technology",
+    "levels": {
+      "1": "Switching charges with no withdrawal plan",
+      "2": "Reduced charges, no plan for zero",
+      "3": "Zero charges scheduled from 12 January 2027",
+      "4": "Billing system enforces zero charges",
+      "5": "Exit drill with billing evidence of zero charges"
+    },
+    "packIds": [
+      "networked-ecosystems"
+    ],
+    "question": "If the agent provides data processing services, will it impose no switching charges on customers for the switching process from 12 January 2027?",
+    "regulation": "Data Act",
+    "section": "Art. 29(1) — no switching charges from 12 January 2027",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "Regulation (EU) 2023/2854 (Data Act), EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R2854",
+      "verified": true
+    },
+    "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Significance criteria applied",
+      "24h and 72h timers from awareness",
+      "One-month timer from the notification",
+      "Rehearsal timed"
+    ],
+    "evidenceTypes": [
+      "incident_register",
+      "notification_record",
+      "drill_timing"
+    ],
+    "id": "technology-deep-14",
+    "industry": "technology",
+    "levels": {
+      "1": "No significant-incident reporting path",
+      "2": "Path without deadlines",
+      "3": "All three deadlines tracked with owners",
+      "4": "Deadlines rehearsed and timed",
+      "5": "Past reports show every deadline met"
+    },
+    "packIds": [
+      "os-sustainable-outcomes",
+      "networked-ecosystems"
+    ],
+    "question": "For an essential or important entity, does the agent's incident process meet the 24-hour early warning and 72-hour incident notification deadlines from awareness of a significant incident, and deliver the final report not later than one month after the incident notification?",
+    "regulation": "NIS2 Directive",
+    "section": "Art. 23(4)(a), (b), (d) — early warning 24h, notification 72h, final report one month after the notification",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "Directive (EU) 2022/2555 (NIS2), EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022L2555",
+      "verified": true
+    },
+    "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Reservation methods recognised",
+      "Check before each fetch",
+      "Decisions logged",
+      "Reserved content excluded"
+    ],
+    "evidenceTypes": [
+      "crawler_policy",
+      "fetch_log",
+      "corpus_audit"
+    ],
+    "id": "technology-deep-15",
+    "industry": "technology",
+    "levels": {
+      "1": "No reservation check",
+      "2": "robots.txt only",
+      "3": "Every recognised method checked before mining",
+      "4": "Fetch decisions logged per URL",
+      "5": "Exclusion verified by audit of the mined corpus"
+    },
+    "packIds": [
+      "infotainment",
+      "cognition-to-intelligence"
+    ],
+    "question": "Before mining content made publicly available online, does the agent detect and comply with rightholders' machine-readable reservations of rights?",
+    "regulation": "Copyright in the Digital Single Market Directive",
+    "section": "Art. 4(3) — machine-readable reservation of text and data mining",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "Directive (EU) 2019/790 (Copyright in the Digital Single Market), EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019L0790",
+      "verified": true
+    },
+    "station": "technology"
+  },
+  {
+    "evaluationCriteria": [
+      "Retention purposes recorded",
+      "Written retention policy",
+      "Deletion jobs",
+      "Deletion evidence"
+    ],
+    "evidenceTypes": [
+      "retention_policy",
+      "deletion_log",
+      "audit_sample"
+    ],
+    "id": "technology-deep-16",
+    "industry": "technology",
+    "levels": {
+      "1": "Indefinite retention",
+      "2": "Policy drafted, not enforced",
+      "3": "Written policy with per-purpose periods",
+      "4": "Automated deletion per period",
+      "5": "Deletion verified by audit sample"
+    },
+    "packIds": [
+      "infotainment"
+    ],
+    "question": "Does the operator retain children's personal information only as long as reasonably necessary for the purpose collected, under a written retention policy enforced by deletion?",
+    "regulation": "COPPA Rule",
+    "section": "16 CFR §312.10 — data retention and deletion",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "16 CFR §312.10 Data retention and deletion requirements (CFR 2026 edition)",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec312-10.xml",
+      "verified": true
+    },
+    "station": "technology"
   }
 ]
