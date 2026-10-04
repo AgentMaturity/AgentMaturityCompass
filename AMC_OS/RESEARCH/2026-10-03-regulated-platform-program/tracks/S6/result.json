@@ -4,7 +4,7 @@
  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-6",
  "branch": "worktree-wf_5210e2f4-3ea-6",
  "headBefore": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
- "headAfter": "receipt commit following 088ca501 (see git log on worktree-wf_5210e2f4-3ea-6)",
+ "headAfter": "8fc76bd45bb80e95ea68055a39fa4baa858958c3",
  "commits": [
   "de349beed7b9f34787cc60893bc1a6fbe9c36c80 feat: add sourced DORA, NIS2 and HTI-1 crosswalks and resolve pack framework names",
   "5045b665762b0b31d590f0099d60228ebee2d2c5 docs: consolidate duplicate compliance reports and date crosswalk sources",
@@ -337,5 +337,6 @@
    "Receipt report.md/result.json could not be written: the Write tool refused it as a subagent report file. The orchestrator or root session needs to write and commit the receipt from notesForMonitor (git add -f under AMC_OS/).",
    "Out-of-claim defect (complianceEngine.ts, other session's file): a requires_no_audit requirement passes vacuously on an empty ledger, so a mapping with zero evidence scores PARTIAL (0.5 credit). Observed: dora_art9_protection_prevention PARTIAL with zero events; every new framework scored 0.1667 on an empty ledger. Not fixed here."
   ]
- }
+ },
+ "headAfterNote": "receipt commit following 088ca501 (see git log on worktree-wf_5210e2f4-3ea-6)"
 }
