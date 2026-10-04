@@ -13,6 +13,7 @@ data:
   AMC_TOOLHUB_PORT: {{ .Values.env.AMC_TOOLHUB_PORT | quote }}
   AMC_LAN_MODE: {{ .Values.env.AMC_LAN_MODE | quote }}
   AMC_ALLOWED_CIDRS: {{ .Values.env.AMC_ALLOWED_CIDRS | quote }}
+  AMC_CORS_ALLOWED_ORIGINS: {{ include "amc.corsAllowedOrigins" . | quote }}
   AMC_QUERY_LEASE_CARRIER_ENABLED: {{ .Values.env.AMC_QUERY_LEASE_CARRIER_ENABLED | quote }}
   AMC_TRUSTED_PROXY_HOPS: {{ .Values.env.AMC_TRUSTED_PROXY_HOPS | quote }}
   AMC_DATA_RETENTION_DAYS: {{ .Values.env.AMC_DATA_RETENTION_DAYS | quote }}

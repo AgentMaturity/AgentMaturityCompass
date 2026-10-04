@@ -59,6 +59,8 @@ export async function runRollbackDrill({ imageA, imageB, secretsDir, port = 3212
     const run = docker(["run", "-d", "--name", container, "-p", `127.0.0.1:${port}:3212`,
       "-v", `${volume}:/data/amc`, "-v", `${resolve(secretsDir)}:/run/secrets:ro`,
       "-e", "AMC_BIND=0.0.0.0", "-e", "AMC_BOOTSTRAP=1",
+      // Studio admits native requests only from the bind host or these origins; the probe calls 127.0.0.1:<port>.
+      "-e", `AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:${port}`,
       "-e", "AMC_ALLOWED_CIDRS=127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16",
       "-e", "AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase",
       "-e", "AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username",

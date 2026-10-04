@@ -32,6 +32,18 @@ describe("rollback drill", () => {
     expect(fake.calls.at(-1)).toEqual(["volume", "rm", "-f", receipt.volume]);
   });
 
+  it("admits the probe's 127.0.0.1 host: docker run sets AMC_CORS_ALLOWED_ORIGINS for the published port", async () => {
+    for (const port of [3212, 4412]) {
+      const fake = fakeDocker({ "amc-studio:s1-a": idA, "amc-studio:s1-b": idB });
+      await runRollbackDrill({ ...base, port, docker: fake.docker, probe: verified });
+      const run = fake.calls.find((c) => c[0] === "run")!;
+      expect(run).toContain(`127.0.0.1:${port}:3212`);
+      const env = run.flatMap((arg, i) => (run[i - 1] === "-e" ? [arg] : []));
+      expect(env).toContain(`AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:${port}`);
+      expect(env).toContain("AMC_BIND=0.0.0.0");
+    }
+  });
+
   it("refuses non-digest ids", async () => {
     for (const bad of ["abc", "sha256:xyz", `sha256:${"A".repeat(64)}`, "amc-studio:s1-a"]) {
       const fake = fakeDocker({ "amc-studio:s1-a": bad, "amc-studio:s1-b": idB });
