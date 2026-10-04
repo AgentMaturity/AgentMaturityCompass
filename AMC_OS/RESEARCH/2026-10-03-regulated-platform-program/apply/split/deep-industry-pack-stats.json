@@ -32,9 +32,11 @@
     "unverifiedSources": 20
   },
   "government": {
-    "questionCount": 50,
+    "questionCount": 56,
     "regulations": [
       "FedRAMP",
+      "EU AI Act",
+      "NIST SP 800-63B-4",
       "FISMA"
     ],
     "station": "governance",
