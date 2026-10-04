@@ -41,9 +41,17 @@
     "unverifiedSources": 50
   },
   "healthcare": {
-    "questionCount": 50,
+    "questionCount": 58,
     "regulations": [
-      "HIPAA"
+      "HIPAA",
+      "FDA QMSR (21 CFR Part 820)",
+      "FDA 21 CFR Part 11",
+      "ACA §1557 final rule (45 CFR Part 92)",
+      "EU AI Act (Regulation (EU) 2024/1689)",
+      "European Health Data Space (Regulation (EU) 2025/327)",
+      "CMS Interoperability and Prior Authorization final rule (CMS-0057-F)",
+      "ICH E6(R3) Good Clinical Practice",
+      "ONC HTI-1 certification criteria (45 CFR Part 170)"
     ],
     "station": "health",
     "unverifiedSources": 0

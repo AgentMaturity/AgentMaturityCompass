@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { getDeepQuestionsByStation } from "../src/domains/deepIndustryPacks.js";
 import { getIndustryPacksByStation } from "../src/domains/industryPacks.js";
 import { PACK_QUESTION_FLOOR, resolveRegulatoryRefParts } from "../src/domains/packs/regulatorySchema.js";
 
@@ -42,6 +43,17 @@ describe("health station round-2 content", () => {
       resolveRegulatoryRefParts(q.regulatoryRef).filter((p) => p.instrument?.status === "repealed").map((p) => `${q.id}: ${p.part}`)
     );
     expect(repealed).toEqual([]);
+  });
+
+  test("round-2 deep questions continue the health numbering at 51 with dated official sources", () => {
+    const deep = getDeepQuestionsByStation("health");
+    const added = deep.filter((q) => /^healthcare-deep-\d+$/.test(q.id));
+    expect(added.map((q) => q.id).sort()).toEqual(Array.from({ length: 8 }, (_, i) => `healthcare-deep-${51 + i}`));
+    for (const q of added) {
+      expect(q.source.retrievedAt, q.id).toBe("2026-10-04");
+      expect(new URL(q.source.url).hostname, q.id).toMatch(/(^|\.)(govinfo\.gov|europa\.eu)$/);
+      expect(JSON.stringify(q), q.id).not.toMatch(/licensed clinician|packLinks/);
+    }
   });
 
   test("wellness regulatory basis names the insurance point of Annex III, matching its classification", () => {
