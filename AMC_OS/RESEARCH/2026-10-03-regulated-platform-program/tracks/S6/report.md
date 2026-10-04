@@ -1,4 +1,104 @@
-# Track S6 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
+# Track S6 — repair round 1 (2026-10-04)
+
+- Status (self-report): **PARTIAL** — 5 of the 6 required fixes done in full; fix 4 done for 5 of 6 families. ISO/IEC 42005 is not added because its clauses could not be read. It needs a root descope or a licensed copy.
+- Branch `worktree-wf_5210e2f4-3ea-6`; base `8f57ce63` (ancestor, verified); round-1 head `83d02211`. Repair commits: `f007629b` (src+tests), `d65cff85` (docs), `088ca501` (Texas category headings), then this receipt commit.
+- Environment: Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, same worktree (not a fresh clone).
+- User relay for this run said "Skip linear": no Linear calls were made.
+
+## Required fixes — what was done
+
+| # | Fix | Result |
+|---|---|---|
+| 1 | PCI DSS label | `frameworks.ts` displayName is now `PCI DSS v4.0.1 (...)`. `grep -n 'PCI DSS v4.0 ' src/compliance/frameworks.ts` prints nothing. A test in frameworkBreadth pins the label. |
+| 2 | Pin unknown-framework rejection | `tests/mappingSources.test.ts` asserts that `safeParse({...base, framework:'DORA_X'})` and `'ONC_HTI_1'` both fail. Mutation M7 (`frameworkEnum -> z.string()`) goes RED. |
+| 3 | Pin non-empty related.questions | `tests/frameworkBreadth.test.ts` asserts that every mapping of the 8 station families has `related.questions.length > 0` and `sources.length > 0`. Mutation M9 (empty questions on `dora_art10_detection`) goes RED. |
+| 4 | Missing families | Added NIST_AI_600_1 (5), CO_AI_ACT (4), TX_TRAIGA (4), CA_AI_LAWS (7) and KR_AI_BASIC_ACT (4). Every mapping cites the official text I read on 2026-10-04 and has non-empty `related.questions`. HHS_HTI_1 is covered by fix 5. **ISO_42005 is not added** (see below). |
+| 5 | Rename ONC_HTI_1 -> HHS_HTI_1 | Renamed in the union, the family, the 6 mappings, the pattern, tests and docs. `ONC_HTI_1`, `onc-hti-1` and `hti-1` remain input aliases only. A maps file naming `ONC_HTI_1` as a framework fails the schema (tested). |
+| 6 | Claimed test names and fixture | `git mv`: frameworks -> packFrameworkAliases, complianceMapping -> mappingSources, controlCrosswalk -> frameworkBreadth (coverageScorer tests merged in, old file removed). Added `tests/fixtures/packFrameworkStrings.unresolved.json` (193 strings, reason `sector-standard-not-modelled`) and `classifyFrameworkString()`. `git diff --name-only 8f57ce63..HEAD` shows only claimed paths. |
+
+Extra low-severity monitor items also closed:
+- Every generated report in `docs/compliance/` now opens with its window end date and age (201-203 days at 2026-10-04).
+- `docs/ISO_42001_ALIGNMENT.md` no longer gives iso.org catalogue numbers that could not be checked (44546/44547). For 42005 it cites the IEC webstore page that was actually read.
+
+## Acceptance (planner check 2, run with tsx against src)
+
+```
+npx tsx scratchpad/s6r/count.ts
+20 false DORA:9:true NIS2:9:true NIST_AI_600_1:5:true ISO_42005:0:true HHS_HTI_1:6:true CO_AI_ACT:4:true TX_TRAIGA:4:true CA_AI_LAWS:7:true KR_AI_BASIC_ACT:4:true 149
+```
+This prints 20 frameworks, not the planner's 21, and `false` because ISO_42005 is absent. 149 mappings (expected >= 137). The 101 base mappings are unchanged, and frameworkBreadth pins the per-family counts.
+
+## ISO/IEC 42005 — needs a root decision
+
+The clause text could not be read:
+- iso.org (44545.html, 44546.html, OBP) returned HTTP 403 to WebFetch and to curl.
+- The IEC webstore page (publication 107659) gives only the title, a one-line abstract, 2025-05-28 and edition 1.0. Its preview PDF redirects to the store home.
+- BSI gives a marketing summary only. ANSI returns 403.
+
+Under the rule "an article you cannot quote from the source does not become a mapping", no ISO_42005 family was created. The existing ISO_42001 category "ISO 42005 Impact Assessment" (3 mappings) is unchanged.
+
+**Root:** either record a written descope of ISO_42005 for S6, or supply a licensed copy. Until then S5 must not emit `frameworkRef: ISO_42005`.
+
+## Still needs root ratification (carried from round 1)
+
+- `coverageScorer.ts`: UNKNOWN now earns 0 (was 0.25), and a blank control id throws. The direction follows brief §2 rule 4 and is tested. Existing `amc comply report` scores with UNKNOWN rows will drop.
+
+## Sources read this round (retrievedAt 2026-10-04)
+
+- NIST AI 600-1 PDF: <https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf>. Read with pdftotext from the WebFetch-saved copy. The 12 risk headings §2.1-2.12 and action IDs MS-2.5-001, MG-4.1-002, MS-2.2-002, MS-1.1-001, MS-2.7-001, MG-4.3-001 and GV-6.2-001 were read verbatim.
+- Colorado SB26-189 final act PDF (05/12/2026): <https://leg.colorado.gov/bill_files/116432/download>. Sections 6-1-1702 to 1706 were read verbatim. The bill page <https://leg.colorado.gov/bills/sb26-189> gives the signed date 2026-05-14. The signed-act PDF (116489) exceeded WebFetch's 10 MB limit.
+- Texas HB 149 enrolled: <https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00149F.htm> (§552.051-.057, .101-.105; effective 2026-01-01).
+- California SB 53: <https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53> (§22757.12(a)(1)-(10) and (c)(1), §22757.13(c)(1)-(2), quoted; chaptered 2025-09-29).
+- California AB 2013: <https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240AB2013> (Civ. Code §3111 opening and items (a)(1), (7), (9), (12)).
+- CPPA approved regulations text: <https://cppa.ca.gov/regulations/pdf/ccpa_updates_cyber_risk_admt_appr_text.pdf> (Art. 11 §7200, 7220, 7221, 7222, read via pdftotext). OAL approval 2025-09-22 per <https://cppa.ca.gov/regulations/ccpa_updates.html>.
+- Korea: KLRI English translation <https://elaw.klri.re.kr/eng_mobile/viewer.do?hseq=73499&type=part&key=18> (Arts. 31-36 and addenda; Act 20676 amended by 21311). The law.go.kr English record shows the header only (Law No. 20676, effective 2026-01-22). The law.go.kr Korean page showed Act 21311 (promulgated 2026-01-20) with no article text.
+- Unreadable: iso.org (403), webstore.ansi.org (403), IEC preview PDF (redirect).
+
+WebFetch summarises pages with a small model. Every quoted clause was checked against verbatim text: pdftotext output for NIST, Colorado and CPPA, and a verbatim-quote request for SB 53 and AB 2013. The Texas section headings were confirmed with a second verbatim-quote fetch (ch. 552 'Artificial Intelligence Protection'; §552.103 'Investigative Authority' with items (1)-(7)); category names were aligned to those headings in a follow-up commit.
+
+## Commands run (this round)
+
+- `pnpm vitest run tests/frameworkBreadth.test.ts tests/packFrameworkAliases.test.ts tests/mappingSources.test.ts` → 3 files, 90 passed, 0 skipped
+- `pnpm vitest run` over the 24 test files that import controlCrosswalk/frameworks/builtInMappings/mappingSchema/coverageScorer (incl. 19 gap10xx boundary tests, gdprAccountabilityMapping, complianceReportReadability) → 24 files, 176 passed
+- `pnpm build` (exit 0), then `pnpm vitest run` over the 3 new files, gdprAccountabilityMapping, compliance/complianceMatrix, complianceReportReadability, complyReportFrameworkSelection, 7 gap10*ControlCrosswalkBoundary, apiRouters, federationComplianceIntegrationMerkle, dataResidency, compliance/dataResidencyPersistence and auditBinderComplianceMaps → 19 files, 222 passed
+- `pnpm typecheck` → exit 0. `pnpm typecheck:tests` → exit 0, 0 `error TS`
+- `node scripts/architecture-boundaries-check.mjs` → exit 0, failures []
+- `pnpm run check:docs-drift` → passed (327 files)
+
+## Mutation checks (this round; each restored to 90/90 green)
+
+| Guard | Mutation | RED |
+|---|---|---|
+| schema rejects unknown framework (mappingSchema.ts:6) | `frameworkEnum = z.string()` | 1 failed / 89 passed |
+| non-empty related.questions | `dora_art10_detection` questions `[]` | 3 failed / 87 passed |
+| PCI label | displayName back to `PCI DSS v4.0 (` | 1 failed / 89 passed |
+| classifyFrameworkString reason | unresolved -> reason `pattern` | 2 failed / 88 passed |
+| unresolved fixture lock | removed `NIST CSF 2.0` from fixture | 1 failed / 89 passed |
+
+## Line budget
+
+- `frameworks.ts` 302 -> 356 (cap 400). It passed 320, so aliases and patterns were split into `src/compliance/frameworks/aliases.ts` (41 lines) as the planner required. The family data alone keeps it above 320.
+- `builtInMappings.ts` 2359 -> 2709 (registry-exempt, data-only; boundaries check passes).
+- `mappingSchema.ts`, `controlCrosswalk.ts`, `coverageScorer.ts` and `dataResidency.ts` were not changed this round.
+
+## Not exercised
+
+- No fresh clone.
+- No `amc comply report --framework <new id>` CLI run (it needs a vault passphrase). The schema parse of the full default maps file is tested.
+- No assurance run proves the new requirements pass on real evidence.
+- The signed Colorado act PDF itself was not read (size limit); the final act sent for signature was read.
+- ISO/IEC 42005 is not covered (see above).
+
+## Ready-to-wire / cross-track
+
+- S5: use `HHS_HTI_1` (not `ONC_HTI_1`) as frameworkRef. NIST_AI_600_1, CO_AI_ACT, TX_TRAIGA, CA_AI_LAWS and KR_AI_BASIC_ACT now exist. ISO_42005 does not.
+- S3: a pack edit that adds or removes a framework string must update `tests/fixtures/packFrameworkStrings.unresolved.json`.
+- Root: regenerate `docs/compliance` reports at the next release build (root ruling).
+
+---
+
+# Round 1 receipt (kept for history)
+
 
 - Status (self-report): **PARTIAL**
 - Branch: `worktree-wf_5210e2f4-3ea-6`; HEAD before `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da` → after `5045b665762b0b31d590f0099d60228ebee2d2c5`
