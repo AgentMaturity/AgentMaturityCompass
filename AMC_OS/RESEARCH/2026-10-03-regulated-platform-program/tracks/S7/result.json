@@ -1,0 +1,17 @@
+{
+  "track": "S7",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "environment": { "os": "Darwin arm64", "node": "v25.5.0", "pnpm": "10.33.0", "vitest": "4.1.11", "python": "3.14.7", "pytest": "8.4.2", "date": "2026-10-03" },
+  "boundary": "Source qualification only, from a worktree on macOS arm64; not package, platform (no Linux) or deployed-release qualification; not reproduced in a fresh clone.",
+  "runs": [
+    { "command": "pnpm vitest run tests/bwrapBackendPure.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts tests/callbackTelemetryCapture.test.ts tests/harnessComparison.test.ts tests/nativeAgentClientVerify.test.ts tests/deepseekHarnessLaunch.test.ts tests/cliImportCommands.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsReleaseGate.test.ts", "result": "Test Files 10 passed (10); Tests 105 passed | 2 expected fail (107); exit 0" },
+    { "command": "pnpm vitest run tests/nativePinnedToolSchemas.test.ts", "result": "11 passed" },
+    { "command": "pnpm vitest run tests/acpFailedTurnUpdates.test.ts", "result": "11 passed" },
+    { "command": "cd sdk/python && PYTHONPATH=. python3 -m pytest -p no:cacheprovider -q tests/test_validation.py", "result": "175 passed, 1 warning" },
+    { "command": "cd sdk/python && PYTHONPATH=. python3 -m pytest -p no:cacheprovider -q tests/test_validation_installed.py", "result": "21 failed, 1 skipped: every failure is ModuleNotFoundError amc_sdk because no wheel is installed (the file refuses checkout imports); skip reason 'native signed fixtures not supplied'. Not an acceptance." },
+    { "command": "pnpm typecheck", "result": "exit 0" },
+    { "command": "pnpm typecheck:tests", "result": "exit 0 (after d4d62bce fixed TS2322 in tests/externalEvidenceExport.test.ts)" }
+  ],
+  "mutationLog": "mutations.log",
+  "readyToWire": ["mcp-ready-to-wire.diff", "dsh-runner-ready-to-wire.diff"]
+}

@@ -1,5 +1,10 @@
-"""Installed canonical consumer regressions: AUTHORED UNEXECUTED (task10).
+"""Installed canonical consumer regressions (task10).
 
+Not "unexecuted", and not accepted: on 2026-10-03 at commit 8f57ce63 this file
+ran without an installed wheel, so its consumer cases failed at import by design
+and the native lane skipped (receipt:
+AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/result.json).
+A passing run requires a wheel built and installed from the candidate source.
 The isolated consumer must import an actual installed wheel, never the checkout
 or an editable install. Scripted ACP peers test wire behavior, not native trust.
 An optional pre-provisioned native lane uses the real explicit installed CLI;

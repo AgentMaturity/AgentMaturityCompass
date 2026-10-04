@@ -69,6 +69,19 @@ describe("external evidence profile", () => {
     expect(verifyExternalEvidence(profile, { authorities: [authority], originalBytes: Buffer.from("changed") })).toMatchObject({ ok: false, trustTier: "SELF_REPORTED", originalDigest: "mismatch" });
     expect(verifyExternalEvidence(profile, { authorities: [authority], expectedNormalizedDigest: "0".repeat(64) }).ok).toBe(false);
   });
+  test("an authority that a direct JS caller admits for imports still cannot promote an import", () => {
+    // The type and externalEvidenceFiles exclude "import"; this isolates the verifier's own gate.
+    const profile = fixture(), authority = seal(profile, "import", "ATTESTED");
+    const permissive = { ...authority, captureMethods: ["import"] } as unknown as ExternalEvidenceAuthority;
+    expect(verifyExternalEvidence(profile, { authorities: [permissive] })).toMatchObject({ ok: false, signatureVerified: true, trustTier: "SELF_REPORTED",
+      errors: ["provenance: declared trust exceeds admitted capture authority"] });
+  });
+  test("the verifier never raises a producer's own lower declaration", () => {
+    const profile = fixture(), authority = seal(profile, "governed-capture", "ATTESTED");
+    expect(verifyExternalEvidence(profile, { authorities: [authority] })).toMatchObject({ ok: true, signatureVerified: true, trustTier: "ATTESTED" });
+    const selfReported = fixture(), sealed = seal(selfReported, "producer-callback", "SELF_REPORTED");
+    expect(verifyExternalEvidence(selfReported, { authorities: [sealed] })).toMatchObject({ ok: true, signatureVerified: true, trustTier: "SELF_REPORTED" });
+  });
   test("future fields/versions and duplicate tool settlements refuse", () => {
     expect(validateExternalEvidenceProfile({ ...fixture(), version: 2 })).not.toEqual([]);
     expect(validateExternalEvidenceProfile({ ...fixture(), unreviewed: true })).not.toEqual([]);

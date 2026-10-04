@@ -1,0 +1,625 @@
+## S7-M01-bwrap-child-guard
+file: src/sandbox/bwrapBackend.ts
+mutation: 'if (child !== null || !Number.isSafeInteger' -> 'if (false && !Number.isSafeInteger'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × duplicate child or exit rows are refused 3ms
+  × child pid 1.5 is refused 0ms
+  × child pid 12 is refused 0ms
+  × child pid 9007199254740992 is refused 1ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  4 failed | 58 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > duplicate child or exit rows are refused
+  AssertionError: expected +0 to be null
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > child pid 1.5 is refused
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > child pid 12 is refused
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M02-bwrap-exit-before-child
+file: src/sandbox/bwrapBackend.ts
+mutation: 'if (child === null || exit !== null ||' -> 'if (exit !== null ||'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × an exit code without a preceding child pid is refused 3ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > an exit code without a preceding child pid is refused
+  AssertionError: expected +0 to be null
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M03-bwrap-exit-dup
+file: src/sandbox/bwrapBackend.ts
+mutation: 'if (child === null || exit !== null ||' -> 'if (child === null ||'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × duplicate child or exit rows are refused 2ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > duplicate child or exit rows are refused
+  AssertionError: expected 1 to be null
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M04-bwrap-exit-range
+file: src/sandbox/bwrapBackend.ts
+mutation: ' || Number(object["exit-code"]) > 255) return null;' -> ') return null;'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × exit code 256 is refused 2ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > exit code 256 is refused
+  AssertionError: expected 256 to be null
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M05-bwrap-nonobject-row
+file: src/sandbox/bwrapBackend.ts
+mutation: 'if (!row || typeof row !== "object" || Array.isArray(row)) return null;' -> 'if (!row) return null;'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × row [1] is refused 2ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > row [1] is refused
+  AssertionError: expected +0 to be null
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M06-bwrap-child-positive
+file: src/sandbox/bwrapBackend.ts
+mutation: ' || Number(object["child-pid"]) <= 0) return null;' -> ') return null;'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × child pid 0 is refused 3ms
+  × child pid -1 is refused 1ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  2 failed | 60 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > child pid 0 is refused
+  FAIL  tests/bwrapBackendPure.test.ts > bwrapCommandExit > child pid -1 is refused
+  AssertionError: expected +0 to be null
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M07-bpf-arch-check
+file: src/sandbox/bwrapBackend.ts
+mutation: '[0x15, 1, 0, arch === "x64"' -> '[0x15, 1, 1, arch === "x64"'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points 4ms
+  × arm64 uses its own socket numbers and kills the x64 ABI 1ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  2 failed | 60 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points
+  AssertionError: expected 327681 to be 2147483648 // Object.is equality
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > arm64 uses its own socket numbers and kills the x64 ABI
+  AssertionError: expected 327681 to be 2147483648 // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M08-bpf-x32-rule
+file: src/sandbox/bwrapBackend.ts
+mutation: 'if (arch === "x64") instructions.push([0x35' -> 'if (false) instructions.push([0x35'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points 4ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points
+  AssertionError: expected 2147418112 to be 327681 // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M09-bpf-io-uring
+file: src/sandbox/bwrapBackend.ts
+mutation: ', 425, 426, 427]) {' -> ']) {'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points 5ms
+  × arm64 uses its own socket numbers and kills the x64 ABI 0ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  2 failed | 60 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points
+  AssertionError: expected 2147418112 to be 327681 // Object.is equality
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > arm64 uses its own socket numbers and kills the x64 ABI
+  AssertionError: expected 2147418112 to be 327681 // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M10-bpf-connect
+file: src/sandbox/bwrapBackend.ts
+mutation: '[41, 53, 42]' -> '[41, 53]'
+command: pnpm vitest run tests/sandboxConfinement.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/bwrapBackendPure.test.ts
+mutated: exit=1
+  × x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points 4ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 61 passed (62)
+  FAIL  tests/bwrapBackendPure.test.ts > linuxSocketDenyFilter > x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points
+  AssertionError: expected 2147418112 to be 327681 // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  62 passed (62)
+
+## S7-M11-profile-import-gate-221
+file: src/standard/externalEvidenceProfile.ts
+mutation: 'if (signatureVerified && profile.provenance.captureMethod !== "import"\n        && authority' -> 'if (signatureVerified\n        && authority'
+command: pnpm vitest run tests/externalEvidenceProfile.test.ts tests/importProvenance.test.ts
+mutated: exit=1
+  × an authority that a direct JS caller admits for imports still cannot promote an import 27ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 17 passed (18)
+  FAIL  tests/externalEvidenceProfile.test.ts > external evidence profile > an authority that a direct JS caller admits for imports still cannot promote an import
+  AssertionError: expected { ok: true, errors: [], …(4) } to match object { ok: false, …(3) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  18 passed (18)
+
+## S7-M12-profile-lower-clamp-230
+file: src/standard/externalEvidenceProfile.ts
+mutation: 'if (ranks[profile.provenance.trustTier] < ranks[trustTier]) trustTier = profile.provenance.trustTier;' -> 'if (false) trustTier = profile.provenance.trustTier;'
+command: pnpm vitest run tests/externalEvidenceProfile.test.ts tests/importProvenance.test.ts
+mutated: exit=1
+  × the verifier never raises a producer's own lower declaration 17ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 17 passed (18)
+  FAIL  tests/externalEvidenceProfile.test.ts > external evidence profile > the verifier never raises a producer's own lower declaration
+  AssertionError: expected { ok: true, errors: [], …(4) } to match object { ok: true, …(2) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  18 passed (18)
+
+## S7-M13-export-chunk-bound
+file: src/importers/externalEvidenceExport.ts
+mutation: 'Math.ceil(input.traces.length / 1000)' -> 'Math.ceil(input.traces.length / 2000)'
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × large sources split into bounded parts without cross-part ancestry and disclose redaction 26ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > large sources split into bounded parts without cross-part ancestry and disclose redaction
+  AssertionError: expected [ 1000 ] to deeply equal [ 1000, 1 ]
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M14-export-callback-cancel
+file: src/importers/externalEvidenceExport.ts
+mutation: 'callback.cancelled === true || ' -> ''
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × cancellation and failure are kept apart and never become success 4ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > cancellation and failure are kept apart and never become success
+  AssertionError: expected [ [ 'metadata', 'unknown' ], …(3) ] to deeply equal [ [ 'cancel', 'cancelled' ], …(3) ]
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M15-export-unicode-replace
+file: src/importers/externalEvidenceExport.ts
+mutation: 'Array.from(value.replace(/[\\uD800-\\uDBFF](?![\\uDC00-\\uDFFF])|(?<![\\uD800-\\uDBFF])[\\uDC00-\\uDFFF]/gu, "\\uFFFD"))' -> 'Array.from(value)'
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × malformed Unicode is replaced and long strings bounded instead of refusing the import 4ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > malformed Unicode is replaced and long strings bounded instead of refusing the import
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M16-export-time-range
+file: src/importers/externalEvidenceExport.ts
+mutation: ' && time <= 253402300799999 ?' -> ' ?'
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × source time and duration are kept only when exactly representable 4ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > source time and duration are kept only when exactly representable
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M17-export-duration-loss
+file: src/importers/externalEvidenceExport.ts
+mutation: 'if (ns !== null && durationNs === null) precisionLoss = true;' -> ''
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M18-export-redaction-loss
+file: src/importers/externalEvidenceExport.ts
+mutation: 'if (candidate.redactionCount > 0) losses.push' -> 'if (false) losses.push'
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × large sources split into bounded parts without cross-part ancestry and disclose redaction 31ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > large sources split into bounded parts without cross-part ancestry and disclose redaction
+  AssertionError: expected [ …(5) ] to include 'Known sensitive source fields were re…'
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M17b-export-duration-loss
+file: src/importers/externalEvidenceExport.ts
+mutation: 'if (ns !== null && durationNs === null) precisionLoss = true;' -> ''
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × source time and duration are kept only when exactly representable 6ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > source time and duration are kept only when exactly representable
+  AssertionError: expected false to be true // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M19-export-time-loss
+file: src/importers/externalEvidenceExport.ts
+mutation: 'if (time !== null && time !== undefined && date === null) precisionLoss = true;' -> ''
+command: pnpm vitest run tests/neutralImporter.test.ts tests/neutralImportMapping.test.ts tests/externalEvidenceExport.test.ts
+mutated: exit=1
+  × source time and duration are kept only when exactly representable 8ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 25 passed (26)
+  FAIL  tests/externalEvidenceExport.test.ts > neutralExternalEvidenceProfiles > source time and duration are kept only when exactly representable
+  AssertionError: expected false to be true // Object.is equality
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  26 passed (26)
+
+## S7-M20-callback-allowlist-66
+file: src/importers/callbackTelemetryCapture.ts
+mutation: 'if (!this.allowed.has(key) || (SENSITIVE_KEY' -> 'if ((SENSITIVE_KEY'
+command: pnpm vitest run tests/neutralImportMapping.test.ts tests/callbackTelemetryCapture.test.ts
+mutated: exit=1
+  × keys outside the operational allowlist are dropped and counted on spans, updates and events 12ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 12 passed (13)
+  FAIL  tests/callbackTelemetryCapture.test.ts > callback capture attribute admission > keys outside the operational allowlist are dropped and counted on spans, updates and events
+  AssertionError: expected { …(5) } to deeply equal { 'pi.tool.name': 'read', …(1) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  13 passed (13)
+
+## S7-M21-callback-sensitive-extension-66
+file: src/importers/callbackTelemetryCapture.ts
+mutation: '|| (SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))) { filtered++' -> ') { filtered++'
+command: pnpm vitest run tests/neutralImportMapping.test.ts tests/callbackTelemetryCapture.test.ts
+mutated: exit=1
+  × an explicit extension admits operational keys but never content-shaped keys 5ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 12 passed (13)
+  FAIL  tests/callbackTelemetryCapture.test.ts > callback capture attribute admission > an explicit extension admits operational keys but never content-shaped keys
+  AssertionError: expected { 'app.region': 'eu', …(2) } to deeply equal { 'app.region': 'eu' }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  13 passed (13)
+
+## S7-M22-callback-token-counter-exemption-66
+file: src/importers/callbackTelemetryCapture.ts
+mutation: '(SENSITIVE_KEY.test(key) && !DEFAULT_CALLBACK_ATTRIBUTES.includes(key))' -> 'SENSITIVE_KEY.test(key)'
+command: pnpm vitest run tests/neutralImportMapping.test.ts tests/callbackTelemetryCapture.test.ts
+mutated: exit=1
+  × known token counters stay admitted although their names contain input/output 6ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 12 passed (13)
+  FAIL  tests/callbackTelemetryCapture.test.ts > callback capture attribute admission > known token counters stay admitted although their names contain input/output
+  AssertionError: expected {} to deeply equal { 'pi.ai.usage.input_tokens': 3, …(1) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  13 passed (13)
+
+## S7-M23-callback-closed-113-equivalent
+file: src/importers/callbackTelemetryCapture.ts
+mutation: '      if (this.closed || entry.ended) return;\n      try { operation(); }' -> '      if (entry.ended) return;\n      try { operation(); }'
+command: pnpm vitest run tests/neutralImportMapping.test.ts tests/callbackTelemetryCapture.test.ts
+mutated: exit=0
+  Test Files  2 passed (2)
+  Tests  13 passed (13)
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  13 passed (13)
+
+## S7-M24-harness-secret-manifest-112
+file: src/benchmarks/harnessComparison.ts
+mutation: 'if (redactComparisonText(bytes.toString("utf8"), secrets) !== bytes.toString("utf8")) throw' -> 'if (false) throw'
+command: pnpm vitest run tests/harnessComparison.test.ts tests/harnessComparisonOutputOwnership.test.ts
+mutated: exit=1
+  × a manifest carrying an exact runtime value is refused before any output directory exists 231ms
+  × a manifest carrying a private key block is refused before any output directory exists 216ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  2 failed | 53 passed (55)
+  FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying an exact runtime value is refused before any output directory exists
+  AssertionError: promise resolved "{ schemaVersion: '2026-09-08', …(11) }" instead of rejecting
+  FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying a private key block is refused before any output directory exists
+  AssertionError: promise resolved "{ schemaVersion: '2026-09-08', …(11) }" instead of rejecting
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  55 passed (55)
+
+## S7-M25-harness-fixture-tamper-248
+file: src/benchmarks/harnessComparison.ts
+mutation: 'if (comparisonSha256(readComparisonFile(fixturePath)) !== task.fixture.sha256) throw' -> 'if (false) throw'
+command: pnpm vitest run tests/harnessComparison.test.ts tests/harnessComparisonOutputOwnership.test.ts
+mutated: exit=1
+  × a target that rewrites its pinned fixture cannot produce a determinate result 303ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 54 passed (55)
+  FAIL  tests/harnessComparison.test.ts > matched harness execution receipts > a target that rewrites its pinned fixture cannot produce a determinate result
+  AssertionError: expected { id: 't1-fixture-success-r1', …(17) } to match object { status: 'inconclusive', …(2) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  55 passed (55)
+
+## S7-M26-sdk-close-before-verify-753
+file: src/sdk/nativeAgentClient.ts
+mutation: 'if (!this.closed) throw new Error("Close the native client before cold verification");' -> 'if (false) throw new Error("Close the native client before cold verification");'
+command: pnpm vitest run tests/cosProduct07NativeSdk.test.ts tests/cosProduct07NativeSdkProcess.test.ts tests/nativeAgentClientVerify.test.ts
+mutated: exit=1
+  × a live client never runs or promotes verification before close 312ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 51 passed (52)
+  FAIL  tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > a live client never runs or promotes verification before close
+  AssertionError: promise resolved "{ sessionId: 'verify-session', …(3) }" instead of rejecting
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  52 passed (52)
+
+## S7-M27-sdk-trust-anchor-789
+file: src/sdk/nativeAgentClient.ts
+mutation: 'if (report.trustRoot.anchored && (!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)) {' -> 'if (false) {'
+command: pnpm vitest run tests/cosProduct07NativeSdk.test.ts tests/cosProduct07NativeSdkProcess.test.ts tests/nativeAgentClientVerify.test.ts
+mutated: exit=1
+  × an anchored receipt with a different expected fingerprint is refused 215ms
+  × an anchored receipt with no expected fingerprint is refused 379ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  2 failed | 50 passed (52)
+  FAIL  tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > an anchored receipt with a different expected fingerprint is refused
+  AssertionError: promise resolved "{ sessionId: 'verify-session', …(3) }" instead of rejecting
+  FAIL  tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > an anchored receipt with no expected fingerprint is refused
+  AssertionError: promise resolved "{ sessionId: 'verify-session', …(3) }" instead of rejecting
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  52 passed (52)
+
+## S7-M28-sdk-trust-anchor-mismatch-only-789
+file: src/sdk/nativeAgentClient.ts
+mutation: '(!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)' -> '(!report.trustRoot.expectedFingerprint)'
+command: pnpm vitest run tests/cosProduct07NativeSdk.test.ts tests/cosProduct07NativeSdkProcess.test.ts tests/nativeAgentClientVerify.test.ts
+mutated: exit=1
+  × an anchored receipt with a different expected fingerprint is refused 196ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 51 passed (52)
+  FAIL  tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > an anchored receipt with a different expected fingerprint is refused
+  AssertionError: promise resolved "{ sessionId: 'verify-session', …(3) }" instead of rejecting
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  52 passed (52)
+
+## S7-M29-sdk-trust-anchor-missing-only-789
+file: src/sdk/nativeAgentClient.ts
+mutation: '(!report.trustRoot.expectedFingerprint\n      || report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)' -> '(report.trustRoot.expectedFingerprint !== null && report.trustRoot.expectedFingerprint !== report.trustRoot.monitorFingerprint)'
+command: pnpm vitest run tests/cosProduct07NativeSdk.test.ts tests/cosProduct07NativeSdkProcess.test.ts tests/nativeAgentClientVerify.test.ts
+mutated: exit=1
+  × an anchored receipt with no expected fingerprint is refused 232ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 51 passed (52)
+  FAIL  tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > an anchored receipt with no expected fingerprint is refused
+  AssertionError: promise resolved "{ sessionId: 'verify-session', …(3) }" instead of rejecting
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  52 passed (52)
+
+## S7-M30-dsh-hash-compare-34
+file: src/adapters/deepseekHarnessLaunch.ts
+mutation: 'if (!statSync(file.path).isFile() || createHash("sha256").update(readFileSync(file.path)).digest("hex") !== file.sha256) {' -> 'if (!statSync(file.path).isFile()) {'
+command: pnpm vitest run tests/deepseekPublicSurface.test.ts tests/dshCaptureInterruption.test.ts tests/deepseekHarnessLaunch.test.ts
+mutated: exit=1
+  × matching pinned files are admitted and changed executable or entrypoint bytes refuse 12ms
+  × launch preparation re-checks the pin instead of trusting configuration time 9ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  2 failed | 34 passed (36)
+  FAIL  tests/deepseekHarnessLaunch.test.ts > DSH launch pin > matching pinned files are admitted and changed executable or entrypoint bytes refuse
+  AssertionError: expected [Function] to throw an error
+  FAIL  tests/deepseekHarnessLaunch.test.ts > DSH launch pin > launch preparation re-checks the pin instead of trusting configuration time
+  AssertionError: expected [Function] to throw an error
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  36 passed (36)
+
+## S7-M31-dsh-isfile-34
+file: src/adapters/deepseekHarnessLaunch.ts
+mutation: 'if (!statSync(file.path).isFile() || createHash' -> 'if (createHash'
+command: pnpm vitest run tests/deepseekPublicSurface.test.ts tests/deepseekHarnessLaunch.test.ts
+mutated: exit=1
+  × a directory at a pinned path is refused even when its hash field is reused 10ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 31 passed (32)
+  FAIL  tests/deepseekHarnessLaunch.test.ts > DSH launch pin > a directory at a pinned path is refused even when its hash field is reused
+  AssertionError: expected [Function] to throw error including 'DSH approved launch artifact changed;…' but got 'EISDIR: illegal operation on a direct…'
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  32 passed (32)
+
+## S7-M32-dsh-prepare-reverify-59
+file: src/adapters/deepseekHarnessLaunch.ts
+mutation: '  verifyDeepseekHarnessLaunch(input.launch);\n  const root = mkdtempSync' -> '  const root = mkdtempSync'
+command: pnpm vitest run tests/deepseekPublicSurface.test.ts tests/dshCaptureInterruption.test.ts tests/deepseekHarnessLaunch.test.ts
+mutated: exit=1
+  × launch preparation re-checks the pin instead of trusting configuration time 10ms
+  Test Files  1 failed | 2 passed (3)
+  Tests  1 failed | 35 passed (36)
+  FAIL  tests/deepseekHarnessLaunch.test.ts > DSH launch pin > launch preparation re-checks the pin instead of trusting configuration time
+  AssertionError: expected [Function] to throw an error
+restored: exit=0
+  Test Files  3 passed (3)
+  Tests  36 passed (36)
+
+## S7-M33-dsh-launchpin-boundary
+file: src/adapters/deepseekHarnessLaunch.ts
+mutation: 'so a write to those paths after the last hash and before exec is not detected." },' -> '" },'
+command: pnpm vitest run tests/deepseekPublicSurface.test.ts tests/deepseekHarnessLaunch.test.ts
+mutated: exit=1
+  × the capture receipt states that exec by path is outside the hash check 6ms
+  Test Files  1 failed | 1 passed (2)
+  Tests  1 failed | 31 passed (32)
+  FAIL  tests/deepseekHarnessLaunch.test.ts > DSH launch pin > the capture receipt states that exec by path is outside the hash check
+  AssertionError: expected { status: 'hashed_before_spawn', …(1) } to deeply equal { status: 'hashed_before_spawn', …(1) }
+restored: exit=0
+  Test Files  2 passed (2)
+  Tests  32 passed (32)
+
+## S7-M34-cli-format-name-version-15
+file: src/cli-import-commands.ts
+mutation: 'const format = candidate.sourceFormat ? `${candidate.sourceFormat.name} v${candidate.sourceFormat.version} (${candidate.format})` : candidate.format;' -> 'const format = candidate.sourceFormat?.version ?? candidate.format;'
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × a preview names the source format and version, record counts and the structured next actions 27ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 3 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > a preview names the source format and version, record counts and the structured next actions
+  AssertionError: expected 'Neutral import imp-1\n  Mode: dry-run…' to contain '  Source: /fixture/pi session.jsonl; …'
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M35-cli-next-actions-16
+file: src/cli-import-commands.ts
+mutation: 'if (next === "actions") for' -> 'if (false) for'
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × a preview names the source format and version, record counts and the structured next actions 10ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 3 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > a preview names the source format and version, record counts and the structured next actions
+  AssertionError: expected 'Neutral import imp-1\n  Mode: dry-run…' to contain '  Next: Inspect supported import opti…'
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M36-cli-record-counts
+file: src/cli-import-commands.ts
+mutation: '  if (records) console.log(' -> '  if (false) console.log('
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × a preview names the source format and version, record counts and the structured next actions 23ms
+  × an applied import and its manifest point to inspection instead of re-applying 5ms
+  Test Files  1 failed (1)
+  Tests  2 failed | 2 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > a preview names the source format and version, record counts and the structured next actions
+  AssertionError: expected 'Neutral import imp-1\n  Mode: dry-run…' to contain '  Records: 5 (3 mapped, 1 retained on…'
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > an applied import and its manifest point to inspection instead of re-applying
+  AssertionError: expected 'Neutral import imp-1\n  Created: 2026…' to contain '  Records: 5 (3 mapped, 1 retained on…'
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M37-cli-applied-no-reapply
+file: src/cli-import-commands.ts
+mutation: 'result.applied ? "inspect" : "actions"' -> '"actions"'
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × an applied import and its manifest point to inspection instead of re-applying 11ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 3 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > an applied import and its manifest point to inspection instead of re-applying
+  AssertionError: expected 'Neutral import imp-1\n  Mode: import\…' to contain '  Next: inspect with amc imports show…'
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M38-cli-json-byte-identical
+file: src/cli-import-commands.ts
+mutation: '        if (opts.json) {\n          console.log(JSON.stringify(result, null, 2));\n          return;\n        }\n        console.log(chalk.bold(`Neutral import ${result.importId}`));' -> '        if (opts.json) {\n          console.log(JSON.stringify(result));\n          return;\n        }\n        console.log(chalk.bold(`Neutral import ${result.importId}`));'
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × JSON output stays the exact receipt serialization 18ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 3 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > JSON output stays the exact receipt serialization
+  AssertionError: expected [ Array(1) ] to deeply equal [ Array(1) ]
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M39-cli-shell-quoting
+file: src/cli-import-commands.ts
+mutation: 'action.argv.map(shellWord).join(" ")' -> 'action.argv.join(" ")'
+command: pnpm vitest run tests/cliImportCommands.test.ts
+mutated: exit=1
+  × a preview names the source format and version, record counts and the structured next actions 20ms
+  Test Files  1 failed (1)
+  Tests  1 failed | 3 passed (4)
+  FAIL  tests/cliImportCommands.test.ts > amc import text rendering > a preview names the source format and version, record counts and the structured next actions
+  AssertionError: expected 'Neutral import imp-1\n  Mode: dry-run…' to contain '  Next: Apply the reviewed import: am…'
+restored: exit=0
+  Test Files  1 passed (1)
+  Tests  4 passed (4)
+
+## S7-M40-gate-drop-typecheck-tests-step
+file (copy under scratchpad/s7/copyroot): scripts/release-gate.mjs
+mutation: '    steps.push(await step("typecheck-tests", "npm", ["run", "typecheck:tests"], {\n      timeoutMs: 600_000, remediation: "Fix test TypeScript contracts without bypassing assertions or suppressing type errors."\n    }));\n' -> ''
+command: AMC_RECONCILE_ROOT=<copyroot> pnpm vitest run tests/reconciliationDefectsReleaseGate.test.ts
+unmutated copy: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+mutated: exit=1
+  Test Files  1 failed (1)
+  Tests  1 failed | 2 passed (3)
+  FAIL  tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step > the release gate runs typecheck:tests as its own step before build
+  AssertionError: expected undefined to deeply equal { id: 'typecheck-tests', …(1) }
+restored: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+
+## S7-M41-gate-substitute-step-command
+file (copy under scratchpad/s7/copyroot): scripts/release-gate.mjs
+mutation: 'step("typecheck-tests", "npm", ["run", "typecheck:tests"]' -> 'step("typecheck-tests", "npm", ["run", "typecheck"]'
+command: AMC_RECONCILE_ROOT=<copyroot> pnpm vitest run tests/reconciliationDefectsReleaseGate.test.ts
+unmutated copy: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+mutated: exit=1
+  Test Files  1 failed (1)
+  Tests  1 failed | 2 passed (3)
+  FAIL  tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step > the release gate runs typecheck:tests as its own step before build
+  AssertionError: expected { id: 'typecheck-tests', …(1) } to deeply equal { id: 'typecheck-tests', …(1) }
+restored: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+
+## S7-M42-ci-drop-typecheck-tests
+file (copy under scratchpad/s7/copyroot): .github/workflows/ci.yml
+mutation: '      - name: Typecheck tests\n        run: npm run typecheck:tests\n' -> ''
+command: AMC_RECONCILE_ROOT=<copyroot> pnpm vitest run tests/reconciliationDefectsReleaseGate.test.ts
+unmutated copy: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+mutated: exit=1
+  Test Files  1 failed (1)
+  Tests  1 failed | 2 passed (3)
+  FAIL  tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step > ci.yml runs the test typecheck as a named step
+  AssertionError: expected 'name: CI\n\non:\n  pull_request:\n  p…' to match /- name: Typecheck tests\n\s+run: npm …/
+restored: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+
+## S7-M43-publish-drop-typecheck-tests
+file (copy under scratchpad/s7/copyroot): .github/workflows/npm-publish.yml
+mutation: '      - name: Typecheck tests\n        run: npm run typecheck:tests\n' -> ''
+command: AMC_RECONCILE_ROOT=<copyroot> pnpm vitest run tests/reconciliationDefectsReleaseGate.test.ts
+unmutated copy: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+mutated: exit=1
+  Test Files  1 failed (1)
+  Tests  1 failed | 2 passed (3)
+  FAIL  tests/reconciliationDefectsReleaseGate.test.ts > test typecheck stays a named release and CI step > npm-publish.yml runs the test typecheck as a named step
+  AssertionError: expected 'name: npm Publish\n\n# Automated rele…' to match /- name: Typecheck tests\n\s+run: npm …/
+restored: exit=0 Test Files  1 passed (1) | Tests  3 passed (3)
+
