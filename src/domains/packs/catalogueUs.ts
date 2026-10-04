@@ -87,4 +87,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["21 CFR Part 1 Subpart S", "21 CFR Part 1, Subpart S"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "21 CFR 1.1455 (CFR 2025 edition) read: records to FDA within 24 hours; electronic sortable spreadsheet. Compliance date not confirmed on an official-host page in this review." }),
   cfr("us-fsma-pchf", 21, 117, "FDA Current Good Manufacturing Practice, Hazard Analysis, and Risk-Based Preventive Controls for Human Food (21 CFR Part 117)",
     ["21 CFR Part 117"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "Federal Register API listing for 21 CFR 117 read; latest listed final-rule document: 2022-10-31 (FR 2022-23534, supply-chain programs effective date)." }),
+  verified("us-pfas-npdwr", "EPA PFAS National Primary Drinking Water Regulation (40 CFR Part 141, Subpart Z)", "US", "law", "in-force",
+    "https://www.ecfr.gov/api/versioner/v1/structure/current/title-40.json?part=141&subpart=Z",
+    ["40 CFR Part 141 Subpart Z"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "Current eCFR structure read: Subpart Z, Control of PFAS, §§141.900-141.905. EPA's May 2026 proposals to extend PFOA/PFOS compliance and rescind four determinations (FR 2026-10086, 2026-10085) are cited by the round-2 content receipt and were not read here." }),
 ];
