@@ -101,8 +101,11 @@ function ageInDays(date: unknown, now: number): number | null {
   return Math.floor((now - parsed) / DAY_MS);
 }
 
+/** A pack with the currency fields typed structurally, so a registry type that declares them (mutable or readonly) fits. */
+export type PackWithCurrency = Omit<IndustryPack, keyof PackCurrencyFields> & PackCurrencyFields;
+
 export function computePackCurrency(
-  pack: IndustryPack & PackCurrencyFields,
+  pack: PackWithCurrency,
   now: number,
   options: { staleAfterDays?: number } = {},
 ): AuditCurrency {
