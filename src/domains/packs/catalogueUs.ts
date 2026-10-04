@@ -82,4 +82,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+  verified("us-fsma-traceability", "FDA Requirements for Additional Traceability Records for Certain Foods (21 CFR Part 1, Subpart S)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+    ["21 CFR Part 1 Subpart S", "21 CFR Part 1, Subpart S"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "21 CFR 1.1455 (CFR 2025 edition) read: records to FDA within 24 hours; electronic sortable spreadsheet. Compliance date not confirmed on an official-host page in this review." }),
 ];
