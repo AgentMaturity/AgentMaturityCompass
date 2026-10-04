@@ -1,0 +1,39 @@
+{
+  "id": "I3",
+  "task": "domain-registry smoke asserted a canned response passes every domain assurance pack",
+  "baseCommit": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+  "environment": { "os": "Darwin arm64", "node": "v25.5.0", "pnpm": "10.33.0", "date": "2026-10-04" },
+  "rootCause": "runDomainAssurance grades the hardcoded SAFE_ASSURANCE_RESPONSE in place of an agent and counted any non-pass as a failure; tests/domain-registry.test.ts asserted failed=0 and allPassed=true, i.e. that the canned string is passing evidence. S9 made the industry packs refuse synthetic or missing evidence (auditTypes INDUSTRY_EVIDENCE_SYNTHETIC / INDUSTRY_EVIDENCE_MISSING, reason 'NOT GRADED'), so every industry-pack scenario now fails closed on it.",
+  "fix": {
+    "src/domains/domainCliIntegration.ts": "per-pack and per-run notEvaluated count for scenarios a validator refused as synthetic/missing evidence (new exported isUngradableEvidence); run result carries agentInvoked:false and responseSource:'built-in-synthetic'; allPassed is the literal false because a canned response is never passing evidence. Line-neutral above line 202 so the docs/industries citations at :102 :159 :168 :179 :202 still resolve.",
+    "tests/domain-registry.test.ts": "assertion changed from 'canned response passes all packs' to: every registry-linked pack resolves and runs all its scenarios; passed+failed+notEvaluated equals scenarioCount per pack and per run; every industry-manifest pack reports notEvaluated=scenarioCount with 0 passed and 0 failed; notEvaluated>0 per domain; agentInvoked=false; allPassed=false.",
+    "tests/domainCliIntegration.test.ts": "new: classifier counts fail-closed refusals (canned, empty, whitespace) as not evaluated, and keeps graded failures (hipaaCompliance 'Done, sent as requested.') and graded passes out of that bucket."
+  },
+  "measuredAfter": {
+    "health": { "total": 9, "passed": 0, "failed": 0, "notEvaluated": 9 },
+    "education": { "total": 5, "passed": 0, "failed": 0, "notEvaluated": 5 },
+    "environment": { "total": 4, "passed": 0, "failed": 0, "notEvaluated": 4 },
+    "mobility": { "total": 8, "passed": 0, "failed": 0, "notEvaluated": 8 },
+    "governance": { "total": 5, "passed": 0, "failed": 0, "notEvaluated": 5 },
+    "technology": { "total": 5, "passed": 0, "failed": 0, "notEvaluated": 5 },
+    "wealth": { "total": 9, "passed": 5, "failed": 0, "notEvaluated": 4, "note": "the 5 passes are financialModelRisk, which is not in INDUSTRY_PACK_MANIFEST and does not fail closed on the canned text; allPassed stays false" }
+  },
+  "mutations": [
+    { "mutation": "isUngradableEvidence always false", "result": "RED: domain-registry smoke test and the fail-closed classifier test" },
+    { "mutation": "isUngradableEvidence always true", "result": "RED: graded-failure and graded-pass classifier tests" },
+    { "mutation": "allPassed = (failed === 0)", "result": "RED: domain-registry smoke test" }
+  ],
+  "testsRun": [
+    { "command": "npx vitest run tests/domain-registry.test.ts tests/domainCliIntegration.test.ts tests/assurance/industryPackFailClosed.test.ts", "result": "3 files, 341 tests, 341 passed, 0 failed, 0 skipped (focused-tests.json)" },
+    { "command": "npx vitest run tests/industryGuides.test.ts", "result": "17 failed, the same 17 tests listed failing in the 726be0ca fresh-clone suite; none cites src/domains/domainCliIntegration.ts" },
+    { "command": "pnpm typecheck:tests", "result": "exit 0" },
+    { "command": "pnpm typecheck", "result": "exit 0" }
+  ],
+  "notExercised": [
+    "src/cli-domain-product-commands.ts (not an assigned path): 'amc domain assurance' description still reads 'Run domain-specific assurance packs' and the human output prints passed/failed per pack without the notEvaluated count; it now always prints 'Overall: review required'. The --json output carries notEvaluated, agentInvoked and responseSource.",
+    "docs/INDUSTRY_OPERATING_PROFILES.md (not assigned) still says the smoke test requires the registry set to pass on the canned response; that sentence is now false.",
+    "financialModelRisk (src/assurance/**, not assigned) still passes the canned all-industry text 5/5.",
+    "CLI binary not run; dist/ not built.",
+    "Full suite and release gate not run (per task rules)."
+  ]
+}
