@@ -1,6 +1,6 @@
 {
   "track": "S5",
-  "status": "COMPLETE (repair round 1)",
+  "status": "COMPLETE (repair round 1, re-verified 2026-10-04)",
   "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
   "branch": "worktree-wf_5210e2f4-3ea-5",
   "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-5",
@@ -145,6 +145,36 @@
       "RSS +90d estimated effectiveDate and in-place lastContentHash",
       "contract vs fetchContract naming; no tests/regulatoryFeeds.test.ts",
       "per-status review windows"
+    ]
+  },
+  "repairRound1Reverified": {
+    "date": "2026-10-04",
+    "headVerified": "297af3a4 (repair commit d7a77cc5)",
+    "codeChanges": "none; every required fix was already in d7a77cc5, re-verified only",
+    "checks": [
+      "git diff --name-only 8f57ce63..HEAD: 17 paths, all claimed (no regulatoryRegister/, euAiAct.test.ts or globalRegulatory.test.ts)",
+      "pnpm vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts -> 6 files, 111 tests passed, 0 skipped",
+      "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+      "node scripts/check-regulatory-currency.mjs -> entries=17 verified=11 unverified=6 asOf=2026-10-04, exit 0; --now 2027-06-01 exit 1; --bogus exit 1; --json lists entries with id,status,verified,lastReviewed,windowDays,currency,sources[{url,retrievedAt}]",
+      "grep -n Superseded docs/wave4-regulatory-audit.md -> line 3",
+      "grep -n 'example.com\\\\|globalThis.fetch' tests/regulatoryAutomation.test.ts -> nothing"
+    ],
+    "mutations": [
+      {
+        "mutation": "getDpiaAssessment stamps lastReviewDate/nextReviewDate with Date.now()",
+        "red": "regulatoryClaimsHonesty + round4Gaps: 2 failed | 51 passed",
+        "restored": "git checkout; 74/74 passed across the three files"
+      },
+      {
+        "mutation": "cn-pipl mappingStatus 'complete'",
+        "red": "round4Gaps: 1 failed | 47 passed",
+        "restored": "git checkout; green"
+      },
+      {
+        "mutation": "eu-ai-act source url -> https://artificialintelligenceact.eu/",
+        "red": "script exit 1 'is not on an official host'; regulatoryCurrency 5 failed | 16 passed",
+        "restored": "git checkout; script exit 0"
+      }
     ]
   }
 }

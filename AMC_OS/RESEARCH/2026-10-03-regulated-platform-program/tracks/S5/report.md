@@ -1,3 +1,17 @@
+# Track S5 — repair round 1 re-verification (2026-10-04)
+
+All six required fixes were already committed in d7a77cc5 (receipt 297af3a4). No code changed this pass; each fix was checked again at HEAD 297af3a4.
+- Paths: `git diff --name-only 8f57ce63..HEAD` lists 17 paths, all claimed. Module is at `src/compliance/regulatory/`; tests are `tests/euAiActTimeline.test.ts` and `tests/regulatoryCurrency.test.ts`.
+- `pnpm vitest run` on regulatoryCurrency, euAiActTimeline, regulatoryAutomation, round4Gaps, regulatoryClaimsHonesty and complyRiskClassifyDocs: 6 files, 111 tests passed, 0 skipped. `pnpm typecheck` and `pnpm typecheck:tests` both exit 0.
+- Currency script: exits 0 by default (asOf=2026-10-04). Exits 1 for `--now 2027-06-01` and for `--bogus`. `--json` lists each entry with its sources.
+- `docs/wave4-regulatory-audit.md:3` has the Superseded banner. `tests/regulatoryAutomation.test.ts` contains neither example.com nor globalThis.fetch.
+- Mutations (each restored and re-run green):
+  - Restoring Date.now() stamping in getDpiaAssessment: 2 tests fail.
+  - Setting cn-pipl mappingStatus to 'complete': round4Gaps has 1 failure.
+  - Using an artificialintelligenceact.eu source: the script exits 1 and 5 regulatoryCurrency tests fail.
+
+---
+
 # Track S5 — repair round 1 (2026-10-03, after monitor REJECTED c6b0d19b)
 
 - Branch `worktree-wf_5210e2f4-3ea-5`; base 8f57ce63 is an ancestor; repair commit d7a77cc5 on top of c6b0d19b; receipt commit follows.
