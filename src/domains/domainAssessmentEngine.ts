@@ -281,23 +281,29 @@ function evaluateCertification(
 
 const ANNEX_III_POINT_COUNT = 8;
 
+/** A parenthetical that explains what a point covers, e.g. "(§2 covers road traffic, not port operations)". */
+const SCOPE_NOTE = /\([^()]*\bcovers\b[^()]*\)/g;
+/** "PROHIBITED", or a specific Art. 5(1)(x) prohibition cited in the same clause. */
+const PROHIBITION = /\bPROHIBITED\b|Art\. 5\(1\)\([a-h]\)[^;]*\bprohibit/;
+
 /**
- * Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]), whether GPAI is declared, and
- * whether the text carries a PROHIBITED qualifier (kept separate: Art. 5 practices are not an Annex III point).
+ * Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]), whether a general-purpose AI
+ * route is declared, and whether the text flags an Art. 5 prohibition (kept separate: Art. 5 is not an Annex III point).
+ * Scope-note parentheticals are skipped, so "Not listed in Annex III (§8 covers judicial authorities)" gives no point.
  */
 export function parseAnnexIIIPoints(classification: string): { points: number[]; generalPurpose: boolean; prohibitedFlag: boolean } {
   const annexAt = classification.indexOf("Annex III");
   const points = new Set<number>();
   if (annexAt >= 0) {
-    for (const match of classification.slice(annexAt).matchAll(/§\s*(\d+)/g)) {
+    for (const match of classification.slice(annexAt).replace(SCOPE_NOTE, "").matchAll(/§\s*(\d+)/g)) {
       const point = Number(match[1]);
       if (point >= 1 && point <= ANNEX_III_POINT_COUNT) points.add(point);
     }
   }
   return {
     points: [...points].sort((a, b) => a - b),
-    generalPurpose: /General Purpose AI/i.test(classification),
-    prohibitedFlag: /\bPROHIBITED\b/.test(classification)
+    generalPurpose: /General[- ]Purpose AI/i.test(classification),
+    prohibitedFlag: PROHIBITION.test(classification)
   };
 }
 

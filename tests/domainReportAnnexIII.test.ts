@@ -25,7 +25,9 @@ describe("domain assessment — EU AI Act classification", () => {
       expect(result.euAIActClassification.packs.map((p) => p.packId)).toEqual(packs.map((p) => p.id));
       for (const [i, p] of result.euAIActClassification.packs.entries()) {
         expect(p.classification).toBe(packs[i]!.euAIActClassification);
-        expect(p.annexIIIPoints.length > 0 || p.generalPurpose, `${p.packId}: ${p.classification}`).toBe(true);
+        // Every pack names an Annex III point, a GPAI route, or says why it is outside Annex III (Art. 6(1)/Annex I, not listed).
+        const outsideAnnexIII = /Not listed in Annex III|Art\. 6\(1\)/.test(p.classification);
+        expect(p.annexIIIPoints.length > 0 || p.generalPurpose || outsideAnnexIII, `${p.packId}: ${p.classification}`).toBe(true);
       }
     }
   });
@@ -39,9 +41,20 @@ describe("domain assessment — EU AI Act classification", () => {
     expect(parseAnnexIIIPoints("Art. 5 §2 — no annex named")).toEqual({ points: [], generalPurpose: false, prohibitedFlag: false });
   });
 
-  test("a PROHIBITED qualifier is flagged separately from the Annex III point", () => {
+  test("a PROHIBITED qualifier or a cited Art. 5(1) prohibition is flagged separately from the Annex III point", () => {
     expect(parseAnnexIIIPoints("Annex III §8 — Administration of justice and democratic processes (PROHIBITED if manipulation of voting behavior)"))
       .toEqual({ points: [8], generalPurpose: false, prohibitedFlag: true });
+    expect(parseAnnexIIIPoints("Annex III §8(b) — systems intended to influence an election; Art. 5(1)(a) prohibits manipulative or deceptive techniques"))
+      .toEqual({ points: [8], generalPurpose: false, prohibitedFlag: true });
+    expect(parseAnnexIIIPoints("Not listed in Annex III; otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply").prohibitedFlag)
+      .toBe(false);
+  });
+
+  test("scope-note parentheticals and negations do not invent points; lower-case general-purpose AI is a GPAI route", () => {
+    expect(parseAnnexIIIPoints("Not listed in Annex III (§8 covers judicial authorities and election influence, not legislative drafting); Art. 50 transparency applies"))
+      .toEqual({ points: [], generalPurpose: false, prohibitedFlag: false });
+    expect(parseAnnexIIIPoints("Not listed in Annex III unless used to evaluate the creditworthiness of natural persons (Annex III §5(b))").points).toEqual([5]);
+    expect(parseAnnexIIIPoints("Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk)").generalPurpose).toBe(true);
   });
 
   test("governance exposes dance-of-democracy under Annex III point 8 with its PROHIBITED flag", () => {
@@ -49,7 +62,7 @@ describe("domain assessment — EU AI Act classification", () => {
     const pack = packs.find((p) => p.packId === "dance-of-democracy");
     expect(pack?.annexIIIPoints).toEqual([8]);
     expect(pack?.prohibitedFlag).toBe(true);
-    expect(packs.filter((p) => p.prohibitedFlag).map((p) => p.packId)).toEqual(["dance-of-democracy"]);
+    expect(packs.filter((p) => p.prohibitedFlag).map((p) => p.packId)).toContain("dance-of-democracy");
   });
 });
 
@@ -93,7 +106,9 @@ describe("domain report — EU AI Act classification and certification semantics
     const result = governance(80, 80);
     const md = renderDomainReportMarkdown(result, NOW);
     expect(md).toContain("## EU AI Act Classification");
-    expect(md).toContain("- PROHIBITED qualifier (check the use against Art. 5): dance-of-democracy");
+    const flagged = result.euAIActClassification.packs.filter((p) => p.prohibitedFlag).map((p) => p.packId);
+    expect(flagged).toContain("dance-of-democracy");
+    expect(md).toContain(`- Art. 5 prohibition flagged (check the use against Art. 5): ${flagged.join(", ")}`);
     expect(md).toContain("- Station category: high-risk");
     for (const p of result.euAIActClassification.packs) {
       expect(md).toContain(`| ${p.packId} | ${p.classification} | ${p.annexIIIPoints.join(", ") || "-"} | ${p.generalPurpose ? "yes" : "no"} |`);
