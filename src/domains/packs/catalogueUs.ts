@@ -89,4 +89,10 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
       note: "csrc.nist.gov read 2026-10-04: final, published July 2025; \"This publication supersedes NIST Special Publication (SP) 800-63B.\"",
     }),
+  verified("us-52usc30124", "52 U.S.C. §30124, Fraudulent misrepresentation of campaign authority", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title52/html/USCODE-2023-title52-subtitleIII-chap301-subchapI-sec30124.htm",
+    ["52 U.S.C. 30124", "52 U.S.C. §30124"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "Section heading and (a) read on govinfo.gov (US Code 2023 edition) 2026-10-04.",
+    }),
 ];
