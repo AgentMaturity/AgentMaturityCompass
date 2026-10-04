@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AMC chart values",
+  "description": "Guards only the values that carry a security contract; other keys stay open.",
+  "type": "object",
+  "definitions": {
+    "bootstrapValue": {
+      "type": "string",
+      "description": "Empty unless bootstrap.createSecret=true. Never a change-me placeholder (case-insensitive).",
+      "not": { "pattern": "^[Cc][Hh][Aa][Nn][Gg][Ee]-?[Mm][Ee]" }
+    }
+  },
+  "properties": {
+    "replicaCount": { "const": 1 },
+    "image": {
+      "type": "object",
+      "required": ["repository"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^(sha256:[a-f0-9]{64})?$" },
+        "requireDigest": { "type": "boolean" }
+      },
+      "if": { "properties": { "requireDigest": { "const": true } }, "required": ["requireDigest"] },
+      "then": {
+        "required": ["digest"],
+        "properties": { "digest": { "pattern": "^sha256:[a-f0-9]{64}$" } }
+      }
+    },
+    "bootstrap": {
+      "type": "object",
+      "properties": {
+        "createSecret": { "type": "boolean" },
+        "values": {
+          "type": "object",
+          "properties": {
+            "vaultPassphrase": { "$ref": "#/definitions/bootstrapValue" },
+            "ownerUsername": { "$ref": "#/definitions/bootstrapValue" },
+            "ownerPassword": { "$ref": "#/definitions/bootstrapValue" },
+            "notaryPassphrase": { "$ref": "#/definitions/bootstrapValue" },
+            "notaryAuthSecret": { "$ref": "#/definitions/bootstrapValue" }
+          }
+        }
+      }
+    }
+  }
+}

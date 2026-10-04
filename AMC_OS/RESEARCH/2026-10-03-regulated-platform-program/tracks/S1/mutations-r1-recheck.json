@@ -1,0 +1,70 @@
+[
+ {
+  "guard": "R1-M1 Chart.yaml appVersion 1.2.0->9.9.9",
+  "file": "deploy/helm/amc/Chart.yaml",
+  "test": "tests/helmChartVersion.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 4 passed (5)",
+   "failing": [
+    "helm chart version and image pinning > Chart.yaml appVersion equals the package.json version"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  5 passed (5)"
+  }
+ },
+ {
+  "guard": "R1-M2 values.yaml env AMC_VAULT_PASSPHRASE literal",
+  "file": "deploy/helm/amc/values.yaml",
+  "test": "tests/helmChartSecrets.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  1 failed | 5 passed (6)",
+   "failing": [
+    "helm chart bootstrap secret > finds no literal secret in Helm values, templates, k8s manifests or docker assets"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  6 passed (6)"
+  }
+ },
+ {
+  "guard": "R1-M4 deploy/k8s strategy Recreate->RollingUpdate",
+  "file": "deploy/k8s/deployment.yaml",
+  "test": "tests/deployPackCheck.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  3 failed | 4 passed (7)",
+   "failing": [
+    "deploy-pack-check > --require-tools fails when a tool is absent (injected), passes the skip list through",
+    "deploy-pack-check > passes offline and names every tool it could not run",
+    "deployment pack: probes and rollout safety > keeps the single-writer workspace to one pod with a Recreate rollout"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  7 passed (7)"
+  }
+ },
+ {
+  "guard": "R1-M6 Helm readiness /readyz->/ready",
+  "file": "deploy/helm/amc/templates/deployment.yaml",
+  "test": "tests/deployPackCheck.test.ts",
+  "red": {
+   "exit": 1,
+   "summary": "Tests  3 failed | 4 passed (7)",
+   "failing": [
+    "deploy-pack-check > --require-tools fails when a tool is absent (injected), passes the skip list through",
+    "deploy-pack-check > passes offline and names every tool it could not run",
+    "deployment pack: probes and rollout safety > probes target AMC health endpoints that exist in the server source"
+   ]
+  },
+  "restoredGreen": {
+   "exit": 0,
+   "summary": "Tests  7 passed (7)"
+  }
+ }
+]

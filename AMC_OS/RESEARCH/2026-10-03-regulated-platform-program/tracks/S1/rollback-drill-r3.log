@@ -1,0 +1,4 @@
+rollback-drill: --secrets-dir is required
+exit 2
+rollback-drill: docker daemon unavailable
+exit 2

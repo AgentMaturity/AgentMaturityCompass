@@ -46,6 +46,17 @@ variable "image_tag" {
   default     = "latest"
 }
 
+variable "image_digest" {
+  type        = string
+  description = "Optional image digest (sha256:<64 hex>). When set the chart deploys repository@digest and ignores image_tag."
+  default     = ""
+
+  validation {
+    condition     = can(regex("^(sha256:[a-f0-9]{64})?$", var.image_digest))
+    error_message = "image_digest must be empty or sha256:<64 lowercase hex>."
+  }
+}
+
 variable "image_pull_policy" {
   type        = string
   description = "Kubernetes image pull policy."
@@ -54,8 +65,8 @@ variable "image_pull_policy" {
 
 variable "replica_count" {
   type        = number
-  description = "Number of AMC Studio replicas."
-  default     = 2
+  description = "Number of AMC Studio replicas. Must be 1: the workspace has a single writer and the chart refuses other values."
+  default     = 1
 }
 
 variable "workspace_storage_size" {

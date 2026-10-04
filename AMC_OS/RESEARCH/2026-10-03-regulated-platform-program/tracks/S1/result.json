@@ -1,0 +1,246 @@
+{
+ "track": "S1",
+ "round": 3,
+ "status": "PARTIAL",
+ "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+ "branch": "worktree-wf_5210e2f4-3ea-1",
+ "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-1",
+ "commits": {
+  "round1": [
+   "e05bcb7d",
+   "a0ed68d0",
+   "3ca024d0",
+   "1cc80aab",
+   "be70e303"
+  ],
+  "round2": [
+   "903c19fe (code/docs/tests)",
+   "receipt commit following 903c19fe"
+  ],
+  "round3": [
+   "cdab568c (code/docs/tests)",
+   "receipt commit following cdab568c"
+  ]
+ },
+ "environment": "macOS Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, Terraform v1.14.4; helm/kubectl/kustomize/kubeconform/pulumi/docker-compose plugin not installed; Docker daemon not running (docker info: no /var/run/docker.sock)",
+ "monitorFixes": [
+  {
+   "fix": "tests/deploymentPack.test.ts reverted; secret.yaml restored behind bootstrap.createSecret with required values and change-me refusal; values.schema.json",
+   "evidence": "git diff --stat 8f57ce63 HEAD -- tests/deploymentPack.test.ts is empty; pnpm vitest run tests/deploymentPack.test.ts passes (green-r2.log); mutation M-R1 (if-wrapper deleted) RED in tests/helmChartSecrets.test.ts"
+  },
+  {
+   "fix": "tests/deployAssets.test.ts split into tests/helmChartVersion.test.ts, tests/helmChartSecrets.test.ts, tests/k8sManifestsSecrets.test.ts, tests/deployPackCheck.test.ts (+ tests/deployPackProbe.test.ts, tests/rollbackDrill.test.ts, tests/helpers/deployPackFixtures.ts)",
+   "evidence": "path-discipline-r2.log: no tests/ path outside the claimed globs; dirty-root and codex-dirty-paths intersections 0"
+  },
+  {
+   "fix": "image.digest/image.requireDigest (values, deployment.yaml image lines, test pod, schema, template fail); Terraform image_digest; Pulumi imageDigest",
+   "evidence": "static template assertions in tests/helmChartVersion.test.ts; mutations M-R4, M-R5 RED. Helm rendering of the digest NOT exercised (helm absent)"
+  },
+  {
+   "fix": "scripts/deploy/deploy-pack-check.mjs --json / --require-tools reusing validate-assets.mjs",
+   "evidence": "deploy-pack-check-r2.log: 'passed helm:binary absent,kubeconform:binary absent'; --require-tools exit 1"
+  },
+  {
+   "fix": "scripts/deploy/governed-turn-probe.mjs on /api/v1/native-tasks (stub, tools none, poll, /verify) + templates/tests/governed-turn.yaml (helm.sh/hook: test) + docker/docker-compose.yml amc-verify (profile verify)",
+   "evidence": "tests/deployPackProbe.test.ts: liveness-only stub (200 /healthz,/readyz; 503 /api/v1/native-tasks*) -> status failed, CLI exit 1; mutation M-R8 RED"
+  },
+  {
+   "fix": "scripts/deploy/rollback-drill.mjs + tests/rollbackDrill.test.ts",
+   "evidence": "refuses non-digest ids / fails closed on probe failure / exit-2 path tested with an injected docker runner; mutations M-R6, M-R7 RED; CLI on this host exit 2 'docker daemon unavailable' (rollback-drill-r2.log). Drill NOT executed on this host (daemon down)"
+  },
+  {
+   "fix": "docs/KUBERNETES_HELM_DEPLOYMENT.md boundary paragraph cites kubernetes.io/helm.sh (retrievedAt 2026-10-03) and names the one statement not re-verified",
+   "evidence": "docs section 'What was exercised'"
+  }
+ ],
+ "acceptance": [
+  {
+   "check": "Default Helm render contains no placeholder secret and no Secret resource",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)",
+   "fallback": "node scripts/deploy/deploy-pack-check.mjs --json -> passed, helm:binary absent,kubeconform:binary absent; static test 'default render must contain no Secret' passes"
+  },
+  {
+   "check": "Explicit secret creation refuses placeholders and missing values (helm template --set bootstrap.createSecret=true ...)",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)",
+   "fallback": "static assertions on the template/helper + Ajv schema test; deploy-pack-check runs both refusals when helm exists"
+  },
+  {
+   "check": "Digest pinning renders repository@digest (helm template --set image.digest=...)",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)",
+   "fallback": "static template assertion only; rendering not exercised"
+  },
+  {
+   "check": "Chart version and quickstart pin tied to their sources",
+   "status": "passed",
+   "command": "pnpm vitest run tests/helmChartVersion.test.ts tests/helmChartSecrets.test.ts tests/k8sManifestsSecrets.test.ts",
+   "observed": "all passed; appVersion 1.2.0 == package.json; quickstart 1.1.1 == verifyPublishedInstallerVersion"
+  },
+  {
+   "check": "Pack check runs offline and names what it could not run",
+   "status": "passed",
+   "command": "node scripts/deploy/deploy-pack-check.mjs --json | node -e ...",
+   "observed": "passed helm:binary absent,kubeconform:binary absent"
+  },
+  {
+   "check": "kubeconform validation of raw manifests and render",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)"
+  },
+  {
+   "check": "Rollback drill receipt with two sha256 ids and six passed steps",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)",
+   "observed": "script exits 2 'docker daemon unavailable'; drill not executed; receipt builder unit-tested with an injected docker runner"
+  },
+  {
+   "check": "helm test governed-turn pod against a deployed release",
+   "status": "blocked",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)",
+   "note": "round 3: the release now lists its own Service origin in AMC_CORS_ALLOWED_ORIGINS; admission of the test pod checked against src/studio/nativeAdmission.ts in tests/helmChartOrigins.test.ts, not in a cluster"
+  },
+  {
+   "check": "Governed-turn probe refuses a liveness-only server",
+   "status": "passed",
+   "command": "pnpm vitest run tests/deployPackProbe.test.ts",
+   "observed": "4 passed; liveness-only stub -> failed / exit 1"
+  },
+  {
+   "check": "No dirty or forbidden path touched",
+   "status": "passed",
+   "observed": "0 (path-discipline-r3.log)"
+  },
+  {
+   "check": "Unclaimed existing deployment tests still pass and docs drift is clean",
+   "status": "passed",
+   "observed": "tests/deploymentPack.test.ts (unmodified) + tests/pulumiHelmRelease.test.ts pass; docs drift passed (327 files)"
+  }
+ ],
+ "remainingBlocked": [
+  {
+   "item": "helm render / lint / helm test (acceptance 1-3, helm test pod)",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)"
+  },
+  {
+   "item": "kubeconform",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)"
+  },
+  {
+   "item": "rollback drill execution and compose verify profile run",
+   "reason": "binary absent / daemon down \u2014 tool install not authorized (root-decisions.md)"
+  }
+ ],
+ "plannerScopeNotDelivered": [
+  "docker/Dockerfile.quickstart SHA256SUMS verification",
+  "scripts/deploy/record-image-digest.mjs",
+  "kubeconform step in .github/workflows/docker-build.yml"
+ ],
+ "mutations": {
+  "round2": "mutations-r2.json (10 guards, each RED then restored GREEN)",
+  "round1Recheck": "mutations-r1-recheck.json (4 round-1 guards re-verified against the split test files)",
+  "round1": "mutations.json (ran against the since-split tests/deployAssets.test.ts)",
+  "round3": "mutations-r3.json (5 guards for the origin fixes, each RED then restored GREEN)"
+ },
+ "security": "Chart 0.1.0 rendered amc-bootstrap with literal change-me-* values; workspaces bootstrapped by plain helm install used a published vault passphrase. Owner decision needed; documented in docs/KUBERNETES_HELM_DEPLOYMENT.md 'Upgrading from chart 0.1.0'.",
+ "logs": [
+  "red-r3.log",
+  "green-r3.log",
+  "deploy-pack-check-r3.log",
+  "rollback-drill-r3.log",
+  "path-discipline-r3.log",
+  "mutations-r3.json",
+  "green-r2.log",
+  "deploy-pack-check-r2.log",
+  "rollback-drill-r2.log",
+  "path-discipline-r2.log",
+  "mutations-r2.json",
+  "mutations-r1-recheck.json",
+  "red-before-fix.log",
+  "validate-before-fix.log",
+  "green-after-fix.log",
+  "validate-after-fix.log",
+  "rollback-check.log",
+  "mutations.json"
+ ],
+ "reportMd": "report.md",
+ "round1": {
+  "status": "PARTIAL",
+  "commits": [
+   "e05bcb7d",
+   "a0ed68d0",
+   "3ca024d0"
+  ],
+  "partialBecause": [
+   "helm not installed: helm template/lint and the helm branches of validate-assets.mjs and rollback-check.mjs were not exercised",
+   "probes do not exercise a governed turn; a governed-turn endpoint requires src/studio/studioServer.ts (forbidden)",
+   "chart 0.1.0 installs used published vault passphrase change-me-vault-passphrase; no amc vault passphrase-change command exists at this revision"
+  ]
+ },
+ "round3": {
+  "trigger": "verify/reverify-S1.json REJECTED round 2 only on the native origin/host defect; all eight round-1 fixes accepted under mutation",
+  "defect": "Studio admits native requests only from hosts in AMC_CORS_ALLOWED_ORIGINS plus the bind host (src/studio/nativeAdmission.ts nativeAllowedBrowserOrigins + assertNativeBrowserAdmission). The chart, drill and compose ran Studio with --bind 0.0.0.0 and no AMC_CORS_ALLOWED_ORIGINS, so the allowed list was [http://0.0.0.0:3212] and the probe's first native request (GET /api/v1/native-tasks/options) from Host <release>-amc:3212, 127.0.0.1:<port> or amc-studio:3212 was refused with NATIVE_HOST_DENIED. Round 2 listed this as unverified; it was verifiable offline and failed.",
+  "fixes": [
+   {
+    "fix": "A chart",
+    "files": [
+     "deploy/helm/amc/templates/_helpers.tpl",
+     "deploy/helm/amc/templates/configmap.yaml",
+     "deploy/helm/amc/templates/tests/governed-turn.yaml",
+     "deploy/helm/amc/values.yaml"
+    ],
+    "change": "new helper amc.studioServiceOrigin = http://<fullname>:<service.port>, used by both the ConfigMap and the test pod --base-url; amc.corsAllowedOrigins joins it with env.AMC_CORS_ALLOWED_ORIGINS (new values key, default \"\") via compact; ConfigMap renders AMC_CORS_ALLOWED_ORIGINS from it",
+    "test": "tests/helmChartOrigins.test.ts (3 tests): static template wiring; rendered value http://amc-amc:3212 passed to nativeAllowedBrowserOrigins(\"0.0.0.0\", 3212, extra) admits GET Host amc-amc:3212 and POST with Origin + intent + CSRF; without it GET throws NATIVE_HOST_DENIED; operator list appended, not substituted"
+   },
+   {
+    "fix": "B drill",
+    "files": [
+     "scripts/deploy/rollback-drill.mjs",
+     "tests/rollbackDrill.test.ts"
+    ],
+    "change": "docker run adds -e AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:${port}",
+    "test": "rollbackDrill.test.ts \"admits the probe's 127.0.0.1 host\" asserts the env entry for ports 3212 and 4412"
+   },
+   {
+    "fix": "C compose",
+    "files": [
+     "docker/docker-compose.yml",
+     "tests/deployPackProbe.test.ts"
+    ],
+    "change": "amc-studio environment adds AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212",
+    "test": "existing compose assertion extended: amc-verify --base-url parsed from the file must appear as AMC_CORS_ALLOWED_ORIGINS in amc-studio environment"
+   },
+   {
+    "fix": "D docs",
+    "files": [
+     "docs/KUBERNETES_HELM_DEPLOYMENT.md"
+    ],
+    "change": "helm test section states the admission mechanism, the rendered value and env.AMC_CORS_ALLOWED_ORIGINS for an Ingress host; drill section states the run env and that --secrets-dir is required (exit 2 \"--secrets-dir is required\" without it, \"docker daemon unavailable\" with it and no daemon); What was exercised keeps the line that the admitted path was proven with a unit test against src/studio/nativeAdmission.ts, not in a cluster, compose run or drill run",
+    "check": "pnpm check:docs-drift: Docs drift check passed (327 files scanned)"
+   }
+  ],
+  "redBeforeFix": "red-r3.log: 3 failed | 9 passed (12) across tests/helmChartOrigins.test.ts, tests/rollbackDrill.test.ts, tests/deployPackProbe.test.ts",
+  "mutations": "mutations-r3.json: 5 mutations, each RED (exit 1, 1 failed) then restored GREEN (exit 0)",
+  "mutationSummary": [
+   "M-R3-A1 configmap AMC_CORS_ALLOWED_ORIGINS line removed: helmChartOrigins 1 failed | 2 passed -> 3 passed",
+   "M-R3-A2 helper drops the Service origin from the list: helmChartOrigins 1 failed | 2 passed -> 3 passed",
+   "M-R3-A3 test pod --base-url diverges from the helper: helmChartOrigins 1 failed | 2 passed -> 3 passed",
+   "M-R3-B drill docker run env entry removed: rollbackDrill 1 failed | 4 passed -> 5 passed",
+   "M-R3-C compose amc-studio env line removed: deployPackProbe 1 failed | 3 passed -> 4 passed"
+  ],
+  "focusedRun": "green-r3.log: pnpm vitest run (10 files: helmChartOrigins, helmChartVersion, helmChartSecrets, k8sManifestsSecrets, deployPackCheck, deployPackProbe, rollbackDrill, deploymentPack, pulumiHelmRelease, containerSourceBuild) -> Test Files 10 passed (10), Tests 58 passed (58)",
+  "deployPackCheck": "deploy-pack-check-r3.log: status passed, skipped helm and kubeconform (binary absent), exit 0",
+  "rollbackDrillCli": "rollback-drill-r3.log: without --secrets-dir exit 2 \"--secrets-dir is required\"; with an empty scratch --secrets-dir exit 2 \"docker daemon unavailable\"",
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "pathDiscipline": "path-discipline-r3.log: 57 paths (8f57ce63..worktree incl. untracked + S1 receipts), 0 outside claimed globs, 0 of 306 dirty-list entries, 0 package.json/pnpm-lock.yaml/src/**",
+  "notExercised": [
+   "helm template/lint/test (helm absent): the rendered value is computed in the test from the template expression, not by Helm",
+   "kubeconform",
+   "rollback drill execution and compose verify run (Docker daemon down)",
+   "any cluster",
+   "Studio itself was not started; admission was checked by calling src/studio/nativeAdmission.ts directly"
+  ],
+  "monitorOpenItemAddressed": "--secrets-dir: documented as required in the guide (monitor option 1); the drill was not changed to generate throwaway credentials"
+ }
+}

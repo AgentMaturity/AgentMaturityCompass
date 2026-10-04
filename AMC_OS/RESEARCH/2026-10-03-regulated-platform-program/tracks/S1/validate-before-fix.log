@@ -1,0 +1,19 @@
+chart amc 0.1.0 appVersion 1.1.1 != package.json 1.2.0
+quickstart AMC_VERSION 1.1.1 (published GitHub release pin)
+probe amc-studio readinessProbe /readyz -> src/studio/studioServer.ts:1768
+probe amc-studio livenessProbe /healthz -> src/studio/studioServer.ts:1729
+probe amc-notary readinessProbe /readyz -> src/notary/notaryServer.ts:149
+probe amc-notary livenessProbe /healthz -> src/notary/notaryServer.ts:144
+probe amc-studio startupProbe /healthz -> src/studio/studioServer.ts:1729
+helm: not on PATH; chart template rendering NOT exercised (static checks only)
+FAIL deploy/helm/amc/Chart.yaml appVersion 1.1.1 != package.json 1.2.0
+FAIL deploy/helm/amc/examples/values-persistent-bootstrap.yaml: does not parse: Map keys must be unique at line 30, column 1:
+FAIL deploy/helm/amc/templates/secret.yaml: chart renders a Secret; bootstrap secrets must be created out of band
+FAIL deploy/helm/amc/templates/secret.yaml: contains a known default secret
+FAIL deploy/helm/amc/templates/deployment.yaml: Studio has no startupProbe to cover bootstrap
+FAIL deploy/helm/amc/templates/deployment.yaml: rollout strategy is not Recreate
+FAIL deploy/helm/amc/templates/deployment.yaml: no render-time refusal of replicaCount > 1
+FAIL deploy/k8s/deployment.yaml: rollout strategy is not Recreate
+FAIL deploy/terraform/helm-release/variables.tf replica_count default 2 != 1
+FAIL terraform.tfvars.example replica_count 2 != 1
+validate-assets: 10 failure(s)

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "M1 appVersion 9.9.9",
+    "test": "Helm chart appVersion equals",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M2 literal passphrase in values.yaml default",
+    "test": "finds no literal secret",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M3 default Secret template re-added",
+    "test": "finds no literal secret",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M4 k8s Deployment back to RollingUpdate",
+    "test": "single-writer",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M5 helm replicaCount guard removed",
+    "test": "single-writer",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M6 helm readiness probe path /ready (no handler)",
+    "test": "probes target AMC health endpoints",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M7 helm liveness on /readyz",
+    "test": "probes target AMC health endpoints",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M8 raw secret example name drift",
+    "test": "raw k8s secret example matches",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M9 rollbackHazards selector check disabled",
+    "test": "rollback hazards",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M10 terraform replica default 2",
+    "test": "single-writer",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  },
+  {
+    "id": "M11 duplicate env key in example",
+    "test": "every Helm example values file parses",
+    "red": "exit 1: Tests  1 failed | 9 skipped (10)",
+    "restoredGreen": "exit 0: Tests  1 passed | 9 skipped (10)"
+  }
+]

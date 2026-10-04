@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-1
+
+
+ Test Files  4 passed (4)
+      Tests  37 passed (37)
+   Start at  22:02:30
+   Duration  3.61s (transform 149ms, setup 118ms, import 314ms, tests 4.26s, environment 1ms)
+

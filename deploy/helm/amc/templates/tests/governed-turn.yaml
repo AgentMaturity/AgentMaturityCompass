@@ -1,0 +1,76 @@
+{{- /*
+`helm test <release>`: one governed native turn against the deployed Studio.
+The probe source is files/governed-turn-probe.mjs, a byte-identical copy of
+scripts/deploy/governed-turn-probe.mjs (tests/deployPackProbe.test.ts enforces it).
+The pod deliberately omits app.kubernetes.io/name so the Studio NetworkPolicy
+does not select it; networkpolicy.yaml admits it by the component label.
+*/}}
+{{- $component := "governed-turn-test" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "amc.fullname" . }}-governed-turn
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-weight: "-1"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+data:
+  governed-turn-probe.mjs: |-
+{{ .Files.Get "files/governed-turn-probe.mjs" | indent 4 }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "amc.fullname" . }}-governed-turn
+  labels:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: {{ $component }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  serviceAccountName: {{ include "amc.serviceAccountName" . }}
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  containers:
+    - name: governed-turn
+      image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command: ["node", "/probe/governed-turn-probe.mjs"]
+      args:
+        - --base-url
+        - {{ include "amc.studioServiceOrigin" . }}
+        - --username-file
+        - /run/secrets/amc_owner_username
+        - --password-file
+        - /run/secrets/amc_owner_password
+        - --ready-timeout-ms
+        - "60000"
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      volumeMounts:
+        - name: probe
+          mountPath: /probe
+          readOnly: true
+        - name: secrets
+          mountPath: /run/secrets
+          readOnly: true
+  volumes:
+    - name: probe
+      configMap:
+        name: {{ include "amc.fullname" . }}-governed-turn
+    - name: secrets
+      projected:
+        sources:
+          - secret:
+              name: {{ .Values.bootstrap.ownerUsernameSecret.name }}
+              items:
+                - key: {{ .Values.bootstrap.ownerUsernameSecret.key }}
+                  path: amc_owner_username
+          - secret:
+              name: {{ .Values.bootstrap.ownerPasswordSecret.name }}
+              items:
+                - key: {{ .Values.bootstrap.ownerPasswordSecret.key }}
+                  path: amc_owner_password
