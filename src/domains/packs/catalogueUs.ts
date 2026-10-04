@@ -82,4 +82,11 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+
+  // Governance station round 2 (2026-10-04): instruments read on their official pages on that date.
+  verified("nist-sp-800-63b-4", "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)", "US", "standard", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/63/b/4/final", ["NIST SP 800-63B-4", "NIST Special Publication 800-63B-4"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "csrc.nist.gov read 2026-10-04: final, published July 2025; \"This publication supersedes NIST Special Publication (SP) 800-63B.\"",
+    }),
 ];
