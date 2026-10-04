@@ -1,0 +1,180 @@
+{
+  "track": "S5",
+  "status": "COMPLETE (repair round 1, re-verified 2026-10-04)",
+  "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "branch": "worktree-wf_5210e2f4-3ea-5",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-5",
+  "codeCommits": [
+    "172de745",
+    "b11f43bb",
+    "276a6570"
+  ],
+  "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; run 2026-10-03",
+  "register": {
+    "entries": 17,
+    "verified": 11,
+    "unverified": 6,
+    "reviewWindowDays": 90,
+    "unverifiedIds": [
+      "eu-nis2",
+      "eu-mdr-ivdr",
+      "intl-iso-iec-42001",
+      "intl-iso-iec-42005",
+      "br-lgpd",
+      "in-dpdp"
+    ]
+  },
+  "feeds": {
+    "live": [
+      "eu-ai-act-rss",
+      "eu-digital-strategy-rss",
+      "edpb-news-rss",
+      "nist-ai-rss",
+      "us-federal-register-ai",
+      "fca-ai-guidance"
+    ],
+    "manualReviewRequiredDisabled": [
+      "iso-updates-api",
+      "owasp-llm-top10",
+      "mitre-atlas",
+      "singapore-ai-verify",
+      "china-tc260-ai"
+    ]
+  },
+  "euAiActTimeline": {
+    "entryIntoForce": "2024-08-01",
+    "prohibitionsAndAiLiteracy": "2025-02-02",
+    "gpaiObligationsAndGovernance": "2025-08-02",
+    "omnibusEntryIntoForce": "2026-07-27",
+    "generalApplication": "2026-08-02",
+    "newProhibitionsAndArt50_2Transition": "2026-12-02",
+    "gpaiLegacyModelsDeadline": "2027-08-02",
+    "annexIIIHighRisk": "2027-12-02",
+    "article6_1AnnexIHighRisk": "2028-08-02"
+  },
+  "commands": [
+    {
+      "cmd": "pnpm vitest run tests/globalRegulatory.test.ts tests/regulatoryAutomation.test.ts tests/euAiAct.test.ts tests/regulatoryCurrency.test.ts",
+      "red": "3 files failed, 19 tests failed / 29 passed",
+      "green": "4 files passed, 49 tests passed"
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs",
+      "result": "entries=17 verified=11 unverified=6 asOf=2026-10-03; exit 0"
+    },
+    {
+      "cmd": "pnpm typecheck",
+      "result": "exit 0, 0 errors"
+    },
+    {
+      "cmd": "pnpm typecheck:tests",
+      "result": "exit 0, 0 errors"
+    },
+    {
+      "cmd": "dependent tests (round4Gaps, complyRiskClassifyDocs, regulatoryClaimsHonesty, apiRouters, 32 doc-referencing tests)",
+      "result": "all pass; 1 pre-existing skip (exampleCommandsResolve requires build)"
+    },
+    {
+      "cmd": "node scripts/architecture-boundaries-check.mjs",
+      "result": "exit 1 only for missing dist/cli.js and dist/api/index.js (no build); no line budget exceeded; regulatoryAutomation.ts 802 -> 712"
+    }
+  ],
+  "mutations": [
+    {
+      "mutation": "eu-ai-act lastReviewed -> 2024-01-01",
+      "red": "script exit 1 'is 1006 days old; policy window is 90 days'; 2 tests failed",
+      "restored": "script exit 0; 17/17"
+    },
+    {
+      "mutation": "EU_AI_ACT_TIMELINE.annexIIIHighRisk -> 2026-08-02",
+      "red": "parity test failed Expected 2027-12-02 Received 2026-08-02 (2 failed)",
+      "restored": "11/11"
+    },
+    {
+      "mutation": "mitre-atlas enabled: true",
+      "red": "2 feed-contract tests failed",
+      "restored": "21/21"
+    },
+    {
+      "mutation": "disable verified-flag consistency guard in script",
+      "red": "1 test failed",
+      "restored": "8/8"
+    }
+  ],
+  "receiptNote": "report.md could not be written: the harness refused the Write of a .md report file from this subagent; the full report is in the structured result notesForMonitor.",
+  "readyToWire": [
+    "tests/round4Gaps.test.ts + globalRegulatory.ts mappingStatus complete -> partial",
+    "package.json script check:regulatory-currency",
+    "scripts/line-budgets.json regulatoryAutomation.ts 802 -> 712"
+  ],
+  "repairRound1": {
+    "trigger": "monitor REJECTED c6b0d19b",
+    "commit": "d7a77cc5 fix: move regulatory register to its claimed path and close S5 review defects",
+    "paths": {
+      "register": "src/compliance/regulatory/{index.ts,feeds.ts,register.json}",
+      "tests": [
+        "tests/euAiActTimeline.test.ts (renamed from tests/euAiAct.test.ts)",
+        "tests/regulatoryCurrency.test.ts (absorbed tests/globalRegulatory.test.ts, deleted)"
+      ]
+    },
+    "fixes": [
+      "module moved to src/compliance/regulatory/; all imports/docs updated",
+      "getDpiaAssessment no Date.now(); template dpoApproval false, review dates null",
+      "legacy GLOBAL_FRAMEWORKS mappingStatus partial; round4Gaps asserts registerId + dated source + lastReviewed",
+      "docs/wave4-regulatory-audit.md superseded banner (line 3)",
+      "currency script: strict args, --now alias, per-entry --json, official-host allowlist from register policy.officialHosts (OFFICIAL_SOURCE_HOSTS/isOfficialSourceUrl)",
+      "RegulatoryMonitor public fetchImpl option; tests inject it and stub global fetch to reject"
+    ],
+    "tests": "7 files, 142 passed, 0 skipped; typecheck + typecheck:tests exit 0; docs-drift passed",
+    "script": {
+      "default": "exit 0 (17/11/6)",
+      "--now 2027-06-01": "exit 1",
+      "--bogus": "exit 1",
+      "--json": "exit 0, per-entry"
+    },
+    "mutations": [
+      "Date.now restored -> RED",
+      "dpoApproval true -> RED",
+      "mappingStatus complete -> RED",
+      "artificialintelligenceact.eu source -> script exit 1 + RED",
+      "--now alias removed -> RED",
+      "fetchImpl ignored -> RED"
+    ],
+    "notChanged": [
+      "per-finding appliesFrom",
+      "RSS +90d estimated effectiveDate and in-place lastContentHash",
+      "contract vs fetchContract naming; no tests/regulatoryFeeds.test.ts",
+      "per-status review windows"
+    ]
+  },
+  "repairRound1Reverified": {
+    "date": "2026-10-04",
+    "headVerified": "297af3a4 (repair commit d7a77cc5)",
+    "codeChanges": "none; every required fix was already in d7a77cc5, re-verified only",
+    "checks": [
+      "git diff --name-only 8f57ce63..HEAD: 17 paths, all claimed (no regulatoryRegister/, euAiAct.test.ts or globalRegulatory.test.ts)",
+      "pnpm vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts -> 6 files, 111 tests passed, 0 skipped",
+      "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+      "node scripts/check-regulatory-currency.mjs -> entries=17 verified=11 unverified=6 asOf=2026-10-04, exit 0; --now 2027-06-01 exit 1; --bogus exit 1; --json lists entries with id,status,verified,lastReviewed,windowDays,currency,sources[{url,retrievedAt}]",
+      "grep -n Superseded docs/wave4-regulatory-audit.md -> line 3",
+      "grep -n 'example.com\\\\|globalThis.fetch' tests/regulatoryAutomation.test.ts -> nothing"
+    ],
+    "mutations": [
+      {
+        "mutation": "getDpiaAssessment stamps lastReviewDate/nextReviewDate with Date.now()",
+        "red": "regulatoryClaimsHonesty + round4Gaps: 2 failed | 51 passed",
+        "restored": "git checkout; 74/74 passed across the three files"
+      },
+      {
+        "mutation": "cn-pipl mappingStatus 'complete'",
+        "red": "round4Gaps: 1 failed | 47 passed",
+        "restored": "git checkout; green"
+      },
+      {
+        "mutation": "eu-ai-act source url -> https://artificialintelligenceact.eu/",
+        "red": "script exit 1 'is not on an official host'; regulatoryCurrency 5 failed | 16 passed",
+        "restored": "git checkout; script exit 0"
+      }
+    ]
+  }
+}

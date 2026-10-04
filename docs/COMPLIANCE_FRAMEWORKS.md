@@ -346,10 +346,50 @@ To add a new framework or extend existing mappings:
 5. **Signed Configurations**: All compliance maps must be signed and verified
 6. **Governance Gates**: Only OWNER can apply new compliance maps
 
+## Regulatory Currency Register
+
+`src/compliance/regulatory/register.json` is the sourced list of instruments that govern AI agents across the seven stations (health, education, environment, mobility, governance, technology, wealth). Each entry records the instrument, obligations relevant to agents, key dates, official sources with `retrievedAt`, `lastReviewed`, and per-fact `verified` flags. An entry is `verified` only when every date and obligation it encodes was read from an official source and nothing is left open; otherwise its `openQuestions` say what was not confirmed. It replaces the five 2020-2023 `GLOBAL_FRAMEWORKS` records as the authority for dates and status; `GLOBAL_FRAMEWORKS` remains as a legacy view and links each record by `registerId`.
+
+```bash
+node scripts/check-regulatory-currency.mjs            # exit 1 if any entry is malformed, unsourced, cites a non-official host or is older than 90 days
+node scripts/check-regulatory-currency.mjs --now 2027-01-15 --json   # --now is an alias of --as-of; unknown flags exit 1
+```
+
+`--json` lists every entry with `status`, `lastReviewed`, `windowDays`, `currency` and its sources (`url`, `retrievedAt`), plus `allowedHosts`. Source hosts must be on `policy.officialHosts` in the register (regulators, legislatures, official journals, standards bodies), exported as `OFFICIAL_SOURCE_HOSTS` from `src/compliance/regulatory/index.ts`.
+
+Register as reviewed on 2026-10-03 (17 entries, 11 verified, 6 unverified):
+
+| Instrument | Jurisdiction | Status | Key dates | Primary source | Retrieved | Verified |
+|---|---|---|---|---|---|---|
+| Artificial Intelligence Act — Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI) | EU | partially-applicable | 2024-08-01, 2025-02-02, 2025-08-02, 2026-07-27, 2026-08-02, 2026-12-02, 2027-08-02, 2027-12-02, 2028-08-02 | [European Commission](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113) | 2026-10-03 | yes |
+| General Data Protection Regulation — Regulation (EU) 2016/679 | EU | in-force | 2016-05-24, 2018-05-25 | [European Commission](https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en) | 2026-10-03 | yes |
+| Digital Operational Resilience Act — Regulation (EU) 2022/2554 | EU | in-force | 2025-01-17 | [EIOPA](https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en) | 2026-10-03 | yes |
+| NIS2 Directive — Directive (EU) 2022/2555 | EU | in-force | 2024-10-17, 2024-10-18, 2026-01-20 | [European Commission](https://digital-strategy.ec.europa.eu/en/policies/nis2-directive) | 2026-10-03 | no |
+| Cyber Resilience Act — Regulation (EU) 2024/2847 | EU | partially-applicable | 2024-12-10, 2026-09-11, 2027-12-11 | [European Commission](https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act) | 2026-10-03 | yes |
+| Medical Devices Regulation and In Vitro Diagnostic Medical Devices Regulation — Regulation (EU) 2017/745; Regulation (EU) 2017/746 | EU | in-force | 2021-05-26, 2022-05-26 | [European Commission](https://health.ec.europa.eu/medical-devices-sector/new-regulations_en) | 2026-10-03 | no |
+| NIST AI Risk Management Framework 1.0 — NIST AI 100-1 | US | in-force | 2023-01-26, 2026-04-07 | [NIST](https://www.nist.gov/itl/ai-risk-management-framework) | 2026-10-03 | yes |
+| Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile — NIST AI 600-1 | US | in-force | 2024-07-26 | [NIST](https://www.nist.gov/itl/ai-risk-management-framework) | 2026-10-03 | yes |
+| Information technology — Artificial intelligence — Management system — ISO/IEC 42001:2023 | International | published | 2023-12 (unverified) | [ISO](https://www.iso.org/standard/42001) | 2026-10-03 | no |
+| Information technology — Artificial intelligence (AI) — AI system impact assessment — ISO/IEC 42005:2025 | International | published | 2025-05 (unverified) | [ISO](https://www.iso.org/standard/42005) | 2026-10-03 | no |
+| Consumer Protections for Artificial Intelligence — Colorado SB24-205 | US-CO | superseded | 2024-05-17, 2026-02-01, 2026-06-30 | [Colorado General Assembly](https://leg.colorado.gov/bills/sb24-205) | 2026-10-03 | yes |
+| Automated Decision-Making Technology — Colorado SB26-189 (repeals and reenacts Part 17 of Article 1 of Title 6, C.R.S.) | US-CO | enacted-not-yet-applicable | 2026-05-14, 2027-01-01 | [Colorado General Assembly](https://leg.colorado.gov/bills/sb26-189) | 2026-10-03 | yes |
+| Personal Information Protection Law of the People's Republic of China — 中华人民共和国个人信息保护法 | CN | in-force | 2021-08-20, 2021-11-01 | [Cyberspace Administration of China](https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm) | 2026-10-03 | yes |
+| Interim Measures for the Management of Generative Artificial Intelligence Services — 生成式人工智能服务管理暂行办法 | CN | in-force | 2023-08-15 | [Cyberspace Administration of China](https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm) | 2026-10-03 | yes |
+| Lei Geral de Proteção de Dados Pessoais — Lei nº 13.709, de 14 de agosto de 2018 | BR | in-force | 2018-12-28, 2021-08-01, 2020-09-18 (unverified) | [Presidência da República (Planalto)](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm) | 2026-10-03 | no |
+| Digital Personal Data Protection Act, 2023 and DPDP Rules, 2025 — Act No. 22 of 2023 | IN | partially-applicable | 2025-11-14 | [Press Information Bureau, Government of India](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190014&reg=3&lang=2) | 2026-10-03 | no |
+| Act on the Protection of Personal Information — Act No. 57 of 2003 (translation as amended by Act No. 37 of 2021) | JP | in-force | 2023-04-01 | [Personal Information Protection Commission, Japan](https://www.ppc.go.jp/en/legal/) | 2026-10-03 | yes |
+
+Unverified entries and why: NIS2 (reporting stages and sector scope not on the page read), MDR/IVDR (Regulation (EU) 2023/607 transition dates not stated on the page read), ISO/IEC 42001 and 42005 (iso.org answered with a bot challenge; month-level dates come from the search index), LGPD (the 2020-09-18 general effective day depends on Lei 14.058/2020, not read), DPDP (phase dates of the 18-month timeline not stated; India Code timed out).
+
+### Regulatory feeds
+
+`DEFAULT_REGULATORY_FEEDS` (`src/compliance/regulatory/feeds.ts`) lists six live official feeds — AI Act Service Desk RSS, Commission digital-strategy RSS, EDPB news RSS, NIST news RSS, Federal Register API v1, FCA news RSS — each with the HTTP status and time of a GET made on 2026-10-03. ISO, OWASP, MITRE ATLAS, AI Verify and TC260 are web pages or non-regulators: they are kept as `manual-review-required` and disabled, with the reason recorded. A feed change is a prompt for human review, never a legal date; RSS items carry `effectiveDateEstimated: true`.
+
 ## References
 
-- [NIST AI RMF 1.0](https://www.nist.gov/itl/ai-risk-management-framework)
-- [SOC 2 Trust Services Criteria](https://www.aicpa.org/soc4so)
-- [ISO/IEC 42001:2023](https://www.iso.org/standard/81230.html)
-- [GDPR (EU) 2016/679](https://gdpr-info.eu/)
-- [EU AI Act (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)
+- [NIST AI RMF 1.0](https://www.nist.gov/itl/ai-risk-management-framework) — retrieved 2026-10-03
+- [SOC 2 Trust Services Criteria](https://www.aicpa.org/soc4so) — not re-checked in the 2026-10-03 review
+- [ISO/IEC 42001:2023](https://www.iso.org/standard/81230.html) — retrieval attempted 2026-10-03, HTTP 403 bot challenge
+- [GDPR (EU) 2016/679 — European Commission legal framework page](https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en) — retrieved 2026-10-03
+- [EU AI Act (EU) 2024/1689](https://eur-lex.europa.eu/eli/reg/2024/1689/oj) — EUR-Lex bot challenge on 2026-10-03; [AI Act Service Desk, Article 113](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113) retrieved 2026-10-03
+- Every other instrument: see the Regulatory Currency Register table above (URL and retrieved date per row)

@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   CONSTRUCT_VALIDITY_DATA,
-  AMC_EVALUATION_DPIA
+  AMC_EVALUATION_DPIA,
+  getDpiaAssessment
 } from "../src/compliance/globalRegulatory.js";
 
 /**
@@ -42,5 +43,19 @@ describe("regulatory artifacts do not claim studies that never happened", () => 
     );
     expect(source).toContain("TEMPLATE — NOT A COMPLETED DPIA");
     expect(source).toMatch(/no DPO or supervisory authority has reviewed them/i);
+  });
+
+  it("does not manufacture review freshness or DPO approval on the template", () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date("2030-01-01T00:00:00Z"));
+      const dpia = getDpiaAssessment();
+      expect(dpia.dpoApproval).toBe(false);
+      expect(dpia.lastReviewDate).toBeNull();
+      expect(dpia.nextReviewDate).toBeNull();
+      expect(AMC_EVALUATION_DPIA.dpoApproval).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

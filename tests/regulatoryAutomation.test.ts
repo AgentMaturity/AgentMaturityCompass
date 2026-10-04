@@ -3,12 +3,22 @@
  * Unit tests for src/compliance/regulatoryAutomation.ts
  */
 
-import { describe, it, expect } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import {
   DEFAULT_REGULATORY_FEEDS,
   RegulatoryMonitor,
   getRegulatoryChanges,
+  type FeedFetch,
 } from "../src/compliance/regulatoryAutomation.js";
+
+// No test in this file may reach the network: the global fetch throws, so a
+// feed read that bypasses the injected fetchImpl fails loudly.
+beforeEach(() => {
+  vi.stubGlobal("fetch", () => Promise.reject(new Error("network disabled in tests; inject fetchImpl")));
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("DEFAULT_REGULATORY_FEEDS", () => {
   it("should have at least 8 feeds", () => {
@@ -70,28 +80,41 @@ describe("RegulatoryMonitor", () => {
     expect(monitor).toBeDefined();
   });
 
-  it("checkAllFeeds should return an array", async () => {
-    // This uses network calls but we can at least check it returns the right type
-    // We timeout quickly here; in real environments it would make HTTP calls
+  it("checkAllFeeds reads feeds through the injected fetchImpl, never the network", async () => {
+    const calls: string[] = [];
+    const fetchImpl: FeedFetch = async (url, init) => {
+      calls.push(url);
+      expect(init.signal).toBeInstanceOf(AbortSignal);
+      return { ok: true, status: 200, text: async () => "<rss></rss>" };
+    };
     const monitor = new RegulatoryMonitor({
       feeds: [{
-        id: "test-feed",
-        name: "Test Feed",
-        framework: "TEST",
-        type: "rss",
-        url: "https://example.com/feed.xml",
-        pollIntervalMs: 3600000,
-        lastChecked: 0,
-        lastContentHash: "",
-        enabled: true,
-        failureCount: 0,
-        jurisdictions: ["GLOBAL"],
+        id: "test-feed", name: "Test Feed", framework: "TEST", type: "rss",
+        url: "https://feeds.test.invalid/feed.xml", pollIntervalMs: 3600000, lastChecked: 0,
+        lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["GLOBAL"],
       }],
       jurisdictions: ["GLOBAL"],
+      fetchImpl,
     });
     const results = await monitor.checkAllFeeds();
-    expect(Array.isArray(results)).toBe(true);
-  }, 15000);
+    expect(calls).toEqual(["https://feeds.test.invalid/feed.xml"]);
+    expect(results.map((r) => [r.feedId, r.status])).toEqual([["test-feed", "new_content"]]);
+  });
+
+  it("reports an HTTP error from fetchImpl as a feed failure", async () => {
+    const monitor = new RegulatoryMonitor({
+      feeds: [{
+        id: "down-feed", name: "Down", framework: "TEST", type: "rss",
+        url: "https://feeds.test.invalid/down.xml", pollIntervalMs: 3600000, lastChecked: 0,
+        lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["GLOBAL"],
+      }],
+      jurisdictions: ["GLOBAL"],
+      fetchImpl: async () => ({ ok: false, status: 503, text: async () => "" }),
+    });
+    const [result] = await monitor.checkAllFeeds();
+    expect(result!.status).toBe("error");
+    expect(result!.error).toContain("HTTP 503");
+  });
 
   it("should be an EventEmitter (has .on method)", () => {
     const monitor = new RegulatoryMonitor();
@@ -170,5 +193,70 @@ describe("getRegulatoryChanges", () => {
     ];
     const all = getRegulatoryChanges(mockChanges);
     expect(all).toHaveLength(2);
+  });
+});
+
+describe("DEFAULT_REGULATORY_FEEDS contract (no fake feeds)", () => {
+  it("every feed declares a contract, authority and recorded reachability", () => {
+    for (const feed of DEFAULT_REGULATORY_FEEDS) {
+      expect(["live", "manual-review-required"], feed.id).toContain(feed.contract);
+      expect(typeof feed.official, feed.id).toBe("boolean");
+      expect(feed.reachability?.checkedAt, feed.id).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+    }
+  });
+
+  it("a live feed is enabled, official, https, machine-readable and was reachable", () => {
+    const live = DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract === "live");
+    expect(live.length).toBeGreaterThanOrEqual(4);
+    for (const feed of live) {
+      expect(feed.enabled, feed.id).toBe(true);
+      expect(feed.official, feed.id).toBe(true);
+      expect(feed.url, feed.id).toMatch(/^https:\/\//);
+      expect(["rss", "api"], feed.id).toContain(feed.type);
+      expect(feed.reachability?.status, feed.id).toBe(200);
+      expect(feed.selector, feed.id).toBeUndefined();
+    }
+  });
+
+  it("a feed that is not a live official source is disabled and says why", () => {
+    for (const feed of DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract !== "live")) {
+      expect(feed.enabled, feed.id).toBe(false);
+      expect(feed.manualReviewReason, feed.id).toBeTruthy();
+    }
+  });
+
+  it("the default monitor polls only live feeds", () => {
+    const monitor = new RegulatoryMonitor({ jurisdictions: ["GLOBAL", "EU", "US", "UK", "SG", "CN"] });
+    const enabled = monitor.getFeeds().filter((f) => f.enabled).map((f) => f.id).sort();
+    expect(enabled).toEqual(DEFAULT_REGULATORY_FEEDS.filter((f) => f.contract === "live").map((f) => f.id).sort());
+  });
+});
+
+describe("parsed changes do not invent legal dates", () => {
+  const feed = (type: "rss" | "api") => ({
+    id: `t-${type}`, name: "T", framework: "EU_AI_ACT", type, url: "https://example.invalid/feed",
+    pollIntervalMs: 1, lastChecked: 0, lastContentHash: "", enabled: true, failureCount: 0, jurisdictions: ["EU"],
+  });
+  async function changesFor(type: "rss" | "api", body: string) {
+    const bodies = ["baseline", body];
+    const fetchImpl: FeedFetch = async () => ({ ok: true, status: 200, text: async () => bodies.shift() ?? body });
+    const monitor = new RegulatoryMonitor({ feeds: [], jurisdictions: ["EU"], fetchImpl });
+    const f = feed(type);
+    await monitor.checkFeed(f);
+    return (await monitor.checkFeed(f)).changes;
+  }
+
+  it("marks an RSS item's effective date as an estimate", async () => {
+    const [change] = await changesFor("rss", "<rss><item><title>AI Act guidance</title><pubDate>Tue, 19 May 2026 10:37:49 +0000</pubDate></item></rss>");
+    expect(change!.effectiveDateEstimated).toBe(true);
+  });
+
+  it("reads Federal Register API fields and keeps a stated effective date", async () => {
+    const body = JSON.stringify({ results: [{ title: "Artificial intelligence rule", abstract: "AI risk", html_url: "https://www.federalregister.gov/d/x", publication_date: "2026-09-01", effective_on: "2026-12-01" }] });
+    const [change] = await changesFor("api", body);
+    expect(change!.source).toBe("https://www.federalregister.gov/d/x");
+    expect(change!.publishedDate).toBe(Date.parse("2026-09-01"));
+    expect(change!.effectiveDate).toBe(Date.parse("2026-12-01"));
+    expect(change!.effectiveDateEstimated).toBe(false);
   });
 });
