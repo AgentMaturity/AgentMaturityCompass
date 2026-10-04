@@ -82,4 +82,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+  // Technology station round 2 (2026-10-04): cited by TECH-NE-6.
+  verified("nist-sp-800-63-4", "NIST SP 800-63-4 Digital Identity Guidelines", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+    ["NIST SP 800-63-4"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-31", note: "Final 31 July 2025; supersedes SP 800-63-3 (csrc.nist.gov page)." }),
 ];
