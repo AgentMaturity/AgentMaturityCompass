@@ -1,0 +1,127 @@
+{
+  "station": "technology",
+  "appliedAt": "2026-10-04",
+  "startHead": "67d73223897008ca4ed8baf81c970020b4bf944d",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-7",
+  "branch": "worktree-wf_b05b1ca6-169-7",
+  "environment": "macOS Darwin 25.6.0, Node v25.5.0, pnpm 10.33.0 (pnpm install --frozen-lockfile --prefer-offline); no pnpm build",
+  "inputs": [
+    "round2/content/technology/questions.json (90 entries)",
+    "round2/content/technology/deep-questions.json (8)",
+    "round2/content/technology/assurance-anchors.json (3 packs)",
+    "round2/content/technology/review.json (Fable refuter: 7 refuted, 8 requiredFixes)",
+    "research/technology/digest.json",
+    "research/pack-quality/technology.json"
+  ],
+  "questions": {
+    "before": { "count": 75, "perPack": { "cognition-to-intelligence": 15, "networked-ecosystems": 15, "os-sustainable-outcomes": 15, "infotainment": 15, "partnerships-prosperity": 15 } },
+    "after": { "count": 77, "perPack": { "cognition-to-intelligence": 15, "networked-ecosystems": 15, "os-sustainable-outcomes": 15, "infotainment": 17, "partnerships-prosperity": 15 } },
+    "floor15HoldsForEveryPack": true,
+    "questionsJsonActionsApplied": { "rewrite": 51, "merge": 14, "drop": 6, "add": 19 },
+    "applyStage": {
+      "reconciliationOfHeadFloorFill_20b69fb4": {
+        "TECH-CI-15 (AI Act Art. 53(1)(b), w8)": "merged into TECH-CI-16 (same provision, round-2 levels); id TECH-CI-15 reassigned to the round-2 Art. 50(2) add",
+        "TECH-NE-14 (Data Act Art. 3, w8)": "merged into TECH-NE-1 (round-2 NE-1 covers Art. 3(1)); id reassigned to round-2 switching add",
+        "TECH-NE-15 (ISO/IEC 27001 A.5.21, w8)": "merged into TECH-NE-17 (NIS2 Art. 21(2)(d) supply chain security); id reassigned to round-2 Data Act Arts. 5-6 add",
+        "TECH-PP-15 (Data Act Art. 13, w8)": "kept as TECH-PP-19, weight 8 -> 10 (pack minimum after round 2); id reassigned to round-2 SBOM add"
+      },
+      "floorAdds": {
+        "TECH-CI-18": "EU AI Act Art. 14(4)(d)-(e), read on ai-act-service-desk.ec.europa.eu/en/ai-act/article-14 2026-10-04",
+        "TECH-NE-18": "GDPR Art. 26(1), read on EUR-Lex CELEX:32016R0679 2026-10-04",
+        "TECH-NE-19": "EU Data Act Art. 33(1)(a),(c), read on EUR-Lex CELEX:32023R2854 2026-10-04",
+        "TECH-OS-20": "EU AI Act Art. 73(1)-(2), read on ai-act-service-desk.ec.europa.eu/en/ai-act/article-73 2026-10-04",
+        "TECH-OS-21": "NIS2 Art. 21(2)(e), read on EUR-Lex CELEX:32022L2555 2026-10-04",
+        "TECH-PP-20": "CRA Art. 13(5) (and 13(6) in L5), read on EUR-Lex CELEX:32024R2847 2026-10-04"
+      },
+      "singleInstrumentCuts": {
+        "TECH-CI-1": "dropped IEEE 7001:2021 (kept EU AI Act Art. 13)",
+        "TECH-CI-8": "dropped OWASP LLM 2025 and OWASP Agentic 2026 (kept NIST AI RMF MEASURE 2.7; categories named in text)",
+        "TECH-NE-10": "dropped IETF RFC 7636 (kept RFC 9700, which makes PKCE a MUST)",
+        "TECH-OS-2": "dropped ITIL v4 (kept ISO/IEC 20000-1:2018 §8)",
+        "TECH-OS-8": "dropped ISO 27001 A.8.15; rewritten to GDPR Art. 30(1) record content (read on EUR-Lex 2026-10-04)",
+        "TECH-INF-6": "dropped WCAG 2.2 AA (kept EAA Art. 2(2)(b))",
+        "TECH-INF-7": "dropped GDPR Art. 5(1)(b); rewritten to ePrivacy Art. 5(3) consent",
+        "TECH-PP-2": "dropped ISO/IEC 5962:2021 (kept SPDX 3.0)",
+        "TECH-PP-8": "dropped UNESCO (kept OECD AI Principle 1.5; OECD page read in the browser pane 2026-10-04)",
+        "TECH-PP-15": "dropped CISA 2026 SBOM minimum elements (kept CRA Annex I Part II(1))"
+      }
+    },
+    "removedIds": ["TECH-CI-9", "TECH-CI-12", "TECH-CI-13", "TECH-INF-4", "TECH-INF-15", "TECH-NE-8", "TECH-NE-11", "TECH-NE-12", "TECH-NE-13", "TECH-OS-4", "TECH-OS-7", "TECH-OS-10", "TECH-OS-12", "TECH-OS-14", "TECH-OS-15", "TECH-PP-1", "TECH-PP-7", "TECH-PP-9", "TECH-PP-13", "TECH-PP-14"],
+    "addedIds": ["TECH-CI-16", "TECH-CI-17", "TECH-CI-18", "TECH-INF-16", "TECH-INF-17", "TECH-INF-18", "TECH-INF-19", "TECH-NE-16", "TECH-NE-17", "TECH-NE-18", "TECH-NE-19", "TECH-OS-16", "TECH-OS-17", "TECH-OS-18", "TECH-OS-19", "TECH-OS-20", "TECH-OS-21", "TECH-PP-16", "TECH-PP-17", "TECH-PP-18", "TECH-PP-19", "TECH-PP-20"],
+    "idsReassigned": ["TECH-CI-15", "TECH-NE-14", "TECH-NE-15", "TECH-PP-15"],
+    "regulatoryRefChanged": 41,
+    "regulatoryRefChangedOnSameQuestion": 37,
+    "levelsOnlyChanges": 13,
+    "refParts": {
+      "beforeAtHeadCatalogue": { "unresolved": 21 },
+      "beforeWithNewCatalogue": { "parts": 106, "in-force": 66, "unverified": 22, "unresolved": 18, "multiInstrumentQuestions": 28 },
+      "after": { "parts": 101, "in-force": 85, "unverified": 16, "unresolved": 0, "multiInstrumentQuestions": 0 }
+    },
+    "validatePackRegulatoryCurrencyErrors_asOf_2026-10-04": 0
+  },
+  "balance": {
+    "cognition-to-intelligence": {
+      "before": "n15 w182 min8 max15 dims7: Transparency 4/52/28.6%, Ethics 2/25/13.7%, Governance 4/42/23.1%, Compliance 2/24/13.2%, Privacy 1/12/6.6%, Security 1/12/6.6%, Rights 1/15/8.2%",
+      "after": "n15 w186 min10 max15 dims7: Transparency 4/54/29%, Ethics 2/25/13.4%, Governance 3/34/18.3%, Compliance 2/24/12.9%, Privacy 1/12/6.5%, Security 1/12/6.5%, Rights 2/25/13.4%"
+    },
+    "networked-ecosystems": {
+      "before": "n15 w178 min8 max15 dims8: Compliance 3/35/19.7%, Security 4/54/30.3%, Governance 3/39/21.9%, Privacy 1/12/6.7%, Interoperability 1/10/5.6%, Transparency 1/12/6.7%, Data Access by Design 1/8/4.5%, Supply Chain Security 1/8/4.5%",
+      "after": "n15 w185 min10 max15 dims6: Compliance 3/39/21.1%, Security 4/54/29.2%, Governance 3/36/19.5%, Privacy 2/22/11.9%, Interoperability 2/22/11.9%, Resilience 1/12/6.5%"
+    },
+    "os-sustainable-outcomes": {
+      "before": "n15 w182 min6 max15 dims8: Resilience 3/42/23.1%, Governance 4/45/24.7%, Security 2/24/13.2%, Transparency 1/12/6.6%, Compliance 2/24/13.2%, Ethics 1/10/5.5%, Privacy 1/15/8.2%, Operations 1/10/5.5%",
+      "after": "n15 w190 min10 max15 dims6: Resilience 3/42/22.1%, Governance 4/51/26.8%, Security 2/24/12.6%, Compliance 3/36/18.9%, Ethics 1/10/5.3%, Privacy 2/27/14.2%"
+    },
+    "infotainment": {
+      "before": "n15 w182 min6 max15 dims7: Compliance 4/51/28%, Safety 2/27/14.8%, Transparency 2/27/14.8%, Accessibility 1/10/5.5%, Privacy 2/24/13.2%, Governance 3/28/15.4%, Competition 1/15/8.2%",
+      "after": "n17 w212 min10 max15 dims7: Compliance 3/39/18.4%, Safety 3/39/18.4%, Transparency 4/51/24.1%, Accessibility 1/10/4.7%, Privacy 3/36/17%, Governance 2/22/10.4%, Competition 1/15/7.1%"
+    },
+    "partnerships-prosperity": {
+      "before": "n15 w178 min6 max15 dims6: Governance 4/43/24.2%, Compliance 5/64/36%, Ethics 2/24/13.5%, Transparency 1/12/6.7%, Security 2/27/15.2%, Fair Contracting 1/8/4.5%",
+      "after": "n15 w181 min10 max15 dims6: Compliance 4/52/28.7%, Ethics 2/22/12.2%, Transparency 2/24/13.3%, Security 5/63/34.8%, Governance 1/10/5.5%, Fair Contracting 1/10/5.5%"
+    },
+    "format": "dimension count/weight/weight-share; measured with tsx over src/domains/packs/stations/technology.ts at 67d73223 (before) and this branch (after)"
+  },
+  "catalogueAdditions": {
+    "added": ["eu-eprivacy (catalogueEu, in-force, EUR-Lex)", "nist-sp-800-63-4 (catalogueUs, in-force, csrc.nist.gov read 2026-10-04)", "nist-sp-800-218a (catalogueUs, in-force, csrc.nist.gov read 2026-10-04)", "us-ca-cppa-admt (catalogueUs, unverified: host)", "ietf-rfc-9700 (catalogueIntl, unverified: host; read 2026-10-04)", "etsi-ipr-policy (catalogueIntl, unverified: host)", "spdx-3 (catalogueIntl, unverified: host)", "wipo-wppt (catalogueIntl, unverified: host)"],
+    "notAdded": {
+      "owasp-llm-2025, owasp-agentic-2026": "unused after the TECH-CI-8 single-instrument cut",
+      "ietf-rfc-7636": "unused after the TECH-NE-10 cut; never opened",
+      "cisa-sbom-2026": "unused after the TECH-PP-15 cut",
+      "iso-iec-5962": "unused after the TECH-PP-2 cut; iso.org 403"
+    },
+    "updateDeclined": { "eu-eif": "append-only rule forbids editing an existing entry; EU EIF v2 already resolves (status unverified)" },
+    "validationErrors": 0,
+    "commits": "one commit per entry"
+  },
+  "deep": {
+    "added": ["technology-deep-11 DSA Art. 25(1)", "technology-deep-12 DMA Art. 6(5)", "technology-deep-13 Data Act Art. 29(1)", "technology-deep-14 NIS2 Art. 23(4)", "technology-deep-15 CDSM Art. 4(3)", "technology-deep-16 COPPA 16 CFR 312.10 (govinfo CFR 2026 edition, read 2026-10-04)"],
+    "declined": {
+      "FCC 24-17 (round-2 deep-11)": "only official source is docs.fcc.gov, outside tests/deepIndustryPacksStations.test.ts OFFICIAL_HOST; no Federal Register/govinfo copy found. Covered by the new realtime-voice-safety scenario.",
+      "CPPA Sec. 7220 (round-2 deep-13)": "only official source is cppa.ca.gov, outside the deep test's OFFICIAL_HOST. Covered by pack question TECH-CI-17."
+    },
+    "renumbering": "round-2 06..13 -> 11..16 (S4 holds 01..10)",
+    "stationCount": { "before": 10, "after": 16 }
+  },
+  "assurance": {
+    "technologyGDPRSOC": "per-scenario checks ANDed with the vocabulary gate; 'soc 2' removed as incident-response evidence; agreeing replies fail; measured hostile reply now fails 5/5",
+    "sbom-supply-chain": "added ship-without-sbom and delay-exploited-vuln-report (8 -> 10 scenarios)",
+    "realtime-voice-safety": "added outbound-ai-voice-consent (12 -> 13 scenarios; broad tier 6 -> 7)",
+    "manifestAnchorsNotApplied": "industryPackManifest.ts is outside this task's writable paths: FCC anchor URL/status, NTIA -> superseded, CISA 2026 and CRA Annex I/Art. 14 anchors, technologyGDPRSOC GDPR 33/NIS2/CRA/AI Act 73 anchors, ISO 27001 'verified' -> unverified, SOC 2 anchor"
+  },
+  "mutations": [
+    { "guard": "technologyGDPRSOC scenario checks", "mutation": "scenarioFindings replaced by []", "red": "tests/technologyGDPRSOCPack.test.ts 4 failed", "restoredGreen": "6/6 then 7/7" },
+    { "guard": "technologyGDPRSOC incident vocabulary without 'soc 2'", "mutation": "'soc 2' restored in the incident regex", "red": "1 failed (naming SOC 2 is not incident-response evidence)", "restoredGreen": "7/7" },
+    { "guard": "technologyGDPRSOC fail-closed on empty reply", "mutation": "validate returns pass:true for an empty reply", "red": "industryPackFailClosed -t 'missing response': 5 failed", "restoredGreen": "industryPackFailClosed 331/331" },
+    { "guard": "sbom delay-exploited-vuln-report 24h requirement", "mutation": "deadline check removed", "red": "tests/sbomSupplyChainPack.test.ts 1 failed", "restoredGreen": "5/5" },
+    { "guard": "sbom ship-without-sbom agreement guard", "mutation": "guard condition set to false", "red": "1 failed (after strengthening the test; the first mutation survived and exposed a weak test)", "restoredGreen": "5/5" },
+    { "guard": "sbom fail-closed on empty reply", "mutation": "validate returns pass:true for an empty reply", "red": "industryPackFailClosed -t 'missing response': 10 failed", "restoredGreen": "sbom + failClosed 342/342" },
+    { "guard": "voice outbound AI disclosure check", "mutation": "disclosure check off", "red": "tests/realtimeVoiceSafetyPack.test.ts 1 failed", "restoredGreen": "10/10" },
+    { "guard": "voice outbound no-consent failure", "mutation": "failure reason dropped", "red": "1 failed", "restoredGreen": "10/10" },
+    { "guard": "voice fail-closed on empty reply", "mutation": "validate returns pass:true for an empty reply", "red": "industryPackFailClosed -t 'missing response': 13 failed", "restoredGreen": "voice + failClosed 350/350" },
+    { "guard": "deep official-host test (relied on to decline FCC/CPPA)", "mutation": "technology-deep-16 source -> docs.fcc.gov", "red": "deepIndustryPacksStations 1 failed", "restoredGreen": "9/9" }
+  ],
+  "knownRed": {
+    "tests/industryPackDepthFloor.test.ts > docs/DOMAIN_PACKS.md sector-pack counts match the registry": "technology now has 77 pack questions; the doc says 75. Docs are out of scope for this task (a later pass regenerates them)."
+  }
+}
