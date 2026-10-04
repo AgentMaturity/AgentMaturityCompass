@@ -1,0 +1,49 @@
+{
+  "track": "O19",
+  "title": "Python SDK wrappers for industry packs and domain commands",
+  "status": "COMPLETE",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "codeCommit": "5ebc5b69b9361d5cf2bc3b74323847226d2d788e",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cbab9c8-0f5-19",
+  "branch": "worktree-wf_3cbab9c8-0f5-19",
+  "environment": "Darwin arm64; Node v25.5.0; pnpm 10.33.0; Python 3.14.7 (/opt/homebrew/bin/python3, system site-packages, no venv) with pytest 8.4.2; no `python` executable on PATH",
+  "filesChanged": [
+    "sdk/python/amc_sdk/industry.py (new, 323 lines)",
+    "sdk/python/tests/test_industry.py (new, 268 lines)",
+    "sdk/python/README.md (196 -> 257 lines, appended section 'Industry packs and domains')"
+  ],
+  "wrapped": {
+    "list_domains": "amc domain list --json (src/cli-domain-product-commands.ts:369-376)",
+    "list_packs": "amc domain pack list [--domain D] --json (src/cli-domain-product-commands.ts:114-139)",
+    "describe_pack": "amc domain pack describe --pack P --json (src/cli-domain-product-commands.ts:162-187)",
+    "score_pack_baseline": "amc domain pack run --pack P --baseline --json (src/cli-domain-product-commands.ts:213-271)",
+    "apply": "amc domain apply --agent A [--domain D] [--pack P] [--dry-run] [--compliance F]... [--file PATH] --json (src/domains/domainApplyCli.ts:35-127, non-audit branch)"
+  },
+  "tests": [
+    {
+      "command": "python3 -B -m pytest sdk/python/tests/test_industry.py -p no:cacheprovider -rs -v",
+      "result": "35 passed, 0 skipped, 1 warning (pytest_asyncio deprecation) in 7.35s; the installed-CLI test ran against dist/cli.js built in this worktree by pnpm build"
+    },
+    {"command": "pnpm typecheck", "result": "exit 0"},
+    {"command": "pnpm typecheck:tests", "result": "exit 0"}
+  ],
+  "mutations": [
+    {"guard": "pack/domain allowlist (_known)", "result": "RED 7 failed; restored GREEN"},
+    {"guard": "stdin=subprocess.DEVNULL", "result": "RED 1 failed; restored GREEN"},
+    {"guard": "argv list, no shell (shell=True string)", "result": "RED 1 failed; restored GREEN"},
+    {"guard": "argv passed to runner as list (joined string)", "result": "RED 7 failed; restored GREEN"},
+    {"guard": "typed locked refusal", "result": "RED 2 failed; restored GREEN"},
+    {"guard": "JSON shape check", "result": "RED 10 failed; restored GREEN"},
+    {"guard": "booleans are not numbers", "result": "RED 1 failed; restored GREEN"},
+    {"guard": "NUL refusal in free-text args", "result": "RED 2 failed; restored GREEN"},
+    {"guard": "TimeoutExpired -> AmcTimeoutError", "result": "RED 1 failed; restored GREEN"},
+    {"guard": "TypedDict required keys", "result": "RED 5 failed; restored GREEN"}
+  ],
+  "notExercised": [
+    "Unlocked describe/score/apply output against the real CLI: needs a signed Industry Packs license key, which this track did not create; covered by fixtures only",
+    "Python 3.10/3.11 (requires-python >=3.10): not available here; module import and shape checks smoke-run on Python 3.12.14 without pytest",
+    "Fresh-clone reproduction of the test run (receipt rule, brief section 4): not done; run was in this worktree",
+    "domain apply --audit, domain assess/modules/gaps/report/assurance/roadmap, domain pack access/checkout/activate/verify: not wrapped",
+    "Package install (wheel) of amc_sdk: tests import from the checkout via a sys.path fallback"
+  ]
+}
