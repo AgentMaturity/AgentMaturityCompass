@@ -630,7 +630,7 @@
         "external": false,
         "frameworkId": "EU_AI_ACT",
         "instrumentId": "eu-ai-act",
-        "label": "EU AI Act Annex III §5/8"
+        "label": "EU AI Act Annex III point 5(a)"
       },
       {
         "external": true,
@@ -644,11 +644,11 @@
       "eIDAS 2.0",
       "GDPR Art. 6(1)(e)",
       "WCAG 2.1 AA",
-      "EU AI Act Annex III §5/8",
+      "EU AI Act Annex III point 5(a)",
       "ISO 9241-210:2019"
     ],
     "description": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
-    "euAIActClassification": "Annex III §5(a) — public authorities evaluating eligibility for essential public assistance benefits and services",
+    "euAIActClassification": "Annex III point 5(a) (eligibility for essential public assistance benefits; obligations from 2 Dec 2027); deployer duties Arts 26-27, explanation Art. 86, interaction disclosure Art. 50(1)",
     "id": "citizen-services",
     "keyRisks": [
       "Systemic service denial for vulnerable populations through AI gatekeeping",
@@ -657,48 +657,48 @@
       "Privacy violations from AI-enabled government data aggregation",
       "Loss of non-digital access channels for elderly/disabled citizens"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Citizen Services",
     "questions": [
       {
         "dimension": "Accessibility",
         "id": "GOV-CS-1",
-        "l1": "No accessibility compliance; citizen service AI is inaccessible to persons with disabilities, lacks WCAG 2.1 AA conformance, and provides no alternative access channels",
-        "l3": "Agent implements WCAG 2.1 AA for primary service interfaces, but does not apply accessibility to all channels or maintain accessibility statements per Art. 7",
-        "l5": "Full accessibility with WCAG 2.1 AA+ implementation, EU Accessibility Directive Art. 4 compliance, multi-channel service delivery (web, mobile, telephone, in-person), accessibility feedback mechanism, annual accessibility statement per Art. 7, and ATAG 2.0 authoring tool compliance",
-        "regulatoryRef": "EU Accessibility Directive 2016/2102 Art. 4; WCAG 2.1 AA",
-        "text": "Does the agent implement universal service accessibility per EU Web Accessibility Directive 2016/2102 Article 4 and WCAG 2.1 AA success criteria for all citizen-facing service channels?",
-        "weight": 20
+        "l1": "No conformance testing; at least one channel has known blocking accessibility failures",
+        "l3": "Primary web interfaces conform to WCAG 2.1 AA, but other channels or dynamic agent-generated content are untested, or no accessibility statement is published",
+        "l5": "Conformance evidence per release for every channel including agent-generated content; SC 2.4.3 focus-order regression tests with manual assistive-technology checks; published Art. 7 statement with a feedback route; WCAG 2.2 conformance tracked for authentication steps",
+        "regulatoryRef": "EU Web Accessibility Directive Art. 4, Art. 7; WCAG 2.1 AA; WCAG 2.2",
+        "text": "Do all citizen-facing service channels the agent operates (web, mobile, chat, voice) meet WCAG 2.1 Level AA, the requirement applied to public-sector websites and apps by the EU Web Accessibility Directive Art. 4, with keyboard focus order (WCAG SC 2.4.3) covered by regression tests and an accessibility statement per Art. 7?",
+        "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "GOV-CS-2",
-        "l1": "No EU SDG compliance; digital service delivery does not meet Art. 6 quality criteria including completeness, accuracy, and cross-border accessibility",
-        "l3": "Agent implements core EU SDG Art. 6 quality requirements, but does not maintain Art. 12 user experience statistics or cross-border service integration",
-        "l5": "Full EU SDG compliance with Art. 6 quality criteria for all procedures, cross-border service delivery per Art. 5, Art. 12 user feedback system, quality statistics reporting to European Commission, and Your Europe portal integration",
-        "regulatoryRef": "EU SDG 2018/1724 Art. 6, 12",
-        "text": "Does the agent implement EU Single Digital Gateway Regulation 2018/1724 Article 6 quality criteria for online procedures and Article 12 user feedback requirements?",
-        "weight": 15
+        "l1": "No user-feedback route on SDG-linked procedures",
+        "l3": "Feedback is collected but not passed to the gateway tool, or not linked to fixes",
+        "l5": "Feedback offered at the end of each procedure, forwarded to the gateway tool, and each recurring issue linked to a tracked fix",
+        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 25 (Regulation (EU) 2018/1724)",
+        "text": "For procedures linked to the Single Digital Gateway, does the agent let users give feedback on the service they used and pass that feedback into the gateway's user-feedback tool (Regulation (EU) 2018/1724 Art. 25), with the feedback used to fix reported problems?",
+        "weight": 10
       },
       {
         "dimension": "Ethics",
         "id": "GOV-CS-3",
-        "l1": "No non-discrimination controls; AI eligibility assessments may discriminate based on protected characteristics without detection or monitoring",
-        "l3": "Agent performs periodic bias audits for service AI and implements basic fairness constraints, but does not maintain EU AI Act Art. 10 data governance requirements or continuous discrimination monitoring",
-        "l5": "Full non-discrimination governance with EU AI Act Art. 10 training data requirements, continuous disparate impact monitoring per ECHR Art. 14, automated adverse outcome investigation, non-discrimination impact assessment for new service AI, and transparent fairness reporting",
-        "regulatoryRef": "EU AI Act Art. 10, 14; ECHR Art. 14",
-        "text": "Does the agent implement non-discrimination per EU AI Act high-risk requirements for AI systems used in essential government services including benefits administration?",
-        "weight": 15
+        "l1": "No bias examination of data and no outcome monitoring",
+        "l3": "Data were examined for bias before deployment, but outcomes are not monitored by group in operation, or disparities are not investigated",
+        "l5": "Documented Art. 10(2)(f) examination per dataset version, outcome disparities monitored by group in production with thresholds, each breach investigated and its resolution recorded, and results reported to the oversight body",
+        "regulatoryRef": "EU AI Act Art. 10(2)(f) as amended by Regulation (EU) 2026/1744 (Art. 10(5) deleted); ECHR Art. 14",
+        "text": "Where the agent supports eligibility decisions in essential public services, are training, validation and test data examined for biases likely to affect fundamental rights or lead to discrimination (EU AI Act Art. 10(2)(f)), with outcome disparities across protected groups monitored in operation and investigated when they appear?",
+        "weight": 12
       },
       {
-        "dimension": "Transparency",
+        "dimension": "Governance",
         "id": "GOV-CS-4",
-        "l1": "No human oversight or citizen transparency; AI-influenced government service decisions are made without citizen notification or accessible human review mechanism",
-        "l3": "Agent implements human review capability for flagged AI decisions, but does not provide Art. 13 citizen transparency or systematic human oversight per Art. 14 requirements",
-        "l5": "Full EU AI Act compliance with Art. 13 citizen notification of AI involvement, Art. 14 human oversight with meaningful review capability, citizen explanation of AI-influenced decisions, contestability mechanisms, and national competent authority system registration",
-        "regulatoryRef": "EU AI Act Art. 13, 14",
-        "text": "Does the agent implement EU AI Act Article 14 human oversight for high-risk AI in essential public services and Article 13 transparency for citizens receiving AI-influenced decisions?",
-        "weight": 15
+        "l1": "No named overseer, or overseers cannot override or stop the agent",
+        "l3": "Overseers are named and can override outputs, but there is no safe stop, or training and authority are not documented",
+        "l5": "Named overseers with recorded training and authority; override, reversal and stop functions tested each release; every override logged with a reason and reviewed",
+        "regulatoryRef": "EU AI Act Art. 14(4)(d)-(e), Art. 26(2)",
+        "text": "For high-risk agents in essential public services, has the deploying authority assigned human oversight to named people with the competence, training and authority to do it (EU AI Act Art. 26(2)), and can those people disregard, override or reverse the agent's output and stop it safely (Art. 14(4)(d)-(e))?",
+        "weight": 12
       },
       {
         "dimension": "Privacy",
@@ -706,9 +706,9 @@
         "l1": "No proportionate data use; citizen service AI accesses and retains all available government data without necessity assessment or purpose limitation controls",
         "l3": "Agent implements purpose limitation for primary service functions and restricts cross-purpose data use, but does not conduct systematic proportionality assessments or automated data minimization",
         "l5": "Full proportionate data governance with GDPR Art. 6(1)(e) necessity assessment for each service AI, Art. 5(1)(b) purpose limitation technical controls, cross-agency data sharing proportionality gates, citizen data transparency dashboards, and automated retention enforcement",
-        "regulatoryRef": "GDPR Art. 5(1)(b); Art. 6(1)(e)",
+        "regulatoryRef": "GDPR Art. 5(1)(b), Art. 6(1)(e)",
         "text": "Does the agent implement proportionate data use per GDPR Article 6(1)(e) public task processing limitation and Article 5(1)(b) purpose limitation for citizen service AI systems?",
-        "weight": 15
+        "weight": 12
       },
       {
         "dimension": "Governance",
@@ -718,97 +718,97 @@
         "l5": "Full human-centered design with ISO 9241-210 iterative design process, user research with representative citizen panels, UN E-Government satisfaction measurement, continuous service improvement cycle, and accessible service design for diverse citizen needs",
         "regulatoryRef": "ISO 9241-210:2019; UN E-Government Survey 2024",
         "text": "Does the agent implement service quality assurance per ISO 9241-210:2019 human-centered design principles and UN E-Government Development Index citizen satisfaction requirements?",
-        "weight": 20
+        "weight": 8
       },
       {
         "dimension": "Security",
         "id": "GOV-CS-7",
-        "l1": "No government cybersecurity framework; citizen-facing AI services are deployed without NIST CSF government profile implementation or FedRAMP-equivalent authorization",
-        "l3": "Agent implements NIST CSF core functions for service security and has completed basic security assessment, but does not maintain FedRAMP-equivalent continuous monitoring or government community profile alignment",
-        "l5": "Full government cybersecurity with NIST CSF 2.0 Government Community Profile implementation, FedRAMP Rev. 5 equivalent authorization and continuous monitoring, penetration testing, supply chain risk management for service AI components, and incident response integrated with CISA coordination",
-        "regulatoryRef": "NIST CSF 2.0 Government Community Profile; FedRAMP Rev. 5",
-        "text": "Does the agent implement cybersecurity for government digital services per NIST CSF 2.0 Government Profile and FedRAMP Rev. 5 authorization requirements?",
-        "weight": 15
+        "l1": "No applicable regime identified and no control mapping",
+        "l3": "Controls are mapped to the applicable regime, but no authorization or assessment is current, or monitoring is periodic only",
+        "l5": "Applicable regime recorded per deployment; current authorization or assessment evidence; NIST CSF 2.0 profile maintained; continuous monitoring with findings tracked to closure",
+        "regulatoryRef": "EU NIS2 Art. 21(2); FedRAMP; NIST CSF 2.0",
+        "text": "Does the agent's hosting and operation meet the cybersecurity regime that applies to the service — the NIS2 Art. 21(2) risk-management measures where the authority is a public administration entity in NIS2 scope, or a FedRAMP authorization at the required baseline for US federal cloud services — with controls mapped to NIST CSF 2.0 outcomes and monitored continuously?",
+        "weight": 12
       },
       {
         "dimension": "Ethics",
         "id": "GOV-CS-8",
-        "l1": "No vulnerability assessment; citizen service AI does not identify or proactively support populations at risk of digital exclusion including elderly, disabled, homeless, or undocumented individuals",
-        "l3": "Agent monitors service utilization patterns and identifies underserved groups, but does not implement proactive outreach or EU AI Act recital-aligned vulnerability protection",
-        "l5": "Full vulnerability governance with EU AI Act recital-aligned vulnerable population identification, proactive service design for at-risk groups, UN SDG 10 equity monitoring, non-digital alternative channels, outreach to digitally excluded populations, and transparent equity reporting to oversight bodies",
-        "regulatoryRef": "EU AI Act Recitals 47-49; UN SDG 10; UN E-Gov Survey 2024",
-        "text": "Does the agent implement proactive identification of vulnerable citizen populations per EU AI Act recitals 47-49 and UN SDG 10 Reduced Inequalities to prevent service exclusion?",
+        "l1": "No screening of service dialogues or messages for exploitation of vulnerable users",
+        "l3": "Policy forbids it and scripts are reviewed at launch, but changes to prompts or messages are not re-screened",
+        "l5": "Every change to agent prompts, templates or messaging is screened against Art. 5(1)(b) before release, outcomes by vulnerable group are monitored for withdrawal or drop-off, and anomalies are investigated",
+        "regulatoryRef": "EU AI Act Art. 5(1)(b) (applies from 2 Feb 2025)",
+        "text": "Is the agent prevented from exploiting the vulnerabilities of citizens due to age, disability or a specific social or economic situation to distort their behaviour in a way that causes or is likely to cause significant harm — for example nudging benefit claimants to withdraw or not pursue a claim (EU AI Act Art. 5(1)(b))?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "GOV-CS-9",
-        "l1": "No fundamental rights impact assessment or AI liability compliance; high-risk citizen service AI lacks Art. 27 FRIA and citizens have no structured redress mechanism for AI-caused service failures",
-        "l3": "Agent conducts basic impact assessment for citizen service AI, but does not implement EU AI Act Art. 27 fundamental rights impact assessment methodology or prepare for AI Liability Directive redress obligations",
-        "l5": "Full EU AI Act Art. 27 fundamental rights impact assessment for all high-risk citizen service AI, AI Liability Directive readiness with disclosure obligations, citizen redress mechanisms, causal chain documentation for AI-influenced service decisions, and national competent authority FRIA reporting",
-        "regulatoryRef": "EU AI Act Art. 27; AI Liability Directive Proposal",
-        "text": "Does the agent implement EU AI Act Article 27 fundamental rights impact assessment for high-risk AI in public services and European Commission AI Liability Directive proposal provisions for citizen redress in AI-caused service failures?",
-        "weight": 12
+        "l1": "No fundamental rights impact assessment",
+        "l3": "An assessment exists but lacks some Art. 27(1) elements, is not updated on change, or the authority was not notified",
+        "l5": "Assessment with all Art. 27(1)(a)-(f) elements, DPIA cross-references, notification receipt, and change-triggered updates linked to the agent version",
+        "regulatoryRef": "EU AI Act Art. 27(1), 27(3), 27(4) (Annex III obligations from 2 Dec 2027)",
+        "text": "Before first deploying a high-risk agent, has the public body (or private entity providing a public service) completed a fundamental rights impact assessment with all EU AI Act Art. 27(1)(a)-(f) elements — including the categories of people likely to be affected and the specific risks to them — notified the market surveillance authority of its results (Art. 27(3)), and cross-referenced any GDPR DPIA it reuses (Art. 27(4))?",
+        "weight": 10
       },
       {
         "dimension": "Compliance",
         "id": "GOV-CS-10",
-        "l1": "Procedure is not fully online: one or more mandatory steps require in-person/phone/mail workarounds or manual staff intervention, with no exception governance or evidence",
-        "l3": "Most steps are online, but identity/evidence/payment/decision delivery or redress steps still require offline actions or are inconsistently available across procedures",
-        "l5": "All SDG procedures are end-to-end fully online with exception governance, evidence of completion rates, cross-border accessibility checks, and auditable proof that offline steps are not mandatory except where legally justified",
-        "regulatoryRef": "EU SDG 2018/1724 Art. 2(2)",
-        "text": "For all SDG-scoped procedures, does the agent ensure the full procedure is available fully online end-to-end (including identification/authentication, guidance, form completion, evidence submission, e-signature where applicable, fee/payment, status tracking, decision delivery, and appeal/redress initiation), with documented exceptions and accessibility-preserving alternative channels, per SDG Regulation (EU) 2018/1724 Article 2(2)?",
-        "weight": 15
+        "l1": "One or more mandatory steps of an Annex II procedure require offline action with no documented exception",
+        "l3": "Most steps are online, but identification, evidence, payment or outcome delivery still require offline action for some procedures",
+        "l5": "Every Annex II procedure served is completable online end to end, exceptions are documented with their legal basis, and completion rates are measured per procedure including cross-border users",
+        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 6(1), Annex II (Regulation (EU) 2018/1724, Art. 6 applies from 12 Dec 2023)",
+        "text": "For each procedure listed in Annex II of the Single Digital Gateway Regulation that the agent serves, can a user complete every step online — identification, information, evidence submission, payment where required, and receipt of the outcome — as Art. 6(1) requires, with any offline step justified in a documented exception?",
+        "weight": 12
       },
       {
         "dimension": "Interoperability",
         "id": "GOV-CS-11",
-        "l1": "No cross-border support: identity/credential flows work only for domestic users and fail for cross-border credentials or foreign-issued attributes",
-        "l3": "Some cross-border scenarios work, but coverage is incomplete, usability is poor, and there is limited evidence of interoperability testing and relying-party validation",
-        "l5": "Full cross-border readiness with interoperable identity/credential acceptance, relying-party verification, consistent UX across Member States, and audit-ready evidence of cross-border transactions and conformance testing",
-        "regulatoryRef": "eIDAS 2.0 §6 (cross-border)",
-        "text": "Does the agent support eIDAS 2.0 cross-border use (per §6) by enabling (1) cross-border identification/authentication acceptance, (2) EUDI Wallet or equivalent credential presentation flows where applicable, (3) relying-party verification and attribute validation, (4) multilingual/cross-border error handling and support, and (5) evidence exports demonstrating successful cross-border transactions and interoperability testing?",
-        "weight": 18
-      },
-      {
-        "dimension": "Accessibility",
-        "id": "GOV-CS-12",
-        "l1": "No focus-order control: keyboard navigation order is illogical, dynamic steps trap focus, or assistive technology users cannot complete procedures",
-        "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
-        "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
-        "regulatoryRef": "WCAG 2.1 SC 2.4.3",
-        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
+        "l1": "Only domestic credentials are accepted",
+        "l3": "Some cross-border credentials work, but wallet acceptance or attribute verification is incomplete, or no cross-border test evidence exists",
+        "l5": "Wallets and notified foreign eID means accepted at the required assurance level, attributes verified, cross-border test transactions recorded per release, and failures handled with multilingual guidance",
+        "regulatoryRef": "eIDAS 2.0 Art. 5f, Art. 6",
+        "text": "Where a public service the agent fronts requires electronic identification, does it accept EU Digital Identity Wallets and notified eID means from other Member States (eIDAS Art. 5f cross-border reliance on wallets; Art. 6 mutual recognition), with relying-party verification of presented attributes and evidence of cross-border test transactions?",
         "weight": 12
       },
       {
         "dimension": "Accessibility",
         "id": "GOV-CS-13",
-        "l1": "No 508 mapping: accessibility is asserted but not evidenced against Revised 508 Standards, with gaps in forms/keyboard/AT compatibility",
-        "l3": "Partial mapping: some criteria are met and tested, but gaps remain and evidence is not consistently retained or auditable",
-        "l5": "Full Revised 508 Standards compliance with traceable criteria mapping, repeatable testing, remediation SLAs, and audit-ready evidence bundles",
-        "regulatoryRef": "Section 508 Revised Standards (36 CFR Part 1194 Appendices A and C)",
-        "text": "For web-based citizen services, does the agent meet Section 508 Revised Standards (36 CFR Part 1194 Appendices A and C) requirements (including text alternatives, keyboard access, non-interference with assistive tech, form label/field associations, timing control, and accessible documentation), and produce evidence bundles (test reports, exception logs, remediation tracking) suitable for procurement/audit?",
-        "weight": 10
+        "l1": "No conformance testing, or the retired §1194.22 is still the reference",
+        "l3": "Automated checks only, or agent-generated dynamic content and authentication steps are untested",
+        "l5": "Conformance evidence per release covering agent-generated content and authentication steps, an exceptions log, and remediation tracked against the applicable compliance date",
+        "regulatoryRef": "Section 508 (36 CFR Part 1194, Appendix A E205.4); 28 CFR Part 35 (ADA Title II web and mobile rule as extended by 91 FR 20902)",
+        "text": "Do US channels the agent operates meet the applicable federal accessibility rule — for federal agencies, the Revised Section 508 Standards (36 CFR part 1194, Appendix A E205.4: WCAG 2.0 Level A and AA), and for state and local governments, the ADA Title II web and mobile rule (28 CFR part 35) by its extended compliance dates (26 Apr 2027 for populations of 50,000 or more; 26 Apr 2028 otherwise)?",
+        "weight": 12
       },
       {
         "dimension": "Interoperability",
         "id": "GOV-CS-14",
-        "l1": "Citizens must upload evidence that authorities already hold",
-        "l3": "Some evidence types are retrieved through the once-only system, but preview and explicit request are not enforced",
-        "l5": "All available evidence types retrieved through the once-only technical system on explicit request, with preview before use, and logged exchanges",
-        "regulatoryRef": "EU SDG 2018/1724 Art. 14",
-        "text": "For procedures in scope of the Single Digital Gateway Regulation (EU) 2018/1724, does the agent support the Article 14 once-only technical system, retrieving evidence directly from competent authorities at the user's explicit request and letting the user preview it before use?",
-        "weight": 8
+        "l1": "Users must obtain and upload cross-border evidence themselves",
+        "l3": "Evidence can be fetched through the once-only system, but the user cannot preview it or decline its use",
+        "l5": "Evidence requested only on explicit user request, previewed by the user before use, use declinable, and each exchange logged",
+        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 14 (Regulation (EU) 2018/1724)",
+        "text": "For Single Digital Gateway procedures that need evidence held by another Member State's authority, can the user ask the agent to obtain it through the once-only technical system (Regulation (EU) 2018/1724 Art. 14, applicable from 12 Dec 2023), preview it before it is used, and decline its use?",
+        "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "GOV-CS-15",
-        "l1": "Applicants are not told that AI is involved in eligibility decisions",
-        "l3": "A general statement exists on the website, not in the applicant's own case",
-        "l5": "Notice given in each case before the decision, stating the system's purpose and the right to an explanation, with the notice recorded on the case file",
-        "regulatoryRef": "EU AI Act Annex III §5(a); EU AI Act Art. 26(11)",
-        "text": "Where the agent supports decisions on eligibility for public assistance benefits and services (EU AI Act Annex III point 5(a)), does the authority inform each applicant that a high-risk AI system is being used, as Article 26(11) requires?",
-        "weight": 8
+        "l1": "Applicants are not told that a high-risk AI system is used in their case",
+        "l3": "A general statement exists (for example on the website), but notice is not given in each applicant's own case or is not recorded",
+        "l5": "Notice is given in each case before the decision and recorded on the case file, and a periodic sample checks the notice records",
+        "regulatoryRef": "EU AI Act Art. 26(11), Annex III point 5(a)",
+        "text": "Where the agent supports decisions on eligibility for essential public assistance benefits and services (EU AI Act Annex III point 5(a)), does the deploying authority inform each affected person that a high-risk AI system is used in the decision about them (Art. 26(11))?",
+        "weight": 10
+      },
+      {
+        "dimension": "Transparency",
+        "id": "GOV-CS-16",
+        "l1": "There is no route to request an explanation, or none can be given",
+        "l3": "Explanations are given on request, but they are generic and not built from the specific decision record",
+        "l5": "A published request route, explanations generated from the logged decision trace and reviewed by a named official, and requests and response times logged",
+        "regulatoryRef": "EU AI Act Art. 86(1)",
+        "text": "When a person affected by an eligibility decision taken on the basis of the agent's output asks for an explanation, can the deploying authority give a clear and meaningful explanation of the AI system's role in the procedure and of the main elements of the decision, built from records kept at decision time (EU AI Act Art. 86(1))?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -817,9 +817,10 @@
       "GDPR Art. 6(1)(e)",
       "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
       "ISO 9241-210:2019 (Human-Centered Design)",
-      "EU AI Act Annex III §8",
+      "EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86",
       "UN E-Government Development Index Standards",
-      "Section 508"
+      "Section 508",
+      "28 CFR Part 35 (ADA Title II web and mobile accessibility)"
     ],
     "regulatoryReferences": [
       {
@@ -877,7 +878,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU AI Act Annex III §8",
+        "text": "EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86",
         "url": "https://data.europa.eu/eli/reg/2024/1689/oj"
       },
       {
@@ -896,6 +897,16 @@
         "status": "in-force",
         "text": "Section 508",
         "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Btype%5D%5B%5D=RULE&conditions%5Bcfr%5D%5Btitle%5D=36&conditions%5Bcfr%5D%5Bpart%5D=1194"
+      },
+      {
+        "citation": "ADA Title II web and mobile app accessibility rule (28 CFR Part 35, Subpart H)",
+        "effectiveDate": "2024-06-24",
+        "instrumentId": "us-ada-title-ii-web",
+        "jurisdiction": "US",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "28 CFR Part 35 (ADA Title II web and mobile accessibility)",
+        "url": "https://www.federalregister.gov/documents/2026/04/20/2026-07663/extension-of-compliance-dates-for-nondiscrimination-on-the-basis-of-disability-accessibility-of-web"
       }
     ],
     "riskTier": "very-high",
@@ -1822,19 +1833,19 @@
         "external": false,
         "frameworkId": "EU_AI_ACT",
         "instrumentId": "eu-ai-act",
-        "label": "EU AI Act Art. 5(1)(a)"
+        "label": "EU AI Act Art. 5(1)(a)-(b); Annex III 8(b)"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-dsa",
-        "label": "EU DSA Art. 34"
+        "label": "EU DSA Art. 34-35"
       },
       {
         "external": false,
         "frameworkId": "GDPR",
         "instrumentId": "eu-gdpr",
-        "label": "EU GDPR Art. 9(d)"
+        "label": "EU GDPR Art. 9(2)(d)"
       },
       {
         "external": true,
@@ -1845,19 +1856,19 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "eu-disinfo-code",
-        "label": "EU Code of Practice on Disinformation 2022"
+        "instrumentId": "eu-political-ads",
+        "label": "EU Political Advertising Regulation"
       }
     ],
     "complianceFrameworks": [
-      "EU AI Act Art. 5(1)(a)",
-      "EU DSA Art. 34",
-      "EU GDPR Art. 9(d)",
+      "EU AI Act Art. 5(1)(a)-(b); Annex III 8(b)",
+      "EU DSA Art. 34-35",
+      "EU GDPR Art. 9(2)(d)",
       "Council of Europe Rec CM/Rec(2017)5",
-      "EU Code of Practice on Disinformation 2022"
+      "EU Political Advertising Regulation"
     ],
     "description": "Electing candidates representing constituent aspirations in the process of governing — AI agents supporting democratic processes, voter engagement, electoral integrity, and political communication with strict safeguards against manipulation and disinformation.",
-    "euAIActClassification": "Annex III §8(b) — systems intended to influence the outcome of an election or referendum or voting behaviour; Art. 5(1)(a) prohibits manipulative or deceptive techniques",
+    "euAIActClassification": "Annex III point 8(b) (influencing the outcome of an election or referendum or voting behaviour; obligations from 2 Dec 2027); prohibited under Art. 5(1)(a)-(b) where techniques are manipulative or exploit vulnerabilities",
     "id": "dance-of-democracy",
     "keyRisks": [
       "Electoral manipulation through micro-targeted AI political messaging",
@@ -1866,7 +1877,7 @@
       "Foreign interference facilitation through AI communication tools",
       "Algorithmic political bias affecting democratic representation"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Dance of Democracy",
     "questions": [
       {
@@ -1877,67 +1888,37 @@
         "l5": "Full Art. 5(1)(a) compliance with prohibited manipulation technique prevention, AI electoral influence impact assessment, anti-manipulation testing per academic adversarial research, and transparent electoral AI governance documentation",
         "regulatoryRef": "EU AI Act Art. 5(1)(a)",
         "text": "Does the agent strictly comply with EU AI Act Article 5(1)(a) prohibition on subliminal AI systems and techniques to manipulate electoral behavior beyond free will?",
-        "weight": 25
-      },
-      {
-        "dimension": "Safety",
-        "id": "GOV-DD-2",
-        "l1": "No disinformation prevention; AI-curated electoral content amplifies false information without detection or correction mechanisms",
-        "l3": "Agent implements fact-checking integration for electoral content and flags suspected disinformation, but does not implement DSA Art. 34 electoral risk assessment or Code of Practice Commitment 22 reporting",
-        "l5": "Full electoral disinformation governance with DSA Art. 34 risk assessment for elections, Code of Practice Commitment 22 implementation, electoral content labeling per EU AI Act Art. 50, cross-platform coordination detection, and electoral period enhanced monitoring",
-        "regulatoryRef": "EU Code of Practice on Disinformation 2022 §22; EU DSA Art. 34",
-        "text": "Does the agent implement electoral disinformation prevention per EU Code of Practice on Disinformation 2022 Commitment 22 and DSA Article 34 electoral risk assessment for very large platforms?",
-        "weight": 20
-      },
-      {
-        "dimension": "Privacy",
-        "id": "GOV-DD-3",
-        "l1": "No political data protection; electoral AI processes political opinion as regular personal data without Art. 9 special category safeguards",
-        "l3": "Agent applies Art. 9 special category controls for explicit political data, but does not prevent inferential political profiling or implement minimal processing for voter analytics",
-        "l5": "Full GDPR Art. 9 political data governance with processing limitation to Art. 9(2)(d) exemption scope, prohibition on political micro-targeting, voter analytics data minimization, special category DPIA, and political data processing transparency",
-        "regulatoryRef": "GDPR Art. 9(1) and 9(2)(d)",
-        "text": "Does the agent protect political opinion data per GDPR Article 9(d) special category processing exemptions with minimal processing and robust access controls for electoral services?",
         "weight": 15
       },
       {
         "dimension": "Transparency",
         "id": "GOV-DD-4",
-        "l1": "No electoral transparency; AI-generated or AI-curated political content is not disclosed, and recommendation algorithms are opaque",
-        "l3": "Agent implements basic AI content disclosure for electoral communications, but does not address CoE Rec §7 full algorithmic transparency or Venice Commission AI in elections guidance",
-        "l5": "Full electoral AI transparency per CoE Rec §7, AI-generated electoral content labeling per EU AI Act Art. 50, recommendation algorithm transparency for political content, electoral period audit reporting, and Venice Commission guidelines compliance",
-        "regulatoryRef": "CoE Rec CM/Rec(2017)5 §7; Venice Commission AI Guidelines",
-        "text": "Does the agent implement electoral AI transparency per Council of Europe Recommendation CM/Rec(2017)5 §7 algorithmic transparency for political communication systems?",
-        "weight": 15
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-DD-5",
-        "l1": "No electoral integrity controls; AI-assisted electoral administration lacks OSCE/ODIHR standards alignment or independent verification mechanisms",
-        "l3": "Agent implements basic integrity controls for electoral AI systems, but does not implement OSCE/ODIHR election assessment framework or independent audit support",
-        "l5": "Full OSCE/ODIHR standards alignment with electoral technology security assessment, observer access mechanisms, results management integrity verification, recount support capability, and OSCE post-election technology review documentation",
-        "regulatoryRef": "OSCE/ODIHR Handbook on Electoral Technology; OSCE Commitments §7",
-        "text": "Does the agent implement OSCE/ODIHR electoral integrity standards for AI-assisted voter registration, information services, and results management systems?",
-        "weight": 25
+        "l1": "No disclosure of AI-generated election content or deep fakes",
+        "l3": "Disclosure is applied to some outputs or channels only, or the editorial-responsibility exception is claimed without a recorded review",
+        "l5": "Every published item and deep fake carries a disclosure, or a record names the reviewer and the person holding editorial responsibility; the approach follows the June 2026 Code of Practice or a documented equivalent",
+        "regulatoryRef": "EU AI Act Art. 50(4) (applies from 2 Aug 2026); Code of Practice on Transparency of AI-generated Content (10 Jun 2026)",
+        "text": "For election-related text the agent generates or manipulates that is published to inform the public on matters of public interest, and for deep fakes it produces, does the deployment disclose that the content is AI-generated or manipulated, unless the text has had human review and a person holds editorial responsibility (EU AI Act Art. 50(4))?",
+        "weight": 12
       },
       {
         "dimension": "Security",
         "id": "GOV-DD-6",
-        "l1": "No electoral cybersecurity; voter registration databases and results management systems are unprotected against adversarial attacks, supply chain compromise, or insider threats",
-        "l3": "Agent implements basic access controls and audit logging for electoral systems, but does not apply CISA election security guidance or NIS2 Art. 21 essential entity requirements",
-        "l5": "Full electoral cybersecurity with CISA election security guidance implementation, NIS2 Art. 21 essential entity controls, supply chain verification for electoral software, insider threat detection, penetration testing before each election cycle, and cybersecurity incident response with electoral authority coordination",
-        "regulatoryRef": "CISA Election Security Guidance 2024; EU NIS2 Art. 21",
-        "text": "Does the agent implement cybersecurity for electoral infrastructure per CISA Election Security Guidance and EU NIS2 Article 21 essential entity requirements for voter registration and results systems?",
-        "weight": 15
+        "l1": "No documented cybersecurity measures for voter-registration or results systems the agent touches",
+        "l3": "Some Art. 21(2) measures (e.g. access control, logging) are in place, but supply-chain security or incident handling is missing, or no pre-election test was run this cycle",
+        "l5": "All Art. 21(2) measures mapped and evidenced for the agent's components, supplier assessments on file, incident-handling playbook linked to the electoral authority, and a pre-election test report for the current cycle",
+        "regulatoryRef": "EU NIS2 Art. 2(2)(f), Art. 21(2)",
+        "text": "Where the electoral management body or its supplier is an essential or important entity under NIS2 (public administration entities fall in scope under Art. 2(2)(f) or by national designation), does the agent's deployment in voter-registration and results systems implement the Art. 21(2) cybersecurity risk-management measures, including supply-chain security for electoral software and incident handling, with a pre-election test each cycle?",
+        "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "GOV-DD-7",
-        "l1": "No campaign finance transparency; AI-generated political advertising lacks mandatory disclosure, spending attribution, or regulatory compliance with campaign finance law",
-        "l3": "Agent tracks campaign finance expenditure for AI services and provides basic disclosure, but does not implement automated FECA reporting or EU political advertising transparency regulation compliance",
-        "l5": "Full campaign finance transparency with FECA §30104 AI expenditure reporting, EU Political Advertising Regulation compliance, AI-generated ad labeling, spending attribution, cross-platform campaign coordination monitoring, and electoral authority disclosure filing automation",
-        "regulatoryRef": "FECA 52 U.S.C. §30104; EU Political Advertising Regulation 2024",
-        "text": "Does the agent implement campaign finance AI transparency per FECA (Federal Election Campaign Act) and EU political advertising transparency regulation for AI-generated political content?",
-        "weight": 15
+        "l1": "Political advertisements are published without labels or transparency notices",
+        "l3": "Labels are applied, but transparency notices are missing required Art. 12(1) items or are not retrievable from the advertisement",
+        "l5": "Every advertisement carries the label, sponsor identity and a retrievable Art. 12(1) notice; notices are archived with the advertisement; a sample is audited each election period",
+        "regulatoryRef": "EU Political Advertising Regulation Art. 11, Art. 12(1) (Regulation (EU) 2024/900, applies from 10 Oct 2025)",
+        "text": "For political advertisements the agent produces, places or publishes in the EU, is each one labelled as a political advertisement with the sponsor identified, and made available with a transparency notice containing the information in Regulation (EU) 2024/900 Art. 12(1), or a clear indication of where it can be retrieved (Art. 11, applicable from 10 Oct 2025)?",
+        "weight": 12
       },
       {
         "dimension": "Ethics",
@@ -1947,16 +1928,6 @@
         "l5": "Full democratic accessibility with CRPD Art. 29 participation safeguards, HAVA-compliant accessible voting AI, multilingual electoral information, assisted participation for voters with disabilities, digital literacy support, and non-digital alternative channel preservation",
         "regulatoryRef": "CRPD Art. 29; HAVA 52 U.S.C. §21081",
         "text": "Does the agent implement accessibility in democratic participation per CRPD Article 29 (participation in political and public life) and HAVA (Help America Vote Act) accessibility requirements?",
-        "weight": 15
-      },
-      {
-        "dimension": "Compliance",
-        "id": "GOV-DD-9",
-        "l1": "No political advertising transparency or automated profiling safeguards; AI-generated political content lacks EU Political Advertising Regulation disclosure and political profiling operates without GDPR Art. 22(4) safeguards",
-        "l3": "Agent implements basic political content labeling and restricts profiling-based targeting, but does not automate EU Political Advertising Regulation transparency requirements or GDPR Art. 22(4) suitable safeguards for political profiling",
-        "l5": "Full EU Political Advertising Regulation compliance with AI-generated political content transparency, sponsor disclosure, targeting criteria publication, GDPR Art. 22(4) safeguards for automated political profiling, and electoral period enhanced transparency reporting",
-        "regulatoryRef": "EU Political Advertising Reg 2024; GDPR Art. 22(4)",
-        "text": "Does the agent implement EU Political Advertising Regulation 2024 transparency requirements for AI-generated political content and GDPR Article 22(4) safeguards for automated political profiling decisions?",
         "weight": 12
       },
       {
@@ -1967,27 +1938,27 @@
         "l5": "Full Art. 5(1)(b) compliance with vulnerability-exploitation threat modeling, pre-deployment testing/red-teaming, targeting restrictions, election-period heightened controls, monitoring for coercive patterns, and auditor-ready evidence of prohibited-practice prevention",
         "regulatoryRef": "EU AI Act Art. 5(1)(b)",
         "text": "Does the agent strictly comply with EU AI Act Article 5(1)(b) by preventing any electoral AI technique that exploits vulnerabilities (age, disability, or social/economic situation) to materially distort voting-related behavior, including coercive targeting, suppression messaging, or undue influence that undermines free political choice?",
-        "weight": 25
+        "weight": 15
       },
       {
         "dimension": "Safety",
         "id": "GOV-DD-11",
-        "l1": "No election systemic-risk assessment or mitigation: risks to civic discourse/elections are unmanaged and unmeasured",
-        "l3": "Performs general misinformation review and some mitigations, but does not run an Art. 34(1)(c)-anchored assessment nor track Art. 35 mitigation effectiveness with election-period escalation",
-        "l5": "Full Art. 34(1)(c)/35 program with documented risk assessment, mitigation selection and effectiveness metrics, election-period escalation playbooks, independent review support, and regulator-ready evidence exports",
-        "regulatoryRef": "EU DSA 2022/2065 Art. 34(1)(c), Art. 35",
-        "text": "For services in scope of DSA systemic-risk duties, does the agent perform a clause-precise DSA Article 34(1)(c) risk assessment for electoral processes and civic discourse (including recommender/ads systems, amplification dynamics, and coordinated inauthentic behavior) and implement DSA Article 35 mitigations with measurable effectiveness reporting during election periods?",
-        "weight": 20
+        "l1": "No election systemic-risk assessment or mitigation",
+        "l3": "A general misinformation review and some mitigations exist, but the assessment is not anchored to Art. 34(1)(c), C/2024/3014 measures are not mapped, or effectiveness is not measured",
+        "l5": "Documented Art. 34(1)(c) assessment; Art. 35 mitigations mapped to C/2024/3014 with effectiveness metrics per election period; election-period escalation playbook; for signatories, commitment-level mapping to the Code of Conduct with audit evidence",
+        "regulatoryRef": "EU DSA Art. 34(1)(c), Art. 35; Commission Guidelines C/2024/3014 (electoral processes); Code of Conduct on Disinformation (DSA framework, auditable from 1 Jul 2025)",
+        "text": "For services in scope of DSA systemic-risk duties (very large online platforms and search engines), does the agent support a DSA Art. 34(1)(c) risk assessment for electoral processes and civic discourse (recommender and advertising systems, amplification, coordinated inauthentic behaviour) and Art. 35 mitigations aligned with the Commission's electoral guidelines C/2024/3014, with mitigation effectiveness measured during election periods and, for signatories, controls mapped to the Code of Conduct on Disinformation?",
+        "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "GOV-DD-12",
-        "l1": "No ODIHR-grade verifiability: no independent verification, limited audit access, and opaque AI influence over election workflows",
-        "l3": "Allows some audits and logs, but observer access, change-control transparency, and verifiability evidence are incomplete or inconsistently provided",
-        "l5": "Full §3.2 alignment with independent verification protocols, observer-accessible evidence packages, tamper-evident logs, strict change-control, and repeatable audit procedures for AI-influenced election operations",
-        "regulatoryRef": "OSCE/ODIHR §3.2",
-        "text": "Does the agent meet OSCE/ODIHR §3.2-aligned election technology integrity expectations by providing independent verification support (pre-election testing, audit access, observer-accessible evidence), verifiability of results processes, and transparent change-control over AI-influenced electoral workflows?",
-        "weight": 20
+        "l1": "No independent verification: no pre-election test, no observer access to evidence, AI-influenced steps change without record",
+        "l3": "Logs and some audits exist, but observer access or change-control records for AI-influenced steps are incomplete",
+        "l5": "Pre-election test reports, observer-accessible evidence packages, tamper-evident logs and a change-control record for every AI-influenced step, with a repeatable audit procedure",
+        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2017)5 (standards for e-voting); OSCE/ODIHR Electoral Standards",
+        "text": "Where the agent influences election technology workflows (voter information, registration, e-voting or results handling), does the electoral authority provide independent verification support — pre-election testing, observer-accessible evidence, tamper-evident logs and transparent change control over AI-influenced steps — consistent with the Council of Europe standards for e-voting (CM/Rec(2017)5) and OSCE/ODIHR observation practice?",
+        "weight": 10
       },
       {
         "dimension": "Privacy",
@@ -1997,37 +1968,78 @@
         "l5": "Full Art. 9 governance with documented basis selection, enforceable safeguards/non-disclosure controls, minimization, strict access controls, DPIA/records linkage, and evidence exports for supervisory authority review",
         "regulatoryRef": "GDPR Art. 9(1), Art. 9(2)(d)",
         "text": "Where political opinions (GDPR Art. 9(1)) are processed in electoral services, does the agent (a) determine and document whether GDPR Art. 9(2)(d) is applicable (not-for-profit body, legitimate activities, appropriate safeguards, no disclosure outside without consent), (b) enforce data minimization and access controls, and (c) prevent inferential political profiling beyond the chosen lawful basis with audit-ready evidence?",
-        "weight": 15
+        "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "GOV-DD-14",
-        "l1": "No accountability/remedy: electoral algorithmic decisions are opaque, unowned, and not meaningfully contestable",
-        "l3": "Provides limited appeals and some governance, but responsibilities, timelines, and evidence retention for independent review are incomplete",
-        "l5": "Full CM/Rec(2017)5 accountability with owned controls, escalation/oversight, contestability mechanisms, election-period SLAs, and audit-ready evidence supporting independent review and remedies",
-        "regulatoryRef": "CoE CM/Rec(2017)5",
-        "text": "Does the agent implement Council of Europe CM/Rec(2017)5-aligned accountability and remedy for electoral algorithmic systems, including clear responsibility assignment, oversight escalation, user-facing contestability/appeal pathways, and retention of evidence sufficient to support independent review during election periods?",
+        "l1": "Electoral algorithmic decisions have no named owner and cannot be contested",
+        "l3": "Owners are named and appeals exist, but escalation timelines or evidence retention for independent review are missing",
+        "l5": "Named owner per system, documented escalation with election-period time limits, contest route with logged outcomes, and evidence retained for the period set by the electoral authority",
+        "regulatoryRef": "Council of Europe Recommendation CM/Rec(2020)1 (human rights impacts of algorithmic systems, 8 Apr 2020)",
+        "text": "For algorithmic systems used in election administration or campaigns, does the operator assign named responsibility for each system, provide an escalation path to oversight, give affected people a route to contest outcomes, and retain evidence sufficient for independent review during election periods, consistent with Council of Europe Recommendation CM/Rec(2020)1 on the human rights impacts of algorithmic systems?",
         "weight": 10
       },
       {
+        "dimension": "Safety",
+        "id": "GOV-DD-16",
+        "l1": "No screen for fraudulent misrepresentation of campaign authority",
+        "l3": "Policy forbids it, but generation requests impersonating candidates or campaigns are not detected or blocked",
+        "l5": "Impersonation requests are detected and blocked at generation time, blocks are logged, and synthetic media about candidates carries provenance and a disclosure",
+        "regulatoryRef": "52 U.S.C. 30124; FEC interpretive rule 89 FR 78785 (26 Sep 2024)",
+        "text": "Does the agent refuse to generate or distribute content that fraudulently presents a person as speaking, writing or otherwise acting for a candidate or political party (52 U.S.C. 30124), including AI-generated voice, image and text, and log each refusal?",
+        "weight": 12
+      },
+      {
+        "dimension": "Privacy",
+        "id": "GOV-DD-17",
+        "l1": "Targeting uses inferred or special-category data without separate explicit consent",
+        "l3": "Separate consent is collected, but special-category profiling is not technically excluded or targeting information is not published",
+        "l5": "Consent records per data subject for political advertising; special-category attributes excluded from targeting pipelines by configuration with tests; targeting parameters published with each advertisement and archived",
+        "regulatoryRef": "EU Political Advertising Regulation Art. 18, Art. 19 (Regulation (EU) 2024/900, applies from 10 Oct 2025); GDPR Art. 9, Art. 22(4)",
+        "text": "When the agent targets or delivers online political advertising in the EU, does it use targeting and ad-delivery techniques only on personal data collected from the data subject with explicit consent given separately for political advertising, never profile on special categories of personal data, and publish the targeting information required (Regulation (EU) 2024/900 Arts 18-19)?",
+        "weight": 12
+      },
+      {
         "dimension": "Governance",
-        "id": "GOV-DD-15",
-        "l1": "No mapping governance: citations drift and requested anchors are inconsistently used",
-        "l3": "Mapping exists but updates are manual and inconsistently applied",
-        "l5": "Versioned control mapping with review workflow and automated checks for citation consistency across questions and outputs",
-        "regulatoryRef": "Citation mapping governance",
-        "text": "Does the program maintain a versioned, Council-anchor-aligned control-to-law mapping for the Dance of Democracy pack (EU AI Act Art. 5(1)(b), DSA Art. 34(1)(c), OSCE/ODIHR §3.2, CoE CM/Rec(2017)5, GDPR Art. 9(2)(d)), with periodic review to prevent citation drift and ensure evidence expectations remain audit-defensible?",
-        "weight": 6
+        "id": "GOV-DD-18",
+        "l1": "Electoral uses are not classified",
+        "l3": "Electoral uses are classified, but the record does not separate prohibited techniques from high-risk uses or lacks a plan for the Chapter III obligations",
+        "l5": "A register of electoral uses with Annex III 8(b) classification and rationale, prohibited techniques screened out under Art. 5(1)(a)-(b), and a dated plan for each Chapter III obligation before 2 Dec 2027",
+        "regulatoryRef": "EU AI Act Annex III point 8(b); EU AI Act Art. 5(1)(a)-(b); EU AI Act Art. 113 as amended by Regulation (EU) 2026/1744",
+        "text": "Is every agent use intended to influence the outcome of an election or referendum or the voting behaviour of natural persons classified as high-risk under EU AI Act Annex III point 8(b), kept distinct from the Art. 5(1)(a)-(b) prohibitions, and recorded with the Chapter III obligations that apply to it from 2 Dec 2027?",
+        "weight": 10
+      },
+      {
+        "dimension": "Transparency",
+        "id": "GOV-DD-19",
+        "l1": "Synthetic election-related outputs carry no machine-readable marking",
+        "l3": "Some media types are marked, or marking is applied but detection has not been verified",
+        "l5": "Every generated media type is marked in a machine-readable format, detection is verified on each release, and robustness to common transformations is tested",
+        "regulatoryRef": "EU AI Act Art. 50(2) (from 2 Aug 2026, legacy generative systems by 2 Dec 2026)",
+        "text": "Where the agent, or the generative system behind it, produces synthetic audio, image, video or text used in election-related content, are the outputs marked in a machine-readable format and detectable as artificially generated or manipulated (EU AI Act Art. 50(2))?",
+        "weight": 12
+      },
+      {
+        "dimension": "Privacy",
+        "id": "GOV-DD-20",
+        "l1": "The agent can infer the listed characteristics from biometric data on request, and its biometric capabilities are not inventoried",
+        "l3": "A policy forbids it and biometric capabilities are inventoried, but nothing in the agent blocks such inference at runtime",
+        "l5": "Biometric capabilities are inventoried, inference of the listed characteristics is blocked at runtime, each block is logged, and a release test with biometric inputs confirms the block",
+        "regulatoryRef": "EU AI Act Art. 5(1)(g) (applies from 2 Feb 2025)",
+        "text": "Is the agent prevented from categorising voters or citizens on the basis of their biometric data (images, video or voice) to deduce or infer their political opinions, race, trade union membership, religious or philosophical beliefs, sex life or sexual orientation, as EU AI Act Art. 5(1)(g) prohibits?",
+        "weight": 15
       }
     ],
     "regulatoryBasis": [
-      "EU AI Act Art. 5 (prohibited electoral manipulation)",
+      "EU AI Act Art. 5(1)(a)-(b) (manipulation, exploitation of vulnerabilities); Annex III point 8(b) (influencing elections)",
       "EU Digital Services Act Art. 34 (electoral risk)",
+      "EU Political Advertising Regulation (EU) 2024/900",
       "OSCE/ODIHR Electoral Standards",
-      "Council of Europe Recommendation CM/Rec(2017)5",
-      "Venice Commission AI in Elections Guidelines",
-      "EU Code of Practice on Disinformation 2022",
-      "GDPR Art. 9(d) (political opinion data)"
+      "Council of Europe Recommendation CM/Rec(2017)5 (e-voting standards)",
+      "Code of Conduct on Disinformation (DSA framework, 2025)",
+      "GDPR Art. 9(2)(d) (political opinion data)",
+      "52 U.S.C. 30124"
     ],
     "regulatoryReferences": [
       {
@@ -2037,7 +2049,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU AI Act Art. 5 (prohibited electoral manipulation)",
+        "text": "EU AI Act Art. 5(1)(a)-(b) (manipulation, exploitation of vulnerabilities); Annex III point 8(b) (influencing elections)",
         "url": "https://data.europa.eu/eli/reg/2024/1689/oj"
       },
       {
@@ -2049,6 +2061,16 @@
         "status": "in-force",
         "text": "EU Digital Services Act Art. 34 (electoral risk)",
         "url": "https://data.europa.eu/eli/reg/2022/2065/oj"
+      },
+      {
+        "citation": "Regulation (EU) 2024/900 (transparency and targeting of political advertising)",
+        "effectiveDate": "2025-10-10",
+        "instrumentId": "eu-political-ads",
+        "jurisdiction": "EU",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "EU Political Advertising Regulation (EU) 2024/900",
+        "url": "https://data.europa.eu/eli/reg/2024/900/oj"
       },
       {
         "citation": "OSCE/ODIHR election observation standards",
@@ -2064,23 +2086,17 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Council of Europe Recommendation CM/Rec(2017)5"
+        "text": "Council of Europe Recommendation CM/Rec(2017)5 (e-voting standards)"
       },
       {
-        "citation": "Venice Commission guidance on AI and elections",
-        "instrumentId": "venice-elections-ai",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "Venice Commission AI in Elections Guidelines"
-      },
-      {
-        "citation": "EU Code of Practice on Disinformation (2022)",
-        "instrumentId": "eu-disinfo-code",
+        "citation": "Code of Conduct on Disinformation (Code of Practice converted to a DSA code of conduct)",
+        "effectiveDate": "2025-07-01",
+        "instrumentId": "eu-disinfo-conduct",
         "jurisdiction": "EU",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "EU Code of Practice on Disinformation 2022"
+        "lastReviewed": "2026-10-04",
+        "status": "in-force",
+        "text": "Code of Conduct on Disinformation (DSA framework, 2025)",
+        "url": "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation"
       },
       {
         "citation": "Regulation (EU) 2016/679 (General Data Protection Regulation)",
@@ -2089,8 +2105,17 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "GDPR Art. 9(d) (political opinion data)",
+        "text": "GDPR Art. 9(2)(d) (political opinion data)",
         "url": "https://data.europa.eu/eli/reg/2016/679/oj"
+      },
+      {
+        "citation": "52 U.S.C. §30124, Fraudulent misrepresentation of campaign authority",
+        "instrumentId": "us-52usc30124",
+        "jurisdiction": "US",
+        "lastReviewed": "2026-10-04",
+        "status": "in-force",
+        "text": "52 U.S.C. 30124",
+        "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title52/html/USCODE-2023-title52-subtitleIII-chap301-subchapI-sec30124.htm"
       }
     ],
     "riskTier": "critical",
@@ -2441,7 +2466,7 @@
         "external": false,
         "frameworkId": "EU_AI_ACT",
         "instrumentId": "eu-ai-act",
-        "label": "EU AI Act Annex III §8"
+        "label": "EU AI Act Art. 5; Annex III point 1(a)/5(a)"
       },
       {
         "external": true,
@@ -2459,12 +2484,12 @@
     "complianceFrameworks": [
       "EU eIDAS 2.0 2024/1183",
       "GDPR Art. 6/9/22",
-      "EU AI Act Annex III §8",
+      "EU AI Act Art. 5; Annex III point 1(a)/5(a)",
       "ISO/IEC 29115:2013",
       "Council of Europe AI Convention 2024"
     ],
     "description": "Citizen data tied with digital identity and tagged with government identities — supporting tax, travel documents, and rights to private and secure data — AI agents managing digital identity ecosystems, citizen data rights, and public trust infrastructure.",
-    "euAIActClassification": "Annex III §1 (biometrics) and §5(a) (public assistance benefits and services) where used; Art. 5(1)(c) prohibits social scoring",
+    "euAIActClassification": "Annex III point 1(a) remote biometric identification (biometric verification that only confirms a claimed identity is excluded) and point 5(a) where identity gates public assistance benefits; Annex III obligations apply from 2 Dec 2027; Art. 5(1)(c), (g), (h) prohibitions apply now",
     "id": "digital-citizens-rights",
     "keyRisks": [
       "Mass surveillance through digital identity AI integration",
@@ -2473,58 +2498,48 @@
       "Government data abuse enabled by AI identity correlation",
       "Loss of anonymous participation rights through identity AI requirements"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Digital Citizens & Rights",
     "questions": [
       {
-        "dimension": "Compliance",
-        "id": "GOV-DCR-1",
-        "l1": "No eIDAS compliance; digital identity verification does not meet eIDAS assurance levels (low/substantial/high) or EU Digital Identity Wallet requirements",
-        "l3": "Agent implements eIDAS assurance level verification for core use cases, but does not support EU Digital Identity Wallet integration or Art. 6a wallet-based identity attestation",
-        "l5": "Full eIDAS 2.0 compliance with EU Digital Identity Wallet integration, Art. 8 assurance level high verification, qualified electronic signature support, selective disclosure of identity attributes, and cross-border recognition per Art. 6a",
-        "regulatoryRef": "EU eIDAS 2.0 2024/1183 Art. 6a, 8",
-        "text": "Does the agent implement EU eIDAS 2.0 Regulation 2024/1183 Article 6a European Digital Identity Wallet requirements for identity verification assurance levels?",
-        "weight": 20
-      },
-      {
         "dimension": "Privacy",
         "id": "GOV-DCR-2",
-        "l1": "No safeguards against prohibited biometric AI; systems may enable real-time remote biometric identification in public spaces without exemption authorization",
-        "l3": "Agent implements controls to prevent unauthorized biometric identification, but does not maintain comprehensive Art. 5 prohibited practice assessment or exception documentation",
-        "l5": "Full Art. 5 compliance with prohibited practice prevention, biometric identification exception management (law enforcement exemptions with judicial authorization), impact assessment for biometric systems, and transparent prohibited practice reporting",
-        "regulatoryRef": "EU AI Act Art. 5(1)(a)-(d)",
-        "text": "Does the agent prevent unlawful biometric identification per EU AI Act Article 5 prohibited practices including real-time biometric identification in publicly accessible spaces?",
-        "weight": 20
+        "l1": "Neither practice is screened: the agent can be configured or invoked to infer sensitive traits from biometric data or to run real-time remote identification in public spaces, and no use-case record shows an Art. 5 assessment",
+        "l3": "Both practices are prohibited in written policy and screened at use-case intake, but at most one of them is blocked technically at runtime, or exceptions are granted without a recorded prior-authorisation reference",
+        "l5": "Both practices are blocked at runtime; a real-time identification request is released only with a recorded Art. 5(3) prior-authorisation reference for an Art. 5(1)(h) objective; every block and release is logged, and the log is reviewed by a named owner each release",
+        "regulatoryRef": "EU AI Act Art. 5(1)(g), 5(1)(h), 5(2)-(3) (apply from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "text": "Does the agent block the two EU AI Act prohibited biometric practices that identity systems can be repurposed for: biometric categorisation that infers race, political opinions, trade-union membership, religious or philosophical beliefs, sex life or sexual orientation (Art. 5(1)(g)), and use of 'real-time' remote biometric identification in publicly accessible spaces for law enforcement outside the objectives and prior authorisation set by Art. 5(1)(h) and 5(2)-(3)?",
+        "weight": 15
       },
       {
         "dimension": "Ethics",
         "id": "GOV-DCR-3",
-        "l1": "No human rights impact assessment; AI affecting citizen rights is deployed without systematic rights impact analysis or remediation mechanisms",
-        "l3": "Agent performs periodic human rights impact assessment and implements identified mitigation measures, but does not maintain continuous rights monitoring or UNGPs §18-21 due diligence framework",
-        "l5": "Full UNGPs due diligence with §18-21 human rights impact assessment, continuous rights monitoring, stakeholder consultation with affected communities, grievance mechanism per §29, and transparent human rights reporting aligned with Council of Europe AI Convention",
-        "regulatoryRef": "UNGPs §18-21; Council of Europe AI Convention 2024 Art. 5",
-        "text": "Does the agent implement human rights impact assessment per UN Guiding Principles on Business and Human Rights §18 for AI systems affecting citizen rights?",
-        "weight": 15
+        "l1": "No human rights impact assessment exists for any AI use case that affects citizens",
+        "l3": "An assessment was done once before deployment with identified risks and mitigations, but it is not repeated on change, mitigations are not tracked to closure, or affected groups were not consulted",
+        "l5": "Assessment per use case, repeated on each material change and at a set interval, with input from affected groups, mitigations tracked to closure, and grievance cases from an operating channel cited in the next assessment",
+        "regulatoryRef": "UNGPs Principles 17-21, 29; CoE AI Convention Art. 16",
+        "text": "Before an AI system that affects citizens' rights goes live, and again on each material change, does the operator carry out a human rights impact assessment that identifies affected groups, assesses the impacts, tracks each mitigation to closure and feeds grievance cases back into the next assessment (UN Guiding Principles 17-21; CoE AI Convention Art. 16 risk and impact management framework)?",
+        "weight": 10
       },
       {
         "dimension": "Governance",
         "id": "GOV-DCR-4",
-        "l1": "No citizen data sovereignty; government AI systems do not support rights of access, correction, or deletion for digital identity data",
-        "l3": "Agent supports GDPR rights requests and implements basic identity data correction, but does not provide self-sovereign identity control or eIDAS 2.0 wallet-based attribute management",
-        "l5": "Full citizen data sovereignty with automated GDPR rights fulfillment, eIDAS 2.0 wallet attribute self-management, citizen data access dashboards, correction workflows with audit trails, and deletion with lawful retention exception management",
-        "regulatoryRef": "GDPR Art. 15-17; eIDAS 2.0 Art. 6a §3",
-        "text": "Does the agent implement data sovereignty controls ensuring citizens can access, correct, and delete government-held digital identity data per GDPR Articles 15-17 and eIDAS 2.0 Article 6a §3?",
-        "weight": 15
+        "l1": "Identity-data access, rectification or erasure requests are not routed or answered",
+        "l3": "Requests are routed and answered, but response times are not measured against the Art. 12(3) period, or refusals are not recorded with a legal basis",
+        "l5": "Every request is logged with receipt date, identity check, action taken, response date within the Art. 12(3) period and any refusal basis; rectifications propagate to every system the agent reads from, with evidence per request",
+        "regulatoryRef": "GDPR Art. 12(3), Art. 15-17",
+        "text": "Does the agent route and fulfil citizens' requests to access, rectify and erase government-held digital identity data (GDPR Arts 15-17) within the one-month period of GDPR Art. 12(3), recording any refusal based on a lawful retention duty with its legal basis?",
+        "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "GOV-DCR-5",
-        "l1": "No AI transparency in government identity systems; citizens are unaware when AI influences identity verification, benefits access, or government service delivery",
-        "l3": "Agent discloses AI involvement in identity processes and provides explanations for adverse AI decisions, but does not implement full EU AI Act Art. 13-14 documentation or CoE Convention Art. 8 notification",
-        "l5": "Full AI transparency with EU AI Act Art. 13-14 system documentation, citizen notification of AI involvement, explanation of AI-influenced decisions affecting rights, contestability mechanisms, and national authority AI system register compliance",
-        "regulatoryRef": "EU AI Act Art. 13-14; CoE AI Convention Art. 8",
-        "text": "Does the agent implement AI transparency for government identity systems per EU AI Act Articles 13-14 information obligations and Council of Europe AI Convention Article 8?",
-        "weight": 15
+        "l1": "No AI-interaction disclosure on any channel",
+        "l3": "Disclosure exists only in terms of service or a footer, or only on some channels",
+        "l5": "Plain-language disclosure at first interaction on every channel, in accessible formats, logged per session, and re-tested on each release",
+        "regulatoryRef": "EU AI Act Art. 50(1), 50(5); CoE AI Convention Art. 15(2)",
+        "text": "On every identity-service channel (chat, voice, email, forms), is the agent designed so that people are told they are interacting with an AI system, clearly and distinguishably, at the latest at the first interaction (EU AI Act Art. 50(1) and 50(5), applicable from 2 Aug 2026; CoE AI Convention Art. 15(2))?",
+        "weight": 12
       },
       {
         "dimension": "Safety",
@@ -2534,17 +2549,17 @@
         "l5": "Full digital inclusion with WCAG 2.1 AA+ implementation, CRPD Art. 9 multi-channel access (digital and non-digital), assisted identity enrollment for vulnerable populations, digital literacy support, and universal design per EU Accessibility Directive",
         "regulatoryRef": "CRPD Art. 9; EU Web Accessibility Directive 2016/2102",
         "text": "Does the agent implement digital inclusion safeguards per UN Convention on the Rights of Persons with Disabilities (CRPD) Article 9 accessibility and EU Web Accessibility Directive for digital identity services?",
-        "weight": 15
+        "weight": 12
       },
       {
         "dimension": "Security",
         "id": "GOV-DCR-7",
-        "l1": "No cryptographic identity security; digital identity verification relies on low-assurance credentials without phishing-resistant multi-factor authentication or hardware-bound key management",
-        "l3": "Agent implements MFA for identity services and uses PKI certificates, but does not meet ISO/IEC 29115 LoA4 requirements or NIST SP 800-63B AAL3 hardware-bound authenticator requirements",
-        "l5": "Full cryptographic identity security with ISO/IEC 29115 LoA4 compliance, NIST SP 800-63B AAL3 phishing-resistant authenticators, hardware security module integration, biometric binding with liveness detection, and cryptographic audit trail for all identity assertions",
-        "regulatoryRef": "ISO/IEC 29115:2013 §7.3 LoA4; NIST SP 800-63B AAL3",
-        "text": "Does the agent implement cryptographic security for digital identity per ISO/IEC 29115:2013 entity authentication assurance level 4 requirements and NIST SP 800-63B authenticator assurance level 3?",
-        "weight": 15
+        "l1": "High-risk identity transactions accept single-factor or SMS-only authentication and no assurance-level mapping exists",
+        "l3": "Multi-factor authentication is used, but the mapping from transaction type to assurance level is missing or incomplete, or the authenticators used do not meet the mapped level",
+        "l5": "A documented mapping assigns every transaction type an assurance level under each applicable scheme; authenticators meet the mapped level's requirements; each authentication event records the level achieved; the mapping is reviewed when NIST, ISO or eIDAS implementing acts change",
+        "regulatoryRef": "eIDAS 2.0 Art. 8 (assurance levels); NIST SP 800-63B-4 (July 2025, supersedes SP 800-63B); ISO/IEC 29115:2013",
+        "text": "Does the agent authenticate citizens for identity services at an assurance level matched to each transaction's risk, using a documented mapping to eIDAS assurance levels (low, substantial, high) in EU flows, NIST SP 800-63B-4 authenticator assurance levels in US federal flows, and ISO/IEC 29115:2013 levels of assurance, and does it apply the authenticator requirements of the mapped level, including the highest level where the mapping requires it?",
+        "weight": 12
       },
       {
         "dimension": "Governance",
@@ -2554,17 +2569,17 @@
         "l5": "Full identity incident response with automated GDPR Art. 33 notification within 72 hours, NIS2 Art. 23 significant incident reporting, affected identity holder notification per Art. 34, credential revocation workflows, and forensic-ready audit evidence preservation",
         "regulatoryRef": "GDPR Art. 33; EU NIS2 Art. 23",
         "text": "Does the agent implement breach notification and identity compromise response per GDPR Article 33 72-hour notification and EU NIS2 Directive Article 23 for identity infrastructure incidents?",
-        "weight": 10
+        "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "GOV-DCR-9",
-        "l1": "No social scoring prohibition or remedy compliance; government identity AI may implement social scoring without Art. 5(1)(d) assessment and citizens lack CoE Convention Art. 14 remedy for AI-influenced identity decisions",
-        "l3": "Agent restricts scoring-based identity decisions and provides basic appeal mechanisms, but does not implement Art. 5(1)(d) social scoring prohibition assessment or CoE Convention Art. 14 procedural safeguards",
-        "l5": "Full EU AI Act Art. 5(1)(d) social scoring prohibition with automated detection, CoE AI Convention Art. 14 remedy and procedural safeguards, citizen notification of AI-influenced decisions, effective contestability mechanisms, and transparent governance reporting to national human rights institutions",
-        "regulatoryRef": "EU AI Act Art. 5(1)(d); CoE AI Convention Art. 14",
-        "text": "Does the agent implement EU AI Act Article 5(1)(d) prohibition on AI social scoring by public authorities and Council of Europe AI Convention 2024 Article 14 remedy and procedural safeguards for citizens affected by AI identity decisions?",
-        "weight": 12
+        "l1": "No social-scoring screen: the agent can build or apply behaviour-based scores to identity holders",
+        "l3": "Social scoring is prohibited in policy and use cases are screened at intake, but no runtime check stops a scoring request or a score from being used across contexts",
+        "l5": "Use-case intake records a guideline-based Art. 5(1)(c) assessment; runtime rules block cross-context use of behaviour scores; blocked requests are logged and reviewed each release",
+        "regulatoryRef": "EU AI Act Art. 5(1)(c) (applies from 2 Feb 2025); Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+        "text": "Does the agent refuse to evaluate or classify people over time based on their social behaviour or known, inferred or predicted personal characteristics where the resulting score leads to detrimental treatment in unrelated contexts or treatment disproportionate to the behaviour (EU AI Act Art. 5(1)(c) social scoring), including when it is asked to rank identity holders for access to public services?",
+        "weight": 15
       },
       {
         "dimension": "Compliance",
@@ -2572,19 +2587,19 @@
         "l1": "No Art. 5a wallet control: wallet assurance level high is not defined, evidenced, or auditably enforced",
         "l3": "Some wallet features exist (e.g., selective disclosure), but assurance level high governance and evidence are incomplete or non-auditable",
         "l5": "Full Art. 5a EUDI Wallet implementation with assurance level high governance, relying-party verification, cross-border acceptance, and auditor-ready evidence packs for issuance/authentication/attestation lifecycles",
-        "regulatoryRef": "eIDAS 2.0 Art. 5a (EUDI Wallet); assurance level high",
+        "regulatoryRef": "eIDAS 2.0 Art. 5a (EUDI Wallet), assurance level high",
         "text": "Does the agent implement eIDAS 2.0 Article 5a EU Digital Identity Wallet requirements with explicit support for wallet assurance level high, including (1) assurance claim governance, (2) evidence bundles for high assurance (issuance + authentication + attribute attestation), (3) relying-party verification flows, (4) cross-border acceptance checks, and (5) auditable wallet lifecycle controls (issuance, suspension, revocation, recovery)?",
-        "weight": 18
+        "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "GOV-DCR-11",
-        "l1": "No Annex III lifecycle: identity AI lacks risk management, data governance, logging, and FRIA evidence",
-        "l3": "Some controls exist (e.g., transparency, incident response), but lifecycle evidence and conformity-assessment readiness are incomplete",
-        "l5": "Full Annex III §8 lifecycle operationalization with conformity-assessment-grade evidence packs, FRIA workflow, and ongoing monitoring/reporting",
-        "regulatoryRef": "EU AI Act Annex III §8 (high-risk) — lifecycle obligations",
-        "text": "For EU AI Act Annex III §8 high-risk use cases in digital identity and citizen-rights systems, does the agent implement the full high-risk lifecycle (risk management system, dataset governance, event logging, technical documentation, post-market monitoring, incident reporting, and a fundamental-rights impact assessment workflow for public-sector deployments), with evidence exports suitable for oversight inquiries?",
-        "weight": 18
+        "l1": "Use cases are not classified against Annex III, or a high-risk use case has none of the Art. 9-14 artefacts",
+        "l3": "Each use case is classified with a rationale, and some artefacts exist (e.g. logs, documentation), but risk-management or data-governance evidence is missing",
+        "l5": "Classification per use case with rationale (including any reliance on the Annex III 1(a) verification exclusion); the complete Art. 9-14 artefact set is versioned with each agent release; open gaps are tracked against 2 Dec 2027",
+        "regulatoryRef": "EU AI Act Annex III point 1(a), point 5(a); EU AI Act Art. 9-12, 14; EU AI Act Art. 113 as amended by Regulation (EU) 2026/1744 (Annex III high-risk obligations from 2 Dec 2027)",
+        "text": "Where the agent is, or is part of, a high-risk AI system under EU AI Act Annex III in this pack's scope — remote biometric identification (point 1(a); biometric verification that only confirms a claimed identity is excluded) or eligibility for essential public assistance benefits (point 5(a)) — does it hold the Chapter III Section 2 evidence set (risk management Art. 9, data governance Art. 10, technical documentation Art. 11, record-keeping Art. 12, human oversight Art. 14), with a gap plan dated against 2 Dec 2027, when those obligations apply to Annex III systems?",
+        "weight": 10
       },
       {
         "dimension": "Privacy",
@@ -2594,27 +2609,7 @@
         "l5": "Full Art. 9(2)(a) explicit-consent governance with granular consent receipts, withdrawal enforcement, and audit-ready logs tied to attribute disclosure events",
         "regulatoryRef": "GDPR Art. 9(2)(a)",
         "text": "When special-category attributes are stored or shared via the digital identity wallet, does the agent implement GDPR Art. 9(2)(a) explicit consent with (1) purpose-scoped consent prompts, (2) granular attribute-level consent, (3) withdrawal/refresh rules, (4) consent receipt + audit logs, and (5) safeguards against coerced consent in public-service contexts?",
-        "weight": 15
-      },
-      {
-        "dimension": "Security",
-        "id": "GOV-DCR-13",
-        "l1": "No AL3 mapping: assurance controls are inconsistent and cannot be evidenced against §7 AL3",
-        "l3": "Some strong auth controls exist, but AL3 mapping and audit evidence are incomplete",
-        "l5": "Full §7 AL3 operationalization with clear control mapping, consistent enforcement, and auditor-ready evidence packs",
-        "regulatoryRef": "ISO/IEC 29115:2013 §7 (AL3)",
-        "text": "Does the agent implement ISO/IEC 29115:2013 §7 assurance level AL3 for entity authentication (and map wallet flows to AL3), including identity proofing strength, authenticator requirements, binding/recovery, phishing resistance expectations appropriate to AL3, and evidence for auditors that AL3 controls are consistently applied across services?",
         "weight": 12
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-DCR-14",
-        "l1": "No mapping governance: citations drift and requested anchors (e.g., Art. 5a) are not consistently used",
-        "l3": "Mapping exists but updates are manual and inconsistently applied",
-        "l5": "Versioned, reviewed control mapping with automated citation-consistency checks and audit-defensible references",
-        "regulatoryRef": "eIDAS 2.0 (control mapping governance)",
-        "text": "Does the program maintain a versioned eIDAS 2.0 control-to-article mapping for the EUDI Wallet (ensuring Art. 5a anchors are used where required), with review on regulatory updates and automated checks for citation consistency across questions and outputs?",
-        "weight": 6
       },
       {
         "dimension": "Rights",
@@ -2624,17 +2619,48 @@
         "l5": "Decision-specific explanations generated from logged inputs and outputs, delivered in plain language within a set time, and tracked through to any appeal",
         "regulatoryRef": "EU AI Act Art. 86",
         "text": "When a decision based on the output of an Annex III high-risk AI system produces legal effects for a person, can the affected person obtain a clear and meaningful explanation of the AI system's role and the main elements of the decision, as EU AI Act Article 86 provides?",
-        "weight": 8
+        "weight": 10
+      },
+      {
+        "dimension": "Ethics",
+        "id": "GOV-DCR-16",
+        "l1": "No route to contest AI-influenced identity decisions",
+        "l3": "A contest route exists, but the person is not told the AI's role or the information relied on, or contested cases are not reviewed by a human",
+        "l5": "Each adverse decision notice states the AI's role and the main information relied on; contests are reviewed by a named human within a published time limit; outcomes are logged; the notice names the complaint route to the market surveillance authority",
+        "regulatoryRef": "CoE AI Convention Art. 14, Art. 15; EU AI Act Art. 85",
+        "text": "When an AI-influenced decision affects a person's identity status or rights, does the operator give the person the information needed to contest it, a route to contest it before a human, and the procedural safeguards the CoE AI Convention requires (Art. 14 remedies, Art. 15 procedural safeguards), and does it signpost the complaint route to the market surveillance authority (EU AI Act Art. 85)?",
+        "weight": 10
+      },
+      {
+        "dimension": "Privacy",
+        "id": "GOV-DCR-17",
+        "l1": "The wallet is the only access route and the agent requests whole credentials rather than selected attributes",
+        "l3": "Selective disclosure is used, but agent-initiated exchanges do not appear on the dashboard, or no equivalent non-wallet route exists",
+        "l5": "Only attributes needed for the stated purpose are requested; each agent-initiated exchange produces a dashboard entry; erasure requests from the dashboard are honoured with evidence; an equivalent non-wallet route is available and tested",
+        "regulatoryRef": "eIDAS 2.0 Art. 5a(4), Art. 5a(15)",
+        "text": "In EU Digital Identity Wallet flows the agent initiates or mediates, does it preserve the user controls of eIDAS Art. 5a: selective disclosure of attributes (Art. 5a(4)), an entry on the wallet's transaction dashboard for each exchange so the user can review it and request erasure (Art. 5a(4)), and no disadvantage for people who do not use a wallet (Art. 5a(15))?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "GOV-DCR-18",
+        "l1": "The agent requests broad attribute sets and caches presentation payloads",
+        "l3": "Requests are limited to registered attributes, but transaction content is retained in agent logs or the relying party is not identified to the user",
+        "l5": "A registration-bound attribute allow-list is enforced at runtime; the relying party is shown to the user; logs hold metadata only; a periodic check produces evidence that no transaction content is stored",
+        "regulatoryRef": "eIDAS 2.0 Art. 5b",
+        "text": "When the agent acts for a relying party that requests data from an EU Digital Identity Wallet, does it act only as or under a registered relying party, request only the attributes registered for the stated use, identify the relying party to the user, and avoid storing data about the content of the transaction, as eIDAS Art. 5b requires of relying parties and intermediaries?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
       "EU eIDAS 2.0 Regulation 2024/1183",
       "GDPR Art. 6/9/22",
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
-      "EU AI Act Annex III §8",
+      "EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)",
       "Council of Europe AI Convention 2024",
       "ISO/IEC 29115:2013",
-      "EU Digital Identity Wallet Architecture"
+      "EU Digital Identity Wallet Architecture",
+      "NIST SP 800-63B-4"
     ],
     "regulatoryReferences": [
       {
@@ -2672,7 +2698,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU AI Act Annex III §8",
+        "text": "EU AI Act Art. 5(1)(c), (g), (h); Annex III point 1(a), 5(a)",
         "url": "https://data.europa.eu/eli/reg/2024/1689/oj"
       },
       {
@@ -2699,6 +2725,15 @@
         "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "EU Digital Identity Wallet Architecture"
+      },
+      {
+        "citation": "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)",
+        "instrumentId": "nist-sp-800-63b-4",
+        "jurisdiction": "US",
+        "lastReviewed": "2026-10-04",
+        "status": "in-force",
+        "text": "NIST SP 800-63B-4",
+        "url": "https://csrc.nist.gov/pubs/sp/800/63/b/4/final"
       }
     ],
     "riskTier": "critical",
@@ -7720,8 +7755,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "eu-eif",
-        "label": "EU EIF v2"
+        "instrumentId": "eu-interoperable-europe",
+        "label": "Interoperable Europe Act"
       },
       {
         "external": true,
@@ -7738,25 +7773,25 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "us-foia",
-        "label": "US FOIA (5 U.S.C. §552)"
+        "instrumentId": "iso-25000",
+        "label": "ISO/IEC 25000 SQuaRE"
       },
       {
-        "external": true,
-        "frameworkId": null,
-        "instrumentId": "iso-25000",
-        "label": "ISO 25000 SQuaRE"
+        "external": false,
+        "frameworkId": "EU_AI_ACT",
+        "instrumentId": "eu-ai-act",
+        "label": "EU AI Act Art. 50(4)"
       }
     ],
     "complianceFrameworks": [
-      "EU EIF v2",
+      "Interoperable Europe Act",
       "EU Open Data Directive 2019/1024",
       "GDPR Art. 6(1)(e)",
-      "US FOIA (5 U.S.C. §552)",
-      "ISO 25000 SQuaRE"
+      "ISO/IEC 25000 SQuaRE",
+      "EU AI Act Art. 50(4)"
     ],
     "description": "The process from petition through bill, legislation, budgetary provision, to law — AI agents supporting legislative processes, democratic drafting, public consultation, and lawmaking transparency with safeguards for democratic integrity and inclusive participation.",
-    "euAIActClassification": "Not listed in Annex III (§8 covers judicial authorities and election influence, not legislative drafting); Art. 50 transparency applies",
+    "euAIActClassification": "Not listed in Annex III by default (point 8(a) covers judicial authorities; 8(b) applies only to systems intended to influence elections or voting); Art. 50(4) disclosure applies to AI-generated text published on matters of public interest; Art. 5 prohibitions apply",
     "id": "petition-to-law",
     "keyRisks": [
       "Exclusion of marginalized voices from AI-mediated legislative processes",
@@ -7765,38 +7800,18 @@
       "Loss of democratic traceability in AI-assisted lawmaking",
       "Algorithmic bias in petitions processed determining legislative priority"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Petition to Law",
     "questions": [
       {
         "dimension": "Transparency",
         "id": "GOV-PL-1",
-        "l1": "No legislative transparency; AI involvement in drafting, analyzing, or prioritizing legislative content is not disclosed to citizens or legislators",
-        "l3": "Agent documents AI roles in legislative processes and provides access logs, but does not implement EU EIF Principle 5 full transparency or SDG 16.6 accountability reporting",
-        "l5": "Full legislative transparency with EU EIF Principle 5 implementation, AI involvement disclosure in all legislative activities, public-accessible legislative AI register, SDG 16.6 institution effectiveness reporting, and parliamentary accountability dashboards",
-        "regulatoryRef": "EU EIF v2 Principle 5; UN SDG 16.6",
-        "text": "Does the agent implement legislative process transparency per EU EIF v2 Principle 5 (Transparency) and UN SDG 16.6 effective, accountable, and transparent institutions requirements?",
-        "weight": 15
-      },
-      {
-        "dimension": "Compliance",
-        "id": "GOV-PL-2",
-        "l1": "No inclusive consultation; AI-mediated public participation favors digitally literate citizens and under-represents marginalized communities",
-        "l3": "Agent provides multilingual consultation and basic accessibility, but does not implement UN E-Government participation standards or OECD OG Recommendation inclusivity requirements",
-        "l5": "Full inclusive consultation with UN E-Government participation framework, OECD OG Art. 2 compliance, multi-channel access (digital and non-digital), minority language support, accessibility per WCAG 2.1 AA, and representativeness monitoring for consultation responses",
-        "regulatoryRef": "UN E-Government Survey 2024; OECD OG Rec Art. 2",
-        "text": "Does the agent implement public consultation inclusivity per UN E-Government Survey 2024 digital participation standards and OECD Recommendation on Open Government Article 2?",
-        "weight": 15
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-PL-3",
-        "l1": "No open legislative data; bills, petitions, and legislative processes are not published in machine-readable open formats per EU Open Data requirements",
-        "l3": "Agent publishes core legislative documents in open formats, but does not implement full EU Open Data Directive compliance or INSPIRE-compliant geospatial legislative data",
-        "l5": "Full open data implementation with EU Open Data Directive Art. 3-5 compliance, INSPIRE-compliant geographic legislative data, legislative linked data publication, API access to legislative corpus, and reuse-friendly licensing per Creative Commons",
-        "regulatoryRef": "EU Open Data Directive 2019/1024 Art. 3-5; EU INSPIRE 2007/2/EC",
-        "text": "Does the agent implement open legislative data per EU Open Data Directive 2019/1024 Articles 3-5 and EU INSPIRE Directive for geographic legislative data with open format publication?",
-        "weight": 12
+        "l1": "No register of the agent's tasks exists",
+        "l3": "A register exists, but it omits some agent tasks or owners, or it is not public",
+        "l5": "A public register lists every agent task with its owner, is updated on each change, and keeps the history of changes",
+        "regulatoryRef": "UN SDG 16.6",
+        "text": "Does the legislature or petition body keep a public register of the legislative and petition tasks the agent performs, naming the owner of each task and dated on each change, as part of accountable and transparent institutions (UN SDG target 16.6)?",
+        "weight": 10
       },
       {
         "dimension": "Privacy",
@@ -7804,39 +7819,39 @@
         "l1": "No petitioner privacy; petition systems collect and retain signatory data beyond necessity without GDPR Art. 6(1)(e) proportionality assessment",
         "l3": "Agent applies GDPR lawful basis for petition processing and implements basic retention policies, but does not conduct proportionality assessments or implement Art. 9 special category protections for sensitive petition topics",
         "l5": "Full petition privacy with GDPR Art. 6(1)(e) proportionality assessment, Art. 9 special category protection for sensitive petitions, minimized signatory data retention, anonymized public petition reporting, and petitioner rights fulfillment automation",
-        "regulatoryRef": "GDPR Art. 6(1)(e); Art. 9; Art. 17",
+        "regulatoryRef": "GDPR Art. 6(1)(e), Art. 9, Art. 17",
         "text": "Does the agent protect petitioner privacy per GDPR Article 6(1)(e) public task basis and Article 9 for sensitive petitions involving special category data about signatories?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "GOV-PL-5",
-        "l1": "No legislative AI manipulation safeguards; petition prioritization and legislative AI tools may implement social scoring or manipulative techniques",
-        "l3": "Agent implements basic safeguards against biased petition processing, but does not conduct Art. 5 prohibited practice assessment for government legislative AI",
-        "l5": "Full Art. 5 compliance for government legislative AI with prohibited social scoring prevention, subliminal manipulation prohibition, human oversight for AI-assisted legislative drafting, and constitutional law review integration for AI-generated legislative proposals",
-        "regulatoryRef": "EU AI Act Art. 5(1)(c)-(d)",
-        "text": "Does the agent prevent AI manipulation in legislative processes per EU AI Act Article 5 prohibited social scoring and subliminal manipulation prohibitions for government AI systems?",
-        "weight": 12
+        "l1": "No prohibited-practice screening for legislative or petition AI",
+        "l3": "Use cases are screened at intake for one or both practices, but nothing blocks manipulative prompts or petitioner scoring at runtime",
+        "l5": "Intake records an assessment against both points; runtime rules block petitioner scoring features and manipulative persuasion templates; blocked requests are logged and reviewed each release",
+        "regulatoryRef": "EU AI Act Art. 5(1)(a), Art. 5(1)(c) (apply from 2 Feb 2025)",
+        "text": "Is the agent prevented from using subliminal, purposefully manipulative or deceptive techniques on petitioners or consultation respondents (EU AI Act Art. 5(1)(a)) and from scoring petitioners on their social behaviour or personal characteristics in a way that leads to detrimental or disproportionate treatment of their petitions (Art. 5(1)(c))?",
+        "weight": 15
       },
       {
         "dimension": "Traceability",
         "id": "GOV-PL-6",
-        "l1": "No legislative traceability; the connection from citizen petition through legislative stages to enacted law cannot be traced by citizens",
-        "l3": "Agent provides basic petition status tracking and legislative stage visibility, but does not implement end-to-end traceability or IPU Digital Parliament standard compliance",
-        "l5": "Full legislative traceability with petition-to-law journey visualization, amendment trail documentation, voting record integration, IPU Digital Parliament standards compliance, citizen notification of petition outcomes, and legislative impact assessment publication",
-        "regulatoryRef": "ISO 9241-210:2019; IPU Digital Parliament Guidelines",
-        "text": "Does the agent maintain end-to-end legislative traceability from petition to enacted law per ISO 9241-210 human-centered system design and international parliamentary digital standards?",
-        "weight": 12
+        "l1": "Petitions cannot be traced to later legislative stages",
+        "l3": "Petition status is shown, but links to amendments, votes or the enacted act are missing or not machine-readable",
+        "l5": "Every petition has machine-readable links to each later legislative document, in Akoma Ntoso or a documented equivalent, with petitioner notification of each stage and a public trace view",
+        "regulatoryRef": "OASIS Akoma Ntoso Version 1.0 (OASIS Standard, 29 Aug 2018)",
+        "text": "Does the agent keep each petition linked to the legislative documents it leads to (bills, amendments, votes, enacted acts) using a machine-readable legal document model such as OASIS Akoma Ntoso 1.0, so a citizen can trace a petition's outcome stage by stage?",
+        "weight": 8
       },
       {
         "dimension": "Governance",
         "id": "GOV-PL-7",
-        "l1": "No access to information compliance; legislative AI systems do not support FOIA requests or proactive disclosure of legislative data",
-        "l3": "Agent supports basic information request processing and publishes selected legislative datasets, but does not implement full Open Data Directive 2019/1024 re-use framework or proactive disclosure program",
-        "l5": "Full access to information compliance with Open Data Directive 2019/1024 re-use framework, CoE CETS 205 proactive disclosure, automated FOIA response capability, legislative data quality assurance, and open license publication for all legislative documents",
-        "regulatoryRef": "EU Open Data Directive 2019/1024; Council of Europe Access to Information Convention (CETS 205)",
-        "text": "Does the agent implement FOIA/access to information compliance per the EU Open Data Directive (EU) 2019/1024 re-use of public sector information (which repealed Directive 2003/98/EC) and proactive disclosure obligations?",
-        "weight": 12
+        "l1": "Access requests handled by or through the agent have no deadline tracking or recorded decisions",
+        "l3": "Deadlines are tracked, but withholding decisions lack a recorded exemption or are issued without an accountable official",
+        "l5": "Every request has a deadline per the applicable law, a logged determination by a named official, the exemption cited for each withholding, and a periodic report of on-time rates",
+        "regulatoryRef": "US FOIA (5 U.S.C. 552(a)(6)(A)(i)); Council of Europe Convention on Access to Official Documents (CETS 205)",
+        "text": "When the agent helps process requests for access to legislative or petition records, does it track each request against the deadline of the applicable access-to-information law (for example 20 working days for a determination under 5 U.S.C. 552(a)(6)(A)(i)), record the exemption relied on for any withholding, and route the decision to an accountable official?",
+        "weight": 10
       },
       {
         "dimension": "Ethics",
@@ -7851,12 +7866,12 @@
       {
         "dimension": "Compliance",
         "id": "GOV-PL-9",
-        "l1": "No CoE Convention transparency or EU Interoperability Act compliance; AI legislative process agents lack Art. 10 transparency requirements and government AI systems are not assessed for mandatory interoperability",
-        "l3": "Agent implements basic transparency for AI-assisted legislative activities, but does not address CoE Convention Art. 10 specific oversight requirements or EU Interoperability Act mandatory assessment for government AI",
-        "l5": "Full CoE AI Convention Art. 10 transparency with legislative AI oversight mechanisms, EU Interoperability Act mandatory interoperability assessment, cross-border legislative data exchange capability, and transparent AI governance reporting to parliamentary oversight bodies",
-        "regulatoryRef": "CoE AI Convention Art. 10; EU Interoperability Act 2024",
-        "text": "Does the agent implement Council of Europe AI Convention 2024 Article 10 transparency and oversight requirements for AI in legislative processes and EU Interoperability Act 2024 mandatory interoperability assessment for government AI systems?",
-        "weight": 12
+        "l1": "No oversight body has documentation or log access for the legislative agent",
+        "l3": "An oversight body is named, but it receives documentation only on request or cannot inspect logs",
+        "l5": "Named oversight body with standing access to documentation and logs, an annual public report on the agent's use, and recorded follow-up of its findings",
+        "regulatoryRef": "CoE AI Convention Art. 8",
+        "text": "Is the agent's use in legislative and petition processes subject to transparency and oversight measures as the CoE AI Convention Art. 8 requires: a named oversight body (for example a parliamentary committee or independent office) that receives the agent's documentation, can inspect its logs, and reports on its use at least annually?",
+        "weight": 10
       },
       {
         "dimension": "Open Data",
@@ -7866,7 +7881,7 @@
         "l5": "Full Art. 5 compliance with machine-readable releases, metadata completeness, API and bulk access for dynamic datasets, publication and update SLAs, and audit-ready evidence artifacts",
         "regulatoryRef": "EU Open Data Directive (EU) 2019/1024 Art. 5",
         "text": "Does the agent implement EU Open Data Directive (EU) 2019/1024 Article 5 by ensuring legislative/petition documents and datasets are made available (1) in machine-readable formats, (2) with complete metadata, (3) with bulk download and where data is dynamic API access, (4) with publication and update SLAs, and (5) with evidence artifacts (metadata schema, API docs, change logs, uptime metrics) to demonstrate ongoing compliance?",
-        "weight": 18
+        "weight": 12
       },
       {
         "dimension": "Interoperability",
@@ -7876,37 +7891,27 @@
         "l5": "Full Art. 7 interoperability with INSPIRE-aligned models, automated conformance validation, documented transformations, and published conformance reports suitable for oversight",
         "regulatoryRef": "EU INSPIRE 2007/2/EC Art. 7",
         "text": "For any geospatial legislative datasets (affected regions, constituency maps, project locations, zoning overlays), does the agent implement INSPIRE Directive 2007/2/EC Article 7 interoperability by aligning datasets and services to INSPIRE implementing rules (harmonised data models, schemas, code lists), validating conformance, and publishing conformance reports and transformation pipelines as evidence?",
-        "weight": 15
+        "weight": 10
       },
       {
         "dimension": "Quality",
         "id": "GOV-PL-12",
-        "l1": "No SQuaRE quality measurement: datasets lack defined quality measures, dashboards, or remediation evidence",
-        "l3": "Some quality checks exist, but measures are incomplete, not tied to §2512, or not published with evidence of remediation",
-        "l5": "Full §2512 operationalization with defined quality measures, automated measurement, published quality reports per release, defect/remediation tracking, and audit-ready evidence bundles",
-        "regulatoryRef": "ISO 25000 SQuaRE §2512",
-        "text": "Does the agent implement ISO 25000 SQuaRE §2512 by defining a data and system quality model for petition-to-law datasets (e.g., completeness, accuracy, timeliness, consistency, provenance), computing quality measures, publishing quality dashboards/reports with each release, and retaining audit evidence (measurement definitions, sampling, defect logs, remediation actions)?",
-        "weight": 12
+        "l1": "No defined quality measures for petition-to-law datasets",
+        "l3": "Some quality checks run, but they are not mapped to a defined model or results are not published with releases",
+        "l5": "Measures mapped to the ISO/IEC 25012 characteristics, computed automatically for every release, published with the release, and defects tracked to closure with evidence",
+        "regulatoryRef": "ISO/IEC 25000 SQuaRE: ISO/IEC 25012 data quality model",
+        "text": "Does the agent measure the quality of petition-to-law datasets against a defined data quality model (ISO/IEC 25012 characteristics such as completeness, accuracy, consistency, currentness), publish the measurements with each data release, and track defects to remediation?",
+        "weight": 8
       },
       {
         "dimension": "Participation",
         "id": "GOV-PL-13",
-        "l1": "No UN EGov 2022 mapping: participation features are ad hoc and not benchmarkable against 2022 criteria",
-        "l3": "Some participation measures exist, but mapping to UN EGov 2022 components and benchmarking metrics is incomplete",
-        "l5": "Full UN EGov Survey 2022 alignment with mapped participation services, accessibility and inclusion controls, representativeness monitoring, and published benchmark-ready metrics",
-        "regulatoryRef": "UN E-Government Survey 2022 (e-participation)",
-        "text": "Does the agent implement inclusive public consultation and e-participation in a way that is explicitly mapped to the UN E-Government Survey 2022 e-participation framework (e-information, e-consultation, e-decision-making), including multi-channel participation, accessibility, representativeness monitoring, and published participation metrics suitable for annual benchmarking?",
-        "weight": 10
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-PL-14",
-        "l1": "No citation governance: references drift and anchors are inconsistent across artifacts",
-        "l3": "Some mapping exists but is manual and inconsistently applied",
-        "l5": "Versioned mapping with periodic review and automated consistency checks ensuring audit-defensible statutory anchors",
-        "regulatoryRef": "Citation mapping governance",
-        "text": "Does the program maintain a versioned control-to-citation map for PSI/Open Data and access-to-information obligations (e.g., mapping any legacy 2003/98 references to 2019/1024 where required), with periodic review and automated checks to keep statutory anchors consistent across questions, datasets, and evidence exports?",
-        "weight": 6
+        "l1": "Participation features are ad hoc and not measured",
+        "l3": "Participation is offered in some stages or channels, but representativeness is not monitored or metrics are not published",
+        "l5": "All three stages supported on digital and non-digital channels, WCAG 2.1 AA conformance evidence, representativeness monitored against the affected population, and annual published metrics",
+        "regulatoryRef": "UN E-Government Survey 2024 (e-participation); WCAG 2.1 AA",
+        "text": "Does the agent support e-participation across the three stages used by the UN E-Government Survey (e-information, e-consultation, e-decision-making) through more than one channel, with accessibility per WCAG 2.1 AA, monitoring of how representative respondents are of the affected population, and published participation metrics each year?",
+        "weight": 8
       },
       {
         "dimension": "Transparency",
@@ -7916,18 +7921,50 @@
         "l5": "Every published AI-generated text carries a disclosure, or a record shows the human reviewer and the editor responsible, checked before publication",
         "regulatoryRef": "EU AI Act Art. 50(4)",
         "text": "When the agent generates or manipulates text published to inform the public on legislative or petition matters, does the deployer disclose that the text was artificially generated or manipulated, as EU AI Act Article 50(4) requires unless the text underwent human review with editorial responsibility?",
-        "weight": 8
+        "weight": 12
+      },
+      {
+        "dimension": "Interoperability",
+        "id": "GOV-PL-16",
+        "l1": "No interoperability assessment for changes the agent depends on",
+        "l3": "Assessments are done for some changes but not published, or not repeated on substantial modification",
+        "l5": "An Art. 3 assessment for each in-scope change, published, linked to the reused interoperability solutions, and redone on substantial modification",
+        "regulatoryRef": "Interoperable Europe Act Art. 3 (Regulation (EU) 2024/903)",
+        "text": "Before the public body adopts new or substantially modified binding requirements for trans-European digital public services that the agent delivers or mediates, does it carry out and publish the interoperability assessment required by the Interoperable Europe Act (Regulation (EU) 2024/903 Art. 3, applicable from 12 Jan 2025)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Safety",
+        "id": "GOV-PL-17",
+        "l1": "Signature and submission counts include automated or duplicate entries without any check",
+        "l3": "Duplicates are removed, but automated or AI-generated submissions are not detected, or exclusions are not reported",
+        "l5": "Detection of automated and AI-generated submissions with documented methods and error rates, exclusions reviewed by a human before counts are published, and a public note of what was excluded and why",
+        "regulatoryRef": "CoE AI Convention Art. 5",
+        "text": "Does the agent protect the integrity of petitions and public consultations against inauthentic participation — detecting AI-generated or automated mass signatures and submissions, deduplicating them before counts are published, and reporting what was excluded — as part of the measures to protect democratic processes in the CoE AI Convention Art. 5?",
+        "weight": 10
+      },
+      {
+        "dimension": "Participation",
+        "id": "GOV-PL-18",
+        "l1": "The agent was introduced without any public discussion or consultation",
+        "l3": "A consultation was held once, but significant changes in the agent's role were not consulted on, or the record was not published",
+        "l5": "Public and multistakeholder consultation before introduction and on each significant change, with the record and the body's response to the input published",
+        "regulatoryRef": "CoE AI Convention Art. 19",
+        "text": "Before the agent is introduced into legislative, petition or consultation processes, and on each significant change in its role, are the important questions it raises put to public discussion and multistakeholder consultation, with the consultation record published, consistent with the CoE AI Convention Art. 19 (public consultation)?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
       "UN E-Government Survey Guidelines",
-      "EU Interoperability Framework (EIF) v2",
+      "Interoperable Europe Act (Regulation (EU) 2024/903)",
       "GDPR Art. 6(1)(e) (public task)",
       "US FOIA (5 U.S.C. §552)",
       "EU INSPIRE Directive 2007/2/EC",
-      "ISO 25000 SQuaRE",
+      "ISO/IEC 25000 SQuaRE (ISO/IEC 25012 data quality model)",
       "EU Open Data Directive 2019/1024",
-      "UN SDG 16.6 (effective institutions)"
+      "UN SDG 16.6 (effective institutions)",
+      "EU AI Act Art. 5, Art. 50(4)",
+      "CoE AI Convention Art. 5, 8"
     ],
     "regulatoryReferences": [
       {
@@ -7939,12 +7976,14 @@
         "text": "UN E-Government Survey Guidelines"
       },
       {
-        "citation": "New European Interoperability Framework, COM(2017) 134",
-        "instrumentId": "eu-eif",
+        "citation": "Regulation (EU) 2024/903 (Interoperable Europe Act)",
+        "effectiveDate": "2024-07-12",
+        "instrumentId": "eu-interoperable-europe",
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "EU Interoperability Framework (EIF) v2"
+        "status": "in-force",
+        "text": "Interoperable Europe Act (Regulation (EU) 2024/903)",
+        "url": "https://data.europa.eu/eli/reg/2024/903/oj"
       },
       {
         "citation": "Regulation (EU) 2016/679 (General Data Protection Regulation)",
@@ -7980,7 +8019,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 25000 SQuaRE"
+        "text": "ISO/IEC 25000 SQuaRE (ISO/IEC 25012 data quality model)"
       },
       {
         "citation": "Directive (EU) 2019/1024 (Open Data Directive)",
@@ -7999,6 +8038,24 @@
         "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "UN SDG 16.6 (effective institutions)"
+      },
+      {
+        "citation": "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744",
+        "effectiveDate": "2024-08-01",
+        "instrumentId": "eu-ai-act",
+        "jurisdiction": "EU",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "EU AI Act Art. 5, Art. 50(4)",
+        "url": "https://data.europa.eu/eli/reg/2024/1689/oj"
+      },
+      {
+        "citation": "Council of Europe Framework Convention on Artificial Intelligence (CETS No. 225)",
+        "instrumentId": "coe-ai-convention",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
+        "status": "unverified",
+        "text": "CoE AI Convention Art. 5, 8"
       }
     ],
     "riskTier": "very-high",
@@ -8669,8 +8726,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "g20-ai",
-        "label": "G20 Responsible AI Principles"
+        "instrumentId": "oecd-ai",
+        "label": "OECD AI Principles"
       }
     ],
     "complianceFrameworks": [
@@ -8679,10 +8736,10 @@
       "OECD PPP Framework",
       "UNCAC",
       "ISO 26000:2010 §6.6",
-      "G20 Responsible AI Principles"
+      "OECD AI Principles"
     ],
     "description": "Connecting public institutions (national/state governments, WHO, UN) and private institutions in growth-oriented transformations — AI agents orchestrating public-private partnerships for sustainable development with accountability, anti-corruption safeguards, and equitable value distribution.",
-    "euAIActClassification": "Annex III §5(a) where public-assistance eligibility decisions are delegated to the partnership; otherwise not listed",
+    "euAIActClassification": "Depends on use case; not Annex III point 8. Annex III point 5 applies only where the agent evaluates eligibility for public assistance (5(a)) or similar listed uses; the GPAI systemic-risk designation applies to models, not to this pack's use cases",
     "id": "public-private-collaboration",
     "keyRisks": [
       "Corruption facilitation through AI-mediated contract procurement",
@@ -8691,7 +8748,7 @@
       "Human rights violations in PPP projects without adequate due diligence",
       "AI-enabled revolving door between public regulators and private interests"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Public and Private Collaboration",
     "questions": [
       {
@@ -8702,17 +8759,7 @@
         "l5": "Full UNCAC compliance with Art. 7 public sector integrity controls, Art. 9 procurement transparency, beneficial ownership verification, conflict of interest automated screening, bribery risk assessment in PPP activities, and anti-corruption audit trail per UNCAC Chapter IV",
         "regulatoryRef": "UNCAC Art. 7, 9",
         "text": "Does the agent implement anti-corruption controls per UNCAC Articles 7 and 9 requirements for public procurement and financial management transparency in AI-mediated PPP activities?",
-        "weight": 20
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-PPC-2",
-        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
-        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
-        "l5": "Full OECD PPP compliance with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
-        "regulatoryRef": "OECD PPP Governance Principles §5-6",
-        "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
-        "weight": 15
+        "weight": 10
       },
       {
         "dimension": "Ethics",
@@ -8722,36 +8769,26 @@
         "l5": "Full UNGPs due diligence with §17-21 human rights impact assessment for all PPP private partners, ongoing monitoring, stakeholder engagement with affected communities per §18, grievance mechanism per §29, and transparent human rights reporting",
         "regulatoryRef": "UNGPs §17-21",
         "text": "Does the agent implement human rights due diligence per UN Guiding Principles §17-21 for private partners in PPP projects with potential adverse human rights impacts?",
-        "weight": 15
+        "weight": 10
       },
       {
         "dimension": "Transparency",
         "id": "GOV-PPC-4",
-        "l1": "No contract transparency; PPP agreements are confidential without public disclosure of terms, performance data, or renegotiation outcomes",
-        "l3": "Agent publishes basic PPP contract summaries and performance metrics, but does not implement OCDS v1.2 structured data publication or World Bank PPP Disclosure Framework requirements",
-        "l5": "Full PPP transparency with OCDS v1.2 contract data publication, World Bank PPP Disclosure Framework compliance, renegotiation disclosure, real-time performance data, beneficial ownership disclosure, and public-accessible partnership registry",
-        "regulatoryRef": "OCDS v1.2; World Bank PPP Disclosure Framework",
-        "text": "Does the agent implement PPP contract transparency per Open Contracting Data Standard (OCDS) and World Bank PPP Disclosure Framework for public access to partnership terms?",
-        "weight": 15
-      },
-      {
-        "dimension": "Compliance",
-        "id": "GOV-PPC-5",
-        "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
-        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
-        "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
-        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
-        "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
-        "weight": 15
+        "l1": "PPP contract information is not published",
+        "l3": "Summaries are published, but not as OCDS-conformant data, or amendments and renegotiations are missing",
+        "l5": "OCDS-conformant releases for every contracting stage including amendments and renegotiations, validated against the schema before publication, with performance data updated on a published schedule",
+        "regulatoryRef": "OCDS 1.1 (latest release 1.1.5)",
+        "text": "Does the agent publish PPP contracting data — tender, award, contract terms, amendments and renegotiations, and performance — as structured open data conforming to the Open Contracting Data Standard 1.1 (latest release 1.1.5), with the PPP extension fields where used?",
+        "weight": 10
       },
       {
         "dimension": "Security",
         "id": "GOV-PPC-6",
-        "l1": "No PPP information security; sensitive partnership information and procurement data lacks ISO 27001 controls or G20 Responsible AI security requirements",
-        "l3": "Agent implements basic access controls and encryption for PPP data, but does not maintain ISO 27001 certification or G20 AI security framework compliance",
-        "l5": "Full ISO 27001 implementation for PPP information assets, G20 Responsible AI §4 security compliance, classified information management for sensitive partnership terms, security incident response for PPP systems, and third-party security audit support",
-        "regulatoryRef": "ISO 27001:2022; G20 AI Principles §4",
-        "text": "Does the agent implement information security for PPP systems per ISO 27001:2022 and G20 Principles for Responsible AI in Government §4 security and privacy requirements?",
+        "l1": "No ISMS scope covers PPP systems or data",
+        "l3": "Controls exist for PPP data, but the ISMS scope or certification does not cover the agent, or the AI system's own security was not assessed",
+        "l5": "ISMS scope includes the agent and PPP data, role-based access to sensitive terms is enforced and reviewed, and an AI-specific security assessment is on file for each release",
+        "regulatoryRef": "ISO/IEC 27001:2022; OECD AI Principles (robustness, security and safety)",
+        "text": "Are PPP systems the agent uses, and the partnership and procurement data it handles, covered by an information security management system meeting ISO/IEC 27001:2022, with access to sensitive partnership terms restricted by role and the security of the AI system itself (robustness, security and safety, OECD AI Principles) assessed before deployment?",
         "weight": 10
       },
       {
@@ -8777,83 +8814,105 @@
       {
         "dimension": "Compliance",
         "id": "GOV-PPC-9",
-        "l1": "No AML risk-based approach for PPP financial flows; AI-managed partnership financial transactions lack FATF R1 risk assessment and PPP corporate structures are not assessed for EU AMLR beneficial ownership transparency",
-        "l3": "Agent implements basic financial due diligence for PPP partners, but does not apply FATF R1 risk-based approach to AI-managed PPP financial flows or EU AMLR beneficial ownership verification for complex PPP structures",
-        "l5": "Full FATF R1 risk-based approach for AI-managed PPP financial flows, EU AMLR beneficial ownership transparency for PPP corporate structures, enhanced due diligence for high-risk jurisdictions, suspicious transaction monitoring, and financial intelligence unit reporting capability",
-        "regulatoryRef": "FATF R1; EU AMLR 2024",
-        "text": "Does the agent implement FATF Recommendation 1 risk-based approach for AI-managed PPP financial flows and EU Anti-Money Laundering Regulation 2024 beneficial ownership transparency for PPP corporate structures?",
-        "weight": 12
+        "l1": "PPP financial flows and partners are not risk-rated",
+        "l3": "Partners are rated at onboarding, but individual flows are not rated or ratings are not reviewed on change",
+        "l5": "Every PPP partner and flow has a documented risk rating, controls scaled to it, and ratings reviewed on each material change with evidence",
+        "regulatoryRef": "FATF R1",
+        "text": "Does the agent apply a risk-based approach to PPP financial flows (FATF Recommendation 1), rating each partner and flow for money-laundering and terrorist-financing risk, scaling controls to the rating, and reviewing ratings on change?",
+        "weight": 10
       },
       {
         "dimension": "Transparency",
         "id": "GOV-PPC-10",
-        "l1": "No Art. 9(1)(c) transparency: criteria are opaque, evaluation is not reproducible, and bidders have no defensible debrief and appeal evidence",
-        "l3": "Some procurement artifacts exist (criteria, logs), but evaluation reproducibility, disclosure, and complaint handling are incomplete or not tied to AI-assisted steps",
-        "l5": "Full Art. 9(1)(c) procurement transparency with objective criteria publication, reproducible evaluation trails, debrief and appeals, and AI decision traceability suitable for anti-corruption audit",
-        "regulatoryRef": "UNCAC Art. 9(1)(c)",
-        "text": "Does the agent implement UNCAC Article 9(1)(c) procurement transparency for PPP procurements by ensuring (1) pre-published tender rules and objective evaluation criteria, (2) traceable scoring and evaluation records for all bids, (3) publication of award rationales and conflict-of-interest declarations, (4) bidder debrief and complaint and appeal workflows, and (5) audit-ready evidence exports showing that AI-assisted recommendations did not override objective criteria?",
-        "weight": 20
-      },
-      {
-        "dimension": "Governance",
-        "id": "GOV-PPC-11",
-        "l1": "No VfM discipline: decisions are made without a PSC and counterfactual, quantified risk valuation, or evidence linking recommendations to VfM",
-        "l3": "Some cost-benefit work exists, but PSC, risk valuation, sensitivity and renegotiation analysis, and evidence bundles are incomplete",
-        "l5": "Full §5.1 VfM implementation with PSC, risk valuation, sensitivity and renegotiation scenarios, and auditor-ready evidence packages for oversight review",
-        "regulatoryRef": "OECD PPP Framework §5.1 (VfM)",
-        "text": "Does the agent implement OECD PPP Framework §5.1 value-for-money (VfM) by producing an ex ante lifecycle business case that includes (1) a public sector comparator (PSC) and counterfactual, (2) quantified risk allocation and risk-transfer valuation, (3) transparent discounting and demand and usage assumptions, (4) sensitivity and renegotiation scenario analysis, and (5) an evidence bundle (models, inputs, approvals) linking AI recommendations to the VfM rationale?",
-        "weight": 18
-      },
-      {
-        "dimension": "Compliance",
-        "id": "GOV-PPC-12",
-        "l1": "No R16 controls: transfers lack required originator and beneficiary information integrity and cannot be traced end-to-end",
-        "l3": "Captures payment metadata, but travel-rule style propagation, exception handling, screening, and audit linkage to PPP milestones are incomplete",
-        "l5": "Full R16 compliance with validated originator and beneficiary data, propagation controls, screening plus exception workflows, and audit-ready traceability tying payments to PPP governance artifacts",
-        "regulatoryRef": "FATF R16 (Wire transfers)",
-        "text": "For PPP-related wire transfers (including cross-border payments), does the agent implement FATF Recommendation 16 by (1) capturing and validating originator and beneficiary information, (2) ensuring required information travels with the transfer through intermediaries, (3) screening against sanctions, PEP, and adverse media where applicable, (4) handling missing or invalid information with exception workflows, and (5) retaining audit evidence linking each payment to contract milestones and beneficial ownership data?",
-        "weight": 15
-      },
-      {
-        "dimension": "Ethics",
-        "id": "GOV-PPC-13",
-        "l1": "No ISO 26000 anti-corruption program: anti-bribery controls are ad hoc and not consistently applied to partners and intermediaries",
-        "l3": "Policies and some checks exist, but third-party due diligence, gifts and hospitality controls, reporting channels, and evidence retention are incomplete",
-        "l5": "Full §6.6.7 anti-corruption implementation with partner-wide controls, due diligence, reporting mechanisms, and audit-ready evidence bundles",
-        "regulatoryRef": "ISO 26000:2010 §6.6.7",
-        "text": "Does the agent implement ISO 26000:2010 §6.6.7 anti-corruption by ensuring (1) anti-bribery and anti-corruption policy enforcement across partners, (2) third-party and intermediary due diligence, (3) gifts and hospitality and facilitation-payment controls, (4) whistleblowing and reporting intake with non-retaliation protections, and (5) auditable controls for political contributions and lobbying interactions in PPP contexts?",
-        "weight": 12
-      },
-      {
-        "dimension": "Accountability",
-        "id": "GOV-PPC-14",
-        "l1": "No §3 accountability: AI influence is opaque and cannot be explained, contested, or mapped to accountable decision-makers",
-        "l3": "Some documentation exists, but explainability, contestability, and separation of AI suggestions from final decisions is inconsistent",
-        "l5": "Full §3 operationalization with publishable rationales, human accountability, contestability workflows, and audit-ready logs of AI vs human decision steps",
-        "regulatoryRef": "G20 AI Gov Principles §3",
-        "text": "Does the agent implement G20 Responsible AI in Government §3 by ensuring AI-influenced PPP decisions (procurement shortlists, risk allocation recommendations, renegotiation triggers) have (1) documented rationale and explainability suitable for publication and oversight, (2) human accountability assignment, (3) contestability and appeal pathways for affected bidders and stakeholders, and (4) an auditable decision log separating AI suggestions from final human decisions?",
+        "l1": "Criteria are not published in advance, evaluation cannot be reproduced, and bidders have no review route",
+        "l3": "Criteria and some evaluation logs exist, but AI-assisted scoring cannot be reproduced or the review route is not documented",
+        "l5": "Published criteria before tender, reproducible evaluation records separating AI suggestions from evaluator decisions, published award information, and a documented review and appeal route with case outcomes",
+        "regulatoryRef": "UNCAC Art. 9(1)(a)-(d)",
+        "text": "Does the agent implement UNCAC Art. 9(1)(a)-(d) procurement transparency for PPP procurements by ensuring (1) public distribution of procurement information and award information, (2) conditions for participation and selection and award criteria set and published in advance, (3) objective and predetermined criteria applied with evaluation records that allow later verification, including where AI assisted, and (4) an effective domestic review and appeal route for bidders?",
         "weight": 10
       },
       {
         "dimension": "Governance",
-        "id": "GOV-PPC-15",
-        "l1": "No mapping governance: citations drift and Council-required anchors are inconsistently applied",
-        "l3": "A mapping exists but updates are manual and inconsistently enforced",
-        "l5": "Versioned, reviewed mapping with automated consistency checks and audit-defensible clause anchors",
-        "regulatoryRef": "Citation mapping governance",
-        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000, G20), ensuring Council-required anchors (UNCAC Art. 9(1)(c), OECD §5.1, FATF R16, ISO 26000 §6.6.7, G20 §3) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
-        "weight": 6
+        "id": "GOV-PPC-11",
+        "l1": "Decisions are made without a pre-test, comparator or risk-allocation analysis",
+        "l3": "A business case exists, but the comparator, risk allocation or the link from AI recommendations to the rationale is missing",
+        "l5": "Pre-test, comparator with published methodology, risk-allocation matrix and sensitivity analysis on file per project, with AI recommendations traceable to each element",
+        "regulatoryRef": "OECD PPP Framework (OECD/LEGAL/0392) Principles 5-6, Annex 5.1, 5.2, 6.1",
+        "text": "Does the agent support PPP value-for-money decisions as the OECD PPP Recommendation sets out: a procurement option pre-test comparing lifetime costs of finance, construction and operation across delivery modes (Principle 5, Annex 5.1), a public sector comparator with a published methodology where relevant (Annex 5.2), and risk allocated to the party that can manage it at least cost (Principle 6, Annex 6.1), with an evidence bundle linking AI recommendations to the value-for-money rationale?",
+        "weight": 10
+      },
+      {
+        "dimension": "Ethics",
+        "id": "GOV-PPC-13",
+        "l1": "Anti-bribery controls are ad hoc and not applied to partners or intermediaries",
+        "l3": "A policy exists and some partners are screened, but intermediary due diligence, reporting channels or records are incomplete",
+        "l5": "Policy applied to every partner and intermediary, due diligence on file and refreshed on change, a protected reporting channel with case logs, and records of contributions and lobbying contacts",
+        "regulatoryRef": "ISO 26000:2010 clause 6.6.3; UNCAC Art. 12",
+        "text": "Does the agent support an anti-corruption programme across PPP partners and intermediaries — anti-bribery policy, third-party due diligence, gifts and hospitality controls, protected reporting channels, and records of political contributions and lobbying contacts — consistent with ISO 26000 clause 6.6.3 (anti-corruption) and the private-sector measures of UNCAC Art. 12?",
+        "weight": 8
+      },
+      {
+        "dimension": "Accountability",
+        "id": "GOV-PPC-14",
+        "l1": "AI influence on PPP decisions is not recorded and no official is accountable",
+        "l3": "Officials are named, but the log does not separate AI suggestions from decisions or rationales are not published",
+        "l5": "Decision log separating AI suggestion and human decision for every decision, named accountable official, published rationale, and a contest route with logged outcomes",
+        "regulatoryRef": "OECD AI Principles (accountability); EU AI Act Art. 26",
+        "text": "For AI-influenced PPP decisions (procurement shortlists, risk-allocation recommendations, renegotiation triggers), does the operator keep a decision log that separates AI suggestions from the final human decision, name the accountable official, publish a rationale suitable for oversight, and offer affected bidders a route to contest, consistent with the accountability principle of the OECD AI Recommendation and, where the system is high-risk, the deployer duties of EU AI Act Art. 26?",
+        "weight": 10
+      },
+      {
+        "dimension": "Compliance",
+        "id": "GOV-PPC-16",
+        "l1": "Standard vendor terms; agency data may be used to train vendor models",
+        "l3": "The training prohibition is present, but portability, knowledge-transfer or licensing terms are missing",
+        "l5": "Contract clause library covering every M-25-22 term, each AI contract checked against it before signature, and an exit plan tested for data and model portability",
+        "regulatoryRef": "OMB M-25-22 (3 Apr 2025, replaces M-24-18)",
+        "text": "Do contracts with private AI vendors in US federal partnerships include the OMB M-25-22 terms: a permanent prohibition on using non-public agency inputs and outputs to further train publicly or commercially available AI without explicit agency consent, and vendor lock-in protections (knowledge transfer, data and model portability, clear licensing, pricing transparency)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Governance",
+        "id": "GOV-PPC-17",
+        "l1": "Public-sector data requests are fulfilled without checks",
+        "l3": "Requests are reviewed manually without recorded criteria",
+        "l5": "Structured intake checking each Art. 15 condition, data minimised to the request, return or deletion tracked, and every decision logged",
+        "regulatoryRef": "EU Data Act Arts 14-15 (Regulation (EU) 2023/2854, applies from 12 Sep 2025)",
+        "text": "When a private partner receives a public-sector request for data on grounds of exceptional need, does the agent check the request against the Data Act conditions (Regulation (EU) 2023/2854 Arts 14-15: demonstrated exceptional need, purpose, scope and time limits) before data is released, release only what is necessary, and log the decision?",
+        "weight": 12
+      },
+      {
+        "dimension": "Transparency",
+        "id": "GOV-PPC-18",
+        "l1": "Beneficial owners of partners and special-purpose vehicles are not identified",
+        "l3": "Beneficial owners are identified at onboarding, but those of special-purpose vehicles are not verified or not re-checked on change, or no AMLR gap plan exists",
+        "l5": "Beneficial owners of every partner and vehicle are verified and re-checked on change, and an AMLR gap plan with owners is dated before 10 Jul 2027",
+        "regulatoryRef": "EU AMLR (Regulation (EU) 2024/1624, applies from 10 Jul 2027)",
+        "text": "Does the agent verify the beneficial owners of PPP partners and special-purpose vehicles, re-check them on change, and track a gap plan for the EU Anti-Money Laundering Regulation, which applies from 10 Jul 2027 (Regulation (EU) 2024/1624)?",
+        "weight": 10
+      },
+      {
+        "dimension": "Accountability",
+        "id": "GOV-PPC-19",
+        "l1": "The private partner has not done a fundamental rights impact assessment",
+        "l3": "An assessment exists, but it omits some Art. 27(1) elements or post-dates first use, or the authority was not notified",
+        "l5": "An assessment with all Art. 27(1)(a)-(f) elements before first use, the notification recorded, updates recorded when any element changes, and the contract assigning this duty to the partner",
+        "regulatoryRef": "EU AI Act Art. 27(1), 27(3) (Annex III obligations from 2 Dec 2027)",
+        "text": "Where a private partner provides a public service through the agent and the agent is an Annex III high-risk system, has the partner, as a private entity providing public services, completed a fundamental rights impact assessment covering EU AI Act Art. 27(1)(a)-(f) before first use and notified its results to the market surveillance authority (Art. 27(3))?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
       "UN SDG 17 Partnership Framework",
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
-      "OECD PPP Framework",
+      "OECD PPP Framework (OECD/LEGAL/0392)",
       "World Bank PPP Guidelines",
       "UNCAC (UN Convention Against Corruption)",
       "ISO 26000:2010 §6.6",
-      "G20 Principles for Responsible AI in Government",
-      "FATF R1 (AML in PPP)"
+      "OECD AI Principles",
+      "FATF R1 (AML in PPP)",
+      "EU AMLR (Regulation (EU) 2024/1624)",
+      "EU Data Act (Regulation (EU) 2023/2854)"
     ],
     "regulatoryReferences": [
       {
@@ -8878,7 +8937,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "OECD PPP Framework"
+        "text": "OECD PPP Framework (OECD/LEGAL/0392)"
       },
       {
         "citation": "World Bank PPP guidelines",
@@ -8905,12 +8964,13 @@
         "text": "ISO 26000:2010 §6.6"
       },
       {
-        "citation": "G20 AI Principles (2019)",
-        "instrumentId": "g20-ai",
+        "citation": "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03",
+        "instrumentId": "oecd-ai",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "G20 Principles for Responsible AI in Government"
+        "status": "in-force",
+        "text": "OECD AI Principles",
+        "url": "https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449"
       },
       {
         "citation": "FATF Recommendations (R.16 revised June 2025)",
@@ -8920,6 +8980,26 @@
         "status": "in-force",
         "text": "FATF R1 (AML in PPP)",
         "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/update-Recommendation-16-payment-transparency-june-2025.html"
+      },
+      {
+        "citation": "Regulation (EU) 2024/1624 (Anti-Money Laundering Regulation)",
+        "effectiveDate": "2027-07-10",
+        "instrumentId": "eu-amlr",
+        "jurisdiction": "EU",
+        "lastReviewed": "2026-10-03",
+        "status": "applies-from",
+        "text": "EU AMLR (Regulation (EU) 2024/1624)",
+        "url": "https://data.europa.eu/eli/reg/2024/1624/oj"
+      },
+      {
+        "citation": "Regulation (EU) 2023/2854 (Data Act)",
+        "effectiveDate": "2025-09-12",
+        "instrumentId": "eu-data-act",
+        "jurisdiction": "EU",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "EU Data Act (Regulation (EU) 2023/2854)",
+        "url": "https://data.europa.eu/eli/reg/2023/2854/oj"
       }
     ],
     "riskTier": "very-high",

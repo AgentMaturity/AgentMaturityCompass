@@ -143,5 +143,27 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://csrc.nist.gov/pubs/sp/800/218/final", ["NIST SP 800-218"], {
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
       note: "Final, published 2022-02-03 (csrc page read 2026-10-04, no supersession shown). SP 800-218 Rev. 1 (SSDF 1.2) is an initial public draft of 2025-12-17, seen in a nist.gov search listing and not opened; not final on the review date.",
+  // Governance station round 2 (2026-10-04): instruments read on their official pages on that date.
+  verified("nist-sp-800-63b-4", "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)", "US", "standard", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/63/b/4/final", ["NIST SP 800-63B-4", "NIST Special Publication 800-63B-4"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "csrc.nist.gov read 2026-10-04: final, published July 2025; \"This publication supersedes NIST Special Publication (SP) 800-63B.\"",
+    }),
+  verified("us-52usc30124", "52 U.S.C. §30124, Fraudulent misrepresentation of campaign authority", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title52/html/USCODE-2023-title52-subtitleIII-chap301-subchapI-sec30124.htm",
+    ["52 U.S.C. 30124", "52 U.S.C. §30124"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "Section heading and (a) read on govinfo.gov (US Code 2023 edition) 2026-10-04.",
+    }),
+  verified("us-fec-89fr78785", "FEC interpretive rule, Fraudulent Misrepresentation of Campaign Authority, 89 FR 78785 (26 Sep 2024)", "US", "guidance", "in-force",
+    "https://www.federalregister.gov/api/v1/documents/2024-21983.json", ["FEC interpretive rule 89 FR 78785", "89 FR 78785"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2024-09-26",
+      note: "Federal Register API read 2026-10-04: agency FEC, published and effective 2024-09-26; the abstract does not mention AI.",
+    }),
+  verified("us-hava-21081", "Help America Vote Act, voting systems standards (52 U.S.C. §21081)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title52/html/USCODE-2023-title52-subtitleII-chap209-subchapIII-partA-sec21081.htm",
+    ["HAVA 52 U.S.C. §21081", "HAVA 52 U.S.C. 21081", "52 U.S.C. §21081", "52 U.S.C. 21081"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "govinfo.gov (US Code 2023 edition) read 2026-10-04: section heading and (a)(3) 'Accessibility for individuals with disabilities'.",
     }),
 ];

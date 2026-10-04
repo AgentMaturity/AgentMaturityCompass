@@ -7,6 +7,8 @@
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { eu, milestones, unverified, verified } from "./catalogueHelpers.js";
+import { eu, milestones, unverified } from "./catalogueHelpers.js";
+import { verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
@@ -248,5 +250,17 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("edpb-gl-4-2019", "EDPB Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0", "EU", "guidance", "in-force",
     "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-42019-article-25-data-protection-design-and_en", ["EDPB Guidelines 4/2019"], {
       note: "Version 2.0 adopted 20 October 2020 (EDPB page read).",
+
+  // Governance station round 2 (2026-10-04): read on the Commission's digital-strategy pages on that date.
+  verified("eu-disinfo-conduct", "Code of Conduct on Disinformation (Code of Practice converted to a DSA code of conduct)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation", ["Code of Conduct on Disinformation"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-01",
+      note: "Read 2026-10-04: integration into the DSA framework endorsed 13 Feb 2025; effective and auditable from 1 Jul 2025. Replaces the 2022 Code of Practice (eu-disinfo-code).",
+    }),
+  verified("eu-ai-content-cop", "Code of Practice on Transparency of AI-generated Content (10 Jun 2026)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content",
+    ["Code of Practice on Transparency of AI-generated Content", "Code of Practice on transparency of AI-generated content"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2026-06-10",
+      note: "Read 2026-10-04: final code published 10 Jun 2026; supports AI Act Art. 50(2), (4) and (5).",
     }),
 ];
