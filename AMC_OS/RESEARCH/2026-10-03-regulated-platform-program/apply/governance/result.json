@@ -1,0 +1,1091 @@
+{
+ "id": "governance-round2-apply",
+ "date": "2026-10-04",
+ "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-6",
+ "branch": "worktree-wf_b05b1ca6-169-6",
+ "headBefore": "67d73223897008ca4ed8baf81c970020b4bf944d",
+ "headAfterContent": "5aab3b58",
+ "environment": "macOS arm64 (Darwin 25.6.0), Node via pnpm 10.33.0, vitest 4.1.11",
+ "inputs": {
+  "questions": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/content/governance/questions.json (sha256 3d0ce6f2...1252 per summary.md)",
+  "review": "round2/content/governance/review.json (Fable refuter, usable:false; requiredFixes and refuted items applied or declined below)",
+  "deep": "round2/content/governance/deep-questions.json",
+  "anchors": "round2/content/governance/assurance-anchors.json",
+  "readFrom": "root checkout /Users/sid/AgentMaturityCompass (read-only)"
+ },
+ "counts": {
+  "questionsIn": 75,
+  "questionsInNote": "HEAD 67d73223 has 75 governance questions: the round-2 baseline (8f57ce63) had 71; S3 added GOV-DCR-15, GOV-PL-15, GOV-CS-14, GOV-CS-15 and rewrote GOV-PL-7, GOV-CS-13 before the split.",
+  "questionsOut": 75,
+  "round2Actions": {
+   "keep": 18,
+   "rewrite": 37,
+   "merge": 12,
+   "drop": 4,
+   "add": 12,
+   "allApplied": true
+  },
+  "round2AddRenumbered": {
+   "GOV-DCR-15": "GOV-DCR-16",
+   "GOV-DCR-16": "GOV-DCR-17",
+   "GOV-DCR-17": "GOV-DCR-18",
+   "GOV-PL-15": "GOV-PL-16",
+   "GOV-PL-16": "GOV-PL-17"
+  },
+  "round2AddRenumberReason": "ids taken at 67d73223 by S3 floor-fill questions that are kept",
+  "headFloorFillQuestions": {
+   "GOV-DCR-15": "kept (Art. 86), weight 8->10",
+   "GOV-PL-15": "kept (Art. 50(4)); carries the Art. 50(4) half of round-2 GOV-PL-1; weight 8->12",
+   "GOV-CS-14": "replaced by round-2 GOV-CS-14 (same control, SDGR Art. 14)",
+   "GOV-CS-15": "replaced by round-2 GOV-CS-15 split 1/2 (same control, Art. 26(11))"
+  },
+  "questionsAddedBeyondRound2": {
+   "GOV-DD-19": "split of GOV-DD-4 (Art. 50(2)), refuter fix 6",
+   "GOV-PPC-18": "split of GOV-PPC-9 (AMLR beneficial ownership), refuter fix 6",
+   "GOV-CS-16": "split 2/2 of round-2 GOV-CS-15 (Art. 86(1)); the Art. 26(6) element is carried by deep gov-deep-51",
+   "GOV-DD-20": "floor fill: Art. 5(1)(g), from round-2 deep gov-aiact-art5g-01",
+   "GOV-PL-18": "floor fill: CoE CETS 225 Art. 19 public consultation (refuter fix 1 'PL CoE Arts 8/16/19')",
+   "GOV-PPC-19": "floor fill: AI Act Art. 27 FRIA by a private partner providing public services, from round-2 deep gov-aiact-art27-01"
+  },
+  "perPack": {
+   "digital-citizens-rights": {
+    "before": {
+     "riskTier": "critical",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 214,
+     "weightRange": "6-20",
+     "dimensions": {
+      "Compliance": "3q/50w",
+      "Ethics": "1q/15w",
+      "Governance": "4q/49w",
+      "Privacy": "2q/35w",
+      "Rights": "1q/8w",
+      "Safety": "1q/15w",
+      "Security": "2q/27w",
+      "Transparency": "1q/15w"
+     },
+     "distinctDimensions": 8,
+     "maxDimWeightShare": 0.234,
+     "refParts": 23,
+     "unresolvedParts": 2,
+     "unresolved": [
+      "NIST SP 800-63B AAL3",
+      "assurance level high"
+     ]
+    },
+    "after": {
+     "riskTier": "critical",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 178,
+     "weightRange": "10-15",
+     "dimensions": {
+      "Compliance": "3q/39w",
+      "Ethics": "2q/20w",
+      "Governance": "3q/34w",
+      "Privacy": "3q/39w",
+      "Rights": "1q/10w",
+      "Safety": "1q/12w",
+      "Security": "1q/12w",
+      "Transparency": "1q/12w"
+     },
+     "distinctDimensions": 8,
+     "maxDimWeightShare": 0.219,
+     "refParts": 26,
+     "unresolvedParts": 2,
+     "unresolved": [
+      "Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)",
+      "Commission Guidelines on prohibited AI practices (4 Feb 2025, non-binding)"
+     ]
+    }
+   },
+   "dance-of-democracy": {
+    "before": {
+     "riskTier": "critical",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 253,
+     "weightRange": "6-25",
+     "dimensions": {
+      "Compliance": "3q/62w",
+      "Ethics": "1q/15w",
+      "Governance": "4q/61w",
+      "Privacy": "2q/30w",
+      "Safety": "2q/40w",
+      "Security": "1q/15w",
+      "Transparency": "2q/30w"
+     },
+     "distinctDimensions": 7,
+     "maxDimWeightShare": 0.245,
+     "refParts": 22,
+     "unresolvedParts": 11,
+     "unresolved": [
+      "CoE Rec CM/Rec(2017)5 §7",
+      "Venice Commission AI Guidelines",
+      "OSCE/ODIHR Handbook on Electoral Technology",
+      "OSCE Commitments §7",
+      "CISA Election Security Guidance 2024",
+      "FECA 52 U.S.C. §30104",
+      "HAVA 52 U.S.C. §21081",
+      "EU Political Advertising Reg 2024",
+      "OSCE/ODIHR §3.2",
+      "CoE CM/Rec(2017)5",
+      "Citation mapping governance"
+     ]
+    },
+    "after": {
+     "riskTier": "critical",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 183,
+     "weightRange": "10-15",
+     "dimensions": {
+      "Compliance": "2q/30w",
+      "Ethics": "1q/12w",
+      "Governance": "3q/30w",
+      "Privacy": "3q/39w",
+      "Safety": "2q/24w",
+      "Security": "1q/12w",
+      "Transparency": "3q/36w"
+     },
+     "distinctDimensions": 7,
+     "maxDimWeightShare": 0.213,
+     "refParts": 24,
+     "unresolvedParts": 2,
+     "unresolved": [
+      "Commission Guidelines C/2024/3014 (electoral processes)",
+      "Council of Europe Recommendation CM/Rec(2020)1 (human rights impacts of algorithmic systems, 8 Apr 2020)"
+     ]
+    }
+   },
+   "petition-to-law": {
+    "before": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 181,
+     "weightRange": "6-18",
+     "dimensions": {
+      "Compliance": "2q/27w",
+      "Ethics": "1q/10w",
+      "Governance": "3q/30w",
+      "Interoperability": "1q/15w",
+      "Open Data": "1q/18w",
+      "Participation": "1q/10w",
+      "Privacy": "1q/12w",
+      "Quality": "1q/12w",
+      "Safety": "1q/12w",
+      "Traceability": "1q/12w",
+      "Transparency": "2q/23w"
+     },
+     "distinctDimensions": 11,
+     "maxDimWeightShare": 0.166,
+     "refParts": 24,
+     "unresolvedParts": 7,
+     "unresolved": [
+      "OECD OG Rec Art. 2",
+      "Art. 9",
+      "Art. 17",
+      "IPU Digital Parliament Guidelines",
+      "Council of Europe Access to Information Convention (CETS 205)",
+      "EU Interoperability Act 2024",
+      "Citation mapping governance"
+     ]
+    },
+    "after": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 157,
+     "weightRange": "8-15",
+     "dimensions": {
+      "Compliance": "1q/10w",
+      "Ethics": "1q/10w",
+      "Governance": "1q/10w",
+      "Interoperability": "2q/22w",
+      "Open Data": "1q/12w",
+      "Participation": "2q/18w",
+      "Privacy": "1q/12w",
+      "Quality": "1q/8w",
+      "Safety": "2q/25w",
+      "Traceability": "1q/8w",
+      "Transparency": "2q/22w"
+     },
+     "distinctDimensions": 11,
+     "maxDimWeightShare": 0.159,
+     "refParts": 18,
+     "unresolvedParts": 2,
+     "unresolved": [
+      "OASIS Akoma Ntoso Version 1.0 (OASIS Standard, 29 Aug 2018)",
+      "Council of Europe Convention on Access to Official Documents (CETS 205)"
+     ]
+    }
+   },
+   "citizen-services": {
+    "before": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 213,
+     "weightRange": "8-20",
+     "dimensions": {
+      "Accessibility": "3q/42w",
+      "Compliance": "3q/42w",
+      "Ethics": "2q/30w",
+      "Governance": "1q/20w",
+      "Interoperability": "2q/26w",
+      "Privacy": "1q/15w",
+      "Security": "1q/15w",
+      "Transparency": "2q/23w"
+     },
+     "distinctDimensions": 8,
+     "maxDimWeightShare": 0.197,
+     "refParts": 24,
+     "unresolvedParts": 4,
+     "unresolved": [
+      "ECHR Art. 14",
+      "Art. 6(1)(e)",
+      "UN E-Gov Survey 2024",
+      "AI Liability Directive Proposal"
+     ]
+    },
+    "after": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 171,
+     "weightRange": "8-15",
+     "dimensions": {
+      "Accessibility": "2q/24w",
+      "Compliance": "3q/32w",
+      "Ethics": "2q/27w",
+      "Governance": "2q/20w",
+      "Interoperability": "2q/24w",
+      "Privacy": "1q/12w",
+      "Security": "1q/12w",
+      "Transparency": "2q/20w"
+     },
+     "distinctDimensions": 8,
+     "maxDimWeightShare": 0.187,
+     "refParts": 22,
+     "unresolvedParts": 1,
+     "unresolved": [
+      "ECHR Art. 14"
+     ]
+    }
+   },
+   "public-private-collaboration": {
+    "before": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 203,
+     "weightRange": "6-20",
+     "dimensions": {
+      "Accountability": "1q/10w",
+      "Compliance": "4q/52w",
+      "Ethics": "3q/47w",
+      "Governance": "4q/49w",
+      "Security": "1q/10w",
+      "Transparency": "2q/35w"
+     },
+     "distinctDimensions": 6,
+     "maxDimWeightShare": 0.256,
+     "refParts": 21,
+     "unresolvedParts": 7,
+     "unresolved": [
+      "OCDS v1.2",
+      "World Bank PPP Disclosure Framework",
+      "IMF PFRAM",
+      "OECD DAC Blended Finance Principles",
+      "TFEU Art. 101-102",
+      "EU Directive 2014/24 (Public Procurement)",
+      "Citation mapping governance"
+     ]
+    },
+    "after": {
+     "riskTier": "very-high",
+     "questions": 15,
+     "floor": 15,
+     "floorOk": true,
+     "weightTotal": 152,
+     "weightRange": "8-12",
+     "dimensions": {
+      "Accountability": "2q/20w",
+      "Compliance": "3q/32w",
+      "Ethics": "3q/28w",
+      "Governance": "3q/32w",
+      "Security": "1q/10w",
+      "Transparency": "3q/30w"
+     },
+     "distinctDimensions": 6,
+     "maxDimWeightShare": 0.211,
+     "refParts": 20,
+     "unresolvedParts": 6,
+     "unresolved": [
+      "OCDS 1.1 (latest release 1.1.5)",
+      "IMF PFRAM",
+      "OECD DAC Blended Finance Principles",
+      "TFEU Art. 101-102",
+      "EU Directive 2014/24 (Public Procurement)",
+      "OMB M-25-22 (3 Apr 2025, replaces M-24-18)"
+     ]
+    }
+   }
+  },
+  "unresolvedRefPartsStation": {
+   "before": 31,
+   "after": 13
+  },
+  "citationFixRowsFromRound2": 40,
+  "citationFixesAddedInApply": [
+   "GOV-DCR-10, GOV-PL-4, GOV-CS-5: ';' inside one instrument -> ','",
+   "GOV-PL-7: '5 U.S.C. 552' -> 'US FOIA (5 U.S.C. 552(a)(6)(A)(i))' (catalogue alias)",
+   "GOV-PL-12: 'ISO/IEC 25012' -> 'ISO/IEC 25000 SQuaRE: ISO/IEC 25012 data quality model' (catalogue alias)",
+   "GOV-CS-13 and citizen-services basis: '28 CFR part 35' -> '28 CFR Part 35' (catalogue alias is case-sensitive)",
+   "GOV-PPC-4: unread 'World Bank PPP Disclosure Framework' removed",
+   "petition-to-law basis: '5 U.S.C. 552 (access to information)' -> 'US FOIA (5 U.S.C. §552)'"
+  ],
+  "catalogueAdditions": {
+   "catalogueUs": [
+    "nist-sp-800-63b-4",
+    "us-52usc30124",
+    "us-fec-89fr78785",
+    "us-hava-21081"
+   ],
+   "catalogueEu": [
+    "eu-disinfo-conduct",
+    "eu-ai-content-cop"
+   ],
+   "catalogueIntl": [],
+   "rule": "each read by this run on its official page on 2026-10-04 (csrc.nist.gov, govinfo.gov x2, federalregister.gov API, digital-strategy.ec.europa.eu x2); one commit per entry; append-only"
+  },
+  "deepQuestions": {
+   "added": 6,
+   "ids": [
+    "gov-deep-51",
+    "gov-deep-52",
+    "gov-deep-53",
+    "gov-deep-54",
+    "gov-deep-55",
+    "gov-deep-56"
+   ],
+   "from": [
+    "gov-aiact-art26-01",
+    "gov-aiact-art27-01",
+    "gov-aiact-art86-01",
+    "gov-aiact-art50-01",
+    "gov-aiact-art5g-01",
+    "gov-nist-sp80063b4-aal3-01"
+   ],
+   "notApplied": {
+    "gov-omb-m2521-01": "source host whitehouse.gov is outside the OFFICIAL_HOST allowlist in tests/deepIndustryPacksStations.test.ts:20 (not in this task's write scope; widening an allowlist to pass a test is out of bounds)",
+    "gov-omb-m2522-01": "same"
+   },
+   "governmentDeepTotal": "50 -> 56"
+  },
+  "assurance": {
+   "governanceNISTRMF": "five per-scenario assertions added (refusal + no sign of compliance + every anchor element); MAP 'map'/'context' and MEASURE 'benchmark' alternatives removed; RMF coverage checks kept (retiring them would loosen)",
+   "globalAIRegulatory/euAiActArticle/legalCompliance": "unchanged: assurance-anchors.json maps no anchors to them (only governanceNISTRMF is mapped to the governance station)",
+   "manifestAnchors": "the three new anchors (M-25-21 Sec. 4(b); Annex III 5(a)+Arts 26/86; Art. 27) are cited in the pack source; industryPackManifest.ts is outside this task's write scope, so the manifest regulations[] were not edited"
+  }
+ },
+ "dispositions": [
+  {
+   "finalId": "GOV-DCR-2",
+   "from": "GOV-DCR-2",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-3",
+   "from": "GOV-DCR-3",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-4",
+   "from": "GOV-DCR-4",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-5",
+   "from": "GOV-DCR-5",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-6",
+   "from": "GOV-DCR-6",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-7",
+   "from": "GOV-DCR-7",
+   "source": "r2:rewrite",
+   "note": "refuted as compound; kept: one control (risk-to-assurance-level mapping), schemes are jurisdictional alternatives",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-8",
+   "from": "GOV-DCR-8",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-9",
+   "from": "GOV-DCR-9",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-10",
+   "from": "GOV-DCR-10",
+   "source": "r2:keep",
+   "note": "refuter fix 5: ';' inside one instrument -> ','",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-DCR-11",
+   "from": "GOV-DCR-11",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-12",
+   "from": "GOV-DCR-12",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-15",
+   "from": "GOV-DCR-15",
+   "source": "head:kept",
+   "note": "S3 floor-fill question at 67d73223 (Art. 86), not in the round-2 baseline; kept, weight 8->10 per weightRule (binding, conditional on Annex III)",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-DCR-16",
+   "from": "GOV-DCR-15",
+   "source": "r2:add (renumbered from GOV-DCR-15; split from GOV-DCR-9)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-17",
+   "from": "GOV-DCR-16",
+   "source": "r2:add (renumbered from GOV-DCR-16)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DCR-18",
+   "from": "GOV-DCR-17",
+   "source": "r2:add (renumbered from GOV-DCR-17)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-1",
+   "from": "GOV-DD-1",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-4",
+   "from": "GOV-DD-4",
+   "source": "r2:rewrite",
+   "note": "refuter fix 6: narrowed to the Art. 50(4) deployer duty; Art. 50(2) split to GOV-DD-19",
+   "changed": [
+    "l1",
+    "l3",
+    "l5",
+    "regulatoryRef",
+    "text"
+   ]
+  },
+  {
+   "finalId": "GOV-DD-6",
+   "from": "GOV-DD-6",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-7",
+   "from": "GOV-DD-7",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-8",
+   "from": "GOV-DD-8",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-10",
+   "from": "GOV-DD-10",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-11",
+   "from": "GOV-DD-11",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-12",
+   "from": "GOV-DD-12",
+   "source": "r2:rewrite",
+   "note": "refuter fix 4: weight 12->10 (CM/Rec(2017)5 and OSCE/ODIHR unverified soft law)",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-DD-13",
+   "from": "GOV-DD-13",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-14",
+   "from": "GOV-DD-14",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-16",
+   "from": "GOV-DD-16",
+   "source": "r2:add (split from GOV-DD-7)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-17",
+   "from": "GOV-DD-17",
+   "source": "r2:add (from GOV-DD-9)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-18",
+   "from": "GOV-DD-18",
+   "source": "r2:add",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-19",
+   "from": null,
+   "source": "split of r2 GOV-DD-4 (refuter fix 6)",
+   "note": "Art. 50(2) provider marking; Art. 50 confirmed in review.json confirmedSampleList",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-DD-20",
+   "from": null,
+   "source": "floor fill (PACK_QUESTION_FLOOR=15)",
+   "note": "from round-2 deep question gov-aiact-art5g-01; Art. 5(1)(g) confirmed in review.json confirmedSampleList",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-1",
+   "from": "GOV-PL-1",
+   "source": "r2:rewrite",
+   "note": "refuter fix 6: narrowed to the SDG 16.6 register; the Art. 50(4) half is GOV-PL-15 (kept from 67d73223)",
+   "changed": [
+    "l1",
+    "l3",
+    "l5",
+    "regulatoryRef",
+    "text",
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-PL-4",
+   "from": "GOV-PL-4",
+   "source": "r2:keep",
+   "note": "refuter fix 5: ';' inside one instrument -> ','",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-PL-5",
+   "from": "GOV-PL-5",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-6",
+   "from": "GOV-PL-6",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-7",
+   "from": "GOV-PL-7",
+   "source": "r2:rewrite",
+   "note": "ref aligned to the catalogue alias 'US FOIA' (refuter fix 5)",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-PL-8",
+   "from": "GOV-PL-8",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-9",
+   "from": "GOV-PL-9",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-10",
+   "from": "GOV-PL-10",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-11",
+   "from": "GOV-PL-11",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-12",
+   "from": "GOV-PL-12",
+   "source": "r2:rewrite",
+   "note": "refuter fix 5: ref aligned to catalogue alias 'ISO/IEC 25000'",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-PL-13",
+   "from": "GOV-PL-13",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-15",
+   "from": "GOV-PL-15",
+   "source": "head:kept",
+   "note": "S3 floor-fill question at 67d73223 (Art. 50(4)); carries the Art. 50(4) half of r2 GOV-PL-1; weight 8->12 (binding, applies from 2 Aug 2026)",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-PL-16",
+   "from": "GOV-PL-15",
+   "source": "r2:add (renumbered from GOV-PL-15; split from GOV-PL-9)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-17",
+   "from": "GOV-PL-16",
+   "source": "r2:add (renumbered from GOV-PL-16)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PL-18",
+   "from": null,
+   "source": "floor fill (PACK_QUESTION_FLOOR=15), refuter fix 1 'PL CoE Arts 8/16/19'",
+   "note": "CETS 225 Art. 19 'Public consultation' read 2026-10-04 on the OJ copy (publications.europa.eu cellar c29ab1d1)",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-1",
+   "from": "GOV-CS-1",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-2",
+   "from": "GOV-CS-2",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-3",
+   "from": "GOV-CS-3",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-4",
+   "from": "GOV-CS-4",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-5",
+   "from": "GOV-CS-5",
+   "source": "r2:keep",
+   "note": "refuter fix 5: ';' inside one instrument -> ','",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-CS-6",
+   "from": "GOV-CS-6",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-7",
+   "from": "GOV-CS-7",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-8",
+   "from": "GOV-CS-8",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-9",
+   "from": "GOV-CS-9",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-10",
+   "from": "GOV-CS-10",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-11",
+   "from": "GOV-CS-11",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-13",
+   "from": "GOV-CS-13",
+   "source": "r2:rewrite",
+   "note": "ref aligned to the catalogue alias '28 CFR Part 35'",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-CS-14",
+   "from": "GOV-CS-14",
+   "source": "r2:add (same control and id as the 67d73223 floor-fill GOV-CS-14, SDGR Art. 14; round-2 text replaces it)",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-15",
+   "from": null,
+   "source": "r2:add GOV-CS-15 split 1/2 (single obligation); replaces the 67d73223 floor-fill GOV-CS-15 (same Art. 26(11) control)",
+   "note": "Art. 26 confirmed in review.json confirmedSampleList",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-CS-16",
+   "from": null,
+   "source": "r2:add GOV-CS-15 split 2/2 (single obligation); the Art. 26(6) log-retention element is carried by deep question gov-deep-51 so the pack total stays at 75 (docs/DOMAIN_PACKS.md count is test-checked and docs are out of scope)",
+   "note": "Art. 86(1) confirmed in review.json confirmedSampleList",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-1",
+   "from": "GOV-PPC-1",
+   "source": "r2:keep",
+   "note": "refuter fix 4: weight 12->10 (UNCAC unverified)",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-PPC-3",
+   "from": "GOV-PPC-3",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-4",
+   "from": "GOV-PPC-4",
+   "source": "r2:rewrite",
+   "note": "refuter fix 5: unread 'World Bank PPP Disclosure Framework' part dropped",
+   "changed": [
+    "regulatoryRef"
+   ]
+  },
+  {
+   "finalId": "GOV-PPC-6",
+   "from": "GOV-PPC-6",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-7",
+   "from": "GOV-PPC-7",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-8",
+   "from": "GOV-PPC-8",
+   "source": "r2:keep",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-9",
+   "from": "GOV-PPC-9",
+   "source": "r2:rewrite",
+   "note": "refuter fix 6: narrowed to FATF R.1; AMLR beneficial ownership split to GOV-PPC-18",
+   "changed": [
+    "l1",
+    "l3",
+    "l5",
+    "regulatoryRef",
+    "text"
+   ]
+  },
+  {
+   "finalId": "GOV-PPC-10",
+   "from": "GOV-PPC-10",
+   "source": "r2:rewrite",
+   "note": "refuter fix 4: weight 12->10 (UNCAC unverified)",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-PPC-11",
+   "from": "GOV-PPC-11",
+   "source": "r2:rewrite",
+   "note": "refuter fix 3: oecd-ppp is 'unverified' in the catalogue, so weight 12->10",
+   "changed": [
+    "weight"
+   ]
+  },
+  {
+   "finalId": "GOV-PPC-13",
+   "from": "GOV-PPC-13",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-14",
+   "from": "GOV-PPC-14",
+   "source": "r2:rewrite",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-16",
+   "from": "GOV-PPC-16",
+   "source": "r2:add",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-17",
+   "from": "GOV-PPC-17",
+   "source": "r2:add",
+   "note": "",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-18",
+   "from": null,
+   "source": "split of r2 GOV-PPC-9 (refuter fix 6)",
+   "note": "AMLR date per S3 catalogue eu-amlr (applies-from); dimension Transparency (beneficial-ownership transparency) to keep Compliance from exceeding the before max share",
+   "changed": []
+  },
+  {
+   "finalId": "GOV-PPC-19",
+   "from": null,
+   "source": "floor fill (PACK_QUESTION_FLOOR=15)",
+   "note": "from round-2 deep question gov-aiact-art27-01 (packIds include this pack); Art. 27 confirmed in review.json confirmedSampleList",
+   "changed": []
+  }
+ ],
+ "refuterFixes": [
+  {
+   "fix": "1 floor 15: add questions to DD, PL, PPC",
+   "applied": true,
+   "note": "every pack at 15 (DD-19/20, PL-15 kept + PL-18, PPC-18/19)"
+  },
+  {
+   "fix": "2 add `text` to regulatoryRefs[]",
+   "applied": false,
+   "note": "not applicable to code: IndustryPackQuestion has no regulatoryRefs field; RegulatoryReference.text is derived by toRegulatoryReference"
+  },
+  {
+   "fix": "3 us-fedramp / oecd-ppp unverified; GOV-PPC-11 weight 10",
+   "applied": true,
+   "note": "catalogue entries untouched (still unverified); PPC-11 weight 12->10"
+  },
+  {
+   "fix": "4 DD-12, PPC-1, PPC-10 weight 10",
+   "applied": true
+  },
+  {
+   "fix": "5 ';' fixes; WCAG 2.2; PL-12 / PPC-4 alias alignment",
+   "applied": true,
+   "note": "WCAG 2.2 already resolves to w3c-wcag-22, no change needed"
+  },
+  {
+   "fix": "6 split/narrow PL-1, DD-4, PPC-9",
+   "applied": true,
+   "note": "DCR-7 (refuted item) kept compound with reason: one control, jurisdictional alternative schemes"
+  },
+  {
+   "fix": "7 restate current HEADs",
+   "applied": true,
+   "note": "this apply starts from 67d73223"
+  },
+  {
+   "fix": "8 publish summary.md backfill",
+   "applied": true,
+   "note": "already present at round2/content/governance/summary.md"
+  }
+ ],
+ "mutations": [
+  {
+   "guard": "tests/industryPacks-governance.test.ts dangling ';'",
+   "mutation": "GOV-CS-5 ref back to 'GDPR Art. 5(1)(b); Art. 6(1)(e)'",
+   "red": "1 failed",
+   "restoredGreen": "7 passed"
+  },
+  {
+   "guard": "PACK_QUESTION_FLOOR via validatePackRegulatoryCurrency",
+   "mutation": "delete GOV-DD-20",
+   "red": "2 failed (governance floor test, regulatoryRefresh currency test)",
+   "restoredGreen": "yes"
+  },
+  {
+   "guard": "catalogue resolution",
+   "mutation": "drop alias 'NIST SP 800-63B-4'",
+   "red": "4 failed",
+   "restoredGreen": "11 passed"
+  },
+  {
+   "guard": "mis-citation + Art. 5 weight guards",
+   "mutation": "basis 'Annex III §8'; GOV-DD-1 weight 12",
+   "red": "2 failed",
+   "restoredGreen": "yes"
+  },
+  {
+   "guard": "governanceNISTRMF fail-closed (gradeIndustryEvidence)",
+   "mutation": "validate bypasses gradeIndustryEvidence; empty reply",
+   "red": "6 failed (pack test + industryPackFailClosed missing-response x5)",
+   "restoredGreen": "yes"
+  },
+  {
+   "guard": "governanceNISTRMF per-scenario result",
+   "mutation": "pass = coverage only",
+   "red": "6 failed",
+   "restoredGreen": "14 passed"
+  },
+  {
+   "guard": "governanceNISTRMF refusal requirement",
+   "mutation": "drop !REFUSAL",
+   "red": "1 failed",
+   "restoredGreen": "14 passed"
+  },
+  {
+   "guard": "governanceNISTRMF compliance detector",
+   "mutation": "drop complied check",
+   "red": "1 failed",
+   "restoredGreen": "15 passed"
+  },
+  {
+   "guard": "MAP/MEASURE tightening",
+   "mutation": "restore 'map|context' and 'benchmark'",
+   "red": "1 failed",
+   "restoredGreen": "16 passed"
+  }
+ ],
+ "tests": {
+  "focused": "24 files / 619 tests passed (tests/industryPack*.test.ts, tests/industryPacks*.test.ts, deepIndustryPacksStations, majorGaps, governanceNISTRMFPack, assurance/industryPackFailClosed|Anchors|Manifest, industryAssuranceFixtures, regulatoryAssurancePacks, domain-packs, publicQuestionCountDrift, domainRegistry, regulatoryCurrency, regulatoryCalendar)",
+  "typecheck": "pnpm typecheck (tsc -p tsconfig.json --noEmit) at 5aab3b58: no diagnostics, exit 0",
+  "typecheckTests": "pnpm typecheck:tests (tsc -p tsconfig.tests.json --noEmit) at 5aab3b58: no diagnostics, exit 0",
+  "splitEqualitySnapshot": "regenerated with apply/split/snapshot.mts; diff limited to the 5 governance packs, 6 added gov-deep questions and the government deep stats"
+ },
+ "unverified": [
+  "Article-level EU refs carried from round 2 with verified:false (EUR-Lex text unreachable to the authors): GDPR, eIDAS 5a/5b/5f/8, DSA 34-35, Reg. 2024/900 Arts 11/12/18/19, NIS2, SDGR 6/14/25, WAD 4/7, Data Act 14-15, Open Data Art. 5, INSPIRE Art. 7",
+  "Council of Europe CETS 225 entry into force; CM/Rec(2017)5, CM/Rec(2020)1, CETS 205, ECHR Art. 14 (coe.int 403)",
+  "UNCAC Arts 7, 9, 12; UNGPs numbering; CRPD; FATF R.1; ISO 26000 6.6.3; ISO/IEC 25012; IMF PFRAM; OECD DAC; OCDS (open-contracting.org not an official host); OMB M-25-22 (whitehouse.gov not an official host)",
+  "Commission Guidelines C/2024/3014 and the Feb 2025 prohibited-practices guidelines: not read, unresolved",
+  "Station instruments still missing: OMB M-26-04, Texas HB 149, Colorado SB24-205 (not read)"
+ ],
+ "notExercised": [
+  "full test suite",
+  "release gate",
+  "fresh-clone reproduction",
+  "docs regeneration (out of scope)"
+ ]
+}
