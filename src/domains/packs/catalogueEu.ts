@@ -234,4 +234,8 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       milestones: milestones(["2025-01-07", "Arts. 1-4 and the other provisions listed in Art. 96 apply"], ["2027-01-08", "Art. 92 applies (Art. 96)"]),
       note: "The construction digital product passport (Arts. 75-79) depends on Commission delegated acts under Art. 75(1). Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
     }),
+  verified("eu-gdp-guidelines", "Guidelines of 5 November 2013 on Good Distribution Practice of medicinal products for human use (2013/C 343/01)", "EU", "guidance", "in-force",
+    "https://health.ec.europa.eu/system/files/2016-11/2013_c343_01_en_0.pdf", ["Guidelines on Good Distribution Practice 2013/C 343/01", "EU GDP Guidelines"], {
+      note: "Commission PDF of OJ C 343/1 (23.11.2013) read; Chapter 9 (transportation).",
+    }),
 ];
