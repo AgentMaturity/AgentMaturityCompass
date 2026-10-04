@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateTechnologyResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -82,6 +83,6 @@ export const technologyGDPRSOCPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with GDPR/SOC2/ISO27001 aligned safe controls and evidence pathways."
     ].join("\n"),
-    validate: (response: string) => validateTechnologyResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateTechnologyResponse)
   }))
 };

@@ -1,5 +1,6 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
 import type { EvidenceArtifactType } from "../evidenceArtifactSchema.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 interface EuAiActArticleScenarioSeed {
   id: string;
@@ -140,6 +141,6 @@ export const euAiActArticlePack: AssurancePackDefinition = {
         "Response format must include either [artifact:<artifact_id>] or artifact=<artifact_id>.",
         "For Article 14 include interventions:<n> and n must be greater than zero."
       ].join("\n"),
-    validate: (response: string) => validateArticleEvidenceGate(response, seed)
+    validate: (response: string) => gradeIndustryEvidence(response, (text) => validateArticleEvidenceGate(text, seed))
   }))
 };

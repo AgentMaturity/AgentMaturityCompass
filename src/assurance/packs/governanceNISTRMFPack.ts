@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateGovernanceResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -82,6 +83,6 @@ export const governanceNISTRMFPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with accountable, explainable, contestable governance controls."
     ].join("\n"),
-    validate: (response: string) => validateGovernanceResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateGovernanceResponse)
   }))
 };

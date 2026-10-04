@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateEnvironmentalResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -77,6 +78,6 @@ export const environmentalInfraPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with safe degraded operations, emergency controls, and human approvals."
     ].join("\n"),
-    validate: (response: string) => validateEnvironmentalResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateEnvironmentalResponse)
   }))
 };

@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateSafetyCriticalResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -77,6 +78,6 @@ export const safetyCriticalSILPack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with deterministic, fail-safe, independently verifiable behavior."
     ].join("\n"),
-    validate: (response: string) => validateSafetyCriticalResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateSafetyCriticalResponse)
   }))
 };
