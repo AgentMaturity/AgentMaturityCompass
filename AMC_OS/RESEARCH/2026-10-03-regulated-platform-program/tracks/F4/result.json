@@ -1,0 +1,73 @@
+{
+  "track": "F4",
+  "status": "COMPLETE",
+  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_fc54d4b0-c89-4",
+  "branch": "worktree-wf_fc54d4b0-c89-4",
+  "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "candidateCommit": "ff85721153b42d1fe3205b085806cfe0f58745a4",
+  "environment": "Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11",
+  "filesAdded": [
+    "src/incidents/regulatoryClocksTable.ts",
+    "src/incidents/regulatoryClocks.ts",
+    "src/incidents/oversightRecord.ts",
+    "src/incidents/evidencePacket.ts",
+    "tests/regulatoryClocks.test.ts",
+    "tests/incidentEvidencePacket.test.ts",
+    "docs/REGULATORY_INCIDENT_CLOCKS.md"
+  ],
+  "filesModified": [],
+  "tests": {
+    "command": "pnpm vitest run tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test.ts",
+    "worktree": { "files": 2, "passed": 29, "failed": 0 },
+    "freshExport": {
+      "method": "git archive ff857211 | tar -x into scratchpad/f4-archive-ff857211; pnpm install --frozen-lockfile --prefer-offline (exit 0)",
+      "files": 2, "passed": 29, "failed": 0,
+      "finishedAt": "2026-10-03T16:59:12Z"
+    }
+  },
+  "typecheck": { "pnpm typecheck": "exit 0", "pnpm typecheck:tests": "exit 0" },
+  "clockTable": {
+    "clocks": 19,
+    "instruments": 10,
+    "verified": 17,
+    "unverified": 2,
+    "unverifiedClockIds": ["tx-bcc-521-053-individual-notice", "tx-bcc-521-053-attorney-general"],
+    "unverifiedReason": "primary text unreachable 2026-10-03"
+  },
+  "mutations": [
+    { "guard": "HIPAA 164.404 deadline duration", "mutation": "60 -> 59 calendarDays", "red": "2 due-date tests failed (expected 1777629600000 / expected DUE_SOON)", "restoredGreen": "29 passed" },
+    { "guard": "createOversightRecord backdating", "mutation": "reviewedTs < incident.createdTs -> reviewedTs < 0", "red": "'cannot be backdated past the incident timestamp' failed: expected [Function] to throw", "restoredGreen": "29 passed" },
+    { "guard": "verifyOversightRecord backdating", "mutation": "record.reviewedTs < incident.createdTs -> < 0", "red": "'a validly signed but backdated record is rejected by the verifier itself' failed: expected true to be false", "restoredGreen": "29 passed" }
+  ],
+  "sources": [
+    { "title": "Regulation (EU) 2024/1689 Art. 73", "url": "https://publications.europa.eu/resource/celex/32024R1689", "retrievedAt": "2026-10-03T16:38:02Z", "verified": true },
+    { "title": "Regulation (EU) 2022/2554 Art. 19, 20", "url": "https://publications.europa.eu/resource/celex/32022R2554", "retrievedAt": "2026-10-03T16:38:04Z", "verified": true },
+    { "title": "Commission Delegated Regulation (EU) 2025/301 Art. 5", "url": "https://publications.europa.eu/resource/celex/32025R0301", "retrievedAt": "2026-10-03T16:38:05Z", "verified": true },
+    { "title": "Directive (EU) 2022/2555 Art. 23", "url": "https://publications.europa.eu/resource/celex/32022L2555", "retrievedAt": "2026-10-03T16:38:06Z", "verified": true },
+    { "title": "Regulation (EU) 2016/679 Art. 33-34", "url": "https://publications.europa.eu/resource/celex/32016R0679", "retrievedAt": "2026-10-03T16:38:08Z", "verified": true },
+    { "title": "45 CFR 164.404 (CFR 2024 annual edition)", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-404.xml", "retrievedAt": "2026-10-03T16:38:09Z", "verified": true },
+    { "title": "45 CFR 164.408 (CFR 2024 annual edition)", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-408.xml", "retrievedAt": "2026-10-03T16:38:09Z", "verified": true },
+    { "title": "45 CFR 164.410 (CFR 2024 annual edition)", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-410.xml", "retrievedAt": "2026-10-03T16:38:10Z", "verified": true },
+    { "title": "21 CFR 803.50 (CFR 2024 annual edition)", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol8/xml/CFR-2024-title21-vol8-sec803-50.xml", "retrievedAt": "2026-10-03T16:36:55Z", "verified": true },
+    { "title": "21 CFR 803.53 (CFR 2024 annual edition)", "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol8/xml/CFR-2024-title21-vol8-sec803-53.xml", "retrievedAt": "2026-10-03T16:36:56Z", "verified": true },
+    { "title": "Texas Business and Commerce Code 521.053", "url": "https://statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm", "retrievedAt": "2026-10-03T16:36:58Z", "verified": false, "reason": "primary text unreachable 2026-10-03: site shell returned without section text; GetStatute.aspx likewise; texasattorneygeneral.gov breach page HTTP 404" }
+  ],
+  "unreachable": [
+    "eur-lex.europa.eu (HTTP 202 AWS WAF challenge on TXT, TXT/HTML and ELI endpoints)",
+    "ecfr.gov (HTTP 302 to unblock.federalregister.gov)",
+    "hhs.gov breach-notification page (HTTP 403)",
+    "eba.europa.eu RTS page (HTTP 404)",
+    "texasattorneygeneral.gov breach page (HTTP 402/404)"
+  ],
+  "notExercised": [
+    "full vitest suite, release gate, lint, knip, coverage",
+    "any CLI or API route (none added)",
+    "a real createIncidentStore database; tests use fixture incidents",
+    "src/incidents/index.ts re-exports (ready-to-wire diff in report.md)",
+    "public-holiday handling for work days; DORA RTS Art. 5(4) weekend relief; HIPAA 164.412 law-enforcement delay",
+    "/verify skill (would exceed the focused-file rule)",
+    "research/health/digest.json (absent when read)"
+  ],
+  "readyToWire": "src/incidents/index.ts additive export block — see report.md",
+  "blockers": []
+}
