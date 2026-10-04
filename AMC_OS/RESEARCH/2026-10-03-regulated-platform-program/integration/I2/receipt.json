@@ -1,0 +1,15 @@
+{
+  "id": "I2",
+  "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+  "failure": "tests/packFrameworkAliases.test.ts > industry pack framework strings > the unresolved set equals the committed fixture, each classified as not modelled",
+  "rootCause": "S6 fixture tests/fixtures/packFrameworkStrings.unresolved.json was generated before S3 commit 5a19ae6d (2026 regulatory refresh of industry packs) renamed or replaced 9 pack complianceFrameworks strings.",
+  "measured": { "packs": 41, "distinctPackStrings": 224, "unresolvedBefore": 193, "unresolvedAfter": 193, "resolved": 31 },
+  "added": ["CONSORT 2025", "ICH E6(R3)", "ISO 14001:2026", "ISO 14155:2026", "ISO 21001", "ISO 27799:2025", "ISO 9001:2026", "ISO/IEC 27701:2025", "US FOIA (5 U.S.C. §552)"],
+  "removedNoLongerCited": ["Access to Information Directive 2003/98", "CONSORT 2010", "ICH E6(R2)", "ISO 14001:2015", "ISO 14155:2020", "ISO 27799:2016", "ISO 29990:2010", "ISO 9001:2015", "ISO/IEC 27701:2019"],
+  "classification": "Each added string classifies as sector-standard-not-modelled via classifyFrameworkString; none names an instrument with an existing framework id (ids: SOC2 NIST_AI_RMF ISO_27001 ISO_42001 EU_AI_ACT GDPR MITRE_ATLAS OWASP_API_TOP10 HIPAA SOX FEDRAMP PCI_DSS DORA NIS2 HHS_HTI_1 NIST_AI_600_1 CO_AI_ACT TX_TRAIGA CA_AI_LAWS KR_AI_BASIC_ACT), so no alias and no framework id were added.",
+  "assertionChanges": "none; the exact-equality assertion is unchanged",
+  "tests": [
+    { "command": "npx vitest run tests/packFrameworkAliases.test.ts", "result": "56/56 passed (before: 1 failed, 55 passed)" },
+    { "command": "pnpm typecheck:tests", "result": "exit 0, no diagnostics" }
+  ]
+}
