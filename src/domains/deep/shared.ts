@@ -30,6 +30,13 @@ export interface DeepIndustryQuestion {
 }
 
 export const RETRIEVED_AT = "2026-10-03";
+/** Date the provisions behind the questions added in the 2026-10-04 repair round were read. */
+export const REPAIR_RETRIEVED_AT = "2026-10-04";
+
+/** The same source, read on a different day. */
+export function readOn(src: RegulationSource, retrievedAt: string): RegulationSource {
+  return { ...src, retrievedAt };
+}
 
 /** A note without `verified` means the provision could not be confirmed; pass `verified` for a confirmed provision with a caveat. */
 export function source(title: string, url: string, note?: string, verified = note === undefined): RegulationSource {

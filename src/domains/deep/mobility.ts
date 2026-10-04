@@ -3,7 +3,7 @@
  * Each question anchors one provision and lists the industry packs it applies to.
  */
 
-import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, levels, source, type DeepIndustryQuestion } from "./shared.js";
+import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, levels, source, readOn, REPAIR_RETRIEVED_AT, type DeepIndustryQuestion } from "./shared.js";
 
 export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
   {
@@ -67,7 +67,7 @@ export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Post-market monitoring plan documented", "Field and deployer data collected systematically", "Interaction with other AI systems analysed where relevant", "Findings trigger corrective action"],
     levels: levels("No post-market monitoring", "Complaints handled case by case", "Documented plan collecting field and deployer data", "Monitoring results reviewed against compliance requirements each period", "Monitoring drives corrective actions with measured effect"),
     evidenceTypes: ["pmm_plan", "field_data_report", "corrective_action_log"],
-    source: aiActSource("article-72", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-72", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "mobility-deep-07", industry: "mobility", station: "mobility",
@@ -77,7 +77,7 @@ export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Accuracy metrics stated with test conditions", "Robustness level stated", "Cybersecurity level stated", "Field performance compared with the declared levels"],
     levels: levels("No performance information for deployers", "Marketing claims without metrics", "Instructions state tested accuracy, robustness and cybersecurity levels", "Deployers report field performance against declared levels", "Declared levels updated from field evidence with version history"),
     evidenceTypes: ["instructions_for_use", "validation_report", "field_performance_report"],
-    source: aiActSource("article-13", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-13", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "mobility-deep-08", industry: "mobility", station: "mobility",
@@ -87,7 +87,7 @@ export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Operating conditions enumerated", "Data coverage measured per condition", "Data gaps and known errors recorded", "Bias in coverage examined"],
     levels: levels("Data provenance and coverage unknown", "Coverage described anecdotally", "Coverage measured per operating condition with gaps recorded", "Gaps closed or the operating envelope narrowed to match", "Coverage re-measured when the deployment area changes"),
     evidenceTypes: ["datasheet", "coverage_matrix", "data_gap_register"],
-    source: aiActSource("article-10", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-10", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "mobility-deep-09", industry: "mobility", station: "mobility",
@@ -97,7 +97,7 @@ export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Override available in every operating mode", "Override does not need vendor support", "Overrides recorded with reason", "Override patterns reviewed"],
     levels: levels("Outputs executed with no override path", "Override possible only through a support ticket", "Operators can override in any mode and overrides are logged with reasons", "Override patterns reviewed to find model weaknesses", "Override reasons feed retraining or rule changes under change control"),
     evidenceTypes: ["override_log", "operator_procedure", "override_review"],
-    source: aiActSource("article-14", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-14", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "mobility-deep-10", industry: "mobility", station: "mobility",
@@ -107,5 +107,5 @@ export const DEEP_MOBILITY_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Agent suppliers inventoried, including model and data providers", "Supplier risk assessed before use", "C-SCRM requirements in supplier agreements", "Reassessment on supplier or component change"],
     levels: levels("No view of the agent's suppliers", "Supplier list without risk assessment", "C-SCRM plan covers agent suppliers with pre-onboarding assessment", "Supplier changes trigger reassessment and are tracked", "Supplier risk monitored continuously and reported to leadership"),
     evidenceTypes: ["supplier_inventory", "cscrm_plan", "supplier_risk_assessment"],
-    source: source("NIST SP 800-161 Rev. 1 Update 1, Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Nov 2024)", "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final"),
+    source: readOn(source("NIST SP 800-161 Rev. 1 Update 1, Cybersecurity Supply Chain Risk Management Practices for Systems and Organizations (Nov 2024)", "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final"), REPAIR_RETRIEVED_AT),
   },];
