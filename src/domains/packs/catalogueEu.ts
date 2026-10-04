@@ -6,7 +6,7 @@
  * recorded as "unverified".
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
-import { eu, milestones, unverified } from "./catalogueHelpers.js";
+import { eu, milestones, unverified, verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
@@ -213,4 +213,9 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],
     "There is no single EPR directive; EPR is set by Directive 2008/98/EC and product-specific acts."),
+  verified("eu-gsr", "Regulation (EU) 2019/2144 (General Safety Regulation for motor vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32019R2144", ["Regulation (EU) 2019/2144", "EU General Safety Regulation"], {
+      milestones: milestones(["2026-07-07", "Advanced safety requirements apply to all new passenger cars and vans (Commission news of 2026-07-08)"]),
+      note: "Arts. 6 and 11 read; entry-into-force date not recorded here. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
 ];
