@@ -269,5 +269,53 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     status: "in-force", lastReviewed: "2026-10-04", url: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219",
     retrievedAt: "2026-10-04", effectiveDate: "2002-07-31", aliases: ["ePrivacy Directive", "Directive 2002/58/EC"],
     note: "Art. 5(3) consent wording read in the EUR-Lex consolidated text (19.12.2009) by the technology round-2 content pass; in force on publication, OJ L 201, 31.7.2002.",
+
+  // Wealth station, round-2 review (2026-10-04): article text read as Publications Office CELLAR text
+  // (publications.europa.eu/resource/celex/<CELEX>); receipt round2/content/wealth/questions.json catalogueAdditions.
+  {
+    id: "eu-sca-rts", citation: "Commission Delegated Regulation (EU) 2018/389 (RTS on strong customer authentication)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/reg_del/2018/389/oj", retrievedAt: "2026-10-03",
+    aliases: ["Commission Delegated Regulation (EU) 2018/389", "EBA RTS on SCA"],
+    note: "Art. 4 (authentication code) and Art. 5 (dynamic linking) read as CELLAR text of CELEX 32018R0389.",
+  },
+  {
+    id: "eu-dora-rts-incident-reporting", citation: "Commission Delegated Regulation (EU) 2025/301 (DORA incident reporting content and time limits)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/reg_del/2025/301/oj", retrievedAt: "2026-10-04",
+    aliases: ["Commission Delegated Regulation (EU) 2025/301"],
+    note: "Art. 5(1)(a)-(c) read as CELLAR text of CELEX 32025R0301: initial notification within 4 hours of classification as major and 24 hours of awareness; intermediate report within 72 hours; final report within one month.",
+  },
+  {
+    id: "eu-pay-transparency", citation: "Directive (EU) 2023/970 (Pay Transparency Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2023/970/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive (EU) 2023/970"],
+    milestones: milestones(["2026-06-07", "Transposition deadline (Art. 34(1))"], ["2027-06-07", "First gender pay gap reports, employers with 150 or more workers (Art. 9(2)-(3))"]),
+    note: "Arts 6, 7, 9 and 34 read as CELLAR text of CELEX 32023L0970.",
+  },
+  {
+    id: "eu-ccd2", citation: "Directive (EU) 2023/2225 (Consumer Credit Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2023/2225/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive (EU) 2023/2225"],
+    milestones: milestones(["2026-11-20", "National measures apply; Directive 2008/48/EC repealed (Art. 48(1), Art. 49)"]),
+    note: "Arts 18(1), 18(8) and 48(1) read as CELLAR text of CELEX 32023L2225.",
+  },
+  {
+    id: "eu-working-time", citation: "Directive 2003/88/EC (Working Time Directive)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2003/88/oj", retrievedAt: "2026-10-03",
+    aliases: ["Directive 2003/88/EC", "EU Working Time Directive 2003/88/EC"],
+    note: "Arts 3, 4, 5, 6(b) and 8 read as Publications Office text/html of CELEX 32003L0088.",
+  },
+  {
+    id: "eu-eba-esg-gl", citation: "EBA Guidelines on the management of ESG risks (EBA/GL/2025/01)", jurisdiction: "EU", kind: "guidance",
+    status: "in-force", lastReviewed: "2026-10-04",
+    url: "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/sustainable-finance/guidelines-management-esg-risks", retrievedAt: "2026-10-04",
+    effectiveDate: "2026-01-11", aliases: ["EBA/GL/2025/01"],
+    note: "EBA page read 2026-10-04: status Applicable, application date 11/01/2026. Date for small and non-complex institutions not confirmed.",
+  },
+  {
+    id: "eu-omnibus-i", citation: "Directive (EU) 2026/470 (Omnibus I, amending the sustainability reporting and due diligence directives)", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://data.europa.eu/eli/dir/2026/470/oj", retrievedAt: "2026-10-04",
+    aliases: ["Directive (EU) 2026/470"],
+    milestones: milestones(["2027-03-19", "Transposition of Arts 1-3 (Art. 5(1)); the value-chain cap does not apply before national measures"]),
+    note: "CELLAR text of CELEX 32026L0470 read 2026-10-04: Directive of 24 February 2026; reporting limited to undertakings with net turnover above EUR 450 000 000 and more than 1 000 employees; value-chain cap and right to decline for protected undertakings. Transposition date confirmed by the Fable refuter (review.json, 2026-10-04).",
   },
 ];

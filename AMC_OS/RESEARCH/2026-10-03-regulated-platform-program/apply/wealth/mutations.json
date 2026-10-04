@@ -1,0 +1,123 @@
+[
+ {
+  "guard": "SOX fail-closed: bypass gradeIndustryEvidence so an empty reply is graded directly",
+  "file": "src/assurance/packs/financialSOXPack.ts",
+  "mutation": "'validate: (response: string) => gradeIndustryEvidence(response, (text) => validateSOXResponse(text, seed.requires))' -> 'validate: (response: string) => validateSOXResponse(response, seed.requires)'",
+  "tests": [
+   "tests/assurance/industryPackFailClosed.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  15 failed | 316 passed (331)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  331 passed (331)",
+  "ok": true
+ },
+ {
+  "guard": "MiFID fail-closed: bypass gradeIndustryEvidence so an empty reply is graded directly",
+  "file": "src/assurance/packs/wealthManagementMiFIDPack.ts",
+  "mutation": "'gradeIndustryEvidence(response, (text) => validateWealthResponse(text, seed.requires, seed.mustNot ?? []))' -> 'validateWealthResponse(response, seed.requires, seed.mustNot ?? [])'",
+  "tests": [
+   "tests/assurance/industryPackFailClosed.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  9 failed | 322 passed (331)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  331 passed (331)",
+  "ok": true
+ },
+ {
+  "guard": "SOX refusal guard: REFUSAL matches everything",
+  "file": "src/assurance/packs/financialSOXPack.ts",
+  "mutation": "'const REFUSAL = /' -> 'const REFUSAL = /|'",
+  "tests": [
+   "tests/financialSOXPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 10 passed (11)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  11 passed (11)",
+  "ok": true
+ },
+ {
+  "guard": "SOX performed guard: PERFORMED never matches",
+  "file": "src/assurance/packs/financialSOXPack.ts",
+  "mutation": "'const PERFORMED = /' -> 'const PERFORMED = /(?!)'",
+  "tests": [
+   "tests/financialSOXPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 10 passed (11)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  11 passed (11)",
+  "ok": true
+ },
+ {
+  "guard": "SOX scenario control guard: requires ignored",
+  "file": "src/assurance/packs/financialSOXPack.ts",
+  "mutation": "'for (const [auditType, pattern, reason] of requires) {' -> 'for (const [auditType, pattern, reason] of requires.slice(1)) {'",
+  "tests": [
+   "tests/financialSOXPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 10 passed (11)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  11 passed (11)",
+  "ok": true
+ },
+ {
+  "guard": "MiFID refusal guard: REFUSAL matches everything",
+  "file": "src/assurance/packs/wealthManagementMiFIDPack.ts",
+  "mutation": "'const REFUSAL = /' -> 'const REFUSAL = /|'",
+  "tests": [
+   "tests/wealthManagementMiFIDPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 8 passed (9)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  9 passed (9)",
+  "ok": true
+ },
+ {
+  "guard": "MiFID performed guard: PERFORMED never matches",
+  "file": "src/assurance/packs/wealthManagementMiFIDPack.ts",
+  "mutation": "'const PERFORMED = /' -> 'const PERFORMED = /(?!)'",
+  "tests": [
+   "tests/wealthManagementMiFIDPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 8 passed (9)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  9 passed (9)",
+  "ok": true
+ },
+ {
+  "guard": "MiFID scenario control guard: requires ignored",
+  "file": "src/assurance/packs/wealthManagementMiFIDPack.ts",
+  "mutation": "'for (const [auditType, pattern, reason] of requires) {' -> 'for (const [auditType, pattern, reason] of requires.slice(1)) {'",
+  "tests": [
+   "tests/wealthManagementMiFIDPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 8 passed (9)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  9 passed (9)",
+  "ok": true
+ },
+ {
+  "guard": "MiFID mustNot guard: kill-switch refusal of the safe action ignored",
+  "file": "src/assurance/packs/wealthManagementMiFIDPack.ts",
+  "mutation": "'for (const [auditType, pattern, reason] of mustNot) {' -> 'for (const [auditType, pattern, reason] of mustNot.slice(1)) {'",
+  "tests": [
+   "tests/wealthManagementMiFIDPack.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 8 passed (9)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  9 passed (9)",
+  "ok": true
+ },
+ {
+  "guard": "Deep host guard: a deep source moved to ecfr.gov (outside the deep test host list)",
+  "file": "src/domains/deep/wealth.ts",
+  "mutation": "'https://www.govinfo.gov/content/pkg/CFR-2026-title12-vol8/xml/CFR-2026-title12-vol8-sec1002-9.xml' -> 'https://www.ecfr.gov/current/title-12/section-1002.9'",
+  "tests": [
+   "tests/deepIndustryPacksStations.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  1 failed | 8 passed (9)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  9 passed (9)",
+  "ok": true
+ },
+ {
+  "guard": "Pack floor: drop one wealth question (blockchain to 14)",
+  "file": "src/domains/packs/stations/wealth.ts",
+  "mutation": "'    q(\"WLT-BC-18\", ' -> '    // q(\"WLT-BC-18\", '",
+  "tests": [
+   "tests/industryPackDepthFloor.test.ts"
+  ],
+  "red": "exit 1: Test Files  1 failed (1) | Tests  2 failed | 2 passed (4)",
+  "restoredGreen": "exit 0: Test Files  1 passed (1) | Tests  4 passed (4)",
+  "ok": true
+ }
+]

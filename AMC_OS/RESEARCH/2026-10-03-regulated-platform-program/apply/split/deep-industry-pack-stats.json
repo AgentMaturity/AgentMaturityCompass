@@ -31,16 +31,23 @@
     "unverifiedSources": 3
   },
   "finance": {
-    "questionCount": 50,
+    "questionCount": 56,
     "regulations": [
       "SOX",
+      "MiCA",
+      "DORA",
+      "Regulation B",
+      "Instant Payments Regulation",
+      "TFR",
+      "Consumer Credit Directive",
+      "Regulation S-P",
       "Basel III",
       "AML",
       "MiFID II",
       "MAR"
     ],
     "station": "wealth",
-    "unverifiedSources": 20
+    "unverifiedSources": 19
   },
   "government": {
     "questionCount": 56,

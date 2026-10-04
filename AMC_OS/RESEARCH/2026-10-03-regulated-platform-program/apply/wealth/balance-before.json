@@ -1,0 +1,256 @@
+{
+  "future-of-work": {
+    "riskTier": "very-high",
+    "questions": 15,
+    "floor": 15,
+    "meetsFloor": true,
+    "weightTotal": 177,
+    "weightMin": 6,
+    "weightMax": 15,
+    "weightHistogram": {
+      "6": 1,
+      "8": 1,
+      "10": 1,
+      "12": 9,
+      "15": 3
+    },
+    "dimensions": {
+      "Ethics": 2,
+      "Compliance": 5,
+      "Transparency": 2,
+      "Safety": 2,
+      "Governance": 3,
+      "Traceability": 1
+    },
+    "dimensionCount": 6,
+    "largestDimensionShare": 0.333,
+    "refParts": 24,
+    "refPartsByStatus": {
+      "in-force": 9,
+      "unresolved": 12,
+      "unverified": 3
+    },
+    "validatorErrors": [],
+    "ids": [
+      "WLT-FW-1",
+      "WLT-FW-2",
+      "WLT-FW-3",
+      "WLT-FW-4",
+      "WLT-FW-5",
+      "WLT-FW-6",
+      "WLT-FW-7",
+      "WLT-FW-8",
+      "WLT-FW-9",
+      "WLT-FW-10",
+      "WLT-FW-11",
+      "WLT-FW-12",
+      "WLT-FW-13",
+      "WLT-FW-14",
+      "WLT-FW-15"
+    ]
+  },
+  "digital-payments": {
+    "riskTier": "very-high",
+    "questions": 15,
+    "floor": 15,
+    "meetsFloor": true,
+    "weightTotal": 179,
+    "weightMin": 8,
+    "weightMax": 15,
+    "weightHistogram": {
+      "8": 1,
+      "10": 3,
+      "12": 8,
+      "15": 3
+    },
+    "dimensions": {
+      "Safety": 3,
+      "Compliance": 4,
+      "Ethics": 1,
+      "Transparency": 1,
+      "Governance": 2,
+      "Traceability": 1,
+      "Payee Verification": 1,
+      "Crypto-Asset Transfer Information": 1,
+      "Resilience": 1
+    },
+    "dimensionCount": 9,
+    "largestDimensionShare": 0.267,
+    "refParts": 25,
+    "refPartsByStatus": {
+      "in-force": 14,
+      "unresolved": 3,
+      "unverified": 8
+    },
+    "validatorErrors": [],
+    "ids": [
+      "WLT-DP-1",
+      "WLT-DP-2",
+      "WLT-DP-3",
+      "WLT-DP-4",
+      "WLT-DP-5",
+      "WLT-DP-6",
+      "WLT-DP-7",
+      "WLT-DP-8",
+      "WLT-DP-9",
+      "WLT-DP-10",
+      "WLT-DP-11",
+      "WLT-DP-12",
+      "WLT-DP-13",
+      "WLT-DP-14",
+      "WLT-DP-15"
+    ]
+  },
+  "no-poverty": {
+    "riskTier": "very-high",
+    "questions": 15,
+    "floor": 15,
+    "meetsFloor": true,
+    "weightTotal": 175,
+    "weightMin": 6,
+    "weightMax": 15,
+    "weightHistogram": {
+      "6": 1,
+      "8": 1,
+      "10": 2,
+      "12": 8,
+      "15": 3
+    },
+    "dimensions": {
+      "Ethics": 2,
+      "Compliance": 2,
+      "Safety": 2,
+      "Transparency": 2,
+      "Governance": 2,
+      "Traceability": 1,
+      "Fair Lending": 1,
+      "Consumer Protection": 1,
+      "Risk Management": 2
+    },
+    "dimensionCount": 9,
+    "largestDimensionShare": 0.133,
+    "refParts": 23,
+    "refPartsByStatus": {
+      "unresolved": 16,
+      "in-force": 4,
+      "unverified": 3
+    },
+    "validatorErrors": [],
+    "ids": [
+      "WLT-NP-1",
+      "WLT-NP-2",
+      "WLT-NP-3",
+      "WLT-NP-4",
+      "WLT-NP-5",
+      "WLT-NP-6",
+      "WLT-NP-7",
+      "WLT-NP-8",
+      "WLT-NP-9",
+      "WLT-NP-10",
+      "WLT-NP-11",
+      "WLT-NP-12",
+      "WLT-NP-13",
+      "WLT-NP-14",
+      "WLT-NP-15"
+    ]
+  },
+  "circular-economy": {
+    "riskTier": "very-high",
+    "questions": 15,
+    "floor": 15,
+    "meetsFloor": true,
+    "weightTotal": 175,
+    "weightMin": 6,
+    "weightMax": 15,
+    "weightHistogram": {
+      "6": 1,
+      "8": 1,
+      "10": 2,
+      "12": 8,
+      "15": 3
+    },
+    "dimensions": {
+      "Compliance": 5,
+      "Transparency": 2,
+      "Governance": 4,
+      "Ethics": 1,
+      "Safety": 1,
+      "Traceability": 2
+    },
+    "dimensionCount": 6,
+    "largestDimensionShare": 0.333,
+    "refParts": 26,
+    "refPartsByStatus": {
+      "in-force": 9,
+      "unresolved": 12,
+      "unverified": 5
+    },
+    "validatorErrors": [],
+    "ids": [
+      "WLT-CE-1",
+      "WLT-CE-2",
+      "WLT-CE-3",
+      "WLT-CE-4",
+      "WLT-CE-5",
+      "WLT-CE-6",
+      "WLT-CE-7",
+      "WLT-CE-8",
+      "WLT-CE-9",
+      "WLT-CE-10",
+      "WLT-CE-11",
+      "WLT-CE-12",
+      "WLT-CE-13",
+      "WLT-CE-14",
+      "WLT-CE-15"
+    ]
+  },
+  "blockchain": {
+    "riskTier": "very-high",
+    "questions": 15,
+    "floor": 15,
+    "meetsFloor": true,
+    "weightTotal": 177,
+    "weightMin": 6,
+    "weightMax": 15,
+    "weightHistogram": {
+      "6": 1,
+      "10": 3,
+      "12": 8,
+      "15": 3
+    },
+    "dimensions": {
+      "Compliance": 5,
+      "Safety": 2,
+      "Governance": 3,
+      "Transparency": 1,
+      "Ethics": 1,
+      "Traceability": 3
+    },
+    "dimensionCount": 6,
+    "largestDimensionShare": 0.333,
+    "refParts": 24,
+    "refPartsByStatus": {
+      "in-force": 12,
+      "unresolved": 10,
+      "unverified": 2
+    },
+    "validatorErrors": [],
+    "ids": [
+      "WLT-BC-1",
+      "WLT-BC-2",
+      "WLT-BC-3",
+      "WLT-BC-4",
+      "WLT-BC-5",
+      "WLT-BC-6",
+      "WLT-BC-7",
+      "WLT-BC-8",
+      "WLT-BC-9",
+      "WLT-BC-10",
+      "WLT-BC-11",
+      "WLT-BC-12",
+      "WLT-BC-13",
+      "WLT-BC-14",
+      "WLT-BC-15"
+    ]
+  }
+}
