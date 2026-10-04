@@ -116,15 +116,24 @@ describe("industry pack audit", () => {
 const DAY_MS = 24 * 60 * 60 * 1000;
 const isoDaysBefore = (days: number) => new Date(NOW - days * DAY_MS).toISOString().slice(0, 10);
 
+/**
+ * The pack as it ships at 8f57ce63: no version, lastReviewed or regulatoryReferences. Built by stripping
+ * those fields so these tests keep meaning the same thing once the registry packs carry them (track S3).
+ */
+function headShapePack() {
+  const { version: _version, lastReviewed: _lastReviewed, regulatoryReferences: _refs, ...rest } = pack() as ReturnType<typeof pack> & PackCurrencyFields;
+  return rest;
+}
+
 function withCurrency(fields: PackCurrencyFields) {
-  return { ...pack(), ...fields };
+  return { ...headShapePack(), ...fields };
 }
 
 const FRESH_REF = { citation: "EU AI Act Annex III point 5(a)", jurisdiction: "EU", url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj", lastReviewed: isoDaysBefore(10), status: "in-force" as const };
 
 describe("industry pack audit — regulatory currency", () => {
   test("a pack without currency fields (HEAD shape) is undated, never current", () => {
-    const c = computePackCurrency(pack(), NOW);
+    const c = computePackCurrency(headShapePack(), NOW);
     expect(c.status).toBe("undated");
     expect(c.missing).toEqual(["version", "lastReviewed", "regulatoryReferences"]);
     expect(c.packLastReviewed).toBeNull();
@@ -183,7 +192,7 @@ describe("industry pack audit — regulatory currency", () => {
   });
 
   test("currency is inside the signed receipt and rendered for the auditor", () => {
-    const audit = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW });
+    const audit = buildIndustryPackAudit({ pack: headShapePack(), responses: responsesAll(3), now: NOW });
     expect(INDUSTRY_PACK_AUDIT_SCHEMA_VERSION).toBe("amc.industry-pack-audit/2");
     expect(audit.schemaVersion).toBe("amc.industry-pack-audit/2");
     expect(audit.currency.status).toBe("undated");
