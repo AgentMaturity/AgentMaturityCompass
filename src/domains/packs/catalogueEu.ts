@@ -221,4 +221,10 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-01",
       note: "Read 2026-10-04: integration into the DSA framework endorsed 13 Feb 2025; effective and auditable from 1 Jul 2025. Replaces the 2022 Code of Practice (eu-disinfo-code).",
     }),
+  verified("eu-ai-content-cop", "Code of Practice on Transparency of AI-generated Content (10 Jun 2026)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content",
+    ["Code of Practice on Transparency of AI-generated Content", "Code of Practice on transparency of AI-generated content"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2026-06-10",
+      note: "Read 2026-10-04: final code published 10 Jun 2026; supports AI Act Art. 50(2), (4) and (5).",
+    }),
 ];
