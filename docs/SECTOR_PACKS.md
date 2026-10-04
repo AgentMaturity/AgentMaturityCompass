@@ -267,7 +267,7 @@ const result = scoreIndustryPack("clinical-trials", responses);
 
 // Station summary
 const summary = getStationSummary("governance");
-// { stationId: "governance", packCount: 5, totalQuestions: 71, frameworks: [...] }
+// { stationId: "governance", packCount, totalQuestions, frameworks: [...] } — counts come from the registry
 ```
 
 ---
