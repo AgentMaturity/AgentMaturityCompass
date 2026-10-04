@@ -1,5 +1,22 @@
 # Track S10 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
 
+## Repair round 1 re-verification (2026-10-04, at 7d6d8a8d)
+
+- The repair commits 30f9103b and 7d6d8a8d were already on the branch. The orchestrator's return still pointed at 1b529a2a, so this round re-verified them. No code or doc changed; only this receipt did.
+- Focused tests: 4 files, 75 passed, 0 skipped (regulatoryCalendar, industryGuides, domainDocs, regulatoryClaimsHonesty). `--check` exit 0. `pnpm typecheck` exit 0. Banned-language grep: no matches.
+- Fresh clone `scratchpad/s10/fresh-7d6d8a8d`, no dist/: 2 files, 70 passed; `--check` exit 0; clean.
+- Header: `5 frameworks, 18 key requirements, 12 EU AI Act risk-matrix rows; 5 of 5 frameworks are unverified. Curated milestones: 12`.
+- Mutations re-run, each RED then restored green:
+  - retrievedAt guard off: 2 failed.
+  - Official-host guard off: 4 failed.
+  - Precedence off: 1 failed.
+  - Risk-matrix count dropped from the header: 3 failed.
+  - Sidecar NIST URL set to example.com: `--check` exit 2.
+- Sources re-read 2026-10-04:
+  - EC AI Act Service Desk Art. 113 confirms all five sidecar dates. It names the Digital Omnibus on AI and shows OJ:L_202601744. That reference was seen only through the summariser, so the OJ citation stays marked unverified.
+  - leg.colorado.gov SB25B-004 confirms June 30, 2026, signed August 28, 2025.
+- Still for root: whether the header must name a commit (see Fix 2 below).
+
 ## Repair round 1 (2026-10-03, after the monitor's REJECTED verdict on 1b529a2a)
 
 - Status: **COMPLETE** for both required fixes. One item still needs a root ruling: whether the calendar header must name a commit (see fix 2).

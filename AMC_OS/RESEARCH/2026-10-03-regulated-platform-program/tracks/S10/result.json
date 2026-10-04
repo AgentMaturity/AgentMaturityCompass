@@ -52,7 +52,7 @@
    "result": "exit 1; its only failures are 'dist/cli.js is missing' and 'dist/api/index.js is missing' because nothing was built. This track changes no src file."
   }
  ],
- "typecheck": "pnpm typecheck: exit 0, no errors. pnpm typecheck:tests: exit 0, 0 'error TS' lines. Run at 3282678f, Darwin arm64, Node v25.5.0.",
+ "typecheck": "pnpm typecheck exit 0 at 7d6d8a8d (2026-10-04, Darwin arm64, Node v25.5.0). No src file is changed by this track.",
  "acceptanceSelfReport": [
   {
    "check": "Both focused test files pass",
@@ -138,8 +138,8 @@
   "Full suite and release gate (forbidden by the program rules)",
   "Web or official-source verification: this track asserts no regulatory date, scope or obligation. The calendar copies the register, and the guides quote framework strings found in source."
  ],
- "receiptPath": "NOT WRITTEN — harness refused writing AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/report.md ('Subagents should return findings as text, not write report files'); receipt content is in notesForMonitor and the other fields of this result",
- "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, tsx 4.23.12. Worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-10, base 8f57ce63, head 3282678f. Fresh clone: /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/s10/fresh-3282678f. Date 2026-10-03.",
+ "receiptPath": "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/report.md (and result.json)",
+ "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, tsx 4.23.12. Worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-10, base 8f57ce63. Repair re-verification 2026-10-04 at 7d6d8a8d; fresh clone /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/s10/fresh-7d6d8a8d (no dist/).",
  "blockers": [
   "The receipt (report.md and result.json under AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/) was not written or committed. The harness Write tool refused report files for subagents, and I did not bypass it through Bash. All receipt content is in this result. If the root session wants the receipt on disk, it can write it from this data.",
   "No technical blocker for the code or docs acceptance."
@@ -232,5 +232,28 @@
    "primary OJ text; EU amending act OJ citation unverified",
    "DPDP Rules commencement phases"
   ]
- }
+ },
+ "repairRound1Reverify": {
+  "date": "2026-10-04",
+  "at": "7d6d8a8db580cd122e6c3975bd463d9864539e70",
+  "note": "The repair round 1 commits 30f9103b and 7d6d8a8d already existed in the worktree; the orchestrator's workers/S10.json still pointed at 1b529a2a. This round re-verified them and changed no code or docs.",
+  "checks": [
+   "pnpm vitest run tests/regulatoryCalendar.test.ts tests/industryGuides.test.ts tests/domainDocs.test.ts tests/regulatoryClaimsHonesty.test.ts: 4 files, 75 passed, 0 skipped",
+   "node scripts/gen-regulatory-calendar.mjs --check: exit 0; header states 5 frameworks, 18 key requirements, 12 EU AI Act risk-matrix rows, 12 curated milestones",
+   "fresh clone at 7d6d8a8d, pnpm install --frozen-lockfile --prefer-offline, no dist/: 2 files 70 passed; --check exit 0; git status clean",
+   "pnpm typecheck exit 0; banned-language grep over docs/industries and the calendar exit 1 (no matches)",
+   "line counts: gen-regulatory-calendar.mjs 98 (<=150), lib/regulatoryCalendarRender.mjs 200 (<=300)",
+   "WebFetch https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113 (2026-10-04): 2 Feb 2025, 2 Aug 2025, 2 Aug 2026, 2 Dec 2027 (Art 6(2)/Annex III), 2 Aug 2028 (Art 6(1)/Annex I) match the sidecar; the page names the Digital Omnibus on AI and shows OJ:L_202601744 (seen only through the summariser, so the sidecar keeps the OJ citation marked unverified)",
+   "WebFetch https://leg.colorado.gov/bills/sb25b-004 (2026-10-04): new date June 30, 2026, signed August 28, 2025, matching the sidecar"
+  ],
+  "mutations": [
+   "retrievedAt guard disabled: 2 failed / 21 passed; restored 23 passed",
+   "official-host guard disabled: 4 failed (incl. CLI --milestones exit 2); restored",
+   "superseded-by-source precedence disabled: 1 failed / 22 passed; restored",
+   "risk-matrix count removed from header: 3 failed / 20 passed; restored",
+   "sidecar NIST URL -> https://example.com/ai-rmf: --check exit 2 naming milestone #10; restored"
+  ],
+  "rootRulingNeeded": "Whether the calendar header must name a commit. Not changed: tests/regulatoryCalendar.test.ts asserts no 40-hex SHA so --check is deterministic; a sha256 of src/compliance/globalRegulatory.ts is the deterministic alternative if root wants a version marker."
+ },
+ "headAfterNote": "headAfter is the last code commit (30f9103b). The receipt commits 7d6d8a8d and the 2026-10-04 re-verification commit on top of it change only this directory."
 }
