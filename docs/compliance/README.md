@@ -10,7 +10,8 @@ These are dated snapshots produced by `amc compliance report` in February and
 March 2026, before the 2026-10-03 mapping changes (new frameworks, corrected
 assurance pack ids, UNKNOWN earning no credit). Regenerate them rather than
 editing by hand; the numbers inside describe the run that produced them, not
-the current code.
+the current code. Each report opens with a line giving its window end date and
+age.
 
 | Framework id | File |
 | --- | --- |
@@ -26,7 +27,7 @@ the current code.
 | PCI_DSS | [compliance-pci_dss.md](./compliance-pci_dss.md) |
 | SOC2 | [compliance-soc2.md](./compliance-soc2.md) |
 | SOX | [compliance-sox.md](./compliance-sox.md) |
-| DORA, NIS2, ONC_HTI_1 | No report generated yet. Mappings and sources: [../COMPLIANCE_MAPS.md](../COMPLIANCE_MAPS.md) |
+| DORA, NIS2, HHS_HTI_1, NIST_AI_600_1, CO_AI_ACT, TX_TRAIGA, CA_AI_LAWS, KR_AI_BASIC_ACT | No report generated yet. Mappings and sources: [../COMPLIANCE_MAPS.md](../COMPLIANCE_MAPS.md) |
 
 ## Hand-written companions
 

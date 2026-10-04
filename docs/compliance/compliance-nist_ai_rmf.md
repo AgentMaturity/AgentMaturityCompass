@@ -1,5 +1,7 @@
 # AMC Compliance Report (NIST_AI_RMF)
 
+> **Snapshot.** Evidence window ended 2026-03-15, 203 days before 2026-10-04 — older than the 180-day review window. Generated before the 2026-10-03 mapping changes; regenerate with `amc comply report` before relying on it. See [README.md](./README.md).
+
 - Agent: default
 - Window: 2026-02-13T08:49:24.102Z -> 2026-03-15T08:49:24.102Z
 - Config trusted: NO (compliance maps signature missing)
