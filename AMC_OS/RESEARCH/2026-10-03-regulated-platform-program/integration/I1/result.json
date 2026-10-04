@@ -1,0 +1,28 @@
+{
+  "id": "I1",
+  "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+  "environment": "Darwin arm64, Node v25.5.0, 2026-10-04, worktree /Users/sid/AgentMaturityCompass/.claude/worktrees/wf_bea95acb-47c-1",
+  "rootCause": "S10 rendered docs/REGULATORY_CALENDAR.md and derived docs/industries/*.md from pre-merge S3/S4/S5 source; the merge changed pack question counts, the register, normalizeFrameworkName, hipaaCompliance validators and line numbers.",
+  "derivation": "S10 left no script in tracks/S10; its scratch builder (scratchpad/s10/build-guides.mts, 243 lines) was copied here as build-guides.mts. Run unchanged at 726be0ca, its output differed from the committed guides only in derived data (counts, resolution lists, citation line numbers), so the committed guides were its output. Only the COMMIT/ENV constants and the header comment were changed before the final run.",
+  "commits": [
+    "8b3c6426 docs: regenerate the regulatory calendar from the merged register",
+    "2cacf8b6 docs: re-derive the station guides from the merged packs and registers"
+  ],
+  "commands": [
+    {"command": "pnpm vitest run tests/industryGuides.test.ts tests/regulatoryCalendar.test.ts (before)", "result": "19 failed: 17 industryGuides, 2 regulatoryCalendar"},
+    {"command": "node scripts/gen-regulatory-calendar.mjs", "result": "exit 0, wrote docs/REGULATORY_CALENDAR.md"},
+    {"command": "node_modules/.bin/tsx AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I1/build-guides.mts", "result": "health 9/151, education 5/75, environment 6/91, mobility 6/90, governance 5/75, technology 5/75, wealth 5/75"},
+    {"command": "pnpm vitest run tests/industryGuides.test.ts tests/regulatoryCalendar.test.ts (after)", "result": "2 files, 70 passed, 0 skipped"},
+    {"command": "node scripts/gen-regulatory-calendar.mjs --check", "result": "exit 0"},
+    {"command": "mutation: education.md C7 :2490 -> :2491 and skills-training 15 -> 14", "result": "2 failed (sector-pack table, citation resolution); restored with git checkout"},
+    {"command": "banned-language grep over docs/industries and the calendar", "result": "exit 1, no matches"},
+    {"command": "pnpm typecheck:tests", "result": "exit 0"}
+  ],
+  "assertionChanges": [],
+  "notExercised": [
+    "full suite and release gate (forbidden)",
+    "pnpm build / dist fallback",
+    "fresh clone of the result",
+    "no regulatory source was consulted; the guides quote source strings only"
+  ]
+}
