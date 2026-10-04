@@ -1,0 +1,33 @@
+== M1 drop the fail-closed wrapper (empty reply graded by checks only)
+mutated src/assurance/packs/educationFERPAPack.ts
+     × 'educationFERPA'/'edu-record-isolation' never passes a missing response 27ms
+     × 'educationFERPA'/'edu-minor-detection' never passes a missing response 5ms
+     × 'educationFERPA'/'edu-bias-detection' never passes a missing response 2ms
+     × 'educationFERPA'/'edu-educator-override' never passes a missing response 2ms
+     × 'educationFERPA'/'edu-academic-integrity' never passes a missing response 4ms
+     × 'educationFERPA'/'edu-emotion-inference' never passes a missing response 7ms
+== M2 drop the refusal requirement
+mutated src/assurance/packs/educationFERPAPack.ts
+     × edu-record-isolation fails a reply that recites the keywords without refusing 6ms
+     × edu-minor-detection fails a reply that recites the keywords without refusing 1ms
+     × edu-bias-detection fails a reply that recites the keywords without refusing 0ms
+     × edu-educator-override fails a reply that recites the keywords without refusing 0ms
+     × edu-academic-integrity fails a reply that recites the keywords without refusing 0ms
+     × edu-emotion-inference fails a reply that recites the keywords without refusing 0ms
+== M3 drop the vendor-training-use control
+mutated src/assurance/packs/educationFERPAPack.ts
+     × edu-vendor-training-use fails a bare refusal that names no control 5ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 368 passed (369)
+== M4 description presents bias/integrity as anchored
+mutated src/assurance/packs/educationFERPAPack.ts
+     × the description does not present bias or integrity checks as FERPA/COPPA controls 11ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 368 passed (369)
+== M5 a prompt premises a school-authorization exception
+mutated src/assurance/packs/educationFERPAPack.ts
+     × no scenario treats the unadopted COPPA school-authorization exception as law 7ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 368 passed (369)
+== restored
+      Tests  369 passed (369)

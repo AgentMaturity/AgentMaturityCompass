@@ -1,0 +1,61 @@
+import json
+OUT = '/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-3/AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/'
+r = {
+ "track": "round-2 content apply, education station",
+ "startHead": "67d73223897008ca4ed8baf81c970020b4bf944d",
+ "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-3",
+ "branch": "worktree-wf_b05b1ca6-169-3",
+ "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; pnpm install --frozen-lockfile --prefer-offline in the worktree; no build",
+ "boundary": "Source qualification in the worktree only. No fresh clone, no package/platform run, nothing deployed or pushed. Focused tests only.",
+ "counts": {
+  "actions": {"keep": 36, "rewrite": 27, "merge": 5, "drop": 4, "add": 13, "split": 4, "headOnlyKept": 3},
+  "renamed": {"EDU-ST-15": "EDU-ST-16", "EDU-DA-14": "EDU-DA-16"},
+  "questionsPerPack": {"k12-pm3": [15, 19], "higher-education": [15, 18], "skills-training": [15, 15], "specialized-education": [15, 15], "differently-abled": [15, 16]},
+  "stationQuestions": [75, 83], "stationWeightTotal": [882, 978], "floor": 15, "floorHolds": True,
+  "singleInstrument": {"multiInstrumentBefore": 39, "multiInstrumentAfter": 0, "narrowed": 27, "split": 4},
+  "refParts": {"before": {"total": 122, "in-force": 53, "unverified": 38, "unresolved": 31}, "after": {"total": 101, "in-force": 72, "unverified": 22, "unresolved": 7}},
+  "catalogue": [267, 273],
+  "deepQuestionsAdded": 6, "deepProposedDropped": 2,
+  "assuranceScenarios": [5, 10]
+ },
+ "balance": "see questions-applied.json measurements (balanceBefore/balanceAfter per pack)",
+ "catalogueAdded": ["us-ppra (verified, govinfo 34 CFR 98.4, 2026-10-04)", "us-section-504 (verified, govinfo 34 CFR 104.44, 2026-10-04)", "us-ca-sopipa (unverified; leginfo not on OFFICIAL_SOURCE_HOSTS)", "us-co-sb26-189 (unverified; leg.colorado.gov not on OFFICIAL_SOURCE_HOSTS)", "etsi-en-301-549 (verified, AccessibleEU page of 2026-09-07, read 2026-10-04)", "unesco-genai-2023 (unverified; unesco.org not on OFFICIAL_SOURCE_HOSTS)"],
+ "catalogueDeclined": ["iso-29993: iso.org 403, no official source read", "us-ftc-edtech-2022: no longer cited after EDU-K12-7 narrowing", "udl alias and us-ferpa alias: edits to existing entries, catalogue is append-only in this pass"],
+ "refuterFixes": [
+  {"fix": "Resolve the floor (15)", "applied": True, "note": "15 is committed at 67d73223. HEAD already held EDU-ST-15/DA-14/DA-15 (20b69fb4); specialized-education needed +2, met by splits EDU-SE-17 and EDU-SE-18. summary.md and the EDU-SE-16 rationale are read-only inputs; governing value recorded here."},
+  {"fix": "Renumber deep questions to education-deep-11.. and drop the two duplicates", "applied": True, "note": "11..16 appended after education-deep-10 in src/domains/deep/education.ts; proposed 07 (16 CFR 312.10 = deep-10) and 13 (Annex III 3(d) = deep-07) dropped. eCFR source URLs replaced by the govinfo pages re-read 2026-10-04."},
+  {"fix": "Write summary.md to disk", "applied": False, "note": "Input file, read-only for this track; it is now on disk (backfilled by the root session) with the 18-in-17 list."},
+  {"fix": "EDU-K12-7 ftc.gov source verified:false; move ISO note out of EDU-ST-4 ref", "applied": True, "note": "FTC source recorded verified:false and the citation dropped by the single-instrument rule; EDU-ST-4 ref is 'ISO 21001' and EDU-ST-13 got the same fix ('ISO 29993:2017')."},
+  {"fix": "Single-instrument policy", "applied": True, "note": "Applied to all 31 flagged questions (12 author-written, 19 inherited keeps): 27 narrowed, 4 split. Guarded by tests/industryPacksEducation.test.ts."}
+ ],
+ "assuranceAnchors": {
+  "applied": ["5 new scenarios with refusal + anchor-specific control checks", "refusal now required on all 10 scenarios", "description names each anchor; bias and integrity have none", "guard test: no scenario premises the unadopted COPPA school-authorization exception"],
+  "notApplied": ["retireChecks 1-3 on the original five scenarios (keyword groups and priming suffix kept: removing a required group lets replies pass that fail today)", "manifest anchors: industryPackManifest.ts outside the write list -> out-of-scope-manifest-anchors.patch"]
+ },
+ "mutations": [
+  {"guard": "single-instrument test", "mutation": "EDU-K12-8 ref back to 'ADA Title II 28 CFR §35.200; WCAG 2.1 AA'", "red": "EDU-K12-8 cites exactly one instrument failed", "restoredGreen": "85/85"},
+  {"guard": "no-working-note test", "mutation": "EDU-ST-4 ref with '(current edition unconfirmed as iso.org was unreachable)'", "red": "regulatoryRef strings carry citations failed (first attempt hit regulatoryBasis and survived; retargeted)", "restoredGreen": "85/85"},
+  {"guard": "deep official-host check (relied on)", "mutation": "education-deep-14 url -> ecfr.gov", "red": "official https source URL test failed", "restoredGreen": "9/9"},
+  {"guard": "deep distinct-provision check (relied on)", "mutation": "education-deep-15 section = deep-08's", "red": "distinct provisions test failed", "restoredGreen": "9/9"},
+  {"guard": "fail-closed wrapper", "mutation": "validate without gradeIndustryEvidence (empty reply)", "red": "never passes a missing response failed for every educationFERPA scenario", "restoredGreen": "369/369"},
+  {"guard": "refusal requirement", "mutation": "REFUSAL removed", "red": "recites-keywords-without-refusing failed", "restoredGreen": "369/369"},
+  {"guard": "vendor-training-use control", "mutation": "control regex matches anything", "red": "bare refusal test failed", "restoredGreen": "369/369"},
+  {"guard": "description anchor honesty", "mutation": "description says 'under FERPA/COPPA'", "red": "description test failed", "restoredGreen": "369/369"},
+  {"guard": "no school-authorization premise", "mutation": "premise added to a prompt", "red": "school-authorization test failed", "restoredGreen": "369/369"}
+ ],
+ "tests": {
+  "focusedSet": "tests/industryPack*.test.ts tests/industryPacks*.test.ts tests/regulatoryCurrency.test.ts tests/deepIndustryPacksStations.test.ts tests/educationFERPAPack.test.ts tests/assurance/industryPack*.test.ts tests/industryAssuranceFixtures.test.ts tests/domainRegistry.test.ts",
+  "result": "19 files: 616 passed, 1 failed (industryPackDepthFloor 'docs/DOMAIN_PACKS.md sector-pack counts': docs out of scope, patch out-of-scope-domain-packs-counts.patch)",
+  "baselineAt67d73223": "16 files, 488 passed (subset without the new files)",
+  "alsoRed": "tests/publicQuestionCountDrift.test.ts: station page counts (website out of scope, patch out-of-scope-station-education-counts.patch); its whitepaper assertion was already RED at 20b69fb4",
+  "typecheck": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0",
+  "splitEqualitySnapshots": "industry-packs.json, deep-industry-questions.json, deep-industry-pack-stats.json regenerated by snapshot-education.mts, which refuses to write if any non-education entry changes"
+ },
+ "unverified": [
+  "EDU-SE-17 cites Directive (EU) 2016/2102 without article numbers: the EUR-Lex text returned an empty body; the Commission digital-strategy page was read",
+  "Not read in this pass, refs stay unverified/unresolved: US Code statutes, GDPR articles, CRPD, ISO 21001/29993/9241-171, 45 CFR 46, OSHA 1910.132, Title VI, UNESCO/ILO/CEDEFOP documents, Europass DCI",
+  "Author-verified items not re-read here: AI Act Arts. 4/13/26/27/50/86, 16 CFR 312.5, 34 CFR 99.x, UDL 3.0, Cal. BPC 22584, Colorado SB26-189"
+ ]
+}
+json.dump(r, open(OUT + 'result.json', 'w'), indent=1, ensure_ascii=False)
+print('ok')
