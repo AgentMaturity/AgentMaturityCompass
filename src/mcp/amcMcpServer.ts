@@ -33,6 +33,7 @@ import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "..
 import { openLedger } from "../ledger/ledger.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { resolveAgentId } from "../fleet/paths.js";
+import { registerIndustryPackTools } from "./industryPackTools.js";
 
 // ---------------------------------------------------------------------------
 // Simple in-process rate limiter
@@ -694,6 +695,8 @@ export async function startMcpServer(workspace?: string): Promise<void> {
       }
     }
   );
+
+  registerIndustryPackTools(server, { beforeCall: enforceRateLimit });
 
   // -------------------------------------------------------------------------
   // Resource: amc://agent/{agentId}
