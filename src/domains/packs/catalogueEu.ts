@@ -220,4 +220,33 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
     ["Directive (EU) 2024/825"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", milestones: milestones(["2026-09-27", "Member State measures apply (Art. 4(1)), incl. Annex I points 2a and 4a of Directive 2005/29/EC"]),
     note: "EUR-Lex CELEX HTML read 2026-10-04 (Annex I points 2a, 4a; Art. 4(1)). Entry-into-force date not recorded here." }),
+  verified("eu-gsr", "Regulation (EU) 2019/2144 (General Safety Regulation for motor vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32019R2144", ["Regulation (EU) 2019/2144", "EU General Safety Regulation"], {
+      milestones: milestones(["2026-07-07", "Advanced safety requirements apply to all new passenger cars and vans (Commission news of 2026-07-08)"]),
+      note: "Arts. 6 and 11 read; entry-into-force date not recorded here. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-ads-ir", "Commission Implementing Regulation (EU) 2022/1426 (automated driving systems of fully automated vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32022R1426", ["Implementing Regulation (EU) 2022/1426", "Commission Implementing Regulation (EU) 2022/1426"], {
+      note: "Original OJ text read (Annex III Part 5 in-service reporting, points 2.1-2.2); a consolidated version (2026-03-24) was not read.",
+    }),
+  verified("eu-efti", "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32020R1056", ["Regulation (EU) 2020/1056", "eFTI Regulation"], {
+      effectiveDate: "2024-08-21",
+      milestones: milestones(["2027-07-09", "Competent authorities must accept regulatory information made available through certified eFTI platforms (Art. 5(1); date from the Commission eFTI page, transport.ec.europa.eu)"]),
+      note: "Arts. 4, 5, 9 and 18 read. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-cpr-2024", "Regulation (EU) 2024/3110 (Construction Products Regulation)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32024R3110", ["Regulation (EU) 2024/3110", "EU Construction Products Regulation 2024/3110"], {
+      effectiveDate: "2026-01-08",
+      milestones: milestones(["2025-01-07", "Arts. 1-4 and the other provisions listed in Art. 96 apply"], ["2027-01-08", "Art. 92 applies (Art. 96)"]),
+      note: "The construction digital product passport (Arts. 75-79) depends on Commission delegated acts under Art. 75(1). Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
+  verified("eu-gdp-guidelines", "Guidelines of 5 November 2013 on Good Distribution Practice of medicinal products for human use (2013/C 343/01)", "EU", "guidance", "in-force",
+    "https://health.ec.europa.eu/system/files/2016-11/2013_c343_01_en_0.pdf", ["Guidelines on Good Distribution Practice 2013/C 343/01", "EU GDP Guidelines"], {
+      note: "Commission PDF of OJ C 343/1 (23.11.2013) read; Chapter 9 (transportation).",
+    }),
+  verified("edpb-gl-4-2019", "EDPB Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0", "EU", "guidance", "in-force",
+    "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-42019-article-25-data-protection-design-and_en", ["EDPB Guidelines 4/2019"], {
+      note: "Version 2.0 adopted 20 October 2020 (EDPB page read).",
+    }),
 ];

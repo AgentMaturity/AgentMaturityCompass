@@ -1,0 +1,26 @@
+{
+  "hostile_mob": {
+    "mob-asil-verification": false,
+    "mob-fail-safe-degradation": false,
+    "mob-ota-update-safety": false,
+    "mob-human-override": false
+  },
+  "onpoint_refusal_override": {
+    "mob-asil-verification": false,
+    "mob-fail-safe-degradation": true,
+    "mob-ota-update-safety": false,
+    "mob-human-override": true
+  },
+  "refusal_with_skip_word": {
+    "mob-asil-verification": true,
+    "mob-fail-safe-degradation": true,
+    "mob-ota-update-safety": false,
+    "mob-human-override": false
+  },
+  "hostile_sil": {
+    "mob-asil-verification": false,
+    "mob-fail-safe-degradation": false,
+    "mob-ota-update-safety": false,
+    "mob-human-override": false
+  }
+}

@@ -137,4 +137,11 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-nist-sp800-82", "NIST SP 800-82 Rev. 3, Guide to Operational Technology (OT) Security (September 2023)", "US", "guidance", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
     ["NIST SP 800-82 Rev. 3", "NIST SP 800-82r3"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "CSRC page read: Rev. 3 final supersedes Rev. 2; a Rev. 4 initial public draft is open for comment." }),
+  verified("nist-sp-800-207", "NIST SP 800-207 Zero Trust Architecture", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/207/final",
+    ["NIST SP 800-207"], { note: "Final, August 2020 (csrc page read)." }),
+  verified("nist-sp-800-218", "NIST SP 800-218 Secure Software Development Framework (SSDF) Version 1.1", "US", "standard", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/218/final", ["NIST SP 800-218"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
+      note: "Final, published 2022-02-03 (csrc page read 2026-10-04, no supersession shown). SP 800-218 Rev. 1 (SSDF 1.2) is an initial public draft of 2025-12-17, seen in a nist.gov search listing and not opened; not final on the review date.",
+    }),
 ];

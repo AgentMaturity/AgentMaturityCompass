@@ -7640,6 +7640,217 @@
   },
   {
     "evaluationCriteria": [
+      "Vehicles and features in SGO scope identified",
+      "Crash-data capture covers the fields the order requires",
+      "Reporting deadlines tracked per crash",
+      "Reports reconcile to retained vehicle data"
+    ],
+    "evidenceTypes": [
+      "sgo_scope_record",
+      "crash_report",
+      "filing_log"
+    ],
+    "id": "mobility-deep-11",
+    "industry": "mobility",
+    "levels": {
+      "1": "No SGO scope determination",
+      "2": "Scope known; crash data collected ad hoc",
+      "3": "Crash data captured for every in-scope crash and reports filed on time",
+      "4": "Filing timeliness monitored and late filings root-caused",
+      "5": "Reports regenerate from retained vehicle data and are audited"
+    },
+    "packIds": [
+      "privacy-security-mobility"
+    ],
+    "question": "If the agent is part of an ADS or Level 2 ADAS deployed in the US, does the operator capture the crash data the Third Amended Standing General Order requires and file reports within the order's timeframes?",
+    "regulation": "NHTSA Standing General Order 2021-01 (Third Amended)",
+    "section": "Crash reporting for ADS and Level 2 ADAS (amended 2025-04-24; reporting period from 2025-06-16)",
+    "source": {
+      "note": "Notice read: the SGO was amended on 2025-04-24 with a reporting period from 2025-06-16, and NHTSA is developing a rule to codify it. The order's own reporting timeframes are in the NHTSA PDF, which was not read (nhtsa.gov returned 403).",
+      "retrievedAt": "2026-10-04",
+      "title": "NHTSA, AV Framework Updates and Request for Comments on Interim Guidance, 91 FR 48485 (2026-07-31), FR Doc 2026-15483 (govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2026-07-31/html/2026-15483.htm",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
+      "Agent systems in the Cybersecurity Assessment",
+      "Cybersecurity Plan names controls for those systems",
+      "Cybersecurity Officer designated",
+      "Reportable cyber incidents routed to the National Response Center"
+    ],
+    "evidenceTypes": [
+      "cyber_assessment",
+      "cybersecurity_plan",
+      "nrc_report_log"
+    ],
+    "id": "mobility-deep-12",
+    "industry": "mobility",
+    "levels": {
+      "1": "Agent systems outside the facility's cyber programme",
+      "2": "Systems listed but no controls in the plan",
+      "3": "Assessment and plan cover the agent's systems and the NRC reporting path is documented",
+      "4": "Reporting path exercised in a drill",
+      "5": "Plan updated after each drill or incident with recorded changes"
+    },
+    "packIds": [
+      "sustainable-ports"
+    ],
+    "question": "For a US-regulated facility, are the systems the agent operates inside the facility's Cybersecurity Assessment and Cybersecurity Plan (due for Coast Guard review within 24 months of 2025-07-16), and does the agent route reportable cyber incidents to the National Response Center?",
+    "regulation": "33 CFR Part 101 Subpart F (USCG, Cybersecurity in the Marine Transportation System)",
+    "section": "§101.650 cybersecurity measures; §101.655 submission and approval of the Cybersecurity Plan; reportable cyber incidents to the National Response Center; effective 2025-07-16",
+    "source": {
+      "retrievedAt": "2026-10-04",
+      "title": "USCG final rule 'Cybersecurity in the Marine Transportation System', 90 FR 6298 (2025-01-17), FR Doc 2025-00708 (govinfo)",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-17/html/2025-00708.htm",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
+      "Covered berths identified",
+      "Connection status recorded per call",
+      "Exceptions recorded with reason",
+      "Records available to the ship operator and verifier"
+    ],
+    "evidenceTypes": [
+      "berth_register",
+      "ops_connection_log",
+      "exception_record"
+    ],
+    "id": "mobility-deep-13",
+    "industry": "mobility",
+    "levels": {
+      "1": "No record of onshore power use",
+      "2": "Usage recorded for some calls",
+      "3": "Connection status and exceptions recorded for every call at covered berths",
+      "4": "Records reconciled with metered supply",
+      "5": "Records shared with operators and verifiers through a controlled interface"
+    },
+    "packIds": [
+      "sustainable-ports"
+    ],
+    "question": "Does the port agent record, per call from 1 January 2030, whether a ship moored at a covered quayside connected to onshore power supply or used an allowed alternative, so the ship operator's FuelEU evidence and any exception are traceable?",
+    "regulation": "Regulation (EU) 2023/1805 (FuelEU Maritime)",
+    "section": "Art. 6(1): zero-emission energy at berth from 1 January 2030 in ports covered by Art. 9 of Regulation (EU) 2023/1804",
+    "source": {
+      "retrievedAt": "2026-10-03",
+      "title": "Regulation (EU) 2023/1805 (FuelEU Maritime), Art. 6 zero-emission at berth (OJ text)",
+      "url": "https://publications.europa.eu/resource/celex/32023R1805",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
+      "Driver-monitoring data sources identified",
+      "No continuous recording or retention beyond purpose",
+      "No third-party access",
+      "Deletion after closed-loop use evidenced"
+    ],
+    "evidenceTypes": [
+      "data_flow_map",
+      "retention_config",
+      "deletion_test"
+    ],
+    "id": "mobility-deep-14",
+    "industry": "mobility",
+    "levels": {
+      "1": "Driver-monitoring data stored or exported freely",
+      "2": "Retention limited by policy only",
+      "3": "Configuration enforces closed-loop use with no export path",
+      "4": "Deletion verified by test",
+      "5": "Independent review confirms no retention or export path"
+    },
+    "packIds": [
+      "privacy-security-mobility"
+    ],
+    "question": "Where the agent processes driver-monitoring data from drowsiness or distraction warning systems, does it avoid continuous recording or retention beyond what the closed-loop purpose needs, and never make those data available to third parties?",
+    "regulation": "Regulation (EU) 2019/2144 (General Safety Regulation)",
+    "section": "Art. 6(3): driver drowsiness, attention and distraction warning data stay in a closed loop",
+    "source": {
+      "retrievedAt": "2026-10-03",
+      "title": "Regulation (EU) 2019/2144 (General Safety Regulation), Arts. 6 and 11 (OJ text)",
+      "url": "https://publications.europa.eu/resource/celex/32019R2144",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
+      "Contract states notice period of at most two months",
+      "Contract states retrieval period of at least 30 days",
+      "Export tooling covers all exportable data",
+      "Retrieval tested within the period"
+    ],
+    "evidenceTypes": [
+      "contract_clause",
+      "export_runbook",
+      "retrieval_test"
+    ],
+    "id": "mobility-deep-15",
+    "industry": "mobility",
+    "levels": {
+      "1": "No switching terms in contract",
+      "2": "Terms present but periods not stated",
+      "3": "Periods stated as required and export tooling documented",
+      "4": "Retrieval test completed within the period",
+      "5": "Retrieval tested on each major release with results retained"
+    },
+    "packIds": [
+      "virtual-infrastructure"
+    ],
+    "question": "Do the agent's cloud contracts and runbooks state a notice period of at most two months to initiate switching and a data-retrieval period of at least 30 calendar days, and is retrieval tested against those periods?",
+    "regulation": "Regulation (EU) 2023/2854 (Data Act)",
+    "section": "Art. 25(2): switching contract terms (notice of at most two months; data retrieval for at least 30 calendar days)",
+    "source": {
+      "retrievedAt": "2026-10-03",
+      "title": "Regulation (EU) 2023/2854 (Data Act), Arts. 23 and 25 (OJ text)",
+      "url": "https://publications.europa.eu/resource/celex/32023R2854",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
+      "Scope decision recorded per product",
+      "Vehicle products routed to type-approval cybersecurity requirements",
+      "Marine equipment routed to its regime",
+      "In-scope products tracked to CRA dates (11 September 2026 reporting; 11 December 2027 general)"
+    ],
+    "evidenceTypes": [
+      "scope_decision",
+      "product_register",
+      "regime_mapping"
+    ],
+    "id": "mobility-deep-16",
+    "industry": "mobility",
+    "levels": {
+      "1": "CRA applied or ignored with no scope analysis",
+      "2": "Scope analysed informally",
+      "3": "Scope decision recorded per product with the legal basis",
+      "4": "Scope decisions reviewed on product change",
+      "5": "Scope decisions audited and reconciled with the product register"
+    },
+    "packIds": [
+      "privacy-security-mobility"
+    ],
+    "question": "Before applying CRA obligations to a mobility product, does the operator record whether it is a type-approved vehicle product (Regulation (EU) 2019/2144) or marine equipment (Directive 2014/90/EU), and route those to their sectoral cybersecurity regime instead?",
+    "regulation": "Regulation (EU) 2024/2847 (Cyber Resilience Act)",
+    "section": "Art. 2(2)(c) and 2(4): products under Regulation (EU) 2019/2144 and equipment under Directive 2014/90/EU are outside the CRA",
+    "source": {
+      "retrievedAt": "2026-10-03",
+      "title": "Regulation (EU) 2024/2847 (Cyber Resilience Act), Arts. 2, 13, 14, 32 and 71 (OJ text)",
+      "url": "https://publications.europa.eu/resource/celex/32024R2847",
+      "verified": true
+    },
+    "station": "mobility"
+  },
+  {
+    "evaluationCriteria": [
       "Disclosure shown at first interaction",
       "Disclosure persists across channels",
       "Exceptions justified",

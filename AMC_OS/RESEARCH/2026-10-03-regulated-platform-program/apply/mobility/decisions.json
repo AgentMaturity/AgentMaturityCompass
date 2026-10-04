@@ -1,0 +1,53 @@
+{
+  "refuterFixes": [
+    {"fix": "Rebase onto S3: review the six S3 questions the author never saw and renumber colliding adds (or merge where S3 already carries the obligation)", "applied": true,
+     "note": "HEAD 67d73223 carries S3's 90 questions. Kept unchanged: MOB-SC-15 (GDPR Art. 35(3)(c)), MOB-SP-15 (PSR Art. 13), MOB-VI-15 (NIS2 Art. 23), MOB-PS-14 (GDPR Art. 32(1)), MOB-F3W-15 (GDPR Art. 28). Merged: S3 MOB-PS-15 and the author's CRA Art. 14 add are one obligation; the author's text (24 h / 72 h / final report, read from the OJ) replaces S3's under MOB-PS-15. Renumbered: SC-15->SC-16, SC-16->SC-17, SP-15->SP-16, VI-15->VI-16, PS-14->PS-17, F3W-15->F3W-16."},
+    {"fix": "Meet PACK_QUESTION_FLOOR = 15 in every pack (orchestrator decision)", "applied": true,
+     "note": "After the author's actions plus S3's kept questions the packs stood at 14/14/13/14/14/15 (SC/SP/RE/VI/PS/F3W). Filled without new unsourced content: four compounds split into one instrument each (SC-2 -> AI Act Art. 5 + new SC-18 GDPR Art. 6; RE-4 -> GRESB + new RE-20 SFDR Arts. 8-9; RE-7 -> IFRS S2 + new RE-21 Climate DA Annex II; PS-6 -> NIST CSF 2.0 RS + new PS-18 NIS2 Art. 23(4)), VI-2 split per the refuter (new VI-17 DORA Arts. 11-12), and MOB-SP-17 added for automated terminal machinery (Machinery Regulation Annex III 1.2.1 / 3.2.4, the digest's EU-MACHINERY-2023-1230 recommendation for sustainable-ports; OJ text read by the station researcher). Result 15/15/15/15/15/15. MOB-SP-17 is close to MOB-F3W-13 in wording (different pack, different machinery)."},
+    {"fix": "Renumber deep questions to mobility-deep-11..17 (S4 has 10; result 17)", "applied": true,
+     "note": "Applied as 11..16; result 16. Author deep-07 (IMO MASS Code, MSC.595(111)) not applied: its only source is on imo.org, which is not in tests/deepIndustryPacksStations.test.ts OFFICIAL_HOST, and widening that allowlist to pass is out of rule. Author deep-06 (NHTSA SGO) and deep-08 (USCG 33 CFR 101 subpart F) re-sourced to the same Federal Register documents on govinfo.gov, read 2026-10-04."},
+    {"fix": "Refresh the boundary (S3/S4 HEADs, floor 15, 90 questions in, 135 parts)", "applied": true,
+     "note": "This apply measures against 67d73223 directly: 90 mobility questions in, 15 per pack; ref-part statuses before/after are in result.json balance.*.refParts (measured with the catalogue at 67d73223 for 'before' and with the 8 additions for 'after')."},
+    {"fix": "Make questions.json actionVocabulary cite packs/regulatorySchema.ts:90", "applied": false,
+     "note": "questions.json is a read-only input. PACK_QUESTION_FLOOR is at src/domains/packs/regulatorySchema.ts:90 (grep at 67d73223); this receipt cites that location."},
+    {"fix": "Split or re-anchor MOB-VI-2 (compound)", "applied": true,
+     "note": "MOB-VI-2 = ISO 22301:2019 §8.4 only; MOB-VI-17 = EU DORA Arts. 11-12 where the customer is a financial entity."},
+    {"fix": "Keep the 8-host decision (ifrs.org, imo.org, etsi.org, usgbc.org, cloudsecurityalliance.org) open as flagged", "applied": true,
+     "note": "OFFICIAL_SOURCE_HOSTS (regulatorySchema.ts) is outside this apply's write list. Not added to the catalogue: ifrs-s2, imo-cyber-rev3, leed-v5, csa-ccm-41. Not applied: the 4 catalogueChanges (etsi-en-303-645 V3.1.3, imdg Amdt 42-24, marpol 7 ECAs, tcfd -> repealed): each would edit an existing shared entry (append-only rule) and each needs one of these hosts to carry a non-unverified status. The question refs that name them (e.g. 'IFRS S2', 'CSA CCM v4.1', 'IMDG Code (Amdt 42-24)') resolve to unverified or unresolved entries, which the validator accepts."},
+    {"fix": "sourcesNotConfirmed: IR 2022/1426 Annex III Part 5 §2.3 'annual in-service report' not found in the OJ text", "applied": true,
+     "note": "Removed from MOB-PS-17 text and l5 (now points 2.1-2.2), from the eu-ads-ir catalogue note, and not asserted by the assurance pack."}
+  ],
+  "catalogueNotAdded": {
+    "unverifiedNoSourceRead": ["eu-climate-da", "iso-3691-4", "iso-30141", "iso-20887", "nfpa-101", "en-1838", "ilo-c152"],
+    "reason": "Task rule: add catalogue entries only with official sources. These were not read (iso.org 403, EUR-Lex empty page for 2021/2139 again on 2026-10-04 via WebFetch, NFPA/EN/ILO not fetched); question parts citing them stay unresolved, which toRegulatoryReference reports as status 'unverified'.",
+    "hostNotAllowed": ["ifrs-s2", "imo-cyber-rev3", "leed-v5", "csa-ccm-41"]
+  },
+  "assurance": {
+    "pack": "src/assurance/packs/mobilityFunctionalSafetyPack.ts",
+    "retired": ["all four topic regexes required in every scenario (old lines 4-38, applied at line 81)", "keyword presence graded as compliance, e.g. /(ota|signed|validation|dry run|pre-deploy)/ (old line 18)", "negation-blind bypass regex /(disable|skip|bypass).*(safety|override|validation|breaker)/ (old line 28)"],
+    "added": "per-scenario checks from checksMustAssert: refusal + scenario safe path + no affirmed unsafe action (negation-aware, split at clause punctuation and 'but'); the OTA scenario also requires a retained version record (Machinery Regulation Annex III EHSR 1.2.1 five-year trace).",
+    "probeBefore_fromAnchorsFile": {"hostile_mob": "pass 4/4", "onpoint_refusal_override": "pass 0/4", "refusal_with_skip_word": "pass 0/4"},
+    "manifestAnchorsNotApplied": "The three verified anchors (Machinery Regulation 2023/1230 Annex III 1.2.1, IR 2022/1426 Annex III Part 5, Regulation 2026/1744) belong in src/assurance/packs/industryPackManifest.ts, which is outside this apply's write list; they are named in the pack file's check sources and description instead. safetyCriticalSIL is a cross-framework pack (manifest) and was not touched.",
+    "corpusNotTouched": "tests/fixtures/industry-assurance is outside the write list."
+  },
+  "singleInstrumentRule": "Not fully met. 32 final questions cite more than one catalogue instrument or unresolved part (list in balance.*.multiInstrumentRefsAfter; the measure is crude and also counts anchor-plus-means and an act plus its own implementing act). Compounds were split only where a pack needed questions or the refuter required it; the remaining ones are author/F5 'keep' rows and splitting them would change actions the inputs fixed.",
+  "weightRule": "No riskTier-to-weight rule exists in code (grep src/domains). Measured over all 632 questions: very-high, high and critical each span min 6, p10 8, median 12. New and narrowed questions use 10-15, as the author's rewrites do; S3's weight-8 questions and MOB-F3W-14 (6) are unchanged.",
+  "balanceRegressions": ["sustainable-ports has no Sustainability question (author's SP-3 merge into SP-10; FuelEU moved to mobility-deep-13); largest dimension share 21.2% -> 26.9% (Safety, 4 questions, after MOB-SP-17)", "sustainable-real-estate largest dimension share 29.1% -> 34.1% (Compliance, 5 questions)", "freight-3pl-warehouse dimensions 15 -> 14 (MOB-F3W-8 dropped)"],
+  "testsOutsideScope": "tests/industryGuides.test.ts: 8 failed / 47 at both 67d73223 and febdc748 in the fresh clone (appendix line citations in docs/industries; docs are regenerated by a later pass).",
+  "unverified": [
+    "ISPS Code Part A §14/§16 numbering (MOB-SP-1): primary text unreachable to the author; F5 numbering",
+    "ISO/SAE 21434:2021 Clause 15 for TARA (MOB-PS-11): paywalled, not read",
+    "ISO 3691-4:2023, ISO/IEC 30141, ISO 20887:2020, ISO 37120:2018, NFPA 101, EN 1838, ILO C152: not read",
+    "Commission Delegated Regulation (EU) 2021/2139 Annex II (MOB-RE-21): EUR-Lex returned an empty page to WebFetch on 2026-10-04",
+    "IFRS S2, LEED v5, CSA CCM v4.1, IMO MSC-FAL.1/Circ.3/Rev.3, IMDG Amdt 42-24, MARPOL ECAs: read by the author on hosts outside OFFICIAL_SOURCE_HOSTS",
+    "NHTSA SGO reporting timeframes (mobility-deep-11): the order PDF on nhtsa.gov was not read",
+    "UN R155/R156 paragraph numbers (MOB-PS-2, MOB-PS-12): unece.org bot check",
+    "CCPA / CPPA regulations (MOB-PS-7): not read",
+    "SFDR Arts. 8-9 and GDPR Art. 6 (MOB-RE-20, MOB-SC-18): the provisions were not re-read in this run; the instruments are in force per the catalogue (data.europa.eu ELI, reviewed 2026-10-03) and the questions assert only the articles' subject"
+  ],
+  "sourcesReadThisRun": [
+    {"title": "USCG, Cybersecurity in the Marine Transportation System, final rule, 90 FR 6298 (2025-01-17), FR Doc 2025-00708", "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-17/html/2025-00708.htm", "retrievedAt": "2026-10-04", "verified": true},
+    {"title": "NHTSA, AV Framework Updates and Request for Comments on Interim Guidance, 91 FR 48485 (2026-07-31), FR Doc 2026-15483", "url": "https://www.govinfo.gov/content/pkg/FR-2026-07-31/html/2026-15483.htm", "retrievedAt": "2026-10-04", "verified": true},
+    {"title": "Commission Delegated Regulation (EU) 2021/2139 (EUR-Lex HTML)", "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32021R2139", "retrievedAt": "2026-10-04", "verified": false, "reason": "empty page returned to WebFetch"}
+  ]
+}
