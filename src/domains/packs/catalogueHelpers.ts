@@ -7,7 +7,7 @@ import type {
   RegulatoryInstrumentKind,
   RegulatoryMilestone,
   RegulatoryStatus,
-} from "../industryPackRegulatorySchema.js";
+} from "./regulatorySchema.js";
 
 /** Date of the October 2026 regulatory-currency review. */
 export const REVIEWED = "2026-10-03";

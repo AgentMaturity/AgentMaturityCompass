@@ -4,7 +4,7 @@
  * 7 stations: Environment, Health, Wealth, Education, Mobility, Technology, Governance
  */
 import type { Domain } from "./domainRegistry.js";
-import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./industryPackRegulatorySchema.js";
+import { withRegulatoryCurrency, type ComplianceFrameworkRef, type RegulatoryReference } from "./packs/regulatorySchema.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,7 +82,9 @@ export interface IndustryPack {
   sdgAlignment: string[];
   certificationPath: string;
   keyRisks: string[];
-  /** ISO date of the pack's last regulatory-currency review (see industryPackRegulatorySchema.ts). */
+  /** Pack content version (PackCurrencyFields v1); stamped at registry build when a pack literal omits it. */
+  version?: string;
+  /** ISO date of the pack's last regulatory-currency review (see packs/regulatorySchema.ts). */
   lastReviewed?: string;
   /** Derived: regulatoryBasis entries resolved to catalogued instruments with currency. */
   regulatoryReferences?: RegulatoryReference[];

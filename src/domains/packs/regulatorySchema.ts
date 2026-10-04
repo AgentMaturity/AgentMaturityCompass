@@ -3,26 +3,31 @@
  *
  * Pack content keeps its free-text `regulatoryBasis`, `complianceFrameworks`
  * and question `regulatoryRef` strings. This module resolves those strings to
- * catalogued instruments (src/domains/packs/regulatoryCatalogue.ts) that carry
- * machine-readable currency: citation, jurisdiction, url, effectiveDate,
- * lastReviewed and status.
+ * catalogued instruments (regulatoryCatalogue.ts) that carry machine-readable
+ * currency: citation, jurisdiction, url, effectiveDate, lastReviewed and status.
+ *
+ * The pack-level fields (version, lastReviewed, regulatoryReferences) follow
+ * the "PackCurrencyFields v1" contract shared with the pack-audit module:
+ * RegulatoryReference = { citation: string; jurisdiction: string; url?;
+ * effectiveDate?; lastReviewed?; status: in-force | applies-from | proposed |
+ * repealed | unverified }. The audit side declares the same shape structurally.
  *
  * Evidence rule: an instrument may only claim a status other than
  * "unverified" when it names the official source it was checked against
- * (url + retrievedAt). Everything else stays "unverified".
+ * (an https url on OFFICIAL_SOURCE_HOSTS + retrievedAt). An "unverified"
+ * instrument carries no url, retrievedAt or effectiveDate.
  */
-import { frameworkChoices, normalizeFrameworkName, type ComplianceFramework } from "../compliance/frameworks.js";
-import { REGULATORY_CATALOGUE } from "./packs/regulatoryCatalogue.js";
-import type { IndustryPack } from "./industryPacks.js";
+import { frameworkChoices, normalizeFrameworkName, type ComplianceFramework } from "../../compliance/frameworks.js";
+import { REGULATORY_CATALOGUE } from "./regulatoryCatalogue.js";
+import type { IndustryPack } from "../industryPacks.js";
 
+/** PackCurrencyFields v1 status enum. */
 export const REGULATORY_STATUSES = [
-  "in-force",                    // binding and applicable
-  "in-force-phased",             // binding; some obligations apply on later dates (see milestones)
-  "adopted-not-yet-applicable",  // adopted, no obligation applies yet
-  "current",                     // current edition of a voluntary standard, guidance or framework
-  "superseded",                  // replaced by a newer edition or instrument (see supersededBy)
-  "repealed",                    // no longer in force (see supersededBy)
-  "unverified",                  // not confirmed against an official source in the last review
+  "in-force",      // binding law in force (later-applying obligations go in milestones), or the current edition of a standard/framework
+  "applies-from",  // adopted; no obligation applies before effectiveDate
+  "proposed",      // proposal not yet adopted
+  "repealed",      // repealed act, or a withdrawn/superseded edition (see supersededBy)
+  "unverified",    // not confirmed against an official source in the last review
 ] as const;
 export type RegulatoryStatus = (typeof REGULATORY_STATUSES)[number];
 
@@ -55,16 +60,19 @@ export interface RegulatoryInstrument {
   aliases: string[];
 }
 
-/** A pack's regulatoryBasis entry with its resolved currency. */
+/** A pack's regulatoryBasis entry with its resolved currency (PackCurrencyFields v1, plus text and instrumentId). */
 export interface RegulatoryReference {
-  text: string;
-  instrumentId: string | null;
-  citation?: string;
-  jurisdiction?: string;
+  /** Catalogue citation; the pack's own regulatoryBasis text when the entry does not resolve. */
+  citation: string;
+  /** Catalogue jurisdiction; UNRESOLVED_JURISDICTION when the entry does not resolve. */
+  jurisdiction: string;
   url?: string;
   effectiveDate?: string;
   lastReviewed?: string;
   status: RegulatoryStatus;
+  /** The regulatoryBasis text this reference was derived from. */
+  text: string;
+  instrumentId: string | null;
 }
 
 /** A pack's complianceFrameworks entry, normalized. */
@@ -78,8 +86,36 @@ export interface ComplianceFrameworkRef {
 }
 
 export const PACK_REVIEW_MAX_AGE_DAYS = 365;
-/** Minimum questions per pack: the 2026-10-03 measured median (15) minus 2. */
+/** Minimum questions per pack: the 15-question median measured on 2026-10-03, minus 2 (raised to 15 by the depth-floor commit). */
 export const PACK_QUESTION_FLOOR = 13;
+/** Content version stamped on every pack by the October 2026 review. */
+export const PACK_CONTENT_VERSION = "2026.10";
+export const UNRESOLVED_JURISDICTION = "unresolved";
+
+/**
+ * Hosts accepted as the official source of a verified instrument (exact host or
+ * any subdomain). Planner list plus issuing bodies actually read in the review:
+ * govinfo.gov (US GPO, Federal Register and CFR text), w3.org (WCAG),
+ * pcisecuritystandards.org (PCI DSS), oecd.org (OECD legal instruments) and
+ * consort-spirit.org (CONSORT/SPIRIT statements).
+ */
+export const OFFICIAL_SOURCE_HOSTS = [
+  "europa.eu", "nist.gov", "iso.org", "federalregister.gov", "ecfr.gov", "hhs.gov",
+  "legislation.gov.uk", "unece.org", "iec.ch", "who.int", "fatf-gafi.org", "ich.org",
+  "govinfo.gov", "w3.org", "pcisecuritystandards.org", "oecd.org", "consort-spirit.org",
+] as const;
+
+export function isOfficialSourceUrl(url: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:") return false;
+  const host = parsed.hostname.toLowerCase();
+  return OFFICIAL_SOURCE_HOSTS.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
+}
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ALIAS_SEPARATOR = /^[\s§(,;/:.-]/;
@@ -118,16 +154,16 @@ export function resolveRegulatoryRefParts(ref: string): Array<{ part: string; in
 
 export function toRegulatoryReference(text: string): RegulatoryReference {
   const inst = resolveRegulatoryInstrument(text);
-  if (!inst) return { text, instrumentId: null, status: "unverified" };
+  if (!inst) return { citation: text, jurisdiction: UNRESOLVED_JURISDICTION, status: "unverified", text, instrumentId: null };
   return {
-    text,
-    instrumentId: inst.id,
     citation: inst.citation,
     jurisdiction: inst.jurisdiction,
-    url: inst.url,
-    effectiveDate: inst.effectiveDate,
+    ...(inst.url ? { url: inst.url } : {}),
+    ...(inst.effectiveDate ? { effectiveDate: inst.effectiveDate } : {}),
     lastReviewed: inst.lastReviewed,
     status: inst.status,
+    text,
+    instrumentId: inst.id,
   };
 }
 
@@ -161,11 +197,16 @@ export function validateRegulatoryInstrument(inst: RegulatoryInstrument, asOf: D
   if (!inst.aliases?.length) errors.push(`${at}: no aliases`);
   if (!REGULATORY_STATUSES.includes(inst.status)) errors.push(`${at}: unknown status "${inst.status}"`);
   errors.push(...dateErrors("lastReviewed", inst.lastReviewed, asOf, PACK_REVIEW_MAX_AGE_DAYS).map((e) => `${at}: ${e}`));
-  if (inst.status !== "unverified") {
-    if (!inst.url || !/^https:\/\//.test(inst.url)) errors.push(`${at}: status "${inst.status}" requires an https source url (or status "unverified")`);
+  if (inst.status === "unverified") {
+    for (const field of ["url", "retrievedAt", "effectiveDate"] as const) {
+      if (inst[field] !== undefined) errors.push(`${at}: status "unverified" must not carry ${field} (${inst[field]})`);
+    }
+  } else {
+    if (!inst.url) errors.push(`${at}: status "${inst.status}" requires an https source url (or status "unverified")`);
+    else if (!isOfficialSourceUrl(inst.url)) errors.push(`${at}: url ${inst.url} is not an https url on an official source host`);
     errors.push(...dateErrors("retrievedAt", inst.retrievedAt, asOf, PACK_REVIEW_MAX_AGE_DAYS).map((e) => `${at}: ${e}`));
   }
-  if ((inst.status === "superseded" || inst.status === "repealed") && !inst.supersededBy) {
+  if (inst.status === "repealed" && !inst.supersededBy) {
     errors.push(`${at}: status "${inst.status}" requires supersededBy`);
   }
   if (inst.effectiveDate !== undefined && !ISO_DATE.test(inst.effectiveDate)) errors.push(`${at}: effectiveDate is not an ISO date`);
@@ -176,11 +217,12 @@ export function validateRegulatoryInstrument(inst: RegulatoryInstrument, asOf: D
   return errors;
 }
 
-const NOT_CURRENT: RegulatoryStatus[] = ["superseded", "repealed"];
+const NOT_CURRENT: RegulatoryStatus[] = ["repealed"];
 
 export function validatePackRegulatoryCurrency(pack: IndustryPack, asOf: Date = new Date()): string[] {
   const at = `pack ${pack.id}`;
   const errors = dateErrors("lastReviewed", pack.lastReviewed, asOf, PACK_REVIEW_MAX_AGE_DAYS).map((e) => `${at}: ${e}`);
+  if (!pack.version) errors.push(`${at}: version is missing`);
   if (pack.questions.length < PACK_QUESTION_FLOOR) {
     errors.push(`${at}: ${pack.questions.length} questions is below the floor of ${PACK_QUESTION_FLOOR}`);
   }
@@ -207,10 +249,11 @@ export function validatePackRegulatoryCurrency(pack: IndustryPack, asOf: Date = 
   return errors;
 }
 
-/** Adds the derived, optional currency fields to a pack. The input object is not modified. */
+/** Adds the content version and the derived currency fields to a pack. The input object is not modified. */
 export function withRegulatoryCurrency(pack: IndustryPack): IndustryPack {
   return {
     ...pack,
+    version: pack.version ?? PACK_CONTENT_VERSION,
     regulatoryReferences: pack.regulatoryBasis.map(toRegulatoryReference),
     complianceFrameworkRefs: pack.complianceFrameworks.map(normalizeComplianceFrameworkLabel),
   };
