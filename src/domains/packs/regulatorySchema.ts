@@ -86,8 +86,8 @@ export interface ComplianceFrameworkRef {
 }
 
 export const PACK_REVIEW_MAX_AGE_DAYS = 365;
-/** Minimum questions per pack: the 15-question median measured on 2026-10-03, minus 2 (raised to 15 by the depth-floor commit). */
-export const PACK_QUESTION_FLOOR = 13;
+/** Minimum questions per pack: the measured median (15) on 2026-10-03. */
+export const PACK_QUESTION_FLOOR = 15;
 /** Content version stamped on every pack by the October 2026 review. */
 export const PACK_CONTENT_VERSION = "2026.10";
 export const UNRESOLVED_JURISDICTION = "unresolved";
