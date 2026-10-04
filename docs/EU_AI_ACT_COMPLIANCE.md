@@ -206,7 +206,7 @@ AMC does not perform the conformity assessment itself — that requires a notifi
 
 ## 5. Timeline Context
 
-Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatory/register.json`); `tests/euAiActTimeline.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
+Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The 2030 dates were added on 2026-10-04 from the Official Journal texts of Regulation (EU) 2024/1689 and Regulation (EU) 2026/1744, read through the Publications Office (Cellar) at 05:06Z by the round-2 register batch (`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-eu-intl/entries.json`); its refuter re-read Art. 111(2) and the amended Art. 113 dates from the same text (`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-eu-intl/review.json`). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatory/register.json`); `tests/euAiActTimeline.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
 
 These dates are agent-drafted and stay experimental until a named expert reviews them: they were read from official sources but have no expert sign-off, and they are not legal advice.
 
@@ -221,15 +221,18 @@ These dates are agent-drafted and stay experimental until a named expert reviews
 | 2027-08-02 | GPAI models placed on the market before 2025-08-02 must comply | Art. 111(3) |
 | **2027-12-02** | **Chapter III Sections 1-3 apply to Annex III high-risk systems (Art. 6(2))** | Art. 113(c)(i) |
 | **2028-08-02** | **Chapter III Sections 1-3 apply to Annex I product-integrated high-risk systems (Art. 6(1))** | Art. 113(c)(ii) |
+| 2030-08-02 | High-risk systems intended for use by public authorities comply | Art. 111(2) as amended |
+| 2030-12-31 | AI components of Annex X large-scale IT systems placed on the market before 2027-08-02 comply | Art. 111(1) |
 
 `amc comply risk-classify --json` now returns `applicationDates` for the tier it assigns (Art. 5, Art. 50, Annex III or Annex I basis).
 
-Sources (all retrieved 2026-10-03):
+Sources (retrieved 2026-10-03 unless stated):
 
 - AI Act Service Desk, Article 113: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113
 - AI Act Service Desk, Article 111: https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111
 - AI Act Service Desk, implementation timeline: https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act
 - European Commission AI Act policy page (last updated 2026-08-03): https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
+- Official Journal text via the Publications Office, retrieved 2026-10-04: https://publications.europa.eu/resource/celex/32024R1689 and https://publications.europa.eu/resource/celex/32026R1744
 - Regulation (EU) 2026/1744 on EUR-Lex: https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng — EUR-Lex answered automated requests with a bot challenge, so the text was read through the Service Desk; title and date (8 July 2026) come from the EUR-Lex index.
 
 The timeline can change again. Verify it against the European Commission's [high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
