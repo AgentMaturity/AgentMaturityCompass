@@ -7,6 +7,7 @@
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { eu, milestones, unverified } from "./catalogueHelpers.js";
+import { verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
@@ -213,4 +214,11 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],
     "There is no single EPR directive; EPR is set by Directive 2008/98/EC and product-specific acts."),
+
+  // Governance station round 2 (2026-10-04): read on the Commission's digital-strategy pages on that date.
+  verified("eu-disinfo-conduct", "Code of Conduct on Disinformation (Code of Practice converted to a DSA code of conduct)", "EU", "framework", "in-force",
+    "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation", ["Code of Conduct on Disinformation"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-01",
+      note: "Read 2026-10-04: integration into the DSA framework endorsed 13 Feb 2025; effective and auditable from 1 Jul 2025. Replaces the 2022 Code of Practice (eu-disinfo-code).",
+    }),
 ];
