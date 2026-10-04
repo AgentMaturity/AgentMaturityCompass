@@ -7,8 +7,6 @@
  */
 import type { RegulatoryInstrument } from "./regulatorySchema.js";
 import { eu, milestones, unverified, verified } from "./catalogueHelpers.js";
-import { eu, milestones, unverified } from "./catalogueHelpers.js";
-import { verified } from "./catalogueHelpers.js";
 
 export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   eu("eu-ai-act", "reg/2024/1689", "Regulation (EU) 2024/1689 (Artificial Intelligence Act), as amended by Regulation (EU) 2026/1744", "in-force", "2024-08-01",
@@ -250,6 +248,7 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("edpb-gl-4-2019", "EDPB Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0", "EU", "guidance", "in-force",
     "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-42019-article-25-data-protection-design-and_en", ["EDPB Guidelines 4/2019"], {
       note: "Version 2.0 adopted 20 October 2020 (EDPB page read).",
+  }),
 
   // Governance station round 2 (2026-10-04): read on the Commission's digital-strategy pages on that date.
   verified("eu-disinfo-conduct", "Code of Conduct on Disinformation (Code of Practice converted to a DSA code of conduct)", "EU", "framework", "in-force",
@@ -269,6 +268,7 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     status: "in-force", lastReviewed: "2026-10-04", url: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219",
     retrievedAt: "2026-10-04", effectiveDate: "2002-07-31", aliases: ["ePrivacy Directive", "Directive 2002/58/EC"],
     note: "Art. 5(3) consent wording read in the EUR-Lex consolidated text (19.12.2009) by the technology round-2 content pass; in force on publication, OJ L 201, 31.7.2002.",
+  },
 
   // Wealth station, round-2 review (2026-10-04): article text read as Publications Office CELLAR text
   // (publications.europa.eu/resource/celex/<CELEX>); receipt round2/content/wealth/questions.json catalogueAdditions.

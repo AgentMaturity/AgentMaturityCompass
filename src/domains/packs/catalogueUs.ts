@@ -143,6 +143,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://csrc.nist.gov/pubs/sp/800/218/final", ["NIST SP 800-218"], {
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
       note: "Final, published 2022-02-03 (csrc page read 2026-10-04, no supersession shown). SP 800-218 Rev. 1 (SSDF 1.2) is an initial public draft of 2025-12-17, seen in a nist.gov search listing and not opened; not final on the review date.",
+  }),
   // Governance station round 2 (2026-10-04): instruments read on their official pages on that date.
   verified("nist-sp-800-63b-4", "NIST SP 800-63B-4, Digital Identity Guidelines: Authentication and Authenticator Management (July 2025)", "US", "standard", "in-force",
     "https://csrc.nist.gov/pubs/sp/800/63/b/4/final", ["NIST SP 800-63B-4", "NIST Special Publication 800-63B-4"], {
