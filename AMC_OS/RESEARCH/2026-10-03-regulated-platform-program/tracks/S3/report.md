@@ -1,3 +1,57 @@
+# Track S3 — repair round 1 (after the monitor REJECTED 406518dd)
+
+- Status: **COMPLETE** for the six required fixes. Per-station decomposition (low-severity monitor note, not a required fix) remains undone; see "Not done".
+- Branch `worktree-wf_5210e2f4-3ea-3`; repair commits on top of 406518dd:
+  - `748d7c23` fix: conform industry-pack currency to PackCurrencyFields v1 and move the schema under packs/
+  - `20b69fb4` feat: raise the industry-pack question floor to 15 [HOLD until root whitepaper edit]
+  - the receipt commit (this file, result.json, ready-to-wire.diff; AMC_OS only)
+- Environment: macOS Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11, run on 2026-10-04.
+
+## Required fixes and how each was verified
+
+1. **PackCurrencyFields v1 conformance** (`src/domains/packs/regulatorySchema.ts`). `RegulatoryReference.citation` is `string` (falls back to the regulatoryBasis text when an entry does not resolve), `jurisdiction` is `string` (`"unresolved"` fallback), and `REGULATORY_STATUSES` is exactly `in-force | applies-from | proposed | repealed | unverified`. The catalogue was remapped: `in-force-phased` and `current` become `in-force` (phases stay in `milestones`), `adopted-not-yet-applicable` becomes `applies-from`, and `superseded` becomes `repealed` with `supersededBy`. `tests/industryPackSchema.test.ts` assigns `listIndustryPacks()` to a structural copy of S4's `PackCurrencyFields` (industryPackAudit.ts:61-74 on S4 7025a1b4), so drift fails `typecheck:tests`.
+   - Scratch merge (`scratchpad/s3/merge-s4`: clone, checkout 20b69fb4, merge S4 7025a1b4, clean merge 937fa14c): `tsc -p tsconfig.json --noEmit` exits 0. The previous result was TS2345 at industryPackAudit.ts(318,40).
+   - Planner acceptance #3 (tsx over source, integrated branch) prints `41 0 0`. The previous result was `41 41 58`.
+2. **version on all 41 packs.** `withRegulatoryCurrency` stamps `PACK_CONTENT_VERSION = "2026.10"` unless a pack literal sets its own, and `IndustryPack.version?: string` is declared. Planner #3 `bad` = 0.
+3. **Depth floor 15.** `PACK_QUESTION_FLOOR = 15`. I added 24 questions to the 19 packs below 15: two each to weave-to-wear, differently-abled, privacy-security-mobility, networked-ecosystems and citizen-services, and one each to the other 14. Each new question cites an article-level reference that resolves to a catalogued, non-repealed instrument: REACH Art. 33; ESPR Arts. 24-25 and Annex VII; WEEE Art. 15; WFD Art. 8; AI Act Arts. 26(7), 26(11), 50(4), 53(1)(b) and 86; Annex III points 3(d) and 5(a); DORA Arts. 24-25; FATF R.15; WCAG 2.2 SC 3.3.8; 34 CFR §300.105; GDPR Arts. 28, 32(1) and 35(3)(c); Port Services Reg. Art. 13; NIS2 Art. 23; CRA Art. 14; Data Act Arts. 3 and 13; ISO/IEC 27001:2022 A.5.21; SDG Reg. Art. 14. Ids continue each pack's prefix scheme, and every question has l1/l3/l5 text.
+   - tsx: `41 15 632` (previously `41 13 608`). The depth-floor test prints `packs=41 questions=632 median=15 min=15 max=18 floor=15`.
+   - Mutation: deleting `MOB-F3W-15` gives `freight-3pl-warehouse: 14 < 15` (RED). Restoring it is GREEN.
+4. **publicQuestionCountDrift.** The sector total and the seven station strings are now derived from `listIndustryPacks()` and `getStationSummary()`. `node_modules/.bin/vitest run tests/publicQuestionCountDrift.test.ts` gives `1 failed | 3 passed`. The only failure is the whitepaper test: "whitepaper/AMC_WHITEPAPER_v1.md must state the registry's sector-pack question count". The seven `website/station-*.html` files (claimed) carry the measured counts in the label and the meta description. One literal stays deliberately: `"844 total"` in website/blog/langchain-scoring-tutorial.html is unclaimed, so its derivation is in ready-to-wire.diff.
+5. **Claimed paths.** The schema moved to `src/domains/packs/regulatorySchema.ts`. Tests now use the claimed names `tests/industryPackSchema.test.ts`, `tests/industryPackFrameworkNormalization.test.ts`, `tests/industryPackDepthFloor.test.ts` and `tests/industryPackRegulatoryRefresh.test.ts`, and the old `tests/industryPacks.test.ts` and `tests/industryPackRegulatory.test.ts` are deleted. Planner #9 (with `src/domains/packs/.*`, since the literal planner regex anchors `src/domains/packs/` at end of line, and with the receipt dir excluded) prints nothing.
+6. **Official-host allowlist and unverified-without-url.** `OFFICIAL_SOURCE_HOSTS` holds the planner list (europa.eu covers eur-lex/ec/eiopa/esma/ema subdomains) plus the issuing bodies the review actually read: govinfo.gov (GPO FR/CFR), w3.org, pcisecuritystandards.org, oecd.org and consort-spirit.org. `validateRegulatoryInstrument` requires an https url on that list for any status other than unverified, and forbids url, retrievedAt and effectiveDate when the status is unverified. The schema test also checks every pack reference.
+   - Mutation M1: the nist-ai-rmf url set to `https://example.com/ai-rmf` gives 2 failed / 8 passed in industryPackSchema. Restoring it gives 10/10.
+   - Mutation M2: adding `url` to the `unverified()` helper (all 148 unverified instruments) gives 2 failed / 8 passed. Restored.
+
+## Other mutation checks (each restored with git checkout, porcelain clean afterwards)
+- Version stamping removed: industryPackSchema 1 failed ("version missing" ×41).
+- Extra status `"current"` added to the enum: industryPackSchema 1 failed (the enum is not v1).
+- `citation?: string` (optional): `tsc -p tsconfig.tests.json` fails with TS2322 at tests/industryPackSchema.test.ts(73,11), "IndustryPack[]" not assignable to "PackCurrencyFieldsV1[]".
+- "Totally Made Up Standard 9999" appended to freight complianceFrameworks: FrameworkNormalization and RegulatoryRefresh go RED and list the string.
+- `PACK_QUESTION_FLOOR` set back to 13: DepthFloor fails with "expected 13 to be 15".
+- website/station-wealth.html set back to "70 questions": publicQuestionCountDrift fails the station test with `wealth`.
+
+## Commands (worktree @20b69fb4 unless noted)
+- `pnpm typecheck` → exit 0; `pnpm typecheck:tests` → exit 0.
+- `AI_AGENT=1 node_modules/.bin/vitest run` over the 4 new test files plus publicQuestionCountDrift → 24 passed, 1 failed (whitepaper only).
+- 18-file regression set (logisticsIndustryPack, industryPacks-infotainment, industryPackAudit, questionSets, industryPackEntitlement, domain-registry, domainApply, citationMetadata, executiveBoardPath, domainDocs, domain-packs, domain-assessment, majorGaps, mcpServer, mcpTools, lineRatchet, receiptsCorrelationRuntimeDashboard, studioVaultModeLoop) → 18 files, 138/138 passed.
+- `node scripts/docs-drift-check.mjs` → passed (327 files). lineRatchet 4/4. Largest file under src/domains/packs is regulatorySchema.ts at 260 lines.
+- Ready-to-wire: `git apply --check` exits 0 at 20b69fb4. Applied in `scratchpad/s3/rtw`, publicQuestionCountDrift, citationMetadata, executiveBoardPath, industryPackDepthFloor and industryPackSchema pass 25/25 (5 files).
+
+## Integrated branch (S3 20b69fb4 + S4 7025a1b4), for the S4 owner
+- tsc exit 0; planner #3 `41 0 0`; planner #4 `41 15 632`. `computePackCurrency` at 2026-10-04 gives `{"unverified":41}`: every pack cites at least one unverified instrument, and S4 lets the worst finding win.
+- Two S4 tests fail post-merge. Both are S4 test-fixture assumptions and are forbidden to S3: `tests/industryPackAudit.test.ts:126` ("HEAD shape") and the receipt-rendering test. They use a live registry pack with `NOW = 1_700_000_000_000` (Nov 2023). Once S3 lands, the pack carries version and references, and its lastReviewed of 2026-10-03 is in the future relative to NOW, so `missing` is `["lastReviewed"]` instead of all three. The fix belongs to S4: strip the currency fields in its `pack()` fixture, or use a NOW after 2026-10-03.
+
+## Ready-to-wire (root, dirty or unclaimed files) — tracks/S3/ready-to-wire.diff, regenerated for 632
+whitepaper/AMC_WHITEPAPER_v1.md (244 + 632 = 876), website/index.html and website/docs/compliance.html station cards, website/blog/langchain-scoring-tutorial.html (876 total), docs/EXECUTIVE_OVERVIEW.md, tests/citationMetadata.test.ts, tests/executiveBoardPath.test.ts, and the derived blog assertion in tests/publicQuestionCountDrift.test.ts. Index exports still to wire in src/domains/index.ts: `normalizeComplianceFrameworkLabel` and `type RegulatoryReference` from `./packs/regulatorySchema.js`.
+
+## Not done / notes
+- Per-station decomposition of src/domains/industryPacks.ts (now 2612 lines, still on the dataRegistries exemption) is not done. The monitor rated it low severity and it was not among the required fixes. Doing it in a repair round would mean a 2.6k-line move with a snapshot proof, so it stays a follow-up.
+- Pre-HOLD commit 748d7c23: publicQuestionCountDrift still fails there on the 600 literal and the stale station strings. Those predate this round, because 5a19ae6d added 8 questions. The planner's "all green before the HOLD tip" cannot hold for this branch. The branch is coherent only at the HOLD tip plus the root whitepaper edit.
+- `node scripts/gen-counts.mjs --check` was not re-run. It fails at base 8f57ce63 ("README.md: unknown count key"), and its stale targets are root-deferred.
+- Regulatory sources: no new instrument was marked verified this round. The new questions cite instruments already in the catalogue, and their status and urls are unchanged from the October review. The NIS2/DORA/MiCA/EHDS/EUDR notes cite the Commission, EIOPA and ESMA pages from the planner's 2026-10-03 retrieval.
+
+---
+
 # Track S3 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
 
 - Status (self-report): **PARTIAL**

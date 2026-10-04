@@ -1,174 +1,195 @@
---- a/tests/publicQuestionCountDrift.test.ts
-+++ b/tests/publicQuestionCountDrift.test.ts
-@@ -48,10 +48,10 @@
-     expect(lifecycleSet.questions).toHaveLength(264);
-     expect(lifecycleSet.questions.length - defaultSet.questions.length).toBe(20);
-     expect(industryPacks).toHaveLength(41);
--    expect(sectorQuestionCount).toBe(600);
-+    expect(sectorQuestionCount).toBe(608);
-   });
+diff --git a/docs/EXECUTIVE_OVERVIEW.md b/docs/EXECUTIVE_OVERVIEW.md
+index 4f8efe16..a3799387 100644
+--- a/docs/EXECUTIVE_OVERVIEW.md
++++ b/docs/EXECUTIVE_OVERVIEW.md
+@@ -45,7 +45,7 @@ We tested a content moderation agent with two methods:
  
--  test("current-facing product surfaces use 244 default, 264 expanded, and 844 total framing", () => {
-+  test("current-facing product surfaces use 244 default, 264 expanded, and 852 total framing", () => {
-     for (const path of PRODUCT_COUNT_FILES) {
-       const body = readProjectFile(path);
-       for (const pattern of STALE_PRODUCT_COUNT_PATTERNS) {
-@@ -60,24 +60,24 @@
-     }
- 
-     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("244 default diagnostic questions");
--    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("844 total");
-+    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("852 total");
-     expect(readProjectFile("website/vs-promptfoo.html")).toContain("264 with lifecycle expansion");
-   });
- 
-   test("industry station pages match compiled sector-pack counts", () => {
-     expect(readProjectFile("website/station-environment.html")).toContain("6 diagnostic packs · 87 questions");
-     expect(readProjectFile("website/station-health.html")).toContain("9 diagnostic packs · 151 questions");
--    expect(readProjectFile("website/station-wealth.html")).toContain("5 diagnostic packs · 70 questions");
-+    expect(readProjectFile("website/station-wealth.html")).toContain("5 diagnostic packs · 72 questions");
-     expect(readProjectFile("website/station-education.html")).toContain("5 diagnostic packs · 72 questions");
--    expect(readProjectFile("website/station-mobility.html")).toContain("6 diagnostic packs · 78 questions");
-+    expect(readProjectFile("website/station-mobility.html")).toContain("6 diagnostic packs · 84 questions");
-     expect(readProjectFile("website/station-technology.html")).toContain("5 diagnostic packs · 71 questions");
-     expect(readProjectFile("website/station-governance.html")).toContain("5 diagnostic packs · 71 questions");
-   });
- 
-   test("whitepaper uses current product runtime counts for default and sector coverage", () => {
-     const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
--    expect(whitepaper).toContain("244 default diagnostic questions plus 600 sector-specific questions");
--    expect(whitepaper).toContain("844 questions (244 default + 600 sector-specific)");
-+    expect(whitepaper).toContain("244 default diagnostic questions plus 608 sector-specific questions");
-+    expect(whitepaper).toContain("852 questions (244 default + 608 sector-specific)");
-     expect(whitepaper).not.toContain("140 core diagnostic questions plus 600 sector-specific questions");
-     expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
-   });
+ ### For Your Engineering Team
+ - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
+-- **600 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
++- **632 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
+ - **142 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
+ - **Auto-generated guardrails** that plug directly into agent config files
+ - **CI/CD integration** — fail builds if agents don't meet maturity targets
+diff --git a/tests/citationMetadata.test.ts b/tests/citationMetadata.test.ts
+index c0a4a29f..3ad3016b 100644
 --- a/tests/citationMetadata.test.ts
 +++ b/tests/citationMetadata.test.ts
-@@ -41,8 +41,8 @@
+@@ -41,8 +41,8 @@ describe("citation metadata", () => {
      const whitepaper = readProjectFile("whitepaper/AMC_WHITEPAPER_v1.md");
  
      expect(whitepaper).toContain("41 industry-specific sector packs");
 -    expect(whitepaper).toContain("600 sector-specific diagnostic questions");
 -    expect(whitepaper).toContain("844 questions (244 default + 600 sector-specific)");
-+    expect(whitepaper).toContain("608 sector-specific diagnostic questions");
-+    expect(whitepaper).toContain("852 questions (244 default + 608 sector-specific)");
++    expect(whitepaper).toContain("632 sector-specific diagnostic questions");
++    expect(whitepaper).toContain("876 questions (244 default + 632 sector-specific)");
      expect(whitepaper).not.toContain("40 industry-specific sector packs");
      expect(whitepaper).not.toContain("593 sector-specific diagnostic questions");
      expect(whitepaper).not.toContain("740 questions (140 core + 600 sector-specific)");
+diff --git a/tests/executiveBoardPath.test.ts b/tests/executiveBoardPath.test.ts
+index 23fae372..89e10dd5 100644
 --- a/tests/executiveBoardPath.test.ts
 +++ b/tests/executiveBoardPath.test.ts
-@@ -25,7 +25,7 @@
+@@ -25,7 +25,7 @@ describe("executive and board-facing path", () => {
      expect(combined).toContain("244");
      expect(combined).toContain("142");
      expect(combined).toContain("41");
 -    expect(combined).toContain("600 sector");
-+    expect(combined).toContain("608 sector");
++    expect(combined).toContain("632 sector");
      expect(docs).toContain("**Mobility** | 6");
      expect(docs).toContain("$9.99/month");
      expect(docs).toContain("amc up");
---- a/docs/EXECUTIVE_OVERVIEW.md
-+++ b/docs/EXECUTIVE_OVERVIEW.md
-@@ -45,7 +45,7 @@
+diff --git a/tests/publicQuestionCountDrift.test.ts b/tests/publicQuestionCountDrift.test.ts
+index dd026081..96faaeba 100644
+--- a/tests/publicQuestionCountDrift.test.ts
++++ b/tests/publicQuestionCountDrift.test.ts
+@@ -58,7 +58,7 @@ describe("public diagnostic question-count claims", () => {
+     expect(SECTOR_QUESTION_COUNT).toBeGreaterThanOrEqual(industryPacks.length * PACK_QUESTION_FLOOR);
+   });
  
- ### For Your Engineering Team
- - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
--- **600 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
-+- **608 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
- - **142 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
- - **Auto-generated guardrails** that plug directly into agent config files
- - **CI/CD integration** — fail builds if agents don't meet maturity targets
---- a/website/station-mobility.html
-+++ b/website/station-mobility.html
-@@ -4,7 +4,7 @@
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>AMC — MOBILITY Station</title>
--  <meta name="description" content="AMC MOBILITY Station: 6 packs · 78 questions">
-+  <meta name="description" content="AMC MOBILITY Station: 6 packs · 84 questions">
-   <link rel="stylesheet" href="style.css">
-   <link rel="stylesheet" href="station.css">
- </head>
-@@ -46,7 +46,7 @@
-     <div class="container">
-       <div class="station-two-col gs">
-         <div class="station-left">
--          <p class="label">■ 6 diagnostic packs · 78 questions</p>
-+          <p class="label">■ 6 diagnostic packs · 84 questions</p>
-           <h2 class="station-tagline">Diagnostics for sustainable communities, ports, real estate, virtual infrastructure, and privacy — mapped to smart city standards, IMO, LEED, NIS2, and GDPR.</h2>
-           <p class="station-body">Mobility AI moves people, goods, and information. AMC diagnostics verify safety-critical decision-making and regulatory compliance across physical and digital infrastructure.</p>
-         </div>
---- a/website/station-wealth.html
-+++ b/website/station-wealth.html
-@@ -4,7 +4,7 @@
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>AMC — WEALTH Station</title>
--  <meta name="description" content="AMC WEALTH Station: 5 packs · 70 questions">
-+  <meta name="description" content="AMC WEALTH Station: 5 packs · 72 questions">
-   <link rel="stylesheet" href="style.css">
-   <link rel="stylesheet" href="station.css">
- </head>
-@@ -46,7 +46,7 @@
-     <div class="container">
-       <div class="station-two-col gs">
-         <div class="station-left">
--          <p class="label">■ 5 diagnostic packs · 70 questions</p>
-+          <p class="label">■ 5 diagnostic packs · 72 questions</p>
-           <h2 class="station-tagline">Diagnostics for future of work, digital payments, financial inclusion, circular economy, and blockchain — mapped to PSD2, MiCA, ILO, ESG, and AML/KYC regulations.</h2>
-           <p class="station-body">Financial AI operates under some of the strictest regulatory regimes. AMC probes whether your agent handles transactions safely and maintains audit trails.</p>
-         </div>
---- a/website/index.html
-+++ b/website/index.html
-@@ -365,7 +365,7 @@
-           <a href="station-wealth.html" class="station-card">
-             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
-             <h3>Wealth</h3>
--            <p class="station-card-meta">5 packs · 70 questions</p>
-+            <p class="station-card-meta">5 packs · 72 questions</p>
-             <p class="station-card-desc">Future of Work, Digital Payments, No Poverty, Circular Economy, Blockchain and DeFi.</p>
-             <span class="station-card-link">SEE +</span>
-           </a>
-@@ -379,7 +379,7 @@
-           <a href="station-mobility.html" class="station-card">
-             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
-             <h3>Mobility</h3>
--            <p class="station-card-meta">6 packs · 78 questions</p>
-+            <p class="station-card-meta">6 packs · 84 questions</p>
-             <p class="station-card-desc">Sustainable Communities, Sustainable Ports, Sustainable Real Estate, Virtual Infrastructure, Privacy and Security, Freight/3PL/Warehouse.</p>
-             <span class="station-card-link">SEE +</span>
-           </a>
---- a/website/docs/compliance.html
-+++ b/website/docs/compliance.html
-@@ -267,7 +267,7 @@
-         <h4>Wealth</h4>
-         <div class="stats">
-           <span>5 packs</span>
--          <span>70 questions</span>
-+          <span>72 questions</span>
-           <span>MiFID II, PSD2, EU DORA, MiCA, FATF R1/R10</span>
-         </div>
-         <p>Investment management, payments, insurance, DeFi/crypto, banking and lending.</p>
-@@ -289,7 +289,7 @@
-         <h4>Mobility</h4>
-         <div class="stats">
-           <span>6 packs</span>
--          <span>78 questions</span>
-+          <span>84 questions</span>
-           <span>EU EPBD 2024, UNECE WP.29 R155 §7, ETSI EN 303 645, EU NIS2</span>
-         </div>
-         <p>Autonomous vehicles, smart buildings, IoT infrastructure, logistics/supply chain, urban mobility.</p>
+-  test("current-facing product surfaces use 244 default, 264 expanded, and 844 total framing", () => {
++  test("current-facing product surfaces use 244 default, 264 expanded, and registry-derived total framing", () => {
+     for (const path of PRODUCT_COUNT_FILES) {
+       const body = readProjectFile(path);
+       for (const pattern of STALE_PRODUCT_COUNT_PATTERNS) {
+@@ -67,9 +67,7 @@ describe("public diagnostic question-count claims", () => {
+     }
+ 
+     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("244 default diagnostic questions");
+-    // website/blog is outside the pack track's claims: 844 = 244 + the pre-October-2026 sector total of 600.
+-    // The derived replacement is in the S3 ready-to-wire diff.
+-    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("844 total");
++    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain(`${DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT} total`);
+     expect(readProjectFile("website/vs-promptfoo.html")).toContain("264 with lifecycle expansion");
+   });
+ 
+diff --git a/website/blog/langchain-scoring-tutorial.html b/website/blog/langchain-scoring-tutorial.html
+index daf98664..5932b637 100644
 --- a/website/blog/langchain-scoring-tutorial.html
 +++ b/website/blog/langchain-scoring-tutorial.html
-@@ -148,7 +148,7 @@
+@@ -148,7 +148,7 @@ amc</code></pre>
  
  <h2>Interpreting Your Results</h2>
  
 -<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 600 sector-specific questions through 41 Industry Packs for 844 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
-+<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 608 sector-specific questions through 41 Industry Packs for 852 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
++<p>AMC scores your agent across 5 dimensions with 244 default diagnostic questions, plus 632 sector-specific questions through 41 Industry Packs for 876 total when domain coverage is enabled, on a scale from L0 (no controls) to L5 (self-governing with cryptographic proof). Here's what the levels mean for a LangChain agent:</p>
  
  <ul>
    <li><strong>L0–L1:</strong> Your agent has no safety controls or only documentation-level intent. Fix the critical gaps immediately.</li>
+diff --git a/website/docs/compliance.html b/website/docs/compliance.html
+index 046f8b47..23905622 100644
+--- a/website/docs/compliance.html
++++ b/website/docs/compliance.html
+@@ -243,7 +243,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Environment</h4>
+         <div class="stats">
+           <span>6 packs</span>
+-          <span>87 questions</span>
++          <span>91 questions</span>
+           <span>EU Farm-to-Fork, REACH, IEC 61850, EU Drinking Water Directive</span>
+         </div>
+         <p>Agricultural AI, fashion/textile supply chains, advanced manufacturing, food systems, energy grids, water/sanitation.</p>
+@@ -267,7 +267,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Wealth</h4>
+         <div class="stats">
+           <span>5 packs</span>
+-          <span>70 questions</span>
++          <span>75 questions</span>
+           <span>MiFID II, PSD2, EU DORA, MiCA, FATF R1/R10</span>
+         </div>
+         <p>Investment management, payments, insurance, DeFi/crypto, banking and lending.</p>
+@@ -278,7 +278,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Education</h4>
+         <div class="stats">
+           <span>5 packs</span>
+-          <span>72 questions</span>
++          <span>75 questions</span>
+           <span>FERPA 20 U.S.C. §1232g, COPPA §312, IDEA, EU AI Act Annex III</span>
+         </div>
+         <p>K-12 learning, higher education, corporate training, special education, educational assessment.</p>
+@@ -289,7 +289,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Mobility</h4>
+         <div class="stats">
+           <span>6 packs</span>
+-          <span>78 questions</span>
++          <span>90 questions</span>
+           <span>EU EPBD 2024, UNECE WP.29 R155 §7, ETSI EN 303 645, EU NIS2</span>
+         </div>
+         <p>Autonomous vehicles, smart buildings, IoT infrastructure, logistics/supply chain, urban mobility.</p>
+@@ -300,7 +300,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Technology</h4>
+         <div class="stats">
+           <span>5 packs</span>
+-          <span>71 questions</span>
++          <span>75 questions</span>
+           <span>EU AI Act Art. 13, EU Data Act 2023, DSA Art. 34, TRIPS Agreement</span>
+         </div>
+         <p>SaaS platforms, cybersecurity AI, data analytics, developer tools, IP/patent management.</p>
+@@ -311,7 +311,7 @@ amc domain report --domain environment --output env.md  <span class="comment">#
+         <h4>Governance</h4>
+         <div class="stats">
+           <span>5 packs</span>
+-          <span>71 questions</span>
++          <span>75 questions</span>
+           <span>EU eIDAS 2.0, EU AI Act Art. 5(1)(a), UNCAC Art. 7/9, UNGPs</span>
+         </div>
+         <p>Digital identity, public safety, anti-corruption, human rights impact, public administration.</p>
+diff --git a/website/index.html b/website/index.html
+index 5df4a3a8..9041062b 100644
+--- a/website/index.html
++++ b/website/index.html
+@@ -351,7 +351,7 @@
+           <a href="station-environment.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+             <h3>Environment</h3>
+-            <p class="station-card-meta">6 packs · 87 questions</p>
++            <p class="station-card-meta">6 packs · 91 questions</p>
+             <p class="station-card-desc">Farm to Fork, Weave to Wear, Material to Machines, Source to Sustenance, Ubiquity to Utility, Sip to Sanitation.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+@@ -365,35 +365,35 @@
+           <a href="station-wealth.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+             <h3>Wealth</h3>
+-            <p class="station-card-meta">5 packs · 70 questions</p>
++            <p class="station-card-meta">5 packs · 75 questions</p>
+             <p class="station-card-desc">Future of Work, Digital Payments, No Poverty, Circular Economy, Blockchain and DeFi.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+           <a href="station-education.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></div>
+             <h3>Education</h3>
+-            <p class="station-card-meta">5 packs · 72 questions</p>
++            <p class="station-card-meta">5 packs · 75 questions</p>
+             <p class="station-card-desc">K-12, Higher Education, Skills and Vocational, Specialized Education, Differently Abled.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+           <a href="station-mobility.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
+             <h3>Mobility</h3>
+-            <p class="station-card-meta">6 packs · 78 questions</p>
++            <p class="station-card-meta">6 packs · 90 questions</p>
+             <p class="station-card-desc">Sustainable Communities, Sustainable Ports, Sustainable Real Estate, Virtual Infrastructure, Privacy and Security, Freight/3PL/Warehouse.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+           <a href="station-technology.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg></div>
+             <h3>Technology</h3>
+-            <p class="station-card-meta">5 packs · 71 questions</p>
++            <p class="station-card-meta">5 packs · 75 questions</p>
+             <p class="station-card-desc">Cognition to Intelligence, Networked Ecosystems, OS for Sustainable Outcomes, Infotainment, Partnerships for Prosperity.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+           <a href="station-governance.html" class="station-card">
+             <div class="station-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/></svg></div>
+             <h3>Governance</h3>
+-            <p class="station-card-meta">5 packs · 71 questions</p>
++            <p class="station-card-meta">5 packs · 75 questions</p>
+             <p class="station-card-desc">Digital Citizens and Rights, Dance of Democracy, Petition to Law, Citizen Services, Public and Private Collaboration.</p>
+             <span class="station-card-link">SEE +</span>
+           </a>
+diff --git a/whitepaper/AMC_WHITEPAPER_v1.md b/whitepaper/AMC_WHITEPAPER_v1.md
+index cc65fdda..c19cc6a7 100644
 --- a/whitepaper/AMC_WHITEPAPER_v1.md
 +++ b/whitepaper/AMC_WHITEPAPER_v1.md
 @@ -19,7 +19,7 @@
@@ -176,43 +197,43 @@
  ## Abstract
  
 -The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 600 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 844 questions (244 default + 600 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 1,489 Vitest test source files.
-+The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 608 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 852 questions (244 default + 608 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 1,489 Vitest test source files.
++The rapid proliferation of autonomous AI agents in enterprise settings has outpaced the development of rigorous frameworks for assessing their operational maturity, safety, and readiness for deployment. Existing approaches—borrowed from software capability maturity models, AI risk management frameworks, or ad-hoc internal reviews—fail to address the distinctive characteristics of agents: persistent autonomy, dynamic tool use, self-modification capacity, and emergent multi-agent coordination. We present the **Agent Maturity Compass (AMC) Framework**, an evidence-grounded system for evaluating autonomous AI agents across 244 default diagnostic questions plus 632 sector-specific questions, with an optional 264-question lifecycle set for deeper runtime and proof coverage, at six levels (L0: Absent through L5: Optimizing). The five dimensions—Strategic Operations, Reliability & Safety, Security & Compliance, Observability & Cost, and Evaluation & Growth—provide comprehensive coverage of the operational surface of deployed agents. The central contribution of AMC is its **Execution-Proof Evidence System (EPES)**, which assigns differential trust multipliers to four evidence tiers—ranging from self-reported claims (0.4×) to observed-and-hardened execution artifacts (1.1×)—thereby rendering the framework resistant to the "documentation inflation" observed in prior approaches. On a canonical benchmark agent (ContentModerationBot), keyword-based scoring inflated the total score by 84 points relative to execution-verified scoring; AMC's trust-weighted scoring eliminated this gap. Artifact validity and evidence readiness are reported independently; only evidence readiness `READY` permits scoped external claims. We further introduce an autonomous self-improvement loop in which agents autonomously diagnose maturity gaps, implement remediations, and re-score across dimensions, demonstrated empirically through two case studies: a human-guided agent achieving 94/100 and an autonomously self-improving agent reaching 80/100 from identical L0 baselines. AMC incorporates research-backed scoring modules including Bloom-inspired behavioral attack packs (sycophancy, self-preservation, sabotage, self-preferential bias), METR-inspired task horizon scoring, Google FACTS-inspired factuality dimensions, graduated autonomy governance, memory integrity scoring, and an alignment index. The framework integrates 142 assurance packs, maps to EU AI Act, ISO 42001, NIST AI RMF, and SOC 2, and introduces the Agent Passport (.amcpass) portable verifiable credential for fleet-level trust composition. AMC v2.0 introduces 41 industry-specific sector packs spanning seven regulated industries (Environment, Health, Wealth, Education, Mobility, Technology, Governance), bringing product diagnostic coverage to 876 questions (244 default + 632 sector-specific). The framework also adds MCP (Model Context Protocol) security scoring, agent protocol hardening, and vibe code audit capabilities. AMC is formally specified through a time-parameterized maturity function M(a,d,t), incorporates evidence decay, and is implemented as 1,200+ platform modules with 1,489 Vitest test source files.
  
  **Keywords:** AI agent maturity, autonomous systems evaluation, execution-proof evidence, AI governance, capability maturity, agent reliability, AI risk management, EU AI Act compliance, agent passport, fleet trust composition
  
-@@ -245,7 +245,7 @@
+@@ -245,7 +245,7 @@ Where $\alpha_d$ are dimension weights with $\sum \alpha_d = 1$.
  
  ## 3.6 Industry Sector Packs (v2.0)
  
 -AMC v2.0 introduces 41 industry-specific sector packs containing 600 sector-specific diagnostic questions, dramatically expanding coverage for regulated enterprises and critical infrastructure. Each sector pack adds precise, sub-vertical controls on top of the 244-question default diagnostic, with specific regulatory article references, risk tiers, EU AI Act classifications, SDG alignment, and assurance paths.
-+AMC v2.0 introduces 41 industry-specific sector packs containing 608 sector-specific diagnostic questions, dramatically expanding coverage for regulated enterprises and critical infrastructure. Each sector pack adds precise, sub-vertical controls on top of the 244-question default diagnostic, with specific regulatory article references, risk tiers, EU AI Act classifications, SDG alignment, and assurance paths.
++AMC v2.0 introduces 41 industry-specific sector packs containing 632 sector-specific diagnostic questions, dramatically expanding coverage for regulated enterprises and critical infrastructure. Each sector pack adds precise, sub-vertical controls on top of the 244-question default diagnostic, with specific regulatory article references, risk tiers, EU AI Act classifications, SDG alignment, and assurance paths.
  
  **Sector Pack Distribution:**
  
-@@ -259,7 +259,7 @@
+@@ -259,7 +259,7 @@ AMC v2.0 introduces 41 industry-specific sector packs containing 600 sector-spec
  | 💡 Technology | 5 | EU AI Act Art. 13, EU Data Act 2023, DSA Art. 34, TRIPS Agreement |
  | 🏛️ Governance | 5 | EU eIDAS 2.0, EU AI Act Art. 5(1)(a) (PROHIBITED uses), UNCAC Art. 7/9, UNGPs |
  
 -**Total product diagnostic coverage:** 844 questions (244 default + 600 sector-specific). The lifecycle lane expands the default diagnostic to 264 questions when teams need deeper runtime, proof, memory, and fleet coverage.
-+**Total product diagnostic coverage:** 852 questions (244 default + 608 sector-specific). The lifecycle lane expands the default diagnostic to 264 questions when teams need deeper runtime, proof, memory, and fleet coverage.
++**Total product diagnostic coverage:** 876 questions (244 default + 632 sector-specific). The lifecycle lane expands the default diagnostic to 264 questions when teams need deeper runtime, proof, memory, and fleet coverage.
  
  **Design Principles for Sector Packs:**
  
-@@ -850,7 +850,7 @@
+@@ -850,7 +850,7 @@ Five directions are prioritized for AMC v2.0:
  
  1. **Fleet Trust Composition:** Extending the Agent Passport (.amcpass) system to support multi-agent fleet deployments where composite trust scores are derived from individual agent maturity using weakest-link composition with signed delegation receipts.
  
 -2. **Domain-Specific Diagnostic Packs (IMPLEMENTED in v2.0):** AMC now ships with 41 industry-specific sector packs containing 600 sector-specific diagnostic questions across 7 industry sectors: Environment, Health, Wealth, Education, Mobility, Technology, and Governance. Each pack references specific regulatory articles (HIPAA §164.312, EU AI Act Art. 5(1)(a), FERPA 20 U.S.C. §1232g, UNCAC Art. 7, ISO 28000:2022, etc.) and includes risk tier, EU AI Act classification, SDG alignment, and an assurance path. This addresses the originally planned healthcare, financial, logistics, and safety-critical extensions and significantly exceeds the initial scope.
-+2. **Domain-Specific Diagnostic Packs (IMPLEMENTED in v2.0):** AMC now ships with 41 industry-specific sector packs containing 608 sector-specific diagnostic questions across 7 industry sectors: Environment, Health, Wealth, Education, Mobility, Technology, and Governance. Each pack references specific regulatory articles (HIPAA §164.312, EU AI Act Art. 5(1)(a), FERPA 20 U.S.C. §1232g, UNCAC Art. 7, ISO 28000:2022, etc.) and includes risk tier, EU AI Act classification, SDG alignment, and an assurance path. This addresses the originally planned healthcare, financial, logistics, and safety-critical extensions and significantly exceeds the initial scope.
++2. **Domain-Specific Diagnostic Packs (IMPLEMENTED in v2.0):** AMC now ships with 41 industry-specific sector packs containing 632 sector-specific diagnostic questions across 7 industry sectors: Environment, Health, Wealth, Education, Mobility, Technology, and Governance. Each pack references specific regulatory articles (HIPAA §164.312, EU AI Act Art. 5(1)(a), FERPA 20 U.S.C. §1232g, UNCAC Art. 7, ISO 28000:2022, etc.) and includes risk tier, EU AI Act classification, SDG alignment, and an assurance path. This addresses the originally planned healthcare, financial, logistics, and safety-critical extensions and significantly exceeds the initial scope.
  
  3. **Federated Assessment:** Privacy-preserving maturity assessment for agents operating on confidential data, where evidence artifacts cannot be centralized.
  
-@@ -1154,7 +1154,7 @@
+@@ -1154,7 +1154,7 @@ The threshold system is designed to be *asymmetric*: a high score on Observabili
  
  ---
  
 -*© 2026 POLARIS Research Team, AMC Labs. This paper is a repository preprint under peer-review preparation. No DOI or arXiv identifier is assigned as of 2026-06-16; cite the repository whitepaper until an external identifier is issued. The AMC platform, including 244 default diagnostic questions, 600 sector-specific diagnostic questions across 41 industry packs, optional 264-question lifecycle coverage, 142 assurance packs, and the Agent Passport (.amcpass) system, is MIT licensed and open source at https://github.com/AgentMaturity/AgentMaturityCompass. Contact research@amc-labs.ai.*
-+*© 2026 POLARIS Research Team, AMC Labs. This paper is a repository preprint under peer-review preparation. No DOI or arXiv identifier is assigned as of 2026-06-16; cite the repository whitepaper until an external identifier is issued. The AMC platform, including 244 default diagnostic questions, 608 sector-specific diagnostic questions across 41 industry packs, optional 264-question lifecycle coverage, 142 assurance packs, and the Agent Passport (.amcpass) system, is MIT licensed and open source at https://github.com/AgentMaturity/AgentMaturityCompass. Contact research@amc-labs.ai.*
++*© 2026 POLARIS Research Team, AMC Labs. This paper is a repository preprint under peer-review preparation. No DOI or arXiv identifier is assigned as of 2026-06-16; cite the repository whitepaper until an external identifier is issued. The AMC platform, including 244 default diagnostic questions, 632 sector-specific diagnostic questions across 41 industry packs, optional 264-question lifecycle coverage, 142 assurance packs, and the Agent Passport (.amcpass) system, is MIT licensed and open source at https://github.com/AgentMaturity/AgentMaturityCompass. Contact research@amc-labs.ai.*
  
  *Acknowledgments: The authors thank the engineering teams who deployed ContentModerationBot and DataPipelineBot in production environments for case study participation. We acknowledge the research contributions of Anthropic (Bloom behavioral evaluation, graduated autonomy), METR (task horizon methodology), and Google DeepMind (FACTS factuality framework) whose work informed AMC's scoring modules. No conflicts of interest to declare.*
  
