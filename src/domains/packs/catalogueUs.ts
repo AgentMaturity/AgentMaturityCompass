@@ -85,4 +85,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // Technology station round 2 (2026-10-04): cited by TECH-NE-6.
   verified("nist-sp-800-63-4", "NIST SP 800-63-4 Digital Identity Guidelines", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/63/4/final",
     ["NIST SP 800-63-4"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2025-07-31", note: "Final 31 July 2025; supersedes SP 800-63-3 (csrc.nist.gov page)." }),
+  // Technology station round 2 (2026-10-04): cited by TECH-PP-18.
+  verified("nist-sp-800-218a", "NIST SP 800-218A Secure Software Development Practices for Generative AI and Dual-Use Foundation Models: An SSDF Community Profile", "US", "standard", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/218/a/final", ["NIST SP 800-218A"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2024-07-26", note: "Final 26 July 2024 (csrc.nist.gov page)." }),
 ];
