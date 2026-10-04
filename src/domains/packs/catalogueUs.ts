@@ -93,4 +93,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-sdwa-1433", "Safe Drinking Water Act Section 1433, community water system risk and resilience (42 U.S.C. 300i-2)", "US", "law", "in-force",
     "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap6A-subchapXII-partD-sec300i-2.htm",
     ["SDWA Section 1433", "SDWA §1433", "42 U.S.C. 300i-2"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "U.S. Code 2023 text read: systems serving more than 3,300 persons; assessment covers electronic, computer or other automated systems incl. their security; emergency response plan includes cybersecurity strategies." }),
+  verified("us-nist-sp800-82", "NIST SP 800-82 Rev. 3, Guide to Operational Technology (OT) Security (September 2023)", "US", "guidance", "in-force",
+    "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+    ["NIST SP 800-82 Rev. 3", "NIST SP 800-82r3"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "CSRC page read: Rev. 3 final supersedes Rev. 2; a Rev. 4 initial public draft is open for comment." }),
 ];
