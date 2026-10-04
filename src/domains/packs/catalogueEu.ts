@@ -222,4 +222,10 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://publications.europa.eu/resource/celex/32022R1426", ["Implementing Regulation (EU) 2022/1426", "Commission Implementing Regulation (EU) 2022/1426"], {
       note: "Original OJ text read (Annex III Part 5 in-service reporting, points 2.1-2.2); a consolidated version (2026-03-24) was not read.",
     }),
+  verified("eu-efti", "Regulation (EU) 2020/1056 (electronic freight transport information, eFTI)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32020R1056", ["Regulation (EU) 2020/1056", "eFTI Regulation"], {
+      effectiveDate: "2024-08-21",
+      milestones: milestones(["2027-07-09", "Competent authorities must accept regulatory information made available through certified eFTI platforms (Art. 5(1); date from the Commission eFTI page, transport.ec.europa.eu)"]),
+      note: "Arts. 4, 5, 9 and 18 read. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
 ];
