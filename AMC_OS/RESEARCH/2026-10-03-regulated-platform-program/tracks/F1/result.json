@@ -1,0 +1,35 @@
+{
+  "track": "F1",
+  "status": "COMPLETE",
+  "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "commits": ["262051c0"],
+  "environment": "Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0, worktree wf_fc54d4b0-c89-1",
+  "measured": {
+    "stations": 7,
+    "industryAssurancePackIds": 18,
+    "unmappedIndustryPacksBefore": 9,
+    "unmappedIndustryPacksAfter": 0,
+    "focusedTests": { "files": 3, "passed": 24, "failed": 0 },
+    "regressionRun": { "files": 6, "passed": 37, "failed": 0 },
+    "typecheck": "exit 0",
+    "typecheckTests": "exit 0",
+    "build": "exit 0",
+    "healthProfile": { "sourcedEntries": 30, "verified": 24, "unverified": 6, "distinctSources": 12, "bytes": 41368 }
+  },
+  "mutations": { "roundA": { "failed": 11, "passed": 13 }, "roundB": { "failed": 4, "passed": 14 } },
+  "signingCommands": [
+    "amc budgets sign",
+    "amc tools sign",
+    "amc ops sign",
+    "amc fix-signatures",
+    "amc firewall enable --mode block",
+    "amc policy approval init (defaults only; no CLI re-sign at HEAD)"
+  ],
+  "notExercised": [
+    "fresh clone",
+    "full suite",
+    "release gate",
+    "signing commands against emitted fragments",
+    "runDomainAssurance with mapped industry packs"
+  ]
+}
