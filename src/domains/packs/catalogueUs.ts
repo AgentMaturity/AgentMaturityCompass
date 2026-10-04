@@ -85,4 +85,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-ppra", "Protection of Pupil Rights Amendment (20 U.S.C. §1232h) and regulations (34 CFR Part 98)", "US", "law", "in-force",
     "https://www.govinfo.gov/content/pkg/CFR-2025-title34-vol1/xml/CFR-2025-title34-vol1-sec98-4.xml",
     ["PPRA"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "34 CFR §98.4 read on govinfo (CFR 2025 edition, revised as of 2025-07-01); the statute was not read (uscode.house.gov maintenance page on 2026-10-03)." }),
+  verified("us-section-504", "Section 504 of the Rehabilitation Act of 1973 (29 U.S.C. §794) and Department of Education regulations (34 CFR Part 104)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2025-title34-vol1/xml/CFR-2025-title34-vol1-sec104-44.xml",
+    ["Section 504", "Section 504 of Rehabilitation Act"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "34 CFR §104.44 (Subpart E, postsecondary education) read on govinfo (CFR 2025 edition); other subparts and the statute were not read." }),
 ];
