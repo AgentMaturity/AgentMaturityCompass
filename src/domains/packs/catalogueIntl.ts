@@ -202,4 +202,7 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // Technology station round 2 (2026-10-04): cited by TECH-PP-2.
   { ...unverified("spdx-3", "SPDX Specification 3.0", "INT", "standard", ["SPDX 3.0"],
     "spdx.dev lists 3.0 as the current specification (read 2026-10-04 by the technology round-2 content pass); not an official-source host."), lastReviewed: "2026-10-04" },
+  // Technology station round 2 (2026-10-04): cited by TECH-PP-11.
+  { ...unverified("wipo-wppt", "WIPO Performances and Phonograms Treaty (1996)", "INT", "treaty", ["WIPO WPPT", "WPPT"],
+    "Art. 7 read on WIPO Lex (wipo.int/wipolex/en/text/295578) 2026-10-04 by the technology round-2 content pass; wipo.int is not on OFFICIAL_SOURCE_HOSTS."), lastReviewed: "2026-10-04" },
 ];
