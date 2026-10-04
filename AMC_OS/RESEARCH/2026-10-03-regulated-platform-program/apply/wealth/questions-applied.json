@@ -1,0 +1,2128 @@
+[
+ {
+  "inputId": "WLT-FW-1",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-1",
+   "dimension": "Ethics",
+   "text": "Before outputs of the agent are used to screen, rank or select candidates or to allocate work, are selection rates compared across race, sex and ethnic groups using the four-fifths rule of 29 CFR 1607.4(D), with each shortfall investigated and recorded?",
+   "regulatoryRef": "29 CFR 1607.4(D)",
+   "l1": "No selection-rate data by group is recorded for decisions the agent influences",
+   "l3": "Selection rates by group are computed at least annually and four-fifths shortfalls are logged, but shortfalls have no recorded investigation or outcome",
+   "l5": "Selection rates by group are computed for every model version and decision cohort; every four-fifths shortfall has a recorded investigation with its outcome (validity evidence, change made, or tool withdrawn), retained for review",
+   "weight": 15
+  },
+  "applied": [
+   "single-instrument: refuter compound: US and EU regimes under one L1/L3/L5; text and levels already score the US four-fifths rule. EU employment-AI duties are scored by WLT-FW-8 (Art. 26(6)) and WLT-FW-15 (Art. 26(7))."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite. EEOC AI technical assistance is no longer published (digest measured HTTP 404 on 2026-10-03); the durable anchor for adverse-impact analysis is 29 CFR 1607.4(D), read in this run. EU AI Act Annex III §4(a) kept as the EU classification anchor (obligations apply 2027-12-02). L1/L3/L5 rewritten to selection-rate evidence.",
+  "sources": [
+   {
+    "title": "29 CFR 1607.4(D) (Uniform Guidelines on Employee Selection Procedures, four-fifths rule)",
+    "url": "https://www.ecfr.gov/current/title-29/section-1607.4",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "url": "https://data.europa.eu/eli/reg/2024/1689/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-2",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-2",
+   "dimension": "Compliance",
+   "text": "When the agent onboards or manages persons performing platform work, does it record the facts indicating direction and control that bear on the Art. 5 legal presumption of an employment relationship, and is each status determination taken and recorded by a human?",
+   "regulatoryRef": "Directive (EU) 2024/2831 Art. 5",
+   "l1": "Status is assigned by the agent or a contract template with no record of direction-and-control facts",
+   "l3": "Direction-and-control facts are recorded at onboarding, but status determinations are not reviewed by a human or are not retained per person",
+   "l5": "For every person the facts considered, the status outcome, the human decision-maker and the date are recorded, and changes to agent-driven controls (pay setting, allocation, ratings, sanctions) trigger a recorded re-assessment",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; the legal presumption is Art. 5 (Art. 4 is determination of status). F5's proposed text still said Article 4, so text and levels are rewritten too. ILO R198 removed: not read in this run. National transposition is due 2026-12-02 (Art. 29(1)).",
+  "sources": [
+   {
+    "title": "Directive (EU) 2024/2831 (Platform Work Directive)",
+    "url": "https://data.europa.eu/eli/dir/2024/2831/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-3",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-3",
+   "dimension": "Transparency",
+   "text": "Does the platform give persons performing platform work, their representatives and, on request, competent authorities the Art. 9 information on each automated monitoring or decision system the agent operates (systems in use, data categories, aims, decision types, main parameters), before use and on every material change?",
+   "regulatoryRef": "Directive (EU) 2024/2831 Art. 9",
+   "l1": "No information is given about the automated systems the agent operates",
+   "l3": "A static notice exists, but it is not tied to the deployed system versions or is not re-issued on change",
+   "l5": "The Art. 9 information is generated from the live system inventory, delivered before use with delivery evidence, and re-issued with a version reference on every material change",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: AI Act Art. 26(7) is already scored by WLT-FW-15 (S3); keeping it here would double-count one duty and bundle two instruments."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) and station digest (research/wealth/digest.json) proposal 2: transparency on automated monitoring and decision systems is Art. 9 (Art. 6 is supporting measures). EU AI Act Art. 13 removed (a provider instructions-for-use duty); Art. 26(7) added because it is the deployer duty to inform workers and their representatives before workplace use (applies to Annex III systems from 2027-12-02).",
+  "sources": [
+   {
+    "title": "Directive (EU) 2024/2831 (Platform Work Directive)",
+    "url": "https://data.europa.eu/eli/dir/2024/2831/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "url": "https://data.europa.eu/eli/reg/2024/1689/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-4",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-4",
+   "dimension": "Safety",
+   "text": "Does the agent technically prevent processing of personal data on the emotional or psychological state of persons performing platform work, their private conversations, data collected while they are not performing platform work, and data used to predict the exercise of fundamental rights such as union activity?",
+   "regulatoryRef": "Directive (EU) 2024/2831 Art. 7(1)",
+   "l1": "No restriction on these data categories",
+   "l3": "A written policy prohibits these categories, but enforcement is manual and untested",
+   "l5": "Input and feature allow-lists exclude the Art. 7(1) categories, off-shift collection is blocked, and automated tests run on every release prove none of the categories is ingested",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) was keep (Art. 7 confirmed). Rewritten anyway to station digest (research/wealth/digest.json) proposal 1 so the level is decidable: the original bundled GDPR Art. 88 (a Member State opening clause, not a controller duty) with PWD Art. 7 and its L5 listed aspirational extras. Art. 7(1) prohibitions read in this run.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2024/2831 (Platform Work Directive)",
+    "url": "https://data.europa.eu/eli/dir/2024/2831/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-5",
+  "pack": "future-of-work",
+  "action": "keep",
+  "final": {
+   "id": "WLT-FW-5",
+   "dimension": "Governance",
+   "text": "Does the agent support collective bargaining and worker representation per ILO Convention C087 freedom of association and C098 right to organize?",
+   "regulatoryRef": "ILO Convention C087 Art. 2; C098 Art. 1-4",
+   "l1": "No collective bargaining support; algorithmic management does not accommodate worker organization or collective negotiation",
+   "l3": "Agent does not interfere with worker communication and provides aggregate workforce data for collective bargaining, but does not proactively facilitate worker representation",
+   "l5": "Full collective bargaining support with worker communication channel protection, aggregate data provision for negotiations, algorithmic management consultation mechanisms, works council integration, and non-interference verification per ILO C087/C098",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. ILO C087/C098 not read in this run (unverified).",
+  "sources": [
+   {
+    "title": "ILO Conventions C087 and C098",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-6",
+  "pack": "future-of-work",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-FW-7",
+  "pack": "future-of-work",
+  "action": "keep",
+  "final": {
+   "id": "WLT-FW-7",
+   "dimension": "Compliance",
+   "text": "Does the agent manage working time and rest period compliance per EU Working Time Directive 2003/88/EC Article 3-6 for algorithmically managed workers?",
+   "regulatoryRef": "EU Working Time Directive 2003/88/EC Art. 3-6",
+   "l1": "No working time compliance; algorithmic scheduling does not enforce maximum working hours or minimum rest periods",
+   "l3": "Agent tracks working hours and flags potential violations of daily/weekly limits, but does not prevent algorithmic scheduling that circumvents rest period requirements",
+   "l5": "Full working time compliance with automated scheduling constraints per Art. 3 (11h daily rest), Art. 4 (rest breaks), Art. 5 (weekly rest), Art. 6 (48h weekly maximum), night work protections per Art. 8, and transparent working time reporting",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. Directive 2003/88/EC Arts 3, 4, 5, 6 and 8 read in this run and match the L5 wording (11 consecutive hours daily rest; 48-hour average weekly limit).",
+  "sources": [
+   {
+    "title": "Directive 2003/88/EC (Working Time Directive)",
+    "url": "https://data.europa.eu/eli/dir/2003/88/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-8",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-8",
+   "dimension": "Traceability",
+   "text": "Does the deployer retain the logs automatically generated by the employment AI system for at least six months, linked to each decision that affects a worker or candidate, so that any individual decision can be reconstructed?",
+   "regulatoryRef": "EU AI Act Art. 26(6); EU AI Act Art. 12",
+   "l1": "Logs are not retained or cannot be linked to individual decisions",
+   "l3": "Logs are retained for at least six months, but cannot be linked to a specific decision, input set and model version",
+   "l5": "Logs are retained for at least six months (or longer where another law requires), each decision links to its inputs, model version and human reviewer, and a sampled reconstruction is tested each quarter",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) kept the control but flagged Art. 6(5) as wrong (PWD has no record-keeping Art. 6(5)). Re-anchored: the deployer duty is AI Act Art. 26(6) (keep automatically generated logs at least six months; financial-institution deployers keep them in financial-services governance documentation); Art. 12 is the provider logging capability. Annex III obligations apply 2027-12-02, so weight follows the F class.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "url": "https://data.europa.eu/eli/reg/2024/1689/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-9",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-9",
+   "dimension": "Compliance",
+   "text": "Before any decision to restrict, suspend or terminate the contractual relationship or account of a person performing platform work, or any decision of equivalent detriment, takes effect, is it taken by a named human rather than by the agent?",
+   "regulatoryRef": "Directive (EU) 2024/2831 Art. 10(5)",
+   "l1": "The agent can restrict, suspend or terminate without a human decision",
+   "l3": "A human approves terminations, but restrictions, suspensions or other detrimental decisions can take effect on the agent's output alone",
+   "l5": "A technical gate blocks every detrimental decision until a named human records the decision and reasons; gate bypass attempts are logged and tested on each release",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; human review is Art. 11 and the human-decision rule is Art. 10(5), not Art. 9(2). Compound question split: this item keeps Art. 10(5); the Art. 11 review duty moves to new WLT-FW-15; the ILO C190 half is removed (not read in this run; monitoring-based harassment risk is covered by the Art. 7(1) limits in WLT-FW-4).",
+  "sources": [
+   {
+    "title": "Directive (EU) 2024/2831 (Platform Work Directive)",
+    "url": "https://data.europa.eu/eli/dir/2024/2831/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-10",
+  "pack": "future-of-work",
+  "action": "keep",
+  "final": {
+   "id": "WLT-FW-10",
+   "dimension": "Compliance",
+   "text": "Does the agent support NYC Local Law 144 compliance for Automated Employment Decision Tools (AEDTs), including: (1) annual independent bias audit and publication of a bias audit summary, and (2) required candidate/employee notices about AEDT use, job qualifications assessed, and access to audit information, per NYC Admin Code §20-870 et seq.?",
+   "regulatoryRef": "NYC Local Law 144 (NYC Admin Code §20-870 et seq.)",
+   "l1": "No NYC LL144 support: no independent bias audit workflow, no audit summary publication, and no candidate/employee notice process for AEDT use",
+   "l3": "Performs some bias testing and can generate an internal report, but independence/audit cadence is unclear and notices/public postings are incomplete or manual",
+   "l5": "Full NYC LL144 readiness: independent bias audit support (metrics, protected classes, selection rates), annual scheduling and evidence retention, public audit-summary generation, and automated compliant notice delivery and tracking for candidates/employees",
+   "weight": 15
+  },
+  "applied": [
+   "refuter fix: §20-871 et seq. -> §20-870 et seq."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. DCWP page read in this run confirms the bias-audit-within-one-year, public summary and notice duties; enforcement since 2023-07-05.",
+  "sources": [
+   {
+    "title": "NYC Local Law 144 of 2021 (NYC Admin Code §20-870 et seq.) and DCWP rules",
+    "url": "https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-11",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-11",
+   "dimension": "Compliance",
+   "text": "If the agent analyses video interviews, does it give written notice that AI will be used, explain how the AI works and which characteristics it evaluates, obtain consent before analysis, and delete the video and copies on the applicant's request?",
+   "regulatoryRef": "820 ILCS 42/5; 820 ILCS 42/15",
+   "l1": "No notice, explanation or consent before AI analysis of interviews",
+   "l3": "Notice and consent are captured, but explanations are generic or deletion on request is not evidenced",
+   "l5": "Notice, explanation and consent are recorded per applicant before analysis, and each deletion request is fulfilled with a dated deletion record covering all copies",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; notice/explanation/consent sit in 820 ILCS 42/5 and deletion in 42/15, so the single '§15' anchor was wrong. Section numbers are F5's and are unverified: ilga.gov was unreachable in this run. Illinois HB 3773 (AI in employment) not added: unverified.",
+  "sources": [
+   {
+    "title": "Illinois Artificial Intelligence Video Interview Act, 820 ILCS 42/5 and 42/15",
+    "url": "https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=4015",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "primary text unreachable 2026-10-03 (ilga.gov connection failed, measured with curl in this run). Section split per F5 verdict."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-12",
+  "pack": "future-of-work",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-FW-12",
+   "dimension": "Safety",
+   "text": "Does the agent's assessment workflow offer applicants with disabilities a reasonable-accommodation route (alternative format or human assessment) before scoring, and is every criterion that screens out individuals with disabilities shown to be job-related and consistent with business necessity?",
+   "regulatoryRef": "42 U.S.C. 12112(b)(5)-(7); 29 CFR 1630.11",
+   "l1": "No accommodation route; applicants are scored only by the automated assessment",
+   "l3": "An accommodation request route exists, but screen-out criteria have no recorded job-relatedness evidence",
+   "l5": "Accommodation is offered before scoring with request and outcome records, and each screen-out criterion has recorded job-relatedness evidence reviewed on every model change",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; EEOC 2023 AI guidance withdrawn (digest measured HTTP 404). Re-anchored to the statute and regulation, both read in this run: 42 U.S.C. 12112(b)(5)(A) reasonable accommodation, (b)(6) screen-out criteria, (b)(7) test administration; 29 CFR 1630.11.",
+  "sources": [
+   {
+    "title": "Americans with Disabilities Act, 42 U.S.C. 12112(b)(5)-(7)",
+    "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap126-subchapI-sec12112.htm",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "29 CFR 1630.11 (administration of tests)",
+    "url": "https://www.ecfr.gov/current/title-29/section-1630.11",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-13",
+  "pack": "future-of-work",
+  "action": "keep",
+  "final": {
+   "id": "WLT-FW-13",
+   "dimension": "Governance",
+   "text": "Does the agent support OECD MNE Guidelines 2023 §V by enabling labor-rights due diligence for algorithmic management (impact identification, prevention/mitigation, worker consultation/engagement, grievance intake, and remediation tracking), with evidence outputs suitable for internal/external accountability?",
+   "regulatoryRef": "OECD MNE Guidelines 2023 §V",
+   "l1": "No OECD due diligence loop: no structured labor-impact assessment, no worker consultation evidence, and grievances/remediation are not tracked",
+   "l3": "Performs periodic assessments and tracks some grievances, but consultation and remediation evidence is incomplete and not connected to algorithmic decisions",
+   "l5": "Full OECD §V operationalization with continuous impact due diligence, documented worker engagement, grievance and remediation case management, and auditable reporting of mitigation effectiveness tied to algorithmic-management changes",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. OECD MNE Guidelines are soft law, not read in this run. Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "OECD Guidelines for Multinational Enterprises on Responsible Business Conduct (2023)",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-14",
+  "pack": "future-of-work",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-DP-1",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-1",
+   "dimension": "Safety",
+   "text": "Does the agent keep primary account numbers out of prompts, transcripts, tool payloads and logs, render any account data it stores unreadable, and use strong cryptography whenever it transmits account data over open networks (PCI DSS v4.0.1 Requirements 3 and 4)?",
+   "regulatoryRef": "PCI DSS v4.0.1 Req. 3; PCI DSS v4.0.1 Req. 4",
+   "l1": "Account data appears in agent prompts, transcripts or logs, or is stored or transmitted in clear text",
+   "l3": "Stored and transmitted account data are protected, but agent prompts, transcripts and logs are not scanned for PAN",
+   "l5": "Automated scanning of prompts, transcripts, tool payloads and logs finds no PAN on every release, stored account data is unreadable, transmissions use strong cryptography, and the agent components are inside the entity's PCI DSS assessment scope",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; L5 required 'all 12 requirements', an organisation-scope test, for an agent-level question. Version moved to v4.0.1 (S3 already did this in its worktree). station digest (research/wealth/digest.json): agents must not persist PAN in prompts, transcripts or logs. Requirement sub-numbers are not cited because the standard text was not read.",
+  "sources": [
+   {
+    "title": "PCI DSS v4.0.1",
+    "url": "https://www.pcisecuritystandards.org/document_library/",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-2",
+  "pack": "digital-payments",
+  "action": "keep",
+  "final": {
+   "id": "WLT-DP-2",
+   "dimension": "Compliance",
+   "text": "Does the agent enforce AML/KYC per FATF Recommendation 10 (Customer Due Diligence) and FinCEN BSA 31 CFR §1020.220 CIP requirements?",
+   "regulatoryRef": "FATF Recommendation 10; FinCEN 31 CFR §1020.220",
+   "l1": "No AML/KYC automation; customer identification and due diligence are manual processes with inconsistent application",
+   "l3": "Agent performs automated CDD with identity verification and sanctions screening, but does not implement enhanced due diligence for high-risk customers or ongoing monitoring",
+   "l5": "Comprehensive AML/KYC with risk-based CDD per FATF R10, automated CIP per §1020.220, enhanced due diligence for PEPs and high-risk jurisdictions, ongoing transaction monitoring, suspicious activity detection, and automated SAR filing preparation",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. 31 CFR 1020.220 read in this run; FATF R10 unverified (fatf-gafi.org HTTP 403).",
+  "sources": [
+   {
+    "title": "FATF Recommendations",
+    "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "fatf-gafi.org returned HTTP 403 to curl in this run; S3 catalogue lists fatf-recs as current from a search-listing title only."
+   },
+   {
+    "title": "31 CFR 1020.220 (Customer Identification Program for banks)",
+    "url": "https://www.ecfr.gov/current/title-31/section-1020.220",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-3",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-3",
+   "dimension": "Ethics",
+   "text": "Does the agent's credit-scoring logic exclude prohibited bases and features that act as proxies for them, with a recorded proxy test for every model version (12 CFR 1002.6(b); 15 U.S.C. 1691(a))?",
+   "regulatoryRef": "12 CFR 1002.6(b); 15 U.S.C. 1691(a)",
+   "l1": "Prohibited-basis attributes or known proxies can enter the scoring model and no test exists",
+   "l3": "Prohibited-basis attributes are excluded from inputs, but proxy testing is not performed for every model version",
+   "l5": "Inputs exclude prohibited bases, every model version has a recorded proxy test with results and remediation, and the records are retained with the model version",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: refuter compound: text and levels score Regulation B / ECOA only; the EU Annex III §5(b) duty is scored by WLT-DP-16 (Art. 27 FRIA)."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) was keep, but the CFPB final rule 91 FR 21620 (effective 2026-07-21) amended 12 CFR 1002.6(a) to state that the Act does not provide that the effects test applies (eCFR text read in this run). The L1/L5 framing of federal 'disparate impact analysis per ECOA' is no longer accurate; re-anchored to prohibited-basis and proxy controls under §1002.6(b) and 15 U.S.C. 1691(a). EU AI Act Annex III §5(b) kept for EU deployments (applies 2027-12-02). State-law disparate-impact duties not assessed.",
+  "sources": [
+   {
+    "title": "12 CFR 1002.6(b) (Regulation B, prohibited-basis rules)",
+    "url": "https://www.ecfr.gov/current/title-12/section-1002.6",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "Equal Credit Opportunity Act, 15 U.S.C. 1691(a)",
+    "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap41-subchapIV-sec1691.htm",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "url": "https://data.europa.eu/eli/reg/2024/1689/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-4",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-4",
+   "dimension": "Compliance",
+   "text": "For electronic payments the agent initiates, does the flow apply strong customer authentication (PSD2 Art. 97) and, for remote transactions, make the payer aware of the amount and payee and generate an authentication code specific to that amount and payee (RTS 2018/389 Art. 5)?",
+   "regulatoryRef": "PSD2 2015/2366 Art. 97; Commission Delegated Regulation (EU) 2018/389 Art. 4; Commission Delegated Regulation (EU) 2018/389 Art. 5",
+   "l1": "Agent-initiated payments complete without strong customer authentication",
+   "l3": "Strong customer authentication is applied, but the authentication code is not bound to amount and payee or the agent can change them after authentication",
+   "l5": "Every agent-initiated payment is authenticated with an amount- and payee-specific code shown to the payer, any post-authentication change invalidates the code, and tests cover web and app channels",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep, and WLT-DP-12 merges into it; dynamic linking is RTS 2018/389 Art. 5 (Art. 4 is the authentication code), both read in this run. Text extended to cover agent-initiated payments and dynamic linking. PSD2 status stays 'unverified' to match the S3 catalogue.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2015/2366 (PSD2)",
+    "url": "https://data.europa.eu/eli/dir/2015/2366/oj",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Arts 21, 45, 97 text read read as Publications Office CELLAR text (http://publications.europa.eu/resource/celex/32015L2366); status left unverified to match S3 catalogue (CELLAR end-of-validity 2026-06-18 with no repealing act listed; PSR/PSD3 not adopted as of 2026-10-03 per station digest)."
+   },
+   {
+    "title": "Commission Delegated Regulation (EU) 2018/389 (RTS on strong customer authentication)",
+    "url": "https://data.europa.eu/eli/reg_del/2018/389/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-5",
+  "pack": "digital-payments",
+  "action": "keep",
+  "final": {
+   "id": "WLT-DP-5",
+   "dimension": "Transparency",
+   "text": "Does the agent provide payment fee transparency per PSD2 Article 45 information on charges?",
+   "regulatoryRef": "PSD2 Art. 45",
+   "l1": "No fee transparency; payment fees, exchange rates, and total costs are not clearly disclosed before transaction execution",
+   "l3": "Agent displays fees and exchange rates before transaction confirmation, but does not provide comparative cost information or total cost of payment calculations",
+   "l5": "Full fee transparency with pre-transaction total cost disclosure, comparative fee analysis, exchange rate markup transparency, recurring payment cost projections, and machine-readable fee schedules per PSD2 Art. 45",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: split: EU half kept here; the US half moves to WLT-DP-17 anchored on 12 CFR 1005.31 (Dodd-Frank §1032 is a CFPB rulemaking authority, not read, and imposes no direct disclosure duty on the firm)."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. PSD2 Art. 45 read in this run; Dodd-Frank §1032 not read. text unchanged. Weight 10 (class U): both parts unverified as instruments (eu-psd2 is 'unverified' in S3's catalogue; Dodd-Frank §1032 not read). The 2026-10-03 draft set 12, which broke its own weight rule; corrected 2026-10-04. Becomes 12 if S3 verifies eu-psd2.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2015/2366 (PSD2)",
+    "url": "https://data.europa.eu/eli/dir/2015/2366/oj",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Arts 21, 45, 97 text read read as Publications Office CELLAR text (http://publications.europa.eu/resource/celex/32015L2366); status left unverified to match S3 catalogue (CELLAR end-of-validity 2026-06-18 with no repealing act listed; PSR/PSD3 not adopted as of 2026-10-03 per station digest)."
+   },
+   {
+    "title": "Dodd-Frank Act §1032 (12 U.S.C. 5532)",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-6",
+  "pack": "digital-payments",
+  "action": "keep",
+  "final": {
+   "id": "WLT-DP-6",
+   "dimension": "Safety",
+   "text": "Does the agent implement real-time fraud detection per EMV 3-D Secure 2.3 risk-based authentication?",
+   "regulatoryRef": "EMV 3DS 2.3",
+   "l1": "No real-time fraud detection; payment transactions are not screened for fraud indicators before authorization",
+   "l3": "Agent performs rule-based fraud screening with basic velocity checks and geolocation verification, but does not implement ML-based behavioral analysis or network-level fraud detection",
+   "l5": "Advanced fraud detection with ML behavioral analysis, device fingerprinting, network graph analysis, real-time risk scoring per EMV 3DS 2.3, and automated fraud case management",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: two unrelated standards (EMVCo, ISO); the question is risk-based authentication, so EMV 3DS is the anchor. ISO 20022 stays in the pack basis."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. EMV 3DS 2.3 and ISO 20022 'fraud reporting' not read (unverified). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "EMVCo EMV 3-D Secure 2.3",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   },
+   {
+    "title": "ISO 20022",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run (iso.org HTTP 403 per station digest)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-7",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-7",
+   "dimension": "Governance",
+   "text": "For each transfer of funds the agent initiates or prepares, does the required payer and payee information accompany the transfer (Regulation (EU) 2023/1113 Art. 4), and are transfers with incomplete information held or rejected?",
+   "regulatoryRef": "Regulation (EU) 2023/1113 Art. 4",
+   "l1": "Transfers are sent without complete payer or payee information",
+   "l3": "Required fields are populated for most transfers, but incomplete transfers are not held or rejected",
+   "l5": "Every transfer is validated for complete payer and payee information before sending, incomplete transfers are held or rejected under a documented rule, and the evidence is retained per transfer",
+   "weight": 15
+  },
+  "applied": [
+   "single-instrument: the parenthetical 'FATF R.16 for non-EU corridors' named a second regime; the levels score one rule for every transfer, so the binding TFR Art. 4 is the anchor (FATF R.16 stays in the pack basis and is scored for virtual-asset transfers by WLT-BC-3). Not split: a 16th question would change the station total that docs/DOMAIN_PACKS.md (outside this write scope) asserts."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (cross-pack duplicate with GOV-PPC-12 noted). S3's added WLT-DP-14 (TFR + R.16) merges into it. Re-anchored to TFR Art. 4 (payer and payee information on transfers of funds), read in this run; FATF R.16 kept for non-EU corridors, unverified. The crypto-asset half of WLT-DP-14 belongs to WLT-BC-12.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1113 (Transfer of Funds Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2023/1113/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "FATF Recommendations",
+    "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "fatf-gafi.org returned HTTP 403 to curl in this run; S3 catalogue lists fatf-recs as current from a search-listing title only."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-8",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-8",
+   "dimension": "Traceability",
+   "text": "Does the agent retain transaction records, including the inputs, rules or model version behind each fraud or risk decision it made, for at least five years in a form usable for dispute resolution and supervisory examination?",
+   "regulatoryRef": "PSD2 2015/2366 Art. 21",
+   "l1": "Transaction records lack the agent's decision inputs or are not retained",
+   "l3": "Transactions are retained for five years, but the agent's decision inputs and model version are not linked to them",
+   "l5": "Each transaction record links to the agent's inputs, rules or model version and outcome, is retained at least five years, and a sampled dispute is reconstructed from the records each quarter",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; Dodd-Frank §1033 is a consumer data-access rule (12 CFR Part 1033), not audit trails, and PSD2 Art. 58 is information for the payee. Record-keeping is PSD2 Art. 21 (at least 5 years), read in this run. Compound split: the §1033 half is removed because its compliance dates are under reconsideration (ANPR 90 FR 40986; no later Federal Register action on Part 1033 found in this run). Weight 10 (class U): the only part (PSD2 Art. 21) resolves to eu-psd2, which S3's catalogue holds as 'unverified'. The 2026-10-03 draft set 12; corrected 2026-10-04. Becomes 12 if S3 verifies eu-psd2.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2015/2366 (PSD2)",
+    "url": "https://data.europa.eu/eli/dir/2015/2366/oj",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Arts 21, 45, 97 text read read as Publications Office CELLAR text (http://publications.europa.eu/resource/celex/32015L2366); status left unverified to match S3 catalogue (CELLAR end-of-validity 2026-06-18 with no repealing act listed; PSR/PSD3 not adopted as of 2026-10-03 per station digest)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-9",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-9",
+   "dimension": "Compliance",
+   "text": "Is every ICT third-party service the payment agent depends on (model or API providers included) recorded in the DORA register of information and managed under the entity's ICT third-party risk policy?",
+   "regulatoryRef": "EU DORA Art. 28",
+   "l1": "Agent model or API providers are not in the register of information",
+   "l3": "Providers are in the register, but risk assessment or contract terms are missing for some of them",
+   "l5": "Every provider the agent calls is in the register with risk assessment, contract terms and exit plan, and the register is reconciled against the agent's live dependency list on each release",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) kept this compound question. Split per the brief: the DORA half is kept and anchored to Art. 28(3) (register of information on ICT third-party arrangements), read in this run; the PCI DSS Req. 12.3.2 'customized approach for AI fraud models' half is removed: requirement text not read and it is an assessment option, not an agent control.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2022/2554 (DORA)",
+    "url": "https://data.europa.eu/eli/reg/2022/2554/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-10",
+  "pack": "digital-payments",
+  "action": "keep",
+  "final": {
+   "id": "WLT-DP-10",
+   "dimension": "Safety",
+   "text": "For payment pages, does the agent enforce PCI DSS v4.0.1 Requirement 6.4.3 by maintaining an authorized script inventory, validating each script legitimacy (source/owner/purpose), implementing change detection and integrity controls (e.g., SRI/CSP/script hashing), and alerting or blocking on unauthorized or modified scripts that could capture payment data?",
+   "regulatoryRef": "PCI DSS v4.0.1 Req. 6.4.3",
+   "l1": "No payment-page script governance: scripts are loaded without authorization controls or integrity monitoring, allowing silent skimming or exfiltration",
+   "l3": "Maintains a script inventory and basic CSP, but integrity or change detection and alerting are incomplete and not audit-ready",
+   "l5": "Full PCI 6.4.3 readiness with authorized-script allowlisting, continuous integrity monitoring (SRI/CSP/hashes), automated change approval workflows, real-time alerting or blocking for unauthorized scripts, and audit evidence bundles for assessor review",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (S3 already moved the citation to v4.0.1). Requirement 6.4.3 confirmed mandatory from 2025-03-31 per PCI SSC blog read by the station digest.",
+  "sources": [
+   {
+    "title": "PCI DSS v4.0.1",
+    "url": "https://www.pcisecuritystandards.org/document_library/",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-11",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-11",
+   "dimension": "Governance",
+   "text": "Are ICT incidents involving the agent classified under DORA criteria and, when major, reported within the RTS time limits: initial notification within 4 hours of classification and no later than 24 hours after awareness, intermediate report within 72 hours of the initial notification, final report within one month?",
+   "regulatoryRef": "EU DORA Art. 18; EU DORA Art. 19; Commission Delegated Regulation (EU) 2025/301 Art. 5",
+   "l1": "Agent incidents are not classified or reported on DORA time limits",
+   "l3": "Incidents are classified, but reporting clocks are tracked manually or some limits were missed without notifying the authority",
+   "l5": "Classification runs on every agent incident, 4h/24h/72h/one-month timers are enforced, and submissions and any late-submission notices are retained",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) and station digest (research/wealth/digest.json) proposal 7: Art. 17 is the process; classification is Art. 18 and reporting Art. 19; time limits are Delegated Regulation (EU) 2025/301 Art. 5, read in this run. Replaces 'commonly treated as ~4 hours'.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2022/2554 (DORA)",
+    "url": "https://data.europa.eu/eli/reg/2022/2554/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "Commission Delegated Regulation (EU) 2025/301 (DORA incident reporting content and time limits)",
+    "url": "https://data.europa.eu/eli/reg_del/2025/301/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-12",
+  "pack": "digital-payments",
+  "action": "merge",
+  "mergedInto": "WLT-DP-4",
+  "final": null
+ },
+ {
+  "inputId": "WLT-NP-1",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-1",
+   "dimension": "Ethics",
+   "text": "Does the agent prevent predatory lending per the CGAP Client Protection Principles?",
+   "regulatoryRef": "CGAP Client Protection Principles",
+   "l1": "No predatory lending prevention; AI lending algorithms optimize for revenue without affordability assessment or interest rate caps",
+   "l3": "Agent implements basic affordability checks and interest rate monitoring, but does not assess cumulative debt burden or prevent over-indebtedness across multiple lenders",
+   "l5": "Comprehensive predatory lending prevention with affordability assessment, cumulative debt burden analysis, interest rate fairness evaluation, transparent pricing disclosure, over-indebtedness early warning, and responsible collection practices per CGAP principles",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: two issuers (CGAP, World Bank); the World Bank FCP Good Practices stay scored by WLT-NP-5."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep; WLT-NP-12 merges into it. CGAP principles are now the SPTF/CERISE Client Protection Standards (F5); not read in this run. Weight 15 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-2",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-2",
+   "dimension": "Ethics",
+   "text": "Does the agent ensure financial inclusion without discrimination for refugees and displaced people per the UNHCR guidelines on financial inclusion?",
+   "regulatoryRef": "UNHCR Financial Inclusion Guidelines",
+   "l1": "No inclusion assessment; financial services algorithms may exclude displaced populations, refugees, or undocumented individuals",
+   "l3": "Agent tracks service access metrics by population segment and flags exclusion patterns, but does not implement alternative identification or credit assessment for underserved populations",
+   "l5": "Full financial inclusion with alternative ID acceptance per UNHCR guidelines, non-traditional credit assessment, refugee/displaced population accommodation, language accessibility, cultural sensitivity, and inclusion impact measurement",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: two issuers (IFC, UNHCR); the question is about refugees and displaced people, so UNHCR is the anchor. IFC PS stays in the pack basis."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (IFC PS1 / UNHCR are soft law; not read). Weight 15 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-3",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-3",
+   "dimension": "Compliance",
+   "text": "Does the agent implement simplified due diligence per FATF Recommendation 1 risk-based approach for low-risk financial inclusion products?",
+   "regulatoryRef": "FATF Recommendation 1; FATF Guidance on Financial Inclusion (2017)",
+   "l1": "No simplified CDD; all customers face the same due diligence requirements regardless of risk level, creating barriers for low-income populations",
+   "l3": "Agent applies tiered CDD based on product risk level, but simplified procedures are not systematically designed for financial inclusion or aligned with FATF guidance",
+   "l5": "Risk-based CDD with FATF-aligned simplified procedures for low-risk inclusion products, tiered account limits, progressive KYC as usage increases, and documented risk assessment justifying simplified measures per FATF R1 and inclusion guidance",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. FATF R1 revision of Feb 2025 reported by F5; fatf-gafi.org HTTP 403 in this run. Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "FATF Recommendations",
+    "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "fatf-gafi.org returned HTTP 403 to curl in this run; S3 catalogue lists fatf-recs as current from a search-listing title only."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-4",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-4",
+   "dimension": "Safety",
+   "text": "Does the agent implement mobile money security per GSMA Mobile Money Certification requirements and protect low-literacy users from fraud?",
+   "regulatoryRef": "GSMA Mobile Money Certification; GSMA Code of Conduct for Mobile Money",
+   "l1": "No mobile money security; digital financial services lack fraud protection appropriate for vulnerable and low-literacy users",
+   "l3": "Agent implements basic transaction security and fraud alerts, but user interfaces are not designed for low-literacy users and fraud education is not provided",
+   "l5": "Comprehensive mobile money security with low-literacy UI design, voice-based transaction confirmation, fraud education in local languages, social engineering protection, agent network fraud monitoring, and GSMA certification compliance",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (GSMA; not read). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-5",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-5",
+   "dimension": "Transparency",
+   "text": "Does the agent provide financial literacy support and transparent product information per World Bank Good Practices Principle 3 (Disclosure and Transparency)?",
+   "regulatoryRef": "World Bank FCP Good Practices Principle 3",
+   "l1": "No financial literacy support; product terms are presented in complex language without educational context",
+   "l3": "Agent provides simplified product information and basic financial literacy content, but does not personalize education or assess user comprehension",
+   "l5": "Full financial literacy integration with personalized education, comprehension verification, transparent product comparison, total cost disclosure in local currency, visual/audio explanations for low-literacy users, and ongoing financial capability building",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (World Bank FCP; not read).",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-6",
+  "pack": "no-poverty",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-NP-7",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-7",
+   "dimension": "Safety",
+   "text": "Does the agent protect vulnerable population data per GDPR Article 9 special category protections?",
+   "regulatoryRef": "GDPR Art. 9",
+   "l1": "No vulnerable population data protection; financial data of displaced/disadvantaged populations is processed without enhanced safeguards",
+   "l3": "Agent applies basic data protection to all customer data, but does not implement enhanced protections for special-category data of vulnerable populations",
+   "l5": "Full vulnerable population data protection with enhanced consent processes, data minimization, purpose limitation, re-identification risk assessment, and data sharing restrictions for special-category data",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: split: binding GDPR half kept here; the ICRC humanitarian-data half moves to WLT-NP-19."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. GDPR status per S3 catalogue; ICRC handbook not read.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2016/679 (GDPR)",
+    "url": "https://data.europa.eu/eli/reg/2016/679/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-8",
+  "pack": "no-poverty",
+  "action": "keep",
+  "final": {
+   "id": "WLT-NP-8",
+   "dimension": "Traceability",
+   "text": "Does the agent maintain social performance management per CERISE-SPTF Universal Standards for Social Performance Management?",
+   "regulatoryRef": "CERISE-SPTF Universal Standards for SPM",
+   "l1": "No social performance tracking; financial inclusion operations are not assessed against social performance standards",
+   "l3": "Agent tracks basic social metrics (outreach to poor, women, rural populations) but does not implement full social performance management or client outcome monitoring",
+   "l5": "Comprehensive SPM with CERISE-SPTF standard implementation, client outcome monitoring, social audit readiness, responsible pricing verification, staff incentive alignment with social goals, and transparent social performance reporting",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (CERISE-SPTF; not read). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-9",
+  "pack": "no-poverty",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-NP-9",
+   "dimension": "Transparency",
+   "text": "For every US credit denial or other adverse action the agent decides or supports, does the notice state the specific principal reasons derived from the model features actually used (12 CFR 1002.9(b)(2)), in a format accessible to applicants without credit history?",
+   "regulatoryRef": "12 CFR 1002.9(a)(2); 12 CFR 1002.9(b)(2)",
+   "l1": "Notices give no reasons or only that the applicant did not reach a qualifying score",
+   "l3": "Reasons come from a fixed list that is not tied to the features the model used for that applicant",
+   "l5": "Reasons are computed per decision from the model's attributions, checked for accuracy against the decision record, and retained with it",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) and station digest (research/wealth/digest.json) proposal 17: 12 CFR Part 202 is the superseded Federal Reserve Regulation B; the CFPB rule is 12 CFR 1002.9, read in this run (§1002.9(b)(2): reasons must be specific; 'failed to achieve a qualifying score' is insufficient). EU AI Act Art. 6(2) removed (classification, not registration). CFPB Circular 2023-03 not added: not read.",
+  "sources": [
+   {
+    "title": "12 CFR 1002.9(a)(2), (b)(2) (Regulation B, adverse action notices and specific reasons)",
+    "url": "https://www.ecfr.gov/current/title-12/section-1002.9",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-10",
+  "pack": "no-poverty",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-NP-10",
+   "dimension": "Ethics",
+   "text": "Before an alternative-data source (mobile, utility, social or transaction data) is used in credit decisions for underserved applicants, is it tested for acting as a proxy for a prohibited basis under 12 CFR 1002.6(b), with the result recorded?",
+   "regulatoryRef": "12 CFR 1002.6(b); 15 U.S.C. 1691(a)",
+   "l1": "Alternative-data sources are added without proxy testing",
+   "l3": "Sources are proxy-tested when first added, but not re-tested when the source or model changes",
+   "l5": "Every alternative-data source has a recorded proxy test before use and on each change, failing sources are blocked, and the record is retained with the model version",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) was keep, but the question framed fair lending as ECOA disparate-impact governance; Regulation B now states the Act does not provide that the effects test applies (91 FR 21620, effective 2026-07-21; eCFR read in this run). Re-scoped to alternative-data features in inclusive credit, which is the pack-specific risk; dimension 'Fair Lending' (single use) normalised to Ethics. Overlap with WLT-DP-3 is cross-pack and accepted: DP-3 tests the scoring model, NP-10 tests alternative-data sources.",
+  "sources": [
+   {
+    "title": "12 CFR 1002.6(b) (Regulation B, prohibited-basis rules)",
+    "url": "https://www.ecfr.gov/current/title-12/section-1002.6",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "Equal Credit Opportunity Act, 15 U.S.C. 1691(a)",
+    "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title15/html/USCODE-2023-title15-chap41-subchapIV-sec1691.htm",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-11",
+  "pack": "no-poverty",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-NP-12",
+  "pack": "no-poverty",
+  "action": "merge",
+  "mergedInto": "WLT-NP-1",
+  "final": null
+ },
+ {
+  "inputId": "WLT-NP-13",
+  "pack": "no-poverty",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-NP-13",
+   "dimension": "Governance",
+   "text": "Does the operator of the agent-run inclusion channel (simplified accounts, agent networks) apply documented proportional risk controls, record incidents from that channel, and report channel risk to the board at a defined cadence?",
+   "regulatoryRef": "BCBS Guidance on the application of the Core Principles for Effective Banking Supervision to institutions relevant to financial inclusion (2016)",
+   "l1": "No documented risk controls for the inclusion channel",
+   "l3": "Controls are documented, but channel incidents are not recorded or not reported to the board",
+   "l5": "Controls are documented with a proportionality rationale, every channel incident is recorded, and board reports on channel risk are evidenced at the defined cadence",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; 'Basel/BCBS financial inclusion governance' is not a citable instrument. F5's proposed BCBS 2016 guidance is unverified (bis.org not read in this run). Dimension 'Risk Management' (single use) normalised to Governance.",
+  "sources": [
+   {
+    "title": "CGAP / SPTF client protection, World Bank FCP Good Practices, IFC PS1, UNHCR, GSMA, ICRC, CERISE-SPTF, BCBS inclusion guidance",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Soft law; not read in this run (station digest also unverified)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-14",
+  "pack": "no-poverty",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-CE-1",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-1",
+   "dimension": "Compliance",
+   "text": "Does the agent assess EU Taxonomy alignment per Regulation 2020/852 Article 3 substantial contribution criteria and Article 17 DNSH principle?",
+   "regulatoryRef": "EU Taxonomy 2020/852 Art. 3, Art. 17",
+   "l1": "No Taxonomy alignment; investment decisions do not assess economic activities against EU Taxonomy technical screening criteria",
+   "l3": "Agent evaluates activities against Taxonomy TSC for climate mitigation/adaptation, but does not implement full DNSH assessment or minimum social safeguards verification",
+   "l5": "Full Taxonomy alignment with TSC assessment across all six environmental objectives, DNSH verification per Art. 17, minimum social safeguards per Art. 18, Taxonomy-eligible vs. aligned distinction, and KPI calculation per delegated acts",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. Weight 15 -> 12 by the weight rule (class B); text unchanged.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2020/852 (Taxonomy Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2020/852/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-2",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-2",
+   "dimension": "Transparency",
+   "text": "Does the agent prevent greenwashing per EU SFDR 2019/2088 Article 6-11 sustainability disclosure requirements?",
+   "regulatoryRef": "EU SFDR 2019/2088 Art. 6-11",
+   "l1": "No greenwashing prevention; sustainability claims in investment products are not verified against actual portfolio characteristics",
+   "l3": "Agent validates basic sustainability claims against portfolio data, but does not implement full SFDR disclosure requirements or detect subtle greenwashing patterns",
+   "l5": "Comprehensive greenwashing prevention with SFDR Art. 8/9 classification verification, principal adverse impact assessment per Art. 7, sustainability claim substantiation, portfolio-level ESG metric validation, and automated disclosure generation per SFDR RTS",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: split: EU SFDR half kept here (levels already score SFDR only); the SEC Names Rule half moves to WLT-CE-17."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep; note SFDR amendment proposal (2025-11-20) and Names Rule compliance dates (2026-06-11 / 2026-12-11).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2019/2088 (SFDR)",
+    "url": "https://data.europa.eu/eli/reg/2019/2088/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "SEC Investment Company Names Rule (17 CFR 270.35d-1) amendments",
+    "url": "https://www.federalregister.gov/documents/2025/03/20/2025-04705/investment-company-names-extension-of-compliance-date",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-3",
+  "pack": "circular-economy",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-CE-3",
+   "dimension": "Governance",
+   "text": "Does the agent's climate and environmental risk assessment for the institution's exposures identify and measure physical and transition risks using documented scenarios, as expected by EBA Guidelines on the management of ESG risks (EBA/GL/2025/01)?",
+   "regulatoryRef": "EBA/GL/2025/01",
+   "l1": "No physical or transition risk assessment of exposures",
+   "l3": "Risks are assessed for some portfolios, but scenarios and methods are undocumented",
+   "l5": "All in-scope exposures are assessed with documented scenarios and methods, results are versioned, and reruns reproduce reported figures",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; TCFD disbanded on 2023-10-12 (fsb-tcfd.org read in this run). F5 proposed IFRS S2 + ECB 2020 guide (unverified); this rewrite uses EBA/GL/2025/01 instead, read in this run (applicable from 2026-01-11), because it is the current supervisory instrument for ESG risk management by EU institutions. IFRS S2 not cited: not read. Weight 10 (class U): EBA guidelines are comply-or-explain supervisory guidance, not binding law. The 2026-10-03 draft set 12; corrected 2026-10-04.",
+  "sources": [
+   {
+    "title": "EBA Guidelines on the management of ESG risks (EBA/GL/2025/01)",
+    "url": "https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/sustainable-finance/guidelines-management-esg-risks",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-4",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-4",
+   "dimension": "Ethics",
+   "text": "Before an investment is reported as Taxonomy-aligned, does the agent verify the minimum social safeguards of EU Taxonomy Regulation Article 18?",
+   "regulatoryRef": "EU Taxonomy 2020/852 Art. 18",
+   "l1": "No safeguards check; investments are reported as Taxonomy-aligned without verifying minimum social safeguards",
+   "l3": "Investments are screened against basic social criteria and exclusion lists, but the Art. 18 safeguards are not verified for each investee",
+   "l5": "Alignment is withheld until each investee's Art. 18 minimum safeguards check (OECD MNE Guidelines, UNGPs, ILO Declaration) is recorded with the evidence used and its date",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: split: two obligations from two issuers; Taxonomy Art. 18 kept here, ILO just-transition half moves to WLT-CE-18."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (Taxonomy Art. 18 is binding; ILO Just Transition Guidelines not read). Weight 10 -> 12 by the weight rule (class B); text unchanged.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2020/852 (Taxonomy Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2020/852/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "GRI, SASB, ICMA GBP, ISO 14040/14044, Ellen MacArthur MCI, ILO Just Transition Guidelines",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Standards/soft law; not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-5",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-5",
+   "dimension": "Compliance",
+   "text": "Does the agent manage ESG data quality per GRI Standards 2021 reporting principles?",
+   "regulatoryRef": "GRI Standards 2021",
+   "l1": "No ESG data quality management; sustainability data is collected without standardized methodology or quality controls",
+   "l3": "Agent collects ESG data per GRI and performs basic quality checks, but does not validate data against primary sources or assess materiality",
+   "l5": "Full ESG data governance with GRI reporting principle compliance, double materiality assessment, data quality scoring, primary source validation, and automated ESG report generation with assurance readiness",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: two issuers (GRI, IFRS/SASB); the question is reporting-principle data quality, so GRI is the anchor. SASB stays in the pack basis."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (GRI/SASB not read). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "GRI, SASB, ICMA GBP, ISO 14040/14044, Ellen MacArthur MCI, ILO Just Transition Guidelines",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Standards/soft law; not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-6",
+  "pack": "circular-economy",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-CE-6",
+   "dimension": "Safety",
+   "text": "Are the non-generative ESG scoring models the agent uses inventoried, validated and monitored under the 2026 interagency model-risk guidance (SR 26-2), and, because that guidance excludes generative and agentic AI, are the agent's generative or agentic components covered by separately documented governance and controls?",
+   "regulatoryRef": "SR 26-2",
+   "l1": "Scoring models are not inventoried or validated, or governance still cites SR 11-7 only",
+   "l3": "Scoring models are validated under SR 26-2, but the agentic or generative components have no documented governance",
+   "l5": "Scoring models have SR 26-2 validation and monitoring records, and agentic components have documented scope limits, logging and human approval points, each reviewed on change",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) was keep, but SR 11-7 is superseded: SR 26-2 (2026-04-17) supersedes SR 11-7 and SR 21-8, and sr1107.htm returns HTTP 404 (both measured in this run). SR 26-2 excludes generative and agentic AI models from scope, so the rewrite (station digest (research/wealth/digest.json) proposal 14) asks for both halves. EBA ESG guidelines moved to WLT-CE-3. Weight 10 (class U): SR 26-2 is supervisory guidance, not binding law. The 2026-10-03 draft set 12; corrected 2026-10-04.",
+  "sources": [
+   {
+    "title": "Federal Reserve SR 26-2 / OCC / FDIC Revised Guidance on Model Risk Management (supersedes SR 11-7 and SR 21-8)",
+    "url": "https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-7",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-7",
+   "dimension": "Traceability",
+   "text": "Does the agent maintain green bond compliance per EU Green Bond Standard Regulation 2023/2631?",
+   "regulatoryRef": "EU GBS Regulation 2023/2631",
+   "l1": "No green bond tracking; proceeds allocation and impact reporting for green bonds are not systematically managed",
+   "l3": "Agent tracks green bond proceeds allocation against eligible project categories, but does not implement full impact reporting or external review management",
+   "l5": "Comprehensive green bond management with proceeds allocation tracking, impact reporting, EU GBS Taxonomy alignment verification, external review coordination, annual allocation/impact report generation, and post-issuance compliance monitoring",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: two issuers (ICMA voluntary principles, EU regulation); the binding EU GBS is the anchor."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/2631 (European Green Bonds)",
+    "url": "https://data.europa.eu/eli/reg/2023/2631/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "GRI, SASB, ICMA GBP, ISO 14040/14044, Ellen MacArthur MCI, ILO Just Transition Guidelines",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Standards/soft law; not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-8",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-8",
+   "dimension": "Governance",
+   "text": "Does the agent support circular economy investment assessment per Ellen MacArthur Foundation circularity indicators?",
+   "regulatoryRef": "Ellen MacArthur Foundation Material Circularity Indicator",
+   "l1": "No circularity assessment; investments are not evaluated for circular economy alignment or material efficiency",
+   "l3": "Agent calculates basic circularity metrics for portfolio companies, but does not implement circular business model assessment",
+   "l5": "Full circularity assessment with Material Circularity Indicator calculation, circular business model evaluation, waste reduction impact measurement, resource efficiency tracking, and circular economy investment opportunity identification",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: ISO 14044 LCA is already scored by WLT-CE-13; the MCI is the anchor here."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (Ellen MacArthur MCI and ISO 14044 not read). Weight 15 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "GRI, SASB, ICMA GBP, ISO 14040/14044, Ellen MacArthur MCI, ILO Just Transition Guidelines",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Standards/soft law; not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-9",
+  "pack": "circular-economy",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-CE-9",
+   "dimension": "Compliance",
+   "text": "For an undertaking within the amended CSRD scope, can every ESRS data point the agent produces be traced to the double-materiality assessment record and to its source data, including value-chain (Scope 3) estimates?",
+   "regulatoryRef": "Directive (EU) 2022/2464; Commission Delegated Regulation (EU) 2023/2772",
+   "l1": "ESRS outputs cannot be traced to a materiality assessment or source data",
+   "l3": "Data points trace to source data, but not to a recorded materiality decision, or value-chain estimates lack documented methods",
+   "l5": "Every reported data point links to its materiality decision, source data and estimation method, and a sampled set is reproduced before publication",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; CSRD as amended by Directive (EU) 2025/794 (stop-the-clock) and 2026/470 (Omnibus I: > EUR 450m net turnover and > 1 000 employees, read in this run). WLT-CE-11 (ESRS E1 Scope 3) merges in. Whether ESRS were revised under Omnibus I was not checked: ESRS citation unverified.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2022/2464 (CSRD), as amended by Directives (EU) 2025/794 and 2026/470",
+    "url": "https://data.europa.eu/eli/dir/2022/2464/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "Commission Delegated Regulation (EU) 2023/2772 (ESRS)",
+    "url": "https://data.europa.eu/eli/reg_del/2023/2772/oj",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run; whether revised ESRS were adopted under Omnibus I was not checked."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-10",
+  "pack": "circular-economy",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-CE-10",
+   "dimension": "Compliance",
+   "text": "For a reporting entity under California Health and Safety Code §38532, does the agent compute scope 1 and scope 2 emissions in conformance with the Greenhouse Gas Protocol with documented boundaries and methods, in a form a limited-assurance provider can reproduce?",
+   "regulatoryRef": "California Health and Safety Code §38532",
+   "l1": "Emissions figures cannot be reproduced from documented boundaries and methods",
+   "l3": "Boundaries and methods are documented, but figures cannot be reproduced from logged inputs or change history is missing",
+   "l5": "Figures are reproduced from logged inputs with documented boundaries, methods and change history, and the assurance provider's sample reproduces without exception",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; SEC climate rules (17 CFR 229.1500-1508) were stayed (89 FR 25804) and their rescission was proposed 2026-06-03 (91 FR 33296; Federal Register API read in this run, no final action found). Re-anchored to California Health and Safety Code §38532 (SB 253), in force: first report due 2026-11-10 per the CARB program page read 2026-10-04 (the 2026-08-10 date read on 2026-10-03 was deferred), scope 1 and 2, GHG Protocol conformance, limited assurance from 2026 (statute and CARB release read in this run).",
+  "sources": [
+   {
+    "title": "California Health and Safety Code §38532 (leginfo.legislature.ca.gov)",
+    "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=38532",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-11",
+  "pack": "circular-economy",
+  "action": "merge",
+  "mergedInto": "WLT-CE-9",
+  "final": null
+ },
+ {
+  "inputId": "WLT-CE-12",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-12",
+   "dimension": "Transparency",
+   "text": "Does the agent compute and disclose EU Taxonomy Article 8 KPIs (taxonomy-eligible vs taxonomy-aligned turnover, CapEx, OpEx) with traceable mappings from financial line items to underlying economic activities, including evidence for eligibility/alignment and reconciliation to financial statements?",
+   "regulatoryRef": "EU Taxonomy 2020/852 Art. 8",
+   "l1": "No Art. 8 KPI disclosures: taxonomy KPIs are not computed or cannot be reconciled to financial statements and activity evidence",
+   "l3": "Computes taxonomy KPIs for some activities, but mappings, reconciliations, and evidence are incomplete",
+   "l5": "Full Art. 8 KPI disclosure readiness with traceable mappings, reconciliation to financial statements, evidence links, and repeatable disclosure-generation workflows",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (cross-pack duplicate with MOB-RE-14 noted).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2020/852 (Taxonomy Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2020/852/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-13",
+  "pack": "circular-economy",
+  "action": "keep",
+  "final": {
+   "id": "WLT-CE-13",
+   "dimension": "Traceability",
+   "text": "Does the agent ensure lifecycle assessment (LCA) governance aligned to ISO 14040 and 14044, including (1) explicit goal and scope definition and functional unit, (2) boundary, allocation, and cut-off rules, (3) data quality requirements, and (4) critical review triggers and evidence retention when LCA supports external claims?",
+   "regulatoryRef": "ISO 14040:2006; ISO 14044:2006",
+   "l1": "No LCA governance: LCAs are ad-hoc with unclear scope and boundaries and no critical review readiness for external claims",
+   "l3": "Maintains basic LCA templates and assumptions, but allocation and boundary discipline and critical review readiness are inconsistent",
+   "l5": "Full ISO 14040 and 14044 governance with goal and scope controls, data quality rules, critical review workflow triggers, and auditable evidence bundles for claim substantiation",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (ISO 14040/14044 not read).",
+  "sources": [
+   {
+    "title": "GRI, SASB, ICMA GBP, ISO 14040/14044, Ellen MacArthur MCI, ILO Just Transition Guidelines",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Standards/soft law; not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-14",
+  "pack": "circular-economy",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-CE-15",
+  "pack": "circular-economy",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-BC-1",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-1",
+   "dimension": "Compliance",
+   "text": "Does the agent enforce crypto-asset service provider authorization per MiCA Regulation 2023/1114 Title V Articles 59-74 CASP requirements?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 59-74",
+   "l1": "No MiCA compliance; crypto-asset services are provided without authorization assessment or prudential requirements",
+   "l3": "Agent tracks MiCA authorization requirements and maintains compliance documentation, but does not automate ongoing prudential requirement monitoring or client asset segregation verification",
+   "l5": "Full MiCA CASP compliance with authorization requirement tracking, prudential requirement monitoring per Art. 67, client asset segregation per Art. 70, complaint handling per Art. 71, conflict of interest management per Art. 72, and outsourcing governance per Art. 73",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. MiCA Title V article titles (59, 67, 70-73) read in this run; CASP transitional period ended no later than 2026-07-01.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-2",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-2",
+   "dimension": "Safety",
+   "text": "Does the agent implement smart contract security assessment per OWASP Smart Contract Top 10?",
+   "regulatoryRef": "OWASP Smart Contract Top 10",
+   "l1": "No smart contract security; AI-interacted smart contracts are not assessed for vulnerabilities before execution",
+   "l3": "Agent performs basic static analysis of smart contracts and checks against known vulnerability patterns, but does not implement formal verification or runtime monitoring",
+   "l5": "Comprehensive smart contract security with static/dynamic analysis, formal verification, runtime monitoring, reentrancy/overflow/access control checks per OWASP Top 10, automated audit report generation, and upgrade proxy security verification",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: IEEE P3207 is a draft (author note), not an instrument; OWASP is the anchor."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (OWASP SC Top 10 / IEEE P3207 not read). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "OWASP Smart Contract Top 10, IEEE P3207, IOSCO DeFi recommendations, BIS CPMI",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run (iosco.org HTTP 403 per station digest)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-3",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-3",
+   "dimension": "Compliance",
+   "text": "Does the agent implement travel rule compliance per FATF Recommendation 16 and FATF VA/VASP Guidance §7 for virtual asset transfers?",
+   "regulatoryRef": "FATF Recommendation 16; FATF VA/VASP Guidance §7",
+   "l1": "No travel rule compliance; virtual asset transfers do not include required originator/beneficiary information",
+   "l3": "Agent collects and transmits travel rule data for transfers above threshold, but does not implement counterparty VASP verification or sunrise issue management",
+   "l5": "Full travel rule compliance with originator/beneficiary data collection per R16, counterparty VASP verification, protocol interoperability (TRISA/OpenVASP), threshold monitoring, and automated regulatory reporting across jurisdictions",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (FATF R16 / VA guidance unverified, HTTP 403). EU transfers are tested in WLT-BC-11 and WLT-BC-12. Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "FATF Recommendations",
+    "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "fatf-gafi.org returned HTTP 403 to curl in this run; S3 catalogue lists fatf-recs as current from a search-listing title only."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-4",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-4",
+   "dimension": "Governance",
+   "text": "Does the agent record, for each token it handles, a classification under the MiCA Art. 3 crypto-asset types, with escalation to legal review where the classification is uncertain?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 3",
+   "l1": "Tokens are handled with no recorded classification",
+   "l3": "A classification is recorded, but the facts it rests on are not captured or uncertain cases are not escalated",
+   "l5": "Every token has a dated MiCA classification with the facts used, uncertain cases are escalated with the legal decision recorded, and classifications are re-run when facts change",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: refuter compound split: EU MiCA half kept here; the US Howey half (with the merged WLT-BC-14 distribution and marketing facts) moves to WLT-BC-17."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep with WLT-BC-14 merging in; station digest (research/wealth/digest.json): MiCA Art. 2 is scope, definitions are Art. 3 (read in this run). SEC proposed Regulation Crypto Assets (91 FR 54510, proposed 2026-08-21) not cited: it is a proposal. Howey unverified (not read).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "SEC v. W.J. Howey Co., 328 U.S. 293 (1946)",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-5",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-5",
+   "dimension": "Safety",
+   "text": "Does the agent implement stablecoin reserve management monitoring per MiCA 2023/1114 Title III Articles 36-39?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 36-39",
+   "l1": "No reserve monitoring; stablecoin reserves are not verified for adequacy, composition, or custody requirements",
+   "l3": "Agent tracks reserve composition and adequacy ratios, but does not implement real-time reserve verification or stress testing",
+   "l5": "Full reserve management monitoring with real-time composition tracking, adequacy verification per MiCA Art. 36, custody requirement compliance per Art. 37, reserve investment policy monitoring, stress testing, and transparent reserve attestation",
+   "weight": 12
+  },
+  "applied": [
+   "single-instrument: two issuers (EU, BIS CPMI); binding MiCA is the anchor. BIS CPMI stays in the pack basis."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep. MiCA Arts 36-37 titles read in this run. Weight 10 -> 12 by the weight rule (class B); text unchanged.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "OWASP Smart Contract Top 10, IEEE P3207, IOSCO DeFi recommendations, BIS CPMI",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run (iosco.org HTTP 403 per station digest)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-6",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-6",
+   "dimension": "Transparency",
+   "text": "Does the agent provide DeFi protocol transparency per IOSCO Policy Recommendations for DeFi?",
+   "regulatoryRef": "IOSCO DeFi Policy Recommendations (2023)",
+   "l1": "No DeFi transparency; protocol mechanics, risks, and AI-driven trading strategies are opaque to users",
+   "l3": "Agent provides basic protocol documentation and risk warnings, but does not implement real-time transparency for AI-managed positions or protocol governance decisions",
+   "l5": "Full DeFi transparency with protocol mechanics documentation, real-time position visibility, AI strategy explanation, governance proposal impact analysis, risk metric dashboards, and transparent fee/slippage disclosure per IOSCO recommendations",
+   "weight": 10
+  },
+  "applied": [
+   "single-instrument: AI Act Art. 13 is a provider duty for high-risk systems and DeFi trading is not Annex III (pack euAIActClassification); the author removed Art. 13 from WLT-FW-3 for the same reason."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (IOSCO not read).",
+  "sources": [
+   {
+    "title": "OWASP Smart Contract Top 10, IEEE P3207, IOSCO DeFi recommendations, BIS CPMI",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run (iosco.org HTTP 403 per station digest)."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-7",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-7",
+   "dimension": "Ethics",
+   "text": "Are the agent's own crypto-asset orders checked before submission so that it does not trade on inside information (MiCA Art. 89) or place orders that give false or misleading signals, such as wash trades or front-running (Art. 91)?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 89; MiCA 2023/1114 Art. 91",
+   "l1": "Agent orders are not checked for insider dealing or manipulation patterns",
+   "l3": "Orders are screened for some patterns, but inside-information restrictions are not enforced on the agent",
+   "l5": "Every agent order passes pre-submission checks for restricted-list hits and manipulation patterns, blocked orders are logged with reasons, and checks are tested on each release",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; insider dealing is Art. 89, market manipulation Art. 91, Art. 92 is prevention and detection (all read in this run). Duplicate with WLT-BC-10 resolved by splitting: BC-7 tests the agent's own orders, BC-10 tests surveillance and reporting.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-8",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-8",
+   "dimension": "Traceability",
+   "text": "Does the CASP keep records of every service, order and transaction the agent performs, linked to the agent's decision, for five years and up to seven where the competent authority requests (MiCA Art. 68(9))?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 68",
+   "l1": "Agent orders and transactions are not recorded with their decision context",
+   "l3": "Records are kept for five years, but are not linked to the agent's decision or cannot be extended to seven years",
+   "l5": "Each order and transaction links to the agent decision and inputs, retention is five years with an authority-extension flag, and a sampled reconstruction is tested each quarter",
+   "weight": 12
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) kept the control but flagged Art. 68 as governance arrangements (record-keeping is Art. 68(9)) and ISO/TC 307 as a committee, not a standard. Re-anchored to Art. 68(9), read in this run: records of services, orders and transactions kept five years, up to seven on request.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-9",
+  "pack": "blockchain",
+  "action": "merge",
+  "mergedInto": "WLT-BC-12",
+  "final": null
+ },
+ {
+  "inputId": "WLT-BC-10",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-10",
+   "dimension": "Compliance",
+   "text": "If the agent professionally arranges or executes crypto-asset transactions, do surveillance arrangements detect possible market abuse in orders and transactions, and are reasonable suspicions reported to the competent authority without delay (MiCA Art. 92(1))?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 92",
+   "l1": "No surveillance of orders and transactions the agent arranges or executes",
+   "l3": "Alerts exist, but escalation and reporting to the authority are manual or untracked",
+   "l5": "Alerts cover the agent's order flow, each alert has a case record and decision, and suspicious-order reports are submitted without delay with submission evidence retained",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json) and station digest (research/wealth/digest.json) proposal 11: market-abuse prevention and detection is MiCA Art. 92(1) (Art. 68 is governance); Art. 92(1) requires reporting reasonable suspicions without delay (read in this run). 'Requested anchor' wording removed.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-11",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-11",
+   "dimension": "Traceability",
+   "text": "For transfers of crypto-assets over EUR 1 000 to a self-hosted address, does the agent assess whether the address is owned or controlled by the originator (Regulation (EU) 2023/1113 Art. 14(5)), and does it apply no amount threshold to the EU information requirement?",
+   "regulatoryRef": "Regulation (EU) 2023/1113 Art. 14",
+   "l1": "Travel-rule data is applied only above a threshold for EU transfers, or self-hosted transfers are not assessed",
+   "l3": "No threshold is applied for EU transfers, but self-hosted ownership assessments are manual or unrecorded",
+   "l5": "No threshold is applied to EU transfers, each self-hosted transfer over EUR 1 000 has a recorded ownership assessment, and transfer value includes fees and FX at a documented rate",
+   "weight": 15
+  },
+  "applied": [
+   "single-instrument: split: L5 scored EU and non-EU corridors together; EU TFR half kept here, FATF R.15 non-EU threshold half moves to WLT-BC-18."
+  ],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): rewrite; station digest (research/wealth/digest.json) found the $/EUR 1 000 threshold logic conflicts with the EU TFR: Art. 14 sets no amount threshold for information accompanying crypto-asset transfers; its only EUR 1 000 figure is the Art. 14(5) self-hosted-address assessment (read in this run). FATF INR.15 threshold kept for non-EU corridors, unverified (HTTP 403).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1113 (Transfer of Funds Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2023/1113/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "FATF Recommendations",
+    "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/Fatf-recommendations.html",
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "fatf-gafi.org returned HTTP 403 to curl in this run; S3 catalogue lists fatf-recs as current from a search-listing title only."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-12",
+  "pack": "blockchain",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-BC-12",
+   "dimension": "Traceability",
+   "text": "Does every crypto-asset transfer the agent sends carry the originator and beneficiary information required by Regulation (EU) 2023/1113 Art. 14, and for incoming transfers does the agent detect missing information (Art. 16) and decide to execute, reject, return or suspend under a risk-based procedure (Art. 17)?",
+   "regulatoryRef": "Regulation (EU) 2023/1113 Art. 14; Regulation (EU) 2023/1113 Art. 16; Regulation (EU) 2023/1113 Art. 17",
+   "l1": "Transfers are sent without complete originator and beneficiary information",
+   "l3": "Outgoing transfers are complete, but missing information on incoming transfers is not detected or handled by a documented procedure",
+   "l5": "Outgoing transfers are validated before sending, incoming transfers are checked for missing information, and every execute/reject/return/suspend decision is recorded with its reason",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep; WLT-BC-9 and the crypto half of S3's WLT-DP-14 merge in. Detection of missing information is Art. 16 and handling of incomplete transfers Art. 17 (read in this run).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1113 (Transfer of Funds Regulation)",
+    "url": "https://data.europa.eu/eli/reg/2023/1113/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-13",
+  "pack": "blockchain",
+  "action": "keep",
+  "final": {
+   "id": "WLT-BC-13",
+   "dimension": "Governance",
+   "text": "Does the agent assess whether a digital asset or related product implicates the CFTC commodity perimeter under CEA §1a(9) (and downstream compliance implications for derivatives/leveraged products and CFTC anti-manipulation posture), with documented reasoning and escalation to legal/compliance?",
+   "regulatoryRef": "CEA §1a(9) (commodity definition)",
+   "l1": "No CFTC perimeter assessment; products are classified only via SEC/Howey or EU categories",
+   "l3": "Performs a basic commodity vs security analysis, but does not connect results to product-type implications or maintain audit-ready rationale",
+   "l5": "Comprehensive CFTC perimeter governance with documented §1a(9) analysis, product-type mapping (spot vs derivatives/leveraged), escalation gates, and periodic reassessment as guidance/enforcement evolves",
+   "weight": 10
+  },
+  "applied": [],
+  "authorRationale": "F5 verdict (research/pack-quality/wealth.json): keep (CEA §1a(9) not read). Weight 12 -> 10 by the weight rule (class U); text unchanged.",
+  "sources": [
+   {
+    "title": "Commodity Exchange Act §1a(9), 7 U.S.C. 1a(9)",
+    "url": null,
+    "retrievedAt": null,
+    "verified": false,
+    "reason": "Not read in this run."
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-14",
+  "pack": "blockchain",
+  "action": "merge",
+  "mergedInto": "WLT-BC-4",
+  "final": null
+ },
+ {
+  "inputId": "WLT-BC-15",
+  "pack": "blockchain",
+  "action": "drop",
+  "mergedInto": null,
+  "final": null
+ },
+ {
+  "inputId": "WLT-DP-13",
+  "pack": "digital-payments",
+  "action": "rewrite",
+  "final": {
+   "id": "WLT-DP-13",
+   "dimension": "Safety",
+   "text": "For credit transfers in euro that the agent prepares or initiates, is verification of payee obtained before the payer authorises, is any close match or mismatch shown to the payer, and does the agent refuse to authorise on the payer's behalf after a mismatch?",
+   "regulatoryRef": "Regulation (EU) No 260/2012 Art. 5c; Regulation (EU) 2024/886",
+   "l1": "Transfers are authorised without verification of payee",
+   "l3": "Verification of payee runs, but the agent can proceed after a mismatch without an explicit payer decision",
+   "l5": "Every transfer records the verification result before authorisation, close-match and no-match force an explicit payer decision, and tests cover match, close-match, no-match and not-possible outcomes",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "Added by S3 in its worktree (industryPacks.ts:1261, not in baseline 8f57ce63). Kept as a control; dimension 'Payee Verification' normalised to Safety (a single-use dimension name); weight 10 -> 15 by the weight rule (binding since 2025-10-09, hard gate). station digest (research/wealth/digest.json) proposal 6 adds the agent rule: never auto-confirm on mismatch. Art. 5c and dates read in this run.",
+  "sources": [
+   {
+    "title": "Regulation (EU) No 260/2012 Art. 5c, inserted by Regulation (EU) 2024/886",
+    "url": "https://data.europa.eu/eli/reg/2024/886/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-14",
+  "pack": "digital-payments",
+  "action": "merge",
+  "mergedInto": "WLT-DP-7",
+  "final": null
+ },
+ {
+  "inputId": "WLT-FW-15",
+  "pack": "future-of-work",
+  "action": "add",
+  "final": {
+   "id": "WLT-FW-16",
+   "dimension": "Transparency",
+   "text": "When a person performing platform work requests review of a decision taken or supported by the agent, does the platform send a written, substantiated reply within two weeks of receipt and, where the decision infringed the person's rights, rectify it within two weeks?",
+   "regulatoryRef": "Directive (EU) 2024/2831 Art. 11(2); Directive (EU) 2024/2831 Art. 11(3)",
+   "l1": "No review channel for decisions taken or supported by the agent",
+   "l3": "Review requests are logged, but replies are not written and substantiated or the two-week limits are not tracked",
+   "l5": "Every review request has a timestamped written reply within two weeks, rectifications are completed within two weeks, and breaches of either limit are reported",
+   "weight": 15
+  },
+  "applied": [
+   "renumbered WLT-FW-15 -> WLT-FW-16 (S3 holds WLT-FW-15)"
+  ],
+  "authorRationale": "New, split from WLT-FW-9 (F5 compound finding) and station digest (research/wealth/digest.json) proposal 0: Art. 11(2)-(3) review duties read in this run.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2024/2831 (Platform Work Directive)",
+    "url": "https://data.europa.eu/eli/dir/2024/2831/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-FW-16",
+  "pack": "future-of-work",
+  "action": "add",
+  "final": {
+   "id": "WLT-FW-17",
+   "dimension": "Ethics",
+   "text": "When the agent proposes pay, pay levels or pay progression, are the criteria it applies objective and gender-neutral, accessible to workers, and reproducible from logged inputs for gender pay-gap reporting?",
+   "regulatoryRef": "Directive (EU) 2023/970 Art. 6; Directive (EU) 2023/970 Art. 9",
+   "l1": "Pay proposals use undisclosed criteria",
+   "l3": "Criteria are documented and accessible to workers, but gender neutrality is not tested or pay-gap figures cannot be reproduced",
+   "l5": "Criteria are published to workers, gender neutrality is tested on every release, and Art. 9 indicators are reproduced from logged inputs",
+   "weight": 12
+  },
+  "applied": [
+   "renumbered WLT-FW-16 -> WLT-FW-17 (S3 holds WLT-FW-16)"
+  ],
+  "authorRationale": "New from station digest (research/wealth/digest.json) proposal 4: Pay Transparency Directive Arts 6, 7, 9 read in this run; transposition deadline 2026-06-07 has passed.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2023/970 (Pay Transparency Directive)",
+    "url": "https://data.europa.eu/eli/dir/2023/970/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-DP-15",
+  "pack": "digital-payments",
+  "action": "add",
+  "final": {
+   "id": "WLT-DP-16",
+   "dimension": "Governance",
+   "text": "Before deploying an AI system that evaluates the creditworthiness or credit score of natural persons, has the deployer completed a fundamental rights impact assessment under AI Act Art. 27(1), tied to the deployed version?",
+   "regulatoryRef": "EU AI Act Art. 27; EU AI Act Annex III §5(b)",
+   "l1": "No fundamental rights impact assessment",
+   "l3": "An assessment exists, but it is not tied to the deployed version or not updated on change",
+   "l5": "The assessment is versioned with the deployed system, covers the processes, affected groups, risks, human-oversight and mitigation measures, and is updated on every material change",
+   "weight": 10
+  },
+  "applied": [
+   "renumbered WLT-DP-15 -> WLT-DP-16 (S3 holds WLT-DP-15)"
+  ],
+  "authorRationale": "New from station digest (research/wealth/digest.json) proposal 9: AI Act Art. 27(1) requires deployers of Annex III §5(b) creditworthiness systems to perform a fundamental rights impact assessment before deployment (read in this run); applies 2027-12-02. Keeps the pack at the S3 floor of 13 after two merges.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744",
+    "url": "https://data.europa.eu/eli/reg/2024/1689/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-15",
+  "pack": "no-poverty",
+  "action": "add",
+  "final": {
+   "id": "WLT-NP-16",
+   "dimension": "Compliance",
+   "text": "Before credit is granted to an EU consumer, does the agent complete and record a creditworthiness assessment carried out in the consumer's interest to prevent irresponsible lending and over-indebtedness (Directive (EU) 2023/2225 Art. 18(1))?",
+   "regulatoryRef": "Directive (EU) 2023/2225 Art. 18",
+   "l1": "Credit can be granted without a recorded creditworthiness assessment",
+   "l3": "An assessment is recorded, but it uses only lender-risk factors and no measure of the consumer's ability to repay",
+   "l5": "Every grant is blocked until an assessment of the consumer's ability to repay is recorded with its data sources, and declined-for-affordability outcomes are retained",
+   "weight": 15
+  },
+  "applied": [
+   "renumbered WLT-NP-15 -> WLT-NP-16 (S3 holds WLT-NP-15)"
+  ],
+  "authorRationale": "New, replacing WLT-NP-14 (station digest (research/wealth/digest.json) proposal 16): Art. 18(1) creditworthiness assessment in the consumer's interest to prevent over-indebtedness, read in this run; national measures apply from 2026-11-20.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2023/2225 (Consumer Credit Directive)",
+    "url": "https://data.europa.eu/eli/dir/2023/2225/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-16",
+  "pack": "no-poverty",
+  "action": "add",
+  "final": {
+   "id": "WLT-NP-17",
+   "dimension": "Transparency",
+   "text": "Where the creditworthiness assessment uses automated processing, can the consumer request and obtain human intervention, a clear explanation of the assessment and its logic, and to express a view and contest the decision (Directive (EU) 2023/2225 Art. 18(8))?",
+   "regulatoryRef": "Directive (EU) 2023/2225 Art. 18(8)",
+   "l1": "No route to human intervention or explanation",
+   "l3": "Human intervention is available on request, but explanations are generic or contests are not recorded",
+   "l5": "Each automated assessment can be explained from its record, requests for human intervention and contests are logged with outcomes and response times",
+   "weight": 12
+  },
+  "applied": [
+   "renumbered WLT-NP-16 -> WLT-NP-17 (S3 holds WLT-NP-16)"
+  ],
+  "authorRationale": "New, split from station digest (research/wealth/digest.json) proposals 8 and 16: Art. 18(8) rights where the assessment uses automated processing, read in this run.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2023/2225 (Consumer Credit Directive)",
+    "url": "https://data.europa.eu/eli/dir/2023/2225/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-NP-17",
+  "pack": "no-poverty",
+  "action": "add",
+  "final": {
+   "id": "WLT-NP-18",
+   "dimension": "Compliance",
+   "text": "If the agent produces a credit-score or probability value that lenders draw on strongly to grant or refuse credit, does the operator treat it as automated individual decision-making under GDPR Art. 22 (per CJEU C-634/21), with a recorded Art. 22(2) basis and safeguards?",
+   "regulatoryRef": "GDPR Art. 22; CJEU C-634/21",
+   "l1": "Scores are supplied without an Art. 22 assessment",
+   "l3": "An Art. 22 basis is recorded, but safeguards (human intervention, contest) are not available to data subjects",
+   "l5": "The Art. 22(2) basis is recorded per use case, safeguards are offered and their use is logged, and the assessment is reviewed when the score's use by lenders changes",
+   "weight": 12
+  },
+  "applied": [
+   "renumbered WLT-NP-17 -> WLT-NP-18 (S3 holds WLT-NP-17)"
+  ],
+  "authorRationale": "New from station digest (research/wealth/digest.json) (instrument EU-GDPR-ADM): no wealth question cited GDPR Art. 22 for credit scoring. CJEU C-634/21 (read in this run) holds that automated establishment of a credit-score probability value that a third party draws on strongly is an Art. 22(1) decision. Distinct actor from WLT-NP-16: the score provider, not the creditor.",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2016/679 (GDPR)",
+    "url": "https://data.europa.eu/eli/reg/2016/679/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   },
+   {
+    "title": "CJEU Case C-634/21 SCHUFA Holding (Scoring), judgment of 7 December 2023",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62021CJ0634",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-CE-16",
+  "pack": "circular-economy",
+  "action": "add",
+  "final": {
+   "id": "WLT-CE-16",
+   "dimension": "Governance",
+   "text": "When the agent requests sustainability information from value-chain undertakings with not more than 1 000 employees, does it limit requests to the value-chain cap and tell the undertaking which extra information is requested and that it may decline?",
+   "regulatoryRef": "Directive (EU) 2022/2464; Directive (EU) 2026/470",
+   "l1": "The agent sends information requests without checking the size of the recipient",
+   "l3": "Recipient size is checked, but requests beyond the cap are sent without telling the recipient it may decline",
+   "l5": "Requests to protected undertakings are limited to the cap by default, any extra request states that it is extra and may be declined, and the self-declaration of size is retained",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "New from station digest (research/wealth/digest.json) proposal 15, agent-level part only: Omnibus I (Directive (EU) 2026/470, read in this run) introduces protected undertakings (not more than 1 000 employees) and a value-chain cap with a statutory right to decline extra requests.",
+  "sources": [
+   {
+    "title": "Directive (EU) 2022/2464 (CSRD), as amended by Directives (EU) 2025/794 and 2026/470",
+    "url": "https://data.europa.eu/eli/dir/2022/2464/oj",
+    "retrievedAt": "2026-10-03",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": "WLT-BC-16",
+  "pack": "blockchain",
+  "action": "add",
+  "final": {
+   "id": "WLT-BC-16",
+   "dimension": "Ethics",
+   "text": "Before the agent gives advice on crypto-assets or manages a crypto-asset portfolio, does it assess suitability from the client's knowledge and experience, investment objectives including risk tolerance, and financial situation, and record the assessment (MiCA Art. 81(1))?",
+   "regulatoryRef": "MiCA 2023/1114 Art. 81",
+   "l1": "No suitability assessment before advice or portfolio management",
+   "l3": "A questionnaire exists, but recommendations are not blocked when it is missing or stale",
+   "l5": "Recommendations are blocked until a current suitability assessment is recorded, and assessments are retained with the recommendations they supported",
+   "weight": 15
+  },
+  "applied": [],
+  "authorRationale": "New from station digest (research/wealth/digest.json) proposal 12: no question covered MiCA Art. 81(1) suitability (read in this run); records under Art. 68(9).",
+  "sources": [
+   {
+    "title": "Regulation (EU) 2023/1114 (MiCA)",
+    "url": "https://data.europa.eu/eli/reg/2023/1114/oj",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "digital-payments",
+  "action": "split",
+  "splitFrom": "WLT-DP-5",
+  "final": {
+   "id": "WLT-DP-17",
+   "dimension": "Transparency",
+   "text": "For remittance transfers the agent initiates or prepares, is the sender given the pre-payment disclosure of 12 CFR 1005.31(b)(1) (amount transferred, fees and taxes, total, exchange rate, amount to be received) when the transfer is requested and before payment (12 CFR 1005.31(e)(1))?",
+   "regulatoryRef": "12 CFR 1005.31",
+   "l1": "Remittance transfers can be paid for without a pre-payment disclosure",
+   "l3": "A disclosure is shown, but it omits applicable elements (such as the exchange rate or covered third-party fees) or is shown after payment in some channels",
+   "l5": "Payment is blocked until a pre-payment disclosure with every applicable §1005.31(b)(1) element is shown, for agent-initiated and user-initiated transfers alike, and the disclosure shown is retained with the transfer",
+   "weight": 15
+  },
+  "applied": [
+   "B + hard gate: 12 CFR 1005.31 read 2026-10-04 on govinfo (CFR 2026 ed., title 12 vol. 8); payment is gated on the disclosure."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "no-poverty",
+  "action": "split",
+  "splitFrom": "WLT-NP-7",
+  "final": {
+   "id": "WLT-NP-19",
+   "dimension": "Safety",
+   "text": "Where the agent processes data about refugees, displaced people or other recipients of humanitarian assistance, does it apply the data protection principles of the ICRC Handbook on Data Protection in Humanitarian Action, including limits on sharing with third parties?",
+   "regulatoryRef": "ICRC Handbook on Data Protection in Humanitarian Action",
+   "l1": "Data about humanitarian beneficiaries is processed like any other customer data",
+   "l3": "Minimisation and purpose limits are documented, but sharing with third parties (including authorities and donors) is not restricted or recorded",
+   "l5": "Each beneficiary data flow has a recorded purpose and minimisation review, sharing with any third party requires a documented assessment, and re-identification risk is assessed before any release",
+   "weight": 10
+  },
+  "applied": [
+   "U: soft law, handbook not read."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "circular-economy",
+  "action": "split",
+  "splitFrom": "WLT-CE-2",
+  "final": {
+   "id": "WLT-CE-17",
+   "dimension": "Transparency",
+   "text": "When the agent proposes or reviews the name of a US registered fund that uses terms such as ESG or sustainable, does it check that the fund has adopted the 80% investment policy that 17 CFR 270.35d-1 requires and that the portfolio is reviewed against it at least quarterly?",
+   "regulatoryRef": "17 CFR 270.35d-1",
+   "l1": "Fund names with ESG-type terms are proposed without checking for an 80% investment policy",
+   "l3": "The 80% policy is checked when a name is proposed, but quarterly portfolio reviews and departures are not tracked",
+   "l5": "A name with ESG-type terms is blocked unless an 80% policy is recorded; quarterly reviews and every departure, with its return to compliance within 90 consecutive days, are recorded",
+   "weight": 12
+  },
+  "applied": [
+   "B: 17 CFR 270.35d-1 read 2026-10-04 on govinfo (CFR 2025 ed., title 17); compliance dates 2026-06-11 / 2026-12-11 per station digest (federalregister.gov 2025-04705)."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "circular-economy",
+  "action": "split",
+  "splitFrom": "WLT-CE-4",
+  "final": {
+   "id": "WLT-CE-18",
+   "dimension": "Ethics",
+   "text": "Does the agent assess the effects of transition-related investment decisions on workers and communities against the ILO Guidelines for a just transition (2015)?",
+   "regulatoryRef": "ILO Just Transition Guidelines (2015)",
+   "l1": "Transition-related investment decisions take no account of effects on workers or communities",
+   "l3": "Effects on workers are noted for some decisions, but are not assessed against the ILO guidelines or recorded",
+   "l5": "Each transition-related decision records its assessment of effects on workers and communities against the ILO guidelines, and the assessment is reviewed when the decision is revisited",
+   "weight": 10
+  },
+  "applied": [
+   "U: soft law, not read."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "blockchain",
+  "action": "split",
+  "splitFrom": "WLT-BC-4",
+  "final": {
+   "id": "WLT-BC-17",
+   "dimension": "Governance",
+   "text": "For tokens offered to or traded with US persons, does the agent record a securities-status analysis under the Howey test, including distribution and marketing facts, with escalation to legal review where investment-contract indicators are present?",
+   "regulatoryRef": "SEC v. W.J. Howey Co., 328 U.S. 293 (1946)",
+   "l1": "Tokens are offered to US persons with no recorded securities-status analysis",
+   "l3": "An analysis is recorded, but distribution and marketing facts are not captured or indicators are not escalated",
+   "l5": "Every token offered to US persons has a dated Howey analysis with the facts used, indicator hits are escalated with the legal decision recorded, and the analysis is re-run when facts change",
+   "weight": 10
+  },
+  "applied": [
+   "U: case law not read (author and refuter)."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "blockchain",
+  "action": "split",
+  "splitFrom": "WLT-BC-11",
+  "final": {
+   "id": "WLT-BC-18",
+   "dimension": "Compliance",
+   "text": "For crypto-asset transfers on corridors outside the EU, does the agent apply the travel-rule threshold of FATF Recommendation 15 and its interpretive note, valuing each transfer deterministically including fees, FX and split transfers?",
+   "regulatoryRef": "FATF Recommendation 15",
+   "l1": "Non-EU transfers apply no threshold logic, or transfer value is computed inconsistently",
+   "l3": "A threshold is applied, but fees, FX or split and merged transfers are not included in the valuation",
+   "l5": "The threshold rule for each non-EU jurisdiction is configured and versioned, transfer value includes fees and FX at a documented rate, split transfers are aggregated, and each decision is retained per transfer",
+   "weight": 10
+  },
+  "applied": [
+   "U: FATF text not read (HTTP 403)."
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "future-of-work",
+  "action": "carried (S3 20b69fb4, outside round-2 input)",
+  "final": {
+   "id": "WLT-FW-15",
+   "dimension": "Transparency",
+   "text": "Before a high-risk AI system is put into service or used at the workplace, does the deployer inform workers' representatives and the affected workers that they will be subject to it, as EU AI Act Article 26(7) requires, and keep evidence of the notice?",
+   "regulatoryRef": "EU AI Act Art. 26(7)",
+   "l1": "Workers and their representatives are not informed before workplace AI is deployed",
+   "l3": "A generic notice is published, but it is not tied to specific systems, sites or go-live dates",
+   "l5": "Go-live is gated on a recorded notice to workers' representatives and affected workers for each system and site, with the notice text, date and recipients retained",
+   "weight": 10
+  },
+  "applied": [
+   "was weight 8; F: Annex III obligations apply from 2027-12-02 (eu-ai-act milestone)"
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "digital-payments",
+  "action": "carried (S3 20b69fb4, outside round-2 input)",
+  "final": {
+   "id": "WLT-DP-15",
+   "dimension": "Safety",
+   "text": "Are the agent and the ICT systems it relies on covered by the digital operational resilience testing programme required by DORA (EU) 2022/2554 Articles 24 and 25, including vulnerability assessments, scenario-based tests and tracked remediation of findings?",
+   "regulatoryRef": "EU DORA (EU) 2022/2554 Arts. 24-25",
+   "l1": "The agent is outside the resilience testing programme",
+   "l3": "The agent is included in annual vulnerability scans, but scenario-based tests and remediation tracking are missing",
+   "l5": "Risk-based test plan covering the agent and its dependencies (vulnerability assessments, scenario and performance tests, source code review where relevant), independent testers, and findings tracked to closure",
+   "weight": 12
+  },
+  "applied": [
+   "was dimension Resilience, weight 8; B: DORA applies since 2025-01-17 (eu-dora, verified); single-use dimension folded into Safety"
+  ]
+ },
+ {
+  "inputId": null,
+  "pack": "no-poverty",
+  "action": "carried (S3 20b69fb4, outside round-2 input)",
+  "final": {
+   "id": "WLT-NP-15",
+   "dimension": "Governance",
+   "text": "Before launching an agent-driven product, delivery channel or technology for low-income or unbanked customers, does the provider assess and mitigate its money-laundering and terrorist-financing risks as FATF Recommendation 15 requires?",
+   "regulatoryRef": "FATF Recommendation 15",
+   "l1": "New agent-driven channels launch with no ML/TF risk assessment",
+   "l3": "A risk assessment is done at launch, but it is not repeated when the agent's behaviour, channel or customer segment changes",
+   "l5": "Pre-launch ML/TF assessment with documented mitigations, re-run on material changes to the agent or channel, calibrated so controls stay proportionate and do not exclude low-risk customers",
+   "weight": 10
+  },
+  "applied": [
+   "was dimension Risk Management, weight 8; U: FATF text not read (HTTP 403); single-use dimension folded into Governance as the author did for WLT-NP-13"
+  ]
+ }
+]
