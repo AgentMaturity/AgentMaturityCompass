@@ -228,4 +228,10 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       milestones: milestones(["2027-07-09", "Competent authorities must accept regulatory information made available through certified eFTI platforms (Art. 5(1); date from the Commission eFTI page, transport.ec.europa.eu)"]),
       note: "Arts. 4, 5, 9 and 18 read. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
     }),
+  verified("eu-cpr-2024", "Regulation (EU) 2024/3110 (Construction Products Regulation)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32024R3110", ["Regulation (EU) 2024/3110", "EU Construction Products Regulation 2024/3110"], {
+      effectiveDate: "2026-01-08",
+      milestones: milestones(["2025-01-07", "Arts. 1-4 and the other provisions listed in Art. 96 apply"], ["2027-01-08", "Art. 92 applies (Art. 96)"]),
+      note: "The construction digital product passport (Arts. 75-79) depends on Commission delegated acts under Art. 75(1). Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
+    }),
 ];
