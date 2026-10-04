@@ -1,0 +1,83 @@
+{
+  "education": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "FERPA",
+      "COPPA"
+    ],
+    "station": "education",
+    "unverifiedSources": 0
+  },
+  "environment": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "NIS2",
+      "CER Directive"
+    ],
+    "station": "environment",
+    "unverifiedSources": 3
+  },
+  "finance": {
+    "questionCount": 50,
+    "regulations": [
+      "SOX",
+      "Basel III",
+      "AML",
+      "MiFID II",
+      "MAR"
+    ],
+    "station": "wealth",
+    "unverifiedSources": 20
+  },
+  "government": {
+    "questionCount": 50,
+    "regulations": [
+      "FedRAMP",
+      "FISMA"
+    ],
+    "station": "governance",
+    "unverifiedSources": 50
+  },
+  "healthcare": {
+    "questionCount": 58,
+    "regulations": [
+      "HIPAA",
+      "FDA QMSR (21 CFR Part 820)",
+      "FDA 21 CFR Part 11",
+      "ACA §1557 final rule (45 CFR Part 92)",
+      "EU AI Act (Regulation (EU) 2024/1689)",
+      "European Health Data Space (Regulation (EU) 2025/327)",
+      "CMS Interoperability and Prior Authorization final rule (CMS-0057-F)",
+      "ICH E6(R3) Good Clinical Practice",
+      "ONC HTI-1 certification criteria (45 CFR Part 170)"
+    ],
+    "station": "health",
+    "unverifiedSources": 0
+  },
+  "mobility": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "UN R155",
+      "UN R156",
+      "Implementing Regulation (EU) 2022/1426",
+      "NIST SP 800-161r1"
+    ],
+    "station": "mobility",
+    "unverifiedSources": 3
+  },
+  "technology": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "Cyber Resilience Act",
+      "Digital Services Act",
+      "Data Act",
+      "GDPR"
+    ],
+    "station": "technology",
+    "unverifiedSources": 0
+  }
+}

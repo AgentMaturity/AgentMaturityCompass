@@ -1,0 +1,40 @@
+{
+  "track": "split — per-station industry pack files",
+  "base": "019e32b55c407f8846b76f652b862be0a038ec4e",
+  "candidate": "00d143acddb110a6f60fbcaceca1d50c02fe07e2",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-1",
+  "freshClone": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/split-clone",
+  "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; pnpm install --frozen-lockfile --prefer-offline in both worktree and clone",
+  "ranAt": "2026-10-04",
+  "layout": {
+    "src/domains/packs/stations/": "environment 412, health 628, wealth 297, education 255, mobility 284, technology 224, governance 224, shared (q) 15 lines; no station needed a second file",
+    "src/domains/industryPacks.ts": "2612 -> 296 lines; types, PACK_CONTENT registry (same key order) and functions unchanged",
+    "src/domains/deep/{health,wealth,governance}.ts": "pack-id lists, control tables, source helpers and the hand-written questions (3 HIPAA, 2 finance, 1 FedRAMP)",
+    "src/domains/deepIndustryPacks.ts": "309 -> 165 lines; keeps the three Array.from template expansions (47 + 48 + 49 questions) because tests/deepIndustryPacksStations.test.ts:49-54 forbids Array.from in src/domains/deep/*.ts"
+  },
+  "proof": {
+    "snapshots": "industry-packs.json, industry-pack-ids.json, deep-industry-questions.json, deep-industry-pack-stats.json written by snapshot.mts at the base before any edit (41 packs, 632 pack questions, 190 deep questions)",
+    "verbatimLineCheck": "sorted multiset of non-blank lines: 2127 moved pack lines identical apart from the added 'export ' prefixes; deep files differ only by new header comments and imports",
+    "equalityTest": "tests/industryPacksSplitEquality.test.ts 4 passed (4)"
+  },
+  "tests": {
+    "namedSetAtBase_cloneDetached019e32b5": "74 passed / 74 (deepIndustryPacksStations 9, domain-registry 7, domainRegistry 6, industryGuides 47, industryPackRegulatoryRefresh 4, industryPacks-infotainment 1)",
+    "namedSetAtCandidate_clone": "70 passed, 8 failed / 78 (adds industryPacksSplitEquality 4; the 8 failures are industryGuides appendix citations src/domains/industryPacks.ts:72 and :2490, which moved to :80 and :174)",
+    "industryGuidesWithGuidePatch_clone": "47 passed / 47",
+    "allIndustryPackStar_clone": "10 files, 76 passed / 76",
+    "typecheck_worktree": "pnpm typecheck exit 0; pnpm typecheck:tests exit 0"
+  },
+  "boundaries": {
+    "base_worktree": "passed",
+    "candidate_clone": "failed: src/domains/industryPacks.ts is listed as a data registry but 6.7% of its lines are logic (limit 3%)",
+    "candidate_clone_with_line_budgets_patch": "passed"
+  },
+  "outOfScopeChangesNeeded": [
+    "out-of-scope-line-budgets.patch: remove \"src/domains/industryPacks.ts\" from dataRegistries in scripts/line-budgets.json (file is now 296 lines, under the 800 cap)",
+    "out-of-scope-guide-citations.patch: 15 appendix rows in docs/industries/{README,education,environment,governance,health,mobility,technology,wealth}.md, industryPacks.ts:72 -> :80 and :2490 -> :174"
+  ],
+  "notExercised": [
+    "full test suite and release gate (program rules: focused files only)",
+    "src/domains/certification/certificationRequirements.ts:65 still names src/domains/industryPacks.ts#<pack id> as a pack's source; that key resolves in the PACK_CONTENT registry, not the station file, and was left unchanged (outside the write list and part of certification output)"
+  ]
+}

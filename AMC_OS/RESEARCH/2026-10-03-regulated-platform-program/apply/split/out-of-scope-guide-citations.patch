@@ -1,0 +1,152 @@
+diff -ru a/docs/industries/README.md b/docs/industries/README.md
+--- a/docs/industries/README.md	2026-10-04 17:12:37
++++ b/docs/industries/README.md	2026-10-04 17:12:37
+@@ -40,7 +40,7 @@
+ | ID | Claim | Source | Token on that line |
+ |---|---|---|---|
+ | C1 | Station registry | `src/domains/domainRegistry.ts:26` | `export const DOMAIN_REGISTRY` |
+-| C2 | Station pack lookup | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C2 | Station pack lookup | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C3 | Calendar register | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
+ | C4 | Scenarios are validated against the fixed text | `src/domains/domainCliIntegration.ts:202` | `scenario.validate(SAFE_ASSURANCE_RESPONSE` |
+ | C5 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts:438` | `await responder.respond(prompt)` |
+diff -ru a/docs/industries/education.md b/docs/industries/education.md
+--- a/docs/industries/education.md	2026-10-04 17:12:37
++++ b/docs/industries/education.md	2026-10-04 17:12:37
+@@ -126,14 +126,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:51` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:52` | `questionCount: 6` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:48` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:49` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:55` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/environment.md b/docs/industries/environment.md
+--- a/docs/industries/environment.md	2026-10-04 17:12:37
++++ b/docs/industries/environment.md	2026-10-04 17:12:37
+@@ -126,14 +126,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:66` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:67` | `questionCount: 6` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:63` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:64` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:70` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/governance.md b/docs/industries/governance.md
+--- a/docs/industries/governance.md	2026-10-04 17:12:37
++++ b/docs/industries/governance.md	2026-10-04 17:12:37
+@@ -126,14 +126,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:96` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:97` | `questionCount: 6` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:93` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:94` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:100` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/health.md b/docs/industries/health.md
+--- a/docs/industries/health.md	2026-10-04 17:12:37
++++ b/docs/industries/health.md	2026-10-04 17:12:37
+@@ -130,14 +130,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:36` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:37` | `questionCount: 9` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:33` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:34` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:40` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/mobility.md b/docs/industries/mobility.md
+--- a/docs/industries/mobility.md	2026-10-04 17:12:37
++++ b/docs/industries/mobility.md	2026-10-04 17:12:37
+@@ -127,14 +127,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:81` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:82` | `questionCount: 14` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:78` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:79` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:85` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/technology.md b/docs/industries/technology.md
+--- a/docs/industries/technology.md	2026-10-04 17:12:37
++++ b/docs/industries/technology.md	2026-10-04 17:12:37
+@@ -125,14 +125,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:111` | `euAIActCategory: "general-purpose"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:112` | `questionCount: 6` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:108` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:109` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:115` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
+diff -ru a/docs/industries/wealth.md b/docs/industries/wealth.md
+--- a/docs/industries/wealth.md	2026-10-04 17:12:37
++++ b/docs/industries/wealth.md	2026-10-04 17:12:37
+@@ -126,14 +126,14 @@
+ | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:126` | `euAIActCategory: "high-risk"` |
+ | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:127` | `questionCount: 14` |
+ | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:123` | `recommendedIndustryPacks:` |
+-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
++| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
+ | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
+ | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
+ | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
+ | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
+ | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:124` | `regulatoryBasis:` |
+ | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:130` | `complianceFrameworks:` |
+-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
++| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
+ | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+ | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
+ | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
