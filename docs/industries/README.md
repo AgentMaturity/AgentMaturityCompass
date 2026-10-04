@@ -1,6 +1,6 @@
 # Regulated-industry deployment guides
 
-One guide per AMC station. Each maps the station's sector packs to the frameworks they name, the assurance packs linked to the station, the deployment controls and the evidence outputs, for source at commit `8f57ce63`. These guides are not legal advice and do not state what any regulation requires.
+One guide per AMC station. Each maps the station's sector packs to the frameworks they name, the assurance packs linked to the station, the deployment controls and the evidence outputs, for source at commit `726be0ca`. These guides are not legal advice and do not state what any regulation requires.
 
 ## Stations
 
@@ -9,14 +9,14 @@ Stations are the keys of `DOMAIN_REGISTRY` [C1]; packs are grouped by `stationId
 | Station | Guide | Packs | Questions |
 |---|---|---|---|
 | `health` | [Health](health.md) | 9 | 151 |
-| `education` | [Education](education.md) | 5 | 72 |
-| `environment` | [Environment / Critical Infrastructure](environment.md) | 6 | 87 |
-| `mobility` | [Mobility](mobility.md) | 6 | 78 |
-| `governance` | [Governance / Public Sector](governance.md) | 5 | 71 |
-| `technology` | [Technology / General AI Services](technology.md) | 5 | 71 |
-| `wealth` | [Wealth](wealth.md) | 5 | 70 |
+| `education` | [Education](education.md) | 5 | 75 |
+| `environment` | [Environment / Critical Infrastructure](environment.md) | 6 | 91 |
+| `mobility` | [Mobility](mobility.md) | 6 | 90 |
+| `governance` | [Governance / Public Sector](governance.md) | 5 | 75 |
+| `technology` | [Technology / General AI Services](technology.md) | 5 | 75 |
+| `wealth` | [Wealth](wealth.md) | 5 | 75 |
 
-Total: 41 packs, 600 questions.
+Total: 41 packs, 632 questions.
 
 ## How these guides stay true
 
@@ -31,7 +31,7 @@ Total: 41 packs, 600 questions.
 
 ## Verification appendix
 
-- Source commit: `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da`. Measured on Darwin arm64, Node v25.5.0, 2026-10-03.
+- Source commit: `726be0ca11e31224b2c93ae13a439f8cb2393e64`. Measured on Darwin arm64, Node v25.5.0, 2026-10-04.
 - Exercised: reading source and running the commands below. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.
 - `pnpm vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.
 - Pack counts by hand: `node_modules/.bin/tsx -e 'import {listIndustryPacks} from "./src/domains/industryPacks.ts"; const p=listIndustryPacks(); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'`
@@ -40,7 +40,7 @@ Total: 41 packs, 600 questions.
 | ID | Claim | Source | Token on that line |
 |---|---|---|---|
 | C1 | Station registry | `src/domains/domainRegistry.ts:26` | `export const DOMAIN_REGISTRY` |
-| C2 | Station pack lookup | `src/domains/industryPacks.ts:2403` | `export function getIndustryPacksByStation` |
-| C3 | Calendar register | `src/compliance/globalRegulatory.ts:100` | `export const GLOBAL_FRAMEWORKS` |
+| C2 | Station pack lookup | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C3 | Calendar register | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C4 | Scenarios are validated against the fixed text | `src/domains/domainCliIntegration.ts:202` | `scenario.validate(SAFE_ASSURANCE_RESPONSE` |
 | C5 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts:438` | `await responder.respond(prompt)` |

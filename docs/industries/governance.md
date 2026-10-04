@@ -1,6 +1,6 @@
 # Governance / Public Sector station: regulated deployment guide
 
-This guide maps what AMC source provides for an agent deployed in the `governance` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `8f57ce63`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
+This guide maps what AMC source provides for an agent deployed in the `governance` station: its sector packs, the frameworks those packs name, the assurance packs, the deployment controls and the evidence AMC can produce. It describes source at commit `726be0ca`. Every count was derived from source by the commands in the verification appendix, and every source location is listed there and checked by `tests/industryGuides.test.ts`.
 
 It does not say what any regulation requires, and it is not legal advice. Framework names below are strings that appear in AMC source; their presence means a pack refers to them, not that AMC satisfies them.
 
@@ -23,13 +23,13 @@ Packs whose `stationId` is `governance`, as returned by `getIndustryPacksByStati
 
 | Pack | Name | Questions | Risk tier | Certification threshold |
 |---|---|---|---|---|
-| `digital-citizens-rights` | Digital Citizens & Rights | 14 | critical | 80 |
+| `digital-citizens-rights` | Digital Citizens & Rights | 15 | critical | 80 |
 | `dance-of-democracy` | Dance of Democracy | 15 | critical | 85 |
-| `petition-to-law` | Petition to Law | 14 | very-high | 78 |
-| `citizen-services` | Citizen Services | 13 | very-high | 80 |
+| `petition-to-law` | Petition to Law | 15 | very-high | 78 |
+| `citizen-services` | Citizen Services | 15 | very-high | 80 |
 | `public-private-collaboration` | Public and Private Collaboration | 15 | very-high | 80 |
 
-Total: 5 packs, 71 questions.
+Total: 5 packs, 75 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -37,13 +37,13 @@ Run one with `amc domain pack run --pack <id>` [C8]. The command requires the in
 
 - Station `regulatoryBasis` [C12]: `NIST AI RMF`, `EU AI Act`, `FedRAMP`, `FISMA`, `OMB M-24-10`, `GDPR`.
 - Station `complianceFrameworks` [C13]: `NIST AI RMF`, `FedRAMP`, `FISMA`, `OMB M-24-10`, `GDPR`, `EU AI Act`.
-- The station's packs name 52 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `EU eIDAS 2.0 Regulation 2024/1183`, `GDPR Art. 6/9/22`, `UN Guiding Principles on Business and Human Rights (UNGPs)`, `EU AI Act Annex III §8`, `Council of Europe AI Convention 2024`, `ISO/IEC 29115:2013`, `EU Digital Identity Wallet Architecture`, `EU eIDAS 2.0 2024/1183`, `EU AI Act Art. 5 (prohibited electoral manipulation)`, `EU Digital Services Act Art. 34 (electoral risk)`, `OSCE/ODIHR Electoral Standards`, `Council of Europe Recommendation CM/Rec(2017)5`, `Venice Commission AI in Elections Guidelines`, `EU Code of Practice on Disinformation 2022`, `GDPR Art. 9(d) (political opinion data)`, `EU AI Act Art. 5(1)(a)`, `EU DSA Art. 34`, `EU GDPR Art. 9(d)`, `Council of Europe Rec CM/Rec(2017)5`, `UN E-Government Survey Guidelines`, `EU Interoperability Framework (EIF) v2`, `GDPR Art. 6(1)(e) (public task)`, `Access to Information Laws (FOIA, EU Directive 2003/98)`, `EU INSPIRE Directive 2007/2/EC`, `ISO 25000 SQuaRE`, `EU Open Data Directive 2019/1024`, `UN SDG 16.6 (effective institutions)`, `EU EIF v2`, `GDPR Art. 6(1)(e)`, `Access to Information Directive 2003/98`, `EU Single Digital Gateway Regulation 2018/1724`, `eIDAS 2.0 Regulation 2024/1183`, `WCAG 2.1 AA / EU Accessibility Directive 2016/2102`, `ISO 9241-210:2019 (Human-Centered Design)`, `UN E-Government Development Index Standards`, `Section 508`, `EU SDG 2018/1724`, `eIDAS 2.0`, `WCAG 2.1 AA`, `EU AI Act Annex III §5/8`, `ISO 9241-210:2019`, `UN SDG 17 Partnership Framework`, `OECD PPP Framework`, `World Bank PPP Guidelines`, `UNCAC (UN Convention Against Corruption)`, `ISO 26000:2010 §6.6`, `G20 Principles for Responsible AI in Government`, `FATF R1 (AML in PPP)`, `UN SDG 17`, `UNGPs`, `UNCAC`, `G20 Responsible AI Principles`.
+- The station's packs name 51 distinct framework strings in their `regulatoryBasis` and `complianceFrameworks` fields [C14]: `EU eIDAS 2.0 Regulation 2024/1183`, `GDPR Art. 6/9/22`, `UN Guiding Principles on Business and Human Rights (UNGPs)`, `EU AI Act Annex III §8`, `Council of Europe AI Convention 2024`, `ISO/IEC 29115:2013`, `EU Digital Identity Wallet Architecture`, `EU eIDAS 2.0 2024/1183`, `EU AI Act Art. 5 (prohibited electoral manipulation)`, `EU Digital Services Act Art. 34 (electoral risk)`, `OSCE/ODIHR Electoral Standards`, `Council of Europe Recommendation CM/Rec(2017)5`, `Venice Commission AI in Elections Guidelines`, `EU Code of Practice on Disinformation 2022`, `GDPR Art. 9(d) (political opinion data)`, `EU AI Act Art. 5(1)(a)`, `EU DSA Art. 34`, `EU GDPR Art. 9(d)`, `Council of Europe Rec CM/Rec(2017)5`, `UN E-Government Survey Guidelines`, `EU Interoperability Framework (EIF) v2`, `GDPR Art. 6(1)(e) (public task)`, `US FOIA (5 U.S.C. §552)`, `EU INSPIRE Directive 2007/2/EC`, `ISO 25000 SQuaRE`, `EU Open Data Directive 2019/1024`, `UN SDG 16.6 (effective institutions)`, `EU EIF v2`, `GDPR Art. 6(1)(e)`, `EU Single Digital Gateway Regulation 2018/1724`, `eIDAS 2.0 Regulation 2024/1183`, `WCAG 2.1 AA / EU Accessibility Directive 2016/2102`, `ISO 9241-210:2019 (Human-Centered Design)`, `UN E-Government Development Index Standards`, `Section 508`, `EU SDG 2018/1724`, `eIDAS 2.0`, `WCAG 2.1 AA`, `EU AI Act Annex III §5/8`, `ISO 9241-210:2019`, `UN SDG 17 Partnership Framework`, `OECD PPP Framework`, `World Bank PPP Guidelines`, `UNCAC (UN Convention Against Corruption)`, `ISO 26000:2010 §6.6`, `G20 Principles for Responsible AI in Government`, `FATF R1 (AML in PPP)`, `UN SDG 17`, `UNGPs`, `UNCAC`, `G20 Responsible AI Principles`.
 
-`amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C15], resolved by `normalizeFrameworkName` [C16]; an unresolved name is rejected [C17]. Of the 58 framework strings above (station and packs together):
+`amc compliance report --framework <id>` accepts the ids of `ComplianceFramework` [C15], resolved by `normalizeFrameworkName` [C16]; an unresolved name is rejected [C17]. Of the 57 framework strings above (station and packs together):
 
-- 2 resolve as written: `FedRAMP` → `FEDRAMP`, `GDPR` → `GDPR`.
-- 2 resolve only after spaces and hyphens are replaced with `_`: `NIST AI RMF` → `NIST_AI_RMF`, `EU AI Act` → `EU_AI_ACT`. Given as written, the CLI rejects them.
-- 54 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
+- 13 resolve as written: `NIST AI RMF` → `NIST_AI_RMF`, `EU AI Act` → `EU_AI_ACT`, `FedRAMP` → `FEDRAMP`, `GDPR` → `GDPR`, `GDPR Art. 6/9/22` → `GDPR`, `EU AI Act Annex III §8` → `EU_AI_ACT`, `EU AI Act Art. 5 (prohibited electoral manipulation)` → `EU_AI_ACT`, `GDPR Art. 9(d) (political opinion data)` → `GDPR`, `EU AI Act Art. 5(1)(a)` → `EU_AI_ACT`, `EU GDPR Art. 9(d)` → `GDPR`, `GDPR Art. 6(1)(e) (public task)` → `GDPR`, `GDPR Art. 6(1)(e)` → `GDPR`, `EU AI Act Annex III §5/8` → `EU_AI_ACT`.
+- None resolves only after replacing spaces and hyphens with `_`.
+- 44 do not resolve to any `ComplianceFramework` id, so AMC has no built-in compliance map under those names.
 
 Dated entries, where the register has them, are in [the regulatory calendar](../REGULATORY_CALENDAR.md), generated from `GLOBAL_FRAMEWORKS` [C18].
 
@@ -104,15 +104,15 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 6; the station has 5 packs and 71 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
-- 54 of 58 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
+- The registry's `questionCount` for this station is 6; the station has 5 packs and 75 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
+- 44 of 57 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
 - Pack scores from `amc domain pack run` are self-assessments (see Sector packs).
 
 ## Verification appendix
 
-- Source commit: `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da`. Measured on Darwin arm64, Node v25.5.0, 2026-10-03.
+- Source commit: `726be0ca11e31224b2c93ae13a439f8cb2393e64`. Measured on Darwin arm64, Node v25.5.0, 2026-10-04.
 - Exercised: reading source and running the commands below. Not exercised: no command in this guide was run against an agent, no control was executed, and no regulatory text was consulted.
 - `pnpm vitest run tests/industryGuides.test.ts` re-derives every pack, question and scenario count in this guide from source, re-runs the empty-response check, and checks that every row below still points at a line containing its token.
 - Pack counts by hand: `node_modules/.bin/tsx -e 'import {getIndustryPacksByStation} from "./src/domains/industryPacks.ts"; const p=getIndustryPacksByStation("governance"); console.log(p.length, p.reduce((n,x)=>n+x.questions.length,0))'`
@@ -126,18 +126,18 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:96` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:97` | `questionCount: 6` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:93` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2403` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:94` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:100` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:71` | `regulatoryBasis: string[];` |
-| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:1` | `export type ComplianceFramework ` |
-| C16 | Framework name resolution | `src/compliance/frameworks.ts:199` | `export function normalizeFrameworkName` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
+| C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |
-| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:100` | `export const GLOBAL_FRAMEWORKS` |
+| C18 | Register the calendar is generated from | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C19 | Station assurancePacks | `src/domains/domainRegistry.ts:98` | `assurancePacks:` |
 | C20 | Assurance pack registry listing | `src/assurance/packs/index.ts:274` | `export function listAssurancePacks` |
 | C21 | Domain assurance command | `src/cli-domain-product-commands.ts:507` | `Run domain-specific assurance packs` |
