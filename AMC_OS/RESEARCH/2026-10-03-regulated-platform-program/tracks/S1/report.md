@@ -1,4 +1,59 @@
-# Track S1 — deployment pack, round 2 (repair after monitor rejection)
+# Track S1 — deployment pack, round 3 (native origin/host admission)
+
+- Status: **PARTIAL**. The monitor's round-3 fixes A–E are in. Helm render/test, kubeconform, the docker drill and the compose verify run stay blocked: binary absent / daemon down, tool install not authorized (root-decisions.md).
+- Branch `worktree-wf_5210e2f4-3ea-1`, round-2 head `33655e6c`, round-3 code commit `cdab568c`, followed by the receipt commit.
+- Environment: macOS Darwin 25.6.0 arm64, Node v25.5.0, pnpm 10.33.0. helm, kubectl, kubeconform and pulumi absent; Docker daemon down.
+
+## Defect (verify/reverify-S1.json)
+
+Studio admits native requests only when the `Host` matches an origin in `AMC_CORS_ALLOWED_ORIGINS` or the bind host (`src/studio/nativeAdmission.ts`). The chart, the drill and compose all ran Studio with `--bind 0.0.0.0` and no `AMC_CORS_ALLOWED_ORIGINS`. The allowed list was therefore `[http://0.0.0.0:3212]`, and the probe's first native request (`GET /api/v1/native-tasks/options`) was refused with `NATIVE_HOST_DENIED` from `<release>-amc:3212` (helm test pod), `127.0.0.1:<port>` (drill) and `amc-studio:3212` (compose `amc-verify`). Round 2 listed this as unverified. It could have been checked offline, and it failed.
+
+## Fixes
+
+- **A, chart.** `_helpers.tpl` gains `amc.studioServiceOrigin` (`http://<fullname>:<service.port>`) and `amc.corsAllowedOrigins`. The second joins the Service origin with `env.AMC_CORS_ALLOWED_ORIGINS`, a new values key that defaults to `""`, using `compact`. `configmap.yaml` renders `AMC_CORS_ALLOWED_ORIGINS` from that helper. The test pod's `--base-url` now uses `amc.studioServiceOrigin` too, so the two can't drift apart. New `tests/helmChartOrigins.test.ts` has 3 tests:
+  - the template wiring
+  - the rendered value `http://amc-amc:3212` is fed to Studio's own `nativeAllowedBrowserOrigins("0.0.0.0", 3212, extra)` and `assertNativeBrowserAdmission`. With it, a GET with Host `amc-amc:3212` and a POST with Origin, intent and CSRF are admitted. Without it, the GET throws `NATIVE_HOST_DENIED`.
+  - an operator origin is appended, not substituted
+- **B, drill.** `rollback-drill.mjs` docker run adds `-e AMC_CORS_ALLOWED_ORIGINS=http://127.0.0.1:${port}`. `tests/rollbackDrill.test.ts` asserts the entry for ports 3212 and 4412.
+- **C, compose.** `docker/docker-compose.yml` amc-studio adds `AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212`. The existing compose assertion in `tests/deployPackProbe.test.ts` now parses the `amc-verify` `--base-url` from the file and requires that same value in the amc-studio environment.
+- **D, docs.** `docs/KUBERNETES_HELM_DEPLOYMENT.md` changes in three places:
+  - The helm test section states the admission mechanism and the rendered value. It also says to put an Ingress host in `env.AMC_CORS_ALLOWED_ORIGINS`.
+  - The drill section states the run env and that `--secrets-dir` is required. This answers the monitor's open item by documenting the requirement, not by changing the drill.
+  - "What was exercised" says the admitted path was proven with a unit test against `src/studio/nativeAdmission.ts`, not in a cluster, a compose run or a drill run.
+
+  `pnpm check:docs-drift`: passed, 327 files scanned.
+
+## Commands (round 3)
+
+| Command | Result |
+|---|---|
+| `pnpm vitest run tests/helmChartOrigins.test.ts tests/rollbackDrill.test.ts tests/deployPackProbe.test.ts` before the fix (`red-r3.log`) | 3 failed, 9 passed (12) |
+| Same 3 files after the fix | 12 passed |
+| 10-file focused run (`green-r3.log`): helmChartOrigins, helmChartVersion, helmChartSecrets, k8sManifestsSecrets, deployPackCheck, deployPackProbe, rollbackDrill, deploymentPack, pulumiHelmRelease, containerSourceBuild | 10 files, 58 tests passed |
+| `node scripts/deploy/deploy-pack-check.mjs --json` (`deploy-pack-check-r3.log`) | `passed`; helm and kubeconform skipped (binary absent); exit 0 |
+| `node scripts/deploy/rollback-drill.mjs ...` (`rollback-drill-r3.log`) | without `--secrets-dir`: exit 2, `--secrets-dir is required`. With an empty scratch dir: exit 2, `docker daemon unavailable` |
+| `pnpm typecheck`; `pnpm typecheck:tests` | exit 0; exit 0 |
+| Path discipline (`path-discipline-r3.log`) | 57 paths checked: 0 outside the claimed globs, 0 of the 306 dirty-list entries, 0 in package.json, pnpm-lock.yaml or src/** |
+
+## Mutation checks (round 3, `mutations-r3.json`)
+
+| Id | Mutation | RED | Restored |
+|---|---|---|---|
+| M-R3-A1 | configmap `AMC_CORS_ALLOWED_ORIGINS` line removed | helmChartOrigins 1 failed, 2 passed | 3 passed |
+| M-R3-A2 | helper drops the Service origin from the list | helmChartOrigins 1 failed, 2 passed | 3 passed |
+| M-R3-A3 | test pod `--base-url` no longer uses the helper | helmChartOrigins 1 failed, 2 passed | 3 passed |
+| M-R3-B | drill docker run env entry removed | rollbackDrill 1 failed, 4 passed | 5 passed |
+| M-R3-C | compose amc-studio env line removed | deployPackProbe 1 failed, 3 passed | 4 passed |
+
+## Not exercised (round 3)
+
+- Helm did not render the value; the test computes it from the template expression (`helm` absent).
+- Studio was not started; admission was checked by calling `src/studio/nativeAdmission.ts` directly.
+- Drill execution, the compose verify run, kubeconform and any cluster (Docker daemon down; tools not installed).
+- Planner scope not delivered (unchanged): quickstart SHA256SUMS verification, `scripts/deploy/record-image-digest.mjs`, the kubeconform step in `.github/workflows/docker-build.yml`.
+
+# Round 2 report (superseded where round 3 differs)
+
 
 - Status: **PARTIAL**. Every monitor fix is in. Helm render, kubeconform and the docker drill are still blocked: binary absent / daemon down, and tool install is not authorized (root-decisions.md).
 - Branch `worktree-wf_5210e2f4-3ea-1`, base `8f57ce63`, round-2 code commit `903c19fe`, followed by the receipt commit.

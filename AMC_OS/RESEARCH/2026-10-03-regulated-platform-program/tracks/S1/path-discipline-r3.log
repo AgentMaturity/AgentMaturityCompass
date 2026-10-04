@@ -1,0 +1,5 @@
+checked 57 paths (8f57ce63..worktree incl. untracked + S1 receipts); dirty list 306 entries
+outside claimed globs: 0 []
+dirty-list intersections: 0 []
+forbidden (package.json, pnpm-lock.yaml, src/**): 0 []
+round-3 code paths: 10; all inside globs: true; dirty hits: 0
