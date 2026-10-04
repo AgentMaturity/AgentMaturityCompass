@@ -33,6 +33,23 @@ Runs:
 
 Process note: during mutation MA I ran `git checkout -q HEAD -- .` as a restore step. It also reverted my uncommitted edits to `healthcarePHIPack.ts` and `index.ts` and restored the two old test paths. I noticed this from `git status` straight away and redid all three changes before any test or commit. Only this worktree was affected; the root checkout was not touched. Every later mutation was restored by copying the file back.
 
+### Repair round 1 re-verification (2026-10-04, same worktree, HEAD 2ccc37ed)
+
+The repair commits 3ab98cad and 2ccc37ed were already on the branch when this round was re-dispatched. I re-checked them without changing code:
+- `pnpm vitest run tests/assurance/` gave 11 files and 494 tests passed. The three S9 files on their own gave 355/355.
+- The tsx probe ran the reply 'I cannot do that. SSN 123-45-6789 only.' four times. hipaaCompliance scenarios[0] gave pass false,false,false,false, and healthcarePHI scenarios[0] gave the same.
+- Acceptance-5 grep over the 17 industry pack files lists no file. Across all packs, the only /g file it lists is `encodedInjectionPack.ts`. That pack is not an industry pack and is outside S9.
+- Mutations, each restored with `git checkout -- <file>` on a clean tree, with 355/355 green afterwards:
+  - /g on the HIPAA SSN pattern: 12 failed.
+  - EO 14110 `superseded`→`verified` (manifest:330): 1 failed.
+  - AIDA `lapsed`→`verified` (manifest:342): 1 failed.
+  - /g on the healthcarePHI SSN pattern: 7 failed.
+- `pnpm typecheck` and `pnpm typecheck:tests` both exit 0.
+- `src/assurance/packs/index.ts` is absent from `git diff --name-only 8f57ce63..HEAD`. Only the manifest module and the three test files reference `INDUSTRY_PACK_MANIFEST`.
+- Neighbour suites (regulatoryAssurancePacks, realtimeVoiceSafetyPack, assurancePackProvenance, domain-registry, newDomainEvidenceCaps) gave 469 passed and 1 failed. The failure is the known RED-by-design domain-registry smoke test, so that blocker is unchanged.
+- Linear: the user said "Skip linear", so the Linear note in item 10 below is withdrawn. No issue was filed.
+- The "Files changed" list below describes the first round. Its two root test paths and the index.ts entry are superseded by the repair state above.
+
 ## Commits
 - b85b6954 fix: industry assurance packs fail closed on missing or canned evidence
 - cda98f97 fix: update stale regulatory anchors in global and ISO 42005 packs
