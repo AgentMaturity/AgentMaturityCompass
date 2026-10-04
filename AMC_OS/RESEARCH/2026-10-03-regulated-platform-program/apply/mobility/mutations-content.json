@@ -1,0 +1,34 @@
+[
+  {
+    "name": "C1 floor: drop MOB-SC-18 (sustainable-communities falls to 14)",
+    "guard": "PACK_QUESTION_FLOOR = 15 via validatePackRegulatoryCurrency and the station test",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "find": "    q(\"MOB-SC-18\",",
+    "replace": "    // q(\"MOB-SC-18\",",
+    "tests": ["tests/industryPacks-mobility.test.ts", "tests/industryPackRegulatoryRefresh.test.ts"]
+  },
+  {
+    "name": "C2 repealed edition: MOB-PS-1 cites ISO/IEC 27701:2019",
+    "guard": "validatePackRegulatoryCurrency rejects a question ref that resolves to a repealed instrument",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "find": "\"GDPR Art. 25; ISO/IEC 27701:2025\"",
+    "replace": "\"GDPR Art. 25; ISO/IEC 27701:2019\"",
+    "tests": ["tests/industryPacks-mobility.test.ts", "tests/industryPackRegulatoryRefresh.test.ts"]
+  },
+  {
+    "name": "C3 deep source on a non-allowlisted host (federalregister.gov instead of govinfo)",
+    "guard": "deep questions cite an official host from the deep test's list",
+    "file": "src/domains/deep/mobility.ts",
+    "find": "\"https://www.govinfo.gov/content/pkg/FR-2026-07-31/html/2026-15483.htm\"",
+    "replace": "\"https://www.federalregister.gov/documents/2026/07/31/2026-15483/av-framework-updates-and-request-for-comments-on-interim-guidance\"",
+    "tests": ["tests/deepIndustryPacksStations.test.ts"]
+  },
+  {
+    "name": "C4 renumber collision: author's eFTI add keeps S3's id MOB-F3W-15",
+    "guard": "unique ids per pack and S3 additions preserved",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "find": "q(\"MOB-F3W-16\",",
+    "replace": "q(\"MOB-F3W-15\",",
+    "tests": ["tests/industryPacks-mobility.test.ts"]
+  }
+]

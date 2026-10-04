@@ -1,0 +1,831 @@
+[
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-1",
+    "action": "merge",
+    "into": "MOB-SC-12",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-2",
+    "finalId": "MOB-SC-2",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD; narrowed to one instrument; second half added as a new question"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-3",
+    "finalId": "MOB-SC-3",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-4",
+    "finalId": "MOB-SC-4",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-5",
+    "finalId": "MOB-SC-5",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-6",
+    "finalId": "MOB-SC-6",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-7",
+    "finalId": "MOB-SC-7",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-8",
+    "finalId": "MOB-SC-8",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-9",
+    "finalId": "MOB-SC-9",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-10",
+    "finalId": "MOB-SC-10",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-11",
+    "action": "merge",
+    "into": "ENV-UU-7",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-12",
+    "finalId": "MOB-SC-12",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-13",
+    "finalId": "MOB-SC-13",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-14",
+    "action": "drop",
+    "into": null,
+    "applied": true
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-15",
+    "finalId": "MOB-SC-16",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered from MOB-SC-15 (S3 holds MOB-SC-15)"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-16",
+    "finalId": "MOB-SC-17",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered from MOB-SC-16 (S3 holds MOB-SC-16)"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-15",
+    "action": "s3-keep",
+    "applied": true,
+    "note": "S3 question committed after the author's snapshot; kept unchanged"
+  },
+  {
+    "pack": "sustainable-communities",
+    "id": "MOB-SC-18",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-1",
+    "finalId": "MOB-SP-1",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-2",
+    "finalId": "MOB-SP-2",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-3",
+    "action": "merge",
+    "into": "MOB-SP-10",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-4",
+    "finalId": "MOB-SP-4",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-5",
+    "finalId": "MOB-SP-5",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-6",
+    "finalId": "MOB-SP-6",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-7",
+    "finalId": "MOB-SP-7",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-8",
+    "finalId": "MOB-SP-8",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-9",
+    "finalId": "MOB-SP-9",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-10",
+    "finalId": "MOB-SP-10",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-11",
+    "finalId": "MOB-SP-11",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-12",
+    "finalId": "MOB-SP-12",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-13",
+    "action": "merge",
+    "into": "MOB-SP-4",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-14",
+    "finalId": "MOB-SP-14",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-15",
+    "finalId": "MOB-SP-16",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered from MOB-SP-15 (S3 holds MOB-SP-15)"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-15",
+    "action": "s3-keep",
+    "applied": true,
+    "note": "S3 question committed after the author's snapshot; kept unchanged"
+  },
+  {
+    "pack": "sustainable-ports",
+    "id": "MOB-SP-17",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-1",
+    "finalId": "MOB-RE-1",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-2",
+    "finalId": "MOB-RE-2",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-3",
+    "finalId": "MOB-RE-3",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-4",
+    "finalId": "MOB-RE-4",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD; narrowed to one instrument; second half added as a new question"
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-5",
+    "finalId": "MOB-RE-5",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-6",
+    "finalId": "MOB-RE-6",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-7",
+    "finalId": "MOB-RE-7",
+    "action": "rewrite",
+    "applied": true,
+    "note": "narrowed to one instrument; second half added as a new question"
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-8",
+    "finalId": "MOB-RE-8",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-9",
+    "action": "merge",
+    "into": "MOB-RE-2",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-10",
+    "finalId": "MOB-RE-10",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-11",
+    "action": "merge",
+    "into": "ENV-UU-3",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-12",
+    "action": "merge",
+    "into": "MOB-RE-4",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-13",
+    "action": "merge",
+    "into": "MOB-RE-3",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-14",
+    "action": "merge",
+    "into": "WLT-CE-12",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-15",
+    "action": "drop",
+    "into": null,
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-16",
+    "finalId": "MOB-RE-16",
+    "action": "add",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-17",
+    "finalId": "MOB-RE-17",
+    "action": "add",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-18",
+    "finalId": "MOB-RE-18",
+    "action": "add",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-19",
+    "finalId": "MOB-RE-19",
+    "action": "add",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-20",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "sustainable-real-estate",
+    "id": "MOB-RE-21",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-1",
+    "finalId": "MOB-VI-1",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-2",
+    "finalId": "MOB-VI-2",
+    "action": "rewrite",
+    "applied": true,
+    "note": "narrowed to one instrument; second half added as a new question"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-3",
+    "finalId": "MOB-VI-3",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-4",
+    "finalId": "MOB-VI-4",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-5",
+    "action": "merge",
+    "into": "MOB-VI-13",
+    "applied": true
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-6",
+    "finalId": "MOB-VI-6",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-7",
+    "finalId": "MOB-VI-7",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-8",
+    "finalId": "MOB-VI-8",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-9",
+    "finalId": "MOB-VI-9",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-10",
+    "finalId": "MOB-VI-10",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-11",
+    "finalId": "MOB-VI-11",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-12",
+    "finalId": "MOB-VI-12",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-13",
+    "finalId": "MOB-VI-13",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-14",
+    "action": "drop",
+    "into": null,
+    "applied": true
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-15",
+    "finalId": "MOB-VI-16",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered from MOB-VI-15 (S3 holds MOB-VI-15)"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-15",
+    "action": "s3-keep",
+    "applied": true,
+    "note": "S3 question committed after the author's snapshot; kept unchanged"
+  },
+  {
+    "pack": "virtual-infrastructure",
+    "id": "MOB-VI-17",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-1",
+    "finalId": "MOB-PS-1",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-2",
+    "finalId": "MOB-PS-2",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-3",
+    "finalId": "MOB-PS-3",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-4",
+    "finalId": "MOB-PS-4",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-5",
+    "action": "merge",
+    "into": "MOB-VI-3",
+    "applied": true
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-6",
+    "finalId": "MOB-PS-6",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD; narrowed to one instrument; second half added as a new question"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-7",
+    "finalId": "MOB-PS-7",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-8",
+    "finalId": "MOB-PS-8",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-9",
+    "action": "merge",
+    "into": "MOB-PS-8",
+    "applied": true
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-10",
+    "finalId": "MOB-PS-10",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-11",
+    "finalId": "MOB-PS-11",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-12",
+    "finalId": "MOB-PS-12",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-13",
+    "action": "merge",
+    "into": "MOB-PS-3",
+    "applied": true
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-14",
+    "finalId": "MOB-PS-17",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered; point 2.3 claim removed (not in OJ text); renumbered from MOB-PS-14 (S3 holds MOB-PS-14)"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-15",
+    "finalId": "MOB-PS-15",
+    "action": "add",
+    "applied": true,
+    "note": "merged with S3's MOB-PS-15 (same CRA Art. 14 obligation); author's text kept"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-16",
+    "finalId": "MOB-PS-16",
+    "action": "add",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-14",
+    "action": "s3-keep",
+    "applied": true,
+    "note": "S3 question committed after the author's snapshot; kept unchanged"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-15",
+    "action": "s3-merged",
+    "applied": true,
+    "note": "replaced by the author's CRA Art. 14 text under the same id"
+  },
+  {
+    "pack": "privacy-security-mobility",
+    "id": "MOB-PS-18",
+    "action": "floor-add",
+    "applied": true
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-1",
+    "finalId": "MOB-F3W-1",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-2",
+    "finalId": "MOB-F3W-2",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-3",
+    "finalId": "MOB-F3W-3",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-4",
+    "finalId": "MOB-F3W-4",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-5",
+    "finalId": "MOB-F3W-5",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-6",
+    "finalId": "MOB-F3W-6",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-7",
+    "finalId": "MOB-F3W-7",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-8",
+    "action": "drop",
+    "into": null,
+    "applied": true
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-9",
+    "finalId": "MOB-F3W-9",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-10",
+    "finalId": "MOB-F3W-10",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-11",
+    "finalId": "MOB-F3W-11",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-12",
+    "finalId": "MOB-F3W-12",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-13",
+    "finalId": "MOB-F3W-13",
+    "action": "rewrite",
+    "applied": true,
+    "note": null
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-14",
+    "finalId": "MOB-F3W-14",
+    "action": "keep",
+    "applied": true,
+    "note": "equal to HEAD"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-15",
+    "finalId": "MOB-F3W-16",
+    "action": "add",
+    "applied": true,
+    "note": "renumbered from MOB-F3W-15 (S3 holds MOB-F3W-15)"
+  },
+  {
+    "pack": "freight-3pl-warehouse",
+    "id": "MOB-F3W-15",
+    "action": "s3-keep",
+    "applied": true,
+    "note": "S3 question committed after the author's snapshot; kept unchanged"
+  }
+]

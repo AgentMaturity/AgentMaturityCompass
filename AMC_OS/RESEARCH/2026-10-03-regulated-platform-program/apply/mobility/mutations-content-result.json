@@ -1,0 +1,54 @@
+[
+  {
+    "guard": "PACK_QUESTION_FLOOR = 15 via validatePackRegulatoryCurrency and the station test",
+    "mutation": "C1 floor: drop MOB-SC-18 (sustainable-communities falls to 14)",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "red": {
+      "exit": 1,
+      "summary": "Tests  2 failed | 8 passed (10)"
+    },
+    "restoredGreen": {
+      "exit": 0,
+      "summary": "Tests  10 passed (10)"
+    }
+  },
+  {
+    "guard": "validatePackRegulatoryCurrency rejects a question ref that resolves to a repealed instrument",
+    "mutation": "C2 repealed edition: MOB-PS-1 cites ISO/IEC 27701:2019",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "red": {
+      "exit": 1,
+      "summary": "Tests  3 failed | 7 passed (10)"
+    },
+    "restoredGreen": {
+      "exit": 0,
+      "summary": "Tests  10 passed (10)"
+    }
+  },
+  {
+    "guard": "deep questions cite an official host from the deep test's list",
+    "mutation": "C3 deep source on a non-allowlisted host (federalregister.gov instead of govinfo)",
+    "file": "src/domains/deep/mobility.ts",
+    "red": {
+      "exit": 1,
+      "summary": "Tests  1 failed | 8 passed (9)"
+    },
+    "restoredGreen": {
+      "exit": 0,
+      "summary": "Tests  9 passed (9)"
+    }
+  },
+  {
+    "guard": "unique ids per pack and S3 additions preserved",
+    "mutation": "C4 renumber collision: author's eFTI add keeps S3's id MOB-F3W-15",
+    "file": "src/domains/packs/stations/mobility.ts",
+    "red": {
+      "exit": 1,
+      "summary": "Tests  2 failed | 4 passed (6)"
+    },
+    "restoredGreen": {
+      "exit": 0,
+      "summary": "Tests  6 passed (6)"
+    }
+  }
+]

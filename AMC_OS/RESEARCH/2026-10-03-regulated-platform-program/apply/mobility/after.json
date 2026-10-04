@@ -1,0 +1,362 @@
+{
+  "tierWeights": {
+    "very-high": {
+      "n": 276,
+      "min": 6,
+      "p10": 8,
+      "median": 12,
+      "max": 20
+    },
+    "high": {
+      "n": 120,
+      "min": 6,
+      "p10": 8,
+      "median": 12,
+      "max": 15
+    },
+    "critical": {
+      "n": 236,
+      "min": 6,
+      "p10": 8,
+      "median": 12,
+      "max": 25
+    }
+  },
+  "packs": [
+    {
+      "id": "sustainable-communities",
+      "riskTier": "very-high",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-SC-2",
+        "MOB-SC-3",
+        "MOB-SC-4",
+        "MOB-SC-5",
+        "MOB-SC-6",
+        "MOB-SC-7",
+        "MOB-SC-8",
+        "MOB-SC-9",
+        "MOB-SC-10",
+        "MOB-SC-12",
+        "MOB-SC-13",
+        "MOB-SC-15",
+        "MOB-SC-16",
+        "MOB-SC-17",
+        "MOB-SC-18"
+      ],
+      "weightTotal": 176,
+      "weightMin": 8,
+      "weightMax": 15,
+      "dimensions": {
+        "Ethics": 2,
+        "Transparency": 1,
+        "Compliance": 2,
+        "Safety": 2,
+        "Traceability": 2,
+        "Sustainability": 1,
+        "Architecture": 1,
+        "Privacy": 2,
+        "Governance": 2
+      },
+      "dimensionCount": 9,
+      "largestDimensionShareOfWeightPct": 15.3,
+      "refParts": {
+        "in-force": 11,
+        "unverified": 7,
+        "unresolved": 6
+      },
+      "multiInstrumentRefs": [
+        "MOB-SC-4: EU Urban Agenda; C40 Cities Inclusive Climate Action Framework",
+        "MOB-SC-5: LEED v5 O+M; BREEAM In-Use",
+        "MOB-SC-6: ISO 37123:2019; UNDRR Sendai Framework",
+        "MOB-SC-7: ISO 37122:2019; Open Data Charter Principles",
+        "MOB-SC-8: ISO/IEC 27400:2022; NIST CSF 2.0",
+        "MOB-SC-16: EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744"
+      ],
+      "validatorErrors": []
+    },
+    {
+      "id": "sustainable-ports",
+      "riskTier": "very-high",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-SP-1",
+        "MOB-SP-2",
+        "MOB-SP-4",
+        "MOB-SP-5",
+        "MOB-SP-6",
+        "MOB-SP-7",
+        "MOB-SP-8",
+        "MOB-SP-9",
+        "MOB-SP-10",
+        "MOB-SP-11",
+        "MOB-SP-12",
+        "MOB-SP-14",
+        "MOB-SP-15",
+        "MOB-SP-16",
+        "MOB-SP-17"
+      ],
+      "weightTotal": 182,
+      "weightMin": 8,
+      "weightMax": 15,
+      "dimensions": {
+        "Safety": 4,
+        "Compliance": 3,
+        "Governance": 2,
+        "Transparency": 2,
+        "Traceability": 1,
+        "Security": 3
+      },
+      "dimensionCount": 6,
+      "largestDimensionShareOfWeightPct": 26.9,
+      "refParts": {
+        "unverified": 8,
+        "in-force": 9,
+        "unresolved": 7
+      },
+      "multiInstrumentRefs": [
+        "MOB-SP-4: ISO 28000:2022; C-TPAT Minimum Security Criteria",
+        "MOB-SP-5: WCO SAFE Framework; UN/CEFACT Single Window Recommendation",
+        "MOB-SP-6: ILO Convention C152; ISO 3691-4:2023",
+        "MOB-SP-8: UN/CEFACT MMT RDM; ISO 17712:2013"
+      ],
+      "validatorErrors": []
+    },
+    {
+      "id": "sustainable-real-estate",
+      "riskTier": "high",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-RE-1",
+        "MOB-RE-2",
+        "MOB-RE-3",
+        "MOB-RE-4",
+        "MOB-RE-5",
+        "MOB-RE-6",
+        "MOB-RE-7",
+        "MOB-RE-8",
+        "MOB-RE-10",
+        "MOB-RE-16",
+        "MOB-RE-17",
+        "MOB-RE-18",
+        "MOB-RE-19",
+        "MOB-RE-20",
+        "MOB-RE-21"
+      ],
+      "weightTotal": 179,
+      "weightMin": 10,
+      "weightMax": 15,
+      "dimensions": {
+        "Sustainability": 3,
+        "Compliance": 5,
+        "Wellbeing": 1,
+        "Governance": 1,
+        "Safety": 1,
+        "Traceability": 1,
+        "Transparency": 3
+      },
+      "dimensionCount": 7,
+      "largestDimensionShareOfWeightPct": 34.1,
+      "refParts": {
+        "in-force": 14,
+        "unverified": 2,
+        "unresolved": 5
+      },
+      "multiInstrumentRefs": [
+        "MOB-RE-5: NFPA 101 Ch. 7; EN 1838",
+        "MOB-RE-6: Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887:2020",
+        "MOB-RE-8: GDPR Art. 25; EDPB Guidelines 4/2019"
+      ],
+      "validatorErrors": []
+    },
+    {
+      "id": "virtual-infrastructure",
+      "riskTier": "critical",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-VI-1",
+        "MOB-VI-2",
+        "MOB-VI-3",
+        "MOB-VI-4",
+        "MOB-VI-6",
+        "MOB-VI-7",
+        "MOB-VI-8",
+        "MOB-VI-9",
+        "MOB-VI-10",
+        "MOB-VI-11",
+        "MOB-VI-12",
+        "MOB-VI-13",
+        "MOB-VI-15",
+        "MOB-VI-16",
+        "MOB-VI-17"
+      ],
+      "weightTotal": 183,
+      "weightMin": 8,
+      "weightMax": 15,
+      "dimensions": {
+        "Security": 2,
+        "Resilience": 2,
+        "Compliance": 3,
+        "Sustainability": 1,
+        "Transparency": 1,
+        "Access Control": 1,
+        "Governance": 3,
+        "Interoperability": 1,
+        "Incident Reporting": 1
+      },
+      "dimensionCount": 9,
+      "largestDimensionShareOfWeightPct": 19.7,
+      "refParts": {
+        "in-force": 18,
+        "unresolved": 3,
+        "unverified": 2
+      },
+      "multiInstrumentRefs": [
+        "MOB-VI-4: CSA CCM v4.1; CSA STAR Level 2",
+        "MOB-VI-6: GHG Protocol Scope 2/3; EU CSRD ESRS E1",
+        "MOB-VI-7: EU AI Act Art. 13; EU NIS2 Art. 21(2)(j)",
+        "MOB-VI-8: ISO 27036:2023; EU NIS2 Art. 21(2)(d)",
+        "MOB-VI-16: EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744"
+      ],
+      "validatorErrors": []
+    },
+    {
+      "id": "privacy-security-mobility",
+      "riskTier": "critical",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-PS-1",
+        "MOB-PS-2",
+        "MOB-PS-3",
+        "MOB-PS-4",
+        "MOB-PS-6",
+        "MOB-PS-7",
+        "MOB-PS-8",
+        "MOB-PS-10",
+        "MOB-PS-11",
+        "MOB-PS-12",
+        "MOB-PS-14",
+        "MOB-PS-15",
+        "MOB-PS-16",
+        "MOB-PS-17",
+        "MOB-PS-18"
+      ],
+      "weightTotal": 192,
+      "weightMin": 8,
+      "weightMax": 15,
+      "dimensions": {
+        "Privacy": 2,
+        "Security": 5,
+        "Compliance": 4,
+        "Governance": 2,
+        "Transparency": 1,
+        "Incident Reporting": 1
+      },
+      "dimensionCount": 6,
+      "largestDimensionShareOfWeightPct": 33.9,
+      "refParts": {
+        "in-force": 17,
+        "unverified": 4
+      },
+      "multiInstrumentRefs": [
+        "MOB-PS-1: GDPR Art. 25; ISO/IEC 27701:2025",
+        "MOB-PS-7: GDPR Art. 13-14; CCPA §1798.100",
+        "MOB-PS-8: EU CRA Art. 2(2)(c), 2(4); EU CRA Art. 13; NIST SP 800-218",
+        "MOB-PS-17: Regulation (EU) 2019/2144 Art. 11; Implementing Regulation (EU) 2022/1426 Annex III Part 5"
+      ],
+      "validatorErrors": []
+    },
+    {
+      "id": "freight-3pl-warehouse",
+      "riskTier": "very-high",
+      "n": 15,
+      "floor": 15,
+      "meetsFloor": true,
+      "ids": [
+        "MOB-F3W-1",
+        "MOB-F3W-2",
+        "MOB-F3W-3",
+        "MOB-F3W-4",
+        "MOB-F3W-5",
+        "MOB-F3W-6",
+        "MOB-F3W-7",
+        "MOB-F3W-9",
+        "MOB-F3W-10",
+        "MOB-F3W-11",
+        "MOB-F3W-12",
+        "MOB-F3W-13",
+        "MOB-F3W-14",
+        "MOB-F3W-15",
+        "MOB-F3W-16"
+      ],
+      "weightTotal": 164,
+      "weightMin": 6,
+      "weightMax": 15,
+      "dimensions": {
+        "Carrier Reliability": 1,
+        "Exception Management": 1,
+        "Warehouse Integrity": 1,
+        "Traceability": 2,
+        "Cold Chain and Condition Monitoring": 1,
+        "3PL and Partner Governance": 1,
+        "EDI/API Resilience": 1,
+        "Driver Hours and Dispatch": 1,
+        "Dangerous Goods": 1,
+        "Workforce Algorithmic Management": 1,
+        "Incident Reporting": 1,
+        "Autonomous Warehouse Machinery": 1,
+        "Forced-Labour Screening": 1,
+        "Data Protection": 1
+      },
+      "dimensionCount": 14,
+      "largestDimensionShareOfWeightPct": 14.6,
+      "refParts": {
+        "in-force": 23,
+        "unverified": 3,
+        "unresolved": 1,
+        "applies-from": 1
+      },
+      "multiInstrumentRefs": [
+        "MOB-F3W-1: ISO 28000:2022; ISO 9001:2026 (monitoring, measurement, analysis and evaluation)",
+        "MOB-F3W-2: ISO 28000:2022 §8; NIST SP 800-161r1-upd1 incident response controls",
+        "MOB-F3W-3: ISO 9001:2026 (control of production and service provision); GS1 EPCIS 2.0",
+        "MOB-F3W-4: GS1 EPCIS 2.0; ISO 28000:2022",
+        "MOB-F3W-5: ISO 28000:2022; Guidelines on Good Distribution Practice 2013/C 343/01 Ch. 9",
+        "MOB-F3W-6: NIST SP 800-161r1-upd1; ISO 28000:2022 §6",
+        "MOB-F3W-7: EU NIS2 Art. 21; NIST SP 800-161r1-upd1 contingency planning controls",
+        "MOB-F3W-9: Regulation (EC) No 561/2006; 49 CFR Part 395",
+        "MOB-F3W-10: 49 CFR Part 172; IMDG Code",
+        "MOB-F3W-13: EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4; ISO 3691-4:2023"
+      ],
+      "validatorErrors": []
+    }
+  ],
+  "deepMobility": [
+    "mobility-deep-01",
+    "mobility-deep-02",
+    "mobility-deep-03",
+    "mobility-deep-04",
+    "mobility-deep-05",
+    "mobility-deep-06",
+    "mobility-deep-07",
+    "mobility-deep-08",
+    "mobility-deep-09",
+    "mobility-deep-10",
+    "mobility-deep-11",
+    "mobility-deep-12",
+    "mobility-deep-13",
+    "mobility-deep-14",
+    "mobility-deep-15",
+    "mobility-deep-16"
+  ]
+}
