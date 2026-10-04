@@ -1,0 +1,10 @@
+--- a/scripts/line-budgets.json	2026-10-04 17:16:49
++++ b/scripts/line-budgets.json	2026-10-04 17:16:49
+@@ -4,7 +4,6 @@
+   "dataRegistries": [
+     "src/compliance/builtInMappings.ts",
+     "src/diagnostic/questionBank.ts",
+-    "src/domains/industryPacks.ts",
+     "src/methodology/publicMethodology.ts",
+     "src/types.ts"
+   ],

@@ -1,0 +1,15 @@
+{
+  "subject": "tests/industryPacksSplitEquality.test.ts",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-1",
+  "base": "019e32b55c407f8846b76f652b862be0a038ec4e",
+  "environment": "Darwin arm64, Node v25.5.0, vitest 4.1.11",
+  "ranAt": "2026-10-04",
+  "method": "copy file to scratchpad, mutate, run the test file, copy back, run again; cmp confirmed every file byte-identical after restore",
+  "mutations": [
+    { "id": "M1", "file": "src/domains/packs/stations/health.ts:168", "mutation": "HLT-WM-12 weight 15 -> 14", "red": "1 failed | 3 passed (4): INDUSTRY_PACKS is byte-equal to the pre-split snapshot", "restoredGreen": "4 passed (4)" },
+    { "id": "M2", "file": "src/domains/deep/health.ts", "mutation": "healthcare-hipaa-security-01 question text shortened", "red": "1 failed | 3 passed (4): deep questions and their stats are byte-equal", "restoredGreen": "4 passed (4)" },
+    { "id": "M3", "file": "src/domains/industryPacks.ts (PACK_CONTENT)", "mutation": "swap farm-to-fork and weave-to-wear registry order", "red": "1 failed | 3 passed (4): registry order and size are unchanged (the sorted-key packs snapshot alone stays green, which is why the ids-order snapshot exists)", "restoredGreen": "4 passed (4)" },
+    { "id": "M4", "file": "src/domains/packs/stations/wealth.ts", "mutation": "append export { digitalHealthRecord } from \"./health.js\"", "red": "1 failed | 3 passed (4): each station file holds only its own station's packs", "restoredGreen": "4 passed (4)" },
+    { "id": "M5", "file": "src/domains/deepIndustryPacks.ts (getDeepIndustryPackStats)", "mutation": "unverifiedSources no longer incremented", "red": "1 failed | 3 passed (4): deep questions and their stats are byte-equal", "restoredGreen": "4 passed (4)" }
+  ]
+}
