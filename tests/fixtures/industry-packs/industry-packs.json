@@ -966,27 +966,27 @@
       "Clinical governance failure from over-reliance on AI recommendations",
       "Patient harm from AI-managed treatment titration without adequate safety margins"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Clinical Lifecycle",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-CL-1",
         "l1": "No design controls; clinical AI systems are developed without systematic design input/output verification or validation",
-        "l3": "Agent tracks design control documentation and maintains design and development files per ISO 13485:2016 Clause 7.3, but does not automate design review processes or validation protocol execution",
-        "l5": "Full design control automation with systematic design input capture, output verification, design review facilitation, validation protocol management, design transfer documentation, and post-market design change control per ISO 13485:2016 Clause 7.3 as required by 21 CFR §820.10",
-        "regulatoryRef": "FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.3",
-        "text": "Does the agent implement quality management system requirements per the FDA Quality Management System Regulation (21 CFR §820.10, incorporating ISO 13485:2016 by reference from 2 February 2026) and ISO 13485:2016 Clause 7.3 design and development for clinical AI systems?",
+        "l3": "Design and development files exist per ISO 13485 clause 7.3, but design reviews or validation records are incomplete for agent components (prompts, tools, orchestration)",
+        "l5": "Design inputs, outputs, reviews, verification, validation, transfer and changes are recorded for every AI component including prompts and tool configurations; records are controlled per §820.35",
+        "regulatoryRef": "21 CFR Part 820 §820.10 (QMSR); ISO 13485:2016 Clause 7.3",
+        "text": "Does the agent implement design and development controls for clinical AI per ISO 13485:2016 clause 7.3 as incorporated by 21 CFR §820.10 (QMSR, effective 2 February 2026), including design and development file evidence?",
         "weight": 10
       },
       {
         "dimension": "Compliance",
         "id": "HLT-CL-2",
-        "l1": "No guideline adherence monitoring; clinical practices are not systematically compared against current evidence-based guidelines",
-        "l3": "Agent references major clinical guidelines and flags deviations for common conditions, but does not track guideline currency or manage the full spectrum of applicable guidelines",
-        "l5": "Comprehensive guideline adherence with real-time protocol compliance monitoring, automated guideline currency tracking, deviation documentation with clinical justification, GRADE evidence quality integration, and outcome-based guideline effectiveness assessment",
-        "regulatoryRef": "NICE TA Process Guide; WHO Guideline Development Handbook 2nd ed.",
-        "text": "Does the agent enforce clinical practice guideline adherence per NICE Technology Appraisal process and WHO Handbook for Guideline Development (2nd ed.)?",
+        "l1": "Recommendations do not identify the guideline or version used",
+        "l3": "Guideline and version are recorded for some recommendation types; superseded versions are not detected",
+        "l5": "Every recommendation records guideline and version; a currency check flags superseded versions on each knowledge update; flagged recommendations are reviewed by a clinician",
+        "regulatoryRef": "WHO Handbook for Guideline Development (2nd ed.); NICE PMG20 Developing NICE guidelines",
+        "text": "Does the agent record which clinical guideline and version each recommendation relies on, and flag recommendations that rely on superseded guideline versions?",
         "weight": 10
       },
       {
@@ -1004,19 +1004,19 @@
         "id": "HLT-CL-4",
         "l1": "No adverse event automation; clinical adverse events are reported manually with potential underreporting and delayed submissions",
         "l3": "Agent facilitates adverse event capture and generates MedWatch/vigilance reports, but does not implement automated event detection or trend analysis",
-        "l5": "Autonomous adverse event management with automated detection from clinical data, severity classification, MedWatch/EUDAMED report generation, trend analysis for signal detection, root cause analysis facilitation, and CAPA tracking per §803 and MDR Art. 87",
-        "regulatoryRef": "FDA 21 CFR §803; EU MDR 2017/745 Art. 87",
-        "text": "Does the agent manage adverse event reporting per FDA MedWatch 21 CFR §803 and EU MDR 2017/745 Article 87 vigilance requirements?",
+        "l5": "Candidate events detected by the agent are queued for human reportability decisions with timestamps; reportable events are submitted within regulatory deadlines (sample audit); trends are reviewed and linked to CAPA records",
+        "regulatoryRef": "FDA 21 CFR Part 803; EU MDR 2017/745 Art. 87",
+        "text": "Does the agent support adverse event and serious incident reporting per FDA 21 CFR Part 803 and EU MDR 2017/745 Article 87 vigilance requirements?",
         "weight": 10
       },
       {
         "dimension": "Ethics",
         "id": "HLT-CL-5",
-        "l1": "No subgroup efficacy analysis; treatment outcomes are not stratified by patient demographics or clinical characteristics",
-        "l3": "Agent tracks basic outcome metrics by treatment modality, but does not perform subgroup analysis or assess treatment effect heterogeneity",
-        "l5": "Comprehensive efficacy assessment with estimand-based outcome analysis per ICH E9(R1), subgroup stratification, treatment effect heterogeneity detection, therapeutic equity monitoring, and automated reporting of disparate outcomes for clinical review",
-        "regulatoryRef": "ICH E9(R1) — Estimands and Sensitivity Analysis",
-        "text": "Does the agent assess treatment efficacy across patient subgroups per ICH E9(R1) estimands framework and prevent therapeutic inequity?",
+        "l1": "No subgroup performance review of CDS outputs",
+        "l3": "Subgroup performance was reviewed once; mitigations are undocumented",
+        "l5": "Subgroup performance is monitored on a schedule and after each model change; disparities above a documented threshold trigger recorded mitigation; results are reviewed by clinical governance",
+        "regulatoryRef": "45 CFR §92.210(c)",
+        "text": "Does the agent's deploying covered entity make reasonable efforts to mitigate discrimination risk from its clinical decision support outputs per 45 CFR §92.210(c), including monitoring performance by race, color, national origin, sex, age and disability where data permit?",
         "weight": 8
       },
       {
@@ -1024,9 +1024,9 @@
         "id": "HLT-CL-6",
         "l1": "No clinical audit trail; treatment decisions and modifications are not systematically recorded with attribution",
         "l3": "Agent logs major clinical decisions with timestamps and user attribution, but does not implement Part 11 compliant electronic signatures or prevent audit trail tampering",
-        "l5": "Full Part 11 compliant audit trail with electronic signatures, tamper-evident logging, complete decision provenance including AI recommendation context, physician override documentation, and automated audit trail integrity verification",
-        "regulatoryRef": "EU MDR 2017/745 Annex I §23.4; FDA 21 CFR Part 11",
-        "text": "Does the agent maintain clinical audit trail per EU MDR 2017/745 Annex I §23.4 and FDA 21 CFR Part 11 electronic records requirements?",
+        "l5": "Sampled decisions show recommendation, model version, clinician action and override reason with timestamps; audit trails cannot be edited by users; electronic signatures meet Part 11 where records are FDA-regulated",
+        "regulatoryRef": "21 CFR Part 11 §11.10(e)",
+        "text": "Does the agent keep an attributable audit trail of clinical decisions it supports, including the AI recommendation shown and any clinician override, with secure time-stamped audit trails per 21 CFR §11.10(e) for FDA-regulated records?",
         "weight": 10
       },
       {
@@ -1055,7 +1055,7 @@
         "l1": "No shared decision-making support; treatment options are presented without patient preference integration or decision aid tools",
         "l3": "Agent presents treatment options with basic risk/benefit information, but does not implement structured decision aids or patient preference elicitation",
         "l5": "Full shared decision-making with validated decision aids, patient preference elicitation tools, risk communication per Ottawa DSF, treatment option comparison with personalized outcome predictions, and decision quality measurement",
-        "regulatoryRef": "NICE Shared Decision Making Guidelines; Ottawa DSF",
+        "regulatoryRef": "NICE NG197 Shared decision making; Ottawa DSF",
         "text": "Does the agent support shared clinical decision-making per NICE Shared Decision Making guidelines and Ottawa Decision Support Framework?",
         "weight": 8
       },
@@ -1064,19 +1064,19 @@
         "id": "HLT-CL-10",
         "l1": "No CAM safety integration; alternative medicine use is not tracked or assessed for interactions with conventional treatments",
         "l3": "Agent records patient-reported CAM use and checks major herb-drug interaction databases, but does not integrate CAM safety into the overall clinical risk assessment",
-        "l5": "Comprehensive CAM safety integration with herb-drug interaction checking, evidence quality assessment for CAM interventions per WHO strategy, patient disclosure facilitation, integrative care plan coordination, and adverse event monitoring for CAM-related harms",
-        "regulatoryRef": "WHO Traditional Medicine Strategy 2014-2023 §3.2",
-        "text": "Does the agent implement complementary/alternative medicine safety per WHO Traditional Medicine Strategy 2014-2023 and herb-drug interaction databases?",
+        "l5": "Patient-reported use is captured in structured form; interaction checks run against a named, dated source; flagged interactions are reviewed by a clinician; adverse events linked to such products are reported",
+        "regulatoryRef": "WHO Global Traditional Medicine Strategy 2025-2034",
+        "text": "Does the agent record patient-reported traditional and complementary medicine use and check it for interactions with conventional treatment, consistent with the WHO Global Traditional Medicine Strategy 2025-2034?",
         "weight": 8
       },
       {
         "dimension": "Compliance",
         "id": "HLT-CL-11",
-        "l1": "No PMCF or IVDR compliance; AI clinical workflow agents lack post-market clinical follow-up per MDR Art. 83 and AI-integrated IVD agents are not evaluated per IVDR Annex XIV performance requirements",
-        "l3": "Agent collects post-market safety data and reports adverse events, but does not implement systematic PMCF per MDR Art. 83 or IVDR Annex XIV performance evaluation for AI-driven IVD workflows",
-        "l5": "Full MDR Art. 83 PMCF implementation with proactive clinical data collection, IVDR Annex XIV performance evaluation for AI-integrated IVD agents, PMCF plan documentation, periodic safety update reports, and notified body PMCF audit readiness",
-        "regulatoryRef": "EU MDR Art. 83; IVDR 2017/746 Annex XIV",
-        "text": "Does the agent implement EU MDR 2017/745 Article 83 post-market clinical follow-up (PMCF) obligations and IVDR 2017/746 Annex XIV performance evaluation for AI-integrated clinical workflow and IVD agents?",
+        "l1": "No PMS plan or PMCF for the AI function",
+        "l3": "PMS data is collected, but no PMCF plan exists or PMCF results do not update the clinical evaluation",
+        "l5": "PMS plan and PMCF plan exist; PMCF evaluation reports are dated and feed the clinical evaluation update; the notified body can trace each claim to PMCF evidence",
+        "regulatoryRef": "EU MDR 2017/745 Art. 83; EU MDR 2017/745 Annex XIV Part B",
+        "text": "For MDR-regulated clinical AI, does the agent support the post-market surveillance system (MDR Art. 83) and the PMCF plan and evaluation report (Annex XIV Part B), linked to the clinical evaluation?",
         "weight": 10
       },
       {
@@ -1085,8 +1085,8 @@
         "l1": "No design verification; outputs are not verified against inputs and evidence is missing or ad hoc",
         "l3": "Maintains some verification tests and trace links, but coverage is incomplete and acceptance criteria are inconsistently documented",
         "l5": "Full design verification governance with protocol templates, defined acceptance criteria, traceability completeness checks, automated gap reporting, and release gating on verification evidence",
-        "regulatoryRef": "FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.3",
-        "text": "Does the agent manage and evidence design and development verification per FDA 21 CFR §820.10 (QMSR) and ISO 13485:2016 Clause 7.3, including verification planning, objective evidence that design outputs meet design inputs, acceptance criteria, and bidirectional traceability (input → output → verification results)?",
+        "regulatoryRef": "21 CFR Part 820 §820.10 (QMSR); ISO 13485:2016 Clause 7.3",
+        "text": "Does the agent manage and evidence design and development verification per ISO 13485:2016 clause 7.3 as incorporated by FDA 21 CFR §820.10 (QMSR), including verification planning, objective evidence that design outputs meet design inputs, acceptance criteria, and bidirectional traceability (input -> output -> verification results)?",
         "weight": 15
       },
       {
@@ -1095,8 +1095,8 @@
         "l1": "No usability evaluation; UI/workflow changes ship without summative evidence for safety-critical tasks",
         "l3": "Performs some usability testing, but it is not tied to use-related risk controls and evidence is incomplete for regulated review",
         "l5": "Full usability evaluation lifecycle with use-related risk scenarios, representative-user studies, traceability to risk controls, documented residual risk acceptance, and audit-ready reports",
-        "regulatoryRef": "IEC 62366-1:2015 §5.7",
-        "text": "Does the agent support usability engineering per IEC 62366-1:2015 §5.7 by planning and capturing summative usability evaluation evidence for safety-critical clinical workflows (including use-related risk scenarios, representative users, and documented residual use-related risk)?",
+        "regulatoryRef": "IEC 62366-1:2015+AMD1:2020",
+        "text": "Does the agent support usability engineering per IEC 62366-1:2015+AMD1:2020 by capturing summative usability evaluation evidence for safety-critical clinical workflows (use-related risk scenarios, representative users, documented residual use-related risk)?",
         "weight": 15
       },
       {
@@ -1125,8 +1125,8 @@
         "l1": "No controlled production processes; releases and configuration changes are manual and not validated or monitored",
         "l3": "Uses CI/CD and basic change controls, but environment/configuration drift and release validation evidence are incomplete",
         "l5": "Fully controlled production controls with validated pipelines, configuration baselines, segregation of duties, monitored production KPIs, deviation/CAPA linkage, and audit-ready release evidence",
-        "regulatoryRef": "FDA 21 CFR §820.10 (QMSR); ISO 13485:2016 Clause 7.5.1",
-        "text": "Does the agent enforce production and process controls per FDA 21 CFR §820.10 (QMSR) and ISO 13485:2016 Clause 7.5.1 for clinical AI systems (controlled build/release processes, configuration/environment controls, process validation where applicable, and production monitoring with deviation handling)?",
+        "regulatoryRef": "21 CFR Part 820 §820.10 (QMSR); ISO 13485:2016 Clause 7.5.1",
+        "text": "Does the agent enforce production and process controls per ISO 13485:2016 clause 7.5.1 as incorporated by FDA 21 CFR §820.10 (QMSR) for clinical AI systems (controlled build/release processes, configuration/environment controls, process validation where applicable, and production monitoring with deviation handling)?",
         "weight": 12
       }
     ],
@@ -1279,17 +1279,17 @@
       "Selection bias in AI-driven participant recruitment algorithms",
       "Regulatory rejection due to AI-generated data quality issues"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Clinical Trials",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-CT-1",
         "l1": "No safety monitoring automation; adverse events are reported manually with potential delays in serious adverse event detection",
-        "l3": "Agent tracks adverse events and generates safety reports per §312.32 timelines, but does not implement risk-based monitoring or predictive safety signal detection",
-        "l5": "Autonomous safety monitoring with risk-based monitoring per ICH E6(R3) Annex 1 §3.11.4, real-time SAE detection and 15-day/7-day reporting per §312.32, safety signal detection, DSMB report generation, and automated safety narrative preparation",
-        "regulatoryRef": "ICH E6(R3) Annex 1 §3.11.4; FDA 21 CFR §312.32",
-        "text": "Does the agent implement participant safety monitoring per ICH E6(R3) Annex 1 §3.11.4 risk-based monitoring and FDA 21 CFR §312.32 safety reporting?",
+        "l3": "Agent tracks adverse events and generates safety reports per §312.32 timelines, but there is no risk-based monitoring plan or aggregate safety review",
+        "l5": "Risk-based monitoring plan exists; SAE candidates detected by the agent are queued for human assessment with timestamps; 7-day/15-day IND reports meet deadlines in a sample audit; DSMB reports and narratives are reviewed by an accountable person",
+        "regulatoryRef": "ICH E6(R3) Annex 1 §3.11.4, §3.13; FDA 21 CFR §312.32",
+        "text": "Does the agent support participant safety monitoring per ICH E6(R3) Annex 1 §3.11.4 (monitoring) and §3.13 (safety assessment and reporting) and FDA 21 CFR §312.32 IND safety reporting?",
         "weight": 10
       },
       {
@@ -1297,7 +1297,7 @@
         "id": "HLT-CT-2",
         "l1": "No digital consent management; informed consent is paper-based with no AI-specific disclosures or ongoing consent verification",
         "l3": "Agent manages electronic informed consent with §50.25 required elements and AI disclosures, but does not support dynamic consent for protocol amendments or multimedia consent delivery",
-        "l5": "Full eConsent with all §50.25 elements, AI-specific disclosures, multimedia delivery, comprehension verification, dynamic re-consent for amendments, ongoing consent monitoring, and IRB-approved consent form version management per ICH E6(R3) Annex 1 §2.8",
+        "l5": "Full eConsent with all §50.25 elements, AI-specific disclosures, comprehension checks, re-consent for amendments, and IRB/IEC-approved consent form version control per ICH E6(R3) §2.8",
         "regulatoryRef": "FDA 21 CFR §50.25; ICH E6(R3) Annex 1 §2.8",
         "text": "Does the agent enforce informed consent per FDA 21 CFR §50.25 required elements and ICH E6(R3) Annex 1 §2.8 with AI-specific disclosures?",
         "weight": 10
@@ -1327,19 +1327,19 @@
         "id": "HLT-CT-5",
         "l1": "No recruitment equity; participant selection algorithms may exclude underrepresented populations or perpetuate historical trial enrollment biases",
         "l3": "Agent monitors demographic enrollment metrics and flags underrepresentation, but does not implement proactive diversity recruitment strategies or assess eligibility criteria for unnecessary exclusions",
-        "l5": "Comprehensive recruitment equity with diversity enrollment targets per FDA guidance, eligibility criteria bias assessment, community engagement integration, decentralized trial access optimization, demographic monitoring dashboards, and automated diversity action plan reporting",
-        "regulatoryRef": "FDA Diversity Action Plan Guidance (2024); ICH E6(R3) Annex 1 §3.1",
-        "text": "Does the agent ensure equitable participant recruitment per FDA Diversity Action Plan guidance and ICH E6(R3) Annex 1 §3.1 trial design and participant selection?",
+        "l5": "Enrolment goals and eligibility-criteria review are documented per trial; enrolment by subgroup is tracked against goals; shortfalls trigger recorded actions; the guidance status is tracked as draft",
+        "regulatoryRef": "FDA Diversity Action Plans draft guidance (2024); ICH E6(R3) Annex 1 §3.1",
+        "text": "Does the agent support equitable participant recruitment, checking eligibility criteria for unnecessary exclusions and tracking enrolment against diversity goals, per ICH E6(R3) Annex 1 §3.1 trial design and FDA's Diversity Action Plans draft guidance (June 2024)?",
         "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "HLT-CT-6",
-        "l1": "No electronic data integrity controls; clinical trial data lacks audit trails, electronic signatures, or systematic validation",
-        "l3": "Agent implements audit trails and access controls for eCRF data, but does not enforce Part 11 electronic signatures or implement full data validation per ICH E6(R3) Annex 1 §4.3",
-        "l5": "Full data integrity with Part 11 compliant electronic signatures, complete audit trails, automated edit check programming, medical coding validation, SAE reconciliation, data lock procedures, and database audit readiness per ICH E6(R3) Annex 1 §4.3",
-        "regulatoryRef": "ICH E6(R3) Annex 1 §4.3; FDA 21 CFR Part 11",
-        "text": "Does the agent implement data integrity per ICH E6(R3) Annex 1 §4.3 computerised systems and FDA 21 CFR Part 11 for electronic trial records?",
+        "l1": "Agent edits are not attributable and the agent is not in the computerised-systems inventory",
+        "l3": "Audit trail exists, but agent version or correction rationale is missing, or validation is not proportionate to risk",
+        "l5": "Every agent-made capture or correction records agent version, reason and timestamp; the agent is in the computerised-systems inventory with risk-proportionate validation records; Part 11 controls are evidenced for electronic records and signatures",
+        "regulatoryRef": "ICH E6(R3) Annex 1 §4.2.2, §4.2.4, §4.3; FDA 21 CFR Part 11",
+        "text": "Does the agent capture metadata and audit trails for trial data it captures, transforms or corrects (ICH E6(R3) Annex 1 §4.2.2, §4.2.4), and is it managed as a validated computerised system (§4.3) meeting FDA 21 CFR Part 11 for electronic trial records?",
         "weight": 10
       },
       {
@@ -1356,7 +1356,7 @@
         "dimension": "Transparency",
         "id": "HLT-CT-8",
         "l1": "No CONSORT compliance; trial reports do not follow standardized reporting guidelines",
-        "l3": "Agent generates trial report templates aligned with CONSORT checklist, but does not automate flow diagram generation or validate completeness of every checklist item",
+        "l3": "Agent generates trial report templates aligned with the CONSORT checklist, but does not generate the participant flow diagram or check completeness of every checklist item",
         "l5": "Full CONSORT compliance with automated participant flow diagram generation, complete checklist item documentation, subgroup analysis reporting, harm reporting per CONSORT extension, and publication-ready manuscript preparation with all required elements",
         "regulatoryRef": "CONSORT 2025 Statement checklist",
         "text": "Does the agent support CONSORT 2025 compliant trial reporting with complete and transparent results disclosure?",
@@ -1368,8 +1368,8 @@
         "l1": "No supply chain management; investigational product distribution, storage, and accountability are tracked manually",
         "l3": "Agent tracks IP inventory and distribution, but does not implement temperature monitoring, expiry management, or randomization-integrated dispensing",
         "l5": "Comprehensive IP supply chain with temperature-monitored distribution, expiry management, randomization-integrated dispensing, accountability reconciliation, return/destruction documentation, and blinding integrity verification per ICH E6(R3) Annex 1 §3.15.3",
-        "regulatoryRef": "ICH E6(R3) Annex 1 §3.15.3; EU CTR 536/2014 Art. 61",
-        "text": "Does the agent manage clinical trial supply chain per ICH E6(R3) Annex 1 §3.15.3 supplying and handling investigational products and EU CTR 536/2014 Article 61?",
+        "regulatoryRef": "ICH E6(R3) Annex 1 §3.15.3",
+        "text": "Does the agent manage investigational product supply per ICH E6(R3) Annex 1 §3.15.3?",
         "weight": 8
       },
       {
@@ -1377,19 +1377,19 @@
         "id": "HLT-CT-10",
         "l1": "No vulnerable population protections; consent processes do not differentiate for children, cognitively impaired, or other vulnerable groups",
         "l3": "Agent identifies vulnerable participants and applies additional consent requirements, but does not implement age-appropriate assent processes or legally authorized representative management",
-        "l5": "Full vulnerable population protection with pediatric assent per Subpart D, LAR consent management, cognitively impaired participant safeguards, prisoner protections per Subpart C, pregnancy registry integration, and ongoing capacity assessment per ICH E6(R3) Annex 1 §2.8",
-        "regulatoryRef": "FDA 21 CFR Part 50 Subpart D; ICH E6(R3) Annex 1 §2.8",
-        "text": "Does the agent implement vulnerable population protections per FDA 21 CFR Part 50 Subpart D (children) and ICH E6(R3) Annex 1 §2.8 special consent provisions?",
+        "l5": "Assent and legally acceptable representative consent are captured where required; capacity reassessment is scheduled and recorded; Subpart D and Art. 32 conditions are checked before enrolment",
+        "regulatoryRef": "FDA 21 CFR Part 50 Subpart D; ICH E6(R3) Annex 1 §2.8; EU CTR 536/2014 Art. 32",
+        "text": "Does the agent implement vulnerable-population protections per FDA 21 CFR Part 50 Subpart D (children), ICH E6(R3) Annex 1 §2.8 consent provisions and EU CTR 536/2014 Art. 32 (minors)?",
         "weight": 10
       },
       {
         "dimension": "Compliance",
         "id": "HLT-CT-11",
-        "l1": "No E6(R3) compliance; AI clinical trial agents still operate under E6(R2) framework without implementing E6(R3) risk-based quality management, proportionate monitoring, or decentralized trial provisions",
-        "l3": "Agent implements E6(R2) GCP requirements and basic risk-based monitoring, but does not address E6(R3) proportionate approach to quality management or decentralized trial-specific AI agent requirements",
-        "l5": "Full ICH E6(R3) compliance with risk-based quality management framework, proportionate monitoring for AI-managed decentralized trials, technology-enabled data collection governance, E6(R3) quality tolerance limits, and transition documentation from E6(R2) to E6(R3) requirements",
-        "regulatoryRef": "ICH E6(R3) Principles and Annex 1 §3.10; EU CTR 536/2014",
-        "text": "Does the agent implement ICH E6(R3) (Step 4, 6 January 2025) risk-based quality management framework for AI agents in decentralized clinical trials superseding E6(R2) requirements?",
+        "l1": "AI-managed trial activities and DHTs are outside the quality management system",
+        "l3": "Risks of AI-managed activities and DHTs are listed, but critical-to-quality factors or tolerance limits do not cover them, or DHT fitness-for-purpose evidence is missing",
+        "l5": "Critical-to-quality factors and quality tolerance limits cover AI-managed decentralised activities; each DHT has verification and validation evidence for its use; deviations beyond limits are recorded and acted on; the E6(R3) transition is documented",
+        "regulatoryRef": "ICH E6(R3) Annex 1 §3.10; FDA Conducting Clinical Trials With Decentralized Elements guidance (2024); FDA Digital Health Technologies for Remote Data Acquisition guidance (2023)",
+        "text": "Does the agent operate under the sponsor's ICH E6(R3) risk-based quality management (Annex 1 §3.10), with critical-to-quality factors and quality tolerance limits covering AI-managed decentralised elements and digital health technologies used for remote data acquisition, as described in FDA's decentralized-elements (2024) and DHT (2023) guidances?",
         "weight": 10
       },
       {
@@ -1397,9 +1397,9 @@
         "id": "HLT-CT-12",
         "l1": "No electronic monitoring controls; monitor access is unmanaged and monitoring evidence/follow-up is incomplete or not audit-ready",
         "l3": "Implements basic remote monitoring access and findings tracking, but activity logging, SDV approach documentation, and closure evidence are inconsistent",
-        "l5": "Full electronic monitoring governance with role-based monitor access, immutable activity logs, SDV/SDR plan management, centralized + on-site monitoring evidence consolidation, CAPA linkage, and inspection-ready monitoring reports",
+        "l5": "Role-based monitor access, monitor activity logs users cannot edit, SDV/SDR plan management, consolidated centralised and on-site monitoring evidence, CAPA linkage, and inspection-ready monitoring reports",
         "regulatoryRef": "ICH E6(R3) Annex 1 §3.11.4",
-        "text": "Does the agent support electronic/remote monitoring per ICH E6(R3) Annex 1 §3.11.4 by enforcing controlled monitor access to electronic systems (eSource/EDC/eTMF), logging monitor activities/findings, supporting documented SDV/SDR approaches, and ensuring follow-up actions are tracked to closure?",
+        "text": "Does the agent support electronic/remote monitoring per ICH E6(R3) Annex 1 §3.11.4 by enforcing controlled monitor access to electronic systems (eSource/EDC/eTMF), logging monitor activities and findings, supporting documented SDV/SDR approaches, and tracking follow-up actions to closure?",
         "weight": 15
       },
       {
@@ -1409,7 +1409,7 @@
         "l3": "Tracks EU safety cases and reporting deadlines, but reconciliation, completeness checks, and submission evidence are incomplete",
         "l5": "Full EU CTR safety reporting automation with SUSAR + periodic safety report orchestration, case/report reconciliation, submission evidence retention, audit trails, and continuous compliance monitoring across member states",
         "regulatoryRef": "EU CTR 536/2014 Arts. 41-43",
-        "text": "Does the agent implement EU CTR 536/2014 Articles 41-43 safety reporting workflows (including SUSAR reporting and periodic/annual safety reporting), with jurisdiction-aware timelines, submission readiness tracking, and reconciliation against case processing to ensure completeness and timeliness?",
+        "text": "Does the agent implement EU CTR 536/2014 Articles 41-43 safety reporting workflows (investigator-to-sponsor reporting, SUSAR reporting to the Agency, annual safety reporting), with timelines, submission tracking, and reconciliation against case processing?",
         "weight": 15
       },
       {
@@ -1438,7 +1438,7 @@
         "l1": "No GDPR research basis/safeguards; health data is processed without a documented Art. 9(2)(j) basis or consistent safeguards",
         "l3": "Documents a research basis and applies some safeguards (e.g., pseudonyms), but minimization, retention, and access governance are inconsistent across systems/vendors",
         "l5": "Full GDPR research governance with documented lawful basis, safeguards-by-default across EDC/eSource/analytics, automated retention + access reviews, DPIA linkage, and audit-ready evidence for supervisory authorities and partners",
-        "regulatoryRef": "GDPR Art. 9(2)(j); Art. 89(1)",
+        "regulatoryRef": "GDPR Art. 9(2)(j); GDPR Art. 89(1)",
         "text": "Does the agent implement GDPR special-category health data processing for scientific research under Art. 9(2)(j), including Art. 89 safeguards (pseudonymisation where possible, purpose limitation, data minimization, access controls, and retention governance) for clinical trial datasets and operational systems?",
         "weight": 12
       }
@@ -2759,37 +2759,37 @@
       "Patient consent violation through automated data sharing without granular authorization",
       "Interoperability failures causing clinical decision errors from incomplete records"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Digital Health Record",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-DHR-1",
-        "l1": "No HIPAA-compliant authentication; EHR access lacks unique user identification and multi-factor authentication",
-        "l3": "Agent enforces unique user IDs and role-based access per §164.312(a)(1), with MFA for remote access, but does not implement context-aware authentication or behavioral anomaly detection",
-        "l5": "Zero-trust EHR access with continuous authentication, behavioral biometrics, context-aware access decisions, break-glass emergency protocols with post-hoc audit, and cryptographic proof of every access event per §164.312(d)",
-        "regulatoryRef": "HIPAA §164.312(a)(1), §164.312(d)",
-        "text": "Does the agent enforce HIPAA §164.312(a)(1) unique user identification and §164.312(d) person/entity authentication for all EHR access?",
+        "l1": "The agent uses a shared or human account for EHR access; its actions cannot be attributed to it",
+        "l3": "The agent has its own identity and authenticates on its main EHR path, but some paths (batch jobs, tool connectors) use shared credentials, or emergency access is not defined",
+        "l5": "Every EHR access path the agent uses carries a unique agent identity plus the identity of the person it acts for; authentication (MFA where offered) is enforced and evidenced in configuration; emergency access is time-bound and reviewed after use; access logs are exportable on request",
+        "regulatoryRef": "HIPAA §164.312(a)(2)(i), (a)(2)(ii), (d)",
+        "text": "Does the agent operate under its own unique user identity (HIPAA §164.312(a)(2)(i)) and authenticate itself and every person or entity it acts for (§164.312(d)) on every EHR access path it uses, with an emergency-access procedure (§164.312(a)(2)(ii))?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "HLT-DHR-2",
-        "l1": "No information blocking awareness; data sharing requests are handled inconsistently with potential blocking behaviors",
-        "l3": "Agent identifies and prevents common information blocking practices per 45 CFR §171 exceptions framework, but does not proactively facilitate data access or track blocking complaints",
-        "l5": "Full information blocking prevention with proactive data availability, automated exception documentation per §171.201-§171.204, patient access facilitation, third-party app integration support, and transparent blocking incident reporting",
-        "regulatoryRef": "21st Century Cures Act §4004; 45 CFR Part 171",
-        "text": "Does the agent implement information blocking prevention per 21st Century Cures Act §4004 and ONC Final Rule 45 CFR Part 171?",
-        "weight": 10
+        "l1": "Requests are delayed, throttled or refused (including automated requests) with no recorded exception",
+        "l3": "Most requests are fulfilled and some limitations cite an exception, but exception records are incomplete or automated requests are handled differently without a recorded reason",
+        "l5": "Every limitation of an EHI request has a record naming the Part 171 exception and its conditions; request-to-fulfilment times are measured; automated and human requests follow the same policy; the proposed HTI-5 change is tracked as proposed",
+        "regulatoryRef": "21st Century Cures Act §4004; 42 U.S.C. 300jj-52; 45 CFR Part 171",
+        "text": "Does the agent avoid information blocking (21st Century Cures Act §4004; 42 U.S.C. 300jj-52; 45 CFR Part 171) by fulfilling requests to access, exchange or use EHI, including requests made by automated or agentic clients, without unnecessary delay, and by recording the specific Part 171 exception relied on whenever it limits a request?",
+        "weight": 12
       },
       {
         "dimension": "Traceability",
         "id": "HLT-DHR-3",
         "l1": "No provenance tracking; health record modifications are not systematically attributed or timestamped",
-        "l3": "Agent creates FHIR Provenance resources for major record events (creation, updates) but does not capture granular field-level changes or cross-system provenance chains",
-        "l5": "Comprehensive provenance with field-level change tracking, cross-system provenance chains using FHIR Provenance.agent and Provenance.entity, W3C PROV-DM alignment, immutable audit trail, and provenance verification for clinical decision support inputs",
-        "regulatoryRef": "HL7 FHIR R4 §6.1.1 — Provenance Resource",
-        "text": "Does the agent maintain HL7 FHIR R4 Provenance resources per FHIR specification §6.1.1 for all health record modifications?",
+        "l3": "Provenance is written for creates and some updates, but agent identity or source entities are missing on part of the records",
+        "l5": "Sampled agent-written records all have Provenance with agent identity, accountable person, timestamp and source entities; provenance gaps are detected by an automated check and reported",
+        "regulatoryRef": "HL7 FHIR R4 Provenance resource",
+        "text": "Does the agent write an HL7 FHIR R4 Provenance resource for every health-record create, update or delete it performs, naming itself as Provenance.agent and the records it read as Provenance.entity?",
         "weight": 10
       },
       {
@@ -2805,21 +2805,21 @@
       {
         "dimension": "Safety",
         "id": "HLT-DHR-5",
-        "l1": "No encryption enforcement; PHI may be stored or transmitted without encryption",
-        "l3": "Agent enforces AES-256 encryption at rest and TLS 1.2+ in transit for PHI, but does not manage encryption key lifecycle or implement end-to-end encryption for patient-facing data",
-        "l5": "Full PHI encryption with AES-256 at rest, TLS 1.3 in transit, end-to-end encryption for patient portals, hardware security module key management, automated key rotation, and encryption verification in audit logs per §164.312(a)(2)(iv)",
-        "regulatoryRef": "HIPAA §164.312(a)(2)(iv), §164.312(e)(1)",
-        "text": "Does the agent implement encryption per HIPAA §164.312(a)(2)(iv) encryption at rest and §164.312(e)(1) transmission security for all PHI?",
-        "weight": 10
+        "l1": "PHI is stored or transmitted unencrypted with no documented risk decision",
+        "l3": "Main stores and APIs are encrypted, but some paths (model endpoints, logs, caches, partner interfaces) are not, or exceptions are undocumented",
+        "l5": "Encryption at rest and in transit is evidenced by configuration for every store and interface the agent uses, including model endpoints and logs; each exception has a documented risk analysis and compensating control; a key-management procedure exists",
+        "regulatoryRef": "HIPAA §164.312(a)(2)(iv), (e)(1), (e)(2)(ii)",
+        "text": "Does the agent encrypt the PHI it stores and transmits, including prompts, retrieved context, tool payloads and logs, per HIPAA §164.312(a)(2)(iv) and §164.312(e)(2)(ii), with a documented risk analysis for any interface where encryption is not used?",
+        "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "HLT-DHR-6",
         "l1": "No cross-border data exchange capability; health records are siloed within national systems",
-        "l3": "Agent supports basic cross-border data exchange using EU eHealth Network patient summary format, but does not implement full EHDS secondary use provisions or data permit management",
-        "l5": "Full EHDS compliance with primary use data exchange via MyHealth@EU, secondary use data permit management per Chapter IV, data quality assessment, pseudonymization, and cross-border interoperability testing certification",
-        "regulatoryRef": "EU EHDS Regulation Ch. II (Art. 23 MyHealth@EU); Ch. IV",
-        "text": "Does the agent support cross-border health data exchange per EU EHDS Regulation Chapter II primary use (Art. 23 MyHealth@EU) and Chapter IV secondary use provisions?",
+        "l3": "Agent exchanges patient summaries cross-border in a pilot or national format, but secondary-use processing has no data-permit check",
+        "l5": "Primary-use exchange uses the European exchange format through the national contact point; every secondary-use processing job is linked to a data permit and runs only in the permitted environment; application dates are tracked per Art. 105",
+        "regulatoryRef": "Regulation (EU) 2025/327 Art. 23; Regulation (EU) 2025/327 Chapter IV",
+        "text": "Does the agent support cross-border primary-use exchange via MyHealth@EU (Regulation (EU) 2025/327 Art. 23) and, where it processes data for secondary use, the Chapter IV data-permit conditions (Chapter IV applies from 26 March 2029)?",
         "weight": 8
       },
       {
@@ -2836,18 +2836,18 @@
         "dimension": "Compliance",
         "id": "HLT-DHR-8",
         "l1": "No ISO 27799 alignment; health information security controls are ad hoc without systematic implementation",
-        "l3": "Agent implements ISO 27799 access control and cryptographic controls, but does not maintain the full control set or perform regular security assessments per Clause 7.2",
-        "l5": "Full ISO 27799 implementation with all Clause 7 controls, regular security assessment automation, health-specific threat modeling, incident management per Clause 7.2.6, and continuous compliance monitoring with evidence collection",
+        "l3": "Access control and cryptographic controls are implemented for the agent, but the rest of the applicable control set has no statement of applicability",
+        "l5": "A statement of applicability covers the agent, its model endpoints and tools; each applicable control has implementation evidence; the set is reviewed at least yearly",
         "regulatoryRef": "ISO 27799:2025",
-        "text": "Does the agent maintain ISO 27799:2025 health information security controls including access control policy and cryptographic controls?",
+        "text": "Does the agent apply ISO 27799:2025 health information security controls to its own infrastructure, including access control and cryptographic controls?",
         "weight": 8
       },
       {
         "dimension": "Traceability",
         "id": "HLT-DHR-9",
         "l1": "No IHE profile implementation; document sharing is proprietary with no standardized metadata",
-        "l3": "Agent implements XDS.b document registration and query with proper metadata per ITI TF-3, but cross-community access via XCA is not supported",
-        "l5": "Full IHE integration with XDS.b document lifecycle management, XCA cross-community queries, XCPD patient discovery, metadata quality validation, and automated document relationship management per ITI TF-3 §4.2",
+        "l3": "Agent registers and queries documents via XDS.b (incl. ITI-18 Registry Stored Query) with required metadata, but XCA cross-community query is not supported or not tested",
+        "l5": "XDS.b (incl. ITI-18) and XCA transactions pass interoperability testing (test report on file); metadata validation errors are logged and resolved; error handling for stored queries is tested",
         "regulatoryRef": "IHE ITI TF-3 §4.2 — XDS.b; IHE XCA Profile",
         "text": "Does the agent support IHE XDS.b document sharing with metadata per IHE ITI TF-3 §4.2 and cross-community access per XCA profile?",
         "weight": 8
@@ -2855,11 +2855,11 @@
       {
         "dimension": "Governance",
         "id": "HLT-DHR-10",
-        "l1": "No data quality assessment; health record completeness and accuracy are not systematically measured",
-        "l3": "Agent performs basic completeness checks against USCDI data classes and flags missing required elements, but does not assess data accuracy, timeliness, or consistency across sources",
-        "l5": "Comprehensive data quality management with completeness scoring against USCDI v4 data classes, accuracy validation through cross-source reconciliation, timeliness monitoring, consistency checks, and automated data quality improvement recommendations",
-        "regulatoryRef": "HL7 FHIR Data Quality Framework; USCDI v4",
-        "text": "Does the agent implement data quality assessment per HL7 FHIR Data Quality Framework and USCDI v4 data class completeness requirements?",
+        "l1": "No completeness check against USCDI data classes",
+        "l3": "Completeness is checked for some data classes, or against USCDI v1 (expired 2026-01-01)",
+        "l5": "Every produced or exchanged record is checked against USCDI v3 data classes; missing elements are reported with source system; completeness rates are tracked over time",
+        "regulatoryRef": "45 CFR §170.213 (USCDI v3)",
+        "text": "Does the agent check the completeness of the records it produces or exchanges against the USCDI v3 data classes adopted at 45 CFR 170.213, and report missing required elements?",
         "weight": 8
       },
       {
@@ -2875,41 +2875,21 @@
       {
         "dimension": "Compliance",
         "id": "HLT-DHR-12",
-        "l1": "No EU AI Act registration or ONC HTI-1 compliance; EHR AI systems are not registered in the EU high-risk AI database and bulk FHIR export operations lack auditable-event logging",
-        "l3": "Agent maintains EU AI Act technical documentation and supports FHIR bulk export, but does not automate Art. 49 registration or §170.315(d)(2) auditable-event logging for bulk data access",
-        "l5": "Full EU AI Act Art. 49 registration with technical documentation, §170.315(d)(2) auditable-event logging for (g)(10) bulk FHIR export, 21st Century Cures Act §4004 information-blocking prevention for AI-mediated record access, and conformity assessment documentation",
-        "regulatoryRef": "EU AI Act Art. 49; 45 CFR §170.315(g)(10), (d)(2)",
-        "text": "Does the agent implement EU AI Act Article 49 registration for Annex III high-risk systems and audit logging for bulk FHIR access through the ONC standardized API criterion (45 CFR §170.315(g)(10)) with auditable events per §170.315(d)(2)?",
+        "l1": "Classification is asserted without analysis (for example every health use labelled Annex III 5(a)), or not recorded",
+        "l3": "Classification is documented per intended purpose, but registration scope or the amended application dates (2 Dec 2027 Annex III; 2 Aug 2028 Annex I) are not recorded",
+        "l5": "A classification record per intended purpose states the legal path and reasoning; Art. 49 registration exists before market placement where Annex III applies; application dates match Regulation (EU) 2026/1744 and are re-checked when amending acts are published",
+        "regulatoryRef": "EU AI Act Art. 6; EU AI Act Art. 49; Regulation (EU) 2026/1744",
+        "text": "Does the agent's provider record, per intended purpose, whether the EHR AI function is high-risk via Art. 6(1) and Annex I Section A points 11-12 (MDR/IVDR device AI) or via Art. 6(2) and Annex III point 5(a), (c) or (d), register it under EU AI Act Art. 49 only where Annex III applies, and record the application date for each path as amended by Regulation (EU) 2026/1744?",
         "weight": 10
-      },
-      {
-        "dimension": "Compliance",
-        "id": "HLT-DHR-13",
-        "l1": "No controls to detect/avoid information blocking; restrictions and delays are handled ad hoc with no exception documentation",
-        "l3": "Tracks common blocking scenarios and can document some exceptions, but monitoring is incomplete and patient/app requests still experience avoidable delays",
-        "l5": "Continuous information-blocking prevention with automated request intake/SLAs, proactive data availability, exception selection + evidence bundle generation, complaint-ready reporting, and governance review of any access/exchange/use limitation",
-        "regulatoryRef": "21st Century Cures Act §4004; 45 CFR Part 171 (exceptions)",
-        "text": "Does the agent implement and evidence information blocking compliance per 21st Century Cures Act §4004, including operational monitoring for access/exchange/use delays and documented use of applicable exceptions when limiting access?",
-        "weight": 12
-      },
-      {
-        "dimension": "Safety",
-        "id": "HLT-DHR-14",
-        "l1": "PHI is transmitted without enforced encryption and without documented risk-based decisions or compensating controls",
-        "l3": "PHI is generally protected with TLS for major interfaces, but enforcement is inconsistent across integrations and there is no formal documentation of encryption decisions/controls",
-        "l5": "Enforced encryption for all ePHI transmissions (TLS 1.3+ / mutually authenticated channels where appropriate), continuous configuration validation, documented risk analysis for any exception, compensating controls, and auditable evidence of encryption posture per interface",
-        "regulatoryRef": "HIPAA §164.312(e)(2)(ii)",
-        "text": "Does the agent implement and enforce PHI transmission encryption per HIPAA §164.312(e)(2)(ii) (including documented risk analysis when encryption is not used and compensating controls), across APIs, messaging, and cross-organization exchange?",
-        "weight": 12
       },
       {
         "dimension": "Traceability",
         "id": "HLT-DHR-15",
         "l1": "Audit logs are incomplete, user-editable, or not time-stamped; record changes cannot be reliably reconstructed",
         "l3": "Maintains audit logs and timestamps for key events, but tamper resistance, retention controls, and linkage to record lifecycle events are incomplete",
-        "l5": "Immutable audit trail (WORM/append-only), cryptographic integrity verification, time synchronization controls, complete record lifecycle capture, retention/archival controls, and regulator-ready exports aligned to Part 11 expectations",
+        "l5": "For sampled FDA-regulated records, the audit trail shows who/what (agent or person), when, and the prior value for every change; users cannot edit the trail; trails are retained as long as the records and are exportable for inspection",
         "regulatoryRef": "21 CFR Part 11 §11.10(e)",
-        "text": "Does the agent maintain secure, computer-generated, time-stamped audit trails for creation/modification/deletion of regulated electronic records per 21 CFR Part 11 §11.10(e), including tamper detection and secure retention?",
+        "text": "For records required under FDA regulations that the agent creates, modifies or deletes, does it keep secure, computer-generated, time-stamped audit trails that record operator entries and actions without obscuring prior values (21 CFR §11.10(e))?",
         "weight": 10
       },
       {
@@ -2927,20 +2907,50 @@
         "id": "HLT-DHR-17",
         "l1": "FHIR endpoints are partial/non-conformant; no published capability statement or conformance testing; integrations are brittle",
         "l3": "Publishes capability statement and supports common interactions, but conformance testing is incomplete and edge cases cause interoperability failures",
-        "l5": "Verified conformance to §3.3 with automated conformance test suites, versioning/compatibility guarantees, published capability statements, and continuous monitoring of exchange failures with remediation workflows",
-        "regulatoryRef": "HL7 FHIR R4 §3.3",
-        "text": "Does the agent conform to HL7 FHIR R4 §3.3 interoperability requirements for API behavior and exchange (including required interactions/constraints and conformance assertions), with testable evidence (e.g., capability statements and conformance tests)?",
+        "l5": "CapabilityStatement is published and versioned; automated conformance tests cover every declared interaction and run on each release; exchange failures are logged and tracked to resolution",
+        "regulatoryRef": "HL7 FHIR R4 CapabilityStatement resource",
+        "text": "Does the agent publish an HL7 FHIR R4 CapabilityStatement for its FHIR endpoints and pass conformance tests for the interactions it declares?",
         "weight": 10
       },
       {
         "dimension": "Traceability",
-        "id": "HLT-DHR-18",
-        "l1": "No standards-compliant ITI-18 query; document discovery is proprietary or incomplete",
-        "l3": "Supports basic ITI-18 queries, but coverage is incomplete (edge cases, error handling, security assertions) and interoperability testing is limited",
-        "l5": "Full ITI-18 compliance with automated conformance testing, robust error handling, security assertions aligned to deployment, and continuous interoperability regression testing across communities",
-        "regulatoryRef": "IHE XDS.b ITI-18",
-        "text": "Does the agent implement IHE XDS.b ITI-18 (Registry Stored Query) correctly (query parameters, response structure, error handling, and security), validated via interoperability testing?",
-        "weight": 8
+        "id": "HLT-DHR-19",
+        "l1": "Agent API and bulk-export access is not logged or is logged under a shared identity",
+        "l3": "Access is logged with agent identity, but purpose, scope or the represented user is missing for bulk exports",
+        "l5": "Every API and bulk-export access is logged with agent identity, user, purpose and scope; logs are reviewed on a schedule; anomalies are investigated with records",
+        "regulatoryRef": "HIPAA §164.312(b); 45 CFR §170.315(g)(10)",
+        "text": "Does the agent log every access it makes through the standardized FHIR API (45 CFR §170.315(g)(10)), including bulk exports, with its own identity, the user it acts for, purpose and scope, as HIPAA audit controls (45 CFR §164.312(b)) require for systems containing ePHI?",
+        "weight": 10
+      },
+      {
+        "dimension": "Transparency",
+        "id": "HLT-DHR-20",
+        "l1": "No source attributes for AI interventions; clinicians cannot see intended use, development data or validation",
+        "l3": "Source attributes are maintained for some predictive DSIs but are not versioned with model updates, and risk management evidence is ad hoc",
+        "l5": "Versioned source attributes for every predictive DSI, risk management evidence (validity, fairness, safety, security) linked to each release, and a tracked regulatory-status flag for the HTI-5 proposal",
+        "regulatoryRef": "45 CFR §170.315(b)(11)(iv), (vi)",
+        "text": "For predictive decision support interventions surfaced through certified health IT, does the agent populate the source attributes required by 45 CFR §170.315(b)(11)(iv) and support intervention risk management under (b)(11)(vi), tracking the HTI-5 proposal (90 FR 60970) to remove these requirements?",
+        "weight": 10
+      },
+      {
+        "dimension": "Transparency",
+        "id": "HLT-DHR-21",
+        "l1": "Agent access is logged under a shared service identity and is not available to patients",
+        "l3": "Agent access is attributed and retained, but patients cannot obtain it, or restrictions are enforced manually",
+        "l5": "Each access records provider or person, date and time, and data accessed; it is available to the patient for at least three years; Art. 8 restrictions are enforced by the system and tested; application dates per Art. 105 (2029-03-26 for priority categories) tracked",
+        "regulatoryRef": "Regulation (EU) 2025/327 Art. 8; Regulation (EU) 2025/327 Art. 9",
+        "text": "Does the agent make every access it makes to personal electronic health data attributable, so that natural persons can obtain information on each access for at least three years (Regulation (EU) 2025/327 Art. 9), and does it honour access restrictions under Art. 8 without revealing them to providers?",
+        "weight": 10
+      },
+      {
+        "dimension": "Governance",
+        "id": "HLT-DHR-22",
+        "l1": "Part 2 records are handled like other PHI; no consent check",
+        "l3": "Part 2 records are tagged, but consent scope is not checked per disclosure or the §2.32 notice is missing",
+        "l5": "Every disclosure of tagged Part 2 records is gated on a matching consent and carries the §2.32 notice; segmentation is tested; disclosures are logged and auditable",
+        "regulatoryRef": "42 CFR Part 2 §2.31, §2.32",
+        "text": "When the agent summarises, routes or discloses substance use disorder records from a 42 CFR Part 2 program, does it check Part 2 consent (§2.31), attach the required notice and copy of consent to each disclosure (§2.32), and keep these records segregated from general HIPAA handling, as required since the 2026-02-16 compliance date?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -3425,27 +3435,27 @@
       "GMP violations from AI-optimized manufacturing process changes",
       "Intellectual property disputes over AI-generated molecular structures"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Drug Discovery",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-DD-1",
-        "l1": "No ALCOA+ enforcement; research data lacks systematic attributability, legibility, contemporaneity, originality, and accuracy controls",
-        "l3": "Agent enforces basic data integrity controls with audit trails and access management, but does not implement full ALCOA+ across all data lifecycle stages or validate computerized system data integrity",
-        "l5": "Full ALCOA+ data integrity with automated attribution, contemporaneous recording verification, original data preservation, accuracy validation, completeness checks, consistency monitoring, enduring storage, and availability assurance per GMP Annex 11 §7",
-        "regulatoryRef": "FDA 21 CFR §211.68; EU GMP Annex 11 §7",
-        "text": "Does the agent enforce data integrity per FDA 21 CFR §211.68 and EU GMP Annex 11 §7 ALCOA+ principles for all discovery data?",
-        "weight": 10
+        "l1": "Systems the agent writes to are unvalidated; data integrity relies on informal checks",
+        "l3": "Key systems are validated, but the agent integration is outside validation scope, or back-up restore is not tested",
+        "l5": "Validation covers the agent integration; access and change control are evidenced; back-up restore is tested (Annex 11 §7.2); periodic review records exist; attributable, contemporaneous records are sampled at review",
+        "regulatoryRef": "21 CFR Part 211 §211.68; EU GMP Annex 11 §4, §7",
+        "text": "Are the computerised systems the agent uses for GMP-relevant discovery or CMC data validated and controlled per FDA 21 CFR §211.68 and EU GMP Annex 11 §4 and §7 (documented validation, input/output checks, access control, change control, back-up and restore checks, periodic review)?",
+        "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "HLT-DD-2",
         "l1": "No QbD integration; drug development processes are not designed with systematic quality risk management",
         "l3": "Agent supports design space exploration and basic risk assessment per ICH Q9, but does not implement full QbD lifecycle including control strategy development",
-        "l5": "Comprehensive QbD with target product profile definition, critical quality attribute identification, design space characterization per ICH Q8(R2), quality risk management per ICH Q9, control strategy per ICH Q10, and lifecycle management per ICH Q12",
-        "regulatoryRef": "ICH Q8(R2) §2.6; ICH Q9",
-        "text": "Does the agent implement Quality by Design (QbD) per ICH Q8(R2) §2.6 design space and ICH Q9 quality risk management for AI-assisted drug development?",
+        "l5": "Design-space boundaries and their evidence are documented; agent-proposed parameters outside the boundary are blocked pending change control; QRM records cover each AI-influenced parameter",
+        "regulatoryRef": "ICH Q8(R2); ICH Q9(R1)",
+        "text": "Does the agent operate within a design space defined per ICH Q8(R2) (explicit boundaries, supporting evidence, rules for changes inside versus outside the design space) with quality risk management per ICH Q9(R1)?",
         "weight": 10
       },
       {
@@ -3474,8 +3484,8 @@
         "l1": "No IP management; AI-assisted discoveries are not systematically documented for patent protection or inventorship determination",
         "l3": "Agent logs AI contributions to discovery processes and maintains invention disclosure records, but does not implement systematic inventorship analysis or freedom-to-operate assessment",
         "l5": "Full IP governance with automated invention disclosure capture, AI contribution documentation per USPTO guidance, freedom-to-operate analysis, prior art monitoring, patent landscape mapping, and inventorship determination support for AI-assisted discoveries",
-        "regulatoryRef": "WIPO PCT; USPTO AI Inventorship Guidance (2024)",
-        "text": "Does the agent manage intellectual property documentation per WIPO Patent Cooperation Treaty and inventorship determination for AI-assisted discoveries?",
+        "regulatoryRef": "USPTO Revised Inventorship Guidance for AI-Assisted Inventions (90 FR 54636, 2025)",
+        "text": "Does the agent document AI contributions to discoveries so that inventorship of AI-assisted inventions can be determined per the USPTO Revised Inventorship Guidance for AI-Assisted Inventions (2025)?",
         "weight": 8
       },
       {
@@ -3493,7 +3503,7 @@
         "id": "HLT-DD-7",
         "l1": "No CTD preparation support; quality documentation for regulatory submissions is compiled manually",
         "l3": "Agent assists with CTD Module 3 document compilation and cross-references, but does not automate data extraction from laboratory systems or validate completeness against ICH requirements",
-        "l5": "Autonomous CTD Module 3 preparation with automated data extraction from LIMS/ELN, document compilation per ICH M4 structure, cross-reference validation, completeness checking, and submission-ready package generation with eCTD formatting",
+        "l5": "CTD Module 3 compilation with automated extraction from LIMS/ELN, cross-reference validation, completeness checks against ICH M4Q, eCTD formatting, and human sign-off recorded before submission",
         "regulatoryRef": "ICH M4 CTD Module 3",
         "text": "Does the agent support regulatory submission preparation per ICH M4 Common Technical Document (CTD) Module 3 quality documentation?",
         "weight": 8
@@ -3531,11 +3541,11 @@
       {
         "dimension": "Compliance",
         "id": "HLT-DD-11",
-        "l1": "No Q9(R1) or Annex 11 §11 compliance; AI quality risk management does not implement updated Q9(R1) 2023 formality-of-risk-management guidance and AI batch release agents lack §11 validation",
-        "l3": "Agent implements basic quality risk management and validates batch release processes, but does not distinguish ICH Q9(R1) 2023 updates from prior Q9 or implement EU GMP Annex 11 §11 specific batch release AI validation",
-        "l5": "Full ICH Q9(R1) 2023 compliance with Annex II AI-assisted risk management, formality-of-risk-management calibration, EU GMP Annex 11 §11 batch release AI validation, computerized system validation documentation, and continuous risk review per Q9(R1) lifecycle approach",
-        "regulatoryRef": "ICH Q9(R1) 2023 Annex II; EU GMP Annex 11 §11",
-        "text": "Does the agent implement ICH Q9(R1) 2023 revision Annex II AI-assisted quality risk management and EU GMP Annex 11 §11 batch release AI agent validation requirements?",
+        "l1": "AI output feeds batch certification with no QRM record or validation",
+        "l3": "QRM records exist for AI-influenced decisions, but batch-release use is not technically restricted",
+        "l5": "Each AI-influenced quality decision has a QRM record with formality matched to risk; batch certification requires a Qualified Person action in a validated system; the restriction is tested",
+        "regulatoryRef": "ICH Q9(R1); EU GMP Annex 11 §15",
+        "text": "Does the agent apply ICH Q9(R1) formality-of-risk-management to AI-influenced quality decisions and stay out of batch certification unless the computerised system is validated per EU GMP Annex 11 §15?",
         "weight": 10
       },
       {
@@ -3564,28 +3574,28 @@
         "l1": "No §7.1 controls; critical data can be entered or edited without effective verification or falsification controls",
         "l3": "Implements some access controls and audit trails, but critical data verification, raw-data linkage, and falsification detection are inconsistent",
         "l5": "Comprehensive §7.1 controls with enforced workflows for critical data entry, verification rules, raw-data provenance linkage, anomaly detection, periodic review, and inspection-ready evidence outputs",
-        "regulatoryRef": "EU GMP Annex 11 §7.1",
-        "text": "Does the agent implement EU GMP Annex 11 §7.1 data integrity controls for critical data capture (e.g., controlled data entry, verification or second-person review where required, prevention or detection of falsification, and linkage of raw data to reported results) across ELN, LIMS, or instrument integrations?",
+        "regulatoryRef": "EU GMP Annex 11 §6, §7.1",
+        "text": "Does the agent apply EU GMP Annex 11 §6 accuracy checks to critical data (additional check by a second operator or validated electronic means for manually entered critical data) and §7.1 data storage protection, with raw data linked to reported results across ELN, LIMS or instrument integrations?",
         "weight": 12
       },
       {
-        "dimension": "Compliance",
-        "id": "HLT-DD-15",
-        "l1": "No CSV or controls; lab computerized systems are unvalidated and rely on informal checks",
-        "l3": "Validates key systems and performs some checks or backups, but validation scope, change control, and periodic review are incomplete or inconsistently evidenced",
-        "l5": "Full §211.68-aligned CSV with risk-based validation, documented checks, controlled configuration, backup or restore verification, and continuous monitoring with audit-ready validation packages",
-        "regulatoryRef": "FDA 21 CFR §211.68",
-        "text": "Does the agent ensure computerized systems used in discovery or CMC labs are validated and controlled per FDA 21 CFR §211.68 (including documented validation, input or output checks, access controls, change control, backup or restore testing, and periodic review) for ELN, LIMS, or instrument integrations?",
+        "dimension": "Safety",
+        "id": "HLT-DD-17",
+        "l1": "LLM outputs feed batch release or other critical GMP decisions without human review",
+        "l3": "LLMs are restricted by policy, but there is no criticality classification or technical enforcement",
+        "l5": "Each GMP AI use is classified critical or non-critical; model-type restrictions are technically enforced and tested; human review by qualified personnel is recorded for non-critical LLM use; draft status is tracked",
+        "regulatoryRef": "EudraLex Vol. 4 draft Annex 22 §1; EU GMP Annex 11",
+        "text": "Are generative-AI and LLM agents kept out of critical GMP applications, with only static, deterministic validated models used there and qualified, trained personnel responsible where LLMs support non-critical GMP tasks, as proposed in draft EU GMP Annex 22 §1?",
         "weight": 12
       },
       {
-        "dimension": "Compliance",
-        "id": "HLT-DD-16",
-        "l1": "No design space; operating ranges and boundaries are informal and not supported by evidence",
-        "l3": "Defines operating ranges and explores multivariate effects, but boundaries, evidence linkage, and within or outside design-space change rules are not consistently enforced",
-        "l5": "Full §2.2 design space governance with evidence-backed boundaries, linkage to CQAs or CPPs, within or outside design-space change workflows, and alignment to Q9 QRM and Q10 control strategy",
-        "regulatoryRef": "ICH Q8(R2) §2.2",
-        "text": "Does the agent define, justify, and govern a design space per ICH Q8(R2) §2.2 (including explicit boundaries, supporting evidence, and change handling within vs outside design space) for AI-assisted development and AI-influenced process optimization?",
+        "dimension": "Governance",
+        "id": "HLT-DD-18",
+        "l1": "No defined context of use; AI outputs enter submissions unassessed",
+        "l3": "Context of use is documented, but credibility evidence is not scaled to model risk",
+        "l5": "Each AI use has a context of use, model-risk rationale, credibility assessment plan and results, and lifecycle maintenance records; draft status is tracked",
+        "regulatoryRef": "FDA draft guidance: Considerations for the Use of AI To Support Regulatory Decision-Making for Drug and Biological Products (January 2025)",
+        "text": "When AI output supports regulatory decisions on drug safety, effectiveness or quality, does the sponsor define the context of use and assess model credibility in proportion to model risk, as in FDA's draft guidance on AI to support regulatory decision-making (January 2025)?",
         "weight": 10
       }
     ],
@@ -5553,7 +5563,7 @@
       "Data exploitation through health app data monetization",
       "Clinical safety incidents from unvalidated AI health predictions"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Life Technology",
     "questions": [
       {
@@ -5569,12 +5579,12 @@
       {
         "dimension": "Compliance",
         "id": "HLT-LT-2",
-        "l1": "No EU AI Act compliance; health AI systems are not assessed against high-risk requirements",
-        "l3": "Agent performs basic risk assessment per Art. 9 and documents training data characteristics per Art. 10, but does not implement full conformity assessment or continuous monitoring",
-        "l5": "Full EU AI Act compliance with systematic risk management per Art. 9, data governance per Art. 10 including bias testing, technical documentation per Art. 11, record-keeping per Art. 12, transparency per Art. 13, human oversight per Art. 14, and accuracy/robustness per Art. 15",
-        "regulatoryRef": "EU AI Act 2024/1689 Art. 9, Art. 10",
-        "text": "Does the agent enforce EU AI Act 2024/1689 Article 9 risk management and Article 10 data governance for high-risk health AI systems?",
-        "weight": 10
+        "l1": "No risk management file or dataset documentation for the AI system",
+        "l3": "A risk management file and dataset descriptions exist, but representativeness and bias checks or Art. 4a safeguards are missing or not versioned",
+        "l5": "Risk management is updated per release; each dataset has versioned provenance, representativeness and bias test results; special-category data use for bias detection is logged with Art. 4a safeguards; obligations dated 2 Aug 2028 (Annex I) or 2 Dec 2027 (Annex III)",
+        "regulatoryRef": "EU AI Act Art. 9; EU AI Act Art. 10(2); EU AI Act Art. 4a; Regulation (EU) 2026/1744",
+        "text": "For high-risk health AI, does the provider operate risk management (EU AI Act Art. 9) and training, validation and testing data governance (Art. 10(2)), processing special-category health data for bias detection only under the Art. 4a safeguards inserted by Regulation (EU) 2026/1744?",
+        "weight": 15
       },
       {
         "dimension": "Safety",
@@ -5630,51 +5640,41 @@
         "dimension": "Safety",
         "id": "HLT-LT-8",
         "l1": "No health-specific cybersecurity; digital health systems use generic security controls without medical device threat modeling",
-        "l3": "Agent implements security controls per FDA guidance including SBOM generation and vulnerability management, but does not perform continuous threat modeling or security risk assessment specific to health contexts",
-        "l5": "Comprehensive health cybersecurity with threat modeling per IEC 81001-5-1, SBOM management, vulnerability disclosure per FDA guidance, security risk assessment integrated with safety risk management, penetration testing, and coordinated vulnerability disclosure process",
-        "regulatoryRef": "FDA Cybersecurity Guidance (2023); IEC 81001-5-1:2021",
-        "text": "Does the agent implement cybersecurity for health software per FDA Cybersecurity Guidance (2023) and IEC 81001-5-1:2021 health software security?",
+        "l3": "SBOM and a vulnerability process exist, but the agent's model, prompt and tool dependencies are not in the SBOM or threat model",
+        "l5": "SBOM covers the agent including model and tool dependencies; threat model and security risk assessment are linked to safety risk management; postmarket vulnerability monitoring and coordinated disclosure are evidenced",
+        "regulatoryRef": "FDA Cybersecurity in Medical Devices guidance (February 2026); FD&C Act §524B; IEC 81001-5-1",
+        "text": "For cyber devices, does the agent's manufacturer provide the FD&C Act §524B evidence (SBOM, postmarket vulnerability monitoring plan, secure product development framework) per FDA's cybersecurity guidance (February 2026), with IEC 81001-5-1 health software security activities?",
         "weight": 10
       },
       {
         "dimension": "Traceability",
         "id": "HLT-LT-9",
-        "l1": "No change control for AI algorithms; model updates are deployed without systematic impact assessment or regulatory notification",
-        "l3": "Agent documents algorithm changes and performs basic impact assessment, but does not implement predetermined change control plans or distinguish between SaMD and non-SaMD changes",
-        "l5": "Full PCCP implementation with predetermined change descriptions, modification protocols, impact assessment methodology, performance monitoring for changes, regulatory notification triggers, and rollback capability with documented decision criteria",
-        "regulatoryRef": "FDA PCCP Guidance for AI/ML SaMD (2023)",
-        "text": "Does the agent maintain algorithm change management per FDA Predetermined Change Control Plan (PCCP) guidance for AI/ML-based SaMD?",
+        "l1": "Model and prompt changes ship without regulatory change assessment",
+        "l3": "A PCCP covers model retraining, but prompt and tool changes are outside it",
+        "l5": "The PCCP covers every modifiable component; each change record shows it was executed per the modification protocol with impact assessment; changes outside the PCCP trigger a new submission decision",
+        "regulatoryRef": "21 U.S.C. 360e-4; FDA PCCP for AI-Enabled Device Software Functions final guidance",
+        "text": "Does the agent's manufacturer control AI changes through an authorized predetermined change control plan (21 U.S.C. 360e-4; FDA PCCP final guidance) describing the planned modifications, the methodology to develop, validate and implement them, and an impact assessment, covering every modifiable component including prompts and tools?",
         "weight": 10
       },
       {
         "dimension": "Governance",
         "id": "HLT-LT-10",
         "l1": "No HTA readiness; digital health technologies are not assessed for clinical and economic value",
-        "l3": "Agent collects basic outcome data that could support HTA submissions, but does not structure evidence per EUnetHTA or NICE ESF requirements",
-        "l5": "Full HTA readiness with evidence generation per NICE ESF tiers, economic evaluation modeling, comparative effectiveness data collection, patient-reported outcome integration, and structured HTA submission documentation per EUnetHTA 21 methodology",
-        "regulatoryRef": "EUnetHTA 21 Methodology; NICE ESF for DHTs",
-        "text": "Does the agent support health technology assessment per EUnetHTA 21 methodology and NICE Evidence Standards Framework for digital health technologies?",
+        "l3": "Outcome data is collected, but it is not structured for HTA submission or JCA scope is not assessed",
+        "l5": "JCA scope under Art. 7 is assessed and recorded; comparative effectiveness and patient-reported outcome evidence is structured for HTA bodies; evidence gaps are tracked",
+        "regulatoryRef": "Regulation (EU) 2021/2282 Art. 7; NICE ESF for DHTs",
+        "text": "Does the agent's evidence generation support health technology assessment, including joint clinical assessment where the technology falls under Regulation (EU) 2021/2282 Art. 7?",
         "weight": 8
       },
       {
         "dimension": "Compliance",
         "id": "HLT-LT-11",
         "l1": "No CDS boundary classification; AI health apps operate without FDA CDS guidance Non-Device vs Device classification assessment, risking unregulated SaMD deployment",
-        "l3": "Agent performs basic SaMD classification assessment, but does not implement FDA CDS four-criteria boundary test or NHS DTAC assessment for UK-market deployment",
-        "l5": "Full FDA CDS boundary classification with four-criteria test automation, Device CDS vs Non-Device CDS determination, NHS DTAC v3 assessment for UK market, regulatory pathway documentation, and continuous classification monitoring for feature changes crossing the Device threshold",
-        "regulatoryRef": "FDA CDS Guidance (85 FR 75492); NHS DTAC v3",
-        "text": "Does the agent implement FDA Clinical Decision Support (CDS) final guidance Non-Device CDS vs Device CDS boundary classification and NHS DTAC (Digital Technology Assessment Criteria) for UK-market digital health AI?",
+        "l3": "Functions are classified once, but the record does not address each criterion or is not repeated after feature changes",
+        "l5": "Each function has a dated classification record addressing every criterion; feature changes trigger re-classification; device functions follow a regulatory pathway",
+        "regulatoryRef": "FD&C Act §520(o)(1)(E); FDA Clinical Decision Support Software guidance (January 2026)",
+        "text": "Does the agent's provider classify each decision-support function as non-device CDS or device software using the FD&C Act §520(o)(1)(E) criteria as explained in FDA's CDS guidance (January 2026), and re-run the classification when features change?",
         "weight": 10
-      },
-      {
-        "dimension": "Compliance",
-        "id": "HLT-LT-12",
-        "l1": "No data governance; training/validation data sources, representativeness, errors, and bias controls are undocumented or ad hoc",
-        "l3": "Basic dataset documentation and some bias checks exist, but representativeness/quality/error-handling controls and provenance are incomplete or not auditable",
-        "l5": "Full Art. 10(2) compliance with documented data management procedures, representativeness and bias test suites, error-handling workflows, dataset versioning/provenance, and exportable audit evidence mapped to intended purpose",
-        "regulatoryRef": "EU AI Act 2024/1689 Art. 10(2)",
-        "text": "Does the agent implement EU AI Act 2024/1689 Article 10(2) training/validation data governance, including documented data management practices, dataset relevance/representativeness checks for intended purpose, error detection/handling, completeness/quality controls, bias testing/mitigation, and versioned dataset provenance for audit?",
-        "weight": 15
       },
       {
         "dimension": "Traceability",
@@ -5692,8 +5692,8 @@
         "l1": "No performance evaluation; diagnostic claims are made without structured evidence or monitoring",
         "l3": "Some validation evidence exists, but it is not structured as an IVDR-grade performance evaluation with clear intended purpose alignment and ongoing monitoring",
         "l5": "Comprehensive IVDR-grade performance evaluation support with plan/report structures, analytical + clinical performance evidence linkage, intended-purpose traceability, and post-market performance monitoring with drift triggers",
-        "regulatoryRef": "EU IVDR 2017/746 Art. 56",
-        "text": "If the agent makes diagnostic/IVD-adjacent claims or interprets physiologic/biomarker inputs, does it support IVDR-aligned performance evaluation evidence (EU IVDR 2017/746 Art. 56), including a performance evaluation plan, analytical/clinical performance evidence linkage, intended purpose alignment, and ongoing performance monitoring for drift?",
+        "regulatoryRef": "EU IVDR 2017/746 Art. 56; EU IVDR 2017/746 Annex XIII",
+        "text": "If the agent makes diagnostic or IVD-adjacent claims or interprets biomarker inputs, does it support IVDR performance evaluation evidence (EU IVDR 2017/746 Art. 56; Annex XIII), including a performance evaluation plan, scientific validity and analytical and clinical performance evidence, and post-market performance follow-up?",
         "weight": 15
       },
       {
@@ -5701,9 +5701,9 @@
         "id": "HLT-LT-15",
         "l1": "No structured clinical evaluation; claims are not supported by clinical association/analytical/clinical validation evidence",
         "l3": "Some validation exists, but evidence is fragmented and does not cleanly map to clinical association vs analytical vs clinical validation for the intended use",
-        "l5": "Full §4-aligned clinical evaluation with evidence mapping, intended-use traceability, subgroup performance analysis, and continuous real-world performance feedback into evaluation updates",
-        "regulatoryRef": "FDA SaMD Clinical Evaluation (2019) §4",
-        "text": "Does the agent implement FDA SaMD Clinical Evaluation (2019) §4 by structuring evidence as (1) clinical association, (2) analytical validation, and (3) clinical validation, with intended-use alignment, population/subgroup analysis, and real-world performance monitoring linkages for ongoing assurance?",
+        "l5": "Full clinical evaluation with evidence mapping, intended-use traceability, subgroup performance analysis, and continuous real-world performance feedback into evaluation updates",
+        "regulatoryRef": "FDA SaMD Clinical Evaluation guidance",
+        "text": "Does the agent implement the FDA guidance Software as a Medical Device (SaMD): Clinical Evaluation by structuring evidence as (1) valid clinical association, (2) analytical validation and (3) clinical validation, with intended-use alignment, subgroup analysis and real-world performance monitoring?",
         "weight": 12
       },
       {
@@ -7361,17 +7361,17 @@
       "Care fragmentation from poor AI-managed handoff between providers",
       "Prognostic model bias leading to disparate care quality across demographics"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Patient Lifecycle",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-PL-1",
-        "l1": "No CDS safety controls; clinical recommendations are generated without validation against clinical evidence or safety boundaries",
-        "l3": "Agent validates CDS outputs against clinical guidelines and flags high-risk recommendations for physician review, but does not implement systematic bias testing or outcome tracking",
-        "l5": "Full CDS safety with clinical guideline validation, systematic bias testing across demographics, outcome tracking with feedback loops, automated adverse event detection, physician override documentation, and FDA/MDR classification-appropriate risk management",
-        "regulatoryRef": "FDA CDS Guidance (2022); EU MDR 2017/745 Annex I §23.4",
-        "text": "Does the agent implement clinical decision support safety per FDA Guidance on CDS Software (2022) and EU MDR 2017/745 Annex I Chapter I §23.4?",
+        "l1": "Opaque recommendations, including time-critical alerts, are offered as non-device CDS",
+        "l3": "Basis information is available on request but is not patient-specific, and time-criticality is not assessed",
+        "l5": "Each recommendation shows its patient-specific basis; an intended-use and time-criticality analysis is on file; automation-bias usability testing is recorded; functions that fail the criteria follow the device pathway",
+        "regulatoryRef": "FDA Clinical Decision Support Software guidance (January 2026)",
+        "text": "Does the agent keep non-device CDS status by letting health care professionals independently review the basis of each recommendation (inputs, data relied on, validation, patient-specific unknowns), and treat time-critical or judgment-directing uses as device functions (FDA CDS guidance, January 2026)?",
         "weight": 10
       },
       {
@@ -7389,9 +7389,9 @@
         "id": "HLT-PL-3",
         "l1": "No automated triage safety; patient prioritization is not validated against ESI criteria or clinical acuity assessment",
         "l3": "Agent applies ESI-aligned triage scoring with vital sign integration, but does not implement continuous re-triage or detect clinical deterioration between assessments",
-        "l5": "Autonomous triage with ESI v4 compliance, continuous clinical deterioration monitoring (NEWS2/MEWS integration), automated re-triage triggers, sepsis screening per Sepsis-3 criteria, and escalation protocols with documented response times per JCI ACC.1",
-        "regulatoryRef": "JCI ACC.1; ESI v4 Implementation Handbook",
-        "text": "Does the agent implement triage safety per Emergency Severity Index (ESI) v4 and JCI Standard ACC.1 with appropriate escalation protocols?",
+        "l5": "ESI assignments are validated against a clinician-labelled sample with recorded agreement; re-triage triggers and escalation times are logged; clinicians confirm every triage level; where Annex III 5(d) applies the high-risk controls are evidenced",
+        "regulatoryRef": "ESI v4 Implementation Handbook; EU AI Act Annex III point 5(d)",
+        "text": "Does the agent implement triage safety per the Emergency Severity Index (ESI) v4 with escalation protocols, and evidence the high-risk controls where EU AI Act Annex III point 5(d) (emergency patient triage) applies?",
         "weight": 10
       },
       {
@@ -7407,11 +7407,11 @@
       {
         "dimension": "Governance",
         "id": "HLT-PL-5",
-        "l1": "No quality measure tracking; clinical outcomes are not systematically measured against standardized quality indicators",
-        "l3": "Agent calculates selected MIPS quality measures from clinical data, but does not automate measure reporting or identify quality improvement opportunities",
-        "l5": "Comprehensive quality measurement with automated MIPS measure calculation, real-time quality dashboards, improvement opportunity identification, benchmarking against national/peer data, and automated QPP reporting with evidence documentation per JCI QPS.1",
-        "regulatoryRef": "CMS QPP MIPS; JCI QPS.1",
-        "text": "Does the agent track clinical quality measures per CMS Quality Payment Program (QPP) MIPS measures and JCI Standard QPS.1?",
+        "l1": "Measures are computed with unversioned or unknown logic",
+        "l3": "Current-year specifications are used, but inputs are not retained or the logic version is not shown",
+        "l5": "Each computed measure records specification version, inputs and result; reviewers can reproduce a sampled measure; specification updates are applied before the reporting year starts",
+        "regulatoryRef": "42 CFR §414.1325; CMS eCQM specifications (annual)",
+        "text": "Where the agent computes clinical quality measures, does it use the CMS-published eCQM specifications for the reporting year, retain calculation inputs, and show the measure logic version to reviewers?",
         "weight": 8
       },
       {
@@ -7467,11 +7467,11 @@
       {
         "dimension": "Compliance",
         "id": "HLT-PL-11",
-        "l1": "No PCCP or post-market monitoring; adaptive AI clinical decision support agents update without predetermined change control plans or systematic post-market performance tracking",
-        "l3": "Agent documents AI model changes and monitors key performance metrics, but does not implement FDA PCCP framework or systematic post-market performance monitoring per SaMD Action Plan requirements",
-        "l5": "Full FDA PCCP implementation with predetermined change control plans per 21 CFR §807.87(l), post-market performance monitoring, real-world performance data collection, model drift detection, and FDA notification for changes exceeding PCCP boundaries",
-        "regulatoryRef": "FDA AI/ML SaMD Action Plan; 21 CFR §807.87(l)",
-        "text": "Does the agent implement FDA AI/ML-Based SaMD Action Plan predetermined change control plan (PCCP) requirements and post-market performance monitoring for adaptive clinical decision support agents?",
+        "l1": "Model updates ship with no performance monitoring or regulatory change assessment",
+        "l3": "Performance is monitored in aggregate, but subgroup performance and drift triggers are missing, or changes outside the PCCP are not flagged",
+        "l5": "Postmarket monitoring reports aggregate and subgroup performance against predefined thresholds; drift triggers open a change assessment; every change is classified as inside or outside the authorized PCCP with a record",
+        "regulatoryRef": "FDA AI-Enabled Device Software Functions draft guidance (January 2025); 21 U.S.C. 360e-4",
+        "text": "For adaptive clinical decision support that is a device, does the agent support postmarket performance monitoring across the total product life cycle, including subgroup performance and drift triggers, as recommended in FDA's AI-enabled device software functions draft guidance (January 2025), and route changes outside an authorized PCCP (21 U.S.C. 360e-4) to regulatory assessment?",
         "weight": 10
       },
       {
@@ -7505,34 +7505,24 @@
         "weight": 12
       },
       {
-        "dimension": "Traceability",
-        "id": "HLT-PL-15",
-        "l1": "No software requirements; behavior is implicit and tests do not trace to safety requirements",
-        "l3": "Maintains partial requirements and some trace links to tests, but risk-control linkage and change impact analysis are incomplete",
-        "l5": "Full §5.2 compliance with safety-class-driven requirements rigor, bidirectional traceability (hazard → requirement → implementation → verification), change impact analysis, and release gating on trace completeness",
-        "regulatoryRef": "IEC 62304:2006 §5.2",
-        "text": "Does the agent support software requirements analysis and requirements traceability for safety-related functions per IEC 62304:2006 §5.2 (including linkage to risk controls and verification evidence)?",
-        "weight": 12
-      },
-      {
-        "dimension": "Safety",
+        "dimension": "Compliance",
         "id": "HLT-PL-16",
         "l1": "No GSPR evidence; risk-benefit and state-of-the-art rationale are absent for automated clinical functions",
         "l3": "Documents high-level risk-benefit and some safety measures, but does not maintain state-of-the-art justification or residual risk acceptability rationale",
         "l5": "Comprehensive GSPR evidence pack with state-of-the-art benchmarked controls, quantified risk-benefit support, residual risk evaluation or acceptability rationale, and continuous update from vigilance and real-world performance data",
         "regulatoryRef": "EU MDR 2017/745 Annex I §1",
-        "text": "Does the agent demonstrate EU MDR 2017 or 745 Annex I §1 alignment by documenting risk-benefit, state of the art safety measures, and risk reduction as far as possible for patient-lifecycle automation (triage or CDS or coordination)?",
+        "text": "Does the agent demonstrate EU MDR 2017/745 Annex I §1 alignment by documenting risk-benefit, state-of-the-art safety measures, and risk reduction as far as possible for patient-lifecycle automation (triage, CDS or coordination)?",
         "weight": 10
       },
       {
-        "dimension": "Governance",
-        "id": "HLT-PL-17",
-        "l1": "No crosswalk; teams cannot map implemented controls to NPSGs or JCI requirements",
-        "l3": "Maintains a partial mapping spreadsheet, but it is not kept current with changes and lacks evidence pointers",
-        "l5": "Automated control crosswalk with versioned mappings, evidence pointers (policies, logs, test reports), and change alerts when accreditor standards update",
-        "regulatoryRef": "Joint Commission NPSG crosswalk expectations",
-        "text": "Does the agent maintain an accreditor crosswalk mapping JCI standards to Joint Commission NPSG controls (including NPSG.06.01.01) with evidence pointers and responsibility assignments?",
-        "weight": 6
+        "dimension": "Transparency",
+        "id": "HLT-PL-18",
+        "l1": "No AI disclosure in patient interactions",
+        "l3": "Disclosure appears at session start only and is missing in voice or asynchronous channels",
+        "l5": "Disclosure appears in every channel, is stored in the transcript, and is tested per release",
+        "regulatoryRef": "EU AI Act Art. 50(1)",
+        "text": "Does a patient-facing agent tell natural persons they are interacting with an AI system unless that is obvious (EU AI Act Art. 50(1), applicable from 2 August 2026)?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -8289,7 +8279,7 @@
       "Provider burnout from poorly designed AI workflow integration",
       "Fraud and abuse liability from AI-optimized billing patterns"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Professional Practice",
     "questions": [
       {
@@ -8315,21 +8305,21 @@
       {
         "dimension": "Compliance",
         "id": "HLT-PP-3",
-        "l1": "No ONC certification awareness; practice management system does not track or maintain certification criteria compliance",
-        "l3": "Agent monitors key ONC certification criteria and flags non-compliance, but does not automate certification maintenance or CQM reporting",
-        "l5": "Full ONC certification management with automated criteria compliance monitoring per §170.315, CQM calculation and reporting, interoperability standard adherence (FHIR, C-CDA), and certification renewal tracking",
-        "regulatoryRef": "ONC 45 CFR §170.315",
-        "text": "Does the agent manage ONC Health IT certification requirements per 45 CFR §170.315 including clinical quality measure reporting and interoperability standards?",
+        "l1": "The agent reads EHR data through screen scraping or undocumented database access",
+        "l3": "The certified API is used for reads, but some writes or bulk jobs use undocumented interfaces, or purpose is not logged",
+        "l5": "All EHR access goes through documented, authorized interfaces; each access is logged with agent identity, user, purpose and scope; interface inventory is reviewed on each release",
+        "regulatoryRef": "45 CFR §170.315(g)(10)",
+        "text": "Where the agent reads or writes EHR data, does it use the certified standardized FHIR API (45 CFR §170.315(g)(10)) or another documented, authorized interface rather than undocumented back-end access, and log each access with purpose?",
         "weight": 8
       },
       {
         "dimension": "Governance",
         "id": "HLT-PP-4",
         "l1": "No billing compliance automation; claims are submitted without systematic fraud risk assessment or compliance verification",
-        "l3": "Agent performs basic claim scrubbing against CMS rules and flags common billing errors, but does not implement pattern-based fraud detection or compliance program management",
-        "l5": "Comprehensive billing compliance with automated claim validation, pattern-based fraud detection, OIG exclusion list screening, Stark Law/Anti-Kickback compliance monitoring, compliance program management per OIG guidance, and automated self-disclosure protocol",
-        "regulatoryRef": "CMS 42 CFR §424.5; False Claims Act 31 USC §3729",
-        "text": "Does the agent implement billing compliance per CMS 42 CFR §424.5 and False Claims Act (31 USC §3729) with automated fraud detection?",
+        "l3": "Claims are scrubbed against CMS rules and unusual patterns are flagged, but referral suggestions are not reviewed against AKS safe harbors",
+        "l5": "Every AI-suggested code and referral is reviewed by an accountable human before submission; claim-pattern and referral-pattern monitoring runs with documented thresholds; exclusion-list screening is evidenced; findings feed the compliance program",
+        "regulatoryRef": "CMS 42 CFR §424.5; False Claims Act 31 USC §3729; AKS 42 U.S.C. §1320a-7b",
+        "text": "Does the agent support billing and referral compliance per CMS 42 CFR §424.5, the False Claims Act (31 U.S.C. §3729) and the Anti-Kickback Statute (42 U.S.C. §1320a-7b), so that AI-assisted coding and referral suggestions cannot produce claims or referral patterns without human review?",
         "weight": 10
       },
       {
@@ -8345,22 +8335,12 @@
       {
         "dimension": "Ethics",
         "id": "HLT-PP-6",
-        "l1": "No burnout prevention; AI workflows add cognitive burden without measuring or mitigating provider fatigue",
-        "l3": "Agent tracks basic workload metrics and provides scheduling optimization, but does not assess cognitive load or implement evidence-based burnout prevention strategies",
-        "l5": "Comprehensive burnout prevention with cognitive load assessment, workflow optimization per NAM recommendations, alert fatigue reduction, documentation burden measurement, scheduling equity analysis, and provider well-being metric tracking",
-        "regulatoryRef": "NAM Action Collaborative on Clinician Well-Being (2019)",
-        "text": "Does the agent prevent provider burnout through workflow optimization per NAM Action Collaborative on Clinician Well-Being recommendations?",
+        "l1": "Alert and documentation burden added by the agent is not measured",
+        "l3": "Burden metrics are measured but have no baseline or reduction target",
+        "l5": "Burden metrics are reported per release against a baseline; alerts with high override rates are reviewed and tuned; results go to clinical governance",
+        "regulatoryRef": "ONC SAFER Guides",
+        "text": "Does the agent measure and report the alert and documentation burden it adds to clinicians (interruptive alerts per encounter, override rate, after-hours documentation time) and reduce it against a baseline?",
         "weight": 8
-      },
-      {
-        "dimension": "Traceability",
-        "id": "HLT-PP-7",
-        "l1": "No breach detection automation; PHI breaches are identified manually with risk of exceeding 60-day notification deadline",
-        "l3": "Agent monitors access logs for potential breach indicators and maintains breach risk assessment templates, but does not automate breach detection or notification workflow management",
-        "l5": "Autonomous breach detection with real-time access anomaly monitoring, automated 4-factor risk assessment per §164.402, notification workflow management within 60-day deadline, HHS/media notification triggers for 500+ record breaches, and breach log maintenance per §164.408",
-        "regulatoryRef": "HITECH Act §13401; HHS Breach Notification Rule 45 CFR §164.404-408",
-        "text": "Does the agent maintain HITECH Act §13401 breach notification readiness with automated breach detection and 60-day notification compliance?",
-        "weight": 10
       },
       {
         "dimension": "Compliance",
@@ -8375,11 +8355,11 @@
       {
         "dimension": "Transparency",
         "id": "HLT-PP-9",
-        "l1": "No billing transparency; patients do not receive cost estimates or understand AI-generated billing before services",
-        "l3": "Agent generates basic cost estimates for scheduled services, but does not implement full good faith estimate requirements or machine-readable price transparency",
-        "l5": "Full billing transparency with good faith estimate generation per §103, machine-readable price file publication, patient-friendly cost comparison tools, surprise billing protection verification, and automated dispute resolution support",
-        "regulatoryRef": "No Surprises Act §103; CMS Price Transparency Final Rule",
-        "text": "Does the agent provide patient-facing billing transparency per No Surprises Act §103 good faith estimate requirements and CMS price transparency rules?",
+        "l1": "No good faith estimates are produced",
+        "l3": "Estimates are produced for scheduled services, but required content or timing is not checked",
+        "l5": "Each estimate is checked against §149.610 content and timing with a record; estimate-vs-bill differences are tracked",
+        "regulatoryRef": "45 CFR §149.610",
+        "text": "Does the agent produce good faith estimates for uninsured or self-pay patients per 45 CFR §149.610?",
         "weight": 8
       },
       {
@@ -8393,23 +8373,13 @@
         "weight": 8
       },
       {
-        "dimension": "Compliance",
-        "id": "HLT-PP-11",
-        "l1": "No FCA or AKS compliance; AI billing agents may generate false claims through upcoding without liability prevention, and AI referral pattern optimization may violate Anti-Kickback Statute",
-        "l3": "Agent implements basic coding validation and flags unusual billing patterns, but does not systematically prevent FCA-triggering false claims or assess AI referral patterns against AKS safe harbors",
-        "l5": "Full FCA prevention with AI billing validation against §3729(a)(1)(A) false claim triggers, AKS safe harbor assessment for AI-assisted referral patterns, OIG Advisory Opinion integration, qui tam risk monitoring, and automated compliance documentation for DOJ audit readiness",
-        "regulatoryRef": "FCA 31 U.S.C. §3729; AKS 42 U.S.C. §1320a-7b",
-        "text": "Does the agent implement False Claims Act 31 U.S.C. §3729(a)(1)(A) liability prevention for AI-enabled billing and Anti-Kickback Statute 42 U.S.C. §1320a-7b compliance for AI-assisted referral patterns?",
-        "weight": 10
-      },
-      {
-        "dimension": "Compliance",
+        "dimension": "Traceability",
         "id": "HLT-PP-12",
         "l1": "No breach notification governance; deadlines/content/trigger thresholds are not tracked and evidence is not retained",
         "l3": "Tracks breach events and deadlines, but notification content requirements, trigger thresholds, and evidence bundles are incomplete or manual",
-        "l5": "End-to-end §13402-aligned breach notification orchestration with deadline SLAs, notification content templates, threshold logic, evidence bundles (risk assessment + decision record), regulator-ready exports, and immutable breach log management",
-        "regulatoryRef": "HITECH Act §13402; 45 CFR §164.404-408",
-        "text": "Does the agent implement breach notification governance aligned to HITECH Act §13402 and 45 CFR §164.404-408, including 60-day notifications, content requirements, individual vs media/HHS triggers, and breach log maintenance?",
+        "l5": "Each suspected breach has a dated risk-assessment record; notices meet content and deadline requirements in a sample audit; media/HHS thresholds are applied; the breach log is complete and exportable",
+        "regulatoryRef": "HITECH Act §13402; 45 CFR §164.402-410",
+        "text": "Does the agent support breach notification under HITECH Act §13402 and 45 CFR §§164.402-164.410, including the four-factor risk assessment, notification without unreasonable delay and within 60 days, required content, individual/media/HHS triggers, and the breach log?",
         "weight": 12
       },
       {
@@ -8435,11 +8405,11 @@
       {
         "dimension": "Governance",
         "id": "HLT-PP-15",
-        "l1": "No state-aware controls; workflows are uniform and can violate state practice standards",
-        "l3": "Supports some configuration by state, but coverage is incomplete and evidence of supervision/disclosure is inconsistent",
-        "l5": "Comprehensive jurisdictional compliance engine with state rules registry, workflow gating, supervision attestations, disclosure artifacts when required, and defensible audit trails mapping AI actions to licensed responsibility",
-        "regulatoryRef": "State medical AI practice acts / medical board standards",
-        "text": "Does the agent enforce jurisdiction-aware medical practice constraints (state-by-state) for AI-assisted documentation/billing/communications—covering clinician supervision, required disclosures, prohibited delegation/unlicensed practice safeguards, and documentation of the responsible licensed professional?",
+        "l1": "No state-specific handling; AI-generated patient communications carry no disclaimer",
+        "l3": "A generic disclaimer is shown everywhere, but the human-review exemption, medium-specific placement or practitioner review records are not modelled",
+        "l5": "A state rules registry drives disclaimers and human-contact instructions per medium; human-review exemptions carry the reviewer identity; Texas practitioner reviews and patient disclosures are recorded; rules are re-checked when statutes change",
+        "regulatoryRef": "Cal. Health & Safety Code §1339.75; Tex. Health & Safety Code §183.005",
+        "text": "Does the agent apply state rules for AI in patient care: the generative-AI disclaimer and human-contact instructions for patient clinical communications unless a licensed provider read and reviewed them (Cal. Health & Safety Code §1339.75), and practitioner review of AI-created records and disclosure of AI diagnostic use (Tex. Health & Safety Code §183.005)?",
         "weight": 12
       },
       {
@@ -8448,8 +8418,8 @@
         "l1": "No EU AI Act controls; classification is noted but obligations are not implemented or evidenced",
         "l3": "Implements some controls (logging/oversight), but documentation and conformity-assessment evidence are incomplete",
         "l5": "Full high-risk compliance with Art. 9-15 controls, technical documentation, monitoring, and audit-ready evidence bundles mapped to practice workflows",
-        "regulatoryRef": "EU AI Act Annex III §5; Arts. 9-15",
-        "text": "If the agent is used in an Annex III §5 high-risk context, does it implement EU AI Act high-risk system obligations (Art. 9-15) including risk management, data governance, logging, transparency, and human oversight for practice-management automation?",
+        "regulatoryRef": "EU AI Act Arts. 9-15; EU AI Act Annex III point 5; Regulation (EU) 2026/1744",
+        "text": "If the agent's use is classified high-risk under the EU AI Act (for example Annex III point 5(c) health insurance pricing), does its provider implement the Art. 9-15 obligations (risk management, data governance, logging, transparency, human oversight), applicable from 2 December 2027?",
         "weight": 10
       },
       {
@@ -8461,6 +8431,26 @@
         "regulatoryRef": "45 CFR §164.526; 45 CFR §164.528",
         "text": "Does the agent support HIPAA individual rights operations beyond authorization, including amendment requests (§164.526) and accounting of disclosures (§164.528), with evidence capture and response SLAs?",
         "weight": 8
+      },
+      {
+        "dimension": "Ethics",
+        "id": "HLT-PP-18",
+        "l1": "No inventory of decision support tools and no review of protected-characteristic inputs",
+        "l3": "An inventory exists and inputs were reviewed once; it is not updated when tools change",
+        "l5": "The inventory is updated on every tool change; each tool has a dated input-variable review; identified tools are linked to mitigation records (see HLT-CL-5)",
+        "regulatoryRef": "45 CFR §92.210(b)",
+        "text": "Does the deploying covered entity keep an inventory of agent-driven patient care decision support tools and make reasonable efforts to identify any input variables that measure race, color, national origin, sex, age or disability (45 CFR §92.210(b))?",
+        "weight": 10
+      },
+      {
+        "dimension": "Safety",
+        "id": "HLT-PP-19",
+        "l1": "AI components are absent from the risk analysis",
+        "l3": "AI components are in the risk analysis, but the asset inventory is incomplete or ePHI flows to model endpoints are not mapped",
+        "l5": "The risk analysis names every AI component and ePHI flow; an asset inventory and network map cover them; NPRM status is tracked as proposed and not scored as an obligation",
+        "regulatoryRef": "HIPAA §164.308(a)(1)(ii)(A); 90 FR 898 (proposed)",
+        "text": "Are the agent, its model endpoints, tools and data stores included in the HIPAA risk analysis (45 CFR §164.308(a)(1)(ii)(A)), and is readiness tracked for the technology asset inventory and network map proposed in the HIPAA Security Rule NPRM (90 FR 898, proposed only)?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -10154,27 +10144,27 @@
       "Patient harm from AI-recommended therapeutic substitutions",
       "Drug diversion undetected by automated inventory management"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Specialized Medicine Apothecary",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-SM-1",
         "l1": "No serialization compliance; drug products are not verified against serialization databases before dispensing",
-        "l3": "Agent verifies product identifiers against DSCSA/FMD databases at receipt, but does not implement full transaction documentation or suspect/illegitimate product investigation",
-        "l5": "Full serialization compliance with automated verification at every transaction point, transaction history/statement/information documentation per DSCSA §582, EU FMD repository integration, suspect product investigation protocols, and supply chain exception management",
-        "regulatoryRef": "FDA DSCSA §582; EU FMD 2011/62/EU Art. 54a",
-        "text": "Does the agent implement drug serialization and verification per FDA DSCSA §582 transaction requirements and EU FMD 2011/62/EU Article 54a?",
+        "l3": "Product identifiers are verified at receipt, but saleable-return verification, suspect-product investigation or the applicable exemption date are not tracked",
+        "l5": "Transaction data is exchanged electronically at package level; saleable returns are verified; suspect products are quarantined and investigated with records; the applicable FDA exemption end date (small dispensers 27 Nov 2027) is tracked",
+        "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1; EU FMD 2011/62/EU Art. 54a",
+        "text": "Does the agent support product tracing and verification per FD&C Act §582 (21 U.S.C. 360eee-1), including the §582(g) enhanced drug distribution security requirements (package-level interoperable tracing, saleable-return verification, suspect product handling) on the schedule that applies to the trading partner, and EU FMD safety features (Directive 2011/62/EU Art. 54a)?",
         "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "HLT-SM-2",
         "l1": "No compounding safety automation; sterile compounding environmental controls and personnel qualifications are not monitored by the agent",
-        "l3": "Agent tracks environmental monitoring results and personnel training records, but does not implement real-time cleanroom parameter monitoring or automated beyond-use date calculation",
-        "l5": "Comprehensive sterile compounding management with real-time environmental monitoring (viable/non-viable particles, temperature, humidity), automated BUD calculation per risk level, personnel competency tracking, media fill scheduling, and corrective action management per USP <797>",
-        "regulatoryRef": "USP <797> (2023) Ch. 3, Ch. 5",
-        "text": "Does the agent enforce sterile compounding controls per USP <797> (2023 revision) Chapter 3 personnel training and Chapter 5 environmental monitoring?",
+        "l3": "Environmental monitoring results and personnel training records are tracked, but excursions are not linked to investigations or overdue requalifications are not flagged",
+        "l5": "Every compounding person has current training and competency records before assignment; monitoring results are compared with action levels and each excursion opens an investigation with CAPA; beyond-use dates are calculated per the chapter and checked",
+        "regulatoryRef": "USP <797> (2023)",
+        "text": "Does the agent enforce sterile compounding controls per USP <797> (2023) for personnel training and microbiological air and surface monitoring?",
         "weight": 10
       },
       {
@@ -10203,8 +10193,8 @@
         "l1": "No MTM automation; medication therapy management is not systematically provided or documented",
         "l3": "Agent identifies patients eligible for MTM per CMS criteria and generates basic medication reviews, but does not implement comprehensive medication action plans or outcome tracking",
         "l5": "Full MTM with automated eligibility identification, comprehensive medication review, personalized medication action plan generation, drug therapy problem resolution tracking, outcome documentation, and CMS Part D MTM reporting compliance",
-        "regulatoryRef": "ASHP Standards of Practice; CMS Part D MTM Requirements",
-        "text": "Does the agent support medication therapy management per ASHP Standards of Practice and CMS Part D MTM program requirements?",
+        "regulatoryRef": "42 CFR §423.153(d); ASHP Statement on Pharmacist MTM",
+        "text": "Does the agent support medication therapy management per 42 CFR §423.153(d) (Part D MTM program) and ASHP practice standards?",
         "weight": 8
       },
       {
@@ -10256,16 +10246,6 @@
         "regulatoryRef": "ASHP Guidelines on Patient Education; Joint Commission NPSG.03.06.01",
         "text": "Does the agent implement clinical pharmacy verification per ASHP Guidelines on Pharmacist-Conducted Patient Education and medication reconciliation standards?",
         "weight": 8
-      },
-      {
-        "dimension": "Compliance",
-        "id": "HLT-SM-11",
-        "l1": "No DSCSA §582 enhanced requirements; AI dispensing agents do not implement November 2024 lot-level verification, saleable returns processing, or enhanced transaction data exchange per §582(g)",
-        "l3": "Agent implements basic DSCSA serialization and verification, but does not address §582 enhanced requirements including lot-level saleable returns verification or §582(g) enhanced transaction data exchange",
-        "l5": "Full DSCSA §582 compliance with lot-level verification, saleable returns processing per §582(g), enhanced transaction data exchange, suspect and illegitimate product investigation automation, and FDA notification capability for confirmed illegitimate products",
-        "regulatoryRef": "FDA DSCSA §582; 21 U.S.C. §360eee-1",
-        "text": "Does the agent implement FDA DSCSA §582 enhanced drug distribution security requirements (effective November 2024) including lot-level saleable returns verification by AI dispensing agents?",
-        "weight": 10
       },
       {
         "dimension": "Compliance",
@@ -10323,18 +10303,18 @@
         "l1": "No sterility assurance program; cleaning/disinfecting schedules and execution are ad-hoc and not verifiable",
         "l3": "Maintains schedules and logs, but execution verification, excursion investigations, and CAPA linkage are incomplete",
         "l5": "Comprehensive sterility assurance with schedule orchestration, execution verification (time-stamped checklists/sensors), sporicidal cadence enforcement, automated excursion investigations, CAPA tracking, and audit-ready evidence bundles",
-        "regulatoryRef": "USP <797> (2023) §5",
-        "text": "Does the agent implement a sterility assurance / contamination control program aligned to USP <797> §5 (cleaning and disinfecting the compounding area), including documented schedules, execution verification, sporicidal use cadence, investigation triggers, and CAPA workflows tied to environmental monitoring excursions?",
+        "regulatoryRef": "USP <797> (2023)",
+        "text": "Does the agent implement a contamination control program aligned to the USP <797> (2023) cleaning, disinfecting and sporicidal requirements, including documented schedules, execution verification, sporicidal cadence, investigation triggers and CAPA tied to environmental monitoring excursions?",
         "weight": 10
       },
       {
-        "dimension": "Ethics",
+        "dimension": "Transparency",
         "id": "HLT-SM-18",
-        "l1": "No hub safeguards; benefits/PA workflows are opaque and error-prone with no equity monitoring",
-        "l3": "Automates benefits/PA workflows with basic validations, but lacks robust evidence completeness checks and equity outcome monitoring",
-        "l5": "Closed-loop hub support with evidence completeness gating, reason-code driven PA submissions, appeal support, equity outcome monitoring, and transparent patient-facing explanations of delays/decisions",
-        "regulatoryRef": "ACA §1557 (equity principles) + payer PA operational requirements",
-        "text": "Does the agent implement rare-disease patient support (hub) safeguards, including prior authorization evidence completeness checks, benefits investigation accuracy validation, and anti-steering/equity guardrails to prevent disparate access outcomes for specialty therapies?",
+        "l1": "Denials are issued without specific reasons and decision times are not tracked",
+        "l3": "Reasons and timers exist, but drug and non-drug requests are not distinguished or overdue decisions are not escalated",
+        "l5": "Every denial carries a specific reason; decision times are measured against 72h/7d with escalation before breach; drug requests follow their own rules",
+        "regulatoryRef": "CMS-0057-F (89 FR 8758)",
+        "text": "When the agent prepares or decides prior authorization for medical items and services of payers covered by CMS-0057-F, does it record a specific reason for every denial and meet the 72-hour (expedited) and 7-calendar-day (standard) decision timeframes that apply from 2026 (not applicable to drugs)?",
         "weight": 6
       }
     ],
@@ -12282,17 +12262,17 @@
       "Insurance discrimination from wellness data aggregation",
       "Addiction to AI wellness coaching creating dependency rather than autonomy"
     ],
-    "lastReviewed": "2026-10-03",
+    "lastReviewed": "2026-10-04",
     "name": "Wellness Management",
     "questions": [
       {
         "dimension": "Safety",
         "id": "HLT-WM-1",
-        "l1": "No crisis detection; wellness agent does not identify suicidal ideation, self-harm indicators, or acute mental health crises",
-        "l3": "Agent detects crisis keywords and sentiment patterns and provides crisis hotline information, but does not implement structured risk assessment or warm handoff to crisis services",
-        "l5": "Comprehensive crisis detection with validated screening tools (PHQ-9, GAD-7 integration), structured risk assessment, automated warm handoff to 988 Suicide & Crisis Lifeline or local services, safety planning support, and post-crisis follow-up protocols per SAMHSA best practices",
-        "regulatoryRef": "SAMHSA National Guidelines for Behavioral Health Crisis Care",
-        "text": "Does the agent implement mental health crisis detection and escalation per SAMHSA National Guidelines for Behavioral Health Crisis Care best practices?",
+        "l1": "No crisis detection or protocol; the agent can be mistaken for a human",
+        "l3": "Crisis keywords trigger hotline information and an AI disclosure exists, but the protocol is unpublished, untested, or has no human escalation path",
+        "l5": "A documented protocol with human escalation is published where required; detection and referral are tested per release with recorded results; referral notifications are counted (Cal. reporting from 1 Jul 2027)",
+        "regulatoryRef": "SAMHSA National Guidelines for Behavioral Health Crisis Care; Cal. Bus. & Prof. Code §§22601-22603",
+        "text": "Does the agent detect suicidal ideation and self-harm content and follow a documented crisis protocol with referral to crisis services (SAMHSA National Guidelines), and, where it is a companion chatbot under Cal. Bus. & Prof. Code §22601, disclose that it is AI and publish its protocol (§22602)?",
         "weight": 12
       },
       {
@@ -12308,11 +12288,11 @@
       {
         "dimension": "Ethics",
         "id": "HLT-WM-3",
-        "l1": "No harm prevention; body optimization recommendations may promote unhealthy behaviors, extreme dieting, or body dysmorphia",
-        "l3": "Agent avoids extreme recommendations and includes health disclaimers, but does not implement validated screening for eating disorder risk or body image sensitivity",
-        "l5": "Evidence-based wellness guidance with validated eating disorder screening (SCOFF/EDE-Q integration), body image sensitivity detection, personalized safe recommendation boundaries, clinical escalation for identified risks, and regular content review against WHO evidence base",
-        "regulatoryRef": "WHO Global Action Plan on Physical Activity 2018-2030 §3.2",
-        "text": "Does the agent prevent body image harm and eating disorder triggering per WHO Global Action Plan on Physical Activity 2018-2030 evidence-based approach?",
+        "l1": "The agent gives weight-loss or restriction advice with no screening for risk indicators",
+        "l3": "Extreme recommendations are filtered by templates, but risk indicators in free text are not detected or not routed",
+        "l5": "Output filters and indicator detection are tested with a red-team set per release; flagged users get a referral message and no further restriction advice; results are logged and reviewed",
+        "regulatoryRef": "NICE NG69 Eating disorders: recognition and treatment",
+        "text": "Does the agent avoid producing restrictive dieting or body-weight content that could trigger eating disorders, and route users who show eating-disorder indicators to professional assessment rather than giving advice, consistent with NICE NG69 recognition and referral recommendations?",
         "weight": 10
       },
       {
@@ -12320,19 +12300,19 @@
         "id": "HLT-WM-4",
         "l1": "No data separation; employer-sponsored wellness data is accessible to HR/management without de-identification",
         "l3": "Agent separates individual wellness data from employer-accessible aggregate reports, but does not prevent re-identification through small group analytics or temporal correlation",
-        "l5": "Full ADA-compliant data separation with k-anonymity for aggregate reports, differential privacy for small groups, automated re-identification risk assessment, voluntary participation verification per EEOC rules, and cryptographic separation of individual and aggregate data stores",
-        "regulatoryRef": "ADA Title I §102; EEOC Wellness Program Rules",
-        "text": "Does the agent implement occupational health data separation per ADA Title I §102 and prevent employer access to individual wellness data?",
+        "l5": "Individual data is stored separately from employer-accessible systems; employer reports are aggregate with a documented minimum group size; a re-identification review is run before new report types; participation is voluntary and evidenced",
+        "regulatoryRef": "ADA 42 U.S.C. §12112(d)(4)(B); 29 CFR 1630.14(d)(2), (d)(4)",
+        "text": "For employer-sponsored wellness programs, does the agent keep individual wellness data separate from the employer and release only aggregate reports (ADA 42 U.S.C. §12112(d)(4)(B); 29 CFR 1630.14(d)(4))?",
         "weight": 10
       },
       {
         "dimension": "Safety",
         "id": "HLT-WM-5",
-        "l1": "No evidence validation; wellness recommendations may include unproven or pseudoscientific interventions",
-        "l3": "Agent references evidence databases for major recommendations but does not systematically grade evidence quality or disclose evidence limitations to users",
-        "l5": "Full evidence-based wellness with intervention grading per Cochrane/GRADE methodology, transparent evidence quality disclosure, automated flagging of insufficient evidence, clinical guideline alignment verification, and regular evidence base updates",
-        "regulatoryRef": "Cochrane Handbook for Systematic Reviews §1.2; FTC Health Claims Guidelines",
-        "text": "Does the agent validate wellness interventions against clinical evidence per Cochrane systematic review standards and avoid unproven health claims?",
+        "l1": "Recommendations include unsubstantiated health claims",
+        "l3": "Major claims reference evidence, but the evidence is not graded or limits are not disclosed",
+        "l5": "Every health-benefit claim template links to its substantiating evidence with grade and date; claims without adequate evidence are blocked; evidence links are reviewed on a schedule",
+        "regulatoryRef": "FTC Act 15 U.S.C. §45; FTC Health Products Compliance Guidance",
+        "text": "Does the agent make health-benefit claims for wellness interventions only when supported by competent and reliable scientific evidence (FTC Act §5; FTC Health Products Compliance Guidance), and state evidence limits to users?",
         "weight": 10
       },
       {
@@ -12368,11 +12348,11 @@
       {
         "dimension": "Traceability",
         "id": "HLT-WM-9",
-        "l1": "No intervention audit trail; wellness recommendations and their outcomes are not systematically tracked",
-        "l3": "Agent logs recommendations and basic outcome metrics, but does not perform causal attribution or long-term outcome tracking",
-        "l5": "Comprehensive intervention audit trail with recommendation provenance, outcome measurement, causal attribution analysis, long-term health outcome tracking, adverse event detection, and evidence feedback loop for continuous recommendation improvement",
-        "regulatoryRef": "FDA Digital Health Technologies Guidance (2024)",
-        "text": "Does the agent maintain wellness intervention audit trails with outcome tracking per FDA guidance on Digital Health Technologies for Remote Data Acquisition?",
+        "l1": "No log of recommendations; outputs name conditions or give treatment advice while marketed as wellness",
+        "l3": "Recommendations are logged and templates avoid disease naming, but free-text outputs are not tested against the boundary",
+        "l5": "All outputs are logged; a boundary test set runs on each release with recorded results; boundary failures block release; HCP-referral wording is reviewed against the guidance",
+        "regulatoryRef": "FDA General Wellness: Policy for Low Risk Devices (January 2026)",
+        "text": "Does the agent log every recommendation and notification it issues and test them against FDA's General Wellness policy (January 2026), so that wellness outputs do not name a disease or condition, apply clinical thresholds, or give diagnoses or treatment recommendations?",
         "weight": 8
       },
       {
@@ -12388,11 +12368,11 @@
       {
         "dimension": "Compliance",
         "id": "HLT-WM-11",
-        "l1": "No deployer obligations; employer wellness AI operates without EU AI Act Art. 26 deployer compliance, emotion inference prohibition assessment, or GDPR Art. 35 DPIA for large-scale health data",
-        "l3": "Agent implements basic GDPR compliance for wellness data and restricts emotion inference features, but does not maintain EU AI Act Art. 26 deployer documentation or conduct Art. 35 DPIA for wellness AI processing",
-        "l5": "Full EU AI Act Art. 26 deployer compliance with Art. 5(1)(f) emotion inference prohibition enforcement, GDPR Art. 35 DPIA for large-scale wellness data processing, deployer transparency obligations, human oversight documentation, and worker consultation per Art. 26(7)",
-        "regulatoryRef": "EU AI Act Art. 5(1)(f); EU AI Act Art. 26; GDPR Art. 35",
-        "text": "Does the agent implement EU AI Act Article 26 deployer obligations for employer-deployed wellness AI including the Article 5(1)(f) prohibition on emotion inference in the workplace and GDPR Article 35 DPIA for large-scale health data processing?",
+        "l1": "Workplace emotion inference is available with no legal analysis",
+        "l3": "Emotion features are disabled by configuration, but there is no test evidence, worker notice record or log-retention setting",
+        "l5": "Emotion inference is technically blocked outside documented medical or safety exceptions and tested; worker notices are recorded before use; logs are retained at least six months where Art. 26(6) applies (high-risk obligations apply from 2 Dec 2027 per Regulation (EU) 2026/1744)",
+        "regulatoryRef": "EU AI Act Art. 5(1)(f); EU AI Act Art. 26(6)-(7)",
+        "text": "If an employer deploys the wellness agent, does it refuse to infer workers' emotions except for medical or safety reasons (EU AI Act Art. 5(1)(f)), and, where the system is high-risk, keep its logs (Art. 26(6)) and inform workers and their representatives before use (Art. 26(7))?",
         "weight": 10
       },
       {
@@ -12430,9 +12410,9 @@
         "id": "HLT-WM-15",
         "l1": "No high-risk AI lifecycle controls; limited documentation, weak logging, and no defined human oversight for consequential outputs",
         "l3": "Maintains partial documentation and some logging, but risk management and data governance are incomplete and conformity evidence is fragmented",
-        "l5": "Full high-risk lifecycle controls with documented risk management, dataset governance, technical documentation, event logging, human oversight controls, and audit-ready evidence supporting conformity assessment for Annex III §5 deployments",
-        "regulatoryRef": "EU AI Act Annex III §5 (high-risk) — provider obligations",
-        "text": "For wellness systems classified as high-risk under EU AI Act Annex III §5, does the agent implement provider-side high-risk controls (risk management, data governance, logging, human oversight, and QMS/conformity assessment evidence) appropriate to Annex III §5 use cases?",
+        "l5": "Classification record shows whether 5(a)/5(c) applies; where it does, risk management, data governance, logging, human oversight and technical documentation exist and map to Arts. 9-15, ready before 2 Dec 2027",
+        "regulatoryRef": "EU AI Act Annex III point 5(a), 5(c); EU AI Act Arts. 9-15; Regulation (EU) 2026/1744",
+        "text": "If the wellness system is used by or for public authorities to evaluate eligibility for healthcare services (EU AI Act Annex III point 5(a)) or for life and health insurance risk assessment and pricing (point 5(c)), does its provider implement the high-risk controls of Arts. 9-15 with conformity evidence, applicable from 2 December 2027?",
         "weight": 12
       },
       {
@@ -12447,13 +12427,13 @@
       },
       {
         "dimension": "Governance",
-        "id": "HLT-WM-17",
-        "l1": "No scope mapping; ADA controls are assumed to be satisfied by workplace-only privacy separation",
-        "l3": "Documents deployment contexts and some mapped controls, but evidence is incomplete and gaps are handled reactively",
-        "l5": "Explicit context-based control mapping with evidence for each deployment model (employer-sponsored vs direct-to-consumer), periodic reviews, and documented accountability for accommodations/accessibility",
-        "regulatoryRef": "ADA Title III §12182 (scope clarity) + ADA Title I context",
-        "text": "Does the program explicitly scope ADA obligations across both workplace wellness (Title I) and consumer/public-accommodation delivery (Title III §12182), with controls and evidence mapped to each deployment context?",
-        "weight": 6
+        "id": "HLT-WM-18",
+        "l1": "No DPIA for large-scale wellness data processing",
+        "l3": "A DPIA exists but predates the agent or does not cover its data flows (model endpoints, tools, logs)",
+        "l5": "A DPIA covers the agent's data flows, is approved before processing, is reviewed on material change, and its mitigations are traced to implemented controls",
+        "regulatoryRef": "GDPR Art. 35",
+        "text": "Before an employer or provider processes workers' or users' wellness data on a large scale through the agent, is a GDPR Art. 35 data protection impact assessment completed and kept current?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -12462,7 +12442,7 @@
       "ISO 45001:2018 (OH&S Management)",
       "WHO Global Action Plan on Physical Activity",
       "HIPAA Privacy Rule",
-      "EU AI Act Annex III §5(b)",
+      "EU AI Act Annex III §5(c)",
       "SAMHSA National Guidelines"
     ],
     "regulatoryReferences": [
@@ -12517,7 +12497,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU AI Act Annex III §5(b)",
+        "text": "EU AI Act Annex III §5(c)",
         "url": "https://data.europa.eu/eli/reg/2024/1689/oj"
       },
       {
