@@ -97,7 +97,7 @@ describe("governed-turn probe", () => {
     }
   });
 
-  it("the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script", () => {
+  it("the Helm test pod ships a byte-identical copy and the compose verify profile mounts the script and is admitted", () => {
     expect(read("deploy/helm/amc/files/governed-turn-probe.mjs")).toBe(read("scripts/deploy/governed-turn-probe.mjs"));
     const hook = read("deploy/helm/amc/templates/tests/governed-turn.yaml");
     expect(hook.match(/helm\.sh\/hook: test/g)).toHaveLength(2);
@@ -107,5 +107,10 @@ describe("governed-turn probe", () => {
     const compose = read("docker/docker-compose.yml");
     expect(compose).toMatch(/amc-verify:\n\s+profiles: \["verify"\]/);
     expect(compose).toContain("../scripts/deploy/governed-turn-probe.mjs:/probe/governed-turn-probe.mjs:ro");
+    // Studio admits native requests only from hosts in AMC_CORS_ALLOWED_ORIGINS plus the bind host.
+    const verifyBaseUrl = /amc-verify:[\s\S]*?- --base-url\n\s+- (\S+)\n/.exec(compose)?.[1];
+    expect(verifyBaseUrl).toBe("http://amc-studio:3212");
+    const studioEnv = /amc-studio:\n[\s\S]*?environment:\n((?:\s+(?:- |# ).*\n)+)/.exec(compose)?.[1] ?? "";
+    expect(studioEnv).toContain(`- AMC_CORS_ALLOWED_ORIGINS=${verifyBaseUrl}\n`);
   });
 });

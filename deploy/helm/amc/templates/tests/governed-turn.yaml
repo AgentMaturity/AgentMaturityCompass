@@ -41,7 +41,7 @@ spec:
       command: ["node", "/probe/governed-turn-probe.mjs"]
       args:
         - --base-url
-        - http://{{ include "amc.fullname" . }}:{{ .Values.service.port }}
+        - {{ include "amc.studioServiceOrigin" . }}
         - --username-file
         - /run/secrets/amc_owner_username
         - --password-file

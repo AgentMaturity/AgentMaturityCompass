@@ -21,6 +21,8 @@ services:
       - NODE_ENV=production
       - AMC_BIND=0.0.0.0
       - AMC_ALLOWED_CIDRS=${AMC_ALLOWED_CIDRS:-127.0.0.1/32,::1/128,172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
+      # Native routes admit only the bind host or these origins; amc-verify calls http://amc-studio:3212.
+      - AMC_CORS_ALLOWED_ORIGINS=http://amc-studio:3212
       - AMC_BOOTSTRAP=1
       - AMC_VAULT_PASSPHRASE_FILE=/run/secrets/amc_vault_passphrase
       - AMC_BOOTSTRAP_OWNER_USERNAME_FILE=/run/secrets/amc_owner_username

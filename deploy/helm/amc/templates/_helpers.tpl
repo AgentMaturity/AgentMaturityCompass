@@ -28,6 +28,23 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/*
+Studio's in-cluster origin: the Service name and port the helm test pod calls.
+*/}}
+{{- define "amc.studioServiceOrigin" -}}
+{{- printf "http://%s:%v" (include "amc.fullname" .) .Values.service.port -}}
+{{- end -}}
+
+{{/*
+AMC_CORS_ALLOWED_ORIGINS. Studio admits native requests only from hosts in this
+list plus the bind host (src/studio/nativeAdmission.ts), and the bind host under
+--bind 0.0.0.0 is http://0.0.0.0:<port>. The chart always lists its own Service
+origin, then appends env.AMC_CORS_ALLOWED_ORIGINS (comma-separated) from values.
+*/}}
+{{- define "amc.corsAllowedOrigins" -}}
+{{- join "," (compact (list (include "amc.studioServiceOrigin" .) .Values.env.AMC_CORS_ALLOWED_ORIGINS)) -}}
+{{- end -}}
+
+{{/*
 A bootstrap Secret value: required, and never a published placeholder.
 Usage: include "amc.bootstrapValue" (list "<values key>" <value>)
 */}}
