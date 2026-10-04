@@ -177,4 +177,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-fdca-pccp", "Predetermined change control plans for devices (21 U.S.C. 360e-4)", "US", "law", "in-force",
     "https://www.govinfo.gov/link/uscode/21/360e-4?link-type=html", ["21 U.S.C. 360e-4", "21 U.S.C. §360e-4"],
     { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04" }),
+  verified("us-ppra", "Protection of Pupil Rights Amendment (20 U.S.C. §1232h) and regulations (34 CFR Part 98)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/CFR-2025-title34-vol1/xml/CFR-2025-title34-vol1-sec98-4.xml",
+    ["PPRA"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "34 CFR §98.4 read on govinfo (CFR 2025 edition, revised as of 2025-07-01); the statute was not read (uscode.house.gov maintenance page on 2026-10-03)." }),
 ];
