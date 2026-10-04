@@ -49,13 +49,19 @@
     "unverifiedSources": 0
   },
   "mobility": {
-    "questionCount": 10,
+    "questionCount": 16,
     "regulations": [
       "EU AI Act",
       "UN R155",
       "UN R156",
       "Implementing Regulation (EU) 2022/1426",
-      "NIST SP 800-161r1"
+      "NIST SP 800-161r1",
+      "NHTSA Standing General Order 2021-01 (Third Amended)",
+      "33 CFR Part 101 Subpart F (USCG, Cybersecurity in the Marine Transportation System)",
+      "Regulation (EU) 2023/1805 (FuelEU Maritime)",
+      "Regulation (EU) 2019/2144 (General Safety Regulation)",
+      "Regulation (EU) 2023/2854 (Data Act)",
+      "Regulation (EU) 2024/2847 (Cyber Resilience Act)"
     ],
     "station": "mobility",
     "unverifiedSources": 3

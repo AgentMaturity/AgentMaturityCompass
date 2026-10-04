@@ -4075,11 +4075,11 @@
       {
         "dimension": "Cold Chain and Condition Monitoring",
         "id": "MOB-F3W-5",
-        "l1": "Condition-sensitive shipments can be released without telemetry, excursion review, or quarantine evidence",
-        "l3": "Condition telemetry is captured and excursions are flagged, but release blocking and corrective evidence are inconsistent",
-        "l5": "Continuous condition monitoring with excursion classification, quarantine/release gates, corrective action evidence, customer/regulatory notification workflow, and trend analytics by lane/carrier/facility",
-        "regulatoryRef": "ISO 28000:2022; GDP cold-chain control expectations",
-        "text": "For temperature-, humidity-, shock-, or seal-sensitive freight, does the agent monitor condition evidence, detect excursions, and block unsafe release until review or corrective action is complete?",
+        "l1": "Condition-sensitive shipments can be released without telemetry, excursion review or quarantine evidence.",
+        "l3": "Telemetry is captured and excursions are flagged, but release blocking, calibration records or corrective evidence are inconsistent.",
+        "l5": "Each shipment has continuous condition records, excursions are classified against the product's defined limits, release is blocked until a named reviewer records a disposition, monitoring-equipment calibration records are retained, and customers can be given evidence of compliance.",
+        "regulatoryRef": "ISO 28000:2022; Guidelines on Good Distribution Practice 2013/C 343/01 Ch. 9",
+        "text": "For temperature-, humidity-, shock- or seal-sensitive freight, does the agent monitor condition evidence, detect excursions and block release until review, and for medicinal products apply the EU Good Distribution Practice Guidelines Chapter 9 (conditions kept within defined limits; qualified equipment and calibrated monitoring for temperature-sensitive products, 9.4)?",
         "weight": 12
       },
       {
@@ -4101,16 +4101,6 @@
         "regulatoryRef": "EU NIS2 Art. 21; NIST SP 800-161r1-upd1 contingency planning controls",
         "text": "Does the agent detect EDI/API, TMS, WMS, telematics, and carrier portal outages and fail over to approved fallback workflows without losing event integrity?",
         "weight": 10
-      },
-      {
-        "dimension": "Operational KPI Mapping",
-        "id": "MOB-F3W-8",
-        "l1": "KPIs exist outside AMC and do not affect maturity, routing, or remediation",
-        "l3": "Some KPIs are reported in dashboards, but they are not consistently bound to evidence or maturity recommendations",
-        "l5": "KPI-to-AMC mapping is versioned, signed, and continuously monitored with threshold drift alerts, evidence links, and remediation playbooks for every degraded KPI",
-        "regulatoryRef": "ISO 9001:2026 (monitoring, measurement, analysis and evaluation); ISO 28000:2022 performance evaluation",
-        "text": "Does the agent map logistics KPIs such as OTIF/DIFOT, fill rate, inventory accuracy, dock-to-stock time, exception aging, carrier acceptance, and SLA breach rate to AMC maturity evidence?",
-        "weight": 8
       },
       {
         "dimension": "Driver Hours and Dispatch",
@@ -4155,12 +4145,12 @@
       {
         "dimension": "Autonomous Warehouse Machinery",
         "id": "MOB-F3W-13",
-        "l1": "Robot and AGV instructions from the agent are not covered by any machinery safety assessment",
-        "l3": "Machinery is CE-marked under the legacy regime, but agent-issued instructions and software changes are not part of the conformity assessment or change control",
-        "l5": "Agent-to-machine instructions are within the assessed safety envelope, software changes go through conformity and change control, humans can stop or override every machine, and the transition to Regulation (EU) 2023/1230 is planned against its application date",
-        "regulatoryRef": "EU Machinery Regulation 2023/1230",
-        "text": "Where the agent directs autonomous mobile robots, AGVs or other machinery, does the deployment meet the essential health and safety requirements of the Machinery Regulation (EU) 2023/1230 (applicable from 20 January 2027 under Art. 54 as corrected), and can a human stop or override every machine the agent directs?",
-        "weight": 8
+        "l1": "Agent instructions to machinery are outside any safety assessment, and no decision or version records are kept.",
+        "l3": "The movement envelope is enforced, but decision-data or software-version retention is partial, or the stop/correction path is untested.",
+        "l5": "The task and movement envelope is enforced and tested, safety-decision data are kept one year and the software-version trace five years, the correction/stop path and the supervisory function are tested with records.",
+        "regulatoryRef": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4; ISO 3691-4:2023",
+        "text": "Where the agent directs autonomous mobile robots, AGVs or other machinery with autonomous or self-evolving control, does the deployment evidence the Machinery Regulation (EU) 2023/1230 Annex III requirements that apply from 20 January 2027: no actions beyond the defined task and movement space, safety-decision data retained for one year, a trace of safety-software versions retained for five years, correction possible at all times (EHSR 1.2.1), and a supervisory function for autonomous mobile machinery (EHSR 3.2.4)?",
+        "weight": 10
       },
       {
         "dimension": "Forced-Labour Screening",
@@ -4181,6 +4171,16 @@
         "regulatoryRef": "GDPR Art. 28(2)-(3)",
         "text": "When the agent shares consignee personal data (names, addresses, delivery photos, signatures) with carriers, 3PLs or other processors, is each processor bound by a contract with the terms GDPR Article 28(3) requires, and is every sub-processor authorised under Article 28(2)?",
         "weight": 8
+      },
+      {
+        "dimension": "Traceability",
+        "id": "MOB-F3W-16",
+        "l1": "Regulatory freight information exists only on paper or as unstructured files.",
+        "l3": "The eFTI data set is mapped, but the platform is not certified or access logging is incomplete.",
+        "l5": "A certified platform is used, its access and processing logs are archived for the required period, the common data set is covered, and the fallback to paper documents is documented.",
+        "regulatoryRef": "Regulation (EU) 2020/1056 Art. 4(2); Regulation (EU) 2020/1056 Art. 9(1)",
+        "text": "When the agent makes regulatory freight information available to authorities electronically, does it use a certified eFTI platform (Regulation (EU) 2020/1056 Art. 4(2)) with authenticated access (Art. 9(1)(f)), operation logs recorded and archived (Art. 9(1)(g), (i)), and data protected against corruption and theft (Art. 9(1)(j)), ready for authorities' mandatory acceptance from 9 July 2027?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -7993,7 +7993,7 @@
         "id": "MOB-PS-1",
         "l1": "No privacy by design; data collection is maximalist with no systematic minimization, pseudonymisation, or purpose limitation controls",
         "l3": "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment",
-        "l5": "Full privacy by design with automated data minimization enforcement, dynamic pseudonymisation per ISO/IEC 27701 §6.2.3, purpose limitation technical controls, DPIA automation for high-risk processing, and continuous privacy compliance monitoring",
+        "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701:2025.",
         "regulatoryRef": "GDPR Art. 25; ISO/IEC 27701:2025",
         "text": "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?",
         "weight": 15
@@ -8011,11 +8011,11 @@
       {
         "dimension": "Security",
         "id": "MOB-PS-3",
-        "l1": "No IoT security; connected devices use default credentials, lack update mechanisms, and have no vulnerability disclosure process",
-        "l3": "Agent enforces unique credentials and supports security updates, but does not implement full ETSI EN 303 645 provision set including data protection and resilience",
-        "l5": "Full ETSI EN 303 645 implementation with all 13 provisions automated, device identity management, secure update orchestration, minimal attack surface enforcement, telemetry security, and compliant vulnerability disclosure program",
-        "regulatoryRef": "ETSI EN 303 645 v2.1.1 Provisions 1-13",
-        "text": "Does the agent implement IoT device security per ETSI EN 303 645 v2.1.1 Provision 1 (unique passwords) through Provision 13 (vulnerability disclosure)?",
+        "l1": "Devices ship or reset to shared default credentials, lack an update mechanism, or there is no disclosure policy.",
+        "l3": "Credentials are unique for most devices and updates are supported, but reset behaviour, update integrity or the disclosure process is not evidenced fleet-wide.",
+        "l5": "A fleet-wide test shows no universal default credentials (including after reset), updates are integrity-checked, the disclosure policy is published, and each baseline provision maps to evidence.",
+        "regulatoryRef": "ETSI EN 303 645 V3.1.3",
+        "text": "Does the agent enforce the consumer-IoT baseline of ETSI EN 303 645 V3.1.3 for the devices it manages, including no universal default passwords (unique per-device or user-set credentials, also after reset), secure software updates and a vulnerability disclosure policy?",
         "weight": 15
       },
       {
@@ -8029,23 +8029,13 @@
         "weight": 12
       },
       {
-        "dimension": "Privacy",
-        "id": "MOB-PS-5",
-        "l1": "No cross-border data transfer controls; personal data flows internationally without adequacy verification or contractual protections",
-        "l3": "Agent tracks data residency and validates standard contractual clauses for key transfers, but does not automate transfer impact assessments or CPRA sensitive data controls",
-        "l5": "Full cross-border transfer compliance with automated adequacy decision monitoring, TIA automation per GDPR Art. 44-49, CPRA sensitive PI special treatment, real-time transfer logging, and regulatory change monitoring for jurisdiction updates",
-        "regulatoryRef": "GDPR Art. 44-49; CCPA/CPRA §1798.140",
-        "text": "Does the agent manage cross-border data transfers per GDPR Chapter V adequacy decisions and CCPA/CPRA Section 1798.140 sensitive personal information protections?",
-        "weight": 12
-      },
-      {
         "dimension": "Governance",
         "id": "MOB-PS-6",
-        "l1": "No formal incident response; cybersecurity incidents are handled ad-hoc without systematic containment, eradication, or NIS2 notification",
-        "l3": "Agent detects and logs security incidents, supports containment actions, but does not implement full NIST CSF Respond function or NIS2 24-hour notification workflow",
-        "l5": "Full incident response with automated detection, NIST CSF 2.0 Respond playbooks, NIS2 Art. 23 notification automation (24h early warning, 72h incident report), forensic evidence preservation, and lessons learned integration",
-        "regulatoryRef": "NIST CSF 2.0 RS; EU NIS2 Art. 23",
-        "text": "Does the agent maintain cybersecurity incident response per NIST CSF 2.0 Respond function and EU NIS2 Article 23 significant incident notification requirements?",
+        "l1": "No formal incident response; incidents are handled ad hoc without containment or records.",
+        "l3": "Incidents are detected, logged and contained, but analysis, stakeholder reporting or mitigation records are incomplete.",
+        "l5": "Each incident has a record covering management, analysis, communication and mitigation, forensic evidence is preserved, and lessons learned are fed back into controls with a recorded change.",
+        "regulatoryRef": "NIST CSF 2.0 RS",
+        "text": "Does the agent support cybersecurity incident response per the NIST CSF 2.0 Respond (RS) function: incident management, incident analysis, response reporting and communication, and incident mitigation?",
         "weight": 12
       },
       {
@@ -8061,41 +8051,31 @@
       {
         "dimension": "Security",
         "id": "MOB-PS-8",
-        "l1": "No software supply chain security; third-party components are not inventoried, scanned for vulnerabilities, or subject to secure development requirements",
-        "l3": "Agent maintains SBOM and performs dependency vulnerability scanning, but does not implement full SSDF practices or EU CRA Art. 13 conformity assessment",
-        "l5": "Full supply chain security with NIST SSDF implementation, SBOM management, continuous dependency vulnerability monitoring, EU CRA conformity assessment support, secure update delivery, and coordinated vulnerability disclosure per CRA Art. 14",
-        "regulatoryRef": "NIST SP 800-218 SSDF; EU CRA (2024/2847) Art. 13",
-        "text": "Does the agent implement software supply chain security per NIST SSDF (SP 800-218) and EU Cyber Resilience Act software security requirements?",
-        "weight": 9
-      },
-      {
-        "dimension": "Compliance",
-        "id": "MOB-PS-9",
-        "l1": "No CRA or R156 compliance; IoT products with AI lack EU CRA Art. 13 conformity assessment and connected vehicle AI does not implement R156 SUMS requirements for over-the-air updates",
-        "l3": "Agent implements basic software update security and IoT vulnerability management, but does not address EU CRA Art. 13 conformity for products with digital elements or R156 SUMS type approval requirements",
-        "l5": "Full EU CRA Art. 13 conformity with vulnerability handling per Art. 14, UNECE R156 SUMS implementation for connected vehicle AI updates, type approval documentation, coordinated vulnerability disclosure, and continuous compliance monitoring for IoT product lifecycle",
-        "regulatoryRef": "EU CRA 2024/2847 Art. 13; UNECE WP.29 R156",
-        "text": "Does the agent implement EU Cyber Resilience Act 2024/2847 Article 13 conformity assessment for IoT products with digital elements and UNECE WP.29 R156 software update management system (SUMS) requirements for connected vehicle AI?",
+        "l1": "CRA applied or ignored with no recorded scope decision; components not inventoried.",
+        "l3": "Scope is recorded and an SBOM exists, but vulnerability handling or secure-development evidence is incomplete.",
+        "l5": "A scope decision is recorded per product, SSDF practices are evidenced in the pipeline, the SBOM is maintained per release, vulnerability handling runs to documented timelines, and the Art. 32 conformity route is documented.",
+        "regulatoryRef": "EU CRA Art. 2(2)(c), 2(4); EU CRA Art. 13; NIST SP 800-218",
+        "text": "For products with digital elements in CRA scope (type-approved vehicles under Regulation (EU) 2019/2144 and marine equipment under Directive 2014/90/EU are excluded, Art. 2(2)(c) and 2(4)), does the agent's software supply chain meet the CRA Art. 13 manufacturer obligations (security by design, vulnerability handling, software bill of materials) using NIST SP 800-218 SSDF practices, ahead of general application on 11 December 2027?",
         "weight": 12
       },
       {
         "dimension": "Governance",
         "id": "MOB-PS-10",
-        "l1": "No governance context: mission, stakeholders, regulatory obligations, and risk appetite are not documented; controls are inconsistent and ad hoc",
-        "l3": "Governance context exists but is incomplete, inconsistently applied, or not linked to control priorities and exception decisions",
-        "l5": "Full GV.OC governance with maintained context and stakeholder mapping, versioned obligation register, risk appetite statements, decision logs for exceptions, and governance outputs that drive privacy and security control prioritization and continuous improvement",
-        "regulatoryRef": "NIST CSF 2.0 GV.OC",
-        "text": "Does the agent implement NIST CSF 2.0 GV.OC (Organizational Context) by maintaining (1) mission and business context for mobility privacy and security, (2) stakeholder map (drivers, passengers, pedestrians, regulators, OEMs, suppliers), (3) regulatory obligation register (GDPR, UNECE R155/R156, ETSI EN 303 645, NIS2, etc.), and (4) documented risk appetite and prioritization rules that drive control selection and exception handling?",
+        "l1": "No obligation register.",
+        "l3": "A register exists but is not versioned or not linked to controls.",
+        "l5": "The register is versioned, each enforced control cites the obligation it implements, and a register change triggers a control review with a recorded decision.",
+        "regulatoryRef": "NIST CSF 2.0 GV.OC-03",
+        "text": "Does the agent maintain a versioned obligation register (GDPR, UNECE R155/R156, ETSI EN 303 645, NIS2) that is bound to its control configuration, so that each enforced control cites the obligation it implements?",
         "weight": 12
       },
       {
         "dimension": "Security",
         "id": "MOB-PS-11",
-        "l1": "No ISO 21434 TARA: threats and attack paths are not systematically analyzed and risk treatment decisions are undocumented",
-        "l3": "Partial TARA exists, but attack path rigor, traceability to requirements, and change triggered review and evidence are incomplete",
-        "l5": "Full §9.3 TARA with structured artifacts, attack path modeling, requirement traceability, change and incident triggered re assessment, and audit ready evidence packs aligned to ISO 21434 expectations",
-        "regulatoryRef": "ISO 21434:2021 §9.3 (TARA)",
-        "text": "Does the agent implement ISO 21434:2021 §9.3 TARA by producing and maintaining item level TARA artifacts (asset identification, threat scenarios, attack path analysis, impact and severity ratings, likelihood and feasibility assessment, risk determination, and risk treatment decisions) with traceability to cybersecurity goals and requirements and evidence of periodic review triggered by changes and incidents?",
+        "l1": "No TARA; threats and treatment decisions are not documented.",
+        "l3": "A TARA exists, but attack-path analysis, traceability to cybersecurity goals, or change-triggered review is incomplete.",
+        "l5": "Each item has a versioned TARA with all listed artefacts, traceability to goals and requirements, and a recorded re-assessment after each relevant change or incident.",
+        "regulatoryRef": "ISO/SAE 21434:2021 Clause 15",
+        "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434:2021 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
         "weight": 15
       },
       {
@@ -8110,16 +8090,6 @@
       },
       {
         "dimension": "Security",
-        "id": "MOB-PS-13",
-        "l1": "Universal and default credentials exist; onboarding and resets reintroduce shared secrets and the fleet is vulnerable to credential stuffing and mass compromise",
-        "l3": "Unique credentials are used for many devices, but reset and onboarding and rotation controls and evidence are incomplete or inconsistently applied across the fleet",
-        "l5": "Full §5.1 compliance with unique credential governance, secure onboarding and reset flows, rotation support, fleet wide verification tests, and auditable evidence demonstrating absence of universal default passwords and keys",
-        "regulatoryRef": "ETSI EN 303 645 §5.1",
-        "text": "Does the agent enforce ETSI EN 303 645 §5.1 by preventing universal default credentials and ensuring unique per device (or unique per user) authentication secrets, including secure onboarding, secure reset behavior, credential rotation and renewal, and evidence that device fleets cannot be accessed via shared defaults?",
-        "weight": 12
-      },
-      {
-        "dimension": "Security",
         "id": "MOB-PS-14",
         "l1": "Vehicle and passenger data is processed without documented security measures",
         "l3": "Encryption is in place, but restoration and regular testing are not evidenced",
@@ -8129,14 +8099,44 @@
         "weight": 8
       },
       {
-        "dimension": "Incident Reporting",
+        "dimension": "Compliance",
         "id": "MOB-PS-15",
-        "l1": "No process exists to detect and report actively exploited vulnerabilities",
-        "l3": "Vulnerabilities are triaged, but the 24-hour early warning and later notifications are not tracked",
-        "l5": "Exploitation signals trigger the Article 14 reporting sequence automatically, deadlines are tracked, users are informed, and each report is retained with its evidence",
-        "regulatoryRef": "EU CRA 2024/2847 Art. 14",
-        "text": "For products with digital elements in the mobility stack, does the manufacturer report actively exploited vulnerabilities and severe incidents under Cyber Resilience Act (EU) 2024/2847 Article 14 (early warning within 24 hours), which has applied since 11 September 2026?",
-        "weight": 8
+        "l1": "No reporting clock for exploited vulnerabilities or severe incidents.",
+        "l3": "Events are timestamped and a contact exists, but the 24-hour, 72-hour and final-report deadlines are tracked by hand.",
+        "l5": "Each event is classified, all three submissions are drafted from evidence and tracked to submission with timestamps, and a reporting drill is on record.",
+        "regulatoryRef": "EU CRA Art. 14",
+        "text": "For in-scope products with digital elements, does the agent support CRA Art. 14 reporting, which applies from 11 September 2026: an early warning within 24 hours and a notification within 72 hours of becoming aware of an actively exploited vulnerability or a severe incident, sent to the coordinating CSIRT and ENISA, with a final report within 14 days of a corrective measure (vulnerabilities) or one month after the notification (incidents)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Privacy",
+        "id": "MOB-PS-16",
+        "l1": "Users have no path to their vehicle or service data.",
+        "l3": "Data are provided on request by hand, or third-party sharing is not supported.",
+        "l5": "Self-service machine-readable access with metadata, third-party sharing on user request with an audit trail, and the Art. 3(1) design obligation recorded per product placed on the market after 12 September 2026.",
+        "regulatoryRef": "EU Data Act Art. 3-5; EU Data Act Art. 50",
+        "text": "For connected vehicles or related services, does the agent make product and related-service data with the metadata needed to use them accessible to the user by default (Data Act Art. 3(1), for products placed on the market after 12 September 2026), otherwise available on request (Art. 4), and shared with a third party at the user's request (Art. 5)?",
+        "weight": 12
+      },
+      {
+        "dimension": "Compliance",
+        "id": "MOB-PS-17",
+        "l1": "No occurrence taxonomy or reporting clock.",
+        "l3": "Occurrences are logged and classified, but notifications are drafted by hand and deadlines are not tracked.",
+        "l5": "Occurrences are classified by the Annex III Part 5 definitions, critical notifications and one-month reports are drafted from logs and tracked to submission, and each record is retained with the data it relied on.",
+        "regulatoryRef": "Regulation (EU) 2019/2144 Art. 11; Implementing Regulation (EU) 2022/1426 Annex III Part 5",
+        "text": "Where the agent is part of the automated driving system of a fully automated vehicle type-approved under Implementing Regulation (EU) 2022/1426, does it classify field occurrences as critical or non-critical and support the manufacturer's notification of critical occurrences without delay and reporting of short-term occurrences within one month (Annex III Part 5 points 2.1-2.2)?",
+        "weight": 15
+      },
+      {
+        "dimension": "Incident Reporting",
+        "id": "MOB-PS-18",
+        "l1": "Incidents affecting vehicle, network or backend systems are handled with no reporting clock.",
+        "l3": "Incidents are timestamped, but significance assessment and the 24-hour, 72-hour and one-month deadlines are tracked by hand.",
+        "l5": "Significance is assessed against documented criteria, and each of the three submissions is drafted from incident evidence and tracked to submission with timestamps.",
+        "regulatoryRef": "EU NIS2 Art. 23(4)",
+        "text": "Where the operator is an essential or important entity under NIS2, does the agent support significant-incident reporting to the CSIRT or competent authority: an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (NIS2 Art. 23(4))?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -10478,33 +10478,23 @@
     "name": "Sustainable Communities",
     "questions": [
       {
-        "dimension": "Governance",
-        "id": "MOB-SC-1",
-        "l1": "No city indicator tracking; urban performance is not systematically measured against standardized indicators",
-        "l3": "Agent tracks selected ISO 37120 indicators, but does not implement full core indicator set or benchmark against peer cities",
-        "l5": "Full ISO 37120 implementation with all core indicators, supporting indicator selection, peer city benchmarking, trend analysis, and automated reporting for sustainable development monitoring",
-        "regulatoryRef": "ISO 37120:2018 Core/Supporting Indicators",
-        "text": "Does the agent implement city performance monitoring per ISO 37120:2018 core and supporting indicators for sustainable urban development?",
-        "weight": 12
-      },
-      {
         "dimension": "Ethics",
         "id": "MOB-SC-2",
-        "l1": "No surveillance safeguards; smart city AI may enable mass surveillance, social scoring, or biometric identification in public spaces",
-        "l3": "Agent implements basic privacy protections and avoids prohibited AI practices per Art. 5, but does not perform comprehensive surveillance impact assessment",
-        "l5": "Full anti-surveillance governance with Art. 5 prohibited practice prevention, biometric identification restrictions, privacy impact assessment for all urban AI, citizen consent frameworks, and transparent surveillance policy per GDPR and EU AI Act",
-        "regulatoryRef": "EU AI Act Art. 5; GDPR Art. 6",
-        "text": "Does the agent prevent surveillance overreach per EU AI Act Article 5 prohibited AI practices and protect citizen privacy in smart city deployments?",
+        "l1": "No screening; smart-city AI may be used for social scoring, untargeted facial-image scraping or remote biometric identification in public spaces.",
+        "l3": "Use cases are screened at first deployment, but not again when the use case, data source or model changes.",
+        "l5": "Every use case has a recorded Art. 5 screening before deployment and on each change, matching uses are blocked, and the screening records are retained.",
+        "regulatoryRef": "EU AI Act Art. 5",
+        "text": "Before each smart-city AI use case is deployed or changed, does the agent screen it against the prohibited AI practices in EU AI Act Article 5 and block any use that matches one?",
         "weight": 15
       },
       {
         "dimension": "Ethics",
         "id": "MOB-SC-3",
-        "l1": "No environmental justice assessment; AI-driven urban development may disproportionately burden disadvantaged communities",
-        "l3": "Agent tracks environmental burden distribution by neighborhood demographics, but does not implement proactive environmental justice in planning decisions",
-        "l5": "Comprehensive environmental justice with cumulative impact assessment, equitable infrastructure placement, community engagement integration, disproportionate burden prevention, and transparent environmental justice reporting per EPA model",
-        "regulatoryRef": "EPA EJ Collaborative Model; EU Urban Agenda Partnership on Urban Poverty",
-        "text": "Does the agent assess environmental justice in urban planning per EPA Environmental Justice Collaborative Problem-Solving model and EU Urban Agenda?",
+        "l1": "Siting recommendations are issued with no distributional assessment on record.",
+        "l3": "A distributional assessment exists for some recommendations, but it is not linked to each decision or omits the community input used.",
+        "l5": "Every siting recommendation links to a distributional assessment naming the data used, the community input received and the decision taken, retained for audit.",
+        "regulatoryRef": "EU Urban Agenda (Partnership on Urban Poverty)",
+        "text": "Before recommending where infrastructure or services are sited, does the agent assess how environmental burdens and benefits fall across neighbourhoods, and record that assessment and the community input it relied on?",
         "weight": 12
       },
       {
@@ -10520,11 +10510,11 @@
       {
         "dimension": "Compliance",
         "id": "MOB-SC-5",
-        "l1": "No green building integration; AI building management does not optimize for sustainability certification requirements",
-        "l3": "Agent monitors energy and water consumption against LEED/BREEAM benchmarks, but does not optimize operations for certification achievement",
-        "l5": "Full green building integration with LEED v4/BREEAM optimization, energy performance monitoring, indoor environmental quality management, waste reduction tracking, and automated certification documentation",
-        "regulatoryRef": "LEED v4 O+M; BREEAM In-Use",
-        "text": "Does the agent implement green building standards per LEED v4 and BREEAM for AI-managed building operations and urban development?",
+        "l1": "Building operations data are not linked to the adopted certification criteria.",
+        "l3": "Energy and water data are compared with certification benchmarks, but the evidence needed for recertification is incomplete or assembled by hand.",
+        "l5": "Each adopted credit or criterion maps to a metered data source, gaps are flagged before the performance period closes, and the recertification evidence set is generated from retained records.",
+        "regulatoryRef": "LEED v5 O+M; BREEAM In-Use",
+        "text": "Does the agent track building operations against the certification criteria the operator has adopted (LEED v5 O+M or BREEAM In-Use) and keep the metered evidence those criteria require?",
         "weight": 10
       },
       {
@@ -10560,62 +10550,42 @@
       {
         "dimension": "Compliance",
         "id": "MOB-SC-9",
-        "l1": "No biometric surveillance prohibition compliance; city AI agents may enable real-time biometric identification in public spaces without Art. 5(1)(c) prohibited practice assessment or judicial authorization for exceptions",
-        "l3": "Agent restricts biometric identification capabilities and implements basic privacy controls, but does not operationalize Art. 5(1)(c) three narrow exceptions with judicial authorization workflow or ISO 37122 smart city indicator compliance",
-        "l5": "Full EU AI Act Art. 5(1)(c) compliance with prohibited biometric surveillance prevention, three narrow exception management with prior judicial authorization workflow, ISO 37122:2019 smart city indicator implementation, biometric impact assessment, and transparent surveillance governance reporting to municipal authorities",
-        "regulatoryRef": "EU AI Act Art. 5(1)(c)-(d); ISO 37122:2019",
-        "text": "Does the agent implement EU AI Act Article 5(1)(c) prohibition on real-time remote biometric identification in publicly accessible spaces including the three narrow law enforcement exceptions requiring prior judicial authorization?",
+        "l1": "The agent can activate real-time remote biometric identification in public spaces with no check of purpose or authorisation.",
+        "l3": "Activation is blocked by default, but an exception can be enabled without an authorisation record tied to that specific use.",
+        "l5": "Law-enforcement activation requires a recorded Art. 5(1)(h) objective and a reference to the Art. 5(3) authorisation, or the urgency route with the request filed within 24 hours and use stopped and data deleted on rejection; each use is logged for the Art. 5(4) notification; every other request is refused.",
+        "regulatoryRef": "EU AI Act Art. 5(1)(h); EU AI Act Art. 5(2)-(3)",
+        "text": "Does the agent refuse to perform or enable real-time remote biometric identification in publicly accessible spaces for law enforcement unless the use serves an objective listed in EU AI Act Art. 5(1)(h) and the prior authorisation required by Art. 5(3) is on record before activation?",
         "weight": 12
       },
       {
         "dimension": "Sustainability",
         "id": "MOB-SC-10",
-        "l1": "No net-zero pathway governance; actions are ad-hoc and not tied to sectoral budgets or 2030 milestones",
-        "l3": "Has a net-zero plan and some milestones, but sectoral budgeting, funding linkage, and accountability reporting are incomplete",
-        "l5": "Full C40-aligned pathway governance with sectoral budgets, quantified milestones to 2030, financed action portfolio tracking, progress dashboards, and third-party-verifiable accountability reporting",
-        "regulatoryRef": "C40 2030 net-zero (1.5°C-aligned pathways)",
-        "text": "Does the agent manage a C40-aligned net-zero pathway with 1.5°C-consistent milestones to 2030 (sectoral emissions budgets for buildings/transport/waste, action tracking, financing readiness, and accountability reporting)?",
-        "weight": 15
-      },
-      {
-        "dimension": "Governance",
-        "id": "MOB-SC-11",
-        "l1": "No Art. 6 controls; carbon claims/credits are not governed and double counting risks are unmanaged",
-        "l3": "Tracks project MRV and some documentation, but authorization/registry linkage and anti-double-counting controls are incomplete",
-        "l5": "Full Art. 6-aligned integrity governance with MRV automation, authorization evidence, registry linkage, anti-double-counting checks, and transparent public reporting of claim boundaries",
-        "regulatoryRef": "Paris Agreement Art. 6",
-        "text": "If the city uses cooperative approaches/carbon market mechanisms, does the agent enforce Paris Agreement Article 6 integrity controls (project MRV, authorization records, registry linkage, corresponding-adjustment awareness where applicable, and anti-double-counting checks)?",
-        "weight": 12
+        "l1": "No milestones exist, or progress claims are not tied to measured data.",
+        "l3": "Milestones exist for some sectors and progress is reported, but the figures cannot be reproduced from the underlying data.",
+        "l5": "Every sector milestone has a measured indicator, a named data source and an owner; progress reports regenerate from retained data and deviations are flagged to the owner.",
+        "regulatoryRef": "C40 Cities (network commitment, non-binding)",
+        "text": "Does the agent track the climate-action targets the city has adopted (for example a C40 commitment or a national climate-law pathway) as sector milestones, and report progress against each milestone from measured data?",
+        "weight": 10
       },
       {
         "dimension": "Traceability",
         "id": "MOB-SC-12",
-        "l1": "No indicator governance; definitions/boundaries vary and data quality is unmanaged",
-        "l3": "Documents definitions and performs some checks, but change control and comparability controls are incomplete",
-        "l5": "Full indicator governance with metadata catalogs, boundary/version control, data quality scoring, reproducible computations, and audit-ready evidence for each reported indicator",
-        "regulatoryRef": "ISO 37120:2018 §4.7",
-        "text": "Does the agent enforce ISO 37120:2018 §4.7-aligned indicator governance (standard definitions, boundary/metadata documentation, data quality checks, update cadence, and change control) so reported city indicators remain comparable and audit-defensible?",
-        "weight": 10
+        "l1": "Indicators are reported without documented definitions or boundaries.",
+        "l3": "Definitions are documented for most indicators, but quality checks or change control are missing for some.",
+        "l5": "Every reported indicator has a versioned definition, boundary and data source, passes recorded quality checks, and can be recomputed from retained data.",
+        "regulatoryRef": "ISO 37120:2018",
+        "text": "Does the agent compute the city indicators it reports (the ISO 37120 core and supporting indicators the city selected) from documented definitions and boundaries, with data-quality checks and change control so that reported values are reproducible?",
+        "weight": 12
       },
       {
         "dimension": "Architecture",
         "id": "MOB-SC-13",
-        "l1": "No interoperability governance; systems are siloed with proprietary schemas and high vendor lock-in",
-        "l3": "Implements partial interoperability via APIs, but semantics and portability governance are incomplete",
-        "l5": "Full SC 41-aligned interoperability with reference architecture mapping, semantic standards governance, digital twin interoperability controls, portability requirements, and conformance evidence",
-        "regulatoryRef": "ISO/IEC JTC 1/SC 41",
-        "text": "Does the agent ensure smart city interoperability aligned to ISO/IEC JTC 1/SC 41-relevant smart city/IoT standards (reference architecture, semantic/data model alignment, digital twin interoperability where used, and vendor portability)?",
+        "l1": "Integrations use undocumented proprietary schemas and have no export path.",
+        "l3": "Architecture and data models are documented for core systems, but export or replacement has not been tested.",
+        "l5": "Architecture mapping and data models are versioned, every integration has a tested export path, and at least one replacement test is on record.",
+        "regulatoryRef": "ISO/IEC 30141",
+        "text": "Does the agent's smart-city integration follow a documented IoT reference architecture (ISO/IEC 30141) with published data models and tested export paths, so that a component or vendor can be replaced without losing data?",
         "weight": 10
-      },
-      {
-        "dimension": "Governance",
-        "id": "MOB-SC-14",
-        "l1": "No partnership delivery workflow; engagement does not translate into managed action plans and outcomes",
-        "l3": "Tracks action plans and stakeholders, but coordination cadence and outcome evidence are inconsistent",
-        "l5": "End-to-end partnership governance with action plan tracking, coordination workflows, outcome KPIs, and transparent dissemination of results and learnings",
-        "regulatoryRef": "EU Urban Agenda §3",
-        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
-        "weight": 6
       },
       {
         "dimension": "Privacy",
@@ -10626,6 +10596,36 @@
         "regulatoryRef": "GDPR Art. 35(3)(c)",
         "text": "Before the agent processes data from large-scale systematic monitoring of publicly accessible areas (cameras, sensors, mobility traces), does the city carry out and keep current the data protection impact assessment required by GDPR Article 35(3)(c)?",
         "weight": 8
+      },
+      {
+        "dimension": "Governance",
+        "id": "MOB-SC-16",
+        "l1": "No named overseer, no suspension criteria, and logs are not retained.",
+        "l3": "An overseer is named and logs are kept, but the retention period, suspension triggers or the provider-notification path are not documented.",
+        "l5": "Named, trained overseers with authority to stop the system; documented and tested suspension triggers; logs retained for at least six months under a written policy; a runbook for informing the provider and authority on risk or serious incident.",
+        "regulatoryRef": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
+        "text": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
+        "weight": 12
+      },
+      {
+        "dimension": "Governance",
+        "id": "MOB-SC-17",
+        "l1": "Incidents affecting traffic or ITS systems are handled with no reporting clock.",
+        "l3": "Incidents are timestamped, but significance assessment and the 24-hour, 72-hour and one-month deadlines are tracked by hand.",
+        "l5": "Significance is assessed against documented criteria and each of the three submissions is drafted from incident evidence and tracked to submission with timestamps.",
+        "regulatoryRef": "EU NIS2 Art. 23(4); EU NIS2 Annex I point 2(d)",
+        "text": "Where the city or its operator is a NIS2 entity (road authority responsible for traffic-management control, or operator of intelligent transport systems, Annex I point 2(d)), does the agent support significant-incident reporting with an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (Art. 23(4))?",
+        "weight": 12
+      },
+      {
+        "dimension": "Privacy",
+        "id": "MOB-SC-18",
+        "l1": "Personal data are processed with no lawful basis recorded per purpose.",
+        "l3": "Lawful bases are recorded for the main purposes, but new purposes or data sources start without a recorded basis, or the Art. 6(3) legal basis is not named.",
+        "l5": "Every processing purpose has a recorded Art. 6(1) basis, with its Art. 6(3) legal basis where required, before processing starts; processing for an unrecorded purpose is blocked; each change of purpose or data source triggers a recorded review.",
+        "regulatoryRef": "GDPR Art. 6",
+        "text": "For each purpose for which the agent processes residents' personal data (sensor, camera, mobility or service-usage data), is a lawful basis under GDPR Article 6(1) recorded before processing starts and, where the city relies on a legal obligation or a public task, the Union or Member State law that lays it down (Art. 6(3))?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
@@ -10769,31 +10769,21 @@
       {
         "dimension": "Safety",
         "id": "MOB-SP-1",
-        "l1": "No ISPS compliance; port facility security is not managed per international ship and port facility security requirements",
-        "l3": "Agent monitors access control and security levels per ISPS Code, but does not automate security level transitions or drill scheduling",
-        "l5": "Full ISPS compliance with automated security level management, access control integration, security assessment updates, drill scheduling and documentation, Declaration of Security management, and continuous security monitoring per Part A §12",
-        "regulatoryRef": "ISPS Code Part A §12; Part B §16",
-        "text": "Does the agent implement port facility security per ISPS Code Part A §12 and Part B §16 including access control and security level management?",
+        "l1": "Security-level changes and access-control events are not recorded by the agent.",
+        "l3": "Security levels and access events are recorded, but level transitions, Declarations of Security or drill records are kept by hand or incompletely.",
+        "l5": "Each security-level transition applies the plan's measures for that level with a timestamped record; access-control, Declaration of Security and drill records are retained and retrievable as the plan requires.",
+        "regulatoryRef": "ISPS Code Part A §14, §16; ISPS Code Part B §16",
+        "text": "Does the agent support port facility security under the ISPS Code (Part A §14 port facility security; §16 port facility security plan): access control and monitoring at each security level, security-level changes, Declarations of Security and drill records?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "MOB-SP-2",
-        "l1": "No dangerous goods management; hazardous cargo documentation and stowage are not verified by the agent",
-        "l3": "Agent validates dangerous goods declarations and checks basic stowage compatibility, but does not optimize stowage plans or manage emergency response information",
-        "l5": "Full IMDG compliance with automated DG declaration validation, stowage compatibility optimization per Ch. 7.1, segregation verification, emergency response information management, and container inspection scheduling per Ch. 5.4",
-        "regulatoryRef": "IMDG Code Ch. 5.4, Ch. 7.1",
-        "text": "Does the agent manage dangerous goods handling per IMDG Code Chapter 5.4 documentation and Chapter 7.1 stowage requirements?",
-        "weight": 12
-      },
-      {
-        "dimension": "Sustainability",
-        "id": "MOB-SP-3",
-        "l1": "No environmental monitoring; port emissions and environmental impact are not tracked or managed",
-        "l3": "Agent monitors vessel fuel sulfur content and calculates emissions, but does not implement comprehensive port environmental management or shore power optimization",
-        "l5": "Comprehensive port environmental management with MARPOL Annex VI compliance monitoring, EU MRV reporting automation, shore power utilization optimization, port emission inventory, and environmental performance benchmarking",
-        "regulatoryRef": "MARPOL Annex VI Reg. 14; EU MRV Regulation 2015/757",
-        "text": "Does the agent monitor port environmental compliance per IMO MARPOL Annex VI Regulation 14 SOx emission controls and EU MRV Regulation 2015/757?",
+        "l1": "Dangerous-goods declarations and stowage are not verified by the agent.",
+        "l3": "Declarations are validated and basic stowage compatibility is checked, but against a superseded amendment or without segregation checks.",
+        "l5": "Declarations are validated against the in-force amendment, stowage and segregation are checked per Ch. 7.1 before loading, emergency-response information is attached, and every exception is logged with the rule applied.",
+        "regulatoryRef": "IMDG Code (Amdt 42-24) Ch. 5.4, Ch. 7.1",
+        "text": "Does the agent check dangerous-goods documentation (IMDG Code Ch. 5.4) and stowage and segregation (Ch. 7.1) against the IMDG Code as amended by Amendment 42-24, in force from 1 January 2026?",
         "weight": 12
       },
       {
@@ -10819,21 +10809,21 @@
       {
         "dimension": "Safety",
         "id": "MOB-SP-6",
-        "l1": "No port worker safety; autonomous port equipment operates without systematic safety controls or worker protection",
-        "l3": "Agent monitors basic safety parameters for autonomous equipment and enforces exclusion zones, but does not implement comprehensive worker safety management",
-        "l5": "Full port worker safety with autonomous equipment safety per ISO 3691-4, worker proximity detection, fatigue monitoring, safety training tracking, incident investigation automation, and continuous safety improvement per ILO C152",
-        "regulatoryRef": "ILO Convention C152; ISO 3691-4:2020 (Driverless Industrial Trucks)",
-        "text": "Does the agent implement port worker safety per ILO Convention C152 (Occupational Safety in Dock Work) and autonomous equipment safety standards?",
+        "l1": "Autonomous equipment runs without documented safety zones or worker-proximity controls.",
+        "l3": "Safety zones and exclusion rules are enforced, but stop/override tests or incident records are incomplete.",
+        "l5": "Safety zones, speed limits and proximity rules are versioned and enforced; the stop/override path is tested on a schedule with records; every safety incident has an investigation record.",
+        "regulatoryRef": "ILO Convention C152; ISO 3691-4:2023",
+        "text": "Does the agent operate autonomous port equipment (AGVs, automated straddle carriers) within documented safety zones and speed limits per ISO 3691-4:2023, with worker-proximity controls consistent with ILO Convention C152 and a tested human stop path?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "MOB-SP-7",
-        "l1": "No port services compliance; service provision does not meet EU minimum requirements or transparency obligations",
-        "l3": "Agent tracks port service performance against basic requirements, but does not implement full transparency reporting or complaint handling per Art. 4",
-        "l5": "Full port services compliance with minimum requirement monitoring, transparent service charge publication, complaint handling mechanism, service quality benchmarking, and automated reporting per EU Regulation 2017/352 Art. 4",
-        "regulatoryRef": "EU Port Services Regulation 2017/352 Art. 4",
-        "text": "Does the agent manage port services per EU Port Services Regulation 2017/352 Article 4 minimum requirements and transparency obligations?",
+        "l1": "Provider compliance with the minimum requirements is not checked and charges are not published.",
+        "l3": "Minimum requirements are checked at onboarding, but charges or their changes are not published, or complaints are not tracked.",
+        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges and their basis are published, and complaints are logged and closed through the Art. 16 procedure with records.",
+        "regulatoryRef": "EU Port Services Regulation Art. 4; EU Port Services Regulation Art. 12; EU Port Services Regulation Art. 16",
+        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), publish port-service charges and their basis transparently (Art. 12), and route complaints into the handling procedure (Art. 16)?",
         "weight": 12
       },
       {
@@ -10849,21 +10839,21 @@
       {
         "dimension": "Security",
         "id": "MOB-SP-9",
-        "l1": "No maritime cyber risk management; AI port management agents lack IMO MSC-FAL.1/Circ.3 cyber risk assessment or SOLAS Chapter XI-2 Reg. 4 ship security alert system integration",
-        "l3": "Agent implements basic cybersecurity controls for port IT systems, but does not address IMO maritime-specific cyber risk management or SOLAS ship security alert system integration for AI-managed port operations",
-        "l5": "Full IMO MSC-FAL.1/Circ.3 maritime cyber risk management with port-specific threat assessment, SOLAS Ch. XI-2 Reg. 4 ship security alert integration, OT/IT convergence security for AI port systems, maritime cyber incident response, and IMO Member State reporting capability",
-        "regulatoryRef": "IMO MSC-FAL.1/Circ.3; SOLAS Ch. XI-2 Reg. 4",
-        "text": "Does the agent implement IMO MSC-FAL.1/Circ.3 maritime cyber risk management requirements and SOLAS Chapter XI-2 Regulation 4 ship security alert system integration for AI port management agents?",
+        "l1": "No maritime cyber risk management covers the systems the agent touches.",
+        "l3": "Port IT/OT systems are risk-assessed, but the Govern element (an accountable person with authority) or recovery testing is missing.",
+        "l5": "All six functional elements are evidenced for systems the agent touches: a named accountable person, an inventory including ship-port interfaces, protections, detection, a tested response plan and a tested recovery.",
+        "regulatoryRef": "IMO MSC-FAL.1/Circ.3/Rev.3",
+        "text": "Does the agent's cyber risk management for port and ship-port interface systems implement the functional elements of IMO MSC-FAL.1/Circ.3/Rev.3 (Govern, Identify, Protect, Detect, Respond, Recover), with a person or entity designated as accountable under Govern?",
         "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "MOB-SP-10",
-        "l1": "No ECA-specific SOx controls; evidence (BDNs/changeover logs/EGCS data) is missing and compliance relies on manual assertions",
-        "l3": "Tracks fuel sulfur and retains some evidence, but ECA boundary logic, changeover verification, and PSC-ready evidence bundles are incomplete or inconsistent",
-        "l5": "Full Reg. 14 compliance automation with ECA geofencing, changeover verification, BDN + sample validation, EGCS equivalency monitoring, noncompliance detection/escalation, and PSC-ready evidence packs per voyage/call",
-        "regulatoryRef": "MARPOL Annex VI Reg. 14 (ECA 0.10% sulfur limit)",
-        "text": "Does the agent enforce and evidence MARPOL Annex VI Reg. 14 SOx compliance, including (1) 0.10% m/m sulfur limit applicability in ECAs, (2) validation of bunker delivery notes (BDNs) and fuel sampling data, (3) fuel changeover procedure + log verification for ECA entry/exit, and (4) EGCS/scrubber equivalency monitoring and exception handling where applicable?",
+        "l1": "No ECA-specific sulphur checks; bunker notes, changeover logs and scrubber data are not collected.",
+        "l3": "Fuel sulphur is tracked, but the ECA list is static or undated, or changeover and bunker-note checks are incomplete.",
+        "l5": "ECA boundaries come from a dated register updated when ECAs enter into force; bunker notes, changeover logs and scrubber data are checked for each call; non-compliance is escalated with a port-state-control-ready evidence pack.",
+        "regulatoryRef": "IMO MARPOL Annex VI Reg. 14",
+        "text": "Does the agent verify MARPOL Annex VI Reg. 14 sulphur compliance for ships it handles: the 0.10% m/m limit inside the Emission Control Areas in force on the date of the call (including the Canadian Arctic and Norwegian Sea ECAs from 1 March 2026), bunker delivery notes, fuel-changeover logs, and scrubber equivalency where used?",
         "weight": 15
       },
       {
@@ -10887,16 +10877,6 @@
         "weight": 12
       },
       {
-        "dimension": "Governance",
-        "id": "MOB-SP-13",
-        "l1": "No §6.1 planning; risks/opportunities are informal and security controls are not linked to objectives or treatment plans",
-        "l3": "Maintains a risk register and some treatment actions, but methodology, acceptance criteria, and objective linkage are incomplete or inconsistently evidenced",
-        "l5": "Full §6.1 implementation with defined methodology, treatment planning + tracking, objective/KPI linkage, change-triggered review, and audit-ready evidence for continual improvement",
-        "regulatoryRef": "ISO 28000:2022 §6.1",
-        "text": "Does the agent implement ISO 28000:2022 §6.1 by maintaining a structured supply chain security risk and opportunity register, defining risk treatment plans and acceptance criteria, linking treatments to measurable security objectives, and reviewing updates based on changes/incidents?",
-        "weight": 12
-      },
-      {
         "dimension": "Security",
         "id": "MOB-SP-14",
         "l1": "No partner security governance; partners are onboarded/used without defined security expectations or monitoring",
@@ -10915,6 +10895,26 @@
         "regulatoryRef": "EU Port Services Regulation 2017/352 Art. 13",
         "text": "Where the agent sets or applies port infrastructure charges, including reductions for environmental performance, does it follow transparent, published criteria and inform port users of the charge structure as Port Services Regulation (EU) 2017/352 Article 13 requires?",
         "weight": 8
+      },
+      {
+        "dimension": "Governance",
+        "id": "MOB-SP-16",
+        "l1": "Incidents affecting port systems are handled with no reporting clock.",
+        "l3": "Incidents are timestamped, but significance assessment and the three deadlines are tracked by hand.",
+        "l5": "Significance is assessed against documented criteria and each submission is drafted from incident evidence and tracked to submission with timestamps.",
+        "regulatoryRef": "EU NIS2 Art. 23(4); EU NIS2 Annex I point 2(c)",
+        "text": "Where the port managing body, its port facilities or VTS operator are NIS2 entities (Annex I point 2(c)), does the agent support significant-incident reporting to the CSIRT or competent authority with an early warning within 24 hours, an incident notification within 72 hours and a final report within one month (Art. 23(4))?",
+        "weight": 12
+      },
+      {
+        "dimension": "Safety",
+        "id": "MOB-SP-17",
+        "l1": "Agent instructions to terminal machinery are outside any safety assessment, and no decision or version records are kept.",
+        "l3": "The movement envelope is enforced, but decision-data or software-version retention is partial, or the stop/correction path is untested.",
+        "l5": "The task and movement envelope is enforced and tested, safety-decision data are kept one year and the software-version trace five years, and the correction/stop path and the supervisory function are tested with records.",
+        "regulatoryRef": "EU Machinery Regulation 2023/1230 Annex III 1.2.1; EU Machinery Regulation 2023/1230 Annex III 3.2.4",
+        "text": "Where the agent directs automated container-handling machinery with autonomous or self-evolving control (automated stacking cranes, straddle carriers, AGVs), does the deployment evidence the Machinery Regulation (EU) 2023/1230 Annex III requirements that apply from 20 January 2027: no actions beyond the defined task and movement space, safety-decision data retained for one year, a trace of safety-software versions retained for five years, correction possible at all times (EHSR 1.2.1), and a supervisory function for autonomous mobile machinery (EHSR 3.2.4)?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -11108,122 +11108,122 @@
       {
         "dimension": "Governance",
         "id": "MOB-RE-4",
-        "l1": "No ESG reporting capability; sustainability performance is not measured against GRESB indicators or SFDR requirements",
-        "l3": "Agent collects basic sustainability data and generates GRESB-aligned reports, but does not automate full GRESB submission or SFDR PAI calculations",
-        "l5": "Full GRESB/SFDR integration with automated indicator collection, GRESB submission preparation, SFDR principal adverse impact calculations, portfolio-level climate risk assessment, and stakeholder transparency dashboards",
-        "regulatoryRef": "GRESB Real Estate Assessment 2024; EU SFDR Art. 8/9",
-        "text": "Does the agent support ESG reporting per GRESB Real Estate Assessment indicators and EU SFDR real estate fund disclosure requirements?",
+        "l1": "No GRESB data collection; sustainability performance is not measured against GRESB indicators.",
+        "l3": "GRESB-aligned data are collected, but evidence is missing for some indicators or completeness is checked by hand.",
+        "l5": "Each submitted indicator links to its source data and evidence, completeness is validated before submission, and the submission can be regenerated from retained records.",
+        "regulatoryRef": "GRESB Real Estate Assessment",
+        "text": "Does the agent prepare the operator's GRESB Real Estate Assessment submission from collected portfolio data, with evidence linked to each indicator and completeness validated before submission?",
         "weight": 12
       },
       {
         "dimension": "Safety",
         "id": "MOB-RE-5",
-        "l1": "No occupant safety automation; fire protection and emergency lighting systems are not integrated with building AI management",
-        "l3": "Agent monitors fire alarm and emergency systems status, but does not optimize evacuation planning or integrate with life safety systems per NFPA 101",
-        "l5": "Full life safety integration with automated evacuation planning, emergency lighting management per IEC 62386, fire compartmentalization verification, evacuation drill scheduling, and real-time occupancy-weighted emergency response",
-        "regulatoryRef": "NFPA 101 Life Safety Code; IEC 62386",
-        "text": "Does the agent manage building occupant safety per NFPA 101 Life Safety Code and IEC 62386 DALI lighting control safety requirements?",
+        "l1": "The agent can command life-safety systems, or has no visibility of their status.",
+        "l3": "The agent reads life-safety status without control, but test records or fault escalation are incomplete.",
+        "l5": "Life-safety systems are read-only to the agent, faults escalate to a named person within a documented time, and periodic egress and emergency-lighting test records are retained.",
+        "regulatoryRef": "NFPA 101 Ch. 7; EN 1838",
+        "text": "Does the agent's integration with fire-alarm, egress and emergency-lighting systems keep those systems outside its control, escalate faults, and retain the test and status records the applicable life-safety code requires (NFPA 101 Chapter 7; EN 1838 emergency lighting)?",
         "weight": 12
       },
       {
         "dimension": "Traceability",
         "id": "MOB-RE-6",
-        "l1": "No material traceability; building materials have no digital documentation of composition, origin, or end-of-life potential",
-        "l3": "Agent maintains basic material inventory, but does not implement design for disassembly assessment or circular economy planning",
-        "l5": "Full material passport implementation with composition documentation per CPR, disassembly value assessment per ISO 20887, embedded carbon tracking, end-of-life material recovery planning, and building circular economy reporting",
-        "regulatoryRef": "ISO 20887:2020; EU Construction Products Regulation (CPR)",
-        "text": "Does the agent maintain building material traceability per ISO 20887:2020 (Design for Disassembly) and EU Construction Products Regulation for circular economy?",
+        "l1": "No product-level records beyond invoices.",
+        "l3": "Declarations are stored for major products but are not linked to building elements, and no disassembly information is kept.",
+        "l5": "Each installed construction product links to its declaration (and passport where available), its location in the building and its disassembly information, and the records are exportable.",
+        "regulatoryRef": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887:2020",
+        "text": "Does the agent keep construction-product records for the building (the declaration of performance and conformity under Regulation (EU) 2024/3110 Art. 13, and the construction digital product passport once delegated acts set it up under Arts. 75-79), together with disassembly information per ISO 20887?",
         "weight": 10
       },
       {
         "dimension": "Compliance",
         "id": "MOB-RE-7",
-        "l1": "No climate risk assessment; real estate portfolio is not analyzed for physical or transition climate risks",
-        "l3": "Agent tracks basic climate risk indicators, but does not implement TCFD-aligned scenario analysis or portfolio-level resilience planning",
-        "l5": "Full TCFD alignment with physical and transition risk assessment across 1.5°C, 2°C, and 4°C scenarios, portfolio resilience scoring, climate-adjusted valuation modeling, and mandatory disclosure preparation per EU climate benchmark regulation",
-        "regulatoryRef": "TCFD Recommendations; EU Climate Benchmark Regulation",
-        "text": "Does the agent implement climate resilience per TCFD recommendations and EU Climate Risk and Vulnerability Assessment for real estate portfolios?",
+        "l1": "No asset-level physical climate-risk assessment.",
+        "l3": "Hazards are assessed for some assets or under one scenario, and the results are not tied to the disclosure.",
+        "l5": "Every asset has a dated hazard and vulnerability assessment under stated scenarios, and the results feed the IFRS S2 disclosure with their inputs retained.",
+        "regulatoryRef": "IFRS S2",
+        "text": "Does the agent assess physical climate risk for each asset and feed the results into the operator's IFRS S2 disclosure where IFRS S2 is applied?",
         "weight": 12
       },
       {
         "dimension": "Transparency",
         "id": "MOB-RE-8",
-        "l1": "No data governance for occupant information; building management data collection lacks consent frameworks or purpose limitation",
-        "l3": "Agent implements basic occupant data consent and anonymization, but does not implement full GDPR Art. 25 privacy by design or ISO 19650 information management",
-        "l5": "Full privacy by design with occupant data minimization per GDPR Art. 25, ISO 19650 BIM information management, consent-driven occupancy analytics, anonymized benchmarking, and transparent data usage documentation for all building AI",
-        "regulatoryRef": "GDPR Art. 25; ISO 19650:2018",
-        "text": "Does the agent manage tenant and occupant data per GDPR Article 25 privacy by design and ISO 19650 BIM information management standards?",
+        "l1": "Occupant data are collected without documented purposes or retention.",
+        "l3": "Purposes and retention are documented, but default settings collect more than needed or retention is not enforced in configuration.",
+        "l5": "Each data flow has a documented purpose, minimised fields, pseudonymisation or aggregation where possible, enforced retention, and a record that the defaults were reviewed.",
+        "regulatoryRef": "GDPR Art. 25; EDPB Guidelines 4/2019",
+        "text": "Does the agent apply data protection by design and by default to tenant and occupant data (occupancy sensing, access logs, energy use) per GDPR Art. 25 as interpreted in EDPB Guidelines 4/2019, collecting only what each stated purpose needs?",
         "weight": 15
-      },
-      {
-        "dimension": "Compliance",
-        "id": "MOB-RE-9",
-        "l1": "No renovation pathway compliance; AI building management agents do not assess EU Taxonomy §7.7 renovation substantial contribution criteria or EED Art. 6 public body renovation rate requirements",
-        "l3": "Agent tracks building energy performance and renovation planning, but does not implement EU Taxonomy §7.7 renovation-specific substantial contribution assessment or EED Art. 6 annual renovation rate compliance",
-        "l5": "Full EU Taxonomy §7.7 renovation substantial contribution assessment, EED Art. 6 public body 3% annual renovation rate tracking, renovation pathway planning with DNSH assessment, energy performance certificate integration, and taxonomy-aligned renovation disclosure for SFDR reporting",
-        "regulatoryRef": "EU Taxonomy Annex I §7.7; EU EED 2023/1791 Art. 6",
-        "text": "Does the agent implement EU Taxonomy Climate Delegated Act Annex I §7.7 renovation of existing buildings substantial contribution criteria and EU Energy Efficiency Directive 2023/1791 Article 6 public body building renovation requirements?",
-        "weight": 12
       },
       {
         "dimension": "Compliance",
         "id": "MOB-RE-10",
-        "l1": "No ZEB readiness: no applicability logic, no evidence against ZEB definition, and no time-bound upgrade plan",
-        "l3": "Has a roadmap concept and partial evidence, but lacks deadline gating, applicability logic, and auditable ZEB evidence bundles",
-        "l5": "Full Art. 9 ZEB readiness with deadline-based gating, ZEB definition evidence packs, sequenced milestones, exception handling, and portfolio reporting for regulator and investor scrutiny",
-        "regulatoryRef": "EU EPBD 2024 Art. 9 (ZEB from 2028)",
-        "text": "Does the agent implement EPBD 2024 Article 9 zero-emission building (ZEB) readiness as a time-bound compliance gate, including (1) applicability logic for new buildings from 2028, (2) evidence that the building design and operation meets the ZEB definition, (3) a sequenced upgrade and renovation plan with milestones, and (4) portfolio-level reporting of ZEB readiness and exceptions?",
+        "l1": "No ZEB gating.",
+        "l3": "One deadline is applied to all buildings, or ZEB evidence is incomplete.",
+        "l5": "Owner type and permit date determine the applicable date; each building has a ZEB evidence pack against the national Art. 11 threshold; buildings exempted under Art. 7(4) are logged with their permit date.",
+        "regulatoryRef": "EU EPBD Art. 7(1); EU EPBD Art. 11",
+        "text": "Does the agent gate zero-emission-building compliance for new buildings by owner type (new buildings owned by public bodies from 1 January 2028, all new buildings from 1 January 2030, EPBD Art. 7(1)) and evidence each building against the zero-emission-building definition in Art. 11 as transposed?",
         "weight": 15
       },
       {
-        "dimension": "Governance",
-        "id": "MOB-RE-11",
-        "l1": "No energy review: significant energy uses, baselines, normalization are undefined and EnPI governance is absent",
-        "l3": "Performs partial energy review and tracks some EnPIs, but baseline control, normalization, and audit evidence are incomplete",
-        "l5": "Full ISO 50001 Clause 6.3 governance with SEU identification, controlled baselines, normalized EnPIs, action-plan tracking, and auditor-ready evidence packs",
-        "regulatoryRef": "ISO 50001:2018 Clause 6.3 (Energy review)",
-        "text": "Does the agent operate an ISO 50001:2018 Clause 6.3 energy review for buildings (and linked EnPIs), including identification of significant energy uses, baseline management, normalization factors (weather and occupancy), action plans, and evidence retention suitable for ISO 50001 certification audits?",
+        "dimension": "Compliance",
+        "id": "MOB-RE-16",
+        "l1": "No building automation system, or one with no retained energy logs.",
+        "l3": "Energy use is logged and benchmarked, but loss detection, interoperability or indoor-environmental-quality monitoring is missing.",
+        "l5": "All Art. 13(10) capabilities are evidenced with retained logs, efficiency-loss alerts reach the responsible person, and each building's threshold status is recorded.",
+        "regulatoryRef": "EU EPBD Art. 13(9)-(10)",
+        "text": "For non-residential buildings above the EPBD thresholds (heating or air-conditioning output over 290 kW by 31 December 2024, over 70 kW by 31 December 2029, Art. 13(9)), does the building automation system the agent runs provide the Art. 13(10) capabilities: continuous monitoring, logging, analysis and adjustment of energy use; benchmarking and detection of efficiency losses; interoperability; and indoor-environmental-quality monitoring?",
         "weight": 12
       },
       {
         "dimension": "Transparency",
-        "id": "MOB-RE-12",
-        "l1": "No scoring governance: GRESB data is ad hoc, evidence is missing, and submission is not validated",
-        "l3": "Collects most data and some evidence, but scoring-driver coverage and validation are incomplete",
-        "l5": "Full Section 3.2 scoring readiness with scoring-driver mapping, evidence quality enforcement, pre-submission validation, and remediation workflow that maximizes verifiable score outcomes",
-        "regulatoryRef": "GRESB Real Estate Assessment §3.2",
-        "text": "Does the agent manage GRESB Section 3.2 scoring readiness by mapping portfolio data to scoring drivers, enforcing evidence quality requirements (document links, timestamps, ownership), validating completeness before submission, and producing a pre-submission score-delta analysis with remediation tasks?",
+        "id": "MOB-RE-17",
+        "l1": "No path for owners, tenants or managers to access building-systems data.",
+        "l3": "Data are provided on request or by hand, or third-party sharing has no consent record.",
+        "l5": "Self-service machine-readable access, consent-based third-party sharing with a consent log, and no access charge to owners, tenants or managers.",
+        "regulatoryRef": "EU EPBD Art. 16",
+        "text": "Does the agent give building owners, tenants and managers direct access to their building systems' data, and make those data available to a third party on their consent, without additional cost to them (EPBD Art. 16(1) and (3))?",
         "weight": 10
       },
       {
-        "dimension": "Wellbeing",
-        "id": "MOB-RE-13",
-        "l1": "No WELL-grade CO2 control: sensors and calibration are unmanaged and thresholds are not enforced or evidenced",
-        "l3": "Monitors CO2 and flags issues, but calibration, threshold governance, and audit evidence are incomplete",
-        "l5": "Full WELL CO2 and ventilation governance with calibrated sensing, threshold enforcement, corrective action workflows, and auditor-ready evidence packs",
-        "regulatoryRef": "WELL v2 — Air (CO2 and ventilation performance)",
-        "text": "Does the agent implement WELL v2 Air requirements for CO2 and ventilation performance by enforcing sensor calibration and QA, validating ventilation rates and CO2 thresholds over time, and generating WELL-audit-ready evidence (continuous logs, exceptions, corrective actions, and commissioning records)?",
+        "dimension": "Sustainability",
+        "id": "MOB-RE-18",
+        "l1": "Life-cycle GWP is not calculated.",
+        "l3": "GWP is calculated for some buildings, or not by the national Annex III method.",
+        "l5": "Each in-scope new building has a dated GWP calculation by the national Annex III method, disclosed in its certificate, with the inputs retained.",
+        "regulatoryRef": "EU EPBD Art. 7(2)",
+        "text": "Does the agent calculate the life-cycle global warming potential of new buildings per EPBD Annex III and record it for the energy performance certificate, from 1 January 2028 for new buildings over 1 000 m² and from 1 January 2030 for all new buildings (Art. 7(2))?",
+        "weight": 10
+      },
+      {
+        "dimension": "Sustainability",
+        "id": "MOB-RE-19",
+        "l1": "Parking and recharging provision are not tracked against Art. 14.",
+        "l3": "Recharging points are counted, but pre-cabling, ducting or bicycle-parking ratios are not checked.",
+        "l5": "Each in-scope building has a recorded count of spaces, recharging points, pre-cabled and ducted spaces and bicycle spaces checked against the national ratios, with gaps assigned to an owner.",
+        "regulatoryRef": "EU EPBD Art. 14(1)",
+        "text": "For new non-residential buildings, and those undergoing major renovation, with more than five car parking spaces, does the agent track the EPBD Art. 14(1) requirements as transposed: at least one recharging point per five spaces, pre-cabling for at least 50% of spaces with ducting for the rest, and bicycle parking of at least 15% of average or 10% of total user capacity?",
         "weight": 10
       },
       {
         "dimension": "Transparency",
-        "id": "MOB-RE-14",
-        "l1": "No Art. 8 KPI output: taxonomy KPIs are not computed or cannot be reconciled and evidenced",
-        "l3": "Computes some KPIs but mappings, reconciliations, evidence are incomplete",
-        "l5": "Full Art. 8 disclosure readiness with repeatable KPI computation, traceable mappings, reconciliations, and audit-ready evidence bundles",
-        "regulatoryRef": "EU Taxonomy 2020/852 Art. 8",
-        "text": "Does the agent compute EU Taxonomy Article 8 KPIs for real estate portfolios (taxonomy-eligible vs taxonomy-aligned turnover, CapEx, OpEx) with traceable mappings to underlying assets and activities and reconciliation to financial reporting, including evidence links for eligibility, alignment, DNSH?",
-        "weight": 10
+        "id": "MOB-RE-20",
+        "l1": "Disclosed characteristics or objectives cannot be traced to asset-level data.",
+        "l3": "Asset-level data exist for most claims, but they are not reconciled to the published disclosure or not retained per reporting period.",
+        "l5": "Every disclosed characteristic or objective maps to asset-level data retained per reporting period and reconciled to the published disclosure, with differences explained and recorded.",
+        "regulatoryRef": "EU SFDR Art. 8; EU SFDR Art. 9",
+        "text": "Where the operator manages a financial product that promotes environmental characteristics (SFDR Art. 8) or has sustainable investment as its objective (Art. 9) through real estate, does the agent keep the asset-level data behind each disclosed characteristic or objective, reconciled to the published disclosure?",
+        "weight": 12
       },
       {
-        "dimension": "Governance",
-        "id": "MOB-RE-15",
-        "l1": "No mapping governance: EPBD and SRI references drift and are not reviewed",
-        "l3": "Mapping exists but updates are manual and can lag regulatory changes",
-        "l5": "Versioned EPBD mapping with review workflow and automated checks for citation consistency across the pack",
-        "regulatoryRef": "EU EPBD 2024 (control mapping governance)",
-        "text": "Does the program maintain an EPBD control-to-article mapping (including SRI) that is reviewed on regulatory updates, so citations and evidence expectations remain audit-defensible over time?",
-        "weight": 6
+        "dimension": "Compliance",
+        "id": "MOB-RE-21",
+        "l1": "Adaptation-alignment claims are made without reference to the Annex II criteria.",
+        "l3": "Claims cite the Annex II activity, but evidence is missing for some of its criteria.",
+        "l5": "Each claim names the Annex II activity and criteria applied, links evidence for every criterion, and is re-tested when the asset or the criteria change.",
+        "regulatoryRef": "Commission Delegated Regulation (EU) 2021/2139 Annex II",
+        "text": "Where the operator claims taxonomy alignment for climate change adaptation, does the agent test each claim against the technical screening criteria in Commission Delegated Regulation (EU) 2021/2139 Annex II for the activity concerned and keep the evidence?",
+        "weight": 10
       }
     ],
     "regulatoryBasis": [
@@ -11692,41 +11692,31 @@
       {
         "dimension": "Resilience",
         "id": "MOB-VI-2",
-        "l1": "No business continuity; infrastructure AI does not support systematic recovery planning or continuity testing",
-        "l3": "Agent supports basic backup and recovery, but does not implement ISO 22301 BCP testing cycles or DORA ICT continuity requirements",
-        "l5": "Full business continuity with ISO 22301 BCP automation, DORA-compliant ICT continuity testing, RTO/RPO monitoring, multi-region failover orchestration, and continuous resilience score tracking",
-        "regulatoryRef": "ISO 22301:2019 §8.4; EU DORA Art. 12",
-        "text": "Does the agent maintain business continuity per ISO 22301:2019 §8.4 business continuity plans and EU DORA Article 12 ICT continuity requirements?",
+        "l1": "No tested continuity plans.",
+        "l3": "Continuity plans exist, but recovery times and recovery points are not tested, or the results are not recorded.",
+        "l5": "Plans are tested on schedule with recovery-time and recovery-point results recorded against targets, and each failed test leads to a recorded plan change.",
+        "regulatoryRef": "ISO 22301:2019 §8.4",
+        "text": "Does the agent maintain business continuity plans per ISO 22301:2019 §8.4 and test them on a schedule with recorded recovery-time and recovery-point results?",
         "weight": 15
       },
       {
         "dimension": "Compliance",
         "id": "MOB-VI-3",
-        "l1": "No data sovereignty controls; data flows cross borders without transfer mechanism verification or residency enforcement",
-        "l3": "Agent tracks data residency requirements and validates standard contractual clauses, but does not automate transfer impact assessments or enforce real-time data localization",
-        "l5": "Full data sovereignty with automated transfer mechanism validation per GDPR Art. 44-49, real-time data residency enforcement, transfer impact assessment automation, EU Data Act portability compliance, and data map currency maintenance",
-        "regulatoryRef": "GDPR Art. 44-49; EU Data Act Art. 23-31",
-        "text": "Does the agent enforce data sovereignty per GDPR Articles 44-49 international transfer restrictions and EU Data Act Chapter V data portability requirements?",
+        "l1": "Personal data cross borders with no recorded transfer mechanism.",
+        "l3": "Mechanisms are recorded for the main flows, but new destinations or sub-processors are not checked before transfer.",
+        "l5": "Every transfer path has a recorded mechanism and assessment, unmapped destinations are blocked, and a change in adequacy status triggers a recorded review.",
+        "regulatoryRef": "GDPR Art. 44-49",
+        "text": "Does the agent enforce GDPR Chapter V on international transfers: a transfer mechanism recorded for each destination (adequacy decision, Art. 46 safeguards, or an Art. 49 derogation) and transfers blocked where none applies?",
         "weight": 15
       },
       {
         "dimension": "Security",
         "id": "MOB-VI-4",
-        "l1": "No cloud security framework; cloud operations lack systematic control implementation against CSA CCM domains",
-        "l3": "Agent monitors key CSA CCM controls and tracks compliance status, but does not automate evidence collection or continuous control assessment",
-        "l5": "Full CSA CCM v4.0 implementation with automated control monitoring across all 17 domains, continuous evidence collection, shared responsibility matrix management, and STAR Level 2 assessment support",
-        "regulatoryRef": "CSA CCM v4.0; CSA STAR Level 2",
-        "text": "Does the agent implement cloud security per CSA STAR Level 2 Cloud Controls Matrix v4.0 with automated compliance evidence collection?",
-        "weight": 12
-      },
-      {
-        "dimension": "Governance",
-        "id": "MOB-VI-5",
-        "l1": "No NIS2 compliance; cybersecurity measures do not meet essential entity requirements of Art. 21",
-        "l3": "Agent implements several Art. 21 measures including incident handling and supply chain security, but does not cover all required measures or maintain NIS2 reporting readiness",
-        "l5": "Full NIS2 compliance with all Art. 21 measures implemented and monitored, 24-hour incident notification capability, supply chain security assessment, management accountability tracking, and regular cybersecurity training",
-        "regulatoryRef": "EU NIS2 Directive 2022/2555 Art. 21",
-        "text": "Does the agent implement NIS2 cybersecurity risk management per EU NIS2 Directive 2022/2555 Article 21 measures for essential/important entities?",
+        "l1": "Cloud operations have no control set mapped to the CCM domains.",
+        "l3": "Key CCM controls are monitored and their status tracked, but evidence collection is manual or covers only some domains.",
+        "l5": "All 17 CCM v4.1 domains are mapped, evidence is collected automatically for each applicable control, the shared-responsibility matrix is maintained, and STAR Level 2 assessment evidence is current.",
+        "regulatoryRef": "CSA CCM v4.1; CSA STAR Level 2",
+        "text": "Does the agent implement cloud security controls per CSA Cloud Controls Matrix v4.1 (STAR Level 2) with automated evidence collection?",
         "weight": 12
       },
       {
@@ -11762,11 +11752,11 @@
       {
         "dimension": "Compliance",
         "id": "MOB-VI-9",
-        "l1": "No systemic risk or CRA compliance; AI infrastructure agents deploying general-purpose AI models lack Art. 51 systemic risk assessment and EU CRA Art. 13 software security conformity",
-        "l3": "Agent implements basic AI model risk assessment and software security controls, but does not address EU AI Act Art. 51 systemic risk provisions for GPAI or EU CRA Art. 13 conformity assessment for infrastructure software",
-        "l5": "Full EU AI Act Art. 51 systemic risk assessment for GPAI in infrastructure, EU CRA Art. 13 software security conformity, vulnerability handling per CRA Art. 14, SBOM maintenance, and coordinated vulnerability disclosure for AI infrastructure components",
-        "regulatoryRef": "EU AI Act Art. 51; EU CRA 2024/2847 Art. 13",
-        "text": "Does the agent implement EU AI Act Article 51 systemic risk assessment for general-purpose AI models deployed in virtual infrastructure and EU Cyber Resilience Act 2024/2847 Article 13 software security requirements?",
+        "l1": "No record of which hosted models are general-purpose models with systemic risk.",
+        "l3": "Such models are identified, but provider evidence is not requested or not retained.",
+        "l5": "Each hosted model's classification is recorded, provider evidence for each Art. 55(1) obligation (or the code of practice relied on under Art. 55(2)) is retained and reviewed when the model version changes, and incidents observed are passed to the provider.",
+        "regulatoryRef": "EU AI Act Art. 51; EU AI Act Art. 55(1)",
+        "text": "Where the agent hosts or orchestrates a general-purpose AI model with systemic risk (EU AI Act Art. 51), does it obtain and retain evidence that the model's provider meets its Art. 55(1) obligations: model evaluation including adversarial testing, systemic-risk assessment and mitigation, serious-incident reporting, and cybersecurity protection?",
         "weight": 12
       },
       {
@@ -11810,16 +11800,6 @@
         "weight": 12
       },
       {
-        "dimension": "Governance",
-        "id": "MOB-VI-14",
-        "l1": "No mapping governance: citations drift and evidence cannot be reliably mapped to specific controls/articles",
-        "l3": "Mapping exists but updates are manual and can lag regulatory changes",
-        "l5": "Versioned regulatory mapping with review workflow and automated checks for citation consistency and evidence linkage across the pack",
-        "regulatoryRef": "Regulatory mapping governance",
-        "text": "Does the program maintain a versioned regulatory mapping for the pack (FedRAMP Rev.5, NIS2 2022/2555, ISO 27001:2022, EU Data Act 2023/2854) with periodic review so legal/control citations and evidence expectations remain audit-defensible over time?",
-        "weight": 6
-      },
-      {
         "dimension": "Incident Reporting",
         "id": "MOB-VI-15",
         "l1": "No process to classify significant incidents or meet NIS2 reporting deadlines",
@@ -11828,6 +11808,26 @@
         "regulatoryRef": "EU NIS2 Directive 2022/2555 Art. 23",
         "text": "For significant incidents affecting the infrastructure the agent operates, does the provider meet NIS2 Directive 2022/2555 Article 23(4): an early warning within 24 hours, an incident notification within 72 hours and a final report within one month?",
         "weight": 8
+      },
+      {
+        "dimension": "Governance",
+        "id": "MOB-VI-16",
+        "l1": "No named overseer, no suspension criteria, and logs are not retained.",
+        "l3": "An overseer is named and logs are kept, but the retention period, suspension triggers or provider-notification path are not documented.",
+        "l5": "Named, trained overseers with authority to stop the system; documented and tested suspension triggers; logs retained for at least six months under a written policy; a runbook for informing the provider and authority.",
+        "regulatoryRef": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
+        "text": "Where the agent is a safety component in the management and operation of critical digital infrastructure (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), before 2 December 2027?",
+        "weight": 12
+      },
+      {
+        "dimension": "Resilience",
+        "id": "MOB-VI-17",
+        "l1": "Financial-entity customers are not identified, or their DORA continuity requirements are not mapped to the service.",
+        "l3": "DORA customers' requirements are mapped, but backup and restoration tests for their services are not evidenced or not shared.",
+        "l5": "For each DORA customer, response, recovery, backup and restoration arrangements are mapped to the contract, tested on schedule, and the test evidence is shared as the contract requires.",
+        "regulatoryRef": "EU DORA Art. 11; EU DORA Art. 12",
+        "text": "Where the customer is a financial entity under DORA, does the agent support that customer's ICT response and recovery arrangements (DORA Art. 11) and its backup, restoration and recovery requirements (Art. 12) with tested evidence the contract makes available?",
+        "weight": 12
       }
     ],
     "regulatoryBasis": [
