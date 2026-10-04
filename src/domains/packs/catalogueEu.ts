@@ -216,4 +216,8 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("etsi-en-301-549", "ETSI EN 301 549 V3.2.1 (2021-03) Accessibility requirements for ICT products and services", "EU", "standard", "in-force",
     "https://accessible-eu-centre.ec.europa.eu/content-corner/news/european-accessibility-standard-en-301-549-has-been-updated-2026-09-07_en",
     ["ETSI EN 301 549", "EN 301 549"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "AccessibleEU (European Commission) page of 2026-09-07: V4.1.1 was published in September 2026; until it is cited in the Official Journal the reference remains V3.2.1 (2021), based on WCAG 2.1 Level AA. ETSI's own page was not read." }),
+  verified("eu-ecgt", "Directive (EU) 2024/825 (empowering consumers for the green transition; amends Directives 2005/29/EC and 2011/83/EU)", "EU", "law", "in-force",
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
+    ["Directive (EU) 2024/825"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", milestones: milestones(["2026-09-27", "Member State measures apply (Art. 4(1)), incl. Annex I points 2a and 4a of Directive 2005/29/EC"]),
+    note: "EUR-Lex CELEX HTML read 2026-10-04 (Annex I points 2a, 4a; Art. 4(1)). Entry-into-force date not recorded here." }),
 ];

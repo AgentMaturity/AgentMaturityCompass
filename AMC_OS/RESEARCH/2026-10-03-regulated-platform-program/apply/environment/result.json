@@ -1,0 +1,1066 @@
+{
+ "task": "round-2 environment station apply",
+ "startHead": "67d73223897008ca4ed8baf81c970020b4bf944d",
+ "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_b05b1ca6-169-4",
+ "branch": "worktree-wf_b05b1ca6-169-4",
+ "environment": "darwin arm64, node v25.5.0, pnpm 10.33.0",
+ "questionsInOut": {
+  "in": 91,
+  "out": 97,
+  "note": "in = station file at 67d73223 (87 baseline + 4 S3 floor additions)"
+ },
+ "actionCounts": {
+  "content": {
+   "keep": 36,
+   "rewrite": 44,
+   "merge": 5,
+   "drop": 2,
+   "add": 9
+  },
+  "applied": {
+   "keepUnchanged": 33,
+   "keepRescopedSingleInstrument": 3,
+   "rewriteAsAuthored": 34,
+   "rewriteRescopedSingleInstrument": 10,
+   "merge": 5,
+   "drop": 2,
+   "addAsAuthored": 5,
+   "addRenumbered": 3,
+   "addDeclined": 1,
+   "splitAdds": 5,
+   "s3FloorKept": 4
+  }
+ },
+ "perPack": {
+  "farm-to-fork": {
+   "riskTier": "very-high",
+   "in": 16,
+   "out": 17,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    194,
+    201
+   ],
+   "weightRangeAfter": [
+    8,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Safety",
+     0.284
+    ],
+    [
+     "Safety",
+     0.274
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-FF-9"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-FF-1",
+     "ENV-FF-2",
+     "ENV-FF-3",
+     "ENV-FF-4",
+     "ENV-FF-8"
+    ],
+    []
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 4,
+     "weight": 44,
+     "weightShare": 0.227
+    },
+    "Ethics": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.103
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 23,
+     "weightShare": 0.119
+    },
+    "Safety": {
+     "count": 4,
+     "weight": 55,
+     "weightShare": 0.284
+    },
+    "Sustainability": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.062
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 30,
+     "weightShare": 0.155
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.052
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 4,
+     "weight": 44,
+     "weightShare": 0.219
+    },
+    "Ethics": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.1
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 23,
+     "weightShare": 0.114
+    },
+    "Safety": {
+     "count": 4,
+     "weight": 55,
+     "weightShare": 0.274
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.109
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 27,
+     "weightShare": 0.134
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.05
+    }
+   }
+  },
+  "material-to-machines": {
+   "riskTier": "high",
+   "in": 15,
+   "out": 16,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    175,
+    187
+   ],
+   "weightRangeAfter": [
+    8,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Compliance",
+     0.217
+    ],
+    [
+     "Compliance",
+     0.203
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-MM-9",
+     "ENV-MM-10"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-MM-1",
+     "ENV-MM-4",
+     "ENV-MM-9"
+    ],
+    [
+     "ENV-MM-10"
+    ]
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 3,
+     "weight": 38,
+     "weightShare": 0.217
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.069
+    },
+    "Governance": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.069
+    },
+    "Safety": {
+     "count": 3,
+     "weight": 37,
+     "weightShare": 0.211
+    },
+    "Security": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.137
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.126
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.114
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.057
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 3,
+     "weight": 38,
+     "weightShare": 0.203
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.064
+    },
+    "Governance": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.064
+    },
+    "Safety": {
+     "count": 2,
+     "weight": 25,
+     "weightShare": 0.134
+    },
+    "Security": {
+     "count": 3,
+     "weight": 36,
+     "weightShare": 0.193
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.118
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.107
+    },
+    "Transparency": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.118
+    }
+   }
+  },
+  "sip-to-sanitation": {
+   "riskTier": "critical",
+   "in": 15,
+   "out": 17,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    177,
+    201
+   ],
+   "weightRangeAfter": [
+    8,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Governance",
+     0.288
+    ],
+    [
+     "Governance",
+     0.254
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-STS-1",
+     "ENV-STS-5",
+     "ENV-STS-7",
+     "ENV-STS-8",
+     "ENV-STS-9",
+     "ENV-STS-10"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-STS-1",
+     "ENV-STS-2"
+    ],
+    []
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 3,
+     "weight": 33,
+     "weightShare": 0.186
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.056
+    },
+    "Governance": {
+     "count": 4,
+     "weight": 51,
+     "weightShare": 0.288
+    },
+    "Safety": {
+     "count": 2,
+     "weight": 29,
+     "weightShare": 0.164
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.136
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 18,
+     "weightShare": 0.102
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.068
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 4,
+     "weight": 45,
+     "weightShare": 0.224
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.05
+    },
+    "Governance": {
+     "count": 4,
+     "weight": 51,
+     "weightShare": 0.254
+    },
+    "Safety": {
+     "count": 2,
+     "weight": 29,
+     "weightShare": 0.144
+    },
+    "Security": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.06
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.119
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 18,
+     "weightShare": 0.09
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.06
+    }
+   }
+  },
+  "source-to-sustenance": {
+   "riskTier": "critical",
+   "in": 15,
+   "out": 15,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    184,
+    192
+   ],
+   "weightRangeAfter": [
+    10,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Compliance",
+     0.163
+    ],
+    [
+     "Safety",
+     0.208
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-SS-2",
+     "ENV-SS-3",
+     "ENV-SS-8",
+     "ENV-SS-9"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-SS-1",
+     "ENV-SS-2",
+     "ENV-SS-3",
+     "ENV-SS-12"
+    ],
+    []
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 3,
+     "weight": 30,
+     "weightShare": 0.163
+    },
+    "Ethics": {
+     "count": 2,
+     "weight": 25,
+     "weightShare": 0.136
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.13
+    },
+    "Safety": {
+     "count": 2,
+     "weight": 28,
+     "weightShare": 0.152
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 27,
+     "weightShare": 0.147
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 27,
+     "weightShare": 0.147
+    },
+    "Transparency": {
+     "count": 2,
+     "weight": 23,
+     "weightShare": 0.125
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 3,
+     "weight": 34,
+     "weightShare": 0.177
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 15,
+     "weightShare": 0.078
+    },
+    "Governance": {
+     "count": 3,
+     "weight": 36,
+     "weightShare": 0.188
+    },
+    "Safety": {
+     "count": 3,
+     "weight": 40,
+     "weightShare": 0.208
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 27,
+     "weightShare": 0.141
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 27,
+     "weightShare": 0.141
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 13,
+     "weightShare": 0.068
+    }
+   }
+  },
+  "ubiquity-to-utility": {
+   "riskTier": "critical",
+   "in": 15,
+   "out": 17,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    184,
+    212
+   ],
+   "weightRangeAfter": [
+    10,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Safety",
+     0.255
+    ],
+    [
+     "Safety",
+     0.241
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-UU-5",
+     "ENV-UU-9"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-UU-2",
+     "ENV-UU-3",
+     "ENV-UU-5",
+     "ENV-UU-8"
+    ],
+    []
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.12
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.054
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.13
+    },
+    "Safety": {
+     "count": 4,
+     "weight": 47,
+     "weightShare": 0.255
+    },
+    "Security": {
+     "count": 3,
+     "weight": 42,
+     "weightShare": 0.228
+    },
+    "Sustainability": {
+     "count": 1,
+     "weight": 15,
+     "weightShare": 0.082
+    },
+    "Traceability": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.065
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.065
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.104
+    },
+    "Ethics": {
+     "count": 1,
+     "weight": 10,
+     "weightShare": 0.047
+    },
+    "Governance": {
+     "count": 3,
+     "weight": 36,
+     "weightShare": 0.17
+    },
+    "Safety": {
+     "count": 4,
+     "weight": 51,
+     "weightShare": 0.241
+    },
+    "Security": {
+     "count": 3,
+     "weight": 42,
+     "weightShare": 0.198
+    },
+    "Sustainability": {
+     "count": 1,
+     "weight": 15,
+     "weightShare": 0.071
+    },
+    "Traceability": {
+     "count": 2,
+     "weight": 24,
+     "weightShare": 0.113
+    },
+    "Transparency": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.057
+    }
+   }
+  },
+  "weave-to-wear": {
+   "riskTier": "high",
+   "in": 15,
+   "out": 15,
+   "floor15": true,
+   "totalWeightBeforeAfter": [
+    168,
+    172
+   ],
+   "weightRangeAfter": [
+    8,
+    15
+   ],
+   "largestDimensionShareBeforeAfter": [
+    [
+     "Safety",
+     0.214
+    ],
+    [
+     "Ethics",
+     0.215
+    ]
+   ],
+   "compoundRefsBeforeAfter": [
+    [
+     "ENV-WW-4",
+     "ENV-WW-9"
+    ],
+    []
+   ],
+   "aspirationalLevelIdsBeforeAfter": [
+    [
+     "ENV-WW-1",
+     "ENV-WW-2",
+     "ENV-WW-3",
+     "ENV-WW-4",
+     "ENV-WW-6",
+     "ENV-WW-7"
+    ],
+    []
+   ],
+   "dimensionsBefore": {
+    "Compliance": {
+     "count": 3,
+     "weight": 30,
+     "weightShare": 0.179
+    },
+    "Ethics": {
+     "count": 2,
+     "weight": 25,
+     "weightShare": 0.149
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 25,
+     "weightShare": 0.149
+    },
+    "Safety": {
+     "count": 3,
+     "weight": 36,
+     "weightShare": 0.214
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.119
+    },
+    "Traceability": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.071
+    },
+    "Transparency": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.119
+    }
+   },
+   "dimensionsAfter": {
+    "Compliance": {
+     "count": 2,
+     "weight": 22,
+     "weightShare": 0.128
+    },
+    "Ethics": {
+     "count": 3,
+     "weight": 37,
+     "weightShare": 0.215
+    },
+    "Governance": {
+     "count": 2,
+     "weight": 25,
+     "weightShare": 0.145
+    },
+    "Safety": {
+     "count": 3,
+     "weight": 36,
+     "weightShare": 0.209
+    },
+    "Sustainability": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.116
+    },
+    "Traceability": {
+     "count": 1,
+     "weight": 12,
+     "weightShare": 0.07
+    },
+    "Transparency": {
+     "count": 2,
+     "weight": 20,
+     "weightShare": 0.116
+    }
+   }
+  }
+ },
+ "refPartsAgainstCatalogue": {
+  "before": {
+   "resolved": 66,
+   "unresolved": 42,
+   "status": {
+    "unverified": 72,
+    "in-force": 36
+   }
+  },
+  "afterContentAndCatalogue": {
+   "resolved": 70,
+   "unresolved": 27,
+   "status": {
+    "unverified": 48,
+    "in-force": 48,
+    "applies-from": 1
+   }
+  },
+  "unresolvedAfter": [
+   "ENV-FF-5: EU Regulation (EU) 1169/2011 Art. 21, Annex II",
+   "ENV-FF-6: Regulation (EU) No 1169/2011 Art. 30-35",
+   "ENV-FF-7: Directive (EU) 2019/633 Art. 3",
+   "ENV-MM-4: Regulation (EU) 2017/1369 and applicable delegated regulations",
+   "ENV-MM-5: EU Conflict Minerals Regulation 2017/821 Art. 4",
+   "ENV-MM-9: IEC 62443-3-3:2013",
+   "ENV-MM-11: IEC 62443-3-3 SR 1.1",
+   "ENV-STS-12: HELCOM BSAP",
+   "ENV-STS-13: WHO GDWQ (4th ed.) §4.1",
+   "ENV-SS-3: PEFC ST 2002:2020",
+   "ENV-SS-4: UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
+   "ENV-SS-7: EU EIA Directive 2011/92/EU Art. 5",
+   "ENV-SS-8: EU IAS Regulation 1143/2014 Art. 5",
+   "ENV-SS-9: CBD Decision 16/2, annex paragraphs 3 and 15",
+   "ENV-SS-10: CBD Art. 8(j)",
+   "ENV-SS-13: FAO Code of Conduct Art. 7.2",
+   "ENV-SS-18: EU IAS Regulation 1143/2014 (early detection and rapid eradication)",
+   "ENV-UU-8: IEC 62933-5-2 — Safety requirements for grid-connected EES systems",
+   "ENV-UU-9: NERC PRC-029-1",
+   "ENV-UU-11: IEC 62351-8",
+   "ENV-UU-12: IEC 61850",
+   "ENV-UU-18: NERC MOD-026-2",
+   "ENV-WW-3: ZDHC Wastewater Guidelines",
+   "ENV-WW-4: ILO Convention C029 Art. 2",
+   "ENV-WW-10: ILO Convention C138 Arts. 2–3",
+   "ENV-WW-11: OECD DDG Garment & Footwear Sector §III",
+   "ENV-WW-16: ILO Convention C182 Art. 3"
+  ],
+  "repealedAfter": 0
+ },
+ "deepQuestions": {
+  "added": [
+   "environment-deep-11",
+   "environment-deep-12",
+   "environment-deep-13",
+   "environment-deep-14",
+   "environment-deep-15",
+   "environment-deep-16",
+   "environment-deep-17"
+  ],
+  "declined": [
+   "content environment-deep-13 (CBD Decision 16/2)"
+  ],
+  "allVerifiedSources": true
+ },
+ "refuterFixes": [
+  {
+   "fix": "Required 1: pack floor 15 (WW and SS at 13 in the content)",
+   "applied": true,
+   "note": "Floor holds: farm-to-fork 17, weave-to-wear 15, material-to-machines 16, source-to-sustenance 15, ubiquity-to-utility 17, sip-to-sanitation 17. WW and SS reach 15 via single-instrument splits (WW-16, SS-17, SS-18), not padding. Current regulatorySchema.ts PACK_QUESTION_FLOOR = 15 (src/domains/packs/regulatorySchema.ts:90). The content's 'floor of 13' statements are superseded by this receipt (content files are read-only inputs)."
+  },
+  {
+   "fix": "Required 2: renumber deep 06-13 to the next free S4 ids",
+   "applied": true,
+   "note": "Applied as environment-deep-11..17 (01..10 exist at src/domains/deep/environment.ts). Content deep-13 (CBD Decision 16/2) declined: its only source is cbd.int, not on the deep test's official-host list (tests/deepIndustryPacksStations.test.ts:20); widening that list to pass would be the §13 anti-pattern. Links: deep-11 -> ENV-UU-17, deep-12 -> ENV-UU-14, deep-13 -> ENV-FF-18, deep-14 -> ENV-STS-16, deep-15 -> ENV-WW-5, deep-16 -> ENV-FF-15/ENV-SS-16, deep-17 -> ENV-MM-16."
+  },
+  {
+   "fix": "Required 3: state the real aspirational regex",
+   "applied": true,
+   "note": "This run's regex (scratchpad stats.py, same in tests/industryPacks-environment.test.ts minus 'fully autonomous'/'blockchain-anchored' which the base terms already match): \\b(autonomous(ly)?|fully autonomous|predict(ive|s|ion)?|cryptographic(ally)?|blockchain(-anchored)?|AI-powered|self-evolving|fully automated|immutable|sub-second)\\b over l1/l3/l5. Measured at 67d73223: 24 questions; after: 1 (ENV-MM-10, Machinery Regulation term, allowed in the test)."
+  },
+  {
+   "fix": "Required 4: correct the Art. 14 source note",
+   "applied": true,
+   "note": "Corrected note for ENV-UU-5, ENV-UU-16, ENV-STS-17 (content STS-16) and anchor[1]: 'AI Act Service Desk Art. 14, consolidated as at 27 Jul 2026 (Digital Omnibus on AI); the 2026/1744 number is cited on the Art. 113 page, not this one.' Recorded here; no code cites the note text."
+  },
+  {
+   "fix": "Required 5: 2024/825 source -> CELEX HTML and Art. 4(1)",
+   "applied": true,
+   "note": "Read this run; environment-deep-15 source and catalogue eu-ecgt use https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825 with Art. 4(1) 27 Sep 2026."
+  },
+  {
+   "fix": "Recommended: split ENV-STS-8 / ENV-UU-9 / ENV-UU-5 to one instrument each",
+   "applied": true,
+   "note": "STS-8 -> NIST SP 800-82 Rev. 3 + new STS-18 (NIS2); UU-9 -> PRC-029-1 + new UU-18 (MOD-026-2), FERC Order No. 901 dropped from the ref (it directs NERC, it binds no entity); UU-5 -> AI Act Art. 14(4)(d)-(e) only (IEEE 2030 dropped: interoperability guide, does not anchor override). Also re-scoped to one ref part: WW-4 (+WW-16), SS-2 (+SS-17), SS-3 (PEFC only; FSC v5.3 Principle 8 is not a chain-of-custody clause), SS-8 (+SS-18, CBD VI/23 dropped), UU-14 (Order 912 clause dropped), STS-1 (WHO fallback dropped), STS-2 (ref = recast), STS-5 (one MARPOL ref), STS-7 (ISO 24510), STS-10 (ref = Subpart Z; proposals stay in the text as tracked state)."
+  },
+  {
+   "fix": "Recommended: refresh S3 line refs in summary.md",
+   "applied": false,
+   "note": "summary.md is a read-only input; superseded by this receipt."
+  }
+ ],
+ "otherDecisions": [
+  "Content WW-14 (ESPR destruction ban) not added: S3 floor commit 20b69fb4 already added ENV-WW-15 asking the same control with ESPR Arts. 24-25/Annex VII.",
+  "Content adds renumbered past S3 floor ids: MM-15 -> ENV-MM-16 (CRA), STS-15 -> ENV-STS-16 (SDWA 1433), STS-16 -> ENV-STS-17 (AI Act). S3 floor questions WW-14, WW-15, MM-15, STS-15 kept unchanged.",
+  "D6 dimension moves applied as authored (MM-4 Safety -> Transparency, UU-9 Security -> Safety).",
+  "Assurance anchors: 'retire keyword checks' DECLINED (retiring loosens grading); replaced by additive ENV_UNSAFE_ACTION_TAKEN and ENV_ACTION_RECORD_MISSING. The /isolate/ pattern not matching 'isolation' is left as is (widening it would loosen). Manifest edits (industryPackManifest.ts anchors, NIS2 sector wording, EU_AI_OMNIBUS url) NOT applied: file outside this task's write set.",
+  "Stale '// GAP-x: <citation>' comments above 8 questions re-labelled to the new regulatoryRef (FF-11, FF-15, MM-10, MM-13, SS-11, UU-13, UU-14, STS-11).",
+  "Catalogue (append-only, one commit each): us-fsma-traceability, us-fsma-pchf, us-pfas-npdwr, us-sdwa-1433, us-nist-sp800-82 (catalogueUs.ts); eu-ecgt (catalogueEu.ts; import line gains 'verified'). Not added: NERC PRC-029-1/MOD-026-2/CIP-015-1 (compliance dates in NERC implementation plans not read), FERC orders, Regulation (EU) 1169/2011, 2019/633, 2017/1369 (EUR-Lex unreachable), CBD/ILO/PEFC (no allowed host)."
+ ],
+ "sourcesReadThisRun": [
+  {
+   "title": "Directive (EU) 2024/825 (EUR-Lex CELEX HTML)",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Annex I point 2a (sustainability label not based on a certification scheme or established by public authorities), point 4a (generic environmental claim without recognised excellent environmental performance); Art. 4(1): measures apply from 27 Sep 2026."
+  },
+  {
+   "title": "42 U.S.C. 300i-2 (U.S. Code 2023, govinfo)",
+   "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap6A-subchapXII-partD-sec300i-2.htm",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": ">3,300 persons; (a)(1)(A)(ii) electronic, computer or other automated systems incl. security; (b)(1) ERP strategies incl. physical security and cybersecurity."
+  },
+  {
+   "title": "21 CFR 1.1455 (CFR 2025 edition, govinfo)",
+   "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Records to FDA within 24 hours; electronic sortable spreadsheet for §§1.1325-1.1350 information."
+  },
+  {
+   "title": "FERC Order No. 907, CIP-015-1 (Federal Register 2025-12309, govinfo)",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2025-07-02/html/2025-12309.htm",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Approves CIP-015-1, effective 2 Sep 2025; scope high impact BCS with/without ERC and medium impact BCS with ERC; R1 detect/evaluate, R2 retain, R3 protect INSM data."
+  },
+  {
+   "title": "FERC Order No. 912 (Federal Register 2025-18394, govinfo)",
+   "url": "https://www.govinfo.gov/content/pkg/FR-2025-09-23/html/2025-18394.htm",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Effective 24 Nov 2025; describes CIP-013-2 as currently effective and software integrity and authenticity as an objective. Does not quote R1 Part 1.2.5 text."
+  },
+  {
+   "title": "NIST SP 800-82 Rev. 3 (CSRC)",
+   "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Final, September 2023, supersedes Rev. 2; Rev. 4 initial public draft open for comment. Segmentation/monitoring content not shown on the landing page."
+  },
+  {
+   "title": "DG ENV: Nature Restoration Regulation",
+   "url": "https://environment.ec.europa.eu/topics/nature-and-biodiversity/nature-restoration-regulation_en",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "32024R1991; national restoration plans due to the Commission by Sep 2026; Member States monitor and report. Article numbers not on the page."
+  },
+  {
+   "title": "DG ENV: Invasive alien species",
+   "url": "https://environment.ec.europa.eu/topics/nature-and-biodiversity/invasive-alien-species_en",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Regulation (EU) 1143/2014: Union list, risk assessments, prevention, early detection and rapid eradication, management. Article numbers not on the page."
+  },
+  {
+   "title": "eCFR structure API: 40 CFR Part 141 Subpart Z",
+   "url": "https://www.ecfr.gov/api/versioner/v1/structure/current/title-40.json?part=141&subpart=Z",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Subpart Z 'Control of PFAS', §§141.900-141.905."
+  },
+  {
+   "title": "Federal Register API: final rules affecting 21 CFR Part 117",
+   "url": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Btype%5D%5B%5D=RULE&conditions%5Bcfr%5D%5Btitle%5D=21&conditions%5Bcfr%5D%5Bpart%5D=117",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Listing read; part current."
+  },
+  {
+   "title": "Access2Markets: EUDR delay to Dec 2026",
+   "url": "https://trade.ec.europa.eu/access-to-markets/en/news/delay-until-december-2026-and-other-developments-implementation-eudr-regulation",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Re-read: 2025/2650; 30 Dec 2026 / 30 Jun 2027; downstream reference number; 5-year records."
+  },
+  {
+   "title": "DG CNECT: CRA reporting",
+   "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-reporting",
+   "retrievedAt": "2026-10-04",
+   "verified": true,
+   "note": "Re-read: from 11 Sep 2026; 24h/72h; final report 14 days / one month; Single Reporting Platform."
+  }
+ ],
+ "unverified": [
+  {
+   "item": "ENV-WW-4 ILO C029 Art. 2 and ENV-WW-16 ILO C182 Art. 3",
+   "reason": "normlex.ilo.org returned HTTP 403 on 2026-10-04; article numbers from the content/baseline, not confirmed."
+  },
+  {
+   "item": "ENV-SS-3 PEFC ST 2002:2020 currency",
+   "reason": "pefc.org returned HTTP 403 on 2026-10-04."
+  },
+  {
+   "item": "ENV-SS-8 / ENV-SS-18 Regulation (EU) No 1143/2014 article numbers (Art. 5 kept from baseline; SS-18 cites no article)",
+   "reason": "EUR-Lex CELEX HTML returned an empty page on 2026-10-04; substance read on the DG ENV page only."
+  },
+  {
+   "item": "ENV-SS-17 Regulation (EU) 2024/1991 article numbers (none cited)",
+   "reason": "EUR-Lex empty on 2026-10-04; DG ENV page read."
+  },
+  {
+   "item": "ENV-UU-9 PRC-029-1 and ENV-UU-18 MOD-026-2 requirement text",
+   "reason": "Approval records read by the content author (FR 2025-14304, 2026-03659); requirement text and compliance dates not read. Questions ask for a check/record against the entity's settings/process, not a specific requirement number."
+  },
+  {
+   "item": "ENV-STS-8 NIST SP 800-82 Rev. 3 segmentation/monitoring content",
+   "reason": "Only the CSRC landing page was read."
+  },
+  {
+   "item": "environment-deep-12 CIP-013-2 Part 1.2.5 number",
+   "reason": "From the NERC PDF read by the content author; the govinfo source read here describes the objective, not the part number."
+  },
+  {
+   "item": "environment-deep-13 / FF-18 20 Jul 2028 FDA traceability date",
+   "reason": "ENV-FF-18 text states the 20 Jul 2028 date from fda.gov (content author's read, verified there); not re-read on an allowed-host page here and not put in the catalogue entry or deep-13 source."
+  },
+  {
+   "item": "All content-author sources not re-read",
+   "reason": "Sources in round2/content/environment/questions.json marked verified:true were read by the content author on 2026-10-04 and re-checked by the refuter (34 of 50 URLs); this run re-read only the 12 listed in sourcesReadThisRun."
+  }
+ ],
+ "outOfScopeRedCausedByCountChange": [
+  {
+   "test": "tests/industryPackDepthFloor.test.ts > docs/DOMAIN_PACKS.md sector-pack counts match the registry",
+   "atBase": "pass",
+   "needs": "docs/DOMAIN_PACKS.md:37 '| `environment` | 6 | 91 |' -> '| `environment` | 6 | 97 |'; :44 total 632 -> 638 (if no other station changes)"
+  },
+  {
+   "test": "tests/publicQuestionCountDrift.test.ts > industry station pages match compiled sector-pack counts",
+   "atBase": "pass",
+   "needs": "website/station-environment.html:7,49 '6 packs · 91 questions' / '6 diagnostic packs · 91 questions' -> 97"
+  },
+  {
+   "test": "tests/publicQuestionCountDrift.test.ts > whitepaper uses current product runtime counts",
+   "atBase": "pass",
+   "needs": "whitepaper/AMC_WHITEPAPER_v1.md:22,248,262,853,1157: 632 -> 638 and 876 -> 882 (test expects '244 default diagnostic questions plus 638 sector-specific questions' and '882 questions (244 default + 638 sector-specific)')"
+  }
+ ],
+ "verification": {
+  "candidateCommit": "6d7153f67a0ef9de75a65f858ef2a253cc064f81",
+  "freshClone": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/39a2e918-fc29-48df-9148-bb8801c84571/scratchpad/envapply/clone-6d7153f6 (git clone --no-hardlinks of the worktree; pnpm install --frozen-lockfile --prefer-offline)",
+  "focusedTests": "17 files: 15 passed, 2 failed; 933 tests: 930 passed, 3 failed (the three out-of-scope doc/website/whitepaper count drifts listed; all three pass at 67d73223 in the same clone)",
+  "typecheck": "pnpm typecheck exit=0 (fresh clone); no diagnostics in the worktree run",
+  "typecheckTests": "pnpm typecheck:tests exit=0 (fresh clone); no diagnostics in the worktree run",
+  "notRun": "full suite, release gate, generators other than the environment-only snapshot regeneration, pnpm build"
+ },
+ "mutations": [
+  {
+   "guard": "tests/industryPacks-environment.test.ts single instrument",
+   "mutation": "ENV-WW-16 ref -> \"ILO Convention C182 Art. 3; ILO Convention C138\"",
+   "red": "1 failed",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "tests/industryPacks-environment.test.ts decidable levels",
+   "mutation": "ENV-SS-18 l1 -> \"Detections are fully automated with predictive alerts\"",
+   "red": "1 failed",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "pack floor (env test + industryPackDepthFloor)",
+   "mutation": "delete ENV-SS-18 (SS 15 -> 14)",
+   "red": "3 failed",
+   "restoredGreen": "5 passed"
+  },
+  {
+   "guard": "deep official-host test",
+   "mutation": "environment-deep-11 url -> nerc.com PDF",
+   "red": "1 failed",
+   "restoredGreen": "9 passed"
+  },
+  {
+   "guard": "environmentalInfra fail-closed wrapper",
+   "mutation": "validate bypasses gradeIndustryEvidence",
+   "red": "empty-reply cases RED in environmentalInfraPack.test.ts and industryPackFailClosed.test.ts",
+   "restoredGreen": "18 passed"
+  },
+  {
+   "guard": "ENV_UNSAFE_ACTION_TAKEN",
+   "mutation": "detector disabled",
+   "red": "9 failed",
+   "restoredGreen": "18 passed"
+  },
+  {
+   "guard": "each of 9 UNSAFE_ACTION patterns",
+   "mutation": "remove one pattern line at a time",
+   "red": "1 failed each (9/9 killed)",
+   "restoredGreen": "30 passed"
+  },
+  {
+   "guard": "ENV_ACTION_RECORD_MISSING",
+   "mutation": "record check disabled",
+   "red": "1 failed",
+   "restoredGreen": "18 passed"
+  },
+  {
+   "guard": "catalogue official-host validator",
+   "mutation": "us-nist-sp800-82 url -> nerc.com",
+   "red": "industryPackSchema 1 failed",
+   "restoredGreen": "10 passed"
+  }
+ ]
+}
