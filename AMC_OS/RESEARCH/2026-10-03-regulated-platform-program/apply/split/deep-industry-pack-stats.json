@@ -61,13 +61,17 @@
     "unverifiedSources": 3
   },
   "technology": {
-    "questionCount": 10,
+    "questionCount": 16,
     "regulations": [
       "EU AI Act",
       "Cyber Resilience Act",
       "Digital Services Act",
       "Data Act",
-      "GDPR"
+      "GDPR",
+      "Digital Markets Act",
+      "NIS2 Directive",
+      "Copyright in the Digital Single Market Directive",
+      "COPPA Rule"
     ],
     "station": "technology",
     "unverifiedSources": 0
