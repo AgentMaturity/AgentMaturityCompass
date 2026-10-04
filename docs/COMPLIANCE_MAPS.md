@@ -146,6 +146,75 @@ strings: 31 resolve and 193 do not. The 193 are committed in
 `tests/packFrameworkAliases.test.ts` fails if the set changes, so a pack edit
 that adds a framework string must update the fixture or a family.
 
+On 2026-10-04 nine aliases were added for the regulatory register ids
+(`src/compliance/regulatory/register.json`: `eu-dora`, `eu-nis2`,
+`us-nist-ai-600-1`, `us-co-sb24-205`, `us-co-sb26-189`) and the official
+instrument names (`Regulation (EU) 2022/2554`, `Digital Operational Resilience
+Act`, `Directive (EU) 2022/2555`, `Implementing Regulation (EU) 2024/2690`).
+No pack string changed resolution: 224 distinct, 31 resolved, 193 unresolved
+before and after (measured with `npx tsx` over `listIndustryPacks()`).
+
+### Clause-level controls
+
+A built-in mapping covers a category; `src/compliance/frameworks/controls.ts`
+lists the clauses under it. Each control quotes one clause of an official text
+and names the built-in mappings whose evidence covers it. Rows are validated by
+`frameworkControlSchema` (`src/compliance/mappingSchema.ts`):
+
+- `sourceUrl`, `retrievedAt` and `verified` on every row. `verified` means the
+  text was string-checked against `sourceUrl` as read on `retrievedAt`.
+- `textKind` is `verbatim`, `verbatim-excerpt` or `paraphrase`. A paraphrase
+  can never be `verified`, and an unverified row must give `unverifiedReason`.
+- `status` is `law`, `proposed` or `guidance`.
+- each mapping's `coverage` is `partial` (its evidence addresses part of the
+  clause) or `supporting` (it only overlaps the clause: a mapping written for
+  another clause or another framework). No control is fully covered.
+
+The rows were applied on 2026-10-04 from the round-2 framework mappings
+(`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/frameworks/`)
+with the refuters' required fixes, by
+`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/gen-controls.py`.
+Counts from that run (`apply/frameworks/counts.json`):
+
+| Framework | Controls | Verified | Mapped (partial / supporting only) | Unmapped | Status |
+| --- | --- | --- | --- | --- | --- |
+| DORA | 56 | 55 | 31 (15 / 16) | 25 | law |
+| NIS2 | 89 | 89 | 43 (43 / 0) | 46 | law |
+| NIST_AI_600_1 | 12 | 12 | 7 (5 / 2) | 5 | guidance |
+| NIST_AI_RMF | 49 | 49 | 43 (33 / 10) | 6 | guidance |
+| CO_AI_ACT | 11 | 11 | 8 (5 / 3) | 3 | law |
+| TX_TRAIGA | 10 | 10 | 6 (5 / 1) | 4 | law |
+| CA_AI_LAWS | 15 | 15 | 9 (7 / 2) | 6 | law |
+| HHS_HTI_1 | 19 | 19 | 15 (12 / 3) | 4 | law |
+| HIPAA | 29 | 29 | 22 (17 / 5) | 7 | proposed |
+
+Notes on the rows:
+
+- DORA: of the 16 supporting-only controls, 9 have a DORA mapping written for
+  another article and 7 have only other frameworks' mappings. The one
+  unverified row, `RTS-2025/1190`, paraphrases the TLPT RTS article headings.
+  Delegated Regulation (EU) 2024/1502 Art. 7 defers sub-criterion 1.4 to
+  16 January 2025; no control row depends on that date.
+- NIS2: the Directive rows were read from the Publications Office text and the
+  Implementing Regulation (EU) 2024/2690 rows from the EUR-Lex OJ PDF. The
+  refuter could not re-fetch that PDF on 2026-10-04 (HTTP 202, empty body), so
+  those rows rest on the copy read by the author. IR Art. 15 (repeal of
+  Regulation 2018/151) has no row.
+- NIST: the 12 risk rows sit on the NIST_AI_600_1 risk categories; the 49 AI
+  RMF subcategory rows are quoted as NIST AI 600-1 §3 reproduces them and sit on
+  the NIST_AI_RMF functions. The suggested actions are not carried.
+- HIPAA: every row quotes the Security Rule NPRM (90 FR 898, 2025-01-06), a
+  proposed rule. The current 45 CFR 164.302-318 text stays the obligation.
+- HHS_HTI_1: the HTI-5 proposed rule would revise or remove several of these
+  criteria; whether it was finalized is unverified.
+
+Not applied: ISO/IEC 42005 and 42006 (descoped above; their 132 round-2 rows
+are all unverified clause headings), NYC Local Law 144 (4 rows) and the
+Illinois Human Rights Act AI amendment (2 rows, both unverified paraphrases),
+because neither is a framework family and adding a family is outside this
+change, the 13 FDA rows (no FDA family), the obligations-for-agents files, the
+calendars and the gap notes.
+
 ### Coverage score
 
 `coverageScore` weights SATISFIED 1, PARTIAL 0.5, MISSING 0 and UNKNOWN 0

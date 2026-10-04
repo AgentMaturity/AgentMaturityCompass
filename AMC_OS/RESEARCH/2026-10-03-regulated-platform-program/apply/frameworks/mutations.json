@@ -1,0 +1,82 @@
+[
+  {
+    "guard": "alias eu-dora -> DORA",
+    "mutation": "src/compliance/frameworks/aliases.ts: replace first '\"eu-dora\": \"DORA\", ' with ''",
+    "test": "tests/packFrameworkAliases.test.ts",
+    "red": "exit 1: 1 failed | 64 passed (65)",
+    "restoredGreen": "exit 0: 65 passed (65)",
+    "ok": true
+  },
+  {
+    "guard": "schema: paraphrase cannot be verified",
+    "mutation": "src/compliance/mappingSchema.ts: replace first '.refine((row) => row.textKind !== \"paraphrase\" || !row.verified,' with '.refine((row) => true || !row.verified,'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "schema: unverified control must say why",
+    "mutation": "src/compliance/mappingSchema.ts: replace first '.refine((row) => row.verified || row.unverifiedReason !== undefined,' with '.refine((row) => true || row.unverifiedReason !== undefined,'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "mapping id exists",
+    "mutation": "src/compliance/frameworks/controls/dora.ts: replace first '\"mappingId\": \"dora_art5_governance\"' with '\"mappingId\": \"dora_art5_governance_x\"'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "category is a family category",
+    "mutation": "src/compliance/frameworks/controls/dora.ts: replace first '\"category\": \"Art. 5 Governance and organisation\"' with '\"category\": \"Art. 5 Governance\"'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "official publisher host",
+    "mutation": "src/compliance/frameworks/controls/nis2.ts: replace first 'https://eur-lex.europa.eu/' with 'https://eur-lex.example.org/'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "framework without a verified control",
+    "mutation": "src/compliance/frameworks/controls/dora.ts: replace first '\"controlId\": \"RTS-2025/1190\", \"framework\": \"DORA\"' with '\"controlId\": \"RTS-2025/1190\", \"framework\": \"KR_AI_BASIC_ACT\"'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 2 failed | 23 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "ISO 42005 descoped",
+    "mutation": "src/compliance/frameworks/controls/dora.ts: replace first '\"title\": \"Internal governance and control framework for ICT risk\"' with '\"title\": \"Internal governance (ISO/IEC 42005) for ICT risk\"'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "HIPAA rows marked proposed",
+    "mutation": "src/compliance/frameworks/controls/hhsHti1Hipaa.ts: replace first '\"status\": \"proposed\"' with '\"status\": \"law\"'",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 1 failed | 24 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  },
+  {
+    "guard": "per-framework counts pinned",
+    "mutation": "src/compliance/frameworks/controls.ts: replace first '  ...usStateAiLawControls,\\n' with ''",
+    "test": "tests/frameworksControls.test.ts",
+    "red": "exit 1: 4 failed | 21 passed (25)",
+    "restoredGreen": "exit 0: 25 passed (25)",
+    "ok": true
+  }
+]
