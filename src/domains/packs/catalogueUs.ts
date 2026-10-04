@@ -95,4 +95,9 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       lastReviewed: "2026-10-04", retrievedAt: "2026-10-04",
       note: "Section heading and (a) read on govinfo.gov (US Code 2023 edition) 2026-10-04.",
     }),
+  verified("us-fec-89fr78785", "FEC interpretive rule, Fraudulent Misrepresentation of Campaign Authority, 89 FR 78785 (26 Sep 2024)", "US", "guidance", "in-force",
+    "https://www.federalregister.gov/api/v1/documents/2024-21983.json", ["FEC interpretive rule 89 FR 78785", "89 FR 78785"], {
+      lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", effectiveDate: "2024-09-26",
+      note: "Federal Register API read 2026-10-04: agency FEC, published and effective 2024-09-26; the abstract does not mention AI.",
+    }),
 ];
