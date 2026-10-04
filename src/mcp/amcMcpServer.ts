@@ -40,6 +40,7 @@ import { clockListing, loadIncidentClocks, parseIsoTimestamp, parseStation } fro
 import { parseWindowToMs } from "../utils/time.js";
 import { agentRunClaim, unboundClaim, withClaim } from "./mcpClaimOutput.js";
 import { a4ToolMetadata, registerA4Tools } from "./a4Tools.js";
+import { registerIndustryPackTools } from "./industryPackTools.js";
 
 // ---------------------------------------------------------------------------
 // Simple in-process rate limiter
@@ -665,6 +666,8 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
       }
     }
   );
+
+  registerIndustryPackTools(server, { beforeCall: enforceRateLimit });
 
   // -------------------------------------------------------------------------
   // Tool: amc_incident_clocks (P1-17)
