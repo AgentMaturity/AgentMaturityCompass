@@ -92,4 +92,8 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     ["Cal. Bus. & Prof. Code §22584"],
     "Read on the Legislature's official code site (leginfo.legislature.ca.gov, codes_displaySection BPC 22584) on 2026-10-04 per round2/content/education/questions.json; that host is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."),
     lastReviewed: "2026-10-04" },
+  { ...unverified("us-co-sb26-189", "Colorado SB26-189 Automated Decision-Making Technology (Session Laws 2026, ch. 131)", "US-CO", "law",
+    ["Colorado SB26-189"],
+    "Bill page read on leg.colorado.gov 2026-10-04 per round2/content/education/questions.json: act effective 2026-05-14; developer documentation duties from 2027-01-01; deployer-duty start date not stated; enacted text not read. Host is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."),
+    lastReviewed: "2026-10-04" },
 ];
