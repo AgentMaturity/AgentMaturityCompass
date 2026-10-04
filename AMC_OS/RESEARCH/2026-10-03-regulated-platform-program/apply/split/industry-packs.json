@@ -648,7 +648,7 @@
       "ISO 9241-210:2019"
     ],
     "description": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
-    "euAIActClassification": "Annex III point 5(a) (eligibility for essential public assistance benefits; obligations from 2 Dec 2027); deployer duties Arts 26-27, explanation Art. 86, interaction disclosure Art. 50(1)",
+    "euAIActClassification": "Annex III §5(a) — eligibility for essential public assistance benefits (obligations from 2 Dec 2027); deployer duties Arts 26-27, explanation Art. 86, interaction disclosure Art. 50(1)",
     "id": "citizen-services",
     "keyRisks": [
       "Systemic service denial for vulnerable populations through AI gatekeeping",
@@ -1579,7 +1579,7 @@
       "NIST AI RMF 1.0"
     ],
     "description": "Contextual data interpretation moving from master data through meta, empirical, analytical, to contextual intelligence — profiled, personalized, and preferentiated — AI agents that transform raw data into actionable, trusted intelligence with explainability and bias controls.",
-    "euAIActClassification": "Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
+    "euAIActClassification": "General Purpose AI — Chapter V obligations for general-purpose AI models (Art. 53; Art. 51 classification with systemic risk) where the agent provides or integrates a GPAI model; Art. 50 transparency for systems interacting with natural persons",
     "id": "cognition-to-intelligence",
     "keyRisks": [
       "Discriminatory automated decisions affecting rights per GDPR Art. 22",
@@ -1868,7 +1868,7 @@
       "EU Political Advertising Regulation"
     ],
     "description": "Electing candidates representing constituent aspirations in the process of governing — AI agents supporting democratic processes, voter engagement, electoral integrity, and political communication with strict safeguards against manipulation and disinformation.",
-    "euAIActClassification": "Annex III point 8(b) (influencing the outcome of an election or referendum or voting behaviour; obligations from 2 Dec 2027); prohibited under Art. 5(1)(a)-(b) where techniques are manipulative or exploit vulnerabilities",
+    "euAIActClassification": "Annex III §8(b) — influencing the outcome of an election or referendum or voting behaviour (obligations from 2 Dec 2027); PROHIBITED under Art. 5(1)(a)-(b) where techniques are manipulative or exploit vulnerabilities",
     "id": "dance-of-democracy",
     "keyRisks": [
       "Electoral manipulation through micro-targeted AI political messaging",
@@ -2489,7 +2489,7 @@
       "Council of Europe AI Convention 2024"
     ],
     "description": "Citizen data tied with digital identity and tagged with government identities — supporting tax, travel documents, and rights to private and secure data — AI agents managing digital identity ecosystems, citizen data rights, and public trust infrastructure.",
-    "euAIActClassification": "Annex III point 1(a) remote biometric identification (biometric verification that only confirms a claimed identity is excluded) and point 5(a) where identity gates public assistance benefits; Annex III obligations apply from 2 Dec 2027; Art. 5(1)(c), (g), (h) prohibitions apply now",
+    "euAIActClassification": "Annex III §1(a) — remote biometric identification (biometric verification that only confirms a claimed identity is excluded) and §5(a) — where identity gates public assistance benefits; Annex III obligations apply from 2 Dec 2027; PROHIBITED under Art. 5(1)(c), (g), (h) where those practices apply now",
     "id": "digital-citizens-rights",
     "keyRisks": [
       "Mass surveillance through digital identity AI integration",
@@ -8759,7 +8759,7 @@
       "OECD AI Principles"
     ],
     "description": "Connecting public institutions (national/state governments, WHO, UN) and private institutions in growth-oriented transformations — AI agents orchestrating public-private partnerships for sustainable development with accountability, anti-corruption safeguards, and equitable value distribution.",
-    "euAIActClassification": "Depends on use case; not Annex III point 8. Annex III point 5 applies only where the agent evaluates eligibility for public assistance (5(a)) or similar listed uses; the GPAI systemic-risk designation applies to models, not to this pack's use cases",
+    "euAIActClassification": "Not listed in Annex III by default (not §8; §5(a) applies only where the agent evaluates eligibility for public assistance or similar listed uses); the GPAI systemic-risk designation applies to models, not to this pack's use cases",
     "id": "public-private-collaboration",
     "keyRisks": [
       "Corruption facilitation through AI-mediated contract procurement",
