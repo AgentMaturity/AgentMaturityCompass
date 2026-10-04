@@ -1,4 +1,98 @@
-# Track S4 — worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
+# Track S4 — worker report
+
+## Repair round 1 (2026-10-04), answering the monitor's REJECTED verdict
+
+Branch `worktree-wf_5210e2f4-3ea-4`, HEAD 7025a1b4 → code HEAD 4bafa2b4, then this receipt commit (base 8f57ce63 is an ancestor). macOS 26.6.2 arm64, Node v25.5.0, vitest 4.1.11.
+
+On entry the worktree held uncommitted work from an interrupted attempt: `src/domains/deep/shared.ts` and the four station arrays deleted from `deepIndustryPacks.ts`. I kept that direction and finished it. Nothing else in the worktree was dirty.
+
+### Required fixes
+
+1. **Deep questions and pack linkage** (54d4d031).
+   - Station questions now live in `src/domains/deep/{education,environment,mobility,technology}.ts`. `deepIndustryPacks.ts` re-exports them and is now 309 lines (was 516).
+   - Added 19 hand-written questions. Counts: health 50, education 10, environment 10, mobility 10, governance 50, technology 10, wealth 50; total 190. Sources: 114 verified, 76 unverified (the 76 are the unchanged legacy NIST/Basel/MAR/CER/R155/R156/2022-1426 notes).
+   - Every question has `packIds?: string[]`. The legacy groups get per-regime constants. `getDeepQuestionsForPack(packId)` was added.
+   - `tests/deepIndustryPacksStations.test.ts` checks four things:
+     - the station floors and the >=190 total;
+     - every packId is in `listIndustryPackIds()`, with at least one pack in the question's own station;
+     - `getDeepQuestionsForPack` returns exactly the questions that list the pack;
+     - there is no `Array.from` in `src/domains/deep/*.ts`.
+   - Eight packs have no deep question: weave-to-wear, clinical-lifecycle, life-technology, drug-discovery, clinical-trials, specialized-medicine, future-of-work, sustainable-real-estate.
+2. **Synthetic HEAD-shape pack** (ccb64212, b71f65b8).
+   - `headShapePack()` removes version, lastReviewed and regulatoryReferences. The undated test, the receipt test and `withCurrency` all use it.
+   - On a scratch merge with S3, `computePackCurrency(IndustryPack & PackCurrencyFields)` failed `typecheck:tests`, because S3 declares a mutable `RegulatoryReference[]`. The parameter is now `PackWithCurrency = Omit<IndustryPack, keyof PackCurrencyFields> & PackCurrencyFields`.
+3. **Test renames to the claimed paths.**
+   - `tests/deepIndustryPacks.test.ts` → `tests/deepIndustryPacksStations.test.ts`.
+   - `tests/domainAssessment.test.ts` → `tests/domainReportAnnexIII.test.ts`. The domain-report tests moved into this file too.
+   - `tests/domainReport.test.ts` → `tests/sectorPacksDocDerived.test.ts`, which now holds only the SECTOR_PACKS checks.
+4. **prohibitedFlag** (7fd5b858, d688673b).
+   - `parseAnnexIIIPoints` returns `prohibitedFlag`. dance-of-democracy reports points [8] with the flag set.
+   - The domain report prints the flagged packs.
+   - Field and section names (`euAIActClassification`, `## EU AI Act Classification`) are unchanged.
+
+### Found on the integrated branch and fixed (scratch merge with S3)
+
+- **Annex III parsing** (d688673b). S3 rewrote every classification as prose, and my parser then invented points and missed the flags:
+  - "Not listed in Annex III (§8 covers …)" produced [8];
+  - lower-case "general-purpose AI" was not detected;
+  - S3 has no "PROHIBITED" text, so no pack was flagged.
+
+  The fix: scope-note parentheticals `( … covers … )` are skipped, `General[- ]Purpose AI` is matched, and the flag also fires on a cited `Art. 5(1)(x) … prohibit…`. HEAD parse results are unchanged; dance-of-democracy is still the only pack flagged at HEAD.
+- **SECTOR_PACKS totals** (cb7e9e12, 2f01eec5).
+  - The doc no longer restates totals: S3 moves the questions to 608 and governance to 75.
+  - The test rejects a restated total or a `totalQuestions: N` literal, and checks every "(N packs)" station heading against `getStationSummary`.
+
+### Verification
+
+- Worktree: `vitest run` over deepIndustryPacksStations, industryPackAudit, domainReportAnnexIII, sectorPacksDocDerived, majorGaps, domain-assessment, domain-registry, domainDocs and lineRatchet. Result: 9 files, 95 tests passed.
+- Worktree: `pnpm typecheck` and `pnpm typecheck:tests` both exit 0. `node scripts/docs-drift-check.mjs` exits 0.
+- The planner's stale-literal grep on `docs/SECTOR_PACKS.md` exits 1 (no match).
+- `grep -c Array.from`: 3 in `deepIndustryPacks.ts` and 0 in every `src/domains/deep/*.ts` file.
+- Path audit: `git diff --name-only 8f57ce63...HEAD` prints only claimed paths and this receipt directory.
+  - The planner's #9 regex anchors `src/domains/deep/` with `$`, so it prints the five `deep/*.ts` files even though `src/domains/deep/**` is claimed. Corrected regex: `src/domains/deep/[^/]+\.ts`.
+- Scratch merge (clone in the scratchpad, not a worktree) of S4 4bafa2b4 with S3 a54b88fc gives 467ed0c7:
+  - typecheck 0 and typecheck:tests 0;
+  - the same 8 S4 files: 88 passed;
+  - docs-drift 0;
+  - the currency histogram reports `unverified` for all 41 packs, with nothing missing.
+- Architecture check (read-only): the only failures are `dist/*.js is missing`, as before.
+
+### Mutation checks this round (each restored to green)
+
+| Guard | Mutation | Red |
+|---|---|---|
+| Pack linkage | education-deep-09 packIds → `["not-a-pack"]` | deepIndustryPacksStations 2 failed / 7 passed ("education-deep-09 links unknown pack ids") |
+| Station floor | delete mobility-deep-10 | 1 failed ("mobility: expected 9 to be >= 10") |
+| Parser swallow | `parseAnnexIIIPoints` returns empty for any input | domainReportAnnexIII 5 failed |
+| prohibitedFlag | flag hard-coded false | 3 failed (synthetic, dance-of-democracy, report line) |
+| HEAD-shape synthetic | `headShapePack()` → `pack()` on the S3 merge | industryPackAudit 2 failed (`['lastReviewed']` vs full missing list) |
+| SECTOR_PACKS base count | 244 → 245 | sectorPacksDocDerived 1 failed |
+| No restated station total | `totalQuestions: 71` example restored | sectorPacksDocDerived 1 failed |
+
+### Sources read this round (retrievedAt 2026-10-04)
+
+- AI Act Service Desk: Annex III point 3(d); Art. 9(1)-(2),(6); Art. 10(2)-(3); Art. 12(1)-(2); Art. 13(1),(3)(b)(ii); Art. 14(4)(b),(d),(e); Art. 15(4)-(5); Art. 26(1),(2),(11); Art. 49(1),(3); Art. 50(3)-(4); Art. 72(1)-(2).
+- govinfo: 34 CFR §99.31(a)(1)(i)(B) (CFR 2024); 16 CFR §312.10 (CFR 2026).
+- EUR-Lex: Data Act Art. 3(1); GDPR Art. 22(1). Art. 22(2)-(3) were not re-read, and the source note says so.
+- Commission DSA VLOP page: 45M threshold, systemic risk assessment, annual audit. Article numbers were not read from the DSA text, and the note says so.
+- NIST: SP 800-161r1-upd1 publication page.
+
+Not used:
+- The EDPB connected-vehicles PDF returned 404.
+- The DORA Art. 28 text did not render on EUR-Lex.
+
+The 19 new questions record `retrievedAt` 2026-10-04 through `readOn(…, REPAIR_RETRIEVED_AT)` in `src/domains/deep/shared.ts` (commit 4bafa2b4). The 171 earlier questions keep 2026-10-03.
+
+### Not exercised
+
+- Full vitest suite, the release gate, `pnpm build` and dist.
+- The CLI end to end.
+- Linux and Windows.
+- The planner's `node -e` commands against dist (no build).
+
+---
+
+# Original worker report (backfilled by the root session from the structured return; the harness refused the subagent's .md write)
 
 - Status (self-report): **PARTIAL**
 - Branch: `worktree-wf_5210e2f4-3ea-4`; HEAD before `8f57ce63d8331f1bef1c2a18fde82a7e8f4511da` → after `b1ba54c2b73a5736e6530baf47343ec13277b0f6`

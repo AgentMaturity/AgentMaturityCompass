@@ -1,6 +1,6 @@
 {
  "track": "S4",
- "status": "PARTIAL",
+ "status": "COMPLETE",
  "worktreePath": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_5210e2f4-3ea-4",
  "branch": "worktree-wf_5210e2f4-3ea-4",
  "headBefore": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
@@ -64,7 +64,7 @@
   {
    "check": "docs/SECTOR_PACKS.md base-question count equals the derived number and names the derivation command",
    "command": "./node_modules/.bin/tsx -e 'import { questionBank } from \"./src/diagnostic/questionBank.ts\"; console.log(questionBank.length)' < /dev/null ; grep -c 244 docs/SECTOR_PACKS.md",
-   "observed": "The command prints 244. The doc states '244-question base AMC rubric' exactly once and prints the command. 138 is gone. 390 is now 600, derived from listIndustryPacks: 41 packs, 600 questions. totalQuestions 37 is now 71. The composite formula is corrected to round(base\u00d70.6 + domain\u00d70.4). tests/domainReport.test.ts guards all of these.",
+   "observed": "The command prints 244. The doc states '244-question base AMC rubric' exactly once and prints the command. 138 is gone. 390 is now 600, derived from listIndustryPacks: 41 packs, 600 questions. totalQuestions 37 is now 71. The composite formula is corrected to round(base×0.6 + domain×0.4). tests/domainReport.test.ts guards all of these.",
    "pass": true
   }
  ],
@@ -271,9 +271,174 @@
   }
  ],
  "readyToWireDiff": "--- a/src/domains/index.ts\n+++ b/src/domains/index.ts\n+export { computePackCurrency, DEFAULT_STALE_AFTER_DAYS, type PackCurrencyFields, type PackRegulatoryReference, type AuditCurrency } from \"./industryPackAudit.js\";\n+export { parseAnnexIIIPoints, type EuAIActClassification, type CertificationOutcome } from \"./domainAssessmentEngine.js\";\n+export { getDeepQuestionsByStation, type RegulationSource } from \"./deepIndustryPacks.js\";\n--- a/src/index.ts (deep industry pack export block near :2353)\n+  getDeepQuestionsByStation,\n--- a/src/domains/domainApplyCli.ts (:93)\n-          const auditReport = buildIndustryPackAudit({ pack, responses, now: Date.now(), frameworkFilter: framework });\n+          const auditReport = buildIndustryPackAudit({ pack, responses, now: Date.now(), frameworkFilter: framework, staleAfterDays: opts.staleAfterDays });\n(The last hunk needs a --stale-after-days <n> option wired where the CLI command is defined; that is the CLI owner's decision.)",
- "notesForMonitor": "RECEIPT CONTENT. The harness blocked writing report.md and result.json, so the receipt is reproduced here.\n\nChanges:\n\n(1) src/domains/industryPackAudit.ts\n- :20 schema bumped to amc.industry-pack-audit/2.\n- :62-79 PackCurrencyFields v1 declared structurally (version?, lastReviewed?, regulatoryReferences?[{citation, jurisdiction?, url?, effectiveDate?, lastReviewed?, status?}]), matching the S3 contract in map/planner-tracks.json. Nothing is imported from S3.\n- :104 computePackCurrency(pack, now, {staleAfterDays=365}):\n  - Fields are read defensively. Wrong types, unparseable dates and future dates count as missing.\n  - Status priority: undated > stale > unverified > current. No lastReviewed or no references means undated.\n  - A non-positive or NaN staleAfterDays throws RangeError.\n- :318 buildIndustryPackAudit accepts an optional staleAfterDays.\n- :389 currency is inside the hashed body.\n- :443 adds a '## Regulatory currency' markdown section.\n- At HEAD all 41 packs report 'undated' with missing version, lastReviewed and regulatoryReferences.\n\n(2) src/domains/domainAssessmentEngine.ts\n- Additive result fields:\n  - euAIActClassification: {domainCategory, packs[{packId, packName, classification, annexIIIPoints, generalPurpose}]}, built from getIndustryPacksByStation (read-only import).\n  - certification: {threshold, comparison '>=', compositeScore, meetsThreshold, blockingGaps, ready}.\n- :267 evaluateCertification replaces isCertificationReady with the same rule.\n- :283 parseAnnexIIIPoints keeps points 1-8 after 'Annex III' and flags GPAI. Every one of the 41 packs' strings parses.\n\n(3) src/domains/domainReportBuilder.ts\n- '## EU AI Act Classification' section.\n- The executive summary prints 'Certification Threshold: composite >= N and no critical control at L1', 'Threshold Met', and 'Blocking Critical Gaps'.\n- Optional now param on renderDomainReportMarkdown and buildDomainReport. Time is computed once, which fixes a possible ms skew between generatedAt and the markdown timestamp.\n- No arithmetic defect found. tests/domain-assessment.test.ts is unchanged and green (84 / 161 / 3).\n\n(4) src/domains/deepIndustryPacks.ts\n- Every question gains station and source {title, url, retrievedAt, verified, note?}.\n- New hand-written questions: education 6, environment 5, mobility 5, technology 5. Each anchors a distinct provision.\n- Existing ids and counts unchanged (majorGaps floors hold).\n- Finance re-anchoring:\n  - Best execution: RTS 28 changed to MiFID II Art. 27(1). ESMA's rulebook text of Art. 27 has no para 6.\n  - Market abuse: 'MiFID II/MAR' changed to 'MAR Art. 16'.\n  - Client money: 'MiFID II/CASS' (CASS is a UK FCA sourcebook) changed to 'MiFID II Art. 16(8)-(9)'.\n  - AML rows cite 31 CFR 1020.320 and 1010.230.\n- Government POA&M row: changed to NIST 800-53 CA-5. The CA-5 title is from my knowledge and unverified (the NIST catalog did not render).\n- Added getDeepQuestionsByStation. Stats keep their industry keys and add station and unverifiedSources. Removed an unused zod import.\n- N = 5 per station.\n- Measured counts: health 50, wealth 50, governance 50, education 6, environment 5, mobility 5, technology 5; 171 total. 95 verified, 76 unverified with notes:\n  - 50 NIST control IDs not fetched individually.\n  - 20 finance: Basel thematic labels and MAR page not rendered.\n  - 3 environment and 3 mobility: article or paragraph numbers from search results only, or 403s.\n\n(5) docs/SECTOR_PACKS.md\n- Base count stated once ('244-question base AMC rubric') with the derivation command (tsx: questionBank.length gives 244).\n- 390 is now 600 and 37 is now 71, both derived.\n- Composite formula corrected to round(base\u00d70.6 + domain\u00d70.4); sector packs are not part of the composite.\n- Guarded by the tests in tests/domainReport.test.ts.\n\nFINDINGS FOR ROOT (outside S4):\n- EUR-Lex shows a consolidated AI Act dated 27/07/2026 with M1 = Regulation (EU) 2026/1744 (Digital Omnibus on AI). From the summary and recitals: Annex III high-risk obligations move to 2 Dec 2027 and Annex I to 2 Aug 2028; Art. 4 is replaced; Art. 5 gains prohibitions on NCII and CSAM generation; Art. 50(2) gets a four-month transitional period for systems on the market before 2 Aug 2026. Packs or docs asserting 2 Aug 2026 high-risk dates need S3 / cross-framework review.\n- Pack classification strings (S3's) are inconsistent with their stations:\n  - virtual-infrastructure and networked-ecosystems are 'General Purpose AI' in high-risk stations.\n  - dance-of-democracy says 'PROHIBITED' under Annex III \u00a78, which is a high-risk area, not Art. 5.\n- 147 of the 150 legacy deep questions remain templates. Replacing them is left for later.\n- ecfr.gov and federalregister.gov redirect to an unblock page; it was not bypassed and govinfo.gov was used instead.\n- The research digest directories were empty, so no digests were used.\n\nPath discipline: every changed path is in the S4 claim; none is in codex-dirty-paths.json (checked by script) or in the unclaimable list. .amc/keys untouched; git status --porcelain is empty at b1ba54c2.",
+ "notesForMonitor": "RECEIPT CONTENT. The harness blocked writing report.md and result.json, so the receipt is reproduced here.\n\nChanges:\n\n(1) src/domains/industryPackAudit.ts\n- :20 schema bumped to amc.industry-pack-audit/2.\n- :62-79 PackCurrencyFields v1 declared structurally (version?, lastReviewed?, regulatoryReferences?[{citation, jurisdiction?, url?, effectiveDate?, lastReviewed?, status?}]), matching the S3 contract in map/planner-tracks.json. Nothing is imported from S3.\n- :104 computePackCurrency(pack, now, {staleAfterDays=365}):\n  - Fields are read defensively. Wrong types, unparseable dates and future dates count as missing.\n  - Status priority: undated > stale > unverified > current. No lastReviewed or no references means undated.\n  - A non-positive or NaN staleAfterDays throws RangeError.\n- :318 buildIndustryPackAudit accepts an optional staleAfterDays.\n- :389 currency is inside the hashed body.\n- :443 adds a '## Regulatory currency' markdown section.\n- At HEAD all 41 packs report 'undated' with missing version, lastReviewed and regulatoryReferences.\n\n(2) src/domains/domainAssessmentEngine.ts\n- Additive result fields:\n  - euAIActClassification: {domainCategory, packs[{packId, packName, classification, annexIIIPoints, generalPurpose}]}, built from getIndustryPacksByStation (read-only import).\n  - certification: {threshold, comparison '>=', compositeScore, meetsThreshold, blockingGaps, ready}.\n- :267 evaluateCertification replaces isCertificationReady with the same rule.\n- :283 parseAnnexIIIPoints keeps points 1-8 after 'Annex III' and flags GPAI. Every one of the 41 packs' strings parses.\n\n(3) src/domains/domainReportBuilder.ts\n- '## EU AI Act Classification' section.\n- The executive summary prints 'Certification Threshold: composite >= N and no critical control at L1', 'Threshold Met', and 'Blocking Critical Gaps'.\n- Optional now param on renderDomainReportMarkdown and buildDomainReport. Time is computed once, which fixes a possible ms skew between generatedAt and the markdown timestamp.\n- No arithmetic defect found. tests/domain-assessment.test.ts is unchanged and green (84 / 161 / 3).\n\n(4) src/domains/deepIndustryPacks.ts\n- Every question gains station and source {title, url, retrievedAt, verified, note?}.\n- New hand-written questions: education 6, environment 5, mobility 5, technology 5. Each anchors a distinct provision.\n- Existing ids and counts unchanged (majorGaps floors hold).\n- Finance re-anchoring:\n  - Best execution: RTS 28 changed to MiFID II Art. 27(1). ESMA's rulebook text of Art. 27 has no para 6.\n  - Market abuse: 'MiFID II/MAR' changed to 'MAR Art. 16'.\n  - Client money: 'MiFID II/CASS' (CASS is a UK FCA sourcebook) changed to 'MiFID II Art. 16(8)-(9)'.\n  - AML rows cite 31 CFR 1020.320 and 1010.230.\n- Government POA&M row: changed to NIST 800-53 CA-5. The CA-5 title is from my knowledge and unverified (the NIST catalog did not render).\n- Added getDeepQuestionsByStation. Stats keep their industry keys and add station and unverifiedSources. Removed an unused zod import.\n- N = 5 per station.\n- Measured counts: health 50, wealth 50, governance 50, education 6, environment 5, mobility 5, technology 5; 171 total. 95 verified, 76 unverified with notes:\n  - 50 NIST control IDs not fetched individually.\n  - 20 finance: Basel thematic labels and MAR page not rendered.\n  - 3 environment and 3 mobility: article or paragraph numbers from search results only, or 403s.\n\n(5) docs/SECTOR_PACKS.md\n- Base count stated once ('244-question base AMC rubric') with the derivation command (tsx: questionBank.length gives 244).\n- 390 is now 600 and 37 is now 71, both derived.\n- Composite formula corrected to round(base×0.6 + domain×0.4); sector packs are not part of the composite.\n- Guarded by the tests in tests/domainReport.test.ts.\n\nFINDINGS FOR ROOT (outside S4):\n- EUR-Lex shows a consolidated AI Act dated 27/07/2026 with M1 = Regulation (EU) 2026/1744 (Digital Omnibus on AI). From the summary and recitals: Annex III high-risk obligations move to 2 Dec 2027 and Annex I to 2 Aug 2028; Art. 4 is replaced; Art. 5 gains prohibitions on NCII and CSAM generation; Art. 50(2) gets a four-month transitional period for systems on the market before 2 Aug 2026. Packs or docs asserting 2 Aug 2026 high-risk dates need S3 / cross-framework review.\n- Pack classification strings (S3's) are inconsistent with their stations:\n  - virtual-infrastructure and networked-ecosystems are 'General Purpose AI' in high-risk stations.\n  - dance-of-democracy says 'PROHIBITED' under Annex III §8, which is a high-risk area, not Art. 5.\n- 147 of the 150 legacy deep questions remain templates. Replacing them is left for later.\n- ecfr.gov and federalregister.gov redirect to an unblock page; it was not bypassed and govinfo.gov was used instead.\n- The research digest directories were empty, so no digests were used.\n\nPath discipline: every changed path is in the S4 claim; none is in codex-dirty-paths.json (checked by script) or in the unclaimable list. .amc/keys untouched; git status --porcelain is empty at b1ba54c2.",
  "kind": "code",
  "id": "S4",
  "workflow": "wf_5210e2f4-3ea",
- "label": "code:S4"
+ "label": "code:S4",
+ "repairRound1": {
+  "date": "2026-10-04",
+  "status": "COMPLETE",
+  "headBefore": "7025a1b4aa6e1597531d7c9f2c8cd5d371bbf76a",
+  "codeHeadAfter": "4bafa2b4",
+  "commits": [
+   "54d4d031 feat: ten hand-written deep questions per new station, linked to industry pack ids",
+   "7fd5b858 feat: flag PROHIBITED Annex III qualifiers and split report tests by claim",
+   "ccb64212 test: build the HEAD-shape pack synthetically in currency tests",
+   "d688673b fix: keep Annex III parsing correct for prose classifications",
+   "cb7e9e12 docs: stop restating sector pack totals in SECTOR_PACKS",
+   "2f01eec5 docs: name getStationSummary fields without a count that drifts",
+   "b71f65b8 fix: type currency input structurally so registry currency fields fit",
+   "4bafa2b4 fix: record the day the repair-round provisions were read"
+  ],
+  "fixesApplied": [
+   "Deep stations: education/environment/mobility/technology = 10 each, total 190; packIds on every question resolve to listIndustryPackIds() with >=1 pack in the question's station; getDeepQuestionsForPack; station files in src/domains/deep/",
+   "tests/industryPackAudit.test.ts uses a synthetic headShapePack(); green on the S3 scratch merge",
+   "Renamed tests to tests/deepIndustryPacksStations.test.ts, tests/domainReportAnnexIII.test.ts, tests/sectorPacksDocDerived.test.ts",
+   "parseAnnexIIIPoints returns prohibitedFlag; dance-of-democracy points [8], prohibitedFlag true (HEAD and S3-merged)",
+   "Integration: Annex III parser handles S3 prose (scope-note parentheticals, general-purpose AI, Art. 5(1)(x) prohibitions); SECTOR_PACKS no longer restates totals; computePackCurrency takes PackWithCurrency so S3's mutable RegulatoryReference[] typechecks"
+  ],
+  "testsRun": [
+   {
+    "command": "./node_modules/.bin/vitest run tests/deepIndustryPacksStations.test.ts tests/industryPackAudit.test.ts tests/domainReportAnnexIII.test.ts tests/sectorPacksDocDerived.test.ts tests/majorGaps.test.ts tests/domain-assessment.test.ts tests/domain-registry.test.ts tests/domainDocs.test.ts tests/lineRatchet.test.ts",
+    "result": "9 files, 95 tests passed"
+   },
+   {
+    "command": "pnpm typecheck; pnpm typecheck:tests",
+    "result": "both exit 0"
+   },
+   {
+    "command": "node scripts/docs-drift-check.mjs",
+    "result": "exit 0"
+   },
+   {
+    "command": "scratch merge S4 4bafa2b4 + S3 a54b88fc (467ed0c7): typecheck, typecheck:tests, 8 S4 test files",
+    "result": "tc 0, tct 0, 88 passed; currency histogram unverified x41, missing none"
+   }
+  ],
+  "measured": {
+   "deepByStation": {
+    "health": 50,
+    "education": 10,
+    "environment": 10,
+    "mobility": 10,
+    "governance": 50,
+    "technology": 10,
+    "wealth": 50
+   },
+   "total": 190,
+   "verifiedSources": 114,
+   "unverifiedSources": 76,
+   "retrievedAt": {
+    "2026-10-03": 171,
+    "2026-10-04": 19
+   },
+   "packsWithoutDeepQuestion": [
+    "weave-to-wear",
+    "clinical-lifecycle",
+    "life-technology",
+    "drug-discovery",
+    "clinical-trials",
+    "specialized-medicine",
+    "future-of-work",
+    "sustainable-real-estate"
+   ]
+  },
+  "pathAudit": "git diff --name-only 8f57ce63...HEAD lists only claimed paths plus this receipt dir; planner #9 regex needs src/domains/deep/[^/]+\\.ts because its 'src/domains/deep/' alternative is $-anchored",
+  "mutationChecks": [
+   {
+    "guard": "Pack linkage",
+    "mutation": "education-deep-09 packIds -> ['not-a-pack']",
+    "red": "deepIndustryPacksStations 2 failed | 7 passed",
+    "restoredGreen": "9 passed"
+   },
+   {
+    "guard": "Station floor",
+    "mutation": "delete mobility-deep-10",
+    "red": "1 failed (mobility 9 < 10)",
+    "restoredGreen": "9 passed"
+   },
+   {
+    "guard": "Parser cannot swallow",
+    "mutation": "parseAnnexIIIPoints returns empty for any input",
+    "red": "domainReportAnnexIII 5 failed",
+    "restoredGreen": "10 passed"
+   },
+   {
+    "guard": "prohibitedFlag",
+    "mutation": "prohibitedFlag hard-coded false",
+    "red": "3 failed",
+    "restoredGreen": "10 passed"
+   },
+   {
+    "guard": "HEAD-shape pack is synthetic",
+    "mutation": "headShapePack() -> pack() on the S3 merge",
+    "red": "industryPackAudit 2 failed",
+    "restoredGreen": "16 passed"
+   },
+   {
+    "guard": "SECTOR_PACKS base count derived",
+    "mutation": "244 -> 245",
+    "red": "sectorPacksDocDerived 1 failed",
+    "restoredGreen": "2 passed"
+   },
+   {
+    "guard": "No restated station total",
+    "mutation": "restore 'packCount: 5, totalQuestions: 71' example",
+    "red": "sectorPacksDocDerived 1 failed",
+    "restoredGreen": "2 passed"
+   }
+  ],
+  "sources": [
+   {
+    "title": "EU AI Act Annex III, Arts. 9, 10, 12, 13, 14, 15, 26, 49, 50, 72 (AI Act Service Desk)",
+    "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "34 CFR 99.31 (govinfo CFR 2024)",
+    "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title34-vol1/xml/CFR-2024-title34-vol1-sec99-31.xml",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "16 CFR 312.10 (govinfo CFR 2026)",
+    "url": "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec312-10.xml",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "Data Act Regulation (EU) 2023/2854 Art. 3(1) (EUR-Lex)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R2854",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "GDPR Art. 22(1) (EUR-Lex)",
+    "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "DSA VLOPs/VLOSEs (European Commission)",
+    "url": "https://digital-strategy.ec.europa.eu/en/policies/dsa-vlops",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   },
+   {
+    "title": "NIST SP 800-161r1-upd1",
+    "url": "https://csrc.nist.gov/pubs/sp/800/161/r1/upd1/final",
+    "retrievedAt": "2026-10-04",
+    "verified": true
+   }
+  ],
+  "notExercised": [
+   "Full vitest suite, release gate, pnpm build/dist and the planner's node -e dist commands",
+   "CLI end to end",
+   "Linux and Windows",
+   "EDPB connected-vehicles PDF (404) and DORA Art. 28 (did not render): not used"
+  ],
+  "monitorNamingNote": "Result field euAIActClassification and section '## EU AI Act Classification' kept (not renamed to the planner's 'exposure' names); not in the required fixes."
+ }
 }
