@@ -90,4 +90,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   verified("us-pfas-npdwr", "EPA PFAS National Primary Drinking Water Regulation (40 CFR Part 141, Subpart Z)", "US", "law", "in-force",
     "https://www.ecfr.gov/api/versioner/v1/structure/current/title-40.json?part=141&subpart=Z",
     ["40 CFR Part 141 Subpart Z"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "Current eCFR structure read: Subpart Z, Control of PFAS, §§141.900-141.905. EPA's May 2026 proposals to extend PFOA/PFOS compliance and rescind four determinations (FR 2026-10086, 2026-10085) are cited by the round-2 content receipt and were not read here." }),
+  verified("us-sdwa-1433", "Safe Drinking Water Act Section 1433, community water system risk and resilience (42 U.S.C. 300i-2)", "US", "law", "in-force",
+    "https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap6A-subchapXII-partD-sec300i-2.htm",
+    ["SDWA Section 1433", "SDWA §1433", "42 U.S.C. 300i-2"], { lastReviewed: "2026-10-04", retrievedAt: "2026-10-04", note: "U.S. Code 2023 text read: systems serving more than 3,300 persons; assessment covers electronic, computer or other automated systems incl. their security; emergency response plan includes cybersecurity strategies." }),
 ];
