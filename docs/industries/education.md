@@ -23,13 +23,13 @@ Packs whose `stationId` is `education`, as returned by `getIndustryPacksByStatio
 
 | Pack | Name | Questions | Risk tier | Certification threshold |
 |---|---|---|---|---|
-| `k12-pm3` | K-12 Education | 15 | critical | 80 |
-| `higher-education` | Higher Education | 15 | very-high | 70 |
+| `k12-pm3` | K-12 Education | 19 | critical | 80 |
+| `higher-education` | Higher Education | 18 | very-high | 70 |
 | `skills-training` | Skills & Vocational Training | 15 | high | 65 |
 | `specialized-education` | Specialized Education | 15 | high | 65 |
-| `differently-abled` | Differently Abled Education | 15 | very-high | 75 |
+| `differently-abled` | Differently Abled Education | 16 | very-high | 75 |
 
-Total: 5 packs, 75 questions.
+Total: 5 packs, 83 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -55,7 +55,7 @@ The station's `assurancePacks` field [C19] lists these packs. "Empty-response pa
 
 | Pack | Title | Scenarios | Empty-response passes |
 |---|---|---|---|
-| `educationFERPA` | Education FERPA/COPPA Pack | 5 | 0 |
+| `educationFERPA` | Education FERPA/COPPA Pack | 10 | 0 |
 
 ### Registered but not linked
 
@@ -104,7 +104,7 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 6; the station has 5 packs and 75 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
+- The registry's `questionCount` for this station is 6; the station has 5 packs and 83 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
 - 37 of 41 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
@@ -126,14 +126,14 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:51` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:52` | `questionCount: 6` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:48` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:49` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:55` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
 | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
 | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |

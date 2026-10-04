@@ -23,14 +23,14 @@ Packs whose `stationId` is `environment`, as returned by `getIndustryPacksByStat
 
 | Pack | Name | Questions | Risk tier | Certification threshold |
 |---|---|---|---|---|
-| `farm-to-fork` | Farm to Fork | 16 | very-high | 70 |
+| `farm-to-fork` | Farm to Fork | 17 | very-high | 70 |
 | `weave-to-wear` | Weave to Wear | 15 | high | 65 |
-| `material-to-machines` | Material to Machines | 15 | high | 65 |
+| `material-to-machines` | Material to Machines | 16 | high | 65 |
 | `source-to-sustenance` | Source to Sustenance | 15 | critical | 75 |
-| `ubiquity-to-utility` | Ubiquity to Utility | 15 | critical | 75 |
-| `sip-to-sanitation` | Sip to Sanitation | 15 | critical | 75 |
+| `ubiquity-to-utility` | Ubiquity to Utility | 17 | critical | 75 |
+| `sip-to-sanitation` | Sip to Sanitation | 17 | critical | 75 |
 
-Total: 6 packs, 91 questions.
+Total: 6 packs, 97 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -104,7 +104,7 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 6; the station has 6 packs and 91 questions, so the field equals the pack count, not the question total. Use the counts in Sector packs.
+- The registry's `questionCount` for this station is 6; the station has 6 packs and 97 questions, so the field equals the pack count, not the question total. Use the counts in Sector packs.
 - 84 of 85 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
@@ -126,14 +126,14 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:66` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:67` | `questionCount: 6` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:63` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:64` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:70` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
 | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
 | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |

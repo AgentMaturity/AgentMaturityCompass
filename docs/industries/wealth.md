@@ -126,14 +126,14 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:126` | `euAIActCategory: "high-risk"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:127` | `questionCount: 14` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:123` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:124` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:130` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
 | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
 | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |

@@ -26,10 +26,10 @@ Packs whose `stationId` is `technology`, as returned by `getIndustryPacksByStati
 | `cognition-to-intelligence` | Cognition to Intelligence | 15 | very-high | 72 |
 | `networked-ecosystems` | Connectivity to Networked Ecosystems | 15 | high | 70 |
 | `os-sustainable-outcomes` | Operating System for Sustainable Outcomes | 15 | critical | 78 |
-| `infotainment` | Infotainment | 15 | high | 72 |
+| `infotainment` | Infotainment | 17 | high | 72 |
 | `partnerships-prosperity` | Partnerships for Peace & Prosperity | 15 | high | 68 |
 
-Total: 5 packs, 75 questions.
+Total: 5 packs, 77 questions.
 
 Run one with `amc domain pack run --pack <id>` [C8]. The command requires the industry-pack entitlement [C9]. Its score comes from levels the operator picks per question (L1, L3 or L5); with `--baseline`, or without a terminal, every question is scored L1 [C10] [C11]. A pack score is therefore a self-assessment, not an observation of the agent.
 
@@ -103,7 +103,7 @@ No output above was produced for this guide. Each row names the function that pr
 
 ## Known gaps at this commit
 
-- The registry's `questionCount` for this station is 6; the station has 5 packs and 75 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
+- The registry's `questionCount` for this station is 6; the station has 5 packs and 77 questions, so the field equals neither the pack count nor the question total. Use the counts in Sector packs.
 - 34 of 55 framework strings do not resolve to a compliance-report framework (see Frameworks referenced).
 - An industry pack records frameworks as plain strings, with no source URL, effective date or review date, so a pack cannot show whether its regulatory references are current.
 - `amc domain assurance` grades a fixed response, not the agent (see Assurance packs).
@@ -125,14 +125,14 @@ No output above was produced for this guide. Each row names the function that pr
 | C4 | Declared EU AI Act category | `src/domains/domainRegistry.ts:111` | `euAIActCategory: "general-purpose"` |
 | C5 | Declared questionCount field | `src/domains/domainRegistry.ts:112` | `questionCount: 6` |
 | C6 | Declared recommended packs | `src/domains/domainRegistry.ts:108` | `recommendedIndustryPacks:` |
-| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C7 | Station pack lookup filters INDUSTRY_PACKS by stationId | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
 | C8 | Sector pack run command | `src/cli-domain-product-commands.ts:215` | `Run an industry sector pack` |
 | C9 | Pack run checks entitlement | `src/cli-domain-product-commands.ts:230` | `assertIndustryPackAccess(process.cwd());` |
 | C10 | Baseline scores every question L1 | `src/cli-domain-product-commands.ts:247` | `Score all questions at L1` |
 | C11 | Non-interactive runs default to L1 | `src/cli-domain-product-commands.ts:266` | `Non-interactive: default to L1 baseline` |
 | C12 | Station regulatoryBasis | `src/domains/domainRegistry.ts:109` | `regulatoryBasis:` |
 | C13 | Station complianceFrameworks | `src/domains/domainRegistry.ts:115` | `complianceFrameworks:` |
-| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:72` | `regulatoryBasis: string[];` |
+| C14 | IndustryPack carries regulatoryBasis as plain strings | `src/domains/industryPacks.ts:80` | `regulatoryBasis: string[];` |
 | C15 | ComplianceFramework id union | `src/compliance/frameworks.ts:3` | `export type ComplianceFramework ` |
 | C16 | Framework name resolution | `src/compliance/frameworks.ts:324` | `export function normalizeFrameworkName` |
 | C17 | CLI rejects an unresolved framework name | `src/cli.ts:12628` | `Unsupported compliance framework` |

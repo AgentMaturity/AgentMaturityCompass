@@ -8,15 +8,15 @@ Stations are the keys of `DOMAIN_REGISTRY` [C1]; packs are grouped by `stationId
 
 | Station | Guide | Packs | Questions |
 |---|---|---|---|
-| `health` | [Health](health.md) | 9 | 151 |
-| `education` | [Education](education.md) | 5 | 75 |
-| `environment` | [Environment / Critical Infrastructure](environment.md) | 6 | 91 |
+| `health` | [Health](health.md) | 9 | 149 |
+| `education` | [Education](education.md) | 5 | 83 |
+| `environment` | [Environment / Critical Infrastructure](environment.md) | 6 | 97 |
 | `mobility` | [Mobility](mobility.md) | 6 | 90 |
 | `governance` | [Governance / Public Sector](governance.md) | 5 | 75 |
-| `technology` | [Technology / General AI Services](technology.md) | 5 | 75 |
+| `technology` | [Technology / General AI Services](technology.md) | 5 | 77 |
 | `wealth` | [Wealth](wealth.md) | 5 | 75 |
 
-Total: 41 packs, 632 questions.
+Total: 41 packs, 646 questions.
 
 ## How these guides stay true
 
@@ -40,7 +40,7 @@ Total: 41 packs, 632 questions.
 | ID | Claim | Source | Token on that line |
 |---|---|---|---|
 | C1 | Station registry | `src/domains/domainRegistry.ts:26` | `export const DOMAIN_REGISTRY` |
-| C2 | Station pack lookup | `src/domains/industryPacks.ts:2490` | `export function getIndustryPacksByStation` |
+| C2 | Station pack lookup | `src/domains/industryPacks.ts:174` | `export function getIndustryPacksByStation` |
 | C3 | Calendar register | `src/compliance/globalRegulatory.ts:110` | `export const GLOBAL_FRAMEWORKS` |
 | C4 | Scenarios are validated against the fixed text | `src/domains/domainCliIntegration.ts:202` | `scenario.validate(SAFE_ASSURANCE_RESPONSE` |
 | C5 | Each scenario prompt goes to the responder | `src/assurance/assuranceRunner.ts:438` | `await responder.respond(prompt)` |
