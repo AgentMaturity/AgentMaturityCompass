@@ -2552,7 +2552,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
   mapping({
     id: "tx_traiga_ag_documentation",
     framework: "TX_TRAIGA",
-    category: "§552.103 Civil investigative demand documentation",
+    category: "§552.103 Investigative authority",
     description: "Signals that the documentation the attorney general may demand exists: purpose and intended use, training-data type, input and output categories, performance metrics, known limitations, post-deployment monitoring and user safeguards (§552.103).",
     evidenceRequirements: [
       { type: "requires_evidence_event", eventTypes: ["artifact", "metric"], minObservedRatio: 0.5 }

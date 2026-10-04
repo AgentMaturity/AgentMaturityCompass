@@ -284,8 +284,8 @@ export const complianceFrameworkFamilies: ComplianceFrameworkFamily[] = [
       "§552.051 Disclosure to consumers",
       "§552.052 Manipulation of human behavior",
       "§552.056 Unlawful discrimination",
-      "§552.057 Sexually explicit content",
-      "§552.103 Civil investigative demand documentation"
+      "§552.057 Certain sexually explicit content and child pornography",
+      "§552.103 Investigative authority"
     ]
   },
   {
