@@ -196,4 +196,7 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   // Technology station round 2 (2026-10-04): cited by TECH-NE-10.
   { ...unverified("ietf-rfc-9700", "IETF RFC 9700 Best Current Practice for OAuth 2.0 Security (BCP 240), January 2025", "INT", "standard", ["IETF RFC 9700", "RFC 9700", "BCP 240"],
     "Read on rfc-editor.org 2026-10-04 (public clients MUST use PKCE; implicit grant SHOULD NOT be used); rfc-editor.org is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."), lastReviewed: "2026-10-04" },
+  // Technology station round 2 (2026-10-04): cited by TECH-PP-4.
+  { ...unverified("etsi-ipr-policy", "ETSI IPR Policy (Annex 6, ETSI Rules of Procedure, 29-30 November 2022)", "INT", "policy", ["ETSI IPR Policy"],
+    "Clauses 4.1 and 6.1 read in the etsi.org PDF 2026-10-04 by the technology round-2 content pass; etsi.org is not on OFFICIAL_SOURCE_HOSTS."), lastReviewed: "2026-10-04" },
 ];
