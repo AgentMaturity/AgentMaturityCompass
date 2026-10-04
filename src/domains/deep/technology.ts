@@ -3,7 +3,7 @@
  * Each question anchors one provision and lists the industry packs it applies to.
  */
 
-import { AI_ACT_DESK, aiActSource, levels, source, readOn, REPAIR_RETRIEVED_AT, type DeepIndustryQuestion } from "./shared.js";
+import { AI_ACT_DESK, aiActSource, cfrSource, levels, source, readOn, REPAIR_RETRIEVED_AT, type DeepIndustryQuestion } from "./shared.js";
 
 export const DEEP_TECHNOLOGY_QUESTIONS: DeepIndustryQuestion[] = [
   {
@@ -108,4 +108,67 @@ export const DEEP_TECHNOLOGY_QUESTIONS: DeepIndustryQuestion[] = [
     evidenceTypes: ["decision_inventory", "dpia", "human_review_log"],
     source: readOn(source("Regulation (EU) 2016/679 (GDPR), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016R0679",
       "Art. 22(1) was read on EUR-Lex; the exceptions in Art. 22(2) and the safeguards in Art. 22(3) are paraphrased in the question and were not re-read.", true), REPAIR_RETRIEVED_AT),
-  },];
+  },
+  // Round-2 content (round2/content/technology/deep-questions.json, renumbered 06-13 -> 11-16 after S4's 01-10).
+  {
+    id: "technology-deep-11", industry: "technology", station: "technology",
+    packIds: ["infotainment"],
+    regulation: "Digital Services Act", section: "Art. 25(1) — online interface design and organisation",
+    question: "Do the agent's user interfaces avoid deceiving or manipulating recipients or materially distorting their ability to make free and informed decisions?",
+    evaluationCriteria: ["Interfaces inventoried", "Deceptive-design review per release", "Choice-architecture experiments approved", "Findings remediated"],
+    levels: levels("No deceptive-design review", "Ad hoc review of some flows", "Checklist review of every release with records", "Experiments changing choice architecture approved and logged", "Review findings tracked to closure and re-tested"),
+    evidenceTypes: ["design_review_record", "experiment_approval", "remediation_ticket"],
+    source: readOn(source("Regulation (EU) 2022/2065 (Digital Services Act), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R2065",
+      "Art. 25(1) title and opening text read on EUR-Lex by the technology round-2 content pass.", true), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "technology-deep-12", industry: "technology", station: "technology",
+    packIds: ["infotainment", "networked-ecosystems"],
+    regulation: "Digital Markets Act", section: "Art. 6(5) — no self-preferencing in ranking, indexing and crawling",
+    question: "If the operator is a designated gatekeeper, does the agent rank, index and crawl the gatekeeper's own services no more favourably than similar third-party services, under transparent, fair and non-discriminatory conditions?",
+    evaluationCriteria: ["Gatekeeper designation checked", "Ranking conditions documented", "Self-preference tests run", "Deviations explained"],
+    levels: levels("No parity controls", "Policy without measurement", "Documented conditions and periodic parity tests", "Parity tests on every ranking change", "Continuous parity monitoring with audit-ready records"),
+    evidenceTypes: ["ranking_conditions", "parity_test", "audit_log"],
+    source: readOn(source("Regulation (EU) 2022/1925 (Digital Markets Act), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022R1925"), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "technology-deep-13", industry: "technology", station: "technology",
+    packIds: ["networked-ecosystems"],
+    regulation: "Data Act", section: "Art. 29(1) — no switching charges from 12 January 2027",
+    question: "If the agent provides data processing services, will it impose no switching charges on customers for the switching process from 12 January 2027?",
+    evaluationCriteria: ["Service in Art. 23 scope assessed", "Switching charges inventoried", "Charge withdrawal scheduled", "Billing evidence"],
+    levels: levels("Switching charges with no withdrawal plan", "Reduced charges, no plan for zero", "Zero charges scheduled from 12 January 2027", "Billing system enforces zero charges", "Exit drill with billing evidence of zero charges"),
+    evidenceTypes: ["price_list", "billing_config", "exit_drill_record"],
+    source: readOn(source("Regulation (EU) 2023/2854 (Data Act), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R2854"), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "technology-deep-14", industry: "technology", station: "technology",
+    packIds: ["os-sustainable-outcomes", "networked-ecosystems"],
+    regulation: "NIS2 Directive", section: "Art. 23(4)(a), (b), (d) — early warning 24h, notification 72h, final report one month after the notification",
+    question: "For an essential or important entity, does the agent's incident process meet the 24-hour early warning and 72-hour incident notification deadlines from awareness of a significant incident, and deliver the final report not later than one month after the incident notification?",
+    evaluationCriteria: ["Significance criteria applied", "24h and 72h timers from awareness", "One-month timer from the notification", "Rehearsal timed"],
+    levels: levels("No significant-incident reporting path", "Path without deadlines", "All three deadlines tracked with owners", "Deadlines rehearsed and timed", "Past reports show every deadline met"),
+    evidenceTypes: ["incident_register", "notification_record", "drill_timing"],
+    source: readOn(source("Directive (EU) 2022/2555 (NIS2), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022L2555"), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "technology-deep-15", industry: "technology", station: "technology",
+    packIds: ["infotainment", "cognition-to-intelligence"],
+    regulation: "Copyright in the Digital Single Market Directive", section: "Art. 4(3) — machine-readable reservation of text and data mining",
+    question: "Before mining content made publicly available online, does the agent detect and comply with rightholders' machine-readable reservations of rights?",
+    evaluationCriteria: ["Reservation methods recognised", "Check before each fetch", "Decisions logged", "Reserved content excluded"],
+    levels: levels("No reservation check", "robots.txt only", "Every recognised method checked before mining", "Fetch decisions logged per URL", "Exclusion verified by audit of the mined corpus"),
+    evidenceTypes: ["crawler_policy", "fetch_log", "corpus_audit"],
+    source: readOn(source("Directive (EU) 2019/790 (Copyright in the Digital Single Market), EUR-Lex", "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019L0790"), REPAIR_RETRIEVED_AT),
+  },
+  {
+    id: "technology-deep-16", industry: "technology", station: "technology",
+    packIds: ["infotainment"],
+    regulation: "COPPA Rule", section: "16 CFR §312.10 — data retention and deletion",
+    question: "Does the operator retain children's personal information only as long as reasonably necessary for the purpose collected, under a written retention policy enforced by deletion?",
+    evaluationCriteria: ["Retention purposes recorded", "Written retention policy", "Deletion jobs", "Deletion evidence"],
+    levels: levels("Indefinite retention", "Policy drafted, not enforced", "Written policy with per-purpose periods", "Automated deletion per period", "Deletion verified by audit sample"),
+    evidenceTypes: ["retention_policy", "deletion_log", "audit_sample"],
+    source: readOn(cfrSource(16, 1, "312.10", "Data retention and deletion requirements", 2026), REPAIR_RETRIEVED_AT),
+  },
+];
