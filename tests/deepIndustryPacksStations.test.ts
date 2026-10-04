@@ -1,22 +1,55 @@
 import { describe, expect, test } from "vitest";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import {
   getAllDeepIndustryQuestions,
   getDeepIndustryPackStats,
   getDeepQuestionsByStation,
+  getDeepQuestionsForPack,
   DEEP_FINANCE_QUESTIONS,
 } from "../src/domains/deepIndustryPacks.js";
+import { getPackById, listIndustryPackIds } from "../src/domains/industryPacks.js";
 import type { Domain } from "../src/domains/domainRegistry.js";
 
 const STATIONS: Domain[] = ["health", "education", "environment", "mobility", "governance", "technology", "wealth"];
-/** N: the per-station floor this track could source from official pages on 2026-10-03. */
-const MIN_PER_STATION = 5;
+const HAND_WRITTEN_STATIONS: Domain[] = ["education", "environment", "mobility", "technology"];
+/** Floors: >= 10 hand-written questions per new station, >= 50 per legacy station, >= 190 in total. */
+const MIN_PER_STATION: Record<Domain, number> = { health: 50, wealth: 50, governance: 50, education: 10, environment: 10, mobility: 10, technology: 10 };
+const MIN_TOTAL = 190;
 /** Official / primary-source hosts only (regulators, legislatures, standards bodies). */
 const OFFICIAL_HOST = /(^|\.)(europa\.eu|govinfo\.gov|nist\.gov|bis\.org|ftc\.gov|fedramp\.gov|unece\.org|ed\.gov)$/;
 
 describe("deep industry packs — all seven stations", () => {
-  test(`every station has at least ${MIN_PER_STATION} deep questions`, () => {
+  test("every station meets its deep-question floor and the total is at least 190", () => {
     for (const station of STATIONS) {
-      expect(getDeepQuestionsByStation(station).length, station).toBeGreaterThanOrEqual(MIN_PER_STATION);
+      expect(getDeepQuestionsByStation(station).length, station).toBeGreaterThanOrEqual(MIN_PER_STATION[station]);
+    }
+    expect(getAllDeepIndustryQuestions().length).toBeGreaterThanOrEqual(MIN_TOTAL);
+  });
+
+  test("every deep question links to real industry packs, at least one in its own station", () => {
+    const known = new Set<string>(listIndustryPackIds());
+    for (const q of getAllDeepIndustryQuestions()) {
+      const packIds = q.packIds ?? [];
+      expect(packIds.length, `${q.id} has no packIds`).toBeGreaterThan(0);
+      const unknown = packIds.filter((id) => !known.has(id));
+      expect(unknown, `${q.id} links unknown pack ids`).toEqual([]);
+      expect(packIds.some((id) => getPackById(id)?.stationId === q.station), `${q.id} links no pack in station ${q.station}`).toBe(true);
+    }
+  });
+
+  test("getDeepQuestionsForPack returns exactly the questions that list the pack", () => {
+    const forK12 = getDeepQuestionsForPack("k12-pm3");
+    expect(forK12.length).toBeGreaterThan(0);
+    expect(forK12.every((q) => q.packIds?.includes("k12-pm3"))).toBe(true);
+    expect(forK12.map((q) => q.id)).toContain("education-deep-09");
+    expect(getDeepQuestionsForPack("not-a-pack")).toEqual([]);
+  });
+
+  test("station question files are hand-written, not generated from templates", () => {
+    const dir = join(process.cwd(), "src", "domains", "deep");
+    for (const file of readdirSync(dir).filter((f) => f.endsWith(".ts"))) {
+      expect(readFileSync(join(dir, file), "utf8"), file).not.toContain("Array.from");
     }
   });
 
@@ -59,7 +92,7 @@ describe("deep industry packs — all seven stations", () => {
   });
 
   test("hand-written station questions are distinct provisions, not one template repeated", () => {
-    for (const station of ["education", "environment", "mobility", "technology"] as Domain[]) {
+    for (const station of HAND_WRITTEN_STATIONS) {
       const qs = getDeepQuestionsByStation(station);
       const anchors = new Set(qs.map((q) => `${q.regulation}|${q.section}`));
       expect(anchors.size, station).toBe(qs.length);
