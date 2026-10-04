@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import { getAssurancePack } from "../src/assurance/packs/index.js";
+import { INDUSTRY_PACK_MANIFEST } from "../src/assurance/packs/industryPackManifest.js";
 import { runDomainAssurance } from "../src/domains/domainCliIntegration.js";
 import { getDomainMetadata, listDomainIds, listDomainMetadata, parseDomain } from "../src/domains/domainRegistry.js";
 
@@ -75,12 +77,35 @@ describe("domain registry", () => {
     expect(parseDomain("third_party_logistics")).toBe("mobility");
   });
 
-  test("built-in domain assurance smoke response passes all domain packs", () => {
+  // This smoke grades a built-in canned response, never an agent. It used to
+  // assert that the canned text passed every pack, i.e. that synthetic text was
+  // passing evidence (execution brief section 2). Industry packs now refuse it,
+  // so the smoke asserts the refusal is reported as "not evaluated" and that
+  // every linked pack and scenario still runs through the pipeline.
+  test("built-in domain assurance smoke runs every linked pack and reports refused canned input as not evaluated", () => {
+    const industryPacks = new Set(INDUSTRY_PACK_MANIFEST.map((entry) => entry.id));
     for (const domain of listDomainIds()) {
       const run = runDomainAssurance(`domain-smoke-${domain}`, domain);
-      expect(run.totalScenarios).toBeGreaterThan(0);
-      expect(run.failed, `${domain}: ${JSON.stringify(run.packRuns)}`).toBe(0);
-      expect(run.allPassed).toBe(true);
+      const detail = `${domain}: ${JSON.stringify(run.packRuns)}`;
+      expect(run.packRuns.map((pack) => pack.packId), detail).toEqual(getDomainMetadata(domain).assurancePacks);
+      for (const pack of run.packRuns) {
+        expect(pack.scenarioCount, detail).toBe(getAssurancePack(pack.packId).scenarios.length);
+        expect(pack.scenarioCount, detail).toBeGreaterThan(0);
+        expect(pack.passed + pack.failed + pack.notEvaluated, detail).toBe(pack.scenarioCount);
+        if (industryPacks.has(pack.packId)) {
+          expect({ passed: pack.passed, failed: pack.failed, notEvaluated: pack.notEvaluated }, detail).toEqual({
+            passed: 0,
+            failed: 0,
+            notEvaluated: pack.scenarioCount
+          });
+        }
+      }
+      expect(run.totalScenarios, detail).toBe(run.packRuns.reduce((n, pack) => n + pack.scenarioCount, 0));
+      expect(run.passed + run.failed + run.notEvaluated, detail).toBe(run.totalScenarios);
+      expect(run.notEvaluated, detail).toBeGreaterThan(0);
+      expect(run.agentInvoked).toBe(false);
+      expect(run.responseSource).toBe("built-in-synthetic");
+      expect(run.allPassed).toBe(false);
     }
   });
 });
