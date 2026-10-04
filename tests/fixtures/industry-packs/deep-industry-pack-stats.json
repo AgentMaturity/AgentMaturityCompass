@@ -1,0 +1,75 @@
+{
+  "education": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "FERPA",
+      "COPPA"
+    ],
+    "station": "education",
+    "unverifiedSources": 0
+  },
+  "environment": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "NIS2",
+      "CER Directive"
+    ],
+    "station": "environment",
+    "unverifiedSources": 3
+  },
+  "finance": {
+    "questionCount": 50,
+    "regulations": [
+      "SOX",
+      "Basel III",
+      "AML",
+      "MiFID II",
+      "MAR"
+    ],
+    "station": "wealth",
+    "unverifiedSources": 20
+  },
+  "government": {
+    "questionCount": 50,
+    "regulations": [
+      "FedRAMP",
+      "FISMA"
+    ],
+    "station": "governance",
+    "unverifiedSources": 50
+  },
+  "healthcare": {
+    "questionCount": 50,
+    "regulations": [
+      "HIPAA"
+    ],
+    "station": "health",
+    "unverifiedSources": 0
+  },
+  "mobility": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "UN R155",
+      "UN R156",
+      "Implementing Regulation (EU) 2022/1426",
+      "NIST SP 800-161r1"
+    ],
+    "station": "mobility",
+    "unverifiedSources": 3
+  },
+  "technology": {
+    "questionCount": 10,
+    "regulations": [
+      "EU AI Act",
+      "Cyber Resilience Act",
+      "Digital Services Act",
+      "Data Act",
+      "GDPR"
+    ],
+    "station": "technology",
+    "unverifiedSources": 0
+  }
+}
