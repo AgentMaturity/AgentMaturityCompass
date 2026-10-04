@@ -218,4 +218,8 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
       milestones: milestones(["2026-07-07", "Advanced safety requirements apply to all new passenger cars and vans (Commission news of 2026-07-08)"]),
       note: "Arts. 6 and 11 read; entry-into-force date not recorded here. Provisions read from the Official Journal text on the review date (mobility station research, round 2).",
     }),
+  verified("eu-ads-ir", "Commission Implementing Regulation (EU) 2022/1426 (automated driving systems of fully automated vehicles)", "EU", "law", "in-force",
+    "https://publications.europa.eu/resource/celex/32022R1426", ["Implementing Regulation (EU) 2022/1426", "Commission Implementing Regulation (EU) 2022/1426"], {
+      note: "Original OJ text read (Annex III Part 5 in-service reporting, points 2.1-2.2); a consolidated version (2026-03-24) was not read.",
+    }),
 ];
