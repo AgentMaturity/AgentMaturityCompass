@@ -82,4 +82,6 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("us-gig-economy", "Gig-economy worker classification rules (various jurisdictions)", "multi", "law", ["Gig Economy Regulations"],
     "Not a single instrument; replace with the specific jurisdictions in scope."),
   unverified("uk-nice-ta", "NICE technology appraisal guidance", "UK", "guidance", ["NICE Technology Appraisal Guidance", "NICE TA Guidance"]),
+  verified("nist-sp-800-207", "NIST SP 800-207 Zero Trust Architecture", "US", "standard", "in-force", "https://csrc.nist.gov/pubs/sp/800/207/final",
+    ["NIST SP 800-207"], { note: "Final, August 2020 (csrc page read)." }),
 ];
