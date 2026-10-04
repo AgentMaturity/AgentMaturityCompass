@@ -193,4 +193,7 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("imdg", "IMO International Maritime Dangerous Goods Code", "INT", "standard", ["IMDG Code"]),
   unverified("isps", "IMO International Ship and Port Facility Security Code", "INT", "standard", ["ISPS Code"]),
   unverified("un-tir", "UN TIR Convention (1975)", "INT", "treaty", ["UN TIR Convention"]),
+  // Technology station round 2 (2026-10-04): cited by TECH-NE-10.
+  { ...unverified("ietf-rfc-9700", "IETF RFC 9700 Best Current Practice for OAuth 2.0 Security (BCP 240), January 2025", "INT", "standard", ["IETF RFC 9700", "RFC 9700", "BCP 240"],
+    "Read on rfc-editor.org 2026-10-04 (public clients MUST use PKCE; implicit grant SHOULD NOT be used); rfc-editor.org is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."), lastReviewed: "2026-10-04" },
 ];
