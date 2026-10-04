@@ -3,7 +3,7 @@
  * Each question anchors one provision and lists the industry packs it applies to.
  */
 
-import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, cfrSource, levels, source, type DeepIndustryQuestion } from "./shared.js";
+import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, cfrSource, levels, source, readOn, REPAIR_RETRIEVED_AT, type DeepIndustryQuestion } from "./shared.js";
 
 export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
   {
@@ -74,7 +74,7 @@ export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Proctoring use classified against Annex III point 3(d)", "No sanction issued on an unreviewed flag", "False-positive rate measured per student group", "Students told how to dispute a flag"],
     levels: levels("Flags trigger sanctions automatically", "Flags reviewed only when a student complains", "Every flag reviewed by a person before any sanction, with the review recorded", "False-positive rates per group reported each exam period", "Flagging thresholds recalibrated from dispute outcomes under documented change control"),
     evidenceTypes: ["proctoring_flag_log", "reviewer_decision", "false_positive_report", "dispute_record"],
-    source: aiActSource("annex-3", OMNIBUS_DATES),
+    source: readOn(aiActSource("annex-3", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "education-deep-08", industry: "education", station: "education",
@@ -84,7 +84,7 @@ export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Decision points that touch learners inventoried", "Notice given before or with the decision", "Notice reaches guardians for minors", "Notice wording reviewed for the audience's age and needs"],
     levels: levels("Learners are not told an AI system is involved", "A general statement sits in a privacy policy", "A notice is given at each decision point, including to guardians of minors", "Notice delivery is logged and checked for every decision", "Notice comprehension tested with learners, including those with disabilities"),
     evidenceTypes: ["notice_text", "decision_point_inventory", "notice_delivery_log"],
-    source: aiActSource("article-26", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-26", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "education-deep-09", industry: "education", station: "education",
@@ -94,7 +94,7 @@ export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Outsourced function documented", "Contract gives the institution direct control over record use and maintenance", "Redisclosure limits under §99.33(a) bind the vendor and its model providers", "Vendor access reviewed when the function changes"],
     levels: levels("Vendor receives education records with no school-official basis", "Contract mentions FERPA in general terms only", "All three §99.31(a)(1)(i)(B) conditions are met in contract and configuration", "Vendor and sub-processor use of records is audited each year", "Record use by the vendor's agent is logged and reported to the institution on demand"),
     evidenceTypes: ["vendor_contract", "data_processing_terms", "subprocessor_list", "vendor_audit"],
-    source: cfrSource(34, 1, "99.31", "Under what conditions is prior consent not required to disclose information?", 2024),
+    source: readOn(cfrSource(34, 1, "99.31", "Under what conditions is prior consent not required to disclose information?", 2024), REPAIR_RETRIEVED_AT),
   },
   {
     id: "education-deep-10", industry: "education", station: "education",
@@ -104,5 +104,5 @@ export const DEEP_EDUCATION_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Written retention policy covers agent conversations and derived data", "Purposes, business need and deletion timeframe stated", "Policy disclosed in the online notice", "Deletion is secure and verified"],
     levels: levels("Children's data kept indefinitely, including chat transcripts", "Retention policy exists but omits agent data", "Written policy covers all agent data with purposes, need and timeframe, and is published", "Deletion jobs verified against the policy each cycle", "Derived data, embeddings and backups included in verified deletion"),
     evidenceTypes: ["retention_policy", "online_notice", "deletion_job_log", "backup_inventory"],
-    source: cfrSource(16, 1, "312.10", "Data retention and deletion requirements", 2026),
+    source: readOn(cfrSource(16, 1, "312.10", "Data retention and deletion requirements", 2026), REPAIR_RETRIEVED_AT),
   },];

@@ -3,7 +3,7 @@
  * Each question anchors one provision and lists the industry packs it applies to.
  */
 
-import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, levels, source, type DeepIndustryQuestion } from "./shared.js";
+import { AI_ACT_DESK, OMNIBUS_DATES, aiActSource, levels, source, readOn, REPAIR_RETRIEVED_AT, type DeepIndustryQuestion } from "./shared.js";
 
 export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
   {
@@ -67,7 +67,7 @@ export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Known and foreseeable risks to health, safety and fundamental rights identified", "Foreseeable misuse of the agent analysed", "Post-market data feeds risk re-evaluation", "Targeted measures adopted and tested"],
     levels: levels("No documented risk analysis for the agent", "One-off risk assessment at launch", "Lifecycle risk process with misuse analysis and owned measures", "Post-market findings reopen the risk assessment on a set trigger", "Residual risk tracked against acceptance criteria and tested after each change"),
     evidenceTypes: ["risk_register", "misuse_analysis", "test_report", "risk_acceptance"],
-    source: aiActSource("article-9", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-9", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "environment-deep-07", industry: "environment", station: "environment",
@@ -77,7 +77,7 @@ export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Logging is automatic, not opt-in", "Logged events chosen to identify risk situations", "Logs usable for post-market monitoring", "Logs retained across model and software versions"],
     levels: levels("No event logs, or logs that operators can switch off", "Application logs kept without a defined event set", "A defined event set logged automatically for the system lifetime", "Logs used routinely in operator monitoring and incident review", "Logs integrity-protected and linked to the model version that produced each event"),
     evidenceTypes: ["logging_specification", "log_sample", "retention_config"],
-    source: aiActSource("article-12", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-12", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "environment-deep-08", industry: "environment", station: "environment",
@@ -87,7 +87,7 @@ export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["AI-specific threats in the threat model (data poisoning, model poisoning, adversarial examples)", "Sensor and telemetry inputs validated", "Model artefacts integrity-checked", "Adversarial testing performed"],
     levels: levels("No AI-specific security controls", "General IT security only", "AI-specific threats modelled and input and model integrity controls in place", "Adversarial testing run before each release", "Attack detection in operation with tested containment"),
     evidenceTypes: ["threat_model", "input_validation_config", "model_integrity_check", "adversarial_test_report"],
-    source: aiActSource("article-15", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-15", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "environment-deep-09", industry: "environment", station: "environment",
@@ -97,7 +97,7 @@ export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Instructions for use mapped to operating procedures", "Oversight staff named per site or shift", "Training and authority to intervene documented", "Use outside the instructions detected"],
     levels: levels("Agent used with no reference to the instructions for use", "Instructions filed but oversight roles unassigned", "Oversight assigned to trained staff with authority, and use follows the instructions", "Oversight competence re-checked after model changes", "Out-of-instruction use is detected automatically and escalated"),
     evidenceTypes: ["operating_procedure", "oversight_roster", "training_record"],
-    source: aiActSource("article-26", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-26", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },
   {
     id: "environment-deep-10", industry: "environment", station: "environment",
@@ -107,5 +107,5 @@ export const DEEP_ENVIRONMENT_QUESTIONS: DeepIndustryQuestion[] = [
     evaluationCriteria: ["Operators trained on automation bias", "Confidence and key inputs shown with each recommendation", "Acceptance rate of recommendations measured", "Unchallenged acceptance reviewed"],
     levels: levels("Recommendations applied without operator scrutiny", "Training mentions over-reliance once", "Confidence and inputs shown, and acceptance rates measured", "High acceptance with low challenge triggers review", "Operator challenge quality tested with seeded faulty recommendations"),
     evidenceTypes: ["training_record", "hmi_capture", "acceptance_rate_report"],
-    source: aiActSource("article-14", OMNIBUS_DATES),
+    source: readOn(aiActSource("article-14", OMNIBUS_DATES), REPAIR_RETRIEVED_AT),
   },];
