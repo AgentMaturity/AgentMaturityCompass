@@ -193,4 +193,8 @@ export const INTL_INSTRUMENTS: readonly RegulatoryInstrument[] = [
   unverified("imdg", "IMO International Maritime Dangerous Goods Code", "INT", "standard", ["IMDG Code"]),
   unverified("isps", "IMO International Ship and Port Facility Security Code", "INT", "standard", ["ISPS Code"]),
   unverified("un-tir", "UN TIR Convention (1975)", "INT", "treaty", ["UN TIR Convention"]),
+  { ...unverified("unesco-genai-2023", "UNESCO Guidance for generative AI in education and research (2023)", "INT", "guidance",
+    ["UNESCO Guidance for generative AI in education and research"],
+    "Non-binding. Page read on unesco.org (the issuing body) 2026-10-03 per round2/content/education/questions.json; that host is not on OFFICIAL_SOURCE_HOSTS, so the status stays unverified."),
+    lastReviewed: "2026-10-04" },
 ];

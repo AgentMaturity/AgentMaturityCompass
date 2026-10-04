@@ -1,0 +1,16 @@
+--- a/docs/DOMAIN_PACKS.md
++++ b/docs/DOMAIN_PACKS.md
+@@ -37,11 +37,11 @@
+ | `environment` | 6 | 91 |
+ | `health` | 9 | 151 |
+ | `wealth` | 5 | 75 |
+-| `education` | 5 | 75 |
++| `education` | 5 | 83 |
+ | `mobility` | 6 | 90 |
+ | `technology` | 5 | 75 |
+ | `governance` | 5 | 75 |
+-| **Total** | **41** | **632** |
++| **Total** | **41** | **640** |
+ 
+ ## Regulatory Currency
+ 
