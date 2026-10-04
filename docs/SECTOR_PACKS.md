@@ -13,7 +13,7 @@ The counts on this page are derived from the source, not maintained by hand. Re-
 ./node_modules/.bin/tsx -e 'import { listIndustryPacks } from "./src/domains/industryPacks.ts"; const p = listIndustryPacks(); console.log(p.length, p.reduce((n, x) => n + x.questions.length, 0))' < /dev/null
 ```
 
-Measured at commit `8f57ce63` (2026-10-03): the base count above, across 5 layers; 41 sector packs holding 600 questions. `tests/domainReport.test.ts` fails if this page drifts from those sources.
+The base count above spans 5 layers. Sector pack and question totals are not restated on this page: the second command (or `amc sector pack list`) reports them for the commit you are on. `tests/sectorPacksDocDerived.test.ts` fails if this page drifts from those sources or restates a total.
 
 ---
 
@@ -23,7 +23,7 @@ Measured at commit `8f57ce63` (2026-10-03): the base count above, across 5 layer
 |---|---|
 | **Base AMC** | The base rubric above, 5 layers — mandatory for all agents |
 | **Domain Packs** | 7 canonical domain stations with CLI aliases (health, education, environment, mobility, governance, technology, wealth) |
-| **Sector Packs** | 41 packs across 7 stations — granular industry sub-verticals |
+| **Sector Packs** | Packs across all 7 stations — granular industry sub-verticals |
 
 **Sector Packs do not replace Domain Packs.** They add a third layer of specificity for organizations that need sub-vertical precision.
 
@@ -40,7 +40,7 @@ Use `amc domain list` for the full alias table, then run `amc domain modules --d
 
 ---
 
-## The 7 Stations — 41 Packs, 600 Questions
+## The 7 Stations
 
 ### 🌿 Environment (6 packs)
 
