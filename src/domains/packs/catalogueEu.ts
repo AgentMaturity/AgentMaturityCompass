@@ -238,4 +238,8 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "https://health.ec.europa.eu/system/files/2016-11/2013_c343_01_en_0.pdf", ["Guidelines on Good Distribution Practice 2013/C 343/01", "EU GDP Guidelines"], {
       note: "Commission PDF of OJ C 343/1 (23.11.2013) read; Chapter 9 (transportation).",
     }),
+  verified("edpb-gl-4-2019", "EDPB Guidelines 4/2019 on Article 25 Data Protection by Design and by Default, version 2.0", "EU", "guidance", "in-force",
+    "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-42019-article-25-data-protection-design-and_en", ["EDPB Guidelines 4/2019"], {
+      note: "Version 2.0 adopted 20 October 2020 (EDPB page read).",
+    }),
 ];
