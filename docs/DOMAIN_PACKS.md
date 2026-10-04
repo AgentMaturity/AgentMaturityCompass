@@ -34,14 +34,14 @@ Industry sector packs (`src/domains/industryPacks.ts`) per station. The Question
 
 | Station | Packs | Questions |
 |---|---:|---:|
-| `environment` | 6 | 91 |
-| `health` | 9 | 151 |
+| `environment` | 6 | 97 |
+| `health` | 9 | 149 |
 | `wealth` | 5 | 75 |
-| `education` | 5 | 75 |
+| `education` | 5 | 83 |
 | `mobility` | 6 | 90 |
-| `technology` | 5 | 75 |
+| `technology` | 5 | 77 |
 | `governance` | 5 | 75 |
-| **Total** | **41** | **632** |
+| **Total** | **41** | **646** |
 
 ## Regulatory Currency
 
