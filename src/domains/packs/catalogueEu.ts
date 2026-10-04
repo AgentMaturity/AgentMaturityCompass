@@ -213,4 +213,11 @@ export const EU_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     "No EU regulation by this name was identified in this review; the citation needs an owner to confirm or replace it."),
   unverified("eu-epr", "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)", "EU", "law", ["Extended Producer Responsibility (EPR) Directive"],
     "There is no single EPR directive; EPR is set by Directive 2008/98/EC and product-specific acts."),
+  // Technology station round 2 (2026-10-04): cited by TECH-INF-7.
+  {
+    id: "eu-eprivacy", citation: "Directive 2002/58/EC (ePrivacy Directive), as amended by Directive 2009/136/EC", jurisdiction: "EU", kind: "law",
+    status: "in-force", lastReviewed: "2026-10-04", url: "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02002L0058-20091219",
+    retrievedAt: "2026-10-04", effectiveDate: "2002-07-31", aliases: ["ePrivacy Directive", "Directive 2002/58/EC"],
+    note: "Art. 5(3) consent wording read in the EUR-Lex consolidated text (19.12.2009) by the technology round-2 content pass; in force on publication, OJ L 201, 31.7.2002.",
+  },
 ];
