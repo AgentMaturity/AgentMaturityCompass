@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import ts from "typescript";
 import { beforeAll, describe, expect, it } from "vitest";
+import { landedBytes, landedText } from "./helpers/landedSource.js";
 
 const map = JSON.parse(readFileSync(resolve(
   "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json"), "utf8")) as {
@@ -17,7 +18,7 @@ const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).dige
 const originalBytes = readFileSync(resolve(map.archivePath));
 if (hash(originalBytes) !== map.originalSha256) throw new Error("Complete original metric source changed");
 const original = originalBytes.toString("utf8");
-const current = readFileSync(resolve(map.originalPath), "utf8");
+const current = landedText(map.originalPath);
 type PropertyContract = { name: string; type: string; optional: boolean; readonly: boolean };
 type Contract = { properties: PropertyContract[]; parameterName: string; parameterOptional: boolean;
   parameterRest: boolean; parameterCount: number; returnType: string; public: boolean };
@@ -130,8 +131,8 @@ it("preserves entire runtime emission and actual built public contracts", () => 
   const emit = (source: string) => ts.transpileModule(source, { fileName: map.originalPath,
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true } }).outputText;
   expect(emit(current)).toBe(emit(original));
-  for (const contract of map.compiledContracts) expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);
-  expect(hash(readFileSync(resolve(map.typesReadOnly.file)))).toBe(map.typesReadOnly.sha256);
+  for (const contract of map.compiledContracts) expect(hash(landedBytes(contract.file))).toBe(contract.sha256);
+  expect(hash(landedBytes(map.typesReadOnly.file))).toBe(map.typesReadOnly.sha256);
 });
 it("changes only the declared private annotations and introduces no new public API", () => {
   expect(map.baseCommit).toBe("b30e1c771b89e23ecedb13604cc0bf9102078136");
@@ -162,7 +163,7 @@ it("changes only the declared private annotations and introduces no new public A
       modifier => modifier.kind === ts.SyntaxKind.ExportKeyword) || false).toBe(false);
   }
   const typesAst = ts.createSourceFile(map.typesReadOnly.file,
-    readFileSync(resolve(map.typesReadOnly.file), "utf8"), ts.ScriptTarget.ES2022, true);
+    landedText(map.typesReadOnly.file), ts.ScriptTarget.ES2022, true);
   const shared = typesAst.statements.find(node => ts.isInterfaceDeclaration(node)
     && node.name.text === "MetricValidationSharedFields");
   expect(shared).toBeDefined();

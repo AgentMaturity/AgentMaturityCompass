@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { restorePrivateHelperVisibility } from "./helpers/restorePrivateHelperVisibility.js";
+import { landedBytes, landedText } from "./helpers/landedSource.js";
 
 const prefix = "unused-code/2026-10-02-main/private-store-locators";
 const map = JSON.parse(readFileSync(resolve(prefix, "restoration.json"), "utf8")) as {
@@ -53,9 +54,9 @@ describe("reviewed module-private store locator visibility", () => {
     expect(map.changedSourceFiles).toBe(46);
     expect(map.files.filter(file => file.declarations.length)).toHaveLength(map.changedSourceFiles);
     expect(map.preservedExports).toHaveLength(4);
-    expect(hash(readFileSync(resolve(map.preservedBarrel.file)))).toBe(map.preservedBarrel.sha256);
+    expect(hash(landedBytes(map.preservedBarrel.file))).toBe(map.preservedBarrel.sha256);
     for (const declaration of map.preservedExports) {
-      const ast = sourceAst(declaration.file, readFileSync(resolve(declaration.file), "utf8"));
+      const ast = sourceAst(declaration.file, landedText(declaration.file));
       const node = ast.statements.find(statement => ts.isFunctionDeclaration(statement) && statement.name?.text === declaration.name);
       if (!node || !ts.isFunctionDeclaration(node)) throw new Error("Referenced barrel export missing: " + declaration.name);
       expect(node.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword)).toBe(true);
@@ -63,14 +64,14 @@ describe("reviewed module-private store locator visibility", () => {
       expect(hash(node.body!.getText(ast))).toBe(declaration.bodySha256);
     }
     expect(map.files.reduce((sum, file) => sum + file.declarations.length, 0)).toBe(map.declarations);
-    const manifest = readFileSync(resolve("package.json"));
+    const manifest = landedBytes("package.json");
     expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
     expect(packageEntriesSha256(manifest)).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     const pkg = JSON.parse(manifest.toString("utf8")) as { exports: Record<string, { types: string }> };
     expect(Object.keys(pkg.exports).sort()).toEqual(map.packageEntries.map(row => row.name).sort());
     for (const entry of map.packageEntries) {
       expect(pkg.exports[entry.name].types.replace(/^\.\/dist\//, "src/").replace(/\.d\.ts$/, ".ts")).toBe(entry.file);
-      expect(hash(readFileSync(resolve(entry.file)))).toBe(entry.sha256);
+      expect(hash(landedBytes(entry.file))).toBe(entry.sha256);
     }
   });
   for (const row of map.files) {
@@ -78,7 +79,7 @@ describe("reviewed module-private store locator visibility", () => {
       const bytes = readFileSync(resolve(row.archivePath));
       if (hash(bytes) !== row.sha256) throw new Error("Complete source original changed: " + row.originalPath);
       const original = bytes.toString("utf8"), current = restorePrivateHelperVisibility(
-        row.originalPath, readFileSync(resolve(row.originalPath), "utf8"));
+        row.originalPath, landedText(row.originalPath));
       it("retains every function, parameter, body and caller while changing only the declared visibility", () => {
         let expected = original;
         for (const declaration of [...row.declarations].sort((a, b) => b.start - a.start)) {

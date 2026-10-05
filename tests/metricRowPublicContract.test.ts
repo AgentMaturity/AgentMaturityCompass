@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import ts from "typescript";
 import { beforeAll, describe, expect, test } from "vitest";
 import { restorePrivateHelperVisibility } from "./helpers/restorePrivateHelperVisibility.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const metricNames = ["MetricValidationRow", "MetricValidationEvalPackRow"] as const;
 const providerNames = ["ProviderDriftComparison", "ProviderDriftEvalPackRow"] as const;
@@ -59,8 +60,8 @@ beforeAll(() => {
       "unused-code/2026-10-01-main/provider-row-types/providerDriftBenchmark.ts.original"), "utf8"))
   };
   current = {
-    ...publicContracts("src/types.ts", metricNames),
-    ...publicContracts("src/benchmarks/providerDriftBenchmark.ts", providerNames)
+    ...publicContracts("src/types.ts", metricNames, landedText("src/types.ts")),
+    ...publicContracts("src/benchmarks/providerDriftBenchmark.ts", providerNames, landedText("src/benchmarks/providerDriftBenchmark.ts"))
   };
 }, 120_000);
 
@@ -85,7 +86,7 @@ let inputCurrent: Record<string, PropertyContract[]>;
 describe("metric validation input public TypeScript contracts", () => {
   beforeAll(() => {
     inputOriginal = publicContracts("src/score/metricValidity.ts", inputNames, inputOriginalSource);
-    inputCurrent = publicContracts("src/score/metricValidity.ts", inputNames);
+    inputCurrent = publicContracts("src/score/metricValidity.ts", inputNames, landedText("src/score/metricValidity.ts"));
   }, 120_000);
 
   for (const name of inputNames) {
@@ -97,7 +98,7 @@ describe("metric validation input public TypeScript contracts", () => {
 
   test("all original input names remain interfaces supporting declaration merging", () => {
     expect(inputNames).toHaveLength(50);
-    const currentSource = readFileSync(resolve(process.cwd(), "src/score/metricValidity.ts"), "utf8");
+    const currentSource = landedText("src/score/metricValidity.ts");
     const currentAst = ts.createSourceFile("metricValidity.ts", currentSource, ts.ScriptTarget.ES2022, true);
     const names = currentAst.statements.filter(ts.isInterfaceDeclaration).map(node => node.name.text);
     for (const name of inputNames) expect(names).toContain(name);
@@ -108,7 +109,7 @@ describe("metric validation input public TypeScript contracts", () => {
       const originalSource = readFileSync(resolve(process.cwd(),
         "unused-code/2026-10-01-main/metric-input-contracts/originals/" + file + ".original"), "utf8");
       const currentSource = restorePrivateHelperVisibility(file,
-        readFileSync(resolve(process.cwd(), file), "utf8"));
+        landedText(file));
       const emit = (source: string) => ts.transpileModule(source, { compilerOptions: {
         target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022, removeComments: true
       } }).outputText;

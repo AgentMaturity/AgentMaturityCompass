@@ -10,6 +10,7 @@ import { forecastLegitimacyPack } from "../src/assurance/packs/forecastLegitimac
 import { factSimulationBoundaryPack } from "../src/assurance/packs/factSimulationBoundaryPack.js";
 import { humanOversightQualityPack } from "../src/assurance/packs/humanOversightQualityPack.js";
 import type { AssurancePackDefinition, AssurancePromptContext } from "../src/assurance/validators.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const BASE_COMMIT = "f0ab8027208f3679029fa624225fe574d27bba30";
 const ARCHIVE = "unused-code/2026-10-01-cos/assurance";
@@ -185,7 +186,7 @@ describe("assurance scenario context parity against preserved base implementatio
       });
 
       it("leaves validator, regex, seed, suffix and metadata source bytes unchanged", () => {
-        const source = readSource(`src/assurance/packs/${name}.ts`);
+        const source = landedText(`src/assurance/packs/${name}.ts`);
         const before = readSource(`${ARCHIVE}/originals/src/assurance/packs/${name}.ts`);
         expect(source.split(HELPER_IMPORT)).toHaveLength(2);
         expect(source.match(PROMPT_BLOCK)).toHaveLength(1);

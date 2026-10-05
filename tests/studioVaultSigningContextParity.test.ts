@@ -10,6 +10,7 @@ import { nativeCsrfTokenForSession, NATIVE_CSRF_HEADER, NATIVE_INTENT_HEADER, NA
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const prefix = "unused-code/2026-10-02-main/studio-vault-signing-context";
 const map = JSON.parse(readFileSync(resolve(prefix, "restoration.json"), "utf8")) as {
@@ -98,6 +99,7 @@ function outcome(factory: Factory, index: number, value: unknown, failure: typeo
 describe("actual Studio signing-vault guard parity", () => {
   it("reverses only the declared sharing to the complete unchanged source", () => {
     expect(map.guards).toHaveLength(40);
+    const current = landedText("src/studio/studioServer.ts");
     expect(current.split(map.helperText)).toHaveLength(2);
     let restored = current.replace(map.helperText, "");
     const guards = currentGuards(restored);

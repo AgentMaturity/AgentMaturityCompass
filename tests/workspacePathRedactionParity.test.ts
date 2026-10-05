@@ -13,6 +13,7 @@ import { redactFixerRcaReport } from "../src/mechanic/fixerRca.js";
 import { redactOrgRunArtifact } from "../src/org/orgRun.js";
 import { redactObservabilityLaneRecord } from "../src/lifecycle/observabilityLane.js";
 import { restoreWorkspacePathSharing } from "./helpers/restoreWorkspacePathSharing.js";
+import { landedBytes, landedText } from "./helpers/landedSource.js";
 
 type RuntimeFunction = (...args: unknown[]) => unknown;
 type Row = { originalPath: string; archivePath: string; sha256: string; currentSha256: string;
@@ -210,7 +211,7 @@ it("freezes every actual source byte outside the declared imports and private bo
   expect(map.files.filter(row => row.nullable)).toHaveLength(6);
   expect(map.compiledContracts).toHaveLength(15);
   for (const row of map.files) {
-    const original = archived(row), current = readFileSync(resolve(row.originalPath), "utf8");
+    const original = archived(row), current = landedText(row.originalPath);
     expect(hash(current)).toBe(row.currentSha256);
     const ast = ts.createSourceFile(row.originalPath, original, ts.ScriptTarget.ES2022, true);
     const nodes = ast.statements.filter(node => ts.isFunctionDeclaration(node) && node.name?.text === row.name);
@@ -223,11 +224,11 @@ it("freezes every actual source byte outside the declared imports and private bo
     expect(() => restoreWorkspacePathSharing(row.originalPath, current + "\n")).toThrow("Source changed beyond declared");
     expect(() => restoreWorkspacePathSharing(row.originalPath, current.replace(row.afterBody, row.beforeBody))).toThrow();
   }
-  expect(hash(readFileSync(resolve(map.utility.path)))).toBe(map.utility.sha256);
+  expect(hash(landedBytes(map.utility.path))).toBe(map.utility.sha256);
   expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
-  expect(packageEntriesSha256(readFileSync(resolve("package.json")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
+  expect(packageEntriesSha256(landedBytes("package.json"))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
   for (const contract of map.compiledContracts) {
-    expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);
+    expect(hash(landedBytes(contract.file))).toBe(contract.sha256);
   }
 });
 it("retains all previous freeze assertions with only the bounded reversal inserted", () => {
@@ -242,7 +243,7 @@ it("retains all previous freeze assertions with only the bounded reversal insert
       : 'import { restoreWorkspacePathSharing } from "./helpers/restoreWorkspacePathSharing.js";\n' + original.replace(
         'current = readFileSync(resolve(row.originalPath), "utf8");',
         'current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), "utf8"));');
-    expect(readFileSync(resolve(row.originalPath), "utf8"))
+    expect(landedText(row.originalPath))
       .toBe(row.originalPath.includes("/helpers/") ? expected : withPackageEntriesPin(expected));
   }
 });

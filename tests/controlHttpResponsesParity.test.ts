@@ -18,6 +18,7 @@ import { createHostUser, createWorkspaceRecord, grantMembership, initHostDb, rev
 import { issueHostSessionToken } from "../src/workspaces/hostAuth.js";
 import { hostWorkspaceDir } from "../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../src/workspaces/workspaceRouter.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-02-native/http-controls";
 const hash = (bytes: string | Buffer) => createHash("sha256").update(bytes).digest("hex");
@@ -264,7 +265,7 @@ it("freezes full original modules and bounds every intentional response edit", (
   expect(map.base).toBe("b30e1c771b89e23ecedb13604cc0bf9102078136");
   for (const row of map.files.filter(value => value.exactBefore)) {
     expect(readFileSync(resolve(row.archive!), "utf8")).toBe(row.exactBefore);
-    const current = readFileSync(resolve(row.path), "utf8");
+    const current = landedText(row.path);
     expect(current).toBe(row.exactAfter); expect(hash(current)).toBe(row.candidateSha256);
     // The exact candidate-to-full-original reversal leaves all route/policy
     // declarations byte-identical, rather than deriving the baseline from copies.

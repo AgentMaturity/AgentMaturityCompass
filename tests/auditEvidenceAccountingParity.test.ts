@@ -14,6 +14,7 @@ import * as gate from "../src/ci/gate.js";
 import * as publicApi from "../src/index.js";
 import { canonicalize } from "../src/utils/json.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-02-native/audit-evidence-accounting";
 const generatedAt = "2026-10-02T08:00:00.000Z";
@@ -103,7 +104,7 @@ for (const [name, path, currentNamespace, buildName, verifyName, renderName, row
       expect(Object.keys(currentNamespace).sort()).toEqual(Object.keys(old()).sort());
       for (const exported of [buildName, verifyName, renderName]) expect((publicApi as unknown as Record<string, unknown>)[exported]).toBe(current[exported]);
       const inverses = JSON.parse(readFileSync(resolve(archive, "inverse-text.json"), "utf8")) as Record<string, Array<{ position: number; before: string; after: string }>>;
-      let restored = readFileSync(resolve(path), "utf8");
+      let restored = landedText(path);
       for (const operation of [...inverses[path]!].reverse()) {
         expect(restored.slice(operation.position, operation.position + operation.after.length)).toBe(operation.after);
         restored = restored.slice(0, operation.position) + operation.before + restored.slice(operation.position + operation.after.length);

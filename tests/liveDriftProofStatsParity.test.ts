@@ -14,6 +14,7 @@ import * as references from "../src/watch/evidenceRefs.js";
 import * as drift from "../src/watch/liveDriftAlerts.js";
 import { collectLiveDriftProofStats } from "../src/watch/proofStats.js";
 import { restoreWatchReceiptSharing } from "./helpers/restoreWatchReceiptSharing.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-01-main/live-drift-proof-stats";
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -99,7 +100,7 @@ exports.rowFields = REQUIRED_ROW_PROOF_FIELDS;
   );
   describe(`${name} actual public and archived proof accounting parity`, () => {
     test("preserves every other declaration, mismatch policy, row hash and public API", () => {
-      expect(unchangedDeclarations(restoreWatchReceiptSharing(sourcePath, read(sourcePath)))).toBe(unchangedDeclarations(source));
+      expect(unchangedDeclarations(restoreWatchReceiptSharing(sourcePath, landedText(sourcePath)))).toBe(unchangedDeclarations(source));
       expect(Reflect.get(realRun as object, "length")).toBe(Reflect.get(oldRun as object, "length"));
       expect(Object.keys(actualModule).sort()).toEqual(Object.keys(original)
         .filter(key => !["privateProofStats", "metadataMismatchReasons", "metadataFields", "rowFields"].includes(key)).sort());

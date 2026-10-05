@@ -19,6 +19,7 @@ import {
 import { initWorkspace } from "../src/workspace.js";
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { savePassportPolicy } from "../src/passport/passportStore.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const roots: string[] = [];
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
@@ -82,7 +83,7 @@ const originals = restoration.files.map(row => {
 for (const original of originals) {
   describe(`text PDF parity against ${original.originalPath}`, () => {
     test("preserves all caller declarations, crypto policy and public APIs", () => {
-      expect(unchangedDeclarations(read(original.originalPath))).toBe(unchangedDeclarations(original.source));
+      expect(unchangedDeclarations(landedText(original.originalPath))).toBe(unchangedDeclarations(original.source));
       expect(escapePdfText.length).toBe(original.functions.escapePdfText.length);
       expect(renderPdfFromLines.length).toBe(original.functions.renderPdfFromLines.length);
     });

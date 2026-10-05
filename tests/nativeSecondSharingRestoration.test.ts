@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, test } from "vitest";
 import { restoreNativeSecondSharing } from "./helpers/restoreNativeSecondSharing.js";
+import { landedText } from "./helpers/landedSource.js";
 const read = (path: string) => readFileSync(resolve(path), "utf8");
 const hash = (source: string) => createHash("sha256").update(source).digest("hex");
 type File = { originalPath: string; archivePath: string; originalSha256: string; currentSha256: string;
@@ -14,17 +15,17 @@ describe("bounded second native sharing provenance", () => {
   });
   for (const row of manifest.files) {
     test(row.originalPath + " restores the complete preserved original", () => {
-      expect(hash(read(row.originalPath))).toBe(row.currentSha256);
+      expect(hash(landedText(row.originalPath))).toBe(row.currentSha256);
       expect(hash(read(row.archivePath))).toBe(row.originalSha256);
-      expect(restoreNativeSecondSharing(row.originalPath, read(row.originalPath))).toBe(read(row.archivePath));
+      expect(restoreNativeSecondSharing(row.originalPath, landedText(row.originalPath))).toBe(read(row.archivePath));
     });
     test(row.originalPath + " refuses any unrelated byte change", () => {
-      expect(() => restoreNativeSecondSharing(row.originalPath, read(row.originalPath) + "\n")).toThrow("Source changed beyond declared");
+      expect(() => restoreNativeSecondSharing(row.originalPath, landedText(row.originalPath) + "\n")).toThrow("Source changed beyond declared");
     });
   }
   test("preserves the complete previous Watch core and binds its declared inverse, current core and new helper", () => {
     const row = manifest.watchCore;
-    const current = read(row.originalPath);
+    const current = landedText(row.originalPath);
     expect(hash(current)).toBe(row.currentSha256);
     expect(hash(read(row.archivePath))).toBe(row.originalSha256);
     const lines = current.match(/[^\n]*\n|[^\n]+$/g) ?? [];
@@ -36,7 +37,7 @@ describe("bounded second native sharing provenance", () => {
     const old = JSON.parse(read("unused-code/2026-10-02-main/native-five-integration/watch-source-restoration.json"));
     expect(old.currentProductionFiles).toHaveLength(9);
     expect(old.currentProductionFiles.find((item: { path: string }) => item.path === row.originalPath).sha256).toBe(row.currentSha256);
-    expect(hash(read(old.laterSharingProvenance.newHelper))).toBe(old.laterSharingProvenance.helperSha256);
+    expect(hash(landedText(old.laterSharingProvenance.newHelper))).toBe(old.laterSharingProvenance.helperSha256);
   });
   test("leaves every unowned module unchanged", () => {
     expect(restoreNativeSecondSharing("src/watch/proofStats.ts", "unowned source")).toBe("unowned source");
