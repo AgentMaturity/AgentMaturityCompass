@@ -35,5 +35,5 @@
   - [ ] ...
 - **Failing regression run** (before the fix): <!-- command and output, or a CI link -->
 - **Mutation check:** <!-- guard broken, test that failed, restored -->
-- **Receipt:** <!-- qualification/<YYYY-MM-DD>-<KEY>/, or "not required by the issue" -->
+- **Receipt:** <!-- qualification/<YYYY-MM-DD>-<KEY>/ (see qualification/README.md), or "not required by the issue" -->
 - **Freeze exception:** <!-- none, or the key and the changeset carrying "freeze-exception: <KEY> — <reason>" -->

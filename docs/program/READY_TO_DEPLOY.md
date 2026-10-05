@@ -25,7 +25,13 @@ They bind code, docs, changesets and PR text alike.
 
 ## Program pause and WIP limits (D-09)
 
-Decision D-09, option A, recorded 2026-10-05: the agent-fleet programs are paused while the Ready-to-Deploy program runs. At most 3 PRs may be open per epic and at most 10 PRs may await review in total. Review capacity, not coding speed, is the bottleneck.
+D-09 is pending: Sid has not recorded it yet. The plan recommends option A, and the agent contract already assumes it:
+
+- No new agent-fleet, apply-round or parallel-track programs until Gate G0. Single agents may work plan issues, one per branch.
+- At most 3 PRs may be open per epic and at most 10 PRs may await review in total. Review capacity, not coding speed, is the bottleneck.
+- An agent-fleet program may start before Gate G0 only with a dated Sid comment `FREEZE EXCEPTION: <program> — <reason>` on the affected issue's heading. This route is separate from the changeset `freeze-exception` line below, which covers CLI command paths and station-pack questions.
+
+When Sid records D-09, this section is updated with the date and the option chosen. If the choice is not option A, the fleet clause in the freeze below is dropped.
 
 ## The freeze (until Gate G0)
 
@@ -42,6 +48,7 @@ No new CLI command paths, no new station-pack questions and no new agent-fleet p
   ```
 
   The key must already be in `allowedExceptionKeys` of the base branch's baseline. A PR cannot authorize itself: adding a key to `allowedExceptionKeys` needs Sid's approval in its own PR.
+- On a pull request the base is `origin/<base branch>`. On a push to `main` it is the commit before the push, so every commit in a multi-commit push is checked; it falls back to `HEAD^1` when that commit is unknown.
 - After Gate G0, Sid sets `freezeActive` to `false` or keeps it on; GATE-G0 records the choice.
 
 ## Proof and receipts
@@ -84,7 +91,7 @@ An issue is done when:
 
 - every acceptance criterion is met and checked off in the PR;
 - the regression test failed before the change and passes after it, and mutation checks are recorded where the issue asks;
-- the commands above pass in CI on Node 22 and 24, including the freeze guard and receipt validation;
+- the `build-test` CI job passes on Node 22 and 24, including the freeze guard and receipt validation, and the other commands above pass where they apply (some run in their own CI jobs, some only locally);
 - the receipt folder, if the issue asks for one, is committed and validates;
 - docs and the changeset are updated and follow the truth rules;
 - the PR is reviewed and merged, and the merged SHA is recorded on the issue.

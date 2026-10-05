@@ -2,7 +2,7 @@
 
 Every contribution makes AI agent trust scoring better for everyone. Whether you're fixing a typo, writing a new attack pack, or adding support for a new agent framework — welcome.
 
-Working on a Ready-to-Deploy plan issue? Read [docs/program/READY_TO_DEPLOY.md](docs/program/READY_TO_DEPLOY.md) first: it covers the truth rules, the freeze guard and where qualification receipts go.
+Working on a Ready-to-Deploy plan issue? Read [docs/program/READY_TO_DEPLOY.md](docs/program/READY_TO_DEPLOY.md) first: it covers the truth rules, the freeze guard and where qualification receipts go ([qualification/README.md](qualification/README.md)).
 
 ## Table of Contents
 
