@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "freezeActive": true,
+  "measuredAt": "2026-10-05T12:36:20.893Z",
+  "measuredOn": "786d8abb2a12b82d0986c3a286864d7966d21166",
+  "counts": {
+    "cliCommandPaths": 1228,
+    "cliInventoryPaths": 1228,
+    "stationPacks": 41,
+    "stationPackQuestions": 600
+  },
+  "allowedExceptionKeys": [
+    "P0-02",
+    "P0-12",
+    "P0-13",
+    "P0-14",
+    "P0-26",
+    "P1-08",
+    "P1-10",
+    "P1-15",
+    "P1-16",
+    "P1-17",
+    "P1-40",
+    "P1-42",
+    "P1-43",
+    "P1-44",
+    "P1-45",
+    "P1-46"
+  ]
+}
