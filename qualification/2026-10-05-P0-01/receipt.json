@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P0-01",
   "date": "2026-10-05",
-  "commit": "e513019f1828299b3f3d4c4952c9f04ecebf2348",
+  "commit": "557059970c5304750b9bf7ccaa5c5bed624d2895",
   "branch": "rtd/p0-01-contract-receipts-freeze",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -25,42 +25,147 @@
       "durationMs": 234
     },
     {
-      "cmd": "npm run typecheck",
+      "cmd": "pnpm install --frozen-lockfile",
       "exit": 0,
-      "durationMs": 22430
-    },
-    {
-      "cmd": "npm run typecheck:tests",
-      "exit": 0,
-      "durationMs": 31087
+      "durationMs": 1000
     },
     {
       "cmd": "npm run lint",
       "exit": 0,
-      "durationMs": 1095
+      "durationMs": 0
     },
     {
-      "cmd": "npm run check:counts",
+      "cmd": "npm run typecheck",
       "exit": 0,
-      "durationMs": 482
+      "durationMs": 21000
     },
     {
-      "cmd": "npm run check:docs-drift",
+      "cmd": "npm run typecheck:tests",
       "exit": 0,
-      "durationMs": 308
+      "durationMs": 28000
+    },
+    {
+      "cmd": "node --test scripts/lib/ownedProcessCommand.test.mjs",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 24000
+    },
+    {
+      "cmd": "npm run check:package",
+      "exit": 0,
+      "durationMs": 3000
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run check:policy-fixtures",
+      "exit": 0,
+      "durationMs": 2000
     },
     {
       "cmd": "npm run check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1588
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:question-bank-export",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run test:coverage",
+      "exit": 0,
+      "durationMs": 414000
+    },
+    {
+      "cmd": "npm run check:coverage",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:incident-readiness",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:compliance-freshness",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:evidence-paths",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:changelog-page",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:vendor-links && npm run check:vendor-rescope && npm run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm pack --ignore-scripts && node dist/cli.js release sbom/licenses/provenance/scan",
+      "exit": 0,
+      "durationMs": 6000
+    },
+    {
+      "cmd": "node dist/cli.js e2e smoke --mode local --json",
+      "exit": 0,
+      "durationMs": 9000
+    },
+    {
+      "cmd": "node scripts/clean-source-check.mjs",
+      "exit": 0,
+      "durationMs": 44000
+    },
+    {
+      "cmd": "node scripts/packed-install-check.mjs",
+      "exit": 0,
+      "durationMs": 41000
+    },
+    {
+      "cmd": "npm run release:gate",
+      "exit": 1,
+      "durationMs": 635000
     }
   ],
   "tests": {
-    "total": 34,
-    "passed": 34,
+    "total": 21443,
+    "passed": 21443,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [],
-  "notes": "Focused run only (tests/freezeGuard.test.ts, tests/qualificationReceipts.test.ts); the full suite is run separately. check:freeze ran without a base baseline (origin/main has none yet), so only the exact check applied. Mutation checks (base-baseline comparison removed; 1 MB size check removed) and the review-fix regression runs are recorded in README.md."
+  "notes": "Every build-test step of .github/workflows/ci.yml plus the clean-source, packed-install and e2e-smoke jobs and npm run release:gate, run in one clone at this commit. Non-zero exits: check:duplicates and check:dead-code (1,253 duplicate blocks and 2,339 Knip findings that already exist on main; ci.yml runs that step as report-only until decision D-11) and release:gate (17/19 executed checks passed; the two failures are the same source-quality checks; live-deploy-health skipped). The same three exits occur on main at 786d8abb. check:freeze ran the exact check only, because origin/main has no freeze baseline yet. tests are the full suite under coverage; per-file coverage floors passed."
 }
