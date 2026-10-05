@@ -97,6 +97,13 @@ export function evaluateFreeze({ counts, baseline, baseBaseline, changesetTexts 
   return { ok: failures.length === 0, failures, notices };
 }
 
+/** A count that is missing or not an integer would make every comparison false and pass silently. */
+function checkCounts(counts, source) {
+  const bad = COUNT_NAMES.filter((name) => !Number.isInteger(counts?.[name]));
+  if (bad.length > 0) throw new Error(`${source} has missing or non-integer counts: ${bad.join(", ")}.`);
+  return counts;
+}
+
 function readBaseline(text, source) {
   const value = JSON.parse(text);
   const valid = value?.schemaVersion === 1 && typeof value.freezeActive === "boolean"
@@ -110,9 +117,23 @@ function git(args, cwd) {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
-function defaultBaseRef() {
+/** On push, the pre-push tip ("before"), so every commit of a multi-commit push is checked. */
+function pushBaseRef(root) {
+  let before;
+  try {
+    before = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH ?? "", "utf8")).before;
+  } catch {
+    before = undefined;
+  }
+  // A new branch reports an all-zero "before"; a force push may name a commit that is gone.
+  const usable = typeof before === "string" && !/^0+$/.test(before)
+    && git(["rev-parse", "--verify", "--quiet", `${before}^{commit}`], root);
+  return usable ? before : "HEAD^1";
+}
+
+function defaultBaseRef(root) {
   if (process.env.GITHUB_BASE_REF) return `origin/${process.env.GITHUB_BASE_REF}`;
-  if (process.env.GITHUB_EVENT_NAME === "push") return "HEAD^1";
+  if (process.env.GITHUB_EVENT_NAME === "push") return pushBaseRef(root);
   return "origin/main";
 }
 
@@ -145,7 +166,10 @@ function flag(args, name) {
 async function main(args) {
   const root = process.cwd();
   const countsFile = flag(args, "--counts-json");
-  const counts = countsFile ? JSON.parse(readFileSync(countsFile, "utf8")) : await measureFreezeCounts(root);
+  const counts = checkCounts(
+    countsFile ? JSON.parse(readFileSync(countsFile, "utf8")) : await measureFreezeCounts(root),
+    countsFile ?? "Measured freeze counts"
+  );
   const baselinePath = join(root, BASELINE_PATH);
 
   if (args.includes("--write-baseline")) {
@@ -165,7 +189,7 @@ async function main(args) {
 
   const notices = [];
   const baseline = readBaseline(readFileSync(baselinePath, "utf8"), BASELINE_PATH);
-  const { baseBaseline, changesetTexts } = loadBase(root, flag(args, "--base-ref") ?? defaultBaseRef(), notices);
+  const { baseBaseline, changesetTexts } = loadBase(root, flag(args, "--base-ref") ?? defaultBaseRef(root), notices);
   const result = evaluateFreeze({ counts, baseline, baseBaseline, changesetTexts });
   result.notices.unshift(...notices);
   if (args.includes("--json")) {

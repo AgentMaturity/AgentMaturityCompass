@@ -7,7 +7,7 @@
  * committed. An empty or missing root passes.
  */
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, lstatSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, posix, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,19 +26,35 @@ function schemaValidator() {
   return validateSchema;
 }
 
+/** Dirents are lstat-based, so a symlink is never followed. */
 function walk(dir, prefix = "") {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-    return entry.isDirectory() ? walk(join(dir, entry.name), relative) : [relative];
+    return entry.isDirectory() ? walk(join(dir, entry.name), relative) : [{ relative, symlink: entry.isSymbolicLink() }];
   });
 }
 
-/** Size and secret rules apply to every file under the root. */
+/** Contents of a regular file, or null for anything else (missing, directory, symlink). */
+function readRegular(path, encoding) {
+  return existsSync(path) && lstatSync(path).isFile() ? readFileSync(path, encoding) : null;
+}
+
+/** A real calendar date: 2026-02-30 is not one. */
+function isRealDate(date) {
+  const time = Date.parse(`${date}T00:00:00Z`);
+  return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === date;
+}
+
+/** Size, symlink and secret rules apply to every file under the root. */
 function checkFiles(dir, errors) {
-  for (const relative of walk(dir)) {
+  for (const { relative, symlink } of walk(dir)) {
+    if (symlink) {
+      errors.push(`${relative}: symlinks are not allowed; commit the file itself.`);
+      continue;
+    }
     const path = join(dir, relative);
     const name = posix.basename(relative);
-    const size = statSync(path).size;
+    const size = lstatSync(path).size;
     if (size > MAX_BYTES) errors.push(`${relative}: ${size} bytes exceeds the ${MAX_BYTES}-byte limit; summarise the log and keep its hash.`);
     if (FORBIDDEN_NAME.test(name)) errors.push(`${relative}: key, credential and vault files (${name}) must not be committed.`);
     else if (size <= MAX_BYTES && readFileSync(path, "utf8").includes("PRIVATE KEY-----")) {
@@ -51,13 +67,13 @@ function checkReceipt(dir, folder, errors) {
   const prefix = (message) => { errors.push(`${folder}: ${message}`); };
   const match = FOLDER.exec(folder);
   if (!match) return prefix("folder name must be <YYYY-MM-DD>-<KEY>.");
-  const readme = join(dir, folder, "README.md");
-  if (!existsSync(readme) || readFileSync(readme, "utf8").trim() === "") prefix("README.md is missing or empty.");
-  const receiptPath = join(dir, folder, "receipt.json");
-  if (!existsSync(receiptPath)) return prefix("receipt.json is missing.");
+  const readme = readRegular(join(dir, folder, "README.md"), "utf8");
+  if (readme === null || readme.trim() === "") prefix("README.md is missing or empty.");
+  const receiptText = readRegular(join(dir, folder, "receipt.json"), "utf8");
+  if (receiptText === null) return prefix("receipt.json is missing.");
   let receipt;
   try {
-    receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
+    receipt = JSON.parse(receiptText);
   } catch (error) {
     return prefix(`receipt.json is not valid JSON (${error.message}).`);
   }
@@ -69,6 +85,7 @@ function checkReceipt(dir, folder, errors) {
     }
     return undefined;
   }
+  if (!isRealDate(receipt.date)) prefix(`receipt date ${receipt.date} is not a real date.`);
   if (receipt.date !== match[1]) prefix(`folder date ${match[1]} differs from receipt date ${receipt.date}.`);
   if (receipt.key !== match[2]) prefix(`folder key ${match[2]} differs from receipt key ${receipt.key}.`);
   const { tests } = receipt;
@@ -80,16 +97,22 @@ function checkReceipt(dir, folder, errors) {
   }
   for (const artifact of receipt.artifacts) {
     const normalized = posix.normalize(artifact.path);
-    if (posix.isAbsolute(normalized) || normalized === ".." || normalized.startsWith("../")) {
+    // Backslashes and drive letters are separators or roots on Windows only; reject them everywhere.
+    if (/\\|^[A-Za-z]:/.test(artifact.path) || posix.isAbsolute(normalized) || normalized === ".." || normalized.startsWith("../")) {
       prefix(`artifact ${artifact.path} must be inside the folder.`);
       continue;
     }
     const path = join(dir, folder, normalized);
-    if (!existsSync(path)) {
+    if (!lstatSync(path, { throwIfNoEntry: false })) {
       prefix(`artifact ${artifact.path} is missing.`);
       continue;
     }
-    const actual = createHash("sha256").update(readFileSync(path)).digest("hex");
+    const content = readRegular(path);
+    if (content === null) {
+      prefix(`artifact ${artifact.path} must be a regular file, not a directory or symlink.`);
+      continue;
+    }
+    const actual = createHash("sha256").update(content).digest("hex");
     if (actual !== artifact.sha256) prefix(`artifact ${artifact.path} sha256 is ${actual}, receipt says ${artifact.sha256}.`);
   }
   return receipt;
