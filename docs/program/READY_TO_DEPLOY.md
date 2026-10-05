@@ -25,13 +25,11 @@ They bind code, docs, changesets and PR text alike.
 
 ## Program pause and WIP limits (D-09)
 
-D-09 is pending: Sid has not recorded it yet. The plan recommends option A, and the agent contract already assumes it:
+Sid decided D-09 on 2026-10-05: option A. The decision is recorded as a `DECISION:` comment on D-09 in the plan document:
 
 - No new agent-fleet, apply-round or parallel-track programs until Gate G0. Single agents may work plan issues, one per branch.
 - At most 3 PRs may be open per epic and at most 10 PRs may await review in total. Review capacity, not coding speed, is the bottleneck.
 - An agent-fleet program may start before Gate G0 only with a dated Sid comment `FREEZE EXCEPTION: <program> — <reason>` on the affected issue's heading. This route is separate from the changeset `freeze-exception` line below, which covers CLI command paths and station-pack questions.
-
-When Sid records D-09, this section is updated with the date and the option chosen. If the choice is not option A, the fleet clause in the freeze below is dropped.
 
 ## The freeze (until Gate G0)
 
