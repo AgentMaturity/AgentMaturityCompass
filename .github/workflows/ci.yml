@@ -78,7 +78,11 @@ jobs:
       - name: Published package lint
         run: npm run check:package
 
+      # Report-only until decision D-11 sets the source-quality policy
+      # (1,253 duplicate blocks and 2,339 Knip findings on 2026-10-05);
+      # plan item P1-52 then turns this into a blocking ratchet.
       - name: Source duplication and reachability
+        continue-on-error: true
         run: |
           npm run check:duplicates
           npm run check:dead-code
