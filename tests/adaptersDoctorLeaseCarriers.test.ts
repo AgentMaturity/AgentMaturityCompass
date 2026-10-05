@@ -2,7 +2,7 @@ import { createServer, request as httpRequest } from "node:http";
 import { mkdtempSync, rmSync, chmodSync, writeFileSync, readFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { initGatewayConfig, type GatewayConfig } from "../src/gateway/config.js";
 import { startGateway } from "../src/gateway/server.js";
@@ -252,13 +252,17 @@ describe("lease carriers, adapters, and doctor", () => {
     chmodSync(fakeClaude, 0o755);
     const oldPath = process.env.PATH ?? "";
     process.env.PATH = `${binDir}:${oldPath}`;
+    // The default workspace is process.cwd(); point it at the temp workspace so
+    // plugin discovery never creates <repo>/.amc/plugins.
+    const cwdSpy = vi.spyOn(process, "cwd").mockReturnValue(workspace);
     try {
-      const rows = adaptersDetectCli({ workspace });
+      const rows = adaptersDetectCli();
       const claude = rows.find((row) => row.adapterId === "claude-cli");
       expect(claude?.installed).toBe(true);
       expect(claude?.command).toBe("claude");
       expect(claude?.version).toBe("9.9.9");
     } finally {
+      cwdSpy.mockRestore();
       process.env.PATH = oldPath;
     }
   });
