@@ -5,7 +5,8 @@ export default defineConfig({
     environment: "node",
     testTimeout: 30_000,
     include: ["tests/**/*.test.ts"],
-    setupFiles: ["tests/setup/guardWorkspace.ts"],
+    globalSetup: ["tests/setup/repoWorkspaceGuard.global.ts"],
+    setupFiles: ["tests/setup/guardWorkspace.ts", "tests/setup/repoWorkspaceGuard.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],
