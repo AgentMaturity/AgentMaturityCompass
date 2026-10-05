@@ -125,7 +125,7 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     put(root, "src/a.ts", "a edited in the working tree\n");
     return { root, base: git(root, "rev-parse", "HEAD") };
   }
-  const read = (root: string) => JSON.parse(readFileSync(join(root, MANIFEST), "utf8")) as ReturnType<typeof manifest>;
+  const read = (root: string) => JSON.parse(readFileSync(join(root, MANIFEST), "utf8")) as { schemaVersion: number; decision: string; files: PlanEdit[] };
 
   it("archives the base bytes, not the working tree, and writes a sorted manifest the helper accepts", () => {
     const { root, base } = repo();
