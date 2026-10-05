@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-01",
+  "date": "2026-10-05",
+  "commit": "0814d82564218de203089440992badb6f07b588f",
+  "branch": "rtd/p0-01-contract-receipts-freeze",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx vitest run tests/freezeGuard.test.ts tests/qualificationReceipts.test.ts",
+      "exit": 0,
+      "durationMs": 818
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1010
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 197
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21755
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 29490
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 1098
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 465
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 286
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1484
+    }
+  ],
+  "tests": {
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [],
+  "notes": "Focused run only (tests/freezeGuard.test.ts, tests/qualificationReceipts.test.ts); the full suite is run separately. check:freeze ran without a base baseline (origin/main has none yet), so only the exact check applied. Mutation checks (base-baseline comparison removed; 1 MB size check removed) are recorded in README.md."
+}
