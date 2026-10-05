@@ -78,4 +78,36 @@ describe("writeFileAtomicSync", () => {
     expect(readFileSync(target, "utf8")).toBe("original contents");
     expect(leftovers(dir)).toEqual([]);
   });
+
+  // rename(2) checks only the directory, so without an explicit check a
+  // read-only (or mode 000, never-read) file would be silently replaced.
+  // Root bypasses permission bits, so the check is meaningless there.
+  it.skipIf(process.platform === "win32" || process.getuid?.() === 0)(
+    "refuses a target the caller may not write, as an in-place write would",
+    () => {
+      const dir = workspace();
+      for (const mode of [0o444, 0o000]) {
+        const target = join(dir, `locked-${mode.toString(8)}.txt`);
+        writeFileSync(target, "locked contents");
+        chmodSync(target, mode);
+
+        expect(() => writeFileAtomicSync(target, "replacement")).toThrow(expect.objectContaining({ code: "EACCES" }));
+
+        chmodSync(target, 0o600);
+        expect(readFileSync(target, "utf8")).toBe("locked contents");
+      }
+      expect(leftovers(dir)).toEqual([]);
+    },
+  );
+
+  it("writes a file whose name is close to the 255-byte name limit", () => {
+    const dir = workspace();
+    const target = join(dir, `${"a".repeat(236)}.txt`);
+    writeFileSync(target, "old");
+
+    writeFileAtomicSync(target, "new");
+
+    expect(readFileSync(target, "utf8")).toBe("new");
+    expect(leftovers(dir)).toEqual([]);
+  });
 });
