@@ -1,0 +1,56 @@
+# Temporary diagnostic for plan item P0-48 (GitHub build-test hang). Never merge.
+name: CI hang probe (P0-48)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/ci-hang-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [coverage-default, coverage-2-workers, plain-default, plain-2-workers]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm run build
+      - name: Runner resources at start
+        run: |
+          nproc; free -m; df -m / /tmp
+          node -e 'console.log("availableParallelism", require("os").availableParallelism())'
+      - name: Suite with resource log
+        timeout-minutes: 45
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          ( while true; do
+              echo "MON $(date +%T) $(free -m | awk '/Mem:/{print "used="$3"MB avail="$7"MB"}') $(free -m | awk '/Swap:/{print "swap="$3"MB"}') $(df -m / | awk 'NR==2{print "disk_avail="$4"MB"}') node_procs=$(pgrep -c node || true)"
+              sleep 30
+            done ) &
+          MON=$!
+          case "$VARIANT" in
+            coverage-default)   npx vitest run --coverage --reporter=dot ;;
+            coverage-2-workers) npx vitest run --coverage --reporter=dot --maxWorkers=2 ;;
+            plain-default)      npx vitest run --reporter=dot ;;
+            plain-2-workers)    npx vitest run --reporter=dot --maxWorkers=2 ;;
+          esac
+          rc=$?
+          kill $MON || true
+          free -m; df -m /
+          exit $rc
