@@ -1,0 +1,81 @@
+{
+  "base": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "originals": [
+    {
+      "path": "src/benchmarks/helmProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/helmProviderDrift.ts",
+      "sha256": "183d6214f4042374c5172765107efbc1cf712c7448b27b43e33ad6df8ff45875",
+      "gitBlob": "4501271950d896f7d90c8201978d6181cf5fdab5",
+      "baseBlob": "4501271950d896f7d90c8201978d6181cf5fdab5",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/patronusProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/patronusProviderDrift.ts",
+      "sha256": "9d516c3b2584679d947006b35e327bdf47ab464a1a5035f9701e09ab2b5001e7",
+      "gitBlob": "bd600a0ed80f23c6b0ac4ba8e1f7e08ad8c9b453",
+      "baseBlob": "bd600a0ed80f23c6b0ac4ba8e1f7e08ad8c9b453",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/inspectProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/inspectProviderDrift.ts",
+      "sha256": "4e61772f7c2e8ab007d1e776aae2dca8a089fa797560bac9f9c08148241591b5",
+      "gitBlob": "1e4d9ec2901e2704f7dfed14f3ad2017158cf982",
+      "baseBlob": "1e4d9ec2901e2704f7dfed14f3ad2017158cf982",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/humanloopProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/humanloopProviderDrift.ts",
+      "sha256": "f7ce652dc5db508f4d560410886a96abcfbfd159aa43a16ddd4ffc6c60af3f95",
+      "gitBlob": "2599e107a1ada3acc8c5f497e4a7b6b6cfc9c7c6",
+      "baseBlob": "2599e107a1ada3acc8c5f497e4a7b6b6cfc9c7c6",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/tensorZeroProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/tensorZeroProviderDrift.ts",
+      "sha256": "623374f099a3e6af76ba998fb8a1a10117b69165466049bbc9137c4f12232491",
+      "gitBlob": "b962b978de9840bbad9b5721dd8b1af23fa21b4f",
+      "baseBlob": "b962b978de9840bbad9b5721dd8b1af23fa21b4f",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/promptLayerProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/promptLayerProviderDrift.ts",
+      "sha256": "b2d9b1e839d4deae4862711003fb5b37bb2b9a40505f1ed056613102151b6b30",
+      "gitBlob": "14e3ed258d020eff57e4baaefc681401f33bc1fa",
+      "baseBlob": "14e3ed258d020eff57e4baaefc681401f33bc1fa",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "src/benchmarks/promptfooProviderDrift.ts",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/src/benchmarks/promptfooProviderDrift.ts",
+      "sha256": "11c8b4c28b02433fe2e90a47d517b3517c48a9a0e3da54b4f290d66c330a6844",
+      "gitBlob": "dbab3f3228fdc0a34f527ea9cc8f0725ba3ee980",
+      "baseBlob": "dbab3f3228fdc0a34f527ea9cc8f0725ba3ee980",
+      "restore": "copy complete archived bytes to path"
+    },
+    {
+      "path": "AMC_OS/INBOX/REV_DATA_ENGINEER.md",
+      "archive": "unused-code/2026-10-02-native/provider-row-contracts/originals/AMC_OS/INBOX/REV_DATA_ENGINEER.md",
+      "sha256": "5645ddfbcded216ae2dcc780834524ca739711f5ef92d2aee514b5274bf0c9dd",
+      "gitBlob": "b7612a10917832bcdb2765d253e8e71c936cfbc4",
+      "baseBlob": "b7612a10917832bcdb2765d253e8e71c936cfbc4",
+      "restore": "copy complete archived bytes to path"
+    }
+  ],
+  "absent": [
+    "src/benchmarks/providerDriftRowContracts.ts",
+    "tests/providerDriftRowContractsParity.test.ts"
+  ],
+  "readonly": {
+    "src/benchmarks/providerDriftDescriptor.ts": "e0bb402f1c18fd96129b371ef75097e73fc5afd5f3976509618dcb3b49775cf0",
+    "src/benchmarks/providerDriftBenchmark.ts": "2612fbc68c83fc36110accb91153fd9183354aa67d52a28a9c51af5d9bdc2b12",
+    "package.json": "56035a95df5ba813dc470ad15d85f5439a880cfca823f940530c4c5f0ad6563d",
+    "pnpm-lock.yaml": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+    "tsconfig.json": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+    "vitest.config.ts": "84c1d645dff96080147f9cfcd14356dce68362b7c35fb945a9bef9661539f53d"
+  }
+}

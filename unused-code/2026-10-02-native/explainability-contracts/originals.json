@@ -1,0 +1,147 @@
+{
+  "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "files": [
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "originalArchive": "unused-code/2026-10-02-native/explainability-contracts/originals/src/diagnostic/questionScoreExplainability.ts",
+      "sha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "gitBlob": "67cbe6d3d9b5dab0aa3051850ac44b3b4713392b",
+      "bytes": 173468
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "originalArchive": "unused-code/2026-10-02-native/explainability-contracts/originals/src/diagnostic/evidenceDrilldown.ts",
+      "sha256": "77f8f6e270be02c9a0cb3c3bf620ca9ddeba180d734057a979580d7af5b16807",
+      "gitBlob": "b608f529bbcf199819c5d0950e4a16b9176e79bd",
+      "bytes": 63860
+    },
+    {
+      "path": "AMC_OS/INBOX/REV_ANALYTICS_ENGINEER.md",
+      "originalArchive": "unused-code/2026-10-02-native/explainability-contracts/originals/AMC_OS/INBOX/REV_ANALYTICS_ENGINEER.md",
+      "sha256": "10db281be4d114b3d598e9f0b51c04e86971a9b5037e5e80684d83a3122dd378",
+      "gitBlob": "d0b0d082a6f2f12d3fc42b076d45e0af18799f29",
+      "bytes": 1663
+    }
+  ],
+  "newAbsent": [
+    "src/diagnostic/explainabilityContracts.ts",
+    "tests/explainabilityContractParity.test.ts"
+  ],
+  "heldReadOnly": [
+    {
+      "path": "src/types.ts",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "gitBlob": "885f314c3fe07633ee7c4749cea5502c7809c0ce"
+    },
+    {
+      "path": "src/score/metricValidity.ts",
+      "sha256": "69cdaaf21ca0f89cb225c3c7866f6705c77eec85a7ba4e835e69886ee9ea1082",
+      "gitBlob": "07bae1472642ce73bba66140484899551b27935d"
+    },
+    {
+      "path": "package.json",
+      "sha256": "56035a95df5ba813dc470ad15d85f5439a880cfca823f940530c4c5f0ad6563d",
+      "gitBlob": "a543e2b70c856285552824396c3c78aa33bb171f"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "gitBlob": "dcc0e0dac48087deae560f7122686b04a44daef2"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "gitBlob": "049a148beabbfee79e7f9ee07e3c9c269491a710"
+    },
+    {
+      "path": "tsconfig.tests.json",
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "gitBlob": "2b4748cc9da05ebe4dbecb38ecaa893590dbd041"
+    },
+    {
+      "path": ".oxlintrc.json",
+      "sha256": "9b76abe409fe9ef1b72d0a68ce051e3c0860b9ca472d6174b6e47ad9e6d1c450",
+      "gitBlob": "0ac57422c5806b28b965999e6eb685004a2396e4"
+    },
+    {
+      "path": ".jscpd.json",
+      "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209",
+      "gitBlob": "59850bade29d91072ed76b68eaa9e58d4c5ec98e"
+    },
+    {
+      "path": "knip.json",
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "gitBlob": "8a7e96b8c8f9e846da5ccf9d42cc4b575187e5d4"
+    },
+    {
+      "path": "scripts/source-quality.mjs",
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "gitBlob": "7d796dd13db20be3b1be202470846130b7848426"
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "sha256": "e96a6a8fb8342c4b11c3235a60307fa75b043cf2e2b99ba1668e8f196970ec8b",
+      "gitBlob": "1167c5a6f9f934ee657062b0c7ac1272a624aa51"
+    },
+    {
+      "path": "tests/helpers/restoreWorkspacePathSharing.ts",
+      "sha256": "e18e74be9bf738f88e6ba0a6d46bfe50e3b5aba261d34bbe1d27ec69959eb6ec",
+      "gitBlob": "8b739be5650d113b492e2379fc3134c0dd0e31c1"
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "gitBlob": "c405f621783067a17bd9172d70f4228dedd5f189"
+    },
+    {
+      "path": "src/passport/passportCollector.ts",
+      "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "gitBlob": "567840b29b76b7e25e7a8c2713c87eab80e2264c"
+    },
+    {
+      "path": "src/api/scoreRouter.ts",
+      "sha256": "3ee913c9105a576971753f6227d5afd58b12f5e0d6a99a7ba36444666bbd0402",
+      "gitBlob": "b627c5dfeb2730bc420d2ed558435f050579f2b9"
+    },
+    {
+      "path": "src/console/assets/evidenceDrilldown.js",
+      "sha256": "ac59e638458be67a35685c2bdcba24ed20ca1d01d203610e30e4fdf6893415f5",
+      "gitBlob": "6d8bdfa48a5fe707bb32c58679d099c13a0f829e"
+    },
+    {
+      "path": "src/index.ts",
+      "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "gitBlob": "a98e1c2aa0519e35207e1c7f0cfc3a149b9eabd4"
+    },
+    {
+      "path": "src/sdk/mobileFetch.ts",
+      "sha256": "9deb8aeddb4d085286443d462f32f2a620d33e254e5752d403c510759b9232f2",
+      "gitBlob": "b1c31a4ecd30cb4de9d230f2fd5efe2d12efaf0c"
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "gitBlob": "d5a3250f84edfb219f528b0a23bcac135f07dfce"
+    },
+    {
+      "path": "src/standard/externalEvidenceProfile.ts",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+      "gitBlob": "71024c54831b6e23a8d9b2c3d7784acc1c251032"
+    },
+    {
+      "path": "src/importers/piTelemetryCallbacks.ts",
+      "sha256": "165eeaef049f34d247768a86948d06ab17f4eb956936a2b37ceec793098d5333",
+      "gitBlob": "1f8148fc3ee5ce08c8629854b2e6bcf275058710"
+    }
+  ],
+  "fixtureSource": {
+    "path": "tests/questionScoreExplainability.test.ts",
+    "archive": "unused-code/2026-10-02-native/explainability-contracts/fixtures/questionScoreExplainability.test.ts.original",
+    "sha256": "bc72c8abf59084bc121fc98e548bc36e98b44219a7455ced227a5b6a8e125b9a"
+  },
+  "additionalFixtureSource": {
+    "path": "tests/gap0748MultiAgentBargainingStudioDrilldownUnavailableBoundary.test.ts",
+    "archive": "unused-code/2026-10-02-native/explainability-contracts/fixtures/obsStudioDrilldown.test.ts.original",
+    "sha256": "cdf37c394dba2994b57bad5bd4841656cd410ff5f32fba0074fcec85278cec7d"
+  }
+}

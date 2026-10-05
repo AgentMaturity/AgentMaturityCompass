@@ -1,0 +1,1441 @@
+{
+  "parentIntegrationCommit": "a3c3a7d823047f5c64c5cecca967b33c7acb4dfa",
+  "sourceOriginalBase": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "files": [
+    {
+      "originalPath": "src/diagnostic/questionScoreExplainability.ts",
+      "archivePath": "unused-code/2026-10-02-main/native-five-integration/second-source-restoration/originals/src/diagnostic/questionScoreExplainability.ts.original",
+      "originalSha256": "89dc1dfde57a623b15a8daee75150d467f7db376a41a3880fcea21e48557554f",
+      "currentSha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "edits": [
+        {
+          "currentStartLine": 72,
+          "beforeLines": [],
+          "afterLines": [
+            "import {\n",
+            "  incidentTriageProofHashes,\n",
+            "  benchmarkSubmissionProofHashes,\n",
+            "  multiUserBenchmarkProofHashes,\n",
+            "  continualLearningBenchmarkProofHashes,\n",
+            "  hermesTurboPerformanceProofHashes,\n",
+            "  iotFirmwareQuestionProofHashes,\n",
+            "  retailSalesQuestionProofHashes,\n",
+            "  scorableStudioDrilldownProofHashes,\n",
+            "  obsStudioDrilldownProofHashes,\n",
+            "  replayableLensStatus,\n",
+            "} from \"./explainabilityContracts.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 2667,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.flowDagHash !== null &&\n",
+            "      ref.paramConfigHash !== null &&\n",
+            "      ref.evalSetHash !== null &&\n",
+            "      ref.batchRunId !== null &&\n",
+            "      ref.evaluatorFlowHash !== null &&\n",
+            "      ref.groundTruthColumn !== null &&\n",
+            "      ref.dataMappingHash !== null &&\n",
+            "      ref.metricIds.length > 0;\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.flowDagHash !== null &&\n",
+            "    ref.paramConfigHash !== null &&\n",
+            "    ref.evalSetHash !== null &&\n",
+            "    ref.batchRunId !== null &&\n",
+            "    ref.evaluatorFlowHash !== null &&\n",
+            "    ref.groundTruthColumn !== null &&\n",
+            "    ref.dataMappingHash !== null &&\n",
+            "    ref.metricIds.length > 0);\n"
+          ]
+        },
+        {
+          "currentStartLine": 2722,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.openEnvConfigHash,\n",
+            "    ref.scenarioManifestHash,\n",
+            "    ref.incidentReportHash,\n",
+            "    ref.rawLogBundleHash,\n",
+            "    ref.metricSnapshotHash,\n",
+            "    ref.userReportHash,\n",
+            "    ref.actionPayloadHash,\n",
+            "    ref.graderConfigHash,\n",
+            "    ref.feedbackHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!incidentTriageProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 2725,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.deterministicGrader &&\n",
+            "      meetsMinimum(ref.reward0to1, ref.minReward0to1) &&\n",
+            "      meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&\n",
+            "      meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&\n",
+            "      meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&\n",
+            "      ref.maxSteps !== null &&\n",
+            "      ref.stepCount !== null &&\n",
+            "      ref.stepCount <= ref.maxSteps;\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.deterministicGrader &&\n",
+            "    meetsMinimum(ref.reward0to1, ref.minReward0to1) &&\n",
+            "    meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&\n",
+            "    meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&\n",
+            "    meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&\n",
+            "    ref.maxSteps !== null &&\n",
+            "    ref.stepCount !== null &&\n",
+            "    ref.stepCount <= ref.maxSteps);\n"
+          ]
+        },
+        {
+          "currentStartLine": 2763,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.submissionMetadataHash,\n",
+            "    ref.taskBreakdownHash,\n",
+            "    ref.leaderboardSnapshotHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!benchmarkSubmissionProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 2766,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.submissionVersion !== null &&\n",
+            "      ref.agentVersion !== null &&\n",
+            "      ref.submittedAt !== null &&\n",
+            "      (ref.taskStatus === \"success\" || ref.taskStatus === \"warning\") &&\n",
+            "      ref.overallScore0to100 !== null &&\n",
+            "      ref.categoryScore0to100 !== null &&\n",
+            "      ref.speedMs !== null &&\n",
+            "      ref.costUsd !== null &&\n",
+            "      ref.leaderboardMetricViews.length > 0 &&\n",
+            "      ref.criterionScores.length > 0 &&\n",
+            "      ref.criterionScores.every(hasReplayableBenchmarkCriterion);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.submissionVersion !== null &&\n",
+            "    ref.agentVersion !== null &&\n",
+            "    ref.submittedAt !== null &&\n",
+            "    (ref.taskStatus === \"success\" || ref.taskStatus === \"warning\") &&\n",
+            "    ref.overallScore0to100 !== null &&\n",
+            "    ref.categoryScore0to100 !== null &&\n",
+            "    ref.speedMs !== null &&\n",
+            "    ref.costUsd !== null &&\n",
+            "    ref.leaderboardMetricViews.length > 0 &&\n",
+            "    ref.criterionScores.length > 0 &&\n",
+            "    ref.criterionScores.every(hasReplayableBenchmarkCriterion));\n"
+          ]
+        },
+        {
+          "currentStartLine": 2806,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.evaluatorIds.length > 0 &&\n",
+            "      ref.experimentRunId !== null &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&\n",
+            "      meetsMinimum(ref.averageScore0to1, ref.threshold0to1);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.evaluatorIds.length > 0 &&\n",
+            "    ref.experimentRunId !== null &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&\n",
+            "    meetsMinimum(ref.averageScore0to1, ref.threshold0to1));\n"
+          ]
+        },
+        {
+          "currentStartLine": 2894,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.metricFamily !== \"custom\" &&\n",
+            "      ref.metricIds.length > 0 &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      evalAiLibraryMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.metricFamily !== \"custom\" &&\n",
+            "    ref.metricIds.length > 0 &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    evalAiLibraryMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 2961,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      ref.runtime !== \"custom\" &&\n",
+            "      ref.openModelIds.length > 0 &&\n",
+            "      ref.evaluationMetricIds.length > 0 &&\n",
+            "      openModelRagMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.ciRunId !== null &&\n",
+            "    ref.runtime !== \"custom\" &&\n",
+            "    ref.openModelIds.length > 0 &&\n",
+            "    ref.evaluationMetricIds.length > 0 &&\n",
+            "    openModelRagMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3017,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.metricFamily !== \"custom\" &&\n",
+            "      ref.metricIds.length > 0 &&\n",
+            "      ref.projectRef !== null &&\n",
+            "      ref.experimentRef !== null &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      opikEvaluationMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.metricFamily !== \"custom\" &&\n",
+            "    ref.metricIds.length > 0 &&\n",
+            "    ref.projectRef !== null &&\n",
+            "    ref.experimentRef !== null &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    opikEvaluationMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3076,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.metricFamily !== \"custom\" &&\n",
+            "      ref.metricIds.length > 0 &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      deepEvalMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.metricFamily !== \"custom\" &&\n",
+            "    ref.metricIds.length > 0 &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    deepEvalMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3137,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.packageRef !== null &&\n",
+            "      ref.adapter !== \"custom\" &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      agentTrialMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.packageRef !== null &&\n",
+            "    ref.adapter !== \"custom\" &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    agentTrialMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3218,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      codeQuestMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.ciRunId !== null &&\n",
+            "    codeQuestMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3270,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.datasetManifestHash,\n",
+            "    ref.userRoleManifestHash,\n",
+            "    ref.instructionSetHash,\n",
+            "    ref.interactionTraceHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.metricReportHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!multiUserBenchmarkProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3276,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.userRoleCount !== null &&\n",
+            "      ref.userRoleCount >= 2 &&\n",
+            "      ref.turnCount !== null &&\n",
+            "      ref.turnCount > 0 &&\n",
+            "      multiUserScenarioMetricMeetsThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.userRoleCount !== null &&\n",
+            "    ref.userRoleCount >= 2 &&\n",
+            "    ref.turnCount !== null &&\n",
+            "    ref.turnCount > 0 &&\n",
+            "    multiUserScenarioMetricMeetsThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3322,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.environmentMode !== \"custom\" &&\n",
+            "      ref.faultMode !== \"custom\" &&\n",
+            "      ref.difficultyLevel !== null &&\n",
+            "      professionalTaskMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.environmentMode !== \"custom\" &&\n",
+            "    ref.faultMode !== \"custom\" &&\n",
+            "    ref.difficultyLevel !== null &&\n",
+            "    professionalTaskMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3351,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.firmwareProjectHash,\n",
+            "    ref.toolchainManifestHash,\n",
+            "    ref.sdkVersionManifestHash,\n",
+            "    ref.hardwareSessionHash,\n",
+            "    ref.deviceLogBundleHash,\n",
+            "    ref.buildArtifactHash,\n",
+            "    ref.flashArtifactHash,\n",
+            "    ref.testArtifactHash,\n",
+            "    ref.knowledgePackManifestHash,\n",
+            "    ref.taskManifestHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.privacyBoundaryHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!iotFirmwareQuestionProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3354,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.platform !== \"custom\" &&\n",
+            "      ref.hardwareRunCount !== null &&\n",
+            "      ref.hardwareRunCount > 0 &&\n",
+            "      ref.deviceCount !== null &&\n",
+            "      ref.deviceCount > 0 &&\n",
+            "      iotFirmwareMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.platform !== \"custom\" &&\n",
+            "    ref.hardwareRunCount !== null &&\n",
+            "    ref.hardwareRunCount > 0 &&\n",
+            "    ref.deviceCount !== null &&\n",
+            "    ref.deviceCount > 0 &&\n",
+            "    iotFirmwareMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3382,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.productCatalogHash,\n",
+            "    ref.productDescriptionHash,\n",
+            "    ref.customerScenarioHash,\n",
+            "    ref.conversationTraceHash,\n",
+            "    ref.customerIntentManifestHash,\n",
+            "    ref.orderCaptureSchemaHash,\n",
+            "    ref.orderLedgerHash,\n",
+            "    ref.pricingPolicyHash,\n",
+            "    ref.discountPolicyHash,\n",
+            "    ref.modelAdapterManifestHash,\n",
+            "    ref.modelProviderMatrixHash,\n",
+            "    ref.promptPolicyHash,\n",
+            "    ref.recommendationPolicyHash,\n",
+            "    ref.safetyPolicyHash,\n",
+            "    ref.privacyBoundaryHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!retailSalesQuestionProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3385,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.salesChannel !== \"custom\" &&\n",
+            "      ref.modelProviderCount !== null &&\n",
+            "      ref.modelProviderCount >= 2 &&\n",
+            "      ref.customerScenarioCount !== null &&\n",
+            "      ref.customerScenarioCount > 0 &&\n",
+            "      ref.orderCount !== null &&\n",
+            "      ref.orderCount > 0 &&\n",
+            "      retailSalesMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.salesChannel !== \"custom\" &&\n",
+            "    ref.modelProviderCount !== null &&\n",
+            "    ref.modelProviderCount >= 2 &&\n",
+            "    ref.customerScenarioCount !== null &&\n",
+            "    ref.customerScenarioCount > 0 &&\n",
+            "    ref.orderCount !== null &&\n",
+            "    ref.orderCount > 0 &&\n",
+            "    retailSalesMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3419,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.datasetManifestHash,\n",
+            "    ref.stateSchemaHash,\n",
+            "    ref.initialStateHash,\n",
+            "    ref.stateMutationTraceHash,\n",
+            "    ref.conversationTraceHash,\n",
+            "    ref.entityRelationshipGraphHash,\n",
+            "    ref.toolExecutionTraceHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.replayCommandHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!continualLearningBenchmarkProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3422,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.scenarioCount !== null &&\n",
+            "      ref.scenarioCount > 0 &&\n",
+            "      ref.turnCount !== null &&\n",
+            "      ref.turnCount > 0 &&\n",
+            "      ref.stateMutationCount !== null &&\n",
+            "      ref.stateMutationCount > 0 &&\n",
+            "      ref.entityCount !== null &&\n",
+            "      ref.entityCount > 0 &&\n",
+            "      continualLearningMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.scenarioCount !== null &&\n",
+            "    ref.scenarioCount > 0 &&\n",
+            "    ref.turnCount !== null &&\n",
+            "    ref.turnCount > 0 &&\n",
+            "    ref.stateMutationCount !== null &&\n",
+            "    ref.stateMutationCount > 0 &&\n",
+            "    ref.entityCount !== null &&\n",
+            "    ref.entityCount > 0 &&\n",
+            "    continualLearningMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3469,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.sourceStatusHash,\n",
+            "    ref.readmeArtifactHash,\n",
+            "    ref.packageManifestHash,\n",
+            "    ref.benchmarkWorkflowHash,\n",
+            "    ref.perfBudgetWorkflowHash,\n",
+            "    ref.dailyScoreWorkflowHash,\n",
+            "    ref.turboScoreScriptHash,\n",
+            "    ref.performanceDashboardHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "    ref.baselineResultHash,\n",
+            "    ref.candidateResultHash,\n",
+            "    ref.latencyTraceHash,\n",
+            "    ref.throughputTraceHash,\n",
+            "    ref.scoreManifestHash,\n",
+            "    ref.regressionThresholdHash,\n",
+            "    ref.ciConfigHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!hermesTurboPerformanceProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3472,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.performanceFacet !== \"custom\" &&\n",
+            "      ref.ciRunId !== null &&\n",
+            "      hermesTurboPerformanceMetricsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.performanceFacet !== \"custom\" &&\n",
+            "    ref.ciRunId !== null &&\n",
+            "    hermesTurboPerformanceMetricsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3527,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.tracePreviewHash,\n",
+            "    ref.reasoningTracePreviewHash,\n",
+            "    ref.receiptPreviewHash,\n",
+            "    ref.evidencePreviewHash,\n",
+            "    ref.sourceArtifactPreviewHash,\n",
+            "    ref.emptyStateHash,\n",
+            "    ref.errorStateHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!obsStudioDrilldownProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3530,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.evidencePreviewState === \"ready\" &&\n",
+            "      obsStudioCountsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.evidencePreviewState === \"ready\" &&\n",
+            "    obsStudioCountsMeetThreshold(ref));\n"
+          ]
+        },
+        {
+          "currentStartLine": 3574,
+          "beforeLines": [
+            "  if (![\n",
+            "    ref.readmeArtifactHash,\n",
+            "    ref.pythonPackageManifestHash,\n",
+            "    ref.pythonOpenApiHash,\n",
+            "    ref.pythonClientHash,\n",
+            "    ref.pythonExecutionLogsHash,\n",
+            "    ref.pythonEvaluatorApiHash,\n",
+            "    ref.pythonExecutionLogApiHash,\n",
+            "    ref.cliPackageManifestHash,\n",
+            "    ref.cliLockfileHash,\n",
+            "    ref.cliEvaluatorCommandHash,\n",
+            "    ref.cliJudgeCommandHash,\n",
+            "    ref.cliExecutionLogCommandHash,\n",
+            "    ref.cliOtelTraceCommandHash,\n",
+            "    ref.cliFileUploadCommandHash,\n",
+            "    ref.typescriptPackageManifestHash,\n",
+            "    ref.typescriptLockfileHash,\n",
+            "    ref.typescriptSourceTreeHash,\n",
+            "    ref.tracePreviewHash,\n",
+            "    ref.receiptPreviewHash,\n",
+            "    ref.policyRulePreviewHash,\n",
+            "    ref.sourceArtifactPreviewHash,\n",
+            "    ref.emptyStateHash,\n",
+            "    ref.errorStateHash,\n",
+            "  ].every(hashPresent)) {\n"
+          ],
+          "afterLines": [
+            "  if (!scorableStudioDrilldownProofHashes(ref).every(hashPresent)) {\n"
+          ]
+        },
+        {
+          "currentStartLine": 3577,
+          "beforeLines": [
+            "  if (ref.status === \"satisfied\") {\n",
+            "    return ref.evidenceRefs.length > 0 &&\n",
+            "      ref.studioSurface !== \"custom\" &&\n",
+            "      ref.evidencePreviewState === \"ready\" &&\n",
+            "      scorableStudioCountsMeetThreshold(ref);\n",
+            "  }\n",
+            "  if (ref.status === \"failed\") {\n",
+            "    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n",
+            "  }\n",
+            "  return ref.repairHint.length > 0;\n"
+          ],
+          "afterLines": [
+            "  return replayableLensStatus(ref, () =>\n",
+            "    ref.studioSurface !== \"custom\" &&\n",
+            "    ref.evidencePreviewState === \"ready\" &&\n",
+            "    scorableStudioCountsMeetThreshold(ref));\n"
+          ]
+        }
+      ],
+      "exactInverseStaticallyVerified": true
+    },
+    {
+      "originalPath": "src/diagnostic/evidenceDrilldown.ts",
+      "archivePath": "unused-code/2026-10-02-main/native-five-integration/second-source-restoration/originals/src/diagnostic/evidenceDrilldown.ts.original",
+      "originalSha256": "77f8f6e270be02c9a0cb3c3bf620ca9ddeba180d734057a979580d7af5b16807",
+      "currentSha256": "7d6b7b8bcdbbd95e660d4fdb40cc5521b374363c77c7e03783bd631efdc60760",
+      "edits": [
+        {
+          "currentStartLine": 20,
+          "beforeLines": [],
+          "afterLines": [
+            "\n",
+            "import {\n",
+            "  incidentTriageProofHashes,\n",
+            "  benchmarkSubmissionProofHashes,\n",
+            "  multiUserBenchmarkProofHashes,\n",
+            "  continualLearningBenchmarkProofHashes,\n",
+            "  hermesTurboPerformanceProofHashes,\n",
+            "  iotFirmwareQuestionProofHashes,\n",
+            "  retailSalesQuestionProofHashes,\n",
+            "  scorableStudioDrilldownProofHashes,\n",
+            "  obsStudioDrilldownProofHashes,\n",
+            "} from \"./explainabilityContracts.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 1117,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.openEnvConfigHash,\n",
+            "    ref.scenarioManifestHash,\n",
+            "    ref.incidentReportHash,\n",
+            "    ref.rawLogBundleHash,\n",
+            "    ref.metricSnapshotHash,\n",
+            "    ref.userReportHash,\n",
+            "    ref.actionPayloadHash,\n",
+            "    ref.graderConfigHash,\n",
+            "    ref.feedbackHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = incidentTriageProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1153,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.submissionMetadataHash,\n",
+            "    ref.taskBreakdownHash,\n",
+            "    ref.leaderboardSnapshotHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = benchmarkSubmissionProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1215,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.datasetManifestHash,\n",
+            "    ref.userRoleManifestHash,\n",
+            "    ref.instructionSetHash,\n",
+            "    ref.interactionTraceHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.metricReportHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = multiUserBenchmarkProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1236,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.datasetManifestHash,\n",
+            "    ref.stateSchemaHash,\n",
+            "    ref.initialStateHash,\n",
+            "    ref.stateMutationTraceHash,\n",
+            "    ref.conversationTraceHash,\n",
+            "    ref.entityRelationshipGraphHash,\n",
+            "    ref.toolExecutionTraceHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.replayCommandHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = continualLearningBenchmarkProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1285,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.sourceStatusHash,\n",
+            "    ref.readmeArtifactHash,\n",
+            "    ref.packageManifestHash,\n",
+            "    ref.benchmarkWorkflowHash,\n",
+            "    ref.perfBudgetWorkflowHash,\n",
+            "    ref.dailyScoreWorkflowHash,\n",
+            "    ref.turboScoreScriptHash,\n",
+            "    ref.performanceDashboardHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "    ref.baselineResultHash,\n",
+            "    ref.candidateResultHash,\n",
+            "    ref.latencyTraceHash,\n",
+            "    ref.throughputTraceHash,\n",
+            "    ref.scoreManifestHash,\n",
+            "    ref.regressionThresholdHash,\n",
+            "    ref.ciConfigHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = hermesTurboPerformanceProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1366,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.firmwareProjectHash,\n",
+            "    ref.toolchainManifestHash,\n",
+            "    ref.sdkVersionManifestHash,\n",
+            "    ref.hardwareSessionHash,\n",
+            "    ref.deviceLogBundleHash,\n",
+            "    ref.buildArtifactHash,\n",
+            "    ref.flashArtifactHash,\n",
+            "    ref.testArtifactHash,\n",
+            "    ref.knowledgePackManifestHash,\n",
+            "    ref.taskManifestHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.privacyBoundaryHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = iotFirmwareQuestionProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1400,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.productCatalogHash,\n",
+            "    ref.productDescriptionHash,\n",
+            "    ref.customerScenarioHash,\n",
+            "    ref.conversationTraceHash,\n",
+            "    ref.customerIntentManifestHash,\n",
+            "    ref.orderCaptureSchemaHash,\n",
+            "    ref.orderLedgerHash,\n",
+            "    ref.pricingPolicyHash,\n",
+            "    ref.discountPolicyHash,\n",
+            "    ref.modelAdapterManifestHash,\n",
+            "    ref.modelProviderMatrixHash,\n",
+            "    ref.promptPolicyHash,\n",
+            "    ref.recommendationPolicyHash,\n",
+            "    ref.safetyPolicyHash,\n",
+            "    ref.privacyBoundaryHash,\n",
+            "    ref.evaluatorConfigHash,\n",
+            "    ref.resultArtifactHash,\n",
+            "    ref.benchmarkReportHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = retailSalesQuestionProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1449,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.readmeArtifactHash,\n",
+            "    ref.pythonPackageManifestHash,\n",
+            "    ref.pythonOpenApiHash,\n",
+            "    ref.pythonClientHash,\n",
+            "    ref.pythonExecutionLogsHash,\n",
+            "    ref.pythonEvaluatorApiHash,\n",
+            "    ref.pythonExecutionLogApiHash,\n",
+            "    ref.cliPackageManifestHash,\n",
+            "    ref.cliLockfileHash,\n",
+            "    ref.cliEvaluatorCommandHash,\n",
+            "    ref.cliJudgeCommandHash,\n",
+            "    ref.cliExecutionLogCommandHash,\n",
+            "    ref.cliOtelTraceCommandHash,\n",
+            "    ref.cliFileUploadCommandHash,\n",
+            "    ref.typescriptPackageManifestHash,\n",
+            "    ref.typescriptLockfileHash,\n",
+            "    ref.typescriptSourceTreeHash,\n",
+            "    ref.tracePreviewHash,\n",
+            "    ref.receiptPreviewHash,\n",
+            "    ref.policyRulePreviewHash,\n",
+            "    ref.sourceArtifactPreviewHash,\n",
+            "    ref.emptyStateHash,\n",
+            "    ref.errorStateHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = scorableStudioDrilldownProofHashes(ref);\n"
+          ]
+        },
+        {
+          "currentStartLine": 1505,
+          "beforeLines": [
+            "  const proofHashes = [\n",
+            "    ref.tracePreviewHash,\n",
+            "    ref.reasoningTracePreviewHash,\n",
+            "    ref.receiptPreviewHash,\n",
+            "    ref.evidencePreviewHash,\n",
+            "    ref.sourceArtifactPreviewHash,\n",
+            "    ref.emptyStateHash,\n",
+            "    ref.errorStateHash,\n",
+            "  ];\n"
+          ],
+          "afterLines": [
+            "  const proofHashes = obsStudioDrilldownProofHashes(ref);\n"
+          ]
+        }
+      ],
+      "exactInverseStaticallyVerified": true
+    }
+  ],
+  "watchCore": {
+    "originalPath": "src/watch/liveDriftAlerts.ts",
+    "archivePath": "unused-code/2026-10-02-main/native-five-integration/second-source-restoration/originals/src/watch/liveDriftAlerts.ts.original",
+    "originalSha256": "752f0b9f2372a108a87fe5ff2a159e2d314595276c7597fa7d42087633df5706",
+    "currentSha256": "1ea774644363df1f4145408e19768dd05e96f2be74dc27ce73fcced80f45935b",
+    "edits": [
+      {
+        "currentStartLine": 0,
+        "beforeLines": [],
+        "afterLines": [
+          "import {\n",
+          "  agentSecurityEvidenceFields,\n",
+          "  agentTestingEvidenceFields,\n",
+          "  adkRuntimeEvidenceFields,\n",
+          "  ragDatasetBuilderBaseFields,\n",
+          "  agenticSearchTraceFields,\n",
+          "  localSystemEvidenceFields,\n",
+          "  privacyWebIdentityFields,\n",
+          "  privacyWebArtifactFields,\n",
+          "  ollamaMetricsConfigFields,\n",
+          "  ollamaMetricsResultFields,\n",
+          "  researchGymSetupFields,\n",
+          "  researchGymArtifactFields,\n",
+          "  osUniverseSetupFields,\n",
+          "  osUniverseArtifactFields,\n",
+          "} from \"./liveDriftEvidenceFields.js\";\n"
+        ]
+      },
+      {
+        "currentStartLine": 2059,
+        "beforeLines": [
+          "  return [\n",
+          "    row.agentSecurityGuardId,\n",
+          "    row.agentSecurityPolicyHash,\n",
+          "    row.agentSecurityTaintTraceHash,\n",
+          "    row.agentSecurityProxyTraceHash,\n",
+          "    row.agentSecurityAuditTrailHash,\n",
+          "    row.agentSecurityRuntimeTelemetryHash,\n",
+          "    row.agentSecurityEvalPackHash,\n",
+          "    row.agentSecurityClassifierHash,\n",
+          "  ].some((value) => normalizeContextId(value) !== null) ||\n"
+        ],
+        "afterLines": [
+          "  return agentSecurityEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||\n"
+        ]
+      },
+      {
+        "currentStartLine": 2071,
+        "beforeLines": [
+          "  return [\n",
+          "    row.agentSecurityGuardId,\n",
+          "    row.agentSecurityPolicyHash,\n",
+          "    row.agentSecurityTaintTraceHash,\n",
+          "    row.agentSecurityProxyTraceHash,\n",
+          "    row.agentSecurityAuditTrailHash,\n",
+          "    row.agentSecurityRuntimeTelemetryHash,\n",
+          "    row.agentSecurityEvalPackHash,\n",
+          "    row.agentSecurityClassifierHash,\n",
+          "  ].every((value) => normalizeContextId(value) !== null);\n"
+        ],
+        "afterLines": [
+          "  return agentSecurityEvidenceFields(row).every((value) => normalizeContextId(value) !== null);\n"
+        ]
+      },
+      {
+        "currentStartLine": 2085,
+        "beforeLines": [
+          "    row.agentTestingTaxonomyId,\n",
+          "    row.agentTestingMethodologyHash,\n",
+          "    row.agentTestingScenarioCatalogHash,\n",
+          "    row.agentTestingFaultInjectionPlanHash,\n",
+          "    row.agentTestingObservabilityPlanHash,\n",
+          "    row.agentTestingSafetyPlanHash,\n",
+          "    row.agentTestingStandardsMapHash,\n"
+        ],
+        "afterLines": [
+          "    ...agentTestingEvidenceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2100,
+        "beforeLines": [
+          "  return [\n",
+          "    row.agentTestingTaxonomyId,\n",
+          "    row.agentTestingMethodologyHash,\n",
+          "    row.agentTestingScenarioCatalogHash,\n",
+          "    row.agentTestingFaultInjectionPlanHash,\n",
+          "    row.agentTestingObservabilityPlanHash,\n",
+          "    row.agentTestingSafetyPlanHash,\n",
+          "    row.agentTestingStandardsMapHash,\n",
+          "  ].every((value) => normalizeContextId(value) !== null);\n"
+        ],
+        "afterLines": [
+          "  return agentTestingEvidenceFields(row).every((value) => normalizeContextId(value) !== null);\n"
+        ]
+      },
+      {
+        "currentStartLine": 2241,
+        "beforeLines": [
+          "    row.adkRuntimeId,\n",
+          "    row.adkFrameworkVersion,\n",
+          "    row.adkAgentGraphHash,\n",
+          "    row.adkToolRegistryHash,\n",
+          "    row.adkEvalDatasetHash,\n",
+          "    row.adkEvalCaseHash,\n",
+          "    row.adkRunnerConfigHash,\n",
+          "    row.adkSessionStateHash,\n"
+        ],
+        "afterLines": [
+          "    ...adkRuntimeEvidenceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2260,
+        "beforeLines": [
+          "    row.adkRuntimeId,\n",
+          "    row.adkFrameworkVersion,\n",
+          "    row.adkAgentGraphHash,\n",
+          "    row.adkToolRegistryHash,\n",
+          "    row.adkEvalDatasetHash,\n",
+          "    row.adkEvalCaseHash,\n",
+          "    row.adkRunnerConfigHash,\n",
+          "    row.adkSessionStateHash,\n"
+        ],
+        "afterLines": [
+          "    ...adkRuntimeEvidenceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2339,
+        "beforeLines": [
+          "    row.ragStrategyComparisonId,\n",
+          "    row.ragStrategyRunId,\n",
+          "    row.ragStrategyManifestHash,\n",
+          "    row.ragIndexManifestHash,\n",
+          "    row.ragQuerySetHash,\n",
+          "    row.ragReferenceAnswerHash,\n",
+          "    row.ragEvaluatorConfigHash,\n",
+          "    row.ragModelConfigHash,\n",
+          "    row.ragStrategyResultHash,\n"
+        ],
+        "afterLines": [
+          "    ...ragStrategyEvidenceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2364,
+        "beforeLines": [
+          "  return [\n",
+          "    row.ragStrategyComparisonId,\n",
+          "    row.ragStrategyRunId,\n",
+          "    row.ragStrategyManifestHash,\n",
+          "    row.ragIndexManifestHash,\n",
+          "    row.ragQuerySetHash,\n",
+          "    row.ragReferenceAnswerHash,\n",
+          "    row.ragEvaluatorConfigHash,\n",
+          "    row.ragModelConfigHash,\n",
+          "    row.ragStrategyResultHash,\n",
+          "  ].some((value) => normalizeContextId(value) !== null) ||\n"
+        ],
+        "afterLines": [
+          "  return ragStrategyEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||\n"
+        ]
+      },
+      {
+        "currentStartLine": 2409,
+        "beforeLines": [
+          "    row.ragDatasetBuilderId,\n",
+          "    row.ragDatasetVersion,\n",
+          "    row.ragSourceDocumentManifestHash,\n",
+          "    row.ragSourceDocumentLicenseId,\n",
+          "    row.ragQaPairManifestHash,\n",
+          "    row.ragPassageManifestHash,\n",
+          "    row.ragBuilderConfigHash,\n"
+        ],
+        "afterLines": [
+          "    ...ragDatasetBuilderBaseFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2429,
+        "beforeLines": [
+          "  const fields = [\n",
+          "    row.ragDatasetBuilderId,\n",
+          "    row.ragDatasetVersion,\n",
+          "    row.ragSourceDocumentManifestHash,\n",
+          "    row.ragSourceDocumentLicenseId,\n",
+          "    row.ragQaPairManifestHash,\n",
+          "    row.ragPassageManifestHash,\n",
+          "    row.ragBuilderConfigHash,\n",
+          "  ];\n"
+        ],
+        "afterLines": [
+          "  const fields = ragDatasetBuilderBaseFields(row);\n"
+        ]
+      },
+      {
+        "currentStartLine": 2594,
+        "beforeLines": [
+          "  return [\n",
+          "    row.llmRagEvalSuiteId,\n",
+          "    row.llmRagEvalRunId,\n",
+          "    row.llmRagCandidateManifestHash,\n",
+          "    row.llmRagReferenceManifestHash,\n",
+          "    row.llmRagMetricSuiteHash,\n",
+          "    row.llmRagSemanticMetricId,\n",
+          "    row.llmRagBiasMetricId,\n",
+          "    row.llmRagHallucinationMetricId,\n",
+          "    row.llmRagJudgeConfigHash,\n",
+          "    row.llmRagReportHash,\n",
+          "  ].some((value) => normalizeContextId(value) !== null) ||\n"
+        ],
+        "afterLines": [
+          "  return llmRagEvalSuiteEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||\n"
+        ]
+      },
+      {
+        "currentStartLine": 2840,
+        "beforeLines": [
+          "    row.agenticSearchSourceManifestHash,\n",
+          "    row.agenticSearchToolConfigHash,\n",
+          "    row.agenticSearchPlannerTraceHash,\n",
+          "    row.agenticSearchSearchTraceHash,\n",
+          "    row.agenticSearchCitationTraceHash,\n",
+          "    row.agenticSearchSynthesisTraceHash,\n",
+          "    row.agenticSearchResultManifestHash,\n"
+        ],
+        "afterLines": [
+          "    ...agenticSearchTraceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 2854,
+        "beforeLines": [
+          "    row.agenticSearchSourceManifestHash,\n",
+          "    row.agenticSearchToolConfigHash,\n",
+          "    row.agenticSearchPlannerTraceHash,\n",
+          "    row.agenticSearchSearchTraceHash,\n",
+          "    row.agenticSearchCitationTraceHash,\n",
+          "    row.agenticSearchSynthesisTraceHash,\n",
+          "    row.agenticSearchResultManifestHash,\n"
+        ],
+        "afterLines": [
+          "    ...agenticSearchTraceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3148,
+        "beforeLines": [
+          "    row.agentEvalObservabilitySourceRefHash,\n",
+          "    row.agentEvalObservabilityRepositorySnapshotHash,\n",
+          "    row.agentEvalObservabilityLicenseRefHash,\n",
+          "    row.agentEvalObservabilityAgentConfigHash,\n",
+          "    row.agentEvalObservabilityEvalDatasetHash,\n",
+          "    row.agentEvalObservabilityPromptVariantHash,\n",
+          "    row.agentEvalObservabilityModelConfigHash,\n",
+          "    row.agentEvalObservabilityRagIndexHash,\n",
+          "    row.agentEvalObservabilityMetricConfigHash,\n",
+          "    row.agentEvalObservabilityBaselineEvalResultHash,\n",
+          "    row.agentEvalObservabilityLiveEvalResultHash,\n",
+          "    row.agentEvalObservabilityOpenTelemetryTraceHash,\n",
+          "    row.agentEvalObservabilityApplicationInsightsHash,\n",
+          "    row.agentEvalObservabilityEventHubHash,\n",
+          "    row.agentEvalObservabilityKustoPolicyHash,\n",
+          "    row.agentEvalObservabilityFabricDashboardHash,\n",
+          "    row.agentEvalObservabilityAlertReceiptHash,\n"
+        ],
+        "afterLines": [
+          "    ...agentEvalObservabilityConfigFields(row),\n",
+          "    ...agentEvalObservabilityTelemetryFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3469,
+        "beforeLines": [
+          "    row.privacyWebBenchmarkId,\n",
+          "    row.privacyWebDatasetHash,\n",
+          "    row.privacyWebTaskConfigHash,\n"
+        ],
+        "afterLines": [
+          "    ...privacyWebIdentityFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3471,
+        "beforeLines": [
+          "    row.privacyWebInstructionConfigHash,\n",
+          "    row.privacyWebCookieStateHash,\n",
+          "    row.privacyWebEnvironmentResetHash,\n",
+          "    row.privacyWebDataMinimizationPolicyHash,\n",
+          "    row.privacyWebAllowedInfoManifestHash,\n",
+          "    row.privacyWebSensitiveInfoManifestHash,\n",
+          "    row.privacyWebTrajectoryHash,\n",
+          "    row.privacyWebResultArtifactHash,\n",
+          "    row.privacyWebLeakageJudgeHash,\n"
+        ],
+        "afterLines": [
+          "    ...privacyWebArtifactFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3487,
+        "beforeLines": [
+          "    row.privacyWebBenchmarkId,\n",
+          "    row.privacyWebDatasetHash,\n",
+          "    row.privacyWebTaskConfigHash,\n",
+          "    row.privacyWebInstructionConfigHash,\n",
+          "    row.privacyWebCookieStateHash,\n",
+          "    row.privacyWebEnvironmentResetHash,\n",
+          "    row.privacyWebDataMinimizationPolicyHash,\n",
+          "    row.privacyWebAllowedInfoManifestHash,\n",
+          "    row.privacyWebSensitiveInfoManifestHash,\n",
+          "    row.privacyWebTrajectoryHash,\n",
+          "    row.privacyWebResultArtifactHash,\n",
+          "    row.privacyWebLeakageJudgeHash,\n"
+        ],
+        "afterLines": [
+          "    ...privacyWebIdentityFields(row),\n",
+          "    ...privacyWebArtifactFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3528,
+        "beforeLines": [
+          "    row.localSystemMonitorProfileId,\n",
+          "    row.localSystemDeviceProfileHash,\n",
+          "    row.localSystemHardwareScannerHash,\n",
+          "    row.localSystemProcessCatalogHash,\n",
+          "    row.localSystemSensorLogHash,\n",
+          "    row.localSystemAlertReceiptHash,\n"
+        ],
+        "afterLines": [
+          "    ...localSystemEvidenceFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3545,
+        "beforeLines": [
+          "  return [\n",
+          "    row.localSystemMonitorProfileId,\n",
+          "    row.localSystemDeviceProfileHash,\n",
+          "    row.localSystemHardwareScannerHash,\n",
+          "    row.localSystemProcessCatalogHash,\n",
+          "    row.localSystemSensorLogHash,\n",
+          "    row.localSystemAlertReceiptHash,\n",
+          "  ].every((value) => normalizeContextId(value) !== null);\n"
+        ],
+        "afterLines": [
+          "  return localSystemEvidenceFields(row).every((value) => normalizeContextId(value) !== null);\n"
+        ]
+      },
+      {
+        "currentStartLine": 3668,
+        "beforeLines": [
+          "    row.ollamaMetricsSidecarId,\n",
+          "    row.ollamaMetricsSourceRefHash,\n",
+          "    row.ollamaMetricsRepositorySnapshotHash,\n",
+          "    row.ollamaMetricsLicenseRefHash,\n",
+          "    row.ollamaMetricsProxyConfigHash,\n",
+          "    row.ollamaMetricsOllamaHostConfigHash,\n",
+          "    row.ollamaMetricsPrometheusScrapeConfigHash,\n"
+        ],
+        "afterLines": [
+          "    ...ollamaMetricsConfigFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3670,
+        "beforeLines": [
+          "    row.ollamaMetricsEndpointSnapshotHash,\n",
+          "    row.ollamaMetricsBaselineSnapshotHash,\n",
+          "    row.ollamaMetricsLiveSnapshotHash,\n",
+          "    row.ollamaMetricsAlertPolicyHash,\n",
+          "    row.ollamaMetricsModelId,\n"
+        ],
+        "afterLines": [
+          "    ...ollamaMetricsResultFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3685,
+        "beforeLines": [
+          "    row.ollamaMetricsSidecarId,\n",
+          "    row.ollamaMetricsSourceRefHash,\n",
+          "    row.ollamaMetricsRepositorySnapshotHash,\n",
+          "    row.ollamaMetricsLicenseRefHash,\n",
+          "    row.ollamaMetricsProxyConfigHash,\n",
+          "    row.ollamaMetricsOllamaHostConfigHash,\n",
+          "    row.ollamaMetricsPrometheusScrapeConfigHash,\n",
+          "    row.ollamaMetricsEndpointSnapshotHash,\n",
+          "    row.ollamaMetricsBaselineSnapshotHash,\n",
+          "    row.ollamaMetricsLiveSnapshotHash,\n",
+          "    row.ollamaMetricsAlertPolicyHash,\n",
+          "    row.ollamaMetricsModelId,\n"
+        ],
+        "afterLines": [
+          "    ...ollamaMetricsConfigFields(row),\n",
+          "    ...ollamaMetricsResultFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 3998,
+        "beforeLines": [
+          "    row.researchGymBenchmarkId,\n",
+          "    row.researchGymPaperRefHash,\n",
+          "    row.researchGymTaskId,\n",
+          "    row.researchGymTaskManifestHash,\n",
+          "    row.researchGymPrunedRepoHash,\n",
+          "    row.researchGymDatasetManifestHash,\n",
+          "    row.researchGymEvaluationHarnessHash,\n",
+          "    row.researchGymBaselineScoreManifestHash,\n",
+          "    row.researchGymGradingScriptHash,\n",
+          "    row.researchGymWithheldSolutionPolicyHash,\n",
+          "    row.researchGymRunConfigHash,\n"
+        ],
+        "afterLines": [
+          "    ...researchGymSetupFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 4000,
+        "beforeLines": [
+          "    row.researchGymAgentAdapterHash,\n",
+          "    row.researchGymWorkspaceSnapshotHash,\n",
+          "    row.researchGymTranscriptHash,\n",
+          "    row.researchGymCostSummaryHash,\n",
+          "    row.researchGymStatusHash,\n",
+          "    row.researchGymPlanHash,\n",
+          "    row.researchGymInspectionReportHash,\n",
+          "    row.researchGymViolationReportHash,\n"
+        ],
+        "afterLines": [
+          "    ...researchGymArtifactFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 4023,
+        "beforeLines": [
+          "    row.researchGymBenchmarkId,\n",
+          "    row.researchGymPaperRefHash,\n",
+          "    row.researchGymTaskId,\n",
+          "    row.researchGymTaskManifestHash,\n",
+          "    row.researchGymPrunedRepoHash,\n",
+          "    row.researchGymDatasetManifestHash,\n",
+          "    row.researchGymEvaluationHarnessHash,\n",
+          "    row.researchGymBaselineScoreManifestHash,\n",
+          "    row.researchGymGradingScriptHash,\n",
+          "    row.researchGymWithheldSolutionPolicyHash,\n",
+          "    row.researchGymRunConfigHash,\n",
+          "    row.researchGymAgentAdapterHash,\n",
+          "    row.researchGymWorkspaceSnapshotHash,\n",
+          "    row.researchGymTranscriptHash,\n",
+          "    row.researchGymCostSummaryHash,\n",
+          "    row.researchGymStatusHash,\n",
+          "    row.researchGymPlanHash,\n",
+          "    row.researchGymInspectionReportHash,\n",
+          "    row.researchGymViolationReportHash,\n"
+        ],
+        "afterLines": [
+          "    ...researchGymSetupFields(row),\n",
+          "    ...researchGymArtifactFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 4078,
+        "beforeLines": [
+          "    row.osUniverseBenchmarkId,\n",
+          "    row.osUniverseSourceRefHash,\n",
+          "    row.osUniverseRepositorySnapshotHash,\n",
+          "    row.osUniverseLicenseRefHash,\n",
+          "    row.osUniversePaperRefHash,\n",
+          "    row.osUniverseTestcaseId,\n",
+          "    row.osUniverseTestcaseManifestHash,\n",
+          "    row.osUniverseAgentConfigHash,\n",
+          "    row.osUniverseRunnerConfigHash,\n"
+        ],
+        "afterLines": [
+          "    ...osUniverseSetupFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 4080,
+        "beforeLines": [
+          "    row.osUniverseDependencyLockHash,\n",
+          "    row.osUniverseValidatorConfigHash,\n",
+          "    row.osUniverseValidationReportHash,\n",
+          "    row.osUniverseResultArtifactHash,\n",
+          "    row.osUniverseViewerArtifactHash,\n",
+          "    row.osUniverseTrajectoryHash,\n",
+          "    row.osUniverseScreenshotTraceHash,\n"
+        ],
+        "afterLines": [
+          "    ...osUniverseArtifactFields(row),\n"
+        ]
+      },
+      {
+        "currentStartLine": 4095,
+        "beforeLines": [
+          "    row.osUniverseBenchmarkId,\n",
+          "    row.osUniverseSourceRefHash,\n",
+          "    row.osUniverseRepositorySnapshotHash,\n",
+          "    row.osUniverseLicenseRefHash,\n",
+          "    row.osUniversePaperRefHash,\n",
+          "    row.osUniverseTestcaseId,\n",
+          "    row.osUniverseTestcaseManifestHash,\n",
+          "    row.osUniverseAgentConfigHash,\n",
+          "    row.osUniverseRunnerConfigHash,\n",
+          "    row.osUniverseDependencyLockHash,\n",
+          "    row.osUniverseValidatorConfigHash,\n",
+          "    row.osUniverseValidationReportHash,\n",
+          "    row.osUniverseResultArtifactHash,\n",
+          "    row.osUniverseViewerArtifactHash,\n",
+          "    row.osUniverseTrajectoryHash,\n",
+          "    row.osUniverseScreenshotTraceHash,\n"
+        ],
+        "afterLines": [
+          "    ...osUniverseSetupFields(row),\n",
+          "    ...osUniverseArtifactFields(row),\n"
+        ]
+      }
+    ],
+    "exactInverseStaticallyVerified": true
+  }
+}

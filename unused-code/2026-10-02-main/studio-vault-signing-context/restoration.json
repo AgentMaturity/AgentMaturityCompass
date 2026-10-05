@@ -1,0 +1,612 @@
+{
+  "baseCommit": "5eee56eda32f79970c23ee8d8a6e5f5ca51f6538",
+  "files": [
+    {
+      "originalPath": "src/studio/studioServer.ts",
+      "archivePath": "unused-code/2026-10-02-main/studio-vault-signing-context/originals/src/studio/studioServer.ts.original",
+      "sha256": "7d7bc92acecfaec70812adf2053476fbc9fcdabccf047a1be8979d089ccbd1e7"
+    },
+    {
+      "originalPath": "tests/studioRouteRoleContextParity.test.ts",
+      "archivePath": "unused-code/2026-10-02-main/studio-vault-signing-context/originals/tests/studioRouteRoleContextParity.test.ts.original",
+      "sha256": "c47bde6bac8ea35fe404dbf367074f3a853acb53413f76eb66e55340bbb824ac"
+    }
+  ],
+  "helperText": "      const requireUnlockedVaultForSigning = (): boolean => {\n        if (vaultStatus(options.workspace).unlocked) return true;\n        json(res, 423, { error: \"vault locked; unlock required for signing\" });\n        return false;\n      };\n\n",
+  "guards": [
+    {
+      "start": 98162,
+      "end": 98319,
+      "line": 2788,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/org/scorecards/recompute\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/org/scorecards/recompute\" && req.method === \"POST\"",
+      "staticPath": "/org/scorecards/recompute",
+      "method": "POST",
+      "path": "/org/scorecards/recompute",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 99441,
+      "end": 99598,
+      "line": 2824,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/org/nodes\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/org/nodes\" && req.method === \"POST\"",
+      "staticPath": "/org/nodes",
+      "method": "POST",
+      "path": "/org/nodes",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 101594,
+      "end": 101751,
+      "line": 2884,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/org/assign\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/org/assign\" && req.method === \"POST\"",
+      "staticPath": "/org/assign",
+      "method": "POST",
+      "path": "/org/assign",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 103484,
+      "end": 103641,
+      "line": 2937,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/org/unassign\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/org/unassign\" && req.method === \"POST\"",
+      "staticPath": "/org/unassign",
+      "method": "POST",
+      "path": "/org/unassign",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 107194,
+      "end": 107351,
+      "line": 3042,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/org/commitments/generate\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/org/commitments/generate\" && req.method === \"POST\"",
+      "staticPath": "/org/commitments/generate",
+      "method": "POST",
+      "path": "/org/commitments/generate",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 110262,
+      "end": 110419,
+      "line": 3122,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/transform/map/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/transform/map/apply\" && req.method === \"POST\"",
+      "staticPath": "/transform/map/apply",
+      "method": "POST",
+      "path": "/transform/map/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 112336,
+      "end": 112493,
+      "line": 3176,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "agentTransformPlanMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/agents/default/transform/plan",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 114179,
+      "end": 114336,
+      "line": 3221,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "agentTransformTrackMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/agents/default/transform/track",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 115690,
+      "end": 115847,
+      "line": 3260,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "agentTransformAttestMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/agents/default/transform/attest",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 118348,
+      "end": 118505,
+      "line": 3324,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "nodeTransformPlanMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/org/nodes/owned-fixture/transform/plan",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 120127,
+      "end": 120284,
+      "line": 3369,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "nodeTransformTrackMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/org/nodes/owned-fixture/transform/track",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 121574,
+      "end": 121731,
+      "line": 3408,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "nodeTransformAttestMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/org/nodes/owned-fixture/transform/attest",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 124057,
+      "end": 124214,
+      "line": 3473,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/canon/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/canon/apply\" && req.method === \"POST\"",
+      "staticPath": "/canon/apply",
+      "method": "POST",
+      "path": "/canon/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 125665,
+      "end": 125822,
+      "line": 3519,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/cgx/policy/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/cgx/policy/apply\" && req.method === \"POST\"",
+      "staticPath": "/cgx/policy/apply",
+      "method": "POST",
+      "path": "/cgx/policy/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 126855,
+      "end": 127012,
+      "line": 3553,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/cgx/build\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/cgx/build\" && req.method === \"POST\"",
+      "staticPath": "/cgx/build",
+      "method": "POST",
+      "path": "/cgx/build",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 130318,
+      "end": 130475,
+      "line": 3654,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/prompt/policy/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/prompt/policy/apply\" && req.method === \"POST\"",
+      "staticPath": "/prompt/policy/apply",
+      "method": "POST",
+      "path": "/prompt/policy/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 132116,
+      "end": 132273,
+      "line": 3705,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/prompt/pack/build\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/prompt/pack/build\" && req.method === \"POST\"",
+      "staticPath": "/prompt/pack/build",
+      "method": "POST",
+      "path": "/prompt/pack/build",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 135088,
+      "end": 135245,
+      "line": 3785,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/prompt/scheduler/run-now\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/prompt/scheduler/run-now\" && req.method === \"POST\"",
+      "staticPath": "/prompt/scheduler/run-now",
+      "method": "POST",
+      "path": "/prompt/scheduler/run-now",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 137024,
+      "end": 137181,
+      "line": 3841,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/forecast/policy/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/forecast/policy/apply\" && req.method === \"POST\"",
+      "staticPath": "/forecast/policy/apply",
+      "method": "POST",
+      "path": "/forecast/policy/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 139344,
+      "end": 139501,
+      "line": 3902,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/forecast/refresh\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/forecast/refresh\" && req.method === \"POST\"",
+      "staticPath": "/forecast/refresh",
+      "method": "POST",
+      "path": "/forecast/refresh",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 141622,
+      "end": 141779,
+      "line": 3957,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/forecast/scheduler/run-now\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/forecast/scheduler/run-now\" && req.method === \"POST\"",
+      "staticPath": "/forecast/scheduler/run-now",
+      "method": "POST",
+      "path": "/forecast/scheduler/run-now",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 143293,
+      "end": 143450,
+      "line": 4009,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/assurance/policy/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/assurance/policy/apply\" && req.method === \"POST\"",
+      "staticPath": "/assurance/policy/apply",
+      "method": "POST",
+      "path": "/assurance/policy/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 144546,
+      "end": 144703,
+      "line": 4044,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/assurance/run\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/assurance/run\" && req.method === \"POST\"",
+      "staticPath": "/assurance/run",
+      "method": "POST",
+      "path": "/assurance/run",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 148116,
+      "end": 148273,
+      "line": 4140,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/assurance/cert/issue\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/assurance/cert/issue\" && req.method === \"POST\"",
+      "staticPath": "/assurance/cert/issue",
+      "method": "POST",
+      "path": "/assurance/cert/issue",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 153087,
+      "end": 153244,
+      "line": 4274,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/assurance/scheduler/run-now\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/assurance/scheduler/run-now\" && req.method === \"POST\"",
+      "staticPath": "/assurance/scheduler/run-now",
+      "method": "POST",
+      "path": "/assurance/scheduler/run-now",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 158036,
+      "end": 158193,
+      "line": 4437,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/audit/binder/create\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/audit/binder/create\" && req.method === \"POST\"",
+      "staticPath": "/audit/binder/create",
+      "method": "POST",
+      "path": "/audit/binder/create",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 159135,
+      "end": 159292,
+      "line": 4464,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/audit/binder/export\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/audit/binder/export\" && req.method === \"POST\"",
+      "staticPath": "/audit/binder/export",
+      "method": "POST",
+      "path": "/audit/binder/export",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 166751,
+      "end": 166908,
+      "line": 4659,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "auditRequestFulfillMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/audit/requests/owned-fixture/fulfill",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 168199,
+      "end": 168356,
+      "line": 4701,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/audit/scheduler/run-now\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/audit/scheduler/run-now\" && req.method === \"POST\"",
+      "staticPath": "/audit/scheduler/run-now",
+      "method": "POST",
+      "path": "/audit/scheduler/run-now",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 181095,
+      "end": 181252,
+      "line": 5065,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/passport/policy/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/passport/policy/apply\" && req.method === \"POST\"",
+      "staticPath": "/passport/policy/apply",
+      "method": "POST",
+      "path": "/passport/policy/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 182340,
+      "end": 182497,
+      "line": 5103,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/passport/create\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/passport/create\" && req.method === \"POST\"",
+      "staticPath": "/passport/create",
+      "method": "POST",
+      "path": "/passport/create",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 184263,
+      "end": 184420,
+      "line": 5155,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/passport/export\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/passport/export\" && req.method === \"POST\"",
+      "staticPath": "/passport/export",
+      "method": "POST",
+      "path": "/passport/export",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 189410,
+      "end": 189567,
+      "line": 5301,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/standard/generate\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/standard/generate\" && req.method === \"POST\"",
+      "staticPath": "/standard/generate",
+      "method": "POST",
+      "path": "/standard/generate",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 192972,
+      "end": 193129,
+      "line": 5406,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "advisoryAckMatch && req.method === \"POST\""
+      ],
+      "routeCondition": null,
+      "path": "/advisories/owned-fixture/ack",
+      "method": "POST",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 215455,
+      "end": 215612,
+      "line": 5996,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/diagnostic/bank/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/diagnostic/bank/apply\" && req.method === \"POST\"",
+      "staticPath": "/diagnostic/bank/apply",
+      "method": "POST",
+      "path": "/diagnostic/bank/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 247173,
+      "end": 247330,
+      "line": 6812,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/mechanic/targets/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/mechanic/targets/apply\" && req.method === \"POST\"",
+      "staticPath": "/mechanic/targets/apply",
+      "method": "POST",
+      "path": "/mechanic/targets/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 249243,
+      "end": 249400,
+      "line": 6869,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/mechanic/profiles/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/mechanic/profiles/apply\" && req.method === \"POST\"",
+      "staticPath": "/mechanic/profiles/apply",
+      "method": "POST",
+      "path": "/mechanic/profiles/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 251669,
+      "end": 251826,
+      "line": 6936,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/mechanic/tuning/apply\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/mechanic/tuning/apply\" && req.method === \"POST\"",
+      "staticPath": "/mechanic/tuning/apply",
+      "method": "POST",
+      "path": "/mechanic/tuning/apply",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 254104,
+      "end": 254261,
+      "line": 7000,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/mechanic/plan/create\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/mechanic/plan/create\" && req.method === \"POST\"",
+      "staticPath": "/mechanic/plan/create",
+      "method": "POST",
+      "path": "/mechanic/plan/create",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    },
+    {
+      "start": 257801,
+      "end": 257958,
+      "line": 7107,
+      "message": "vault locked; unlock required for signing",
+      "text": "if (!vaultStatus(options.workspace).unlocked) {\n          json(res, 423, { error: \"vault locked; unlock required for signing\" });\n          return;\n        }",
+      "ancestorConditions": [
+        "pathname === \"/mechanic/plan/execute\" && req.method === \"POST\""
+      ],
+      "routeCondition": "pathname === \"/mechanic/plan/execute\" && req.method === \"POST\"",
+      "staticPath": "/mechanic/plan/execute",
+      "method": "POST",
+      "path": "/mechanic/plan/execute",
+      "replacement": "if (!requireUnlockedVaultForSigning()) {\n          return;\n        }"
+    }
+  ],
+  "reason": "Consolidate40 existing byte-equivalent signing-vault refusal guards; preserve lazyIO, original caller/order,423message/body and all other source",
+  "restore": "Copy full originals and verify SHA256; newtestpath was absent"
+}

@@ -1,0 +1,3316 @@
+{
+  "baseCommit": "bd84d51faa894e178b3331c2c95662ba5a7a0749",
+  "files": [
+    {
+      "originalPath": "src/studio/studioServer.ts",
+      "archivePath": "unused-code/2026-10-01-main/studio-route-role-context/originals/src/studio/studioServer.ts.original",
+      "sha256": "29c1b1ce86930c8a4566f1c2768f547f2d122d9331cc6097c7f9924a2085f515"
+    }
+  ],
+  "newPaths": [
+    "tests/studioRouteRoleContextParity.test.ts"
+  ],
+  "helperText": "      // Bind the authenticated request context once; each route retains its role list.\n      const requireRouteRoles = (roles: UserRole[]): boolean =>\n        requireRoles({ auth, res, workspace: options.workspace, roles });\n\n",
+  "calls": [
+    {
+      "start": 80316,
+      "end": 80436,
+      "line": 2318,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 87933,
+      "end": 88053,
+      "line": 2505,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/trust/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 89144,
+      "end": 89231,
+      "line": 2541,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/retention/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 89692,
+      "end": 89779,
+      "line": 2554,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/retention/run\" && req.method === \"POST\""
+    },
+    {
+      "start": 91245,
+      "end": 91332,
+      "line": 2590,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/maintenance/stats\" && req.method === \"GET\""
+    },
+    {
+      "start": 91742,
+      "end": 91829,
+      "line": 2602,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/maintenance/vacuum\" && req.method === \"POST\""
+    },
+    {
+      "start": 92891,
+      "end": 92978,
+      "line": 2632,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/maintenance/prune\" && req.method === \"POST\""
+    },
+    {
+      "start": 93993,
+      "end": 94080,
+      "line": 2660,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/ops/backup/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 94271,
+      "end": 94391,
+      "line": 2668,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/org\" && req.method === \"GET\""
+    },
+    {
+      "start": 94740,
+      "end": 94860,
+      "line": 2681,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/org/roles\" && req.method === \"GET\""
+    },
+    {
+      "start": 95095,
+      "end": 95215,
+      "line": 2690,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/org/runs\" && req.method === \"GET\""
+    },
+    {
+      "start": 95590,
+      "end": 95677,
+      "line": 2703,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/org/runs\" && req.method === \"POST\""
+    },
+    {
+      "start": 97354,
+      "end": 97474,
+      "line": 2751,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 97856,
+      "end": 97976,
+      "line": 2764,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/org/scorecards/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 98340,
+      "end": 98427,
+      "line": 2777,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/org/scorecards/recompute\" && req.method === \"POST\""
+    },
+    {
+      "start": 99678,
+      "end": 99753,
+      "line": 2813,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/org/nodes\" && req.method === \"POST\""
+    },
+    {
+      "start": 101878,
+      "end": 101953,
+      "line": 2873,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/org/assign\" && req.method === \"POST\""
+    },
+    {
+      "start": 103815,
+      "end": 103890,
+      "line": 2926,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/org/unassign\" && req.method === \"POST\""
+    },
+    {
+      "start": 105718,
+      "end": 105838,
+      "line": 2978,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 106655,
+      "end": 106775,
+      "line": 3002,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 107654,
+      "end": 107741,
+      "line": 3031,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/org/commitments/generate\" && req.method === \"POST\""
+    },
+    {
+      "start": 109787,
+      "end": 109907,
+      "line": 3083,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 110545,
+      "end": 110665,
+      "line": 3103,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transform/map\" && req.method === \"GET\""
+    },
+    {
+      "start": 110875,
+      "end": 110950,
+      "line": 3111,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/transform/map/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 112414,
+      "end": 112534,
+      "line": 3151,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 113031,
+      "end": 113118,
+      "line": 3165,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 114921,
+      "end": 115008,
+      "line": 3210,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 116480,
+      "end": 116566,
+      "line": 3249,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"AUDITOR\"] })",
+      "route": null
+    },
+    {
+      "start": 118652,
+      "end": 118772,
+      "line": 3299,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 119231,
+      "end": 119318,
+      "line": 3313,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 121057,
+      "end": 121144,
+      "line": 3358,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 122552,
+      "end": 122638,
+      "line": 3397,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"AUDITOR\"] })",
+      "route": null
+    },
+    {
+      "start": 124554,
+      "end": 124674,
+      "line": 3446,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/canon\" && req.method === \"GET\""
+    },
+    {
+      "start": 124869,
+      "end": 124989,
+      "line": 3454,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/canon/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 125187,
+      "end": 125262,
+      "line": 3462,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/canon/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 126568,
+      "end": 126688,
+      "line": 3500,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/cgx/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 126889,
+      "end": 126964,
+      "line": 3508,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/cgx/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 128287,
+      "end": 128374,
+      "line": 3546,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/cgx/build\" && req.method === \"POST\""
+    },
+    {
+      "start": 129679,
+      "end": 129799,
+      "line": 3581,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/cgx/graph/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 130470,
+      "end": 130590,
+      "line": 3603,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/cgx/pack/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 130943,
+      "end": 131051,
+      "line": 3619,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"AUDITOR\", \"OWNER\", \"OPERATOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"AUDITOR\", \"OWNER\", \"OPERATOR\", \"VIEWER\"])",
+      "roles": [
+        "AUDITOR",
+        "OWNER",
+        "OPERATOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"AUDITOR\", \"OWNER\", \"OPERATOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/cgx/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 131248,
+      "end": 131356,
+      "line": 3627,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 131556,
+      "end": 131664,
+      "line": 3635,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 131871,
+      "end": 131946,
+      "line": 3643,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/prompt/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 133581,
+      "end": 133689,
+      "line": 3688,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 133924,
+      "end": 134011,
+      "line": 3698,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/prompt/pack/build\" && req.method === \"POST\""
+    },
+    {
+      "start": 135154,
+      "end": 135262,
+      "line": 3733,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/pack/show\" && req.method === \"GET\""
+    },
+    {
+      "start": 136289,
+      "end": 136397,
+      "line": 3758,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/pack/diff\" && req.method === \"GET\""
+    },
+    {
+      "start": 136755,
+      "end": 136863,
+      "line": 3770,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/prompt/scheduler\" && req.method === \"GET\""
+    },
+    {
+      "start": 137084,
+      "end": 137171,
+      "line": 3778,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/prompt/scheduler/run-now\" && req.method === \"POST\""
+    },
+    {
+      "start": 137982,
+      "end": 138069,
+      "line": 3800,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/prompt/scheduler/enable\" && req.method === \"POST\""
+    },
+    {
+      "start": 138352,
+      "end": 138439,
+      "line": 3811,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/prompt/scheduler/disable\" && req.method === \"POST\""
+    },
+    {
+      "start": 138713,
+      "end": 138833,
+      "line": 3822,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/forecast/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 139047,
+      "end": 139122,
+      "line": 3830,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/forecast/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 140510,
+      "end": 140630,
+      "line": 3869,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/forecast/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 141622,
+      "end": 141709,
+      "line": 3895,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/forecast/refresh\" && req.method === \"POST\""
+    },
+    {
+      "start": 143649,
+      "end": 143769,
+      "line": 3942,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/forecast/scheduler/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 143994,
+      "end": 144081,
+      "line": 3950,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/forecast/scheduler/run-now\" && req.method === \"POST\""
+    },
+    {
+      "start": 144571,
+      "end": 144658,
+      "line": 3966,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/forecast/scheduler/enable\" && req.method === \"POST\""
+    },
+    {
+      "start": 144970,
+      "end": 145057,
+      "line": 3978,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/forecast/scheduler/disable\" && req.method === \"POST\""
+    },
+    {
+      "start": 145359,
+      "end": 145479,
+      "line": 3990,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/assurance/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 145692,
+      "end": 145767,
+      "line": 3998,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/assurance/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 146980,
+      "end": 147067,
+      "line": 4033,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/assurance/run\" && req.method === \"POST\""
+    },
+    {
+      "start": 149680,
+      "end": 149800,
+      "line": 4101,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/assurance/runs\" && req.method === \"GET\""
+    },
+    {
+      "start": 150097,
+      "end": 150217,
+      "line": 4112,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 150691,
+      "end": 150778,
+      "line": 4129,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/assurance/cert/issue\" && req.method === \"POST\""
+    },
+    {
+      "start": 152488,
+      "end": 152608,
+      "line": 4177,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/assurance/cert/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 152827,
+      "end": 152902,
+      "line": 4185,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/assurance/waiver/request\" && req.method === \"POST\""
+    },
+    {
+      "start": 154197,
+      "end": 154317,
+      "line": 4219,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/assurance/waiver/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 154537,
+      "end": 154612,
+      "line": 4227,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/assurance/waiver/revoke\" && req.method === \"POST\""
+    },
+    {
+      "start": 155597,
+      "end": 155717,
+      "line": 4255,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/assurance/scheduler/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 155944,
+      "end": 156031,
+      "line": 4263,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/assurance/scheduler/run-now\" && req.method === \"POST\""
+    },
+    {
+      "start": 157136,
+      "end": 157223,
+      "line": 4299,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/assurance/scheduler/enable\" && req.method === \"POST\""
+    },
+    {
+      "start": 157508,
+      "end": 157595,
+      "line": 4310,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/assurance/scheduler/disable\" && req.method === \"POST\""
+    },
+    {
+      "start": 158258,
+      "end": 158378,
+      "line": 4336,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/audit/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 158649,
+      "end": 158724,
+      "line": 4347,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/audit/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 159634,
+      "end": 159754,
+      "line": 4376,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/audit/map/active\" && req.method === \"GET\""
+    },
+    {
+      "start": 160080,
+      "end": 160155,
+      "line": 4390,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/audit/map/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 161047,
+      "end": 161167,
+      "line": 4419,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/audit/map/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 161442,
+      "end": 161529,
+      "line": 4430,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/audit/binder/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 162600,
+      "end": 162675,
+      "line": 4457,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/audit/binder/export\" && req.method === \"POST\""
+    },
+    {
+      "start": 165173,
+      "end": 165293,
+      "line": 4519,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/audit/binders\" && req.method === \"GET\""
+    },
+    {
+      "start": 165632,
+      "end": 165752,
+      "line": 4531,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 166617,
+      "end": 166694,
+      "line": 4558,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"AUDITOR\"])",
+      "roles": [
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"AUDITOR\"] })",
+      "route": "pathname === \"/audit/requests/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 168000,
+      "end": 168098,
+      "line": 4589,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\"] })",
+      "route": "pathname === \"/audit/requests\" && req.method === \"GET\""
+    },
+    {
+      "start": 168492,
+      "end": 168567,
+      "line": 4603,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 169828,
+      "end": 169903,
+      "line": 4631,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 170533,
+      "end": 170620,
+      "line": 4652,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 171682,
+      "end": 171790,
+      "line": 4683,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/audit/scheduler/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 172075,
+      "end": 172162,
+      "line": 4694,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/audit/scheduler/run-now\" && req.method === \"POST\""
+    },
+    {
+      "start": 173128,
+      "end": 173215,
+      "line": 4720,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/audit/scheduler/enable\" && req.method === \"POST\""
+    },
+    {
+      "start": 173558,
+      "end": 173645,
+      "line": 4734,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/audit/scheduler/disable\" && req.method === \"POST\""
+    },
+    {
+      "start": 174304,
+      "end": 174412,
+      "line": 4760,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/value/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 174683,
+      "end": 174758,
+      "line": 4771,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/value/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 175660,
+      "end": 175747,
+      "line": 4800,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/contracts\" && req.method === \"GET\""
+    },
+    {
+      "start": 176492,
+      "end": 176579,
+      "line": 4822,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/contracts/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 178642,
+      "end": 178729,
+      "line": 4873,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/import/csv\" && req.method === \"POST\""
+    },
+    {
+      "start": 179933,
+      "end": 180041,
+      "line": 4905,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/value/snapshot/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 181090,
+      "end": 181198,
+      "line": 4932,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/value/report\" && req.method === \"GET\""
+    },
+    {
+      "start": 182348,
+      "end": 182456,
+      "line": 4963,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR",
+        "AUDITOR",
+        "VIEWER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\", \"AUDITOR\", \"VIEWER\"] })",
+      "route": "pathname === \"/value/scheduler/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 182741,
+      "end": 182828,
+      "line": 4974,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/scheduler/run-now\" && req.method === \"POST\""
+    },
+    {
+      "start": 183928,
+      "end": 184015,
+      "line": 5003,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/scheduler/enable\" && req.method === \"POST\""
+    },
+    {
+      "start": 184362,
+      "end": 184449,
+      "line": 5017,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/value/scheduler/disable\" && req.method === \"POST\""
+    },
+    {
+      "start": 185127,
+      "end": 185235,
+      "line": 5043,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/passport/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 185515,
+      "end": 185590,
+      "line": 5054,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/passport/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 186968,
+      "end": 187055,
+      "line": 5096,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/passport/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 188478,
+      "end": 188586,
+      "line": 5133,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/passport/cache/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 188997,
+      "end": 189072,
+      "line": 5148,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/passport/export\" && req.method === \"POST\""
+    },
+    {
+      "start": 191850,
+      "end": 191937,
+      "line": 5224,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/passport/verify\" && req.method === \"POST\""
+    },
+    {
+      "start": 193121,
+      "end": 193229,
+      "line": 5256,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/passport/exports\" && req.method === \"GET\""
+    },
+    {
+      "start": 193728,
+      "end": 193836,
+      "line": 5276,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/passport/badge\" && req.method === \"GET\""
+    },
+    {
+      "start": 194332,
+      "end": 194407,
+      "line": 5294,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/standard/generate\" && req.method === \"POST\""
+    },
+    {
+      "start": 195237,
+      "end": 195345,
+      "line": 5323,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/standard/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 195619,
+      "end": 195727,
+      "line": 5334,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/standard/schemas\" && req.method === \"GET\""
+    },
+    {
+      "start": 196073,
+      "end": 196181,
+      "line": 5346,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 196538,
+      "end": 196625,
+      "line": 5358,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/standard/validate\" && req.method === \"POST\""
+    },
+    {
+      "start": 197327,
+      "end": 197447,
+      "line": 5377,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/advisories\" && req.method === \"GET\""
+    },
+    {
+      "start": 198164,
+      "end": 198251,
+      "line": 5399,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 199599,
+      "end": 199719,
+      "line": 5434,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/agents\" && req.method === \"GET\""
+    },
+    {
+      "start": 200771,
+      "end": 200846,
+      "line": 5463,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/users\" && req.method === \"GET\""
+    },
+    {
+      "start": 201263,
+      "end": 201338,
+      "line": 5478,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/users/add\" && req.method === \"POST\""
+    },
+    {
+      "start": 202439,
+      "end": 202514,
+      "line": 5509,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/users/revoke\" && req.method === \"POST\""
+    },
+    {
+      "start": 203260,
+      "end": 203335,
+      "line": 5531,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/users/roles\" && req.method === \"POST\""
+    },
+    {
+      "start": 204192,
+      "end": 204300,
+      "line": 5554,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/leases/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 204818,
+      "end": 204926,
+      "line": 5569,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/budgets\" && req.method === \"GET\""
+    },
+    {
+      "start": 205303,
+      "end": 205378,
+      "line": 5582,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/budgets/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 206490,
+      "end": 206565,
+      "line": 5612,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/leases/issue\" && req.method === \"POST\""
+    },
+    {
+      "start": 208647,
+      "end": 208722,
+      "line": 5665,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/leases/revoke\" && req.method === \"POST\""
+    },
+    {
+      "start": 210033,
+      "end": 210153,
+      "line": 5696,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 211604,
+      "end": 211724,
+      "line": 5734,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 212907,
+      "end": 212982,
+      "line": 5762,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 215508,
+      "end": 215583,
+      "line": 5837,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 217819,
+      "end": 217906,
+      "line": 5889,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 219068,
+      "end": 219188,
+      "line": 5923,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/auto-answer\" && req.method === \"GET\""
+    },
+    {
+      "start": 219602,
+      "end": 219689,
+      "line": 5937,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/run\" && req.method === \"POST\""
+    },
+    {
+      "start": 220755,
+      "end": 220875,
+      "line": 5969,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/bank\" && req.method === \"GET\""
+    },
+    {
+      "start": 221089,
+      "end": 221209,
+      "line": 5977,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/bank/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 221426,
+      "end": 221501,
+      "line": 5985,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/bank/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 222504,
+      "end": 222624,
+      "line": 6011,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/diagnostic/render\" && req.method === \"GET\""
+    },
+    {
+      "start": 227213,
+      "end": 227300,
+      "line": 6145,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 228379,
+      "end": 228466,
+      "line": 6176,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 230108,
+      "end": 230195,
+      "line": 6216,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 230713,
+      "end": 230811,
+      "line": 6231,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\", \"AUDITOR\"] })",
+      "route": null
+    },
+    {
+      "start": 231791,
+      "end": 231878,
+      "line": 6255,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 241577,
+      "end": 241697,
+      "line": 6493,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/toolhub/pending-intents\" && req.method === \"GET\""
+    },
+    {
+      "start": 241915,
+      "end": 242035,
+      "line": 6503,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/approvals\" && req.method === \"GET\""
+    },
+    {
+      "start": 242645,
+      "end": 242765,
+      "line": 6522,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/approvals/requests\" && req.method === \"GET\""
+    },
+    {
+      "start": 243530,
+      "end": 243650,
+      "line": 6543,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 244698,
+      "end": 244818,
+      "line": 6571,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 246442,
+      "end": 246540,
+      "line": 6611,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"APPROVER\", \"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"APPROVER\", \"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "APPROVER",
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"APPROVER\", \"OWNER\", \"AUDITOR\"] })",
+      "route": null
+    },
+    {
+      "start": 248730,
+      "end": 248828,
+      "line": 6667,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"APPROVER\", \"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"APPROVER\", \"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "APPROVER",
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"APPROVER\", \"OWNER\", \"AUDITOR\"] })",
+      "route": null
+    },
+    {
+      "start": 250985,
+      "end": 251060,
+      "line": 6723,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 253425,
+      "end": 253545,
+      "line": 6787,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/targets\" && req.method === \"GET\""
+    },
+    {
+      "start": 253827,
+      "end": 253902,
+      "line": 6798,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/mechanic/targets/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 255587,
+      "end": 255707,
+      "line": 6844,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/profiles\" && req.method === \"GET\""
+    },
+    {
+      "start": 255991,
+      "end": 256066,
+      "line": 6855,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/mechanic/profiles/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 258111,
+      "end": 258231,
+      "line": 6911,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/tuning\" && req.method === \"GET\""
+    },
+    {
+      "start": 258511,
+      "end": 258586,
+      "line": 6922,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/mechanic/tuning/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 260278,
+      "end": 260398,
+      "line": 6968,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/gap\" && req.method === \"GET\""
+    },
+    {
+      "start": 261201,
+      "end": 261288,
+      "line": 6990,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/mechanic/plan/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 262567,
+      "end": 262687,
+      "line": 7026,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/plan/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 262968,
+      "end": 263088,
+      "line": 7037,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/plan/diff\" && req.method === \"POST\""
+    },
+    {
+      "start": 263766,
+      "end": 263841,
+      "line": 7061,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/mechanic/plan/request-approval\" && req.method === \"POST\""
+    },
+    {
+      "start": 265098,
+      "end": 265173,
+      "line": 7097,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/mechanic/plan/execute\" && req.method === \"POST\""
+    },
+    {
+      "start": 267014,
+      "end": 267101,
+      "line": 7156,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/mechanic/simulate\" && req.method === \"POST\""
+    },
+    {
+      "start": 268279,
+      "end": 268399,
+      "line": 7192,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/mechanic/simulations/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 269249,
+      "end": 269369,
+      "line": 7215,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/policy\" && req.method === \"GET\""
+    },
+    {
+      "start": 269723,
+      "end": 269798,
+      "line": 7227,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/bench/policy/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 270972,
+      "end": 271059,
+      "line": 7262,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/bench/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 273098,
+      "end": 273218,
+      "line": 7314,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/exports\" && req.method === \"GET\""
+    },
+    {
+      "start": 273598,
+      "end": 273718,
+      "line": 7328,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/imports\" && req.method === \"GET\""
+    },
+    {
+      "start": 274101,
+      "end": 274221,
+      "line": 7342,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/registries\" && req.method === \"GET\""
+    },
+    {
+      "start": 274579,
+      "end": 274654,
+      "line": 7354,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/bench/registry/add\" && req.method === \"POST\""
+    },
+    {
+      "start": 279027,
+      "end": 279147,
+      "line": 7470,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/registry/browse\" && req.method === \"GET\""
+    },
+    {
+      "start": 279858,
+      "end": 279945,
+      "line": 7493,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/bench/import\" && req.method === \"POST\""
+    },
+    {
+      "start": 282108,
+      "end": 282195,
+      "line": 7558,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/bench/compare\" && req.method === \"POST\""
+    },
+    {
+      "start": 283567,
+      "end": 283687,
+      "line": 7598,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/bench/comparison/latest\" && req.method === \"GET\""
+    },
+    {
+      "start": 284046,
+      "end": 284121,
+      "line": 7610,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/bench/publish\" && req.method === \"POST\""
+    },
+    {
+      "start": 287093,
+      "end": 287191,
+      "line": 7696,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\", \"AUDITOR\"] })",
+      "replacement": "requireRouteRoles([\"OPERATOR\", \"OWNER\", \"AUDITOR\"])",
+      "roles": [
+        "OPERATOR",
+        "OWNER",
+        "AUDITOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OPERATOR\", \"OWNER\", \"AUDITOR\"] })",
+      "route": "pathname === \"/benchmarks/ingest\" && req.method === \"POST\""
+    },
+    {
+      "start": 287990,
+      "end": 288110,
+      "line": 7720,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/benchmarks/list\" && req.method === \"GET\""
+    },
+    {
+      "start": 288402,
+      "end": 288522,
+      "line": 7731,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/benchmarks/stats\" && req.method === \"GET\""
+    },
+    {
+      "start": 288959,
+      "end": 289079,
+      "line": 7744,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/outcomes/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 289437,
+      "end": 289557,
+      "line": 7756,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/outcomes/report\" && req.method === \"GET\""
+    },
+    {
+      "start": 290111,
+      "end": 290231,
+      "line": 7774,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/outcomes/history\" && req.method === \"GET\""
+    },
+    {
+      "start": 290688,
+      "end": 290808,
+      "line": 7787,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/outcomes/fleet\" && req.method === \"GET\""
+    },
+    {
+      "start": 291155,
+      "end": 291275,
+      "line": 7800,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/experiments/list\" && req.method === \"GET\""
+    },
+    {
+      "start": 291664,
+      "end": 291784,
+      "line": 7813,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/experiments/history\" && req.method === \"GET\""
+    },
+    {
+      "start": 292157,
+      "end": 292277,
+      "line": 7825,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/experiments/optimizers\" && req.method === \"GET\""
+    },
+    {
+      "start": 292838,
+      "end": 292925,
+      "line": 7843,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/experiments/optimize\" && req.method === \"POST\""
+    },
+    {
+      "start": 293846,
+      "end": 293966,
+      "line": 7868,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 294453,
+      "end": 294540,
+      "line": 7883,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/experiments/create\" && req.method === \"POST\""
+    },
+    {
+      "start": 295385,
+      "end": 295472,
+      "line": 7904,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 296314,
+      "end": 296401,
+      "line": 7923,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 297290,
+      "end": 297377,
+      "line": 7945,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 298134,
+      "end": 298254,
+      "line": 7963,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 298819,
+      "end": 298906,
+      "line": 7979,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": null
+    },
+    {
+      "start": 299699,
+      "end": 299819,
+      "line": 8000,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/compliance/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 300034,
+      "end": 300154,
+      "line": 8008,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/compliance/report\" && req.method === \"GET\""
+    },
+    {
+      "start": 300751,
+      "end": 300871,
+      "line": 8025,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/compliance/fleet\" && req.method === \"GET\""
+    },
+    {
+      "start": 301345,
+      "end": 301465,
+      "line": 8040,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/federation/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 301769,
+      "end": 301856,
+      "line": 8051,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/federation/export\" && req.method === \"POST\""
+    },
+    {
+      "start": 302346,
+      "end": 302433,
+      "line": 8065,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/federation/import\" && req.method === \"POST\""
+    },
+    {
+      "start": 303052,
+      "end": 303172,
+      "line": 8084,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/integrations/status\" && req.method === \"GET\""
+    },
+    {
+      "start": 303473,
+      "end": 303560,
+      "line": 8095,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/integrations/test\" && req.method === \"POST\""
+    },
+    {
+      "start": 304034,
+      "end": 304121,
+      "line": 8109,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\", \"OPERATOR\"])",
+      "roles": [
+        "OWNER",
+        "OPERATOR"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\", \"OPERATOR\"] })",
+      "route": "pathname === \"/integrations/dispatch\" && req.method === \"POST\""
+    },
+    {
+      "start": 304956,
+      "end": 305076,
+      "line": 8132,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/integrations/verify-receipt\" && req.method === \"POST\""
+    },
+    {
+      "start": 305632,
+      "end": 305752,
+      "line": 8149,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/tail\" && req.method === \"GET\""
+    },
+    {
+      "start": 306087,
+      "end": 306207,
+      "line": 8160,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 306423,
+      "end": 306543,
+      "line": 8168,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/merkle/verify\" && req.method === \"GET\""
+    },
+    {
+      "start": 306760,
+      "end": 306880,
+      "line": 8176,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/merkle/root\" && req.method === \"GET\""
+    },
+    {
+      "start": 307206,
+      "end": 307326,
+      "line": 8187,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/merkle/prove\" && req.method === \"POST\""
+    },
+    {
+      "start": 308014,
+      "end": 308134,
+      "line": 8206,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/merkle/verify-proof\" && req.method === \"POST\""
+    },
+    {
+      "start": 308611,
+      "end": 308731,
+      "line": 8220,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/transparency/raw\" && req.method === \"GET\""
+    },
+    {
+      "start": 309549,
+      "end": 309669,
+      "line": 8239,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/plugins/installed\" && req.method === \"GET\""
+    },
+    {
+      "start": 310244,
+      "end": 310364,
+      "line": 8259,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/plugins/registries\" && req.method === \"GET\""
+    },
+    {
+      "start": 310684,
+      "end": 310759,
+      "line": 8270,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/plugins/registries/apply\" && req.method === \"POST\""
+    },
+    {
+      "start": 312043,
+      "end": 312163,
+      "line": 8305,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/plugins/registry/browse\" && req.method === \"GET\""
+    },
+    {
+      "start": 312731,
+      "end": 312806,
+      "line": 8324,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/plugins/install\" && req.method === \"POST\""
+    },
+    {
+      "start": 314280,
+      "end": 314355,
+      "line": 8362,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/plugins/upgrade\" && req.method === \"POST\""
+    },
+    {
+      "start": 315918,
+      "end": 315993,
+      "line": 8403,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/plugins/remove\" && req.method === \"POST\""
+    },
+    {
+      "start": 317428,
+      "end": 317548,
+      "line": 8441,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 318277,
+      "end": 318352,
+      "line": 8463,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/plugins/execute\" && req.method === \"POST\""
+    },
+    {
+      "start": 320016,
+      "end": 320136,
+      "line": 8508,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/policy-packs/list\" && req.method === \"GET\""
+    },
+    {
+      "start": 320355,
+      "end": 320475,
+      "line": 8518,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/industry-packs/access\" && req.method === \"GET\""
+    },
+    {
+      "start": 320857,
+      "end": 320977,
+      "line": 8529,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/industry-packs/checkout\" && (req.method === \"GET\" || req.method === \"POST\")"
+    },
+    {
+      "start": 322380,
+      "end": 322455,
+      "line": 8560,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": "pathname === \"/industry-packs/activate\" && req.method === \"POST\""
+    },
+    {
+      "start": 323831,
+      "end": 323951,
+      "line": 8595,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/industry-packs/license/verify\" && req.method === \"POST\""
+    },
+    {
+      "start": 324628,
+      "end": 324748,
+      "line": 8611,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": "pathname === \"/industry-packs/list\" && req.method === \"GET\""
+    },
+    {
+      "start": 325396,
+      "end": 325516,
+      "line": 8626,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 326515,
+      "end": 326635,
+      "line": 8652,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 327000,
+      "end": 327120,
+      "line": 8664,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"])",
+      "roles": [
+        "VIEWER",
+        "OPERATOR",
+        "APPROVER",
+        "AUDITOR",
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"VIEWER\", \"OPERATOR\", \"APPROVER\", \"AUDITOR\", \"OWNER\"] })",
+      "route": null
+    },
+    {
+      "start": 327877,
+      "end": 327952,
+      "line": 8684,
+      "text": "requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "replacement": "requireRouteRoles([\"OWNER\"])",
+      "roles": [
+        "OWNER"
+      ],
+      "guard": "!requireRoles({ auth, res, workspace: options.workspace, roles: [\"OWNER\"] })",
+      "route": null
+    }
+  ],
+  "reason": "Bind actual authenticated request context at232 literal-role call sites; preserve existing role guard implementation and exact route lists/positions",
+  "restore": "Copy complete original, verify SHA256, remove only the declared new test"
+}

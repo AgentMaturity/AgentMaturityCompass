@@ -1,0 +1,3816 @@
+{
+  "baseCommit": "bff701a4b49de06195dea4cbd99005c082dd0686",
+  "reviewSource": "5eee56eda32f79970c23ee8d8a6e5f5ca51f6538; same49production source SHAs atbasebff",
+  "scope": "Exactly96 module-local sole-return node:path store locators across46 changed source files; retain four existing runtime barrel exports and all49 reviewed originals, functions/signatures/bodies/callers/package entry sources",
+  "files": [
+    {
+      "originalPath": "src/diagnostic/runAliases.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/diagnostic/runAliases.ts.original",
+      "sha256": "15a544a156f407fe8596ef7a0ae3c1db5273c24c9abb82281eed4d53b7d0e3cc",
+      "declarations": [
+        {
+          "name": "runAliasStorePath",
+          "line": 47,
+          "start": 1288,
+          "end": 1295,
+          "token": "export ",
+          "originalDeclaration": "export function runAliasStorePath(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"run-aliases.json\");\n}",
+          "bodySha256": "476b7553d1ae9c6beb0b0481f5e6d0c5c6b0c75b01aaf168808a972438f38ab6",
+          "consumers": [
+            {
+              "file": "src/diagnostic/runAliases.ts",
+              "line": 99,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadRunAliasStore"
+            },
+            {
+              "file": "src/diagnostic/runAliases.ts",
+              "line": 107,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "writeRunAliasStore"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/diagnostic/runAliases.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/enforce/resourceManifest.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/enforce/resourceManifest.ts.original",
+      "sha256": "bd4d28771dbe623f7f5dd99b669893b72a0226ec78b67ed41a09f652674f46f9",
+      "declarations": [
+        {
+          "name": "enforceResourceSnapshotBundlePath",
+          "line": 490,
+          "start": 12838,
+          "end": 12845,
+          "token": "export ",
+          "originalDeclaration": "export function enforceResourceSnapshotBundlePath(workspace: string, agentId: string, manifestId: string): string {\n  return join(enforceResourceDir(workspace, agentId), \"snapshots\", manifestId);\n}",
+          "bodySha256": "2234af2a949083eb944f96043369f1b7f8e03c9e6b4f5cfd7e6a2ed1fac59f96",
+          "consumers": [
+            {
+              "file": "src/enforce/resourceManifest.ts",
+              "line": 495,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "enforceResourceSnapshotManifestPath"
+            },
+            {
+              "file": "src/enforce/resourceManifest.ts",
+              "line": 499,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "enforceResourceSnapshotFilesPath"
+            },
+            {
+              "file": "src/enforce/resourceManifest.ts",
+              "line": 783,
+              "column": 30,
+              "kind": "runtime",
+              "enclosingFunction": "writeEnforceResourceManifestUnlocked"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/enforce/resourceManifest.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/episodeRecord.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/episodeRecord.ts.original",
+      "sha256": "3b15455d469105dd83621c51fb484ef91f210002765f69c766dcd08c1f53c1cb",
+      "declarations": [
+        {
+          "name": "episodeRecordsDir",
+          "line": 165,
+          "start": 5789,
+          "end": 5796,
+          "token": "export ",
+          "originalDeclaration": "export function episodeRecordsDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"episodes\");\n}",
+          "bodySha256": "1cdc33eaf0ebc3f175a6734ad7a9c1bc5ed38418aaff7bbabc90fe74b0f781fd",
+          "consumers": [
+            {
+              "file": "src/lifecycle/episodeRecord.ts",
+              "line": 170,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "episodeRecordPath"
+            },
+            {
+              "file": "src/lifecycle/episodeRecord.ts",
+              "line": 174,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listEpisodeRecords"
+            },
+            {
+              "file": "src/lifecycle/episodeRecord.ts",
+              "line": 186,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "loadEpisodeRecord"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/episodeRecord.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/decisionReceipt.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/decisionReceipt.ts.original",
+      "sha256": "7574d1ba91ea5bb913c4ca67ef048eb1bfa15307d3d44f1b3f22907b7b3895b9",
+      "declarations": [
+        {
+          "name": "decisionReceiptsDir",
+          "line": 65,
+          "start": 1768,
+          "end": 1775,
+          "token": "export ",
+          "originalDeclaration": "export function decisionReceiptsDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"decision-receipts\");\n}",
+          "bodySha256": "ce8aa6bfa1494d8bad8631dae73e8b89026b14eeb4af0d2e2e174dbc2d5e7048",
+          "consumers": [
+            {
+              "file": "src/lifecycle/decisionReceipt.ts",
+              "line": 70,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "decisionReceiptsPath"
+            },
+            {
+              "file": "src/lifecycle/decisionReceipt.ts",
+              "line": 230,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listDecisionReceipts"
+            },
+            {
+              "file": "src/lifecycle/decisionReceipt.ts",
+              "line": 242,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "decisionReceiptFiles"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/decisionReceipt.ts"
+          ]
+        },
+        {
+          "name": "decisionReceiptsPath",
+          "line": 69,
+          "start": 1933,
+          "end": 1940,
+          "token": "export ",
+          "originalDeclaration": "export function decisionReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(decisionReceiptsDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "b61681983094b317462caecbd0291dbefd4b6fa4fa898811d806e634c43e56bd",
+          "consumers": [
+            {
+              "file": "src/lifecycle/decisionReceipt.ts",
+              "line": 224,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "writeDecisionReceipts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/decisionReceipt.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/findingProof.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/findingProof.ts.original",
+      "sha256": "c76d079ecd6af455e4715e193dfa65caac5b53706a3fba2f3ad78f15f94bdbf8",
+      "declarations": [
+        {
+          "name": "findingProofsDir",
+          "line": 218,
+          "start": 8301,
+          "end": 8308,
+          "token": "export ",
+          "originalDeclaration": "export function findingProofsDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"finding-proofs\");\n}",
+          "bodySha256": "243c1d8af7aa6c7cead143fa7232cbd3fa7bf0da2bec5aabf7518b79cba00a69",
+          "consumers": [
+            {
+              "file": "src/lifecycle/findingProof.ts",
+              "line": 223,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "findingProofsPath"
+            },
+            {
+              "file": "src/lifecycle/findingProof.ts",
+              "line": 308,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listFindingProofs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/findingProof.ts"
+          ]
+        },
+        {
+          "name": "findingProofsPath",
+          "line": 222,
+          "start": 8460,
+          "end": 8467,
+          "token": "export ",
+          "originalDeclaration": "export function findingProofsPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(findingProofsDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "703ecc1d029aa44aef52a7bd2d788a85f8b1e6d57522f1c31f0808da12f2e9b4",
+          "consumers": [
+            {
+              "file": "src/lifecycle/findingProof.ts",
+              "line": 275,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "writeFindingProofs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/findingProof.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/changeReceipt.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/changeReceipt.ts.original",
+      "sha256": "60e02035ff17a0423f9d15b63331e980c1f4615b1afac6cf4f051d8cd7dbbfc6",
+      "declarations": [
+        {
+          "name": "lifecycleChangeReceiptsDir",
+          "line": 229,
+          "start": 8479,
+          "end": 8486,
+          "token": "export ",
+          "originalDeclaration": "export function lifecycleChangeReceiptsDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"lifecycle-receipts\");\n}",
+          "bodySha256": "ad8ecb0182c264219484a82ab719ade093f624905f13ff715872b7fe347ceacb",
+          "consumers": [
+            {
+              "file": "src/lifecycle/changeReceipt.ts",
+              "line": 234,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "lifecycleChangeReceiptsPath"
+            },
+            {
+              "file": "src/lifecycle/changeReceipt.ts",
+              "line": 324,
+              "column": 28,
+              "kind": "runtime",
+              "enclosingFunction": "writeRollbackLifecycleReceipt"
+            },
+            {
+              "file": "src/lifecycle/changeReceipt.ts",
+              "line": 340,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listLifecycleChangeReceipts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/changeReceipt.ts"
+          ]
+        },
+        {
+          "name": "lifecycleChangeReceiptsPath",
+          "line": 233,
+          "start": 8652,
+          "end": 8659,
+          "token": "export ",
+          "originalDeclaration": "export function lifecycleChangeReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(lifecycleChangeReceiptsDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "92a4da54c8e5da67110b47c8410ccc7d78f78093bb4a408eec6b51e4abaca6b6",
+          "consumers": [
+            {
+              "file": "src/lifecycle/changeReceipt.ts",
+              "line": 239,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "writeLifecycleChangeReceipts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/changeReceipt.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/lifecycleRunArtifact.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/lifecycleRunArtifact.ts.original",
+      "sha256": "3203cac29af1c7f0452e7777c68473b14518aa1510056e91117fd7b2c4c96a2f",
+      "declarations": [
+        {
+          "name": "lifecycleRunArtifactsDir",
+          "line": 361,
+          "start": 14618,
+          "end": 14625,
+          "token": "export ",
+          "originalDeclaration": "export function lifecycleRunArtifactsDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"lifecycle-runs\");\n}",
+          "bodySha256": "6597220aa4eadcfd387aa448bc6eacd1ec704a7abcfd1f9eddaa1196f973182b",
+          "consumers": [
+            {
+              "file": "src/lifecycle/lifecycleRunArtifact.ts",
+              "line": 366,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "lifecycleRunArtifactPath"
+            },
+            {
+              "file": "src/lifecycle/lifecycleRunArtifact.ts",
+              "line": 370,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listLifecycleRunArtifacts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/lifecycleRunArtifact.ts"
+          ]
+        },
+        {
+          "name": "lifecycleRunArtifactPath",
+          "line": 365,
+          "start": 14785,
+          "end": 14792,
+          "token": "export ",
+          "originalDeclaration": "export function lifecycleRunArtifactPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(lifecycleRunArtifactsDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "bf35c84154a19ed218c7a6bf656123b409cb442ed5e47cad9165b8bf111f7418",
+          "consumers": [
+            {
+              "file": "src/lifecycle/lifecycleRunArtifact.ts",
+              "line": 300,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "writeLifecycleRunArtifact"
+            },
+            {
+              "file": "src/lifecycle/lifecycleRunArtifact.ts",
+              "line": 383,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "loadLifecycleRunArtifact"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/lifecycleRunArtifact.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/observabilityLane.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/observabilityLane.ts.original",
+      "sha256": "a29759d85e65d1538bb0a58d4183b2ee8452fe1c98f0ce791aa160dbbaed7485",
+      "declarations": [
+        {
+          "name": "observabilityLaneDir",
+          "line": 125,
+          "start": 3473,
+          "end": 3480,
+          "token": "export ",
+          "originalDeclaration": "export function observabilityLaneDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"observability-lane\");\n}",
+          "bodySha256": "0e7fa3a6874eefee00a3c3dc1c59cad97762c50fc1a5dec692c954352062ff0f",
+          "consumers": [
+            {
+              "file": "src/lifecycle/observabilityLane.ts",
+              "line": 130,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "observabilityLanePath"
+            },
+            {
+              "file": "src/lifecycle/observabilityLane.ts",
+              "line": 393,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listObservabilityLaneRecords"
+            },
+            {
+              "file": "src/lifecycle/observabilityLane.ts",
+              "line": 409,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "loadObservabilityLaneRecord"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/observabilityLane.ts"
+          ]
+        },
+        {
+          "name": "observabilityLanePath",
+          "line": 129,
+          "start": 3640,
+          "end": 3647,
+          "token": "export ",
+          "originalDeclaration": "export function observabilityLanePath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(observabilityLaneDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "83683a7fa1173cde9804eab721b2c48dab209e87e1b41abc95de870a891b606a",
+          "consumers": [
+            {
+              "file": "src/lifecycle/observabilityLane.ts",
+              "line": 370,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "writeObservabilityLaneRecord"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/observabilityLane.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/fleet/fleetLifecycle.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/fleet/fleetLifecycle.ts.original",
+      "sha256": "d9b3cd8abdc2a1b49b80065d457e7898fe65919f3fa25ac4391177fdf39640e1",
+      "declarations": [
+        {
+          "name": "fleetLifecycleRunPath",
+          "line": 91,
+          "start": 2738,
+          "end": 2745,
+          "token": "export ",
+          "originalDeclaration": "export function fleetLifecycleRunPath(workspace: string, fleetRunId: string): string {\n  return join(fleetLifecycleRoot(workspace), `${fleetRunId}.json`);\n}",
+          "bodySha256": "a0f9a6e622872c6f3d3b78032fbc6c5bc17b3f00b8833db8da89906e43430d50",
+          "consumers": [
+            {
+              "file": "src/fleet/fleetLifecycle.ts",
+              "line": 310,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "writeFleetLifecycleRunArtifact"
+            },
+            {
+              "file": "src/fleet/fleetLifecycle.ts",
+              "line": 357,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "loadFleetLifecycleRunArtifact"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/fleet/fleetLifecycle.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/fleet/typedGraph.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/fleet/typedGraph.ts.original",
+      "sha256": "8c8ce7f11d4865af9e1578445f5a4a67c90f030e7ede20b4eda991e2bf8035c4",
+      "declarations": [
+        {
+          "name": "latestTypedMultiAgentGraphPath",
+          "line": 148,
+          "start": 4558,
+          "end": 4565,
+          "token": "export ",
+          "originalDeclaration": "export function latestTypedMultiAgentGraphPath(workspace: string): string {\n  return join(graphRoot(workspace), \"latest.json\");\n}",
+          "bodySha256": "b57729277a45b2905055cbae2e246a718f54be30c1f27a953b977cc9be85dde8",
+          "consumers": [
+            {
+              "file": "src/fleet/typedGraph.ts",
+              "line": 366,
+              "column": 48,
+              "kind": "runtime",
+              "enclosingFunction": "typedMultiAgentGraphRef"
+            },
+            {
+              "file": "src/fleet/typedGraph.ts",
+              "line": 381,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "writeTypedMultiAgentGraph"
+            },
+            {
+              "file": "src/fleet/typedGraph.ts",
+              "line": 399,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadLatestTypedMultiAgentGraph"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/fleet/typedGraph.ts"
+          ]
+        },
+        {
+          "name": "typedMultiAgentGraphPath",
+          "line": 152,
+          "start": 4689,
+          "end": 4696,
+          "token": "export ",
+          "originalDeclaration": "export function typedMultiAgentGraphPath(workspace: string, graphId: string): string {\n  return join(graphRoot(workspace), `${graphId}.json`);\n}",
+          "bodySha256": "6190bbb776404d6b6c0755a00b31c7239c14d37feabae8cafa53ff0d5b4a4691",
+          "consumers": [
+            {
+              "file": "src/fleet/typedGraph.ts",
+              "line": 380,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "writeTypedMultiAgentGraph"
+            },
+            {
+              "file": "src/fleet/typedGraph.ts",
+              "line": 394,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadTypedMultiAgentGraph"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/fleet/typedGraph.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/studio/studioState.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/studio/studioState.ts.original",
+      "sha256": "5943e12e20783faf68c66e28d617f407194cf8f11128acf2ccec5a9991a6bfaf",
+      "declarations": [
+        {
+          "name": "studioStatePath",
+          "line": 50,
+          "start": 1449,
+          "end": 1456,
+          "token": "export ",
+          "originalDeclaration": "export function studioStatePath(workspace: string): string {\n  return join(studioDir(workspace), \"state.json\");\n}",
+          "bodySha256": "1e9a39ed26046d95c1980c487cba8439cf8d30d25890de22c217e9e50c3e9ade",
+          "consumers": [
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 72,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "writeStudioState"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 76,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "readStudioState"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 100,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "clearStudioState"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/studio/studioState.ts"
+          ]
+        },
+        {
+          "name": "studioTokenPath",
+          "line": 54,
+          "start": 1564,
+          "end": 1571,
+          "token": "export ",
+          "originalDeclaration": "export function studioTokenPath(workspace: string): string {\n  return join(studioDir(workspace), \"admin.token\");\n}",
+          "bodySha256": "2c9f851c70b5a8b732dd42590a62b661a9f16f8407d28c62bc4caaadcbf0b025",
+          "consumers": [
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 107,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "ensureAdminToken"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 118,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "readAdminToken"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/studio/studioState.ts"
+          ]
+        },
+        {
+          "name": "studioAgentTokenDir",
+          "line": 58,
+          "start": 1680,
+          "end": 1687,
+          "token": "export ",
+          "originalDeclaration": "export function studioAgentTokenDir(workspace: string): string {\n  return join(studioDir(workspace), \"agent.tokens\");\n}",
+          "bodySha256": "d9647b91f1760fa788a753a91d9af0a9ef45c5329a46568ae1d8e08324dd81e9",
+          "consumers": [
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 63,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "studioAgentTokenPath"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 67,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "studioAgentTokenMetaPath"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 258,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "issueAgentToken"
+            },
+            {
+              "file": "src/studio/studioState.ts",
+              "line": 319,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "findAgentByToken"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/studio/studioState.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/workorders/workorderEngine.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/workorders/workorderEngine.ts.original",
+      "sha256": "ee0cb089e2126d406ea9fcd55957840f358aecf7f78011626e268d7d1f55f229",
+      "declarations": [
+        {
+          "name": "workOrderPath",
+          "line": 36,
+          "start": 1199,
+          "end": 1206,
+          "token": "export ",
+          "originalDeclaration": "export function workOrderPath(workspace: string, agentId: string, workOrderId: string): string {\n  return join(workOrdersDir(workspace, agentId), `${workOrderId}.json`);\n}",
+          "bodySha256": "716ee9e358cc0965415f5f14494e1439c5234b65c9adea98271d3e1f23418929",
+          "consumers": [
+            {
+              "file": "src/workorders/workorderEngine.ts",
+              "line": 133,
+              "column": 20,
+              "kind": "runtime",
+              "enclosingFunction": "createWorkOrder"
+            },
+            {
+              "file": "src/workorders/workorderEngine.ts",
+              "line": 156,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyWorkOrder"
+            },
+            {
+              "file": "src/workorders/workorderEngine.ts",
+              "line": 184,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadWorkOrder"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/workorders/workorderEngine.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/drift/alerts.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/drift/alerts.ts.original",
+      "sha256": "907fcf6b9a60b3ab660cd3d043ff88c20e01883f6bd6ef266667dd6885987334",
+      "declarations": [
+        {
+          "name": "alertsPath",
+          "line": 64,
+          "start": 1891,
+          "end": 1898,
+          "token": "export ",
+          "originalDeclaration": "export function alertsPath(workspace: string): string {\n  return join(workspace, \".amc\", \"alerts.yaml\");\n}",
+          "bodySha256": "ca8b09931264f81fbfa365e14b8ccc7034c1813a75981be917de73c64ad50408",
+          "consumers": [
+            {
+              "file": "src/drift/alerts.ts",
+              "line": 69,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "alertsSigPath"
+            },
+            {
+              "file": "src/drift/alerts.ts",
+              "line": 106,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAlertsConfig"
+            },
+            {
+              "file": "src/drift/alerts.ts",
+              "line": 114,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "signAlertsConfig"
+            },
+            {
+              "file": "src/drift/alerts.ts",
+              "line": 133,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAlertsConfigSignature"
+            },
+            {
+              "file": "src/drift/alerts.ts",
+              "line": 171,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "initAlertsConfig"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/drift/alerts.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/benchmarks/benchStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/benchmarks/benchStore.ts.original",
+      "sha256": "27e176412856bbedd820b55f19e88158098c4486bcbf0f3ff2cda0993a4e7009",
+      "declarations": [
+        {
+          "name": "benchmarksDir",
+          "line": 7,
+          "start": 268,
+          "end": 275,
+          "token": "export ",
+          "originalDeclaration": "export function benchmarksDir(workspace: string): string {\n  return join(workspace, \".amc\", \"benchmarks\");\n}",
+          "bodySha256": "2f3e1e03d73cbbb083a4fca63bc7598cedd9edc85a19d513151ffb8fef11b04d",
+          "consumers": [
+            {
+              "file": "src/benchmarks/benchStore.ts",
+              "line": 12,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "importedBenchmarksDir"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/benchmarks/benchStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/runtime/firewall.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/runtime/firewall.ts.original",
+      "sha256": "347d83d87e4ce8b61755a7961c71e5e76729476f1f6b711f8a4836354fd2ab89",
+      "declarations": [
+        {
+          "name": "runtimeFirewallPolicyJournalDir",
+          "line": 453,
+          "start": 16073,
+          "end": 16080,
+          "token": "export ",
+          "originalDeclaration": "export function runtimeFirewallPolicyJournalDir(workspace: string): string {\n  return join(runtimeFirewallRoot(workspace), \"policy-revisions\");\n}",
+          "bodySha256": "71729eff4bacc385da44adb03e48b94e56aaaa8d0dbad55d681770a665c329e5",
+          "consumers": [
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 502,
+              "column": 17,
+              "kind": "runtime",
+              "enclosingFunction": "readRuntimeFirewallPolicyJournal"
+            },
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 567,
+              "column": 17,
+              "kind": "runtime",
+              "enclosingFunction": "commitRuntimeFirewallPolicy"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/runtime/firewall.ts"
+          ]
+        },
+        {
+          "name": "runtimeFirewallEventsDir",
+          "line": 457,
+          "start": 16220,
+          "end": 16227,
+          "token": "export ",
+          "originalDeclaration": "export function runtimeFirewallEventsDir(workspace: string): string {\n  return join(runtimeFirewallRoot(workspace), \"events\");\n}",
+          "bodySha256": "c039ddc2f22294029100973af070ce0e6724419d241d307617ab30b9c9d0ec79",
+          "consumers": [
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 1006,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "eventPath"
+            },
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 1197,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "evaluateRuntimeFirewall"
+            },
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 1221,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listRuntimeFirewallDecisions"
+            },
+            {
+              "file": "src/runtime/firewall.ts",
+              "line": 1307,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "buildRuntimeFirewallRolloutStatus"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/runtime/firewall.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/mechanic/fixerRca.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/mechanic/fixerRca.ts.original",
+      "sha256": "a3a73abc5953cc03b39613b441c76f8109d0ac78893a780d29841e60cd33ce2d",
+      "declarations": [
+        {
+          "name": "fixerRcaDir",
+          "line": 322,
+          "start": 13967,
+          "end": 13974,
+          "token": "export ",
+          "originalDeclaration": "export function fixerRcaDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"fixer\");\n}",
+          "bodySha256": "a2274a9b2ba3f69ae14f19e80280676c34c1ff68d0263064acc37c01486679a3",
+          "consumers": [
+            {
+              "file": "src/mechanic/fixerRca.ts",
+              "line": 327,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "fixerRcaPath"
+            },
+            {
+              "file": "src/mechanic/fixerRca.ts",
+              "line": 379,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listFixerRcaReports"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/mechanic/fixerRca.ts"
+          ]
+        },
+        {
+          "name": "fixerRcaPath",
+          "line": 326,
+          "start": 14112,
+          "end": 14119,
+          "token": "export ",
+          "originalDeclaration": "export function fixerRcaPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(fixerRcaDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "ea500cd68cf88bf61216f433551e94b5683d6785f49d7f1f9e107ec897734b53",
+          "consumers": [
+            {
+              "file": "src/mechanic/fixerRca.ts",
+              "line": 345,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "writeFixerRcaReport"
+            },
+            {
+              "file": "src/mechanic/fixerRca.ts",
+              "line": 391,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "loadFixerRcaReport"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/mechanic/fixerRca.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/shield/exploitConfirmation.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/shield/exploitConfirmation.ts.original",
+      "sha256": "ae24053d2dab78647b35100840d4e65f225e113e8cfee7ea8c9537b2c209334b",
+      "declarations": [
+        {
+          "name": "exploitConfirmationScopePath",
+          "line": 191,
+          "start": 6290,
+          "end": 6297,
+          "token": "export ",
+          "originalDeclaration": "export function exploitConfirmationScopePath(workspace: string, scopeId: string): string {\n  return join(scopesDir(workspace), `${scopeId}.json`);\n}",
+          "bodySha256": "41bcbd13dab9252c10896c53134f3ff55d181a3659428d441f647b83b19790c2",
+          "consumers": [
+            {
+              "file": "src/shield/exploitConfirmation.ts",
+              "line": 286,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "writeExploitConfirmationScope"
+            },
+            {
+              "file": "src/shield/exploitConfirmation.ts",
+              "line": 328,
+              "column": 26,
+              "kind": "runtime",
+              "enclosingFunction": "loadExploitConfirmationScope"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/shield/exploitConfirmation.ts"
+          ]
+        },
+        {
+          "name": "exploitConfirmationProofPath",
+          "line": 195,
+          "start": 6440,
+          "end": 6447,
+          "token": "export ",
+          "originalDeclaration": "export function exploitConfirmationProofPath(workspace: string, proofId: string): string {\n  return join(proofsDir(workspace), `${proofId}.json`);\n}",
+          "bodySha256": "6bb5e30af047019545198b7d56cfb35a079cc46dd87967cfd8a9b4cddce9e2ef",
+          "consumers": [
+            {
+              "file": "src/shield/exploitConfirmation.ts",
+              "line": 578,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "runExploitConfirmation"
+            },
+            {
+              "file": "src/shield/exploitConfirmation.ts",
+              "line": 596,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadExploitConfirmationProof"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/shield/exploitConfirmation.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/notary/notaryConfigStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/notary/notaryConfigStore.ts.original",
+      "sha256": "119bbd152c2e4c5972c289bf44d4cd24ba9f5ec194970f0e058cbd50ac0998d5",
+      "declarations": [
+        {
+          "name": "notaryKeysDir",
+          "line": 26,
+          "start": 809,
+          "end": 816,
+          "token": "export ",
+          "originalDeclaration": "export function notaryKeysDir(notaryDir: string): string {\n  return join(notaryDir, \"keys\");\n}",
+          "bodySha256": "943540904f033537a5311b021b6845bce39f84a244370cd2bd83a5a29cae8b97",
+          "consumers": [
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 35,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "notarySealedKeyPath"
+            },
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 39,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "notaryPublicKeyPath"
+            },
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 94,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureNotaryDir"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/notary/notaryConfigStore.ts"
+          ]
+        },
+        {
+          "name": "notaryLogsDir",
+          "line": 30,
+          "start": 905,
+          "end": 912,
+          "token": "export ",
+          "originalDeclaration": "export function notaryLogsDir(notaryDir: string): string {\n  return join(notaryDir, \"logs\");\n}",
+          "bodySha256": "20cea7b57ca8d7a2540152235bfcbbcf3bce384b044fb36eff876a16d6e3052e",
+          "consumers": [
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 43,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "notaryLogPath"
+            },
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 47,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "notarySealPath"
+            },
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 51,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "notarySealSigPath"
+            },
+            {
+              "file": "src/notary/notaryConfigStore.ts",
+              "line": 95,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureNotaryDir"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/notary/notaryConfigStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/casebooks/casebookStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/casebooks/casebookStore.ts.original",
+      "sha256": "3305c4f40d83b2506cb03bd08cd15053ac7b89c14f7d6461182e6f51b0a49f01",
+      "declarations": [
+        {
+          "name": "casebookYamlPath",
+          "line": 29,
+          "start": 1128,
+          "end": 1135,
+          "token": "export ",
+          "originalDeclaration": "export function casebookYamlPath(workspace: string, casebookId: string, agentId?: string): string {\n  return join(casebookFolder(workspace, casebookId, agentId), \"casebook.yaml\");\n}",
+          "bodySha256": "53cb265cb456b0771680a31e990b42a53e4d024c5a8c155ac32820dccd8a6cec",
+          "consumers": [
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 120,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "initCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 135,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 228,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "addCaseToCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 245,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "verifyCasebook"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/casebooks/casebookStore.ts"
+          ]
+        },
+        {
+          "name": "casebookCasesDir",
+          "line": 33,
+          "start": 1311,
+          "end": 1318,
+          "token": "export ",
+          "originalDeclaration": "export function casebookCasesDir(workspace: string, casebookId: string, agentId?: string): string {\n  return join(casebookFolder(workspace, casebookId, agentId), \"cases\");\n}",
+          "bodySha256": "ee252d6164fe18b4f9aa39d8ca5da7ff3fd3aad4b8b7824e272c1f8e625ca14a",
+          "consumers": [
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 38,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "caseFilePath"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 82,
+              "column": 20,
+              "kind": "runtime",
+              "enclosingFunction": "initCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 223,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "addCaseToCasebook"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/casebooks/casebookStore.ts"
+          ]
+        },
+        {
+          "name": "caseFilePath",
+          "line": 37,
+          "start": 1486,
+          "end": 1493,
+          "token": "export ",
+          "originalDeclaration": "export function caseFilePath(workspace: string, casebookId: string, caseId: string, agentId?: string): string {\n  return join(casebookCasesDir(workspace, casebookId, agentId), `${caseId}.json`);\n}",
+          "bodySha256": "37eb6b37215ba86963917801ab9f57adc06f5cf9737c72587d7233c791e9cb28",
+          "consumers": [
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 122,
+              "column": 20,
+              "kind": "runtime",
+              "enclosingFunction": "initCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 143,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadCase"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 222,
+              "column": 20,
+              "kind": "runtime",
+              "enclosingFunction": "addCaseToCasebook"
+            },
+            {
+              "file": "src/casebooks/casebookStore.ts",
+              "line": 263,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "verifyCasebook"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/casebooks/casebookStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/compliance/complianceEngine.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/compliance/complianceEngine.ts.original",
+      "sha256": "3e62db1457d6a33c4b1904b03de2b643e9fa0080480790a18010f0e5beb73504",
+      "declarations": [
+        {
+          "name": "complianceMapsPath",
+          "line": 87,
+          "start": 2789,
+          "end": 2796,
+          "token": "export ",
+          "originalDeclaration": "export function complianceMapsPath(workspace: string): string {\n  return join(workspace, \".amc\", \"compliance-maps.yaml\");\n}",
+          "bodySha256": "f94075b6e465e0cf4db035a69ffef6147a51ab880dbc37ab94a8791c1be9b79f",
+          "consumers": [
+            {
+              "file": "src/compliance/complianceEngine.ts",
+              "line": 92,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "complianceMapsSigPath"
+            },
+            {
+              "file": "src/compliance/complianceEngine.ts",
+              "line": 111,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "signComplianceMaps"
+            },
+            {
+              "file": "src/compliance/complianceEngine.ts",
+              "line": 126,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "initComplianceMaps"
+            },
+            {
+              "file": "src/compliance/complianceEngine.ts",
+              "line": 136,
+              "column": 66,
+              "kind": "runtime",
+              "enclosingFunction": "loadComplianceMaps"
+            },
+            {
+              "file": "src/compliance/complianceEngine.ts",
+              "line": 153,
+              "column": 66,
+              "kind": "runtime",
+              "enclosingFunction": "verifyComplianceMapsSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/compliance/complianceEngine.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/org/orgScorecard.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/org/orgScorecard.ts.original",
+      "sha256": "af424cdcd4c379cd6cba7516fc2db1fb8224c99c6599800a500e232f309e2ca2",
+      "declarations": [
+        {
+          "name": "latestOrgScorecardPath",
+          "line": 7,
+          "start": 374,
+          "end": 381,
+          "token": "export ",
+          "originalDeclaration": "export function latestOrgScorecardPath(workspace: string): string {\n  return join(orgScorecardsDir(workspace), \"latest.json\");\n}",
+          "bodySha256": "e6e996b76627d9b4321988a4c899d620718c8bb8a87ea30aa3d04f44c43fa8ae",
+          "consumers": [
+            {
+              "file": "src/org/orgScorecard.ts",
+              "line": 23,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "writeOrgScorecard"
+            },
+            {
+              "file": "src/org/orgScorecard.ts",
+              "line": 39,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadLatestOrgScorecard"
+            },
+            {
+              "file": "src/org/orgScorecard.ts",
+              "line": 47,
+              "column": 49,
+              "kind": "runtime",
+              "enclosingFunction": "verifyLatestOrgScorecardSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/org/orgScorecard.ts"
+          ]
+        },
+        {
+          "name": "orgScorecardHistoryPath",
+          "line": 11,
+          "start": 504,
+          "end": 511,
+          "token": "export ",
+          "originalDeclaration": "export function orgScorecardHistoryPath(workspace: string, ts: number): string {\n  return join(orgScorecardHistoryDir(workspace), `${ts}.json`);\n}",
+          "bodySha256": "846db29d16457582eada5ec7f03d247d93ea6ee55d24e058cb64ba365b0e2c87",
+          "consumers": [
+            {
+              "file": "src/org/orgScorecard.ts",
+              "line": 24,
+              "column": 23,
+              "kind": "runtime",
+              "enclosingFunction": "writeOrgScorecard"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/org/orgScorecard.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/transformation/transformTasks.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/transformation/transformTasks.ts.original",
+      "sha256": "08a42cf09020deebfd9ab538266c73ce1544e802becbe398db0e70893d4bd5bb",
+      "declarations": [
+        {
+          "name": "agentTransformDir",
+          "line": 131,
+          "start": 4047,
+          "end": 4054,
+          "token": "export ",
+          "originalDeclaration": "export function agentTransformDir(workspace: string, agentId: string): string {\n  return join(workspace, \".amc\", \"agents\", agentId, \"transform\");\n}",
+          "bodySha256": "4aaec1fd3f09d1bf969d941a983ce0f05747d935d162cefd0287a8e390e2f015",
+          "consumers": [
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 140,
+              "column": 41,
+              "kind": "runtime",
+              "enclosingFunction": "transformPlansDir"
+            },
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 145,
+              "column": 41,
+              "kind": "runtime",
+              "enclosingFunction": "transformSnapshotsDir"
+            },
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 150,
+              "column": 41,
+              "kind": "runtime",
+              "enclosingFunction": "transformLatestPlanPath"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/transformation/transformTasks.ts"
+          ]
+        },
+        {
+          "name": "nodeTransformDir",
+          "line": 135,
+          "start": 4196,
+          "end": 4203,
+          "token": "export ",
+          "originalDeclaration": "export function nodeTransformDir(workspace: string, nodeId: string): string {\n  return join(workspace, \".amc\", \"org\", \"transform\", nodeId);\n}",
+          "bodySha256": "5047ffb7dd90fd40fa28cc19b5165d67f4abee8d7c3b115c7300587ed92260d1",
+          "consumers": [
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 140,
+              "column": 87,
+              "kind": "runtime",
+              "enclosingFunction": "transformPlansDir"
+            },
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 145,
+              "column": 87,
+              "kind": "runtime",
+              "enclosingFunction": "transformSnapshotsDir"
+            },
+            {
+              "file": "src/transformation/transformTasks.ts",
+              "line": 150,
+              "column": 87,
+              "kind": "runtime",
+              "enclosingFunction": "transformLatestPlanPath"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/transformation/transformTasks.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/passport/passportStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/passport/passportStore.ts.original",
+      "sha256": "45d86e01973b01741ce8c61bf5e1abf0b9168de39587899ceb6e7332eba79d27",
+      "declarations": [
+        {
+          "name": "passportPolicyPath",
+          "line": 20,
+          "start": 781,
+          "end": 788,
+          "token": "export ",
+          "originalDeclaration": "export function passportPolicyPath(workspace: string): string {\n  return join(passportRoot(workspace), \"policy.yaml\");\n}",
+          "bodySha256": "ceabf8658568d11f60ff86559d66dde45e6519a7d8da78d8c5558700b13d462e",
+          "consumers": [
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 25,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "passportPolicySigPath"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 133,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "savePassportPolicy"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 156,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadPassportPolicy"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 164,
+              "column": 49,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPassportPolicySignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/passport/passportStore.ts"
+          ]
+        },
+        {
+          "name": "passportCacheDir",
+          "line": 32,
+          "start": 1140,
+          "end": 1147,
+          "token": "export ",
+          "originalDeclaration": "export function passportCacheDir(workspace: string): string {\n  return join(passportRoot(workspace), \"cache\");\n}",
+          "bodySha256": "b95abbe17971dc1f09f9513dc1a0b1ec73b814875a42ee49a4fc1bd53e8b381b",
+          "consumers": [
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 45,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "passportLatestCachePath"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 67,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensurePassportDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/passport/passportStore.ts"
+          ]
+        },
+        {
+          "name": "passportRevocationsPath",
+          "line": 36,
+          "start": 1254,
+          "end": 1261,
+          "token": "export ",
+          "originalDeclaration": "export function passportRevocationsPath(workspace: string): string {\n  return join(passportRoot(workspace), \"revocations.json\");\n}",
+          "bodySha256": "fa6eb1085e8c164bc2bd7148a83b1482947517490f532669257cbf4ea2479572",
+          "consumers": [
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 85,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadPassportRevocationFile"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 97,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "savePassportRevocationFile"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/passport/passportStore.ts"
+          ]
+        },
+        {
+          "name": "passportLatestCachePath",
+          "line": 40,
+          "start": 1386,
+          "end": 1393,
+          "token": "export ",
+          "originalDeclaration": "export function passportLatestCachePath(\n  workspace: string,\n  scopeType: \"WORKSPACE\" | \"NODE\" | \"AGENT\",\n  scopeId: string\n): string {\n  return join(passportCacheDir(workspace), `latest_${scopeSegment(scopeType)}_${scopeId}.json`);\n}",
+          "bodySha256": "30ba51002243cd9307e63a59b9b399126cbba6c24a9075fbae0326cc277e7b4a",
+          "consumers": [
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 53,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "passportLatestCacheSigPath"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 177,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "savePassportCache"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 191,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadPassportCache"
+            },
+            {
+              "file": "src/passport/passportStore.ts",
+              "line": 209,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPassportCacheSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/passport/passportStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/integrations/integrationDeadLetters.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/integrations/integrationDeadLetters.ts.original",
+      "sha256": "fa21de23f042fa24f481d14e15002eb6b46b270deb45ee0fc44887e84a98ae7e",
+      "declarations": [
+        {
+          "name": "integrationDeadLetterPath",
+          "line": 21,
+          "start": 556,
+          "end": 563,
+          "token": "export ",
+          "originalDeclaration": "export function integrationDeadLetterPath(workspace: string): string {\n  return join(workspace, \".amc\", \"integrations\", \"dead-letters.jsonl\");\n}",
+          "bodySha256": "ce51451a776a18a540f1d1205073d8211b2af0b3ebe2b6b19839a018676087cf",
+          "consumers": [
+            {
+              "file": "src/integrations/integrationDeadLetters.ts",
+              "line": 34,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "appendIntegrationDeadLetter"
+            },
+            {
+              "file": "src/integrations/integrationDeadLetters.ts",
+              "line": 47,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadIntegrationDeadLetters"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/integrations/integrationDispatcher.ts",
+            "src/integrations/integrationDeadLetters.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/bench/benchPolicyStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/bench/benchPolicyStore.ts.original",
+      "sha256": "99a4c67d30950ff4252421db13445c037887070231361217e80aec5e93e815a2",
+      "declarations": [
+        {
+          "name": "benchRootDir",
+          "line": 9,
+          "start": 550,
+          "end": 557,
+          "token": "export ",
+          "originalDeclaration": "export function benchRootDir(workspace: string): string {\n  return join(workspace, \".amc\", \"bench\");\n}",
+          "bodySha256": "590e94c79ec06e28b8a46bfaf1663cec2cc8a89402f4f1669cc3f8a461771596",
+          "consumers": [
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 14,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchPolicyPath"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 22,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchExportsDir"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 26,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchImportsDir"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 46,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchComparisonsDir"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 58,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureBenchDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/bench/benchPolicyStore.ts"
+          ]
+        },
+        {
+          "name": "benchImportsDir",
+          "line": 25,
+          "start": 1001,
+          "end": 1008,
+          "token": "export ",
+          "originalDeclaration": "export function benchImportsDir(workspace: string): string {\n  return join(benchRootDir(workspace), \"imports\");\n}",
+          "bodySha256": "ef517c9ef8131cd7e9853c7857c27cba55ab235eb61698d43186d8fbb0969ce3",
+          "consumers": [
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 30,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchImportsRegistriesPath"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 38,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchImportsCacheDir"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 42,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchImportsBenchesDir"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/bench/benchPolicyStore.ts"
+          ]
+        },
+        {
+          "name": "benchImportsRegistriesPath",
+          "line": 29,
+          "start": 1116,
+          "end": 1123,
+          "token": "export ",
+          "originalDeclaration": "export function benchImportsRegistriesPath(workspace: string): string {\n  return join(benchImportsDir(workspace), \"registries.yaml\");\n}",
+          "bodySha256": "b16e151a8aecb5d7a072c723b88ba4ae016decd1b1b3c43b4e8dcb938ba9fbee",
+          "consumers": [
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 34,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "benchImportsRegistriesSigPath"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 110,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveBenchRegistriesConfig"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 117,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadBenchRegistriesConfig"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 127,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyBenchRegistriesSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/bench/benchPolicyStore.ts"
+          ]
+        },
+        {
+          "name": "benchComparisonsDir",
+          "line": 45,
+          "start": 1634,
+          "end": 1641,
+          "token": "export ",
+          "originalDeclaration": "export function benchComparisonsDir(workspace: string): string {\n  return join(benchRootDir(workspace), \"comparisons\");\n}",
+          "bodySha256": "bdb827ea5bd5c06576311e429910c4ad18d6d75fa8a09fe6a170109396fae874",
+          "consumers": [
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 50,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "benchComparisonLatestPath"
+            },
+            {
+              "file": "src/bench/benchPolicyStore.ts",
+              "line": 62,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureBenchDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/bench/benchPolicyStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/assurance/assurancePolicyStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/assurance/assurancePolicyStore.ts.original",
+      "sha256": "10ae60af2c310bc7e746f1e8921c10f019a0a1c9711dd1b24d3c70744ab70015",
+      "declarations": [
+        {
+          "name": "assuranceRunDir",
+          "line": 36,
+          "start": 1172,
+          "end": 1179,
+          "token": "export ",
+          "originalDeclaration": "export function assuranceRunDir(workspace: string, runId: string): string {\n  return join(assuranceRunsRoot(workspace), runId);\n}",
+          "bodySha256": "586c301a772b85cd26048871e163ddd9eb8cac3e0fc8a56d68127a8df5b53e1f",
+          "consumers": [
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 41,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "assuranceRunJsonPath"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 45,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "assuranceFindingsPath"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 49,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "assuranceTraceRefsPath"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 150,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "saveAssuranceRunArtifacts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/assurance/assurancePolicyStore.ts"
+          ]
+        },
+        {
+          "name": "assuranceRunJsonPath",
+          "line": 40,
+          "start": 1303,
+          "end": 1310,
+          "token": "export ",
+          "originalDeclaration": "export function assuranceRunJsonPath(workspace: string, runId: string): string {\n  return join(assuranceRunDir(workspace, runId), \"run.json\");\n}",
+          "bodySha256": "aa2b99fd343a65b166cc10f6c569e0ebd1925f1ad1f4538defeef794df4e69ca",
+          "consumers": [
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 153,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "saveAssuranceRunArtifacts"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 176,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAssuranceRun"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 287,
+              "column": 5,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAssuranceRunArtifacts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/assurance/assurancePolicyStore.ts"
+          ]
+        },
+        {
+          "name": "assuranceFindingsPath",
+          "line": 44,
+          "start": 1449,
+          "end": 1456,
+          "token": "export ",
+          "originalDeclaration": "export function assuranceFindingsPath(workspace: string, runId: string): string {\n  return join(assuranceRunDir(workspace, runId), \"findings.json\");\n}",
+          "bodySha256": "3b4f2948dbb3d0d4dbc177a786e952602a5208c07ff3c092925aa5d4387aec8f",
+          "consumers": [
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 157,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "saveAssuranceRunArtifacts"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 184,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAssuranceFindings"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 288,
+              "column": 5,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAssuranceRunArtifacts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/assurance/assurancePolicyStore.ts"
+          ]
+        },
+        {
+          "name": "assuranceTraceRefsPath",
+          "line": 48,
+          "start": 1601,
+          "end": 1608,
+          "token": "export ",
+          "originalDeclaration": "export function assuranceTraceRefsPath(workspace: string, runId: string): string {\n  return join(assuranceRunDir(workspace, runId), \"trace.refs.json\");\n}",
+          "bodySha256": "d6e9919e71bd8df03b10893b374f96d997abdee88928501fde03518662c62c65",
+          "consumers": [
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 161,
+              "column": 25,
+              "kind": "runtime",
+              "enclosingFunction": "saveAssuranceRunArtifacts"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 192,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAssuranceTraceRefs"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 289,
+              "column": 5,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAssuranceRunArtifacts"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/assurance/assurancePolicyStore.ts"
+          ]
+        },
+        {
+          "name": "assuranceSchedulerPath",
+          "line": 72,
+          "start": 2518,
+          "end": 2525,
+          "token": "export ",
+          "originalDeclaration": "export function assuranceSchedulerPath(workspace: string): string {\n  return join(assuranceRoot(workspace), \"scheduler.json\");\n}",
+          "bodySha256": "45d1712aa4246372865fc0427bfd339b8c17371de73abb0fa479910104b4f71e",
+          "consumers": [
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 212,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveAssuranceSchedulerState"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 219,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAssuranceSchedulerState"
+            },
+            {
+              "file": "src/assurance/assurancePolicyStore.ts",
+              "line": 227,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAssuranceSchedulerSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/assurance/assurancePolicyStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/audit/auditPolicyStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/audit/auditPolicyStore.ts.original",
+      "sha256": "9253ed44c43f56d4b16dd26fdc013c1595f8c17edb8713187eddf784690515c4",
+      "declarations": [
+        {
+          "name": "auditBindersDir",
+          "line": 30,
+          "start": 858,
+          "end": 865,
+          "token": "export ",
+          "originalDeclaration": "export function auditBindersDir(workspace: string): string {\n  return join(auditRoot(workspace), \"binders\");\n}",
+          "bodySha256": "7a840639bf97e6276112338ee0eb7718a97e3534263df2e616c5626c2f5b3e22",
+          "consumers": [
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 35,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "auditBindersExportsDir"
+            },
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 39,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "auditBindersCacheDir"
+            },
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 61,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureAuditDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/audit/auditPolicyStore.ts"
+          ]
+        },
+        {
+          "name": "auditRequestsDir",
+          "line": 42,
+          "start": 1216,
+          "end": 1223,
+          "token": "export ",
+          "originalDeclaration": "export function auditRequestsDir(workspace: string): string {\n  return join(auditRoot(workspace), \"requests\");\n}",
+          "bodySha256": "442e6ac8c32fd3b68905aec3f0b2da9e80e3b721b162e19914d6514c4bc4219b",
+          "consumers": [
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 47,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "auditRequestsOpenDir"
+            },
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 51,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "auditRequestsClosedDir"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/audit/auditPolicyStore.ts"
+          ]
+        },
+        {
+          "name": "auditSchedulerPath",
+          "line": 54,
+          "start": 1576,
+          "end": 1583,
+          "token": "export ",
+          "originalDeclaration": "export function auditSchedulerPath(workspace: string): string {\n  return join(auditRoot(workspace), \"scheduler.json\");\n}",
+          "bodySha256": "c6a9dea067266068161de34c99a56dfe057992bccbfeb5f1cf62c07c238830cc",
+          "consumers": [
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 115,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAuditSchedulerState"
+            },
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 127,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveAuditSchedulerState"
+            },
+            {
+              "file": "src/audit/auditPolicyStore.ts",
+              "line": 137,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyAuditSchedulerSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/audit/auditPolicyStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/business/riskHeatmap.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/business/riskHeatmap.ts.original",
+      "sha256": "54d111ce9c21366a096674cdad82a4c7a4a10497a5e534dee466f000a9e37d82",
+      "declarations": [
+        {
+          "name": "defaultRiskHeatmapPath",
+          "line": 568,
+          "start": 22000,
+          "end": 22007,
+          "token": "export ",
+          "originalDeclaration": "export function defaultRiskHeatmapPath(workspace: string, format: RiskHeatmapFormat): string {\n  return join(workspace, \".amc\", \"reports\", `business-risk-heatmap.${format === \"json\" ? \"json\" : \"md\"}`);\n}",
+          "bodySha256": "c4e7e9eaf4c59a3d36fca7ef7517bd9ad0bd654047640b00fb6ea85a1f325ee1",
+          "consumers": [
+            {
+              "file": "src/business/riskHeatmap.ts",
+              "line": 579,
+              "column": 43,
+              "kind": "runtime",
+              "enclosingFunction": "writeRiskHeatmapReport"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/cli-late-stage-commands.ts",
+            "src/cli-business-commands.ts",
+            "src/business/riskHeatmap.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/business/roiCalculator.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/business/roiCalculator.ts.original",
+      "sha256": "11bdf38894a4fdc59ebcea69b123f51dfdf96d10c0be6b98eb08386b700c8145",
+      "declarations": [
+        {
+          "name": "defaultTrustGapRoiPath",
+          "line": 313,
+          "start": 12230,
+          "end": 12237,
+          "token": "export ",
+          "originalDeclaration": "export function defaultTrustGapRoiPath(workspace: string, format: TrustGapRoiFormat): string {\n  return join(workspace, \".amc\", \"reports\", `business-trust-gap-roi.${format === \"json\" ? \"json\" : \"md\"}`);\n}",
+          "bodySha256": "93b74ad34dd2cf898ab618abdb92a030ff28f39cb1ccf8a4976eed06ad6c57b8",
+          "consumers": [
+            {
+              "file": "src/business/roiCalculator.ts",
+              "line": 324,
+              "column": 43,
+              "kind": "runtime",
+              "enclosingFunction": "writeTrustGapRoiReport"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/cli-late-stage-commands.ts",
+            "src/cli-business-commands.ts",
+            "src/business/roiCalculator.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/mechanic/profiles.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/mechanic/profiles.ts.original",
+      "sha256": "8351accdcd3bc3bdf437cca6ba4b572d822b30a2bd4f7ede0347b9d83fcf2142",
+      "declarations": [
+        {
+          "name": "mechanicProfilesPath",
+          "line": 156,
+          "start": 6812,
+          "end": 6819,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicProfilesPath(workspace: string): string {\n  return join(mechanicRoot(workspace), \"profiles.yaml\");\n}",
+          "bodySha256": "6f3df69de88d492e9769bf05a45a711b5a89a378b8d05b4933393452797aa032",
+          "consumers": [
+            {
+              "file": "src/mechanic/profiles.ts",
+              "line": 161,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "mechanicProfilesSigPath"
+            },
+            {
+              "file": "src/mechanic/profiles.ts",
+              "line": 166,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "initMechanicProfiles"
+            },
+            {
+              "file": "src/mechanic/profiles.ts",
+              "line": 174,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadMechanicProfiles"
+            },
+            {
+              "file": "src/mechanic/profiles.ts",
+              "line": 182,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyMechanicProfilesSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/mechanic/profiles.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/canon/canonLoader.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/canon/canonLoader.ts.original",
+      "sha256": "51440d84a02e3d78d026e103883e162cec234dd66c50001297b44800f4a40dcd",
+      "declarations": [
+        {
+          "name": "canonDir",
+          "line": 9,
+          "start": 420,
+          "end": 427,
+          "token": "export ",
+          "originalDeclaration": "export function canonDir(workspace: string): string {\n  return join(workspace, \".amc\", \"canon\");\n}",
+          "bodySha256": "afade9f5664974b3258ee084e17577443c0610eece658d74b92c28b6096f54a2",
+          "consumers": [
+            {
+              "file": "src/canon/canonLoader.ts",
+              "line": 14,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "canonPath"
+            },
+            {
+              "file": "src/canon/canonLoader.ts",
+              "line": 96,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "saveCanon"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/canon/canonLoader.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/plugins/pluginStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/plugins/pluginStore.ts.original",
+      "sha256": "2d63b2aedee6320da40f47958dd22c650b738667934a77f5bd4354b612df35e2",
+      "declarations": [
+        {
+          "name": "pluginsPendingDir",
+          "line": 25,
+          "start": 829,
+          "end": 836,
+          "token": "export ",
+          "originalDeclaration": "export function pluginsPendingDir(workspace: string): string {\n  return join(pluginsRoot(workspace), \"pending\");\n}",
+          "bodySha256": "52e367217083397bb9c20489f13dbcf2d5c3c61002cb9585e4e1363fc9d5bdce",
+          "consumers": [
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 56,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensurePluginsStore"
+            },
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 185,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "pendingActionPath"
+            },
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 189,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "pendingPackagePath"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/plugins/pluginStore.ts"
+          ]
+        },
+        {
+          "name": "pluginsOverridesPath",
+          "line": 33,
+          "start": 1073,
+          "end": 1080,
+          "token": "export ",
+          "originalDeclaration": "export function pluginsOverridesPath(workspace: string): string {\n  return join(pluginsRoot(workspace), \"overrides.yaml\");\n}",
+          "bodySha256": "18367c023d8048d395edfb9a15072f1e5bbc884c8a4d81efc3503e25d6947e90",
+          "consumers": [
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 145,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadPluginOverrides"
+            },
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 162,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "savePluginOverrides"
+            },
+            {
+              "file": "src/plugins/pluginStore.ts",
+              "line": 171,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPluginOverrides"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/plugins/pluginStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/workspaces/workspacePaths.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/workspaces/workspacePaths.ts.original",
+      "sha256": "c899a9d18166a7594c919c5981a3a5a14a52de3d010f4a49f68158e37857e70e",
+      "declarations": [
+        {
+          "name": "hostLogsDir",
+          "line": 10,
+          "start": 289,
+          "end": 296,
+          "token": "export ",
+          "originalDeclaration": "export function hostLogsDir(hostDir: string): string {\n  return join(hostDir, \"logs\");\n}",
+          "bodySha256": "43ed94054aa8fa1f5c39c07e9f9e16c62576c899f7b7a94d20a879551d4c6055",
+          "consumers": [
+            {
+              "file": "src/workspaces/workspacePaths.ts",
+              "line": 32,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureHostDirLayout"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/studio/studioSupervisor.ts",
+            "src/workspaces/workspacePaths.ts"
+          ]
+        },
+        {
+          "name": "hostTmpDir",
+          "line": 14,
+          "start": 379,
+          "end": 386,
+          "token": "export ",
+          "originalDeclaration": "export function hostTmpDir(hostDir: string): string {\n  return join(hostDir, \"tmp\");\n}",
+          "bodySha256": "162294a5edd3f7cde38a8d2861ec16db7c629d66b764b51dd1edfcd5009dd5ec",
+          "consumers": [
+            {
+              "file": "src/workspaces/workspacePaths.ts",
+              "line": 33,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureHostDirLayout"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/studio/studioSupervisor.ts",
+            "src/workspaces/workspacePaths.ts"
+          ]
+        },
+        {
+          "name": "hostWorkspacesDir",
+          "line": 18,
+          "start": 467,
+          "end": 474,
+          "token": "export ",
+          "originalDeclaration": "export function hostWorkspacesDir(hostDir: string): string {\n  return join(hostDir, \"workspaces\");\n}",
+          "bodySha256": "52c247e979407b9b34bd491c17736f18f65039a78789cac8622338226945a28c",
+          "consumers": [
+            {
+              "file": "src/workspaces/workspacePaths.ts",
+              "line": 27,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "hostWorkspaceDir"
+            },
+            {
+              "file": "src/workspaces/workspacePaths.ts",
+              "line": 34,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureHostDirLayout"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/studio/studioSupervisor.ts",
+            "src/workspaces/workspacePaths.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/forecast/forecastStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/forecast/forecastStore.ts.original",
+      "sha256": "7c2e0dbf2e68a8d5a1644904cb17ff43f180e16685779246d8c9a686e9696741",
+      "declarations": [
+        {
+          "name": "forecastAdvisoriesDir",
+          "line": 51,
+          "start": 1699,
+          "end": 1706,
+          "token": "export ",
+          "originalDeclaration": "export function forecastAdvisoriesDir(workspace: string): string {\n  return join(forecastRoot(workspace), \"advisories\");\n}",
+          "bodySha256": "04980fd2dd51c8936e700641989c6a7407963998fe1de5beae25583f7fdfa5f8",
+          "consumers": [
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 56,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "forecastAdvisoryPath"
+            },
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 163,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "saveAdvisory"
+            },
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 183,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listAdvisories"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/forecast/forecastStore.ts"
+          ]
+        },
+        {
+          "name": "forecastAdvisoryPath",
+          "line": 55,
+          "start": 1823,
+          "end": 1830,
+          "token": "export ",
+          "originalDeclaration": "export function forecastAdvisoryPath(workspace: string, advisoryId: string): string {\n  return join(forecastAdvisoriesDir(workspace), `${advisoryId}.json`);\n}",
+          "bodySha256": "840d01ce48ea592d601978b0ca1450e84da481c59b1c5b351fc6a588fd443f23",
+          "consumers": [
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 164,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveAdvisory"
+            },
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 171,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadAdvisory"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/forecast/forecastStore.ts"
+          ]
+        },
+        {
+          "name": "forecastSchedulerPath",
+          "line": 59,
+          "start": 1983,
+          "end": 1990,
+          "token": "export ",
+          "originalDeclaration": "export function forecastSchedulerPath(workspace: string): string {\n  return join(forecastRoot(workspace), \"scheduler.json\");\n}",
+          "bodySha256": "1b482c9fd33b1cecfbaac5d01f2c42b0b2b6320c446767e09735537759f8cbfb",
+          "consumers": [
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 76,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadForecastSchedulerState"
+            },
+            {
+              "file": "src/forecast/forecastStore.ts",
+              "line": 88,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveForecastSchedulerState"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/forecast/forecastStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/runtime/autonomyBoundary.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/runtime/autonomyBoundary.ts.original",
+      "sha256": "c0be8a3f5c3d172c92d78d6381bc696f819d678dd6c44ccd486942bed26d8529",
+      "declarations": []
+    },
+    {
+      "originalPath": "src/runtime/lifecycleGraph.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/runtime/lifecycleGraph.ts.original",
+      "sha256": "99d931ad3fd885b5fda007f635af2ce677b9d6a7ba9c2a87795b8906aea639ca",
+      "declarations": []
+    },
+    {
+      "originalPath": "src/runtime/stateCheckpoint.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/runtime/stateCheckpoint.ts.original",
+      "sha256": "c34cdc21c3e05fa1be379e0d6b18b1b886c4508288065fcd51d8cc98bd83705e",
+      "declarations": []
+    },
+    {
+      "originalPath": "src/watch/traceFailureIndex.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/watch/traceFailureIndex.ts.original",
+      "sha256": "73c154eb8529b38b75f664cdafed5e666e45cbbe8a1b72d697061741b0736835",
+      "declarations": [
+        {
+          "name": "traceFailureIndexesDir",
+          "line": 341,
+          "start": 13841,
+          "end": 13848,
+          "token": "export ",
+          "originalDeclaration": "export function traceFailureIndexesDir(workspace: string, agentId?: string): string {\n  return join(getAgentPaths(workspace, agentId).rootDir, \"trace-indexes\");\n}",
+          "bodySha256": "ce7a4f445c3c66ce6c676f049249151d26dbd5d1c98763846bafc8dee979db7f",
+          "consumers": [
+            {
+              "file": "src/watch/traceFailureIndex.ts",
+              "line": 346,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "traceFailureIndexPath"
+            },
+            {
+              "file": "src/watch/traceFailureIndex.ts",
+              "line": 433,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listTraceFailureIndexes"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/episodeRecord.ts",
+            "src/watch/traceFailureIndex.ts"
+          ]
+        },
+        {
+          "name": "traceFailureIndexPath",
+          "line": 345,
+          "start": 14005,
+          "end": 14012,
+          "token": "export ",
+          "originalDeclaration": "export function traceFailureIndexPath(workspace: string, agentId: string | undefined, runId: string): string {\n  return join(traceFailureIndexesDir(workspace, agentId), `${runId}.json`);\n}",
+          "bodySha256": "29f83f1ad6a4a61939f14c1fb2f4fdded252441c07356ac50f5085976924bb52",
+          "consumers": [
+            {
+              "file": "src/watch/traceFailureIndex.ts",
+              "line": 390,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "writeTraceFailureIndex"
+            },
+            {
+              "file": "src/watch/traceFailureIndex.ts",
+              "line": 445,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "loadTraceFailureIndex"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/lifecycle/episodeRecord.ts",
+            "src/watch/traceFailureIndex.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/lifecycle/signedControlJournal.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/lifecycle/signedControlJournal.ts.original",
+      "sha256": "535009f4733ad6639c8d6eec2ce9d756fea86c5006145252c3c5e8b0b1629c7b",
+      "declarations": [
+        {
+          "name": "signedControlJournalEntryPath",
+          "line": 127,
+          "start": 4463,
+          "end": 4470,
+          "token": "export ",
+          "originalDeclaration": "export function signedControlJournalEntryPath(journalDir: string, revision: number): string {\n  return join(journalDir, `${String(revision).padStart(12, \"0\")}.json`);\n}",
+          "bodySha256": "4349c3032c154f54e5d3779ca131f9e8dd00c462353097b17c923bae4c2f3930",
+          "consumers": [
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 382,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "readSignedControlJournalCore"
+            },
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 495,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "recoverPendingPublication"
+            },
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 616,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "appendSignedControlJournal"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/runtime/firewall.ts",
+            "src/lifecycle/signedControlJournal.ts"
+          ]
+        },
+        {
+          "name": "signedControlCheckpointPath",
+          "line": 131,
+          "start": 4633,
+          "end": 4640,
+          "token": "export ",
+          "originalDeclaration": "export function signedControlCheckpointPath(workspace: string, controlKind: SignedControlKind, revision: number): string {\n  return join(controlCheckpointDir(workspace, controlKind), `${String(revision).padStart(12, \"0\")}.json`);\n}",
+          "bodySha256": "5832c1c0e2ba64bc347e74fc7a0370c9df3411f5c3b22777d694c605ed0d92fd",
+          "consumers": [
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 347,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "readSignedControlJournalCore"
+            },
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 454,
+              "column": 26,
+              "kind": "runtime",
+              "enclosingFunction": "recoverPendingPublication"
+            },
+            {
+              "file": "src/lifecycle/signedControlJournal.ts",
+              "line": 640,
+              "column": 26,
+              "kind": "runtime",
+              "enclosingFunction": "appendSignedControlJournal"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/runtime/firewall.ts",
+            "src/lifecycle/signedControlJournal.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/mechanic/simulator.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/mechanic/simulator.ts.original",
+      "sha256": "2d0284f6311fc3e9a8cdcae8bc14deddb558e77611f746c63216ed3afe26d81e",
+      "declarations": [
+        {
+          "name": "mechanicSimulationPath",
+          "line": 11,
+          "start": 589,
+          "end": 596,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicSimulationPath(workspace: string): string {\n  return join(mechanicRoot(workspace), \"simulations\", \"latest.json\");\n}",
+          "bodySha256": "ad7e5fda9cf0714831c617ed4ed8a06dd7693d81806508a437b32bd5ae4f00d8",
+          "consumers": [
+            {
+              "file": "src/mechanic/simulator.ts",
+              "line": 16,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadLatestMechanicSimulation"
+            },
+            {
+              "file": "src/mechanic/simulator.ts",
+              "line": 27,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicSimulation"
+            },
+            {
+              "file": "src/mechanic/simulator.ts",
+              "line": 35,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyMechanicSimulationSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/mechanic/mechanicApi.ts",
+            "src/mechanic/simulator.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/transparency/sessionAnchor.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/transparency/sessionAnchor.ts.original",
+      "sha256": "56327d2965288c35d247ac135b528f4930cb76703824c74bbb2b9e7a1627a497",
+      "declarations": [
+        {
+          "name": "sessionRootDescriptorPath",
+          "line": 34,
+          "start": 1567,
+          "end": 1574,
+          "token": "export ",
+          "originalDeclaration": "export function sessionRootDescriptorPath(workspace: string, sessionId: string): string {\n  return join(workspace, \".amc\", \"transparency\", \"session-roots\", `${sessionId}.json`);\n}",
+          "bodySha256": "b2f5a8a9cbf0cd1871a6a55b1d36966d216d174b111021952e0b1344004fe2fa",
+          "consumers": [
+            {
+              "file": "src/transparency/sessionAnchor.ts",
+              "line": 87,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "readAnchoredSessionDescriptor"
+            },
+            {
+              "file": "src/transparency/sessionAnchor.ts",
+              "line": 126,
+              "column": 5,
+              "kind": "runtime",
+              "enclosingFunction": "anchorSessionRoot"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/cli-session-commands.ts",
+            "src/transparency/sessionAnchor.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/value/valueStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/value/valueStore.ts.original",
+      "sha256": "f8b536cd7483992aeaf82499186cc6100503df6c9c97e54bfb1da5566155ad95",
+      "declarations": [
+        {
+          "name": "valueWorkspaceContractPath",
+          "line": 36,
+          "start": 1278,
+          "end": 1285,
+          "token": "export ",
+          "originalDeclaration": "export function valueWorkspaceContractPath(workspace: string): string {\n  return join(valueContractsDir(workspace), \"workspace.yaml\");\n}",
+          "bodySha256": "1704e81e933fe70337f39a4c0457164e2131874b541d9d1894e6e8f830e15a89",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 140,
+              "column": 92,
+              "kind": "runtime",
+              "enclosingFunction": "saveValueContract"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 154,
+              "column": 92,
+              "kind": "runtime",
+              "enclosingFunction": "loadValueContract"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 165,
+              "column": 92,
+              "kind": "runtime",
+              "enclosingFunction": "verifyValueContractSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        },
+        {
+          "name": "valueEventsMonthPath",
+          "line": 48,
+          "start": 1688,
+          "end": 1695,
+          "token": "export ",
+          "originalDeclaration": "export function valueEventsMonthPath(workspace: string, month: string): string {\n  return join(valueEventsDir(workspace), `${month}`, \"events.ndjson\");\n}",
+          "bodySha256": "31f45972a3829af4eca1539856a686e74469b64a877f91a76ceeea485d441fd6",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 177,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "appendValueEvents"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 204,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "appendValueEvents"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 249,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "readValueEvents"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        },
+        {
+          "name": "valueSnapshotsDir",
+          "line": 52,
+          "start": 1843,
+          "end": 1850,
+          "token": "export ",
+          "originalDeclaration": "export function valueSnapshotsDir(workspace: string): string {\n  return join(valueRoot(workspace), \"snapshots\");\n}",
+          "bodySha256": "6e0d1dcad5f3f4d006dd9bcfd676195d837ecb347f2bfbd9f384c4b9eed67ab1",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 75,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "valueSnapshotLatestPath"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 87,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureValueDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        },
+        {
+          "name": "valueReportsDir",
+          "line": 56,
+          "start": 1959,
+          "end": 1966,
+          "token": "export ",
+          "originalDeclaration": "export function valueReportsDir(workspace: string): string {\n  return join(valueRoot(workspace), \"reports\");\n}",
+          "bodySha256": "29a3b68ca3b944af708f6f7ee583133c36850f445893262cfb09051c0bf15f86",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 79,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "valueReportPath"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 88,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "ensureValueDirs"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        },
+        {
+          "name": "valueSchedulerPath",
+          "line": 60,
+          "start": 2071,
+          "end": 2078,
+          "token": "export ",
+          "originalDeclaration": "export function valueSchedulerPath(workspace: string): string {\n  return join(valueRoot(workspace), \"scheduler.json\");\n}",
+          "bodySha256": "b9613a2e572c9536e5a2088449dbe23ec07efdbf2e11239d352dbf4d66ee98c0",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 343,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadValueSchedulerState"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 355,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveValueSchedulerState"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 365,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyValueSchedulerSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        },
+        {
+          "name": "valueReportPath",
+          "line": 78,
+          "start": 2674,
+          "end": 2681,
+          "token": "export ",
+          "originalDeclaration": "export function valueReportPath(workspace: string, scope: { type: \"WORKSPACE\" | \"NODE\" | \"AGENT\"; id: string }, ts: number): string {\n  return join(valueReportsDir(workspace), scopeSegment(scope), `${ts}.json`);\n}",
+          "bodySha256": "ba85d5cb26760bf9de812fd6570ae9c0ef47f04d8924fcec9f3aa741006556fe",
+          "consumers": [
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 319,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveValueReport"
+            },
+            {
+              "file": "src/value/valueStore.ts",
+              "line": 332,
+              "column": 23,
+              "kind": "runtime",
+              "enclosingFunction": "listValueReports"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/value/valueStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/wire/wireListener.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/wire/wireListener.ts.original",
+      "sha256": "cba5b34821049477da0817a85c10780077d70b58e562bbaee2e9c0a07b3f7293",
+      "declarations": [
+        {
+          "name": "wireSocketDir",
+          "line": 72,
+          "start": 3306,
+          "end": 3313,
+          "token": "export ",
+          "originalDeclaration": "export function wireSocketDir(workspace: string): string {\n  return join(workspace, \".amc\", \"wire\");\n}",
+          "bodySha256": "3750ea4caa25a2342a4fce756a41de8879883cfdf421fb7271a7163f85afbe13",
+          "consumers": [
+            {
+              "file": "src/wire/wireListener.ts",
+              "line": 77,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "wireSocketPath"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/wire/wireCli.ts",
+            "src/wire/wireListener.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/ops/retention/retentionArchive.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/ops/retention/retentionArchive.ts.original",
+      "sha256": "fa5b858b27f32360748271f1a9d42ececee5bd847b2208978bcbdc2f44e28844",
+      "declarations": [
+        {
+          "name": "archiveLedgerDir",
+          "line": 33,
+          "start": 1069,
+          "end": 1076,
+          "token": "export ",
+          "originalDeclaration": "export function archiveLedgerDir(workspace: string): string {\n  return join(workspace, \".amc\", \"archive\", \"ledger\");\n}",
+          "bodySha256": "28c619ce6d2e4912549066a3059b24c28b945ca9ca53bc2c66bac3a0a66ea45f",
+          "consumers": [
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 38,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "segmentFilePath"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 166,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "writeRetentionSegment"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 221,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "listRetentionSegments"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/ledger/ledger.ts",
+            "src/ops/retention/retentionArchive.ts"
+          ]
+        },
+        {
+          "name": "segmentFilePath",
+          "line": 37,
+          "start": 1189,
+          "end": 1196,
+          "token": "export ",
+          "originalDeclaration": "export function segmentFilePath(workspace: string, segmentId: string, startTs: number, endTs: number): string {\n  return join(archiveLedgerDir(workspace), `segment_${startTs}_${endTs}_${segmentId}.jsonl.gz`);\n}",
+          "bodySha256": "c166b9cef0311c2cdad2b7a8eb4635a7a96ffcf855afd4bbe4c31b8eea7c65b4",
+          "consumers": [
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 167,
+              "column": 23,
+              "kind": "runtime",
+              "enclosingFunction": "writeRetentionSegment"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/ledger/ledger.ts",
+            "src/ops/retention/retentionArchive.ts"
+          ]
+        },
+        {
+          "name": "prunedLogPath",
+          "line": 49,
+          "start": 1625,
+          "end": 1632,
+          "token": "export ",
+          "originalDeclaration": "export function prunedLogPath(workspace: string): string {\n  return join(workspace, \".amc\", \"blobs\", \"pruned.jsonl\");\n}",
+          "bodySha256": "1f8a21adaec564efe13e916fb351c84782a2160681b91f91f4c829a52ff31528",
+          "consumers": [
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 58,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "readPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 68,
+              "column": 39,
+              "kind": "runtime",
+              "enclosingFunction": "signPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 68,
+              "column": 80,
+              "kind": "runtime",
+              "enclosingFunction": "signPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 92,
+              "column": 30,
+              "kind": "runtime",
+              "enclosingFunction": "appendPrunedRow"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 92,
+              "column": 67,
+              "kind": "runtime",
+              "enclosingFunction": "appendPrunedRow"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 93,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "appendPrunedRow"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 130,
+              "column": 43,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 130,
+              "column": 84,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPrunedRows"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/ledger/ledger.ts",
+            "src/ops/retention/retentionArchive.ts"
+          ]
+        },
+        {
+          "name": "prunedSealPath",
+          "line": 53,
+          "start": 1746,
+          "end": 1753,
+          "token": "export ",
+          "originalDeclaration": "export function prunedSealPath(workspace: string): string {\n  return join(workspace, \".amc\", \"blobs\", \"pruned.jsonl.sig\");\n}",
+          "bodySha256": "3f52f61d00a3c2f3844a652d412ee34f103a8b1fa4c1ec90d94c70a5dce25c3f",
+          "consumers": [
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 77,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "signPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 125,
+              "column": 38,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 127,
+              "column": 25,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPrunedRows"
+            },
+            {
+              "file": "src/ops/retention/retentionArchive.ts",
+              "line": 129,
+              "column": 67,
+              "kind": "runtime",
+              "enclosingFunction": "verifyPrunedRows"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/ledger/ledger.ts",
+            "src/ops/retention/retentionArchive.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/mechanic/tuningStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/mechanic/tuningStore.ts.original",
+      "sha256": "1ecd5a39776d5679845221e360bcc007290e44ba275f29bc4af59b8e4226bf45",
+      "declarations": [
+        {
+          "name": "mechanicTuningPath",
+          "line": 9,
+          "start": 416,
+          "end": 423,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicTuningPath(workspace: string): string {\n  return join(mechanicRoot(workspace), \"tuning.yaml\");\n}",
+          "bodySha256": "a7776fa9bebdf14f1b412cb59f88099fe22fa874c0e634b129b46d265b33268f",
+          "consumers": [
+            {
+              "file": "src/mechanic/tuningStore.ts",
+              "line": 14,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "mechanicTuningSigPath"
+            },
+            {
+              "file": "src/mechanic/tuningStore.ts",
+              "line": 69,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadMechanicTuning"
+            },
+            {
+              "file": "src/mechanic/tuningStore.ts",
+              "line": 84,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicTuning"
+            },
+            {
+              "file": "src/mechanic/tuningStore.ts",
+              "line": 104,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyMechanicTuningSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/mechanic/tuningStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/federation/federationStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/federation/federationStore.ts.original",
+      "sha256": "702a373ecb959cf6b17810af9f7510d6b2847ed8cd57aa10f26f5d3949a65150",
+      "declarations": [
+        {
+          "name": "federationConfigPath",
+          "line": 22,
+          "start": 787,
+          "end": 794,
+          "token": "export ",
+          "originalDeclaration": "export function federationConfigPath(workspace: string): string {\n  return join(federationRoot(workspace), \"federation.yaml\");\n}",
+          "bodySha256": "1ddff30956f1edbc21c3854010abfdeed5f64fa5db48b97790e096e006f40ac8",
+          "consumers": [
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 27,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "federationConfigSigPath"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 132,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "initFederationStore"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 142,
+              "column": 66,
+              "kind": "runtime",
+              "enclosingFunction": "loadFederationConfig"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 156,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyFederationConfigSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/federation/federationCli.ts",
+            "src/federation/federationStore.ts"
+          ]
+        },
+        {
+          "name": "federationPeersDir",
+          "line": 30,
+          "start": 1040,
+          "end": 1047,
+          "token": "export ",
+          "originalDeclaration": "export function federationPeersDir(workspace: string): string {\n  return join(federationRoot(workspace), \"peers\");\n}",
+          "bodySha256": "7892408f5894dd0b78fcfe405e4434cccaee722b4a2071fe489596e3871e89b9",
+          "consumers": [
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 43,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "federationPeerPath"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 129,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "initFederationStore"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 174,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "addFederationPeer"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 196,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "listFederationPeers"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 199,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "listFederationPeers"
+            },
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 201,
+              "column": 26,
+              "kind": "runtime",
+              "enclosingFunction": "listFederationPeers"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/federation/federationCli.ts",
+            "src/federation/federationStore.ts"
+          ]
+        },
+        {
+          "name": "federationPeerPath",
+          "line": 42,
+          "start": 1396,
+          "end": 1403,
+          "token": "export ",
+          "originalDeclaration": "export function federationPeerPath(workspace: string, peerId: string): string {\n  return join(federationPeersDir(workspace), `${peerId}.json`);\n}",
+          "bodySha256": "098bb64ad5b69cd69b8c1eb2761305f1e0f147bc7bdb217fb85fc572e326c435",
+          "consumers": [
+            {
+              "file": "src/federation/federationStore.ts",
+              "line": 182,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "addFederationPeer"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/index.ts",
+            "src/federation/federationCli.ts",
+            "src/federation/federationStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/mechanic/planStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/mechanic/planStore.ts.original",
+      "sha256": "29b1bd6687baafe1fbcf0ac2e88b568865b21f910f7b39b512363003565661ed",
+      "declarations": [
+        {
+          "name": "mechanicPlansDir",
+          "line": 8,
+          "start": 382,
+          "end": 389,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicPlansDir(workspace: string): string {\n  return join(mechanicRoot(workspace), \"plans\");\n}",
+          "bodySha256": "c1b50656eeda643dd2ea6066101fba535cd121af0f75f0b428f1de43bfa37455",
+          "consumers": [
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 13,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "mechanicPlanLatestPath"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 17,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "mechanicPlanSnapshotPath"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 27,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicPlan"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 28,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicPlan"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 59,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "loadMechanicPlanById"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 86,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "verifyMechanicPlanSignatures"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/mechanic/mechanicCli.ts",
+            "src/mechanic/planStore.ts"
+          ]
+        },
+        {
+          "name": "mechanicPlanLatestPath",
+          "line": 12,
+          "start": 496,
+          "end": 503,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicPlanLatestPath(workspace: string): string {\n  return join(mechanicPlansDir(workspace), \"latest.json\");\n}",
+          "bodySha256": "201ce94fdfd43a1153a707c1d7049f359208a9b6e4da8738c01521d8fca193fd",
+          "consumers": [
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 30,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicPlan"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 47,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadLatestMechanicPlan"
+            },
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 76,
+              "column": 22,
+              "kind": "runtime",
+              "enclosingFunction": "verifyMechanicPlanSignatures"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/mechanic/mechanicCli.ts",
+            "src/mechanic/planStore.ts"
+          ]
+        },
+        {
+          "name": "mechanicPlanSnapshotPath",
+          "line": 16,
+          "start": 626,
+          "end": 633,
+          "token": "export ",
+          "originalDeclaration": "export function mechanicPlanSnapshotPath(workspace: string, ts: number): string {\n  return join(mechanicPlansDir(workspace), \"snapshots\", `${ts}.json`);\n}",
+          "bodySha256": "a15152481385949c27167b46fb7f940e76e9a17793623d6df23dedbd48bbe685",
+          "consumers": [
+            {
+              "file": "src/mechanic/planStore.ts",
+              "line": 34,
+              "column": 24,
+              "kind": "runtime",
+              "enclosingFunction": "saveMechanicPlan"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/cli.ts",
+            "src/mechanic/mechanicCli.ts",
+            "src/mechanic/planStore.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/auth/humanLog.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/auth/humanLog.ts.original",
+      "sha256": "16728412a3301aab26cb7547774ae34f2e92abde315e858ba1a191f37264bebe",
+      "declarations": [
+        {
+          "name": "humanLogPath",
+          "line": 38,
+          "start": 916,
+          "end": 923,
+          "token": "export ",
+          "originalDeclaration": "export function humanLogPath(workspace: string): string {\n  return join(humanLogDir(workspace), \"human.log\");\n}",
+          "bodySha256": "78092e8db24d1c014fcba7932e32c33272edd71f832b9317301252f99998975b",
+          "consumers": [
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 51,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadEntries"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 91,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 92,
+              "column": 21,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 98,
+              "column": 14,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 129,
+              "column": 31,
+              "kind": "runtime",
+              "enclosingFunction": "appendHumanActionEvent"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 129,
+              "column": 74,
+              "kind": "runtime",
+              "enclosingFunction": "appendHumanActionEvent"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 130,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "appendHumanActionEvent"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/auth/humanLog.ts"
+          ]
+        },
+        {
+          "name": "humanSealPath",
+          "line": 42,
+          "start": 1029,
+          "end": 1036,
+          "token": "export ",
+          "originalDeclaration": "export function humanSealPath(workspace: string): string {\n  return join(humanLogDir(workspace), \"human.seal.json\");\n}",
+          "bodySha256": "442d595a09e723d6118ee49b4c9144aacff2f31262efda9b88ca4bb90ae349ec",
+          "consumers": [
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 74,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "writeSeal"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 94,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 99,
+              "column": 15,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 164,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "verifyHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 168,
+              "column": 40,
+              "kind": "runtime",
+              "enclosingFunction": "verifyHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 170,
+              "column": 45,
+              "kind": "runtime",
+              "enclosingFunction": "verifyHumanActionLog"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/auth/humanLog.ts"
+          ]
+        },
+        {
+          "name": "humanSealSigPath",
+          "line": 46,
+          "start": 1149,
+          "end": 1156,
+          "token": "export ",
+          "originalDeclaration": "export function humanSealSigPath(workspace: string): string {\n  return join(humanLogDir(workspace), \"human.seal.sig\");\n}",
+          "bodySha256": "ce240f22e7844c68d1e2cd974b77a2081656bf76b25b1552ff1a9bffc1d0d180",
+          "consumers": [
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 82,
+              "column": 19,
+              "kind": "runtime",
+              "enclosingFunction": "writeSeal"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 94,
+              "column": 60,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 100,
+              "column": 18,
+              "kind": "runtime",
+              "enclosingFunction": "initHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 164,
+              "column": 60,
+              "kind": "runtime",
+              "enclosingFunction": "verifyHumanActionLog"
+            },
+            {
+              "file": "src/auth/humanLog.ts",
+              "line": 169,
+              "column": 39,
+              "kind": "runtime",
+              "enclosingFunction": "verifyHumanActionLog"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/auth/humanLog.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/audit/binderStore.ts",
+      "archivePath": "unused-code/2026-10-02-main/private-store-locators/originals/src/audit/binderStore.ts.original",
+      "sha256": "d3284578ce57270d9281cb21b4854de4ad62355a4b775628e6f18b05d4f88c25",
+      "declarations": [
+        {
+          "name": "binderCachePath",
+          "line": 14,
+          "start": 616,
+          "end": 623,
+          "token": "export ",
+          "originalDeclaration": "export function binderCachePath(workspace: string, scopeType: \"WORKSPACE\" | \"NODE\" | \"AGENT\", scopeId: string): string {\n  return join(auditBindersCacheDir(workspace), `latest_${scopeSegment(scopeType)}_${scopeId}.json`);\n}",
+          "bodySha256": "be8996d21c87518971031ad62186b5e8ffdfdc29a9646aa475c2fd0ed68f902f",
+          "consumers": [
+            {
+              "file": "src/audit/binderStore.ts",
+              "line": 19,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "binderCacheSigPath"
+            },
+            {
+              "file": "src/audit/binderStore.ts",
+              "line": 36,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "saveBinderCache"
+            },
+            {
+              "file": "src/audit/binderStore.ts",
+              "line": 48,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "loadBinderCache"
+            },
+            {
+              "file": "src/audit/binderStore.ts",
+              "line": 60,
+              "column": 16,
+              "kind": "runtime",
+              "enclosingFunction": "verifyBinderCacheSignature"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/audit/auditApi.ts",
+            "src/audit/binderStore.ts"
+          ]
+        },
+        {
+          "name": "hostAuditPortfolioCachePath",
+          "line": 113,
+          "start": 3820,
+          "end": 3827,
+          "token": "export ",
+          "originalDeclaration": "export function hostAuditPortfolioCachePath(hostDir: string): string {\n  return join(hostDir, \"audit-portfolio\", \"cache.json\");\n}",
+          "bodySha256": "def6250a795b0582323bc2f9977255099e2e550913c03794264992be29ac0248",
+          "consumers": [
+            {
+              "file": "src/audit/binderStore.ts",
+              "line": 118,
+              "column": 13,
+              "kind": "runtime",
+              "enclosingFunction": "hostAuditPortfolioCacheSigPath"
+            }
+          ],
+          "staticProductModulePath": [
+            "src/studio/studioServer.ts",
+            "src/audit/auditApi.ts",
+            "src/audit/binderStore.ts"
+          ]
+        }
+      ]
+    }
+  ],
+  "packageManifestSha256": "56035a95df5ba813dc470ad15d85f5439a880cfca823f940530c4c5f0ad6563d",
+  "packageEntries": [
+    {
+      "name": ".",
+      "file": "src/index.ts",
+      "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+    },
+    {
+      "name": "./sdk/mobile-fetch",
+      "file": "src/sdk/mobileFetch.ts",
+      "sha256": "9deb8aeddb4d085286443d462f32f2a620d33e254e5752d403c510759b9232f2"
+    },
+    {
+      "name": "./sdk/native",
+      "file": "src/sdk/nativeAgentClient.ts",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+    },
+    {
+      "name": "./standard/external-evidence",
+      "file": "src/standard/externalEvidenceProfile.ts",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "name": "./telemetry/pi",
+      "file": "src/importers/piTelemetryCallbacks.ts",
+      "sha256": "165eeaef049f34d247768a86948d06ab17f4eb956936a2b37ceec793098d5333"
+    }
+  ],
+  "declarations": 96,
+  "restoration": "Copy all49 complete originals and verifySHA256; new test path originallyabsent",
+  "limitations": [
+    "Arbitrary unsupported/manual/computed external consumers unassessed. Positive own-module callers and all49static entrypaths reviewed; no new artificial consumers or gate waivers.",
+    "Source qualification/package behavior/scanner delta/full aggregate remain pending until fresh committed clone acceptance."
+  ],
+  "reviewedSourceFiles": 49,
+  "changedSourceFiles": 46,
+  "preservedExports": [
+    {
+      "file": "src/runtime/autonomyBoundary.ts",
+      "name": "runtimeAutonomyBoundaryDecisionPath",
+      "originalDeclaration": "export function runtimeAutonomyBoundaryDecisionPath(workspace: string, decisionId: string): string {\n  return join(autonomyBoundaryDecisionDir(workspace), `${decisionId}.json`);\n}",
+      "bodySha256": "b077a2f7a501914be5b54d7c901850795428bb7478fb2ae444f1f7519174dcd4",
+      "consumers": [
+        {
+          "file": "src/runtime/index.ts",
+          "line": 75,
+          "column": 3,
+          "kind": "reexport"
+        }
+      ]
+    },
+    {
+      "file": "src/runtime/lifecycleGraph.ts",
+      "name": "runtimeLifecycleGraphPath",
+      "originalDeclaration": "export function runtimeLifecycleGraphPath(workspace: string, agentId: string, runId: string): string {\n  return join(runtimeRunEventsDir(resolve(workspace), agentId, runId), \"..\", \"lifecycle-graph.json\");\n}",
+      "bodySha256": "5b84e579e952fac105f84aebeeae64f1acbe440a27e745bb01b5c80af94b1396",
+      "consumers": [
+        {
+          "file": "src/runtime/index.ts",
+          "line": 31,
+          "column": 3,
+          "kind": "reexport"
+        }
+      ]
+    },
+    {
+      "file": "src/runtime/stateCheckpoint.ts",
+      "name": "runtimeStateCheckpointPath",
+      "originalDeclaration": "export function runtimeStateCheckpointPath(workspace: string, agentId: string, runId: string, checkpointId: string): string {\n  return join(dirname(runtimeRunStatePath(resolve(workspace), agentId, runId)), \"state-checkpoints\", `${checkpointId}.json`);\n}",
+      "bodySha256": "5b96729986fb04a6f50bec9b88ed51f537e4130db4ed22042f13b4ad41f58351",
+      "consumers": [
+        {
+          "file": "src/runtime/index.ts",
+          "line": 51,
+          "column": 3,
+          "kind": "reexport"
+        }
+      ]
+    },
+    {
+      "file": "src/runtime/stateCheckpoint.ts",
+      "name": "runtimeStateRestoreProofPath",
+      "originalDeclaration": "export function runtimeStateRestoreProofPath(workspace: string, agentId: string, runId: string, checkpointId: string): string {\n  return join(dirname(runtimeRunStatePath(resolve(workspace), agentId, runId)), \"state-checkpoints\", `${checkpointId}.restore-proof.json`);\n}",
+      "bodySha256": "cb9697ffcf83ab0975c6917764275f5b43715189138837d28a7b4ea9e00fe0fc",
+      "consumers": [
+        {
+          "file": "src/runtime/index.ts",
+          "line": 52,
+          "column": 3,
+          "kind": "reexport"
+        }
+      ]
+    }
+  ],
+  "preservedBarrel": {
+    "file": "src/runtime/index.ts",
+    "sha256": "1ae6cde65db819929710dddc0c1a095c2ea112440f448f2a32c436655c3b5b50"
+  },
+  "correction": {
+    "initialCandidate": "d81096b34ddcc96ab39534f268877b5cb3184510",
+    "initialTypecheck": "Failed four existing runtime barrel exports; no root copy; all initial authored bytes preserved in barrel-consumer-correction",
+    "review": "main-private-store-locator-full-source-correction-review.json",
+    "reexportClassification": "Full-source semantic audit handles re-export specifiers before declaration names; five unrelated same-name symbols separately verified",
+    "qualifications": "Corrected fresh clone validation remains pending"
+  }
+}

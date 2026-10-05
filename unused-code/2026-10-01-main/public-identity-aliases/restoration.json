@@ -1,0 +1,22 @@
+{
+  "baseCommit": "c4cba889496b470057fd061a4c9d3df7451fc067",
+  "files": [
+    {
+      "originalPath": "src/sdk/mobileFetch.ts",
+      "archivePath": "unused-code/2026-10-01-main/public-identity-aliases/originals/src/sdk/mobileFetch.ts.original",
+      "sha256": "df3cc502fa5153d952a419af83f559d1b7ec2c354d675f88335e606c87fd36d3"
+    },
+    {
+      "originalPath": "src/org/orgSchema.ts",
+      "archivePath": "unused-code/2026-10-01-main/public-identity-aliases/originals/src/org/orgSchema.ts.original",
+      "sha256": "3d41ee333ba68d16d8706a57d2e5213d59f9b9cfc2011ae08a04da5598503765"
+    },
+    {
+      "originalPath": "tests/mobileFetchSdk.test.ts",
+      "archivePath": "unused-code/2026-10-01-main/public-identity-aliases/originals/tests/mobileFetchSdk.test.ts.original",
+      "sha256": "a74ce6866b837a2cdfa41c990cc633dca471ad294ef65370f899d2fa9acec4c1"
+    }
+  ],
+  "reason": "Represent two existing public value-identity aliases directly through standard named ES exports; preserve both names, types and referenced object/function; no wrappers, policy/config annotations, exclusions or waivers",
+  "restore": "Copy complete original bytes and verify SHA256"
+}

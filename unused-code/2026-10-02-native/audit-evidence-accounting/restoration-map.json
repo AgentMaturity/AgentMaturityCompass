@@ -1,0 +1,71 @@
+{
+  "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "files": [
+    {
+      "sourcePath": "src/audit/posthocAuditSampling.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/audit/posthocAuditSampling.ts",
+      "restoreTo": "src/audit/posthocAuditSampling.ts",
+      "sha256": "703a8c93017b2a9ecffc5cc0aaf7f81a7bd0e896cef0fa79b91c1909d29caf49",
+      "bytes": 15699,
+      "gitBlob": "9cf59d9f91ad4d1d9b18069f02ceafae60399066"
+    },
+    {
+      "sourcePath": "src/audit/reviewerIndependence.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/audit/reviewerIndependence.ts",
+      "restoreTo": "src/audit/reviewerIndependence.ts",
+      "sha256": "f89de565859e8f66bb8597be5febfc1638fa18887e738977ebe09bc85b4f8f43",
+      "bytes": 12099,
+      "gitBlob": "b36305a34e4fd77da6176335426f3073a9d6225c"
+    },
+    {
+      "sourcePath": "src/compliance/exceptionLifecycle.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/compliance/exceptionLifecycle.ts",
+      "restoreTo": "src/compliance/exceptionLifecycle.ts",
+      "sha256": "15effcc106364a315ed5dbe8597d1ec1d0340f819ada8b4a25af54d83dfd8495",
+      "bytes": 12125,
+      "gitBlob": "3f9ef37f8da2b1aa0161feca2f9e607ff0356fe2"
+    },
+    {
+      "sourcePath": "src/compliance/policyDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/compliance/policyDrift.ts",
+      "restoreTo": "src/compliance/policyDrift.ts",
+      "sha256": "d3f31a6c91fb501cb9efda884766a95fc96404285186c0e536e5204c89edcb13",
+      "bytes": 15289,
+      "gitBlob": "984326f0f0a899a92c9409724b2d181231201618"
+    },
+    {
+      "sourcePath": "src/compliance/providerRisk.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/compliance/providerRisk.ts",
+      "restoreTo": "src/compliance/providerRisk.ts",
+      "sha256": "95a0892c53993bb8a23cadfc1355c5ba74b375f2cb45c2e9370f9a0e2bd59f08",
+      "bytes": 13031,
+      "gitBlob": "1cc3be431c5ddbb46cce0b84188ece414f626fc6"
+    },
+    {
+      "sourcePath": "src/ci/gate.ts",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/src/ci/gate.ts",
+      "restoreTo": "src/ci/gate.ts",
+      "sha256": "66e961c1a7c07354a60002c642dd0087d9395ee6f7e458de032a3d15bda7a131",
+      "bytes": 31728,
+      "gitBlob": "6f825a2a8198ec37527d3026b8d7ae4c0703b248"
+    },
+    {
+      "sourcePath": "AMC_OS/INBOX/REV_SECURITY_OFFICER.md",
+      "archivePath": "unused-code/2026-10-02-native/audit-evidence-accounting/originals/AMC_OS/INBOX/REV_SECURITY_OFFICER.md",
+      "restoreTo": "AMC_OS/INBOX/REV_SECURITY_OFFICER.md",
+      "sha256": "171de475ef215afd93e98c6771431a7493a049ccc47ec90bed7cc682d657c370",
+      "bytes": 1733,
+      "gitBlob": "0fe00480c4f4d03034f3d20006dc9c3f02aee77b"
+    }
+  ],
+  "absentAtBase": [
+    {
+      "path": "src/audit/auditEvidenceAccounting.ts",
+      "filesystemAbsent": true
+    },
+    {
+      "path": "tests/auditEvidenceAccountingParity.test.ts",
+      "filesystemAbsent": true
+    }
+  ]
+}

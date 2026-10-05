@@ -1,0 +1,32 @@
+{
+  "baseCommit": "e41d67dd96dbff4ee330750acb2af10830278142",
+  "files": [
+    {
+      "originalPath": "src/watch/bishengObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-01-main/live-drift-proof-stats/originals/src/watch/bishengObservabilityLiveDrift.ts.original",
+      "sha256": "79c0ede9cc70fd5d9e87635b2e632e8fd49cf31408f08b655279973df441a760"
+    },
+    {
+      "originalPath": "src/watch/lmnrObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-01-main/live-drift-proof-stats/originals/src/watch/lmnrObservabilityLiveDrift.ts.original",
+      "sha256": "d936ed4a38ba63133b8b32e39142952bcd022e07ab099d40fff4a740ec9a0fa0"
+    },
+    {
+      "originalPath": "src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-01-main/live-drift-proof-stats/originals/src/watch/narrowTaskBroadMisalignmentLiveDrift.ts.original",
+      "sha256": "02e0da2c1eefc6242cb90536d7d7807be7358b2ea2f509d28ffa53301bd926e9"
+    },
+    {
+      "originalPath": "src/watch/openCompassLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-01-main/live-drift-proof-stats/originals/src/watch/openCompassLiveDrift.ts.original",
+      "sha256": "e927e193357d8d9b030469362fafaa5f43971c2e163bbefeb75247ec9d7ec20c"
+    },
+    {
+      "originalPath": "src/watch/trismAgenticLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-01-main/live-drift-proof-stats/originals/src/watch/trismAgenticLiveDrift.ts.original",
+      "sha256": "7d8b09f1a61e3b0b572c1071d114b2dfe917c47e07e5585f46499f36b1fc8156"
+    }
+  ],
+  "reason": "Share five byte-identical private proof-accounting bodies while preserving every domain field, mismatch rule, receipt and public API",
+  "restore": "Copy original full bytes to originalPath and verify SHA256"
+}

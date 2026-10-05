@@ -1,0 +1,25 @@
+{
+  "lane": "security",
+  "baseCommit": "b30e1c771b89e23ecedb13604cc0bf9102078136",
+  "files": [
+    {
+      "sourcePath": "src/audit/binderVerifier.ts",
+      "archivePath": "unused-code/2026-10-02-native/signed-artifacts/originals/src/audit/binderVerifier.ts",
+      "restoreTo": "src/audit/binderVerifier.ts",
+      "sha256": "c0497062161defcd8edbf877e463bbd14140b8095a32394f3383cb7991df52c8",
+      "bytes": 11387
+    },
+    {
+      "sourcePath": "src/passport/passportVerifier.ts",
+      "archivePath": "unused-code/2026-10-02-native/signed-artifacts/originals/src/passport/passportVerifier.ts",
+      "restoreTo": "src/passport/passportVerifier.ts",
+      "sha256": "c22f33a747c722f72cbac7ce0ddeb6969004904b80edd9a29cd5a2acf2dbf566",
+      "bytes": 9969
+    }
+  ],
+  "newFilesToRemoveOnRestore": [
+    "src/utils/signedArtifactVerification.ts",
+    "tests/signedArtifactVerificationParity.test.ts"
+  ],
+  "restoreInstructions": "Copy each archived file verbatim to restoreTo after checking its SHA-256. Preserve the archive and remove the two introduced source/test files from active use."
+}

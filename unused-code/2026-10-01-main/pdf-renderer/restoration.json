@@ -1,0 +1,17 @@
+{
+  "baseCommit": "c2aa99333235310393a9aa231f92e125b6a47c60",
+  "files": [
+    {
+      "originalPath": "src/evidence/exporter.ts",
+      "archivePath": "unused-code/2026-10-01-main/pdf-renderer/originals/src/evidence/exporter.ts.original",
+      "sha256": "e42547d7bdbe7b49df662adbdca2759932a9a0c0bac6c2402c6c288f6f926b48"
+    },
+    {
+      "originalPath": "src/passport/passportCli.ts",
+      "archivePath": "unused-code/2026-10-01-main/pdf-renderer/originals/src/passport/passportCli.ts.original",
+      "sha256": "c0e6a51862ff1acc0755b4c70a0309e0cf5e521c983ef46e4b126bb0290e87f9"
+    }
+  ],
+  "reason": "Share two byte-identical text PDF implementations, retaining existing private wrappers and all caller logic",
+  "restore": "Copy complete original bytes to originalPath and verify SHA256"
+}

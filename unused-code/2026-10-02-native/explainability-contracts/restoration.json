@@ -1,0 +1,382 @@
+{
+  "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "inverseEdits": [
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.openEnvConfigHash,\n    ref.scenarioManifestHash,\n    ref.incidentReportHash,\n    ref.rawLogBundleHash,\n    ref.metricSnapshotHash,\n    ref.userReportHash,\n    ref.actionPayloadHash,\n    ref.graderConfigHash,\n    ref.feedbackHash,\n  ].every(hashPresent)",
+      "after": "incidentTriageProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.openEnvConfigHash,\n    ref.scenarioManifestHash,\n    ref.incidentReportHash,\n    ref.rawLogBundleHash,\n    ref.metricSnapshotHash,\n    ref.userReportHash,\n    ref.actionPayloadHash,\n    ref.graderConfigHash,\n    ref.feedbackHash,\n  ];",
+      "after": "const proofHashes = incidentTriageProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.submissionMetadataHash,\n    ref.taskBreakdownHash,\n    ref.leaderboardSnapshotHash,\n  ].every(hashPresent)",
+      "after": "benchmarkSubmissionProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.submissionMetadataHash,\n    ref.taskBreakdownHash,\n    ref.leaderboardSnapshotHash,\n  ];",
+      "after": "const proofHashes = benchmarkSubmissionProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.datasetManifestHash,\n    ref.userRoleManifestHash,\n    ref.instructionSetHash,\n    ref.interactionTraceHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.metricReportHash,\n  ].every(hashPresent)",
+      "after": "multiUserBenchmarkProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.datasetManifestHash,\n    ref.userRoleManifestHash,\n    ref.instructionSetHash,\n    ref.interactionTraceHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.metricReportHash,\n  ];",
+      "after": "const proofHashes = multiUserBenchmarkProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.datasetManifestHash,\n    ref.stateSchemaHash,\n    ref.initialStateHash,\n    ref.stateMutationTraceHash,\n    ref.conversationTraceHash,\n    ref.entityRelationshipGraphHash,\n    ref.toolExecutionTraceHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.replayCommandHash,\n  ].every(hashPresent)",
+      "after": "continualLearningBenchmarkProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.datasetManifestHash,\n    ref.stateSchemaHash,\n    ref.initialStateHash,\n    ref.stateMutationTraceHash,\n    ref.conversationTraceHash,\n    ref.entityRelationshipGraphHash,\n    ref.toolExecutionTraceHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.replayCommandHash,\n  ];",
+      "after": "const proofHashes = continualLearningBenchmarkProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.sourceStatusHash,\n    ref.readmeArtifactHash,\n    ref.packageManifestHash,\n    ref.benchmarkWorkflowHash,\n    ref.perfBudgetWorkflowHash,\n    ref.dailyScoreWorkflowHash,\n    ref.turboScoreScriptHash,\n    ref.performanceDashboardHash,\n    ref.benchmarkReportHash,\n    ref.baselineResultHash,\n    ref.candidateResultHash,\n    ref.latencyTraceHash,\n    ref.throughputTraceHash,\n    ref.scoreManifestHash,\n    ref.regressionThresholdHash,\n    ref.ciConfigHash,\n  ].every(hashPresent)",
+      "after": "hermesTurboPerformanceProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.sourceStatusHash,\n    ref.readmeArtifactHash,\n    ref.packageManifestHash,\n    ref.benchmarkWorkflowHash,\n    ref.perfBudgetWorkflowHash,\n    ref.dailyScoreWorkflowHash,\n    ref.turboScoreScriptHash,\n    ref.performanceDashboardHash,\n    ref.benchmarkReportHash,\n    ref.baselineResultHash,\n    ref.candidateResultHash,\n    ref.latencyTraceHash,\n    ref.throughputTraceHash,\n    ref.scoreManifestHash,\n    ref.regressionThresholdHash,\n    ref.ciConfigHash,\n  ];",
+      "after": "const proofHashes = hermesTurboPerformanceProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.firmwareProjectHash,\n    ref.toolchainManifestHash,\n    ref.sdkVersionManifestHash,\n    ref.hardwareSessionHash,\n    ref.deviceLogBundleHash,\n    ref.buildArtifactHash,\n    ref.flashArtifactHash,\n    ref.testArtifactHash,\n    ref.knowledgePackManifestHash,\n    ref.taskManifestHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.privacyBoundaryHash,\n    ref.benchmarkReportHash,\n  ].every(hashPresent)",
+      "after": "iotFirmwareQuestionProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.firmwareProjectHash,\n    ref.toolchainManifestHash,\n    ref.sdkVersionManifestHash,\n    ref.hardwareSessionHash,\n    ref.deviceLogBundleHash,\n    ref.buildArtifactHash,\n    ref.flashArtifactHash,\n    ref.testArtifactHash,\n    ref.knowledgePackManifestHash,\n    ref.taskManifestHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.privacyBoundaryHash,\n    ref.benchmarkReportHash,\n  ];",
+      "after": "const proofHashes = iotFirmwareQuestionProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.productCatalogHash,\n    ref.productDescriptionHash,\n    ref.customerScenarioHash,\n    ref.conversationTraceHash,\n    ref.customerIntentManifestHash,\n    ref.orderCaptureSchemaHash,\n    ref.orderLedgerHash,\n    ref.pricingPolicyHash,\n    ref.discountPolicyHash,\n    ref.modelAdapterManifestHash,\n    ref.modelProviderMatrixHash,\n    ref.promptPolicyHash,\n    ref.recommendationPolicyHash,\n    ref.safetyPolicyHash,\n    ref.privacyBoundaryHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.benchmarkReportHash,\n  ].every(hashPresent)",
+      "after": "retailSalesQuestionProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.productCatalogHash,\n    ref.productDescriptionHash,\n    ref.customerScenarioHash,\n    ref.conversationTraceHash,\n    ref.customerIntentManifestHash,\n    ref.orderCaptureSchemaHash,\n    ref.orderLedgerHash,\n    ref.pricingPolicyHash,\n    ref.discountPolicyHash,\n    ref.modelAdapterManifestHash,\n    ref.modelProviderMatrixHash,\n    ref.promptPolicyHash,\n    ref.recommendationPolicyHash,\n    ref.safetyPolicyHash,\n    ref.privacyBoundaryHash,\n    ref.evaluatorConfigHash,\n    ref.resultArtifactHash,\n    ref.benchmarkReportHash,\n  ];",
+      "after": "const proofHashes = retailSalesQuestionProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.readmeArtifactHash,\n    ref.pythonPackageManifestHash,\n    ref.pythonOpenApiHash,\n    ref.pythonClientHash,\n    ref.pythonExecutionLogsHash,\n    ref.pythonEvaluatorApiHash,\n    ref.pythonExecutionLogApiHash,\n    ref.cliPackageManifestHash,\n    ref.cliLockfileHash,\n    ref.cliEvaluatorCommandHash,\n    ref.cliJudgeCommandHash,\n    ref.cliExecutionLogCommandHash,\n    ref.cliOtelTraceCommandHash,\n    ref.cliFileUploadCommandHash,\n    ref.typescriptPackageManifestHash,\n    ref.typescriptLockfileHash,\n    ref.typescriptSourceTreeHash,\n    ref.tracePreviewHash,\n    ref.receiptPreviewHash,\n    ref.policyRulePreviewHash,\n    ref.sourceArtifactPreviewHash,\n    ref.emptyStateHash,\n    ref.errorStateHash,\n  ].every(hashPresent)",
+      "after": "scorableStudioDrilldownProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.readmeArtifactHash,\n    ref.pythonPackageManifestHash,\n    ref.pythonOpenApiHash,\n    ref.pythonClientHash,\n    ref.pythonExecutionLogsHash,\n    ref.pythonEvaluatorApiHash,\n    ref.pythonExecutionLogApiHash,\n    ref.cliPackageManifestHash,\n    ref.cliLockfileHash,\n    ref.cliEvaluatorCommandHash,\n    ref.cliJudgeCommandHash,\n    ref.cliExecutionLogCommandHash,\n    ref.cliOtelTraceCommandHash,\n    ref.cliFileUploadCommandHash,\n    ref.typescriptPackageManifestHash,\n    ref.typescriptLockfileHash,\n    ref.typescriptSourceTreeHash,\n    ref.tracePreviewHash,\n    ref.receiptPreviewHash,\n    ref.policyRulePreviewHash,\n    ref.sourceArtifactPreviewHash,\n    ref.emptyStateHash,\n    ref.errorStateHash,\n  ];",
+      "after": "const proofHashes = scorableStudioDrilldownProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "[\n    ref.tracePreviewHash,\n    ref.reasoningTracePreviewHash,\n    ref.receiptPreviewHash,\n    ref.evidencePreviewHash,\n    ref.sourceArtifactPreviewHash,\n    ref.emptyStateHash,\n    ref.errorStateHash,\n  ].every(hashPresent)",
+      "after": "obsStudioDrilldownProofHashes(ref).every(hashPresent)"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "const proofHashes = [\n    ref.tracePreviewHash,\n    ref.reasoningTracePreviewHash,\n    ref.receiptPreviewHash,\n    ref.evidencePreviewHash,\n    ref.sourceArtifactPreviewHash,\n    ref.emptyStateHash,\n    ref.errorStateHash,\n  ];",
+      "after": "const proofHashes = obsStudioDrilldownProofHashes(ref);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.flowDagHash !== null &&\n      ref.paramConfigHash !== null &&\n      ref.evalSetHash !== null &&\n      ref.batchRunId !== null &&\n      ref.evaluatorFlowHash !== null &&\n      ref.groundTruthColumn !== null &&\n      ref.dataMappingHash !== null &&\n      ref.metricIds.length > 0;\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.flowDagHash !== null &&\n    ref.paramConfigHash !== null &&\n    ref.evalSetHash !== null &&\n    ref.batchRunId !== null &&\n    ref.evaluatorFlowHash !== null &&\n    ref.groundTruthColumn !== null &&\n    ref.dataMappingHash !== null &&\n    ref.metricIds.length > 0);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.deterministicGrader &&\n      meetsMinimum(ref.reward0to1, ref.minReward0to1) &&\n      meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&\n      meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&\n      meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&\n      ref.maxSteps !== null &&\n      ref.stepCount !== null &&\n      ref.stepCount <= ref.maxSteps;\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.deterministicGrader &&\n    meetsMinimum(ref.reward0to1, ref.minReward0to1) &&\n    meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&\n    meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&\n    meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&\n    ref.maxSteps !== null &&\n    ref.stepCount !== null &&\n    ref.stepCount <= ref.maxSteps);"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.submissionVersion !== null &&\n      ref.agentVersion !== null &&\n      ref.submittedAt !== null &&\n      (ref.taskStatus === \"success\" || ref.taskStatus === \"warning\") &&\n      ref.overallScore0to100 !== null &&\n      ref.categoryScore0to100 !== null &&\n      ref.speedMs !== null &&\n      ref.costUsd !== null &&\n      ref.leaderboardMetricViews.length > 0 &&\n      ref.criterionScores.length > 0 &&\n      ref.criterionScores.every(hasReplayableBenchmarkCriterion);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.submissionVersion !== null &&\n    ref.agentVersion !== null &&\n    ref.submittedAt !== null &&\n    (ref.taskStatus === \"success\" || ref.taskStatus === \"warning\") &&\n    ref.overallScore0to100 !== null &&\n    ref.categoryScore0to100 !== null &&\n    ref.speedMs !== null &&\n    ref.costUsd !== null &&\n    ref.leaderboardMetricViews.length > 0 &&\n    ref.criterionScores.length > 0 &&\n    ref.criterionScores.every(hasReplayableBenchmarkCriterion));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.evaluatorIds.length > 0 &&\n      ref.experimentRunId !== null &&\n      ref.ciRunId !== null &&\n      meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&\n      meetsMinimum(ref.averageScore0to1, ref.threshold0to1);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.evaluatorIds.length > 0 &&\n    ref.experimentRunId !== null &&\n    ref.ciRunId !== null &&\n    meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&\n    meetsMinimum(ref.averageScore0to1, ref.threshold0to1));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.metricFamily !== \"custom\" &&\n      ref.metricIds.length > 0 &&\n      ref.ciRunId !== null &&\n      evalAiLibraryMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.metricFamily !== \"custom\" &&\n    ref.metricIds.length > 0 &&\n    ref.ciRunId !== null &&\n    evalAiLibraryMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.ciRunId !== null &&\n      ref.runtime !== \"custom\" &&\n      ref.openModelIds.length > 0 &&\n      ref.evaluationMetricIds.length > 0 &&\n      openModelRagMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.ciRunId !== null &&\n    ref.runtime !== \"custom\" &&\n    ref.openModelIds.length > 0 &&\n    ref.evaluationMetricIds.length > 0 &&\n    openModelRagMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.metricFamily !== \"custom\" &&\n      ref.metricIds.length > 0 &&\n      ref.projectRef !== null &&\n      ref.experimentRef !== null &&\n      ref.ciRunId !== null &&\n      opikEvaluationMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.metricFamily !== \"custom\" &&\n    ref.metricIds.length > 0 &&\n    ref.projectRef !== null &&\n    ref.experimentRef !== null &&\n    ref.ciRunId !== null &&\n    opikEvaluationMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.metricFamily !== \"custom\" &&\n      ref.metricIds.length > 0 &&\n      ref.ciRunId !== null &&\n      deepEvalMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.metricFamily !== \"custom\" &&\n    ref.metricIds.length > 0 &&\n    ref.ciRunId !== null &&\n    deepEvalMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.packageRef !== null &&\n      ref.adapter !== \"custom\" &&\n      ref.ciRunId !== null &&\n      agentTrialMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.packageRef !== null &&\n    ref.adapter !== \"custom\" &&\n    ref.ciRunId !== null &&\n    agentTrialMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.ciRunId !== null &&\n      codeQuestMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.ciRunId !== null &&\n    codeQuestMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.userRoleCount !== null &&\n      ref.userRoleCount >= 2 &&\n      ref.turnCount !== null &&\n      ref.turnCount > 0 &&\n      multiUserScenarioMetricMeetsThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.userRoleCount !== null &&\n    ref.userRoleCount >= 2 &&\n    ref.turnCount !== null &&\n    ref.turnCount > 0 &&\n    multiUserScenarioMetricMeetsThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.environmentMode !== \"custom\" &&\n      ref.faultMode !== \"custom\" &&\n      ref.difficultyLevel !== null &&\n      professionalTaskMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.environmentMode !== \"custom\" &&\n    ref.faultMode !== \"custom\" &&\n    ref.difficultyLevel !== null &&\n    professionalTaskMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.platform !== \"custom\" &&\n      ref.hardwareRunCount !== null &&\n      ref.hardwareRunCount > 0 &&\n      ref.deviceCount !== null &&\n      ref.deviceCount > 0 &&\n      iotFirmwareMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.platform !== \"custom\" &&\n    ref.hardwareRunCount !== null &&\n    ref.hardwareRunCount > 0 &&\n    ref.deviceCount !== null &&\n    ref.deviceCount > 0 &&\n    iotFirmwareMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.salesChannel !== \"custom\" &&\n      ref.modelProviderCount !== null &&\n      ref.modelProviderCount >= 2 &&\n      ref.customerScenarioCount !== null &&\n      ref.customerScenarioCount > 0 &&\n      ref.orderCount !== null &&\n      ref.orderCount > 0 &&\n      retailSalesMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.salesChannel !== \"custom\" &&\n    ref.modelProviderCount !== null &&\n    ref.modelProviderCount >= 2 &&\n    ref.customerScenarioCount !== null &&\n    ref.customerScenarioCount > 0 &&\n    ref.orderCount !== null &&\n    ref.orderCount > 0 &&\n    retailSalesMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.scenarioCount !== null &&\n      ref.scenarioCount > 0 &&\n      ref.turnCount !== null &&\n      ref.turnCount > 0 &&\n      ref.stateMutationCount !== null &&\n      ref.stateMutationCount > 0 &&\n      ref.entityCount !== null &&\n      ref.entityCount > 0 &&\n      continualLearningMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.scenarioCount !== null &&\n    ref.scenarioCount > 0 &&\n    ref.turnCount !== null &&\n    ref.turnCount > 0 &&\n    ref.stateMutationCount !== null &&\n    ref.stateMutationCount > 0 &&\n    ref.entityCount !== null &&\n    ref.entityCount > 0 &&\n    continualLearningMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.performanceFacet !== \"custom\" &&\n      ref.ciRunId !== null &&\n      hermesTurboPerformanceMetricsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.performanceFacet !== \"custom\" &&\n    ref.ciRunId !== null &&\n    hermesTurboPerformanceMetricsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.evidencePreviewState === \"ready\" &&\n      obsStudioCountsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.evidencePreviewState === \"ready\" &&\n    obsStudioCountsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "  if (ref.status === \"satisfied\") {\n    return ref.evidenceRefs.length > 0 &&\n      ref.studioSurface !== \"custom\" &&\n      ref.evidencePreviewState === \"ready\" &&\n      scorableStudioCountsMeetThreshold(ref);\n  }\n  if (ref.status === \"failed\") {\n    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;\n  }\n  return ref.repairHint.length > 0;",
+      "after": "  return replayableLensStatus(ref, () =>\n    ref.studioSurface !== \"custom\" &&\n    ref.evidencePreviewState === \"ready\" &&\n    scorableStudioCountsMeetThreshold(ref));"
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "before": "import { sha256Hex }",
+      "after": "import {\n  incidentTriageProofHashes,\n  benchmarkSubmissionProofHashes,\n  multiUserBenchmarkProofHashes,\n  continualLearningBenchmarkProofHashes,\n  hermesTurboPerformanceProofHashes,\n  iotFirmwareQuestionProofHashes,\n  retailSalesQuestionProofHashes,\n  scorableStudioDrilldownProofHashes,\n  obsStudioDrilldownProofHashes,\n  replayableLensStatus,\n} from \"./explainabilityContracts.js\";\nimport { sha256Hex }"
+    },
+    {
+      "path": "src/diagnostic/evidenceDrilldown.ts",
+      "before": "export type ScoreEvidenceDrilldownState",
+      "after": "import {\n  incidentTriageProofHashes,\n  benchmarkSubmissionProofHashes,\n  multiUserBenchmarkProofHashes,\n  continualLearningBenchmarkProofHashes,\n  hermesTurboPerformanceProofHashes,\n  iotFirmwareQuestionProofHashes,\n  retailSalesQuestionProofHashes,\n  scorableStudioDrilldownProofHashes,\n  obsStudioDrilldownProofHashes,\n} from \"./explainabilityContracts.js\";\n\nexport type ScoreEvidenceDrilldownState"
+    }
+  ],
+  "statusSites": [
+    "hasReplayableRagFlowDiagnostic",
+    "hasReplayableIncidentTriageLens",
+    "hasReplayableBenchmarkSubmissionLens",
+    "hasReplayableTestSuiteEvaluationLens",
+    "hasReplayableEvalAiLibraryQuestionLens",
+    "hasReplayableOpenModelRagQuestionLens",
+    "hasReplayableOpikEvaluationQuestionLens",
+    "hasReplayableDeepEvalQuestionLens",
+    "hasReplayableAgentTrialStatisticalLens",
+    "hasReplayableCodeQuestQualityLens",
+    "hasReplayableMultiUserBenchmarkLens",
+    "hasReplayableProfessionalTaskLens",
+    "hasReplayableIotFirmwareQuestionLens",
+    "hasReplayableRetailSalesQuestionLens",
+    "hasReplayableContinualLearningBenchmarkLens",
+    "hasReplayableHermesTurboPerformanceLens",
+    "hasReplayableObsStudioDrilldownLens",
+    "hasReplayableScorableStudioDrilldownLens"
+  ],
+  "projections": [
+    {
+      "name": "incidentTriageProofHashes",
+      "type": "QuestionScoreIncidentTriageLensRef",
+      "keys": [
+        "openEnvConfigHash",
+        "scenarioManifestHash",
+        "incidentReportHash",
+        "rawLogBundleHash",
+        "metricSnapshotHash",
+        "userReportHash",
+        "actionPayloadHash",
+        "graderConfigHash",
+        "feedbackHash"
+      ]
+    },
+    {
+      "name": "benchmarkSubmissionProofHashes",
+      "type": "QuestionScoreBenchmarkSubmissionLensRef",
+      "keys": [
+        "submissionMetadataHash",
+        "taskBreakdownHash",
+        "leaderboardSnapshotHash"
+      ]
+    },
+    {
+      "name": "multiUserBenchmarkProofHashes",
+      "type": "QuestionScoreMultiUserBenchmarkLensRef",
+      "keys": [
+        "datasetManifestHash",
+        "userRoleManifestHash",
+        "instructionSetHash",
+        "interactionTraceHash",
+        "evaluatorConfigHash",
+        "resultArtifactHash",
+        "metricReportHash"
+      ]
+    },
+    {
+      "name": "continualLearningBenchmarkProofHashes",
+      "type": "QuestionScoreContinualLearningBenchmarkLensRef",
+      "keys": [
+        "datasetManifestHash",
+        "stateSchemaHash",
+        "initialStateHash",
+        "stateMutationTraceHash",
+        "conversationTraceHash",
+        "entityRelationshipGraphHash",
+        "toolExecutionTraceHash",
+        "evaluatorConfigHash",
+        "resultArtifactHash",
+        "replayCommandHash"
+      ]
+    },
+    {
+      "name": "hermesTurboPerformanceProofHashes",
+      "type": "QuestionScoreHermesTurboPerformanceLensRef",
+      "keys": [
+        "sourceStatusHash",
+        "readmeArtifactHash",
+        "packageManifestHash",
+        "benchmarkWorkflowHash",
+        "perfBudgetWorkflowHash",
+        "dailyScoreWorkflowHash",
+        "turboScoreScriptHash",
+        "performanceDashboardHash",
+        "benchmarkReportHash",
+        "baselineResultHash",
+        "candidateResultHash",
+        "latencyTraceHash",
+        "throughputTraceHash",
+        "scoreManifestHash",
+        "regressionThresholdHash",
+        "ciConfigHash"
+      ]
+    },
+    {
+      "name": "iotFirmwareQuestionProofHashes",
+      "type": "QuestionScoreIotFirmwareQuestionLensRef",
+      "keys": [
+        "firmwareProjectHash",
+        "toolchainManifestHash",
+        "sdkVersionManifestHash",
+        "hardwareSessionHash",
+        "deviceLogBundleHash",
+        "buildArtifactHash",
+        "flashArtifactHash",
+        "testArtifactHash",
+        "knowledgePackManifestHash",
+        "taskManifestHash",
+        "evaluatorConfigHash",
+        "resultArtifactHash",
+        "privacyBoundaryHash",
+        "benchmarkReportHash"
+      ]
+    },
+    {
+      "name": "retailSalesQuestionProofHashes",
+      "type": "QuestionScoreRetailSalesQuestionLensRef",
+      "keys": [
+        "productCatalogHash",
+        "productDescriptionHash",
+        "customerScenarioHash",
+        "conversationTraceHash",
+        "customerIntentManifestHash",
+        "orderCaptureSchemaHash",
+        "orderLedgerHash",
+        "pricingPolicyHash",
+        "discountPolicyHash",
+        "modelAdapterManifestHash",
+        "modelProviderMatrixHash",
+        "promptPolicyHash",
+        "recommendationPolicyHash",
+        "safetyPolicyHash",
+        "privacyBoundaryHash",
+        "evaluatorConfigHash",
+        "resultArtifactHash",
+        "benchmarkReportHash"
+      ]
+    },
+    {
+      "name": "scorableStudioDrilldownProofHashes",
+      "type": "QuestionScoreScorableStudioDrilldownLensRef",
+      "keys": [
+        "readmeArtifactHash",
+        "pythonPackageManifestHash",
+        "pythonOpenApiHash",
+        "pythonClientHash",
+        "pythonExecutionLogsHash",
+        "pythonEvaluatorApiHash",
+        "pythonExecutionLogApiHash",
+        "cliPackageManifestHash",
+        "cliLockfileHash",
+        "cliEvaluatorCommandHash",
+        "cliJudgeCommandHash",
+        "cliExecutionLogCommandHash",
+        "cliOtelTraceCommandHash",
+        "cliFileUploadCommandHash",
+        "typescriptPackageManifestHash",
+        "typescriptLockfileHash",
+        "typescriptSourceTreeHash",
+        "tracePreviewHash",
+        "receiptPreviewHash",
+        "policyRulePreviewHash",
+        "sourceArtifactPreviewHash",
+        "emptyStateHash",
+        "errorStateHash"
+      ]
+    },
+    {
+      "name": "obsStudioDrilldownProofHashes",
+      "type": "QuestionScoreObsStudioDrilldownLensRef",
+      "keys": [
+        "tracePreviewHash",
+        "reasoningTracePreviewHash",
+        "receiptPreviewHash",
+        "evidencePreviewHash",
+        "sourceArtifactPreviewHash",
+        "emptyStateHash",
+        "errorStateHash"
+      ]
+    }
+  ],
+  "heldDifferences": [
+    "Professional-task drilldown additionally requires debugTraceHash.",
+    "Landscape computes freshness eagerly before evidenceRefs read."
+  ]
+}

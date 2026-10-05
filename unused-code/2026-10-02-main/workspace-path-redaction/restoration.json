@@ -1,0 +1,230 @@
+{
+  "sourceCommit": "49f81c339ca4f62da2e9342f2dd846e3610c90ae",
+  "scope": "Share only ten private native-path helper bodies; preserve every other source byte and public contract",
+  "files": [
+    {
+      "originalPath": "src/experiments/governedOptimizer.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/experiments/governedOptimizer.ts.original",
+      "sha256": "a8b105b280fd38d5cb7fb1d6a5ed2fcf91e05645ed498c957a9da57956cf3a80",
+      "currentSha256": "0e8527f1d7deeefb3f08b8939567163bda80b9c5bdc100fec54115389ed602f1",
+      "name": "redactPath",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/fleet/fleetLifecycle.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/fleet/fleetLifecycle.ts.original",
+      "sha256": "ad86a1de4e0fd2729e804f5d0a3321a1612c3adea68c35c069665a388b279f6c",
+      "currentSha256": "365bbf2f995947dcfb0465eb262657af67b3f7fb0d0f90ffd9eaeb7c52fe18cd",
+      "name": "redactPath",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/lifecycle/changeReceipt.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/lifecycle/changeReceipt.ts.original",
+      "sha256": "4d987fb9db6a8e1e41e7a5e2472023f30650716fc403f437a846a4695cd8a8db",
+      "currentSha256": "96b76c441a23dfb364aa721a1af5edf877d0199a9c5012aed64ef4e9b719fefc",
+      "name": "redactPathForExport",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPathForExport(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPathForExport(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/mechanic/fixerRca.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/mechanic/fixerRca.ts.original",
+      "sha256": "0d0f849fac2149780eaf0568fd7d55a1c1f61f516a88eefea8a9856e22b27241",
+      "currentSha256": "8710ade39145e1f0146016ab128926511a8bbde846346e008e9f348947c990e2",
+      "name": "redactPath",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/runtime/runManager.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/runtime/runManager.ts.original",
+      "sha256": "a896d9aa46c1ab586cce93c971714ad8c26a98ec43556edf48eff3444f67abb9",
+      "currentSha256": "c73e94bb51e07e6f3fd2ace0e2bea154cc544d4c2bdbeb7d049650d4a0387236",
+      "name": "relativePathForExport",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function relativePathForExport(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function relativePathForExport(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/runtime/firewall.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/runtime/firewall.ts.original",
+      "sha256": "cd2b443628ee443f819bcdf993a1552efd57dc68240ac04441bea1973267bfd6",
+      "currentSha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05",
+      "name": "redactPath",
+      "nullable": true,
+      "importLine": "import { redactNullableWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactNullableWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  if (!path) return null;\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string | null, workspace: string): string | null {\n  return redactNullableWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/learning/reasoningMemory.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/learning/reasoningMemory.ts.original",
+      "sha256": "f63408e6fdc4bfa73cc1df14f66b3e301b790357533f2c4b9e58a99790268717",
+      "currentSha256": "13359fd81bbf5fd3c75ed08b8e973de978f60cfae3e10bc1c656b567b89b8a19",
+      "name": "redactPath",
+      "nullable": false,
+      "importLine": "import { redactWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string, workspace: string): string {\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string, workspace: string): string {\n  return redactWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/org/orgRun.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/org/orgRun.ts.original",
+      "sha256": "d3b26d74772bb05753a8eb704e53952fcacb7cbebfa4e3dbc9ee506e55842d16",
+      "currentSha256": "de6f8d70b8b3410b4476f1daa6169818bffbcf8e4fe131149df8a6c86cd2fcee",
+      "name": "redactPath",
+      "nullable": false,
+      "importLine": "import { redactWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string, workspace: string): string {\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string, workspace: string): string {\n  return redactWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/watch/traceFailureIndex.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/watch/traceFailureIndex.ts.original",
+      "sha256": "96bcf3d64ce872600910a5704f40db041f0cc07d325bfdc90bab97ff0dfbc657",
+      "currentSha256": "18cbb11b79a7505e814c2e682d16190a3edc7ada318377bfb6d71f5df76ba51c",
+      "name": "redactPath",
+      "nullable": false,
+      "importLine": "import { redactWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "afterBody": "{\n  return redactWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactPath(path: string, workspace: string): string {\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  return path;\n}",
+      "currentDeclaration": "function redactPath(path: string, workspace: string): string {\n  return redactWorkspacePath(path, workspace);\n}"
+    },
+    {
+      "originalPath": "src/lifecycle/observabilityLane.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/src/lifecycle/observabilityLane.ts.original",
+      "sha256": "20ea4008185c1b2d9ca1beac5d561d768007b19b7c1c5c1add7e12b6f5c57744",
+      "currentSha256": "1cb242d7fd924b5f6eea73111e6950d2d2d9b22a741446431fb8bea3585124ab",
+      "name": "redactWorkspacePath",
+      "nullable": false,
+      "importLine": "import { redactWorkspacePath as redactRequiredWorkspacePath } from \"../utils/workspacePathRedaction.js\";\n",
+      "beforeBody": "{\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) {\n    return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  }\n  return path;\n}",
+      "afterBody": "{\n  return redactRequiredWorkspacePath(path, workspace);\n}",
+      "originalDeclaration": "function redactWorkspacePath(path: string, workspace: string): string {\n  const root = resolve(workspace);\n  const full = resolve(path);\n  if (full === root) return \"$WORKSPACE\";\n  if (full.startsWith(`${root}/`)) {\n    return `$WORKSPACE/${full.slice(root.length + 1)}`;\n  }\n  return path;\n}",
+      "currentDeclaration": "function redactWorkspacePath(path: string, workspace: string): string {\n  return redactRequiredWorkspacePath(path, workspace);\n}"
+    }
+  ],
+  "priorTests": [
+    {
+      "originalPath": "tests/helpers/restorePrivateHelperVisibility.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/tests/helpers/restorePrivateHelperVisibility.ts.original",
+      "sha256": "80acf15e22bc55ca58f7b5b62f3601f693ea0f899a840b36c5a4ceb6ddc47189"
+    },
+    {
+      "originalPath": "tests/privateModuleHelperVisibility.test.ts",
+      "archivePath": "unused-code/2026-10-02-main/workspace-path-redaction/originals/tests/privateModuleHelperVisibility.test.ts.original",
+      "sha256": "20b4c860991009e14add614f61afa97460d2d37fc5cb604194ca8a912b154f5f"
+    }
+  ],
+  "utility": {
+    "path": "src/utils/workspacePathRedaction.ts",
+    "sha256": "f3e4755708d62d7de9638c8c113f3156fe9eed68ba2fa9a0e08d00c0e7ba8878"
+  },
+  "packageManifestSha256": "56035a95df5ba813dc470ad15d85f5439a880cfca823f940530c4c5f0ad6563d",
+  "compiledContracts": [
+    {
+      "source": "src/experiments/governedOptimizer.ts",
+      "file": "dist/experiments/governedOptimizer.d.ts",
+      "sha256": "e2a36efef0396fbe6198a1ea2ce2953bded4707830d29ee7c3f0b9175ed59341"
+    },
+    {
+      "source": "src/fleet/fleetLifecycle.ts",
+      "file": "dist/fleet/fleetLifecycle.d.ts",
+      "sha256": "327f0b736fd18172085f9d51cdc17964ac9f29d9e16c885a627d2c12a8dd572f"
+    },
+    {
+      "source": "src/lifecycle/changeReceipt.ts",
+      "file": "dist/lifecycle/changeReceipt.d.ts",
+      "sha256": "3c96cb6a7a9443d0056bf163ca72275bb5643fe2880a7ad5ed356788f1e335cb"
+    },
+    {
+      "source": "src/mechanic/fixerRca.ts",
+      "file": "dist/mechanic/fixerRca.d.ts",
+      "sha256": "b753d5afaddd2bbb667f14fcc3ae6d01cb28a5e14e6755d22f2648171294080e"
+    },
+    {
+      "source": "src/runtime/runManager.ts",
+      "file": "dist/runtime/runManager.d.ts",
+      "sha256": "d82e2dea74dd01a0c4a5a07c6b65387b3048226e7687db8607e8979298fec825"
+    },
+    {
+      "source": "src/runtime/firewall.ts",
+      "file": "dist/runtime/firewall.d.ts",
+      "sha256": "b9d0d6ea421896588b78b7b7dc5c6afe3529209d06b0a7031642f7875e162527"
+    },
+    {
+      "source": "src/learning/reasoningMemory.ts",
+      "file": "dist/learning/reasoningMemory.d.ts",
+      "sha256": "43966d6876bfac6d90aa2a3cd837c2aa0141b00f7ff1c53613088b24d3a7dc33"
+    },
+    {
+      "source": "src/org/orgRun.ts",
+      "file": "dist/org/orgRun.d.ts",
+      "sha256": "f1aaf94001038ab59a7e8713c8fbd7e7076a8bcbb9a8f5b44138b35411138043"
+    },
+    {
+      "source": "src/watch/traceFailureIndex.ts",
+      "file": "dist/watch/traceFailureIndex.d.ts",
+      "sha256": "56860b82b9f2b268d19e77d54efa32e2930120d7c26515334402a427835744d2"
+    },
+    {
+      "source": "src/lifecycle/observabilityLane.ts",
+      "file": "dist/lifecycle/observabilityLane.d.ts",
+      "sha256": "e7995082773763a4d23dba7dfc83f5a421b4c62b7a345947f93d1614bf1530d4"
+    },
+    {
+      "source": "src/index.ts",
+      "file": "dist/index.d.ts",
+      "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+    },
+    {
+      "source": "src/sdk/mobileFetch.ts",
+      "file": "dist/sdk/mobileFetch.d.ts",
+      "sha256": "b35427a4de1324020064b8a6dcbf2cb26b93caca8fc388b77bb6e60c8801fe3b"
+    },
+    {
+      "source": "src/sdk/nativeAgentClient.ts",
+      "file": "dist/sdk/nativeAgentClient.d.ts",
+      "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+    },
+    {
+      "source": "src/standard/externalEvidenceProfile.ts",
+      "file": "dist/standard/externalEvidenceProfile.d.ts",
+      "sha256": "b14d55d260d9c5b5c84b97fce4fd4db27bec942d24feccb15477fb15c37c9d69"
+    },
+    {
+      "source": "src/importers/piTelemetryCallbacks.ts",
+      "file": "dist/importers/piTelemetryCallbacks.d.ts",
+      "sha256": "5db8ab813511f831a7c5c3a9808702b7c5f32e4db5182f8cd367fc9a0cd163b7"
+    }
+  ]
+}

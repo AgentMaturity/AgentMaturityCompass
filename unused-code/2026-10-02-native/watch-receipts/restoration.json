@@ -1,0 +1,65 @@
+{
+  "base": "b30e1c771b89e23ecedb13604cc0bf9102078136",
+  "files": [
+    {
+      "originalPath": "src/watch/liveDriftAlerts.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/liveDriftAlerts.ts",
+      "sha256": "dfe0d6281465067bf4467d1cb7db640c2b75a6050085c0470d95ec44b2d2adec",
+      "gitBlob": "92c598b0b7185dccdfd9e961aea62961822044a1",
+      "restore": "copy archivePath bytes to src/watch/liveDriftAlerts.ts"
+    },
+    {
+      "originalPath": "src/watch/bishengObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/bishengObservabilityLiveDrift.ts",
+      "sha256": "7ab95a6c70a36136ae97ab8b53ef1e925b421bf7b10bf65c2bd29f6948dbb3ef",
+      "gitBlob": "f2998e4f10f7b0713c9255672b9e996f1b24edd9",
+      "restore": "copy archivePath bytes to src/watch/bishengObservabilityLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/lmnrObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/lmnrObservabilityLiveDrift.ts",
+      "sha256": "e5acb1b878ffd66e85d7fa90ff8b1fc63715d34037a93e434524f618b8524d28",
+      "gitBlob": "0ff6efedf46cb64a49d4aa3f522ee560b0721e18",
+      "restore": "copy archivePath bytes to src/watch/lmnrObservabilityLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/openCompassLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/openCompassLiveDrift.ts",
+      "sha256": "debffcd75f699a42716b9ea36fd31cfa13200d17772540d2a97badf05256a969",
+      "gitBlob": "ca833f7a30a1b31ffe3fb351321e2670d6e1409f",
+      "restore": "copy archivePath bytes to src/watch/openCompassLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "sha256": "ad488836a4839aa716f11050d8646b5711ec5c7d5f7e04c1d90efe816d1e96ff",
+      "gitBlob": "f20a16c54b8fe8cfb929739720c5607e1ef29537",
+      "restore": "copy archivePath bytes to src/watch/narrowTaskBroadMisalignmentLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/trismAgenticLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/trismAgenticLiveDrift.ts",
+      "sha256": "1932f560e12e763643dd9b0928947443d318d69fb7f843a693ef6a1658fea811",
+      "gitBlob": "9db47f9c5abc6acc6629baf0e07f9a78ba0bd48a",
+      "restore": "copy archivePath bytes to src/watch/trismAgenticLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/agentReadingTestLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/agentReadingTestLiveDrift.ts",
+      "sha256": "743678ed7ded43889032cae74a14ae086679035fa9c1470e7782d93862014028",
+      "gitBlob": "504eac6d6510b52d2638cb0e8b570a384346baa3",
+      "restore": "copy archivePath bytes to src/watch/agentReadingTestLiveDrift.ts"
+    },
+    {
+      "originalPath": "src/watch/awesomeAgentMemoryLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/awesomeAgentMemoryLiveDrift.ts",
+      "sha256": "0ea2c250ce26ce260d00d53ce45f4127e0838f668a935c1ad89e6c754889146d",
+      "gitBlob": "f2c86ae4ae9df5c16758c668e4de0a9d68a20997",
+      "restore": "copy archivePath bytes to src/watch/awesomeAgentMemoryLiveDrift.ts"
+    },
+    {
+      "originalPath": "AMC_OS/INBOX/REV_OPS_AUTOMATION_ENGINEER.md",
+      "absent": true
+    }
+  ]
+}

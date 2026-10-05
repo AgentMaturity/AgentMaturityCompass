@@ -1,0 +1,27 @@
+{
+  "baseCommit": "e7b346d10c3f42de6d8ff77433332ecfb0078c93",
+  "files": [
+    {
+      "originalPath": "src/assurance/assuranceCertificates.ts",
+      "archivePath": "unused-code/2026-10-01-main/archive-files-additional/originals/src/assurance/assuranceCertificates.ts.original",
+      "sha256": "3916124a81b498af846f5f74ff8c8f26d7a686a5d5b6495700f854e1c71029f1"
+    },
+    {
+      "originalPath": "src/plugins/pluginPackage.ts",
+      "archivePath": "unused-code/2026-10-01-main/archive-files-additional/originals/src/plugins/pluginPackage.ts.original",
+      "sha256": "28ded8e83de0eea0982ff5c69c0543a981dd63f2ce44e7b8278fc77153bb2888"
+    },
+    {
+      "originalPath": "src/prompt/promptPackArtifact.ts",
+      "archivePath": "unused-code/2026-10-01-main/archive-files-additional/originals/src/prompt/promptPackArtifact.ts.original",
+      "sha256": "b6240fc315e3b50c38115e2f79723c7565d3250737df7dd1949f8fba2148d907"
+    },
+    {
+      "originalPath": "tests/archiveFilesParity.test.ts",
+      "archivePath": "unused-code/2026-10-01-main/archive-files-additional/originals/tests/archiveFilesParity.test.ts.original",
+      "sha256": "14fb408cf2a1cc3e912fd49f0a6f9cde210ae116819405a6f9cb577b7d6b172e"
+    }
+  ],
+  "reason": "Reuse already authored archive collector in three byte-identical private callers; retain all other declarations, cleanup, archive limits and crypto",
+  "restore": "Copy complete original bytes and verify SHA256"
+}

@@ -1,0 +1,1167 @@
+{
+  "baseCommit": "08583964252ea9e6aaa2c0c0476fb5c704730a40",
+  "files": [
+    {
+      "originalPath": "src/score/metricValidity.ts",
+      "archivePath": "unused-code/2026-10-01-main/metric-projections/originals/src/score/metricValidity.ts.original",
+      "sha256": "c2d151c8c5b67f9459af16f3e088a71e9f9addcecede676e7076208fb20a53e4"
+    },
+    {
+      "originalPath": "tests/metricCoverageSummaryParity.test.ts",
+      "archivePath": "unused-code/2026-10-01-main/metric-projections/originals/tests/metricCoverageSummaryParity.test.ts.original",
+      "sha256": "82276d6bf7b22d9fd2b8dadaa6bd5e19817aa356dd1f2796053f9681c7bd6a30"
+    },
+    {
+      "originalPath": "tests/metricRowPublicContract.test.ts",
+      "archivePath": "unused-code/2026-10-01-main/metric-projections/originals/tests/metricRowPublicContract.test.ts.original",
+      "sha256": "b3f48dcb5fffb9f65099f2b9bb445790227205d2ad1a65b3048a652afbdf3fd5"
+    }
+  ],
+  "helperName": "uniqueProjectedMetricValues",
+  "projectionExpressions": [
+    {
+      "start": 123148,
+      "end": 123303,
+      "originalLine": 3544,
+      "parentFunction": "mirageRagMetricSummary",
+      "collection": "scoped",
+      "field": "datasetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.datasetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim())",
+      "outputField": "datasetIds"
+    },
+    {
+      "start": 123607,
+      "end": 123764,
+      "originalLine": 3557,
+      "parentFunction": "mirageRagMetricSummary",
+      "collection": "scoped",
+      "field": "retrieverIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.retrieverIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.retrieverIds, (id) => id.trim())",
+      "outputField": "retrieverIds"
+    },
+    {
+      "start": 123780,
+      "end": 123933,
+      "originalLine": 3563,
+      "parentFunction": "mirageRagMetricSummary",
+      "collection": "scoped",
+      "field": "modelIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.modelIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim())",
+      "outputField": "modelIds"
+    },
+    {
+      "start": 123952,
+      "end": 124140,
+      "originalLine": 3569,
+      "parentFunction": "mirageRagMetricSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 134344,
+      "end": 134499,
+      "originalLine": 3846,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "datasetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.datasetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim())",
+      "outputField": "datasetIds"
+    },
+    {
+      "start": 134518,
+      "end": 134674,
+      "originalLine": 3852,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "languageIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.languageIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.languageIds, (id) => id.trim())",
+      "outputField": "languageIds"
+    },
+    {
+      "start": 134690,
+      "end": 134843,
+      "originalLine": 3858,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "modelIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.modelIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim())",
+      "outputField": "modelIds"
+    },
+    {
+      "start": 134863,
+      "end": 135020,
+      "originalLine": 3864,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "thresholdIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.thresholdIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.thresholdIds, (id) => id.trim())",
+      "outputField": "thresholdIds"
+    },
+    {
+      "start": 135039,
+      "end": 135227,
+      "originalLine": 3870,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 135248,
+      "end": 135422,
+      "originalLine": 3876,
+      "parentFunction": "guardbenchMetricSummary",
+      "collection": "scoped",
+      "field": "exportFormats",
+      "trimCallback": "(format) => format.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.exportFormats ?? [])\n        .map((format) => format.trim())\n        .filter((format) => format.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.exportFormats, (format) => format.trim())",
+      "outputField": "exportFormats"
+    },
+    {
+      "start": 138766,
+      "end": 138944,
+      "originalLine": 3973,
+      "parentFunction": "embodiedAgentSummary",
+      "collection": "scoped",
+      "field": "taskTypes",
+      "trimCallback": "(taskType) => taskType.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.taskTypes ?? [])\n        .map((taskType) => taskType.trim())\n        .filter((taskType) => taskType.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim())",
+      "outputField": "taskTypes"
+    },
+    {
+      "start": 138963,
+      "end": 139151,
+      "originalLine": 3979,
+      "parentFunction": "embodiedAgentSummary",
+      "collection": "scoped",
+      "field": "baselineIds",
+      "trimCallback": "(baselineId) => baselineId.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.baselineIds ?? [])\n        .map((baselineId) => baselineId.trim())\n        .filter((baselineId) => baselineId.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.baselineIds, (baselineId) => baselineId.trim())",
+      "outputField": "baselineIds"
+    },
+    {
+      "start": 142553,
+      "end": 142756,
+      "originalLine": 4077,
+      "parentFunction": "evaluatorSuiteSummary",
+      "collection": "scoped",
+      "field": "assertionTypes",
+      "trimCallback": "(assertionType) => assertionType.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.assertionTypes ?? [])\n        .map((assertionType) => assertionType.trim())\n        .filter((assertionType) => assertionType.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.assertionTypes, (assertionType) => assertionType.trim())",
+      "outputField": "assertionTypes"
+    },
+    {
+      "start": 142779,
+      "end": 142955,
+      "originalLine": 4083,
+      "parentFunction": "evaluatorSuiteSummary",
+      "collection": "scoped",
+      "field": "reporterFormats",
+      "trimCallback": "(format) => format.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.reporterFormats ?? [])\n        .map((format) => format.trim())\n        .filter((format) => format.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.reporterFormats, (format) => format.trim())",
+      "outputField": "reporterFormats"
+    },
+    {
+      "start": 142973,
+      "end": 143156,
+      "originalLine": 4089,
+      "parentFunction": "evaluatorSuiteSummary",
+      "collection": "scoped",
+      "field": "judgeNames",
+      "trimCallback": "(judgeName) => judgeName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.judgeNames ?? [])\n        .map((judgeName) => judgeName.trim())\n        .filter((judgeName) => judgeName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.judgeNames, (judgeName) => judgeName.trim())",
+      "outputField": "judgeNames"
+    },
+    {
+      "start": 148205,
+      "end": 148376,
+      "originalLine": 4219,
+      "parentFunction": "pentestBenchmarkSummary",
+      "collection": "scoped",
+      "field": "languageStacks",
+      "trimCallback": "(stack) => stack.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.languageStacks ?? [])\n        .map((stack) => stack.trim())\n        .filter((stack) => stack.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.languageStacks, (stack) => stack.trim())",
+      "outputField": "languageStacks"
+    },
+    {
+      "start": 148404,
+      "end": 148597,
+      "originalLine": 4225,
+      "parentFunction": "pentestBenchmarkSummary",
+      "collection": "scoped",
+      "field": "vulnerabilityClasses",
+      "trimCallback": "(vulnClass) => vulnClass.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.vulnerabilityClasses ?? [])\n        .map((vulnClass) => vulnClass.trim())\n        .filter((vulnClass) => vulnClass.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.vulnerabilityClasses, (vulnClass) => vulnClass.trim())",
+      "outputField": "vulnerabilityClasses"
+    },
+    {
+      "start": 148621,
+      "end": 148794,
+      "originalLine": 4231,
+      "parentFunction": "pentestBenchmarkSummary",
+      "collection": "scoped",
+      "field": "difficultyLevels",
+      "trimCallback": "(level) => level.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.difficultyLevels ?? [])\n        .map((level) => level.trim())\n        .filter((level) => level.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.difficultyLevels, (level) => level.trim())",
+      "outputField": "difficultyLevels"
+    },
+    {
+      "start": 148819,
+      "end": 149001,
+      "originalLine": 4237,
+      "parentFunction": "pentestBenchmarkSummary",
+      "collection": "scoped",
+      "field": "benchmarkSuiteIds",
+      "trimCallback": "(suiteId) => suiteId.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkSuiteIds ?? [])\n        .map((suiteId) => suiteId.trim())\n        .filter((suiteId) => suiteId.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkSuiteIds, (suiteId) => suiteId.trim())",
+      "outputField": "benchmarkSuiteIds"
+    },
+    {
+      "start": 149020,
+      "end": 149208,
+      "originalLine": 4243,
+      "parentFunction": "pentestBenchmarkSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 154272,
+      "end": 154445,
+      "originalLine": 4383,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "modelIds",
+      "trimCallback": "(modelId) => modelId.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.modelIds ?? [])\n        .map((modelId) => modelId.trim())\n        .filter((modelId) => modelId.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (modelId) => modelId.trim())",
+      "outputField": "modelIds"
+    },
+    {
+      "start": 154471,
+      "end": 154638,
+      "originalLine": 4389,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "agentParameterKeys",
+      "trimCallback": "(key) => key.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.agentParameterKeys ?? [])\n        .map((key) => key.trim())\n        .filter((key) => key.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.agentParameterKeys, (key) => key.trim())",
+      "outputField": "agentParameterKeys"
+    },
+    {
+      "start": 154655,
+      "end": 154833,
+      "originalLine": 4395,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "toolNames",
+      "trimCallback": "(toolName) => toolName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.toolNames ?? [])\n        .map((toolName) => toolName.trim())\n        .filter((toolName) => toolName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (toolName) => toolName.trim())",
+      "outputField": "toolNames"
+    },
+    {
+      "start": 154852,
+      "end": 155040,
+      "originalLine": 4401,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 155060,
+      "end": 155237,
+      "originalLine": 4407,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "caseSuiteIds",
+      "trimCallback": "(suiteId) => suiteId.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.caseSuiteIds ?? [])\n        .map((suiteId) => suiteId.trim())\n        .filter((suiteId) => suiteId.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.caseSuiteIds, (suiteId) => suiteId.trim())",
+      "outputField": "caseSuiteIds"
+    },
+    {
+      "start": 155257,
+      "end": 155422,
+      "originalLine": 4413,
+      "parentFunction": "traceEvaluationSummary",
+      "collection": "scoped",
+      "field": "backendModes",
+      "trimCallback": "(mode) => mode.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.backendModes ?? [])\n        .map((mode) => mode.trim())\n        .filter((mode) => mode.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.backendModes, (mode) => mode.trim())",
+      "outputField": "backendModes"
+    },
+    {
+      "start": 159865,
+      "end": 160033,
+      "originalLine": 4537,
+      "parentFunction": "livingEnvironmentSummary",
+      "collection": "scoped",
+      "field": "capabilityNames",
+      "trimCallback": "(name) => name.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.capabilityNames ?? [])\n        .map((name) => name.trim())\n        .filter((name) => name.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.capabilityNames, (name) => name.trim())",
+      "outputField": "capabilityNames"
+    },
+    {
+      "start": 160057,
+      "end": 160242,
+      "originalLine": 4543,
+      "parentFunction": "livingEnvironmentSummary",
+      "collection": "scoped",
+      "field": "sandboxProviders",
+      "trimCallback": "(provider) => provider.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.sandboxProviders ?? [])\n        .map((provider) => provider.trim())\n        .filter((provider) => provider.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.sandboxProviders, (provider) => provider.trim())",
+      "outputField": "sandboxProviders"
+    },
+    {
+      "start": 160263,
+      "end": 160441,
+      "originalLine": 4549,
+      "parentFunction": "livingEnvironmentSummary",
+      "collection": "scoped",
+      "field": "agentAdapters",
+      "trimCallback": "(adapter) => adapter.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.agentAdapters ?? [])\n        .map((adapter) => adapter.trim())\n        .filter((adapter) => adapter.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.agentAdapters, (adapter) => adapter.trim())",
+      "outputField": "agentAdapters"
+    },
+    {
+      "start": 160460,
+      "end": 160648,
+      "originalLine": 4555,
+      "parentFunction": "livingEnvironmentSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 166081,
+      "end": 166238,
+      "originalLine": 4716,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "benchmarkIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim())",
+      "outputField": "benchmarkIds"
+    },
+    {
+      "start": 166260,
+      "end": 166419,
+      "originalLine": 4722,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "environmentIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.environmentIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.environmentIds, (id) => id.trim())",
+      "outputField": "environmentIds"
+    },
+    {
+      "start": 166433,
+      "end": 166584,
+      "originalLine": 4728,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "appIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.appIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.appIds, (id) => id.trim())",
+      "outputField": "appIds"
+    },
+    {
+      "start": 166605,
+      "end": 166763,
+      "originalLine": 4734,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "apiCatalogIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.apiCatalogIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.apiCatalogIds, (id) => id.trim())",
+      "outputField": "apiCatalogIds"
+    },
+    {
+      "start": 166781,
+      "end": 166936,
+      "originalLine": 4740,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "uiTraceIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.uiTraceIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.uiTraceIds, (id) => id.trim())",
+      "outputField": "uiTraceIds"
+    },
+    {
+      "start": 166954,
+      "end": 167109,
+      "originalLine": 4746,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "taskSetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.taskSetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.taskSetIds, (id) => id.trim())",
+      "outputField": "taskSetIds"
+    },
+    {
+      "start": 167137,
+      "end": 167314,
+      "originalLine": 4752,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "taskComplexityGroups",
+      "trimCallback": "(group) => group.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.taskComplexityGroups ?? [])\n        .map((group) => group.trim())\n        .filter((group) => group.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.taskComplexityGroups, (group) => group.trim())",
+      "outputField": "taskComplexityGroups"
+    },
+    {
+      "start": 167343,
+      "end": 167531,
+      "originalLine": 4758,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "checkpointMetricNames"
+    },
+    {
+      "start": 167558,
+      "end": 167726,
+      "originalLine": 4764,
+      "parentFunction": "mobileAgentSummary",
+      "collection": "scoped",
+      "field": "licenseBoundaryRefs",
+      "trimCallback": "(ref) => ref.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.licenseBoundaryRefs ?? [])\n        .map((ref) => ref.trim())\n        .filter((ref) => ref.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.licenseBoundaryRefs, (ref) => ref.trim())",
+      "outputField": "licenseBoundaryRefs"
+    },
+    {
+      "start": 172156,
+      "end": 172311,
+      "originalLine": 4890,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "personaIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.personaIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.personaIds, (id) => id.trim())",
+      "outputField": "personaIds"
+    },
+    {
+      "start": 172333,
+      "end": 172492,
+      "originalLine": 4896,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "environmentIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.environmentIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.environmentIds, (id) => id.trim())",
+      "outputField": "environmentIds"
+    },
+    {
+      "start": 172514,
+      "end": 172673,
+      "originalLine": 4902,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "questionSetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.questionSetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.questionSetIds, (id) => id.trim())",
+      "outputField": "questionSetIds"
+    },
+    {
+      "start": 172689,
+      "end": 172842,
+      "originalLine": 4908,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "modelIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.modelIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim())",
+      "outputField": "modelIds"
+    },
+    {
+      "start": 172861,
+      "end": 173017,
+      "originalLine": 4914,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "providerIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.providerIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.providerIds, (id) => id.trim())",
+      "outputField": "providerIds"
+    },
+    {
+      "start": 173036,
+      "end": 173224,
+      "originalLine": 4920,
+      "parentFunction": "personaAgentSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 178291,
+      "end": 178448,
+      "originalLine": 5059,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "benchmarkIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim())",
+      "outputField": "benchmarkIds"
+    },
+    {
+      "start": 178465,
+      "end": 178643,
+      "originalLine": 5065,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "taskTypes",
+      "trimCallback": "(taskType) => taskType.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.taskTypes ?? [])\n        .map((taskType) => taskType.trim())\n        .filter((taskType) => taskType.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim())",
+      "outputField": "taskTypes"
+    },
+    {
+      "start": 178661,
+      "end": 178816,
+      "originalLine": 5071,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "datasetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.datasetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim())",
+      "outputField": "datasetIds"
+    },
+    {
+      "start": 178840,
+      "end": 179001,
+      "originalLine": 5077,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "searchBackendIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.searchBackendIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.searchBackendIds, (id) => id.trim())",
+      "outputField": "searchBackendIds"
+    },
+    {
+      "start": 179016,
+      "end": 179168,
+      "originalLine": 5083,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "toolIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.toolIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.toolIds, (id) => id.trim())",
+      "outputField": "toolIds"
+    },
+    {
+      "start": 179187,
+      "end": 179375,
+      "originalLine": 5089,
+      "parentFunction": "scientificLiteratureSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 184838,
+      "end": 184995,
+      "originalLine": 5246,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "benchmarkIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim())",
+      "outputField": "benchmarkIds"
+    },
+    {
+      "start": 185012,
+      "end": 185190,
+      "originalLine": 5252,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "taskTypes",
+      "trimCallback": "(taskType) => taskType.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.taskTypes ?? [])\n        .map((taskType) => taskType.trim())\n        .filter((taskType) => taskType.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim())",
+      "outputField": "taskTypes"
+    },
+    {
+      "start": 185208,
+      "end": 185363,
+      "originalLine": 5258,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "datasetIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.datasetIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim())",
+      "outputField": "datasetIds"
+    },
+    {
+      "start": 185382,
+      "end": 185538,
+      "originalLine": 5264,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "workflowIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.workflowIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.workflowIds, (id) => id.trim())",
+      "outputField": "workflowIds"
+    },
+    {
+      "start": 185555,
+      "end": 185717,
+      "originalLine": 5270,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "toolNames",
+      "trimCallback": "(name) => name.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.toolNames ?? [])\n        .map((name) => name.trim())\n        .filter((name) => name.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (name) => name.trim())",
+      "outputField": "toolNames"
+    },
+    {
+      "start": 185736,
+      "end": 185924,
+      "originalLine": 5276,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 185947,
+      "end": 186107,
+      "originalLine": 5282,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "perturbationIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.perturbationIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.perturbationIds, (id) => id.trim())",
+      "outputField": "perturbationIds"
+    },
+    {
+      "start": 186134,
+      "end": 186302,
+      "originalLine": 5288,
+      "parentFunction": "bioinformaticsAgentSummary",
+      "collection": "scoped",
+      "field": "privacyBoundaryRefs",
+      "trimCallback": "(ref) => ref.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.privacyBoundaryRefs ?? [])\n        .map((ref) => ref.trim())\n        .filter((ref) => ref.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.privacyBoundaryRefs, (ref) => ref.trim())",
+      "outputField": "privacyBoundaryRefs"
+    },
+    {
+      "start": 200110,
+      "end": 200267,
+      "originalLine": 5662,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "benchmarkIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim())",
+      "outputField": "benchmarkIds"
+    },
+    {
+      "start": 200286,
+      "end": 200442,
+      "originalLine": 5668,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "scenarioIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.scenarioIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.scenarioIds, (id) => id.trim())",
+      "outputField": "scenarioIds"
+    },
+    {
+      "start": 200463,
+      "end": 200629,
+      "originalLine": 5674,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "topologyTiers",
+      "trimCallback": "(tier) => tier.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.topologyTiers ?? [])\n        .map((tier) => tier.trim())\n        .filter((tier) => tier.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.topologyTiers, (tier) => tier.trim())",
+      "outputField": "topologyTiers"
+    },
+    {
+      "start": 200647,
+      "end": 200830,
+      "originalLine": 5680,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "issueTypes",
+      "trimCallback": "(issueType) => issueType.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.issueTypes ?? [])\n        .map((issueType) => issueType.trim())\n        .filter((issueType) => issueType.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.issueTypes, (issueType) => issueType.trim())",
+      "outputField": "issueTypes"
+    },
+    {
+      "start": 200846,
+      "end": 200999,
+      "originalLine": 5686,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "agentIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.agentIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.agentIds, (id) => id.trim())",
+      "outputField": "agentIds"
+    },
+    {
+      "start": 201016,
+      "end": 201178,
+      "originalLine": 5692,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "toolNames",
+      "trimCallback": "(name) => name.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.toolNames ?? [])\n        .map((name) => name.trim())\n        .filter((name) => name.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (name) => name.trim())",
+      "outputField": "toolNames"
+    },
+    {
+      "start": 201197,
+      "end": 201385,
+      "originalLine": 5698,
+      "parentFunction": "networkTroubleshootingSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(metricName) => metricName.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((metricName) => metricName.trim())\n        .filter((metricName) => metricName.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim())",
+      "outputField": "metricNames"
+    },
+    {
+      "start": 207009,
+      "end": 207166,
+      "originalLine": 5856,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "benchmarkIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.benchmarkIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim())",
+      "outputField": "benchmarkIds"
+    },
+    {
+      "start": 207185,
+      "end": 207341,
+      "originalLine": 5862,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "scenarioIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.scenarioIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.scenarioIds, (id) => id.trim())",
+      "outputField": "scenarioIds"
+    },
+    {
+      "start": 207367,
+      "end": 207530,
+      "originalLine": 5868,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "hardwareProfileIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.hardwareProfileIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.hardwareProfileIds, (id) => id.trim())",
+      "outputField": "hardwareProfileIds"
+    },
+    {
+      "start": 207548,
+      "end": 207703,
+      "originalLine": 5874,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "backendIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.backendIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.backendIds, (id) => id.trim())",
+      "outputField": "backendIds"
+    },
+    {
+      "start": 207725,
+      "end": 207884,
+      "originalLine": 5880,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "searchSpaceIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.searchSpaceIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.searchSpaceIds, (id) => id.trim())",
+      "outputField": "searchSpaceIds"
+    },
+    {
+      "start": 207899,
+      "end": 208051,
+      "originalLine": 5886,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "gateIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.gateIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.gateIds, (id) => id.trim())",
+      "outputField": "gateIds"
+    },
+    {
+      "start": 208067,
+      "end": 208220,
+      "originalLine": 5892,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "agentIds",
+      "trimCallback": "(id) => id.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.agentIds ?? [])\n        .map((id) => id.trim())\n        .filter((id) => id.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.agentIds, (id) => id.trim())",
+      "outputField": "agentIds"
+    },
+    {
+      "start": 208239,
+      "end": 208403,
+      "originalLine": 5898,
+      "parentFunction": "inferenceOptimizationSummary",
+      "collection": "scoped",
+      "field": "metricNames",
+      "trimCallback": "(name) => name.trim()",
+      "text": "[\n      ...new Set(scoped\n        .flatMap((check) => check.metricNames ?? [])\n        .map((name) => name.trim())\n        .filter((name) => name.length > 0))\n    ]",
+      "replacement": "uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (name) => name.trim())",
+      "outputField": "metricNames"
+    }
+  ],
+  "summaries": [
+    {
+      "name": "mirageRagMetricSummary",
+      "signalField": "mirageSignalType",
+      "fields": [
+        "datasetIds",
+        "retrieverIds",
+        "modelIds",
+        "metricNames"
+      ],
+      "outputFields": [
+        "datasetIds",
+        "retrieverIds",
+        "modelIds",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "guardbenchMetricSummary",
+      "signalField": "guardbenchSignalType",
+      "fields": [
+        "datasetIds",
+        "languageIds",
+        "modelIds",
+        "thresholdIds",
+        "metricNames",
+        "exportFormats"
+      ],
+      "outputFields": [
+        "datasetIds",
+        "languageIds",
+        "modelIds",
+        "thresholdIds",
+        "metricNames",
+        "exportFormats"
+      ]
+    },
+    {
+      "name": "embodiedAgentSummary",
+      "signalField": "embodiedSignalType",
+      "fields": [
+        "taskTypes",
+        "baselineIds"
+      ],
+      "outputFields": [
+        "taskTypes",
+        "baselineIds"
+      ]
+    },
+    {
+      "name": "evaluatorSuiteSummary",
+      "signalField": "evaluatorSignalType",
+      "fields": [
+        "assertionTypes",
+        "reporterFormats",
+        "judgeNames"
+      ],
+      "outputFields": [
+        "assertionTypes",
+        "reporterFormats",
+        "judgeNames"
+      ]
+    },
+    {
+      "name": "pentestBenchmarkSummary",
+      "signalField": "pentestSignalType",
+      "fields": [
+        "languageStacks",
+        "vulnerabilityClasses",
+        "difficultyLevels",
+        "benchmarkSuiteIds",
+        "metricNames"
+      ],
+      "outputFields": [
+        "languageStacks",
+        "vulnerabilityClasses",
+        "difficultyLevels",
+        "benchmarkSuiteIds",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "traceEvaluationSummary",
+      "signalField": "traceEvaluationSignalType",
+      "fields": [
+        "modelIds",
+        "agentParameterKeys",
+        "toolNames",
+        "metricNames",
+        "caseSuiteIds",
+        "backendModes"
+      ],
+      "outputFields": [
+        "modelIds",
+        "agentParameterKeys",
+        "toolNames",
+        "metricNames",
+        "caseSuiteIds",
+        "backendModes"
+      ]
+    },
+    {
+      "name": "livingEnvironmentSummary",
+      "signalField": "livingEnvironmentSignalType",
+      "fields": [
+        "capabilityNames",
+        "sandboxProviders",
+        "agentAdapters",
+        "metricNames"
+      ],
+      "outputFields": [
+        "capabilityNames",
+        "sandboxProviders",
+        "agentAdapters",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "mobileAgentSummary",
+      "signalField": "mobileAgentSignalType",
+      "fields": [
+        "benchmarkIds",
+        "environmentIds",
+        "appIds",
+        "apiCatalogIds",
+        "uiTraceIds",
+        "taskSetIds",
+        "taskComplexityGroups",
+        "metricNames",
+        "licenseBoundaryRefs"
+      ],
+      "outputFields": [
+        "benchmarkIds",
+        "environmentIds",
+        "appIds",
+        "apiCatalogIds",
+        "uiTraceIds",
+        "taskSetIds",
+        "taskComplexityGroups",
+        "checkpointMetricNames",
+        "licenseBoundaryRefs"
+      ]
+    },
+    {
+      "name": "personaAgentSummary",
+      "signalField": "personaSignalType",
+      "fields": [
+        "personaIds",
+        "environmentIds",
+        "questionSetIds",
+        "modelIds",
+        "providerIds",
+        "metricNames"
+      ],
+      "outputFields": [
+        "personaIds",
+        "environmentIds",
+        "questionSetIds",
+        "modelIds",
+        "providerIds",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "scientificLiteratureSummary",
+      "signalField": "scientificLiteratureSignalType",
+      "fields": [
+        "benchmarkIds",
+        "taskTypes",
+        "datasetIds",
+        "searchBackendIds",
+        "toolIds",
+        "metricNames"
+      ],
+      "outputFields": [
+        "benchmarkIds",
+        "taskTypes",
+        "datasetIds",
+        "searchBackendIds",
+        "toolIds",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "bioinformaticsAgentSummary",
+      "signalField": "bioinformaticsAgentSignalType",
+      "fields": [
+        "benchmarkIds",
+        "taskTypes",
+        "datasetIds",
+        "workflowIds",
+        "toolNames",
+        "metricNames",
+        "perturbationIds",
+        "privacyBoundaryRefs"
+      ],
+      "outputFields": [
+        "benchmarkIds",
+        "taskTypes",
+        "datasetIds",
+        "workflowIds",
+        "toolNames",
+        "metricNames",
+        "perturbationIds",
+        "privacyBoundaryRefs"
+      ]
+    },
+    {
+      "name": "networkTroubleshootingSummary",
+      "signalField": "networkTroubleshootingSignalType",
+      "fields": [
+        "benchmarkIds",
+        "scenarioIds",
+        "topologyTiers",
+        "issueTypes",
+        "agentIds",
+        "toolNames",
+        "metricNames"
+      ],
+      "outputFields": [
+        "benchmarkIds",
+        "scenarioIds",
+        "topologyTiers",
+        "issueTypes",
+        "agentIds",
+        "toolNames",
+        "metricNames"
+      ]
+    },
+    {
+      "name": "inferenceOptimizationSummary",
+      "signalField": "inferenceOptimizationSignalType",
+      "fields": [
+        "benchmarkIds",
+        "scenarioIds",
+        "hardwareProfileIds",
+        "backendIds",
+        "searchSpaceIds",
+        "gateIds",
+        "agentIds",
+        "metricNames"
+      ],
+      "outputFields": [
+        "benchmarkIds",
+        "scenarioIds",
+        "hardwareProfileIds",
+        "backendIds",
+        "searchSpaceIds",
+        "gateIds",
+        "agentIds",
+        "metricNames"
+      ]
+    }
+  ],
+  "reason": "Share74 equivalent runtime projections with original callbacks and malformed-input behavior; all other source preserved",
+  "restore": "Copy complete originals and verify SHA256"
+}

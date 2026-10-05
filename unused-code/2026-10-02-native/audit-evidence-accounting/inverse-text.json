@@ -1,0 +1,479 @@
+{
+  "src/audit/posthocAuditSampling.ts": [
+    {
+      "position": 3322,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3322,
+      "before": "function timestampPresent(value: string | undefined): boolean {\n  return typeof value === \"string\" && value.length > 0 && !Number.isNaN(Date.parse(value));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3322,
+      "before": "function unique(values: string[]): string[] {\n  return [...new Set(values)];\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3322,
+      "before": "function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {\n  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3574,
+      "before": "function evidenceRefsValid(evidenceRefs: PosthocAuditSamplingEvidenceLink[]): boolean {\n  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (\n    Boolean(evidence.eventId)\n    && Boolean(evidence.eventType)\n    && Boolean(evidence.signedEvidenceRef)\n    && isSha256(evidence.eventHash)\n  ));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3405,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 3531,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 10251,
+      "before": "sha256Hex(canonicalize(samplePlan ?? null))",
+      "after": "hashAuditEvidence(samplePlan ?? null)"
+    },
+    {
+      "position": 10310,
+      "before": "sha256Hex(canonicalize(findings))",
+      "after": "hashAuditEvidence(findings)"
+    },
+    {
+      "position": 10368,
+      "before": "sha256Hex(canonicalize(correctiveActions))",
+      "after": "hashAuditEvidence(correctiveActions)"
+    },
+    {
+      "position": 10429,
+      "before": "sha256Hex(canonicalize(scoreImpacts))",
+      "after": "hashAuditEvidence(scoreImpacts)"
+    },
+    {
+      "position": 10487,
+      "before": "sha256Hex(canonicalize(action.evidenceRefs))",
+      "after": "hashAuditEvidence(action.evidenceRefs)"
+    },
+    {
+      "position": 6047,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 10686,
+      "before": "  const withoutHash: Omit<PosthocAuditSamplingReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: unique(failClosedReasons),\n  };\n\n  return {\n    ...withoutHash,\n    receiptHash: receiptHash(withoutHash),\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 10888,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"reviewedActions:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"reviewedActions:missing\");\n"
+    },
+    {
+      "position": 0,
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  auditTimestampPresent as timestampPresent,\n  uniqueAuditReasons as unique,\n  auditSignedRefValid as signedRefValid,\n  auditEvidenceRefsValid as evidenceRefsValid,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"./auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 252,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 14156,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ],
+  "src/audit/reviewerIndependence.ts": [
+    {
+      "position": 2863,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2863,
+      "before": "function unique(values: string[]): string[] {\n  return [...new Set(values)];\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2946,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 3072,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 6826,
+      "before": "sha256Hex(canonicalize(approval.evidenceRefs))",
+      "after": "hashAuditEvidence(approval.evidenceRefs)"
+    },
+    {
+      "position": 5227,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 8254,
+      "before": "  const withoutHash: Omit<ReviewerIndependenceReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: unique(failClosedReasons),\n  };\n  return {\n    ...withoutHash,\n    receiptHash: receiptHash(withoutHash),\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 8456,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"approvals:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"approvals:missing\");\n"
+    },
+    {
+      "position": 0,
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  isAuditEvidenceSha256 as isSha256,\n  uniqueAuditReasons as unique,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"./auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 156,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 11137,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ],
+  "src/compliance/exceptionLifecycle.ts": [
+    {
+      "position": 2762,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2762,
+      "before": "function timestampPresent(value: string | undefined): boolean {\n  return typeof value === \"string\" && value.length > 0 && !Number.isNaN(Date.parse(value));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2762,
+      "before": "function unique(values: string[]): string[] {\n  return [...new Set(values)];\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2762,
+      "before": "function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {\n  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3030,
+      "before": "function evidenceRefsValid(evidenceRefs: GovernanceExceptionLifecycleEvidenceLink[]): boolean {\n  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (\n    Boolean(evidence.eventId)\n    && Boolean(evidence.eventType)\n    && Boolean(evidence.signedEvidenceRef)\n    && isSha256(evidence.eventHash)\n  ));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 2853,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 2987,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 7415,
+      "before": "sha256Hex(canonicalize(exception.compensatingControls))",
+      "after": "hashAuditEvidence(exception.compensatingControls)"
+    },
+    {
+      "position": 7491,
+      "before": "sha256Hex(canonicalize(exception.evidenceRefs))",
+      "after": "hashAuditEvidence(exception.evidenceRefs)"
+    },
+    {
+      "position": 3828,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 7593,
+      "before": "  const withoutHash: Omit<GovernanceExceptionLifecycleReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: unique(failClosedReasons),\n  };\n\n  return {\n    ...withoutHash,\n    receiptHash: receiptHash(withoutHash),\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 7819,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"exceptions:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"exceptions:missing\");\n"
+    },
+    {
+      "position": 0,
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  auditTimestampPresent as timestampPresent,\n  uniqueAuditReasons as unique,\n  auditSignedRefValid as signedRefValid,\n  auditEvidenceRefsValid as evidenceRefsValid,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"../audit/auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 252,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 10591,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ],
+  "src/compliance/policyDrift.ts": [
+    {
+      "position": 3683,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3683,
+      "before": "function timestampPresent(value: string | undefined): boolean {\n  return typeof value === \"string\" && value.length > 0 && !Number.isNaN(Date.parse(value));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3683,
+      "before": "function unique(values: string[]): string[] {\n  return [...new Set(values)];\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3683,
+      "before": "function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {\n  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3929,
+      "before": "function evidenceRefsValid(evidenceRefs: PolicyDriftImpactEvidenceLink[]): boolean {\n  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (\n    Boolean(evidence.eventId)\n    && Boolean(evidence.eventType)\n    && Boolean(evidence.signedEvidenceRef)\n    && isSha256(evidence.eventHash)\n  ));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3763,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 3886,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 10046,
+      "before": "sha256Hex(canonicalize(policyDiff))",
+      "after": "hashAuditEvidence(policyDiff)"
+    },
+    {
+      "position": 10095,
+      "before": "sha256Hex(canonicalize(impact))",
+      "after": "hashAuditEvidence(impact)"
+    },
+    {
+      "position": 10141,
+      "before": "sha256Hex(canonicalize(change.rolloutReceipt))",
+      "after": "hashAuditEvidence(change.rolloutReceipt)"
+    },
+    {
+      "position": 10208,
+      "before": "sha256Hex(canonicalize(change.evidenceRefs))",
+      "after": "hashAuditEvidence(change.evidenceRefs)"
+    },
+    {
+      "position": 6174,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 10304,
+      "before": "  const withoutHash: Omit<PolicyDriftImpactReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: unique(failClosedReasons),\n  };\n\n  return {\n    ...withoutHash,\n    receiptHash: receiptHash(withoutHash),\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 10497,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"changes:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"changes:missing\");\n"
+    },
+    {
+      "position": 0,
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  isAuditEvidenceSha256 as isSha256,\n  auditTimestampPresent as timestampPresent,\n  uniqueAuditReasons as unique,\n  auditSignedRefValid as signedRefValid,\n  auditEvidenceRefsValid as evidenceRefsValid,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"../audit/auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 289,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 13802,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ],
+  "src/compliance/providerRisk.ts": [
+    {
+      "position": 3503,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3503,
+      "before": "function unique(values: string[]): string[] {\n  return [...new Set(values)];\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3759,
+      "before": "function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {\n  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3759,
+      "before": "function evidenceRefsValid(evidenceRefs: ThirdPartyProviderRiskEvidenceLink[]): boolean {\n  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (\n    Boolean(evidence.eventId)\n    && Boolean(evidence.eventType)\n    && Boolean(evidence.signedEvidenceRef)\n    && isSha256(evidence.eventHash)\n  ));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 3588,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 3716,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 8143,
+      "before": "sha256Hex(canonicalize(provider.dataBoundary))",
+      "after": "hashAuditEvidence(provider.dataBoundary)"
+    },
+    {
+      "position": 8216,
+      "before": "sha256Hex(canonicalize(provider.contractualControls))",
+      "after": "hashAuditEvidence(provider.contractualControls)"
+    },
+    {
+      "position": 8289,
+      "before": "sha256Hex(canonicalize(provider.attestations))",
+      "after": "hashAuditEvidence(provider.attestations)"
+    },
+    {
+      "position": 8399,
+      "before": "sha256Hex(canonicalize(provider.evidenceRefs))",
+      "after": "hashAuditEvidence(provider.evidenceRefs)"
+    },
+    {
+      "position": 5108,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 8498,
+      "before": "  const withoutHash: Omit<ThirdPartyProviderRiskReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: unique(failClosedReasons),\n  };\n  return {\n    ...withoutHash,\n    receiptHash: receiptHash(withoutHash),\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 8706,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"providers:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"providers:missing\");\n"
+    },
+    {
+      "position": 0,
+      "before": "import { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  uniqueAuditReasons as unique,\n  auditSignedRefValid as signedRefValid,\n  auditEvidenceRefsValid as evidenceRefsValid,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"../audit/auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 207,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 11612,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ],
+  "src/ci/gate.ts": [
+    {
+      "position": 19967,
+      "before": "function isSha256(value: string | undefined): boolean {\n  return typeof value === \"string\" && /^[a-f0-9]{64}$/.test(value);\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 19967,
+      "before": "function timestampPresent(value: string | undefined): boolean {\n  return typeof value === \"string\" && value.length > 0 && !Number.isNaN(Date.parse(value));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 20230,
+      "before": "function releaseGateEvidenceValid(evidenceRefs: ReleaseGateEvidenceLink[]): boolean {\n  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (\n    Boolean(evidence.eventId)\n    && Boolean(evidence.eventType)\n    && Boolean(evidence.signedEvidenceRef)\n    && isSha256(evidence.eventHash)\n  ));\n}\n\n",
+      "after": ""
+    },
+    {
+      "position": 20059,
+      "before": "sha256Hex(canonicalize(row))",
+      "after": "hashAuditEvidence(row)"
+    },
+    {
+      "position": 20187,
+      "before": "sha256Hex(canonicalize(receipt))",
+      "after": "hashAuditEvidence(receipt)"
+    },
+    {
+      "position": 23683,
+      "before": "sha256Hex(canonicalize(row.gateConfig))",
+      "after": "hashAuditEvidence(row.gateConfig)"
+    },
+    {
+      "position": 23881,
+      "before": "sha256Hex(canonicalize(row.evidenceRefs))",
+      "after": "hashAuditEvidence(row.evidenceRefs)"
+    },
+    {
+      "position": 26602,
+      "before": "sha256Hex(canonicalize(gate.gateConfig))",
+      "after": "hashAuditEvidence(gate.gateConfig)"
+    },
+    {
+      "position": 26668,
+      "before": "sha256Hex(canonicalize(gate.evidenceRefs))",
+      "after": "hashAuditEvidence(gate.evidenceRefs)"
+    },
+    {
+      "position": 24929,
+      "before": "  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));\n  if (sourceIds.size === 0) {\n    failClosedReasons.push(\"sourceCitations:missing\");\n  }",
+      "after": "  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);"
+    },
+    {
+      "position": 27601,
+      "before": "  const withoutHash: Omit<ReleaseGateReceipt, \"receiptHash\"> = {\n    receiptId: input.receiptId,\n    generatedAt: input.generatedAt ?? new Date().toISOString(),\n    sourceCitations: input.sourceCitations,\n    rows,\n    failClosed: failClosedReasons.length > 0,\n    failClosedReasons: [...new Set(failClosedReasons)]\n  };\n  return {\n    ...withoutHash,\n    receiptHash: releaseGateReceiptHash(withoutHash)\n  };\n",
+      "after": "  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);\n"
+    },
+    {
+      "position": 27779,
+      "before": "  const reasons: string[] = [];\n  if (receipt.failClosed) {\n    reasons.push(...receipt.failClosedReasons);\n  }\n  if (receipt.sourceCitations.length === 0) {\n    reasons.push(\"sourceCitations:missing\");\n  }\n  if (receipt.rows.length === 0) {\n    reasons.push(\"rows:missing\");\n  }\n",
+      "after": "  const reasons = beginAuditReceiptVerification(receipt, \"rows:missing\");\n"
+    },
+    {
+      "position": 28152,
+      "before": "reasons: [...new Set(reasons)]",
+      "after": "reasons: unique(reasons)"
+    },
+    {
+      "position": 312,
+      "before": "import { canonicalize } from \"../utils/json.js\";\n",
+      "after": "import {\n  isAuditEvidenceSha256 as isSha256,\n  auditTimestampPresent as timestampPresent,\n  uniqueAuditReasons as unique,\n  auditEvidenceRefsValid as releaseGateEvidenceValid,\n  hashAuditEvidence,\n  collectAuditSourceIds,\n  finalizeAuditEvidenceReceipt,\n  beginAuditReceiptVerification\n} from \"../audit/auditEvidenceAccounting.js\";\n"
+    },
+    {
+      "position": 567,
+      "before": "  beginAuditReceiptVerification\n",
+      "after": "  beginAuditReceiptVerification,\n  finalizeAuditEvidenceExport\n"
+    },
+    {
+      "position": 30499,
+      "before": "  if (receipt.failClosedReasons.length > 0) {\n    lines.push(\"\");\n    lines.push(\"## Fail-Closed Reasons\");\n    for (const reason of receipt.failClosedReasons) {\n      lines.push(`- ${reason}`);\n    }\n  }\n  lines.push(\"\");\n  return lines.join(\"\\n\");",
+      "after": "  return finalizeAuditEvidenceExport(lines, receipt);"
+    }
+  ]
+}

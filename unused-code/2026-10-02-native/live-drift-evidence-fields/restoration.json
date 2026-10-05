@@ -1,0 +1,29 @@
+{
+  "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+  "files": [
+    {
+      "originalPath": "src/watch/liveDriftAlerts.ts",
+      "archivePath": "unused-code/2026-10-02-native/live-drift-evidence-fields/originals/src/watch/liveDriftAlerts.ts",
+      "sha256": "752f0b9f2372a108a87fe5ff2a159e2d314595276c7597fa7d42087633df5706",
+      "gitBlob": "d67453cd944d465bb9ce0055b5f8cde7c579cef0",
+      "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+      "restoration": "Full exact original bytes; no feature/work deletion"
+    },
+    {
+      "originalPath": "src/watch/liveDriftEvidenceFields.ts",
+      "absent": true
+    },
+    {
+      "originalPath": "tests/liveDriftEvidenceFieldsParity.test.ts",
+      "absent": true
+    },
+    {
+      "originalPath": "AMC_OS/INBOX/REV_OPS_AUTOMATION_ENGINEER.md",
+      "archivePath": "unused-code/2026-10-02-native/live-drift-evidence-fields/originals/AMC_OS/INBOX/REV_OPS_AUTOMATION_ENGINEER.md",
+      "sha256": "64d8d48050372fa2a03b3060a0ed5ea25b6b355154f5e8d77e3a63438e3e8202",
+      "gitBlob": "13555022aaaca9ac2273e82ab60c83ee4792cee1",
+      "baseCommit": "3148d96edbe13324c9c4b58860976b6815cab595",
+      "restoration": "Full exact original bytes; no feature/work deletion"
+    }
+  ]
+}

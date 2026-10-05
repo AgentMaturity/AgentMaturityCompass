@@ -1,0 +1,458 @@
+[
+  {
+    "firstFile": {
+      "end": 2140,
+      "endLoc": {
+        "column": 33,
+        "line": 2140,
+        "position": 71216
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2128,
+      "startLoc": {
+        "column": 23,
+        "line": 2128,
+        "position": 70840
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasChaosSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.chaosBenchmarkId,\n    row.chaosScenarioId,\n    row.chaosProfileId,\n    row.chaosInjectionPlanHash,\n    row.chaosMutationManifestHash,\n    row.chaosEndpointContractHash,\n    row.chaosJudgeConfigHash,\n    row.chaosTraceBundleHash,\n    row.chaosScoreLedgerHash,\n    row.chaosAgentCardHash,\n    row.chaosImprovementEvalHash,",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 13,
+    "secondFile": {
+      "end": 2164,
+      "endLoc": {
+        "column": 33,
+        "line": 2164,
+        "position": 72016
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2152,
+      "startLoc": {
+        "column": 33,
+        "line": 2152,
+        "position": 71640
+      }
+    },
+    "tokens": 54
+  },
+  {
+    "firstFile": {
+      "end": 2197,
+      "endLoc": {
+        "column": 4,
+        "line": 2197,
+        "position": 73270
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2177,
+      "startLoc": {
+        "column": 31,
+        "line": 2177,
+        "position": 72485
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasRecoveryBenchSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.recoveryBenchBenchmarkId,\n    row.recoveryBenchSourceRefHash,\n    row.recoveryBenchRepositorySnapshotHash,\n    row.recoveryBenchLicenseRefHash,\n    row.recoveryBenchTerminalBenchVersion,\n    row.recoveryBenchInitialTraceSetHash,\n    row.recoveryBenchTaskId,\n    row.recoveryBenchFailedTrajectoryHash,\n    row.recoveryBenchReplayCommandLogHash,\n    row.recoveryBenchReplayEnvironmentHash,\n    row.recoveryBenchCorruptedEnvironmentHash,\n    row.recoveryBenchRecoveryAgentId,\n    row.recoveryBenchRecoveryAgentConfigHash,\n    row.recoveryBenchRecoveryModelId,\n    row.recoveryBenchRecoveryRunConfigHash,\n    row.recoveryBenchRecoveryTranscriptHash,\n    row.recoveryBenchRecoveryResultHash,\n    row.recoveryBenchScoreReportHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 21,
+    "secondFile": {
+      "end": 2262,
+      "endLoc": {
+        "column": 4,
+        "line": 2262,
+        "position": 76022
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2242,
+      "startLoc": {
+        "column": 41,
+        "line": 2242,
+        "position": 75237
+      }
+    },
+    "tokens": 84
+  },
+  {
+    "firstFile": {
+      "end": 2352,
+      "endLoc": {
+        "column": 4,
+        "line": 2352,
+        "position": 79719
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2333,
+      "startLoc": {
+        "column": 32,
+        "line": 2333,
+        "position": 79005
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasPhysicianBenchSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.physicianBenchBenchmarkId,\n    row.physicianBenchTaskSetVersion,\n    row.physicianBenchPaperRefHash,\n    row.physicianBenchTaskId,\n    row.physicianBenchSpecialty,\n    row.physicianBenchFhirServerImageHash,\n    row.physicianBenchFhirApiSchemaHash,\n    row.physicianBenchPatientRecordManifestHash,\n    row.physicianBenchPatientCohortHash,\n    row.physicianBenchVerifierCheckpointHash,\n    row.physicianBenchTrajectoryHash,\n    row.physicianBenchWorkspaceArtifactHash,\n    row.physicianBenchEvalLogHash,\n    row.physicianBenchMetadataHash,\n    row.physicianBenchModelConfigHash,\n    row.physicianBenchToolManifestHash,\n    row.physicianBenchRunConfigHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 20,
+    "secondFile": {
+      "end": 2382,
+      "endLoc": {
+        "column": 4,
+        "line": 2382,
+        "position": 81006
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2363,
+      "startLoc": {
+        "column": 42,
+        "line": 2363,
+        "position": 80292
+      }
+    },
+    "tokens": 80
+  },
+  {
+    "firstFile": {
+      "end": 2579,
+      "endLoc": {
+        "column": 3,
+        "line": 2579,
+        "position": 89082
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2563,
+      "startLoc": {
+        "column": 57,
+        "line": 2563,
+        "position": 88644
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasKiteSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.kiteBenchmarkId,\n    row.kiteSourceRefHash,\n    row.kiteRepositorySnapshotHash,\n    row.kiteLicenseRefHash,\n    row.kiteCorpusManifestHash,\n    row.kiteDocumentSetId,\n    row.kiteQuerySetHash,\n    row.kiteGroundTruthAnswerHash,\n    row.kiteRubricHash,\n    row.kiteRagPipelineConfigHash,\n    row.kiteResponseManifestHash,\n    row.kiteResultManifestHash,\n    row.kiteJudgeConfigHash,\n    row.kiteRagConfigurationId,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 17,
+    "secondFile": {
+      "end": 2606,
+      "endLoc": {
+        "column": 3,
+        "line": 2606,
+        "position": 90015
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2590,
+      "startLoc": {
+        "column": 80,
+        "line": 2590,
+        "position": 89577
+      }
+    },
+    "tokens": 60
+  },
+  {
+    "firstFile": {
+      "end": 2659,
+      "endLoc": {
+        "column": 3,
+        "line": 2659,
+        "position": 92394
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2645,
+      "startLoc": {
+        "column": 62,
+        "line": 2645,
+        "position": 91952
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasPokerEvalSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.pokerEvalBenchmarkId,\n    row.pokerEvalSourceRefHash,\n    row.pokerEvalRepositorySnapshotHash,\n    row.pokerEvalPackageRefHash,\n    row.pokerEvalCitationRefHash,\n    row.pokerEvalSimulationConfigHash,\n    row.pokerEvalAgentConfigHash,\n    row.pokerEvalOpponentPoolHash,\n    row.pokerEvalRunManifestHash,\n    row.pokerEvalHandHistoryManifestHash,\n    row.pokerEvalMetricReportHash,\n    row.pokerEvalBlindStructureHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 15,
+    "secondFile": {
+      "end": 2684,
+      "endLoc": {
+        "column": 3,
+        "line": 2684,
+        "position": 93350
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 2670,
+      "startLoc": {
+        "column": 85,
+        "line": 2670,
+        "position": 92908
+      }
+    },
+    "tokens": 52
+  },
+  {
+    "firstFile": {
+      "end": 3031,
+      "endLoc": {
+        "column": 4,
+        "line": 3031,
+        "position": 108154
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3019,
+      "startLoc": {
+        "column": 33,
+        "line": 3019,
+        "position": 107700
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasDocumentDatasetSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.documentDatasetPipelineId,\n    row.documentDatasetCorpusHash,\n    row.documentDatasetIndexManifestHash,\n    row.documentDatasetDocumentRecordHash,\n    row.documentDatasetPageRecordHash,\n    row.documentDatasetCellRecordHash,\n    row.documentDatasetSampleManifestHash,\n    row.documentDatasetExportManifestHash,\n    row.documentDatasetBenchMetricHash,\n    row.documentDatasetReportArtifactHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 13,
+    "secondFile": {
+      "end": 3057,
+      "endLoc": {
+        "column": 4,
+        "line": 3057,
+        "position": 109328
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3045,
+      "startLoc": {
+        "column": 43,
+        "line": 3045,
+        "position": 108874
+      }
+    },
+    "tokens": 52
+  },
+  {
+    "firstFile": {
+      "end": 3090,
+      "endLoc": {
+        "column": 37,
+        "line": 3090,
+        "position": 110887
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3075,
+      "startLoc": {
+        "column": 63,
+        "line": 3075,
+        "position": 110370
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasCpuAgenticSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.cpuAgenticBenchmarkId,\n    row.cpuAgenticPaperRefHash,\n    row.cpuAgenticFrameworkId,\n    row.cpuAgenticEnvironmentHash,\n    row.cpuAgenticCondaEnvHash,\n    row.cpuAgenticHardwareProfileHash,\n    row.cpuAgenticSystemRequirementsHash,\n    row.cpuAgenticModelServerConfigHash,\n    row.cpuAgenticApiKeyBoundaryHash,\n    row.cpuAgenticWorkloadConfigHash,\n    row.cpuAgenticDatasetManifestHash,\n    row.cpuAgenticToolManifestHash,\n    row.cpuAgenticRunScriptHash,\n    row.cpuAgenticResultManifestHash,",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 16,
+    "secondFile": {
+      "end": 3126,
+      "endLoc": {
+        "column": 37,
+        "line": 3126,
+        "position": 112405
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3111,
+      "startLoc": {
+        "column": 86,
+        "line": 3111,
+        "position": 111888
+      }
+    },
+    "tokens": 59
+  },
+  {
+    "firstFile": {
+      "end": 3268,
+      "endLoc": {
+        "column": 3,
+        "line": 3268,
+        "position": 119250
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3251,
+      "startLoc": {
+        "column": 65,
+        "line": 3251,
+        "position": 118647
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasSapAgentEvalSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.sapAgentEvalTutorialId,\n    row.sapAgentEvalSourceRefHash,\n    row.sapAgentEvalRepositorySnapshotHash,\n    row.sapAgentEvalLicenseRefHash,\n    row.sapAgentEvalPaperRefHash,\n    row.sapAgentEvalNotebookHash,\n    row.sapAgentEvalDatasetManifestHash,\n    row.sapAgentEvalBaselineLogManifestHash,\n    row.sapAgentEvalLiveSampleManifestHash,\n    row.sapAgentEvalMetricConfigHash,\n    row.sapAgentEvalToolingConfigHash,\n    row.sapAgentEvalRoleAccessPolicyHash,\n    row.sapAgentEvalReliabilityPolicyHash,\n    row.sapAgentEvalCompliancePolicyHash,\n    row.sapAgentEvalAlertReceiptHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 18,
+    "secondFile": {
+      "end": 3295,
+      "endLoc": {
+        "column": 3,
+        "line": 3295,
+        "position": 120386
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3278,
+      "startLoc": {
+        "column": 88,
+        "line": 3278,
+        "position": 119783
+      }
+    },
+    "tokens": 64
+  },
+  {
+    "firstFile": {
+      "end": 3436,
+      "endLoc": {
+        "column": 3,
+        "line": 3436,
+        "position": 126646
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3419,
+      "startLoc": {
+        "column": 33,
+        "line": 3419,
+        "position": 126096
+      }
+    },
+    "format": "typescript",
+    "fragment": "    row.hedraRagLicenseReviewHash,\n    row.hedraRagPaperRefHash,\n    row.hedraRagArtifactReadmeHash,\n    row.hedraRagDatasetManifestHash,\n    row.hedraRagCorpusManifestHash,\n    row.hedraRagIndexManifestHash,\n    row.hedraRagDependencyManifestHash,\n    row.hedraRagEnvironmentConfigHash,\n    row.hedraRagRunScriptHash,\n    row.hedraRagFigureId,\n    row.hedraRagResultCsvHash,\n    row.hedraRagPlotArtifactHash,\n    row.hedraRagBaselineResultHash,\n    row.hedraRagLiveResultHash,\n    row.hedraRagAlertPolicyHash,\n    row.hedraRagResourceProfileHash,\n    row.hedraRagGpuProfileHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 18,
+    "secondFile": {
+      "end": 3470,
+      "endLoc": {
+        "column": 3,
+        "line": 3470,
+        "position": 127934
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3453,
+      "startLoc": {
+        "column": 38,
+        "line": 3453,
+        "position": 127384
+      }
+    },
+    "tokens": 66
+  },
+  {
+    "firstFile": {
+      "end": 3810,
+      "endLoc": {
+        "column": 36,
+        "line": 3810,
+        "position": 144095
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3797,
+      "startLoc": {
+        "column": 66,
+        "line": 3797,
+        "position": 143621
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasObservabilitySignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.observabilityBenchmarkId,\n    row.observabilityTaskSpecHash,\n    row.observabilityGeneratedTaskHash,\n    row.observabilityEnvironmentConfigHash,\n    row.observabilityDockerConfigHash,\n    row.observabilityScenarioClockHash,\n    row.observabilityAgentTrajectoryHash,\n    row.observabilityCommandStdoutHash,\n    row.observabilityGradingDetailsHash,\n    row.observabilityRewardHash,\n    row.observabilityResultJsonHash,\n    row.observabilityHtmlReportHash,",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 14,
+    "secondFile": {
+      "end": 3836,
+      "endLoc": {
+        "column": 36,
+        "line": 3836,
+        "position": 145201
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 3823,
+      "startLoc": {
+        "column": 89,
+        "line": 3823,
+        "position": 144727
+      }
+    },
+    "tokens": 51
+  },
+  {
+    "firstFile": {
+      "end": 4138,
+      "endLoc": {
+        "column": 4,
+        "line": 4138,
+        "position": 159077
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 4120,
+      "startLoc": {
+        "column": 9,
+        "line": 4120,
+        "position": 158484
+      }
+    },
+    "format": "typescript",
+    "fragment": "  return [\n    row.naviBenchBenchmarkId,\n    row.naviBenchSourceRefHash,\n    row.naviBenchRepositorySnapshotHash,\n    row.naviBenchLicenseRefHash,\n    row.naviBenchDatasetRefHash,\n    row.naviBenchBlogRefHash,\n    row.naviBenchTaskId,\n    row.naviBenchTaskConfigHash,\n    row.naviBenchEvaluatorConfigHash,\n    row.naviBenchAgentConfigHash,\n    row.naviBenchBrowserProviderHash,\n    row.naviBenchBaselineResultHash,\n    row.naviBenchLiveResultHash,\n    row.naviBenchTrajectoryHash,\n    row.naviBenchVisualizationArtifactHash,\n    row.naviBenchScreenshotTraceHash,\n    row.naviBenchAlertReceiptHash,\n  ].some((value) => normalizeContextId(value) !== null) ||",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 19,
+    "secondFile": {
+      "end": 4184,
+      "endLoc": {
+        "column": 4,
+        "line": 4184,
+        "position": 160836
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 4166,
+      "startLoc": {
+        "column": 24,
+        "line": 4166,
+        "position": 160243
+      }
+    },
+    "tokens": 71
+  },
+  {
+    "firstFile": {
+      "end": 4234,
+      "endLoc": {
+        "column": 39,
+        "line": 4234,
+        "position": 163159
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 4221,
+      "startLoc": {
+        "column": 63,
+        "line": 4221,
+        "position": 162728
+      }
+    },
+    "format": "typescript",
+    "fragment": "function hasLegalAgentSignal(row: LiveDriftSampleRow): boolean {\n  return [\n    row.legalAgentBenchmarkId,\n    row.legalAgentDatasetHash,\n    row.legalAgentCorpusId,\n    row.legalAgentTaskId,\n    row.legalAgentPlanningTreeHash,\n    row.legalAgentToolManifestHash,\n    row.legalAgentToolRunTraceHash,\n    row.legalAgentIntermediateStepAnnotationHash,\n    row.legalAgentProcessTraceHash,\n    row.legalAgentOutputHash,\n    row.legalAgentReferenceAnswerHash,\n    row.legalAgentEvaluationReportHash,",
+    "isNew": false,
+    "kind": "exact",
+    "lines": 14,
+    "secondFile": {
+      "end": 4259,
+      "endLoc": {
+        "column": 39,
+        "line": 4259,
+        "position": 164117
+      },
+      "name": "watch/liveDriftAlerts.ts",
+      "start": 4246,
+      "startLoc": {
+        "column": 86,
+        "line": 4246,
+        "position": 163686
+      }
+    },
+    "tokens": 51
+  }
+]

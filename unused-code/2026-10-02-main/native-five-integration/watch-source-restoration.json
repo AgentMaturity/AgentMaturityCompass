@@ -1,0 +1,532 @@
+{
+  "v": 1,
+  "parentIntegrationCommit": "81bea9255dbf7ca14c1ad554fc06aa7e767b6ad5",
+  "workerQualifiedSourceCommit": "8182d4382099ffcb676fd3f225478f02d701b929",
+  "workerDeliveryCommit": "0fedd4266c9e43437b60f160b4cc343c590260f2",
+  "sourceOriginalBase": "b30e1c771b89e23ecedb13604cc0bf9102078136",
+  "oldTest": {
+    "path": "tests/liveDriftProofStatsParity.test.ts",
+    "archivePath": "unused-code/2026-10-02-main/native-five-integration/originals/tests/liveDriftProofStatsParity.test.ts.original",
+    "sha256": "b89a81872def2d81930370db6c370614c3f512223fef96ef12cf83e7f561a76f",
+    "change": "one bounded reversal call in existing declaration comparison plus helper import; all behavior/public/proof assertions retained"
+  },
+  "newFilesAbsentBefore": [
+    "tests/helpers/restoreWatchReceiptSharing.ts",
+    "tests/watchReceiptSharingRestoration.test.ts"
+  ],
+  "files": [
+    {
+      "originalPath": "src/watch/bishengObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/bishengObservabilityLiveDrift.ts",
+      "originalSha256": "7ab95a6c70a36136ae97ab8b53ef1e925b421bf7b10bf65c2bd29f6948dbb3ef",
+      "currentSha256": "69eabfe13e0e5e9a6faeba8a47e3ca6375914157255fb29d5b3152e3917993f2",
+      "edits": [
+        {
+          "currentStartLine": 0,
+          "beforeLines": [],
+          "afterLines": [
+            "import { createLiveDriftMetadataReceiptEnricher } from \"./liveDriftReceiptValidation.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 294,
+          "beforeLines": [
+            "function rehashReceipt(receipt: Omit<LiveDriftReceipt, \"receiptHash\">): LiveDriftReceipt {\n",
+            "  return {\n",
+            "    ...receipt,\n",
+            "    receiptHash: sha256Hex(canonicalize(receipt)),\n",
+            "  };\n",
+            "}\n",
+            "\n",
+            "function withBishengObservabilityReceipt(\n",
+            "  receipt: LiveDriftReceipt,\n",
+            "  coverage: number,\n",
+            "  missingReasons: string[],\n",
+            "  proof: BishengObservabilityMetadataProof,\n",
+            "): LiveDriftReceipt {\n",
+            "  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;\n",
+            "  const alertRefs = unique([\n"
+          ],
+          "afterLines": [
+            "const withBishengObservabilityReceipt = createLiveDriftMetadataReceiptEnricher<BishengObservabilityMetadataProof>({\n",
+            "  alertSuffix: \"bishengObservabilityEvidenceCoverage0to1\",\n",
+            "  metricId: \"observabilityEvidenceCoverage0to1\",\n",
+            "  messagePrefix: \"Bisheng-style observability live drift proof is incomplete or mismatched: \",\n",
+            "  summaryPrefix: \"Bisheng observability metadata-only evidence coverage=\",\n",
+            "  evidenceRefs: (proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 309,
+          "beforeLines": [
+            "  ]);\n",
+            "  const signedRefs = unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]);\n",
+            "  const alerts: LiveDriftAlert[] = [...receipt.alerts];\n",
+            "\n",
+            "  if (missingReasons.length > 0) {\n",
+            "    alerts.push({\n",
+            "      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:bishengObservabilityEvidenceCoverage0to1`,\n",
+            "      metricId: \"observabilityEvidenceCoverage0to1\",\n",
+            "      severity: coverage < 0.75 ? \"critical\" : \"high\",\n",
+            "      message: `Bisheng-style observability live drift proof is incomplete or mismatched: ${missingReasons.join(\", \")}.`,\n",
+            "      threshold: 1,\n",
+            "      observed: round(coverage),\n",
+            "      evidenceRefs: alertRefs,\n",
+            "      signedEvidenceRefs: signedRefs,\n",
+            "    });\n",
+            "  }\n",
+            "\n",
+            "  const recommendation = alerts.length > 0 ? \"alert\" : receipt.recommendation;\n",
+            "  return rehashReceipt({\n",
+            "    ...receiptWithoutHash,\n",
+            "    alerts,\n",
+            "    recommendation,\n",
+            "    failClosed: alerts.length > 0,\n",
+            "    sourceRefs: unique([\n"
+          ],
+          "afterLines": [
+            "  ]),\n",
+            "  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]),\n",
+            "  sourceRefs: (receipt, proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 327,
+          "beforeLines": [
+            "    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; Bisheng observability metadata-only evidence coverage=${round(coverage)}`,\n",
+            "  });\n",
+            "}\n"
+          ],
+          "afterLines": [
+            "});\n"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/watch/lmnrObservabilityLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/lmnrObservabilityLiveDrift.ts",
+      "originalSha256": "e5acb1b878ffd66e85d7fa90ff8b1fc63715d34037a93e434524f618b8524d28",
+      "currentSha256": "d52f197dff53c657faa519af71e8f551460aba65c3c96101da65169dc348cf76",
+      "edits": [
+        {
+          "currentStartLine": 0,
+          "beforeLines": [],
+          "afterLines": [
+            "import { createLiveDriftMetadataReceiptEnricher } from \"./liveDriftReceiptValidation.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 21,
+          "beforeLines": [
+            "  type LiveDriftAlert,\n"
+          ],
+          "afterLines": []
+        },
+        {
+          "currentStartLine": 274,
+          "beforeLines": [
+            "function rehashReceipt(receipt: Omit<LiveDriftReceipt, \"receiptHash\">): LiveDriftReceipt {\n",
+            "  return {\n",
+            "    ...receipt,\n",
+            "    receiptHash: sha256Hex(canonicalize(receipt)),\n",
+            "  };\n",
+            "}\n",
+            "\n",
+            "function withLmnrObservabilityReceipt(\n",
+            "  receipt: LiveDriftReceipt,\n",
+            "  coverage: number,\n",
+            "  missingReasons: string[],\n",
+            "  proof: LmnrObservabilityMetadataProof,\n",
+            "): LiveDriftReceipt {\n",
+            "  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;\n",
+            "  const alertRefs = unique([\n"
+          ],
+          "afterLines": [
+            "const withLmnrObservabilityReceipt = createLiveDriftMetadataReceiptEnricher<LmnrObservabilityMetadataProof>({\n",
+            "  alertSuffix: \"lmnrObservabilityEvidenceCoverage0to1\",\n",
+            "  metricId: \"observabilityEvidenceCoverage0to1\",\n",
+            "  messagePrefix: \"LMNR/Laminar-style observability live drift proof is incomplete or mismatched: \",\n",
+            "  summaryPrefix: \"LMNR observability metadata-only evidence coverage=\",\n",
+            "  evidenceRefs: (proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 290,
+          "beforeLines": [
+            "  ]);\n",
+            "  const signedRefs = unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]);\n",
+            "  const alerts: LiveDriftAlert[] = [...receipt.alerts];\n",
+            "\n",
+            "  if (missingReasons.length > 0) {\n",
+            "    alerts.push({\n",
+            "      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:lmnrObservabilityEvidenceCoverage0to1`,\n",
+            "      metricId: \"observabilityEvidenceCoverage0to1\",\n",
+            "      severity: coverage < 0.75 ? \"critical\" : \"high\",\n",
+            "      message: `LMNR/Laminar-style observability live drift proof is incomplete or mismatched: ${missingReasons.join(\", \")}.`,\n",
+            "      threshold: 1,\n",
+            "      observed: round(coverage),\n",
+            "      evidenceRefs: alertRefs,\n",
+            "      signedEvidenceRefs: signedRefs,\n",
+            "    });\n",
+            "  }\n",
+            "\n",
+            "  const recommendation = alerts.length > 0 ? \"alert\" : receipt.recommendation;\n",
+            "  return rehashReceipt({\n",
+            "    ...receiptWithoutHash,\n",
+            "    alerts,\n",
+            "    recommendation,\n",
+            "    failClosed: alerts.length > 0,\n",
+            "    sourceRefs: unique([\n"
+          ],
+          "afterLines": [
+            "  ]),\n",
+            "  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]),\n",
+            "  sourceRefs: (receipt, proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 308,
+          "beforeLines": [
+            "    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; LMNR observability metadata-only evidence coverage=${round(coverage)}`,\n",
+            "  });\n",
+            "}\n"
+          ],
+          "afterLines": [
+            "});\n"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/watch/openCompassLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/openCompassLiveDrift.ts",
+      "originalSha256": "debffcd75f699a42716b9ea36fd31cfa13200d17772540d2a97badf05256a969",
+      "currentSha256": "3435f9e098a2ca8685be7901f1e15ff1e87790a5083985210418ea5910abd123",
+      "edits": [
+        {
+          "currentStartLine": 0,
+          "beforeLines": [],
+          "afterLines": [
+            "import { createLiveDriftMetadataReceiptEnricher } from \"./liveDriftReceiptValidation.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 21,
+          "beforeLines": [
+            "  type LiveDriftAlert,\n"
+          ],
+          "afterLines": []
+        },
+        {
+          "currentStartLine": 324,
+          "beforeLines": [
+            "function rehashReceipt(receipt: Omit<LiveDriftReceipt, \"receiptHash\">): LiveDriftReceipt {\n",
+            "  return {\n",
+            "    ...receipt,\n",
+            "    receiptHash: sha256Hex(canonicalize(receipt)),\n",
+            "  };\n",
+            "}\n",
+            "\n",
+            "function withOpenCompassReceipt(\n",
+            "  receipt: LiveDriftReceipt,\n",
+            "  coverage: number,\n",
+            "  missingReasons: string[],\n",
+            "  proof: OpenCompassLiveDriftMetadataProof,\n",
+            "): LiveDriftReceipt {\n",
+            "  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;\n",
+            "  const alertRefs = unique([\n"
+          ],
+          "afterLines": [
+            "const withOpenCompassReceipt = createLiveDriftMetadataReceiptEnricher<OpenCompassLiveDriftMetadataProof>({\n",
+            "  alertSuffix: \"openCompassEvidenceCoverage0to1\",\n",
+            "  metricId: \"agentEvalHarnessEvidenceCoverage0to1\",\n",
+            "  messagePrefix: \"OpenCompass live drift proof is incomplete or mismatched: \",\n",
+            "  summaryPrefix: \"OpenCompass evidence coverage=\",\n",
+            "  evidenceRefs: (proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 344,
+          "beforeLines": [
+            "  ]);\n",
+            "  const signedRefs = unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]);\n",
+            "  const alerts: LiveDriftAlert[] = [...receipt.alerts];\n",
+            "\n",
+            "  if (missingReasons.length > 0) {\n",
+            "    alerts.push({\n",
+            "      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:openCompassEvidenceCoverage0to1`,\n",
+            "      metricId: \"agentEvalHarnessEvidenceCoverage0to1\",\n",
+            "      severity: coverage < 0.75 ? \"critical\" : \"high\",\n",
+            "      message: `OpenCompass live drift proof is incomplete or mismatched: ${missingReasons.join(\", \")}.`,\n",
+            "      threshold: 1,\n",
+            "      observed: round(coverage),\n",
+            "      evidenceRefs: alertRefs,\n",
+            "      signedEvidenceRefs: signedRefs,\n",
+            "    });\n",
+            "  }\n",
+            "\n",
+            "  const recommendation = alerts.length > 0 ? \"alert\" : receipt.recommendation;\n",
+            "  return rehashReceipt({\n",
+            "    ...receiptWithoutHash,\n",
+            "    alerts,\n",
+            "    recommendation,\n",
+            "    failClosed: alerts.length > 0,\n",
+            "    sourceRefs: unique([\n"
+          ],
+          "afterLines": [
+            "  ]),\n",
+            "  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]),\n",
+            "  sourceRefs: (receipt, proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 368,
+          "beforeLines": [
+            "    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; OpenCompass evidence coverage=${round(coverage)}`,\n",
+            "  });\n",
+            "}\n"
+          ],
+          "afterLines": [
+            "});\n"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "originalSha256": "ad488836a4839aa716f11050d8646b5711ec5c7d5f7e04c1d90efe816d1e96ff",
+      "currentSha256": "abff472736ae205d60e0bd2d28b12efc7f8a12e1f25d00d1b86a10cb9400ab0a",
+      "edits": [
+        {
+          "currentStartLine": 0,
+          "beforeLines": [],
+          "afterLines": [
+            "import { createLiveDriftMetadataReceiptEnricher } from \"./liveDriftReceiptValidation.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 21,
+          "beforeLines": [
+            "  type LiveDriftAlert,\n"
+          ],
+          "afterLines": []
+        },
+        {
+          "currentStartLine": 266,
+          "beforeLines": [
+            "function rehashReceipt(receipt: Omit<LiveDriftReceipt, \"receiptHash\">): LiveDriftReceipt {\n",
+            "  return {\n",
+            "    ...receipt,\n",
+            "    receiptHash: sha256Hex(canonicalize(receipt)),\n",
+            "  };\n",
+            "}\n",
+            "\n",
+            "function withNarrowTaskBroadMisalignmentReceipt(\n",
+            "  receipt: LiveDriftReceipt,\n",
+            "  coverage: number,\n",
+            "  missingReasons: string[],\n",
+            "  proof: NarrowTaskBroadMisalignmentMetadataProof,\n",
+            "): LiveDriftReceipt {\n",
+            "  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;\n",
+            "  const alertRefs = unique([\n"
+          ],
+          "afterLines": [
+            "const withNarrowTaskBroadMisalignmentReceipt = createLiveDriftMetadataReceiptEnricher<NarrowTaskBroadMisalignmentMetadataProof>({\n",
+            "  alertSuffix: \"narrowTaskBroadMisalignmentEvidenceCoverage0to1\",\n",
+            "  metricId: \"narrowTaskBroadMisalignmentEvidenceCoverage0to1\",\n",
+            "  messagePrefix: \"Narrow-task broad-misalignment live drift metadata/proof is incomplete or mismatched: \",\n",
+            "  summaryPrefix: \"narrow-task broad-misalignment metadata-only evidence coverage=\",\n",
+            "  evidenceRefs: (proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 283,
+          "beforeLines": [
+            "  ]);\n",
+            "  const signedRefs = unique([proof.alertReceiptHash]);\n",
+            "  const alerts: LiveDriftAlert[] = [...receipt.alerts];\n",
+            "\n",
+            "  if (missingReasons.length > 0) {\n",
+            "    alerts.push({\n",
+            "      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:narrowTaskBroadMisalignmentEvidenceCoverage0to1`,\n",
+            "      metricId: \"narrowTaskBroadMisalignmentEvidenceCoverage0to1\",\n",
+            "      severity: coverage < 0.75 ? \"critical\" : \"high\",\n",
+            "      message: `Narrow-task broad-misalignment live drift metadata/proof is incomplete or mismatched: ${missingReasons.join(\", \")}.`,\n",
+            "      threshold: 1,\n",
+            "      observed: round(coverage),\n",
+            "      evidenceRefs: alertRefs,\n",
+            "      signedEvidenceRefs: signedRefs,\n",
+            "    });\n",
+            "  }\n",
+            "\n",
+            "  const recommendation = alerts.length > 0 ? \"alert\" : receipt.recommendation;\n",
+            "  return rehashReceipt({\n",
+            "    ...receiptWithoutHash,\n",
+            "    alerts,\n",
+            "    recommendation,\n",
+            "    failClosed: alerts.length > 0,\n",
+            "    sourceRefs: unique([\n"
+          ],
+          "afterLines": [
+            "  ]),\n",
+            "  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash]),\n",
+            "  sourceRefs: (receipt, proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 301,
+          "beforeLines": [
+            "    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; narrow-task broad-misalignment metadata-only evidence coverage=${round(coverage)}`,\n",
+            "  });\n",
+            "}\n"
+          ],
+          "afterLines": [
+            "});\n"
+          ]
+        }
+      ]
+    },
+    {
+      "originalPath": "src/watch/trismAgenticLiveDrift.ts",
+      "archivePath": "unused-code/2026-10-02-native/watch-receipts/originals/src/watch/trismAgenticLiveDrift.ts",
+      "originalSha256": "1932f560e12e763643dd9b0928947443d318d69fb7f843a693ef6a1658fea811",
+      "currentSha256": "35b12af0c0939dffabf959fc4b884e9067be4bb283157b58e650fb973791813d",
+      "edits": [
+        {
+          "currentStartLine": 0,
+          "beforeLines": [],
+          "afterLines": [
+            "import { createLiveDriftMetadataReceiptEnricher } from \"./liveDriftReceiptValidation.js\";\n"
+          ]
+        },
+        {
+          "currentStartLine": 21,
+          "beforeLines": [
+            "  type LiveDriftAlert,\n"
+          ],
+          "afterLines": []
+        },
+        {
+          "currentStartLine": 268,
+          "beforeLines": [
+            "function rehashReceipt(receipt: Omit<LiveDriftReceipt, \"receiptHash\">): LiveDriftReceipt {\n",
+            "  return {\n",
+            "    ...receipt,\n",
+            "    receiptHash: sha256Hex(canonicalize(receipt)),\n",
+            "  };\n",
+            "}\n",
+            "\n",
+            "function withTrismAgenticReceipt(\n",
+            "  receipt: LiveDriftReceipt,\n",
+            "  coverage: number,\n",
+            "  missingReasons: string[],\n",
+            "  proof: TrismAgenticMetadataProof,\n",
+            "): LiveDriftReceipt {\n",
+            "  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;\n",
+            "  const alertRefs = unique([\n"
+          ],
+          "afterLines": [
+            "const withTrismAgenticReceipt = createLiveDriftMetadataReceiptEnricher<TrismAgenticMetadataProof>({\n",
+            "  alertSuffix: \"trismAgenticEvidenceCoverage0to1\",\n",
+            "  metricId: \"trismAgenticEvidenceCoverage0to1\",\n",
+            "  messagePrefix: \"TRiSM agentic live drift metadata/proof is incomplete or mismatched: \",\n",
+            "  summaryPrefix: \"TRiSM metadata-only evidence coverage=\",\n",
+            "  evidenceRefs: (proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 285,
+          "beforeLines": [
+            "  ]);\n",
+            "  const signedRefs = unique([proof.alertReceiptHash]);\n",
+            "  const alerts: LiveDriftAlert[] = [...receipt.alerts];\n",
+            "\n",
+            "  if (missingReasons.length > 0) {\n",
+            "    alerts.push({\n",
+            "      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:trismAgenticEvidenceCoverage0to1`,\n",
+            "      metricId: \"trismAgenticEvidenceCoverage0to1\",\n",
+            "      severity: coverage < 0.75 ? \"critical\" : \"high\",\n",
+            "      message: `TRiSM agentic live drift metadata/proof is incomplete or mismatched: ${missingReasons.join(\", \")}.`,\n",
+            "      threshold: 1,\n",
+            "      observed: round(coverage),\n",
+            "      evidenceRefs: alertRefs,\n",
+            "      signedEvidenceRefs: signedRefs,\n",
+            "    });\n",
+            "  }\n",
+            "\n",
+            "  const recommendation = alerts.length > 0 ? \"alert\" : receipt.recommendation;\n",
+            "  return rehashReceipt({\n",
+            "    ...receiptWithoutHash,\n",
+            "    alerts,\n",
+            "    recommendation,\n",
+            "    failClosed: alerts.length > 0,\n",
+            "    sourceRefs: unique([\n"
+          ],
+          "afterLines": [
+            "  ]),\n",
+            "  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash]),\n",
+            "  sourceRefs: (receipt, proof) => unique([\n"
+          ]
+        },
+        {
+          "currentStartLine": 303,
+          "beforeLines": [
+            "    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; TRiSM metadata-only evidence coverage=${round(coverage)}`,\n",
+            "  });\n",
+            "}\n"
+          ],
+          "afterLines": [
+            "});\n"
+          ]
+        }
+      ]
+    }
+  ],
+  "currentProductionFiles": [
+    {
+      "path": "src/watch/liveDriftAlerts.ts",
+      "sha256": "1ea774644363df1f4145408e19768dd05e96f2be74dc27ce73fcced80f45935b"
+    },
+    {
+      "path": "src/watch/bishengObservabilityLiveDrift.ts",
+      "sha256": "69eabfe13e0e5e9a6faeba8a47e3ca6375914157255fb29d5b3152e3917993f2"
+    },
+    {
+      "path": "src/watch/lmnrObservabilityLiveDrift.ts",
+      "sha256": "d52f197dff53c657faa519af71e8f551460aba65c3c96101da65169dc348cf76"
+    },
+    {
+      "path": "src/watch/openCompassLiveDrift.ts",
+      "sha256": "3435f9e098a2ca8685be7901f1e15ff1e87790a5083985210418ea5910abd123"
+    },
+    {
+      "path": "src/watch/narrowTaskBroadMisalignmentLiveDrift.ts",
+      "sha256": "abff472736ae205d60e0bd2d28b12efc7f8a12e1f25d00d1b86a10cb9400ab0a"
+    },
+    {
+      "path": "src/watch/trismAgenticLiveDrift.ts",
+      "sha256": "35b12af0c0939dffabf959fc4b884e9067be4bb283157b58e650fb973791813d"
+    },
+    {
+      "path": "src/watch/agentReadingTestLiveDrift.ts",
+      "sha256": "016ca52bb9325880177109033caa75e70cbc7194485857e47d1553b00d2d6e0c"
+    },
+    {
+      "path": "src/watch/awesomeAgentMemoryLiveDrift.ts",
+      "sha256": "0c1860b7274a88c499f3770eb742c2add5501b8183f50ead4622ad7f7d872d68"
+    },
+    {
+      "path": "src/watch/liveDriftReceiptValidation.ts",
+      "sha256": "eb36a77bf2e044e3a3f20c50ff6a812275f7dda003409d4bbb796bba6784d4fb"
+    }
+  ],
+  "laterSharingProvenance": {
+    "sourceCommit": "0fe04985eb8a09bce5f6b27020156d7fe322c011",
+    "fullOriginalAndExactInverseMap": "unused-code/2026-10-02-main/native-five-integration/second-source-restoration/restoration.json",
+    "newHelper": "src/watch/liveDriftEvidenceFields.ts",
+    "helperSha256": "2ec8cbc86171dea404e07854fa2bd28e89f8d67da6c81363fd36ae84bc5fd818",
+    "firstFiveMetadataSourceEntriesUnchanged": true
+  }
+}

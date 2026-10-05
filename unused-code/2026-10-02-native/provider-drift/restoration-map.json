@@ -1,0 +1,73 @@
+{
+  "base": "b30e1c771b89e23ecedb13604cc0bf9102078136",
+  "scope": "Whole originals before any lane source or handoff edit",
+  "originals": [
+    {
+      "path": "src/benchmarks/helmProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/helmProviderDrift.ts",
+      "sha256": "4cb1be81b560e7d3b262bc26b4439d8c69e6ea59d602ac97293453d37492d12e",
+      "gitBlob": "1cfd4ae8b556286a8cc41ccabe9419714fe0afc2",
+      "baseBlob": "1cfd4ae8b556286a8cc41ccabe9419714fe0afc2",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/patronusProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/patronusProviderDrift.ts",
+      "sha256": "62536d747829524b008f19e0a72ff96db40515280c5626df2e0123daf47ea6a5",
+      "gitBlob": "f985aec0477457eb332ec64e7145d508f1e09c10",
+      "baseBlob": "f985aec0477457eb332ec64e7145d508f1e09c10",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/inspectProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/inspectProviderDrift.ts",
+      "sha256": "c66bd5b90e7574e1cb891ff09f3a89b9eeb732414f97f930dc37dc4bafa3119e",
+      "gitBlob": "a7723071317cca2ec6d76275f44d4bc062227915",
+      "baseBlob": "a7723071317cca2ec6d76275f44d4bc062227915",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/humanloopProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/humanloopProviderDrift.ts",
+      "sha256": "f719bb795eda0bcfa411e5a59d3563fb2c3e8893faa84cbd3b37f430b9fdd734",
+      "gitBlob": "c69fd1f19ede34b8b0afad99b3e37a216538b6cf",
+      "baseBlob": "c69fd1f19ede34b8b0afad99b3e37a216538b6cf",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/tensorZeroProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/tensorZeroProviderDrift.ts",
+      "sha256": "6751ed00e8f100ad7f853a33b394a1c76cef25ab9c5398bd754cdfd65cd4380d",
+      "gitBlob": "63efccf4f00656a4cf400eda5c052fa6dc0272ca",
+      "baseBlob": "63efccf4f00656a4cf400eda5c052fa6dc0272ca",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/promptLayerProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/promptLayerProviderDrift.ts",
+      "sha256": "ce9e667536d36077e5a3b6590bb1af24607ea869905aab63cf6560f8c064364e",
+      "gitBlob": "eff496f77a90c0c6b5b8ee3dd8b9a81d8cfb831f",
+      "baseBlob": "eff496f77a90c0c6b5b8ee3dd8b9a81d8cfb831f",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "src/benchmarks/promptfooProviderDrift.ts",
+      "existed": true,
+      "archive": "unused-code/2026-10-02-native/provider-drift/originals/src/benchmarks/promptfooProviderDrift.ts",
+      "sha256": "c62db3dfcfa4464e1a521b67318ed7e7274b58e31fc00d2dc6335611c77d8eb7",
+      "gitBlob": "fd8a5d48e746aaec1f3d9a5e500412936c3bf037",
+      "baseBlob": "fd8a5d48e746aaec1f3d9a5e500412936c3bf037",
+      "restore": "copy archived bytes to original path; verify sha256 and git hash-object"
+    },
+    {
+      "path": "AMC_OS/INBOX/REV_DATA_ENGINEER.md",
+      "existed": false
+    }
+  ]
+}
