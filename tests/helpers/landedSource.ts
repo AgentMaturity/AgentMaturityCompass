@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
  */
 export type PlanEdit = { path: string; issue: string; baseCommit: string; archivePath: string; sha256: string };
 
-export const PLAN_EDITS_MANIFEST = "unused-code/plan-edits/manifest.json";
+const PLAN_EDITS_MANIFEST = "unused-code/plan-edits/manifest.json";
 const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;
 const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 

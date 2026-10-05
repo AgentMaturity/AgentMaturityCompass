@@ -20,7 +20,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-export const MANIFEST = "unused-code/plan-edits/manifest.json";
+const MANIFEST = "unused-code/plan-edits/manifest.json";
 const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;
 const USAGE = "Usage: node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <rev> <path>...";
 const EMPTY = { schemaVersion: 1, decision: "D-15", files: [] };
@@ -70,7 +70,7 @@ function landedBytesAt(root, base, baseCommit, path, pins) {
 }
 
 /** Archives each path's bytes at `base` and returns the new entries plus any warnings. */
-export function snapshotPlanEdit({ cwd, issue, base, paths }) {
+function snapshotPlanEdit({ cwd, issue, base, paths }) {
   if (!issue || !base || paths.length === 0) throw new Error(USAGE);
   if (!ISSUE_KEY.test(issue)) throw new Error(`Issue key must match ${ISSUE_KEY}: ${issue}`);
   const root = gitText(cwd, ["rev-parse", "--show-toplevel"]);
