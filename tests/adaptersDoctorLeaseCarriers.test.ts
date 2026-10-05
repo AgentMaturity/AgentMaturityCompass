@@ -253,7 +253,7 @@ describe("lease carriers, adapters, and doctor", () => {
     const oldPath = process.env.PATH ?? "";
     process.env.PATH = `${binDir}:${oldPath}`;
     try {
-      const rows = adaptersDetectCli();
+      const rows = adaptersDetectCli({ workspace });
       const claude = rows.find((row) => row.adapterId === "claude-cli");
       expect(claude?.installed).toBe(true);
       expect(claude?.command).toBe("claude");
