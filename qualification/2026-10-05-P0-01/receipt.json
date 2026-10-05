@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "key": "P0-01",
   "date": "2026-10-05",
-  "commit": "0814d82564218de203089440992badb6f07b588f",
+  "commit": "e513019f1828299b3f3d4c4952c9f04ecebf2348",
   "branch": "rtd/p0-01-contract-receipts-freeze",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
@@ -12,55 +12,55 @@
     {
       "cmd": "npx vitest run tests/freezeGuard.test.ts tests/qualificationReceipts.test.ts",
       "exit": 0,
-      "durationMs": 818
+      "durationMs": 1145
     },
     {
       "cmd": "npm run check:freeze",
       "exit": 0,
-      "durationMs": 1010
+      "durationMs": 1329
     },
     {
       "cmd": "npm run check:qualification",
       "exit": 0,
-      "durationMs": 197
+      "durationMs": 234
     },
     {
       "cmd": "npm run typecheck",
       "exit": 0,
-      "durationMs": 21755
+      "durationMs": 22430
     },
     {
       "cmd": "npm run typecheck:tests",
       "exit": 0,
-      "durationMs": 29490
+      "durationMs": 31087
     },
     {
       "cmd": "npm run lint",
       "exit": 0,
-      "durationMs": 1098
+      "durationMs": 1095
     },
     {
       "cmd": "npm run check:counts",
       "exit": 0,
-      "durationMs": 465
+      "durationMs": 482
     },
     {
       "cmd": "npm run check:docs-drift",
       "exit": 0,
-      "durationMs": 286
+      "durationMs": 308
     },
     {
       "cmd": "npm run check:architecture-boundaries",
       "exit": 0,
-      "durationMs": 1484
+      "durationMs": 1588
     }
   ],
   "tests": {
-    "total": 27,
-    "passed": 27,
+    "total": 34,
+    "passed": 34,
     "failed": 0,
     "skipped": 0
   },
   "artifacts": [],
-  "notes": "Focused run only (tests/freezeGuard.test.ts, tests/qualificationReceipts.test.ts); the full suite is run separately. check:freeze ran without a base baseline (origin/main has none yet), so only the exact check applied. Mutation checks (base-baseline comparison removed; 1 MB size check removed) are recorded in README.md."
+  "notes": "Focused run only (tests/freezeGuard.test.ts, tests/qualificationReceipts.test.ts); the full suite is run separately. check:freeze ran without a base baseline (origin/main has none yet), so only the exact check applied. Mutation checks (base-baseline comparison removed; 1 MB size check removed) and the review-fix regression runs are recorded in README.md."
 }
