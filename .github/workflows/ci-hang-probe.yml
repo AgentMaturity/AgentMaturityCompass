@@ -1,8 +1,8 @@
 # Temporary diagnostic for plan item P0-48 (GitHub build-test hang). Never merge.
-# Round 2: every variant of round 1 (coverage or not, default or 2 workers) killed
-# the runner itself (no logs uploaded). Run the suite inside a memory-capped
-# container so a runaway test can only take the container down, and the runner
-# survives to upload the log showing what ran last.
+# Round 1: every variant (coverage or not, default or 2 workers) killed the runner.
+# Round 2: inside a 12 GB container the runner still died ~10 min into the suite
+# with 87 GB disk free. Round 3: bisect by shard; a shard whose runner dies
+# (cancelled, no log) holds the culprit.
 name: CI hang probe (P0-48)
 
 on:
@@ -16,30 +16,26 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Runner resources at start
-        run: nproc; free -m; df -m /; docker version --format '{{.Server.Version}}'
-      - name: Suite inside a memory-capped container
-        timeout-minutes: 60
-        run: |
-          set +e
-          docker run --name amc-suite --memory=12g --memory-swap=12g --pids-limit=4096 \
-            -v "$PWD":/w -w /w -e CI=true node:24 bash -c '
-              set -e
-              npm install -g pnpm@10.33.0 >/dev/null
-              pnpm install --frozen-lockfile >/dev/null
-              npm run build >/dev/null
-              ( while true; do echo "MON $(date +%T) $(awk "/MemAvailable/{print \"avail=\"int(\$2/1024)\"MB\"}" /proc/meminfo) node_procs=$(ls /proc | grep -c "^[0-9]") "; sleep 30; done ) &
-              npx vitest run --reporter=verbose --maxWorkers=2
-            '
-          rc=$?
-          echo "container exit code: $rc"
-          docker inspect amc-suite --format 'OOMKilled={{.State.OOMKilled}} ExitCode={{.State.ExitCode}} Error={{.State.Error}}'
-          exit $rc
-      - name: Kernel messages
-        if: always()
-        run: sudo dmesg | tail -n 60 || true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm run build
+      - name: Shard ${{ matrix.shard }} of 8
+        timeout-minutes: 25
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: npx vitest run --shard="$SHARD/8" --reporter=verbose --maxWorkers=2
