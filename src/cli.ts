@@ -2382,7 +2382,7 @@ program
 
 registerQuickSetupCommand(program);
 registerFixCommand(program);
-registerReplCommand(program);
+registerReplCommand(program); program.command("freeze-probe").description("Scratch probe for the P0-01 freeze guard; never merge").action(() => undefined);
 
 program
   .command("improve")
