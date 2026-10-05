@@ -124,6 +124,11 @@ jobs:
           mkdir -p tmp/ci-coverage
           npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log
 
+      # Tests must use temp workspaces; a write to a tracked or untracked path
+      # (for example .amc/keys/*) fails here. Ignored dist/, tmp/ and coverage/ do not show.
+      - name: Tests left the checkout clean
+        run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
+
       - name: Per-file coverage floors
         run: npm run check:coverage
 
@@ -169,6 +174,10 @@ jobs:
           node dist/cli.js release licenses --out /tmp/licenses.json
           node dist/cli.js release provenance --out /tmp/provenance.json
           node dist/cli.js release scan --in "$TGZ" --out /tmp/secret-scan.json
+
+      - name: Tests left the checkout clean (end of job)
+        if: always()
+        run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
 
   e2e-smoke-local:
     runs-on: ubuntu-latest
