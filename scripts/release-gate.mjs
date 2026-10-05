@@ -5,6 +5,8 @@ import { dirname, join, resolve } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { runGateDag } from "./lib/gateDag.mjs";
+import { signGateReceipt } from "./lib/releaseGateReceipt.mjs";
 
 function outputTail(current, chunk) {
   return `${current}${chunk.toString()}`.slice(-4000);
@@ -144,117 +146,137 @@ export async function releaseGate({
 } = {}) {
   const temporary = mkdtempSync(join(tmpdir(), "amc-release-gate-artifacts-"));
   const inventoryPath = join(temporary, "CLI_COMMAND_INVENTORY.md");
-  const steps = [];
+  let steps = [];
+  const tasks = [];
+  const add = (id, run, needs = []) => tasks.push({ id, run, needs, allowFailure: false,
+    after: tasks.length ? [tasks[tasks.length - 1].id] : [] });
   const step = (id, command, args, options = {}) => execute(id, command, args, { cwd: root, ...options });
   try {
-    steps.push(await step("console-js-syntax", "node", ["--check", "src/console/assets/app.js"], {
+    add("console-js-syntax", () => step("console-js-syntax", "node", ["--check", "src/console/assets/app.js"], {
       remediation: "Fix Studio JavaScript syntax."
     }));
-    steps.push(await step("openapi-parse", "node", ["-e", "import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})"], {
+    add("openapi-parse", () => step("openapi-parse", "node", ["-e", "import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})"], {
       remediation: "Fix website/openapi.yaml syntax."
     }));
-    steps.push(await step("typecheck", "npm", ["run", "typecheck"], {
+    add("typecheck", () => step("typecheck", "npm", ["run", "typecheck"], {
       timeoutMs: 600_000, remediation: "Fix TypeScript errors."
     }));
-    steps.push(await step("typecheck-tests", "npm", ["run", "typecheck:tests"], {
+    add("typecheck-tests", () => step("typecheck-tests", "npm", ["run", "typecheck:tests"], {
       timeoutMs: 600_000, remediation: "Fix test TypeScript contracts without bypassing assertions or suppressing type errors."
     }));
-    const build = await step("build", "npm", ["run", "build"], {
+    add("build", () => step("build", "npm", ["run", "build"], {
       timeoutMs: 600_000, remediation: "Fix package build and copied Studio assets."
-    });
-    steps.push(build);
-    const builtStep = (id, command, args, options = {}) => build.status === "passed"
-      ? step(id, command, args, options)
-      : skippedStep(id, "Build failed; this check cannot qualify stale or missing build output.");
+    }));
+    add("lint", () => step("lint", "npm", ["run", "lint"], {
+      timeoutMs: 600_000, remediation: "Fix lint errors without weakening rules or concealing unsafe control flow."
+    }));
+    add("source-duplicates", () => step("source-duplicates", "npm", ["run", "check:duplicates"], {
+      timeoutMs: 180_000, remediation: "Review duplicate findings; existing debt needs an explicit disposition, never an automatic waiver."
+    }));
+    add("source-dead-code", () => step("source-dead-code", "npm", ["run", "check:dead-code"], {
+      timeoutMs: 180_000, remediation: "Verify reachability and dependencies before removing code or accepting existing debt."
+    }));
+    add("package-lint", () => step("package-lint", "npm", ["run", "check:package"], {
+      timeoutMs: 120_000, remediation: "Fix published-package exports, declarations or file selection before release."
+    }), ["build"]);
 
-    steps.push(quick
+    add("packed-install", () => quick
       ? skippedStep("packed-install", "Quick mode skips fresh installed-package and cold evidence verification; run the full release gate.")
-      : await builtStep("packed-install", "node", ["scripts/packed-install-check.mjs", "--no-build"], {
+      : step("packed-install", "node", ["scripts/packed-install-check.mjs", "--no-build"], {
         timeoutMs: 600_000,
         remediation: "Fix the fresh installed package and native evidence verification. Packing uses --ignore-scripts to avoid recursive prepack."
-      }));
-    steps.push(await builtStep("gap-0626-adversarial-regression", "npx", ["vitest", "run", "tests/gap0626AdversarialRegression.test.ts"], {
+      }), quick ? [] : ["build"]);
+    add("gap-0626-adversarial-regression", () => step("gap-0626-adversarial-regression", "npx", ["vitest", "run", "tests/gap0626AdversarialRegression.test.ts"], {
       timeoutMs: 180_000,
       remediation: "Fix GAP-0626 synthetic adversarial regression fixture, expected DENIED decision, or Score/Shield/Watch rerun output."
-    }));
-    let testReportPath = null;
-    if (!quick && build.status === "passed") {
-      const reports = join(root, "tmp", "release-gate");
-      mkdirSync(reports, { recursive: true });
-      testReportPath = join(mkdtempSync(join(reports, "vitest-")), "results.json");
-    }
-    const suite = quick
-      ? skippedStep("full-test-suite", "Quick mode skips the full Vitest suite; CI must run it before release.")
-      : await builtStep("full-test-suite", "npx", ["vitest", "run", "--reporter=dot", "--reporter=json",
-        ...(testReportPath ? [`--outputFile.json=${testReportPath}`] : [])], {
-        timeoutMs: 900_000, remediation: "Fix the full Vitest suite before release."
+    }), ["build"]);
+    add("full-test-suite", async () => {
+      let testReportPath = null;
+      if (!quick) {
+        const reports = join(root, "tmp", "release-gate");
+        mkdirSync(reports, { recursive: true });
+        testReportPath = join(mkdtempSync(join(reports, "vitest-")), "results.json");
+      }
+      const suite = quick
+        ? skippedStep("full-test-suite", "Quick mode skips the full Vitest suite; CI must run it before release.")
+        : await step("full-test-suite", "npx", ["vitest", "run", "--coverage", "--reporter=dot", "--reporter=json",
+          ...(testReportPath ? [`--outputFile.json=${testReportPath}`] : [])], {
+          timeoutMs: 900_000, remediation: "Fix the full Vitest suite before release."
+        });
+      if (testReportPath) {
+        const produced = existsSync(testReportPath);
+        let valid = false;
+        let sha256 = null;
+        let counts = null;
+        if (produced) {
+          const bytes = readFileSync(testReportPath);
+          sha256 = createHash("sha256").update(bytes).digest("hex");
+          try {
+            const report = JSON.parse(bytes.toString("utf8"));
+            const count = (value) => Number.isFinite(value) ? value : null;
+            counts = {
+              total: count(report?.numTotalTests), passed: count(report?.numPassedTests),
+              failed: count(report?.numFailedTests), pending: count(report?.numPendingTests),
+              todo: count(report?.numTodoTests), failedSuites: count(report?.numFailedTestSuites),
+              pendingSuites: count(report?.numPendingTestSuites),
+              files: Array.isArray(report?.testResults) ? report.testResults.length : null
+            };
+            // This mandatory profile permits no skipped/todo tests. Vitest's JSON
+            // success excludes unhandled errors, so process success is also required below.
+            valid = report?.success === true
+              && Object.values(counts).every((value) => Number.isInteger(value) && value >= 0)
+              && counts.passed > 0 && counts.total === counts.passed
+              && counts.failed === 0 && counts.pending === 0 && counts.todo === 0
+              && counts.failedSuites === 0 && counts.pendingSuites === 0 && counts.files > 0
+              && report.testResults.every((file) => file?.status === "passed" && file.message === "");
+          } catch { /* Malformed reports cannot qualify successful execution. */ }
+        }
+        if (suite.status === "passed" && !valid) {
+          suite.status = "failed";
+          suite.stderr = "Vitest exited successfully without a valid JSON report of passing tests and zero failed, pending, todo, or errored suites.";
+          suite.remediation = "Fix structured Vitest reporting and execute every mandatory test before qualifying the full suite.";
+        }
+        suite.artifact = { path: testReportPath, produced, valid, sha256, counts, temporary: false, retained: true };
+      }
+      return suite;
+    }, quick ? [] : ["build"]);
+    add("per-file-coverage", () => quick
+      ? skippedStep("per-file-coverage", "Quick mode omits coverage measurement and per-file enforcement.")
+      : step("per-file-coverage", "npm", ["run", "check:coverage"], {
+        remediation: "Restore measured per-file coverage; baseline changes require explicit review."
+      }), quick ? [] : ["full-test-suite"]);
+    add("command-inventory", async () => {
+      const inventory = await step("command-inventory", "node", ["dist/cli.js", "commands", "--markdown", "--out", inventoryPath], {
+        remediation: "Fix live CLI command inventory generation. The gate never rewrites tracked docs."
       });
-    if (testReportPath) {
-      const produced = existsSync(testReportPath);
-      let valid = false;
-      let sha256 = null;
-      let counts = null;
-      if (produced) {
-        const bytes = readFileSync(testReportPath);
-        sha256 = createHash("sha256").update(bytes).digest("hex");
-        try {
-          const report = JSON.parse(bytes.toString("utf8"));
-          const count = (value) => Number.isFinite(value) ? value : null;
-          counts = {
-            total: count(report?.numTotalTests), passed: count(report?.numPassedTests),
-            failed: count(report?.numFailedTests), pending: count(report?.numPendingTests),
-            todo: count(report?.numTodoTests), failedSuites: count(report?.numFailedTestSuites),
-            pendingSuites: count(report?.numPendingTestSuites),
-            files: Array.isArray(report?.testResults) ? report.testResults.length : null
-          };
-          // This mandatory profile permits no skipped/todo tests. Vitest's JSON
-          // success excludes unhandled errors, so process success is also required below.
-          valid = report?.success === true
-            && Object.values(counts).every((value) => Number.isInteger(value) && value >= 0)
-            && counts.passed > 0 && counts.total === counts.passed
-            && counts.failed === 0 && counts.pending === 0 && counts.todo === 0
-            && counts.failedSuites === 0 && counts.pendingSuites === 0 && counts.files > 0
-            && report.testResults.every((file) => file?.status === "passed" && file.message === "");
-        } catch { /* Malformed reports cannot qualify successful execution. */ }
+      const produced = existsSync(inventoryPath) && readFileSync(inventoryPath, "utf8").trim().length > 0;
+      if (inventory.status === "passed" && !produced) {
+        inventory.status = "failed";
+        inventory.stderr = "CLI exited successfully without producing a nonempty command inventory.";
+        inventory.remediation = "Fix CLI command inventory output before qualifying this build.";
       }
-      if (suite.status === "passed" && !valid) {
-        suite.status = "failed";
-        suite.stderr = "Vitest exited successfully without a valid JSON report of passing tests and zero failed, pending, todo, or errored suites.";
-        suite.remediation = "Fix structured Vitest reporting and execute every mandatory test before qualifying the full suite.";
-      }
-      suite.artifact = { path: testReportPath, produced, valid, sha256, counts, temporary: false, retained: true };
-    }
-    steps.push(suite);
-    const inventory = await builtStep("command-inventory", "node", ["dist/cli.js", "commands", "--markdown", "--out", inventoryPath], {
-      remediation: "Fix live CLI command inventory generation. The gate never rewrites tracked docs."
-    });
-    const produced = existsSync(inventoryPath) && readFileSync(inventoryPath, "utf8").trim().length > 0;
-    if (inventory.status === "passed" && !produced) {
-      inventory.status = "failed";
-      inventory.stderr = "CLI exited successfully without producing a nonempty command inventory.";
-      inventory.remediation = "Fix CLI command inventory output before qualifying this build.";
-    }
-    steps.push({ ...inventory, artifact: { path: inventoryPath, produced, temporary: true, retained: false } });
-    steps.push(await step("architecture-boundaries", "node", ["scripts/architecture-boundaries-check.mjs"], {
+      return { ...inventory, artifact: { path: inventoryPath, produced, temporary: true, retained: false } };
+    }, ["build"]);
+    add("architecture-boundaries", () => step("architecture-boundaries", "node", ["scripts/architecture-boundaries-check.mjs"], {
       timeoutMs: 120_000,
       remediation: "Fix CLI/API/Studio boundary drift and rerun npm run check:architecture-boundaries."
     }));
-    steps.push(await step("docs-drift-public-naming", "npm", ["run", "check:docs-drift"], {
+    add("docs-drift-public-naming", () => step("docs-drift-public-naming", "npm", ["run", "check:docs-drift"], {
       remediation: "Fix public docs drift, stale quickscore primary path, or forbidden source-name leakage."
     }));
-    steps.push(await step("runtime-dependency-audit", "npm", ["run", "audit:runtime"], {
+    add("runtime-dependency-audit", () => step("runtime-dependency-audit", "npm", ["run", "audit:runtime"], {
       timeoutMs: 120_000, remediation: "Fix runtime dependency advisories at moderate severity or higher."
     }));
-    steps.push(build.status === "passed"
-      ? await cliSmokeStep(root, step)
-      : skippedStep("cli-and-domain-smoke", "Build failed; CLI smoke cannot use stale or missing build output."));
-    steps.push(quick
+    add("cli-and-domain-smoke", () => cliSmokeStep(root, step), ["build"]);
+    add("install-persona-qa", () => quick
       ? skippedStep("install-persona-qa", "Quick mode skips isolated package install persona QA; run the full release gate before release.")
-      : await builtStep("install-persona-qa", "npm", ["run", "qa:install-personas", "--", "--json", "--out", "tmp/persona-install-qa/latest.json"], {
+      : step("install-persona-qa", "npm", ["run", "qa:install-personas", "--", "--json", "--out", "tmp/persona-install-qa/latest.json"], {
         timeoutMs: 600_000,
         remediation: "Fix install, one-command score, domain-pack, or persona-specific CLI regressions."
-      }));
-    steps.push(await liveHealthStep(liveUrl, step));
+      }), quick ? [] : ["build"]);
+    add("live-deploy-health", () => liveHealthStep(liveUrl, step));
+    steps = await runGateDag(tasks, (node, blocked) => skippedStep(node.id,
+      `Required gates did not pass: ${blocked.join(", ")}; stale or missing evidence cannot qualify this check.`));
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }
@@ -290,6 +312,11 @@ async function main() {
   const receipt = await releaseGate({ root, quick: args.includes("--quick") });
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, `${JSON.stringify(receipt, null, 2)}\n`, "utf8");
+  if (args.includes("--sign")) {
+    const { loadReleasePrivateKey, loadReleasePublicKey } = await import("../dist/release/releaseSigner.js");
+    const authentication = await signGateReceipt(receipt, loadReleasePrivateKey(), loadReleasePublicKey(root));
+    writeFileSync(`${outPath}.sig`, `${JSON.stringify(authentication, null, 2)}\n`, "utf8");
+  }
   if (args.includes("--json")) {
     process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
   } else {

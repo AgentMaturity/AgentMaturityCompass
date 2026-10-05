@@ -4,7 +4,7 @@ import { resolveAgentId } from "../fleet/paths.js";
 import { ensureDir, pathExists, readUtf8 } from "../utils/fs.js";
 import { benchmarkSchema, type BenchmarkArtifact } from "./benchSchema.js";
 
-export function benchmarksDir(workspace: string): string {
+function benchmarksDir(workspace: string): string {
   return join(workspace, ".amc", "benchmarks");
 }
 

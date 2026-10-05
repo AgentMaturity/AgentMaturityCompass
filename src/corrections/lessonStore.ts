@@ -85,7 +85,7 @@ function lessonFilePath(workspace: string, lessonId: string): string {
   return join(lessonsDir(workspace), `${lessonId}.json`);
 }
 
-export function loadAllLessons(workspace: string): Lesson[] {
+function loadAllLessons(workspace: string): Lesson[] {
   const dir = lessonsDir(workspace);
   if (!pathExists(dir)) return [];
   const files = readdirSync(dir).filter((f: string) => f.endsWith(".json"));

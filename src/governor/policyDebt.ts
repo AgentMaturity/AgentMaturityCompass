@@ -145,20 +145,20 @@ export function resolveDebtEntry(workspace: string, debtId: string): boolean {
   return true;
 }
 
-export function loadDebtEntry(workspace: string, debtId: string): PolicyDebtEntry | null {
+function loadDebtEntry(workspace: string, debtId: string): PolicyDebtEntry | null {
   const file = debtFilePath(workspace, debtId);
   if (!pathExists(file)) return null;
   return JSON.parse(readUtf8(file)) as PolicyDebtEntry;
 }
 
-export function listActiveDebt(workspace: string, agentId?: string): PolicyDebtEntry[] {
+function listActiveDebt(workspace: string, agentId?: string): PolicyDebtEntry[] {
   const now = Date.now();
   return loadAllDebt(workspace).filter((d) =>
     !d.resolved && d.expiryTs > now && (!agentId || d.agentId === agentId)
   );
 }
 
-export function listExpiredUnresolved(workspace: string, agentId?: string): PolicyDebtEntry[] {
+function listExpiredUnresolved(workspace: string, agentId?: string): PolicyDebtEntry[] {
   const now = Date.now();
   return loadAllDebt(workspace).filter((d) =>
     !d.resolved && d.expiryTs <= now && (!agentId || d.agentId === agentId)
@@ -168,7 +168,7 @@ export function listExpiredUnresolved(workspace: string, agentId?: string): Poli
 /** Debt accumulation alert threshold */
 const DEBT_THRESHOLD = 5;
 
-export function checkDebtAccumulation(workspace: string, agentId?: string): DebtAccumulationAlert {
+function checkDebtAccumulation(workspace: string, agentId?: string): DebtAccumulationAlert {
   const active = listActiveDebt(workspace, agentId);
   const expiredUnresolved = listExpiredUnresolved(workspace, agentId);
   const highRisk = active.filter((d) => d.riskAssessment === "HIGH" || d.riskAssessment === "CRITICAL");

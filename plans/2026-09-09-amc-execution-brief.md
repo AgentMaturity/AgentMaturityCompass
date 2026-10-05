@@ -37,6 +37,13 @@ run on different harnesses concurrently; §3 and §4 already assume that. Where 
 names a harness-specific tool, use your harness's equivalent, and if there is none, do the
 work by hand and say so in the execution log. (Sid, 2026-09-09.)
 
+> 2026-10-03 correction (Sid, this session): for the regulated-platform program the one-model
+> rule is superseded — 5 Fable 5.1 planner/monitor agents orchestrate 10 Opus 5.5 specialist
+> engineers (per-agent `model` override in the Workflow `agent()` API), on non-overlapping
+> tracks, toward deployment readiness and regulation-current industry packs. Everything else
+> in this brief stands; the one-model rule resumes after the program. Logged in the execution
+> log at the same timestamp.
+
 ---
 
 ## 1. Ground truth — verify these before trusting them

@@ -41,7 +41,7 @@ function configSha(workspace: string, relPath: string): string | null {
   return sha256Hex(readFileSync(path));
 }
 
-export function buildNotaryAttestation(params: {
+function buildNotaryAttestation(params: {
   signer: NotarySigner;
   workspace?: string | null;
 }): z.infer<typeof notaryAttestPayloadSchema> {

@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { randomUUID } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
@@ -442,7 +443,7 @@ function migrationReceiptFromMetadata(metadata: unknown): RuntimeFirewallMigrati
   return parsed.success ? parsed.data.receipt : null;
 }
 
-export function runtimeFirewallRoot(workspace: string): string {
+function runtimeFirewallRoot(workspace: string): string {
   return join(workspace, ".amc", "firewall");
 }
 
@@ -450,11 +451,11 @@ export function runtimeFirewallPolicyPath(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "policy.json");
 }
 
-export function runtimeFirewallPolicyJournalDir(workspace: string): string {
+function runtimeFirewallPolicyJournalDir(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "policy-revisions");
 }
 
-export function runtimeFirewallEventsDir(workspace: string): string {
+function runtimeFirewallEventsDir(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "events");
 }
 
@@ -1231,15 +1232,10 @@ export function listRuntimeFirewallDecisions(input: { workspace: string; limit?:
 }
 
 function redactPath(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
-export function redactRuntimeFirewallDecision(decision: RuntimeFirewallDecision): RuntimeFirewallDecision {
+function redactRuntimeFirewallDecision(decision: RuntimeFirewallDecision): RuntimeFirewallDecision {
   return {
     ...decision,
     workspace: "$WORKSPACE",

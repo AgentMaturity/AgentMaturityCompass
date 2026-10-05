@@ -100,7 +100,7 @@ export function trustConfigSigPath(workspace: string): string {
   return `${trustConfigPath(workspace)}.sig`;
 }
 
-export function defaultTrustConfig(): TrustConfig {
+function defaultTrustConfig(): TrustConfig {
   return trustConfigSchema.parse({
     trust: {
       version: 1,
@@ -154,7 +154,7 @@ export function initTrustConfig(workspace: string): {
   return { path, sigPath, config };
 }
 
-export function saveTrustConfig(workspace: string, config: TrustConfig): {
+function saveTrustConfig(workspace: string, config: TrustConfig): {
   path: string;
   sigPath: string;
 } {

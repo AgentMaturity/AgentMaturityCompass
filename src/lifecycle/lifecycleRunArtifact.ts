@@ -358,11 +358,11 @@ export function redactLifecycleRunArtifact(artifact: LifecycleRunArtifact): Life
   };
 }
 
-export function lifecycleRunArtifactsDir(workspace: string, agentId?: string): string {
+function lifecycleRunArtifactsDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "lifecycle-runs");
 }
 
-export function lifecycleRunArtifactPath(workspace: string, agentId: string | undefined, runId: string): string {
+function lifecycleRunArtifactPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(lifecycleRunArtifactsDir(workspace, agentId), `${runId}.json`);
 }
 

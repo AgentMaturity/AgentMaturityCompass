@@ -84,3 +84,31 @@ Fixed clean-source cache cleanup and installed composition's unpublished workspa
 # REV_DEVOPS_ENGINEER Handoff — 2026-09-29
 
 Candidate `421859b0` passed both full suites (14,130 tests), existing coverage thresholds, all 14 executed release checks and installed Studio/crash/non-replay/npm-link acceptance. All worktree heads and local branch tips are integrated. Source and public distribution remain distinct: native 1.2.0 requires the source build; public installers now correctly fetch the available 1.1.1 release. The exact receipts, remote setup commands, current CI scope and external blockers are in [the completion handoff](../RELEASES/2026-09-29-completion/README.md). Live deployment health remains skipped; real model access, publication/deployment inputs and Linear reconnection are still needed. Private runtime files are preserved locally.
+
+
+---
+
+# REV_DEVOPS_ENGINEER — deployment/platform coordination — 2026-10-03
+
+Read-only review of clean combined `4a5b48e5fa8a32bb793fe9a448b06112f9143a28`; all four assigned existing owners received precise nonoverlapping follow-ups. No extra workers, model changes, production/config edits, application commands, tests or deployment.
+
+Concrete blocker sent immediately to main/parent: `.github/workflows/npm-publish.yml:42,44` repeats the checkout `ref` key. Main owns correction and strict YAML acceptance. Docker found no new defect. Compose allowlist typo is already fixed by main `05486c31`; owner private alignment is redundant. Helm reported metrics-port collision, fractional/invalid port/replica and duplicate API route guard gaps; exact scope awaits main admission. CI helper/contract follow-up is still source-only and pending.
+
+Current deployment source remains unqualified. Last completed compiler pass inspected belongs to `f595a639`, with separate public/core functional control failures retained. Main is composing pending product/API/dependency repairs before a fresh exact-pin build/typecheck and inspected benign static contracts. Real image, Compose, Helm/Kustomize and six-platform/package acceptance remain open. Restricted runtime remains prohibited; no policy or credential changes requested.
+
+Detailed evidence and commits: `AMC_OS/RESEARCH/2026-10-01-pending-implementation/native-workers/ten-worker-expansion/deployment-platform-coordination/20261003T040716Z/review.json`. Complete prior handoff bytes preserved alongside it.
+
+
+Deployment/platform follow-up: CI source review completed. Clean private final HEAD `eb568171eeb6f6b61053c1f844e38e3e7814f17d`; ordered source corrections `6ed167f9e71117993c8bb30ed179580788c6feeb`, `52930895bcc509d6335526fe82d6d922e30236a9` are sent to main/parent. Complete dirty-source checks stay intact, unsafe receipt locations are refused before writing, and current declared publication assets are checked with package evidence retained. Tests/build/scanners/platform lanes remain unrun. Full diff inspected natively; source clone clean. Later main candidate `067ac23892cddc9639b671450fd11b54f248e17d` was also verified clean; no compiler pass on it is claimed. Chart guards and conditional historical quickstart expansion await main. Node20 quickstart defaults to1.1.1, so current1.2.0 manifest alone does not prove its default is broken.
+
+Exact final source review/delivery: `AMC_OS/RESEARCH/2026-10-01-pending-implementation/native-workers/ten-worker-expansion/deployment-platform-coordination/20261003T040716Z/followup-delivery.json`.
+
+
+Admitted deployment follow-ups delivered — 2026-10-03: Docker source `890f9d11b3fea4d14f6d09b8e397515712078ca0`, final `24a0fde66a27b3432ab2e1df48ba446ca5ac3009`; Helm source `bbaa915c5395af4069f166419924066106080c61`, final `71b6757446ab656831899d620c9f564dbd74d3d4`. Both derive from main-admitted `eede912c`, preserve full originals, and were independently reviewed using native read-only Git/filesystem. Clean final clones and whole whitespace checks pass. Docker inverse/log first whitespace failures remain byte-complete in gzip containers; Helm four originals match admitted base exactly. Main received both full commit chains and clone paths.
+
+Main validation dependencies: Docker four authored static cases; Helm eleven authored source contracts and the saved 15-positive/37-negative offline render matrix. All compiler/test/render/image/runtime work is still unrun here and belongs to main's serialized queue. No source/package/platform qualification is claimed. CI correction `eb568171` remains the earlier delivered acceptance dependency; Compose needs no duplicate patch. Detailed commits, original checks, scope and remaining limitations: `AMC_OS/RESEARCH/2026-10-01-pending-implementation/native-workers/ten-worker-expansion/deployment-platform-coordination/20261003T040716Z/admitted-delivery-final.json`.
+
+
+### 20261003T102947Z collector-json-metadata source review
+
+Finite slice delivered and independently reviewed at `3c24d5c2a58d966cdacc83114d9ad297882ac2cf`; base `856711e8`. Exactly five admitted product/test paths, complete originals and guarded inverses preserved, clean final clone, complete diff check exit 0. All 49 cases authored/unrun; compiler/build/runtime/detectors unrun. Main alone owns the privacy binder historical guard composition and serialized qualification. Source changes stopped. Full receipt: `AMC_OS/RESEARCH/2026-10-01-pending-implementation/native-workers/ten-worker-expansion/deployment-platform-coordination/20261003T102947Z/collector-review.json`. Main and parent received exact commits/clone/blockers.

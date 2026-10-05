@@ -84,7 +84,7 @@ function gatewayPaths(workspace: string): { configPath: string; sigPath: string 
   };
 }
 
-export function expandEnvTemplate(input: string, env: NodeJS.ProcessEnv = process.env): string {
+function expandEnvTemplate(input: string, env: NodeJS.ProcessEnv = process.env): string {
   return input.replace(/\$\{([A-Z0-9_]+)(:-([^}]*))?\}/gi, (_all, key: string, _fallback: string | undefined, defaultValue: string | undefined) => {
     const value = env[key];
     if (typeof value === "string" && value.length > 0) {
@@ -357,7 +357,7 @@ export function saveGatewayConfig(workspace: string, config: GatewayConfig, expl
   return targetPath;
 }
 
-export function loadGatewayConfigFromPath(configPath: string): GatewayConfig {
+function loadGatewayConfigFromPath(configPath: string): GatewayConfig {
   if (!pathExists(configPath)) {
     throw new Error(`Gateway config not found: ${configPath}`);
   }

@@ -1,5 +1,14 @@
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
+import {
+  auditTimestampPresent as timestampPresent,
+  uniqueAuditReasons as unique,
+  auditSignedRefValid as signedRefValid,
+  auditEvidenceRefsValid as evidenceRefsValid,
+  hashAuditEvidence,
+  collectAuditSourceIds,
+  finalizeAuditEvidenceReceipt,
+  beginAuditReceiptVerification,
+  finalizeAuditEvidenceExport
+} from "../audit/auditEvidenceAccounting.js";
 
 export type GovernanceExceptionApprovalDecision = "approved" | "rejected";
 export type GovernanceExceptionRenewalOutcome = "renewed" | "denied" | "not_requested";
@@ -98,37 +107,12 @@ export interface GovernanceExceptionLifecycleVerification {
   reasons: string[];
 }
 
-function isSha256(value: string | undefined): boolean {
-  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-}
-
-function timestampPresent(value: string | undefined): boolean {
-  return typeof value === "string" && value.length > 0 && !Number.isNaN(Date.parse(value));
-}
-
-function unique(values: string[]): string[] {
-  return [...new Set(values)];
-}
-
-function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {
-  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));
-}
-
 function rowHash(row: Omit<GovernanceExceptionLifecycleRow, "rowHash">): string {
-  return sha256Hex(canonicalize(row));
+  return hashAuditEvidence(row);
 }
 
 function receiptHash(receipt: Omit<GovernanceExceptionLifecycleReceipt, "receiptHash">): string {
-  return sha256Hex(canonicalize(receipt));
-}
-
-function evidenceRefsValid(evidenceRefs: GovernanceExceptionLifecycleEvidenceLink[]): boolean {
-  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (
-    Boolean(evidence.eventId)
-    && Boolean(evidence.eventType)
-    && Boolean(evidence.signedEvidenceRef)
-    && isSha256(evidence.eventHash)
-  ));
+  return hashAuditEvidence(receipt);
 }
 
 function compensatingControlValid(control: GovernanceExceptionCompensatingControl): boolean {
@@ -158,10 +142,7 @@ export function buildGovernanceExceptionLifecycleReceipt(input: {
   generatedAt?: string;
 }): GovernanceExceptionLifecycleReceipt {
   const failClosedReasons: string[] = [];
-  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));
-  if (sourceIds.size === 0) {
-    failClosedReasons.push("sourceCitations:missing");
-  }
+  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);
 
   const rows = input.exceptions.map((exception): GovernanceExceptionLifecycleRow => {
     const sourceCitationIds = exception.sourceCitationIds ?? [...sourceIds];
@@ -244,8 +225,8 @@ export function buildGovernanceExceptionLifecycleReceipt(input: {
       renewalDecidedAt: exception.renewalDecision.decidedAt,
       sourceCitationIds,
       evidenceRefs: exception.evidenceRefs,
-      compensatingControlsHash: sha256Hex(canonicalize(exception.compensatingControls)),
-      evidenceChainHash: sha256Hex(canonicalize(exception.evidenceRefs)),
+      compensatingControlsHash: hashAuditEvidence(exception.compensatingControls),
+      evidenceChainHash: hashAuditEvidence(exception.evidenceRefs),
     };
 
     return {
@@ -258,34 +239,13 @@ export function buildGovernanceExceptionLifecycleReceipt(input: {
     failClosedReasons.push("exceptions:missing");
   }
 
-  const withoutHash: Omit<GovernanceExceptionLifecycleReceipt, "receiptHash"> = {
-    receiptId: input.receiptId,
-    generatedAt: input.generatedAt ?? new Date().toISOString(),
-    sourceCitations: input.sourceCitations,
-    rows,
-    failClosed: failClosedReasons.length > 0,
-    failClosedReasons: unique(failClosedReasons),
-  };
-
-  return {
-    ...withoutHash,
-    receiptHash: receiptHash(withoutHash),
-  };
+  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);
 }
 
 export function verifyGovernanceExceptionLifecycleReceipt(
   receipt: GovernanceExceptionLifecycleReceipt
 ): GovernanceExceptionLifecycleVerification {
-  const reasons: string[] = [];
-  if (receipt.failClosed) {
-    reasons.push(...receipt.failClosedReasons);
-  }
-  if (receipt.sourceCitations.length === 0) {
-    reasons.push("sourceCitations:missing");
-  }
-  if (receipt.rows.length === 0) {
-    reasons.push("exceptions:missing");
-  }
+  const reasons = beginAuditReceiptVerification(receipt, "exceptions:missing");
   for (const row of receipt.rows) {
     const { rowHash: actualRowHash, ...withoutRowHash } = row;
     if (rowHash(withoutRowHash) !== actualRowHash) {
@@ -351,13 +311,5 @@ export function renderGovernanceExceptionLifecycleAuditExport(
     ];
     lines.push(`| ${values.map((value) => value.replace(/\|/g, "\\|")).join(" | ")} |`);
   }
-  if (receipt.failClosedReasons.length > 0) {
-    lines.push("");
-    lines.push("## Fail-Closed Reasons");
-    for (const reason of receipt.failClosedReasons) {
-      lines.push(`- ${reason}`);
-    }
-  }
-  lines.push("");
-  return lines.join("\n");
+  return finalizeAuditEvidenceExport(lines, receipt);
 }

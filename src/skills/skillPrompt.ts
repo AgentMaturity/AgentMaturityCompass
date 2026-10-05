@@ -38,12 +38,12 @@ import type { Skill } from "./skillCatalog.js";
 export const SKILL_CONTEXT_ORDER = 150;
 
 /** The context name a loaded skill registers under. */
-export function skillContextName(skill: Skill): string {
+function skillContextName(skill: Skill): string {
   return `skill:${skill.name}`;
 }
 
 /** Frame a skill for the model: whose words these are, and where they came from. */
-export function renderSkillContext(skill: Skill): string {
+function renderSkillContext(skill: Skill): string {
   return [
     `# Skill: ${skill.name}`,
     `${skill.description}`,

@@ -32,7 +32,7 @@ export interface SandboxRunnerInit {
 }
 
 /** The backends AMC ships, in preference order. */
-export function defaultBackends(): readonly SandboxBackend[] {
+function defaultBackends(): readonly SandboxBackend[] {
   // Availability is a prerequisite only. Linux execution requires a separate
   // launcher status receipt; the backend never promotes binary presence to
   // evidence that a namespace/profile was actually applied.

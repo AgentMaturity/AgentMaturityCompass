@@ -48,7 +48,7 @@ function digestOf(bytes: Buffer): string {
  * files. Falls back to the given path when the file does not exist yet, which
  * is the normal case for a write.
  */
-export function canonicalKey(path: string): string {
+function canonicalKey(path: string): string {
   try {
     return realpathSync(path);
   } catch {

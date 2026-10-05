@@ -1,5 +1,12 @@
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
+import {
+  isAuditEvidenceSha256 as isSha256,
+  uniqueAuditReasons as unique,
+  hashAuditEvidence,
+  collectAuditSourceIds,
+  finalizeAuditEvidenceReceipt,
+  beginAuditReceiptVerification,
+  finalizeAuditEvidenceExport
+} from "./auditEvidenceAccounting.js";
 
 export type ReviewerIndependenceRiskTier = "low" | "medium" | "high" | "critical";
 export type ReviewerIndependenceDecision = "approved" | "rejected" | "escalated";
@@ -105,20 +112,12 @@ export interface ReviewerIndependenceVerification {
 
 const HIGH_RISK_TIERS = new Set<ReviewerIndependenceRiskTier>(["high", "critical"]);
 
-function isSha256(value: string | undefined): boolean {
-  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-}
-
-function unique(values: string[]): string[] {
-  return [...new Set(values)];
-}
-
 function rowHash(row: Omit<ReviewerIndependenceRow, "rowHash">): string {
-  return sha256Hex(canonicalize(row));
+  return hashAuditEvidence(row);
 }
 
 function receiptHash(receipt: Omit<ReviewerIndependenceReceipt, "receiptHash">): string {
-  return sha256Hex(canonicalize(receipt));
+  return hashAuditEvidence(receipt);
 }
 
 function validateEvidenceRefs(approvalId: string, evidenceRefs: ReviewerIndependenceEvidenceLink[], reasons: string[]): void {
@@ -185,10 +184,7 @@ export function buildReviewerIndependenceReceipt(input: {
   generatedAt?: string;
 }): ReviewerIndependenceReceipt {
   const failClosedReasons: string[] = [];
-  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));
-  if (sourceIds.size === 0) {
-    failClosedReasons.push("sourceCitations:missing");
-  }
+  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);
 
   const rows = input.approvals.map((approval): ReviewerIndependenceRow => {
     const citationIds = approval.sourceCitationIds ?? [...sourceIds];
@@ -218,7 +214,7 @@ export function buildReviewerIndependenceReceipt(input: {
       conflictFree: noConflicts,
       secondReviewSatisfied: secondSatisfied,
       evidenceRefs: approval.evidenceRefs,
-      evidenceChainHash: sha256Hex(canonicalize(approval.evidenceRefs)),
+      evidenceChainHash: hashAuditEvidence(approval.evidenceRefs),
     };
 
     if (citationIds.length === 0) {
@@ -261,33 +257,13 @@ export function buildReviewerIndependenceReceipt(input: {
     failClosedReasons.push("approvals:missing");
   }
 
-  const withoutHash: Omit<ReviewerIndependenceReceipt, "receiptHash"> = {
-    receiptId: input.receiptId,
-    generatedAt: input.generatedAt ?? new Date().toISOString(),
-    sourceCitations: input.sourceCitations,
-    rows,
-    failClosed: failClosedReasons.length > 0,
-    failClosedReasons: unique(failClosedReasons),
-  };
-  return {
-    ...withoutHash,
-    receiptHash: receiptHash(withoutHash),
-  };
+  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);
 }
 
 export function verifyReviewerIndependenceReceipt(
   receipt: ReviewerIndependenceReceipt
 ): ReviewerIndependenceVerification {
-  const reasons: string[] = [];
-  if (receipt.failClosed) {
-    reasons.push(...receipt.failClosedReasons);
-  }
-  if (receipt.sourceCitations.length === 0) {
-    reasons.push("sourceCitations:missing");
-  }
-  if (receipt.rows.length === 0) {
-    reasons.push("approvals:missing");
-  }
+  const reasons = beginAuditReceiptVerification(receipt, "approvals:missing");
   for (const row of receipt.rows) {
     const { rowHash: actualRowHash, ...withoutRowHash } = row;
     if (rowHash(withoutRowHash) !== actualRowHash) {
@@ -349,13 +325,5 @@ export function renderReviewerIndependenceAuditExport(receipt: ReviewerIndepende
     ];
     lines.push(`| ${values.map((value) => value.replace(/\|/g, "\\|")).join(" | ")} |`);
   }
-  if (receipt.failClosedReasons.length > 0) {
-    lines.push("");
-    lines.push("## Fail-Closed Reasons");
-    for (const reason of receipt.failClosedReasons) {
-      lines.push(`- ${reason}`);
-    }
-  }
-  lines.push("");
-  return lines.join("\n");
+  return finalizeAuditEvidenceExport(lines, receipt);
 }

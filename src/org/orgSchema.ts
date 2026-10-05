@@ -185,4 +185,4 @@ export interface OrgScorecard {
   };
 }
 
-export const orgScorecardSignatureSchema = orgSignatureSchema;
+export { orgSignatureSchema as orgScorecardSignatureSchema };

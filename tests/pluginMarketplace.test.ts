@@ -1,12 +1,12 @@
 import { createPrivateKey, sign } from "node:crypto";
 import { createServer, type Server } from "node:http";
-import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
+import { extractPluginPackage, printPluginPackage, pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
 import { initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
 import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
@@ -575,5 +575,73 @@ describe("plugin marketplace", () => {
     expect(status).toBeDefined();
     expect(status?.failedValidation).toBe(true);
     expect(status?.errors.some((row) => row.includes("FAILED_VALIDATION"))).toBe(true);
+  });
+});
+
+
+describe("supported plugin package public workflows", () => {
+  test("prints signed package verification and extracts canonical, alternate and flat layouts", () => {
+    const ws = workspace(), keys = pluginKeygen({ outDir: join(ws, "owned-keys") });
+    const source = pluginSource({ root: ws, pluginId: "amc.plugin.fixture.public", version: "1.0.0",
+      contentFiles: [{ path: "learn/questions/AMC-PUBLIC.md", content: "# owned public workflow fixture\n" }] });
+    const file = join(ws, "owned-public.amcplug");
+    const packed = pluginPack({ inputDir: source, keyPath: keys.privateKeyPath, outFile: file });
+    const verified = verifyPluginPackage({ file });
+    expect(verified.ok).toBe(true);
+    const printed = printPluginPackage(file);
+    expect(printed.pluginId).toBe("amc.plugin.fixture.public");
+    expect(printed.version).toBe("1.0.0");
+    expect(printed.artifactCount).toBe(1);
+    expect(printed.publisherFingerprint).toBe(verified.publisherFingerprint);
+    expect(printed.verification).toEqual({ ok: true, errors: [] });
+    expect(packed.outFile).toBe(file);
+    expect(packed.manifest).toEqual(verified.manifest);
+    expect(packed.manifest.signing.pubkeyFingerprint).toBe(keys.fingerprint);
+    expect(packed.signature.signer).toBe("publisher");
+    const canonical = extractPluginPackage(file, join(ws, "canonical-extract")).rootDir;
+    expect(canonical).toBe(join(ws, "canonical-extract", "amc-plugin"));
+    for (const layout of ["alternate", "flat"] as const) {
+      const content = join(ws, `owned-${layout}-content`);
+      const initial = extractPluginPackage(file, content).rootDir;
+      const expected = layout === "alternate" ? join(content, "renamed-plugin") : content;
+      if (layout === "alternate") renameSync(initial, expected);
+      else {
+        for (const entry of readdirSync(initial)) renameSync(join(initial, entry), join(content, entry));
+        rmSync(initial, { recursive: true });
+      }
+      writeFileSync(join(content, "ignored.txt"), "non-directory fixture");
+      mkdirSync(join(content, "incomplete-child"));
+      writeFileSync(join(content, "incomplete-child", "manifest.json"), "{}");
+      const repacked = join(ws, `${layout}.amcplug`);
+      const tar = spawnSync("tar", ["-czf", repacked, "-C", content, "."], { encoding: "utf8" });
+      expect(tar.status, tar.stderr).toBe(0);
+      const destination = join(ws, `${layout}-extract`), actual = extractPluginPackage(repacked, destination).rootDir;
+      expect(actual).toBe(layout === "alternate" ? join(destination, "renamed-plugin") : destination);
+      expect(readUtf8(join(actual, "content", "learn", "questions", "AMC-PUBLIC.md"))).toBe("# owned public workflow fixture\n");
+      // Payload/signature bytes are unchanged; extraction itself is not a verifier.
+      expect(readFileSync(join(actual, "manifest.json"))).toEqual(readFileSync(join(canonical, "manifest.json")));
+    }
+  });
+  test("malformed gzip printing preserves the verifier refusal", () => {
+    const ws = workspace(), file = join(ws, "malformed.amcplug");
+    writeFileSync(file, "owned invalid gzip fixture");
+    expect(() => verifyPluginPackage({ file })).toThrow();
+    expect(() => printPluginPackage(file)).toThrow();
+  });
+  test("incomplete valid archive printing refuses verification and omits identity", () => {
+    const ws = workspace(), content = join(ws, "owned-incomplete-plugin"), file = join(ws, "incomplete.amcplug");
+    mkdirSync(content);
+    writeFileSync(join(content, "manifest.json"), "{}");
+    const tar = spawnSync("tar", ["-czf", file, "-C", content, "."], { encoding: "utf8" });
+    expect(tar.status, tar.stderr).toBe(0);
+    const verified = verifyPluginPackage({ file });
+    expect(verified).toEqual({ ok: false, errors: ["plugin bundle missing manifest/signature/publisher key"],
+      manifest: null, publisherFingerprint: null });
+    const printed = printPluginPackage(file);
+    expect(printed.verification.ok).toBe(false);
+    expect(printed.verification.errors.length).toBeGreaterThan(0);
+    expect(printed.pluginId).toBeNull();
+    expect(printed.version).toBeNull();
+    expect(printed.artifactCount).toBe(0);
   });
 });

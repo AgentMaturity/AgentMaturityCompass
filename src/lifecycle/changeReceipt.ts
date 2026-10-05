@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -226,11 +227,11 @@ export function buildLifecycleChangeReceipts(input: WriteLifecycleChangeReceipts
   return receipts;
 }
 
-export function lifecycleChangeReceiptsDir(workspace: string, agentId?: string): string {
+function lifecycleChangeReceiptsDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "lifecycle-receipts");
 }
 
-export function lifecycleChangeReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {
+function lifecycleChangeReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(lifecycleChangeReceiptsDir(workspace, agentId), `${runId}.json`);
 }
 
@@ -256,7 +257,7 @@ export function writeLifecycleChangeReceipts(input: WriteLifecycleChangeReceipts
   };
 }
 
-export function buildRollbackLifecycleReceipt(input: {
+function buildRollbackLifecycleReceipt(input: {
   workspace: string;
   agentId: string;
   command: string;
@@ -358,12 +359,7 @@ export function loadLifecycleChangeReceipt(input: { workspace: string; selector:
 }
 
 function redactPathForExport(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
 export function redactLifecycleChangeReceipt(receipt: LifecycleChangeReceipt): LifecycleChangeReceipt {

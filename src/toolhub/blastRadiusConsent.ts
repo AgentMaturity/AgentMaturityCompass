@@ -97,11 +97,11 @@ function urlHost(value: unknown): string | null {
   }
 }
 
-export function isHighImpactAction(actionClass: ActionClass): boolean {
+function isHighImpactAction(actionClass: ActionClass): boolean {
   return HIGH_IMPACT_ACTIONS.has(actionClass);
 }
 
-export function summarizeToolBlastRadius(params: {
+function summarizeToolBlastRadius(params: {
   toolName: string;
   actionClass: ActionClass;
   args: Record<string, unknown>;
@@ -177,7 +177,7 @@ export function summarizeToolBlastRadius(params: {
   };
 }
 
-export function buildToolBlastRadiusPrompt(params: {
+function buildToolBlastRadiusPrompt(params: {
   toolName: string;
   actionClass: ActionClass;
   requestedMode: ExecutionMode;

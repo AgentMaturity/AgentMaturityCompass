@@ -1,6 +1,7 @@
+import { collectFiles as collectArchiveFiles } from "../utils/archiveFiles.js";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
@@ -41,19 +42,7 @@ function cleanup(path: string): void {
 }
 
 function collectFiles(root: string): string[] {
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile()) {
-        out.push(relative(root, full).replace(/\\/g, "/"));
-      }
-    }
-  };
-  walk(root);
-  return out.sort((a, b) => a.localeCompare(b));
+  return collectArchiveFiles(root);
 }
 
 function tarCreateDeterministic(sourceDir: string, outFile: string): void {

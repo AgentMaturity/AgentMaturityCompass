@@ -27,7 +27,7 @@ const importedBenchMetaSchema = z.object({
 
 export type ImportedBenchMeta = z.infer<typeof importedBenchMetaSchema>;
 
-export function benchRegistryCachePath(workspace: string, registryId: string): {
+function benchRegistryCachePath(workspace: string, registryId: string): {
   indexPath: string;
   sigPath: string;
   pubPath: string;

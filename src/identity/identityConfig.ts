@@ -163,7 +163,7 @@ interface IdentitySigEnvelope {
   signedTs: number;
 }
 
-export function identityConfigPaths(hostDir: string): {
+function identityConfigPaths(hostDir: string): {
   dir: string;
   path: string;
   sigPath: string;
@@ -176,7 +176,7 @@ export function identityConfigPaths(hostDir: string): {
   };
 }
 
-export function defaultIdentityConfig(): IdentityConfig {
+function defaultIdentityConfig(): IdentityConfig {
   return identityConfigSchema.parse({
     identity: {
       version: 1,

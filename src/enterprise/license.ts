@@ -110,7 +110,7 @@ export function createSignedLicenseKey(params: {
   return `${payloadB64}.${sig}`;
 }
 
-export function validateLicenseKey(params: {
+function validateLicenseKey(params: {
   key: string;
   publicKey: KeyObject;
   now?: Date;

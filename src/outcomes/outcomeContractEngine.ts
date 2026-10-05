@@ -17,7 +17,7 @@ interface SignaturePayload {
   signer: "auditor";
 }
 
-export function outcomesDir(workspace: string, agentId?: string): string {
+function outcomesDir(workspace: string, agentId?: string): string {
   const paths = getAgentPaths(workspace, resolveAgentId(workspace, agentId));
   return join(paths.rootDir, "outcomes");
 }
@@ -26,7 +26,7 @@ export function outcomeContractPath(workspace: string, agentId?: string): string
   return join(outcomesDir(workspace, agentId), "contract.yaml");
 }
 
-export function outcomeContractSigPath(workspace: string, agentId?: string): string {
+function outcomeContractSigPath(workspace: string, agentId?: string): string {
   return `${outcomeContractPath(workspace, agentId)}.sig`;
 }
 

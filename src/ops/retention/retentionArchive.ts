@@ -30,27 +30,27 @@ export interface RetentionProofIndex {
   prunedBlobs: ReadonlyMap<string, BlobPrunedRow>;
 }
 
-export function archiveLedgerDir(workspace: string): string {
+function archiveLedgerDir(workspace: string): string {
   return join(workspace, ".amc", "archive", "ledger");
 }
 
-export function segmentFilePath(workspace: string, segmentId: string, startTs: number, endTs: number): string {
+function segmentFilePath(workspace: string, segmentId: string, startTs: number, endTs: number): string {
   return join(archiveLedgerDir(workspace), `segment_${startTs}_${endTs}_${segmentId}.jsonl.gz`);
 }
 
-export function segmentManifestPath(segmentPath: string): string {
+function segmentManifestPath(segmentPath: string): string {
   return `${segmentPath}.manifest.json`;
 }
 
-export function segmentManifestSigPath(segmentPath: string): string {
+function segmentManifestSigPath(segmentPath: string): string {
   return `${segmentPath}.manifest.sig`;
 }
 
-export function prunedLogPath(workspace: string): string {
+function prunedLogPath(workspace: string): string {
   return join(workspace, ".amc", "blobs", "pruned.jsonl");
 }
 
-export function prunedSealPath(workspace: string): string {
+function prunedSealPath(workspace: string): string {
   return join(workspace, ".amc", "blobs", "pruned.jsonl.sig");
 }
 
@@ -201,7 +201,7 @@ export function writeRetentionSegment(params: {
   };
 }
 
-export function readRetentionSegmentLines(segmentPath: string): string[] {
+function readRetentionSegmentLines(segmentPath: string): string[] {
   const bytes = readFileSync(segmentPath);
   const text = gunzipSync(bytes, {
     maxOutputLength: MAX_RETENTION_SEGMENT_DECOMPRESSED_BYTES

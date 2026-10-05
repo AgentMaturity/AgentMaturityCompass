@@ -44,7 +44,7 @@ export function loadApiKeyManager(workspace: string): ApiKeyManager {
   return ApiKeyManager.fromSnapshot(snapshot);
 }
 
-export function saveApiKeyManager(workspace: string, manager: ApiKeyManager): string {
+function saveApiKeyManager(workspace: string, manager: ApiKeyManager): string {
   const file = apiKeyStorePath(workspace);
   mkdirSync(dirname(file), { recursive: true });
   writeFileAtomic(file, JSON.stringify(manager.toSnapshot(), null, 2), 0o600);

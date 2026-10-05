@@ -18,7 +18,13 @@
     reverse_proxy amc-studio:3210
   }
 
-  handle {
+  @proxyHealth path /__amc/proxy-health
+  handle @proxyHealth {
     respond "AMC TLS reverse proxy" 200
+  }
+
+  # Studio owns /api/v1/* and its other authenticated/native routes.
+  handle {
+    reverse_proxy amc-studio:3212
   }
 }

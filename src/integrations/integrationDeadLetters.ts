@@ -18,7 +18,7 @@ export interface IntegrationDeadLetterEntry {
   reason: string;
 }
 
-export function integrationDeadLetterPath(workspace: string): string {
+function integrationDeadLetterPath(workspace: string): string {
   return join(workspace, ".amc", "integrations", "dead-letters.jsonl");
 }
 

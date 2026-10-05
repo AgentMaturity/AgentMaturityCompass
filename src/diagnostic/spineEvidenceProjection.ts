@@ -270,7 +270,7 @@ export function delegationEvidenceFor(fact: DelegationEvidenceFact): SpineEviden
 }
 
 /** The questions a scope-verified delegation evidences, deduplicated. */
-export function projectDelegationQuestionIds(): string[] {
+function projectDelegationQuestionIds(): string[] {
   const seen = new Set<string>();
   for (const rule of SPINE_PROJECTION_RULES) {
     for (const questionId of rule.questionIds) seen.add(questionId);

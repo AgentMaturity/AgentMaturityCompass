@@ -11,7 +11,7 @@ import {
   type PromptSchedulerState
 } from "./promptPolicySchema.js";
 
-export function promptRoot(workspace: string): string {
+function promptRoot(workspace: string): string {
   return join(workspace, ".amc", "prompt");
 }
 
@@ -27,11 +27,11 @@ export function promptPacksRoot(workspace: string): string {
   return join(promptRoot(workspace), "packs", "agents");
 }
 
-export function promptSnapshotsRoot(workspace: string): string {
+function promptSnapshotsRoot(workspace: string): string {
   return join(promptRoot(workspace), "snapshots", "agents");
 }
 
-export function promptLintRoot(workspace: string): string {
+function promptLintRoot(workspace: string): string {
   return join(promptRoot(workspace), "lint", "agents");
 }
 

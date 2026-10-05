@@ -192,7 +192,7 @@ export function renderProspectDemoMarkdown(plan: ProspectDemoPlan): string {
   return `${lines.join("\n")}\n`;
 }
 
-export function renderProspectDemoHtml(plan: ProspectDemoPlan): string {
+function renderProspectDemoHtml(plan: ProspectDemoPlan): string {
   const stepCards = plan.steps.map((step) => `
       <section class="step">
         <div class="minute">${escapeHtml(step.minute)}</div>

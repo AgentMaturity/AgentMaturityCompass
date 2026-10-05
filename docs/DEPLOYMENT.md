@@ -97,3 +97,21 @@ Create the `amc-bootstrap` Kubernetes secret outside Terraform so bootstrap pass
 - Keep LAN mode enabled and pairing required.
 - Restrict clients with `AMC_ALLOWED_CIDRS`.
 - Never expose Studio directly to public internet without TLS and RBAC.
+
+## Studio and standalone API together
+
+The TLS stack can serve both existing surfaces from one origin:
+
+```bash
+cd deploy/compose
+docker compose -f docker-compose.tls.yml -f docker-compose.studio-api.yml config
+docker compose -f docker-compose.tls.yml -f docker-compose.studio-api.yml up -d --build
+```
+
+Use the secret-file configuration and `AMC_TLS_HOST` in the Compose guide. Caddy uses a private CA; explicitly trust its public certificate in clients. This is not a public deployment qualification.
+
+Studio owns `/console`, `/api/v1/*`, native Studio API routes and gateway traffic. The standalone API owns `/api/health`, `/api/quickscore`, `/api/badge/*` and `/api/industry-packs/*`. Its internal port 3220 avoids Studio ToolHub's port 3213. Studio authentication and RBAC remain in force. Legacy quickscore remains unauthenticated self-reporting, marked `evidenceVerified: false`; it does not produce an evidence-verified maturity assessment. The badge remains a placeholder, identified by its response header.
+
+For a Node host, `pnpm build` includes the compiled standalone API. Run `PORT=3220 pnpm api:start:production` alongside Studio. The production API requires runtime dependencies, neither TypeScript source nor `tsx`. Existing Railway and Vercel configurations serve only the standalone API.
+
+Qualify installed packages, containers, TLS, restart and rollback on the chosen host before exposure. Hosting identity and required key-rotation proof remain operator prerequisites. These commands are instructions, not evidence of an executed deployment.

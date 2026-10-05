@@ -33,7 +33,7 @@ const bomSignatureSchema = z.object({
 
 export type BomSignature = z.infer<typeof bomSignatureSchema>;
 
-export function loadBom(file: string): MaturityBom {
+function loadBom(file: string): MaturityBom {
   const parsed = JSON.parse(readFileSync(file, "utf8")) as unknown;
   return maturityBomSchema.parse(parsed);
 }

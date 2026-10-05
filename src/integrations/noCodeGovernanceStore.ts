@@ -46,7 +46,7 @@ export function loadNoCodeGovernanceConfig(workspace: string): NoCodeGovernanceC
   return noCodeGovernanceConfigSchema.parse(parsed);
 }
 
-export function saveNoCodeGovernanceConfig(workspace: string, config: NoCodeGovernanceConfig): string {
+function saveNoCodeGovernanceConfig(workspace: string, config: NoCodeGovernanceConfig): string {
   const path = noCodeGovernanceConfigPath(workspace);
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(path, YAML.stringify(noCodeGovernanceConfigSchema.parse(config)), 0o644);

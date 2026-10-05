@@ -69,7 +69,7 @@ export const DEFAULT_MAX_WIRE_CONNECTIONS = 16;
 /** How long a connection may sit idle before it is closed. */
 export const DEFAULT_WIRE_IDLE_MS = 120_000;
 
-export function wireSocketDir(workspace: string): string {
+function wireSocketDir(workspace: string): string {
   return join(workspace, ".amc", "wire");
 }
 

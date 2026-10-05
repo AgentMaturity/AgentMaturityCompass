@@ -111,7 +111,7 @@ function loadSnapshotById(
 // Diff computation
 // ---------------------------------------------------------------------------
 
-export function diffGraphSnapshots(
+function diffGraphSnapshots(
   graphA: CgxGraph,
   graphB: CgxGraph,
   runA: string,

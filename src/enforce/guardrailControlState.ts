@@ -72,7 +72,7 @@ export function isGuardrailControlError(value: unknown): value is GuardrailContr
   return value instanceof GuardrailControlError;
 }
 
-export function guardrailControlRoot(workspace: string): string {
+function guardrailControlRoot(workspace: string): string {
   return join(resolve(workspace), ".amc", "guardrails");
 }
 

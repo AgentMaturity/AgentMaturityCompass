@@ -6,7 +6,7 @@ import type { MechanicScope } from "./targetSchema.js";
 import { mechanicTuningSchema, type MechanicTuning } from "./tuningSchema.js";
 import { mechanicRoot } from "./targetsStore.js";
 
-export function mechanicTuningPath(workspace: string): string {
+function mechanicTuningPath(workspace: string): string {
   return join(mechanicRoot(workspace), "tuning.yaml");
 }
 
@@ -14,7 +14,7 @@ export function mechanicTuningSigPath(workspace: string): string {
   return `${mechanicTuningPath(workspace)}.sig`;
 }
 
-export function defaultMechanicTuning(scope: MechanicScope): MechanicTuning {
+function defaultMechanicTuning(scope: MechanicScope): MechanicTuning {
   return mechanicTuningSchema.parse({
     mechanicTuning: {
       version: 1,

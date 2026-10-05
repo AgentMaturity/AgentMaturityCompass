@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "categories": { "correctness": "off" },
+  "rules": {
+    "no-async-promise-executor": "error",
+    "no-unsafe-finally": "error",
+    "typescript/no-implied-eval": "error"
+  }
+}

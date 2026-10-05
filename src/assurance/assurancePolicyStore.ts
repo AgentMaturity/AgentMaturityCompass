@@ -17,7 +17,7 @@ import {
   type AssuranceWaiver
 } from "./assuranceSchema.js";
 
-export function assuranceRoot(workspace: string): string {
+function assuranceRoot(workspace: string): string {
   return join(workspace, ".amc", "assurance");
 }
 
@@ -29,23 +29,23 @@ export function assurancePolicySigPath(workspace: string): string {
   return `${assurancePolicyPath(workspace)}.sig`;
 }
 
-export function assuranceRunsRoot(workspace: string): string {
+function assuranceRunsRoot(workspace: string): string {
   return join(assuranceRoot(workspace), "runs");
 }
 
-export function assuranceRunDir(workspace: string, runId: string): string {
+function assuranceRunDir(workspace: string, runId: string): string {
   return join(assuranceRunsRoot(workspace), runId);
 }
 
-export function assuranceRunJsonPath(workspace: string, runId: string): string {
+function assuranceRunJsonPath(workspace: string, runId: string): string {
   return join(assuranceRunDir(workspace, runId), "run.json");
 }
 
-export function assuranceFindingsPath(workspace: string, runId: string): string {
+function assuranceFindingsPath(workspace: string, runId: string): string {
   return join(assuranceRunDir(workspace, runId), "findings.json");
 }
 
-export function assuranceTraceRefsPath(workspace: string, runId: string): string {
+function assuranceTraceRefsPath(workspace: string, runId: string): string {
   return join(assuranceRunDir(workspace, runId), "trace.refs.json");
 }
 
@@ -69,7 +69,7 @@ export function assuranceTimestampedCertificateShaPath(workspace: string, ts: nu
   return `${assuranceTimestampedCertificatePath(workspace, ts)}.sha256`;
 }
 
-export function assuranceSchedulerPath(workspace: string): string {
+function assuranceSchedulerPath(workspace: string): string {
   return join(assuranceRoot(workspace), "scheduler.json");
 }
 
@@ -77,7 +77,7 @@ export function assuranceWaiversDir(workspace: string): string {
   return join(assuranceRoot(workspace), "waivers");
 }
 
-export function defaultAssuranceSchedulerState(): AssuranceSchedulerState {
+function defaultAssuranceSchedulerState(): AssuranceSchedulerState {
   return assuranceSchedulerStateSchema.parse({
     enabled: true,
     lastRunTs: null,
@@ -90,7 +90,7 @@ export function defaultAssuranceSchedulerState(): AssuranceSchedulerState {
   });
 }
 
-export function ensureAssuranceDirs(workspace: string): void {
+function ensureAssuranceDirs(workspace: string): void {
   ensureDir(assuranceRoot(workspace));
   ensureDir(assuranceRunsRoot(workspace));
   ensureDir(assuranceCertificatesDir(workspace));

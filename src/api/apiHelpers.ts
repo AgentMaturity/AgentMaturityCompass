@@ -147,6 +147,20 @@ export function apiError(res: ServerResponse, status: number, message: string): 
   res.end(JSON.stringify({ ok: false, error: message }));
 }
 
+/** Preserve request-body status codes while retaining each route's existing fallback. */
+export function apiRequestError(
+  res: ServerResponse,
+  error: unknown,
+  fallback: string,
+  fallbackStatus = 400
+): void {
+  if (isRequestBodyError(error)) {
+    apiError(res, error.statusCode, error.message);
+    return;
+  }
+  apiError(res, fallbackStatus, error instanceof Error ? error.message : fallback);
+}
+
 /* ── Method guard ────────────────────────────────────────────────── */
 
 export function requireMethod(req: IncomingMessage, res: ServerResponse, method: string): boolean {

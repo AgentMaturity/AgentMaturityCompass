@@ -1,7 +1,7 @@
 import type { ServerResponse } from "node:http";
 import { claimPairingCode, pairingTokenFromCookie, verifyPairingToken } from "./pairingCodes.js";
 
-export function setPairingCookie(res: ServerResponse, token: string, maxAgeSeconds: number): void {
+function setPairingCookie(res: ServerResponse, token: string, maxAgeSeconds: number): void {
   res.setHeader("set-cookie", `amc_pairing=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${Math.max(60, maxAgeSeconds)}`);
 }
 

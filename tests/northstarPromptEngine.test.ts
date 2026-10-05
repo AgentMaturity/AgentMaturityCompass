@@ -1,5 +1,8 @@
+import { spawnSync } from "node:child_process";
+import { sha256Hex } from "../src/utils/hash.js";
+import { extractValidatedTarGzipArchive } from "../src/security/safeTarArchive.js";
 import { request as httpRequest, createServer, type Server } from "node:http";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
@@ -474,6 +477,46 @@ describe("northstar prompt engine", () => {
     } finally {
       await runtime.stop();
       await new Promise<void>((resolvePromise) => fake.server.close(() => resolvePromise()));
+    }
+  });
+});
+
+
+describe("supported prompt pack public inspection workflows", () => {
+  test("inspects alternate and flat layouts with absent optional lint metadata", () => {
+    const workspace = newWorkspace();
+    buildPromptPackForApi({ workspace, agentId: "default" });
+    const file = promptLatestPackPath(workspace, "default"), original = inspectPromptPackArtifact(file);
+    expect(verifyPromptPackFile({ file }).ok).toBe(true);
+    for (const layout of ["alternate", "flat"] as const) {
+      const content = join(workspace, `owned-${layout}-prompt`);
+      mkdirSync(content);
+      extractValidatedTarGzipArchive({ file, destination: content, label: "owned prompt fixture",
+        limits: { maxEntries: 10_000, maxCompressedBytes: 128 * 1024 * 1024, maxEntryBytes: 128 * 1024 * 1024, maxTotalBytes: 512 * 1024 * 1024, maxPathBytes: 1024 } });
+      const canonical = join(content, "amc-prompt"), root = layout === "alternate" ? join(content, "renamed-prompt") : content;
+      if (layout === "alternate") renameSync(canonical, root);
+      else {
+        for (const entry of readdirSync(canonical)) renameSync(join(canonical, entry), join(content, entry));
+        rmSync(canonical, { recursive: true });
+      }
+      writeFileSync(join(content, "ignore.txt"), "non-directory fixture");
+      mkdirSync(join(content, "incomplete-child"));
+      writeFileSync(join(content, "incomplete-child", "pack.json"), "{}");
+      rmSync(join(root, "lint", "lint.json"));
+      rmSync(join(root, "lint", "lint.sig"));
+      const modified = join(workspace, `${layout}.amcprompt`);
+      const tar = spawnSync("tar", ["-czf", modified, "-C", content, "."], { encoding: "utf8" });
+      expect(tar.status, tar.stderr).toBe(0);
+      // This is metadata inspection with deliberately absent lint; no verification claim.
+      const inspected = inspectPromptPackArtifact(modified);
+      expect(inspected.pack).toEqual(original.pack);
+      expect(inspected.signature).toEqual(original.signature);
+      expect(inspected.providerFiles).toEqual(original.providerFiles);
+      expect(inspected.signerPub).toBe(original.signerPub);
+      expect(inspected.sha256).toBe(sha256Hex(readFileSync(modified)));
+      expect(inspected.lint).toBeNull();
+      expect(inspected.lintSignature).toBeNull();
+      expect(inspected.lintDigestSha256).toBeNull();
     }
   });
 });

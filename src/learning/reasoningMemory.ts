@@ -1,3 +1,4 @@
+import { redactWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { randomUUID } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -653,11 +654,7 @@ export function retrieveReasoningMemory(input: {
 }
 
 function redactPath(path: string, workspace: string): string {
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactWorkspacePath(path, workspace);
 }
 
 export function redactReasoningMemoryItem(item: ReasoningMemoryItem, workspace: string): ReasoningMemoryItem {

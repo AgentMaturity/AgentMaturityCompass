@@ -7,15 +7,15 @@ export function hostDbPath(hostDir: string): string {
   return join(hostDir, "host.db");
 }
 
-export function hostLogsDir(hostDir: string): string {
+function hostLogsDir(hostDir: string): string {
   return join(hostDir, "logs");
 }
 
-export function hostTmpDir(hostDir: string): string {
+function hostTmpDir(hostDir: string): string {
   return join(hostDir, "tmp");
 }
 
-export function hostWorkspacesDir(hostDir: string): string {
+function hostWorkspacesDir(hostDir: string): string {
   return join(hostDir, "workspaces");
 }
 

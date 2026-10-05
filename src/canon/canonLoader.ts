@@ -6,7 +6,7 @@ import { canonSchema, type CompassCanon } from "./canonSchema.js";
 import { builtInCanon } from "./canonBuiltin.js";
 import { loadInstalledPluginAssets } from "../plugins/pluginLoader.js";
 
-export function canonDir(workspace: string): string {
+function canonDir(workspace: string): string {
   return join(workspace, ".amc", "canon");
 }
 

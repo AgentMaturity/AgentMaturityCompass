@@ -565,7 +565,7 @@ export function inferRiskHeatmapFormat(outputPath: string | undefined, explicitF
   return outputPath?.toLowerCase().endsWith(".json") ? "json" : "markdown";
 }
 
-export function defaultRiskHeatmapPath(workspace: string, format: RiskHeatmapFormat): string {
+function defaultRiskHeatmapPath(workspace: string, format: RiskHeatmapFormat): string {
   return join(workspace, ".amc", "reports", `business-risk-heatmap.${format === "json" ? "json" : "md"}`);
 }
 

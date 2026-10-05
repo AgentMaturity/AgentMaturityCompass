@@ -89,7 +89,7 @@ function readSignedRoot(workspace: string): { fileText: string; row: SignedMerkl
  * changed, and the newest anchor is the one whose leaf the current tree still
  * contains at a stable index.
  */
-export function buildSessionAnchorProof(params: SessionAnchorProofParams): SessionAnchorProof {
+function buildSessionAnchorProof(params: SessionAnchorProofParams): SessionAnchorProof {
   const entries = findSessionAnchorEntries(params.workspace, params.sessionId);
   const entry = entries[entries.length - 1];
   if (entry === undefined) {

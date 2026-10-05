@@ -14,7 +14,7 @@ import {
   type CgxScope
 } from "./cgxSchema.js";
 
-export function cgxRoot(workspace: string): string {
+function cgxRoot(workspace: string): string {
   return join(workspace, ".amc", "cgx");
 }
 
@@ -42,7 +42,7 @@ export function cgxLatestPackPath(workspace: string, agentId: string): string {
   return join(cgxRoot(workspace), "packs", "agents", agentId, "latest.pack.json");
 }
 
-export function defaultCgxPolicy(): CgxPolicy {
+function defaultCgxPolicy(): CgxPolicy {
   return cgxPolicySchema.parse({
     cgxPolicy: {
       version: 1,

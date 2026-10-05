@@ -70,6 +70,18 @@ import type {
   QuestionScoreSignedEvidenceRef,
   TrustTier
 } from "../types.js";
+import {
+  incidentTriageProofHashes,
+  benchmarkSubmissionProofHashes,
+  multiUserBenchmarkProofHashes,
+  continualLearningBenchmarkProofHashes,
+  hermesTurboPerformanceProofHashes,
+  iotFirmwareQuestionProofHashes,
+  retailSalesQuestionProofHashes,
+  scorableStudioDrilldownProofHashes,
+  obsStudioDrilldownProofHashes,
+  replayableLensStatus,
+} from "./explainabilityContracts.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 
@@ -2653,21 +2665,15 @@ function hasReplayableRagFlowDiagnostic(ref: QuestionScoreRagFlowDiagnosticRef):
   ].every(validOptionalHash)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.flowDagHash !== null &&
-      ref.paramConfigHash !== null &&
-      ref.evalSetHash !== null &&
-      ref.batchRunId !== null &&
-      ref.evaluatorFlowHash !== null &&
-      ref.groundTruthColumn !== null &&
-      ref.dataMappingHash !== null &&
-      ref.metricIds.length > 0;
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.flowDagHash !== null &&
+    ref.paramConfigHash !== null &&
+    ref.evalSetHash !== null &&
+    ref.batchRunId !== null &&
+    ref.evaluatorFlowHash !== null &&
+    ref.groundTruthColumn !== null &&
+    ref.dataMappingHash !== null &&
+    ref.metricIds.length > 0);
 }
 
 function hasReplayableLandscapeLens(ref: QuestionScoreLandscapeLensRef): boolean {
@@ -2714,34 +2720,18 @@ function hasReplayableIncidentTriageLens(ref: QuestionScoreIncidentTriageLensRef
   ) {
     return false;
   }
-  if (![
-    ref.openEnvConfigHash,
-    ref.scenarioManifestHash,
-    ref.incidentReportHash,
-    ref.rawLogBundleHash,
-    ref.metricSnapshotHash,
-    ref.userReportHash,
-    ref.actionPayloadHash,
-    ref.graderConfigHash,
-    ref.feedbackHash,
-  ].every(hashPresent)) {
+  if (!incidentTriageProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.deterministicGrader &&
-      meetsMinimum(ref.reward0to1, ref.minReward0to1) &&
-      meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&
-      meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&
-      meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&
-      ref.maxSteps !== null &&
-      ref.stepCount !== null &&
-      ref.stepCount <= ref.maxSteps;
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.deterministicGrader &&
+    meetsMinimum(ref.reward0to1, ref.minReward0to1) &&
+    meetsMinimum(ref.rootCauseScore0to1, ref.minRootCauseScore0to1) &&
+    meetsMinimum(ref.redHerringFilterScore0to1, ref.minRedHerringFilterScore0to1) &&
+    meetsMinimum(ref.orderedRemediationScore0to1, ref.minOrderedRemediationScore0to1) &&
+    ref.maxSteps !== null &&
+    ref.stepCount !== null &&
+    ref.stepCount <= ref.maxSteps);
 }
 
 function hasReplayableBenchmarkCriterion(ref: QuestionScoreBenchmarkCriterionRef): boolean {
@@ -2771,31 +2761,21 @@ function hasReplayableBenchmarkSubmissionLens(ref: QuestionScoreBenchmarkSubmiss
   ) {
     return false;
   }
-  if (![
-    ref.submissionMetadataHash,
-    ref.taskBreakdownHash,
-    ref.leaderboardSnapshotHash,
-  ].every(hashPresent)) {
+  if (!benchmarkSubmissionProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.submissionVersion !== null &&
-      ref.agentVersion !== null &&
-      ref.submittedAt !== null &&
-      (ref.taskStatus === "success" || ref.taskStatus === "warning") &&
-      ref.overallScore0to100 !== null &&
-      ref.categoryScore0to100 !== null &&
-      ref.speedMs !== null &&
-      ref.costUsd !== null &&
-      ref.leaderboardMetricViews.length > 0 &&
-      ref.criterionScores.length > 0 &&
-      ref.criterionScores.every(hasReplayableBenchmarkCriterion);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.submissionVersion !== null &&
+    ref.agentVersion !== null &&
+    ref.submittedAt !== null &&
+    (ref.taskStatus === "success" || ref.taskStatus === "warning") &&
+    ref.overallScore0to100 !== null &&
+    ref.categoryScore0to100 !== null &&
+    ref.speedMs !== null &&
+    ref.costUsd !== null &&
+    ref.leaderboardMetricViews.length > 0 &&
+    ref.criterionScores.length > 0 &&
+    ref.criterionScores.every(hasReplayableBenchmarkCriterion));
 }
 
 function hasReplayableTestSuiteEvaluationLens(ref: QuestionScoreTestSuiteEvaluationLensRef): boolean {
@@ -2824,18 +2804,12 @@ function hasReplayableTestSuiteEvaluationLens(ref: QuestionScoreTestSuiteEvaluat
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.evaluatorIds.length > 0 &&
-      ref.experimentRunId !== null &&
-      ref.ciRunId !== null &&
-      meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&
-      meetsMinimum(ref.averageScore0to1, ref.threshold0to1);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.evaluatorIds.length > 0 &&
+    ref.experimentRunId !== null &&
+    ref.ciRunId !== null &&
+    meetsMinimum(ref.passRate0to1, ref.minPassRate0to1) &&
+    meetsMinimum(ref.averageScore0to1, ref.threshold0to1));
 }
 
 function sourceHashPresent(value: string | null): boolean {
@@ -2918,17 +2892,11 @@ function hasReplayableEvalAiLibraryQuestionLens(ref: QuestionScoreEvalAiLibraryQ
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.metricFamily !== "custom" &&
-      ref.metricIds.length > 0 &&
-      ref.ciRunId !== null &&
-      evalAiLibraryMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.metricFamily !== "custom" &&
+    ref.metricIds.length > 0 &&
+    ref.ciRunId !== null &&
+    evalAiLibraryMetricsMeetThreshold(ref));
 }
 
 function openModelRagMetricsMeetThreshold(ref: QuestionScoreOpenModelRagQuestionLensRef): boolean {
@@ -2991,18 +2959,12 @@ function hasReplayableOpenModelRagQuestionLens(ref: QuestionScoreOpenModelRagQue
   ].every(sourceHashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.ciRunId !== null &&
-      ref.runtime !== "custom" &&
-      ref.openModelIds.length > 0 &&
-      ref.evaluationMetricIds.length > 0 &&
-      openModelRagMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.ciRunId !== null &&
+    ref.runtime !== "custom" &&
+    ref.openModelIds.length > 0 &&
+    ref.evaluationMetricIds.length > 0 &&
+    openModelRagMetricsMeetThreshold(ref));
 }
 
 function opikEvaluationMetricsMeetThreshold(ref: QuestionScoreOpikEvaluationQuestionLensRef): boolean {
@@ -3053,19 +3015,13 @@ function hasReplayableOpikEvaluationQuestionLens(ref: QuestionScoreOpikEvaluatio
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.metricFamily !== "custom" &&
-      ref.metricIds.length > 0 &&
-      ref.projectRef !== null &&
-      ref.experimentRef !== null &&
-      ref.ciRunId !== null &&
-      opikEvaluationMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.metricFamily !== "custom" &&
+    ref.metricIds.length > 0 &&
+    ref.projectRef !== null &&
+    ref.experimentRef !== null &&
+    ref.ciRunId !== null &&
+    opikEvaluationMetricsMeetThreshold(ref));
 }
 
 function deepEvalMetricsMeetThreshold(ref: QuestionScoreDeepEvalQuestionLensRef): boolean {
@@ -3118,17 +3074,11 @@ function hasReplayableDeepEvalQuestionLens(ref: QuestionScoreDeepEvalQuestionLen
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.metricFamily !== "custom" &&
-      ref.metricIds.length > 0 &&
-      ref.ciRunId !== null &&
-      deepEvalMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.metricFamily !== "custom" &&
+    ref.metricIds.length > 0 &&
+    ref.ciRunId !== null &&
+    deepEvalMetricsMeetThreshold(ref));
 }
 
 function meetsMaximum(value: number | null, maximum: number | null): boolean {
@@ -3185,17 +3135,11 @@ function hasReplayableAgentTrialStatisticalLens(ref: QuestionScoreAgentTrialStat
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.packageRef !== null &&
-      ref.adapter !== "custom" &&
-      ref.ciRunId !== null &&
-      agentTrialMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.packageRef !== null &&
+    ref.adapter !== "custom" &&
+    ref.ciRunId !== null &&
+    agentTrialMetricsMeetThreshold(ref));
 }
 
 function hasReplayableCodeQuestDimension(ref: QuestionScoreCodeQuestQualityDimensionRef): boolean {
@@ -3272,15 +3216,9 @@ function hasReplayableCodeQuestQualityLens(ref: QuestionScoreCodeQuestQualityLen
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.ciRunId !== null &&
-      codeQuestMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.ciRunId !== null &&
+    codeQuestMetricsMeetThreshold(ref));
 }
 
 function multiUserScenarioMetricMeetsThreshold(ref: QuestionScoreMultiUserBenchmarkLensRef): boolean {
@@ -3330,32 +3268,18 @@ function hasReplayableMultiUserBenchmarkLens(ref: QuestionScoreMultiUserBenchmar
   ) {
     return false;
   }
-  if (![
-    ref.datasetManifestHash,
-    ref.userRoleManifestHash,
-    ref.instructionSetHash,
-    ref.interactionTraceHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.metricReportHash,
-  ].every(hashPresent)) {
+  if (!multiUserBenchmarkProofHashes(ref).every(hashPresent)) {
     return false;
   }
   if (!multiUserScenarioProofPresent(ref)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.userRoleCount !== null &&
-      ref.userRoleCount >= 2 &&
-      ref.turnCount !== null &&
-      ref.turnCount > 0 &&
-      multiUserScenarioMetricMeetsThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.userRoleCount !== null &&
+    ref.userRoleCount >= 2 &&
+    ref.turnCount !== null &&
+    ref.turnCount > 0 &&
+    multiUserScenarioMetricMeetsThreshold(ref));
 }
 
 function professionalTaskMetricsMeetThreshold(ref: QuestionScoreProfessionalTaskLensRef): boolean {
@@ -3396,17 +3320,11 @@ function hasReplayableProfessionalTaskLens(ref: QuestionScoreProfessionalTaskLen
   ].every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.environmentMode !== "custom" &&
-      ref.faultMode !== "custom" &&
-      ref.difficultyLevel !== null &&
-      professionalTaskMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.environmentMode !== "custom" &&
+    ref.faultMode !== "custom" &&
+    ref.difficultyLevel !== null &&
+    professionalTaskMetricsMeetThreshold(ref));
 }
 
 function iotFirmwareMetricsMeetThreshold(ref: QuestionScoreIotFirmwareQuestionLensRef): boolean {
@@ -3431,37 +3349,16 @@ function hasReplayableIotFirmwareQuestionLens(ref: QuestionScoreIotFirmwareQuest
   ) {
     return false;
   }
-  if (![
-    ref.firmwareProjectHash,
-    ref.toolchainManifestHash,
-    ref.sdkVersionManifestHash,
-    ref.hardwareSessionHash,
-    ref.deviceLogBundleHash,
-    ref.buildArtifactHash,
-    ref.flashArtifactHash,
-    ref.testArtifactHash,
-    ref.knowledgePackManifestHash,
-    ref.taskManifestHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.privacyBoundaryHash,
-    ref.benchmarkReportHash,
-  ].every(hashPresent)) {
+  if (!iotFirmwareQuestionProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.platform !== "custom" &&
-      ref.hardwareRunCount !== null &&
-      ref.hardwareRunCount > 0 &&
-      ref.deviceCount !== null &&
-      ref.deviceCount > 0 &&
-      iotFirmwareMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.platform !== "custom" &&
+    ref.hardwareRunCount !== null &&
+    ref.hardwareRunCount > 0 &&
+    ref.deviceCount !== null &&
+    ref.deviceCount > 0 &&
+    iotFirmwareMetricsMeetThreshold(ref));
 }
 
 function retailSalesMetricsMeetThreshold(ref: QuestionScoreRetailSalesQuestionLensRef): boolean {
@@ -3483,43 +3380,18 @@ function hasReplayableRetailSalesQuestionLens(ref: QuestionScoreRetailSalesQuest
   ) {
     return false;
   }
-  if (![
-    ref.productCatalogHash,
-    ref.productDescriptionHash,
-    ref.customerScenarioHash,
-    ref.conversationTraceHash,
-    ref.customerIntentManifestHash,
-    ref.orderCaptureSchemaHash,
-    ref.orderLedgerHash,
-    ref.pricingPolicyHash,
-    ref.discountPolicyHash,
-    ref.modelAdapterManifestHash,
-    ref.modelProviderMatrixHash,
-    ref.promptPolicyHash,
-    ref.recommendationPolicyHash,
-    ref.safetyPolicyHash,
-    ref.privacyBoundaryHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.benchmarkReportHash,
-  ].every(hashPresent)) {
+  if (!retailSalesQuestionProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.salesChannel !== "custom" &&
-      ref.modelProviderCount !== null &&
-      ref.modelProviderCount >= 2 &&
-      ref.customerScenarioCount !== null &&
-      ref.customerScenarioCount > 0 &&
-      ref.orderCount !== null &&
-      ref.orderCount > 0 &&
-      retailSalesMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.salesChannel !== "custom" &&
+    ref.modelProviderCount !== null &&
+    ref.modelProviderCount >= 2 &&
+    ref.customerScenarioCount !== null &&
+    ref.customerScenarioCount > 0 &&
+    ref.orderCount !== null &&
+    ref.orderCount > 0 &&
+    retailSalesMetricsMeetThreshold(ref));
 }
 
 function continualLearningMetricsMeetThreshold(ref: QuestionScoreContinualLearningBenchmarkLensRef): boolean {
@@ -3545,36 +3417,19 @@ function hasReplayableContinualLearningBenchmarkLens(
   ) {
     return false;
   }
-  if (![
-    ref.datasetManifestHash,
-    ref.stateSchemaHash,
-    ref.initialStateHash,
-    ref.stateMutationTraceHash,
-    ref.conversationTraceHash,
-    ref.entityRelationshipGraphHash,
-    ref.toolExecutionTraceHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.replayCommandHash,
-  ].every(hashPresent)) {
+  if (!continualLearningBenchmarkProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.scenarioCount !== null &&
-      ref.scenarioCount > 0 &&
-      ref.turnCount !== null &&
-      ref.turnCount > 0 &&
-      ref.stateMutationCount !== null &&
-      ref.stateMutationCount > 0 &&
-      ref.entityCount !== null &&
-      ref.entityCount > 0 &&
-      continualLearningMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.scenarioCount !== null &&
+    ref.scenarioCount > 0 &&
+    ref.turnCount !== null &&
+    ref.turnCount > 0 &&
+    ref.stateMutationCount !== null &&
+    ref.stateMutationCount > 0 &&
+    ref.entityCount !== null &&
+    ref.entityCount > 0 &&
+    continualLearningMetricsMeetThreshold(ref));
 }
 
 function hermesTurboPerformanceMetricsMeetThreshold(ref: QuestionScoreHermesTurboPerformanceLensRef): boolean {
@@ -3612,36 +3467,13 @@ function hasReplayableHermesTurboPerformanceLens(ref: QuestionScoreHermesTurboPe
   ) {
     return false;
   }
-  if (![
-    ref.sourceStatusHash,
-    ref.readmeArtifactHash,
-    ref.packageManifestHash,
-    ref.benchmarkWorkflowHash,
-    ref.perfBudgetWorkflowHash,
-    ref.dailyScoreWorkflowHash,
-    ref.turboScoreScriptHash,
-    ref.performanceDashboardHash,
-    ref.benchmarkReportHash,
-    ref.baselineResultHash,
-    ref.candidateResultHash,
-    ref.latencyTraceHash,
-    ref.throughputTraceHash,
-    ref.scoreManifestHash,
-    ref.regressionThresholdHash,
-    ref.ciConfigHash,
-  ].every(hashPresent)) {
+  if (!hermesTurboPerformanceProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.performanceFacet !== "custom" &&
-      ref.ciRunId !== null &&
-      hermesTurboPerformanceMetricsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.performanceFacet !== "custom" &&
+    ref.ciRunId !== null &&
+    hermesTurboPerformanceMetricsMeetThreshold(ref));
 }
 
 function scorableStudioRoutePresent(ref: QuestionScoreScorableStudioDrilldownLensRef): boolean {
@@ -3693,26 +3525,12 @@ function hasReplayableObsStudioDrilldownLens(
   ) {
     return false;
   }
-  if (![
-    ref.tracePreviewHash,
-    ref.reasoningTracePreviewHash,
-    ref.receiptPreviewHash,
-    ref.evidencePreviewHash,
-    ref.sourceArtifactPreviewHash,
-    ref.emptyStateHash,
-    ref.errorStateHash,
-  ].every(hashPresent)) {
+  if (!obsStudioDrilldownProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.evidencePreviewState === "ready" &&
-      obsStudioCountsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.evidencePreviewState === "ready" &&
+    obsStudioCountsMeetThreshold(ref));
 }
 
 function scorableStudioCountsMeetThreshold(ref: QuestionScoreScorableStudioDrilldownLensRef): boolean {
@@ -3754,43 +3572,13 @@ function hasReplayableScorableStudioDrilldownLens(
   ) {
     return false;
   }
-  if (![
-    ref.readmeArtifactHash,
-    ref.pythonPackageManifestHash,
-    ref.pythonOpenApiHash,
-    ref.pythonClientHash,
-    ref.pythonExecutionLogsHash,
-    ref.pythonEvaluatorApiHash,
-    ref.pythonExecutionLogApiHash,
-    ref.cliPackageManifestHash,
-    ref.cliLockfileHash,
-    ref.cliEvaluatorCommandHash,
-    ref.cliJudgeCommandHash,
-    ref.cliExecutionLogCommandHash,
-    ref.cliOtelTraceCommandHash,
-    ref.cliFileUploadCommandHash,
-    ref.typescriptPackageManifestHash,
-    ref.typescriptLockfileHash,
-    ref.typescriptSourceTreeHash,
-    ref.tracePreviewHash,
-    ref.receiptPreviewHash,
-    ref.policyRulePreviewHash,
-    ref.sourceArtifactPreviewHash,
-    ref.emptyStateHash,
-    ref.errorStateHash,
-  ].every(hashPresent)) {
+  if (!scorableStudioDrilldownProofHashes(ref).every(hashPresent)) {
     return false;
   }
-  if (ref.status === "satisfied") {
-    return ref.evidenceRefs.length > 0 &&
-      ref.studioSurface !== "custom" &&
-      ref.evidencePreviewState === "ready" &&
-      scorableStudioCountsMeetThreshold(ref);
-  }
-  if (ref.status === "failed") {
-    return ref.evidenceRefs.length > 0 || ref.rejectedEvidenceRefs.length > 0 || ref.repairHint.length > 0;
-  }
-  return ref.repairHint.length > 0;
+  return replayableLensStatus(ref, () =>
+    ref.studioSurface !== "custom" &&
+    ref.evidencePreviewState === "ready" &&
+    scorableStudioCountsMeetThreshold(ref));
 }
 
 export function buildQuestionExplainabilityReport(

@@ -15,7 +15,6 @@ import {
   buildProviderDriftEvalPack,
   buildProviderDriftWatchAlerts,
   normalizeProviderDriftCanaryRowEvidence,
-  normalizeProviderDriftEvidenceRefs,
   runProviderDriftBenchmark,
   type BuildProviderDriftCiGateInput,
   type BuildProviderDriftEvalPackInput,
@@ -27,6 +26,24 @@ import {
   type ProviderDriftWaiver,
   type ProviderDriftWatchAlert,
 } from "./providerDriftBenchmark.js";
+
+import {
+  activeProviderDriftMetadataWaivers as activeWaivers,
+  createProviderDriftDescriptor,
+  isProviderDriftSha256 as isSha256,
+  normalizeProviderDriftMetadataId as normalizedId,
+  normalizeProviderDriftMetadataList as normalizedStringList,
+  providerDriftMetadataKey as metadataKey,
+  providerDriftMetadataKey as rowKey,
+  providerDriftMetadataRecommendation as recommendationFromReport,
+} from "./providerDriftDescriptor.js";
+
+import {
+  hashProviderDriftProof,
+  providerDriftProofMetricCount,
+  providerDriftProofVersion,
+  validateProviderDriftProofMetricCoverage,
+} from "./providerDriftRowContracts.js";
 
 export type PromptLayerProviderDriftSide = "baseline" | "candidate";
 
@@ -98,8 +115,6 @@ export interface PromptLayerProviderDriftResult {
   ciGate: ReturnType<typeof buildProviderDriftCiGate>;
 }
 
-const SHA256_RE = /^[a-f0-9]{64}$/i;
-
 const REQUIRED_HASH_FIELDS: Array<keyof PromptLayerProviderDriftMetadata> = [
   "sourceRefHash",
   "websiteSnapshotHash",
@@ -127,81 +142,29 @@ const FORBIDDEN_CONTENT_FIELDS = [
   "datasetRows",
 ];
 
-function rowKey(row: Pick<ProviderDriftCanaryRow, "provider" | "model" | "canaryId">): string {
-  return `${row.provider}\u0000${row.model}\u0000${row.canaryId}`;
-}
-
-function isSha256(value: unknown): value is string {
-  return typeof value === "string" && SHA256_RE.test(value);
-}
-
-function normalizedId(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : undefined;
-}
-
-function normalizedStringList(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return [...new Set(value.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))];
-}
-
-function metadataKey(row: Pick<PromptLayerProviderDriftMetadata, "provider" | "model" | "canaryId">): string {
-  return `${row.provider}\u0000${row.model}\u0000${row.canaryId}`;
-}
-
-function activeWaivers(waivers: ProviderDriftWaiver[], now: Date): ProviderDriftWaiver[] {
-  return waivers.filter((waiver) => {
-    const expiresAt = Date.parse(waiver.expiresAt);
-    return Number.isFinite(expiresAt) && expiresAt > now.getTime();
-  });
-}
-
-function waiverCoversPromptLayerAlert(waiver: ProviderDriftWaiver, alert: Omit<ProviderDriftAlert, "waived" | "waiverId">): boolean {
-  if (waiver.provider && waiver.provider !== alert.provider) return false;
-  if (waiver.model && waiver.model !== alert.model) return false;
-  if (waiver.canaryId && waiver.canaryId !== alert.canaryId) return false;
-  if (
-    waiver.metricIds !== undefined
-    && (!Array.isArray(waiver.metricIds) || !waiver.metricIds.includes(alert.metricId))
-  ) return false;
-  return normalizeProviderDriftEvidenceRefs(waiver.evidenceRefs).length > 0;
-}
-
-function recommendationFromReport(report: ProviderDriftBenchmarkReport): ProviderDriftRecommendation {
-  if (report.alerts.some((alert) => !alert.waived)) return "alert";
-  if (report.alerts.length > 0 && report.alerts.every((alert) => alert.waived)) return "waive";
-  if (report.comparisons.some((comparison) => comparison.status === "monitor")) return "monitor";
-  return "approve";
-}
+const descriptor = createProviderDriftDescriptor<PromptLayerProviderDriftMetadata>({
+  metadataReason: "promptLayerMetadata",
+  requiredHashFields: REQUIRED_HASH_FIELDS,
+  forbiddenContentFields: FORBIDDEN_CONTENT_FIELDS,
+  proofRefPrefix: "promptlayer-proof",
+  alertIdSuffix: "promptLayerMetadataEvidence",
+  metricId: "observabilityPipelineEvidence",
+  incompleteMessage: "PromptLayer relevance metadata proof is incomplete",
+});
 
 function buildPromptLayerProof(
   side: PromptLayerProviderDriftSide,
   row: ProviderDriftCanaryRow,
   metadata: PromptLayerProviderDriftMetadata | undefined,
 ): PromptLayerProviderDriftProof {
-  const missingReasons: string[] = [];
-  if (!metadata) {
-    missingReasons.push(`${side}:promptLayerMetadata`);
-  }
-  for (const field of REQUIRED_HASH_FIELDS) {
-    if (!isSha256(metadata?.[field])) missingReasons.push(`${side}:${String(field)}`);
-  }
-  for (const field of FORBIDDEN_CONTENT_FIELDS) {
-    if (metadata && Object.hasOwn(metadata as object, field)) missingReasons.push(`${side}:metadataOnly:${field}`);
-  }
-  const providerVersion = normalizedId(metadata?.providerVersion);
-  if (!providerVersion) {
-    missingReasons.push(`${side}:providerVersion`);
-  } else if (row.version && providerVersion !== row.version) {
-    missingReasons.push(`${side}:providerVersionMismatch`);
-  }
+  const missingReasons = descriptor.missingReasons(side, metadata);
+
+  const providerVersion = providerDriftProofVersion(side, row, metadata, missingReasons);
   if (!normalizedId(metadata?.promptVersionId)) missingReasons.push(`${side}:promptVersionId`);
   if (!normalizedId(metadata?.providerRouteId)) missingReasons.push(`${side}:providerRouteId`);
   const metricIds = normalizedStringList(metadata?.metricIds);
-  const metricCount = Number.isFinite(metadata?.metricCount) ? Math.max(0, metadata?.metricCount ?? 0) : 0;
-  if (metricIds.length === 0) missingReasons.push(`${side}:metricIds`);
-  if (metricCount < Math.max(1, metricIds.length)) missingReasons.push(`${side}:metricCount`);
+  const metricCount = providerDriftProofMetricCount(metadata);
+  validateProviderDriftProofMetricCoverage(side, metricIds, metricCount, missingReasons);
 
   const proofPayload = {
     side,
@@ -218,42 +181,7 @@ function buildPromptLayerProof(
     alertOrWaiverHash: isSha256(metadata?.alertOrWaiverHash) ? metadata?.alertOrWaiverHash.toLowerCase() : undefined,
     missingReasons,
   };
-  return {
-    ...proofPayload,
-    proofHash: sha256Hex(canonicalize(proofPayload)),
-  };
-}
-
-function promptLayerAlert(
-  report: ProviderDriftBenchmarkReport,
-  row: ProviderDriftCanaryRow,
-  proofs: PromptLayerProviderDriftProof[],
-  active: ProviderDriftWaiver[],
-): ProviderDriftAlert | undefined {
-  const missingReasons = proofs.flatMap((proof) => proof.missingReasons);
-  if (missingReasons.length === 0) return undefined;
-  const evidenceRefs = [...new Set([
-    ...normalizeProviderDriftEvidenceRefs(row.evidenceRefs),
-    ...proofs.map((proof) => `promptlayer-proof:${proof.proofHash}`),
-  ])];
-  const base = {
-    alertId: `pdrift:${row.provider}:${row.model}:${row.canaryId}:promptLayerMetadataEvidence`,
-    provider: row.provider,
-    model: row.model,
-    canaryId: row.canaryId,
-    metricId: "observabilityPipelineEvidence" as const,
-    severity: "critical" as const,
-    message: `PromptLayer relevance metadata proof is incomplete: ${missingReasons.join(", ")}.`,
-    threshold: 1,
-    observed: 0,
-    evidenceRefs,
-  };
-  const waiver = active.find((item) => waiverCoversPromptLayerAlert(item, base));
-  return {
-    ...base,
-    waived: Boolean(waiver),
-    waiverId: waiver?.waiverId,
-  };
+  return hashProviderDriftProof(proofPayload);
 }
 
 export function runPromptLayerProviderDrift(input: RunPromptLayerProviderDriftInput): PromptLayerProviderDriftResult {
@@ -286,7 +214,7 @@ export function runPromptLayerProviderDrift(input: RunPromptLayerProviderDriftIn
       buildPromptLayerProof("candidate", candidateRow, candidateMetadata.get(key)),
     ];
     promptLayerEvidence.push(...proofs);
-    const alert = promptLayerAlert(baseReport, row, proofs, active);
+    const alert = descriptor.alert(row, proofs, active);
     if (alert) {
       promptLayerAlerts.push(alert);
       if (!alert.waived) comparison.status = "alert";

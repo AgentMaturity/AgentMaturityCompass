@@ -584,7 +584,16 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
       expect(row).toBeTruthy();
       const meta = JSON.parse(row!.meta_json) as Record<string, unknown>;
       const receipt = String(meta.receipt ?? "");
-      meta.receipt = `${receipt.slice(0, -1)}X`;
+      const publicKeys = getPublicKeyHistory(workspace, "monitor");
+      expect(verifyReceipt(receipt, publicKeys).ok).toBe(true);
+      const [payload, signature] = receipt.split(".");
+      const signatureBytes = Buffer.from(signature!, "base64url");
+      expect(signatureBytes.length).toBe(64);
+      // Changing a final base64 character can change only ignored padding bits.
+      // Flip a decoded bit so the negative fixture always changes the signature.
+      signatureBytes[0] = signatureBytes[0]! ^ 1;
+      meta.receipt = `${payload}.${signatureBytes.toString("base64url")}`;
+      expect(verifyReceipt(String(meta.receipt), publicKeys).ok).toBe(false);
       db.prepare("UPDATE evidence_events SET meta_json = ? WHERE id = ?").run(JSON.stringify(meta), row!.id);
     } finally {
       db.close();
@@ -595,5 +604,6 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
 
     const verify = await verifyEvidenceBundle(tamperedBundle);
     expect(verify.ok).toBe(false);
+    expect(verify.errors.join("\n")).toMatch(/receipt verification failed: signature verification failed/);
   });
 });

@@ -310,7 +310,7 @@ export function inferTrustGapRoiFormat(outputPath: string | undefined, requested
   return outputPath?.toLowerCase().endsWith(".json") ? "json" : "markdown";
 }
 
-export function defaultTrustGapRoiPath(workspace: string, format: TrustGapRoiFormat): string {
+function defaultTrustGapRoiPath(workspace: string, format: TrustGapRoiFormat): string {
   return join(workspace, ".amc", "reports", `business-trust-gap-roi.${format === "json" ? "json" : "md"}`);
 }
 

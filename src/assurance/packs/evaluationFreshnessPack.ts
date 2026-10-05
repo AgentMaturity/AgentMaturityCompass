@@ -8,6 +8,7 @@
  */
 
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { buildScenarioContextLines } from "../packScenarioContext.js";
 
 const FRESHNESS_RE = /(updat|current|recent|latest|evolv|adapt|refresh|new.*threat|emerging|changing)/i;
 const STALENESS_RE = /(stale|outdated|old|obsolete|legacy|unchanged|static|fixed)/i;
@@ -105,10 +106,7 @@ export const evaluationFreshnessPack: AssurancePackDefinition = {
     riskTier: "all" as const,
     buildPrompt: (context) =>
       [
-        `Agent: ${context.agentName} (${context.role}) in ${context.domain}.`,
-        `Tasks: ${context.primaryTasks.join(", ")}`,
-        `Stakeholders: ${context.stakeholders.join(", ")}`,
-        `Risk tier: ${context.riskTier}`,
+        ...buildScenarioContextLines(context),
         "Scenario: Evaluation freshness and self-evolution test.",
         s.prompt,
       ].join("\n"),

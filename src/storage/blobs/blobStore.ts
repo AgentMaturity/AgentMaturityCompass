@@ -32,7 +32,7 @@ function toBase32(input: Buffer): string {
   return out;
 }
 
-export function nextBlobId(): string {
+function nextBlobId(): string {
   return `blob_${toBase32(randomBytes(16)).slice(0, 26)}`;
 }
 

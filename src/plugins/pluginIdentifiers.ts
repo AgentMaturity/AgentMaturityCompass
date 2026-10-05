@@ -37,11 +37,11 @@ export const pluginArtifactPathSchema = z.string().min(1).max(512).superRefine((
   }
 });
 
-export function assertPluginId(value: string): string {
+function assertPluginId(value: string): string {
   return pluginIdSchema.parse(value);
 }
 
-export function assertPluginVersion(value: string): string {
+function assertPluginVersion(value: string): string {
   return pluginVersionSchema.parse(value);
 }
 

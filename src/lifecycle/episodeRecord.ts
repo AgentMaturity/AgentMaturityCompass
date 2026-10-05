@@ -162,7 +162,7 @@ export function redactEpisodeRecord(episode: EpisodeRecord): EpisodeRecord {
   };
 }
 
-export function episodeRecordsDir(workspace: string, agentId?: string): string {
+function episodeRecordsDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "episodes");
 }
 

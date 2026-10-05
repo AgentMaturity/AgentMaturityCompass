@@ -13,7 +13,7 @@ import {
   promptSnapshotsDir
 } from "./promptPolicyStore.js";
 
-export function ensurePromptAgentDirs(workspace: string, agentId: string): void {
+function ensurePromptAgentDirs(workspace: string, agentId: string): void {
   ensurePromptDirs(workspace);
   ensureDir(dirname(promptLatestPackPath(workspace, agentId)));
   ensureDir(promptSnapshotsDir(workspace, agentId));

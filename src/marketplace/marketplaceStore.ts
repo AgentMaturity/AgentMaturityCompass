@@ -28,7 +28,7 @@ export function marketplaceStorePath(workspace: string): string {
 
 /* ── Defaults ─────────────────────────────────────────────────── */
 
-export function defaultMarketplaceStore(): MarketplaceStore {
+function defaultMarketplaceStore(): MarketplaceStore {
   return marketplaceStoreSchema.parse({
     v: 1,
     updatedTs: Date.now(),

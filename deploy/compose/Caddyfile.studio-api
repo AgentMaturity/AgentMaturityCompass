@@ -1,0 +1,39 @@
+{
+  # Keep internal certificate issuance; only the unpublished HTTP redirect is off.
+  auto_https disable_redirects
+  skip_install_trust
+}
+
+{$AMC_TLS_HOST:localhost}:443 {
+  tls internal
+  encode gzip
+
+  @console path /console* /auth* /org* /transform* /approvals* /benchmarks* /integrations* /status /healthz /readyz
+  handle @console {
+    reverse_proxy amc-studio:3212
+  }
+
+  @gateway path /openai* /anthropic* /gemini* /grok* /openrouter* /local* /__amc/health
+  handle @gateway {
+    reverse_proxy amc-studio:3210
+  }
+
+  # The legacy lightweight API keeps its own contract. Studio /api/v1 stays on Studio.
+  @standaloneApi {
+    path /api /api/*
+    not path /api/v1 /api/v1/*
+  }
+  handle @standaloneApi {
+    reverse_proxy amc-api:3220
+  }
+
+  @proxyHealth path /__amc/proxy-health
+  handle @proxyHealth {
+    respond "AMC TLS reverse proxy" 200
+  }
+
+  # Studio owns /api/v1/* and its other authenticated/native routes.
+  handle {
+    reverse_proxy amc-studio:3212
+  }
+}

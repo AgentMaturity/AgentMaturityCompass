@@ -644,6 +644,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     for (const fiber of [...fibers].reverse()) {
       try { await fiber.dispose(); }
       catch (error) {
+        // oxlint-disable-next-line no-unsafe-finally -- Disposal failure must refuse successful ownership handover.
         if (options.schedulePass === undefined) throw error;
         scheduleDisposalError ??= error; // Try every remaining owner, including the parent session.
       }
@@ -663,9 +664,11 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // finally would replace the real failure with this one.
       if (options.schedulePass !== undefined) {
         try { session.disposeWithoutClosing(); } catch { /* preserve original closure failure */ }
-        throw error; // A schedule owner cannot report released/closed on a refused seal.
+        // oxlint-disable-next-line no-unsafe-finally -- A schedule owner cannot report released/closed on a refused seal.
+        throw error;
       }
     }
+    // oxlint-disable-next-line no-unsafe-finally -- Report failed disposal after attempting every schedule owner.
     if (scheduleDisposalError !== undefined) throw scheduleDisposalError;
   }
 }

@@ -1,5 +1,13 @@
-import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
+import {
+  uniqueAuditReasons as unique,
+  auditSignedRefValid as signedRefValid,
+  auditEvidenceRefsValid as evidenceRefsValid,
+  hashAuditEvidence,
+  collectAuditSourceIds,
+  finalizeAuditEvidenceReceipt,
+  beginAuditReceiptVerification,
+  finalizeAuditEvidenceExport
+} from "../audit/auditEvidenceAccounting.js";
 
 export type ThirdPartyProviderType = "agent" | "model" | "tool" | "data" | "infrastructure" | "other";
 export type ThirdPartyProviderDataPosture =
@@ -120,33 +128,12 @@ export interface ThirdPartyProviderRiskVerification {
   reasons: string[];
 }
 
-function isSha256(value: string | undefined): boolean {
-  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-}
-
-function unique(values: string[]): string[] {
-  return [...new Set(values)];
-}
-
 function rowHash(row: Omit<ThirdPartyProviderRiskRow, "rowHash">): string {
-  return sha256Hex(canonicalize(row));
+  return hashAuditEvidence(row);
 }
 
 function receiptHash(receipt: Omit<ThirdPartyProviderRiskReceipt, "receiptHash">): string {
-  return sha256Hex(canonicalize(receipt));
-}
-
-function signedRefValid(value: { signedEvidenceRef?: string; signatureSha256?: string }): boolean {
-  return Boolean(value.signedEvidenceRef && isSha256(value.signatureSha256));
-}
-
-function evidenceRefsValid(evidenceRefs: ThirdPartyProviderRiskEvidenceLink[]): boolean {
-  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (
-    Boolean(evidence.eventId)
-    && Boolean(evidence.eventType)
-    && Boolean(evidence.signedEvidenceRef)
-    && isSha256(evidence.eventHash)
-  ));
+  return hashAuditEvidence(receipt);
 }
 
 function attestationValid(attestation: ThirdPartyProviderAttestation): boolean {
@@ -198,10 +185,7 @@ export function buildThirdPartyProviderRiskReceipt(input: {
   generatedAt?: string;
 }): ThirdPartyProviderRiskReceipt {
   const failClosedReasons: string[] = [];
-  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));
-  if (sourceIds.size === 0) {
-    failClosedReasons.push("sourceCitations:missing");
-  }
+  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);
 
   const rows = input.providers.map((provider): ThirdPartyProviderRiskRow => {
     const sourceCitationIds = provider.sourceCitationIds ?? [...sourceIds];
@@ -261,11 +245,11 @@ export function buildThirdPartyProviderRiskReceipt(input: {
       contractualControlCount: provider.contractualControls.length,
       exceptionStates: (provider.exceptions ?? []).map((exception) => exception.state),
       sourceCitationIds,
-      dataBoundaryHash: sha256Hex(canonicalize(provider.dataBoundary)),
-      contractualControlsHash: sha256Hex(canonicalize(provider.contractualControls)),
-      attestationsHash: sha256Hex(canonicalize(provider.attestations)),
+      dataBoundaryHash: hashAuditEvidence(provider.dataBoundary),
+      contractualControlsHash: hashAuditEvidence(provider.contractualControls),
+      attestationsHash: hashAuditEvidence(provider.attestations),
       evidenceRefs: provider.evidenceRefs,
-      evidenceChainHash: sha256Hex(canonicalize(provider.evidenceRefs)),
+      evidenceChainHash: hashAuditEvidence(provider.evidenceRefs),
     };
     return {
       ...baseRow,
@@ -277,33 +261,13 @@ export function buildThirdPartyProviderRiskReceipt(input: {
     failClosedReasons.push("providers:missing");
   }
 
-  const withoutHash: Omit<ThirdPartyProviderRiskReceipt, "receiptHash"> = {
-    receiptId: input.receiptId,
-    generatedAt: input.generatedAt ?? new Date().toISOString(),
-    sourceCitations: input.sourceCitations,
-    rows,
-    failClosed: failClosedReasons.length > 0,
-    failClosedReasons: unique(failClosedReasons),
-  };
-  return {
-    ...withoutHash,
-    receiptHash: receiptHash(withoutHash),
-  };
+  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);
 }
 
 export function verifyThirdPartyProviderRiskReceipt(
   receipt: ThirdPartyProviderRiskReceipt
 ): ThirdPartyProviderRiskVerification {
-  const reasons: string[] = [];
-  if (receipt.failClosed) {
-    reasons.push(...receipt.failClosedReasons);
-  }
-  if (receipt.sourceCitations.length === 0) {
-    reasons.push("sourceCitations:missing");
-  }
-  if (receipt.rows.length === 0) {
-    reasons.push("providers:missing");
-  }
+  const reasons = beginAuditReceiptVerification(receipt, "providers:missing");
   for (const row of receipt.rows) {
     const { rowHash: actualRowHash, ...withoutRowHash } = row;
     if (rowHash(withoutRowHash) !== actualRowHash) {
@@ -370,13 +334,5 @@ export function renderThirdPartyProviderRiskAuditExport(receipt: ThirdPartyProvi
     ];
     lines.push(`| ${values.map((value) => value.replace(/\|/g, "\\|")).join(" | ")} |`);
   }
-  if (receipt.failClosedReasons.length > 0) {
-    lines.push("");
-    lines.push("## Fail-Closed Reasons");
-    for (const reason of receipt.failClosedReasons) {
-      lines.push(`- ${reason}`);
-    }
-  }
-  lines.push("");
-  return lines.join("\n");
+  return finalizeAuditEvidenceExport(lines, receipt);
 }

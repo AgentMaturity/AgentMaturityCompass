@@ -118,7 +118,7 @@ export interface ResolvedRegistryPackage {
   packagePath: string;
 }
 
-export async function fetchRegistryIndex(baseRaw: string): Promise<{
+async function fetchRegistryIndex(baseRaw: string): Promise<{
   base: string;
   index: PluginRegistryIndex;
   registryPub: string;

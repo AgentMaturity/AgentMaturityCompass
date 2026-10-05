@@ -11,7 +11,7 @@ function scopeSegment(scopeType: "WORKSPACE" | "NODE" | "AGENT"): string {
   return "agent";
 }
 
-export function binderCachePath(workspace: string, scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId: string): string {
+function binderCachePath(workspace: string, scopeType: "WORKSPACE" | "NODE" | "AGENT", scopeId: string): string {
   return join(auditBindersCacheDir(workspace), `latest_${scopeSegment(scopeType)}_${scopeId}.json`);
 }
 
@@ -110,7 +110,7 @@ export function listBinderExports(workspace: string): Array<{
   return out.sort((a, b) => b.file.localeCompare(a.file));
 }
 
-export function hostAuditPortfolioCachePath(hostDir: string): string {
+function hostAuditPortfolioCachePath(hostDir: string): string {
   return join(hostDir, "audit-portfolio", "cache.json");
 }
 

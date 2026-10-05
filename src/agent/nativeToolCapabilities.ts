@@ -23,7 +23,7 @@ export const NATIVE_DELEGATION_CAPABILITIES: readonly NativeToolCapability[] = O
   Object.freeze({ name: "workflow", actionClass: "READ_ONLY" as const })
 ]);
 
-export function nativeToolMatchesCapability(tool: ToolDefinition, capability: NativeToolCapability): boolean {
+function nativeToolMatchesCapability(tool: ToolDefinition, capability: NativeToolCapability): boolean {
   if (tool.name !== capability.name || tool.actionClass !== capability.actionClass) return false;
   const actual = tool.context;
   const expected = capability.context;

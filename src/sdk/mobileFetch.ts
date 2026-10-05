@@ -181,4 +181,4 @@ export function createAMCMobileFetchBridge(opts: AMCMobileFetchOptions): AMCMobi
   }) as AMCMobileFetchLike;
 }
 
-export const createReactNativeAMCFetch = createAMCMobileFetchBridge;
+export { createAMCMobileFetchBridge as createReactNativeAMCFetch };

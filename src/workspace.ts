@@ -89,7 +89,7 @@ export function getWorkspacePaths(workspace = process.cwd(), agentId?: string): 
   };
 }
 
-export function defaultAMCConfig(): AMCConfig {
+function defaultAMCConfig(): AMCConfig {
   return {
     profile: "dev",
     runtimes: {

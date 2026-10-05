@@ -17,7 +17,7 @@ import { valueContractSchema, type ValueContract } from "./valueContracts.js";
 import { valueEventSchema, type ValueEvent } from "./valueEventSchema.js";
 import { valueReportSchema, valueSnapshotSchema, type ValueReport, type ValueSnapshot } from "./valueSchema.js";
 
-export function valueRoot(workspace: string): string {
+function valueRoot(workspace: string): string {
   return join(workspace, ".amc", "value");
 }
 
@@ -33,7 +33,7 @@ export function valueContractsDir(workspace: string): string {
   return join(valueRoot(workspace), "contracts");
 }
 
-export function valueWorkspaceContractPath(workspace: string): string {
+function valueWorkspaceContractPath(workspace: string): string {
   return join(valueContractsDir(workspace), "workspace.yaml");
 }
 
@@ -45,19 +45,19 @@ export function valueEventsDir(workspace: string): string {
   return join(valueRoot(workspace), "events");
 }
 
-export function valueEventsMonthPath(workspace: string, month: string): string {
+function valueEventsMonthPath(workspace: string, month: string): string {
   return join(valueEventsDir(workspace), `${month}`, "events.ndjson");
 }
 
-export function valueSnapshotsDir(workspace: string): string {
+function valueSnapshotsDir(workspace: string): string {
   return join(valueRoot(workspace), "snapshots");
 }
 
-export function valueReportsDir(workspace: string): string {
+function valueReportsDir(workspace: string): string {
   return join(valueRoot(workspace), "reports");
 }
 
-export function valueSchedulerPath(workspace: string): string {
+function valueSchedulerPath(workspace: string): string {
   return join(valueRoot(workspace), "scheduler.json");
 }
 
@@ -75,11 +75,11 @@ export function valueSnapshotLatestPath(workspace: string, scope: { type: "WORKS
   return join(valueSnapshotsDir(workspace), scopeSegment(scope), "latest.json");
 }
 
-export function valueReportPath(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }, ts: number): string {
+function valueReportPath(workspace: string, scope: { type: "WORKSPACE" | "NODE" | "AGENT"; id: string }, ts: number): string {
   return join(valueReportsDir(workspace), scopeSegment(scope), `${ts}.json`);
 }
 
-export function ensureValueDirs(workspace: string): void {
+function ensureValueDirs(workspace: string): void {
   ensureDir(valueRoot(workspace));
   ensureDir(valueContractsDir(workspace));
   ensureDir(join(valueContractsDir(workspace), "agents"));

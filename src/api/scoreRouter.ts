@@ -3,6 +3,7 @@
  * Full parity with: amc score *, amc diagnostic *
  */
 
+import { providerDriftBasicScoreResponse, providerDriftScoreResponse } from './routerResponseHelpers.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
 import { bodyJson, bodyJsonSchema, apiSuccess, apiError, pathParam, queryParam, isRequestBodyError } from './apiHelpers.js';
@@ -167,20 +168,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.report.providerVersions,
-        canaryResults: result.report.comparisons,
-        driftStatistics: result.report.comparisons.map((item) => ({
-          canaryId: item.canaryId,
-          provider: item.provider,
-          model: item.model,
-          driftStatistic: item.driftStatistic,
-          status: item.status,
-        })),
-        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
-        failClosed: result.report.failClosed,
-      });
+      apiSuccess(res, providerDriftBasicScoreResponse(result, 'promptLayerEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'Provider drift scoring failed');
     }
@@ -200,20 +188,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.report.providerVersions,
-        canaryResults: result.report.comparisons,
-        driftStatistics: result.report.comparisons.map((item) => ({
-          canaryId: item.canaryId,
-          provider: item.provider,
-          model: item.model,
-          driftStatistic: item.driftStatistic,
-          status: item.status,
-        })),
-        promptfooEvidenceHash: result.promptfooEvidenceHash,
-        failClosed: result.report.failClosed,
-      });
+      apiSuccess(res, providerDriftBasicScoreResponse(result, 'promptfooEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'promptfoo provider drift scoring failed');
     }
@@ -233,15 +208,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.score.providerVersions,
-        canaryResults: result.score.canaryResults,
-        driftStatistics: result.score.driftStatistics,
-        patronusEvidenceHash: result.patronusEvidenceHash,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftScoreResponse(result, 'patronusEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'Patronus provider drift scoring failed');
     }
@@ -261,15 +228,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.score.providerVersions,
-        canaryResults: result.score.canaryResults,
-        driftStatistics: result.score.driftStatistics,
-        inspectEvidenceHash: result.inspectEvidenceHash,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftScoreResponse(result, 'inspectEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'Inspect provider drift scoring failed');
     }
@@ -289,15 +248,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.score.providerVersions,
-        canaryResults: result.score.canaryResults,
-        driftStatistics: result.score.driftStatistics,
-        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftScoreResponse(result, 'tensorZeroEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'TensorZero provider drift scoring failed');
     }
@@ -317,15 +268,7 @@ export async function handleScoreRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        providerVersions: result.score.providerVersions,
-        canaryResults: result.score.canaryResults,
-        driftStatistics: result.score.driftStatistics,
-        helmEvidenceHash: result.helmEvidenceHash,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftScoreResponse(result, 'helmEvidenceHash'));
     } catch (err) {
       scoreRouteError(res, err, 'HELM provider drift scoring failed');
     }

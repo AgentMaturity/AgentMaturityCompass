@@ -11,7 +11,7 @@ import {
   type AuditSchedulerState
 } from "./auditPolicySchema.js";
 
-export function auditRoot(workspace: string): string {
+function auditRoot(workspace: string): string {
   return join(workspace, ".amc", "audit");
 }
 
@@ -27,7 +27,7 @@ export function auditMapsDir(workspace: string): string {
   return join(auditRoot(workspace), "maps");
 }
 
-export function auditBindersDir(workspace: string): string {
+function auditBindersDir(workspace: string): string {
   return join(auditRoot(workspace), "binders");
 }
 
@@ -39,7 +39,7 @@ export function auditBindersCacheDir(workspace: string): string {
   return join(auditBindersDir(workspace), "cache");
 }
 
-export function auditRequestsDir(workspace: string): string {
+function auditRequestsDir(workspace: string): string {
   return join(auditRoot(workspace), "requests");
 }
 
@@ -51,7 +51,7 @@ export function auditRequestsClosedDir(workspace: string): string {
   return join(auditRequestsDir(workspace), "closed");
 }
 
-export function auditSchedulerPath(workspace: string): string {
+function auditSchedulerPath(workspace: string): string {
   return join(auditRoot(workspace), "scheduler.json");
 }
 

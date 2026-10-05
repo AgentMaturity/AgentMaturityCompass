@@ -15,7 +15,7 @@ export interface KeyHistoryEntry {
 export const KEY_HISTORY_GENESIS = "GENESIS";
 
 /** Hash of one entry, committing to its predecessor. */
-export function keyHistoryEntryHash(
+function keyHistoryEntryHash(
   item: Pick<KeyHistoryEntry, "createdTs" | "fingerprint" | "publicKeyPem">,
   prevHash: string
 ): string {
@@ -25,7 +25,7 @@ export function keyHistoryEntryHash(
 }
 
 /** The hash a new entry must chain onto, given the current history. */
-export function nextPrevHash(existing: readonly KeyHistoryEntry[]): string {
+function nextPrevHash(existing: readonly KeyHistoryEntry[]): string {
   if (existing.length === 0) return KEY_HISTORY_GENESIS;
   return existing[existing.length - 1]?.entryHash ?? KEY_HISTORY_GENESIS;
 }

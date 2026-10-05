@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { trySignArtifactFile } from "../lifecycle/artifactSignature.js";
@@ -88,17 +89,12 @@ function fleetLifecycleRoot(workspace: string): string {
   return join(workspace, ".amc", "fleet", "lifecycle-runs");
 }
 
-export function fleetLifecycleRunPath(workspace: string, fleetRunId: string): string {
+function fleetLifecycleRunPath(workspace: string, fleetRunId: string): string {
   return join(fleetLifecycleRoot(workspace), `${fleetRunId}.json`);
 }
 
 function redactPath(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
 function severityForSharedAgentCount(agentCount: number, totalAgents: number): FleetCascadeFailureSeverity {
@@ -316,7 +312,7 @@ export function writeFleetLifecycleRunArtifact(input: {
   return { artifact: signedArtifact, artifactPath, signaturePath: signedArtifact.signaturePath };
 }
 
-export function redactFleetLifecycleRunArtifact(artifact: FleetLifecycleRunArtifact): FleetLifecycleRunArtifact {
+function redactFleetLifecycleRunArtifact(artifact: FleetLifecycleRunArtifact): FleetLifecycleRunArtifact {
   return {
     ...artifact,
     workspace: "$WORKSPACE",

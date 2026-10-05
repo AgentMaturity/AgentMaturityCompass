@@ -21,7 +21,7 @@ export function listBuiltInScenarios(): readonly string[] {
 }
 
 /** Resolve a scenario name or path to an absolute file path. */
-export function resolveScenarioPath(nameOrPath: string): string {
+function resolveScenarioPath(nameOrPath: string): string {
   // If it's an absolute path or relative path that exists, use it directly
   if (nameOrPath.endsWith(".yml") || nameOrPath.endsWith(".yaml")) {
     const abs = resolve(nameOrPath);

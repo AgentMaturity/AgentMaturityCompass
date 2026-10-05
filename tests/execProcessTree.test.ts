@@ -1,9 +1,10 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, type ChildProcess } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { runProcess } from "../src/exec/runProcess.js";
+import { signalTree, treeAlive, terminateTree, forwardSignals, waitForTreeExit } from "../src/exec/processTree.js";
 import type { ProcessSpec } from "../src/exec/processTypes.js";
 
 /**
@@ -221,5 +222,67 @@ describe("the environment is complete, never inherited", () => {
       if (priorKey === undefined) delete process.env["OPENAI_API_KEY"];
       else process.env["OPENAI_API_KEY"] = priorKey;
     }
+  });
+});
+
+// These syscall fault contracts complement the real tree-termination tests above.
+// They make rare fallback/permission paths deterministic without claiming OS proof.
+describe("process-tree syscall failure contracts", () => {
+  it("falls back to the child when the group is unavailable and tolerates reaping", () => {
+    const kill = vi.spyOn(process, "kill").mockImplementation(() => { throw Object.assign(new Error("gone"), { code: "ESRCH" }); });
+    const childKill = vi.fn().mockReturnValue(true);
+    const child = { pid: 123, kill: childKill } as unknown as ChildProcess;
+    try {
+      signalTree(child, "SIGTERM");
+      expect(childKill).toHaveBeenCalledWith("SIGTERM");
+      childKill.mockImplementation(() => { throw new Error("already reaped"); });
+      expect(() => signalTree(child, "SIGTERM")).not.toThrow();
+      kill.mockClear();
+      signalTree({ kill: childKill } as unknown as ChildProcess, "SIGTERM");
+      expect(kill).not.toHaveBeenCalled();
+    } finally { kill.mockRestore(); }
+  });
+  it("does not confuse permission failure or unknown probe errors with absence", async () => {
+    const kill = vi.spyOn(process, "kill");
+    const child = { pid: 123 } as ChildProcess;
+    try {
+      for (const [code, result] of [["ESRCH", false], ["EPERM", true], ["EIO", undefined]] as const) {
+        kill.mockImplementation(() => { throw Object.assign(new Error(code), { code }); });
+        expect(treeAlive(child)).toBe(result);
+      }
+      expect(treeAlive({} as ChildProcess)).toBe(false);
+      // Unknown still means not proven, including when the deadline expires.
+      expect(await waitForTreeExit(child, 0)).toBe(false);
+      kill.mockReturnValueOnce(true).mockImplementation(() => {
+        throw Object.assign(new Error("gone"), { code: "ESRCH" });
+      });
+      expect(await waitForTreeExit(child, 1000)).toBe(true);
+      expect(kill).toHaveBeenCalledWith(-123, 0);
+    } finally { kill.mockRestore(); }
+  });
+  it("forwards interactive signals and escalates only until disposed", () => {
+    const kill = vi.spyOn(process, "kill").mockReturnValue(true);
+    const child = { pid: 123 } as ChildProcess;
+    const before = process.listenerCount("SIGINT");
+    let disposeSignals = () => {};
+    vi.useFakeTimers();
+    try {
+      disposeSignals = forwardSignals(child);
+      process.emit("SIGINT");
+      expect(kill).toHaveBeenCalledWith(-123, "SIGINT");
+      disposeSignals();
+      expect(process.listenerCount("SIGINT")).toBe(before);
+      const disposeTermination = terminateTree(child, 100);
+      expect(kill).toHaveBeenCalledWith(-123, "SIGCONT");
+      expect(kill).toHaveBeenCalledWith(-123, "SIGTERM");
+      vi.advanceTimersByTime(100);
+      expect(kill).toHaveBeenCalledWith(-123, "SIGKILL");
+      disposeTermination();
+      kill.mockClear();
+      const cancel = terminateTree(child, 100);
+      cancel();
+      vi.advanceTimersByTime(100);
+      expect(kill).not.toHaveBeenCalledWith(-123, "SIGKILL");
+    } finally { disposeSignals(); vi.useRealTimers(); kill.mockRestore(); }
   });
 });

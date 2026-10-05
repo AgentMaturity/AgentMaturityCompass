@@ -1,3 +1,5 @@
+import { createLiveDriftMetadataReceiptEnricher } from "./liveDriftReceiptValidation.js";
+import { collectLiveDriftProofStats } from "./proofStats.js";
 /**
  * Vendor-named drift receipt builder — NO VENDOR API IS CONTACTED.
  *
@@ -11,14 +13,12 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  hasNonBlankEvidenceRef,
   normalizeEvidenceRefs,
 } from "./evidenceRefs.js";
 import {
   buildLiveDriftWatchAlerts,
   runLiveScoreBehaviorDrift,
   type LiveBehaviorDrift,
-  type LiveDriftAlert,
   type LiveDriftDistribution,
   type LiveDriftReceipt,
   type LiveDriftReceiptRow,
@@ -173,12 +173,6 @@ function unique(values: unknown): string[] {
   return normalizeEvidenceRefs(values).sort();
 }
 
-function isPresent(value: unknown): boolean {
-  if (typeof value === "string") return value.trim().length > 0;
-  if (typeof value === "number") return Number.isFinite(value);
-  if (Array.isArray(value)) return value.length > 0;
-  return value !== null && value !== undefined;
-}
 
 function round(value: number): number {
   return Math.round(value * 10000) / 10000;
@@ -267,63 +261,15 @@ function proofStats(proof: NarrowTaskBroadMisalignmentMetadataProof, rows: Narro
   total: number;
   missingReasons: string[];
 } {
-  let present = 0;
-  let total = 0;
-  const missingReasons: string[] = [];
-
-  for (const field of REQUIRED_METADATA_PROOF_FIELDS) {
-    total += 1;
-    if (isPresent(proof[field])) {
-      present += 1;
-    } else {
-      missingReasons.push(field);
-    }
-  }
-
-  const mismatches = metadataMismatchReasons(proof);
-  total += mismatches.length;
-  missingReasons.push(...mismatches);
-
-  for (const row of rows) {
-    for (const field of REQUIRED_ROW_PROOF_FIELDS) {
-      total += 1;
-      if (isPresent(row[field])) {
-        present += 1;
-      } else {
-        missingReasons.push(`${row.traceId}.${String(field)}`);
-      }
-    }
-    total += 2;
-    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.evidenceRefs`);
-    }
-    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.signedEvidenceRefs`);
-    }
-  }
-
-  return { present, total, missingReasons };
+  return collectLiveDriftProofStats(proof, rows, REQUIRED_METADATA_PROOF_FIELDS, REQUIRED_ROW_PROOF_FIELDS, metadataMismatchReasons);
 }
 
-function rehashReceipt(receipt: Omit<LiveDriftReceipt, "receiptHash">): LiveDriftReceipt {
-  return {
-    ...receipt,
-    receiptHash: sha256Hex(canonicalize(receipt)),
-  };
-}
-
-function withNarrowTaskBroadMisalignmentReceipt(
-  receipt: LiveDriftReceipt,
-  coverage: number,
-  missingReasons: string[],
-  proof: NarrowTaskBroadMisalignmentMetadataProof,
-): LiveDriftReceipt {
-  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;
-  const alertRefs = unique([
+const withNarrowTaskBroadMisalignmentReceipt = createLiveDriftMetadataReceiptEnricher<NarrowTaskBroadMisalignmentMetadataProof>({
+  alertSuffix: "narrowTaskBroadMisalignmentEvidenceCoverage0to1",
+  metricId: "narrowTaskBroadMisalignmentEvidenceCoverage0to1",
+  messagePrefix: "Narrow-task broad-misalignment live drift metadata/proof is incomplete or mismatched: ",
+  summaryPrefix: "narrow-task broad-misalignment metadata-only evidence coverage=",
+  evidenceRefs: (proof) => unique([
     proof.openAlexWorkId,
     proof.doi,
     proof.openAlexSourceHash,
@@ -335,30 +281,9 @@ function withNarrowTaskBroadMisalignmentReceipt(
     proof.liveSampleManifestHash,
     proof.driftStatisticHash,
     proof.alertReceiptHash,
-  ]);
-  const signedRefs = unique([proof.alertReceiptHash]);
-  const alerts: LiveDriftAlert[] = [...receipt.alerts];
-
-  if (missingReasons.length > 0) {
-    alerts.push({
-      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:narrowTaskBroadMisalignmentEvidenceCoverage0to1`,
-      metricId: "narrowTaskBroadMisalignmentEvidenceCoverage0to1",
-      severity: coverage < 0.75 ? "critical" : "high",
-      message: `Narrow-task broad-misalignment live drift metadata/proof is incomplete or mismatched: ${missingReasons.join(", ")}.`,
-      threshold: 1,
-      observed: round(coverage),
-      evidenceRefs: alertRefs,
-      signedEvidenceRefs: signedRefs,
-    });
-  }
-
-  const recommendation = alerts.length > 0 ? "alert" : receipt.recommendation;
-  return rehashReceipt({
-    ...receiptWithoutHash,
-    alerts,
-    recommendation,
-    failClosed: alerts.length > 0,
-    sourceRefs: unique([
+  ]),
+  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash]),
+  sourceRefs: (receipt, proof) => unique([
       ...receipt.sourceRefs,
       NARROW_TASK_BROAD_MISALIGNMENT_METADATA.doiUrl,
       `https://openalex.org/${NARROW_TASK_BROAD_MISALIGNMENT_METADATA.openAlexWorkId}`,
@@ -374,9 +299,7 @@ function withNarrowTaskBroadMisalignmentReceipt(
       proof.watchSurfaceMappingHash,
       proof.noPaperProseCopiedHash,
     ]),
-    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; narrow-task broad-misalignment metadata-only evidence coverage=${round(coverage)}`,
-  });
-}
+});
 
 export function runNarrowTaskBroadMisalignmentLiveDrift(
   input: RunNarrowTaskBroadMisalignmentLiveDriftInput,

@@ -50,7 +50,7 @@ export function weightedMedian(points: WeightedPoint[]): number {
   return weightedPercentile(points, 0.5);
 }
 
-export function weightedTrimmedMean(points: WeightedPoint[], trimRatio = 0.1): number {
+function weightedTrimmedMean(points: WeightedPoint[], trimRatio = 0.1): number {
   const rows = sanitize(points);
   if (rows.length === 0) {
     return 0;

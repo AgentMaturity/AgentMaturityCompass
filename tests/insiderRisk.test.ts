@@ -23,6 +23,39 @@ afterEach(() => {
   resetInsiderRiskState();
 });
 
+describe("deterministic time and denial severity boundaries", () => {
+  test("approval hours distinguish an allowed weekday from an excluded day", () => {
+    configureInsiderRisk({ normalHoursStart: 8, normalHoursEnd: 18, normalDays: [3] });
+    const fixtures = [
+      { actor: "inside", date: new Date(2026, 8, 30, 11) },
+      { actor: "before-hours", date: new Date(2026, 8, 30, 7) },
+      { actor: "at-end", date: new Date(2026, 8, 30, 18) },
+      { actor: "excluded-day", date: new Date(2026, 9, 1, 11) }
+    ];
+    expect(fixtures[0].date.getDay()).toBe(3);
+    for (const fixture of fixtures) recordApprovalEvent({
+      requesterId: "requester", approverId: fixture.actor, action: "review", decision: "APPROVED",
+      ts: fixture.date.getTime(), durationMs: 10_000
+    });
+    const outside = detectUnusualHours();
+    expect(outside.map(row => row.actorId).sort()).toEqual(["at-end", "before-hours", "excluded-day"]);
+    expect(outside.every(row => row.isOutsideNormalHours)).toBe(true);
+  });
+
+  test("a qualifying fifty-percent denial rate emits medium severity", () => {
+    configureInsiderRisk({ permissionMinAttempts: 6, permissionDenialRateThreshold: 0.5 });
+    const ts = new Date(2026, 8, 30, 11).getTime();
+    for (let index = 0; index < 6; index++) recordToolUsageEvent({
+      agentId: "half-denied", toolName: "controlled-tool", action: "execute", ts,
+      permitted: index >= 3
+    });
+    expect(detectPermissionAnomalies()).toEqual([expect.objectContaining({
+      agentId: "half-denied", denialCount: 3, totalAttempts: 6, denialRate: 0.5, isAnomaly: true
+    })]);
+    expect(getInsiderAlerts("half-denied").find(row => row.category === "permission_anomaly")?.severity).toBe("medium");
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------

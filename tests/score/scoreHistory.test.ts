@@ -230,7 +230,7 @@ describe("ScoreHistoryStore", () => {
         dimensionScores: {
           governance: 0.5 + (i * 0.03), // Improving
           reliability: 0.8 - (i * 0.02), // Degrading
-          security: 0.7 + (Math.random() * 0.1 - 0.05) // Volatile
+          security: 0.7 + (i % 2 === 0 ? -0.02 : 0.02) // Stable bounded variation
         },
         overallScore: 0.7,
         level: 3,
@@ -251,6 +251,9 @@ describe("ScoreHistoryStore", () => {
 
     const reliability = report.dimensions.find(d => d.dimension === "reliability");
     expect(reliability?.trend).toBe("degrading");
+
+    const security = report.dimensions.find(d => d.dimension === "security");
+    expect(security?.trend).toBe("stable");
 
     expect(report.summary).toContain("10 snapshots analyzed");
   });

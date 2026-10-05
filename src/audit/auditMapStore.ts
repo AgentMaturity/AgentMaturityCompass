@@ -25,7 +25,7 @@ function writeMapFile(workspace: string, path: string, map: AuditMapFile): { pat
   };
 }
 
-export function saveAuditMapBuiltin(workspace: string, map: AuditMapFile): { path: string; sigPath: string } {
+function saveAuditMapBuiltin(workspace: string, map: AuditMapFile): { path: string; sigPath: string } {
   return writeMapFile(workspace, auditMapBuiltinPath(workspace), map);
 }
 

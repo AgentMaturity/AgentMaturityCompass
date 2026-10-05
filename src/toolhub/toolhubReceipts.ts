@@ -3,7 +3,7 @@ import { defaultGatewayConfig, loadGatewayConfig } from "../gateway/config.js";
 import { redactBody } from "../gateway/redaction.js";
 import { sha256Hex } from "../utils/hash.js";
 
-export function redactToolPayload(workspace: string, payload: string): {
+function redactToolPayload(workspace: string, payload: string): {
   redacted: string;
   wasRedacted: boolean;
   bodySha256: string;

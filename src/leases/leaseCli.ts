@@ -15,7 +15,7 @@ export function parseLeaseTtlToMs(ttl: string): number {
   return value * factor;
 }
 
-export function parseLeaseScopes(raw: string): LeaseScope[] {
+function parseLeaseScopes(raw: string): LeaseScope[] {
   const scopes = raw
     .split(",")
     .map((item) => item.trim())
@@ -23,7 +23,7 @@ export function parseLeaseScopes(raw: string): LeaseScope[] {
   return scopes as LeaseScope[];
 }
 
-export function parseStringList(raw: string): string[] {
+function parseStringList(raw: string): string[] {
   return raw
     .split(",")
     .map((item) => item.trim())

@@ -1,3 +1,4 @@
+import { redactWorkspacePath as redactRequiredWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -122,11 +123,11 @@ export interface WriteObservabilityLaneResult {
   ref: ObservabilityLaneRef;
 }
 
-export function observabilityLaneDir(workspace: string, agentId?: string): string {
+function observabilityLaneDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "observability-lane");
 }
 
-export function observabilityLanePath(workspace: string, agentId: string | undefined, runId: string): string {
+function observabilityLanePath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(observabilityLaneDir(workspace, agentId), `${runId}.json`);
 }
 
@@ -312,7 +313,7 @@ function buildDecisionChain(receipts: DecisionReceipt[] | undefined): DecisionCh
   }));
 }
 
-export function buildObservabilityLaneRecord(input: WriteObservabilityLaneInput): ObservabilityLaneRecord {
+function buildObservabilityLaneRecord(input: WriteObservabilityLaneInput): ObservabilityLaneRecord {
   const workspace = resolve(input.workspace);
   const report = input.report;
   const componentAttribution = [
@@ -421,13 +422,7 @@ export function loadObservabilityLaneRecord(input: {
 }
 
 function redactWorkspacePath(path: string, workspace: string): string {
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) {
-    return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  }
-  return path;
+  return redactRequiredWorkspacePath(path, workspace);
 }
 
 export function redactObservabilityLaneRecord(record: ObservabilityLaneRecord): ObservabilityLaneRecord {

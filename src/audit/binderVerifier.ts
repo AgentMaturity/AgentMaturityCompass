@@ -1,4 +1,10 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import {
+  cleanupSignedArtifactVerification,
+  resolveSignedArtifactRoot,
+  readSignedArtifactInclusionProofs,
+  verifySignedArtifactPiiScan
+} from "../utils/signedArtifactVerification.js";
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -43,62 +49,12 @@ export interface AuditBinderVerifyResult {
   fileSha256: string;
 }
 
-function cleanup(path: string): void {
-  try {
-    rmSync(path, { recursive: true, force: true });
-  } catch {
-    // best effort
-  }
-}
-
 function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
 
-function resolveRoot(dir: string): string {
-  const direct = join(dir, "amc-audit");
-  if (pathExists(direct)) {
-    return direct;
-  }
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) {
-      continue;
-    }
-    const child = join(dir, entry.name);
-    if (pathExists(join(child, "binder.json")) && pathExists(join(child, "binder.sig"))) {
-      return child;
-    }
-  }
-  return dir;
-}
-
 function digestFile(path: string): string {
   return sha256Hex(readFileSync(path));
-}
-
-function parseInclusionProofs(root: string): Array<{
-  v: 1;
-  proofId: string;
-  eventHash: string;
-  rootHash: string;
-  merklePath: Array<{ position: "left" | "right"; hash: string }>;
-  verifiedBy: "amc";
-}> {
-  const dir = join(root, "proofs", "inclusion");
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b))
-    .map((name) => JSON.parse(readUtf8(join(dir, name))) as {
-      v: 1;
-      proofId: string;
-      eventHash: string;
-      rootHash: string;
-      merklePath: Array<{ position: "left" | "right"; hash: string }>;
-      verifiedBy: "amc";
-    });
 }
 
 function verifyDigestSignature(params: {
@@ -147,7 +103,7 @@ export function verifyAuditBinderFile(params: {
   let binder: AuditBinderJson | null = null;
   try {
     tarExtract(file, tmp);
-    const root = resolveRoot(tmp);
+    const root = resolveSignedArtifactRoot(tmp, "amc-audit", "binder.json", "binder.sig");
     const binderPath = join(root, "binder.json");
     const sigPath = join(root, "binder.sig");
     const pubPath = join(root, "signer.pub");
@@ -181,27 +137,15 @@ export function verifyAuditBinderFile(params: {
       errors.push({ code: "SIGNATURE_INVALID", message: "binder signature verification failed" });
     }
 
-    const piiPath = join(root, "checks", "pii-scan.json");
-    if (!pathExists(piiPath)) {
-      errors.push({ code: "MISSING_PII_SCAN", message: "checks/pii-scan.json missing" });
-    } else {
-      const pii = binderPiiScanSchema.parse(JSON.parse(readUtf8(piiPath)) as unknown);
-      if (pii.status !== "PASS") {
-        errors.push({ code: "PII_SCAN_FAILED", message: "binder pii scan status is FAIL" });
-      }
-      const piiSha = join(root, "checks", "pii-scan.sha256");
-      if (pathExists(piiSha)) {
-        const expected = readUtf8(piiSha).trim();
-        const actual = digestFile(piiPath);
-        if (expected !== actual) {
-          errors.push({ code: "PII_SHA_MISMATCH", message: "checks/pii-scan.sha256 mismatch" });
-        }
-      } else {
-        errors.push({ code: "MISSING_PII_SHA", message: "checks/pii-scan.sha256 missing" });
-      }
-    }
+    verifySignedArtifactPiiScan({
+      root,
+      artifact: "binder",
+      readScan: (path) => binderPiiScanSchema.parse(JSON.parse(readUtf8(path)) as unknown),
+      requireChecksum: true,
+      errors
+    });
 
-    const inclusion = parseInclusionProofs(root);
+    const inclusion = readSignedArtifactInclusionProofs(root);
     const proofOk = verifyBinderProofs({
       transparencyRoot: null,
       merkleRoot: null,
@@ -261,7 +205,7 @@ export function verifyAuditBinderFile(params: {
       fileSha256
     };
   } finally {
-    cleanup(tmp);
+    cleanupSignedArtifactVerification(tmp);
   }
 }
 

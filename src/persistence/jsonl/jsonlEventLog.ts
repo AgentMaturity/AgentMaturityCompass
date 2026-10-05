@@ -114,7 +114,7 @@ function optionalNumber(source: Record<string, unknown>, key: string): number | 
  * missing `writer_sig` reach the verifier as `undefined` and compare unequal
  * instead of being reported as malformed.
  */
-export function parseEventLine(text: string, line: number): EvidenceEvent {
+function parseEventLine(text: string, line: number): EvidenceEvent {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);

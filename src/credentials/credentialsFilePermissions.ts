@@ -29,12 +29,12 @@ export const OWNER_ONLY_DIR_MODE = 0o700;
 const GROUP_AND_OTHER_BITS = 0o077;
 
 /** Permission bits only; `Stats.mode` also encodes the file type. */
-export function permissionBits(mode: number): number {
+function permissionBits(mode: number): number {
   return mode & 0o777;
 }
 
 /** True when neither group nor other holds any bit. */
-export function isOwnerOnlyMode(mode: number): boolean {
+function isOwnerOnlyMode(mode: number): boolean {
   return (permissionBits(mode) & GROUP_AND_OTHER_BITS) === 0;
 }
 

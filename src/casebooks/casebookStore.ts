@@ -16,25 +16,25 @@ interface SignedDigest {
   signer: "auditor";
 }
 
-export function casebooksRoot(workspace: string, agentId?: string): string {
+function casebooksRoot(workspace: string, agentId?: string): string {
   const resolved = resolveAgentId(workspace, agentId);
   const paths = getAgentPaths(workspace, resolved);
   return join(paths.rootDir, "casebooks");
 }
 
-export function casebookFolder(workspace: string, casebookId: string, agentId?: string): string {
+function casebookFolder(workspace: string, casebookId: string, agentId?: string): string {
   return join(casebooksRoot(workspace, agentId), casebookId);
 }
 
-export function casebookYamlPath(workspace: string, casebookId: string, agentId?: string): string {
+function casebookYamlPath(workspace: string, casebookId: string, agentId?: string): string {
   return join(casebookFolder(workspace, casebookId, agentId), "casebook.yaml");
 }
 
-export function casebookCasesDir(workspace: string, casebookId: string, agentId?: string): string {
+function casebookCasesDir(workspace: string, casebookId: string, agentId?: string): string {
   return join(casebookFolder(workspace, casebookId, agentId), "cases");
 }
 
-export function caseFilePath(workspace: string, casebookId: string, caseId: string, agentId?: string): string {
+function caseFilePath(workspace: string, casebookId: string, caseId: string, agentId?: string): string {
   return join(casebookCasesDir(workspace, casebookId, agentId), `${caseId}.json`);
 }
 

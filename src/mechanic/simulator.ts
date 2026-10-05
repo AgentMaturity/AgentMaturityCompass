@@ -8,7 +8,7 @@ import { mechanicSimulatorGate } from "./simulatorEvidenceGates.js";
 import type { MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { mechanicRoot } from "./targetsStore.js";
 
-export function mechanicSimulationPath(workspace: string): string {
+function mechanicSimulationPath(workspace: string): string {
   return join(mechanicRoot(workspace), "simulations", "latest.json");
 }
 
@@ -20,7 +20,7 @@ export function loadLatestMechanicSimulation(workspace: string): MechanicSimulat
   return mechanicSimulationSchema.parse(JSON.parse(readUtf8(path)) as unknown);
 }
 
-export function saveMechanicSimulation(workspace: string, simulation: MechanicSimulation): {
+function saveMechanicSimulation(workspace: string, simulation: MechanicSimulation): {
   path: string;
   sigPath: string;
 } {

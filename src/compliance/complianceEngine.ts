@@ -84,11 +84,11 @@ function parseAuditType(event: EvidenceEvent): string | null {
   return typeof meta.auditType === "string" ? meta.auditType : null;
 }
 
-export function complianceMapsPath(workspace: string): string {
+function complianceMapsPath(workspace: string): string {
   return join(workspace, ".amc", "compliance-maps.yaml");
 }
 
-export function complianceMapsSigPath(workspace: string): string {
+function complianceMapsSigPath(workspace: string): string {
   return `${complianceMapsPath(workspace)}.sig`;
 }
 
@@ -107,7 +107,7 @@ function signComplianceMapsDigest(workspace: string, digest: string): SignedDige
   };
 }
 
-export function signComplianceMaps(workspace: string): string {
+function signComplianceMaps(workspace: string): string {
   const path = complianceMapsPath(workspace);
   if (!pathExists(path)) {
     throw new Error(`Compliance maps not found: ${path}`);

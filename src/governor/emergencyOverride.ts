@@ -199,7 +199,7 @@ export function fileOverridePostmortem(
   return true;
 }
 
-export function loadOverride(workspace: string, overrideId: string): EmergencyOverrideEntry | null {
+function loadOverride(workspace: string, overrideId: string): EmergencyOverrideEntry | null {
   const file = overrideFilePath(workspace, overrideId);
   if (!pathExists(file)) return null;
   return JSON.parse(readUtf8(file)) as EmergencyOverrideEntry;

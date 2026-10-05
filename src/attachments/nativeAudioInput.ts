@@ -84,7 +84,7 @@ export function snapshotNativeAudio(audio: NativeAudioInput): QueuedNativeAudio 
     data: bytes.toString("base64"), byteLength: bytes.length, sha256: sha256Hex(bytes) });
 }
 
-export function materializeNativeAudio(audio: QueuedNativeAudio): NativeAudioInput {
+function materializeNativeAudio(audio: QueuedNativeAudio): NativeAudioInput {
   exact(audio, ["filename", "mediaType", "data", "byteLength", "sha256"]);
   filename(audio.filename);
   if (typeof audio.data !== "string" || !audio.data || audio.data.length > 4 * Math.ceil(MAX_NATIVE_AUDIO_BYTES / 3)

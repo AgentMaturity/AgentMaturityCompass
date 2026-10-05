@@ -1,3 +1,20 @@
+import {
+  agentSecurityEvidenceFields,
+  agentTestingEvidenceFields,
+  adkRuntimeEvidenceFields,
+  ragDatasetBuilderBaseFields,
+  agenticSearchTraceFields,
+  localSystemEvidenceFields,
+  privacyWebIdentityFields,
+  privacyWebArtifactFields,
+  ollamaMetricsConfigFields,
+  ollamaMetricsResultFields,
+  researchGymSetupFields,
+  researchGymArtifactFields,
+  osUniverseSetupFields,
+  osUniverseArtifactFields,
+} from "./liveDriftEvidenceFields.js";
+import { withLiveDriftReceiptHash, withLiveDriftRowHash } from "./liveDriftReceiptValidation.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
@@ -2040,16 +2057,7 @@ function backdoorAgentEvidenceCoverage(row: LiveDriftSampleRow): number {
 }
 
 function hasAgentSecuritySignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.agentSecurityGuardId,
-    row.agentSecurityPolicyHash,
-    row.agentSecurityTaintTraceHash,
-    row.agentSecurityProxyTraceHash,
-    row.agentSecurityAuditTrailHash,
-    row.agentSecurityRuntimeTelemetryHash,
-    row.agentSecurityEvalPackHash,
-    row.agentSecurityClassifierHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return agentSecurityEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.agentSecuritySourceOriginCoverage0to1 !== undefined ||
     row.agentSecurityTaintPropagationCoverage0to1 !== undefined ||
     row.agentSecurityPolicyDecisionAccuracy0to1 !== undefined ||
@@ -2061,16 +2069,7 @@ function hasAgentSecuritySignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompleteAgentSecurityEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.agentSecurityGuardId,
-    row.agentSecurityPolicyHash,
-    row.agentSecurityTaintTraceHash,
-    row.agentSecurityProxyTraceHash,
-    row.agentSecurityAuditTrailHash,
-    row.agentSecurityRuntimeTelemetryHash,
-    row.agentSecurityEvalPackHash,
-    row.agentSecurityClassifierHash,
-  ].every((value) => normalizeContextId(value) !== null);
+  return agentSecurityEvidenceFields(row).every((value) => normalizeContextId(value) !== null);
 }
 
 function agentSecurityContextLabel(row: LiveDriftSampleRow): string {
@@ -2084,13 +2083,7 @@ function agentSecurityContextLabel(row: LiveDriftSampleRow): string {
 
 function hasAgentTestingSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.agentTestingTaxonomyId,
-    row.agentTestingMethodologyHash,
-    row.agentTestingScenarioCatalogHash,
-    row.agentTestingFaultInjectionPlanHash,
-    row.agentTestingObservabilityPlanHash,
-    row.agentTestingSafetyPlanHash,
-    row.agentTestingStandardsMapHash,
+    ...agentTestingEvidenceFields(row),
     row.agentTestingCategory,
     row.agentTestingApproach,
     row.agentTestingFaultModel,
@@ -2105,15 +2098,7 @@ function hasAgentTestingSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompleteAgentTestingEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.agentTestingTaxonomyId,
-    row.agentTestingMethodologyHash,
-    row.agentTestingScenarioCatalogHash,
-    row.agentTestingFaultInjectionPlanHash,
-    row.agentTestingObservabilityPlanHash,
-    row.agentTestingSafetyPlanHash,
-    row.agentTestingStandardsMapHash,
-  ].every((value) => normalizeContextId(value) !== null);
+  return agentTestingEvidenceFields(row).every((value) => normalizeContextId(value) !== null);
 }
 
 function agentTestingContextLabel(row: LiveDriftSampleRow): string {
@@ -2125,7 +2110,7 @@ function agentTestingContextLabel(row: LiveDriftSampleRow): string {
   ].join("/");
 }
 
-function hasChaosSignal(row: LiveDriftSampleRow): boolean {
+function chaosEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
     row.chaosBenchmarkId,
     row.chaosScenarioId,
@@ -2138,6 +2123,12 @@ function hasChaosSignal(row: LiveDriftSampleRow): boolean {
     row.chaosScoreLedgerHash,
     row.chaosAgentCardHash,
     row.chaosImprovementEvalHash,
+  ];
+}
+
+function hasChaosSignal(row: LiveDriftSampleRow): boolean {
+  return [
+    ...chaosEvidenceFields(row),
     row.chaosFrameworkId,
     row.chaosModality,
     row.chaosBenchmarkFamily,
@@ -2150,19 +2141,7 @@ function hasChaosSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompleteChaosEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.chaosBenchmarkId,
-    row.chaosScenarioId,
-    row.chaosProfileId,
-    row.chaosInjectionPlanHash,
-    row.chaosMutationManifestHash,
-    row.chaosEndpointContractHash,
-    row.chaosJudgeConfigHash,
-    row.chaosTraceBundleHash,
-    row.chaosScoreLedgerHash,
-    row.chaosAgentCardHash,
-    row.chaosImprovementEvalHash,
-  ].every((value) => normalizeContextId(value) !== null);
+  return chaosEvidenceFields(row).every((value) => normalizeContextId(value) !== null);
 }
 
 function chaosContextLabel(row: LiveDriftSampleRow): string {
@@ -2174,7 +2153,7 @@ function chaosContextLabel(row: LiveDriftSampleRow): string {
   ].join("/");
 }
 
-function hasRecoveryBenchSignal(row: LiveDriftSampleRow): boolean {
+function recoveryBenchEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
     row.recoveryBenchBenchmarkId,
     row.recoveryBenchSourceRefHash,
@@ -2194,7 +2173,11 @@ function hasRecoveryBenchSignal(row: LiveDriftSampleRow): boolean {
     row.recoveryBenchRecoveryTranscriptHash,
     row.recoveryBenchRecoveryResultHash,
     row.recoveryBenchScoreReportHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  ];
+}
+
+function hasRecoveryBenchSignal(row: LiveDriftSampleRow): boolean {
+  return recoveryBenchEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.recoveryBenchMessageMode !== undefined ||
     row.recoveryBenchAgentHarness !== undefined ||
     row.recoveryBenchInitialReward0to1 !== undefined ||
@@ -2240,26 +2223,7 @@ function recoveryBenchContextCoverage(row: LiveDriftSampleRow): number {
 }
 
 function hasCompleteRecoveryBenchEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.recoveryBenchBenchmarkId,
-    row.recoveryBenchSourceRefHash,
-    row.recoveryBenchRepositorySnapshotHash,
-    row.recoveryBenchLicenseRefHash,
-    row.recoveryBenchTerminalBenchVersion,
-    row.recoveryBenchInitialTraceSetHash,
-    row.recoveryBenchTaskId,
-    row.recoveryBenchFailedTrajectoryHash,
-    row.recoveryBenchReplayCommandLogHash,
-    row.recoveryBenchReplayEnvironmentHash,
-    row.recoveryBenchCorruptedEnvironmentHash,
-    row.recoveryBenchRecoveryAgentId,
-    row.recoveryBenchRecoveryAgentConfigHash,
-    row.recoveryBenchRecoveryModelId,
-    row.recoveryBenchRecoveryRunConfigHash,
-    row.recoveryBenchRecoveryTranscriptHash,
-    row.recoveryBenchRecoveryResultHash,
-    row.recoveryBenchScoreReportHash,
-  ].every((value) => normalizeContextId(value) !== null) &&
+  return recoveryBenchEvidenceFields(row).every((value) => normalizeContextId(value) !== null) &&
     normalizeRecoveryBenchMessageMode(row.recoveryBenchMessageMode) !== "unknown" &&
     normalizeRecoveryBenchHarness(row.recoveryBenchAgentHarness) !== "unknown" &&
     recoveryBenchFailureTraceCoverage(row) === 1 &&
@@ -2275,14 +2239,7 @@ function recoveryBenchTaskLabel(row: LiveDriftSampleRow): string {
 
 function hasAdkSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.adkRuntimeId,
-    row.adkFrameworkVersion,
-    row.adkAgentGraphHash,
-    row.adkToolRegistryHash,
-    row.adkEvalDatasetHash,
-    row.adkEvalCaseHash,
-    row.adkRunnerConfigHash,
-    row.adkSessionStateHash,
+    ...adkRuntimeEvidenceFields(row),
     row.adkLiveRequestQueueHash,
     row.adkApiServerRouteHash,
     row.adkDeploymentManifestHash,
@@ -2301,14 +2258,7 @@ function hasCompleteAdkEvidence(row: LiveDriftSampleRow): boolean {
   const executionMode = normalizeAdkExecutionMode(row.adkExecutionMode);
   const deploymentTarget = normalizeContextId(row.adkDeploymentTarget);
   const baseComplete = [
-    row.adkRuntimeId,
-    row.adkFrameworkVersion,
-    row.adkAgentGraphHash,
-    row.adkToolRegistryHash,
-    row.adkEvalDatasetHash,
-    row.adkEvalCaseHash,
-    row.adkRunnerConfigHash,
-    row.adkSessionStateHash,
+    ...adkRuntimeEvidenceFields(row),
     row.adkModelRoute,
     row.adkDeploymentTarget,
   ].every((value) => normalizeContextId(value) !== null) && executionMode !== "unknown";
@@ -2330,7 +2280,7 @@ function adkRuntimeContextLabel(row: LiveDriftSampleRow): string {
   ].join("/");
 }
 
-function hasPhysicianBenchSignal(row: LiveDriftSampleRow): boolean {
+function physicianBenchEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
     row.physicianBenchBenchmarkId,
     row.physicianBenchTaskSetVersion,
@@ -2349,7 +2299,11 @@ function hasPhysicianBenchSignal(row: LiveDriftSampleRow): boolean {
     row.physicianBenchModelConfigHash,
     row.physicianBenchToolManifestHash,
     row.physicianBenchRunConfigHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  ];
+}
+
+function hasPhysicianBenchSignal(row: LiveDriftSampleRow): boolean {
+  return physicianBenchEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.physicianBenchTaskType !== undefined ||
     row.physicianBenchTaskSuccess !== undefined ||
     row.physicianBenchCheckpointPassRate0to1 !== undefined ||
@@ -2361,25 +2315,7 @@ function hasPhysicianBenchSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompletePhysicianBenchEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.physicianBenchBenchmarkId,
-    row.physicianBenchTaskSetVersion,
-    row.physicianBenchPaperRefHash,
-    row.physicianBenchTaskId,
-    row.physicianBenchSpecialty,
-    row.physicianBenchFhirServerImageHash,
-    row.physicianBenchFhirApiSchemaHash,
-    row.physicianBenchPatientRecordManifestHash,
-    row.physicianBenchPatientCohortHash,
-    row.physicianBenchVerifierCheckpointHash,
-    row.physicianBenchTrajectoryHash,
-    row.physicianBenchWorkspaceArtifactHash,
-    row.physicianBenchEvalLogHash,
-    row.physicianBenchMetadataHash,
-    row.physicianBenchModelConfigHash,
-    row.physicianBenchToolManifestHash,
-    row.physicianBenchRunConfigHash,
-  ].every((value) => normalizeContextId(value) !== null) &&
+  return physicianBenchEvidenceFields(row).every((value) => normalizeContextId(value) !== null) &&
     normalizePhysicianBenchTaskType(row.physicianBenchTaskType) !== "unknown";
 }
 
@@ -2401,15 +2337,7 @@ function physicianBenchEhrContextLabel(row: LiveDriftSampleRow): string {
 
 function hasRagSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.ragStrategyComparisonId,
-    row.ragStrategyRunId,
-    row.ragStrategyManifestHash,
-    row.ragIndexManifestHash,
-    row.ragQuerySetHash,
-    row.ragReferenceAnswerHash,
-    row.ragEvaluatorConfigHash,
-    row.ragModelConfigHash,
-    row.ragStrategyResultHash,
+    ...ragStrategyEvidenceFields(row),
     row.ragCorpusId,
     row.ragCorpusHash,
     row.ragNodeName,
@@ -2434,17 +2362,7 @@ function hasRagSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasRagStrategySignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.ragStrategyComparisonId,
-    row.ragStrategyRunId,
-    row.ragStrategyManifestHash,
-    row.ragIndexManifestHash,
-    row.ragQuerySetHash,
-    row.ragReferenceAnswerHash,
-    row.ragEvaluatorConfigHash,
-    row.ragModelConfigHash,
-    row.ragStrategyResultHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return ragStrategyEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.ragPipelineStrategy !== undefined;
 }
 
@@ -2489,13 +2407,7 @@ function ragPipelineContextLabel(row: LiveDriftSampleRow): string {
 
 function hasRagDatasetBuilderSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.ragDatasetBuilderId,
-    row.ragDatasetVersion,
-    row.ragSourceDocumentManifestHash,
-    row.ragSourceDocumentLicenseId,
-    row.ragQaPairManifestHash,
-    row.ragPassageManifestHash,
-    row.ragBuilderConfigHash,
+    ...ragDatasetBuilderBaseFields(row),
     row.ragPdfParseTraceHash,
     row.ragPostprocessManifestHash,
   ].some((value) => normalizeContextId(value) !== null) ||
@@ -2515,15 +2427,7 @@ function hasRagDatasetBuilderSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function ragDatasetBuilderEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
-  const fields = [
-    row.ragDatasetBuilderId,
-    row.ragDatasetVersion,
-    row.ragSourceDocumentManifestHash,
-    row.ragSourceDocumentLicenseId,
-    row.ragQaPairManifestHash,
-    row.ragPassageManifestHash,
-    row.ragBuilderConfigHash,
-  ];
+  const fields = ragDatasetBuilderBaseFields(row);
   const stage = normalizeRagBuilderStage(row.ragBuilderStage);
   if (stage === "preprocess_pdf") fields.push(row.ragPdfParseTraceHash);
   if (stage === "postprocess_medium") fields.push(row.ragPostprocessManifestHash);
@@ -2561,22 +2465,7 @@ function ragDatasetBuilderContextLabel(row: LiveDriftSampleRow): string {
 }
 
 function hasKiteSignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.kiteBenchmarkId,
-    row.kiteSourceRefHash,
-    row.kiteRepositorySnapshotHash,
-    row.kiteLicenseRefHash,
-    row.kiteCorpusManifestHash,
-    row.kiteDocumentSetId,
-    row.kiteQuerySetHash,
-    row.kiteGroundTruthAnswerHash,
-    row.kiteRubricHash,
-    row.kiteRagPipelineConfigHash,
-    row.kiteResponseManifestHash,
-    row.kiteResultManifestHash,
-    row.kiteJudgeConfigHash,
-    row.kiteRagConfigurationId,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return kiteEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.kiteDatasetFamily !== undefined ||
     row.kiteGradingScale !== undefined ||
     row.kiteQuestionCount !== undefined ||
@@ -2643,20 +2532,7 @@ function kiteBenchmarkContextLabel(row: LiveDriftSampleRow): string {
 }
 
 function hasPokerEvalSignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.pokerEvalBenchmarkId,
-    row.pokerEvalSourceRefHash,
-    row.pokerEvalRepositorySnapshotHash,
-    row.pokerEvalPackageRefHash,
-    row.pokerEvalCitationRefHash,
-    row.pokerEvalSimulationConfigHash,
-    row.pokerEvalAgentConfigHash,
-    row.pokerEvalOpponentPoolHash,
-    row.pokerEvalRunManifestHash,
-    row.pokerEvalHandHistoryManifestHash,
-    row.pokerEvalMetricReportHash,
-    row.pokerEvalBlindStructureHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return pokerEvalEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.pokerEvalGameType !== undefined ||
     row.pokerEvalTableSize !== undefined ||
     row.pokerEvalHandCount !== undefined ||
@@ -2716,18 +2592,7 @@ function pokerEvalOpponentPoolLabel(row: LiveDriftSampleRow): string {
 }
 
 function hasLlmRagEvalSuiteSignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.llmRagEvalSuiteId,
-    row.llmRagEvalRunId,
-    row.llmRagCandidateManifestHash,
-    row.llmRagReferenceManifestHash,
-    row.llmRagMetricSuiteHash,
-    row.llmRagSemanticMetricId,
-    row.llmRagBiasMetricId,
-    row.llmRagHallucinationMetricId,
-    row.llmRagJudgeConfigHash,
-    row.llmRagReportHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return llmRagEvalSuiteEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.llmRagSemanticSimilarity0to1 !== undefined ||
     row.llmRagBiasRisk0to1 !== undefined ||
     row.llmRagHallucinationRate0to1 !== undefined;
@@ -2973,13 +2838,7 @@ function hasAgenticSearchSignal(row: LiveDriftSampleRow): boolean {
     row.agenticSearchBenchmarkId,
     row.agenticSearchQueryId,
     row.agenticSearchTaskId,
-    row.agenticSearchSourceManifestHash,
-    row.agenticSearchToolConfigHash,
-    row.agenticSearchPlannerTraceHash,
-    row.agenticSearchSearchTraceHash,
-    row.agenticSearchCitationTraceHash,
-    row.agenticSearchSynthesisTraceHash,
-    row.agenticSearchResultManifestHash,
+    ...agenticSearchTraceFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.agenticSearchDatasetFamily !== undefined ||
     row.agenticSearchQueryType !== undefined ||
@@ -2993,13 +2852,7 @@ function hasAgenticSearchSignal(row: LiveDriftSampleRow): boolean {
 function hasCompleteAgenticSearchTrace(row: LiveDriftSampleRow): boolean {
   return [
     row.agenticSearchBenchmarkId,
-    row.agenticSearchSourceManifestHash,
-    row.agenticSearchToolConfigHash,
-    row.agenticSearchPlannerTraceHash,
-    row.agenticSearchSearchTraceHash,
-    row.agenticSearchCitationTraceHash,
-    row.agenticSearchSynthesisTraceHash,
-    row.agenticSearchResultManifestHash,
+    ...agenticSearchTraceFields(row),
   ].every((value) => normalizeContextId(value) !== null);
 }
 
@@ -3016,7 +2869,7 @@ function agenticSearchToolContextLabel(row: LiveDriftSampleRow): string {
   ].join("/");
 }
 
-function hasDocumentDatasetSignal(row: LiveDriftSampleRow): boolean {
+function documentDatasetEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
     row.documentDatasetPipelineId,
     row.documentDatasetCorpusHash,
@@ -3028,7 +2881,11 @@ function hasDocumentDatasetSignal(row: LiveDriftSampleRow): boolean {
     row.documentDatasetExportManifestHash,
     row.documentDatasetBenchMetricHash,
     row.documentDatasetReportArtifactHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  ];
+}
+
+function hasDocumentDatasetSignal(row: LiveDriftSampleRow): boolean {
+  return documentDatasetEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.documentDatasetSourceFormat !== undefined ||
     row.documentDatasetTask !== undefined ||
     row.documentDatasetExportTarget !== undefined ||
@@ -3043,18 +2900,7 @@ function hasDocumentDatasetSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompleteDocumentDatasetEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.documentDatasetPipelineId,
-    row.documentDatasetCorpusHash,
-    row.documentDatasetIndexManifestHash,
-    row.documentDatasetDocumentRecordHash,
-    row.documentDatasetPageRecordHash,
-    row.documentDatasetCellRecordHash,
-    row.documentDatasetSampleManifestHash,
-    row.documentDatasetExportManifestHash,
-    row.documentDatasetBenchMetricHash,
-    row.documentDatasetReportArtifactHash,
-  ].every((value) => normalizeContextId(value) !== null);
+  return documentDatasetEvidenceFields(row).every((value) => normalizeContextId(value) !== null);
 }
 
 function documentDatasetPipelineContextLabel(row: LiveDriftSampleRow): string {
@@ -3074,20 +2920,7 @@ function documentDatasetPipelineContextLabel(row: LiveDriftSampleRow): string {
 
 function hasCpuAgenticSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.cpuAgenticBenchmarkId,
-    row.cpuAgenticPaperRefHash,
-    row.cpuAgenticFrameworkId,
-    row.cpuAgenticEnvironmentHash,
-    row.cpuAgenticCondaEnvHash,
-    row.cpuAgenticHardwareProfileHash,
-    row.cpuAgenticSystemRequirementsHash,
-    row.cpuAgenticModelServerConfigHash,
-    row.cpuAgenticApiKeyBoundaryHash,
-    row.cpuAgenticWorkloadConfigHash,
-    row.cpuAgenticDatasetManifestHash,
-    row.cpuAgenticToolManifestHash,
-    row.cpuAgenticRunScriptHash,
-    row.cpuAgenticResultManifestHash,
+    ...cpuAgenticEvidenceFields(row),
     row.cpuAgenticFigureArtifactHash,
   ].some((value) => normalizeContextId(value) !== null) ||
     row.cpuAgenticWorkloadFamily !== undefined ||
@@ -3249,23 +3082,7 @@ function evalTechniqueContextLabel(row: LiveDriftSampleRow): string {
 }
 
 function hasSapAgentEvalSignal(row: LiveDriftSampleRow): boolean {
-  return [
-    row.sapAgentEvalTutorialId,
-    row.sapAgentEvalSourceRefHash,
-    row.sapAgentEvalRepositorySnapshotHash,
-    row.sapAgentEvalLicenseRefHash,
-    row.sapAgentEvalPaperRefHash,
-    row.sapAgentEvalNotebookHash,
-    row.sapAgentEvalDatasetManifestHash,
-    row.sapAgentEvalBaselineLogManifestHash,
-    row.sapAgentEvalLiveSampleManifestHash,
-    row.sapAgentEvalMetricConfigHash,
-    row.sapAgentEvalToolingConfigHash,
-    row.sapAgentEvalRoleAccessPolicyHash,
-    row.sapAgentEvalReliabilityPolicyHash,
-    row.sapAgentEvalCompliancePolicyHash,
-    row.sapAgentEvalAlertReceiptHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  return sapAgentEvalEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.sapAgentEvalObjective !== undefined ||
     row.sapAgentEvalProcess !== undefined ||
     row.sapAgentEvalEnterpriseContext !== undefined ||
@@ -3329,23 +3146,8 @@ function sapAgentEvalEvidenceCoverage(row: LiveDriftSampleRow): number {
 
 function hasAgentEvalObservabilitySignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.agentEvalObservabilitySourceRefHash,
-    row.agentEvalObservabilityRepositorySnapshotHash,
-    row.agentEvalObservabilityLicenseRefHash,
-    row.agentEvalObservabilityAgentConfigHash,
-    row.agentEvalObservabilityEvalDatasetHash,
-    row.agentEvalObservabilityPromptVariantHash,
-    row.agentEvalObservabilityModelConfigHash,
-    row.agentEvalObservabilityRagIndexHash,
-    row.agentEvalObservabilityMetricConfigHash,
-    row.agentEvalObservabilityBaselineEvalResultHash,
-    row.agentEvalObservabilityLiveEvalResultHash,
-    row.agentEvalObservabilityOpenTelemetryTraceHash,
-    row.agentEvalObservabilityApplicationInsightsHash,
-    row.agentEvalObservabilityEventHubHash,
-    row.agentEvalObservabilityKustoPolicyHash,
-    row.agentEvalObservabilityFabricDashboardHash,
-    row.agentEvalObservabilityAlertReceiptHash,
+    ...agentEvalObservabilityConfigFields(row),
+    ...agentEvalObservabilityTelemetryFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.agentEvalObservabilityMetricSet !== undefined ||
     row.agentEvalObservabilityTelemetry !== undefined ||
@@ -3410,13 +3212,8 @@ function agentEvalObservabilityEvidenceCoverage(row: LiveDriftSampleRow): number
   ) / 3);
 }
 
-function hasHedraRagSignal(row: LiveDriftSampleRow): boolean {
+function hedraRagArtifactDetailFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
-    row.hedraRagArtifactId,
-    row.hedraRagSourceRefHash,
-    row.hedraRagRepositorySnapshotHash,
-    row.hedraRagLicenseRefHash,
-    row.hedraRagLicenseReviewHash,
     row.hedraRagPaperRefHash,
     row.hedraRagArtifactReadmeHash,
     row.hedraRagDatasetManifestHash,
@@ -3433,6 +3230,17 @@ function hasHedraRagSignal(row: LiveDriftSampleRow): boolean {
     row.hedraRagAlertPolicyHash,
     row.hedraRagResourceProfileHash,
     row.hedraRagGpuProfileHash,
+  ];
+}
+
+function hasHedraRagSignal(row: LiveDriftSampleRow): boolean {
+  return [
+    row.hedraRagArtifactId,
+    row.hedraRagSourceRefHash,
+    row.hedraRagRepositorySnapshotHash,
+    row.hedraRagLicenseRefHash,
+    row.hedraRagLicenseReviewHash,
+    ...hedraRagArtifactDetailFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.hedraRagLicenseStatus !== undefined ||
     row.hedraRagWorkflow !== undefined ||
@@ -3451,22 +3259,7 @@ function hedraRagArtifactEvidenceFields(row: LiveDriftSampleRow): Array<string |
     row.hedraRagArtifactId,
     row.hedraRagSourceRefHash,
     row.hedraRagRepositorySnapshotHash,
-    row.hedraRagPaperRefHash,
-    row.hedraRagArtifactReadmeHash,
-    row.hedraRagDatasetManifestHash,
-    row.hedraRagCorpusManifestHash,
-    row.hedraRagIndexManifestHash,
-    row.hedraRagDependencyManifestHash,
-    row.hedraRagEnvironmentConfigHash,
-    row.hedraRagRunScriptHash,
-    row.hedraRagFigureId,
-    row.hedraRagResultCsvHash,
-    row.hedraRagPlotArtifactHash,
-    row.hedraRagBaselineResultHash,
-    row.hedraRagLiveResultHash,
-    row.hedraRagAlertPolicyHash,
-    row.hedraRagResourceProfileHash,
-    row.hedraRagGpuProfileHash,
+    ...hedraRagArtifactDetailFields(row),
   ];
 }
 
@@ -3674,19 +3467,9 @@ function strandsBenchmarkHarnessEvidenceCoverage(row: LiveDriftSampleRow): numbe
 
 function hasPrivacyWebSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.privacyWebBenchmarkId,
-    row.privacyWebDatasetHash,
-    row.privacyWebTaskConfigHash,
+    ...privacyWebIdentityFields(row),
     row.privacyWebActionSetTag,
-    row.privacyWebInstructionConfigHash,
-    row.privacyWebCookieStateHash,
-    row.privacyWebEnvironmentResetHash,
-    row.privacyWebDataMinimizationPolicyHash,
-    row.privacyWebAllowedInfoManifestHash,
-    row.privacyWebSensitiveInfoManifestHash,
-    row.privacyWebTrajectoryHash,
-    row.privacyWebResultArtifactHash,
-    row.privacyWebLeakageJudgeHash,
+    ...privacyWebArtifactFields(row),
     row.privacyWebCaptioningModelHash,
     row.privacyWebModelRouteHash,
   ].some((value) => normalizeContextId(value) !== null) ||
@@ -3702,18 +3485,8 @@ function hasPrivacyWebSignal(row: LiveDriftSampleRow): boolean {
 
 function privacyWebEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   const fields = [
-    row.privacyWebBenchmarkId,
-    row.privacyWebDatasetHash,
-    row.privacyWebTaskConfigHash,
-    row.privacyWebInstructionConfigHash,
-    row.privacyWebCookieStateHash,
-    row.privacyWebEnvironmentResetHash,
-    row.privacyWebDataMinimizationPolicyHash,
-    row.privacyWebAllowedInfoManifestHash,
-    row.privacyWebSensitiveInfoManifestHash,
-    row.privacyWebTrajectoryHash,
-    row.privacyWebResultArtifactHash,
-    row.privacyWebLeakageJudgeHash,
+    ...privacyWebIdentityFields(row),
+    ...privacyWebArtifactFields(row),
     row.privacyWebModelRouteHash,
   ];
   if (normalizePrivacyWebObservationMode(row.privacyWebObservationMode) === "image_som") {
@@ -3753,12 +3526,7 @@ function privacyWebContextLabel(row: LiveDriftSampleRow): string {
 
 function hasLocalSystemSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.localSystemMonitorProfileId,
-    row.localSystemDeviceProfileHash,
-    row.localSystemHardwareScannerHash,
-    row.localSystemProcessCatalogHash,
-    row.localSystemSensorLogHash,
-    row.localSystemAlertReceiptHash,
+    ...localSystemEvidenceFields(row),
     row.localSystemVoltageRailId,
   ].some((value) => normalizeContextId(value) !== null) ||
     row.localSystemWorkloadContext !== undefined ||
@@ -3775,14 +3543,7 @@ function hasLocalSystemSignal(row: LiveDriftSampleRow): boolean {
 }
 
 function hasCompleteLocalSystemEvidence(row: LiveDriftSampleRow): boolean {
-  return [
-    row.localSystemMonitorProfileId,
-    row.localSystemDeviceProfileHash,
-    row.localSystemHardwareScannerHash,
-    row.localSystemProcessCatalogHash,
-    row.localSystemSensorLogHash,
-    row.localSystemAlertReceiptHash,
-  ].every((value) => normalizeContextId(value) !== null);
+  return localSystemEvidenceFields(row).every((value) => normalizeContextId(value) !== null);
 }
 
 function localSystemHardwareContextLabel(row: LiveDriftSampleRow): string {
@@ -3796,18 +3557,7 @@ function localSystemHardwareContextLabel(row: LiveDriftSampleRow): string {
 
 function hasObservabilitySignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.observabilityBenchmarkId,
-    row.observabilityTaskSpecHash,
-    row.observabilityGeneratedTaskHash,
-    row.observabilityEnvironmentConfigHash,
-    row.observabilityDockerConfigHash,
-    row.observabilityScenarioClockHash,
-    row.observabilityAgentTrajectoryHash,
-    row.observabilityCommandStdoutHash,
-    row.observabilityGradingDetailsHash,
-    row.observabilityRewardHash,
-    row.observabilityResultJsonHash,
-    row.observabilityHtmlReportHash,
+    ...observabilityEvidenceFields(row),
     row.observabilityIncidentContextId,
   ].some((value) => normalizeContextId(value) !== null) ||
     row.observabilityScenarioClockAligned !== undefined ||
@@ -3916,19 +3666,9 @@ type OllamaMetricsReceiptRowSlice = Pick<
 
 function hasOllamaMetricsSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.ollamaMetricsSidecarId,
-    row.ollamaMetricsSourceRefHash,
-    row.ollamaMetricsRepositorySnapshotHash,
-    row.ollamaMetricsLicenseRefHash,
-    row.ollamaMetricsProxyConfigHash,
-    row.ollamaMetricsOllamaHostConfigHash,
-    row.ollamaMetricsPrometheusScrapeConfigHash,
+    ...ollamaMetricsConfigFields(row),
     row.ollamaMetricsGrafanaDashboardHash,
-    row.ollamaMetricsEndpointSnapshotHash,
-    row.ollamaMetricsBaselineSnapshotHash,
-    row.ollamaMetricsLiveSnapshotHash,
-    row.ollamaMetricsAlertPolicyHash,
-    row.ollamaMetricsModelId,
+    ...ollamaMetricsResultFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.ollamaMetricsDeploymentMode !== undefined ||
     row.ollamaMetricsPromptTokensTotal !== undefined ||
@@ -3943,18 +3683,8 @@ function hasOllamaMetricsSignal(row: LiveDriftSampleRow): boolean {
 
 function ollamaMetricsEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
-    row.ollamaMetricsSidecarId,
-    row.ollamaMetricsSourceRefHash,
-    row.ollamaMetricsRepositorySnapshotHash,
-    row.ollamaMetricsLicenseRefHash,
-    row.ollamaMetricsProxyConfigHash,
-    row.ollamaMetricsOllamaHostConfigHash,
-    row.ollamaMetricsPrometheusScrapeConfigHash,
-    row.ollamaMetricsEndpointSnapshotHash,
-    row.ollamaMetricsBaselineSnapshotHash,
-    row.ollamaMetricsLiveSnapshotHash,
-    row.ollamaMetricsAlertPolicyHash,
-    row.ollamaMetricsModelId,
+    ...ollamaMetricsConfigFields(row),
+    ...ollamaMetricsResultFields(row),
   ];
 }
 
@@ -4116,7 +3846,7 @@ function webOperatorProviderLabel(row: LiveDriftSampleRow): string {
   return normalizeContextId(row.webOperatorProviderId) ?? "unknown-provider";
 }
 
-function hasNaviBenchSignal(row: LiveDriftSampleRow): boolean {
+function naviBenchEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
     row.naviBenchBenchmarkId,
     row.naviBenchSourceRefHash,
@@ -4135,7 +3865,11 @@ function hasNaviBenchSignal(row: LiveDriftSampleRow): boolean {
     row.naviBenchVisualizationArtifactHash,
     row.naviBenchScreenshotTraceHash,
     row.naviBenchAlertReceiptHash,
-  ].some((value) => normalizeContextId(value) !== null) ||
+  ];
+}
+
+function hasNaviBenchSignal(row: LiveDriftSampleRow): boolean {
+  return naviBenchEvidenceFields(row).some((value) => normalizeContextId(value) !== null) ||
     row.naviBenchWebsiteDomain !== undefined ||
     row.naviBenchBrowserMode !== undefined ||
     row.naviBenchTaskFinished !== undefined ||
@@ -4163,25 +3897,7 @@ function naviBenchVisualizationCovered(row: LiveDriftSampleRow): boolean {
 
 function naviBenchEvidenceCoverage(row: LiveDriftSampleRow): number {
   const explicit = normalizeRate(row.naviBenchEvidenceCoverage0to1);
-  const requiredProof = [
-    row.naviBenchBenchmarkId,
-    row.naviBenchSourceRefHash,
-    row.naviBenchRepositorySnapshotHash,
-    row.naviBenchLicenseRefHash,
-    row.naviBenchDatasetRefHash,
-    row.naviBenchBlogRefHash,
-    row.naviBenchTaskId,
-    row.naviBenchTaskConfigHash,
-    row.naviBenchEvaluatorConfigHash,
-    row.naviBenchAgentConfigHash,
-    row.naviBenchBrowserProviderHash,
-    row.naviBenchBaselineResultHash,
-    row.naviBenchLiveResultHash,
-    row.naviBenchTrajectoryHash,
-    row.naviBenchVisualizationArtifactHash,
-    row.naviBenchScreenshotTraceHash,
-    row.naviBenchAlertReceiptHash,
-  ].filter((value) => normalizeContextId(value) !== null).length;
+  const requiredProof = naviBenchEvidenceFields(row).filter((value) => normalizeContextId(value) !== null).length;
   const requiredBooleans = [
     row.naviBenchTaskFinished,
     row.naviBenchTaskCrashed,
@@ -4220,18 +3936,7 @@ function naviBenchEvalContextLabel(row: LiveDriftSampleRow): string {
 
 function hasLegalAgentSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.legalAgentBenchmarkId,
-    row.legalAgentDatasetHash,
-    row.legalAgentCorpusId,
-    row.legalAgentTaskId,
-    row.legalAgentPlanningTreeHash,
-    row.legalAgentToolManifestHash,
-    row.legalAgentToolRunTraceHash,
-    row.legalAgentIntermediateStepAnnotationHash,
-    row.legalAgentProcessTraceHash,
-    row.legalAgentOutputHash,
-    row.legalAgentReferenceAnswerHash,
-    row.legalAgentEvaluationReportHash,
+    ...legalAgentEvidenceFields(row),
     row.legalAgentTokenRecordHash,
   ].some((value) => normalizeContextId(value) !== null) ||
     row.legalAgentTaskType !== undefined ||
@@ -4291,26 +3996,9 @@ function legalAgentToolContextLabel(row: LiveDriftSampleRow): string {
 
 function hasResearchGymSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.researchGymBenchmarkId,
-    row.researchGymPaperRefHash,
-    row.researchGymTaskId,
-    row.researchGymTaskManifestHash,
-    row.researchGymPrunedRepoHash,
-    row.researchGymDatasetManifestHash,
-    row.researchGymEvaluationHarnessHash,
-    row.researchGymBaselineScoreManifestHash,
-    row.researchGymGradingScriptHash,
-    row.researchGymWithheldSolutionPolicyHash,
-    row.researchGymRunConfigHash,
+    ...researchGymSetupFields(row),
     row.researchGymRuntimeImageHash,
-    row.researchGymAgentAdapterHash,
-    row.researchGymWorkspaceSnapshotHash,
-    row.researchGymTranscriptHash,
-    row.researchGymCostSummaryHash,
-    row.researchGymStatusHash,
-    row.researchGymPlanHash,
-    row.researchGymInspectionReportHash,
-    row.researchGymViolationReportHash,
+    ...researchGymArtifactFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.researchGymTaskDomain !== undefined ||
     row.researchGymRuntime !== undefined ||
@@ -4333,25 +4021,8 @@ function hasResearchGymSignal(row: LiveDriftSampleRow): boolean {
 
 function researchGymEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
-    row.researchGymBenchmarkId,
-    row.researchGymPaperRefHash,
-    row.researchGymTaskId,
-    row.researchGymTaskManifestHash,
-    row.researchGymPrunedRepoHash,
-    row.researchGymDatasetManifestHash,
-    row.researchGymEvaluationHarnessHash,
-    row.researchGymBaselineScoreManifestHash,
-    row.researchGymGradingScriptHash,
-    row.researchGymWithheldSolutionPolicyHash,
-    row.researchGymRunConfigHash,
-    row.researchGymAgentAdapterHash,
-    row.researchGymWorkspaceSnapshotHash,
-    row.researchGymTranscriptHash,
-    row.researchGymCostSummaryHash,
-    row.researchGymStatusHash,
-    row.researchGymPlanHash,
-    row.researchGymInspectionReportHash,
-    row.researchGymViolationReportHash,
+    ...researchGymSetupFields(row),
+    ...researchGymArtifactFields(row),
   ];
 }
 
@@ -4405,23 +4076,9 @@ function researchGymRuntimeContextLabel(row: LiveDriftSampleRow): string {
 
 function hasOsUniverseSignal(row: LiveDriftSampleRow): boolean {
   return [
-    row.osUniverseBenchmarkId,
-    row.osUniverseSourceRefHash,
-    row.osUniverseRepositorySnapshotHash,
-    row.osUniverseLicenseRefHash,
-    row.osUniversePaperRefHash,
-    row.osUniverseTestcaseId,
-    row.osUniverseTestcaseManifestHash,
-    row.osUniverseAgentConfigHash,
-    row.osUniverseRunnerConfigHash,
+    ...osUniverseSetupFields(row),
     row.osUniverseRuntimeImageHash,
-    row.osUniverseDependencyLockHash,
-    row.osUniverseValidatorConfigHash,
-    row.osUniverseValidationReportHash,
-    row.osUniverseResultArtifactHash,
-    row.osUniverseViewerArtifactHash,
-    row.osUniverseTrajectoryHash,
-    row.osUniverseScreenshotTraceHash,
+    ...osUniverseArtifactFields(row),
   ].some((value) => normalizeContextId(value) !== null) ||
     row.osUniverseTaskCategory !== undefined ||
     row.osUniverseComplexityLevel !== undefined ||
@@ -4436,22 +4093,8 @@ function hasOsUniverseSignal(row: LiveDriftSampleRow): boolean {
 
 function osUniverseEvidenceFields(row: LiveDriftSampleRow): Array<string | undefined> {
   return [
-    row.osUniverseBenchmarkId,
-    row.osUniverseSourceRefHash,
-    row.osUniverseRepositorySnapshotHash,
-    row.osUniverseLicenseRefHash,
-    row.osUniversePaperRefHash,
-    row.osUniverseTestcaseId,
-    row.osUniverseTestcaseManifestHash,
-    row.osUniverseAgentConfigHash,
-    row.osUniverseRunnerConfigHash,
-    row.osUniverseDependencyLockHash,
-    row.osUniverseValidatorConfigHash,
-    row.osUniverseValidationReportHash,
-    row.osUniverseResultArtifactHash,
-    row.osUniverseViewerArtifactHash,
-    row.osUniverseTrajectoryHash,
-    row.osUniverseScreenshotTraceHash,
+    ...osUniverseSetupFields(row),
+    ...osUniverseArtifactFields(row),
   ];
 }
 
@@ -7218,10 +6861,7 @@ function receiptRows(rows: LiveDriftSampleRow[]): LiveDriftReceiptRow[] {
       evidenceRefs: unique(row.evidenceRefs ?? []),
       signedEvidenceRefs: unique(row.signedEvidenceRefs ?? []),
     };
-    return {
-      ...rowPayload,
-      rowHash: sha256Hex(canonicalize(rowPayload)),
-    };
+    return withLiveDriftRowHash(rowPayload);
   });
 }
 
@@ -10106,10 +9746,7 @@ export function runLiveScoreBehaviorDrift(input: RunLiveScoreBehaviorDriftInput)
     sourceRefs: input.sourceRefs ?? [],
     summary: `${alerts.length} live drift alert(s), recommendation=${recommendationValue}`,
   };
-  return {
-    ...receiptWithoutHash,
-    receiptHash: sha256Hex(canonicalize(receiptWithoutHash)),
-  };
+  return withLiveDriftReceiptHash(receiptWithoutHash);
 }
 
 export function buildLiveDriftWatchAlerts(receipt: LiveDriftReceipt): LiveDriftWatchAlert[] {

@@ -62,11 +62,11 @@ export interface ObserveDecisionOutcomesResult {
   receiptPaths: string[];
 }
 
-export function decisionReceiptsDir(workspace: string, agentId?: string): string {
+function decisionReceiptsDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "decision-receipts");
 }
 
-export function decisionReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {
+function decisionReceiptsPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(decisionReceiptsDir(workspace, agentId), `${runId}.json`);
 }
 

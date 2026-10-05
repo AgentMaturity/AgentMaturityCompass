@@ -1,4 +1,10 @@
-import { mkdtempSync, readdirSync, rmSync } from "node:fs";
+import {
+  cleanupSignedArtifactVerification,
+  resolveSignedArtifactRoot,
+  readSignedArtifactInclusionProofs,
+  verifySignedArtifactPiiScan
+} from "../utils/signedArtifactVerification.js";
+import { mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { sha256Hex } from "../utils/hash.js";
@@ -39,14 +45,6 @@ export interface PassportVerifyResult {
   fileSha256: string;
 }
 
-function cleanup(path: string): void {
-  try {
-    rmSync(path, { recursive: true, force: true });
-  } catch {
-    // best effort
-  }
-}
-
 function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({
     file: bundleFile,
@@ -54,48 +52,6 @@ function tarExtract(bundleFile: string, outDir: string): void {
     label: "passport bundle",
     limits: PASSPORT_ARCHIVE_LIMITS,
   });
-}
-
-function resolveRoot(dir: string): string {
-  const direct = join(dir, "amc-passport");
-  if (pathExists(direct)) {
-    return direct;
-  }
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) {
-      continue;
-    }
-    const child = join(dir, entry.name);
-    if (pathExists(join(child, "passport.json")) && pathExists(join(child, "passport.sig"))) {
-      return child;
-    }
-  }
-  return dir;
-}
-
-function parseInclusionProofs(root: string): Array<{
-  v: 1;
-  proofId: string;
-  eventHash: string;
-  rootHash: string;
-  merklePath: Array<{ position: "left" | "right"; hash: string }>;
-  verifiedBy: "amc";
-}> {
-  const dir = join(root, "proofs", "inclusion");
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b))
-    .map((name) => JSON.parse(readUtf8(join(dir, name))) as {
-      v: 1;
-      proofId: string;
-      eventHash: string;
-      rootHash: string;
-      merklePath: Array<{ position: "left" | "right"; hash: string }>;
-      verifiedBy: "amc";
-    });
 }
 
 export function verifyPassportArtifactFile(params: {
@@ -110,7 +66,7 @@ export function verifyPassportArtifactFile(params: {
   let passport: PassportJson | null = null;
   try {
     tarExtract(file, tmp);
-    const root = resolveRoot(tmp);
+    const root = resolveSignedArtifactRoot(tmp, "amc-passport", "passport.json", "passport.sig");
     const passportPath = join(root, "passport.json");
     const sigPath = join(root, "passport.sig");
     const pubPath = join(root, "signer.pub");
@@ -163,25 +119,15 @@ export function verifyPassportArtifactFile(params: {
       errors.push({ code: "SIGNATURE_INVALID", message: "passport signature verification failed" });
     }
 
-    const piiPath = join(root, "checks", "pii-scan.json");
-    if (pathExists(piiPath)) {
-      const pii = passportPiiScanSchema.parse(JSON.parse(readUtf8(piiPath)) as unknown);
-      if (pii.status !== "PASS") {
-        errors.push({ code: "PII_SCAN_FAILED", message: "passport pii scan status is FAIL" });
-      }
-      const piiSha = join(root, "checks", "pii-scan.sha256");
-      if (pathExists(piiSha)) {
-        const expected = readUtf8(piiSha).trim();
-        const actual = digestFile(piiPath);
-        if (expected !== actual) {
-          errors.push({ code: "PII_SHA_MISMATCH", message: "checks/pii-scan.sha256 mismatch" });
-        }
-      }
-    } else {
-      errors.push({ code: "MISSING_PII_SCAN", message: "checks/pii-scan.json missing" });
-    }
+    verifySignedArtifactPiiScan({
+      root,
+      artifact: "passport",
+      readScan: (path) => passportPiiScanSchema.parse(JSON.parse(readUtf8(path)) as unknown),
+      requireChecksum: false,
+      errors
+    });
 
-    const inclusion = parseInclusionProofs(root);
+    const inclusion = readSignedArtifactInclusionProofs(root);
     const proofOk = verifyPassportProofBundle({
       transparencyRoot: null,
       merkleRoot: null,
@@ -241,7 +187,7 @@ export function verifyPassportArtifactFile(params: {
       fileSha256
     };
   } finally {
-    cleanup(tmp);
+    cleanupSignedArtifactVerification(tmp);
   }
 }
 

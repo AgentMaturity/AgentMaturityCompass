@@ -1,3 +1,4 @@
+import { redactWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import type { AMCTraceV1 } from "../correlation/traceSchema.js";
@@ -176,7 +177,7 @@ function classifyFromText(text: string): TraceFailureClass {
   return "unknown_failure";
 }
 
-export function classifyTraceFailure(input: {
+function classifyTraceFailure(input: {
   flags?: string[];
   finalLevel?: number;
   note?: string | null;
@@ -338,11 +339,11 @@ function buildClusters(entries: TraceFailureIndexEntry[]): TraceFailureCluster[]
     .sort((a, b) => b.scoreImpact - a.scoreImpact || b.count - a.count);
 }
 
-export function traceFailureIndexesDir(workspace: string, agentId?: string): string {
+function traceFailureIndexesDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "trace-indexes");
 }
 
-export function traceFailureIndexPath(workspace: string, agentId: string | undefined, runId: string): string {
+function traceFailureIndexPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(traceFailureIndexesDir(workspace, agentId), `${runId}.json`);
 }
 
@@ -409,14 +410,10 @@ export function writeTraceFailureIndex(input: BuildTraceFailureIndexInput): { in
 }
 
 function redactPath(path: string, workspace: string): string {
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactWorkspacePath(path, workspace);
 }
 
-export function redactTraceFailureIndex(index: TraceFailureIndex): TraceFailureIndex {
+function redactTraceFailureIndex(index: TraceFailureIndex): TraceFailureIndex {
   return {
     ...index,
     workspace: "$WORKSPACE",

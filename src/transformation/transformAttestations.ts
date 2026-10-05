@@ -37,7 +37,7 @@ export const transformAttestationSchema = z.object({
 
 export type TransformAttestation = z.infer<typeof transformAttestationSchema>;
 
-export function transformAttestationsDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
+function transformAttestationsDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
   if (scope.type === "AGENT") {
     return join(workspace, ".amc", "agents", scope.agentId, "transform", "attestations");
   }

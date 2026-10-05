@@ -5,7 +5,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from 'zod';
-import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, queryParam } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, apiRequestError, queryParam } from './apiHelpers.js';
 
 const vaultRedactBodySchema = z.object({
   text: z.string().min(1),
@@ -125,8 +125,7 @@ export async function handleVaultRoute(
       const result = scanForPII(body.text);
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -141,8 +140,7 @@ export async function handleVaultRoute(
       const classification = hasSSN ? 'RESTRICTED' : (hasEmail || hasPhone) ? 'INTERNAL' : 'PUBLIC';
       apiSuccess(res, { classification, piiDetected: { email: hasEmail, phone: hasPhone, ssn: hasSSN } });
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }

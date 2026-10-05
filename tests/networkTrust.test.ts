@@ -92,7 +92,7 @@ describe("output attestation", () => {
       trustLevel: 4,
       shieldResults: [{ pack: "injection", passed: true }],
     }, TEST_SIGNING_KEY);
-    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY, att.timestamp + 24 * 60 * 60 * 1000);
     const report = scoreOutputAttestation({
       attestations: [att],
       verifications: [ver],
@@ -101,6 +101,7 @@ describe("output attestation", () => {
     expect(report.hasOutputSigning).toBe(true);
     expect(report.hasTrustLevelBinding).toBe(true);
     expect(report.hasShieldResultBinding).toBe(true);
+    expect(report.hasEvidenceDecay).toBe(true);
   });
 
   test("binds PBSAI context envelope provenance and output contract into attestation", () => {
@@ -142,13 +143,18 @@ describe("output attestation", () => {
     expect(att.provenanceMetadata?.evidenceRefs).toContain("ev://incident-001");
     expect(att.outputContract?.schemaId).toBe("pbsai.output.contract.v1");
 
-    const ver = verifyAttestation(att, TEST_SIGNING_KEY);
+    // Fresh and elapsed attestations must both be explicit; wall-clock ticks
+    // otherwise change which capability/level branch this fixture exercises.
+    const ver = verifyAttestation(att, TEST_SIGNING_KEY, att.timestamp);
     expect(ver.valid).toBe(true);
+    expect(ver.trustDecay).toBe(0);
 
     const report = scoreOutputAttestation({ attestations: [att], verifications: [ver] });
     expect(report.hasStructuredContextEnvelope).toBe(true);
     expect(report.hasProvenanceMetadata).toBe(true);
     expect(report.hasOutputContract).toBe(true);
+    expect(report.hasEvidenceDecay).toBe(false);
+    expect(report.level).toBe(4);
   });
 });
 

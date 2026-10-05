@@ -1,0 +1,31 @@
+# Optional overlay for docker-compose.tls.yml. Both existing services stay intact.
+services:
+  amc-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: api
+    image: amc-api:local
+    restart: unless-stopped
+    environment:
+      PORT: "3220"
+      NODE_ENV: production
+    expose:
+      - "3220"
+    volumes:
+      - amc_data:/data/amc:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /home/amc:uid=10001,gid=10001,mode=0700
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  caddy:
+    depends_on:
+      - amc-studio
+      - amc-api
+    volumes:
+      - ./Caddyfile.studio-api:/etc/caddy/Caddyfile:ro

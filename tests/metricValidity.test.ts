@@ -1,5 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { buildMetricValidationReport, googleAdkEvalMetricValidityRequirements } from "../src/score/metricValidity.js";
+import {
+  buildMetricValidationReport, googleAdkEvalMetricValidityRequirements,
+  lunaryObservabilityMetricValidityRequirements,
+  type MetricValidationArchitectureRealityCheck,
+  type MetricValidationRagPipelineCheck
+} from "../src/score/metricValidity.js";
 import type {
   DiagnosticReport,
   LayerName,
@@ -68,6 +73,91 @@ function prior(runId: string, ts: number, layerValue = 3): DiagnosticReport {
 }
 
 const layerName: LayerName = "Strategic Agent Operations";
+
+describe("metric proof refusal boundaries", () => {
+  test("Lunary requirements retain evidence admission and return an independent copy", () => {
+    const first = lunaryObservabilityMetricValidityRequirements();
+    expect(first).toEqual(expect.arrayContaining([
+      "signed evidence refs", "artifact hashes", "row hashes", "fail-closed threshold policy",
+      "no-copy/source-review boundary proof", "metric owner", "sample size", "confidence interval"
+    ]));
+    const second = lunaryObservabilityMetricValidityRequirements();
+    first.splice(0);
+    expect(lunaryObservabilityMetricValidityRequirements()).toEqual(second);
+  });
+
+  function input(): Parameters<typeof buildMetricValidationReport>[0] {
+    const questionScores = Array.from({ length: 6 }, (_, index) => score(`AMC-1.${index + 1}`, 4));
+    return {
+      agentId: "invalid-proof-fixture", runId: "invalid-proof-run", ts: Date.UTC(2026, 5, 13),
+      trustLabel: "HIGH TRUST", integrityIndex: 1, evidenceCoverage: 1, correlationRatio: 1,
+      unsupportedClaimCount: 0, layerScores: [{ layerName, avgFinalLevel: 4, confidenceWeightedFinalLevel: 4 }],
+      questionScores, questions: questionScores.map(row => ({ id: row.questionId, layerName })),
+      confidenceSummary: { lowConfidenceFindings: 0, highUncertaintyFindings: 0, downgradedFindings: 0,
+        autoFixBlockedRecommendations: 0, averageEvidenceSufficiency: 1, averageJudgeAgreement: 0.94 },
+      signedEvidenceRefs: [...questionScores.map((row, index) => ({
+        evidenceId: row.evidenceEventIds[0]!, eventHash: String(index).repeat(64),
+        writerSig: `fixture-signature-${index}`, eventType: "audit" as const,
+        sessionId: `fixture-session-${index}`, ts: Date.UTC(2026, 5, 13), trustTier: "OBSERVED" as const
+      })), { evidenceId: "proof-fixture", eventHash: "a".repeat(64), writerSig: "proof-fixture-signature",
+        eventType: "metric", sessionId: "proof-fixture-session", ts: Date.UTC(2026, 5, 13), trustTier: "OBSERVED_HARDENED" }],
+      sourceRefs: ["fixture:metric-proof-refusal"], gateMode: "ci"
+    };
+  }
+
+  const architectureBase: MetricValidationArchitectureRealityCheck = {
+    architectureSignalId: "invalid-architecture-proof", architectureSignalType: "wrapper_agent_baseline",
+    covered: true, evidenceRefs: ["proof-fixture"], artifactHash: "a".repeat(64)
+  };
+  const architectureCases: Array<{ name: string; change: Partial<MetricValidationArchitectureRealityCheck> }> = [
+    { name: "explicitly uncovered", change: { covered: false } },
+    { name: "no evidence references", change: { evidenceRefs: [] } },
+    { name: "malformed artifact hash", change: { artifactHash: "not-a-sha256" } },
+    { name: "insufficient stress scenarios", change: { architectureSignalType: "stress_tool_failure", scenarioCount: 0 } },
+    { name: "unnamed cost metric", change: { architectureSignalType: "cost_per_success", metricNames: [" "] } },
+    { name: "missing confidence interval", change: { architectureSignalType: "statistical_confidence", sampleSize: 12 } },
+    { name: "invalid confidence level", change: { architectureSignalType: "statistical_confidence", sampleSize: 12,
+      confidenceInterval: { level: 0, lower: 64, upper: 70, marginOfError: 3 } } },
+    { name: "reversed confidence interval", change: { architectureSignalType: "statistical_confidence", sampleSize: 12,
+      confidenceInterval: { level: 0.95, lower: 70, upper: 64, marginOfError: 3 } } }
+  ];
+  for (const fixture of architectureCases) {
+    test(`architecture proof rejects ${fixture.name}`, () => {
+      const check = { ...architectureBase, ...fixture.change };
+      const report = buildMetricValidationReport({ ...input(), requireArchitectureRealityProof: true,
+        architectureRealityChecks: [check] }, [prior("prior-1", Date.UTC(2026, 5, 1), 4), prior("prior-2", Date.UTC(2026, 5, 7), 4.01)]);
+      expect(report.rows[0]).toMatchObject({ status: "fail", architectureRealityCoverage: 0 });
+      expect(report.rows[0]?.architectureRealityMissingSignals).toContain(check.architectureSignalType);
+      expect(report.evalPack.rows[0]?.architectureRealityCoverage).toBe(0);
+      expect(report.failClosed).toBe(true);
+    });
+  }
+  const ragBase: MetricValidationRagPipelineCheck = {
+    ragSignalId: "invalid-rag-proof", evaluationSignalType: "ground_truth_questions", covered: true,
+    evidenceRefs: ["proof-fixture"], artifactHash: "a".repeat(64)
+  };
+  const ragCases: Array<{ name: string; change: Partial<MetricValidationRagPipelineCheck> }> = [
+    { name: "explicitly uncovered", change: { covered: false } },
+    { name: "no evidence references", change: { evidenceRefs: [] } },
+    { name: "malformed artifact hash", change: { artifactHash: "not-a-sha256" } },
+    { name: "unnamed metric", change: { evaluationSignalType: "metric_definition", metricNames: [" "] } },
+    { name: "empty owner", change: { evaluationSignalType: "metric_owner", owner: " " } },
+    { name: "missing confidence interval", change: { evaluationSignalType: "sample_size_confidence_interval", sampleSize: 12 } },
+    { name: "insufficient sample", change: { evaluationSignalType: "sample_size_confidence_interval", sampleSize: 0,
+      confidenceInterval: { level: 0.95, lower: 78, upper: 84, marginOfError: 3 } } }
+  ];
+  for (const fixture of ragCases) {
+    test(`RAG proof rejects ${fixture.name}`, () => {
+      const check = { ...ragBase, ...fixture.change };
+      const report = buildMetricValidationReport({ ...input(), requireRagEvaluationPipelineProof: true,
+        ragPipelineChecks: [check] }, [prior("prior-1", Date.UTC(2026, 5, 1), 4), prior("prior-2", Date.UTC(2026, 5, 7), 4.01)]);
+      expect(report.rows[0]).toMatchObject({ status: "fail", ragEvaluationPipelineCoverage: 0 });
+      expect(report.rows[0]?.ragEvaluationPipelineMissingSignals).toContain(check.evaluationSignalType);
+      expect(report.evalPack.rows[0]?.ragEvaluationPipelineCoverage).toBe(0);
+      expect(report.failClosed).toBe(true);
+    });
+  }
+});
 
 describe("buildMetricValidationReport", () => {
   test("exposes Google ADK metric-validity requirements without adding an ADK-specific adapter", () => {

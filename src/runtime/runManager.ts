@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { randomUUID } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -271,12 +272,7 @@ function eventMessage(type: RuntimeRunEventType, stage?: string | null): string 
 }
 
 function relativePathForExport(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
 function signState(workspace: string, statePath: string): string | null {
@@ -642,7 +638,7 @@ export function inspectRuntimeRun(input: {
   };
 }
 
-export function redactRuntimeRun(run: RuntimeManagedRun, workspace = run.statePath ? resolve(run.statePath, "..", "..", "..") : process.cwd()): RuntimeManagedRun {
+function redactRuntimeRun(run: RuntimeManagedRun, workspace = run.statePath ? resolve(run.statePath, "..", "..", "..") : process.cwd()): RuntimeManagedRun {
   return {
     ...run,
     statePath: relativePathForExport(run.statePath, workspace),
@@ -651,7 +647,7 @@ export function redactRuntimeRun(run: RuntimeManagedRun, workspace = run.statePa
   };
 }
 
-export function redactRuntimeRunEvent(event: RuntimeRunEvent, workspace = process.cwd()): RuntimeRunEvent {
+function redactRuntimeRunEvent(event: RuntimeRunEvent, workspace = process.cwd()): RuntimeRunEvent {
   return {
     ...event,
     payloadRef: relativePathForExport(event.payloadRef, workspace),

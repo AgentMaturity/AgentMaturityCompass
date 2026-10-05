@@ -19,6 +19,18 @@ import type {
   QuestionScoreSignedEvidenceRef,
 } from "../types.js";
 
+import {
+  incidentTriageProofHashes,
+  benchmarkSubmissionProofHashes,
+  multiUserBenchmarkProofHashes,
+  continualLearningBenchmarkProofHashes,
+  hermesTurboPerformanceProofHashes,
+  iotFirmwareQuestionProofHashes,
+  retailSalesQuestionProofHashes,
+  scorableStudioDrilldownProofHashes,
+  obsStudioDrilldownProofHashes,
+} from "./explainabilityContracts.js";
+
 export type ScoreEvidenceDrilldownState = "ready" | "empty";
 
 export interface ScoreEvidenceDrilldownArtifactLink {
@@ -1103,17 +1115,7 @@ function incidentTriageLensFailClosed(ref: QuestionScoreIncidentTriageLensRef): 
     return true;
   }
 
-  const proofHashes = [
-    ref.openEnvConfigHash,
-    ref.scenarioManifestHash,
-    ref.incidentReportHash,
-    ref.rawLogBundleHash,
-    ref.metricSnapshotHash,
-    ref.userReportHash,
-    ref.actionPayloadHash,
-    ref.graderConfigHash,
-    ref.feedbackHash,
-  ];
+  const proofHashes = incidentTriageProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1149,11 +1151,7 @@ function benchmarkSubmissionLensFailClosed(ref: QuestionScoreBenchmarkSubmission
     return true;
   }
 
-  const proofHashes = [
-    ref.submissionMetadataHash,
-    ref.taskBreakdownHash,
-    ref.leaderboardSnapshotHash,
-  ];
+  const proofHashes = benchmarkSubmissionProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1215,15 +1213,7 @@ function multiUserBenchmarkLensFailClosed(ref: QuestionScoreMultiUserBenchmarkLe
   if (!ref.benchmarkId || !ref.sourceRef || !ref.scenarioId || !isSha256(ref.rowHash)) {
     return true;
   }
-  const proofHashes = [
-    ref.datasetManifestHash,
-    ref.userRoleManifestHash,
-    ref.instructionSetHash,
-    ref.interactionTraceHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.metricReportHash,
-  ];
+  const proofHashes = multiUserBenchmarkProofHashes(ref);
   if (!proofHashes.every(isPresentSha256) || !multiUserScenarioProofPresent(ref)) {
     return true;
   }
@@ -1244,18 +1234,7 @@ function continualLearningBenchmarkLensFailClosed(
   if (!ref.benchmarkId || !ref.sourceRef || !ref.domainId || !ref.workflowId || !isSha256(ref.rowHash)) {
     return true;
   }
-  const proofHashes = [
-    ref.datasetManifestHash,
-    ref.stateSchemaHash,
-    ref.initialStateHash,
-    ref.stateMutationTraceHash,
-    ref.conversationTraceHash,
-    ref.entityRelationshipGraphHash,
-    ref.toolExecutionTraceHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.replayCommandHash,
-  ];
+  const proofHashes = continualLearningBenchmarkProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1304,24 +1283,7 @@ function hermesTurboPerformanceLensFailClosed(
   ) {
     return true;
   }
-  const proofHashes = [
-    ref.sourceStatusHash,
-    ref.readmeArtifactHash,
-    ref.packageManifestHash,
-    ref.benchmarkWorkflowHash,
-    ref.perfBudgetWorkflowHash,
-    ref.dailyScoreWorkflowHash,
-    ref.turboScoreScriptHash,
-    ref.performanceDashboardHash,
-    ref.benchmarkReportHash,
-    ref.baselineResultHash,
-    ref.candidateResultHash,
-    ref.latencyTraceHash,
-    ref.throughputTraceHash,
-    ref.scoreManifestHash,
-    ref.regressionThresholdHash,
-    ref.ciConfigHash,
-  ];
+  const proofHashes = hermesTurboPerformanceProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1402,22 +1364,7 @@ function iotFirmwareQuestionLensFailClosed(ref: QuestionScoreIotFirmwareQuestion
   ) {
     return true;
   }
-  const proofHashes = [
-    ref.firmwareProjectHash,
-    ref.toolchainManifestHash,
-    ref.sdkVersionManifestHash,
-    ref.hardwareSessionHash,
-    ref.deviceLogBundleHash,
-    ref.buildArtifactHash,
-    ref.flashArtifactHash,
-    ref.testArtifactHash,
-    ref.knowledgePackManifestHash,
-    ref.taskManifestHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.privacyBoundaryHash,
-    ref.benchmarkReportHash,
-  ];
+  const proofHashes = iotFirmwareQuestionProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1451,26 +1398,7 @@ function retailSalesQuestionLensFailClosed(ref: QuestionScoreRetailSalesQuestion
   ) {
     return true;
   }
-  const proofHashes = [
-    ref.productCatalogHash,
-    ref.productDescriptionHash,
-    ref.customerScenarioHash,
-    ref.conversationTraceHash,
-    ref.customerIntentManifestHash,
-    ref.orderCaptureSchemaHash,
-    ref.orderLedgerHash,
-    ref.pricingPolicyHash,
-    ref.discountPolicyHash,
-    ref.modelAdapterManifestHash,
-    ref.modelProviderMatrixHash,
-    ref.promptPolicyHash,
-    ref.recommendationPolicyHash,
-    ref.safetyPolicyHash,
-    ref.privacyBoundaryHash,
-    ref.evaluatorConfigHash,
-    ref.resultArtifactHash,
-    ref.benchmarkReportHash,
-  ];
+  const proofHashes = retailSalesQuestionProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1519,31 +1447,7 @@ function scorableStudioDrilldownLensFailClosed(ref: QuestionScoreScorableStudioD
   ) {
     return true;
   }
-  const proofHashes = [
-    ref.readmeArtifactHash,
-    ref.pythonPackageManifestHash,
-    ref.pythonOpenApiHash,
-    ref.pythonClientHash,
-    ref.pythonExecutionLogsHash,
-    ref.pythonEvaluatorApiHash,
-    ref.pythonExecutionLogApiHash,
-    ref.cliPackageManifestHash,
-    ref.cliLockfileHash,
-    ref.cliEvaluatorCommandHash,
-    ref.cliJudgeCommandHash,
-    ref.cliExecutionLogCommandHash,
-    ref.cliOtelTraceCommandHash,
-    ref.cliFileUploadCommandHash,
-    ref.typescriptPackageManifestHash,
-    ref.typescriptLockfileHash,
-    ref.typescriptSourceTreeHash,
-    ref.tracePreviewHash,
-    ref.receiptPreviewHash,
-    ref.policyRulePreviewHash,
-    ref.sourceArtifactPreviewHash,
-    ref.emptyStateHash,
-    ref.errorStateHash,
-  ];
+  const proofHashes = scorableStudioDrilldownProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }
@@ -1599,15 +1503,7 @@ function obsStudioDrilldownLensFailClosed(ref: QuestionScoreObsStudioDrilldownLe
   ) {
     return true;
   }
-  const proofHashes = [
-    ref.tracePreviewHash,
-    ref.reasoningTracePreviewHash,
-    ref.receiptPreviewHash,
-    ref.evidencePreviewHash,
-    ref.sourceArtifactPreviewHash,
-    ref.emptyStateHash,
-    ref.errorStateHash,
-  ];
+  const proofHashes = obsStudioDrilldownProofHashes(ref);
   if (!proofHashes.every(isPresentSha256)) {
     return true;
   }

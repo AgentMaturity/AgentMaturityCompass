@@ -1,7 +1,7 @@
 import { parseCookieHeader } from "../auth/sessionTokens.js";
 import type { IdentityConfig } from "./identityConfig.js";
 
-export function identityCookieName(config: IdentityConfig): string {
+function identityCookieName(config: IdentityConfig): string {
   return config.identity.session.cookieName;
 }
 

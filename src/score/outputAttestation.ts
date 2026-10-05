@@ -111,7 +111,7 @@ const DECAY_RATE = 0.02; // 2% per day
  * source. A key must now be supplied explicitly and must not be a known weak
  * value.
  */
-export function assertSigningKey(signingKey: string): void {
+function assertSigningKey(signingKey: string): void {
   const key = signingKey?.trim() ?? "";
   // Check known-weak values first so the error names the actual problem.
   if (key === "amc-default-key" || key === "default" || key === "changeme") {

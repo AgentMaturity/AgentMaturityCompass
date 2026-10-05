@@ -139,7 +139,7 @@ function buildModel(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions): E
   };
 }
 
-export function inferExecutiveBriefFormat(outputPath: string | undefined, format: string | undefined): ExecutiveBriefFormat {
+function inferExecutiveBriefFormat(outputPath: string | undefined, format: string | undefined): ExecutiveBriefFormat {
   if (format !== undefined) {
     const normalized = format.trim().toLowerCase();
     if (normalized === "html" || normalized === "markdown") return normalized;
@@ -150,12 +150,12 @@ export function inferExecutiveBriefFormat(outputPath: string | undefined, format
   return ext === ".md" || ext === ".markdown" ? "markdown" : "html";
 }
 
-export function defaultExecutiveBriefPath(workspace: string, runId: string, format: ExecutiveBriefFormat): string {
+function defaultExecutiveBriefPath(workspace: string, runId: string, format: ExecutiveBriefFormat): string {
   const ext = format === "markdown" ? "md" : "html";
   return join(workspace, ".amc", "reports", `executive-brief-${runId}.${ext}`);
 }
 
-export function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions = { workspace: process.cwd() }): string {
+function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions = { workspace: process.cwd() }): string {
   const model = buildModel(resolved, opts);
   const gapRows = model.topGaps
     .map((gap) => `| ${gap.name} | L${gap.score.toFixed(1)} | ${gap.action} |`)
@@ -199,7 +199,7 @@ export function renderExecutiveBriefMarkdown(resolved: ResolvedRunReport, opts: 
   ].join("\n");
 }
 
-export function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions = { workspace: process.cwd() }): string {
+function renderExecutiveBriefHtml(resolved: ResolvedRunReport, opts: ExecutiveBriefOptions = { workspace: process.cwd() }): string {
   const model = buildModel(resolved, opts);
   const riskColor = model.riskLabel === "Low" ? "#4AEF79" : model.riskLabel === "Moderate" ? "#f59e0b" : "#ff3355";
   const gapRows = model.topGaps

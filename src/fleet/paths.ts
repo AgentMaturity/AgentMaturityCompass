@@ -86,7 +86,7 @@ export function agentRoot(workspace: string, agentId: string): string {
   return join(fleetAgentsDir(workspace), normalizeAgentId(agentId));
 }
 
-export function hasAgentFolder(workspace: string, agentId: string): boolean {
+function hasAgentFolder(workspace: string, agentId: string): boolean {
   return pathExists(agentRoot(workspace, agentId));
 }
 

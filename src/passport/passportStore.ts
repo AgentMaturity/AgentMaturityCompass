@@ -13,11 +13,11 @@ function scopeSegment(scopeType: "WORKSPACE" | "NODE" | "AGENT"): string {
   return "agent";
 }
 
-export function passportRoot(workspace: string): string {
+function passportRoot(workspace: string): string {
   return join(workspace, ".amc", "passport");
 }
 
-export function passportPolicyPath(workspace: string): string {
+function passportPolicyPath(workspace: string): string {
   return join(passportRoot(workspace), "policy.yaml");
 }
 
@@ -29,15 +29,15 @@ export function passportExportsDir(workspace: string): string {
   return join(passportRoot(workspace), "exports");
 }
 
-export function passportCacheDir(workspace: string): string {
+function passportCacheDir(workspace: string): string {
   return join(passportRoot(workspace), "cache");
 }
 
-export function passportRevocationsPath(workspace: string): string {
+function passportRevocationsPath(workspace: string): string {
   return join(passportRoot(workspace), "revocations.json");
 }
 
-export function passportLatestCachePath(
+function passportLatestCachePath(
   workspace: string,
   scopeType: "WORKSPACE" | "NODE" | "AGENT",
   scopeId: string
@@ -61,7 +61,7 @@ export function passportExportsScopeDir(
   return join(passportExportsDir(workspace), scopeSegment(scopeType), scopeId);
 }
 
-export function ensurePassportDirs(workspace: string): void {
+function ensurePassportDirs(workspace: string): void {
   ensureDir(passportRoot(workspace));
   ensureDir(passportExportsDir(workspace));
   ensureDir(passportCacheDir(workspace));
@@ -139,7 +139,7 @@ export function savePassportPolicy(workspace: string, policy: PassportPolicy): {
   };
 }
 
-export function initPassportPolicy(workspace: string): {
+function initPassportPolicy(workspace: string): {
   path: string;
   sigPath: string;
   policy: PassportPolicy;

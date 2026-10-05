@@ -6,7 +6,7 @@ import { benchPolicySchema, defaultBenchPolicy, type BenchPolicy } from "./bench
 import { benchComparisonSchema, benchPiiScanSchema, type BenchComparison, type BenchPiiScanReport } from "./benchSchema.js";
 import { benchRegistryConfigSchema, type BenchRegistryConfig } from "./benchRegistrySchema.js";
 
-export function benchRootDir(workspace: string): string {
+function benchRootDir(workspace: string): string {
   return join(workspace, ".amc", "bench");
 }
 
@@ -22,11 +22,11 @@ export function benchExportsDir(workspace: string): string {
   return join(benchRootDir(workspace), "exports");
 }
 
-export function benchImportsDir(workspace: string): string {
+function benchImportsDir(workspace: string): string {
   return join(benchRootDir(workspace), "imports");
 }
 
-export function benchImportsRegistriesPath(workspace: string): string {
+function benchImportsRegistriesPath(workspace: string): string {
   return join(benchImportsDir(workspace), "registries.yaml");
 }
 
@@ -42,7 +42,7 @@ export function benchImportsBenchesDir(workspace: string): string {
   return join(benchImportsDir(workspace), "benches");
 }
 
-export function benchComparisonsDir(workspace: string): string {
+function benchComparisonsDir(workspace: string): string {
   return join(benchRootDir(workspace), "comparisons");
 }
 
@@ -54,7 +54,7 @@ export function benchComparisonLatestSigPath(workspace: string): string {
   return `${benchComparisonLatestPath(workspace)}.sig`;
 }
 
-export function ensureBenchDirs(workspace: string): void {
+function ensureBenchDirs(workspace: string): void {
   ensureDir(benchRootDir(workspace));
   ensureDir(benchExportsDir(workspace));
   ensureDir(benchImportsCacheDir(workspace));
@@ -93,7 +93,7 @@ export function initBenchPolicy(workspace: string): {
   return saveBenchPolicy(workspace, defaultBenchPolicy());
 }
 
-export function defaultBenchRegistriesConfig(): BenchRegistryConfig {
+function defaultBenchRegistriesConfig(): BenchRegistryConfig {
   return benchRegistryConfigSchema.parse({
     benchRegistries: {
       version: 1,

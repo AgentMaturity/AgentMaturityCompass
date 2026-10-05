@@ -28,7 +28,7 @@ function lanSigPath(workspace: string): string {
   return `${lanPath(workspace)}.sig`;
 }
 
-export function defaultLanMode(): LanModeConfig {
+function defaultLanMode(): LanModeConfig {
   return {
     enabled: false,
     bind: "127.0.0.1",
@@ -53,7 +53,7 @@ export function loadLanMode(workspace: string): LanModeConfig {
   };
 }
 
-export function signLanMode(workspace: string): string {
+function signLanMode(workspace: string): string {
   const path = lanPath(workspace);
   if (!pathExists(path)) {
     throw new Error(`LAN config not found: ${path}`);

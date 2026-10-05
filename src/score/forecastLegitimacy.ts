@@ -1,3 +1,4 @@
+import { scoreToLevel } from "./diagnosticResponseScoring.js";
 /**
  * Forecast Legitimacy Scoring Module
  *
@@ -132,14 +133,7 @@ function scoreResponse(response: string, criteria: { required: RegExp[]; bonus: 
   return Math.max(0, Math.min(1, score));
 }
 
-function scoreToLevel(score: number): number {
-  if (score >= 90) return 5;
-  if (score >= 70) return 4;
-  if (score >= 50) return 3;
-  if (score >= 30) return 2;
-  if (score >= 10) return 1;
-  return 0;
-}
+
 
 /**
  * Score forecast legitimacy from diagnostic question responses.

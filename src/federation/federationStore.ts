@@ -15,11 +15,11 @@ interface SignedDigest {
   signer: "auditor";
 }
 
-export function federationRoot(workspace: string): string {
+function federationRoot(workspace: string): string {
   return join(workspace, ".amc", "federation");
 }
 
-export function federationConfigPath(workspace: string): string {
+function federationConfigPath(workspace: string): string {
   return join(federationRoot(workspace), "federation.yaml");
 }
 
@@ -27,7 +27,7 @@ export function federationConfigSigPath(workspace: string): string {
   return `${federationConfigPath(workspace)}.sig`;
 }
 
-export function federationPeersDir(workspace: string): string {
+function federationPeersDir(workspace: string): string {
   return join(federationRoot(workspace), "peers");
 }
 
@@ -39,7 +39,7 @@ export function federationOutboxDir(workspace: string): string {
   return join(federationRoot(workspace), "outbox");
 }
 
-export function federationPeerPath(workspace: string, peerId: string): string {
+function federationPeerPath(workspace: string, peerId: string): string {
   return join(federationPeersDir(workspace), `${peerId}.json`);
 }
 

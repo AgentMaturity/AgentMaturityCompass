@@ -16,7 +16,7 @@ import {
   type ForecastSchedulerState
 } from "./forecastSchema.js";
 
-export function forecastRoot(workspace: string): string {
+function forecastRoot(workspace: string): string {
   return join(workspace, ".amc", "forecast");
 }
 
@@ -38,7 +38,7 @@ export function forecastScopeLatestPath(workspace: string, scope: ForecastScope)
   return normalized;
 }
 
-export function forecastScopeSnapshotsDir(workspace: string, scope: ForecastScope): string {
+function forecastScopeSnapshotsDir(workspace: string, scope: ForecastScope): string {
   const segment =
     scope.type === "WORKSPACE"
       ? "workspace"
@@ -48,15 +48,15 @@ export function forecastScopeSnapshotsDir(workspace: string, scope: ForecastScop
   return join(forecastRoot(workspace), "snapshots", segment);
 }
 
-export function forecastAdvisoriesDir(workspace: string): string {
+function forecastAdvisoriesDir(workspace: string): string {
   return join(forecastRoot(workspace), "advisories");
 }
 
-export function forecastAdvisoryPath(workspace: string, advisoryId: string): string {
+function forecastAdvisoryPath(workspace: string, advisoryId: string): string {
   return join(forecastAdvisoriesDir(workspace), `${advisoryId}.json`);
 }
 
-export function forecastSchedulerPath(workspace: string): string {
+function forecastSchedulerPath(workspace: string): string {
   return join(forecastRoot(workspace), "scheduler.json");
 }
 

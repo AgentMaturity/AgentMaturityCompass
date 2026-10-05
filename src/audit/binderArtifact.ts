@@ -1,6 +1,7 @@
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { collectFiles, cleanupDir } from "../utils/archiveFiles.js";
+import { mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { getPublicKeyHistory } from "../crypto/keys.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -54,27 +55,9 @@ const AMC_ARCHIVE_LIMITS: TarArchiveLimits = {
 };
 
 
-function cleanupDir(path: string): void {
-  if (pathExists(path)) {
-    rmSync(path, { recursive: true, force: true });
-  }
-}
 
-function collectFiles(root: string): string[] {
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const full = join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(full);
-      } else if (entry.isFile()) {
-        out.push(relative(root, full).replace(/\\/g, "/"));
-      }
-    }
-  };
-  walk(root);
-  return out.sort((a, b) => a.localeCompare(b));
-}
+
+
 
 function tarCreateDeterministic(sourceDir: string, outFile: string): void {
   const files = collectFiles(sourceDir);

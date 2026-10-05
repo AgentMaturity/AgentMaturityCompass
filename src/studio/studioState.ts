@@ -47,15 +47,15 @@ export function studioHumanAuditPath(workspace: string): string {
   return join(studioDir(workspace), "audit", "human.log");
 }
 
-export function studioStatePath(workspace: string): string {
+function studioStatePath(workspace: string): string {
   return join(studioDir(workspace), "state.json");
 }
 
-export function studioTokenPath(workspace: string): string {
+function studioTokenPath(workspace: string): string {
   return join(studioDir(workspace), "admin.token");
 }
 
-export function studioAgentTokenDir(workspace: string): string {
+function studioAgentTokenDir(workspace: string): string {
   return join(studioDir(workspace), "agent.tokens");
 }
 

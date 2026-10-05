@@ -12,7 +12,7 @@ function uniqueSorted<T extends string>(items: T[]): T[] {
   return [...new Set(items)].sort((a, b) => a.localeCompare(b));
 }
 
-export function buildAutoAnswerRules(): AutoAnswerRule[] {
+function buildAutoAnswerRules(): AutoAnswerRule[] {
   const rules = questionBank.map((question) => {
     const requiredEvidenceTypes = uniqueSorted(
       question.gates.flatMap((gate) => gate.requiredEvidenceTypes).filter((item): item is EvidenceEventType => Boolean(item))

@@ -35,7 +35,7 @@ function parseBearer(value: string | null): string | null {
   return match[1].trim();
 }
 
-export function looksLikeLeaseToken(value: string): boolean {
+function looksLikeLeaseToken(value: string): boolean {
   return /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value.trim());
 }
 

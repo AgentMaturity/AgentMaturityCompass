@@ -152,7 +152,7 @@ function isLegacyIndustryPackLicenseKey(value: string): boolean {
   return /^AMC-(INDUSTRY|DOMAIN)-PACKS-[A-Z0-9_-]{8,}$/i.test(value.trim());
 }
 
-export function validLegacyIndustryPackLicenseKey(
+function validLegacyIndustryPackLicenseKey(
   value: string,
   env: NodeJS.ProcessEnv = process.env,
 ): boolean {

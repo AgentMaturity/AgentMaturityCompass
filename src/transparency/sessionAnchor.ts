@@ -31,7 +31,7 @@ import {
 } from "./sessionRootDescriptor.js";
 
 /** Where the anchored descriptor bytes are kept, keyed by session id. */
-export function sessionRootDescriptorPath(workspace: string, sessionId: string): string {
+function sessionRootDescriptorPath(workspace: string, sessionId: string): string {
   return join(workspace, ".amc", "transparency", "session-roots", `${sessionId}.json`);
 }
 
@@ -42,7 +42,7 @@ export function sessionRootDescriptorPath(workspace: string, sessionId: string):
  * formatting, so the digest is reproducible by anyone who holds the descriptor
  * object — including the offline verifier, which never sees this file.
  */
-export function sessionRootDescriptorBytes(descriptor: SessionRootDescriptor): string {
+function sessionRootDescriptorBytes(descriptor: SessionRootDescriptor): string {
   return canonicalize(descriptor);
 }
 

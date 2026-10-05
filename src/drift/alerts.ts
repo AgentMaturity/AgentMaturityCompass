@@ -61,11 +61,11 @@ interface SignedDigest {
   signer: "auditor";
 }
 
-export function alertsPath(workspace: string): string {
+function alertsPath(workspace: string): string {
   return join(workspace, ".amc", "alerts.yaml");
 }
 
-export function alertsSigPath(workspace: string): string {
+function alertsSigPath(workspace: string): string {
   return `${alertsPath(workspace)}.sig`;
 }
 

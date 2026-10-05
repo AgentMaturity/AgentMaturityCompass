@@ -4,7 +4,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
-import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, pathParam } from './apiHelpers.js';
+import { bodyJsonSchema, apiSuccess, apiError, apiRequestError, pathParam } from './apiHelpers.js';
 import type { ApiRouteContext } from './index.js';
 
 const createBatchBodySchema = z.object({
@@ -43,11 +43,7 @@ export async function handleProductRoute(
       const batch = bp.createBatch(body.name, body.items);
       apiSuccess(res, batch, 201);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -96,11 +92,7 @@ export async function handleProductRoute(
       const job = pm.submitJob(body.name, body.type, submitter, body.payload);
       apiSuccess(res, job, 201);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }

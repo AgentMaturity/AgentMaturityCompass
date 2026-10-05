@@ -145,11 +145,11 @@ function graphRoot(workspace: string): string {
   return join(workspace, ".amc", "fleet", "typed-graphs");
 }
 
-export function latestTypedMultiAgentGraphPath(workspace: string): string {
+function latestTypedMultiAgentGraphPath(workspace: string): string {
   return join(graphRoot(workspace), "latest.json");
 }
 
-export function typedMultiAgentGraphPath(workspace: string, graphId: string): string {
+function typedMultiAgentGraphPath(workspace: string, graphId: string): string {
   return join(graphRoot(workspace), `${graphId}.json`);
 }
 

@@ -110,7 +110,7 @@ function workspacePathSha256(workspace: string): string {
   return sha256Hex(resolvedWorkspacePath(workspace));
 }
 
-export function controlCheckpointRoot(): string {
+function controlCheckpointRoot(): string {
   const configured = process.env.AMC_CONTROL_CHECKPOINT_DIR?.trim();
   return physicalPath(configured || join(homedir(), ".amc", "control-checkpoints"));
 }
@@ -124,11 +124,11 @@ export function controlCheckpointDir(workspace: string, controlKind: SignedContr
   return join(root, workspacePathSha256(workspace), controlKind);
 }
 
-export function signedControlJournalEntryPath(journalDir: string, revision: number): string {
+function signedControlJournalEntryPath(journalDir: string, revision: number): string {
   return join(journalDir, `${String(revision).padStart(12, "0")}.json`);
 }
 
-export function signedControlCheckpointPath(workspace: string, controlKind: SignedControlKind, revision: number): string {
+function signedControlCheckpointPath(workspace: string, controlKind: SignedControlKind, revision: number): string {
   return join(controlCheckpointDir(workspace, controlKind), `${String(revision).padStart(12, "0")}.json`);
 }
 

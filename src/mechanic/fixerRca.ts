@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { getAgentPaths } from "../fleet/paths.js";
@@ -145,7 +146,7 @@ function resourcesFor(workspace: string, agentId: string): EnforceResource[] {
   }
 }
 
-export function normalizeAgentCallRecords(index: TraceFailureIndex): AgentCallRecord[] {
+function normalizeAgentCallRecords(index: TraceFailureIndex): AgentCallRecord[] {
   return index.entries.map((entry) => ({
     callId: entry.entryId,
     runId: entry.runId,
@@ -162,7 +163,7 @@ export function normalizeAgentCallRecords(index: TraceFailureIndex): AgentCallRe
   }));
 }
 
-export function validateAgentCallRecord(record: AgentCallRecord): AgentCallValidation[] {
+function validateAgentCallRecord(record: AgentCallRecord): AgentCallValidation[] {
   const out: AgentCallValidation[] = [];
   const add = (validatorId: AgentCallValidatorId, status: AgentCallValidation["status"], reason: string): void => {
     out.push({ validatorId, status, reason, evidenceRefs: record.evidenceRefs });
@@ -222,7 +223,7 @@ function regressionTestFor(cluster: TraceFailureCluster): FixerRegressionTest {
   };
 }
 
-export function buildFixerRcaReport(input: {
+function buildFixerRcaReport(input: {
   workspace: string;
   agentId?: string;
   traceIndex: TraceFailureIndex;
@@ -319,11 +320,11 @@ export function buildFixerRcaReport(input: {
   };
 }
 
-export function fixerRcaDir(workspace: string, agentId?: string): string {
+function fixerRcaDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "fixer");
 }
 
-export function fixerRcaPath(workspace: string, agentId: string | undefined, runId: string): string {
+function fixerRcaPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(fixerRcaDir(workspace, agentId), `${runId}.json`);
 }
 
@@ -354,12 +355,7 @@ export function writeFixerRcaReport(input: { workspace: string; agentId?: string
 }
 
 function redactPath(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
 export function redactFixerRcaReport(report: FixerRcaReport): FixerRcaReport {

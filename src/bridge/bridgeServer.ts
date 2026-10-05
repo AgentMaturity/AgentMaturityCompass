@@ -1,3 +1,4 @@
+import { writeControlJson, writeControlError } from "../utils/controlHttpResponses.js";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { once } from "node:events";
@@ -88,9 +89,7 @@ async function readUpstreamBody(
 }
 
 function writeJson(res: ServerResponse, status: number, payload: unknown): void {
-  res.statusCode = status;
-  res.setHeader("content-type", "application/json");
-  res.end(JSON.stringify(payload));
+  writeControlJson(res, status, payload);
 }
 
 function isLoopbackAddress(address: string | undefined): boolean {
@@ -299,7 +298,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
 
   if (options.pathname === "/bridge/health") {
     if ((options.req.method ?? "GET").toUpperCase() !== "GET") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     writeJson(options.res, 200, { ok: true, status: "ok", ts: Date.now() });
@@ -308,7 +307,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
 
   if (options.pathname === "/bridge/lease/verify") {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     let raw: Buffer<ArrayBufferLike> = Buffer.alloc(0);
@@ -318,16 +317,16 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       parsed = parseJsonBody(raw);
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "payload too large" });
+        writeControlError(options.res, 413, "payload too large");
         return true;
       }
-      writeJson(options.res, 400, { error: `invalid bridge request: ${String(error)}` });
+      writeControlError(options.res, 400, `invalid bridge request: ${String(error)}`);
       return true;
     }
     const row = typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
     const token = typeof row.token === "string" ? row.token.trim() : "";
     if (!token) {
-      writeJson(options.res, 400, { error: "token is required" });
+      writeControlError(options.res, 400, "token is required");
       return true;
     }
     const headers: Record<string, string | string[] | undefined> = {
@@ -371,7 +370,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
 
   if (options.pathname === OBSERVED_HOOK_CORRELATION_PATH) {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     const auth = verifyBridgeLease({
@@ -382,7 +381,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       requiredScope: "hook:observe",
     });
     if (!auth.ok || !auth.payload) {
-      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      writeControlError(options.res, auth.status, auth.error ?? "unauthorized");
       return true;
     }
     try {
@@ -395,7 +394,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
       if (!rateLimit.allowed) {
         options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
-        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        writeControlError(options.res, 429, "hook lease rate limit exceeded");
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_HOOK_CORRELATION_BODY_BYTES));
@@ -409,21 +408,21 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       writeJson(options.res, 200, { ok: true, resolved: true, ...resolved });
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "hook correlation payload too large" });
+        writeControlError(options.res, 413, "hook correlation payload too large");
         return true;
       }
       if (error instanceof HookIngressError) {
         writeJson(options.res, error.statusCode, { error: error.message, code: error.code });
         return true;
       }
-      writeJson(options.res, 500, { error: "hook action correlation failed" });
+      writeControlError(options.res, 500, "hook action correlation failed");
     }
     return true;
   }
 
   if (options.pathname === OBSERVED_AEP_HOOK_PATH) {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     const auth = verifyBridgeLease({
@@ -434,7 +433,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       requiredScope: "hook:observe"
     });
     if (!auth.ok || !auth.payload) {
-      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      writeControlError(options.res, auth.status, auth.error ?? "unauthorized");
       return true;
     }
     try {
@@ -446,7 +445,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
       if (!rateLimit.allowed) {
         options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
-        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        writeControlError(options.res, 429, "hook lease rate limit exceeded");
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_OBSERVED_HOOK_BODY_BYTES));
@@ -474,31 +473,31 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "hook payload too large" });
+        writeControlError(options.res, 413, "hook payload too large");
         return true;
       }
       if (error instanceof HookIngressError) {
-        writeJson(options.res, error.statusCode, { error: error.message });
+        writeControlError(options.res, error.statusCode, error.message);
         return true;
       }
-      writeJson(options.res, 500, { error: "hook event could not be recorded" });
+      writeControlError(options.res, 500, "hook event could not be recorded");
     }
     return true;
   }
 
   if (options.pathname === CONTROL_HOOK_PATH) {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     if (!isLoopbackAddress(options.req.socket.remoteAddress)) {
-      writeJson(options.res, 403, { error: "hook control accepts loopback requests only" });
+      writeControlError(options.res, 403, "hook control accepts loopback requests only");
       return true;
     }
     const providerHeader = options.req.headers["x-amc-hook-provider"];
     const provider = Array.isArray(providerHeader) ? providerHeader[0] : providerHeader;
     if (provider !== "claude-code" && provider !== "gemini-cli") {
-      writeJson(options.res, 400, { error: "supported hook provider header required" });
+      writeControlError(options.res, 400, "supported hook provider header required");
       return true;
     }
     const auth = verifyBridgeLease({
@@ -509,7 +508,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       requiredScope: "hook:control",
     });
     if (!auth.ok || !auth.payload) {
-      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      writeControlError(options.res, auth.status, auth.error ?? "unauthorized");
       return true;
     }
     try {
@@ -522,7 +521,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
       if (!rateLimit.allowed) {
         options.res.setHeader("retry-after", String(rateLimit.retryAfterSeconds));
-        writeJson(options.res, 429, { error: "hook lease rate limit exceeded" });
+        writeControlError(options.res, 429, "hook lease rate limit exceeded");
         return true;
       }
       const rawBody = await readBody(options.req, Math.min(options.maxRequestBytes, MAX_CONTROL_HOOK_BODY_BYTES));
@@ -535,21 +534,21 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       writeJson(options.res, controlled.idempotentReplay ? 200 : 201, controlled);
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "hook payload too large" });
+        writeControlError(options.res, 413, "hook payload too large");
         return true;
       }
       if (error instanceof HookControlError) {
-        writeJson(options.res, error.statusCode, { error: error.message });
+        writeControlError(options.res, error.statusCode, error.message);
         return true;
       }
-      writeJson(options.res, 500, { error: "hook control could not be evaluated" });
+      writeControlError(options.res, 500, "hook control could not be evaluated");
     }
     return true;
   }
 
   if (options.pathname === "/bridge/evidence") {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     const auth = verifyBridgeLease({
@@ -559,7 +558,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       model: null
     });
     if (!auth.ok || !auth.payload) {
-      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      writeControlError(options.res, auth.status, auth.error ?? "unauthorized");
       return true;
     }
     try {
@@ -570,7 +569,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       const sessionId = typeof row.session_id === "string" ? row.session_id.trim() : "";
       const payload = row.payload;
       if (!eventType || !sessionId || payload === undefined) {
-        writeJson(options.res, 400, { error: "event_type, session_id, and payload are required" });
+        writeControlError(options.res, 400, "event_type, session_id, and payload are required");
         return true;
       }
       const ledger = openLedger(options.workspace);
@@ -606,17 +605,17 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       }
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "payload too large" });
+        writeControlError(options.res, 413, "payload too large");
         return true;
       }
-      writeJson(options.res, 400, { error: String(error) });
+      writeControlError(options.res, 400, String(error));
     }
     return true;
   }
 
   if (options.pathname === "/bridge/telemetry") {
     if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-      writeJson(options.res, 405, { error: "method not allowed" });
+      writeControlError(options.res, 405, "method not allowed");
       return true;
     }
     const auth = verifyBridgeLease({
@@ -626,7 +625,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       model: null
     });
     if (!auth.ok || !auth.payload) {
-      writeJson(options.res, auth.status, { error: auth.error ?? "unauthorized" });
+      writeControlError(options.res, auth.status, auth.error ?? "unauthorized");
       return true;
     }
     try {
@@ -644,21 +643,21 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       });
     } catch (error) {
       if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-        writeJson(options.res, 413, { error: "payload too large" });
+        writeControlError(options.res, 413, "payload too large");
         return true;
       }
-      writeJson(options.res, 400, { error: String(error) });
+      writeControlError(options.res, 400, String(error));
     }
     return true;
   }
 
   const route = resolveBridgeRoute(options.pathname);
   if (!route) {
-    writeJson(options.res, 404, { error: "unknown bridge route" });
+    writeControlError(options.res, 404, "unknown bridge route");
     return true;
   }
   if ((options.req.method ?? "POST").toUpperCase() !== "POST") {
-    writeJson(options.res, 405, { error: "method not allowed" });
+    writeControlError(options.res, 405, "method not allowed");
     return true;
   }
 
@@ -679,10 +678,10 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
     bodyJson = parseJsonBody(requestBody);
   } catch (error) {
     if (String(error).includes("PAYLOAD_TOO_LARGE")) {
-      writeJson(options.res, 413, { error: "payload too large" });
+      writeControlError(options.res, 413, "payload too large");
       return true;
     }
-    writeJson(options.res, 400, { error: `invalid bridge request: ${String(error)}` });
+    writeControlError(options.res, 400, `invalid bridge request: ${String(error)}`);
     return true;
   }
 
@@ -705,7 +704,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       reason: lease.error ?? "lease verification failed",
       provider: route.provider
     });
-    writeJson(options.res, lease.status, { error: lease.error ?? "unauthorized" });
+    writeControlError(options.res, lease.status, lease.error ?? "unauthorized");
     return true;
   }
 
@@ -731,7 +730,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       reason: policy.reason ?? "bridge policy denied",
       provider: route.provider
     });
-    writeJson(options.res, policy.status, { error: policy.reason ?? "bridge policy denied" });
+    writeControlError(options.res, policy.status, policy.reason ?? "bridge policy denied");
     return true;
   }
 
@@ -821,7 +820,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
   });
 
   if (!options.gatewayBaseUrl) {
-    writeJson(options.res, 503, { error: "gateway unavailable" });
+    writeControlError(options.res, 503, "gateway unavailable");
     return true;
   }
 
@@ -1324,7 +1323,7 @@ export async function handleBridgeRequest(options: HandleBridgeRequestOptions): 
       }
     });
     ledger.sealSession(sessionId);
-    writeJson(options.res, 502, { error: "bridge upstream failure" });
+    writeControlError(options.res, 502, "bridge upstream failure");
   } finally {
     ledger.close();
   }
@@ -1354,11 +1353,11 @@ export async function startBridgeServer(params: {
         gatewayBaseUrl: params.gatewayBaseUrl
       });
       if (!handled) {
-        writeJson(res, 404, { error: "not found" });
+        writeControlError(res, 404, "not found");
       }
     } catch {
       if (!res.headersSent) {
-        writeJson(res, 500, { error: "bridge request failed" });
+        writeControlError(res, 500, "bridge request failed");
       } else {
         res.destroy();
       }

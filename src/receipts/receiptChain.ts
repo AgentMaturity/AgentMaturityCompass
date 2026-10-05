@@ -78,7 +78,7 @@ function chainPath(workspace: string, receiptId: string): string {
  * With a workspace, the receipt is also persisted so other processes can
  * verify the chain; without one, the registration stays in-process.
  */
-export function registerChainedReceipt(
+function registerChainedReceipt(
   receiptId: string,
   receipt: string,
   payload: ChainedReceiptPayloadV1,

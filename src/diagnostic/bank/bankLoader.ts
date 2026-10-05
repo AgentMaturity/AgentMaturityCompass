@@ -5,7 +5,7 @@ import { signFileWithAuditor, verifySignedFileWithAuditor } from "../../org/orgS
 import { defaultDiagnosticBankV1 } from "./bankV1.js";
 import { diagnosticBankSchema, type DiagnosticBank } from "./bankSchema.js";
 
-export function diagnosticBankRoot(workspace: string): string {
+function diagnosticBankRoot(workspace: string): string {
   return join(workspace, ".amc", "diagnostic", "bank");
 }
 

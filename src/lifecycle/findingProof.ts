@@ -215,11 +215,11 @@ export function buildFindingProofs(input: WriteFindingProofsInput): FindingProof
     });
 }
 
-export function findingProofsDir(workspace: string, agentId?: string): string {
+function findingProofsDir(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "finding-proofs");
 }
 
-export function findingProofsPath(workspace: string, agentId: string | undefined, runId: string): string {
+function findingProofsPath(workspace: string, agentId: string | undefined, runId: string): string {
   return join(findingProofsDir(workspace, agentId), `${runId}.json`);
 }
 

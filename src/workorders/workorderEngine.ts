@@ -28,12 +28,12 @@ function toWorkOrderRisk(risk: RiskTier): WorkOrder["riskTier"] {
   return risk === "med" ? "medium" : risk;
 }
 
-export function workOrdersDir(workspace: string, agentId?: string): string {
+function workOrdersDir(workspace: string, agentId?: string): string {
   const resolved = resolveAgentId(workspace, agentId);
   return join(getAgentPaths(workspace, resolved).rootDir, "workorders");
 }
 
-export function workOrderPath(workspace: string, agentId: string, workOrderId: string): string {
+function workOrderPath(workspace: string, agentId: string, workOrderId: string): string {
   return join(workOrdersDir(workspace, agentId), `${workOrderId}.json`);
 }
 

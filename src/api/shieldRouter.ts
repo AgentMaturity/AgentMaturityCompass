@@ -2,9 +2,10 @@
  * shieldRouter.ts — Shield API routes.
  */
 
+import { providerDriftVerificationResponse } from './routerResponseHelpers.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
-import { bodyJson, bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, requireMethod } from './apiHelpers.js';
+import { bodyJson, bodyJsonSchema, apiSuccess, apiError, apiRequestError, requireMethod } from './apiHelpers.js';
 import type { ReplayBenchmarkCiReceipt, ReplayBenchmarkCorpusManifest } from '../benchmarks/replayBenchmarkCorpus.js';
 import type { LiveDriftReceipt } from '../watch/liveDriftAlerts.js';
 import type { JudgeCalibrationReceipt } from '../eval/judgeCalibration.js';
@@ -116,14 +117,7 @@ export async function handleShieldRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
-      });
+      apiSuccess(res, providerDriftVerificationResponse(result, 'promptLayerEvidenceHash'));
     } catch (err) {
       apiError(res, 400, err instanceof Error ? err.message : 'Provider drift receipt verification failed');
     }
@@ -142,14 +136,7 @@ export async function handleShieldRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        promptfooEvidenceHash: result.promptfooEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
-      });
+      apiSuccess(res, providerDriftVerificationResponse(result, 'promptfooEvidenceHash'));
     } catch (err) {
       apiError(res, 400, err instanceof Error ? err.message : 'promptfoo provider drift receipt verification failed');
     }
@@ -169,12 +156,7 @@ export async function handleShieldRoute(
         agentId: body.agentId ?? 'default',
       });
       apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        patronusEvidenceHash: result.patronusEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        ...providerDriftVerificationResponse(result, 'patronusEvidenceHash'),
         shield: result.shield,
         sourceRefs: result.sourceRefs,
       });
@@ -197,12 +179,7 @@ export async function handleShieldRoute(
         agentId: body.agentId ?? 'default',
       });
       apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        inspectEvidenceHash: result.inspectEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        ...providerDriftVerificationResponse(result, 'inspectEvidenceHash'),
         shield: result.shield,
         sourceRefs: result.sourceRefs,
       });
@@ -225,12 +202,7 @@ export async function handleShieldRoute(
         agentId: body.agentId ?? 'default',
       });
       apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        ...providerDriftVerificationResponse(result, 'tensorZeroEvidenceHash'),
         shield: result.shield,
         sourceRefs: result.sourceRefs,
       });
@@ -253,12 +225,7 @@ export async function handleShieldRoute(
         agentId: body.agentId ?? 'default',
       });
       apiSuccess(res, {
-        verification: result.ciGate.passed ? 'passed' : 'blocked',
-        ciGate: result.ciGate,
-        helmEvidenceHash: result.helmEvidenceHash,
-        failClosed: result.report.failClosed,
-        activeAlerts: result.report.alerts.filter((alert) => !alert.waived).map((alert) => alert.alertId),
-        waivedAlerts: result.report.alerts.filter((alert) => alert.waived).map((alert) => alert.alertId),
+        ...providerDriftVerificationResponse(result, 'helmEvidenceHash'),
         shield: result.shield,
         sourceRefs: result.sourceRefs,
       });
@@ -299,11 +266,7 @@ export async function handleShieldRoute(
       const result = analyzeSkill(body.code);
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -315,11 +278,7 @@ export async function handleShieldRoute(
       const result = detectInjection(body.input);
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -331,11 +290,7 @@ export async function handleShieldRoute(
       const result = sanitize(body.input);
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -353,8 +308,7 @@ export async function handleShieldRoute(
       const report = rt.generateReport();
       apiSuccess(res, { status: 'initiated', report, targetProfile: body.targetProfile });
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Red team run failed');
+      apiRequestError(res, err, 'Red team run failed', 500);
     }
     return true;
   }
@@ -389,8 +343,7 @@ export async function handleShieldRoute(
       const written = writeExploitConfirmationScope({ workspace, scope: body.scope });
       apiSuccess(res, written, 201);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 400, err instanceof Error ? err.message : 'Could not write exploit confirmation scope');
+      apiRequestError(res, err, 'Could not write exploit confirmation scope', 400);
     }
     return true;
   }
@@ -427,8 +380,7 @@ export async function handleShieldRoute(
       });
       apiSuccess(res, { result }, result.status === 'BLOCKED' ? 200 : 201);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 400, err instanceof Error ? err.message : 'Exploit confirmation failed');
+      apiRequestError(res, err, 'Exploit confirmation failed', 400);
     }
     return true;
   }
@@ -460,8 +412,7 @@ export async function handleShieldRoute(
       });
       apiSuccess(res, exported);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 400, err instanceof Error ? err.message : 'Could not export exploit confirmation proof');
+      apiRequestError(res, err, 'Could not export exploit confirmation proof', 400);
     }
     return true;
   }
@@ -481,8 +432,7 @@ export async function handleShieldRoute(
       const result = await runTrustPipeline({ ...body, parameters: body.parameters ?? {} });
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Trust pipeline failed');
+      apiRequestError(res, err, 'Trust pipeline failed', 500);
     }
     return true;
   }
@@ -505,8 +455,7 @@ export async function handleShieldRoute(
       }, 'crescendo', 1);
       apiSuccess(res, { attack: attacks[0] ?? null, generated: attacks.length });
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Attack generation failed');
+      apiRequestError(res, err, 'Attack generation failed', 500);
     }
     return true;
   }

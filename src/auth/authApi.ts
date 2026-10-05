@@ -113,7 +113,7 @@ export function verifyUsersConfigSignature(workspace: string): {
   }
 }
 
-export function signUsersConfig(workspace: string): string {
+function signUsersConfig(workspace: string): string {
   const path = usersPath(workspace);
   if (!pathExists(path)) {
     throw new Error(`users config not found: ${path}`);
@@ -131,7 +131,7 @@ export function signUsersConfig(workspace: string): string {
   return sigPath;
 }
 
-export function loadUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }): UsersFile {
+function loadUsersConfig(workspace: string, options?: { requireValidSignature?: boolean }): UsersFile {
   const path = usersPath(workspace);
   if (!pathExists(path)) {
     throw new Error("users config missing");

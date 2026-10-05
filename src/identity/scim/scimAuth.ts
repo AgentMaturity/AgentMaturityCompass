@@ -2,7 +2,7 @@ import type { IncomingMessage } from "node:http";
 import type { IdentityConfig } from "../identityConfig.js";
 import { validateScimBearerToken } from "../identityConfig.js";
 
-export function extractBearerToken(req: IncomingMessage): string | null {
+function extractBearerToken(req: IncomingMessage): string | null {
   const raw = req.headers.authorization;
   if (!raw || typeof raw !== "string") {
     return null;

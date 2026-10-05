@@ -128,25 +128,25 @@ export function transformMapSigPath(workspace: string): string {
   return `${transformMapPath(workspace)}.sig`;
 }
 
-export function agentTransformDir(workspace: string, agentId: string): string {
+function agentTransformDir(workspace: string, agentId: string): string {
   return join(workspace, ".amc", "agents", agentId, "transform");
 }
 
-export function nodeTransformDir(workspace: string, nodeId: string): string {
+function nodeTransformDir(workspace: string, nodeId: string): string {
   return join(workspace, ".amc", "org", "transform", nodeId);
 }
 
-export function transformPlansDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
+function transformPlansDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
   const root = scope.type === "AGENT" ? agentTransformDir(workspace, scope.agentId) : nodeTransformDir(workspace, scope.nodeId);
   return join(root, "plans");
 }
 
-export function transformSnapshotsDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
+function transformSnapshotsDir(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
   const root = scope.type === "AGENT" ? agentTransformDir(workspace, scope.agentId) : nodeTransformDir(workspace, scope.nodeId);
   return join(root, "snapshots");
 }
 
-export function transformLatestPlanPath(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
+function transformLatestPlanPath(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }): string {
   const root = scope.type === "AGENT" ? agentTransformDir(workspace, scope.agentId) : nodeTransformDir(workspace, scope.nodeId);
   return join(root, "latest.json");
 }

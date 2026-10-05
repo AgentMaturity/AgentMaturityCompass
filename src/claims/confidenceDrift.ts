@@ -64,7 +64,7 @@ export const CRITICAL_THRESHOLD = 0.3;
 /**
  * Build confidence history for a question from claim records.
  */
-export function buildConfidenceHistory(
+function buildConfidenceHistory(
   db: Database.Database,
   agentId: string,
   questionId: string,
@@ -87,7 +87,7 @@ export function buildConfidenceHistory(
 /**
  * Analyze confidence drift for a single question within a time window.
  */
-export function analyzeQuestionDrift(
+function analyzeQuestionDrift(
   snapshots: ConfidenceSnapshot[],
   windowMs: number,
   now?: number,

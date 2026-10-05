@@ -19,7 +19,7 @@ export function isSafeProviderActionId(value: unknown): value is string {
     && SAFE_ACTION_ID.test(value);
 }
 
-export function providerHookCorrelationSha256(input: {
+function providerHookCorrelationSha256(input: {
   provider: HookActionProvider;
   sessionId?: string | null;
   toolName: string;

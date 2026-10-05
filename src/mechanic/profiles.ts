@@ -153,7 +153,7 @@ function builtInProfiles(): MechanicProfiles {
   });
 }
 
-export function mechanicProfilesPath(workspace: string): string {
+function mechanicProfilesPath(workspace: string): string {
   return join(mechanicRoot(workspace), "profiles.yaml");
 }
 
@@ -170,7 +170,7 @@ export function initMechanicProfiles(workspace: string): { path: string; sigPath
   return { path, sigPath, profiles };
 }
 
-export function loadMechanicProfiles(workspace: string): MechanicProfiles {
+function loadMechanicProfiles(workspace: string): MechanicProfiles {
   const path = mechanicProfilesPath(workspace);
   if (!pathExists(path)) {
     return initMechanicProfiles(workspace).profiles;

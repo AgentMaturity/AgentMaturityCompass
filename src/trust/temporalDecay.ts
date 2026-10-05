@@ -90,7 +90,7 @@ const MS_PER_DAY = 86_400_000;
 // Core math
 // ---------------------------------------------------------------------------
 
-export function lambdaForHalfLife(halfLifeDays: number): number {
+function lambdaForHalfLife(halfLifeDays: number): number {
   return Math.LN2 / halfLifeDays;
 }
 

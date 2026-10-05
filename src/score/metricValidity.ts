@@ -5,6 +5,7 @@ import type {
   LayerScore,
   MetricValidationCiGate,
   MetricValidationConfidenceInterval,
+  SharedMetricValidationEvidence,
   MetricValidationContinualLearningSignal,
   MetricValidationEvalPackManifest,
   MetricValidationEvalPackRow,
@@ -317,129 +318,105 @@ export interface BuildMetricValidationInput {
   gateMode?: "ci" | "lifecycle";
 }
 
-export interface MetricValidationCounterfactualCheck {
-  metricId?: string;
+export interface MetricValidationCounterfactualCheck extends SharedMetricValidationEvidence<
+  "metricId" | "evidenceRefs"
+> {
   interventionId: string;
   passed: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationFacetCheck {
-  metricId?: string;
+export interface MetricValidationFacetCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   facetId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationConfounderControlCheck {
-  metricId?: string;
+export interface MetricValidationConfounderControlCheck extends SharedMetricValidationEvidence<
+  "metricId" | "evidenceRefs"
+> {
   confounderId: string;
   controlled: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationOutcomeAlignmentCheck {
-  metricId?: string;
+export interface MetricValidationOutcomeAlignmentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "evidenceRefs"
+> {
   outcomeId: string;
   aligned: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationProcessEvidenceCheck {
-  metricId?: string;
+export interface MetricValidationProcessEvidenceCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   processEvidenceId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationSafetyUtilityCheck {
-  metricId?: string;
+export interface MetricValidationSafetyUtilityCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   safetyUtilityId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationModalityTransformationCheck {
-  metricId?: string;
+export interface MetricValidationModalityTransformationCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   transformationId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationLifecycleObservabilityCheck {
-  metricId?: string;
+export interface MetricValidationLifecycleObservabilityCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   lifecycleSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationRankingStabilityCheck {
-  metricId?: string;
+export interface MetricValidationRankingStabilityCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   rankingSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationToolSandboxCheck {
-  metricId?: string;
+export interface MetricValidationToolSandboxCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   sandboxSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationContinualLearningCheck {
-  metricId?: string;
+export interface MetricValidationContinualLearningCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "confidenceInterval"
+> {
   continualSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   continualSignalType?: MetricValidationContinualLearningSignal;
-  artifactHash?: string;
   memoryArtifactHash?: string;
   runSummaryArtifactHash?: string;
   gameplayLogArtifactHash?: string;
   runCount?: number;
-  metricNames?: string[];
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationStrategicInteractionCheck {
-  metricId?: string;
+export interface MetricValidationStrategicInteractionCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   strategicSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationArchitectureRealityCheck {
-  metricId?: string;
+export interface MetricValidationArchitectureRealityCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "sampleSize" | "confidenceInterval" | "metricNames"
+> {
   architectureSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   architectureSignalType?: MetricValidationArchitectureRealitySignal;
-  artifactHash?: string;
   scenarioCount?: number;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
-  metricNames?: string[];
 }
 
-export interface MetricValidationRagPipelineCheck {
-  metricId?: string;
+export interface MetricValidationRagPipelineCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "owner" | "sampleSize" | "confidenceInterval" | "metricNames" | "repositoryRefs"
+> {
   ragSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   evaluationSignalType?: MetricValidationRagEvaluationPipelineSignal;
   mirageSignalType?: MetricValidationMirageRagSignal;
   legalCodeRagSignalType?: MetricValidationLegalCodeRagSignal;
   ragasNotebookSignalType?: MetricValidationRagasNotebookSignal;
-  artifactHash?: string;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
-  metricNames?: string[];
   datasetIds?: string[];
   retrieverIds?: string[];
   modelIds?: string[];
-  repositoryRefs?: string[];
   licenseBoundaryRefs?: string[];
   notebookIds?: string[];
   dependencyIds?: string[];
@@ -465,128 +442,89 @@ export interface MetricValidationRagPipelineCheck {
   contextPoolCount?: number;
 }
 
-export interface MetricValidationGuardbenchCheck {
-  metricId?: string;
+export interface MetricValidationGuardbenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   guardbenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   guardbenchSignalType?: MetricValidationGuardbenchSignal;
-  artifactHash?: string;
   datasetIds?: string[];
   languageIds?: string[];
   modelIds?: string[];
   thresholdIds?: string[];
-  metricNames?: string[];
   exportFormats?: string[];
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationBusinessWorkflowCheck {
-  metricId?: string;
+export interface MetricValidationBusinessWorkflowCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   workflowSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationDataAgentAnalyticalCheck {
-  metricId?: string;
+export interface MetricValidationDataAgentAnalyticalCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs"
+> {
   dataAgentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
 }
 
-export interface MetricValidationEmbodiedAgentCheck {
-  metricId?: string;
+export interface MetricValidationEmbodiedAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   embodiedSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   embodiedSignalType?: MetricValidationEmbodiedAgentSignal;
-  artifactHash?: string;
   taskTypes?: string[];
   baselineIds?: string[];
-  metricNames?: string[];
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationEvaluatorSuiteCheck {
-  metricId?: string;
+export interface MetricValidationEvaluatorSuiteCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   evaluatorSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   evaluatorSignalType?: MetricValidationEvaluatorSuiteSignal;
-  artifactHash?: string;
   assertionTypes?: string[];
   reporterFormats?: string[];
   judgeNames?: string[];
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationPentestBenchmarkCheck {
-  metricId?: string;
+export interface MetricValidationPentestBenchmarkCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   pentestSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   pentestSignalType?: MetricValidationPentestBenchmarkSignal;
-  artifactHash?: string;
   languageStacks?: string[];
   vulnerabilityClasses?: string[];
   difficultyLevels?: string[];
   benchmarkSuiteIds?: string[];
-  metricNames?: string[];
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationTraceEvaluationCheck {
-  metricId?: string;
+export interface MetricValidationTraceEvaluationCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   traceEvaluationSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   traceEvaluationSignalType?: MetricValidationTraceEvaluationSignal;
-  artifactHash?: string;
   modelIds?: string[];
   agentParameterKeys?: string[];
   toolNames?: string[];
-  metricNames?: string[];
   caseSuiteIds?: string[];
   backendModes?: string[];
   runPermutationCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationLivingEnvironmentCheck {
-  metricId?: string;
+export interface MetricValidationLivingEnvironmentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   livingEnvironmentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   livingEnvironmentSignalType?: MetricValidationLivingEnvironmentSignal;
-  artifactHash?: string;
   capabilityNames?: string[];
   sandboxProviders?: string[];
   agentAdapters?: string[];
-  metricNames?: string[];
   trialCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationMobileAgentCheck {
-  metricId?: string;
+export interface MetricValidationMobileAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   mobileAgentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   mobileAgentSignalType?: MetricValidationMobileAgentSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   environmentIds?: string[];
   appIds?: string[];
@@ -594,80 +532,56 @@ export interface MetricValidationMobileAgentCheck {
   uiTraceIds?: string[];
   taskSetIds?: string[];
   taskComplexityGroups?: string[];
-  metricNames?: string[];
   licenseBoundaryRefs?: string[];
   trialCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationPersonaAgentCheck {
-  metricId?: string;
+export interface MetricValidationPersonaAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   personaSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   personaSignalType?: MetricValidationPersonaAgentSignal;
-  artifactHash?: string;
   personaIds?: string[];
   environmentIds?: string[];
   questionSetIds?: string[];
   modelIds?: string[];
   providerIds?: string[];
-  metricNames?: string[];
   questionCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationScientificLiteratureCheck {
-  metricId?: string;
+export interface MetricValidationScientificLiteratureCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   scientificLiteratureSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   scientificLiteratureSignalType?: MetricValidationScientificLiteratureSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   taskTypes?: string[];
   datasetIds?: string[];
   searchBackendIds?: string[];
   toolIds?: string[];
-  metricNames?: string[];
   taskCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationBioinformaticsAgentCheck {
-  metricId?: string;
+export interface MetricValidationBioinformaticsAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   bioinformaticsAgentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   bioinformaticsAgentSignalType?: MetricValidationBioinformaticsAgentSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   taskTypes?: string[];
   datasetIds?: string[];
   workflowIds?: string[];
   toolNames?: string[];
-  metricNames?: string[];
   perturbationIds?: string[];
   privacyBoundaryRefs?: string[];
   taskCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationMirageDrugRepositioningCheck {
-  metricId?: string;
+export interface MetricValidationMirageDrugRepositioningCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   mirageDrugRepositioningSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   mirageDrugRepositioningSignalType?: MetricValidationMirageDrugRepositioningSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   datasetIds?: string[];
   splitIds?: string[];
@@ -679,44 +593,32 @@ export interface MetricValidationMirageDrugRepositioningCheck {
   featureSelectionReportIds?: string[];
   scoreCalculationIds?: string[];
   caseStudyIds?: string[];
-  metricNames?: string[];
   drugCount?: number;
   diseaseCount?: number;
   mappingCount?: number;
   featureSetCount?: number;
   similarityMatrixCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationNetworkTroubleshootingCheck {
-  metricId?: string;
+export interface MetricValidationNetworkTroubleshootingCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   networkTroubleshootingSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   networkTroubleshootingSignalType?: MetricValidationNetworkTroubleshootingSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   scenarioIds?: string[];
   topologyTiers?: string[];
   issueTypes?: string[];
   agentIds?: string[];
   toolNames?: string[];
-  metricNames?: string[];
   incidentCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationInferenceOptimizationCheck {
-  metricId?: string;
+export interface MetricValidationInferenceOptimizationCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   inferenceOptimizationSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   inferenceOptimizationSignalType?: MetricValidationInferenceOptimizationSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   scenarioIds?: string[];
   hardwareProfileIds?: string[];
@@ -724,20 +626,14 @@ export interface MetricValidationInferenceOptimizationCheck {
   searchSpaceIds?: string[];
   gateIds?: string[];
   agentIds?: string[];
-  metricNames?: string[];
   runCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationJavaCodingAgentCheck {
-  metricId?: string;
+export interface MetricValidationJavaCodingAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   javaCodingAgentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   javaCodingAgentSignalType?: MetricValidationJavaCodingAgentSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
   taskIds?: string[];
   taskTypes?: string[];
@@ -746,22 +642,15 @@ export interface MetricValidationJavaCodingAgentCheck {
   agentConfigIds?: string[];
   judgeTierIds?: string[];
   checkTypes?: string[];
-  metricNames?: string[];
   trialCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationWebEvalDatasetCheck {
-  metricId?: string;
+export interface MetricValidationWebEvalDatasetCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   webEvalDatasetSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   webEvalDatasetSignalType?: MetricValidationWebEvalDatasetSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
-  repositoryRefs?: string[];
   subjectIds?: string[];
   querySetIds?: string[];
   searchProviderIds?: string[];
@@ -771,7 +660,6 @@ export interface MetricValidationWebEvalDatasetCheck {
   referenceAnswerSetIds?: string[];
   datasetExportIds?: string[];
   outputTargets?: Array<"local" | "langsmith" | "custom">;
-  metricNames?: string[];
   questionCount?: number;
   documentCount?: number;
   providerDiversityCount?: number;
@@ -779,45 +667,30 @@ export interface MetricValidationWebEvalDatasetCheck {
   maxFreshnessHours?: number;
   sourceCoverage?: number;
   answerGrounding?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationParallelResearchSkillCheck {
-  metricId?: string;
+export interface MetricValidationParallelResearchSkillCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   parallelResearchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   parallelResearchSignalType?: MetricValidationParallelResearchSkillSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   skillManifestIds?: string[];
   apiSurfaceIds?: string[];
   searchModeIds?: string[];
   processorTiers?: string[];
   securityBoundaryRefs?: string[];
   dependencyLockIds?: string[];
-  metricNames?: string[];
   citationCoverage0to1?: number;
   sourcePolicyCoverage0to1?: number;
   batchTaskLimit?: number;
   monitoringCoverage0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationResumeRagEvaluatorCheck {
-  metricId?: string;
+export interface MetricValidationResumeRagEvaluatorCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   resumeRagSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   resumeRagSignalType?: MetricValidationResumeRagEvaluatorSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   resumeInputFormats?: string[];
   ragStrategyIds?: string[];
   queryExpansionIds?: string[];
@@ -831,23 +704,15 @@ export interface MetricValidationResumeRagEvaluatorCheck {
   batchModeIds?: string[];
   privacyBoundaryRefs?: string[];
   dependencyLockIds?: string[];
-  metricNames?: string[];
   parserCoverage0to1?: number;
   evaluationGrounding0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationChipBenchmarkCheck {
-  metricId?: string;
+export interface MetricValidationChipBenchmarkCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   chipBenchmarkSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   chipBenchmarkSignalType?: MetricValidationChipBenchmarkSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   benchmarkIds?: string[];
   hardwareProfileIds?: string[];
   modelFamilyIds?: string[];
@@ -858,28 +723,18 @@ export interface MetricValidationChipBenchmarkCheck {
   datasetIds?: string[];
   frontendDatasetIds?: string[];
   pricingRefs?: string[];
-  metricNames?: string[];
   regressionThresholdIds?: string[];
   resultRowCount?: number;
   throughputCoverage0to1?: number;
   latencyCoverage0to1?: number;
   costCoverage0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationHermesBenchCheck {
-  metricId?: string;
+export interface MetricValidationHermesBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   hermesBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   hermesBenchSignalType?: MetricValidationHermesBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   buildSpecRefs?: string[];
@@ -895,30 +750,20 @@ export interface MetricValidationHermesBenchCheck {
   backendTestIds?: string[];
   frontendTestIds?: string[];
   dockerRuntimeIds?: string[];
-  metricNames?: string[];
   taskCount?: number;
   adapterCount?: number;
   backendTestCount?: number;
   frontendTestCount?: number;
   judgeAgreement0to1?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationCooperBenchCheck {
-  metricId?: string;
+export interface MetricValidationCooperBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   cooperBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   cooperBenchSignalType?: MetricValidationCooperBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   releaseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   changelogRefs?: string[];
@@ -931,7 +776,6 @@ export interface MetricValidationCooperBenchCheck {
   ciWorkflowIds?: string[];
   packageLockRefs?: string[];
   reportPublicationRefs?: string[];
-  metricNames?: string[];
   taskCount?: number;
   featureCount?: number;
   agentAdapterCount?: number;
@@ -939,23 +783,14 @@ export interface MetricValidationCooperBenchCheck {
   cooperationScore0to1?: number;
   conflictResolutionRate0to1?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationCoderCupCheck {
-  metricId?: string;
+export interface MetricValidationCoderCupCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   coderCupSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   coderCupSignalType?: MetricValidationCoderCupSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   homepageRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   contributingRefs?: string[];
@@ -973,7 +808,6 @@ export interface MetricValidationCoderCupCheck {
   referenceRefs?: string[];
   costMethodologyRefs?: string[];
   publicFixtureRefs?: string[];
-  metricNames?: string[];
   phaseCount?: number;
   testPlanCount?: number;
   runnerCount?: number;
@@ -982,22 +816,13 @@ export interface MetricValidationCoderCupCheck {
   interRaterAgreement0to1?: number;
   testRetestReliability0to1?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationAgenticGraphRagCheck {
-  metricId?: string;
+export interface MetricValidationAgenticGraphRagCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   agenticGraphRagSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   agenticGraphRagSignalType?: MetricValidationAgenticGraphRagSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   graphWorkflowIds?: string[];
@@ -1009,28 +834,20 @@ export interface MetricValidationAgenticGraphRagCheck {
   experimentTrackerIds?: string[];
   uiComponentIds?: string[];
   dependencyLockRefs?: string[];
-  metricNames?: string[];
   graphNodeCount?: number;
   graphEdgeCount?: number;
   evaluationMetricCount?: number;
   experimentCount?: number;
   retrievalGroundingScore0to1?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationAgentScenarioTestCheck {
-  metricId?: string;
+export interface MetricValidationAgentScenarioTestCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   agentScenarioTestSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   agentScenarioTestSignalType?: MetricValidationAgentScenarioTestSignal;
-  artifactHash?: string;
   benchmarkIds?: string[];
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   scenarioIds?: string[];
   personaIds?: string[];
   goalIds?: string[];
@@ -1038,26 +855,19 @@ export interface MetricValidationAgentScenarioTestCheck {
   toolMockIds?: string[];
   trajectoryAssertionIds?: string[];
   judgeIds?: string[];
-  metricNames?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "custom">;
   agentIds?: string[];
   comparisonIds?: string[];
   scenarioCount?: number;
   turnCount?: number;
   toolCallCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationOpenCodeLabCheck {
-  metricId?: string;
+export interface MetricValidationOpenCodeLabCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   openCodeLabSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   openCodeLabSignalType?: MetricValidationOpenCodeLabSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
   benchmarkIds?: string[];
   agentContextIds?: string[];
   promptVariantIds?: string[];
@@ -1067,7 +877,6 @@ export interface MetricValidationOpenCodeLabCheck {
   forkIds?: string[];
   modelIds?: string[];
   groundTruthIds?: string[];
-  metricNames?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
   resultArtifactIds?: string[];
   runCount?: number;
@@ -1075,20 +884,13 @@ export interface MetricValidationOpenCodeLabCheck {
   minForkAgreement0to1?: number;
   modelVariance0to1?: number;
   maxModelVariance0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationCcPluginEvalCheck {
-  metricId?: string;
+export interface MetricValidationCcPluginEvalCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   ccPluginEvalSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   ccPluginEvalSignalType?: MetricValidationCcPluginEvalSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   pluginManifestIds?: string[];
   componentTypes?: MetricValidationCcPluginEvalComponentType[];
   triggerManifestIds?: string[];
@@ -1104,26 +906,18 @@ export interface MetricValidationCcPluginEvalCheck {
   costEstimateIds?: string[];
   reporterFormats?: Array<"json" | "yaml" | "junit_xml" | "tap" | "github_actions" | "custom">;
   resultArtifactIds?: string[];
-  metricNames?: string[];
   triggerAccuracy0to1?: number;
   falsePositiveRate0to1?: number;
   falseNegativeRate0to1?: number;
   componentCount?: number;
   scenarioCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationRealignSimulationCheck {
-  metricId?: string;
+export interface MetricValidationRealignSimulationCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   realignSimulationSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   realignSimulationSignalType?: MetricValidationRealignSimulationSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   configIds?: string[];
   appIds?: string[];
   datasetIds?: string[];
@@ -1140,28 +934,18 @@ export interface MetricValidationRealignSimulationCheck {
   reporterFormats?: Array<"json" | "junit_xml" | "github_actions" | "markdown" | "custom">;
   experimentIds?: string[];
   resultArtifactIds?: string[];
-  metricNames?: string[];
   judgeAgreement0to1?: number;
   regressionPassRate0to1?: number;
   scenarioCount?: number;
   evaluatorCount?: number;
   repeatCount?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationAcademiClawCheck {
-  metricId?: string;
+export interface MetricValidationAcademiClawCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   academiClawSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   academiClawSignalType?: MetricValidationAcademiClawSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   citationRefs?: string[];
@@ -1175,7 +959,6 @@ export interface MetricValidationAcademiClawCheck {
   conversationTraceIds?: string[];
   metaEvalIds?: string[];
   modelIds?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
   taskCount?: number;
@@ -1185,22 +968,13 @@ export interface MetricValidationAcademiClawCheck {
   metaEvalCount?: number;
   modelCount?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationRagChunkingTechniqueCheck {
-  metricId?: string;
+export interface MetricValidationRagChunkingTechniqueCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   ragChunkingTechniqueSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   ragChunkingTechniqueSignalType?: MetricValidationRagChunkingTechniqueSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   policyCorpusRefs?: string[];
@@ -1209,7 +983,6 @@ export interface MetricValidationRagChunkingTechniqueCheck {
   retrievalPipelineIds?: string[];
   embeddingVectorstoreIds?: string[];
   evaluationDatasetIds?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
   policyDocumentCount?: number;
@@ -1218,23 +991,14 @@ export interface MetricValidationRagChunkingTechniqueCheck {
   evaluationQuestionCount?: number;
   metricCount?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationKubernetesOperationalAgentCheck {
-  metricId?: string;
+export interface MetricValidationKubernetesOperationalAgentCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   kubernetesOperationalAgentSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   kubernetesOperationalAgentSignalType?: MetricValidationKubernetesOperationalAgentSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   releaseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   buildWorkflowRefs?: string[];
@@ -1245,7 +1009,6 @@ export interface MetricValidationKubernetesOperationalAgentCheck {
   diagnosticCapabilityIds?: string[];
   resourceMetricIds?: string[];
   logAnalysisIds?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "junit_xml" | "markdown" | "custom">;
   toolCategoryCount?: number;
@@ -1253,24 +1016,15 @@ export interface MetricValidationKubernetesOperationalAgentCheck {
   resourceMetricCount?: number;
   logAnalysisCount?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationSecureVibeBenchCheck {
-  metricId?: string;
+export interface MetricValidationSecureVibeBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   secureVibeBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   secureVibeBenchSignalType?: MetricValidationSecureVibeBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
   homepageRefs?: string[];
   arxivRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   resultsBlobRefs?: string[];
@@ -1282,29 +1036,19 @@ export interface MetricValidationSecureVibeBenchCheck {
   testScriptIds?: string[];
   parserUtilityRefs?: string[];
   patchDiffUtilityRefs?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "markdown" | "custom">;
   agentAdapterCount?: number;
   scenarioCount?: number;
   testScriptCount?: number;
   regressionPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationRavigBenchCheck {
-  metricId?: string;
+export interface MetricValidationRavigBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   ravigBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   ravigBenchSignalType?: MetricValidationRavigBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   legalBlobRefs?: string[];
@@ -1322,35 +1066,24 @@ export interface MetricValidationRavigBenchCheck {
   multiModalEvaluatorIds?: string[];
   screenshotEvaluationRefs?: string[];
   runScriptRefs?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "github_actions" | "junit_xml" | "markdown" | "custom">;
   datasetCaseCount?: number;
   visualDesignCheckCount?: number;
   evaluatorCount?: number;
   validationPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationHumanStudyBenchCheck {
-  metricId?: string;
+export interface MetricValidationHumanStudyBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   humanStudyBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   humanStudyBenchSignalType?: MetricValidationHumanStudyBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   studyConfigIds?: string[];
   backgroundDatasetIds?: string[];
   humanResponseDatasetIds?: string[];
   agentResponseDatasetIds?: string[];
   evaluatorIds?: string[];
-  metricNames?: string[];
   validatorIds?: string[];
   scorerIds?: string[];
   standardizerIds?: string[];
@@ -1366,22 +1099,13 @@ export interface MetricValidationHumanStudyBenchCheck {
   interRaterAgreement0to1?: number;
   testRetestReliability0to1?: number;
   validationPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationLegacyBenchCheck {
-  metricId?: string;
+export interface MetricValidationLegacyBenchCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   legacyBenchSignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   legacyBenchSignalType?: MetricValidationLegacyBenchSignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   readmeBlobRefs?: string[];
   taskCorpusRefs?: string[];
@@ -1392,7 +1116,6 @@ export interface MetricValidationLegacyBenchCheck {
   patchSubmissionIds?: string[];
   testOracleIds?: string[];
   evaluatorIds?: string[];
-  metricNames?: string[];
   ciReporterIds?: string[];
   reporterFormats?: Array<"json" | "junit_xml" | "github_actions" | "markdown" | "custom">;
   resultArtifactIds?: string[];
@@ -1404,22 +1127,13 @@ export interface MetricValidationLegacyBenchCheck {
   evaluatorCount?: number;
   regressionPassRate0to1?: number;
   replayPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
-export interface MetricValidationSubtleMemoryCheck {
-  metricId?: string;
+export interface MetricValidationSubtleMemoryCheck extends SharedMetricValidationEvidence<
+  "metricId" | "covered" | "evidenceRefs" | "artifactHash" | "repositoryRefs" | "licenseRefs" | "branchRefs" | "commitRefs" | "metricNames" | "owner" | "sampleSize" | "confidenceInterval"
+> {
   subtleMemorySignalId: string;
-  covered: boolean;
-  evidenceRefs: string[];
   subtleMemorySignalType?: MetricValidationSubtleMemorySignal;
-  artifactHash?: string;
-  repositoryRefs?: string[];
-  licenseRefs?: string[];
-  branchRefs?: string[];
-  commitRefs?: string[];
   treeRefs?: string[];
   arxivRefs?: string[];
   datasetRefs?: string[];
@@ -1432,7 +1146,6 @@ export interface MetricValidationSubtleMemoryCheck {
   adapterIds?: string[];
   judgeIds?: string[];
   evaluatorIds?: string[];
-  metricNames?: string[];
   scoreSummaryIds?: string[];
   diagnosticProtocolIds?: string[];
   ciReporterIds?: string[];
@@ -1446,9 +1159,6 @@ export interface MetricValidationSubtleMemoryCheck {
   adapterCount?: number;
   judgeAgreement0to1?: number;
   validationPassRate0to1?: number;
-  owner?: string;
-  sampleSize?: number;
-  confidenceInterval?: MetricValidationConfidenceInterval;
 }
 
 export interface MetricValidationThresholdPolicy {
@@ -1788,8 +1498,8 @@ function counterfactualSummary(
   };
 }
 
-function validationFacetSummary(
-  checks: MetricValidationFacetCheck[] | undefined,
+function coveredMetricSummary<Check extends { metricId?: string; covered: boolean; evidenceRefs: string[] }>(
+  checks: Check[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
   const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
@@ -1802,6 +1512,13 @@ function validationFacetSummary(
     coverage: Number((covered / scoped.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
   };
+}
+
+function validationFacetSummary(
+  checks: MetricValidationFacetCheck[] | undefined,
+  metricId: string
+): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
+  return coveredMetricSummary(checks, metricId);
 }
 
 function confounderControlSummary(
@@ -1840,96 +1557,42 @@ function processEvidenceSummary(
   checks: MetricValidationProcessEvidenceCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function safetyUtilitySummary(
   checks: MetricValidationSafetyUtilityCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function modalityTransformationSummary(
   checks: MetricValidationModalityTransformationCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function lifecycleObservabilitySummary(
   checks: MetricValidationLifecycleObservabilityCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function rankingStabilitySummary(
   checks: MetricValidationRankingStabilityCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function toolSandboxSummary(
   checks: MetricValidationToolSandboxCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 const CONTINUAL_LEARNING_REQUIRED_SIGNALS: MetricValidationContinualLearningSignal[] = [
@@ -2014,16 +1677,7 @@ function strategicInteractionSummary(
   checks: MetricValidationStrategicInteractionCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 const ARCHITECTURE_REALITY_REQUIRED_SIGNALS: MetricValidationArchitectureRealitySignal[] = [
@@ -2057,16 +1711,7 @@ function ragPipelineSummary(
   checks: MetricValidationRagPipelineCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 const RAG_EVALUATION_PIPELINE_REQUIRED_SIGNALS: MetricValidationRagEvaluationPipelineSignal[] = [
@@ -3437,6 +3082,20 @@ function isSha256Hash(value: string | undefined): boolean {
   return typeof value === "string" && /^[a-f0-9]{64}$/i.test(value);
 }
 
+/** Flatten optional metric fields, retaining each domain's original trim callback. */
+function uniqueProjectedMetricValues<Check>(
+  checks: Check[],
+  project: (check: Check) => string[] | undefined,
+  trim: (value: string) => string
+): string[] {
+  return [
+    ...new Set(checks
+      .flatMap((check) => project(check) ?? [])
+      .map(trim)
+      .filter((value) => value.length > 0))
+  ];
+}
+
 function uniqueTrimmed(values: Array<string | undefined>): string[] {
   return [
     ...new Set(values
@@ -3896,12 +3555,7 @@ function mirageRagMetricSummary(
     coverage: Number((coveredSignals.size / MIRAGE_RAG_METRIC_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: MIRAGE_RAG_METRIC_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    datasetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.datasetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
+    datasetIds: uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim()),
     evaluationModes: [
       ...new Set(scoped
         .flatMap((check) => check.evaluationModes ?? [])
@@ -3909,24 +3563,9 @@ function mirageRagMetricSummary(
           mode === "base" || mode === "oracle" || mode === "mixed" || mode === "custom"
         ))
     ],
-    retrieverIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.retrieverIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    modelIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.modelIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    retrieverIds: uniqueProjectedMetricValues(scoped, (check) => check.retrieverIds, (id) => id.trim()),
+    modelIds: uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     qaPairCount: qaPairCounts.length > 0 ? Math.max(...qaPairCounts) : null,
     contextPoolCount: contextPoolCounts.length > 0 ? Math.max(...contextPoolCounts) : null,
     reportArtifactHashes: [
@@ -4198,42 +3837,12 @@ function guardbenchMetricSummary(
     coverage: Number((coveredSignals.size / GUARDBENCH_METRIC_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: GUARDBENCH_METRIC_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    datasetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.datasetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    languageIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.languageIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    modelIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.modelIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    thresholdIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.thresholdIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
-    exportFormats: [
-      ...new Set(scoped
-        .flatMap((check) => check.exportFormats ?? [])
-        .map((format) => format.trim())
-        .filter((format) => format.length > 0))
-    ],
+    datasetIds: uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim()),
+    languageIds: uniqueProjectedMetricValues(scoped, (check) => check.languageIds, (id) => id.trim()),
+    modelIds: uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim()),
+    thresholdIds: uniqueProjectedMetricValues(scoped, (check) => check.thresholdIds, (id) => id.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
+    exportFormats: uniqueProjectedMetricValues(scoped, (check) => check.exportFormats, (format) => format.trim()),
     reportArtifactHashes: [
       ...new Set(scoped
         .filter((check) => GUARDBENCH_METRIC_ARTIFACT_SIGNALS.has(check.guardbenchSignalType as MetricValidationGuardbenchSignal) && isSha256Hash(check.artifactHash))
@@ -4325,18 +3934,8 @@ function embodiedAgentSummary(
     coverage: Number((coveredSignals.size / EMBODIED_AGENT_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals,
-    taskTypes: [
-      ...new Set(scoped
-        .flatMap((check) => check.taskTypes ?? [])
-        .map((taskType) => taskType.trim())
-        .filter((taskType) => taskType.length > 0))
-    ],
-    baselineIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.baselineIds ?? [])
-        .map((baselineId) => baselineId.trim())
-        .filter((baselineId) => baselineId.length > 0))
-    ],
+    taskTypes: uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim()),
+    baselineIds: uniqueProjectedMetricValues(scoped, (check) => check.baselineIds, (baselineId) => baselineId.trim()),
     reportArtifactHashes: [
       ...new Set(scoped
         .filter((check) =>
@@ -4429,24 +4028,9 @@ function evaluatorSuiteSummary(
     coverage: Number((coveredSignals.size / EVALUATOR_SUITE_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals,
-    assertionTypes: [
-      ...new Set(scoped
-        .flatMap((check) => check.assertionTypes ?? [])
-        .map((assertionType) => assertionType.trim())
-        .filter((assertionType) => assertionType.length > 0))
-    ],
-    reporterFormats: [
-      ...new Set(scoped
-        .flatMap((check) => check.reporterFormats ?? [])
-        .map((format) => format.trim())
-        .filter((format) => format.length > 0))
-    ],
-    judgeNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.judgeNames ?? [])
-        .map((judgeName) => judgeName.trim())
-        .filter((judgeName) => judgeName.length > 0))
-    ],
+    assertionTypes: uniqueProjectedMetricValues(scoped, (check) => check.assertionTypes, (assertionType) => assertionType.trim()),
+    reporterFormats: uniqueProjectedMetricValues(scoped, (check) => check.reporterFormats, (format) => format.trim()),
+    judgeNames: uniqueProjectedMetricValues(scoped, (check) => check.judgeNames, (judgeName) => judgeName.trim()),
     reportArtifactHashes: [
       ...new Set(scoped
         .filter((check) => check.evaluatorSignalType === "reporter_output" && isSha256Hash(check.artifactHash))
@@ -4571,36 +4155,11 @@ function pentestBenchmarkSummary(
     coverage: Number((coveredSignals.size / PENTEST_BENCHMARK_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals,
-    languageStacks: [
-      ...new Set(scoped
-        .flatMap((check) => check.languageStacks ?? [])
-        .map((stack) => stack.trim())
-        .filter((stack) => stack.length > 0))
-    ],
-    vulnerabilityClasses: [
-      ...new Set(scoped
-        .flatMap((check) => check.vulnerabilityClasses ?? [])
-        .map((vulnClass) => vulnClass.trim())
-        .filter((vulnClass) => vulnClass.length > 0))
-    ],
-    difficultyLevels: [
-      ...new Set(scoped
-        .flatMap((check) => check.difficultyLevels ?? [])
-        .map((level) => level.trim())
-        .filter((level) => level.length > 0))
-    ],
-    benchmarkSuiteIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkSuiteIds ?? [])
-        .map((suiteId) => suiteId.trim())
-        .filter((suiteId) => suiteId.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    languageStacks: uniqueProjectedMetricValues(scoped, (check) => check.languageStacks, (stack) => stack.trim()),
+    vulnerabilityClasses: uniqueProjectedMetricValues(scoped, (check) => check.vulnerabilityClasses, (vulnClass) => vulnClass.trim()),
+    difficultyLevels: uniqueProjectedMetricValues(scoped, (check) => check.difficultyLevels, (level) => level.trim()),
+    benchmarkSuiteIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkSuiteIds, (suiteId) => suiteId.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     reportArtifactHashes: [
       ...new Set(scoped
         .filter((check) =>
@@ -4735,42 +4294,12 @@ function traceEvaluationSummary(
     coverage: Number((coveredSignals.size / TRACE_EVALUATION_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals,
-    modelIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.modelIds ?? [])
-        .map((modelId) => modelId.trim())
-        .filter((modelId) => modelId.length > 0))
-    ],
-    agentParameterKeys: [
-      ...new Set(scoped
-        .flatMap((check) => check.agentParameterKeys ?? [])
-        .map((key) => key.trim())
-        .filter((key) => key.length > 0))
-    ],
-    toolNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.toolNames ?? [])
-        .map((toolName) => toolName.trim())
-        .filter((toolName) => toolName.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
-    caseSuiteIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.caseSuiteIds ?? [])
-        .map((suiteId) => suiteId.trim())
-        .filter((suiteId) => suiteId.length > 0))
-    ],
-    backendModes: [
-      ...new Set(scoped
-        .flatMap((check) => check.backendModes ?? [])
-        .map((mode) => mode.trim())
-        .filter((mode) => mode.length > 0))
-    ],
+    modelIds: uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (modelId) => modelId.trim()),
+    agentParameterKeys: uniqueProjectedMetricValues(scoped, (check) => check.agentParameterKeys, (key) => key.trim()),
+    toolNames: uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (toolName) => toolName.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
+    caseSuiteIds: uniqueProjectedMetricValues(scoped, (check) => check.caseSuiteIds, (suiteId) => suiteId.trim()),
+    backendModes: uniqueProjectedMetricValues(scoped, (check) => check.backendModes, (mode) => mode.trim()),
     runPermutationCount: runPermutationCounts.length > 0 ? Math.max(...runPermutationCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -4889,30 +4418,10 @@ function livingEnvironmentSummary(
     coverage: Number((coveredSignals.size / LIVING_ENVIRONMENT_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: LIVING_ENVIRONMENT_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    capabilityNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.capabilityNames ?? [])
-        .map((name) => name.trim())
-        .filter((name) => name.length > 0))
-    ],
-    sandboxProviders: [
-      ...new Set(scoped
-        .flatMap((check) => check.sandboxProviders ?? [])
-        .map((provider) => provider.trim())
-        .filter((provider) => provider.length > 0))
-    ],
-    agentAdapters: [
-      ...new Set(scoped
-        .flatMap((check) => check.agentAdapters ?? [])
-        .map((adapter) => adapter.trim())
-        .filter((adapter) => adapter.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    capabilityNames: uniqueProjectedMetricValues(scoped, (check) => check.capabilityNames, (name) => name.trim()),
+    sandboxProviders: uniqueProjectedMetricValues(scoped, (check) => check.sandboxProviders, (provider) => provider.trim()),
+    agentAdapters: uniqueProjectedMetricValues(scoped, (check) => check.agentAdapters, (adapter) => adapter.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     trialCount: trialCounts.length > 0 ? Math.max(...trialCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -5068,60 +4577,15 @@ function mobileAgentSummary(
     coverage: Number((coveredSignals.size / MOBILE_AGENT_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: MOBILE_AGENT_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    benchmarkIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    environmentIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.environmentIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    appIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.appIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    apiCatalogIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.apiCatalogIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    uiTraceIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.uiTraceIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    taskSetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.taskSetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    taskComplexityGroups: [
-      ...new Set(scoped
-        .flatMap((check) => check.taskComplexityGroups ?? [])
-        .map((group) => group.trim())
-        .filter((group) => group.length > 0))
-    ],
-    checkpointMetricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
-    licenseBoundaryRefs: [
-      ...new Set(scoped
-        .flatMap((check) => check.licenseBoundaryRefs ?? [])
-        .map((ref) => ref.trim())
-        .filter((ref) => ref.length > 0))
-    ],
+    benchmarkIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim()),
+    environmentIds: uniqueProjectedMetricValues(scoped, (check) => check.environmentIds, (id) => id.trim()),
+    appIds: uniqueProjectedMetricValues(scoped, (check) => check.appIds, (id) => id.trim()),
+    apiCatalogIds: uniqueProjectedMetricValues(scoped, (check) => check.apiCatalogIds, (id) => id.trim()),
+    uiTraceIds: uniqueProjectedMetricValues(scoped, (check) => check.uiTraceIds, (id) => id.trim()),
+    taskSetIds: uniqueProjectedMetricValues(scoped, (check) => check.taskSetIds, (id) => id.trim()),
+    taskComplexityGroups: uniqueProjectedMetricValues(scoped, (check) => check.taskComplexityGroups, (group) => group.trim()),
+    checkpointMetricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
+    licenseBoundaryRefs: uniqueProjectedMetricValues(scoped, (check) => check.licenseBoundaryRefs, (ref) => ref.trim()),
     trialCount: trialCounts.length > 0 ? Math.max(...trialCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -5242,42 +4706,12 @@ function personaAgentSummary(
     coverage: Number((coveredSignals.size / PERSONA_AGENT_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: PERSONA_AGENT_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    personaIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.personaIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    environmentIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.environmentIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    questionSetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.questionSetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    modelIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.modelIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    providerIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.providerIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    personaIds: uniqueProjectedMetricValues(scoped, (check) => check.personaIds, (id) => id.trim()),
+    environmentIds: uniqueProjectedMetricValues(scoped, (check) => check.environmentIds, (id) => id.trim()),
+    questionSetIds: uniqueProjectedMetricValues(scoped, (check) => check.questionSetIds, (id) => id.trim()),
+    modelIds: uniqueProjectedMetricValues(scoped, (check) => check.modelIds, (id) => id.trim()),
+    providerIds: uniqueProjectedMetricValues(scoped, (check) => check.providerIds, (id) => id.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     questionCount: questionCounts.length > 0 ? Math.max(...questionCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -5411,42 +4845,12 @@ function scientificLiteratureSummary(
     coverage: Number((coveredSignals.size / SCIENTIFIC_LITERATURE_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: SCIENTIFIC_LITERATURE_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    benchmarkIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    taskTypes: [
-      ...new Set(scoped
-        .flatMap((check) => check.taskTypes ?? [])
-        .map((taskType) => taskType.trim())
-        .filter((taskType) => taskType.length > 0))
-    ],
-    datasetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.datasetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    searchBackendIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.searchBackendIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    toolIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.toolIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    benchmarkIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim()),
+    taskTypes: uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim()),
+    datasetIds: uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim()),
+    searchBackendIds: uniqueProjectedMetricValues(scoped, (check) => check.searchBackendIds, (id) => id.trim()),
+    toolIds: uniqueProjectedMetricValues(scoped, (check) => check.toolIds, (id) => id.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     taskCount: taskCounts.length > 0 ? Math.max(...taskCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -5598,54 +5002,14 @@ function bioinformaticsAgentSummary(
     coverage: Number((coveredSignals.size / BIOINFORMATICS_AGENT_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: BIOINFORMATICS_AGENT_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    benchmarkIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    taskTypes: [
-      ...new Set(scoped
-        .flatMap((check) => check.taskTypes ?? [])
-        .map((taskType) => taskType.trim())
-        .filter((taskType) => taskType.length > 0))
-    ],
-    datasetIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.datasetIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    workflowIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.workflowIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    toolNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.toolNames ?? [])
-        .map((name) => name.trim())
-        .filter((name) => name.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
-    perturbationIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.perturbationIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    privacyBoundaryRefs: [
-      ...new Set(scoped
-        .flatMap((check) => check.privacyBoundaryRefs ?? [])
-        .map((ref) => ref.trim())
-        .filter((ref) => ref.length > 0))
-    ],
+    benchmarkIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim()),
+    taskTypes: uniqueProjectedMetricValues(scoped, (check) => check.taskTypes, (taskType) => taskType.trim()),
+    datasetIds: uniqueProjectedMetricValues(scoped, (check) => check.datasetIds, (id) => id.trim()),
+    workflowIds: uniqueProjectedMetricValues(scoped, (check) => check.workflowIds, (id) => id.trim()),
+    toolNames: uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (name) => name.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
+    perturbationIds: uniqueProjectedMetricValues(scoped, (check) => check.perturbationIds, (id) => id.trim()),
+    privacyBoundaryRefs: uniqueProjectedMetricValues(scoped, (check) => check.privacyBoundaryRefs, (ref) => ref.trim()),
     taskCount: taskCounts.length > 0 ? Math.max(...taskCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -6014,48 +5378,13 @@ function networkTroubleshootingSummary(
     coverage: Number((coveredSignals.size / NETWORK_TROUBLESHOOTING_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: NETWORK_TROUBLESHOOTING_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    benchmarkIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    scenarioIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.scenarioIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    topologyTiers: [
-      ...new Set(scoped
-        .flatMap((check) => check.topologyTiers ?? [])
-        .map((tier) => tier.trim())
-        .filter((tier) => tier.length > 0))
-    ],
-    issueTypes: [
-      ...new Set(scoped
-        .flatMap((check) => check.issueTypes ?? [])
-        .map((issueType) => issueType.trim())
-        .filter((issueType) => issueType.length > 0))
-    ],
-    agentIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.agentIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    toolNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.toolNames ?? [])
-        .map((name) => name.trim())
-        .filter((name) => name.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((metricName) => metricName.trim())
-        .filter((metricName) => metricName.length > 0))
-    ],
+    benchmarkIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim()),
+    scenarioIds: uniqueProjectedMetricValues(scoped, (check) => check.scenarioIds, (id) => id.trim()),
+    topologyTiers: uniqueProjectedMetricValues(scoped, (check) => check.topologyTiers, (tier) => tier.trim()),
+    issueTypes: uniqueProjectedMetricValues(scoped, (check) => check.issueTypes, (issueType) => issueType.trim()),
+    agentIds: uniqueProjectedMetricValues(scoped, (check) => check.agentIds, (id) => id.trim()),
+    toolNames: uniqueProjectedMetricValues(scoped, (check) => check.toolNames, (name) => name.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (metricName) => metricName.trim()),
     incidentCount: incidentCounts.length > 0 ? Math.max(...incidentCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -6208,54 +5537,14 @@ function inferenceOptimizationSummary(
     coverage: Number((coveredSignals.size / INFERENCE_OPTIMIZATION_REQUIRED_SIGNALS.length).toFixed(6)),
     evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))],
     missingSignals: INFERENCE_OPTIMIZATION_REQUIRED_SIGNALS.filter((signal) => !coveredSignals.has(signal)),
-    benchmarkIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.benchmarkIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    scenarioIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.scenarioIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    hardwareProfileIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.hardwareProfileIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    backendIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.backendIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    searchSpaceIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.searchSpaceIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    gateIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.gateIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    agentIds: [
-      ...new Set(scoped
-        .flatMap((check) => check.agentIds ?? [])
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0))
-    ],
-    metricNames: [
-      ...new Set(scoped
-        .flatMap((check) => check.metricNames ?? [])
-        .map((name) => name.trim())
-        .filter((name) => name.length > 0))
-    ],
+    benchmarkIds: uniqueProjectedMetricValues(scoped, (check) => check.benchmarkIds, (id) => id.trim()),
+    scenarioIds: uniqueProjectedMetricValues(scoped, (check) => check.scenarioIds, (id) => id.trim()),
+    hardwareProfileIds: uniqueProjectedMetricValues(scoped, (check) => check.hardwareProfileIds, (id) => id.trim()),
+    backendIds: uniqueProjectedMetricValues(scoped, (check) => check.backendIds, (id) => id.trim()),
+    searchSpaceIds: uniqueProjectedMetricValues(scoped, (check) => check.searchSpaceIds, (id) => id.trim()),
+    gateIds: uniqueProjectedMetricValues(scoped, (check) => check.gateIds, (id) => id.trim()),
+    agentIds: uniqueProjectedMetricValues(scoped, (check) => check.agentIds, (id) => id.trim()),
+    metricNames: uniqueProjectedMetricValues(scoped, (check) => check.metricNames, (name) => name.trim()),
     runCount: runCounts.length > 0 ? Math.max(...runCounts) : null,
     reportArtifactHashes: [
       ...new Set(scoped
@@ -11102,32 +10391,14 @@ function businessWorkflowSummary(
   checks: MetricValidationBusinessWorkflowCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function dataAgentAnalyticalSummary(
   checks: MetricValidationDataAgentAnalyticalCheck[] | undefined,
   metricId: string
 ): { sampleSize: number; coverage: number | null; evidenceRefs: string[] } {
-  const scoped = (checks ?? []).filter((check) => (check.metricId ?? "overall_maturity_score") === metricId);
-  if (scoped.length === 0) {
-    return { sampleSize: 0, coverage: null, evidenceRefs: [] };
-  }
-  const covered = scoped.filter((check) => check.covered).length;
-  return {
-    sampleSize: scoped.length,
-    coverage: Number((covered / scoped.length).toFixed(6)),
-    evidenceRefs: [...new Set(scoped.flatMap((check) => check.evidenceRefs).filter((ref) => ref.trim().length > 0))]
-  };
+  return coveredMetricSummary(checks, metricId);
 }
 
 function signedEvidenceRefsFor(
@@ -11163,94 +10434,364 @@ function constructValidity(params: {
   return Number(clamp(value, 0, 1).toFixed(6));
 }
 
-function statusForRow(params: {
-  sampleSize: number;
-  constructValidity: number;
+// Private parameter contracts reuse existing public row fields without changing runtime behavior.
+type MetricRowStatusInput = Pick<MetricValidationRow,
+  | "sampleSize"
+  | "constructValidity"
+  | "testRetestStability"
+  | "counterfactualResponsiveness"
+  | "validationFacetCoverage"
+  | "confounderControlCoverage"
+  | "outcomeAlignment"
+  | "processEvidenceCoverage"
+  | "safetyUtilityCoverage"
+  | "modalityTransformationCoverage"
+  | "lifecycleObservabilityCoverage"
+  | "rankingStabilityCoverage"
+  | "toolSandboxCoverage"
+  | "continualLearningCoverage"
+  | "strategicInteractionCoverage"
+  | "architectureRealityCoverage"
+  | "ragPipelineCoverage"
+  | "ragEvaluationPipelineCoverage"
+  | "ragasNotebookCoverage"
+  | "mirageRagMetricCoverage"
+  | "legalCodeRagCoverage"
+  | "guardbenchMetricCoverage"
+  | "businessWorkflowCoverage"
+  | "dataAgentAnalyticalCoverage"
+  | "embodiedAgentCoverage"
+  | "evaluatorSuiteCoverage"
+  | "pentestBenchmarkCoverage"
+  | "traceEvaluationCoverage"
+  | "livingEnvironmentCoverage"
+  | "mobileAgentCoverage"
+  | "personaAgentCoverage"
+  | "scientificLiteratureCoverage"
+  | "bioinformaticsAgentCoverage"
+  | "mirageDrugRepositioningCoverage"
+  | "networkTroubleshootingCoverage"
+  | "inferenceOptimizationCoverage"
+  | "javaCodingAgentCoverage"
+  | "webEvalDatasetCoverage"
+  | "parallelResearchSkillCoverage"
+  | "resumeRagEvaluatorCoverage"
+  | "chipBenchmarkCoverage"
+  | "hermesBenchCoverage"
+  | "hermesBenchJudgeAgreement0to1"
+  | "hermesBenchRegressionPassRate0to1"
+  | "cooperBenchCoverage"
+  | "cooperBenchCooperationScore0to1"
+  | "cooperBenchConflictResolutionRate0to1"
+  | "cooperBenchRegressionPassRate0to1"
+  | "coderCupCoverage"
+  | "coderCupInterRaterAgreement0to1"
+  | "coderCupTestRetestReliability0to1"
+  | "coderCupRegressionPassRate0to1"
+  | "agenticGraphRagCoverage"
+  | "agenticGraphRagRetrievalGroundingScore0to1"
+  | "agenticGraphRagRegressionPassRate0to1"
+  | "agentScenarioTestCoverage"
+  | "openCodeLabCoverage"
+  | "ccPluginEvalCoverage"
+  | "ccPluginEvalTriggerAccuracy0to1"
+  | "ccPluginEvalFalsePositiveRate0to1"
+  | "ccPluginEvalFalseNegativeRate0to1"
+  | "realignSimulationCoverage"
+  | "realignSimulationJudgeAgreement0to1"
+  | "realignSimulationRegressionPassRate0to1"
+  | "academiClawCoverage"
+  | "academiClawRegressionPassRate0to1"
+  | "ragChunkingTechniqueCoverage"
+  | "ragChunkingTechniqueRegressionPassRate0to1"
+  | "kubernetesOperationalAgentCoverage"
+  | "kubernetesOperationalAgentRegressionPassRate0to1"
+  | "secureVibeBenchCoverage"
+  | "secureVibeBenchRegressionPassRate0to1"
+  | "ravigBenchCoverage"
+  | "ravigBenchValidationPassRate0to1"
+  | "humanStudyBenchCoverage"
+  | "humanStudyBenchInterRaterAgreement0to1"
+  | "humanStudyBenchTestRetestReliability0to1"
+  | "humanStudyBenchValidationPassRate0to1"
+  | "legacyBenchCoverage"
+  | "legacyBenchRegressionPassRate0to1"
+  | "legacyBenchReplayPassRate0to1"
+  | "subtleMemoryCoverage"
+  | "subtleMemoryJudgeAgreement0to1"
+  | "subtleMemoryValidationPassRate0to1"
+> & {
   ciWidth: number;
-  testRetestStability: number | null;
-  counterfactualResponsiveness: number | null;
-  validationFacetCoverage: number | null;
-  confounderControlCoverage: number | null;
-  outcomeAlignment: number | null;
-  processEvidenceCoverage: number | null;
-  safetyUtilityCoverage: number | null;
-  modalityTransformationCoverage: number | null;
-  lifecycleObservabilityCoverage: number | null;
-  rankingStabilityCoverage: number | null;
-  toolSandboxCoverage: number | null;
-  continualLearningCoverage: number | null;
-  strategicInteractionCoverage: number | null;
-  architectureRealityCoverage: number | null;
-  ragPipelineCoverage: number | null;
-  ragEvaluationPipelineCoverage: number | null;
-  ragasNotebookCoverage: number | null;
-  mirageRagMetricCoverage: number | null;
-  legalCodeRagCoverage: number | null;
-  guardbenchMetricCoverage: number | null;
-  businessWorkflowCoverage: number | null;
-  dataAgentAnalyticalCoverage: number | null;
-  embodiedAgentCoverage: number | null;
-  evaluatorSuiteCoverage: number | null;
-  pentestBenchmarkCoverage: number | null;
-  traceEvaluationCoverage: number | null;
-  livingEnvironmentCoverage: number | null;
-  mobileAgentCoverage: number | null;
-  personaAgentCoverage: number | null;
-  scientificLiteratureCoverage: number | null;
-  bioinformaticsAgentCoverage: number | null;
-  mirageDrugRepositioningCoverage: number | null;
-  networkTroubleshootingCoverage: number | null;
-  inferenceOptimizationCoverage: number | null;
-  javaCodingAgentCoverage: number | null;
-  webEvalDatasetCoverage: number | null;
-  parallelResearchSkillCoverage: number | null;
-  resumeRagEvaluatorCoverage: number | null;
-  chipBenchmarkCoverage: number | null;
-  hermesBenchCoverage: number | null;
-  hermesBenchJudgeAgreement0to1: number | null;
-  hermesBenchRegressionPassRate0to1: number | null;
-  cooperBenchCoverage: number | null;
-  cooperBenchCooperationScore0to1: number | null;
-  cooperBenchConflictResolutionRate0to1: number | null;
-  cooperBenchRegressionPassRate0to1: number | null;
-  coderCupCoverage: number | null;
-  coderCupInterRaterAgreement0to1: number | null;
-  coderCupTestRetestReliability0to1: number | null;
-  coderCupRegressionPassRate0to1: number | null;
-  agenticGraphRagCoverage: number | null;
-  agenticGraphRagRetrievalGroundingScore0to1: number | null;
-  agenticGraphRagRegressionPassRate0to1: number | null;
-  agentScenarioTestCoverage: number | null;
-  openCodeLabCoverage: number | null;
-  ccPluginEvalCoverage: number | null;
-  ccPluginEvalTriggerAccuracy0to1: number | null;
-  ccPluginEvalFalsePositiveRate0to1: number | null;
-  ccPluginEvalFalseNegativeRate0to1: number | null;
-  realignSimulationCoverage: number | null;
-  realignSimulationJudgeAgreement0to1: number | null;
-  realignSimulationRegressionPassRate0to1: number | null;
-  academiClawCoverage: number | null;
-  academiClawRegressionPassRate0to1: number | null;
-  ragChunkingTechniqueCoverage: number | null;
-  ragChunkingTechniqueRegressionPassRate0to1: number | null;
-  kubernetesOperationalAgentCoverage: number | null;
-  kubernetesOperationalAgentRegressionPassRate0to1: number | null;
-  secureVibeBenchCoverage: number | null;
-  secureVibeBenchRegressionPassRate0to1: number | null;
-  ravigBenchCoverage: number | null;
-  ravigBenchValidationPassRate0to1: number | null;
-  humanStudyBenchCoverage: number | null;
-  humanStudyBenchInterRaterAgreement0to1: number | null;
-  humanStudyBenchTestRetestReliability0to1: number | null;
-  humanStudyBenchValidationPassRate0to1: number | null;
-  legacyBenchCoverage: number | null;
-  legacyBenchRegressionPassRate0to1: number | null;
-  legacyBenchReplayPassRate0to1: number | null;
-  subtleMemoryCoverage: number | null;
-  subtleMemoryJudgeAgreement0to1: number | null;
-  subtleMemoryValidationPassRate0to1: number | null;
   thresholds: MetricValidationThresholdPolicy;
-}): MetricValidationRow["status"] {
+};
+
+type MetricRowWarningsInput = MetricRowStatusInput & Pick<MetricValidationRow,
+  | "interRaterAgreement"
+  | "counterfactualSampleSize"
+  | "validationFacetSampleSize"
+  | "confounderControlSampleSize"
+  | "outcomeAlignmentSampleSize"
+  | "processEvidenceSampleSize"
+  | "safetyUtilitySampleSize"
+  | "modalityTransformationSampleSize"
+  | "lifecycleObservabilitySampleSize"
+  | "rankingStabilitySampleSize"
+  | "toolSandboxSampleSize"
+  | "continualLearningSampleSize"
+  | "continualLearningRunCount"
+  | "continualLearningMissingSignals"
+  | "strategicInteractionSampleSize"
+  | "architectureRealitySampleSize"
+  | "architectureRealityStressScenarioCount"
+  | "architectureRealityNetworkScenarioCount"
+  | "architectureRealityEnsemblePatternCount"
+  | "architectureRealityMissingSignals"
+  | "ragPipelineSampleSize"
+  | "ragEvaluationPipelineSampleSize"
+  | "ragEvaluationPipelineCaseSampleSizeMin"
+  | "ragEvaluationPipelineMissingSignals"
+  | "ragasNotebookSampleSize"
+  | "ragasNotebookMissingSignals"
+  | "ragasNotebookQuestionCount"
+  | "mirageRagMetricSampleSize"
+  | "mirageRagMetricMissingSignals"
+  | "mirageRagMetricQaPairCount"
+  | "mirageRagMetricContextPoolCount"
+  | "legalCodeRagSampleSize"
+  | "legalCodeRagMissingSignals"
+  | "legalCodeRagQuestionCount"
+  | "guardbenchMetricSampleSize"
+  | "guardbenchMetricMissingSignals"
+  | "businessWorkflowSampleSize"
+  | "dataAgentAnalyticalSampleSize"
+  | "embodiedAgentSampleSize"
+  | "embodiedAgentMissingSignals"
+  | "evaluatorSuiteSampleSize"
+  | "evaluatorSuiteMissingSignals"
+  | "pentestBenchmarkSampleSize"
+  | "pentestBenchmarkMissingSignals"
+  | "traceEvaluationSampleSize"
+  | "traceEvaluationMissingSignals"
+  | "livingEnvironmentSampleSize"
+  | "livingEnvironmentMissingSignals"
+  | "mobileAgentSampleSize"
+  | "mobileAgentMissingSignals"
+  | "mobileAgentTrialCount"
+  | "personaAgentSampleSize"
+  | "personaAgentMissingSignals"
+  | "scientificLiteratureSampleSize"
+  | "scientificLiteratureMissingSignals"
+  | "scientificLiteratureTaskCount"
+  | "bioinformaticsAgentSampleSize"
+  | "bioinformaticsAgentMissingSignals"
+  | "bioinformaticsAgentTaskCount"
+  | "mirageDrugRepositioningSampleSize"
+  | "mirageDrugRepositioningMissingSignals"
+  | "mirageDrugRepositioningDrugCount"
+  | "mirageDrugRepositioningDiseaseCount"
+  | "mirageDrugRepositioningMappingCount"
+  | "mirageDrugRepositioningFeatureSetCount"
+  | "mirageDrugRepositioningSimilarityMatrixCount"
+  | "networkTroubleshootingSampleSize"
+  | "networkTroubleshootingMissingSignals"
+  | "networkTroubleshootingIncidentCount"
+  | "inferenceOptimizationSampleSize"
+  | "inferenceOptimizationMissingSignals"
+  | "inferenceOptimizationRunCount"
+  | "javaCodingAgentSampleSize"
+  | "javaCodingAgentMissingSignals"
+  | "javaCodingAgentTrialCount"
+  | "webEvalDatasetSampleSize"
+  | "webEvalDatasetMissingSignals"
+  | "webEvalDatasetQuestionCount"
+  | "webEvalDatasetDocumentCount"
+  | "parallelResearchSkillSampleSize"
+  | "parallelResearchSkillMissingSignals"
+  | "parallelResearchSkillCitationCoverage0to1"
+  | "parallelResearchSkillSourcePolicyCoverage0to1"
+  | "parallelResearchSkillBatchTaskLimit"
+  | "parallelResearchSkillMonitoringCoverage0to1"
+  | "resumeRagEvaluatorSampleSize"
+  | "resumeRagEvaluatorMissingSignals"
+  | "resumeRagEvaluatorParserCoverage0to1"
+  | "resumeRagEvaluatorEvaluationGrounding0to1"
+  | "chipBenchmarkSampleSize"
+  | "chipBenchmarkMissingSignals"
+  | "chipBenchmarkResultRowCount"
+  | "chipBenchmarkThroughputCoverage0to1"
+  | "chipBenchmarkLatencyCoverage0to1"
+  | "chipBenchmarkCostCoverage0to1"
+  | "hermesBenchSampleSize"
+  | "hermesBenchMissingSignals"
+  | "hermesBenchTaskCount"
+  | "hermesBenchAdapterCount"
+  | "hermesBenchBackendTestCount"
+  | "hermesBenchFrontendTestCount"
+  | "cooperBenchSampleSize"
+  | "cooperBenchMissingSignals"
+  | "cooperBenchTaskCount"
+  | "cooperBenchFeatureCount"
+  | "cooperBenchAgentAdapterCount"
+  | "cooperBenchTestCount"
+  | "coderCupSampleSize"
+  | "coderCupMissingSignals"
+  | "coderCupPhaseCount"
+  | "coderCupTestPlanCount"
+  | "coderCupRunnerCount"
+  | "coderCupScoreLedgerCount"
+  | "coderCupLiveSurfaceCount"
+  | "agenticGraphRagSampleSize"
+  | "agenticGraphRagMissingSignals"
+  | "agenticGraphRagGraphNodeCount"
+  | "agenticGraphRagEvaluationMetricCount"
+  | "agenticGraphRagExperimentCount"
+  | "agentScenarioTestSampleSize"
+  | "agentScenarioTestMissingSignals"
+  | "agentScenarioTestScenarioCount"
+  | "agentScenarioTestTurnCount"
+  | "agentScenarioTestToolCallCount"
+  | "openCodeLabSampleSize"
+  | "openCodeLabMissingSignals"
+  | "openCodeLabRunCount"
+  | "openCodeLabForkAgreement0to1"
+  | "openCodeLabModelVariance0to1"
+  | "ccPluginEvalSampleSize"
+  | "ccPluginEvalMissingSignals"
+  | "ccPluginEvalComponentCount"
+  | "ccPluginEvalScenarioCount"
+  | "realignSimulationSampleSize"
+  | "realignSimulationMissingSignals"
+  | "realignSimulationScenarioCount"
+  | "realignSimulationEvaluatorCount"
+  | "realignSimulationRepeatCount"
+  | "academiClawSampleSize"
+  | "academiClawMissingSignals"
+  | "academiClawTaskCount"
+  | "academiClawLanguageCount"
+  | "academiClawRubricCount"
+  | "academiClawTraceCount"
+  | "academiClawMetaEvalCount"
+  | "academiClawModelCount"
+  | "ragChunkingTechniqueSampleSize"
+  | "ragChunkingTechniqueMissingSignals"
+  | "ragChunkingTechniquePolicyDocumentCount"
+  | "ragChunkingTechniqueNotebookCount"
+  | "ragChunkingTechniqueChunkingStrategyCount"
+  | "ragChunkingTechniqueEvaluationQuestionCount"
+  | "ragChunkingTechniqueMetricCount"
+  | "kubernetesOperationalAgentSampleSize"
+  | "kubernetesOperationalAgentMissingSignals"
+  | "kubernetesOperationalAgentToolCategoryCount"
+  | "kubernetesOperationalAgentDiagnosticCapabilityCount"
+  | "kubernetesOperationalAgentResourceMetricCount"
+  | "kubernetesOperationalAgentLogAnalysisCount"
+  | "secureVibeBenchSampleSize"
+  | "secureVibeBenchMissingSignals"
+  | "secureVibeBenchAgentAdapterCount"
+  | "secureVibeBenchScenarioCount"
+  | "secureVibeBenchTestScriptCount"
+  | "ravigBenchSampleSize"
+  | "ravigBenchMissingSignals"
+  | "ravigBenchDatasetCaseCount"
+  | "ravigBenchVisualDesignCheckCount"
+  | "ravigBenchEvaluatorCount"
+  | "humanStudyBenchSampleSize"
+  | "humanStudyBenchMissingSignals"
+  | "humanStudyBenchStudyCount"
+  | "humanStudyBenchParticipantCount"
+  | "humanStudyBenchResponseCount"
+  | "humanStudyBenchEvaluatorCount"
+  | "legacyBenchSampleSize"
+  | "legacyBenchMissingSignals"
+  | "legacyBenchTaskCount"
+  | "legacyBenchLanguageCount"
+  | "legacyBenchEnvironmentCount"
+  | "legacyBenchTestOracleCount"
+  | "legacyBenchEvaluatorCount"
+  | "subtleMemorySampleSize"
+  | "subtleMemoryMissingSignals"
+  | "subtleMemoryPersonaCount"
+  | "subtleMemoryBenchInstanceCount"
+  | "subtleMemoryHistoryCount"
+  | "subtleMemoryMemoryVariantSetCount"
+  | "subtleMemoryRelationTypeCount"
+  | "subtleMemoryEvaluationStageCount"
+  | "subtleMemoryAdapterCount"
+>;
+
+type MetricRowBuildInput = Omit<MetricValidationRow,
+  | "sampleSize"
+  | "mirageRagMetricEvaluationModes"
+  | "confidenceInterval"
+  | "evidenceRefs"
+  | "warnings"
+  | "testRetestStability"
+  | "status"
+> & {
+  agentId: string;
+  timestamp: number;
+  values: number[];
+  questionScores: QuestionScore[];
+  counterfactualEvidenceRefs: string[];
+  validationFacetEvidenceRefs: string[];
+  confounderControlEvidenceRefs: string[];
+  outcomeAlignmentEvidenceRefs: string[];
+  processEvidenceRefs: string[];
+  safetyUtilityEvidenceRefs: string[];
+  modalityTransformationEvidenceRefs: string[];
+  lifecycleObservabilityEvidenceRefs: string[];
+  rankingStabilityEvidenceRefs: string[];
+  toolSandboxEvidenceRefs: string[];
+  continualLearningEvidenceRefs: string[];
+  strategicInteractionEvidenceRefs: string[];
+  architectureRealityEvidenceRefs: string[];
+  ragPipelineEvidenceRefs: string[];
+  ragEvaluationPipelineEvidenceRefs: string[];
+  ragasNotebookEvidenceRefs: string[];
+  mirageRagMetricEvidenceRefs: string[];
+  mirageRagMetricEvaluationModes: Array<"base" | "oracle" | "mixed" | "custom">;
+  legalCodeRagEvidenceRefs: string[];
+  guardbenchMetricEvidenceRefs: string[];
+  businessWorkflowEvidenceRefs: string[];
+  dataAgentAnalyticalEvidenceRefs: string[];
+  embodiedAgentEvidenceRefs: string[];
+  evaluatorSuiteEvidenceRefs: string[];
+  pentestBenchmarkEvidenceRefs: string[];
+  traceEvaluationEvidenceRefs: string[];
+  livingEnvironmentEvidenceRefs: string[];
+  mobileAgentEvidenceRefs: string[];
+  personaAgentEvidenceRefs: string[];
+  scientificLiteratureEvidenceRefs: string[];
+  bioinformaticsAgentEvidenceRefs: string[];
+  mirageDrugRepositioningEvidenceRefs: string[];
+  networkTroubleshootingEvidenceRefs: string[];
+  inferenceOptimizationEvidenceRefs: string[];
+  javaCodingAgentEvidenceRefs: string[];
+  webEvalDatasetEvidenceRefs: string[];
+  parallelResearchSkillEvidenceRefs: string[];
+  resumeRagEvaluatorEvidenceRefs: string[];
+  chipBenchmarkEvidenceRefs: string[];
+  hermesBenchEvidenceRefs: string[];
+  cooperBenchEvidenceRefs: string[];
+  coderCupEvidenceRefs: string[];
+  agenticGraphRagEvidenceRefs: string[];
+  agentScenarioTestEvidenceRefs: string[];
+  openCodeLabEvidenceRefs: string[];
+  ccPluginEvalEvidenceRefs: string[];
+  realignSimulationEvidenceRefs: string[];
+  academiClawEvidenceRefs: string[];
+  ragChunkingTechniqueEvidenceRefs: string[];
+  kubernetesOperationalAgentEvidenceRefs: string[];
+  secureVibeBenchEvidenceRefs: string[];
+  ravigBenchEvidenceRefs: string[];
+  humanStudyBenchEvidenceRefs: string[];
+  legacyBenchEvidenceRefs: string[];
+  subtleMemoryEvidenceRefs: string[];
+  previousObservations: ScoreObservation[];
+  thresholds: MetricValidationThresholdPolicy;
+};
+
+function statusForRow(params: MetricRowStatusInput): MetricValidationRow["status"] {
   if (
     params.sampleSize < params.thresholds.minSampleSize ||
     params.constructValidity < params.thresholds.minConstructValidity ||
@@ -11426,285 +10967,7 @@ function statusForRow(params: {
   return "pass";
 }
 
-function warningsForRow(params: {
-  sampleSize: number;
-  constructValidity: number;
-  ciWidth: number;
-  testRetestStability: number | null;
-  interRaterAgreement: number | null;
-  counterfactualResponsiveness: number | null;
-  counterfactualSampleSize: number;
-  validationFacetCoverage: number | null;
-  validationFacetSampleSize: number;
-  confounderControlCoverage: number | null;
-  confounderControlSampleSize: number;
-  outcomeAlignment: number | null;
-  outcomeAlignmentSampleSize: number;
-  processEvidenceCoverage: number | null;
-  processEvidenceSampleSize: number;
-  safetyUtilityCoverage: number | null;
-  safetyUtilitySampleSize: number;
-  modalityTransformationCoverage: number | null;
-  modalityTransformationSampleSize: number;
-  lifecycleObservabilityCoverage: number | null;
-  lifecycleObservabilitySampleSize: number;
-  rankingStabilityCoverage: number | null;
-  rankingStabilitySampleSize: number;
-  toolSandboxCoverage: number | null;
-  toolSandboxSampleSize: number;
-  continualLearningCoverage: number | null;
-  continualLearningSampleSize: number;
-  continualLearningRunCount: number | null;
-  continualLearningMissingSignals: MetricValidationContinualLearningSignal[];
-  strategicInteractionCoverage: number | null;
-  strategicInteractionSampleSize: number;
-  architectureRealityCoverage: number | null;
-  architectureRealitySampleSize: number;
-  architectureRealityStressScenarioCount: number | null;
-  architectureRealityNetworkScenarioCount: number | null;
-  architectureRealityEnsemblePatternCount: number | null;
-  architectureRealityMissingSignals: MetricValidationArchitectureRealitySignal[];
-  ragPipelineCoverage: number | null;
-  ragPipelineSampleSize: number;
-  ragEvaluationPipelineCoverage: number | null;
-  ragEvaluationPipelineSampleSize: number;
-  ragEvaluationPipelineCaseSampleSizeMin: number | null;
-  ragEvaluationPipelineMissingSignals: MetricValidationRagEvaluationPipelineSignal[];
-  ragasNotebookCoverage: number | null;
-  ragasNotebookSampleSize: number;
-  ragasNotebookMissingSignals: MetricValidationRagasNotebookSignal[];
-  ragasNotebookQuestionCount: number | null;
-  mirageRagMetricCoverage: number | null;
-  mirageRagMetricSampleSize: number;
-  mirageRagMetricMissingSignals: MetricValidationMirageRagSignal[];
-  mirageRagMetricQaPairCount: number | null;
-  mirageRagMetricContextPoolCount: number | null;
-  legalCodeRagCoverage: number | null;
-  legalCodeRagSampleSize: number;
-  legalCodeRagMissingSignals: MetricValidationLegalCodeRagSignal[];
-  legalCodeRagQuestionCount: number | null;
-  guardbenchMetricCoverage: number | null;
-  guardbenchMetricSampleSize: number;
-  guardbenchMetricMissingSignals: MetricValidationGuardbenchSignal[];
-  businessWorkflowCoverage: number | null;
-  businessWorkflowSampleSize: number;
-  dataAgentAnalyticalCoverage: number | null;
-  dataAgentAnalyticalSampleSize: number;
-  embodiedAgentCoverage: number | null;
-  embodiedAgentSampleSize: number;
-  embodiedAgentMissingSignals: MetricValidationEmbodiedAgentSignal[];
-  evaluatorSuiteCoverage: number | null;
-  evaluatorSuiteSampleSize: number;
-  evaluatorSuiteMissingSignals: MetricValidationEvaluatorSuiteSignal[];
-  pentestBenchmarkCoverage: number | null;
-  pentestBenchmarkSampleSize: number;
-  pentestBenchmarkMissingSignals: MetricValidationPentestBenchmarkSignal[];
-  traceEvaluationCoverage: number | null;
-  traceEvaluationSampleSize: number;
-  traceEvaluationMissingSignals: MetricValidationTraceEvaluationSignal[];
-  livingEnvironmentCoverage: number | null;
-  livingEnvironmentSampleSize: number;
-  livingEnvironmentMissingSignals: MetricValidationLivingEnvironmentSignal[];
-  mobileAgentCoverage: number | null;
-  mobileAgentSampleSize: number;
-  mobileAgentMissingSignals: MetricValidationMobileAgentSignal[];
-  mobileAgentTrialCount: number | null;
-  personaAgentCoverage: number | null;
-  personaAgentSampleSize: number;
-  personaAgentMissingSignals: MetricValidationPersonaAgentSignal[];
-  scientificLiteratureCoverage: number | null;
-  scientificLiteratureSampleSize: number;
-  scientificLiteratureMissingSignals: MetricValidationScientificLiteratureSignal[];
-  scientificLiteratureTaskCount: number | null;
-  bioinformaticsAgentCoverage: number | null;
-  bioinformaticsAgentSampleSize: number;
-  bioinformaticsAgentMissingSignals: MetricValidationBioinformaticsAgentSignal[];
-  bioinformaticsAgentTaskCount: number | null;
-  mirageDrugRepositioningCoverage: number | null;
-  mirageDrugRepositioningSampleSize: number;
-  mirageDrugRepositioningMissingSignals: MetricValidationMirageDrugRepositioningSignal[];
-  mirageDrugRepositioningDrugCount: number | null;
-  mirageDrugRepositioningDiseaseCount: number | null;
-  mirageDrugRepositioningMappingCount: number | null;
-  mirageDrugRepositioningFeatureSetCount: number | null;
-  mirageDrugRepositioningSimilarityMatrixCount: number | null;
-  networkTroubleshootingCoverage: number | null;
-  networkTroubleshootingSampleSize: number;
-  networkTroubleshootingMissingSignals: MetricValidationNetworkTroubleshootingSignal[];
-  networkTroubleshootingIncidentCount: number | null;
-  inferenceOptimizationCoverage: number | null;
-  inferenceOptimizationSampleSize: number;
-  inferenceOptimizationMissingSignals: MetricValidationInferenceOptimizationSignal[];
-  inferenceOptimizationRunCount: number | null;
-  javaCodingAgentCoverage: number | null;
-  javaCodingAgentSampleSize: number;
-  javaCodingAgentMissingSignals: MetricValidationJavaCodingAgentSignal[];
-  javaCodingAgentTrialCount: number | null;
-  webEvalDatasetCoverage: number | null;
-  webEvalDatasetSampleSize: number;
-  webEvalDatasetMissingSignals: MetricValidationWebEvalDatasetSignal[];
-  webEvalDatasetQuestionCount: number | null;
-  webEvalDatasetDocumentCount: number | null;
-  parallelResearchSkillCoverage: number | null;
-  parallelResearchSkillSampleSize: number;
-  parallelResearchSkillMissingSignals: MetricValidationParallelResearchSkillSignal[];
-  parallelResearchSkillCitationCoverage0to1: number | null;
-  parallelResearchSkillSourcePolicyCoverage0to1: number | null;
-  parallelResearchSkillBatchTaskLimit: number | null;
-  parallelResearchSkillMonitoringCoverage0to1: number | null;
-  resumeRagEvaluatorCoverage: number | null;
-  resumeRagEvaluatorSampleSize: number;
-  resumeRagEvaluatorMissingSignals: MetricValidationResumeRagEvaluatorSignal[];
-  resumeRagEvaluatorParserCoverage0to1: number | null;
-  resumeRagEvaluatorEvaluationGrounding0to1: number | null;
-  chipBenchmarkCoverage: number | null;
-  chipBenchmarkSampleSize: number;
-  chipBenchmarkMissingSignals: MetricValidationChipBenchmarkSignal[];
-  chipBenchmarkResultRowCount: number | null;
-  chipBenchmarkThroughputCoverage0to1: number | null;
-  chipBenchmarkLatencyCoverage0to1: number | null;
-  chipBenchmarkCostCoverage0to1: number | null;
-  hermesBenchCoverage: number | null;
-  hermesBenchSampleSize: number;
-  hermesBenchMissingSignals: MetricValidationHermesBenchSignal[];
-  hermesBenchTaskCount: number | null;
-  hermesBenchAdapterCount: number | null;
-  hermesBenchBackendTestCount: number | null;
-  hermesBenchFrontendTestCount: number | null;
-  hermesBenchJudgeAgreement0to1: number | null;
-  hermesBenchRegressionPassRate0to1: number | null;
-  cooperBenchCoverage: number | null;
-  cooperBenchSampleSize: number;
-  cooperBenchMissingSignals: MetricValidationCooperBenchSignal[];
-  cooperBenchTaskCount: number | null;
-  cooperBenchFeatureCount: number | null;
-  cooperBenchAgentAdapterCount: number | null;
-  cooperBenchTestCount: number | null;
-  cooperBenchCooperationScore0to1: number | null;
-  cooperBenchConflictResolutionRate0to1: number | null;
-  cooperBenchRegressionPassRate0to1: number | null;
-  coderCupCoverage: number | null;
-  coderCupSampleSize: number;
-  coderCupMissingSignals: MetricValidationCoderCupSignal[];
-  coderCupPhaseCount: number | null;
-  coderCupTestPlanCount: number | null;
-  coderCupRunnerCount: number | null;
-  coderCupScoreLedgerCount: number | null;
-  coderCupLiveSurfaceCount: number | null;
-  coderCupInterRaterAgreement0to1: number | null;
-  coderCupTestRetestReliability0to1: number | null;
-  coderCupRegressionPassRate0to1: number | null;
-  agenticGraphRagCoverage: number | null;
-  agenticGraphRagSampleSize: number;
-  agenticGraphRagMissingSignals: MetricValidationAgenticGraphRagSignal[];
-  agenticGraphRagGraphNodeCount: number | null;
-  agenticGraphRagEvaluationMetricCount: number | null;
-  agenticGraphRagExperimentCount: number | null;
-  agenticGraphRagRetrievalGroundingScore0to1: number | null;
-  agenticGraphRagRegressionPassRate0to1: number | null;
-  agentScenarioTestCoverage: number | null;
-  agentScenarioTestSampleSize: number;
-  agentScenarioTestMissingSignals: MetricValidationAgentScenarioTestSignal[];
-  agentScenarioTestScenarioCount: number | null;
-  agentScenarioTestTurnCount: number | null;
-  agentScenarioTestToolCallCount: number | null;
-  openCodeLabCoverage: number | null;
-  openCodeLabSampleSize: number;
-  openCodeLabMissingSignals: MetricValidationOpenCodeLabSignal[];
-  openCodeLabRunCount: number | null;
-  openCodeLabForkAgreement0to1: number | null;
-  openCodeLabModelVariance0to1: number | null;
-  ccPluginEvalCoverage: number | null;
-  ccPluginEvalSampleSize: number;
-  ccPluginEvalMissingSignals: MetricValidationCcPluginEvalSignal[];
-  ccPluginEvalTriggerAccuracy0to1: number | null;
-  ccPluginEvalFalsePositiveRate0to1: number | null;
-  ccPluginEvalFalseNegativeRate0to1: number | null;
-  ccPluginEvalComponentCount: number | null;
-  ccPluginEvalScenarioCount: number | null;
-  realignSimulationCoverage: number | null;
-  realignSimulationSampleSize: number;
-  realignSimulationMissingSignals: MetricValidationRealignSimulationSignal[];
-  realignSimulationJudgeAgreement0to1: number | null;
-  realignSimulationRegressionPassRate0to1: number | null;
-  realignSimulationScenarioCount: number | null;
-  realignSimulationEvaluatorCount: number | null;
-  realignSimulationRepeatCount: number | null;
-  academiClawCoverage: number | null;
-  academiClawSampleSize: number;
-  academiClawMissingSignals: MetricValidationAcademiClawSignal[];
-  academiClawTaskCount: number | null;
-  academiClawLanguageCount: number | null;
-  academiClawRubricCount: number | null;
-  academiClawTraceCount: number | null;
-  academiClawMetaEvalCount: number | null;
-  academiClawModelCount: number | null;
-  academiClawRegressionPassRate0to1: number | null;
-  ragChunkingTechniqueCoverage: number | null;
-  ragChunkingTechniqueSampleSize: number;
-  ragChunkingTechniqueMissingSignals: MetricValidationRagChunkingTechniqueSignal[];
-  ragChunkingTechniquePolicyDocumentCount: number | null;
-  ragChunkingTechniqueNotebookCount: number | null;
-  ragChunkingTechniqueChunkingStrategyCount: number | null;
-  ragChunkingTechniqueEvaluationQuestionCount: number | null;
-  ragChunkingTechniqueMetricCount: number | null;
-  ragChunkingTechniqueRegressionPassRate0to1: number | null;
-  kubernetesOperationalAgentCoverage: number | null;
-  kubernetesOperationalAgentSampleSize: number;
-  kubernetesOperationalAgentMissingSignals: MetricValidationKubernetesOperationalAgentSignal[];
-  kubernetesOperationalAgentToolCategoryCount: number | null;
-  kubernetesOperationalAgentDiagnosticCapabilityCount: number | null;
-  kubernetesOperationalAgentResourceMetricCount: number | null;
-  kubernetesOperationalAgentLogAnalysisCount: number | null;
-  kubernetesOperationalAgentRegressionPassRate0to1: number | null;
-  secureVibeBenchCoverage: number | null;
-  secureVibeBenchSampleSize: number;
-  secureVibeBenchMissingSignals: MetricValidationSecureVibeBenchSignal[];
-  secureVibeBenchAgentAdapterCount: number | null;
-  secureVibeBenchScenarioCount: number | null;
-  secureVibeBenchTestScriptCount: number | null;
-  secureVibeBenchRegressionPassRate0to1: number | null;
-  ravigBenchCoverage: number | null;
-  ravigBenchSampleSize: number;
-  ravigBenchMissingSignals: MetricValidationRavigBenchSignal[];
-  ravigBenchDatasetCaseCount: number | null;
-  ravigBenchVisualDesignCheckCount: number | null;
-  ravigBenchEvaluatorCount: number | null;
-  ravigBenchValidationPassRate0to1: number | null;
-  humanStudyBenchCoverage: number | null;
-  humanStudyBenchSampleSize: number;
-  humanStudyBenchMissingSignals: MetricValidationHumanStudyBenchSignal[];
-  humanStudyBenchStudyCount: number | null;
-  humanStudyBenchParticipantCount: number | null;
-  humanStudyBenchResponseCount: number | null;
-  humanStudyBenchEvaluatorCount: number | null;
-  humanStudyBenchInterRaterAgreement0to1: number | null;
-  humanStudyBenchTestRetestReliability0to1: number | null;
-  humanStudyBenchValidationPassRate0to1: number | null;
-  legacyBenchCoverage: number | null;
-  legacyBenchSampleSize: number;
-  legacyBenchMissingSignals: MetricValidationLegacyBenchSignal[];
-  legacyBenchTaskCount: number | null;
-  legacyBenchLanguageCount: number | null;
-  legacyBenchEnvironmentCount: number | null;
-  legacyBenchTestOracleCount: number | null;
-  legacyBenchEvaluatorCount: number | null;
-  legacyBenchRegressionPassRate0to1: number | null;
-  legacyBenchReplayPassRate0to1: number | null;
-  subtleMemoryCoverage: number | null;
-  subtleMemorySampleSize: number;
-  subtleMemoryMissingSignals: MetricValidationSubtleMemorySignal[];
-  subtleMemoryPersonaCount: number | null;
-  subtleMemoryBenchInstanceCount: number | null;
-  subtleMemoryHistoryCount: number | null;
-  subtleMemoryMemoryVariantSetCount: number | null;
-  subtleMemoryRelationTypeCount: number | null;
-  subtleMemoryEvaluationStageCount: number | null;
-  subtleMemoryAdapterCount: number | null;
-  subtleMemoryJudgeAgreement0to1: number | null;
-  subtleMemoryValidationPassRate0to1: number | null;
-  thresholds: MetricValidationThresholdPolicy;
-}): string[] {
+function warningsForRow(params: MetricRowWarningsInput): string[] {
   const warnings: string[] = [];
   if (params.sampleSize < params.thresholds.minSampleSize) {
     warnings.push(`sample size ${params.sampleSize} below minimum ${params.thresholds.minSampleSize}`);
@@ -13119,846 +12382,7 @@ function stabilityForMetric(params: {
   return computeScoreStability(observations).stabilityIndex;
 }
 
-function buildRow(params: {
-  metricId: string;
-  owner: string;
-  agentId: string;
-  timestamp: number;
-  values: number[];
-  questionScores: QuestionScore[];
-  constructValidity: number;
-  interRaterAgreement: number | null;
-  counterfactualResponsiveness: number | null;
-  counterfactualSampleSize: number;
-  counterfactualEvidenceRefs: string[];
-  validationFacetCoverage: number | null;
-  validationFacetSampleSize: number;
-  validationFacetEvidenceRefs: string[];
-  confounderControlCoverage: number | null;
-  confounderControlSampleSize: number;
-  confounderControlEvidenceRefs: string[];
-  outcomeAlignment: number | null;
-  outcomeAlignmentSampleSize: number;
-  outcomeAlignmentEvidenceRefs: string[];
-  processEvidenceCoverage: number | null;
-  processEvidenceSampleSize: number;
-  processEvidenceRefs: string[];
-  safetyUtilityCoverage: number | null;
-  safetyUtilitySampleSize: number;
-  safetyUtilityEvidenceRefs: string[];
-  modalityTransformationCoverage: number | null;
-  modalityTransformationSampleSize: number;
-  modalityTransformationEvidenceRefs: string[];
-  lifecycleObservabilityCoverage: number | null;
-  lifecycleObservabilitySampleSize: number;
-  lifecycleObservabilityEvidenceRefs: string[];
-  rankingStabilityCoverage: number | null;
-  rankingStabilitySampleSize: number;
-  rankingStabilityEvidenceRefs: string[];
-  toolSandboxCoverage: number | null;
-  toolSandboxSampleSize: number;
-  toolSandboxEvidenceRefs: string[];
-  continualLearningCoverage: number | null;
-  continualLearningSampleSize: number;
-  continualLearningEvidenceRefs: string[];
-  continualLearningRunCount: number | null;
-  continualLearningMissingSignals: MetricValidationContinualLearningSignal[];
-  continualLearningMemoryArtifactHashes: string[];
-  continualLearningRunSummaryArtifactHashes: string[];
-  continualLearningGameplayLogArtifactHashes: string[];
-  continualLearningMetricNames: string[];
-  strategicInteractionCoverage: number | null;
-  strategicInteractionSampleSize: number;
-  strategicInteractionEvidenceRefs: string[];
-  architectureRealityCoverage: number | null;
-  architectureRealitySampleSize: number;
-  architectureRealityEvidenceRefs: string[];
-  architectureRealityStressScenarioCount: number | null;
-  architectureRealityNetworkScenarioCount: number | null;
-  architectureRealityEnsemblePatternCount: number | null;
-  architectureRealityMissingSignals: MetricValidationArchitectureRealitySignal[];
-  ragPipelineCoverage: number | null;
-  ragPipelineSampleSize: number;
-  ragPipelineEvidenceRefs: string[];
-  ragEvaluationPipelineCoverage: number | null;
-  ragEvaluationPipelineSampleSize: number;
-  ragEvaluationPipelineEvidenceRefs: string[];
-  ragEvaluationPipelineCaseSampleSizeMin: number | null;
-  ragEvaluationPipelineMissingSignals: MetricValidationRagEvaluationPipelineSignal[];
-  ragEvaluationPipelineMetricOwners: string[];
-  ragEvaluationPipelineReportArtifactHashes: string[];
-  ragasNotebookCoverage: number | null;
-  ragasNotebookSampleSize: number;
-  ragasNotebookEvidenceRefs: string[];
-  ragasNotebookMissingSignals: MetricValidationRagasNotebookSignal[];
-  ragasNotebookMetricNames: string[];
-  ragasNotebookQuestionCount: number | null;
-  ragasNotebookReportArtifactHashes: string[];
-  mirageRagMetricCoverage: number | null;
-  mirageRagMetricSampleSize: number;
-  mirageRagMetricEvidenceRefs: string[];
-  mirageRagMetricMissingSignals: MetricValidationMirageRagSignal[];
-  mirageRagMetricDatasetIds: string[];
-  mirageRagMetricEvaluationModes: Array<"base" | "oracle" | "mixed" | "custom">;
-  mirageRagMetricRetrieverIds: string[];
-  mirageRagMetricModelIds: string[];
-  mirageRagMetricNames: string[];
-  mirageRagMetricQaPairCount: number | null;
-  mirageRagMetricContextPoolCount: number | null;
-  mirageRagMetricReportArtifactHashes: string[];
-  legalCodeRagCoverage: number | null;
-  legalCodeRagSampleSize: number;
-  legalCodeRagEvidenceRefs: string[];
-  legalCodeRagMissingSignals: MetricValidationLegalCodeRagSignal[];
-  legalCodeRagLegalCodeIds: string[];
-  legalCodeRagJurisdictionIds: string[];
-  legalCodeRagRetrievalTechniqueIds: string[];
-  legalCodeRagVectorStoreIds: string[];
-  legalCodeRagEmbeddingModelIds: string[];
-  legalCodeRagEvaluationDatasetIds: string[];
-  legalCodeRagMetricNames: string[];
-  legalCodeRagQuestionCount: number | null;
-  legalCodeRagMetricOwners: string[];
-  legalCodeRagReportArtifactHashes: string[];
-  guardbenchMetricCoverage: number | null;
-  guardbenchMetricSampleSize: number;
-  guardbenchMetricEvidenceRefs: string[];
-  guardbenchMetricMissingSignals: MetricValidationGuardbenchSignal[];
-  guardbenchDatasetIds: string[];
-  guardbenchLanguageIds: string[];
-  guardbenchModelIds: string[];
-  guardbenchThresholdIds: string[];
-  guardbenchMetricNames: string[];
-  guardbenchExportFormats: string[];
-  guardbenchReportArtifactHashes: string[];
-  businessWorkflowCoverage: number | null;
-  businessWorkflowSampleSize: number;
-  businessWorkflowEvidenceRefs: string[];
-  dataAgentAnalyticalCoverage: number | null;
-  dataAgentAnalyticalSampleSize: number;
-  dataAgentAnalyticalEvidenceRefs: string[];
-  embodiedAgentCoverage: number | null;
-  embodiedAgentSampleSize: number;
-  embodiedAgentEvidenceRefs: string[];
-  embodiedAgentMissingSignals: MetricValidationEmbodiedAgentSignal[];
-  embodiedAgentTaskTypes: string[];
-  embodiedAgentBaselineIds: string[];
-  embodiedAgentReportArtifactHashes: string[];
-  evaluatorSuiteCoverage: number | null;
-  evaluatorSuiteSampleSize: number;
-  evaluatorSuiteEvidenceRefs: string[];
-  evaluatorSuiteMissingSignals: MetricValidationEvaluatorSuiteSignal[];
-  evaluatorSuiteAssertionTypes: string[];
-  evaluatorSuiteReporterFormats: string[];
-  evaluatorSuiteJudgeNames: string[];
-  evaluatorSuiteReportArtifactHashes: string[];
-  pentestBenchmarkCoverage: number | null;
-  pentestBenchmarkSampleSize: number;
-  pentestBenchmarkEvidenceRefs: string[];
-  pentestBenchmarkMissingSignals: MetricValidationPentestBenchmarkSignal[];
-  pentestBenchmarkLanguageStacks: string[];
-  pentestBenchmarkVulnerabilityClasses: string[];
-  pentestBenchmarkDifficultyLevels: string[];
-  pentestBenchmarkSuiteIds: string[];
-  pentestBenchmarkMetricNames: string[];
-  pentestBenchmarkReportArtifactHashes: string[];
-  traceEvaluationCoverage: number | null;
-  traceEvaluationSampleSize: number;
-  traceEvaluationEvidenceRefs: string[];
-  traceEvaluationMissingSignals: MetricValidationTraceEvaluationSignal[];
-  traceEvaluationModelIds: string[];
-  traceEvaluationAgentParameterKeys: string[];
-  traceEvaluationToolNames: string[];
-  traceEvaluationMetricNames: string[];
-  traceEvaluationCaseSuiteIds: string[];
-  traceEvaluationBackendModes: string[];
-  traceEvaluationRunPermutationCount: number | null;
-  traceEvaluationReportArtifactHashes: string[];
-  livingEnvironmentCoverage: number | null;
-  livingEnvironmentSampleSize: number;
-  livingEnvironmentEvidenceRefs: string[];
-  livingEnvironmentMissingSignals: MetricValidationLivingEnvironmentSignal[];
-  livingEnvironmentCapabilityNames: string[];
-  livingEnvironmentSandboxProviders: string[];
-  livingEnvironmentAgentAdapters: string[];
-  livingEnvironmentMetricNames: string[];
-  livingEnvironmentTrialCount: number | null;
-  livingEnvironmentReportArtifactHashes: string[];
-  mobileAgentCoverage: number | null;
-  mobileAgentSampleSize: number;
-  mobileAgentEvidenceRefs: string[];
-  mobileAgentMissingSignals: MetricValidationMobileAgentSignal[];
-  mobileAgentBenchmarkIds: string[];
-  mobileAgentEnvironmentIds: string[];
-  mobileAgentAppIds: string[];
-  mobileAgentApiCatalogIds: string[];
-  mobileAgentUiTraceIds: string[];
-  mobileAgentTaskSetIds: string[];
-  mobileAgentTaskComplexityGroups: string[];
-  mobileAgentCheckpointMetricNames: string[];
-  mobileAgentLicenseBoundaryRefs: string[];
-  mobileAgentTrialCount: number | null;
-  mobileAgentReportArtifactHashes: string[];
-  personaAgentCoverage: number | null;
-  personaAgentSampleSize: number;
-  personaAgentEvidenceRefs: string[];
-  personaAgentMissingSignals: MetricValidationPersonaAgentSignal[];
-  personaAgentPersonaIds: string[];
-  personaAgentEnvironmentIds: string[];
-  personaAgentQuestionSetIds: string[];
-  personaAgentModelIds: string[];
-  personaAgentProviderIds: string[];
-  personaAgentMetricNames: string[];
-  personaAgentQuestionCount: number | null;
-  personaAgentReportArtifactHashes: string[];
-  scientificLiteratureCoverage: number | null;
-  scientificLiteratureSampleSize: number;
-  scientificLiteratureEvidenceRefs: string[];
-  scientificLiteratureMissingSignals: MetricValidationScientificLiteratureSignal[];
-  scientificLiteratureBenchmarkIds: string[];
-  scientificLiteratureTaskTypes: string[];
-  scientificLiteratureDatasetIds: string[];
-  scientificLiteratureSearchBackendIds: string[];
-  scientificLiteratureToolIds: string[];
-  scientificLiteratureMetricNames: string[];
-  scientificLiteratureTaskCount: number | null;
-  scientificLiteratureReportArtifactHashes: string[];
-  bioinformaticsAgentCoverage: number | null;
-  bioinformaticsAgentSampleSize: number;
-  bioinformaticsAgentEvidenceRefs: string[];
-  bioinformaticsAgentMissingSignals: MetricValidationBioinformaticsAgentSignal[];
-  bioinformaticsAgentBenchmarkIds: string[];
-  bioinformaticsAgentTaskTypes: string[];
-  bioinformaticsAgentDatasetIds: string[];
-  bioinformaticsAgentWorkflowIds: string[];
-  bioinformaticsAgentToolNames: string[];
-  bioinformaticsAgentMetricNames: string[];
-  bioinformaticsAgentPerturbationIds: string[];
-  bioinformaticsAgentPrivacyBoundaryRefs: string[];
-  bioinformaticsAgentTaskCount: number | null;
-  bioinformaticsAgentReportArtifactHashes: string[];
-  mirageDrugRepositioningCoverage: number | null;
-  mirageDrugRepositioningSampleSize: number;
-  mirageDrugRepositioningEvidenceRefs: string[];
-  mirageDrugRepositioningMissingSignals: MetricValidationMirageDrugRepositioningSignal[];
-  mirageDrugRepositioningBenchmarkIds: string[];
-  mirageDrugRepositioningDatasetIds: string[];
-  mirageDrugRepositioningSplitIds: string[];
-  mirageDrugRepositioningMappingIds: string[];
-  mirageDrugRepositioningFeatureSetIds: string[];
-  mirageDrugRepositioningSimilarityMatrixIds: string[];
-  mirageDrugRepositioningNegativeSamplingIds: string[];
-  mirageDrugRepositioningClassifierConfigIds: string[];
-  mirageDrugRepositioningFeatureSelectionReportIds: string[];
-  mirageDrugRepositioningScoreCalculationIds: string[];
-  mirageDrugRepositioningCaseStudyIds: string[];
-  mirageDrugRepositioningMetricNames: string[];
-  mirageDrugRepositioningDrugCount: number | null;
-  mirageDrugRepositioningDiseaseCount: number | null;
-  mirageDrugRepositioningMappingCount: number | null;
-  mirageDrugRepositioningFeatureSetCount: number | null;
-  mirageDrugRepositioningSimilarityMatrixCount: number | null;
-  mirageDrugRepositioningReportArtifactHashes: string[];
-  networkTroubleshootingCoverage: number | null;
-  networkTroubleshootingSampleSize: number;
-  networkTroubleshootingEvidenceRefs: string[];
-  networkTroubleshootingMissingSignals: MetricValidationNetworkTroubleshootingSignal[];
-  networkTroubleshootingBenchmarkIds: string[];
-  networkTroubleshootingScenarioIds: string[];
-  networkTroubleshootingTopologyTiers: string[];
-  networkTroubleshootingIssueTypes: string[];
-  networkTroubleshootingAgentIds: string[];
-  networkTroubleshootingToolNames: string[];
-  networkTroubleshootingMetricNames: string[];
-  networkTroubleshootingIncidentCount: number | null;
-  networkTroubleshootingReportArtifactHashes: string[];
-  inferenceOptimizationCoverage: number | null;
-  inferenceOptimizationSampleSize: number;
-  inferenceOptimizationEvidenceRefs: string[];
-  inferenceOptimizationMissingSignals: MetricValidationInferenceOptimizationSignal[];
-  inferenceOptimizationBenchmarkIds: string[];
-  inferenceOptimizationScenarioIds: string[];
-  inferenceOptimizationHardwareProfileIds: string[];
-  inferenceOptimizationBackendIds: string[];
-  inferenceOptimizationSearchSpaceIds: string[];
-  inferenceOptimizationGateIds: string[];
-  inferenceOptimizationAgentIds: string[];
-  inferenceOptimizationMetricNames: string[];
-  inferenceOptimizationRunCount: number | null;
-  inferenceOptimizationReportArtifactHashes: string[];
-  javaCodingAgentCoverage: number | null;
-  javaCodingAgentSampleSize: number;
-  javaCodingAgentEvidenceRefs: string[];
-  javaCodingAgentMissingSignals: MetricValidationJavaCodingAgentSignal[];
-  javaCodingAgentBenchmarkIds: string[];
-  javaCodingAgentTaskIds: string[];
-  javaCodingAgentTaskTypes: string[];
-  javaCodingAgentJavaProjectIds: string[];
-  javaCodingAgentSandboxIds: string[];
-  javaCodingAgentAgentConfigIds: string[];
-  javaCodingAgentJudgeTierIds: string[];
-  javaCodingAgentCheckTypes: string[];
-  javaCodingAgentMetricNames: string[];
-  javaCodingAgentTrialCount: number | null;
-  javaCodingAgentReportArtifactHashes: string[];
-  webEvalDatasetCoverage: number | null;
-  webEvalDatasetSampleSize: number;
-  webEvalDatasetEvidenceRefs: string[];
-  webEvalDatasetMissingSignals: MetricValidationWebEvalDatasetSignal[];
-  webEvalDatasetBenchmarkIds: string[];
-  webEvalDatasetRepositoryRefs: string[];
-  webEvalDatasetSubjectIds: string[];
-  webEvalDatasetQuerySetIds: string[];
-  webEvalDatasetSearchProviderIds: string[];
-  webEvalDatasetDocumentSetIds: string[];
-  webEvalDatasetFilterPolicyIds: string[];
-  webEvalDatasetQaGenerationIds: string[];
-  webEvalDatasetReferenceAnswerSetIds: string[];
-  webEvalDatasetExportIds: string[];
-  webEvalDatasetOutputTargets: string[];
-  webEvalDatasetMetricNames: string[];
-  webEvalDatasetQuestionCount: number | null;
-  webEvalDatasetDocumentCount: number | null;
-  webEvalDatasetProviderDiversityCount: number | null;
-  webEvalDatasetFreshnessHours: number | null;
-  webEvalDatasetSourceCoverage: number | null;
-  webEvalDatasetAnswerGrounding: number | null;
-  webEvalDatasetReportArtifactHashes: string[];
-  parallelResearchSkillCoverage: number | null;
-  parallelResearchSkillSampleSize: number;
-  parallelResearchSkillEvidenceRefs: string[];
-  parallelResearchSkillMissingSignals: MetricValidationParallelResearchSkillSignal[];
-  parallelResearchSkillRepositoryRefs: string[];
-  parallelResearchSkillLicenseRefs: string[];
-  parallelResearchSkillManifestIds: string[];
-  parallelResearchSkillApiSurfaceIds: string[];
-  parallelResearchSkillSearchModeIds: string[];
-  parallelResearchSkillProcessorTiers: string[];
-  parallelResearchSkillSecurityBoundaryRefs: string[];
-  parallelResearchSkillDependencyLockIds: string[];
-  parallelResearchSkillMetricNames: string[];
-  parallelResearchSkillCitationCoverage0to1: number | null;
-  parallelResearchSkillSourcePolicyCoverage0to1: number | null;
-  parallelResearchSkillBatchTaskLimit: number | null;
-  parallelResearchSkillMonitoringCoverage0to1: number | null;
-  parallelResearchSkillReportArtifactHashes: string[];
-  resumeRagEvaluatorCoverage: number | null;
-  resumeRagEvaluatorSampleSize: number;
-  resumeRagEvaluatorEvidenceRefs: string[];
-  resumeRagEvaluatorMissingSignals: MetricValidationResumeRagEvaluatorSignal[];
-  resumeRagEvaluatorRepositoryRefs: string[];
-  resumeRagEvaluatorLicenseRefs: string[];
-  resumeRagEvaluatorResumeInputFormats: string[];
-  resumeRagEvaluatorRagStrategyIds: string[];
-  resumeRagEvaluatorQueryExpansionIds: string[];
-  resumeRagEvaluatorRetrievalKMin: number | null;
-  resumeRagEvaluatorRetrievalKMax: number | null;
-  resumeRagEvaluatorVectorStoreIds: string[];
-  resumeRagEvaluatorOllamaModelIds: string[];
-  resumeRagEvaluatorEmbeddingModelIds: string[];
-  resumeRagEvaluatorEvaluationEndpointIds: string[];
-  resumeRagEvaluatorCandidateRatingScale: string | null;
-  resumeRagEvaluatorBatchModeIds: string[];
-  resumeRagEvaluatorPrivacyBoundaryRefs: string[];
-  resumeRagEvaluatorDependencyLockIds: string[];
-  resumeRagEvaluatorMetricNames: string[];
-  resumeRagEvaluatorParserCoverage0to1: number | null;
-  resumeRagEvaluatorEvaluationGrounding0to1: number | null;
-  resumeRagEvaluatorReportArtifactHashes: string[];
-  chipBenchmarkCoverage: number | null;
-  chipBenchmarkSampleSize: number;
-  chipBenchmarkEvidenceRefs: string[];
-  chipBenchmarkMissingSignals: MetricValidationChipBenchmarkSignal[];
-  chipBenchmarkRepositoryRefs: string[];
-  chipBenchmarkLicenseRefs: string[];
-  chipBenchmarkBenchmarkIds: string[];
-  chipBenchmarkHardwareProfileIds: string[];
-  chipBenchmarkModelFamilyIds: string[];
-  chipBenchmarkPrecisionModeIds: string[];
-  chipBenchmarkEnvironmentIds: string[];
-  chipBenchmarkRunnerScriptIds: string[];
-  chipBenchmarkServingBackendIds: string[];
-  chipBenchmarkDatasetIds: string[];
-  chipBenchmarkFrontendDatasetIds: string[];
-  chipBenchmarkPricingRefs: string[];
-  chipBenchmarkMetricNames: string[];
-  chipBenchmarkRegressionThresholdIds: string[];
-  chipBenchmarkResultRowCount: number | null;
-  chipBenchmarkThroughputCoverage0to1: number | null;
-  chipBenchmarkLatencyCoverage0to1: number | null;
-  chipBenchmarkCostCoverage0to1: number | null;
-  chipBenchmarkReportArtifactHashes: string[];
-  hermesBenchCoverage: number | null;
-  hermesBenchSampleSize: number;
-  hermesBenchEvidenceRefs: string[];
-  hermesBenchMissingSignals: MetricValidationHermesBenchSignal[];
-  hermesBenchRepositoryRefs: string[];
-  hermesBenchLicenseRefs: string[];
-  hermesBenchBranchRefs: string[];
-  hermesBenchCommitRefs: string[];
-  hermesBenchTreeRefs: string[];
-  hermesBenchReadmeBlobRefs: string[];
-  hermesBenchBuildSpecRefs: string[];
-  hermesBenchBackendTreeRefs: string[];
-  hermesBenchFrontendTreeRefs: string[];
-  hermesBenchRunnerIds: string[];
-  hermesBenchJudgeIds: string[];
-  hermesBenchTaskRegistryIds: string[];
-  hermesBenchServerConfigIds: string[];
-  hermesBenchAdapterIds: string[];
-  hermesBenchResultSchemaIds: string[];
-  hermesBenchFrontendComponentIds: string[];
-  hermesBenchBackendTestIds: string[];
-  hermesBenchFrontendTestIds: string[];
-  hermesBenchDockerRuntimeIds: string[];
-  hermesBenchMetricNames: string[];
-  hermesBenchTaskCount: number | null;
-  hermesBenchAdapterCount: number | null;
-  hermesBenchBackendTestCount: number | null;
-  hermesBenchFrontendTestCount: number | null;
-  hermesBenchJudgeAgreement0to1: number | null;
-  hermesBenchRegressionPassRate0to1: number | null;
-  hermesBenchReportArtifactHashes: string[];
-  cooperBenchCoverage: number | null;
-  cooperBenchSampleSize: number;
-  cooperBenchEvidenceRefs: string[];
-  cooperBenchMissingSignals: MetricValidationCooperBenchSignal[];
-  cooperBenchRepositoryRefs: string[];
-  cooperBenchLicenseRefs: string[];
-  cooperBenchReleaseRefs: string[];
-  cooperBenchBranchRefs: string[];
-  cooperBenchCommitRefs: string[];
-  cooperBenchTreeRefs: string[];
-  cooperBenchReadmeBlobRefs: string[];
-  cooperBenchChangelogRefs: string[];
-  cooperBenchDatasetTreeRefs: string[];
-  cooperBenchDatasetReadmeRefs: string[];
-  cooperBenchRunnerIds: string[];
-  cooperBenchEvalBackendIds: string[];
-  cooperBenchTeamHarnessIds: string[];
-  cooperBenchAgentAdapterIds: string[];
-  cooperBenchCiWorkflowIds: string[];
-  cooperBenchPackageLockRefs: string[];
-  cooperBenchReportPublicationRefs: string[];
-  cooperBenchMetricNames: string[];
-  cooperBenchTaskCount: number | null;
-  cooperBenchFeatureCount: number | null;
-  cooperBenchAgentAdapterCount: number | null;
-  cooperBenchTestCount: number | null;
-  cooperBenchCooperationScore0to1: number | null;
-  cooperBenchConflictResolutionRate0to1: number | null;
-  cooperBenchRegressionPassRate0to1: number | null;
-  cooperBenchReportArtifactHashes: string[];
-  coderCupCoverage: number | null;
-  coderCupSampleSize: number;
-  coderCupEvidenceRefs: string[];
-  coderCupMissingSignals: MetricValidationCoderCupSignal[];
-  coderCupRepositoryRefs: string[];
-  coderCupLicenseRefs: string[];
-  coderCupHomepageRefs: string[];
-  coderCupBranchRefs: string[];
-  coderCupCommitRefs: string[];
-  coderCupTreeRefs: string[];
-  coderCupReadmeBlobRefs: string[];
-  coderCupContributingRefs: string[];
-  coderCupCiWorkflowIds: string[];
-  coderCupPackageManifestRefs: string[];
-  coderCupPackageLockRefs: string[];
-  coderCupTaskSpecRefs: string[];
-  coderCupTestSuiteRefs: string[];
-  coderCupSuiteIndexRefs: string[];
-  coderCupRunnerIds: string[];
-  coderCupRunnerContractRefs: string[];
-  coderCupScoreLedgerRefs: string[];
-  coderCupLiveArtifactRefs: string[];
-  coderCupMethodologyRefs: string[];
-  coderCupReferenceRefs: string[];
-  coderCupCostMethodologyRefs: string[];
-  coderCupPublicFixtureRefs: string[];
-  coderCupMetricNames: string[];
-  coderCupPhaseCount: number | null;
-  coderCupTestPlanCount: number | null;
-  coderCupRunnerCount: number | null;
-  coderCupScoreLedgerCount: number | null;
-  coderCupLiveSurfaceCount: number | null;
-  coderCupInterRaterAgreement0to1: number | null;
-  coderCupTestRetestReliability0to1: number | null;
-  coderCupRegressionPassRate0to1: number | null;
-  coderCupReportArtifactHashes: string[];
-  agenticGraphRagCoverage: number | null;
-  agenticGraphRagSampleSize: number;
-  agenticGraphRagEvidenceRefs: string[];
-  agenticGraphRagMissingSignals: MetricValidationAgenticGraphRagSignal[];
-  agenticGraphRagRepositoryRefs: string[];
-  agenticGraphRagLicenseRefs: string[];
-  agenticGraphRagBranchRefs: string[];
-  agenticGraphRagCommitRefs: string[];
-  agenticGraphRagTreeRefs: string[];
-  agenticGraphRagReadmeBlobRefs: string[];
-  agenticGraphRagGraphWorkflowIds: string[];
-  agenticGraphRagOrchestratorIds: string[];
-  agenticGraphRagRagPipelineIds: string[];
-  agenticGraphRagDatabaseIds: string[];
-  agenticGraphRagVectorStoreIds: string[];
-  agenticGraphRagEvaluationIds: string[];
-  agenticGraphRagExperimentTrackerIds: string[];
-  agenticGraphRagUiComponentIds: string[];
-  agenticGraphRagDependencyLockRefs: string[];
-  agenticGraphRagMetricNames: string[];
-  agenticGraphRagGraphNodeCount: number | null;
-  agenticGraphRagGraphEdgeCount: number | null;
-  agenticGraphRagEvaluationMetricCount: number | null;
-  agenticGraphRagExperimentCount: number | null;
-  agenticGraphRagRetrievalGroundingScore0to1: number | null;
-  agenticGraphRagRegressionPassRate0to1: number | null;
-  agenticGraphRagReportArtifactHashes: string[];
-  agentScenarioTestCoverage: number | null;
-  agentScenarioTestSampleSize: number;
-  agentScenarioTestEvidenceRefs: string[];
-  agentScenarioTestMissingSignals: MetricValidationAgentScenarioTestSignal[];
-  agentScenarioTestBenchmarkIds: string[];
-  agentScenarioTestRepositoryRefs: string[];
-  agentScenarioTestLicenseRefs: string[];
-  agentScenarioTestScenarioIds: string[];
-  agentScenarioTestPersonaIds: string[];
-  agentScenarioTestGoalIds: string[];
-  agentScenarioTestKnowledgeSetIds: string[];
-  agentScenarioTestToolMockIds: string[];
-  agentScenarioTestTrajectoryAssertionIds: string[];
-  agentScenarioTestJudgeIds: string[];
-  agentScenarioTestMetricNames: string[];
-  agentScenarioTestReporterFormats: string[];
-  agentScenarioTestAgentIds: string[];
-  agentScenarioTestComparisonIds: string[];
-  agentScenarioTestScenarioCount: number | null;
-  agentScenarioTestTurnCount: number | null;
-  agentScenarioTestToolCallCount: number | null;
-  agentScenarioTestReportArtifactHashes: string[];
-  openCodeLabCoverage: number | null;
-  openCodeLabSampleSize: number;
-  openCodeLabEvidenceRefs: string[];
-  openCodeLabMissingSignals: MetricValidationOpenCodeLabSignal[];
-  openCodeLabBenchmarkIds: string[];
-  openCodeLabRepositoryRefs: string[];
-  openCodeLabAgentContextIds: string[];
-  openCodeLabPromptVariantIds: string[];
-  openCodeLabToolDescriptionIds: string[];
-  openCodeLabPolicyIds: string[];
-  openCodeLabRunTraceIds: string[];
-  openCodeLabForkIds: string[];
-  openCodeLabModelIds: string[];
-  openCodeLabGroundTruthIds: string[];
-  openCodeLabMetricNames: string[];
-  openCodeLabReporterFormats: string[];
-  openCodeLabResultArtifactIds: string[];
-  openCodeLabRunCount: number | null;
-  openCodeLabForkAgreement0to1: number | null;
-  openCodeLabModelVariance0to1: number | null;
-  openCodeLabReportArtifactHashes: string[];
-  ccPluginEvalCoverage: number | null;
-  ccPluginEvalSampleSize: number;
-  ccPluginEvalEvidenceRefs: string[];
-  ccPluginEvalMissingSignals: MetricValidationCcPluginEvalSignal[];
-  ccPluginEvalRepositoryRefs: string[];
-  ccPluginEvalLicenseRefs: string[];
-  ccPluginEvalPluginManifestIds: string[];
-  ccPluginEvalComponentTypes: MetricValidationCcPluginEvalComponentType[];
-  ccPluginEvalTriggerManifestIds: string[];
-  ccPluginEvalScenarioManifestIds: string[];
-  ccPluginEvalScenarioTypes: MetricValidationCcPluginEvalScenarioType[];
-  ccPluginEvalTranscriptIds: string[];
-  ccPluginEvalDetectionReportIds: string[];
-  ccPluginEvalDetectionModes: MetricValidationCcPluginEvalDetectionMode[];
-  ccPluginEvalJudgeIds: string[];
-  ccPluginEvalCalibrationIds: string[];
-  ccPluginEvalConflictReportIds: string[];
-  ccPluginEvalCheckpointStateIds: string[];
-  ccPluginEvalCostEstimateIds: string[];
-  ccPluginEvalReporterFormats: string[];
-  ccPluginEvalResultArtifactIds: string[];
-  ccPluginEvalMetricNames: string[];
-  ccPluginEvalTriggerAccuracy0to1: number | null;
-  ccPluginEvalFalsePositiveRate0to1: number | null;
-  ccPluginEvalFalseNegativeRate0to1: number | null;
-  ccPluginEvalComponentCount: number | null;
-  ccPluginEvalScenarioCount: number | null;
-  ccPluginEvalReportArtifactHashes: string[];
-  realignSimulationCoverage: number | null;
-  realignSimulationSampleSize: number;
-  realignSimulationEvidenceRefs: string[];
-  realignSimulationMissingSignals: MetricValidationRealignSimulationSignal[];
-  realignSimulationRepositoryRefs: string[];
-  realignSimulationLicenseRefs: string[];
-  realignSimulationConfigIds: string[];
-  realignSimulationAppIds: string[];
-  realignSimulationDatasetIds: string[];
-  realignSimulationScenarioIds: string[];
-  realignSimulationPersonaIds: string[];
-  realignSimulationEvaluatorIds: string[];
-  realignSimulationTargetIds: string[];
-  realignSimulationRunTraceIds: string[];
-  realignSimulationRepeatedRunTraceIds: string[];
-  realignSimulationJudgeIds: string[];
-  realignSimulationCalibrationIds: string[];
-  realignSimulationStatisticsReportIds: string[];
-  realignSimulationCiReporterIds: string[];
-  realignSimulationReporterFormats: string[];
-  realignSimulationExperimentIds: string[];
-  realignSimulationResultArtifactIds: string[];
-  realignSimulationMetricNames: string[];
-  realignSimulationJudgeAgreement0to1: number | null;
-  realignSimulationRegressionPassRate0to1: number | null;
-  realignSimulationScenarioCount: number | null;
-  realignSimulationEvaluatorCount: number | null;
-  realignSimulationRepeatCount: number | null;
-  realignSimulationReportArtifactHashes: string[];
-  academiClawCoverage: number | null;
-  academiClawSampleSize: number;
-  academiClawEvidenceRefs: string[];
-  academiClawMissingSignals: MetricValidationAcademiClawSignal[];
-  academiClawRepositoryRefs: string[];
-  academiClawLicenseRefs: string[];
-  academiClawBranchRefs: string[];
-  academiClawCommitRefs: string[];
-  academiClawTreeRefs: string[];
-  academiClawReadmeBlobRefs: string[];
-  academiClawCitationRefs: string[];
-  academiClawTaskCorpusRefs: string[];
-  academiClawLanguageIds: string[];
-  academiClawWorkspaceQueryIds: string[];
-  academiClawDockerImageIds: string[];
-  academiClawRubricIds: string[];
-  academiClawEvalTaskRunnerIds: string[];
-  academiClawResultManifestIds: string[];
-  academiClawConversationTraceIds: string[];
-  academiClawMetaEvalIds: string[];
-  academiClawModelIds: string[];
-  academiClawMetricNames: string[];
-  academiClawCiReporterIds: string[];
-  academiClawReporterFormats: string[];
-  academiClawTaskCount: number | null;
-  academiClawLanguageCount: number | null;
-  academiClawRubricCount: number | null;
-  academiClawTraceCount: number | null;
-  academiClawMetaEvalCount: number | null;
-  academiClawModelCount: number | null;
-  academiClawRegressionPassRate0to1: number | null;
-  academiClawReportArtifactHashes: string[];
-  ragChunkingTechniqueCoverage: number | null;
-  ragChunkingTechniqueSampleSize: number;
-  ragChunkingTechniqueEvidenceRefs: string[];
-  ragChunkingTechniqueMissingSignals: MetricValidationRagChunkingTechniqueSignal[];
-  ragChunkingTechniqueRepositoryRefs: string[];
-  ragChunkingTechniqueLicenseRefs: string[];
-  ragChunkingTechniqueBranchRefs: string[];
-  ragChunkingTechniqueCommitRefs: string[];
-  ragChunkingTechniqueTreeRefs: string[];
-  ragChunkingTechniqueReadmeBlobRefs: string[];
-  ragChunkingTechniquePolicyCorpusRefs: string[];
-  ragChunkingTechniqueNotebookIds: string[];
-  ragChunkingTechniqueChunkingStrategyIds: string[];
-  ragChunkingTechniqueRetrievalPipelineIds: string[];
-  ragChunkingTechniqueEmbeddingVectorstoreIds: string[];
-  ragChunkingTechniqueEvaluationDatasetIds: string[];
-  ragChunkingTechniqueMetricNames: string[];
-  ragChunkingTechniqueCiReporterIds: string[];
-  ragChunkingTechniqueReporterFormats: string[];
-  ragChunkingTechniquePolicyDocumentCount: number | null;
-  ragChunkingTechniqueNotebookCount: number | null;
-  ragChunkingTechniqueChunkingStrategyCount: number | null;
-  ragChunkingTechniqueEvaluationQuestionCount: number | null;
-  ragChunkingTechniqueMetricCount: number | null;
-  ragChunkingTechniqueRegressionPassRate0to1: number | null;
-  ragChunkingTechniqueReportArtifactHashes: string[];
-  kubernetesOperationalAgentCoverage: number | null;
-  kubernetesOperationalAgentSampleSize: number;
-  kubernetesOperationalAgentEvidenceRefs: string[];
-  kubernetesOperationalAgentMissingSignals: MetricValidationKubernetesOperationalAgentSignal[];
-  kubernetesOperationalAgentRepositoryRefs: string[];
-  kubernetesOperationalAgentLicenseRefs: string[];
-  kubernetesOperationalAgentReleaseRefs: string[];
-  kubernetesOperationalAgentBranchRefs: string[];
-  kubernetesOperationalAgentCommitRefs: string[];
-  kubernetesOperationalAgentTreeRefs: string[];
-  kubernetesOperationalAgentReadmeBlobRefs: string[];
-  kubernetesOperationalAgentBuildWorkflowRefs: string[];
-  kubernetesOperationalAgentAgentModuleRefs: string[];
-  kubernetesOperationalAgentMcpServerModuleRefs: string[];
-  kubernetesOperationalAgentToolModuleRefs: string[];
-  kubernetesOperationalAgentToolCategoryIds: string[];
-  kubernetesOperationalAgentDiagnosticCapabilityIds: string[];
-  kubernetesOperationalAgentResourceMetricIds: string[];
-  kubernetesOperationalAgentLogAnalysisIds: string[];
-  kubernetesOperationalAgentMetricNames: string[];
-  kubernetesOperationalAgentCiReporterIds: string[];
-  kubernetesOperationalAgentReporterFormats: string[];
-  kubernetesOperationalAgentToolCategoryCount: number | null;
-  kubernetesOperationalAgentDiagnosticCapabilityCount: number | null;
-  kubernetesOperationalAgentResourceMetricCount: number | null;
-  kubernetesOperationalAgentLogAnalysisCount: number | null;
-  kubernetesOperationalAgentRegressionPassRate0to1: number | null;
-  kubernetesOperationalAgentReportArtifactHashes: string[];
-  secureVibeBenchCoverage: number | null;
-  secureVibeBenchSampleSize: number;
-  secureVibeBenchEvidenceRefs: string[];
-  secureVibeBenchMissingSignals: MetricValidationSecureVibeBenchSignal[];
-  secureVibeBenchRepositoryRefs: string[];
-  secureVibeBenchLicenseRefs: string[];
-  secureVibeBenchHomepageRefs: string[];
-  secureVibeBenchArxivRefs: string[];
-  secureVibeBenchBranchRefs: string[];
-  secureVibeBenchCommitRefs: string[];
-  secureVibeBenchTreeRefs: string[];
-  secureVibeBenchReadmeBlobRefs: string[];
-  secureVibeBenchResultsBlobRefs: string[];
-  secureVibeBenchDatasetRefs: string[];
-  secureVibeBenchFormatExampleRefs: string[];
-  secureVibeBenchEvaluationRunnerRefs: string[];
-  secureVibeBenchAgentAdapterIds: string[];
-  secureVibeBenchVulnerabilityScenarioIds: string[];
-  secureVibeBenchTestScriptIds: string[];
-  secureVibeBenchParserUtilityRefs: string[];
-  secureVibeBenchPatchDiffUtilityRefs: string[];
-  secureVibeBenchMetricNames: string[];
-  secureVibeBenchCiReporterIds: string[];
-  secureVibeBenchReporterFormats: string[];
-  secureVibeBenchAgentAdapterCount: number | null;
-  secureVibeBenchScenarioCount: number | null;
-  secureVibeBenchTestScriptCount: number | null;
-  secureVibeBenchRegressionPassRate0to1: number | null;
-  secureVibeBenchReportArtifactHashes: string[];
-  ravigBenchCoverage: number | null;
-  ravigBenchSampleSize: number;
-  ravigBenchEvidenceRefs: string[];
-  ravigBenchMissingSignals: MetricValidationRavigBenchSignal[];
-  ravigBenchRepositoryRefs: string[];
-  ravigBenchLicenseRefs: string[];
-  ravigBenchBranchRefs: string[];
-  ravigBenchCommitRefs: string[];
-  ravigBenchTreeRefs: string[];
-  ravigBenchReadmeBlobRefs: string[];
-  ravigBenchLegalBlobRefs: string[];
-  ravigBenchEnvironmentRefs: string[];
-  ravigBenchConfigurationRefs: string[];
-  ravigBenchContentEvaluationRefs: string[];
-  ravigBenchDesignEvaluationRefs: string[];
-  ravigBenchExecutionEvaluationRefs: string[];
-  ravigBenchFunctionScoringRefs: string[];
-  ravigBenchDatasetRefs: string[];
-  ravigBenchTestCaseRefs: string[];
-  ravigBenchModelResultRefs: string[];
-  ravigBenchTaxonomyIds: string[];
-  ravigBenchRetrievalContextIds: string[];
-  ravigBenchMultiModalEvaluatorIds: string[];
-  ravigBenchScreenshotEvaluationRefs: string[];
-  ravigBenchRunScriptRefs: string[];
-  ravigBenchMetricNames: string[];
-  ravigBenchCiReporterIds: string[];
-  ravigBenchReporterFormats: string[];
-  ravigBenchDatasetCaseCount: number | null;
-  ravigBenchVisualDesignCheckCount: number | null;
-  ravigBenchEvaluatorCount: number | null;
-  ravigBenchValidationPassRate0to1: number | null;
-  ravigBenchReportArtifactHashes: string[];
-  humanStudyBenchCoverage: number | null;
-  humanStudyBenchSampleSize: number;
-  humanStudyBenchEvidenceRefs: string[];
-  humanStudyBenchMissingSignals: MetricValidationHumanStudyBenchSignal[];
-  humanStudyBenchRepositoryRefs: string[];
-  humanStudyBenchLicenseRefs: string[];
-  humanStudyBenchBranchRefs: string[];
-  humanStudyBenchCommitRefs: string[];
-  humanStudyBenchStudyConfigIds: string[];
-  humanStudyBenchBackgroundDatasetIds: string[];
-  humanStudyBenchHumanResponseDatasetIds: string[];
-  humanStudyBenchAgentResponseDatasetIds: string[];
-  humanStudyBenchEvaluatorIds: string[];
-  humanStudyBenchMetricNames: string[];
-  humanStudyBenchValidatorIds: string[];
-  humanStudyBenchScorerIds: string[];
-  humanStudyBenchStandardizerIds: string[];
-  humanStudyBenchReliabilityReportIds: string[];
-  humanStudyBenchValidationPipelineIds: string[];
-  humanStudyBenchResultArtifactIds: string[];
-  humanStudyBenchCiReporterIds: string[];
-  humanStudyBenchReporterFormats: string[];
-  humanStudyBenchStudyCount: number | null;
-  humanStudyBenchParticipantCount: number | null;
-  humanStudyBenchResponseCount: number | null;
-  humanStudyBenchEvaluatorCount: number | null;
-  humanStudyBenchInterRaterAgreement0to1: number | null;
-  humanStudyBenchTestRetestReliability0to1: number | null;
-  humanStudyBenchValidationPassRate0to1: number | null;
-  humanStudyBenchReportArtifactHashes: string[];
-  legacyBenchCoverage: number | null;
-  legacyBenchSampleSize: number;
-  legacyBenchEvidenceRefs: string[];
-  legacyBenchMissingSignals: MetricValidationLegacyBenchSignal[];
-  legacyBenchRepositoryRefs: string[];
-  legacyBenchLicenseRefs: string[];
-  legacyBenchBranchRefs: string[];
-  legacyBenchCommitRefs: string[];
-  legacyBenchTreeRefs: string[];
-  legacyBenchReadmeBlobRefs: string[];
-  legacyBenchTaskCorpusRefs: string[];
-  legacyBenchLegacyLanguageIds: string[];
-  legacyBenchEnvironmentIds: string[];
-  legacyBenchHarnessRunnerIds: string[];
-  legacyBenchAgentTaskIds: string[];
-  legacyBenchPatchSubmissionIds: string[];
-  legacyBenchTestOracleIds: string[];
-  legacyBenchEvaluatorIds: string[];
-  legacyBenchMetricNames: string[];
-  legacyBenchCiReporterIds: string[];
-  legacyBenchReporterFormats: string[];
-  legacyBenchResultArtifactIds: string[];
-  legacyBenchReplayCommandIds: string[];
-  legacyBenchTaskCount: number | null;
-  legacyBenchLanguageCount: number | null;
-  legacyBenchEnvironmentCount: number | null;
-  legacyBenchTestOracleCount: number | null;
-  legacyBenchEvaluatorCount: number | null;
-  legacyBenchRegressionPassRate0to1: number | null;
-  legacyBenchReplayPassRate0to1: number | null;
-  legacyBenchReportArtifactHashes: string[];
-  subtleMemoryCoverage: number | null;
-  subtleMemorySampleSize: number;
-  subtleMemoryEvidenceRefs: string[];
-  subtleMemoryMissingSignals: MetricValidationSubtleMemorySignal[];
-  subtleMemoryRepositoryRefs: string[];
-  subtleMemoryLicenseRefs: string[];
-  subtleMemoryBranchRefs: string[];
-  subtleMemoryCommitRefs: string[];
-  subtleMemoryTreeRefs: string[];
-  subtleMemoryArxivRefs: string[];
-  subtleMemoryDatasetRefs: string[];
-  subtleMemoryPersonaIds: string[];
-  subtleMemoryBenchInstanceManifestIds: string[];
-  subtleMemoryHistorySessionManifestIds: string[];
-  subtleMemoryRelationTypes: string[];
-  subtleMemoryConstructionPipelineIds: string[];
-  subtleMemoryEvaluationStageIds: string[];
-  subtleMemoryAdapterIds: string[];
-  subtleMemoryJudgeIds: string[];
-  subtleMemoryEvaluatorIds: string[];
-  subtleMemoryMetricNames: string[];
-  subtleMemoryScoreSummaryIds: string[];
-  subtleMemoryDiagnosticProtocolIds: string[];
-  subtleMemoryCiReporterIds: string[];
-  subtleMemoryReporterFormats: string[];
-  subtleMemoryPersonaCount: number | null;
-  subtleMemoryBenchInstanceCount: number | null;
-  subtleMemoryHistoryCount: number | null;
-  subtleMemoryMemoryVariantSetCount: number | null;
-  subtleMemoryRelationTypeCount: number | null;
-  subtleMemoryEvaluationStageCount: number | null;
-  subtleMemoryAdapterCount: number | null;
-  subtleMemoryJudgeAgreement0to1: number | null;
-  subtleMemoryValidationPassRate0to1: number | null;
-  subtleMemoryReportArtifactHashes: string[];
-  previousObservations: ScoreObservation[];
-  thresholds: MetricValidationThresholdPolicy;
-}): MetricValidationRow {
+function buildRow(params: MetricRowBuildInput): MetricValidationRow {
   const interval = confidenceInterval(params.values);
   const score = mean(params.values);
   const testRetestStability = stabilityForMetric({

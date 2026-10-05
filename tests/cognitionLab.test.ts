@@ -375,3 +375,38 @@ describe("reset", () => {
     expect(getSignalImports().length).toBe(0);
   });
 });
+
+
+test.each([
+  { label: "positive threshold", baseline: 0, candidate: 0.05, delta: 0.05, significant: false },
+  { label: "negative threshold", baseline: 0.05, candidate: 0, delta: -0.05, significant: false },
+  { label: "positive above threshold", baseline: 0, candidate: 0.0501, delta: 0.0501, significant: true },
+  { label: "negative above threshold", baseline: 0.0501, candidate: 0, delta: -0.0501, significant: true },
+])("compares explicit fixture scores at the $label without UUID-derived simulation", ({ baseline, candidate, delta, significant }) => {
+  const baselineExperiment = createLabExperiment({ kind: "custom", name: "Boundary baseline", description: "Explicit score fixture", modelId: "fixture", probes: [] });
+  const candidateExperiment = createLabExperiment({ kind: "custom", name: "Boundary candidate", description: "Explicit score fixture", modelId: "fixture", probes: [] });
+  for (const [experimentId, score] of [
+    [baselineExperiment.experimentId, baseline],
+    [candidateExperiment.experimentId, candidate],
+  ] as const) {
+    recordLabProbeResult({
+      experimentId,
+      probeId: "explicit-boundary-probe",
+      responseText: "Explicit comparison fixture; no model execution",
+      scores: { fixtureDimension: score },
+      latencyMs: 0,
+      tokenCount: 0,
+      metadata: { fixture: true },
+    });
+  }
+  const pairs = compareExperiments(baselineExperiment.experimentId, candidateExperiment.experimentId);
+  expect(pairs).toHaveLength(1);
+  const pair = pairs[0]!;
+  expect(pair.baselineExperimentId).toBe(baselineExperiment.experimentId);
+  expect(pair.candidateExperimentId).toBe(candidateExperiment.experimentId);
+  expect(pair.probeId).toBe("explicit-boundary-probe");
+  expect(pair.baselineScores).toEqual({ fixtureDimension: baseline });
+  expect(pair.candidateScores).toEqual({ fixtureDimension: candidate });
+  expect(pair.deltas).toEqual({ fixtureDimension: delta });
+  expect(pair.significantDimensions).toEqual(significant ? ["fixtureDimension"] : []);
+});

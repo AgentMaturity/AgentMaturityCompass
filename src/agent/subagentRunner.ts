@@ -353,6 +353,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
         } finally {
           active = false;
           if (releaseRequested) finalize();
+          // oxlint-disable-next-line no-unsafe-finally -- A child cannot report success after its writer release failed.
           if (releaseError !== undefined) throw releaseError;
         }
       };

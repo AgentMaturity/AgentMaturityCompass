@@ -3,6 +3,7 @@
  * Full parity with: amc watch *, amc governor *, amc guardrails *
  */
 
+import { providerDriftBasicWatchResponse, providerDriftWatchResponse } from './routerResponseHelpers.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { bodyJson, apiSuccess, apiError, queryParam } from './apiHelpers.js';
 import type { ReplayBenchmarkCorpusInput } from '../benchmarks/replayBenchmarkCorpus.js';
@@ -245,12 +246,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        promptLayerEvidenceHash: result.promptLayerEvidenceHash,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-      });
+      apiSuccess(res, providerDriftBasicWatchResponse(result, 'promptLayerEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Provider drift watch projection failed');
     }
@@ -270,16 +266,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        humanloopEvidenceHash: result.humanloopEvidenceHash,
-        score: result.score,
-        shield: result.shield,
-        watch: result.watch,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftWatchResponse(result, 'humanloopEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Humanloop provider drift watch projection failed');
     }
@@ -299,12 +286,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        promptfooEvidenceHash: result.promptfooEvidenceHash,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-      });
+      apiSuccess(res, providerDriftBasicWatchResponse(result, 'promptfooEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'promptfoo provider drift watch projection failed');
     }
@@ -324,16 +306,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        patronusEvidenceHash: result.patronusEvidenceHash,
-        score: result.score,
-        shield: result.shield,
-        watch: result.watch,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftWatchResponse(result, 'patronusEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Patronus provider drift watch projection failed');
     }
@@ -353,16 +326,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        inspectEvidenceHash: result.inspectEvidenceHash,
-        score: result.score,
-        shield: result.shield,
-        watch: result.watch,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftWatchResponse(result, 'inspectEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Inspect provider drift watch projection failed');
     }
@@ -382,16 +346,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        tensorZeroEvidenceHash: result.tensorZeroEvidenceHash,
-        score: result.score,
-        shield: result.shield,
-        watch: result.watch,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftWatchResponse(result, 'tensorZeroEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'TensorZero provider drift watch projection failed');
     }
@@ -411,16 +366,7 @@ export async function handleWatchRoute(
         ...body,
         agentId: body.agentId ?? 'default',
       });
-      apiSuccess(res, {
-        report: result.report,
-        helmEvidenceHash: result.helmEvidenceHash,
-        score: result.score,
-        shield: result.shield,
-        watch: result.watch,
-        watchAlerts: result.watchAlerts,
-        failClosed: result.report.failClosed,
-        sourceRefs: result.sourceRefs,
-      });
+      apiSuccess(res, providerDriftWatchResponse(result, 'helmEvidenceHash'));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'HELM provider drift watch projection failed');
     }

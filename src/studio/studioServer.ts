@@ -2242,6 +2242,16 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         allowedOrigins: nativeAllowedBrowserOrigins(options.host, (server.address() as { port?: number } | null)?.port ?? options.port,
           [...(options.corsAllowedOrigins ?? []), ...(options.nativeAllowedOrigins ?? [])]), readOnly: requiresReadOnlyMode(options.workspace) })) return;
 
+      // Bind the authenticated request context once; each route retains its role list.
+      const requireRouteRoles = (roles: UserRole[]): boolean =>
+        requireRoles({ auth, res, workspace: options.workspace, roles });
+
+      const requireUnlockedVaultForSigning = (): boolean => {
+        if (vaultStatus(options.workspace).unlocked) return true;
+        json(res, 423, { error: "vault locked; unlock required for signing" });
+        return false;
+      };
+
       const denyMechanicLeaseAccess = (): boolean => {
         if (!auth.isAdmin && auth.agentId) {
           writeStudioAuditEvent({
@@ -2315,7 +2325,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       };
 
       if (pathname === "/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const vault = vaultStatus(options.workspace);
@@ -2502,7 +2512,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/trust/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const sig = verifyTrustConfigSignature(options.workspace);
@@ -2538,7 +2548,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/retention/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const status = retentionStatusCli(options.workspace);
@@ -2551,7 +2561,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/retention/run" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -2587,7 +2597,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/maintenance/stats" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const stats = maintenanceStatsCli(options.workspace);
@@ -2599,7 +2609,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/maintenance/vacuum" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -2629,7 +2639,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/maintenance/prune" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -2657,7 +2667,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/ops/backup/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, backupStatusSummary(options.workspace));
@@ -2665,7 +2675,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const config = loadOrgConfig(options.workspace);
@@ -2678,7 +2688,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/roles" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const roles = orgRunRoleDefinitions();
@@ -2687,7 +2697,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/runs" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const runs = listOrgRuns({ workspace: options.workspace, limit: 25, redacted: true });
@@ -2700,7 +2710,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/runs" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -2748,7 +2758,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const orgRunGetMatch = pathname.match(/^\/org\/runs\/([^/]+)$/);
       if (orgRunGetMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const run = loadOrgRun({
@@ -2761,7 +2771,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/scorecards/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const latest = loadLatestOrgScorecard(options.workspace);
@@ -2774,15 +2784,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/scorecards/recompute" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -2810,15 +2819,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/nodes" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -2870,15 +2878,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/assign" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -2923,15 +2930,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/unassign" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -2975,7 +2981,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const orgNodeMatch = pathname.match(/^\/org\/nodes\/([^/]+)$/);
       if (orgNodeMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const nodeId = decodeURIComponent(orgNodeMatch[1] ?? "");
@@ -2999,7 +3005,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const orgNodeScoreMatch = pathname.match(/^\/org\/nodes\/([^/]+)\/scorecard$/);
       if (orgNodeScoreMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const nodeId = decodeURIComponent(orgNodeScoreMatch[1] ?? "");
@@ -3028,15 +3034,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/org/commitments/generate" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3080,7 +3085,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const orgCommitmentGetMatch = pathname.match(/^\/org\/commitments\/([^/]+)\/([^/]+)$/);
       if (orgCommitmentGetMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const nodeId = decodeURIComponent(orgCommitmentGetMatch[1] ?? "");
@@ -3100,7 +3105,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transform/map" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, getTransformMapForApi(options.workspace));
@@ -3108,15 +3113,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transform/map/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3148,7 +3152,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTransformMatch = pathname.match(/^\/agents\/([^/]+)\/transform\/latest$/);
       if (agentTransformMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformMatch[1] ?? "default"));
@@ -3162,15 +3166,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTransformPlanMatch = pathname.match(/^\/agents\/([^/]+)\/transform\/plan$/);
       if (agentTransformPlanMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformPlanMatch[1] ?? "default"));
@@ -3207,15 +3210,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTransformTrackMatch = pathname.match(/^\/agents\/([^/]+)\/transform\/track$/);
       if (agentTransformTrackMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformTrackMatch[1] ?? "default"));
@@ -3246,15 +3248,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTransformAttestMatch = pathname.match(/^\/agents\/([^/]+)\/transform\/attest$/);
       if (agentTransformAttestMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["OWNER", "AUDITOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTransformAttestMatch[1] ?? "default"));
@@ -3296,7 +3297,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const nodeTransformLatestMatch = pathname.match(/^\/org\/nodes\/([^/]+)\/transform\/latest$/);
       if (nodeTransformLatestMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const nodeId = decodeURIComponent(nodeTransformLatestMatch[1] ?? "");
@@ -3310,15 +3311,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const nodeTransformPlanMatch = pathname.match(/^\/org\/nodes\/([^/]+)\/transform\/plan$/);
       if (nodeTransformPlanMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const nodeId = decodeURIComponent(nodeTransformPlanMatch[1] ?? "");
@@ -3355,15 +3355,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const nodeTransformTrackMatch = pathname.match(/^\/org\/nodes\/([^/]+)\/transform\/track$/);
       if (nodeTransformTrackMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const nodeId = decodeURIComponent(nodeTransformTrackMatch[1] ?? "");
@@ -3394,15 +3393,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const nodeTransformAttestMatch = pathname.match(/^\/org\/nodes\/([^/]+)\/transform\/attest$/);
       if (nodeTransformAttestMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["OWNER", "AUDITOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const nodeId = decodeURIComponent(nodeTransformAttestMatch[1] ?? "");
@@ -3443,7 +3441,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/canon" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, canonGetForApi(options.workspace));
@@ -3451,7 +3449,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/canon/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, canonVerifyForApi(options.workspace));
@@ -3459,15 +3457,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/canon/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3497,7 +3494,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/policy" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, cgxPolicyForApi(options.workspace));
@@ -3505,15 +3502,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/policy/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3543,11 +3539,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/build" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3578,7 +3573,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/graph/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const scopeRaw = String(url.searchParams.get("scope") ?? "workspace").toLowerCase();
@@ -3600,7 +3595,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/pack/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = url.searchParams.get("agentId");
@@ -3616,7 +3611,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/cgx/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["AUDITOR", "OWNER", "OPERATOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["AUDITOR", "OWNER", "OPERATOR", "VIEWER"])) {
           return;
         }
         json(res, 200, cgxVerifyForApi(options.workspace));
@@ -3624,7 +3619,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/policy" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, promptPolicyForApi(options.workspace));
@@ -3632,7 +3627,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, promptVerifyForApi(options.workspace));
@@ -3640,15 +3635,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/policy/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3685,7 +3679,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, {
@@ -3695,11 +3689,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/pack/build" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3730,7 +3723,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/pack/show" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -3755,7 +3748,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/pack/diff" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -3767,7 +3760,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/scheduler" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, promptSchedulerStatusForApi(options.workspace));
@@ -3775,11 +3768,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/scheduler/run-now" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3797,7 +3789,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/scheduler/enable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, promptSchedulerSetEnabledForApi({
@@ -3808,7 +3800,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/prompt/scheduler/disable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, promptSchedulerSetEnabledForApi({
@@ -3819,7 +3811,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/policy" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, getForecastPolicyForApi(options.workspace));
@@ -3827,15 +3819,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/policy/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3866,7 +3857,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
@@ -3892,11 +3883,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/refresh" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -3939,7 +3929,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/scheduler/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, forecastSchedulerStatusForApi(options.workspace));
@@ -3947,11 +3937,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/scheduler/run-now" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const out = forecastSchedulerRunNowForApi({
@@ -3963,7 +3952,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/scheduler/enable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const out = forecastSchedulerSetEnabledForApi({
@@ -3975,7 +3964,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/forecast/scheduler/disable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const out = forecastSchedulerSetEnabledForApi({
@@ -3987,7 +3976,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/policy" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, assurancePolicyForApi(options.workspace));
@@ -3995,15 +3984,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/policy/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4030,15 +4018,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/run" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4098,7 +4085,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/runs" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -4109,7 +4096,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const assuranceRunMatch = pathname.match(/^\/assurance\/runs\/([^/]+)$/);
       if (assuranceRunMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const runId = decodeURIComponent(assuranceRunMatch[1] ?? "");
@@ -4126,15 +4113,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/cert/issue" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4174,7 +4160,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/cert/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, assuranceCertLatestForApi(options.workspace));
@@ -4182,7 +4168,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/waiver/request" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4216,7 +4202,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/waiver/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, assuranceWaiverStatusForApi(options.workspace));
@@ -4224,7 +4210,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/waiver/revoke" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4252,7 +4238,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/scheduler/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, assuranceSchedulerStatusForApi(options.workspace));
@@ -4260,15 +4246,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/scheduler/run-now" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const out = await assuranceSchedulerRunNowForApi({
@@ -4296,7 +4281,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/scheduler/enable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, assuranceSchedulerEnableForApi({
@@ -4307,7 +4292,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/assurance/scheduler/disable" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, assuranceSchedulerEnableForApi({
@@ -4333,7 +4318,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, auditPolicyForApi(options.workspace));
@@ -4344,7 +4329,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4373,7 +4358,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, auditMapShowForApi({
@@ -4387,7 +4372,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4416,7 +4401,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, auditMapVerifyForApi(options.workspace));
@@ -4427,11 +4412,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4454,11 +4438,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4516,7 +4499,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, auditBindersForApi(options.workspace));
@@ -4528,7 +4511,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const binderId = decodeURIComponent(auditVerifyMatch[1] ?? "");
@@ -4555,7 +4538,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["AUDITOR"] })) {
+        if (!requireRouteRoles(["AUDITOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4586,7 +4569,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR"])) {
           return;
         }
         json(res, 200, {
@@ -4600,7 +4583,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const requestId = decodeURIComponent(auditRequestApproveMatch[1] ?? "");
@@ -4628,7 +4611,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const requestId = decodeURIComponent(auditRequestRejectMatch[1] ?? "");
@@ -4649,11 +4632,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const requestId = decodeURIComponent(auditRequestFulfillMatch[1] ?? "");
@@ -4680,7 +4662,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, auditSchedulerStatusForApi(options.workspace));
@@ -4691,11 +4673,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4717,7 +4698,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, auditSchedulerEnableForApi({
@@ -4731,7 +4712,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyAuditLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, auditSchedulerEnableForApi({
@@ -4757,7 +4738,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, valuePolicyForApi(options.workspace));
@@ -4768,7 +4749,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4797,7 +4778,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
@@ -4819,7 +4800,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -4870,7 +4851,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -4902,7 +4883,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
@@ -4929,7 +4910,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const scopeRaw = (url.searchParams.get("scope") ?? "workspace").toLowerCase();
@@ -4960,7 +4941,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR", "AUDITOR", "VIEWER"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR", "AUDITOR", "VIEWER"])) {
           return;
         }
         json(res, 200, valueSchedulerStatusForApi(options.workspace));
@@ -4971,7 +4952,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5000,7 +4981,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, valueSchedulerSetEnabledForApi({
@@ -5014,7 +4995,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyValueLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         json(res, 200, valueSchedulerSetEnabledForApi({
@@ -5040,7 +5021,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, passportPolicyForApi(options.workspace));
@@ -5051,15 +5032,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5093,11 +5073,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5130,7 +5109,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, passportCacheLatestForApi({
@@ -5145,11 +5124,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5221,7 +5199,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5253,7 +5231,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -5273,7 +5251,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           });
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -5291,11 +5269,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const out = standardGenerateForApi(options.workspace);
@@ -5320,7 +5297,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, standardVerifyForApi(options.workspace));
@@ -5331,7 +5308,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, standardSchemasForApi(options.workspace));
@@ -5343,7 +5320,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const name = decodeURIComponent(standardSchemaMatch[1] ?? "");
@@ -5355,7 +5332,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         if (denyPassportLeaseAccess()) {
           return;
         }
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5374,7 +5351,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/advisories" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const scopeRaw = url.searchParams.get("scope");
@@ -5396,11 +5373,10 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const advisoryAckMatch = pathname.match(/^\/advisories\/([^/]+)\/ack$/);
       if (advisoryAckMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const advisoryId = decodeURIComponent(advisoryAckMatch[1] ?? "");
@@ -5431,7 +5407,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/agents" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agents = listAgents(options.workspace).map((agent) => {
@@ -5460,7 +5436,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/users" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const users = listHumanUsers(options.workspace).map((user) => ({
@@ -5475,7 +5451,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/users/add" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -5506,7 +5482,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/users/revoke" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -5528,7 +5504,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/users/roles" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -5551,7 +5527,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/leases/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const verify = verifyLeaseRevocationsSignature(options.workspace);
@@ -5566,7 +5542,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/budgets" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -5579,7 +5555,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/budgets/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -5609,7 +5585,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/leases/issue" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5662,7 +5638,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/leases/revoke" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -5693,7 +5669,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTargetsMatch = pathname.match(/^\/agents\/([^/]+)\/targets$/);
       if (agentTargetsMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTargetsMatch[1] ?? ""));
@@ -5731,7 +5707,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTargetsWhatIfMatch = pathname.match(/^\/agents\/([^/]+)\/targets\/whatif$/);
       if (agentTargetsWhatIfMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentTargetsWhatIfMatch[1] ?? ""));
@@ -5759,7 +5735,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentTargetsApplyMatch = pathname.match(/^\/agents\/([^/]+)\/targets\/apply$/);
       if (agentTargetsApplyMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -5834,7 +5810,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const agentLeaseMatch = pathname.match(/^\/agents\/([^/]+)\/lease$/);
       if (agentLeaseMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(agentLeaseMatch[1] ?? ""));
@@ -5886,7 +5862,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const runMatch = pathname.match(/^\/agents\/([^/]+)\/run$/);
       if (runMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(runMatch[1] ?? ""));
@@ -5920,7 +5896,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/auto-answer" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
@@ -5934,7 +5910,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/run" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
@@ -5966,7 +5942,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/bank" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, diagnosticBankGetForApi(options.workspace));
@@ -5974,7 +5950,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/bank/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, diagnosticBankVerifyForApi(options.workspace));
@@ -5982,15 +5958,14 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/bank/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6008,7 +5983,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/diagnostic/render" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? undefined);
@@ -6142,7 +6117,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const assuranceMatch = pathname.match(/^\/agents\/([^/]+)\/assurance$/);
       if (assuranceMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(assuranceMatch[1] ?? ""));
@@ -6173,7 +6148,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const driftCheckMatch = pathname.match(/^\/agents\/([^/]+)\/drift\/check$/);
       if (driftCheckMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(driftCheckMatch[1] ?? ""));
@@ -6213,7 +6188,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const dashboardMatch = pathname.match(/^\/agents\/([^/]+)\/dashboard\/build$/);
       if (dashboardMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(dashboardMatch[1] ?? ""));
@@ -6228,7 +6203,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const bundleMatch = pathname.match(/^\/agents\/([^/]+)\/export\/bundle$/);
       if (bundleMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER", "AUDITOR"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(bundleMatch[1] ?? ""));
@@ -6252,7 +6227,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const policyMatch = pathname.match(/^\/agents\/([^/]+)\/export\/policy$/);
       if (policyMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, decodeURIComponent(policyMatch[1] ?? ""));
@@ -6490,7 +6465,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/toolhub/pending-intents" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -6500,7 +6475,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/approvals" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -6519,7 +6494,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/approvals/requests" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -6540,7 +6515,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const approvalMatch = pathname.match(/^\/approvals\/([^/]+)$/);
       if (approvalMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const approvalId = decodeURIComponent(approvalMatch[1] ?? "");
@@ -6568,7 +6543,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const approvalRequestMatch = pathname.match(/^\/approvals\/requests\/([^/]+)$/);
       if (approvalRequestMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const approvalId = decodeURIComponent(approvalRequestMatch[1] ?? "");
@@ -6608,7 +6583,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const approvalApproveMatch = pathname.match(/^\/approvals\/([^/]+)\/approve$/);
       const approvalRequestDecideMatch = pathname.match(/^\/approvals\/requests\/([^/]+)\/decide$/);
       if ((approvalApproveMatch || approvalRequestDecideMatch) && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["APPROVER", "OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["APPROVER", "OWNER", "AUDITOR"])) {
           return;
         }
         const approvalId = decodeURIComponent((approvalApproveMatch?.[1] ?? approvalRequestDecideMatch?.[1]) ?? "");
@@ -6664,7 +6639,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const approvalDenyMatch = pathname.match(/^\/approvals\/([^/]+)\/deny$/);
       if (approvalDenyMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["APPROVER", "OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["APPROVER", "OWNER", "AUDITOR"])) {
           return;
         }
         const approvalId = decodeURIComponent(approvalDenyMatch[1] ?? "");
@@ -6720,7 +6695,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const approvalCancelMatch = pathname.match(/^\/approvals\/requests\/([^/]+)\/cancel$/);
       if (approvalCancelMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         const approvalId = decodeURIComponent(approvalCancelMatch[1] ?? "");
@@ -6784,7 +6759,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/targets" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6795,7 +6770,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/targets/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6805,8 +6780,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6841,7 +6815,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/profiles" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6852,7 +6826,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/profiles/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6862,8 +6836,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6908,7 +6881,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/tuning" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6919,7 +6892,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/tuning/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6929,8 +6902,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 403, { error: "users signature invalid; write operations blocked" });
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -6965,7 +6937,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/gap" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -6987,14 +6959,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/plan/create" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -7023,7 +6994,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/plan/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -7034,7 +7005,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/plan/diff" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -7058,7 +7029,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/plan/request-approval" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -7094,14 +7065,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/plan/execute" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
           return;
         }
-        if (!vaultStatus(options.workspace).unlocked) {
-          json(res, 423, { error: "vault locked; unlock required for signing" });
+        if (!requireUnlockedVaultForSigning()) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -7153,7 +7123,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/simulate" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -7189,7 +7159,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/mechanic/simulations/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (denyMechanicLeaseAccess()) {
@@ -7212,7 +7182,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/policy" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7224,7 +7194,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/policy/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7259,7 +7229,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/create" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7311,7 +7281,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/exports" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7325,7 +7295,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/imports" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7339,7 +7309,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/registries" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7351,7 +7321,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/registry/add" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7467,7 +7437,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/registry/browse" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7490,7 +7460,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/import" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7555,7 +7525,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/compare" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7595,7 +7565,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/comparison/latest" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7607,7 +7577,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/bench/publish" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (!auth.isAdmin && auth.agentId) {
@@ -7693,7 +7663,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/benchmarks/ingest" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OPERATOR", "OWNER", "AUDITOR"] })) {
+        if (!requireRouteRoles(["OPERATOR", "OWNER", "AUDITOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -7717,7 +7687,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/benchmarks/list" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const rows = listImportedBenchmarks(options.workspace).map((row) => row.bench);
@@ -7728,7 +7698,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/benchmarks/stats" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const groupBy = url.searchParams.get("groupBy");
@@ -7741,7 +7711,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7753,7 +7723,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/report" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7771,7 +7741,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/history" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7784,7 +7754,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/outcomes/fleet" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const window = url.searchParams.get("window") ?? "30d";
@@ -7797,7 +7767,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/experiments/list" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7810,7 +7780,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/experiments/history" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7822,7 +7792,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/experiments/optimizers" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const agentId = resolveAgentId(options.workspace, url.searchParams.get("agentId") ?? "default");
@@ -7840,7 +7810,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/experiments/optimize" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -7865,7 +7835,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const optimizerMatch = pathname.match(/^\/experiments\/optimizers\/([^/]+)$/);
       if (optimizerMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const selector = decodeURIComponent(optimizerMatch[1] ?? "");
@@ -7880,7 +7850,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/experiments/create" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -7901,7 +7871,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentBaselineMatch = pathname.match(/^\/experiments\/([^/]+)\/baseline$/);
       if (experimentBaselineMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const experimentId = decodeURIComponent(experimentBaselineMatch[1] ?? "");
@@ -7920,7 +7890,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentCandidateMatch = pathname.match(/^\/experiments\/([^/]+)\/candidate$/);
       if (experimentCandidateMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const experimentId = decodeURIComponent(experimentCandidateMatch[1] ?? "");
@@ -7942,7 +7912,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentRunMatch = pathname.match(/^\/experiments\/([^/]+)\/run$/);
       if (experimentRunMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const experimentId = decodeURIComponent(experimentRunMatch[1] ?? "");
@@ -7960,7 +7930,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentAnalyzeMatch = pathname.match(/^\/experiments\/([^/]+)\/analyze$/);
       if (experimentAnalyzeMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const experimentId = decodeURIComponent(experimentAnalyzeMatch[1] ?? "");
@@ -7976,7 +7946,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const experimentGateMatch = pathname.match(/^\/experiments\/([^/]+)\/gate$/);
       if (experimentGateMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const experimentId = decodeURIComponent(experimentGateMatch[1] ?? "");
@@ -7997,7 +7967,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/compliance/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, verifyComplianceMapsSignature(options.workspace));
@@ -8005,7 +7975,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/compliance/report" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const framework = parseComplianceFramework(url.searchParams.get("framework")) ?? "SOC2";
@@ -8022,7 +7992,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/compliance/fleet" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const framework = parseComplianceFramework(url.searchParams.get("framework")) ?? "SOC2";
@@ -8037,7 +8007,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/federation/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -8048,7 +8018,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/federation/export" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8062,7 +8032,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/federation/import" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8081,7 +8051,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/integrations/status" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -8092,7 +8062,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/integrations/test" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8106,7 +8076,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/integrations/dispatch" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER", "OPERATOR"] })) {
+        if (!requireRouteRoles(["OWNER", "OPERATOR"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8129,7 +8099,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/integrations/verify-receipt" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8146,7 +8116,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/tail" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const count = Math.max(1, Number(url.searchParams.get("n") ?? "100") || 100);
@@ -8157,7 +8127,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, verifyTransparencyLog(options.workspace));
@@ -8165,7 +8135,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/merkle/verify" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, verifyTransparencyMerkle(options.workspace));
@@ -8173,7 +8143,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/merkle/root" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -8184,7 +8154,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/merkle/prove" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8203,7 +8173,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/merkle/verify-proof" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8217,7 +8187,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/transparency/raw" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const count = Math.max(1, Number(url.searchParams.get("n") ?? "100") || 100);
@@ -8236,7 +8206,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/installed" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const listed = listInstalledPlugins(options.workspace);
@@ -8256,7 +8226,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/registries" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -8267,7 +8237,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/registries/apply" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8302,7 +8272,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/registry/browse" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const registryId = url.searchParams.get("id");
@@ -8321,7 +8291,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/install" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8359,7 +8329,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/upgrade" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8400,7 +8370,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/remove" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8438,7 +8408,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const pluginApprovalMatch = pathname.match(/^\/plugins\/approvals\/([^/]+)$/);
       if (pluginApprovalMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const approvalRequestId = decodeURIComponent(pluginApprovalMatch[1] ?? "");
@@ -8460,7 +8430,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/plugins/execute" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8505,7 +8475,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/policy-packs/list" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         json(res, 200, {
@@ -8515,7 +8485,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/industry-packs/access" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const { getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
@@ -8526,7 +8496,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/industry-packs/checkout" && (req.method === "GET" || req.method === "POST")) {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const { buildIndustryPackCheckoutUrl, getIndustryPackEntitlement } = await import("../domains/industryPackEntitlement.js");
@@ -8557,7 +8527,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/industry-packs/activate" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {
@@ -8592,7 +8562,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/industry-packs/license/verify" && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
@@ -8608,7 +8578,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       }
 
       if (pathname === "/industry-packs/list" && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const { listIndustryPacks } = await import("../domains/industryPacks.js");
@@ -8623,7 +8593,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const industryPackMatch = pathname.match(/^\/industry-packs\/([^/]+)$/);
       if (industryPackMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const { getPackById } = await import("../domains/industryPacks.js");
@@ -8649,7 +8619,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const policyPackMatch = pathname.match(/^\/policy-packs\/([^/]+)$/);
       if (policyPackMatch && req.method === "GET") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const packId = decodeURIComponent(policyPackMatch[1] ?? "");
@@ -8661,7 +8631,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const policyPackDiffMatch = pathname.match(/^\/policy-packs\/([^/]+)\/diff$/);
       if (policyPackDiffMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"] })) {
+        if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
         }
         const packId = decodeURIComponent(policyPackDiffMatch[1] ?? "");
@@ -8681,7 +8651,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
 
       const policyPackApplyMatch = pathname.match(/^\/policy-packs\/([^/]+)\/apply$/);
       if (policyPackApplyMatch && req.method === "POST") {
-        if (!requireRoles({ auth, res, workspace: options.workspace, roles: ["OWNER"] })) {
+        if (!requireRouteRoles(["OWNER"])) {
           return;
         }
         if (requiresReadOnlyMode(options.workspace)) {

@@ -445,7 +445,7 @@ function preferredGatewayRoute(workspace: string): string {
   }
 }
 
-export function autoConfigureDetectedFrameworkAdapters(params: {
+function autoConfigureDetectedFrameworkAdapters(params: {
   workspace: string;
   detections: FrameworkDetection[];
   agentId?: string;

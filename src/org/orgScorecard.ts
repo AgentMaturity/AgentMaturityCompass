@@ -4,11 +4,11 @@ import { orgScorecardHistoryDir, orgScorecardsDir } from "./orgStore.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor, type SignedFileVerification } from "./orgSigner.js";
 
-export function latestOrgScorecardPath(workspace: string): string {
+function latestOrgScorecardPath(workspace: string): string {
   return join(orgScorecardsDir(workspace), "latest.json");
 }
 
-export function orgScorecardHistoryPath(workspace: string, ts: number): string {
+function orgScorecardHistoryPath(workspace: string, ts: number): string {
   return join(orgScorecardHistoryDir(workspace), `${ts}.json`);
 }
 

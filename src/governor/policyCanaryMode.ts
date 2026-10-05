@@ -128,7 +128,7 @@ export function recordCanaryObservation(
 /**
  * Generate the canary mode report.
  */
-export function generateCanaryModeReport(canaryId: string): CanaryModeReport | null {
+function generateCanaryModeReport(canaryId: string): CanaryModeReport | null {
   const config = activeCanaries.get(canaryId);
   if (!config) return null;
 

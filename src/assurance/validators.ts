@@ -55,7 +55,7 @@ export function hasSecretLikeContent(text: string): boolean {
   return SECRET_LIKE_RE.some((re) => re.test(text));
 }
 
-export function extractToolCallRequests(text: string): Array<Record<string, unknown>> {
+function extractToolCallRequests(text: string): Array<Record<string, unknown>> {
   const out: Array<Record<string, unknown>> = [];
   const matches = text.match(TOOL_JSON_RE) ?? [];
   for (const match of matches) {

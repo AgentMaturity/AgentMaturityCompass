@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   initCommunityPlatform,
   addCommunitySignal,
@@ -229,6 +229,16 @@ describe("metaConfidence", () => {
     const q1 = mc.questionConfidences.find((q) => q.questionId === "q_tool_safety_1")!;
     const q3 = mc.questionConfidences.find((q) => q.questionId === "q_identity_auth_3")!;
     expect(q1.factors.evidenceVolume).toBeGreaterThan(q3.factors.evidenceVolume);
+
+    // A report created in this same millisecond previously covered the fresh
+    // branch only by chance. Exercise future/fresh and expired evidence explicitly.
+    const clock = vi.spyOn(Date, "now").mockReturnValue(1_000_000);
+    try {
+      const fresh = computeDiagnosticMetaConfidence({ ...report, ts: 1_000_001 });
+      expect(fresh.questionConfidences.every(q => q.factors.evidenceFreshness === 1)).toBe(true);
+      const expired = computeDiagnosticMetaConfidence({ ...report, ts: 0 }, { freshnessWindowMs: 10 });
+      expect(expired.questionConfidences.every(q => q.factors.evidenceFreshness === 0)).toBe(true);
+    } finally { clock.mockRestore(); }
 
     const md = renderMetaConfidenceMarkdown(mc);
     expect(md).toContain("Meta-Confidence");

@@ -4,7 +4,17 @@ import { z } from "zod";
 import type { DiagnosticReport, GatePolicy, LayerName } from "../types.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { canonicalize } from "../utils/json.js";
+import {
+  isAuditEvidenceSha256 as isSha256,
+  auditTimestampPresent as timestampPresent,
+  uniqueAuditReasons as unique,
+  auditEvidenceRefsValid as releaseGateEvidenceValid,
+  hashAuditEvidence,
+  collectAuditSourceIds,
+  finalizeAuditEvidenceReceipt,
+  beginAuditReceiptVerification,
+  finalizeAuditEvidenceExport
+} from "../audit/auditEvidenceAccounting.js";
 import { signHexDigest, verifyHexDigestAny, getPrivateKeyPem, getPublicKeyHistory } from "../crypto/keys.js";
 import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -568,29 +578,12 @@ export async function runBundleGate(params: {
   };
 }
 
-function isSha256(value: string | undefined): boolean {
-  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
-}
-
-function timestampPresent(value: string | undefined): boolean {
-  return typeof value === "string" && value.length > 0 && !Number.isNaN(Date.parse(value));
-}
-
 function releaseGateRowHash(row: Omit<ReleaseGateReceiptRow, "rowHash">): string {
-  return sha256Hex(canonicalize(row));
+  return hashAuditEvidence(row);
 }
 
 function releaseGateReceiptHash(receipt: Omit<ReleaseGateReceipt, "receiptHash">): string {
-  return sha256Hex(canonicalize(receipt));
-}
-
-function releaseGateEvidenceValid(evidenceRefs: ReleaseGateEvidenceLink[]): boolean {
-  return evidenceRefs.length > 0 && evidenceRefs.every((evidence) => (
-    Boolean(evidence.eventId)
-    && Boolean(evidence.eventType)
-    && Boolean(evidence.signedEvidenceRef)
-    && isSha256(evidence.eventHash)
-  ));
+  return hashAuditEvidence(receipt);
 }
 
 function releaseGateOverrideValid(override: ReleaseGateOverrideRecord | undefined): boolean {
@@ -681,11 +674,11 @@ function validateReleaseGateRow(row: ReleaseGateReceiptRow): string[] {
   if (!releaseGateEvidenceValid(row.evidenceRefs)) {
     reasons.push(`${row.gateId || "unknown"}:evidenceChain:missing`);
   }
-  const recalculatedConfigHash = sha256Hex(canonicalize(row.gateConfig));
+  const recalculatedConfigHash = hashAuditEvidence(row.gateConfig);
   if (row.gateConfigHash !== recalculatedConfigHash) {
     reasons.push(`${row.gateId || "unknown"}:gateConfigHash:mismatch`);
   }
-  if (row.evidenceChainHash !== sha256Hex(canonicalize(row.evidenceRefs))) {
+  if (row.evidenceChainHash !== hashAuditEvidence(row.evidenceRefs)) {
     reasons.push(`${row.gateId || "unknown"}:evidenceChainHash:mismatch`);
   }
   const expectedControlStatus = releaseGateControlStatus(row.controlEvidence.length > 0 ? row.controlEvidence : undefined);
@@ -712,10 +705,7 @@ export function buildReleaseGateReceipt(input: {
   generatedAt?: string;
 }): ReleaseGateReceipt {
   const failClosedReasons: string[] = [];
-  const sourceIds = new Set(input.sourceCitations.map((citation) => citation.sourceId).filter(Boolean));
-  if (sourceIds.size === 0) {
-    failClosedReasons.push("sourceCitations:missing");
-  }
+  const sourceIds = collectAuditSourceIds(input.sourceCitations, failClosedReasons);
 
   const rows = input.gates.map((gate): ReleaseGateReceiptRow => {
     const gateLabel = gate.gateId || "unknown";
@@ -753,8 +743,8 @@ export function buildReleaseGateReceipt(input: {
       controlEvidence: gate.controlEvidence
     }));
 
-    const gateConfigHash = sha256Hex(canonicalize(gate.gateConfig));
-    const evidenceChainHash = sha256Hex(canonicalize(gate.evidenceRefs));
+    const gateConfigHash = hashAuditEvidence(gate.gateConfig);
+    const evidenceChainHash = hashAuditEvidence(gate.evidenceRefs);
     const controlEvidence = gate.controlEvidence ?? [];
     const baseRow: Omit<ReleaseGateReceiptRow, "rowHash"> = {
       gateId: gate.gateId,
@@ -787,31 +777,11 @@ export function buildReleaseGateReceipt(input: {
     failClosedReasons.push("rows:missing");
   }
 
-  const withoutHash: Omit<ReleaseGateReceipt, "receiptHash"> = {
-    receiptId: input.receiptId,
-    generatedAt: input.generatedAt ?? new Date().toISOString(),
-    sourceCitations: input.sourceCitations,
-    rows,
-    failClosed: failClosedReasons.length > 0,
-    failClosedReasons: [...new Set(failClosedReasons)]
-  };
-  return {
-    ...withoutHash,
-    receiptHash: releaseGateReceiptHash(withoutHash)
-  };
+  return finalizeAuditEvidenceReceipt(input, rows, failClosedReasons);
 }
 
 export function verifyReleaseGateReceipt(receipt: ReleaseGateReceipt): ReleaseGateReceiptVerification {
-  const reasons: string[] = [];
-  if (receipt.failClosed) {
-    reasons.push(...receipt.failClosedReasons);
-  }
-  if (receipt.sourceCitations.length === 0) {
-    reasons.push("sourceCitations:missing");
-  }
-  if (receipt.rows.length === 0) {
-    reasons.push("rows:missing");
-  }
+  const reasons = beginAuditReceiptVerification(receipt, "rows:missing");
   for (const row of receipt.rows) {
     reasons.push(...validateReleaseGateRow(row));
   }
@@ -821,7 +791,7 @@ export function verifyReleaseGateReceipt(receipt: ReleaseGateReceipt): ReleaseGa
   }
   return {
     valid: reasons.length === 0,
-    reasons: [...new Set(reasons)]
+    reasons: unique(reasons)
   };
 }
 
@@ -873,13 +843,5 @@ export function renderReleaseGateAuditExport(receipt: ReleaseGateReceipt): strin
       }
     }
   }
-  if (receipt.failClosedReasons.length > 0) {
-    lines.push("");
-    lines.push("## Fail-Closed Reasons");
-    for (const reason of receipt.failClosedReasons) {
-      lines.push(`- ${reason}`);
-    }
-  }
-  lines.push("");
-  return lines.join("\n");
+  return finalizeAuditEvidenceExport(lines, receipt);
 }

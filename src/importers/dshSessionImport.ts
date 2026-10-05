@@ -49,7 +49,7 @@ export function parseDetectedDshSession(text: string): ParsedDshSession | null {
   return parseDshSession(text);
 }
 
-export function parseDshSession(text: string): ParsedDshSession {
+function parseDshSession(text: string): ParsedDshSession {
   if (Buffer.byteLength(text, "utf8") > DSH_IMPORT_LIMITS.bytes) refuse("document exceeds 32 MiB.");
   const rows: unknown[] = [];
   for (const [index, line] of text.split(/\r?\n/).entries()) {

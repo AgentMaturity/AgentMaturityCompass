@@ -219,7 +219,7 @@ export function generateL5DeltaReport(params: {
   };
 }
 
-export function renderL5DeltaMarkdown(report: L5DeltaReport): string {
+function renderL5DeltaMarkdown(report: L5DeltaReport): string {
   const lines: string[] = [
     "# L4→L5 Delta Report",
     "",

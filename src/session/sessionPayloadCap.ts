@@ -71,7 +71,7 @@ export function assertSessionPayloadWithinCap(workspace: string, what: string, b
 }
 
 /** Refuse before admission when not even the spill store can retain the payload. */
-export function assertSessionPayloadRetainable(workspace: string, what: string, byteLength: number): void {
+function assertSessionPayloadRetainable(workspace: string, what: string, byteLength: number): void {
   const cap = sessionSpillCap(workspace);
   if (byteLength > cap) throw new SessionSpillCapError(what, byteLength, cap);
 }

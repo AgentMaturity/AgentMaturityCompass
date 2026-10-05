@@ -1,3 +1,4 @@
+import { writeControlJson, writeControlError } from "../utils/controlHttpResponses.js";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { renameSync } from "node:fs";
@@ -160,9 +161,7 @@ async function readBody(req: IncomingMessage, maxBytes = 1_048_576): Promise<str
 }
 
 function json(res: ServerResponse, status: number, payload: unknown): void {
-  res.statusCode = status;
-  res.setHeader("content-type", "application/json");
-  res.end(JSON.stringify(payload));
+  writeControlJson(res, status, payload);
 }
 
 function extractClientIp(req: IncomingMessage): string {
@@ -759,7 +758,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
   };
 
   const server = createServer(async (req, res) => {
-    if (workspaceApis.closing) { json(res, 503, { error: "workspace router is stopping" }); return; }
+    if (workspaceApis.closing) { writeControlError(res, 503, "workspace router is stopping"); return; }
     try {
       const url = new URL(req.url ?? "/", `http://${options.host}:${options.port}`);
       const pathname = url.pathname;
@@ -792,7 +791,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/events") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         res.writeHead(200, {
@@ -808,7 +807,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       if (pathname.startsWith("/host/") && pathname !== "/host/healthz" && pathname !== "/host/readyz") {
         if (leasePresentForRequest(req, url)) {
-          json(res, 403, { error: "lease-auth is not allowed on host endpoints" });
+          writeControlError(res, 403, "lease-auth is not allowed on host endpoints");
           return;
         }
       }
@@ -828,7 +827,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       if ((pathname === "/host/api/login" || pathname === "/host/api/auth/login") && req.method === "POST") {
         if (!hostLoginLimiter(`host-login:${clientIp}`)) {
-          json(res, 429, { error: "too many login attempts" });
+          writeControlError(res, 429, "too many login attempts");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
@@ -935,10 +934,10 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             route: "/host/api/login",
             mode: "legacy_fallback"
           });
-          json(res, 401, { error: legacyAuth.error ?? "invalid credentials" });
+          writeControlError(res, 401, legacyAuth.error ?? "invalid credentials");
           return;
         }
-        json(res, local.status, { error: local.error ?? "login failed" });
+        writeControlError(res, local.status, local.error ?? "login failed");
         return;
       }
 
@@ -963,7 +962,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/auth/me" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         json(res, 200, {
@@ -1009,7 +1008,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             providerId
           });
         } catch (error) {
-          json(res, 400, { error: String(error) });
+          writeControlError(res, 400, String(error));
           return;
         }
         res.statusCode = 302;
@@ -1023,7 +1022,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         const code = url.searchParams.get("code") ?? "";
         const state = url.searchParams.get("state") ?? "";
         if (!code || !state) {
-          json(res, 400, { error: "missing code/state" });
+          writeControlError(res, 400, "missing code/state");
           return;
         }
         let completed;
@@ -1038,18 +1037,18 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         } catch (error) {
           const message = String(error);
           if (message.includes("state mismatch") || message.includes("state expired")) {
-            json(res, 400, { error: message });
+            writeControlError(res, 400, message);
             return;
           }
           if (message.includes("nonce mismatch") || message.includes("signature invalid")) {
-            json(res, 401, { error: message });
+            writeControlError(res, 401, message);
             return;
           }
           if (message.includes("missing email") || message.includes("email not verified")) {
-            json(res, 403, { error: message });
+            writeControlError(res, 403, message);
             return;
           }
-          json(res, 401, { error: message });
+          writeControlError(res, 401, message);
           return;
         }
         setIdentityCookieHeader({
@@ -1082,7 +1081,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             providerId
           });
         } catch (error) {
-          json(res, 400, { error: String(error) });
+          writeControlError(res, 400, String(error));
           return;
         }
         res.statusCode = 302;
@@ -1098,7 +1097,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         const samlResponse = form.SAMLResponse ?? "";
         const relayState = form.RelayState ?? "";
         if (!samlResponse || !relayState) {
-          json(res, 400, { error: "missing SAMLResponse or RelayState" });
+          writeControlError(res, 400, "missing SAMLResponse or RelayState");
           return;
         }
         let completed;
@@ -1113,18 +1112,18 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         } catch (error) {
           const message = String(error);
           if (message.includes("relay state")) {
-            json(res, 400, { error: message });
+            writeControlError(res, 400, message);
             return;
           }
           if (message.includes("invalid SAML response")) {
-            json(res, 401, { error: message });
+            writeControlError(res, 401, message);
             return;
           }
           if (message.includes("missing required")) {
-            json(res, 403, { error: message });
+            writeControlError(res, 403, message);
             return;
           }
-          json(res, 401, { error: message });
+          writeControlError(res, 401, message);
           return;
         }
         setIdentityCookieHeader({
@@ -1154,7 +1153,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/workspaces" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         const visible = listAccessibleWorkspaces(options.hostDir, auth.username);
@@ -1171,7 +1170,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/portfolio/forecast" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         const visible = listAccessibleWorkspaces(options.hostDir, auth.username);
@@ -1193,7 +1192,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/bench/portfolio" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         const visible = listAccessibleWorkspaces(options.hostDir, auth.username);
@@ -1215,7 +1214,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/audit/portfolio" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "unauthorized" });
+          writeControlError(res, auth.status, auth.error ?? "unauthorized");
           return;
         }
         const visible = listAccessibleWorkspaces(options.hostDir, auth.username);
@@ -1237,7 +1236,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/users" && req.method === "GET") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         json(res, 200, { users: listHostUsers(options.hostDir) });
@@ -1247,7 +1246,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/workspaces" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
@@ -1295,7 +1294,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/workspaces/delete" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { workspaceId?: unknown };
@@ -1323,7 +1322,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/users/add" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
@@ -1348,7 +1347,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/users/disable" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as { username?: unknown };
@@ -1362,7 +1361,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/memberships/grant" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
@@ -1388,7 +1387,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (pathname === "/host/api/memberships/revoke" && req.method === "POST") {
         const auth = requireHostAccess(req, options.hostDir, true);
         if (!auth.ok || !auth.username) {
-          json(res, auth.status, { error: auth.error ?? "host admin required" });
+          writeControlError(res, auth.status, auth.error ?? "host admin required");
           return;
         }
         const body = JSON.parse(await readBody(req, options.maxRequestBytes ?? 1_048_576)) as {
@@ -1441,7 +1440,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       const wsMatch = /^\/w\/([^/]+)(\/.*)?$/.exec(pathname);
       if (!wsMatch) {
-        json(res, 404, { error: "not found" });
+        writeControlError(res, 404, "not found");
         return;
       }
       const urlWorkspaceId = normalizeWorkspaceId(wsMatch[1] ?? "");
@@ -1473,7 +1472,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
 
       if ((workspacePath === "/login" || workspacePath === "/api/login" || workspacePath === "/auth/login") && req.method === "POST") {
         if (!workspaceLoginLimiter(`workspace-login:${urlWorkspaceId}:${clientIp}`)) {
-          json(res, 429, { error: "too many login attempts" });
+          writeControlError(res, 429, "too many login attempts");
           return;
         }
         const hostAccess = resolveHostAccess(req, options.hostDir);
@@ -1495,7 +1494,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             password: inputPassword
           });
           if (!auth.ok || !auth.user) {
-            json(res, 401, { error: auth.error ?? "invalid credentials" });
+            writeControlError(res, 401, auth.error ?? "invalid credentials");
             return;
           }
           userId = auth.user.userId;
@@ -1507,7 +1506,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
               );
         }
         if (roles.length === 0) {
-          json(res, 403, { error: "membership required" });
+          writeControlError(res, 403, "membership required");
           return;
         }
         const runtime = await ensureWorkspaceApi(urlWorkspaceId).catch(() => null);
@@ -1570,7 +1569,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       if (nativeRequest && lease.leaseToken) {
         // A lease must not select the branch that skips current human membership
         // checks merely because the same request also carries a session cookie.
-        json(res, 403, { error: "agent leases cannot authorize native task workspace requests" });
+        writeControlError(res, 403, "agent leases cannot authorize native task workspace requests");
         return;
       }
       if (lease.leaseToken) {
@@ -1624,14 +1623,12 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           } catch {
             // best effort audit logging
           }
-          json(res, 403, { error: "lease workspace mismatch" });
+          writeControlError(res, 403, "lease workspace mismatch");
           return;
         }
         const leaseVerify = verifyWorkspaceLeaseToken(manager, urlWorkspaceId, lease.leaseToken);
         if (!leaseVerify.ok) {
-          json(res, leaseVerify.status, {
-            error: leaseVerify.error ?? "lease verification failed"
-          });
+          writeControlError(res, leaseVerify.status, leaseVerify.error ?? "lease verification failed");
           return;
         }
       }
@@ -1643,7 +1640,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
           if (workspaceSession.payload.userId === "local-demo") {
             if (!allowLocalDemoAccess) {
               clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
-              json(res, 401, { error: "local demo session is not enabled" });
+              writeControlError(res, 401, "local demo session is not enabled");
               return;
             }
           } else {
@@ -1669,7 +1666,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             if (!sessionCurrent) {
               workspaceSessionValid = false;
               clearWorkspaceSessionCookie(res, urlWorkspaceId, requestUsesHttps(req));
-              json(res, 401, { error: "workspace session authority changed" });
+              writeControlError(res, 401, "workspace session authority changed");
               return;
             }
           }
@@ -1677,7 +1674,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
         if (hostAccess.ok) {
           const roles = resolveWorkspaceRolesForHostAccess(options.hostDir, urlWorkspaceId, hostAccess);
           if (roles.length === 0) {
-            json(res, 403, { error: "membership required" });
+            writeControlError(res, 403, "membership required");
             return;
           }
           const canMintWorkspaceSession = hostAccess.username && hostAccess.userId;
@@ -1722,7 +1719,7 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
             req.headers.cookie = replaceSessionCookie(req.headers.cookie, issued.token);
           }
         } else if (!workspaceSessionValid) {
-          json(res, 401, { error: "missing workspace session" });
+          writeControlError(res, 401, "missing workspace session");
           return;
         }
       }
@@ -1737,21 +1734,21 @@ export async function startWorkspaceRouter(options: StartWorkspaceRouterOptions)
       const runtime = await ensureWorkspaceApi(urlWorkspaceId);
       await proxyStudioWorkspaceRequest(req, res, runtime, nativeRequest ? `${workspacePath}${url.search}` : workspacePath);
     } catch (error) {
-      if (error instanceof WorkspaceRuntimeClosingError) { json(res, 503, { error: error.message }); return; }
+      if (error instanceof WorkspaceRuntimeClosingError) { writeControlError(res, 503, error.message); return; }
       if (error instanceof NativeAdmissionError) {
         json(res, error.statusCode, { error: error.message, code: error.code });
         return;
       }
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("PAYLOAD_TOO_LARGE")) {
-        json(res, 413, { error: "payload too large" });
+        writeControlError(res, 413, "payload too large");
         return;
       }
       if (error instanceof SyntaxError) {
-        json(res, 400, { error: "invalid JSON body" });
+        writeControlError(res, 400, "invalid JSON body");
         return;
       }
-      json(res, 500, { error: "internal server error" });
+      writeControlError(res, 500, "internal server error");
     }
   });
 

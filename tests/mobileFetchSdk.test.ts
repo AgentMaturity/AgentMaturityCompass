@@ -1,7 +1,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, test } from "vitest";
-import { createAMCMobileFetchBridge } from "../src/sdk/mobileFetch.js";
+import { describe, expect, expectTypeOf, test } from "vitest";
+import { createAMCMobileFetchBridge, createReactNativeAMCFetch } from "../src/sdk/mobileFetch.js";
+import * as sdkExports from "../src/sdk/index.js";
+import { orgSignatureSchema, orgScorecardSignatureSchema } from "../src/org/orgSchema.js";
+import { createHash } from "node:crypto";
+import ts from "typescript";
 
 function headersObject(headers: HeadersInit | undefined): Record<string, string> {
   const headersObj = new Headers(headers);
@@ -104,5 +108,58 @@ describe("AMC mobile fetch bridge", () => {
     expect(source).not.toContain("node:");
     expect(source).not.toContain("process.env");
     expect(source).not.toContain("Buffer.");
+  });
+});
+
+
+const aliasArchive = "unused-code/2026-10-01-main/public-identity-aliases";
+describe("public SDK and scorecard identity aliases", () => {
+  test("React Native name preserves function identity, type and SDK barrel routing", async () => {
+    expect(createReactNativeAMCFetch).toBe(createAMCMobileFetchBridge);
+    expect(sdkExports.createReactNativeAMCFetch).toBe(createAMCMobileFetchBridge);
+    expect(sdkExports.createAMCMobileFetchBridge).toBe(createAMCMobileFetchBridge);
+    expect(createReactNativeAMCFetch.name).toBe("createAMCMobileFetchBridge");
+    expect(createReactNativeAMCFetch.length).toBe(1);
+    expectTypeOf(createReactNativeAMCFetch).toEqualTypeOf<typeof createAMCMobileFetchBridge>();
+    const urls: string[] = [];
+    const proxy = createReactNativeAMCFetch({
+      bridgeUrl: "https://amc.example.invalid", agentId: "alias-fixture",
+      fetchImpl: (async (url: RequestInfo | URL) => { urls.push(String(url)); return new Response("owned fixture"); }) as typeof fetch,
+    });
+    const response = await proxy("https://api.openai.com/v1/chat/completions", { method: "POST", body: JSON.stringify({ messages: [] }) });
+    expect(await response.text()).toBe("owned fixture");
+    expect(urls).toEqual(["https://amc.example.invalid/bridge/openai/v1/chat/completions"]);
+  });
+  test("scorecard signature name preserves schema object identity, type and validation", () => {
+    expect(orgScorecardSignatureSchema).toBe(orgSignatureSchema);
+    expectTypeOf(orgScorecardSignatureSchema).toEqualTypeOf<typeof orgSignatureSchema>();
+    const signature = { digestSha256: "a".repeat(64), signature: "owned schema fixture", signedTs: 1_700_000_000_000, signer: "auditor" };
+    expect(orgScorecardSignatureSchema.parse(signature)).toEqual(orgSignatureSchema.parse(signature));
+    for (const value of [null, {}, { ...signature, digestSha256: "short" }, { ...signature, signedTs: 1.5 }, { ...signature, signer: "owner" }]) {
+      const original = orgSignatureSchema.safeParse(value), alias = orgScorecardSignatureSchema.safeParse(value);
+      expect(alias.success).toBe(original.success);
+      expect(alias.success).toBe(false);
+      if (!alias.success && !original.success) expect(alias.error.issues).toEqual(original.error.issues);
+    }
+  });
+  test("keeps every other declaration and public implementation byte-identical", () => {
+    const restoration = JSON.parse(readFileSync(join(process.cwd(), aliasArchive, "restoration.json"), "utf8")) as {
+      files: Array<{ originalPath: string; archivePath: string; sha256: string }>;
+    };
+    const aliases = new Set(["createReactNativeAMCFetch", "orgScorecardSignatureSchema"]);
+    function unchanged(source: string) {
+      const file = ts.createSourceFile("alias.ts", source, ts.ScriptTarget.ES2022, true);
+      return file.statements.filter(node => {
+        if (ts.isVariableStatement(node) && node.declarationList.declarations.some(decl => ts.isIdentifier(decl.name) && aliases.has(decl.name.text))) return false;
+        if (ts.isExportDeclaration(node) && node.exportClause && ts.isNamedExports(node.exportClause)
+          && node.exportClause.elements.every(element => aliases.has(element.name.text))) return false;
+        return true;
+      }).map(node => node.getText(file)).join("\n");
+    }
+    for (const row of restoration.files.filter(item => item.originalPath.startsWith("src/"))) {
+      const original = readFileSync(join(process.cwd(), row.archivePath), "utf8");
+      expect(createHash("sha256").update(original).digest("hex")).toBe(row.sha256);
+      expect(unchanged(readFileSync(join(process.cwd(), row.originalPath), "utf8"))).toBe(unchanged(original));
+    }
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { PolicyFirewall } from '../src/enforce/policyFirewall.js';
 import { checkExec } from '../src/enforce/execGuard.js';
 import { CircuitBreaker } from '../src/enforce/circuitBreaker.js';
@@ -209,8 +209,29 @@ describe('E24 — Evidence Contract', () => {
 
 describe('E27 — Temporal Controls', () => {
   it('checks time access', () => {
-    const r = checkTemporalAccess('deploy', { allowedHours: { start: 9, end: 17 }, allowedDays: [1, 2, 3, 4, 5] });
-    expect(r).toHaveProperty('allowed');
+    const policy = { allowedHours: { start: 9, end: 17 }, allowedDays: [1, 2, 3, 4, 5] };
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      // Local calendar dates match the implementation's local-hour policy.
+      vi.setSystemTime(new Date(2026, 8, 28, 10));
+      const r = checkTemporalAccess('deploy', policy);
+      expect(r).toHaveProperty('allowed');
+      expect(r.allowed).toBe(true);
+
+      vi.setSystemTime(new Date(2026, 8, 28, 8));
+      expect(checkTemporalAccess('deploy', policy)).toMatchObject({
+        allowed: false, reason: 'Outside allowed hours (9-17)'
+      });
+      vi.setSystemTime(new Date(2026, 8, 28, 17));
+      expect(checkTemporalAccess('deploy', policy).allowed).toBe(false);
+
+      vi.setSystemTime(new Date(2026, 9, 3, 10));
+      expect(checkTemporalAccess('deploy', policy)).toMatchObject({
+        allowed: false, reason: 'Day 6 not in allowed days'
+      });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

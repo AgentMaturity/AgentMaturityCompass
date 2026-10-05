@@ -75,7 +75,7 @@ function defaultPassphrase(): string {
   return "";
 }
 
-export function hostVaultPaths(hostDir: string): {
+function hostVaultPaths(hostDir: string): {
   dir: string;
   vaultFile: string;
   metaFile: string;

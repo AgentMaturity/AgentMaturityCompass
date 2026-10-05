@@ -28382,7 +28382,7 @@ function buildManifestHashPayload(manifest: Omit<ReplayBenchmarkCorpusManifest, 
   return sha256Hex(canonicalize(manifest));
 }
 
-export function computeReplayBenchmarkManifestHash(manifest: Omit<ReplayBenchmarkCorpusManifest, "manifestHash">): string {
+function computeReplayBenchmarkManifestHash(manifest: Omit<ReplayBenchmarkCorpusManifest, "manifestHash">): string {
   return buildManifestHashPayload(manifest);
 }
 
@@ -28696,7 +28696,7 @@ export function runReplayBenchmarkCorpus(input: ReplayBenchmarkCorpusInput): Rep
   };
 }
 
-export function buildReplayBenchmarkCiReceipt(
+function buildReplayBenchmarkCiReceipt(
   manifest: ReplayBenchmarkCorpusManifest,
   mode: ReplayBenchmarkGateMode = "ci",
 ): ReplayBenchmarkCiReceipt {

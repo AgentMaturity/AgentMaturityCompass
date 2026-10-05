@@ -298,7 +298,7 @@ export function buildEvaluatorRegistryProjection(input: {
   });
 }
 
-export function evaluatorRegistryRoot(workspace: string): string {
+function evaluatorRegistryRoot(workspace: string): string {
   return join(workspace, ".amc", "evaluators");
 }
 

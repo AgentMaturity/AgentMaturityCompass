@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Build from the repository root: --target studio (default) or --target runner.
+# Build from the repository root: --target studio (default), runner or api.
 # Override NODE_IMAGE with a reviewed digest to pin the operating-system image.
 ARG NODE_IMAGE=node:22-bookworm-slim
 FROM ${NODE_IMAGE} AS native-tools
@@ -18,6 +18,7 @@ COPY packages/ packages/
 COPY scripts/ scripts/
 RUN pnpm install --frozen-lockfile
 COPY src/ src/
+COPY api/ api/
 COPY fixtures/policy/ fixtures/policy/
 RUN pnpm run build
 # The separate release/prepack gate is NOT exercised by this source image build.
@@ -65,6 +66,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && ln -s /usr/bin/python3 /usr/local/bin/python
 USER 10001:10001
 LABEL org.opencontainers.image.title="amc-runner"
+
+# The independent lightweight API uses its packaged bundle and no dev-time TS loader.
+FROM runtime AS api
+ENV PORT=3220
+WORKDIR /data/amc
+EXPOSE 3220
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD node -e 'fetch("http://127.0.0.1:"+process.env.PORT+"/api/health",{signal:AbortSignal.timeout(4000)}).then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'
+ENTRYPOINT ["node", "/opt/amc/node_modules/agent-maturity-compass/dist/standalone-api.js"]
+CMD []
 
 # Studio is the default target. No arguments starts Studio; explicit arguments
 # retain normal `amc <args>` CLI behavior (including notary and --help).

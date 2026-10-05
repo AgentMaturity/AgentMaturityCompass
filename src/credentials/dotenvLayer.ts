@@ -40,7 +40,7 @@ function unquote(raw: string): string {
 }
 
 /** Parses `.env` text into the credential entries it contributes. */
-export function parseDotenv(raw: string): ReadonlyMap<string, string> {
+function parseDotenv(raw: string): ReadonlyMap<string, string> {
   const entries = new Map<string, string>();
   for (const line of raw.split(/\r?\n/)) {
     const trimmed = line.trim();

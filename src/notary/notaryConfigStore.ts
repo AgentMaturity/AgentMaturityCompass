@@ -4,7 +4,7 @@ import YAML from "yaml";
 import { notaryConfigSchema, type NotaryConfig } from "./notaryConfigSchema.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 
-export function defaultNotaryDir(): string {
+function defaultNotaryDir(): string {
   const custom = process.env.AMC_NOTARY_DIR;
   if (typeof custom === "string" && custom.trim().length > 0) {
     return resolve(custom.trim());
@@ -23,11 +23,11 @@ export function notaryConfigPath(notaryDir: string): string {
   return join(notaryDir, "notary.yaml");
 }
 
-export function notaryKeysDir(notaryDir: string): string {
+function notaryKeysDir(notaryDir: string): string {
   return join(notaryDir, "keys");
 }
 
-export function notaryLogsDir(notaryDir: string): string {
+function notaryLogsDir(notaryDir: string): string {
   return join(notaryDir, "logs");
 }
 
@@ -89,7 +89,7 @@ export function defaultNotaryConfig(): NotaryConfig {
   });
 }
 
-export function ensureNotaryDir(notaryDir: string): void {
+function ensureNotaryDir(notaryDir: string): void {
   ensureDir(notaryDir);
   ensureDir(notaryKeysDir(notaryDir));
   ensureDir(notaryLogsDir(notaryDir));

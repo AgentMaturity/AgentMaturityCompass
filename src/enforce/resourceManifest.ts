@@ -487,7 +487,7 @@ function enforceResourceSnapshotPath(workspace: string, agentId: string, manifes
   return join(enforceResourceDir(workspace, agentId), "snapshots", `${manifestId}.json`);
 }
 
-export function enforceResourceSnapshotBundlePath(workspace: string, agentId: string, manifestId: string): string {
+function enforceResourceSnapshotBundlePath(workspace: string, agentId: string, manifestId: string): string {
   return join(enforceResourceDir(workspace, agentId), "snapshots", manifestId);
 }
 

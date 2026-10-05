@@ -14,7 +14,7 @@ import {
   type PluginRegistryConfig
 } from "./pluginRegistrySchema.js";
 
-export function pluginsRoot(workspace: string): string {
+function pluginsRoot(workspace: string): string {
   return join(workspace, ".amc", "plugins");
 }
 
@@ -22,7 +22,7 @@ export function pluginsInstalledDir(workspace: string): string {
   return join(pluginsRoot(workspace), "installed");
 }
 
-export function pluginsPendingDir(workspace: string): string {
+function pluginsPendingDir(workspace: string): string {
   return join(pluginsRoot(workspace), "pending");
 }
 
@@ -30,7 +30,7 @@ export function pluginsRegistriesPath(workspace: string): string {
   return join(pluginsRoot(workspace), "registries.yaml");
 }
 
-export function pluginsOverridesPath(workspace: string): string {
+function pluginsOverridesPath(workspace: string): string {
   return join(pluginsRoot(workspace), "overrides.yaml");
 }
 

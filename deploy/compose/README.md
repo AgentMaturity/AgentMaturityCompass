@@ -85,3 +85,11 @@ When `AMC_ENABLE_NOTARY=1`, bootstrap writes and signs `.amc/trust.yaml` in `NOT
 - Keep `AMC_QUERY_LEASE_CARRIER_ENABLED=false` except local development.
 - Keep notary auth and passphrase in Docker secrets only.
 - Never store secrets directly in compose YAML; use Docker secrets files.
+
+## Optional standalone API alongside Studio
+
+Add `-f docker-compose.studio-api.yml` after `-f docker-compose.tls.yml` to both `config` and `up` commands. The overlay retains Studio and notary, adds the production API image, and mounts `Caddyfile.studio-api`. Studio `/api/v1/*` stays on Studio; the legacy `/api/*` namespace goes to the separate API on internal port 3220. No API host port is published.
+
+The API shares the workspace read-only for industry-pack entitlements. License issuance remains refused unless its existing administrator token is explicitly configured by the operator. Quickscore is self-reporting, not signed evidence; the badge is a labelled placeholder. `/__amc/proxy-health` identifies the proxy, `/api/health` checks the standalone API, and `/readyz` checks Studio readiness. Proxy or API health does not prove a governed Studio turn.
+
+The API image target is additive; the default Docker target remains Studio. Use both Compose files consistently for lifecycle and rollback commands. Roll back to previously recorded immutable images while retaining workspace and Caddy volumes; do not use `down -v`. Qualify rollback on a disposable deployment before public use.

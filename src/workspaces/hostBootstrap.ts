@@ -12,7 +12,7 @@ function readSecretFile(path: string | undefined): string {
   return readFileSync(resolve(path.trim()), "utf8").trim();
 }
 
-export async function bootstrapHost(params: {
+async function bootstrapHost(params: {
   hostDir: string;
   workspaceId?: string;
   workspaceName?: string;

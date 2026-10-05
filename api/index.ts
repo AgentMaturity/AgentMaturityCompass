@@ -3,19 +3,22 @@
  * 
  * Endpoints:
  *   GET  /api/health          — Health check
- *   GET  /api/questions       — List all diagnostic questions
- *   GET  /api/packs           — List sector packs
- *   POST /api/score           — Score an agent from evidence/responses
+ *   GET  /api/industry-packs/access — Entitlements and checkout availability
  *   POST /api/quickscore      — Quick self-assessment score
- *   GET  /api/badge/:agentId  — SVG badge for agent's score
+ *   GET  /api/badge/:agentId  — Labelled placeholder SVG badge
  * 
- * Can run standalone: npx ts-node api/index.ts
+ * Development: pnpm api:start; production: pnpm build && pnpm api:start:production
  * Or deploy to Vercel/Railway/Fly.io
  */
 
 import http from 'node:http';
+import { readdirSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { amcVersion } from '../src/version.js';
+import { questionBank } from '../src/diagnostic/questionBank.js';
+import { listAssurancePacks } from '../src/assurance/packs/index.js';
+import { listIndustryPacks } from '../src/domains/industryPacks.js';
 import {
   buildIndustryPackCheckoutUrl,
   createIndustryPackLicenseKey,
@@ -44,6 +47,9 @@ interface ScoreResult {
   dimensions: Record<string, { score: number; level: string; questions: number }>;
   timestamp: string;
   version: string;
+  packageVersion: string;
+  assessmentBasis: 'self_reported';
+  evidenceVerified: false;
 }
 
 interface CheckoutRequest {
@@ -131,8 +137,8 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
     
     for (const [dimId, dim] of Object.entries(DIMENSIONS)) {
       if (dim.questionPrefix.some(p => prefix === p)) {
-        dimScores[dimId].total += (clampedLevel / 5) * 100;
-        dimScores[dimId].count += 1;
+        dimScores[dimId]!.total += (clampedLevel / 5) * 100;
+        dimScores[dimId]!.count += 1;
         break;
       }
     }
@@ -143,7 +149,7 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
   let dimCount = 0;
   
   for (const [dimId, dim] of Object.entries(DIMENSIONS)) {
-    const s = dimScores[dimId];
+    const s = dimScores[dimId]!;
     const score = s.count > 0 ? s.total / s.count : 0;
     dimensions[dim.name] = {
       score: Math.round(score * 10) / 10,
@@ -163,6 +169,9 @@ function computeQuickScore(req: QuickScoreRequest): ScoreResult {
     dimensions,
     timestamp: new Date().toISOString(),
     version: '2.0.0',
+    packageVersion: amcVersion,
+    assessmentBasis: 'self_reported',
+    evidenceVerified: false,
   };
 }
 
@@ -199,8 +208,27 @@ function hasAdminToken(req: http.IncomingMessage): boolean {
   return provided === expected;
 }
 
+let compiledModuleCount: number | null | undefined;
+function moduleInventory(): number | null {
+  if (compiledModuleCount !== undefined) return compiledModuleCount;
+  const walk = (directory: string): number => readdirSync(directory, { withFileTypes: true })
+    .reduce((count, entry) => count + (entry.isDirectory()
+      ? walk(resolve(directory, entry.name))
+      : entry.isFile() && entry.name.endsWith('.js') ? 1 : 0), 0);
+  try {
+    // Both api/index.ts and the production dist bundle resolve this to dist/.
+    compiledModuleCount = walk(fileURLToPath(new URL('../dist/', import.meta.url)));
+  } catch {
+    compiledModuleCount = null;
+  }
+  return compiledModuleCount;
+}
+
 async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse) {
-  const parsedUrl = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+  // Routing uses only the path/query; an untrusted Host must not crash the service.
+  let parsedUrl: URL;
+  try { parsedUrl = new URL(req.url || '/', 'http://localhost'); }
+  catch { sendJson(res, 400, { error: 'Invalid request URL' }); return; }
   const path = parsedUrl.pathname || '/';
   const method = req.method || 'GET';
   
@@ -219,11 +247,13 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (path === '/api/health' && method === 'GET') {
     sendJson(res, 200, {
       status: 'ok',
-      version: '1.0.0',
-      questions: 240,
-      modules: 75,
-      assurancePacks: 147,
-      sectorPacks: 40,
+      version: amcVersion,
+      questions: questionBank.length,
+      modules: moduleInventory(),
+      moduleInventoryBasis: 'compiled_js_files',
+      assurancePacks: listAssurancePacks().length,
+      sectorPacks: listIndustryPacks().length,
+      inventoryBasis: 'registered_catalogs_and_installed_files',
       industryPacksPlan: INDUSTRY_PACKS_PLAN_ID,
       industryPacksPriceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
     });
@@ -231,14 +261,21 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   if (path === '/api/industry-packs/access' && method === 'GET') {
-    sendJson(res, 200, {
-      entitlement: getIndustryPackEntitlement(process.cwd()),
-      checkoutUrl: buildIndustryPackCheckoutUrl({
+    let checkoutUrl: string | null = null;
+    try {
+      checkoutUrl = buildIndustryPackCheckoutUrl({
         successUrl: parsedUrl.searchParams.get('successUrl') ?? undefined,
         cancelUrl: parsedUrl.searchParams.get('cancelUrl') ?? undefined,
         customerEmail: parsedUrl.searchParams.get('email') ?? undefined,
         clientReferenceId: parsedUrl.searchParams.get('reference') ?? undefined,
-      })
+      });
+    } catch {
+      // Entitlements remain readable when checkout has not been configured.
+    }
+    sendJson(res, 200, {
+      entitlement: getIndustryPackEntitlement(process.cwd()),
+      checkoutUrl,
+      checkoutAvailable: checkoutUrl !== null,
     });
     return;
   }
@@ -310,17 +347,21 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
   
   if (path === '/api/quickscore' && method === 'POST') {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      try {
-        const data = JSON.parse(body) as QuickScoreRequest;
-        const result = computeQuickScore(data);
-        sendJson(res, 200, result);
-      } catch (e) {
-        sendJson(res, 400, { error: 'Invalid JSON body', usage: 'POST { agentId, responses: { "SO-01": 3, "SK-02": 4, ... } }' });
+    try {
+      const data = await readJsonBody<QuickScoreRequest>(req);
+      if (!data || typeof data !== 'object' || Array.isArray(data)
+          || (data.agentId !== undefined && typeof data.agentId !== 'string')
+          || (data.responses !== undefined && (typeof data.responses !== 'object'
+            || data.responses === null || Array.isArray(data.responses)
+            || Object.values(data.responses).some(value => typeof value !== 'number' || !Number.isFinite(value))))) {
+        sendJson(res, 400, { error: 'responses must be an object of finite numbers' });
+        return;
       }
-    });
+      sendJson(res, 200, computeQuickScore(data));
+    } catch (e) {
+      sendJson(res, e instanceof Error && e.message === 'PAYLOAD_TOO_LARGE' ? 413 : 400,
+        { error: 'Invalid JSON body', usage: 'POST { agentId, responses: { "SO-01": 3, "SK-02": 4, ... } }' });
+    }
     return;
   }
   
@@ -328,6 +369,7 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     const agentId = path.split('/api/badge/')[1] || 'unknown';
     // For now, return a default badge. In production, look up cached scores.
     const svg = generateBadgeSvg(agentId, 'L0', 0);
+    res.setHeader('X-AMC-Score-Basis', 'placeholder-not-measured');
     res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'no-cache' });
     res.end(svg);
     return;
@@ -336,7 +378,7 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   if (path === '/' || path === '/api') {
     sendJson(res, 200, {
       name: 'Agent Maturity Compass API',
-      version: '1.0.0',
+      version: amcVersion,
       endpoints: {
         'GET /api/health': 'Health check',
         'GET /api/industry-packs/access': 'Industry Packs entitlement and checkout metadata',
@@ -356,15 +398,22 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
 }
 
 const currentFile = fileURLToPath(import.meta.url);
-const invokedFile = process.argv[1] ? resolve(process.argv[1]) : "";
+let invokedFile = "";
+try {
+  if (process.argv[1]) invokedFile = realpathSync(resolve(process.argv[1]));
+} catch {
+  // Embedders may supply an argv entry that is not a local file.
+}
 
 if (invokedFile === currentFile) {
   const server = http.createServer(handleRequest);
   server.listen(PORT, () => {
-    console.log(`🧭 AMC API running on http://localhost:${PORT}`);
-    console.log(`   Health:     GET  http://localhost:${PORT}/api/health`);
-    console.log(`   QuickScore: POST http://localhost:${PORT}/api/quickscore`);
-    console.log(`   Badge:      GET  http://localhost:${PORT}/api/badge/:agentId`);
+    const address = server.address();
+    const actualPort = address && typeof address === 'object' ? address.port : PORT;
+    console.log(`🧭 AMC API running on http://localhost:${actualPort}`);
+    console.log(`   Health:     GET  http://localhost:${actualPort}/api/health`);
+    console.log(`   QuickScore: POST http://localhost:${actualPort}/api/quickscore`);
+    console.log(`   Badge:      GET  http://localhost:${actualPort}/api/badge/:agentId`);
   });
 }
 

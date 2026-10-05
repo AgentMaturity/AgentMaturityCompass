@@ -35,15 +35,15 @@ function humanLogDir(workspace: string): string {
   return join(workspace, ".amc", "studio", "audit");
 }
 
-export function humanLogPath(workspace: string): string {
+function humanLogPath(workspace: string): string {
   return join(humanLogDir(workspace), "human.log");
 }
 
-export function humanSealPath(workspace: string): string {
+function humanSealPath(workspace: string): string {
   return join(humanLogDir(workspace), "human.seal.json");
 }
 
-export function humanSealSigPath(workspace: string): string {
+function humanSealSigPath(workspace: string): string {
   return join(humanLogDir(workspace), "human.seal.sig");
 }
 
@@ -82,7 +82,7 @@ function writeSeal(workspace: string, lastHash: string | null, entryCount: numbe
   writeFileAtomic(humanSealSigPath(workspace), JSON.stringify(sig, null, 2), 0o644);
 }
 
-export function initHumanActionLog(workspace: string): {
+function initHumanActionLog(workspace: string): {
   logPath: string;
   sealPath: string;
   sealSigPath: string;

@@ -27,13 +27,16 @@ describe("release readiness scripts", () => {
     expect(gate).toContain("install-persona-qa");
     expect(gate).toContain("qa:install-personas");
     expect(gate).toContain("full-test-suite");
-    expect(gate).toContain('"npx", ["vitest", "run", "--reporter=dot", "--reporter=json"');
+    expect(gate).toContain('"npx", ["vitest", "run", "--coverage", "--reporter=dot", "--reporter=json"');
     expect(gate).toContain("audit:runtime");
     expect(gate).toContain("const child = spawn(command, args");
     expect(gate).toContain("const timer = setTimeout(() =>");
     expect(gate).toContain('detached: process.platform !== "win32"');
     expect(gate).toContain('process.kill(-child.pid, "SIGKILL")');
-    expect(gate.indexOf('step("build"')).toBeLessThan(gate.indexOf('builtStep("full-test-suite"'));
+    expect(gate.indexOf('add("build"')).toBeLessThan(gate.indexOf('add("full-test-suite"'));
+    const suiteRegistration = gate.slice(gate.indexOf('add("full-test-suite"'), gate.indexOf('add("command-inventory"'));
+    expect(suiteRegistration).toContain('}, quick ? [] : ["build"]);');
+    // Actual execution ordering and stale-build refusal are exercised by releaseGateExecution.test.ts.
   });
 
   test("install persona QA emits a readable automated contract report", () => {

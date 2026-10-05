@@ -8,6 +8,7 @@ import { handleApiRoute } from "../src/api/index.js";
 import {
   detectFleetCascadeFailures,
   loadFleetLifecycleRunArtifact,
+  listFleetLifecycleRunArtifacts,
   writeFleetLifecycleRunArtifact
 } from "../src/fleet/fleetLifecycle.js";
 import type { FleetScoringResult } from "../src/fleet/fleetScoring.js";
@@ -205,5 +206,51 @@ describe("fleet lifecycle evidence spine", () => {
     await handleApiRoute(`/api/v1/fleet/lifecycle/${written.artifact.fleetLifecycleRunId}`, "GET", showReq, shown.res, ws);
     const detail = JSON.parse(shown.state.body) as { ok: boolean; data: { cascadeFailures: unknown[] } };
     expect(detail.data.cascadeFailures).toHaveLength(1);
+  });
+});
+
+
+describe("persisted fleet lifecycle export coverage", () => {
+  test("an absent lifecycle directory lists no artifacts and refuses a missing selector", () => {
+    const ws = workspace();
+    expect(listFleetLifecycleRunArtifacts({ workspace: ws, redacted: true })).toEqual([]);
+    expect(() => loadFleetLifecycleRunArtifact({ workspace: ws, selector: "missing-run", redacted: true }))
+      .toThrow("Fleet lifecycle run not found: missing-run");
+  });
+
+  test("fleet public privacy: masks workspace references through persisted list and direct load", () => {
+    const ws = workspace(), fleetResult = result();
+    fleetResult.agents[0]!.lifecycleArtifactPath = join(ws, "child/lifecycle.json");
+    fleetResult.agents[0]!.episodePath = join(ws, "child/episode.json");
+    const written = writeFleetLifecycleRunArtifact({ workspace: ws, result: fleetResult });
+    const listed = listFleetLifecycleRunArtifacts({ workspace: ws, redacted: true });
+    const direct = loadFleetLifecycleRunArtifact({ workspace: ws, selector: written.artifact.fleetRunId, redacted: true });
+    expect(listed).toHaveLength(1);
+    expect(direct).toEqual(listed[0]);
+    expect(JSON.stringify(direct)).not.toContain(ws);
+    expect(direct.childRuns[0]!.lifecycleArtifactPath).toBe("$WORKSPACE/child/lifecycle.json");
+    expect(direct.childRuns[0]!.episodePath).toBe("$WORKSPACE/child/episode.json");
+    expect(direct.evidenceSummary.childEpisodePaths[0]).toBe("$WORKSPACE/child/episode.json");
+    expect(direct.artifactPath).toBe("$WORKSPACE/.amc/fleet/lifecycle-runs/fleet-run-cascade.json");
+    expect(direct.signaturePath).toBeTruthy();
+    expect(listFleetLifecycleRunArtifacts({ workspace: ws, redacted: false })[0]).toEqual(written.artifact);
+  });
+
+  test("parent selection preserves raw or redacted output and explicit zero list limit", () => {
+    const ws = workspace();
+    const written = writeFleetLifecycleRunArtifact({ workspace: ws, result: result() });
+    expect(loadFleetLifecycleRunArtifact({ workspace: ws, selector: written.artifact.parentRunId, redacted: false }))
+      .toEqual(written.artifact);
+    const redacted = loadFleetLifecycleRunArtifact({ workspace: ws, selector: written.artifact.parentRunId, redacted: true });
+    expect(redacted.workspace).toBe("$WORKSPACE");
+    expect(redacted.artifactPath).toBe("$WORKSPACE/.amc/fleet/lifecycle-runs/fleet-run-cascade.json");
+    expect(listFleetLifecycleRunArtifacts({ workspace: ws, limit: 0, redacted: true })).toEqual([]);
+  });
+
+  test("an existing lifecycle store still refuses an unmatched selector", () => {
+    const ws = workspace();
+    writeFleetLifecycleRunArtifact({ workspace: ws, result: result() });
+    expect(() => loadFleetLifecycleRunArtifact({ workspace: ws, selector: "not-a-parent-or-child", redacted: true }))
+      .toThrow("Fleet lifecycle run not found: not-a-parent-or-child");
   });
 });

@@ -424,7 +424,7 @@ export function inferGrcTreatmentPlanFormat(outputPath: string | undefined, expl
   return "csv";
 }
 
-export function defaultGrcTreatmentPlanPath(workspace: string, format: GrcTreatmentPlanFormat): string {
+function defaultGrcTreatmentPlanPath(workspace: string, format: GrcTreatmentPlanFormat): string {
   const extension = format === "json" ? "json" : format === "markdown" ? "md" : "csv";
   return join(workspace, ".amc", "reports", `grc-treatment-plan.${extension}`);
 }

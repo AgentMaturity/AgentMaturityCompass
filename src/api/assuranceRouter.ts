@@ -51,7 +51,7 @@ import {
   apiSuccess,
   bodyJson,
   bodyJsonSchema,
-  isRequestBodyError,
+  apiRequestError,
   pathParam,
   queryParam
 } from "./apiHelpers.js";
@@ -165,11 +165,7 @@ export async function handleAssuranceRoute(
       const out = assurancePolicyApplyForApi({ workspace, policy: body.policy });
       apiSuccess(res, out);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "policy apply failed");
+      apiRequestError(res, err, "policy apply failed");
     }
     return true;
   }
@@ -228,11 +224,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "verify failed");
+      apiRequestError(res, err, "verify failed");
     }
     return true;
   }
@@ -252,11 +244,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "patch failed");
+      apiRequestError(res, err, "patch failed");
     }
     return true;
   }
@@ -286,11 +274,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "cert issue failed");
+      apiRequestError(res, err, "cert issue failed");
     }
     return true;
   }
@@ -305,11 +289,7 @@ export async function handleAssuranceRoute(
       }
       apiSuccess(res, assuranceCertVerifyForApi({ file: body.file }));
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "cert verify failed");
+      apiRequestError(res, err, "cert verify failed");
     }
     return true;
   }
@@ -381,11 +361,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, out);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "waiver request failed");
+      apiRequestError(res, err, "waiver request failed");
     }
     return true;
   }
@@ -410,11 +386,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, out);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "waiver revoke failed");
+      apiRequestError(res, err, "waiver revoke failed");
     }
     return true;
   }
@@ -471,11 +443,7 @@ export async function handleAssuranceRoute(
       }
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "lab pack failed");
+      apiRequestError(res, err, "lab pack failed");
     }
     return true;
   }
@@ -505,11 +473,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, report);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "fp submit failed");
+      apiRequestError(res, err, "fp submit failed");
     }
     return true;
   }
@@ -541,11 +505,7 @@ export async function handleAssuranceRoute(
       }
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "fp resolve failed");
+      apiRequestError(res, err, "fp resolve failed");
     }
     return true;
   }
@@ -598,11 +558,7 @@ export async function handleAssuranceRoute(
       });
       apiSuccess(res, out);
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 400, err instanceof Error ? err.message : "invalid request");
+      apiRequestError(res, err, "invalid request");
     }
     return true;
   }

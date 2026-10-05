@@ -108,7 +108,7 @@ function parseMetaJson(metaJson: string): Record<string, unknown> | undefined {
   }
 }
 
-export function mapToMITRE(moduleCode: string, _decision: string): MITRECategory {
+function mapToMITRE(moduleCode: string, _decision: string): MITRECategory {
   return MODULE_MITRE_MAP[moduleCode] ?? MITRECategory.execution;
 }
 

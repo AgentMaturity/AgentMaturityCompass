@@ -44,7 +44,7 @@ export function normalizeRunAlias(input: string): string {
   return alias;
 }
 
-export function runAliasStorePath(workspace: string, agentId?: string): string {
+function runAliasStorePath(workspace: string, agentId?: string): string {
   return join(getAgentPaths(workspace, agentId).rootDir, "run-aliases.json");
 }
 
@@ -95,7 +95,7 @@ function parseRunAliasStore(workspace: string, agentId: string | undefined, raw:
   };
 }
 
-export function loadRunAliasStore(workspace: string, agentId?: string): DiagnosticRunAliasStore {
+function loadRunAliasStore(workspace: string, agentId?: string): DiagnosticRunAliasStore {
   const file = runAliasStorePath(workspace, agentId);
   if (!pathExists(file)) {
     return emptyRunAliasStore(workspace, agentId);

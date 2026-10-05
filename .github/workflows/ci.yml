@@ -72,23 +72,16 @@ jobs:
         timeout-minutes: 1
         run: node --test scripts/lib/ownedProcessCommand.test.mjs
 
-      - name: Test
-        timeout-minutes: 30
-        shell: bash
-        run: |
-          mkdir -p tmp/ci-tests
-          npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log
-
-      - name: Upload test diagnostics
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: test-diagnostics-node-${{ matrix.node-version }}
-          path: tmp/ci-tests/
-          if-no-files-found: ignore
-
       - name: Build
         run: npm run build
+
+      - name: Published package lint
+        run: npm run check:package
+
+      - name: Source duplication and reachability
+        run: |
+          npm run check:duplicates
+          npm run check:dead-code
 
       - name: Policy fixture regression
         if: matrix.node-version == '24'
@@ -119,12 +112,16 @@ jobs:
       # and incident-readiness regressions could merge and ship unchecked.
       # Coverage thresholds were pinned at 0, so the gate could never fail and
       # whole subsystems could lose their tests silently. Now enforced.
-      - name: Coverage thresholds
+      # One instrumented suite supplies test outcomes and global/per-file coverage.
+      - name: Full suite and coverage thresholds
         timeout-minutes: 45
         shell: bash
         run: |
           mkdir -p tmp/ci-coverage
           npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log
+
+      - name: Per-file coverage floors
+        run: npm run check:coverage
 
       - name: Upload coverage diagnostics
         if: always()

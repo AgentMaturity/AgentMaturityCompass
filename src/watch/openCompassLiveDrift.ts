@@ -1,3 +1,5 @@
+import { createLiveDriftMetadataReceiptEnricher } from "./liveDriftReceiptValidation.js";
+import { collectLiveDriftProofStats } from "./proofStats.js";
 /**
  * Vendor-named drift receipt builder — NO VENDOR API IS CONTACTED.
  *
@@ -11,14 +13,12 @@
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  hasNonBlankEvidenceRef,
   normalizeEvidenceRefs,
 } from "./evidenceRefs.js";
 import {
   buildLiveDriftWatchAlerts,
   runLiveScoreBehaviorDrift,
   type LiveBehaviorDrift,
-  type LiveDriftAlert,
   type LiveDriftDistribution,
   type LiveDriftReceipt,
   type LiveDriftReceiptRow,
@@ -214,12 +214,6 @@ function unique(values: unknown): string[] {
   return normalizeEvidenceRefs(values).sort();
 }
 
-function isPresent(value: unknown): boolean {
-  if (typeof value === "string") return value.trim().length > 0;
-  if (typeof value === "number") return Number.isFinite(value);
-  if (Array.isArray(value)) return value.length > 0;
-  return value !== null && value !== undefined;
-}
 
 function round(value: number): number {
   return Math.round(value * 10000) / 10000;
@@ -325,63 +319,15 @@ function proofStats(proof: OpenCompassLiveDriftMetadataProof, rows: OpenCompassL
   total: number;
   missingReasons: string[];
 } {
-  let present = 0;
-  let total = 0;
-  const missingReasons: string[] = [];
-
-  for (const field of REQUIRED_METADATA_PROOF_FIELDS) {
-    total += 1;
-    if (isPresent(proof[field])) {
-      present += 1;
-    } else {
-      missingReasons.push(field);
-    }
-  }
-
-  const mismatches = metadataMismatchReasons(proof);
-  total += mismatches.length;
-  missingReasons.push(...mismatches);
-
-  for (const row of rows) {
-    for (const field of REQUIRED_ROW_PROOF_FIELDS) {
-      total += 1;
-      if (isPresent(row[field])) {
-        present += 1;
-      } else {
-        missingReasons.push(`${row.traceId}.${String(field)}`);
-      }
-    }
-    total += 2;
-    if (hasNonBlankEvidenceRef(row.evidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.evidenceRefs`);
-    }
-    if (hasNonBlankEvidenceRef(row.signedEvidenceRefs)) {
-      present += 1;
-    } else {
-      missingReasons.push(`${row.traceId}.signedEvidenceRefs`);
-    }
-  }
-
-  return { present, total, missingReasons };
+  return collectLiveDriftProofStats(proof, rows, REQUIRED_METADATA_PROOF_FIELDS, REQUIRED_ROW_PROOF_FIELDS, metadataMismatchReasons);
 }
 
-function rehashReceipt(receipt: Omit<LiveDriftReceipt, "receiptHash">): LiveDriftReceipt {
-  return {
-    ...receipt,
-    receiptHash: sha256Hex(canonicalize(receipt)),
-  };
-}
-
-function withOpenCompassReceipt(
-  receipt: LiveDriftReceipt,
-  coverage: number,
-  missingReasons: string[],
-  proof: OpenCompassLiveDriftMetadataProof,
-): LiveDriftReceipt {
-  const { receiptHash: _oldHash, ...receiptWithoutHash } = receipt;
-  const alertRefs = unique([
+const withOpenCompassReceipt = createLiveDriftMetadataReceiptEnricher<OpenCompassLiveDriftMetadataProof>({
+  alertSuffix: "openCompassEvidenceCoverage0to1",
+  metricId: "agentEvalHarnessEvidenceCoverage0to1",
+  messagePrefix: "OpenCompass live drift proof is incomplete or mismatched: ",
+  summaryPrefix: "OpenCompass evidence coverage=",
+  evidenceRefs: (proof) => unique([
     proof.requestedSourceUrl,
     proof.canonicalSourceUrl,
     proof.rankSourceUrl,
@@ -396,30 +342,9 @@ function withOpenCompassReceipt(
     proof.liveSampleManifestHash,
     proof.driftStatisticHash,
     proof.alertReceiptHash,
-  ]);
-  const signedRefs = unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]);
-  const alerts: LiveDriftAlert[] = [...receipt.alerts];
-
-  if (missingReasons.length > 0) {
-    alerts.push({
-      alertId: `live-drift:${receipt.agentId}:${receipt.baselineWindowId}:${receipt.liveWindowId}:openCompassEvidenceCoverage0to1`,
-      metricId: "agentEvalHarnessEvidenceCoverage0to1",
-      severity: coverage < 0.75 ? "critical" : "high",
-      message: `OpenCompass live drift proof is incomplete or mismatched: ${missingReasons.join(", ")}.`,
-      threshold: 1,
-      observed: round(coverage),
-      evidenceRefs: alertRefs,
-      signedEvidenceRefs: signedRefs,
-    });
-  }
-
-  const recommendation = alerts.length > 0 ? "alert" : receipt.recommendation;
-  return rehashReceipt({
-    ...receiptWithoutHash,
-    alerts,
-    recommendation,
-    failClosed: alerts.length > 0,
-    sourceRefs: unique([
+  ]),
+  signedEvidenceRefs: (proof) => unique([proof.alertReceiptHash, proof.ciReceiptHash, proof.signedEvidencePolicyHash]),
+  sourceRefs: (receipt, proof) => unique([
       ...receipt.sourceRefs,
       OPENCOMPASS_LIVE_DRIFT_METADATA.requestedSourceUrl,
       OPENCOMPASS_LIVE_DRIFT_METADATA.canonicalSourceUrl,
@@ -441,9 +366,7 @@ function withOpenCompassReceipt(
       proof.noCopiedWebsiteDocsProseHash,
       proof.noCopiedConfigOrResultRowsHash,
     ]),
-    summary: `${alerts.length} live drift alert(s), recommendation=${recommendation}; OpenCompass evidence coverage=${round(coverage)}`,
-  });
-}
+});
 
 export function runOpenCompassLiveDrift(input: RunOpenCompassLiveDriftInput): OpenCompassLiveDriftResult {
   const allRows = [...input.baselineWindow.rows, ...input.liveWindow.rows];

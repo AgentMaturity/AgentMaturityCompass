@@ -13,7 +13,7 @@ import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyAssuranceCertificateFile } from "./assuranceVerifier.js";
 
-export function listAssuranceRuns(workspace: string): AssuranceRun[] {
+function listAssuranceRuns(workspace: string): AssuranceRun[] {
   return listAssuranceRunIds(workspace)
     .map((runId) => loadAssuranceRun(workspace, runId))
     .filter((row): row is AssuranceRun => Boolean(row));

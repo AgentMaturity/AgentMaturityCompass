@@ -109,6 +109,9 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       console.log(`${absent ? "ok  " : "FAIL"} @amc/core is not resolvable from the consumer directory`);
       return absent;
     },
+    () => run("installed standalone production API (no dev dependencies)", "node",
+      [join(root, "scripts", "standalone-api-smoke.mjs"), join(consumer, "node_modules", pkg.name, "dist", "standalone-api.js")],
+      { cwd: workspace, env: isolated }).ok,
     () => run("amc doctor", join(consumer, "node_modules", ".bin", "amc"), ["doctor"], { cwd: workspace, env: isolated }).ok,
     () => run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok,
     () => {

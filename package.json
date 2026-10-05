@@ -24,7 +24,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs",
+    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build",
     "build:pages": "node scripts/build-pages-site.mjs",
     "docs:api": "typedoc --options typedoc.json",
     "build:sea": "node scripts/build-sea.mjs",
@@ -36,7 +36,9 @@
     "copy-assets": "node scripts/copy-build-assets.mjs",
     "dev": "tsx src/cli.ts",
     "api:start": "tsx api/index.ts",
-    "lint": "npm run typecheck",
+    "api:build": "node scripts/build-standalone-api.mjs",
+    "api:start:production": "node dist/standalone-api.js",
+    "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
     "pretest": "npm run build",
@@ -82,7 +84,11 @@
     "check:clean-source": "node scripts/clean-source-check.mjs",
     "bundle:kernel": "node scripts/bundle-kernel.mjs",
     "check:packed-install": "node scripts/packed-install-check.mjs",
-    "qualify:platform": "node scripts/qualify-platform.mjs"
+    "qualify:platform": "node scripts/qualify-platform.mjs",
+    "check:package": "node scripts/package-lint.mjs",
+    "check:duplicates": "node scripts/source-quality.mjs duplicates",
+    "check:dead-code": "node scripts/source-quality.mjs dead-code",
+    "check:coverage": "node scripts/per-file-coverage.mjs"
   },
   "keywords": [
     "ai-agent",
@@ -121,12 +127,12 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./sdk/mobile-fetch": {
-      "import": "./dist/sdk/mobileFetch.js",
-      "types": "./dist/sdk/mobileFetch.d.ts"
+      "types": "./dist/sdk/mobileFetch.d.ts",
+      "import": "./dist/sdk/mobileFetch.js"
     },
     "./sdk/native": {
       "types": "./dist/sdk/nativeAgentClient.d.ts",
@@ -168,7 +174,12 @@
     "ajv": "8.18.0",
     "date-fns": "^4.1.0",
     "esbuild": "0.28.2",
+    "jscpd": "^5.4.0",
+    "knip": "^6.39.0",
     "marked": "18.0.6",
+    "oxlint": "^1.86.0",
+    "oxlint-tsgolint": "^7.0.2003",
+    "publint": "^0.3.24",
     "tsx": "^4.23.0",
     "typedoc": "0.28.20",
     "typescript": "^6.0.2",
@@ -182,8 +193,9 @@
   "pnpm": {
     "overrides": {
       "qs": ">=6.16.0",
-      "fast-uri": "^3.1.6",
-      "@modelcontextprotocol/sdk>hono": "^4.13.5"
+      "fast-uri": "^3.1.8",
+      "@modelcontextprotocol/sdk>hono": "^4.13.5",
+      "ip-address": "^10.7.1"
     }
   }
 }

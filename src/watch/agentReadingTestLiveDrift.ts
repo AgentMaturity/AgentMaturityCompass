@@ -1,3 +1,4 @@
+import { withLiveDriftRowHash } from "./liveDriftReceiptValidation.js";
 /**
  * Vendor-named drift receipt builder — NO VENDOR API IS CONTACTED.
  *
@@ -243,10 +244,7 @@ function toReceiptRow(row: AgentReadingTestLiveDriftRow, phase: "baseline" | "li
     receiptScore0to1,
     evidenceCoverage0to1,
   };
-  return {
-    ...withoutHash,
-    rowHash: sha256Hex(canonicalize(withoutHash)),
-  };
+  return withLiveDriftRowHash(withoutHash);
 }
 
 function toLiveDriftRow(row: AgentReadingTestLiveDriftRow): LiveDriftSampleRow {

@@ -91,7 +91,7 @@ export function verifyPromptPackFile(params: {
   }
 }
 
-export function verifyPromptSignatureObject(params: {
+function verifyPromptSignatureObject(params: {
   digestHex: string;
   signature: unknown;
   signerPub: string;

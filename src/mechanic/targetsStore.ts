@@ -56,7 +56,7 @@ function measuredTargetMapping(workspace: string, scope: MechanicScope): Record<
   }
 }
 
-export function defaultTargets(scope: MechanicScope, mode: "DESIRED" | "EXCELLENCE", measured: Record<string, number> | null): MechanicTargets {
+function defaultTargets(scope: MechanicScope, mode: "DESIRED" | "EXCELLENCE", measured: Record<string, number> | null): MechanicTargets {
   const ids = questionIds();
   const now = Date.now();
   const targets: Record<string, number> = {};

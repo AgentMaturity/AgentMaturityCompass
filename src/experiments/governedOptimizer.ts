@@ -1,3 +1,4 @@
+import { redactNullableWorkspacePath } from "../utils/workspacePathRedaction.js";
 import { randomUUID } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -478,15 +479,10 @@ export function writeGovernedOptimizerRun(input: {
 }
 
 function redactPath(path: string | null, workspace: string): string | null {
-  if (!path) return null;
-  const root = resolve(workspace);
-  const full = resolve(path);
-  if (full === root) return "$WORKSPACE";
-  if (full.startsWith(`${root}/`)) return `$WORKSPACE/${full.slice(root.length + 1)}`;
-  return path;
+  return redactNullableWorkspacePath(path, workspace);
 }
 
-export function redactGovernedOptimizerRun(run: GovernedOptimizerRun): GovernedOptimizerRun {
+function redactGovernedOptimizerRun(run: GovernedOptimizerRun): GovernedOptimizerRun {
   return {
     ...run,
     workspace: "$WORKSPACE",

@@ -47,7 +47,7 @@ function walk(path: string, value: unknown, findings: string[]): void {
   }
 }
 
-export function scanValuePayload(payload: unknown): {
+function scanValuePayload(payload: unknown): {
   ok: boolean;
   findings: string[];
 } {

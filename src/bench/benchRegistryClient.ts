@@ -76,7 +76,7 @@ function compareVersions(a: string, b: string): number {
   return a.localeCompare(b);
 }
 
-export async function fetchBenchRegistryIndex(baseRaw: string): Promise<{
+async function fetchBenchRegistryIndex(baseRaw: string): Promise<{
   base: string;
   indexRaw: string;
   sigRaw: string;

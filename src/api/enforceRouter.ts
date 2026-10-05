@@ -4,7 +4,7 @@
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { z } from "zod";
-import { bodyJsonSchema, apiSuccess, apiError, isRequestBodyError, queryParam } from './apiHelpers.js';
+import { bodyJsonSchema, apiSuccess, apiError, apiRequestError, isRequestBodyError, queryParam } from './apiHelpers.js';
 import { PolicyFirewall } from '../enforce/policyFirewall.js';
 import type { PolicyDecision, PolicyRule } from '../enforce/policyFirewall.js';
 import {
@@ -130,11 +130,7 @@ export async function handleEnforceRoute(
         evaluatedAt: new Date().toISOString(),
       });
     } catch (err) {
-      if (isRequestBodyError(err)) {
-        apiError(res, err.statusCode, err.message);
-        return true;
-      }
-      apiError(res, 500, err instanceof Error ? err.message : 'Internal error');
+      apiRequestError(res, err, 'Internal error', 500);
     }
     return true;
   }
@@ -439,8 +435,7 @@ export async function handleEnforceRoute(
       const cert = boundedModelCheck(property, state as Parameters<typeof boundedModelCheck>[1]);
       apiSuccess(res, cert);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Formal verification failed');
+      apiRequestError(res, err, 'Formal verification failed', 500);
     }
     return true;
   }
@@ -467,8 +462,7 @@ export async function handleEnforceRoute(
       const result = verifyCertificate(body.certificate as unknown as Parameters<typeof verifyCertificate>[0]);
       apiSuccess(res, result);
     } catch (err) {
-      if (isRequestBodyError(err)) { apiError(res, err.statusCode, err.message); return true; }
-      apiError(res, 500, err instanceof Error ? err.message : 'Certificate verification failed');
+      apiRequestError(res, err, 'Certificate verification failed', 500);
     }
     return true;
   }

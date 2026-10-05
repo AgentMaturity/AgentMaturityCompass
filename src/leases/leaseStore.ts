@@ -20,7 +20,7 @@ export function leaseRevocationPaths(workspace: string): { file: string; sig: st
   };
 }
 
-export function defaultLeaseRevocations(): LeaseRevocations {
+function defaultLeaseRevocations(): LeaseRevocations {
   return {
     v: 1,
     updatedTs: Date.now(),

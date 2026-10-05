@@ -22,7 +22,7 @@ export const FOREIGN_PROVIDER_IDS = ["claude-cli"] as const;
 
 export type DelegationProviderId = typeof IN_PROCESS_PROVIDER | typeof FOREIGN_PROVIDER_IDS[number];
 
-export function delegationProviderIds(): string[] {
+function delegationProviderIds(): string[] {
   return [IN_PROCESS_PROVIDER, ...FOREIGN_PROVIDER_IDS];
 }
 

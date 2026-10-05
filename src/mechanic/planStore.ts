@@ -5,15 +5,15 @@ import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSign
 import { mechanicPlanSchema, type MechanicUpgradePlan } from "./upgradePlanSchema.js";
 import { mechanicRoot } from "./targetsStore.js";
 
-export function mechanicPlansDir(workspace: string): string {
+function mechanicPlansDir(workspace: string): string {
   return join(mechanicRoot(workspace), "plans");
 }
 
-export function mechanicPlanLatestPath(workspace: string): string {
+function mechanicPlanLatestPath(workspace: string): string {
   return join(mechanicPlansDir(workspace), "latest.json");
 }
 
-export function mechanicPlanSnapshotPath(workspace: string, ts: number): string {
+function mechanicPlanSnapshotPath(workspace: string, ts: number): string {
   return join(mechanicPlansDir(workspace), "snapshots", `${ts}.json`);
 }
 

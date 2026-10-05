@@ -96,7 +96,9 @@ export function compactReleasedSession(input: SessionCompactionInput) {
       try { service.releaseWithoutClosing(); }
       catch (releaseError) {
         try { service.disposeWithoutClosing(); }
+        // oxlint-disable-next-line no-unsafe-finally -- A failed writer release must override a successful compaction result.
         catch (disposeError) { throw new AggregateError([releaseError, disposeError], "Compaction writer release and disposal failed"); }
+        // oxlint-disable-next-line no-unsafe-finally -- Never report writerReleased when signed release failed.
         throw releaseError;
       }
     }

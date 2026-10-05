@@ -268,7 +268,7 @@ export function binaryAllowedForTool(tool: ToolDefinition, binary: string): bool
   return allow.includes(binary);
 }
 
-export function argvAllowed(tool: ToolDefinition, argv: string[]): { ok: boolean; reason?: string } {
+function argvAllowed(tool: ToolDefinition, argv: string[]): { ok: boolean; reason?: string } {
   const joined = argv.join(" ");
   const denyRegex = tool.deny?.argvRegexDenylist ?? [];
   for (const pattern of denyRegex) {

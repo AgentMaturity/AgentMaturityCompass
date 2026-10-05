@@ -158,6 +158,7 @@ export async function discoverNativeMcpCatalog(server: NativeMcpServer, workspac
     // Preserve a classified authentication/session failure even if remote DELETE
     // is also refused. A successful discovery still exposes termination failure.
     try { try { await client.close(); } finally { await transport.close(); } }
+    // oxlint-disable-next-line no-unsafe-finally -- Successful discovery must expose termination failure; classified HTTP failures are preserved.
     catch (error) { if (!(transport instanceof NativeMcpHttpTransport) || !transport.failureMessage) throw error; }
   }
 }

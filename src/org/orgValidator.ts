@@ -1,6 +1,6 @@
 import type { OrgConfig } from "./orgSchema.js";
 
-export function validateOrgGraph(config: OrgConfig): {
+function validateOrgGraph(config: OrgConfig): {
   valid: boolean;
   errors: string[];
 } {
