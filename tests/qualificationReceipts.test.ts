@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
@@ -119,6 +119,47 @@ describe("P0-01 qualification receipts", () => {
     // Split so secret scanners do not flag this test source.
     write(`${folder}/notes.txt`, "-----BEGIN " + "PRIVATE KEY-----\nMIIE\n");
     expect(errorsFor()).toMatch(/private key/i);
+  });
+
+  test("an impossible date fails even when the folder agrees", () => {
+    writeReceipt(receipt({ date: "2026-02-30" }), "2026-02-30-P0-01");
+    expect(errorsFor()).toContain("2026-02-30 is not a real date");
+  });
+
+  test("a dangling symlink is reported, not thrown", () => {
+    writeReceipt(receipt());
+    symlinkSync(join(root, "missing-target"), join(root, folder, "dangling"));
+    expect(errorsFor()).toContain(`${folder}/dangling: symlinks are not allowed`);
+  });
+
+  test("a symlinked artifact cannot escape the folder", () => {
+    const outside = mkdtempSync(join(tmpdir(), "amc-qualification-outside-"));
+    try {
+      writeFileSync(join(outside, "secret.txt"), "outside\n");
+      mkdirSync(join(root, folder), { recursive: true });
+      symlinkSync(join(outside, "secret.txt"), join(root, folder, "a.txt"));
+      writeReceipt(receipt({ artifacts: [{ path: "a.txt", sha256: createHash("sha256").update("outside\n").digest("hex") }] }));
+      expect(errorsFor()).toContain("artifact a.txt must be a regular file");
+    } finally {
+      rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
+  test("an artifact path that names a directory is reported, not thrown", () => {
+    mkdirSync(join(root, folder, "logs"), { recursive: true });
+    write(`${folder}/logs/run.log`, "x\n");
+    writeReceipt(receipt({ artifacts: [{ path: "logs", sha256: "0".repeat(64) }] }));
+    expect(errorsFor()).toContain("artifact logs must be a regular file");
+  });
+
+  test("a backslash or drive-letter artifact path fails on every platform", () => {
+    writeReceipt(receipt({ artifacts: [
+      { path: "..\\..\\package.json", sha256: "0".repeat(64) },
+      { path: "C:/repo/package.json", sha256: "0".repeat(64) }
+    ] }));
+    const errors = errorsFor();
+    expect(errors).toContain("artifact ..\\..\\package.json must be inside the folder");
+    expect(errors).toContain("artifact C:/repo/package.json must be inside the folder");
   });
 
   test("key and credential file names fail", () => {

@@ -140,4 +140,59 @@ describe("P0-01 freeze guard", () => {
       rmSync(fixture, { recursive: true, force: true });
     }
   });
+
+  test("the CLI rejects missing or non-numeric counts", () => {
+    const fixture = mkdtempSync(join(tmpdir(), "amc-freeze-cli-"));
+    try {
+      mkdirSync(join(fixture, "scripts"));
+      writeFileSync(join(fixture, "scripts/freeze-baseline.json"), JSON.stringify(baseline()));
+      writeFileSync(join(fixture, "counts.json"), JSON.stringify({ ...counts, cliCommandPaths: "x", stationPacks: undefined }));
+      const run = spawnSync(process.execPath, [resolve("scripts/check-freeze.mjs"), "--counts-json", "counts.json"], {
+        cwd: fixture, encoding: "utf8", timeout: 10_000, env: { ...process.env, GITHUB_BASE_REF: "", GITHUB_EVENT_NAME: "" }
+      });
+      expect(run.status).toBe(1);
+      expect(run.stderr).toContain("cliCommandPaths, stationPacks");
+    } finally {
+      rmSync(fixture, { recursive: true, force: true });
+    }
+  });
+
+  test("on push, a baseline raise in an earlier commit of the push is checked against the pre-push tip", () => {
+    const fixture = mkdtempSync(join(tmpdir(), "amc-freeze-push-"));
+    const git = (...args: string[]) => {
+      const result = spawnSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "commit.gpgsign=false", ...args], {
+        cwd: fixture, encoding: "utf8"
+      });
+      expect(result.status, result.stderr).toBe(0);
+      return result.stdout.trim();
+    };
+    try {
+      mkdirSync(join(fixture, "scripts"));
+      git("init", "-q");
+      writeFileSync(join(fixture, "scripts/freeze-baseline.json"), JSON.stringify(baseline()));
+      git("add", ".");
+      git("commit", "-q", "-m", "base");
+      const before = git("rev-parse", "HEAD");
+      writeFileSync(join(fixture, "scripts/freeze-baseline.json"), JSON.stringify(baseline({ cliCommandPaths: 1278 })));
+      git("commit", "-q", "-am", "raise without an exception");
+      writeFileSync(join(fixture, "other.txt"), "unrelated\n");
+      git("add", "other.txt");
+      git("commit", "-q", "-m", "unrelated");
+      writeFileSync(join(fixture, "counts.json"), JSON.stringify({ ...counts, cliCommandPaths: 1278 }));
+      const runPush = (eventBefore: string) => {
+        writeFileSync(join(fixture, "event.json"), JSON.stringify({ before: eventBefore }));
+        return spawnSync(process.execPath, [resolve("scripts/check-freeze.mjs"), "--counts-json", "counts.json"], {
+          cwd: fixture, encoding: "utf8", timeout: 10_000,
+          env: { ...process.env, GITHUB_BASE_REF: "", GITHUB_EVENT_NAME: "push", GITHUB_EVENT_PATH: join(fixture, "event.json") }
+        });
+      };
+      const pushed = runPush(before);
+      expect(pushed.status).toBe(1);
+      expect(pushed.stderr).toContain("baseline cliCommandPaths rose from 1228 to 1278");
+      // A new branch reports an all-zero "before"; the guard falls back to HEAD^1.
+      expect(runPush("0".repeat(40)).status).toBe(0);
+    } finally {
+      rmSync(fixture, { recursive: true, force: true });
+    }
+  });
 });
