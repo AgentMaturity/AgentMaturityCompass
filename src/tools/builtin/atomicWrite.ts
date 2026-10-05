@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { closeSync, fchmodSync, fsyncSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { accessSync, closeSync, constants, fchmodSync, fsyncSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 /**
  * Replace a file so a reader sees the old bytes or the new bytes, never a mix.
@@ -11,13 +11,20 @@ import { basename, dirname, join } from "node:path";
  * it takes the replaced file's mode, because the rename swaps in the temp
  * file's inode and `open`'s mode argument is masked by the umask.
  *
+ * `rename` checks only the directory's permissions, so an existing target is
+ * checked for write access first: a file the caller may not write (mode 0444,
+ * or 0000) fails with EACCES, as an in-place write would, instead of being
+ * silently replaced. The temp name leaves out the target's basename so a name
+ * near the 255-byte limit stays writable.
+ *
  * Callers pass a resolved path: renaming over a symlink replaces the link, not
  * the file it points to.
  */
 export function writeFileAtomicSync(path: string, data: string | Buffer, opts?: { encoding?: BufferEncoding }): void {
   const directory = dirname(path);
-  const temporary = join(directory, `.${basename(path)}.amc-tmp-${process.pid}-${randomUUID()}`);
+  const temporary = join(directory, `.amc-tmp-${process.pid}-${randomUUID()}`);
   const mode = existingMode(path);
+  if (mode !== undefined) accessSync(path, constants.W_OK);
   let renamed = false;
   try {
     const fd = openSync(temporary, "wx");
