@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync, readFileSync } from "node:fs";
+import { lstatSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -67,5 +67,24 @@ describe("fs.edit literal replacement", () => {
     const result = await editOnce("abc", "missing", "y");
     expect(result.ok).toBe(false);
     expect(result.after).toBe("abc");
+  });
+
+  // The atomic write renames over its path, so it must get the resolved path:
+  // an edit through a link changes the target and leaves the link in place.
+  it.skipIf(process.platform === "win32")("edits the target of a symlink and keeps the link", async () => {
+    const workspace = mkdtempSync(join(tmpdir(), "amc-fsedit-link-"));
+    dirs.push(workspace);
+    const registry = new ToolRegistry();
+    for (const tool of fsTools({ ledger: new ReadBeforeEditLedger() })) registry.define(tool);
+    const pipeline = new ToolPipeline({ registry, workspace });
+    const run = (name: string, args: Record<string, unknown>) =>
+      pipeline.execute({ name, agentId: "alice", arguments: args, requestedMode: "EXECUTE" });
+    writeFileSync(join(workspace, "target.txt"), "cost: PRICE", "utf8");
+    symlinkSync("target.txt", join(workspace, "link.txt"));
+
+    expect((await run("fs.read", { path: "link.txt" })).ok).toBe(true);
+    expect((await run("fs.edit", { path: "link.txt", find: "PRICE", replace: "$$5" })).ok).toBe(true);
+    expect(readFileSync(join(workspace, "target.txt"), "utf8")).toBe("cost: $$5");
+    expect(lstatSync(join(workspace, "link.txt")).isSymbolicLink()).toBe(true);
   });
 });
