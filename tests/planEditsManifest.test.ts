@@ -1,9 +1,10 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import { compiledPins } from "../scripts/snapshot-plan-edit.mjs";
 import { landedBytes, landedSourceAt, planEdits, validatePlanEdits, type PlanEdit } from "./helpers/landedSource.js";
 
 const SCRIPT = resolve("scripts/snapshot-plan-edit.mjs");
@@ -36,6 +37,25 @@ const entry = (overrides: Partial<PlanEdit> = {}): PlanEdit => ({
 });
 const manifest = (files: unknown[]) => ({ schemaVersion: 1, decision: "D-15", files });
 
+/**
+ * Where each archive came from: a pinned build output must equal its compiledContracts pin; any other
+ * archive must equal the blob at its baseCommit, and that commit must be an ancestor of HEAD, so a
+ * base rewritten by a squash merge fails here instead of skipping.
+ */
+function provenanceFailures(root: string, edits: readonly PlanEdit[]): string[] {
+  const pins = compiledPins(root);
+  return edits.flatMap(edit => {
+    const archive = readFileSync(join(root, edit.archivePath));
+    const pinned = pins.get(edit.path);
+    if (pinned) return pinned.every(pin => pin === sha256(archive)) ? [] : [`${edit.path}: archive is not the pinned build`];
+    if (spawnSync("git", ["merge-base", "--is-ancestor", edit.baseCommit, "HEAD"], { cwd: root }).status !== 0) {
+      return [`${edit.path}: baseCommit ${edit.baseCommit} is not an ancestor of HEAD; re-run scripts/snapshot-plan-edit.mjs at the new base`];
+    }
+    const shown = spawnSync("git", ["cat-file", "blob", `${edit.baseCommit}:${edit.path}`], { cwd: root, maxBuffer: 256 * 1024 * 1024 });
+    return shown.status === 0 && shown.stdout.equals(archive) ? [] : [`${edit.path}: archive differs from ${edit.baseCommit}:${edit.path}`];
+  });
+}
+
 describe("committed plan-edits manifest (D-15)", () => {
   it("validates: schema, sorted unique paths, archives under plan-edits/<issue>/, archive sha256, 40-hex base", () => {
     const edits = planEdits();
@@ -49,15 +69,12 @@ describe("committed plan-edits manifest (D-15)", () => {
     }
   });
 
-  it("archives equal git show <baseCommit>:<path> when history is available", (ctx) => {
+  it("archives equal the blob at an ancestor baseCommit, or the pinned build for dist/ outputs", (ctx) => {
     const missing = planEdits().filter(edit =>
       spawnSync("git", ["cat-file", "-e", `${edit.baseCommit}^{commit}`]).status !== 0).map(edit => edit.baseCommit);
-    if (missing.length) ctx.skip(`base commits not in this clone (shallow?): ${[...new Set(missing)].join(", ")}`);
-    for (const edit of planEdits()) {
-      const shown = spawnSync("git", ["show", `${edit.baseCommit}:${edit.path}`], { maxBuffer: 256 * 1024 * 1024 });
-      expect(shown.status).toBe(0);
-      expect(shown.stdout.equals(readFileSync(resolve(edit.archivePath)))).toBe(true);
-    }
+    const shallow = spawnSync("git", ["rev-parse", "--is-shallow-repository"], { encoding: "utf8" }).stdout.trim() === "true";
+    if (missing.length && shallow) ctx.skip(`base commits not in this shallow clone: ${[...new Set(missing)].join(", ")}`);
+    expect(provenanceFailures(resolve("."), planEdits())).toEqual([]);
   });
 
   it("rejects malformed manifests", () => {
@@ -76,6 +93,7 @@ describe("committed plan-edits manifest (D-15)", () => {
       [manifest([entry({ issue: "P9-01", archivePath: "unused-code/plan-edits/P9-01/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ path: "../outside.ts", archivePath: "unused-code/plan-edits/P0-06/../outside.ts.landed" })]), "path"],
       [manifest([entry({ path: "src\\a.ts", archivePath: "unused-code/plan-edits/P0-06/src\\a.ts.landed" })]), "path"],
+      [manifest([entry({ path: "package.json", archivePath: "unused-code/plan-edits/P0-06/package.json.landed" })]), "tests/helpers/packageEntries.ts"],
     ];
     for (const [value, reason] of bad) expect(() => validatePlanEdits(value), reason).toThrow(reason);
   });
@@ -161,6 +179,8 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
       [["--issue", "P4-01", "--base", "HEAD", "src/a.ts"], "Issue key"],
       [["--issue", "P0-06", "--base", "HEAD", "../outside.ts"], "outside the repository"],
       [["--issue", "P0-06", "--base", "HEAD", "src/missing.ts"], "not present at HEAD"],
+      [["--issue", "P0-06", "--base", "HEAD", "src"], "not present at HEAD"],
+      [["--issue", "P0-06", "--base", "HEAD", "package.json"], "pinned by entries in tests/helpers/packageEntries.ts"],
       [["--issue", "P0-06", "--base", "HEAD"], "Usage"],
     ] as const) {
       const result = snapshot(root, ...args);
@@ -170,6 +190,25 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     expect(git(root, "status", "--porcelain", "--untracked-files=all")).toBe("M src/a.ts");
   });
 
+  it("runs when invoked through a symlinked script path", () => {
+    const { root } = repo(), link = join(scratch(), "scripts");
+    symlinkSync(dirname(SCRIPT), link);
+    const result = spawnSync(process.execPath, [join(link, "snapshot-plan-edit.mjs"), "--issue", "P0-06", "--base", "HEAD", "src/a.ts"],
+      { cwd: root, encoding: "utf8" });
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("Archived src/a.ts");
+    expect(read(root).files.map(row => row.path)).toEqual(["src/a.ts"]);
+  });
+
+  it("fails provenance, not skips, when a baseCommit is not an ancestor of HEAD", () => {
+    const { root } = repo();
+    git(root, "checkout", "-q", "-b", "side");
+    git(root, "commit", "-q", "-am", "side");
+    git(root, "checkout", "-q", "-");
+    expect(snapshot(root, "--issue", "P0-06", "--base", "side", "src/a.ts").status).toBe(0);
+    expect(provenanceFailures(root, landedSourceAt(root).planEdits())[0]).toContain("is not an ancestor of HEAD");
+  });
+
   it("warns when the manifest has uncommitted entries from another issue", () => {
     const { root } = repo();
     expect(snapshot(root, "--issue", "P0-06", "--base", "HEAD", "src/a.ts").status).toBe(0);
@@ -177,5 +216,46 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
     expect(other.status).toBe(0);
     expect(other.stderr).toContain("uncommitted manifest entries from another issue: src/a.ts (P0-06)");
     expect(read(root).files.map(row => row.path)).toEqual(["src/a.ts", "src/z.ts"]);
+  });
+
+  describe("pinned build outputs under dist/", () => {
+    const pins = { "dist/a.d.ts": "declare a\n", "dist/a.js": "emit a\n" };
+    function distRepo(onDisk: Record<string, string>) {
+      const root = scratch();
+      git(root, "init", "-q");
+      put(root, ".gitignore", "dist/\n");
+      put(root, "src/a.ts", "a at base\n");
+      put(root, "unused-code/x/restoration.json", JSON.stringify({ compiledContracts: Object.entries(pins)
+        .map(([file, bytes]) => ({ source: "src/a.ts", file, sha256: sha256(bytes) })) }));
+      git(root, "add", ".");
+      git(root, "commit", "-q", "-m", "base");
+      for (const [file, bytes] of Object.entries(onDisk)) put(root, file, bytes);
+      put(root, "src/a.ts", "export const added = 1;\n");
+      return root;
+    }
+
+    it("registering a source also archives its pinned build outputs from disk", () => {
+      const root = distRepo(pins);
+      const result = snapshot(root, "--issue", "P0-06", "--base", "HEAD", "src/a.ts");
+      expect(result.stderr).toBe("");
+      expect(result.status).toBe(0);
+      const landed = landedSourceAt(root);
+      expect(landed.planEdits().map(edit => edit.path)).toEqual(["dist/a.d.ts", "dist/a.js", "src/a.ts"]);
+      put(root, "dist/a.d.ts", "declare a\nexport declare const added = 1;\n");
+      expect(landed.landedText("dist/a.d.ts")).toBe("declare a\n");
+      expect(landed.landedText("src/a.ts")).toBe("a at base\n");
+      expect(provenanceFailures(root, landed.planEdits())).toEqual([]);
+      expect(compiledPins(root).get("dist/a.js")).toEqual([sha256("emit a\n")]);
+    });
+
+    it("refuses a rebuilt output that no longer matches its pin and writes nothing", () => {
+      const root = distRepo({ ...pins, "dist/a.d.ts": "declare a\nexport declare const added = 1;\n" });
+      for (const path of ["src/a.ts", "dist/a.d.ts"]) {
+        const result = snapshot(root, "--issue", "P0-06", "--base", "HEAD", path);
+        expect(result.status).not.toBe(0);
+        expect(result.stderr).toContain("dist/a.d.ts on disk is not the pinned build");
+      }
+      expect(git(root, "status", "--porcelain", "--untracked-files=all")).toBe("M src/a.ts");
+    });
   });
 });

@@ -25,6 +25,7 @@ export function validatePlanEdits(value: unknown): readonly PlanEdit[] {
     const fail = (reason: string) => { throw new Error(`Invalid plan-edits entry ${index} (${String(row?.path)}): ${reason}`); };
     if (typeof row?.path !== "string" || row.path.includes("\\")
       || row.path.split("/").some(part => part === "" || part === "." || part === "..")) fail("path must be repo-relative POSIX");
+    if (row.path === "package.json") fail("package.json is pinned by entries in tests/helpers/packageEntries.ts, not by snapshot");
     if (!ISSUE_KEY.test(row.issue)) fail("issue must match " + ISSUE_KEY);
     if (!/^[0-9a-f]{40}$/.test(row.baseCommit)) fail("baseCommit must be 40 hex");
     if (row.archivePath !== `unused-code/plan-edits/${row.issue}/${row.path}.landed`) fail("archivePath must be unused-code/plan-edits/<issue>/<path>.landed");
