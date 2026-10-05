@@ -2,6 +2,8 @@
 
 Every contribution makes AI agent trust scoring better for everyone. Whether you're fixing a typo, writing a new attack pack, or adding support for a new agent framework — welcome.
 
+Working on a Ready-to-Deploy plan issue? Read [docs/program/READY_TO_DEPLOY.md](docs/program/READY_TO_DEPLOY.md) first: it covers the truth rules, the freeze guard and where qualification receipts go.
+
 ## Table of Contents
 
 - [Quick Setup](#quick-setup)
@@ -49,7 +51,7 @@ npx vitest run -t "my test name"                  # by name
 cd platform/python && python3 -m pytest tests/ -q # Python
 ```
 
-The root suite contains <!-- amc:count:testFiles -->1,522<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
+The root suite contains <!-- amc:count:testFiles -->1,524<!-- /amc:count --> Vitest test source files under `tests/`. This generated inventory counts source paths; Vitest and the [CI workflow](https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml) report execution outcomes. The internal `gen-counts --json` field `testBlocks` counts regex matches for direct `it()`/`test()` calls, including possible comment matches and excluding parameterized or generated cases; it is not a passing-test count.
 
 All tests must pass before submitting a PR.
 
