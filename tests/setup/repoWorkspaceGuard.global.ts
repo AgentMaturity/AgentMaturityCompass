@@ -17,8 +17,15 @@ export function toPosixPath(path: string): string {
   return path.replace(/\\/g, "/");
 }
 
-/** Fingerprints every file under root: sha256 up to 1 MB, size and mtime above. */
-export function snapshotDirectory(root: string): DirectorySnapshot {
+/**
+ * "content" (global guard): sha256 of every file up to 1 MB, size and mtime above,
+ * and every directory. "stat" (per-file guard): size and mtime only, no reads, plus
+ * directory mtimes including the root, so a file created and deleted again within
+ * one test file still shows as a changed directory.
+ */
+export type SnapshotMode = "content" | "stat";
+
+export function snapshotDirectory(root: string, mode: SnapshotMode = "content"): DirectorySnapshot {
   const snapshot: DirectorySnapshot = {};
   let entries: string[];
   try {
@@ -27,14 +34,17 @@ export function snapshotDirectory(root: string): DirectorySnapshot {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return snapshot;
     throw error;
   }
+  if (mode === "stat") snapshot["."] = `dir,mtime:${statSync(root).mtimeMs}`;
   for (const entry of entries) {
     const full = join(root, entry);
     const stat = statSync(full, { throwIfNoEntry: false });
-    if (!stat?.isFile()) continue;
-    snapshot[toPosixPath(relative(root, full))] =
-      stat.size <= FULL_HASH_LIMIT_BYTES
-        ? `sha256:${createHash("sha256").update(readFileSync(full)).digest("hex")}`
-        : `size:${stat.size},mtime:${stat.mtimeMs}`;
+    const rel = toPosixPath(relative(root, full));
+    if (stat?.isDirectory()) snapshot[`${rel}/`] = mode === "stat" ? `dir,mtime:${stat.mtimeMs}` : "dir";
+    else if (stat?.isFile())
+      snapshot[rel] =
+        mode === "content" && stat.size <= FULL_HASH_LIMIT_BYTES
+          ? `sha256:${createHash("sha256").update(readFileSync(full)).digest("hex")}`
+          : `size:${stat.size},mtime:${stat.mtimeMs}`;
   }
   return snapshot;
 }
@@ -52,7 +62,7 @@ export function diffSnapshots(before: DirectorySnapshot, after: DirectorySnapsho
 }
 
 export function describeChanges(changes: string[]): string {
-  return changes.map((change) => `.amc/${change}`).join(", ");
+  return changes.map((change) => (change.startsWith(". ") ? `.amc/${change.slice(1)}` : `.amc/${change}`)).join(", ");
 }
 
 export default function setup(): () => void {

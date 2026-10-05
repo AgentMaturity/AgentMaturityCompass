@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -44,6 +44,23 @@ describe("repository workspace guard helpers", () => {
     const before = snapshotDirectory(root);
     writeFileSync(join(root, "keys", "auditor_ed25519.pub"), "new key");
     expect(diffSnapshots(before, snapshotDirectory(root))).toEqual(["keys/auditor_ed25519.pub (changed)"]);
+  });
+
+  test("lists a created empty nested directory", () => {
+    const root = tempRoot();
+    const before = snapshotDirectory(root);
+    mkdirSync(join(root, "plugins", "x"), { recursive: true });
+    expect(diffSnapshots(before, snapshotDirectory(root))).toEqual(["plugins/ (created)", "plugins/x/ (created)"]);
+  });
+
+  test("stat mode catches a file that a test created and deleted again", () => {
+    const root = tempRoot();
+    // Coarse filesystem clocks could otherwise leave the directory mtime unchanged.
+    utimesSync(root, new Date(2000, 0, 1), new Date(2000, 0, 1));
+    const before = snapshotDirectory(root, "stat");
+    writeFileSync(join(root, "scratchpad.sqlite"), "db");
+    unlinkSync(join(root, "scratchpad.sqlite"));
+    expect(diffSnapshots(before, snapshotDirectory(root, "stat"))).toEqual([". (changed)"]);
   });
 
   test("a missing directory snapshots as empty", () => {
