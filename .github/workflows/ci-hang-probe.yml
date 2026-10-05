@@ -3,6 +3,8 @@
 # Round 2: inside a 12 GB container the runner still died ~10 min into the suite
 # with 87 GB disk free. Round 3: bisect by shard; a shard whose runner dies
 # (cancelled, no log) holds the culprit.
+# Round 4: shard 8 of 8 hung (others finished in ~5 min); split its 190 files
+# into 8 explicit lists under .github/probe/.
 name: CI hang probe (P0-48)
 
 on:
@@ -20,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        part: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -34,8 +36,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: npm run build
-      - name: Shard ${{ matrix.shard }} of 8
+      - name: Shard 8 part ${{ matrix.part }}
         timeout-minutes: 25
         env:
-          SHARD: ${{ matrix.shard }}
-        run: npx vitest run --shard="$SHARD/8" --reporter=verbose --maxWorkers=2
+          PART: ${{ matrix.part }}
+        run: npx vitest run $(cat ".github/probe/s8-$PART.txt") --reporter=verbose --maxWorkers=2
