@@ -1,4 +1,8 @@
 # Temporary diagnostic for plan item P0-48 (GitHub build-test hang). Never merge.
+# Round 2: every variant of round 1 (coverage or not, default or 2 workers) killed
+# the runner itself (no logs uploaded). Run the suite inside a memory-capped
+# container so a runaway test can only take the container down, and the runner
+# survives to upload the log showing what ran last.
 name: CI hang probe (P0-48)
 
 on:
@@ -12,45 +16,30 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        variant: [coverage-default, coverage-2-workers, plain-default, plain-2-workers]
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: npm run build
       - name: Runner resources at start
+        run: nproc; free -m; df -m /; docker version --format '{{.Server.Version}}'
+      - name: Suite inside a memory-capped container
+        timeout-minutes: 60
         run: |
-          nproc; free -m; df -m / /tmp
-          node -e 'console.log("availableParallelism", require("os").availableParallelism())'
-      - name: Suite with resource log
-        timeout-minutes: 45
-        env:
-          VARIANT: ${{ matrix.variant }}
-        run: |
-          ( while true; do
-              echo "MON $(date +%T) $(free -m | awk '/Mem:/{print "used="$3"MB avail="$7"MB"}') $(free -m | awk '/Swap:/{print "swap="$3"MB"}') $(df -m / | awk 'NR==2{print "disk_avail="$4"MB"}') node_procs=$(pgrep -c node || true)"
-              sleep 30
-            done ) &
-          MON=$!
-          case "$VARIANT" in
-            coverage-default)   npx vitest run --coverage --reporter=dot ;;
-            coverage-2-workers) npx vitest run --coverage --reporter=dot --maxWorkers=2 ;;
-            plain-default)      npx vitest run --reporter=dot ;;
-            plain-2-workers)    npx vitest run --reporter=dot --maxWorkers=2 ;;
-          esac
+          set +e
+          docker run --name amc-suite --memory=12g --memory-swap=12g --pids-limit=4096 \
+            -v "$PWD":/w -w /w -e CI=true node:24 bash -c '
+              set -e
+              npm install -g pnpm@10.33.0 >/dev/null
+              pnpm install --frozen-lockfile >/dev/null
+              npm run build >/dev/null
+              ( while true; do echo "MON $(date +%T) $(awk "/MemAvailable/{print \"avail=\"int(\$2/1024)\"MB\"}" /proc/meminfo) node_procs=$(ls /proc | grep -c "^[0-9]") "; sleep 30; done ) &
+              npx vitest run --reporter=verbose --maxWorkers=2
+            '
           rc=$?
-          kill $MON || true
-          free -m; df -m /
+          echo "container exit code: $rc"
+          docker inspect amc-suite --format 'OOMKilled={{.State.OOMKilled}} ExitCode={{.State.ExitCode}} Error={{.State.Error}}'
           exit $rc
+      - name: Kernel messages
+        if: always()
+        run: sudo dmesg | tail -n 60 || true
