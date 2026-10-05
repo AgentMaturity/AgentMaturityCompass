@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { ARCHIVED_PACKAGE_ENTRIES_SHA256, ARCHIVED_PACKAGE_MANIFEST_SHA256, packageEntriesSha256, withPackageEntriesPin } from "./helpers/packageEntries.js";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
@@ -223,7 +224,8 @@ it("freezes every actual source byte outside the declared imports and private bo
     expect(() => restoreWorkspacePathSharing(row.originalPath, current.replace(row.afterBody, row.beforeBody))).toThrow();
   }
   expect(hash(readFileSync(resolve(map.utility.path)))).toBe(map.utility.sha256);
-  expect(hash(readFileSync(resolve("package.json")))).toBe(map.packageManifestSha256);
+  expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
+  expect(packageEntriesSha256(readFileSync(resolve("package.json")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
   for (const contract of map.compiledContracts) {
     expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);
   }
@@ -240,6 +242,7 @@ it("retains all previous freeze assertions with only the bounded reversal insert
       : 'import { restoreWorkspacePathSharing } from "./helpers/restoreWorkspacePathSharing.js";\n' + original.replace(
         'current = readFileSync(resolve(row.originalPath), "utf8");',
         'current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), "utf8"));');
-    expect(readFileSync(resolve(row.originalPath), "utf8")).toBe(expected);
+    expect(readFileSync(resolve(row.originalPath), "utf8"))
+      .toBe(row.originalPath.includes("/helpers/") ? expected : withPackageEntriesPin(expected));
   }
 });

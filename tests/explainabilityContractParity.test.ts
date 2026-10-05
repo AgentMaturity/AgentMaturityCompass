@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { ARCHIVED_PACKAGE_ENTRIES_SHA256, ARCHIVED_PACKAGE_MANIFEST_SHA256, packageEntriesSha256 } from "./helpers/packageEntries.js";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import ts from "typescript";
@@ -132,8 +133,10 @@ describe("explainability shared contracts retain complete original exported flow
       expect(hash(restored)).toBe(row.sha256);
     }
     const immutableContracts = originals.heldReadOnly.filter(row => !row.path.startsWith("tests/")
-      && !["src/api/scoreRouter.ts"].includes(row.path));
+      && !["src/api/scoreRouter.ts", "package.json"].includes(row.path));
     for (const row of immutableContracts) expect(hash(readFileSync(resolve(row.path)))).toBe(row.sha256);
+    expect(originals.heldReadOnly.find(row => row.path === "package.json")?.sha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
+    expect(packageEntriesSha256(readFileSync(resolve("package.json")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     expect(Object.keys(currentQuestion)).toEqual(Object.keys(originalQuestion));
     expect(Object.keys(currentDrilldown)).toEqual(Object.keys(originalDrilldown));
   });

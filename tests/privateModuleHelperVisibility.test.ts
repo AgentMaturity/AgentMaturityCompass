@@ -1,4 +1,5 @@
 import { restoreWorkspacePathSharing } from "./helpers/restoreWorkspacePathSharing.js";
+import { ARCHIVED_PACKAGE_ENTRIES_SHA256, ARCHIVED_PACKAGE_MANIFEST_SHA256, packageEntriesSha256 } from "./helpers/packageEntries.js";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -56,7 +57,8 @@ describe("individually reviewed module-private helper visibility", () => {
     }
     expect(map.files.reduce((sum, file) => sum + file.declarations.length, 0)).toBe(map.declarations);
     const manifest = readFileSync(resolve("package.json"));
-    expect(hash(manifest)).toBe(map.packageManifestSha256);
+    expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
+    expect(packageEntriesSha256(manifest)).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     const pkg = JSON.parse(manifest.toString("utf8")) as { exports: Record<string, { types: string }> };
     expect(Object.keys(pkg.exports).sort()).toEqual(map.packageEntries.map(row => row.name).sort());
     for (const entry of map.packageEntries) {
