@@ -19,13 +19,27 @@ const DOMAIN_TAG = "AMC_TRUST_LIST_V1";
 const keyIdSchema = z.string().regex(/^[0-9a-f]{64}$/, "must be 64 lowercase hex");
 const utcTimeSchema = z.iso.datetime();
 
-/** AMC fingerprint: sha256 of the UTF-8 PEM text. Null when the PEM is not an Ed25519 public key. */
-export function ed25519KeyId(publicKeyPem: string): string | null {
+/**
+ * The canonical SPKI PEM (Node's export, LF line endings) of an Ed25519 public key. Null for anything else,
+ * including private keys and certificates, which createPublicKey would otherwise accept.
+ */
+export function canonicalEd25519Pem(publicKeyPem: string): string | null {
+  if (!publicKeyPem.trimStart().startsWith("-----BEGIN PUBLIC KEY-----")) return null;
   try {
-    return createPublicKey(publicKeyPem).asymmetricKeyType === "ed25519" ? sha256Hex(Buffer.from(publicKeyPem, "utf8")) : null;
+    const key = createPublicKey(publicKeyPem);
+    return key.asymmetricKeyType === "ed25519" ? key.export({ format: "pem", type: "spki" }).toString() : null;
   } catch {
     return null;
   }
+}
+
+/**
+ * AMC fingerprint: sha256 of the UTF-8 PEM text, taken over the canonical PEM so the same key always gets the
+ * same id (a CRLF copy cannot slip past a pin or a distrust entry). Null when the PEM is not an Ed25519 public key.
+ */
+export function ed25519KeyId(publicKeyPem: string): string | null {
+  const canonical = canonicalEd25519Pem(publicKeyPem);
+  return canonical === null ? null : sha256Hex(Buffer.from(canonical, "utf8"));
 }
 
 export const trustListEntrySchema = z.strictObject({
@@ -47,7 +61,7 @@ export const trustListEntrySchema = z.strictObject({
   }).optional()
 }).superRefine((entry, ctx) => {
   const issue = (message: string) => ctx.addIssue({ code: "custom", message });
-  if (ed25519KeyId(entry.publicKeyPem) === null) issue("publicKeyPem must be an Ed25519 SPKI public key");
+  if (canonicalEd25519Pem(entry.publicKeyPem) !== entry.publicKeyPem) issue("publicKeyPem must be an Ed25519 SPKI public key in canonical PEM form");
   else if (ed25519KeyId(entry.publicKeyPem) !== entry.keyId) issue("sha256 of publicKeyPem must equal keyId");
   if (entry.validTo !== null && Date.parse(entry.validTo) <= Date.parse(entry.validFrom)) issue("validTo must be after validFrom");
   if ((entry.revokedAt === undefined) !== (entry.revocationReason === undefined)) issue("revokedAt and revocationReason go together");
@@ -130,10 +144,16 @@ export function verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds:
   return list;
 }
 
-/** Reads a JSON file of at most 1 MiB without following a final symlink. */
+/**
+ * Reads a JSON file of at most 1 MiB without following a final symlink. A "__proto__" key is refused: the strict
+ * schemas would silently drop it, so a signed file could carry it without breaking its signature.
+ */
 export function readSignedTrustListFile(path: string): unknown {
   try {
-    return JSON.parse(boundedFile(path, TRUST_LIST_MAX_BYTES).toString("utf8")) as unknown;
+    return JSON.parse(boundedFile(path, TRUST_LIST_MAX_BYTES).toString("utf8"), (key, value: unknown) => {
+      if (key === "__proto__") throw new Error("unknown field __proto__");
+      return value;
+    }) as unknown;
   } catch (error) {
     throw new TrustListError("TRUST_LIST_INVALID", `${path}: ${error instanceof Error ? error.message : String(error)}`);
   }

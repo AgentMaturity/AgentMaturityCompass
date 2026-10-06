@@ -4,14 +4,15 @@
  * it signs and verifies through dist/trust, the same code the verifiers use. See docs/TRUST_LIST.md.
  */
 import { generateKeyPairSync } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 
 const USAGE = `Usage: node scripts/trust-list.mjs <command> [options]
 
 Commands:
   keygen   --out <dir> --name <name>             write <name>.key (0600) and <name>.pub, print the key id
+                                                 (missing directories are created with mode 0700)
   init     --list-id <id> --out <file> [--days 90] [--sequence 1]
                                                  write an empty, unsigned trust list
   add      --list <file> --pubkey <pem> --purpose <purpose>... --subject <text>
@@ -45,6 +46,7 @@ function required(values, name) {
   return value;
 }
 const readJson = path => JSON.parse(readFileSync(path, "utf8"));
+const privateDir = dir => mkdirSync(dir, { recursive: true, mode: 0o700 });
 const writeJson = (path, value, flag = "w") => writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { mode: 0o600, flag });
 
 /** Validates the edited list before anything is written; an edit invalidates every signature. */
@@ -66,6 +68,7 @@ const COMMANDS = {
     const { ed25519KeyId } = await trust();
     const dir = required(values, "out"), name = required(values, "name");
     const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+    privateDir(dir);
     const publicKeyPem = publicKey.export({ type: "spki", format: "pem" }).toString();
     writeFileSync(join(dir, `${name}.key`), privateKey.export({ type: "pkcs8", format: "pem" }).toString(), { mode: 0o600, flag: "wx" });
     writeFileSync(join(dir, `${name}.pub`), publicKeyPem, { mode: 0o644, flag: "wx" });
@@ -79,11 +82,15 @@ const COMMANDS = {
       type: "amc.trust-list", version: 1, listId: required(values, "list-id"), sequence: Number(values.sequence ?? "1"),
       issuedAt: now.toISOString(), expiresAt: new Date(now.getTime() + days * 86_400_000).toISOString(), entries: [], distrust: []
     });
-    writeJson(required(values, "out"), { list, signatures: [] }, "wx");
+    const out = required(values, "out");
+    privateDir(dirname(out));
+    writeJson(out, { list, signatures: [] }, "wx");
   },
   async add(values) {
-    const { ed25519KeyId } = await trust();
-    const publicKeyPem = readFileSync(required(values, "pubkey"), "utf8");
+    const { canonicalEd25519Pem, ed25519KeyId } = await trust();
+    // Stored in canonical form, so a CRLF copy gets the key's real id; a private key or certificate is refused.
+    const text = readFileSync(required(values, "pubkey"), "utf8");
+    const publicKeyPem = canonicalEd25519Pem(text) ?? text;
     await editList(values, list => ({ ...list, entries: [...list.entries, {
       keyId: ed25519KeyId(publicKeyPem) ?? "not-an-ed25519-key", algorithm: "ed25519", publicKeyPem,
       purposes: required(values, "purpose"), subject: required(values, "subject"),
