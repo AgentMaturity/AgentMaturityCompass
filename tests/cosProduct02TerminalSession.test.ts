@@ -127,6 +127,20 @@ describe("P02 terminal session input, streaming and lifecycle", () => {
     expect((await pending).exitCode).toBe(0);
   });
 
+  it("reports exited, not an error, when the command closes the shell before the sentinel is accepted", async () => {
+    const f = fixture();
+    // `exit 0; false` closes the shell: the command line is accepted, the sentinel line
+    // fails with EPIPE, and the backend reports the exit only after that write error.
+    f.write
+      .mockImplementationOnce(async (text: string) => { f.writes.push(text); })
+      .mockImplementationOnce(async () => { throw new Error("The pipe terminal did not accept input."); });
+    const pending = f.session.send("exit 0; false");
+    setTimeout(() => f.exit(0), 5);
+    const result = await pending;
+    expect(result.readiness.rung).toBe("exited");
+    expect(result.exitCode).toBeNull();
+  });
+
   it("bounds the retained transcript without dropping live output or splitting Unicode", async () => {
     const f = fixture({ maxOutputBytes: 64 });
     let live = "";
