@@ -19,6 +19,7 @@ They bind code, docs, changesets and PR text alike.
 
 - **Own clone only.** Work in a fresh clone or worktree, never in a checkout that holds someone else's uncommitted work.
 - **Branch and PR.** Branch `rtd/<key>-<slug>` from `origin/main` unless the issue names a landing-slice branch. Rebase before opening the PR. Title it `[<KEY>] <issue title>` and paste the acceptance checklist into the body (the PR template has the block).
+- **Landing slices.** Slices of candidate `37c1466b` follow [`landing/RUNBOOK.md`](landing/RUNBOOK.md) and its commit-to-slice map.
 - **One issue, one PR**, under about 800 changed lines excluding generated files and fixtures. Split larger work and say so in the issue.
 - **Touch scope.** Change only the files the issue names and explain any other file in the PR. Never delete features, files or docs the issue does not ask for.
 - **Stalls.** When blocked, write the exact blocker and the key it depends on, then stop; never work around a missing decision. When an issue states a wrong fact, write the evidence (file, line, command output) and propose a corrected scope. New work becomes a proposed follow-up issue, not scope creep.
