@@ -190,6 +190,21 @@ describe("P01 connected native chat behavior", () => {
     expect(fail).not.toHaveBeenCalled();
   });
 
+  it.each([true, false, undefined])("forwards --unsafe-unconfined-shell to the turn child and the printed resume only when opted in: %s", async unsafeUnconfinedShell => {
+    seam.answers = ["task", "/exit"];
+    seam.results = [{ code: 0, body: summary() }];
+    await run(unsafeUnconfinedShell === undefined ? {} : { unsafeUnconfinedShell });
+    const flags = (args: readonly string[]) => args.filter(arg => arg === "--unsafe-unconfined-shell").length;
+    const expected = unsafeUnconfinedShell === true ? 1 : 0;
+    expect(seam.commands).toHaveLength(1);
+    expect(seam.commands[0]!.join(" ")).toContain(" agent-loop run ");
+    expect(flags(seam.commands[0]!)).toBe(expected);
+    const resume = logs.find(line => line.startsWith("Resume in this workspace:"));
+    expect(resume).toContain("amc agent-loop chat");
+    expect(flags(resume!.split(/\s+/))).toBe(expected);
+    expect(fail).not.toHaveBeenCalled();
+  });
+
   it("clears a queued fork without changing history or dispatching a command for the cancellation", async () => {
     seam.answers = ["/fork", "/fork cancel", "continue parent", "/exit"];
     seam.results = [{ code: 0, body: summary() }];

@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { EventEmitter } from "node:events";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -22,6 +23,7 @@ import { signAmcConfig, verifyAmcConfigSignature } from "../src/config/amcConfig
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { decideNativeShell, nativeShellReadiness, type NativeShellReadiness } from "../src/sandbox/nativeShellGate.js";
 import { AMCNativeClient } from "../src/sdk/nativeAgentClient.js";
+import { startAcpStdio } from "../src/acp/acpStdioMain.js";
 import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
@@ -341,6 +343,37 @@ describe("every surface composes through the gate", () => {
     await program.parseAsync(["agent-loop", "run", "list files", "--provider", "stub", "--tools", "workspace", "--json", ...extra], { from: "user" });
     return errors.join("\n");
   }
+
+  /** Opens one real ACP session over in-memory stdio; returns what `amc acp` wrote to its own stderr. */
+  async function acpSession(dir: string, unconfinedShell?: boolean): Promise<string[]> {
+    const stdin = new EventEmitter(), frames: { id?: number; error?: unknown }[] = [], diagnostics: string[] = [];
+    const handle = startAcpStdio({ workspace: dir, agentId: "default", providerId: "stub", systemPrompt: "s", tools: "workspace",
+      credentialsMode: "operator-only", credentialsHome: join(dir, "empty-home"), ...(unconfinedShell === undefined ? {} : { unconfinedShell }),
+      stdin, stdout: { write: bytes => { frames.push(JSON.parse(bytes.toString("utf8")) as { id?: number }); return true; } },
+      stderr: { write: chunk => { diagnostics.push(chunk); return true; } } });
+    const call = async (id: number, method: string, params: unknown): Promise<void> => {
+      stdin.emit("data", Buffer.from(JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\n"));
+      await vi.waitFor(() => expect(frames.find(frame => frame.id === id)).toBeDefined());
+      expect(frames.find(frame => frame.id === id)!.error).toBeUndefined();
+    };
+    try {
+      await call(1, "initialize", { protocolVersion: 1, clientCapabilities: {} });
+      await call(2, "session/new", { cwd: dir, mcpServers: [] });
+    } finally { await handle.close(); }
+    return diagnostics;
+  }
+
+  it("amc acp maps --unsafe-unconfined-shell to the cli-flag opt-in and refuses the shell without it", async () => {
+    pin("darwin");
+    const stderr = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const warnings = () => stderr.mock.calls.map(([chunk]) => String(chunk)).filter(chunk => chunk.includes("UNCONFINED"));
+    const dir = workspace();
+    for (const off of [undefined, false]) expect(await acpSession(dir, off), String(off)).toEqual([`amc acp: ${DARWIN_REFUSAL}\n`]);
+    expect(warnings()).toEqual([]);
+    // The session composes with "cli-flag", not "sdk-option": the warning names its source.
+    expect(await acpSession(dir, true)).toEqual([]);
+    expect(warnings()).toEqual([`${CLI_FLAG_WARNING}\n`]);
+  });
 
   it("amc agent-loop run refuses the shell on macOS and warns when --unsafe-unconfined-shell is passed", async () => {
     pin("darwin");
