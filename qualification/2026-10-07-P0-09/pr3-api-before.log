@@ -1,0 +1,67 @@
+# The PR 3 API route cases (added after ef1e4377) run in a worktree of 0b818f4f with the final forgery suite: 6 failed
+# npx vitest run tests/trust/embeddedKeyForgery.test.ts -t "API verify routes"
+
+
+ RUN  v4.1.11 <worktree of 0b818f4f>
+
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts (90 tests | 6 failed | 75 skipped) 1300ms
+     × POST /api/v1/plugins/verify refuses a body that carries pubkeyPath 20ms
+     × POST /api/v1/plugins/verify answers an unpinned issuer with ok:false and the verifier report 14ms
+     × POST /api/v1/plugins/registry/verify refuses a body that carries trustList 1ms
+     × POST /api/v1/plugins/registry/verify answers an unpinned issuer with ok:false and the verifier report 0ms
+     × POST /api/v1/benchmarks/verify refuses a body that carries trustRoot 13ms
+     × POST /api/v1/benchmarks/verify answers an unpinned issuer with ok:false and the verifier report 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify refuses a body that carries pubkeyPath
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/registry/verify refuses a body that carries trustList
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/verify refuses a body that carries trustRoot
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:608:26
+    606|     test(`${name} refuses a body that carries ${field}`, async () => {
+    607|       const out = await route(handler, pathname, { ...body(), [field]:…
+    608|       expect(out.status).toBe(400);
+       |                          ^
+    609|       expect(out.json.error).toContain(`request field "${field}" is re…
+    610|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/verify answers an unpinned issuer with ok:false and the verifier report
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/plugins/registry/verify answers an unpinned issuer with ok:false and the verifier report
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/benchmarks/verify answers an unpinned issuer with ok:false and the verifier report
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:613:33
+    611|     test(`${name} answers an unpinned issuer with ok:false and the ver…
+    612|       const out = await route(handler, pathname, body(), evidence.work…
+    613|       expect(out.json.data?.ok).toBe(false);
+       |                                 ^
+    614|       expect(out.json.data?.report?.trusted).toBe(false);
+    615|       expect(out.json.data?.report?.issuerAdmission.status).toBe("fail…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 9 passed | 75 skipped (90)
+   Start at  05:17:19
+   Duration  4.48s (transform 2.33s, setup 21ms, import 3.04s, tests 1.30s, environment 0ms)
+
