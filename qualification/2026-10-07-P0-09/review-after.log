@@ -1,0 +1,476 @@
+
+ RUN  v4.1.11 <clone>
+
+ ✓ tests/trust/trustListScript.test.ts > scripts/trust-list.mjs (maintainer tooling) > prints usage for --help and refuses an unknown subcommand 216ms
+ ✓ tests/trust/trustListScript.test.ts > scripts/trust-list.mjs (maintainer tooling) > builds, signs and verifies a list end to end, and refuses an unpinned root or a change after signing 1185ms
+ ✓ tests/trust/trustListScript.test.ts > scripts/trust-list.mjs (maintainer tooling) > creates missing directories with mode 0700 on a fresh machine 235ms
+ ✓ tests/trust/trustListScript.test.ts > scripts/trust-list.mjs (maintainer tooling) > adds a CRLF public key in canonical form and refuses a private key file 336ms
+ ✓ tests/trust/trustListScript.test.ts > scripts/trust-list.mjs (maintainer tooling) > refuses an invalid entry instead of writing it 260ms
+ ✓ tests/ledgerTrustRootAnchor.test.ts > the ledger's trust root > cannot detect a workspace-write attacker without an external anchor 362ms
+stderr | tests/keyHistoryBundleCertificate.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/trustTierWriteValidation.test.ts > trustTier is validated where it is written > refuses a tier outside the union 348ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Config > init creates default config 350ms
+ ✓ tests/trustBoundarySignature.test.ts > security config signature > a freshly initialised workspace signs its security config 366ms
+ ✓ tests/ledgerTrustRootAnchor.test.ts > the ledger's trust root > rejects the same forgery when the monitor key is pinned out of band 260ms
+ ✓ tests/trustTierWriteValidation.test.ts > trustTier is validated where it is written > refuses a tier that is only the wrong case 248ms
+ ✓ tests/trustBoundarySignature.test.ts > security config signature > editing the config invalidates the signature 250ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a list signed by a pinned root parses, with the spec's signed bytes 6ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a purpose added after signing invalidates the list 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > a signature whose public key does not hash to its key id is refused 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > an expired list gives TRUST_LIST_EXPIRED 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses duplicate key id 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses empty purposes 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses duplicate purposes 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses revokedAt without a reason 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses validTo not after validFrom 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a PEM whose sha256 is not the key id 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an RSA key 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a private key in place of the public key 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-canonical (CRLF) PEM 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown entry field 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown list field 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a non-UTC time 1ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an evidence-authority key without authority 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses a bad list id 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > accepts an evidence-authority key that carries its authority, and a dated revocation with a reason 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > refuses an unknown signature field 0ms
+ ✓ tests/trust/trustList.test.ts > signed trust lists > accepts 4,096 distinct entries and refuses 4,097 on the size limit 878ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > a reordered JSON file still verifies 2ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > refuses a __proto__ field at any level, which a parsed object would otherwise drop 2ms
+ ✓ tests/trust/trustList.test.ts > trust-list files > refuses files over 1 MiB and symlinks 2ms
+ ✓ tests/ledgerTrustRootAnchor.test.ts > the ledger's trust root > passes and reports itself anchored when the key matches 229ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Config > load returns initialized config 262ms
+ ✓ tests/trustTierWriteValidation.test.ts > trustTier is validated where it is written > refuses a non-string tier 225ms
+ ✓ tests/trustBoundarySignature.test.ts > security config signature > distinguishes unsigned from tampered 222ms
+ ✓ tests/trustBoundarySignature.test.ts > security config signature > re-signing after a legitimate edit restores validity 279ms
+ ✓ tests/ledgerTrustRootAnchor.test.ts > the ledger's trust root > reads the expectation from the environment when no option is passed 282ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Config > load auto-initializes if missing 252ms
+ ✓ tests/trustTierWriteValidation.test.ts > trustTier is validated where it is written > accepts every tier in the union, and rows with no tier at all 256ms
+ ✓ tests/trustTierWriteValidation.test.ts > the receipt-bearing writer is guarded too > refuses an invalid tier through appendEvidenceWithReceipt 274ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > add and list edges 281ms
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all on a fresh workspace (first-run passport boundary) > uninitialized passport reports SKIP, not a critical failure 334ms
+stderr | tests/keyHistoryBundleCertificate.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/verifyFreshWorkspacePassport.test.ts > verify all on a fresh workspace (first-run passport boundary) > fails closed when passport artifacts exist without a signed policy 284ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails the workspace-write forgery as UNANCHORED by default 1525ms
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > generates a signed JSON trust certificate with required fields 84ms
+ ✓ tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > appends form an intact chain 74ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > reject self-delegation 274ms
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > detects tampering when payload is modified 69ms
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > generates an unsigned preview without vault signing and verifier rejects it 2ms
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > writes PDF certificate and machine-verifiable JSON sidecar 63ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > returns a TrustPipelineResult with all required fields 153ms
+ ✓ tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > detects a key planted directly into the file 63ms
+ ✓ tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > detects an altered existing entry 70ms
+stderr | tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > records where an externally admitted key came from
+[amc] Explicit notary admission expanded the auditor signing role (02462c21ddc1504efa2d5dc354a464f7218f958a3ecc2d8eada59e3dd13f7955).
+
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > uses empty evidence chain defaults when evidence DB is absent 70ms
+ ✓ tests/trustCertificate.test.ts > generateTrustCertificate > stores signing key fingerprint derived from signing public key 75ms
+ ✓ tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > writes the trust set owner-only 73ms
+ ✓ tests/trustAnchorIntegrity.test.ts > key history is tamper-evident > records where an externally admitted key came from 65ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > stages object has all four stage keys 50ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > shieldGate stage has passed, trustScore, reason 39ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > formalVerification stage has passed, propertiesVerified, certificateHash 34ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > reject duplicate edge 213ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > zkProof stage has generated, claim, proofId 54ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > trustToken stage has issued, tokenId, expiresAt 39ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > evidenceChain is a non-empty array of strings 41ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > share format url returns public and verify URLs 434ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > processingTimeMs is a non-negative number 29ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — result shape > overallTrustScore is a number between 0 and 100 28ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — logic > evidenceChain has at least genesis + shield hashes 50ms
+ ✓ tests/cleanSourceDocs.test.ts > AMC-1509 — documented source install matches the executable check > README.md quotes every documented command and no npm ci 1ms
+ ✓ tests/cleanSourceDocs.test.ts > AMC-1509 — documented source install matches the executable check > docs/INSTALL.md quotes every documented command and no npm ci 1ms
+ ✓ tests/cleanSourceDocs.test.ts > AMC-1509 — documented source install matches the executable check > CONTRIBUTING.md quotes every documented command and no npm ci 0ms
+ ✓ tests/cleanSourceDocs.test.ts > AMC-1509 — documented source install matches the executable check > the pinned package manager is what the docs tell people to use 0ms
+ ✓ tests/cleanSourceDocs.test.ts > clean-source command orchestration (synthetic subprocesses, not install acceptance) > isolates install/build/runtime and verifies a cold resumed session 9ms
+ ✓ tests/cleanSourceDocs.test.ts > clean-source command orchestration (synthetic subprocesses, not install acceptance) > refuses ledger failure even when other subprocesses exit zero 4ms
+ ✓ tests/cleanSourceDocs.test.ts > clean-source command orchestration (synthetic subprocesses, not install acceptance) > refuses resume failure even when other subprocesses exit zero 3ms
+ ✓ tests/cleanSourceDocs.test.ts > clean-source command orchestration (synthetic subprocesses, not install acceptance) > refuses install failure even when other subprocesses exit zero 1ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > reject cycles 238ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — logic > all evidence chain hashes are distinct (no repeated hashes) 45ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — logic > different agentIds produce different evidence chains 155ms
+ ✓ tests/trustDriftMonitor.test.ts > startTrustDriftMonitor > alerts when sequential run scores degrade past threshold 5ms
+ ✓ tests/trustDriftMonitor.test.ts > startTrustDriftMonitor > does not re-alert when no new runs are available 3ms
+ ✓ tests/trustDriftMonitor.test.ts > startTrustDriftMonitor > uses persisted state to evaluate only newly appended runs 5ms
+ ✓ tests/trustDriftMonitor.test.ts > startTrustDriftMonitor > does not alert on improvements 5ms
+ ✓ tests/trustDriftMonitor.test.ts > startTrustDriftMonitor > classifies severe drops as critical 3ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — logic > allowed pipeline has more stages in evidence chain than blocked 33ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — logic > when shield gate blocks, downstream stages are empty/false 47ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — exports > runTrustPipeline is a function 0ms
+ ✓ tests/trustPipeline.test.ts > TrustPipeline — exports > runTrustPipeline returns a Promise 35ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > share format qr returns QR URL that encodes verify URL 343ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > conversation integrity actually detects tampering > verifies an untouched conversation against its baseline 97ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > conversation integrity actually detects tampering > detects a modified turn and names it 1ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > conversation integrity actually detects tampering > detects a removed turn 1ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > conversation integrity actually detects tampering > detects an appended turn 1ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > conversation integrity actually detects tampering > reports unverified rather than valid when no baseline exists 1ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > remove edge 282ms
+ ✓ tests/trustPrimitivesHonesty.test.ts > G1-34: attestation names who vouched > refuses to upgrade trust without an attester 11ms
+ ✓ tests/trust/admission.test.ts > admitKey > an explicit pin for the purpose 3ms
+ ✓ tests/trust/admission.test.ts > admitKey > a trust-list entry for the purpose 1ms
+ ✓ tests/trust/admission.test.ts > admitKey > a trust-list entry checked at the claimed time 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a trust-list entry for another purpose 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an explicit pin for another purpose 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an explicit pin for another purpose with --allow-unpinned 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an absent key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an absent key with --allow-unpinned 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a pinned and distrusted key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a distrusted key with --allow-unpinned and an explicit pin 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key distrusted from a date, claim before it 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key distrusted from a date, claim at it 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key distrusted from a date, no claimed time 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key-compromise revocation, claim before it 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key-compromise revocation, no claimed time 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a superseded key, claim before the revocation 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a superseded key, claim at the revocation 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a superseded key, no claimed time 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a claim before validFrom 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a claim at validTo 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a claim later than the verification time, inside the window 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a claim later than the verification time, for a key valid only from then 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an expired key, claim before validTo 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a key-compromise revocation in one list and an entry in another 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > the same two lists in the other order 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a CRLF copy of a distrusted key with an explicit pin 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a CRLF copy of a distrusted key with --allow-unpinned 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a CRLF copy of a listed key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > a private key in place of the public key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > no claim and a verification time after validTo 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > tenant B's key against tenant A's list 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > an artifact without a public key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey > names the key id to pin and the signature in every refusal 1ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > admits an older key when the pinned anchor allows key history 1ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses it without allowKeyHistory 0ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses history signed by an unpinned anchor 1ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses history for a role that does not sign the purpose 0ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses tampered history 0ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > still applies distrust to a history key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses history anchored by a distrusted key 0ms
+ ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses history anchored by a key that another list revoked for key compromise 0ms
+stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > export never launders a correctly hashed planted history into a signed bundle
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/trust/verifierReport.test.ts > VerifierReportV1 > trusts only intact artifacts whose every signature is admitted, and leaves P1-06 dimensions not evaluated 3ms
+ ✓ tests/trust/verifierReport.test.ts > VerifierReportV1 > is untrusted on integrity errors, refused or missing signatures, and unanchored ledgers 1ms
+ ✓ tests/trust/verifierReport.test.ts > VerifierReportV1 > records allow flags as overrides and never turns them into trust 0ms
+ ✓ tests/trust/verifierReport.test.ts > VerifierReportV1 > labels workspace self-trust as a self-check 0ms
+ ✓ tests/trust/verifierReport.test.ts > VerifierReportV1 > parses the documented example and refuses unknown fields 1ms
+ ✓ tests/trustComposition.test.ts > Delegation Edges > remove nonexistent edge throws 312ms
+ ✓ tests/trustComposition.test.ts > Cycle Detection > no cycles in empty graph 0ms
+ ✓ tests/trustComposition.test.ts > Cycle Detection > no cycles in linear DAG 0ms
+ ✓ tests/trustComposition.test.ts > Cycle Detection > detects simple cycle 0ms
+ ✓ tests/trustComposition.test.ts > Cycle Detection > detects 3-node cycle 0ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > every consumer reads the same table 1ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > matches the published methodology 0ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > orders tiers by how much corroboration each carries 0ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > keeps the lowercase kind weights in step with the tiers 0ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > decays evidence on the documented 90-day half-life 0ms
+ ✓ tests/trustWeightConsistency.test.ts > evidence trust weights > no scorer hardcodes its own weights any more 0ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > share format json includes passport payload 366ms
+ ✓ tests/trustInterchange.test.ts > TRUST_TRANSLATIONS > should be an array with at least 2 entries 1ms
+ ✓ tests/trustInterchange.test.ts > TRUST_TRANSLATIONS > each translation should have sourceSystem, targetSystem, mappings 0ms
+ ✓ tests/trustInterchange.test.ts > TRUST_TRANSLATIONS > should include amc→nist_ai_rmf translation 0ms
+ ✓ tests/trustInterchange.test.ts > TRUST_TRANSLATIONS > each mapping should have conversionFactor and confidence 1ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should return a token with required fields 2ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should set the correct agentId in subject 0ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should set the correct workspaceId in issuer 0ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should expire in 24h by default 0ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should respect custom ttlHours 0ms
+ ✓ tests/trustInterchange.test.ts > issueTrustToken > should include displayName when provided 0ms
+ ✓ tests/trustInterchange.test.ts > verifyTrustToken > should verify a freshly issued token as valid 1ms
+ ✓ tests/trustInterchange.test.ts > verifyTrustToken > should fail verification with wrong secret 0ms
+ ✓ tests/trustInterchange.test.ts > verifyTrustToken > should detect tampered signature 0ms
+ ✓ tests/trustInterchange.test.ts > verifyTrustToken > should detect expired token 3ms
+ ✓ tests/trustInterchange.test.ts > translateTrustScores > should return an empty object for unknown system pair 0ms
+ ✓ tests/trustInterchange.test.ts > translateTrustScores > should translate known amc → nist_ai_rmf scores 0ms
+ ✓ tests/trustInterchange.test.ts > translateTrustScores > translated scores should have score, level, confidence 1ms
+ ✓ tests/trustInterchange.test.ts > translateTrustScores > translated scores should be in valid range 0ms
+ ✓ tests/trust/builtInDistrust.test.ts > built-in distrust (src/trust/amc-distrust.json) > refuses a key in an injected built-in entry even when --pubkey pins it, with or without --allow-unpinned 5ms
+ ✓ tests/trust/builtInDistrust.test.ts > built-in distrust (src/trust/amc-distrust.json) > applies to workspace self-trust as well 1ms
+ ✓ tests/trust/builtInDistrust.test.ts > built-in distrust (src/trust/amc-distrust.json) > fails closed when the shipped file is malformed 1ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor 1448ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > leaf agent has composite = own 261ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeTrustInheritanceGraph > bounds child trust by parent effective trust 3ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeTrustInheritanceGraph > applies minimum bound across multiple parents 0ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeTrustInheritanceGraph > supports edge attenuation weights 0ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeTrustInheritanceGraph > throws on cyclic inheritance graph 0ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeTrustInheritanceGraph > enforces configurable minimum floor 0ms
+ ✓ tests/trustInheritanceGraph.test.ts > computeInheritedTrust (compatibility) > retains existing strict mode behavior 0ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > share format pdf writes a PDF file 353ms
+ ✓ tests/trustTemporalDecay.test.ts > temporal trust decay > half-life decay factor is 0.5 at exactly one half-life 1ms
+ ✓ tests/trustTemporalDecay.test.ts > temporal trust decay > derives weighted evidence from diagnostic runs 1ms
+ ✓ tests/trustTemporalDecay.test.ts > temporal trust decay > report computes freshness ratio and stale alert 0ms
+ ✓ tests/trustTemporalDecay.test.ts > temporal trust decay > markdown renderers include freshness details 1ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > strict mode: composite bounded by weakest worker 312ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > compare returns side-by-side dimensions and deltas 397ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > starts from the built-in distrust list, with no pins and no allow flags from the environment 2ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins a --pubkey file for the purposes the command checks 48ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins the key, not the PEM text: a CRLF --pubkey file gets the canonical key id, and a private key is refused 2ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > pins ledger-row from --expect-monitor, else from AMC_EXPECTED_MONITOR_FINGERPRINT 1ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > loads the default trust list under pinned roots from the AMC home and merges its distrust entries 7ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > uses --trust-list and --trust-root instead of the defaults 2ms
+ ✓ tests/trust/trustContext.test.ts > loadTrustContext > fails hard, never skips, on a bad signature, an expired list, missing roots or a malformed roots file 6ms
+ ✓ tests/trust/trustContext.test.ts > workspaceSelfTrust > admits the workspace's own role keys for their role purposes, labelled workspace-self 1ms
+ ✓ tests/trust/trustContext.test.ts > workspaceSelfTrust > never admits a workspace key as an independent or third-party issuer 0ms
+ ✓ tests/trust/trustContext.test.ts > package surface > exports ./trust and ships the built-in distrust file 1ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > export never launders a correctly hashed planted history into a signed bundle 1122ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > weighted mode: weighted average 223ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle rejects an attacker signer admitted by unsigned hash chain 156ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > no-inherit mode: composite equals own 244ms
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > public helper returns null for unknown passport id 213ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle rejects an attacker signer admitted by rehashed signed envelope 161ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle rejects an attacker signer admitted by transplanted signed envelope 148ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > blast radius computation 231ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > registry helper supports pagination 412ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > passes a clean workspace whose monitor key is pinned 1184ms
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > cross-agent contradiction detection 228ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > VERIFY-1: a turn with a tool call takes two steps and completes 416ms
+stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/trustComposition.test.ts > Trust Composition Computation > fleet composite score is average of composites 224ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > verify helper reports expiry after 90 days 348ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > VERIFY-2: a steer sent mid-turn is claimed by a later step of the SAME turn 424ms
+ ✓ tests/trustComposition.test.ts > Report Persistence & Rendering > save and render report 214ms
+ ✓ tests/trustComposition.test.ts > Report Persistence & Rendering > report has valid signature fields 216ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > revoke helper marks passport revoked and verify reflects revocation 377ms
+stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission
+[amc] Explicit imported admission expanded the auditor signing role (8ad705db2cdd943594a2ad581324d4b99c91c6fc4137c734337632d145a0766c).
+
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission 952ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > VERIFY-3: a cancel mid-request leaves a BALANCED turn that names who stopped it 315ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > GET /api/v1/passports is public and paginated 275ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle preserves authenticated monitor rotation for offline ledger verification 184ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle still verifies current-key signatures with legacy arrays 114ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a clean workspace whose monitor key is not pinned 1090ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle still verifies current-key signatures with absent history 115ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 1046ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > GET /api/v1/passport/:id is public 280ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate rejects an attacker signer admitted by unsigned hash chain 107ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate rejects an attacker signer admitted by rehashed signed envelope 103ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate rejects an attacker signer admitted by transplanted signed envelope 114ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > GET /api/v1/passport/:id/verify is public 310ms
+ ✓ tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > POST /api/v1/passport/:id/revoke requires admin token and then fails verify 278ms
+stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > accepts the recorded fingerprint in upper case, as the trust context does 949ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 3ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses missing evidence eventType with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses missing evidence eventHash with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves sparse evidence and native null/undefined behavior 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves getter and array operation order on success and refusal 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > rejects independently rehashed/altered empty citations 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > sampling complete original workflow > deduplicates refusal reasons in original first-occurrence order 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses missing evidence eventType with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses missing evidence eventHash with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves sparse evidence and native null/undefined behavior 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves getter and array operation order on success and refusal 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > rejects independently rehashed/altered empty citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > reviewer complete original workflow > deduplicates refusal reasons in original first-occurrence order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses missing evidence eventType with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses missing evidence eventHash with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves sparse evidence and native null/undefined behavior 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves getter and array operation order on success and refusal 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > rejects independently rehashed/altered empty citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > exceptions complete original workflow > deduplicates refusal reasons in original first-occurrence order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses missing evidence eventType with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses missing evidence eventHash with original reasons 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves sparse evidence and native null/undefined behavior 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves getter and array operation order on success and refusal 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > rejects independently rehashed/altered empty citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > drift complete original workflow > deduplicates refusal reasons in original first-occurrence order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses missing evidence eventType with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses missing evidence eventHash with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves sparse evidence and native null/undefined behavior 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves getter and array operation order on success and refusal 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > rejects independently rehashed/altered empty citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > provider complete original workflow > deduplicates refusal reasons in original first-occurrence order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves complete module exports, root public consumers and unchanged domain source bytes 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > matches every receipt/row/hash/export byte and succeeds for valid references 2ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves ordered refusal for missing citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves ordered refusal for empty record citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves ordered refusal for unknown citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves ordered refusal for empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses missing evidence eventId with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses missing evidence eventType with original reasons 3ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses missing evidence signedEvidenceRef with original reasons 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses missing evidence eventHash with original reasons 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses malformed evidence hash AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses malformed evidence hash aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > refuses malformed evidence hash gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves sparse evidence and native null/undefined behavior 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves getter and array operation order on success and refusal 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves generatedAt fallback and caller array identity 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > preserves rendered refusal footer bytes and getter order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > rejects independently rehashed/altered empty citations 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > rejects independently rehashed/altered empty rows 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > rejects independently rehashed/altered row tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > rejects independently rehashed/altered receipt tamper 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > gate complete original workflow > deduplicates refusal reasons in original first-occurrence order 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > keeps reviewer role separation, high-risk second review and conflict refusal distinct 0ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > keeps timestamp and signed-reference refusals at their domain boundaries 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > archive originals are pinned to the expected base and Git blob bytes 1ms
+ ✓ tests/auditEvidenceAccountingParity.test.ts > unsigned CI initialization preserves real policy/workflow bytes and disclosed signing boundary 3ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > VERIFY-4: the run verifies — signed, chained, and every request re-derived 1341ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy still fails when the legitimate key is pinned 914ms
+stderr | tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission
+[amc] Explicit imported admission expanded the auditor signing role (8ad705db2cdd943594a2ad581324d4b99c91c6fc4137c734337632d145a0766c).
+
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission 823ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate preserves authenticated monitor rotation for offline ledger verification 152ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > records the selected native identity and refuses another agent resuming its session 404ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate still verifies current-key signatures with legacy arrays 101ms
+ ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate still verifies current-key signatures with absent history 101ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with its key pinned is trusted 786ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > prints the full monitor key id with an UNANCHORED refusal, so the operator can compare it with their record 887ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 725ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a distrusted monitor key even when it is pinned and --allow-unanchored is used 832ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > runs a turn from argv and reports what the log recorded 1319ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > cancels on --cancel-after and still exits with a balanced, attributed turn 275ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 791ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > fails the CLI for a recorded budget error without changing idle driver semantics or poisoning a later successful resume 408ms
+ ✓ tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > refuses a run it cannot compose, and names the flag that was wrong 169ms
+ ✓ tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > gives an integrity-only result with exit 2 under --allow-unanchored 897ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a distrusted monitor key fails even with --expect-monitor and --allow-unanchored 747ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > an issuer key superseded after it sealed the bundle is admitted on the claimed signing time 726ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy re-signed with an embedded key fails as not-pinned by default 757ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy still fails when the legitimate key is pinned 782ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with its key pinned is trusted 706ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 705ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 715ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy re-signed with an embedded key fails as not-pinned by default 658ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy still fails when the legitimate key is pinned 637ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with its key pinned is trusted 634ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 636ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a revocation signed by a different pinned key does not revoke the certificate 677ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 728ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy still fails when the legitimate key is pinned 753ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with its key pinned is trusted 743ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 700ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a distrusted key is refused even when it is pinned with --pubkey 706ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a passport whose inclusion proof carries its own fabricated root is refused 721ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 683ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy still fails when the legitimate key is pinned 684ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with its key pinned is trusted 690ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 679ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > an assurance certificate whose inclusion proof carries its own fabricated root is refused 680ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate 676ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy re-signed with an embedded key fails as not-pinned by default 644ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy still fails when the legitimate key is pinned 630ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with its key pinned is trusted 637ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 644ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 715ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy still fails when the legitimate key is pinned 701ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with its key pinned is trusted 683ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 676ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > verify all names the key to pin when it refuses an unpinned release bundle 836ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/bundle/verify refuses a body that carries publicKeyPath 1ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/bundle/verify answers an unpinned issuer with ok:false and the verifier report 44ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify refuses a body that carries allowUnpinned 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify answers an unpinned issuer with ok:false and the verifier report 42ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify-revocation refuses a body that carries trustList 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/crypto/cert/verify-revocation answers an unpinned issuer with ok:false and the verifier report 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify refuses a body that carries pubkey 0ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify answers an unpinned issuer with ok:false and the verifier report 16ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer 40ms
+
+ Test Files  27 passed (27)
+      Tests  440 passed (440)
+   Start at  02:49:28
+   Duration  35.36s (transform 24.37s, setup 798ms, import 42.59s, tests 68.55s, environment 3ms)
+
