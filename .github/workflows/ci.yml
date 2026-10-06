@@ -107,6 +107,14 @@ jobs:
       - name: Published counts match reality
         run: npm run check:counts
 
+      # Phase 0 freeze: no new CLI command paths or station-pack questions
+      # without a named freeze exception (docs/program/READY_TO_DEPLOY.md).
+      - name: Freeze guard (until Gate G0)
+        run: npm run check:freeze
+
+      - name: Qualification receipts
+        run: npm run check:qualification
+
       # The question-bank export is generated; fail if it has drifted from the
       # live bank.
       - name: Generated docs are current
