@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-04",
+  "date": "2026-10-05",
+  "commit": "786d8abb2a12b82d0986c3a286864d7966d21166",
+  "branch": "main",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 5000
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21000
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 28000
+    },
+    {
+      "cmd": "node --test scripts/lib/ownedProcessCommand.test.mjs",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 23000
+    },
+    {
+      "cmd": "npm run check:package",
+      "exit": 0,
+      "durationMs": 4000
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run check:policy-fixtures",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:question-bank-export",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "mkdir -p tmp/ci-coverage && npm run test:coverage -- --reporter=default --reporter=json --outputFile.json=tmp/ci-coverage/tests.json",
+      "exit": 0,
+      "durationMs": 409000
+    },
+    {
+      "cmd": "npm run check:coverage",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:incident-readiness",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:compliance-freshness",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:evidence-paths",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:changelog-page",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run check:vendor-links && npm run check:vendor-rescope && npm run check:third-party-notices",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "T=$(mktemp -d) && npm pack --ignore-scripts --json > $T/pack.json && TGZ=$(node -e 'const j=JSON.parse(require(\"fs\").readFileSync(process.argv[1],\"utf8\"));process.stdout.write(j[0].filename)' $T/pack.json) && node dist/cli.js release sbom --out $T/sbom.json && node dist/cli.js release licenses --out $T/lic.json && node dist/cli.js release provenance --out $T/prov.json && node dist/cli.js release scan --in \"$TGZ\" --out $T/scan.json; rc=$?; rm -f \"$TGZ\"; exit $rc",
+      "exit": 0,
+      "durationMs": 6000
+    },
+    {
+      "cmd": "node dist/cli.js e2e smoke --mode local --json > tmp/e2e-smoke-local.json",
+      "exit": 0,
+      "durationMs": 9000
+    },
+    {
+      "cmd": "node scripts/clean-source-check.mjs",
+      "exit": 0,
+      "durationMs": 44000
+    },
+    {
+      "cmd": "node scripts/packed-install-check.mjs",
+      "exit": 0,
+      "durationMs": 40000
+    },
+    {
+      "cmd": "npm run release:gate",
+      "exit": 1,
+      "durationMs": 634000
+    }
+  ],
+  "tests": {
+    "total": 21409,
+    "passed": 21409,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "ci-summary.tsv",
+      "sha256": "49dd736f4bc1c7ac9a2c640f3dab652dd3f55ddc28424acc2189e3943b4fde9f"
+    },
+    {
+      "path": "release-gate.log",
+      "sha256": "654a309dfef2676b7de71b026f749363bee1bce9e4cad71e1eba4bae5f32bd92"
+    },
+    {
+      "path": "check-duplicates.log",
+      "sha256": "fae56412b04fca7b5167d206eebeb78c793b451d7d72216ef397f93d759453c2"
+    },
+    {
+      "path": "check-dead-code.log",
+      "sha256": "33c6d5de4409a2b503ea1310bef4dde5b92d5bbd9337078dd0ab536f323204f5"
+    },
+    {
+      "path": "audit-runtime-2026-10-06.log",
+      "sha256": "7ee4a3db3d6cf3c927c40246c94ee437d725989761e406fc41c14d9784cf638e"
+    }
+  ],
+  "notes": "Baseline for the landing slices: the steps of the build-test, e2e-smoke-local, clean-source and packed-install jobs of .github/workflows/ci.yml plus npm run release:gate, run in one fresh clone of origin/main at this commit on 2026-10-05. Not run: the docker-smoke, helm-lint-template and security-scan-lite jobs (no baseline exists for them; slice C runs them, see RUNBOOK.md section 8), and the changeset job, which runs only on pull requests. Non-zero exits: check:duplicates (1,253 jscpd clones) and check:dead-code (2,339 Knip findings), which ci.yml runs as report-only until decision D-11, and release:gate (17 of 19 executed checks passed; the two failures are source-duplicates and source-dead-code; live-deploy-health skipped). runtime-dependency-audit passed on 2026-10-05. A rerun of npm run audit:runtime alone on this commit on 2026-10-06 exits 1 on critical advisory GHSA-jqcg-44mw-7w3h (proxy-addr), published that day; see README.md and audit-runtime-2026-10-06.log. tests are the full suite under coverage: 21,409 tests in 1,522 files."
+}

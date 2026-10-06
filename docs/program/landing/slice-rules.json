@@ -1,0 +1,710 @@
+{
+  "schemaVersion": 1,
+  "candidateRef": "amc/regulated-platform-20261003",
+  "slices": [
+    {
+      "id": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "buildOrder": 0
+    },
+    {
+      "id": "A",
+      "issue": "P0-12",
+      "phase": 0,
+      "buildOrder": 1
+    },
+    {
+      "id": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "buildOrder": 2
+    },
+    {
+      "id": "C",
+      "issue": "P0-14",
+      "phase": 0,
+      "buildOrder": 3
+    },
+    {
+      "id": "A-register",
+      "issue": "P0-12",
+      "phase": 0,
+      "buildOrder": 4
+    },
+    {
+      "id": "F4",
+      "issue": "P1-17",
+      "phase": 1,
+      "buildOrder": 5
+    },
+    {
+      "id": "F1",
+      "issue": "P1-15",
+      "phase": 1,
+      "buildOrder": 6
+    },
+    {
+      "id": "F3",
+      "issue": "P1-16",
+      "phase": 1,
+      "buildOrder": 7
+    },
+    {
+      "id": "S8",
+      "issue": "P1-43",
+      "phase": 1,
+      "buildOrder": 8
+    },
+    {
+      "id": "S6",
+      "issue": "P1-45",
+      "phase": 1,
+      "buildOrder": 9
+    },
+    {
+      "id": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "buildOrder": 10
+    },
+    {
+      "id": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "buildOrder": 11
+    },
+    {
+      "id": "hidden",
+      "issue": "P1-46",
+      "phase": "hidden",
+      "buildOrder": 12
+    }
+  ],
+  "rules": [
+    {
+      "branch": "worktree-wf_fc54d4b0-c89-1",
+      "track": "F1",
+      "slice": "F1",
+      "issue": "P1-15",
+      "phase": 1,
+      "acceptedHead": "0b72371f2",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_fc54d4b0-c89-2",
+      "track": "F2",
+      "slice": "hidden",
+      "issue": "P1-46",
+      "phase": "hidden",
+      "acceptedHead": "91b434b82",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "action": "record-only"
+    },
+    {
+      "branch": "worktree-wf_fc54d4b0-c89-3",
+      "track": "F3",
+      "slice": "F3",
+      "issue": "P1-16",
+      "phase": 1,
+      "acceptedHead": "8ceeaa656",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_fc54d4b0-c89-4",
+      "track": "F4",
+      "slice": "F4",
+      "issue": "P1-17",
+      "phase": 1,
+      "acceptedHead": "ed9b45a25",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-7",
+      "track": "S7",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": "4e8cc837c",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-2",
+      "track": "S2",
+      "slice": "C",
+      "issue": "P0-14",
+      "phase": 0,
+      "acceptedHead": "0d1bb10a3",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-8",
+      "track": "S8",
+      "slice": "S8",
+      "issue": "P1-43",
+      "phase": 1,
+      "acceptedHead": "0c7421f84",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-10",
+      "track": "S10",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": "8383e4cad",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-5",
+      "track": "S5",
+      "slice": "A",
+      "issue": "P0-12",
+      "phase": 0,
+      "acceptedHead": "97027c5d9",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-4",
+      "track": "S4",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": "76569f23c",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-9",
+      "track": "S9",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": "5a29f5c45",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-3",
+      "track": "S3",
+      "slice": "A",
+      "issue": "P0-12",
+      "phase": 0,
+      "acceptedHead": "a54b88fc9",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-6",
+      "track": "S6",
+      "slice": "S6",
+      "issue": "P1-45",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "BLOCKED at 8fc76bd45; merged at 653e3eeeb by root ruling (4 Oct 05:43Z)",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md"
+    },
+    {
+      "branch": "worktree-wf_5210e2f4-3ea-1",
+      "track": "S1",
+      "slice": "C",
+      "issue": "P0-14",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdict": "IN REVIEW: round-3 re-verification of 7180bd0c4",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/reverify-S1-r3.json"
+    },
+    {
+      "branch": "worktree-wf_3cbab9c8-0f5-17",
+      "track": "O17",
+      "slice": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json"
+    },
+    {
+      "branch": "worktree-wf_3cbab9c8-0f5-18",
+      "track": "O18",
+      "slice": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json"
+    },
+    {
+      "branch": "worktree-wf_3cbab9c8-0f5-19",
+      "track": "O19",
+      "slice": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json"
+    },
+    {
+      "branch": "worktree-wf_3cbab9c8-0f5-20",
+      "track": "O20",
+      "slice": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json"
+    },
+    {
+      "branch": "worktree-wf_bea95acb-47c-1",
+      "track": "I1",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json"
+    },
+    {
+      "branch": "worktree-wf_bea95acb-47c-2",
+      "track": "I2",
+      "slice": "S6",
+      "issue": "P1-45",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "action": "regenerate"
+    },
+    {
+      "branch": "worktree-wf_bea95acb-47c-3",
+      "track": "I3",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json"
+    },
+    {
+      "branch": "worktree-wf_bea95acb-47c-4",
+      "track": "I4",
+      "slice": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "action": "regenerate"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-2",
+      "track": "apply-health",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-9",
+      "track": "apply-frameworks",
+      "slice": "S6",
+      "issue": "P1-45",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-3",
+      "track": "apply-education",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-4",
+      "track": "apply-environment",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-5",
+      "track": "apply-mobility",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-6",
+      "track": "apply-governance",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/governance/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-7",
+      "track": "apply-technology",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/technology/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-8",
+      "track": "apply-wealth",
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/result.json"
+    },
+    {
+      "branch": "worktree-wf_b05b1ca6-169-10",
+      "track": "apply-register",
+      "slice": "A-register",
+      "issue": "P0-12",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/result.json"
+    },
+    {
+      "sha": "48e8b6849",
+      "track": null,
+      "slice": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "regenerate"
+    },
+    {
+      "sha": "019e32b55",
+      "track": null,
+      "slice": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "regenerate"
+    },
+    {
+      "sha": "13ea36191",
+      "track": null,
+      "slice": "A",
+      "issue": "P0-12",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "50783334c",
+      "track": null,
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "7d4bbecee",
+      "track": null,
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "1f811e091",
+      "track": null,
+      "slice": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "regenerate"
+    },
+    {
+      "sha": "ab808047a",
+      "track": null,
+      "slice": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "regenerate"
+    },
+    {
+      "sha": "37c1466b3",
+      "track": null,
+      "slice": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "7016af08d",
+      "track": "apply-health",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "d4592bcbd",
+      "track": "apply-education",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "e3fe61d53",
+      "track": "apply-environment",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "72e3c3d88",
+      "track": "apply-mobility",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "2fd42c5b8",
+      "track": "apply-governance",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "5aab3b589",
+      "track": "apply-governance",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "615450e67",
+      "track": "apply-technology",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "de9d84009",
+      "track": "apply-technology",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "5e8afb1a0",
+      "track": "apply-technology",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    },
+    {
+      "sha": "1ce9b08aa",
+      "track": "apply-wealth",
+      "slice": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "acceptedHead": null,
+      "verdictFile": null,
+      "action": "cherry-pick"
+    }
+  ],
+  "overlaps": [
+    {
+      "path": "src/domains/industryPacks.ts",
+      "issues": [
+        "P0-12",
+        "P0-21",
+        "P0-23",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "slice A grows the monolith to 2,612 lines; P0-21, P0-23 and P0-24 edit it next; P1-42 redoes the split on top"
+    },
+    {
+      "path": "tests/logisticsIndustryPack.test.ts",
+      "issues": [
+        "P0-12",
+        "P0-21",
+        "P0-23",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "slice A grows the monolith to 2,612 lines; P0-21, P0-23 and P0-24 edit it next; P1-42 redoes the split on top"
+    },
+    {
+      "path": "src/domains/domainCliIntegration.ts",
+      "issues": [
+        "P0-13",
+        "P0-15"
+      ],
+      "rule": "I3 lands in slice B; P0-15 edits it after B merges"
+    },
+    {
+      "path": "src/assurance/packs/euAiActArticlePack.ts",
+      "issues": [
+        "P0-13",
+        "P0-19"
+      ],
+      "rule": "slice B first, then P0-19"
+    },
+    {
+      "path": "src/assurance/packs/healthcarePHIPack.ts",
+      "issues": [
+        "P0-13",
+        "P0-19"
+      ],
+      "rule": "slice B first, then P0-19"
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "issues": [
+        "P0-02",
+        "P0-19",
+        "P0-17"
+      ],
+      "rule": "root patch (P0-02, landed on main at 786d8abb), then P0-19 and P0-17"
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "issues": [
+        "P0-02",
+        "P0-19",
+        "P0-17"
+      ],
+      "rule": "root patch (P0-02, landed on main at 786d8abb), then P0-19 and P0-17"
+    },
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/domains/domainReportBuilder.ts",
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/domains/domainAssessmentEngine.ts",
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/compliance/coverageScorer.ts",
+      "issues": [
+        "P0-17",
+        "P1-45"
+      ],
+      "rule": "S6 and the apply-round frameworks land in P1-45 after P0-17"
+    },
+    {
+      "path": "src/compliance/mappingSchema.ts",
+      "issues": [
+        "P0-17",
+        "P1-45"
+      ],
+      "rule": "S6 and the apply-round frameworks land in P1-45 after P0-17"
+    },
+    {
+      "path": "src/mcp/amcMcpServer.ts",
+      "issues": [
+        "P0-23",
+        "P1-44"
+      ],
+      "rule": "O17 lands in P1-44 after P0-23"
+    },
+    {
+      "path": "tests/fixtures/packFrameworkStrings.unresolved.json",
+      "issues": [
+        "P1-45",
+        "P1-42"
+      ],
+      "rule": "regenerate in the landing slice; never cherry-pick the I2 or 37c1466b3 fixture hunks; I2 cannot precede P1-45"
+    }
+  ]
+}

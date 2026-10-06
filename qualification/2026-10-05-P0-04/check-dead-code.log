@@ -1,0 +1,22 @@
+
+> agent-maturity-compass@1.2.0 check:dead-code
+> node scripts/source-quality.mjs dead-code
+
+{
+  "status": "failed",
+  "tool": "knip",
+  "version": "6.39.0",
+  "findingCount": 2339,
+  "representativeFindings": [
+    "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+    "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+    "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+    "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+    "[\"src/acp/acpEnvelope.ts\",\"exports\",{\"name\":\"acpRequest\"}]",
+    "[\"src/acp/acpRuntimeContracts.ts\",\"types\",{\"name\":\"AcpForkSessionParams\"}]",
+    "[\"src/acp/acpSchema.ts\",\"exports\",{\"name\":\"ACP_INBOUND_SHAPES\"}]",
+    "[\"src/acp/acpStdioMain.ts\",\"types\",{\"name\":\"AcpInputStream\"}]",
+    "[\"src/adapters/adapterCapabilities.ts\",\"types\",{\"name\":\"BuiltInHookCapability\"}]",
+    "[\"src/adapters/adapterConfigSchema.ts\",\"exports\",{\"name\":\"adapterAgentProfileSchema\"}]"
+  ]
+}

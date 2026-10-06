@@ -1,0 +1,26 @@
+
+> agent-maturity-compass@1.2.0 release:gate
+> node scripts/release-gate.mjs
+
+FAILED 17/19 executed checks passed; 2 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.
+Receipt: <clone>/.amc/release-gate/latest.json
+- PASSED console-js-syntax
+- PASSED openapi-parse
+- PASSED typecheck
+- PASSED typecheck-tests
+- PASSED build
+- PASSED lint
+- FAILED source-duplicates
+- FAILED source-dead-code
+- PASSED package-lint
+- PASSED packed-install
+- PASSED gap-0626-adversarial-regression
+- PASSED full-test-suite
+- PASSED per-file-coverage
+- PASSED command-inventory
+- PASSED architecture-boundaries
+- PASSED docs-drift-public-naming
+- PASSED runtime-dependency-audit
+- PASSED cli-and-domain-smoke
+- PASSED install-persona-qa
+- SKIPPED live-deploy-health

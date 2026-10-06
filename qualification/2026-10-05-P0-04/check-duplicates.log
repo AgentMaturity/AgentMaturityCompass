@@ -1,0 +1,34 @@
+
+> agent-maturity-compass@1.2.0 check:duplicates
+> node scripts/source-quality.mjs duplicates
+
+{
+  "status": "failed",
+  "tool": "jscpd",
+  "version": "5.4.0",
+  "findingCount": 1253,
+  "statistics": {
+    "clones": 1253,
+    "duplicatedLines": 14759,
+    "duplicatedTokens": 94252,
+    "lines": 482560,
+    "newClones": 0,
+    "newDuplicatedLines": 0,
+    "percentage": 3.058479774535809,
+    "percentageTokens": 3.3040120897985137,
+    "sources": 1896,
+    "tokens": 2852653
+  },
+  "representativeFindings": [
+    "[[\"acp/acpHistoryContinuity.ts\",\"session/nativeAudioProvenance.ts\"],\"typescript\",\"d22af3de032950ea462336a9d49bb53e68e3277fc5a3ed6d10670ee3506c9cfe\"]",
+    "[[\"acp/acpStdioMain.ts\",\"acp/acpStdioMain.ts\"],\"typescript\",\"c843ef394f21f993ffbaa8ba43177d4205e148cc0ac3f86d83d1d75ae5655a10\"]",
+    "[[\"adapters/builtins/autogenCli.ts\",\"adapters/builtins/crewaiCli.ts\"],\"typescript\",\"aa41b7a530885b604a32b70fb274e9730a8f34f1074c675826b5758740743345\"]",
+    "[[\"adapters/builtins/autogenCli.ts\",\"adapters/builtins/langchainNode.ts\"],\"typescript\",\"aa41b7a530885b604a32b70fb274e9730a8f34f1074c675826b5758740743345\"]",
+    "[[\"adapters/builtins/autogenCli.ts\",\"adapters/builtins/langchainPython.ts\"],\"typescript\",\"bdb32918ed489ae8eac07a806c5cbba381d082b9addf37537447e34dfb6dac9d\"]",
+    "[[\"adapters/builtins/crewaiCli.ts\",\"adapters/builtins/langchainNode.ts\"],\"typescript\",\"5c263b8747507d5b8fbd43c894aef8b2f06e2dd590206a3ea472c0afc8c510c5\"]",
+    "[[\"adapters/builtins/crewaiCli.ts\",\"adapters/builtins/langchainPython.ts\"],\"typescript\",\"5c263b8747507d5b8fbd43c894aef8b2f06e2dd590206a3ea472c0afc8c510c5\"]",
+    "[[\"adapters/builtins/hermesCli.ts\",\"adapters/builtins/openclawCli.ts\"],\"typescript\",\"3ffa0933b811d490d5be02ea80ef3cc58ef680c0900385beee5368e381d68f0c\"]",
+    "[[\"adapters/builtins/hermesCli.ts\",\"adapters/builtins/openhandsCli.ts\"],\"typescript\",\"3ffa0933b811d490d5be02ea80ef3cc58ef680c0900385beee5368e381d68f0c\"]",
+    "[[\"adapters/builtins/langchainNode.ts\",\"adapters/builtins/openaiAgentsSdk.ts\"],\"typescript\",\"9201e112b392a385059f3997f1d9e0088cfb140421d6a94714faa40a45008cbd\"]"
+  ]
+}
