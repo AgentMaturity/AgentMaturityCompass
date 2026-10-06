@@ -4,12 +4,16 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import Database from "better-sqlite3";
-import { afterAll, describe, expect, it } from "vitest";
+import { Command } from "commander";
+import { stripVTControlCharacters } from "node:util";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { canonicalMetadataForHash, openLedger } from "../src/ledger/ledger.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { signTrustList } from "../src/trust/index.js";
+import { LEDGER_UNANCHORED_MESSAGE } from "../src/ledger/ledgerVerification.js";
+import { registerSessionCommands } from "../src/cli-session-commands.js";
 
 /**
  * The forgery from tests/ledgerTrustRootAnchor.test.ts, run through `amc verify` (P0-09 step 9). The library test
@@ -145,5 +149,145 @@ describe("amc verify and the ledger trust root", () => {
     const result = amcVerify(workspace, ["--allow-unanchored"]);
     expect(result.status, result.output).toBe(2);
     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.stderr).toBe(true);
+  });
+});
+
+/**
+ * `amc session verify` is a second command over the same verdict, so it must map it to the same exit codes. These
+ * run the registered command in process (dist/cli.js above is a subprocess, which the parent coverage run cannot see),
+ * with process.exit and the console captured.
+ */
+class Exit extends Error {
+  constructor(readonly code: number | undefined) { super(`process.exit(${code})`); }
+}
+
+async function sessionVerify(cwd: string, args: string[] = []) {
+  const amcHome = mkdtempSync(join(tmpdir(), "amc-trustroot-home-"));
+  roots.push(amcHome);
+  vi.stubEnv("AMC_HOME", amcHome);
+  vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
+  vi.spyOn(process, "cwd").mockReturnValue(cwd);
+  const out: string[] = [];
+  const err: string[] = [];
+  vi.spyOn(console, "log").mockImplementation((...parts: unknown[]) => { out.push(stripVTControlCharacters(parts.join(" "))); });
+  vi.spyOn(console, "error").mockImplementation((...parts: unknown[]) => { err.push(stripVTControlCharacters(parts.join(" "))); });
+  vi.spyOn(process, "exit").mockImplementation((code?: string | number | null) => { throw new Exit(typeof code === "number" ? code : undefined); });
+  const program = new Command().exitOverride().configureOutput({ writeOut: () => {}, writeErr: () => {} });
+  registerSessionCommands(program);
+  let exit: number | null = null;
+  let failure: unknown = null;
+  try {
+    await program.parseAsync(["node", "amc", "session", "verify", ...args]);
+  } catch (error) {
+    if (error instanceof Exit) exit = error.code ?? 0;
+    else failure = error;
+  }
+  return { exit, failure, out: out.join("\n"), err };
+}
+
+describe("amc session verify and the ledger trust root", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+  });
+
+  it("passes a clean workspace whose monitor key is pinned, and lists the session lifecycle", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint]);
+    expect(result.failure).toBeNull();
+    expect(result.exit).toBe(0);
+    expect(result.out).toContain("Ledger verification PASSED");
+    expect(result.out).toContain(`Anchored to the pinned monitor key ${fingerprint}`);
+    expect(result.out).toMatch(/Agent sessions\n\s+closed\s+0\n\s+open\s+0\n\s+released\s+0 \(handed off; resumable\)\n\s+interrupted 0/);
+    expect(result.err).toEqual([]);
+  });
+
+  it("prints the verdict as JSON under --json, with the monitor key's admission, and exits 0 when it is pinned", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint.toUpperCase(), "--json"]);
+    expect(result.exit).toBe(0);
+    const verdict = JSON.parse(result.out) as { ok: boolean; trustRoot: { anchored: boolean; expectedFingerprint: string; monitorAdmission: { status: string } } };
+    expect(verdict.ok).toBe(true);
+    expect(verdict.trustRoot).toMatchObject({ anchored: true, expectedFingerprint: fingerprint, monitorAdmission: { status: "admitted" } });
+  });
+
+  it("fails a clean workspace whose monitor key is not pinned, naming the key it read from the workspace", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const result = await sessionVerify(workspace);
+    expect(result.exit).toBe(1);
+    expect(result.out).toContain(LEDGER_UNANCHORED_MESSAGE);
+    expect(result.out).toContain(`Signed by monitor key ${fingerprint}, read from inside the workspace.`);
+    expect(result.out).not.toContain("Ledger verification PASSED");
+    expect(result.err).toEqual([]);
+    expect((await sessionVerify(workspace, ["--json"])).exit).toBe(1);
+  });
+
+  it("gives an integrity-only result with exit 2 and an UNTRUSTED line on stderr under --allow-unanchored", async () => {
+    const { workspace } = buildWorkspace();
+    const text = await sessionVerify(workspace, ["--allow-unanchored"]);
+    expect(text.exit).toBe(2);
+    expect(text.out).toContain("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This proves internal consistency only.");
+    expect(text.err).toHaveLength(1);
+    expect(text.err[0]?.startsWith("UNTRUSTED: integrity verified, but --allow-unanchored was used:")).toBe(true);
+    const json = await sessionVerify(workspace, ["--allow-unanchored", "--json"]);
+    expect(json.exit).toBe(2);
+    expect(JSON.parse(json.out)).toMatchObject({ ok: true, trustRoot: { anchored: false } });
+    expect(json.err[0]?.startsWith("UNTRUSTED:")).toBe(true);
+  });
+
+  it("fails the substituted-key forgery against the recorded fingerprint, and --allow-unanchored does not soften it", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    forge(workspace);
+    for (const flags of [[], ["--allow-unanchored"]]) {
+      const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint, ...flags]);
+      expect(result.exit, result.out).toBe(1);
+      expect(result.out).toContain("Ledger verification FAILED");
+      expect(result.err).toEqual([]);
+    }
+  });
+
+  it("fails a distrusted monitor key even when it is pinned and --allow-unanchored is used", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const root = generateKeyPairSync("ed25519");
+    const rootId = sha256Hex(Buffer.from(root.publicKey.export({ format: "pem", type: "spki" }).toString(), "utf8"));
+    const now = Date.now();
+    const list = signTrustList({ type: "amc.trust-list", version: 1, listId: "distrust-monitor", sequence: 1,
+      issuedAt: new Date(now - 3_600_000).toISOString(), expiresAt: new Date(now + 86_400_000).toISOString(), entries: [],
+      distrust: [{ keyId: fingerprint, distrustedFrom: null, reason: "key-compromise", note: "session verify test", source: "operator" }] },
+    root.privateKey.export({ format: "pem", type: "pkcs8" }).toString());
+    const listDir = mkdtempSync(join(tmpdir(), "amc-trustroot-list-"));
+    roots.push(listDir);
+    writeFileSync(join(listDir, "list.json"), JSON.stringify(list));
+    const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint, "--allow-unanchored", "--trust-list", join(listDir, "list.json"), "--trust-root", rootId]);
+    expect(result.exit).toBe(1);
+    expect(result.out).toContain("Ledger verification FAILED: monitor key distrusted.");
+    expect(result.out).toContain("session verify test");
+    expect(result.err).toEqual([]);
+  });
+
+  it("refuses a malformed --expect-monitor value before verifying anything", async () => {
+    const { workspace } = buildWorkspace();
+    const result = await sessionVerify(workspace, ["--expect-monitor", "not-a-fingerprint", "--allow-unanchored"]);
+    expect(result.exit).toBeNull();
+    expect(String(result.failure)).toContain("--expect-monitor must be a 64 hex sha256 fingerprint");
+    expect(result.out).toBe("");
+  });
+
+  it("refuses a missing trust-list file instead of verifying without it", async () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const missing = join(workspace, "no-such-list.json");
+    const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint, "--trust-list", missing, "--trust-root", fingerprint]);
+    expect(result.exit).toBeNull();
+    expect(String(result.failure)).toContain("TRUST_LIST_INVALID");
+    expect(String(result.failure)).toContain(missing);
+    expect(result.out).toBe("");
+  });
+
+  it("has no --allow-unpinned, since a ledger has no issuer to pin", async () => {
+    const { workspace } = buildWorkspace();
+    const result = await sessionVerify(workspace, ["--allow-unpinned"]);
+    expect(result.exit).toBeNull();
+    expect((result.failure as { code?: string }).code).toBe("commander.unknownOption");
+    expect(result.out).toBe("");
   });
 });
