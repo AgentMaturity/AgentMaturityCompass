@@ -32,19 +32,19 @@ these opt-ins:
 - `allowUnconfinedShell: true` in `AMCNativeClient.start()` options, which passes
   that flag to the spawned `amc acp`, or `unconfinedShell: "sdk-option"` for
   `openAgentSession()`.
-- `runtime.shell.allowUnconfined: true` in `.amc/amc.config.yaml`. AMC honours it
-  only while the file carries a valid auditor signature over the exact bytes it
-  read; an unsigned or edited file is ignored with a message. Sign the file
-  with `amc verify --sign-config`. `amc init` and `amc up` re-sign the config,
-  so they drop an opt-in that was not already covered by a valid signature
-  rather than sign it.
-  This is the only opt-in Studio accepts; the browser and the HTTP API cannot
-  enable the shell.
+- `AMC_UNSAFE_UNCONFINED_SHELL=1` in the environment of `amc studio start` or
+  `amc up`. Studio reads it once, from its own process environment, when it
+  starts, and passes the explicit SDK opt-in to each native task; only the
+  exact value `1` counts. This is the only opt-in Studio accepts; the browser
+  and the HTTP API cannot enable the shell. The CLI, ACP and SDK never read
+  this variable, because they can load project dotenv files and configured
+  environment.
 
-An agent cannot grant itself the opt-in: `.amc` is a forbidden path for the
-file tools, and the config key needs the auditor signature. Delegated children
-inherit the parent's decision and can never widen it: a child of a refused
-parent is refused even if the config is signed later in the run.
+No workspace file can opt in. A `runtime.shell.allowUnconfined` key in
+`.amc/amc.config.yaml` is not honoured, even when the file is signed, because a
+workspace can sign its own config with keys a repository ships; a refusal then
+says so. Delegated children inherit the parent's decision and can never widen
+it: a child of a refused parent is refused.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
 stream). Studio returns the same text as `shell.reason` in the native-task
