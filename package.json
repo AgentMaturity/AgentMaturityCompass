@@ -69,6 +69,7 @@
     "check:counts": "node scripts/gen-counts.mjs --check",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:qualification": "node scripts/check-qualification-receipts.mjs",
+    "check:regulatory-currency": "node scripts/check-regulatory-currency.mjs",
     "trust-list": "node scripts/trust-list.mjs",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
     "check:evidence-paths": "node scripts/evidence-path-check.mjs",
