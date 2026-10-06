@@ -81,7 +81,8 @@ export function formatClaimLabel(label: ClaimLabel, surface: ClaimLabelSurface):
 const LEGEND: [string, [string, string][]][] = [
   ["Claim kinds", [
     [KIND_LABELS.synthetic_example, "example values from a labelled example mode; never evidence, never a level"],
-    [KIND_LABELS.self_reported, "stated by the agent or its operator, including results stored by AMC 1.x; at most level 1 and never a pass on a regulated control"],
+    [KIND_LABELS.self_reported, "stated by the agent or its operator, or not backed by observed evidence, including results "
+      + "stored by AMC 1.x; numeric self-answers reach at most level 1 and never pass a regulated control"],
     [KIND_LABELS.observed, "AMC observed the behaviour at runtime or in an executed test"],
     [KIND_LABELS.independently_reviewed, "approved by an independent reviewer whose key is pinned"]
   ]],

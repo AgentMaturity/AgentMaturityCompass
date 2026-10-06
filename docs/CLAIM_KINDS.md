@@ -9,7 +9,7 @@ AMC output is evidence of conformity. It is not a certificate.
 | Kind | Label | Meaning |
 | --- | --- | --- |
 | `synthetic_example` | Synthetic example (not evidence) | Example values from a labelled example mode. Never evidence and never a level. |
-| `self_reported` | Self-reported | Stated by the agent or its operator. At most level 1 when it comes from numeric answers, and never a pass on a regulated control. |
+| `self_reported` | Self-reported | Stated by the agent or its operator, or not backed by observed evidence. Numeric self-answers reach at most level 1 and never pass a regulated control. |
 | `observed` | Observed | AMC observed the behaviour at runtime or in an executed test, backed by `OBSERVED` or `OBSERVED_HARDENED` evidence. |
 | `independently_reviewed` | Independently reviewed | Approved by a reviewer who is independent of the producer and whose key is pinned. |
 
