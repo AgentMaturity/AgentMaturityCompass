@@ -28,7 +28,7 @@ function codeOf(run: () => unknown): string {
   return "no error";
 }
 const roots = (...keyIds: string[]) => ({ type: "amc.trust-roots", version: 1, roots: keyIds });
-const shipped = JSON.parse(readFileSync("src/trust/data/amc-distrust.json", "utf8")) as { distrust: unknown[] };
+const shipped = JSON.parse(readFileSync("src/trust/amc-distrust.json", "utf8")) as { distrust: unknown[] };
 
 describe("loadTrustContext", () => {
   it("starts from the built-in distrust list, with no pins and no allow flags from the environment", () => {
@@ -127,8 +127,8 @@ describe("package surface", () => {
   it("exports ./trust and ships the built-in distrust file", () => {
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { exports: Record<string, unknown>; files: string[] };
     expect(pkg.exports["./trust"]).toEqual({ types: "./dist/trust/index.d.ts", import: "./dist/trust/index.js" });
-    expect(pkg.files).toContain("dist/trust/data/amc-distrust.json");
-    expect(readFileSync("scripts/copy-build-assets.mjs", "utf8")).toContain("src/trust/data/amc-distrust.json");
+    expect(pkg.files).toContain("dist/trust/amc-distrust.json");
+    expect(readFileSync("scripts/copy-build-assets.mjs", "utf8")).toContain("src/trust/amc-distrust.json");
     expect(shipped).toEqual({ distrust: [] });
   });
 });

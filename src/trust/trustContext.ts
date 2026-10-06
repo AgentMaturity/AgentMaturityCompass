@@ -48,7 +48,7 @@ const builtInDistrustSchema = z.strictObject({ distrust: z.array(distrustEntrySc
 
 /** Shipped with the package; no flag or environment variable disables it, and it beats any pin. */
 function builtInDistrust(): DistrustEntry[] {
-  const text = readFileSync(new URL("./data/amc-distrust.json", import.meta.url), "utf8");
+  const text = readFileSync(new URL("./amc-distrust.json", import.meta.url), "utf8");
   return parseTrustValue(builtInDistrustSchema, JSON.parse(text) as unknown, "built-in amc-distrust.json").distrust;
 }
 

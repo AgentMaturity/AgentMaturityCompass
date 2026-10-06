@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "files": [
     "dist/**",
-    "dist/trust/data/amc-distrust.json",
+    "dist/trust/amc-distrust.json",
     "!dist/sea/**",
     "!dist/installers/**",
     "scripts/postinstall.js",

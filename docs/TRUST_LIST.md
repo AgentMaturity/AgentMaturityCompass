@@ -135,7 +135,7 @@ Until trusted time lands (P1-25), a signing time is whatever the artifact claims
 
 ## Built-in distrust list
 
-The package ships `dist/trust/data/amc-distrust.json` (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. The verify commands apply it once PR 2 and PR 3 wire them. A malformed file stops verification instead of being ignored.
+The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. The verify commands apply it once PR 2 and PR 3 wire them. A malformed file stops verification instead of being ignored.
 
 ## Workspace self-trust
 

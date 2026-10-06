@@ -4,7 +4,7 @@ import { distrustEntry, testKey } from "./trustFixtures.js";
 const shipped = vi.hoisted(() => ({ text: "" }));
 vi.mock("node:fs", async (importOriginal) => {
   const actual = await importOriginal<typeof import("node:fs")>();
-  const readFileSync = ((path: unknown, ...rest: unknown[]) => /[\\/]trust[\\/]data[\\/]amc-distrust\.json$/.test(String(path)) && shipped.text
+  const readFileSync = ((path: unknown, ...rest: unknown[]) => /[\\/]trust[\\/]amc-distrust\.json$/.test(String(path)) && shipped.text
     ? shipped.text
     : (actual.readFileSync as (...args: unknown[]) => unknown)(path, ...rest)) as typeof actual.readFileSync;
   return { ...actual, default: { ...actual, readFileSync }, readFileSync };
@@ -13,7 +13,7 @@ const { admitKey, loadTrustContext, workspaceSelfTrust } = await import("../../s
 
 afterEach(() => { shipped.text = ""; });
 
-describe("built-in distrust (src/trust/data/amc-distrust.json)", () => {
+describe("built-in distrust (src/trust/amc-distrust.json)", () => {
   const key = testKey();
   const pin = { keyId: key.keyId, purposes: ["artifact-seal" as const], origin: "--pubkey k.pub" };
 
