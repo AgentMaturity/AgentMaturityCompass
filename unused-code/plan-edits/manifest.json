@@ -31,11 +31,32 @@
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
     },
     {
+      "path": "src/api/benchmarkRouter.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/api/benchmarkRouter.ts.landed",
+      "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd"
+    },
+    {
       "path": "src/assurance/assuranceStore.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
       "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
       "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0"
+    },
+    {
+      "path": "src/bench/benchRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryClient.ts.landed",
+      "sha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f"
+    },
+    {
+      "path": "src/bench/benchRegistryStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
+      "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c"
     },
     {
       "path": "src/ci/gate.ts",
@@ -57,6 +78,27 @@
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
       "archivePath": "unused-code/plan-edits/P0-09/src/passport/passportCli.ts.landed",
       "sha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8"
+    },
+    {
+      "path": "src/plugins/pluginPackage.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginPackage.ts.landed",
+      "sha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e"
+    },
+    {
+      "path": "src/plugins/pluginRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginRegistryClient.ts.landed",
+      "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f"
+    },
+    {
+      "path": "src/prompt/promptPackVerifier.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
+      "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad"
     },
     {
       "path": "src/sdk/nativeAgentClient.ts",
