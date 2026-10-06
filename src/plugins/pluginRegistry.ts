@@ -7,6 +7,7 @@ import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { verifyPluginPackage } from "./pluginPackage.js";
+import { checkSignature, loadTrustContext, untrustedReasons, verdictExitCode, buildVerifierReport, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import {
   pluginRegistryIndexSchema,
   pluginRegistryIndexSignatureSchema,
@@ -119,24 +120,32 @@ export function initPluginRegistry(params: {
   };
 }
 
-export function verifyPluginRegistry(dirRaw: string): {
+/**
+ * Verifies a plugin registry directory. registry.pub and --pubkey only locate the signer; index.sig needs a key the
+ * trust context admits for artifact-seal (P0-09). ok equals report.trusted.
+ */
+export function verifyPluginRegistry(dirRaw: string, trust: TrustContext, pubkeyPath?: string): {
   ok: boolean;
   errors: string[];
   index: PluginRegistryIndex | null;
+  report: VerifierReportV1;
 } {
   const dir = resolve(dirRaw);
   const errors: string[] = [];
+  const signatures: VerifierReportV1["issuerAdmission"]["signatures"] = [];
   const indexPath = registryIndexPath(dir);
   const sigPath = registryIndexSigPath(dir);
   const pubPath = registryPubPath(dir);
-  if (!pathExists(indexPath) || !pathExists(sigPath) || !pathExists(pubPath)) {
-    return {
-      ok: false,
-      errors: ["registry missing index/index.sig/registry.pub"],
-      index: null
-    };
-  }
   let index: PluginRegistryIndex | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "plugin-registry", path: dir, sha256: pathExists(indexPath) ? sha256Hex(readFileSync(indexPath)) : "0".repeat(64) },
+      context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, index, report };
+  };
+  if (!pathExists(indexPath) || !pathExists(sigPath) || !pathExists(pubPath)) {
+    errors.push("registry missing index/index.sig/registry.pub");
+    return finish();
+  }
   try {
     index = loadIndex(dir);
   } catch (error) {
@@ -144,16 +153,19 @@ export function verifyPluginRegistry(dirRaw: string): {
   }
   try {
     const sig = pluginRegistryIndexSignatureSchema.parse(JSON.parse(readUtf8(sigPath)) as unknown);
-    if (index) {
-      const payloadDigest = sha256Hex(Buffer.from(canonicalize(index), "utf8"));
+    const parsed = index;
+    if (parsed) {
+      const payloadDigest = sha256Hex(Buffer.from(canonicalize(parsed), "utf8"));
       if (payloadDigest !== sig.digestSha256) {
         errors.push("index signature digest mismatch");
       }
-      const pub = readUtf8(pubPath);
-      if (!verifyIndex(index, sig.signature, pub)) {
+      const check = checkSignature({ signature: "index.sig", purpose: "artifact-seal", context: trust, claimedSignedAt: sig.signedTs,
+        candidates: [pubkeyPath ? readUtf8(resolve(pubkeyPath)) : null, readUtf8(pubPath)], verify: (pem) => verifyIndex(parsed, sig.signature, pem) });
+      signatures.push(check.admission);
+      if (!check.verified) {
         errors.push("index signature verification failed");
       }
-      if (index.registry.issuerFingerprint !== publisherFingerprintFromPublicPem(pub)) {
+      if (parsed.registry.issuerFingerprint !== check.admission.keyId) {
         errors.push("index issuer fingerprint does not match registry.pub");
       }
     }
@@ -182,11 +194,7 @@ export function verifyPluginRegistry(dirRaw: string): {
       }
     }
   }
-  return {
-    ok: errors.length === 0,
-    errors,
-    index
-  };
+  return finish();
 }
 
 export function publishPluginToRegistry(params: {
@@ -203,9 +211,10 @@ export function publishPluginToRegistry(params: {
   const dir = resolve(params.dir);
   const pluginFile = resolve(params.pluginFile);
   const registryKey = readUtf8(resolve(params.registryKeyPath));
-  const verified = verifyPluginPackage({ file: pluginFile });
-  if (!verified.ok || !verified.manifest || !verified.publisherFingerprint) {
-    throw new Error(`plugin verify failed before publish: ${verified.errors.join("; ")}`);
+  // Integrity only: publishing is the registry operator vouching for this publisher, by signing the index that names it.
+  const verified = verifyPluginPackage({ file: pluginFile, trust: { ...loadTrustContext(), allowUnpinned: true } });
+  if (verdictExitCode(verified.report) === 1 || !verified.manifest || !verified.publisherFingerprint) {
+    throw new Error(`plugin verify failed before publish: ${untrustedReasons(verified.report).join("; ")}`);
   }
   const index = loadIndex(dir);
   const pluginId = verified.manifest.plugin.id;

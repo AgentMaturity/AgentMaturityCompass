@@ -8,12 +8,11 @@ import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
-import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { verifyBinderProofs } from "./binderProofs.js";
+import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { binderJsonSchema, binderPiiScanSchema, binderSignatureSchema, type AuditBinderJson } from "./binderSchema.js";
 import { listBinderExports, verifyBinderCacheSignature } from "./binderStore.js";
 import { verifyAuditMapActiveSignature, verifyAuditMapBuiltinSignature } from "./auditMapStore.js";
@@ -47,6 +46,7 @@ export interface AuditBinderVerifyResult {
   binder: AuditBinderJson | null;
   errors: AuditBinderVerifyError[];
   fileSha256: string;
+  report: VerifierReportV1;
 }
 
 function tarExtract(bundleFile: string, outDir: string): void {
@@ -57,50 +57,29 @@ function digestFile(path: string): string {
   return sha256Hex(readFileSync(path));
 }
 
-function verifyDigestSignature(params: {
-  digestHex: string;
-  signature: ReturnType<typeof binderSignatureSchema.parse>;
-  workspace?: string;
-  publicKeyPem?: string;
-}): boolean {
-  const trustedKeys = params.publicKeyPem
-    ? [params.publicKeyPem]
-    : params.workspace
-      ? getPublicKeyHistory(params.workspace, "auditor")
-      : [];
-  if (params.signature.envelope) {
-    try {
-      if (params.signature.signature !== params.signature.envelope.sigB64) {
-        return false;
-      }
-      if (
-        verifySignatureEnvelope(params.digestHex, params.signature.envelope, {
-          trustedPublicKeys: trustedKeys,
-          requireTrustedKey: true
-        })
-      ) {
-        return true;
-      }
-    } catch {
-      // fall through to key-based verification
-    }
-  }
-  if (trustedKeys.length > 0) {
-    return verifyHexDigestAny(params.digestHex, params.signature.signature, trustedKeys);
-  }
-  return false;
-}
-
+/**
+ * Verifies a .amcaudit offline. signer.pub, the signature envelope and --pubkey only locate the signer: the binder
+ * and its signed Merkle root need keys the trust context admits for artifact-seal, and inclusion proofs must resolve
+ * to that signed root (P0-09). ok equals report.trusted.
+ */
 export function verifyAuditBinderFile(params: {
   file: string;
   workspace?: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }): AuditBinderVerifyResult {
   const file = resolve(params.file);
   const errors: AuditBinderVerifyError[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "not-applicable", detail: null };
   const fileSha256 = digestFile(file);
   const tmp = mkdtempSync(join(tmpdir(), "amc-audit-verify-"));
   let binder: AuditBinderJson | null = null;
+  const finish = (): AuditBinderVerifyResult => {
+    const report = buildVerifierReport({ artifact: { kind: "audit-binder", path: file, sha256: fileSha256 }, context: params.trust,
+      integrityErrors: errors.map((error) => `${error.code}: ${error.message}`), signatures, anchoring });
+    return { ok: report.trusted, binder, errors, fileSha256, report };
+  };
   try {
     tarExtract(file, tmp);
     const root = resolveSignedArtifactRoot(tmp, "amc-audit", "binder.json", "binder.sig");
@@ -109,11 +88,11 @@ export function verifyAuditBinderFile(params: {
     const pubPath = join(root, "signer.pub");
     if (!pathExists(binderPath)) {
       errors.push({ code: "MISSING_BINDER_JSON", message: "binder.json missing" });
-      return { ok: false, binder: null, errors, fileSha256 };
+      return finish();
     }
     if (!pathExists(sigPath)) {
       errors.push({ code: "MISSING_BINDER_SIG", message: "binder.sig missing" });
-      return { ok: false, binder: null, errors, fileSha256 };
+      return finish();
     }
 
     binder = binderJsonSchema.parse(JSON.parse(readUtf8(binderPath)) as unknown);
@@ -123,17 +102,15 @@ export function verifyAuditBinderFile(params: {
       errors.push({ code: "DIGEST_MISMATCH", message: "binder.json digest mismatch with binder.sig" });
     }
 
-    const pubPem = params.publicKeyPath
-      ? readUtf8(resolve(params.publicKeyPath))
-      : pathExists(pubPath)
-        ? readUtf8(pubPath)
-        : undefined;
-    if (!verifyDigestSignature({
-      digestHex: digest,
-      signature,
-      workspace: params.workspace,
-      publicKeyPem: pubPem
-    })) {
+    const candidates = [
+      params.publicKeyPath ? readUtf8(resolve(params.publicKeyPath)) : null,
+      pathExists(pubPath) ? readUtf8(pubPath) : null,
+      envelopePublicKey(signature.envelope)
+    ];
+    const check = checkDigestSignature({ signature: "binder.sig", purpose: "artifact-seal", digestHex: digest,
+      signatureB64: signature.signature, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
+    signatures.push(check.admission);
+    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "binder signature verification failed" });
     }
 
@@ -146,16 +123,10 @@ export function verifyAuditBinderFile(params: {
     });
 
     const inclusion = readSignedArtifactInclusionProofs(root);
-    const proofOk = verifyBinderProofs({
-      transparencyRoot: null,
-      merkleRoot: null,
-      proofs: inclusion
-    });
-    if (!proofOk.ok) {
-      for (const error of proofOk.errors) {
-        errors.push({ code: "PROOF_INVALID", message: error });
-      }
-    }
+    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates, claimedSignedAt: signature.signedTs });
+    errors.push(...proofs.errors.map((message) => ({ code: "PROOF_INVALID", message })));
+    if (proofs.admission) signatures.push(proofs.admission);
+    anchoring = proofs.anchoring;
     const proofIds = inclusion.map((row) => row.proofId).sort((a, b) => a.localeCompare(b));
     const expectedProofIds = [...binder.proofBindings.includedEventProofIds].sort((a, b) => a.localeCompare(b));
     if (JSON.stringify(proofIds) !== JSON.stringify(expectedProofIds)) {
@@ -187,23 +158,13 @@ export function verifyAuditBinderFile(params: {
       }
     }
 
-    return {
-      ok: errors.length === 0,
-      binder,
-      errors,
-      fileSha256
-    };
+    return finish();
   } catch (error) {
     errors.push({
       code: "VERIFY_EXCEPTION",
       message: String(error)
     });
-    return {
-      ok: false,
-      binder,
-      errors,
-      fileSha256
-    };
+    return finish();
   } finally {
     cleanupSignedArtifactVerification(tmp);
   }
@@ -234,9 +195,11 @@ export function verifyAuditWorkspace(params: {
   }
 
   for (const row of listBinderExports(params.workspace)) {
+    // A workspace self-check of its own exports: its own keys are the pins, labelled workspace-self.
     const verify = verifyAuditBinderFile({
       file: row.file,
-      workspace: params.workspace
+      workspace: params.workspace,
+      trust: workspaceSelfTrust(params.workspace)
     });
     if (!verify.ok) {
       errors.push(`export ${row.file}: ${verify.errors.map((error) => error.message).join("; ")}`);

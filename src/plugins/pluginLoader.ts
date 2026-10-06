@@ -14,7 +14,7 @@ import { casebookCaseSchema, casebookSchema } from "../casebooks/casebookSchema.
 import { transformMapSchema } from "../transformation/transformMapSchema.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { builtInAssetRegistry } from "./builtins/builtInRegistry.js";
-import { extractPluginPackage, verifyPluginPackage } from "./pluginPackage.js";
+import { extractPluginPackage, installedPluginTrust, verifyPluginPackage } from "./pluginPackage.js";
 import { loadInstalledPluginsLock, loadPluginOverrides, pluginInstalledPackagePath, verifyPluginOverrides } from "./pluginStore.js";
 import { canOverrideAsset } from "./rules/overlayRules.js";
 import { verifyInstalledPluginsIntegrity } from "./pluginVerifier.js";
@@ -167,7 +167,7 @@ export function loadInstalledPluginAssets(workspace: string): PluginLoadResult {
     if (!overridesSig.valid && overridesSig.signatureExists) {
       status.errors.push(`PLUGIN_OVERRIDES_UNTRUSTED:${overridesSig.reason ?? "unknown"}`);
     }
-    const verified = verifyPluginPackage({ file: packageFile });
+    const verified = verifyPluginPackage({ file: packageFile, trust: installedPluginTrust(workspace, installed.publisherFingerprint) });
     if (!verified.ok || !verified.manifest || verified.publisherFingerprint !== installed.publisherFingerprint
       || verified.manifest.plugin.id !== installed.id || verified.manifest.plugin.version !== installed.version) {
       status.failedValidation = true;

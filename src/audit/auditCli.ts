@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import YAML from "yaml";
 import { readUtf8 } from "../utils/fs.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { exportEnterpriseAudit, type EnterpriseAuditExportFormat } from "./enterpriseAuditExport.js";
 import {
   auditBinderCreateForApi,
@@ -142,11 +143,13 @@ export function auditBinderVerifyCli(params: {
   workspace?: string;
   file: string;
   pubkeyPath?: string;
+  trust: TrustContext;
 }) {
   return auditBinderVerifyForApi({
     workspace: params.workspace,
     file: params.file,
-    publicKeyPath: params.pubkeyPath
+    publicKeyPath: params.pubkeyPath,
+    trust: params.trust
   });
 }
 

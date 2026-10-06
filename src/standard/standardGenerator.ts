@@ -241,7 +241,7 @@ function extractPayloadForValidation(name: SchemaName, file: string, workspace: 
     return verify.cert;
   }
   if (name === "amcaudit.schema.json" && resolved.endsWith(".amcaudit")) {
-    const verify = verifyAuditBinderFile({ file: resolved });
+    const verify = verifyAuditBinderFile({ file: resolved, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok || !verify.binder) {
       throw new Error(`audit binder verification failed: ${verify.errors.map((row) => row.message).join("; ")}`);
     }

@@ -113,11 +113,17 @@ export function buildBenchProofs(params: {
   };
 }
 
+/**
+ * Checks each proof's Merkle path and, when the bundle carries its signed merkle root, that every proof resolves to
+ * that root rather than to a root the proof names for itself (P0-09). The root's signature is the caller's to check
+ * under a trust context; verifyProofsAgainstSignedRoot does both.
+ */
 export function verifyBenchProofBundle(bundle: BenchProofBundle): {
   ok: boolean;
   errors: string[];
 } {
   const errors: string[] = [];
+  const signedRoot = bundle.merkleRoot ? (bundle.merkleRoot.root as { root?: unknown } | null)?.root : undefined;
   for (const proof of bundle.proofs) {
     const valid = verifyMerkleProof({
       entryHash: proof.eventHash,
@@ -126,6 +132,9 @@ export function verifyBenchProofBundle(bundle: BenchProofBundle): {
     });
     if (!valid) {
       errors.push(`invalid inclusion proof: ${proof.proofId}`);
+    }
+    if (bundle.merkleRoot && proof.rootHash !== signedRoot) {
+      errors.push(`inclusion proof ${proof.proofId} does not resolve to the signed merkle root`);
     }
   }
   return {
@@ -147,28 +156,27 @@ export function verifyProofsAgainstSignedRoot(params: {
   /** The artifact's claimed signing time, which the root signature shares. */
   claimedSignedAt?: number | null;
 }): { errors: string[]; admission: IssuerAdmission | null; anchoring: VerifierReportV1["anchoring"] } {
-  const errors = params.proofs
-    .filter((proof) => !verifyMerkleProof({ entryHash: proof.eventHash, proofPath: proof.merklePath, root: proof.rootHash }))
-    .map((proof) => `invalid inclusion proof: ${proof.proofId}`);
-  if (params.proofs.length === 0) return { errors, admission: null, anchoring: { status: "not-applicable", detail: "no inclusion proofs" } };
   const rootPath = join(params.root, "proofs", "merkle.root.json");
   const sigPath = join(params.root, "proofs", "merkle.root.sig");
-  if (!pathExists(rootPath) || !pathExists(sigPath)) {
-    return { errors, admission: null, anchoring: { status: "unanchored", detail: "inclusion proofs without a signed proofs/merkle.root.json" } };
+  if (params.proofs.length === 0 || !pathExists(rootPath) || !pathExists(sigPath)) {
+    const { errors } = verifyBenchProofBundle({ transparencyRoot: null, merkleRoot: null, proofs: [...params.proofs] });
+    return { errors, admission: null, anchoring: params.proofs.length === 0
+      ? { status: "not-applicable", detail: "no inclusion proofs" }
+      : { status: "unanchored", detail: "inclusion proofs without a signed proofs/merkle.root.json" } };
   }
   const digest = sha256Hex(readFileSync(rootPath));
   const sig = JSON.parse(readUtf8(sigPath)) as { digestSha256?: unknown; signature?: unknown; envelope?: unknown };
+  const signedRoot = JSON.parse(readUtf8(rootPath)) as { root?: unknown };
+  const bound = verifyBenchProofBundle({ transparencyRoot: null, merkleRoot: { root: signedRoot, signature: sig, sha256: digest }, proofs: [...params.proofs] });
+  const errors = [...bound.errors];
   if (sig.digestSha256 !== digest) errors.push("signed merkle root digest mismatch");
   const check = checkDigestSignature({ signature: "proofs/merkle.root.sig", purpose: "artifact-seal", digestHex: digest,
     signatureB64: String(sig.signature ?? ""), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,
     claimedSignedAt: params.claimedSignedAt ?? null });
   if (!check.verified) errors.push("signed merkle root signature invalid");
-  const signedRoot = (JSON.parse(readUtf8(rootPath)) as { root?: unknown }).root;
-  const unbound = params.proofs.filter((proof) => proof.rootHash !== signedRoot);
-  errors.push(...unbound.map((proof) => `inclusion proof ${proof.proofId} does not resolve to the signed merkle root`));
-  const anchored = check.verified && unbound.length === 0;
+  const anchored = check.verified && sig.digestSha256 === digest && bound.ok;
   return { errors, admission: check.admission, anchoring: anchored
-    ? { status: "anchored", detail: `inclusion proofs resolve to signed merkle root ${String(signedRoot)}` }
+    ? { status: "anchored", detail: `inclusion proofs resolve to signed merkle root ${String(signedRoot.root)}` }
     : { status: "unanchored", detail: "inclusion proofs do not resolve to a verified signed merkle root" } };
 }
 

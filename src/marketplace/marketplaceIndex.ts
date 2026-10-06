@@ -7,7 +7,7 @@
 
 import { listAssurancePacks } from "../assurance/packs/index.js";
 import { listPolicyPacks } from "../policyPacks/builtInPacks.js";
-import { browseRegistry } from "../plugins/pluginRegistryClient.js";
+import { browseRegistry, registryTrust } from "../plugins/pluginRegistryClient.js";
 import { loadPluginRegistriesConfig } from "../plugins/pluginStore.js";
 import { listInstalledPlugins } from "../plugins/pluginApi.js";
 import {
@@ -138,7 +138,7 @@ export async function buildCatalog(
 
       for (const reg of registriesConfig.pluginRegistries.registries) {
         try {
-          const index = await browseRegistry({ registryBase: reg.base });
+          const index = await browseRegistry({ registryBase: reg.base, trust: registryTrust(reg.pinnedRegistryPubkeyFingerprint) });
           for (const plugin of index.plugins) {
             const latestVersion = plugin.versions[plugin.versions.length - 1];
             if (!latestVersion) continue;

@@ -5,7 +5,7 @@ export {
   signedTrustListSchema, trustListEntrySchema, trustListSchema, verifySignedTrustList,
   type DistrustEntry, type SignedTrustList, type TrustList, type TrustListEntry, type TrustListErrorCode
 } from "./trustList.js";
-export { loadTrustContext, workspaceSelfTrust, type LoadTrustContextOptions, type TrustContext, type TrustPin } from "./trustContext.js";
+export { loadTrustContext, withPins, workspaceSelfTrust, type LoadTrustContextOptions, type TrustContext, type TrustPin } from "./trustContext.js";
 export { admitKey, issuerAdmissionSchema, type AdmitKeyInput, type IssuerAdmission } from "./admission.js";
 export {
   buildVerifierReport, untrustedReasons, verdictExitCode, verifierReportSchema, type VerifierReportInput, type VerifierReportV1

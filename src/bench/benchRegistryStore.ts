@@ -10,6 +10,7 @@ import {
   benchImportsCacheDir
 } from "./benchPolicyStore.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 const importedBenchMetaSchema = z.object({
   v: z.literal(1),
@@ -84,12 +85,13 @@ export function storeImportedBench(params: {
   sourceUrl: string;
   version: string;
   file: string;
+  trust: TrustContext;
 }): {
   meta: ImportedBenchMeta;
   artifactPath: string;
   metaPath: string;
 } {
-  const verified = verifyBenchArtifactFile({ file: params.file });
+  const verified = verifyBenchArtifactFile({ file: params.file, trust: params.trust });
   if (!verified.ok || !verified.bench) {
     throw new Error(`cannot store imported bench; verification failed: ${verified.errors.map((e) => e.message).join("; ")}`);
   }

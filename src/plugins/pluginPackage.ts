@@ -23,6 +23,8 @@ import {
   verifyPluginManifestSignature
 } from "./pluginSigner.js";
 import type { PluginArtifactKind } from "./pluginTypes.js";
+import { buildVerifierReport, checkSignature, withPins, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 import {
   assertSafeTarMemberPath,
   extractValidatedTarGzipArchive,
@@ -228,33 +230,42 @@ export function pluginPack(params: {
   };
 }
 
+/**
+ * Verifies a .amcplug offline. publisher.pub and --pubkey only locate the signer; manifest.sig needs a key the trust
+ * context admits for artifact-seal (P0-09). ok equals report.trusted.
+ */
 export function verifyPluginPackage(params: {
   file: string;
   pubkeyPath?: string;
+  trust: TrustContext;
 }): {
   ok: boolean;
   errors: string[];
   manifest: PluginManifest | null;
   publisherFingerprint: string | null;
+  report: VerifierReportV1;
 } {
   const file = resolve(params.file);
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let manifest: PluginManifest | null = null;
+  let publisherFingerprint: string | null = null;
+  const finish = () => {
+    const report = buildVerifierReport({ artifact: { kind: "plugin", path: file, sha256: fileSha256(file) }, context: params.trust,
+      integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+    return { ok: report.trusted, errors, manifest, publisherFingerprint, report };
+  };
   const tmp = mkdtempSync(join(tmpdir(), "amc-plugin-verify-"));
   try {
     tarExtract(file, tmp);
     const root = resolvePluginRoot(tmp);
     const manifestPath = join(root, "manifest.json");
     const signaturePath = join(root, "manifest.sig");
-    const publisherPubPath = params.pubkeyPath ? resolve(params.pubkeyPath) : join(root, "publisher.pub");
-    if (!pathExists(manifestPath) || !pathExists(signaturePath) || !pathExists(publisherPubPath)) {
-      return {
-        ok: false,
-        errors: ["plugin bundle missing manifest/signature/publisher key"],
-        manifest: null,
-        publisherFingerprint: null
-      };
+    const embeddedPubPath = join(root, "publisher.pub");
+    if (!pathExists(manifestPath) || !pathExists(signaturePath) || (!params.pubkeyPath && !pathExists(embeddedPubPath))) {
+      errors.push("plugin bundle missing manifest/signature/publisher key");
+      return finish();
     }
-    let manifest: PluginManifest | null = null;
     let signature: PluginManifestSignature | null = null;
     try {
       manifest = pluginManifestSchema.parse(JSON.parse(readUtf8(manifestPath)) as unknown);
@@ -266,8 +277,13 @@ export function verifyPluginPackage(params: {
     } catch (error) {
       errors.push(`invalid manifest.sig: ${String(error)}`);
     }
-    const publisherPub = readUtf8(publisherPubPath);
-    const publisherFingerprint = publisherFingerprintFromPublicPem(publisherPub);
+    const candidates = [params.pubkeyPath ? readUtf8(resolve(params.pubkeyPath)) : null, pathExists(embeddedPubPath) ? readUtf8(embeddedPubPath) : null];
+    const [parsed, sig] = [manifest, signature];
+    const check = parsed && sig ? checkSignature({ signature: "manifest.sig", purpose: "artifact-seal", context: params.trust,
+      claimedSignedAt: sig.signedTs, candidates, verify: (pem) => verifyPluginManifestSignature(parsed, sig.signature, pem) }) : null;
+    if (check) signatures.push(check.admission);
+    // The signing key's fingerprint, or the first named key's when none signed.
+    publisherFingerprint = check?.admission.keyId ?? publisherFingerprintFromPublicPem(candidates.find((pem) => pem !== null) ?? "");
     if (manifest) {
       if (manifest.plugin.publisher.pubkeyFingerprint !== publisherFingerprint) {
         errors.push("manifest publisher fingerprint does not match publisher.pub");
@@ -295,7 +311,7 @@ export function verifyPluginPackage(params: {
       const expectedDigest = sha256Hex(Buffer.from(canonicalize(manifest), "utf8"));
       if (expectedDigest !== signature.digestSha256) {
         errors.push("manifest signature digest mismatch");
-      } else if (!verifyPluginManifestSignature(manifest, signature.signature, publisherPub)) {
+      } else if (!check?.verified) {
         errors.push("manifest signature verification failed");
       }
     }
@@ -304,18 +320,21 @@ export function verifyPluginPackage(params: {
     } catch (error) {
       errors.push(String(error));
     }
-    return {
-      ok: errors.length === 0,
-      errors,
-      manifest,
-      publisherFingerprint
-    };
+    return finish();
   } finally {
     cleanupDir(tmp);
   }
 }
 
-export function printPluginPackage(file: string): {
+/**
+ * Trust for a package this workspace already admitted: the publisher its auditor-signed install lock or approved
+ * install request records, plus the workspace's own keys. A self-check, labelled workspace-self (P0-09).
+ */
+export function installedPluginTrust(workspace: string, publisherFingerprint: string): TrustContext {
+  return withPins(workspaceSelfTrust(workspace), [{ keyId: publisherFingerprint, purposes: ["artifact-seal"], origin: "workspace-self:plugin install record" }]);
+}
+
+export function printPluginPackage(file: string, trust: TrustContext): {
   file: string;
   pluginId: string | null;
   version: string | null;
@@ -323,7 +342,7 @@ export function printPluginPackage(file: string): {
   artifactCount: number;
   verification: { ok: boolean; errors: string[] };
 } {
-  const verified = verifyPluginPackage({ file });
+  const verified = verifyPluginPackage({ file, trust });
   return {
     file: resolve(file),
     pluginId: verified.manifest?.plugin.id ?? null,

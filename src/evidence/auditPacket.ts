@@ -63,11 +63,11 @@ function packetReadme(nowTs: number): string {
     "- `incidents/`: incident records and evidence link edges.",
     "- `corrections/`: correction records and evidence correction-closure links.",
     "- `ledger/evidence.sqlite`: raw immutable ledger database.",
-    "- `keys/`: public keys and key history for offline signature verification.",
+    "- `keys/`: public keys and key history. They identify the keys; they do not vouch for this packet.",
     "- `meta/manifest.json` + `meta/manifest.sig.json`: packet manifest and auditor signature.",
     "",
     "Verification guide:",
-    "1. Verify `meta/manifest.sig.json` against `keys/auditor_ed25519.pub` and `meta/manifest.json` hash.",
+    "1. Verify `meta/manifest.sig.json` and the `meta/manifest.json` hash with an auditor key pinned outside this packet: from your trust list, or a fingerprint the operator published when the vault was created. The copy in `keys/` only identifies which key to look up; a forger can replace it, so a match with it proves nothing.",
     "2. Verify file hashes in `meta/manifest.json`.",
     "3. Recompute and validate event hash chain and signatures using `ledger/evidence.sqlite` and monitor keys."
   ].join("\n");

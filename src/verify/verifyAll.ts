@@ -7,7 +7,7 @@ import { verifyTransparencyLog } from "../transparency/logChain.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
-import type { TrustContext } from "../trust/trustContext.js";
+import { withPins, workspaceSelfTrust, type TrustContext } from "../trust/trustContext.js";
 import { untrustedReasons } from "../trust/verifierReport.js";
 import { isKeyRefused } from "../trust/signatureCheck.js";
 import { verifyForecastWorkspaceArtifacts } from "../forecast/forecastVerifier.js";
@@ -26,7 +26,7 @@ import {
   listPromptAgentsWithPacks,
   verifyPromptLintSignature
 } from "../prompt/promptPackStore.js";
-import { verifyPromptPackFile } from "../prompt/promptPackVerifier.js";
+import { verifyWorkspacePromptPack } from "../prompt/promptPackVerifier.js";
 import {
   promptLatestPackPath,
   verifyPromptPolicySignature,
@@ -204,9 +204,7 @@ export async function verifyAll(params: {
   const promptErrors: string[] = [];
   for (const agentId of listPromptAgentsWithPacks(workspace)) {
     const packPath = promptLatestPackPath(workspace, agentId);
-    const verify = verifyPromptPackFile({
-      file: packPath
-    });
+    const verify = verifyWorkspacePromptPack(workspace, packPath);
     if (!verify.ok) {
       promptErrors.push(`pack(${agentId}): ${verify.errors.join("; ")}`);
     }
@@ -260,7 +258,8 @@ export async function verifyAll(params: {
   for (const row of listExportedAuditBinders(workspace)) {
     const verify = verifyAuditBinderFile({
       file: row.file,
-      workspace
+      workspace,
+      trust: workspaceSelfTrust(workspace)
     });
     if (!verify.ok) {
       auditExportErrors.push(`${row.file}: ${verify.errors.map((error) => error.message).join("; ")}`);
@@ -382,14 +381,16 @@ export async function verifyAll(params: {
 
   const benchErrors: string[] = [];
   for (const artifact of listExportedBenchArtifacts(workspace)) {
-    const verify = verifyBenchArtifactFile({ file: artifact.file });
+    const verify = verifyBenchArtifactFile({ file: artifact.file, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok) {
       benchErrors.push(`export ${artifact.file}: ${verify.errors.map((row) => row.message).join("; ")}`);
     }
   }
   for (const imported of listImportedBenchArtifacts(workspace)) {
     const artifactPath = importedBenchPath(workspace, imported.benchId, imported.version).artifactPath;
-    const verify = verifyBenchArtifactFile({ file: artifactPath });
+    // The signer this workspace recorded when a pinned registry vouched for the import: a self-check, labelled workspace-self.
+    const verify = verifyBenchArtifactFile({ file: artifactPath, trust: withPins(workspaceSelfTrust(workspace),
+      [{ keyId: imported.signerFingerprint, purposes: ["artifact-seal"], origin: "workspace-self:bench import record" }]) });
     if (!verify.ok) {
       benchErrors.push(`import ${artifactPath}: ${verify.errors.map((row) => row.message).join("; ")}`);
     }
@@ -409,7 +410,7 @@ export async function verifyAll(params: {
     let requiresUnlockedVaultOnly = true;
     for (const file of backupFiles) {
       try {
-        const verify = backupVerifyCli({ backupFile: file });
+        const verify = backupVerifyCli({ backupFile: file, trust: workspaceSelfTrust(workspace) });
         if (!verify.ok) {
           backupErrors.push(`${file}: ${verify.errors.join("; ")}`);
           const onlyPassphraseErrors = verify.errors.every((row) =>

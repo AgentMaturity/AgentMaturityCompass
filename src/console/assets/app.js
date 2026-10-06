@@ -1108,6 +1108,8 @@ function pemToSpkiBytes(pem) {
   return base64ToBytes(b64).buffer;
 }
 
+// Consistency only (P0-09): raw.auditorPub comes in the same response as the seal, so a match cannot show who signed it.
+// The server's verdict is the one that counts.
 async function verifySealSignatureClientSide(raw) {
   if (!raw?.seal || !raw?.sig || !raw?.auditorPub) {
     return { ok: false, reason: "missing seal/sig/pubkey" };
@@ -1841,9 +1843,10 @@ async function renderTransparency() {
   const clientVerify = await verifyTransparencyClientSide(raw);
   root.innerHTML = `
     ${card("Transparency Verify", `
-      <p>Server verify: <strong>${serverVerify.ok ? "OK" : "FAILED"}</strong></p>
-      <p>Client verify: <strong>${clientVerify.ok ? "OK" : "FAILED"}</strong></p>
-      <p>Client seal signature: <strong>${clientVerify.signatureVerified ? "VERIFIED" : "FAILED"}</strong></p>
+      <p>Server verdict: <strong>${serverVerify.ok ? "OK" : "FAILED"}</strong></p>
+      <p class="muted">The browser checks below are consistency only: they use the key the server sent with the seal, so they cannot show who signed it.</p>
+      <p>Client chain check (consistency only): <strong>${clientVerify.ok ? "OK" : "FAILED"}</strong></p>
+      <p>Client seal check (consistency only): <strong>${clientVerify.signatureVerified ? "CONSISTENT" : "FAILED"}</strong></p>
       <pre class="scroll">${JSON.stringify({ serverVerify, clientVerify }, null, 2)}</pre>
     `)}
     ${card("Merkle Root", `

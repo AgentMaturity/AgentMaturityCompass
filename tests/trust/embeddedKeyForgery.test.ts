@@ -28,6 +28,8 @@ import { issueAssuranceCertificate } from "../../src/assurance/assuranceCertific
 import { handleBomRoute } from "../../src/api/bomRouter.js";
 import { handleCryptoRoute } from "../../src/api/cryptoRouter.js";
 import { handleAssuranceRoute } from "../../src/api/assuranceRouter.js";
+import { handleToolsRoute } from "../../src/api/toolsRouter.js";
+import { handleBenchmarkRoute } from "../../src/api/benchmarkRouter.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
 import { startFakeAgentServer, useFakeAgentEnv } from "../helpers/fakeAgentServer.js";
 import { merkleLeafHash } from "../../src/transparency/merkle.js";
@@ -570,6 +572,8 @@ describe("API verify routes use the server's trust context and refuse request-su
   const previousMonitor = process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
   beforeAll(async () => {
     signed ??= await signedArtifactFixture();
+    plugin ??= pluginFixture();
+    benchmark ??= benchmarkFixture();
     process.env.AMC_HOME = amcHome; // the server's AMC home pins nothing
     delete process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
   }, 180_000);
@@ -593,7 +597,9 @@ describe("API verify routes use the server's trust context and refuse request-su
     ["POST /api/v1/bundle/verify", handleBomRoute as Handler, "/api/v1/bundle/verify", () => ({ file: evidence.bundle }), "publicKeyPath"],
     ["POST /api/v1/crypto/cert/verify", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify", () => ({ certFile: evidence.certificate }), "allowUnpinned"],
     ["POST /api/v1/crypto/cert/verify-revocation", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify-revocation", () => ({ file: evidence.revocation }), "trustList"],
-    ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"]
+    ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"],
+    ["POST /api/v1/plugins/verify", handleToolsRoute as Handler, "/api/v1/plugins/verify", () => ({ file: plugin.file }), "pubkeyPath"],
+    ["POST /api/v1/benchmarks/verify", handleBenchmarkRoute as Handler, "/api/v1/benchmarks/verify", () => ({ file: benchmark }), "trustRoot"]
   ];
   for (const [name, handler, pathname, body, field] of cases) {
     test(`${name} refuses a body that carries ${field}`, async () => {
@@ -693,11 +699,13 @@ describe("verifyBenchArtifactFile (amc bench verify) and verifyBenchProofBundle"
   });
 });
 
+let benchmark: string;
+function benchmarkFixture(): string {
+  return exportBenchmarkArtifact({ workspace: evidence.workspace, runId: evidence.runId, outFile: "run.amcbench" }).outFile;
+}
+
 describe("verifyBenchmarkArtifact (amc benchmark verify)", () => {
-  let benchmark: string;
-  beforeAll(() => {
-    benchmark = exportBenchmarkArtifact({ workspace: evidence.workspace, runId: evidence.runId, outFile: "run.amcbench" }).outFile;
-  }, 60_000);
+  beforeAll(() => { benchmark ??= benchmarkFixture(); }, 60_000);
   function forge(): string {
     const root = extract(benchmark);
     const benchPath = join(root, "bench.json");
@@ -813,8 +821,9 @@ describe("plugin registry (amc plugin registry verify, and the registry client)"
   });
 
   test("the client refuses a registry.pub that is not pinned", async () => {
+    // A caller that passes no pin (the type now requires one) is refused at run time too.
     await expect(resolveRegistryPackage({ registryBase: plugin.registry, pluginRef: "amc.plugin.forgery.learn" } as never)).rejects.toThrow(/not pinned|not admitted/);
-    await expect(browseRegistry({ registryBase: plugin.registry, trust: pinnedTrust([]) } as never)).rejects.toThrow(/not pinned|not admitted/);
+    await expect(browseRegistry({ registryBase: plugin.registry, trust: pinnedTrust([]) })).rejects.toThrow(/not pinned|not admitted/);
   });
 
   test("the client admits a pinned registry and the publisher its signed index names", async () => {

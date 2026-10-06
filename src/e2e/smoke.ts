@@ -10,7 +10,7 @@ import { refreshForecastForApi } from "../forecast/forecastApi.js";
 import { benchCreateCli, benchInitCli, benchVerifyCli } from "../bench/benchCli.js";
 import { backupCreateCli, backupVerifyCli } from "../ops/backup/backupCli.js";
 import { releaseVerifyCli } from "../release/releaseCli.js";
-import { loadTrustContext } from "../trust/trustContext.js";
+import { loadTrustContext, workspaceSelfTrust } from "../trust/trustContext.js";
 import { createReleaseBundle } from "../release/releaseBundle.js";
 import { verifyTransparencyLog } from "../transparency/logChain.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
@@ -291,8 +291,10 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
           windowDays: 14,
           named: false
         });
+        // The smoke run's own export, checked with its own keys: a self-check, labelled workspace-self.
         const verified = benchVerifyCli({
-          file: created.outFile
+          file: created.outFile,
+          trust: workspaceSelfTrust(workspace)
         });
         if (!verified.ok) {
           throw new Error(`bench verify failed: ${verified.errors.map((row) => row.message).join("; ")}`);
@@ -314,7 +316,8 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
           const created = backupCreateCli(workspace, backupFile);
           const verified = backupVerifyCli({
             backupFile: created.outFile,
-            passphrase: backupPassphrase
+            passphrase: backupPassphrase,
+            trust: workspaceSelfTrust(workspace)
           });
           if (!verified.ok) {
             throw new Error(`backup verify failed: ${verified.errors.join("; ")}`);

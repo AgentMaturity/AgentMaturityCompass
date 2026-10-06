@@ -232,10 +232,14 @@ export async function handleToolsRoute(
     // POST /api/v1/plugins/verify — verify plugin package signature
     if (pathname === '/api/v1/plugins/verify' && method === 'POST') {
       try {
-        const body = await bodyJson<{ file: string; pubkeyPath?: string }>(req);
+        const body = await bodyJson<{ file: string }>(req);
         if (!body.file) { apiError(res, 400, 'Required: file'); return true; }
+        // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+        const refused = requestTrustOverride(body);
+        if (refused) { apiError(res, 400, refused); return true; }
         const { pluginVerifyCli } = await import('../plugins/pluginCli.js');
-        const out = pluginVerifyCli(body);
+        const out = pluginVerifyCli({ file: body.file, trust: loadTrustContext() });
         apiSuccess(res, out);
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Plugin verify failed');
@@ -249,7 +253,8 @@ export async function handleToolsRoute(
         const body = await bodyJson<{ file: string }>(req);
         if (!body.file) { apiError(res, 400, 'Required: file'); return true; }
         const { pluginPrintCli } = await import('../plugins/pluginCli.js');
-        const out = pluginPrintCli(body.file);
+        const { loadTrustContext } = await import('../trust/index.js');
+        const out = pluginPrintCli(body.file, loadTrustContext());
         apiSuccess(res, out);
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Plugin print failed');
@@ -354,8 +359,11 @@ export async function handleToolsRoute(
       try {
         const body = await bodyJson<{ dir: string }>(req);
         if (!body.dir) { apiError(res, 400, 'Required: dir'); return true; }
+        const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+        const refused = requestTrustOverride(body);
+        if (refused) { apiError(res, 400, refused); return true; }
         const { pluginRegistryVerifyCli } = await import('../plugins/pluginCli.js');
-        const out = pluginRegistryVerifyCli(body.dir);
+        const out = pluginRegistryVerifyCli(body.dir, loadTrustContext());
         apiSuccess(res, out);
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Plugin registry verify failed');

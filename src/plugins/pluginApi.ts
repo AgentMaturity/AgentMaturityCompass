@@ -9,10 +9,12 @@ import { sha256Hex } from "../utils/hash.js";
 import {
   browseRegistry,
   cleanupResolvedPackage,
+  registryTrust,
   resolveRegistryConfigForWorkspace,
   resolveRegistryPackage
 } from "./pluginRegistryClient.js";
-import { verifyPluginPackage } from "./pluginPackage.js";
+import { installedPluginTrust, verifyPluginPackage } from "./pluginPackage.js";
+import { untrustedReasons } from "../trust/verifierReport.js";
 import { pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 import {
   defaultInstalledPluginsLock,
@@ -184,7 +186,7 @@ export function listInstalledPlugins(workspace: string): {
           verification: { ok: false, errors: ["installed package missing"] }
         };
       }
-      const verification = verifyPluginPackage({ file: pkg });
+      const verification = verifyPluginPackage({ file: pkg, trust: installedPluginTrust(workspace, item.publisherFingerprint) });
       return {
         ...item,
         verification: {
@@ -217,7 +219,8 @@ export async function browsePluginRegistryForWorkspace(params: {
   });
   const browsed = await browseRegistry({
     registryBase: entry.base,
-    query: params.query
+    query: params.query,
+    trust: registryTrust(entry.pinnedRegistryPubkeyFingerprint)
   });
   return {
     registryId: browsed.registryId,
@@ -477,8 +480,9 @@ export function executePluginRequest(params: {
     if (!pathExists(pendingPkg)) {
       throw new Error("pending plugin package missing");
     }
-    const verified = verifyPluginPackage({ file: pendingPkg });
-    if (!verified.ok || !verified.manifest) {
+    // The publisher the pinned registry named in the approved request; a request without one admits nothing.
+    const verified = verifyPluginPackage({ file: pendingPkg, trust: installedPluginTrust(params.workspace, pending.publisherFingerprint ?? "") });
+    if (verified.report.integrity.status !== "pass" || !verified.manifest) {
       throw new Error(`pending plugin package verification failed: ${verified.errors.join("; ")}`);
     }
     if (verified.manifest.plugin.id !== pending.pluginId || verified.manifest.plugin.version !== pending.version) {
@@ -492,6 +496,9 @@ export function executePluginRequest(params: {
     }
     if (pending.packageSha256 && pending.packageSha256 !== sha256Hex(readFileSync(pendingPkg))) {
       throw new Error("pending plugin package sha mismatch");
+    }
+    if (!verified.ok) {
+      throw new Error(`pending plugin package publisher not admitted: ${untrustedReasons(verified.report).join("; ")}`);
     }
     const installPath = writeInstalledPackage({
       workspace: params.workspace,

@@ -106,3 +106,11 @@ export function workspaceSelfTrust(workspace: string, now: Date = new Date()): T
   });
   return { mode: "workspace-self", asOf: now, lists: [], explicitPins, distrust: builtInDistrust(), allowUnpinned: false, allowUnanchored: false };
 }
+
+/**
+ * `context` plus pins by key id, for fingerprints recorded outside the artifact being verified: a registry entry the
+ * pinned registry signed, a peer key the operator added, a publisher the workspace's signed install lock names.
+ */
+export function withPins(context: TrustContext, pins: readonly TrustPin[]): TrustContext {
+  return { ...context, explicitPins: [...context.explicitPins, ...pins] };
+}

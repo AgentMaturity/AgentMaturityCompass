@@ -92,8 +92,12 @@ export async function handleBenchmarkRoute(
         apiError(res, 400, 'Required: path (file or directory)');
         return true;
       }
+      // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+      const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { ingestBenchmarks } = await import('../benchmarks/benchImport.js');
-      const result = ingestBenchmarks(workspace, body.path);
+      const result = ingestBenchmarks(workspace, body.path, loadTrustContext());
       apiSuccess(res, { imported: result.imported, total: result.imported.length });
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Benchmark import failed');
@@ -109,8 +113,11 @@ export async function handleBenchmarkRoute(
         apiError(res, 400, 'Required: file');
         return true;
       }
+      const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { verifyBenchmarkArtifact } = await import('../benchmarks/benchVerify.js');
-      const result = verifyBenchmarkArtifact(body.file);
+      const result = verifyBenchmarkArtifact(body.file, loadTrustContext());
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Benchmark verification failed');

@@ -194,6 +194,7 @@ import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
@@ -4709,25 +4710,13 @@ plugin
     console.log(`artifacts: ${out.manifest.artifacts.length}`);
   });
 
-plugin
+withTrustFlags(plugin
   .command("verify")
   .description("Verify plugin package signature + artifact hashes")
-  .argument("<file>", "plugin package (.amcplug)")
-  .option("--pubkey <path>", "override publisher public key path")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const out = pluginVerifyCli({
-      file,
-      pubkeyPath: opts.pubkey
-    });
-    if (out.ok) {
-      console.log(chalk.green("Plugin verification PASS"));
-      return;
-    }
-    console.log(chalk.red("Plugin verification FAIL"));
-    for (const error of out.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>", "plugin package (.amcplug)"), { pubkey: "pin the publisher public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = pluginVerifyCli({ file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("Plugin", out.report, { json: opts.json, result: out });
   });
 
 plugin
@@ -4735,7 +4724,7 @@ plugin
   .description("Print plugin manifest summary")
   .argument("<file>", "plugin package (.amcplug)")
   .action((file: string) => {
-    const out = pluginPrintCli(file);
+    const out = pluginPrintCli(file, loadTrustContext());
     console.log(JSON.stringify(out, null, 2));
     if (!out.verification.ok) {
       process.exit(1);
@@ -4830,21 +4819,13 @@ pluginRegistry
     console.log(`index.sig: ${out.sigPath}`);
   });
 
-pluginRegistry
+withTrustFlags(pluginRegistry
   .command("verify")
   .description("Verify registry signature and package hashes")
-  .requiredOption("--dir <dir>", "registry directory")
-  .action((opts: { dir: string }) => {
-    const out = pluginRegistryVerifyCli(opts.dir);
-    if (out.ok) {
-      console.log(chalk.green("Registry verification PASS"));
-      return;
-    }
-    console.log(chalk.red("Registry verification FAIL"));
-    for (const error of out.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .requiredOption("--dir <dir>", "registry directory"), { pubkey: "pin the registry public key (artifact-seal)", json: true })
+  .action((opts: { dir: string } & TrustFlags) => {
+    const out = pluginRegistryVerifyCli(opts.dir, trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
+    finishVerify("Registry", out.report, { json: opts.json, result: out });
   });
 
 pluginRegistry
@@ -8693,28 +8674,14 @@ promptPack
     console.log(`latest=${out.persisted.latestPath}`);
   });
 
-promptPack
+withTrustFlags(promptPack
   .command("verify")
   .description("Verify .amcprompt signature and lint signature")
-  .argument("<file>", ".amcprompt path")
-  .option("--pubkey <path>", "optional signer pubkey path")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const out = promptPackVerifyCli({
-      file,
-      pubkeyPath: opts.pubkey
-    });
-    if (!out.ok) {
-      console.log(chalk.red("Prompt pack verification failed"));
-      for (const error of out.errors) {
-        console.log(`- ${error}`);
-      }
-      process.exit(1);
-      return;
-    }
-    console.log(chalk.green("Prompt pack verification passed"));
-    console.log(`packId=${out.packId ?? "unknown"}`);
-    console.log(`templateId=${out.templateId ?? "unknown"}`);
-    console.log(`lint=${out.lintStatus}`);
+  .argument("<file>", ".amcprompt path"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = promptPackVerifyCli({ file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("Prompt pack", out.report, { json: opts.json, result: out,
+      details: [`packId=${out.packId ?? "unknown"}`, `templateId=${out.templateId ?? "unknown"}`, `lint=${out.lintStatus}`] });
   });
 
 promptPack
@@ -9292,38 +9259,28 @@ backup
     console.log(`backupId=${created.backupId}`);
   });
 
-backup
+withTrustFlags(backup
   .command("verify")
   .description("Verify signed backup bundle offline")
-  .argument("<file>", "backup file path")
-  .option("--pubkey <path>", "optional auditor pubkey override")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const verified = backupVerifyCli({
-      backupFile: file,
-      pubkeyPath: opts.pubkey
-    });
-    if (verified.ok) {
-      console.log(chalk.green(`Backup verification PASSED (${verified.manifest?.backupId ?? "unknown"})`));
-      return;
-    }
-    console.log(chalk.red("Backup verification FAILED"));
-    for (const error of verified.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>", "backup file path"), { pubkey: "pin the auditor public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const verified = backupVerifyCli({ backupFile: file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("Backup", verified.report, { json: opts.json, result: verified, details: [`backupId: ${verified.manifest?.backupId ?? "unknown"}`] });
   });
 
-backup
+withTrustFlags(backup
   .command("restore")
   .description("Restore a verified backup into target directory")
   .argument("<file>", "backup file path")
   .requiredOption("--to <dir>", "restore target directory")
-  .option("--force", "allow restore into existing target directory", false)
-  .action(async (file: string, opts: { to: string; force: boolean }) => {
+  .option("--force", "allow restore into existing target directory", false), { pubkey: "pin the auditor public key (artifact-seal)" })
+  .action(async (file: string, opts: { to: string; force: boolean } & TrustFlags) => {
     const restored = await backupRestoreCli({
       backupFile: file,
       toDir: opts.to,
-      force: opts.force
+      force: opts.force,
+      pubkeyPath: opts.pubkey,
+      trust: trustFromFlags(opts, ["artifact-seal"])
     });
     console.log(chalk.green(`Backup restored to ${restored.restoredTo}`));
     if (!restored.trusted) {
@@ -12960,22 +12917,13 @@ federate
     console.log(`benchmarks=${out.benchmarkCount} certs=${out.certCount} bom=${out.bomCount}`);
   });
 
-federate
+withTrustFlags(federate
   .command("verify-bundle")
   .description("Verify .amcfed package")
-  .argument("<file>")
-  .action((file: string) => {
-    const out = federateVerifyBundleCli(resolve(process.cwd(), file));
-    if (out.ok) {
-      console.log(chalk.green("Federation package verification PASSED"));
-      console.log(`sourceOrg=${out.manifest?.sourceOrgId ?? "unknown"}`);
-      return;
-    }
-    console.log(chalk.red("Federation package verification FAILED"));
-    for (const error of out.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the peer publisher public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = federateVerifyBundleCli(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
+    finishVerify("Federation package", out.report, { json: opts.json, result: out, details: [`sourceOrg=${out.manifest?.sourceOrgId ?? "unknown"}`] });
   });
 
 integrations
@@ -17146,28 +17094,14 @@ auditBinder
     console.log(`binderId: ${out.binder.binderId}`);
   });
 
-auditBinder
+withTrustFlags(auditBinder
   .command("verify")
   .description("Verify .amcaudit file")
-  .argument("<file.amcaudit>")
-  .option("--pubkey <path>", "optional signer public key pem")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const verify = auditBinderVerifyCli({
-      workspace: process.cwd(),
-      file,
-      pubkeyPath: opts.pubkey
-    });
-    if (!verify.ok) {
-      console.log(chalk.red("Audit binder verification failed"));
-      for (const error of verify.errors) {
-        console.log(`- ${error.code}: ${error.message}`);
-      }
-      process.exit(1);
-      return;
-    }
-    console.log(chalk.green("Audit binder verified"));
-    console.log(`sha256: ${verify.fileSha256}`);
-    console.log(`binderId: ${verify.binder?.binderId ?? "unknown"}`);
+  .argument("<file.amcaudit>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const verify = auditBinderVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("Audit binder", verify.report, { json: opts.json, result: verify,
+      details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`] });
   });
 
 auditBinder
@@ -17451,26 +17385,14 @@ bench
     console.log(`trust: ${out.bench.evidence.trustLabel}`);
   });
 
-bench
+withTrustFlags(bench
   .command("verify")
   .description("Verify .amcbench artifact offline")
-  .argument("<file>")
-  .option("--pubkey <path>", "override signer pubkey")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const out = benchVerifyCli({
-      file: resolve(process.cwd(), file),
-      pubkeyPath: opts.pubkey ? resolve(process.cwd(), opts.pubkey) : undefined
-    });
-    if (!out.ok) {
-      console.log(chalk.red("Bench verify failed"));
-      for (const error of out.errors) {
-        console.log(`- ${error.code}: ${error.message}`);
-      }
-      process.exit(1);
-      return;
-    }
-    console.log(chalk.green("Bench artifact verified"));
-    console.log(`benchId: ${out.bench?.benchId ?? "unknown"}`);
+  .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = benchVerifyCli({ file: resolve(process.cwd(), file), trust: trustFromFlags(opts, ["artifact-seal"]),
+      pubkeyPath: opts.pubkey ? resolve(process.cwd(), opts.pubkey) : undefined });
+    finishVerify("Bench artifact", out.report, { json: opts.json, result: out, details: [`benchId: ${out.bench?.benchId ?? "unknown"}`] });
   });
 
 bench
@@ -17729,26 +17651,20 @@ benchmark
     console.log(chalk.green(`Benchmark exported: ${out.outFile}`));
   });
 
-benchmark
+withTrustFlags(benchmark
   .command("verify")
-  .argument("<file>")
-  .action((file: string) => {
-    const verify = verifyBenchmarkArtifact(resolve(process.cwd(), file));
-    if (!verify.ok) {
-      console.log(chalk.red("Benchmark verify failed"));
-      for (const error of verify.errors) {
-        console.log(`- ${error}`);
-      }
-      process.exit(1);
-    }
-    console.log(chalk.green("Benchmark verified"));
+  .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const verify = verifyBenchmarkArtifact(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]), opts.pubkey);
+    finishVerify("Benchmark", verify.report, { json: opts.json, result: verify });
   });
 
 benchmark
   .command("ingest")
   .argument("<fileOrDir>")
   .action((fileOrDir: string) => {
-    const out = ingestBenchmarks(process.cwd(), fileOrDir);
+    // Imported benchmarks need a signer the operator pinned in the AMC home trust list (P0-09).
+    const out = ingestBenchmarks(process.cwd(), fileOrDir, loadTrustContext());
     console.log(chalk.green(`Imported ${out.imported.length} benchmark(s)`));
   });
 

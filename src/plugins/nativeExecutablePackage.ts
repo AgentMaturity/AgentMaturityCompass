@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import semver from "semver";
 import { sha256Hex } from "../utils/hash.js";
 import { inspectTarGzipArchive } from "../security/safeTarArchive.js";
-import { extractPluginPackage, verifyPluginPackage } from "./pluginPackage.js";
+import { extractPluginPackage, installedPluginTrust, verifyPluginPackage } from "./pluginPackage.js";
 import { installedPluginsLockSchema } from "./pluginRegistrySchema.js";
 import { pluginInstalledPackagePath, pluginsInstalledLockPath } from "./pluginStore.js";
 import { NATIVE_EXECUTABLE_LIMITS, NativeExecutableError, nativeExecutableReference, type NativeExecutableReference } from "./nativeExecutableSchema.js";
@@ -50,7 +50,7 @@ export function readInstalledNativeExecutable(workspace: string, selected: Nativ
       maxEntries: 512, maxCompressedBytes: NATIVE_EXECUTABLE_LIMITS.packageBytes,
       maxEntryBytes: 1_048_576, maxTotalBytes: NATIVE_EXECUTABLE_LIMITS.packageBytes, maxPathBytes: 512
     } });
-    const verified = verifyPluginPackage({ file: archive });
+    const verified = verifyPluginPackage({ file: archive, trust: installedPluginTrust(workspace, reference.publisherFingerprint) });
     if (!verified.ok || !verified.manifest || verified.publisherFingerprint !== reference.publisherFingerprint
       || verified.manifest.plugin.id !== reference.pluginId || verified.manifest.plugin.version !== reference.version) {
       throw new NativeExecutableError("EXECUTABLE_SIGNATURE_INVALID", "The executable package does not have a valid signature from its pinned publisher and identity. No module was imported.");

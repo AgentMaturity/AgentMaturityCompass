@@ -13,6 +13,7 @@ import {
 } from "./benchRegistrySchema.js";
 import { inspectBenchArtifact } from "./benchArtifact.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import { loadTrustContext, untrustedReasons, verdictExitCode } from "../trust/index.js";
 
 function registryIndexPath(dir: string): string {
   return join(dir, "index.json");
@@ -207,9 +208,10 @@ export function publishBenchToRegistry(params: {
   const dir = resolve(params.dir);
   const benchFile = resolve(params.benchFile);
   const registryKey = readUtf8(resolve(params.registryKeyPath));
-  const verifyResult = verifyBenchArtifactFile({ file: benchFile });
-  if (!verifyResult.ok || !verifyResult.bench) {
-    throw new Error(`bench verification failed before publish: ${verifyResult.errors.map((row) => row.message).join("; ")}`);
+  // Integrity only: publishing is the registry operator vouching for this signer, by signing the index that names it.
+  const verifyResult = verifyBenchArtifactFile({ file: benchFile, trust: { ...loadTrustContext(), allowUnpinned: true } });
+  if (verdictExitCode(verifyResult.report) === 1 || !verifyResult.bench) {
+    throw new Error(`bench verification failed before publish: ${untrustedReasons(verifyResult.report).join("; ")}`);
   }
   const inspected = inspectBenchArtifact(benchFile);
   const benchId = inspected.bench.benchId;

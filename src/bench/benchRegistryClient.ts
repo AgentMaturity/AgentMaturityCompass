@@ -6,6 +6,7 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import { loadTrustContext, untrustedReasons, withPins } from "../trust/index.js";
 import { cacheRegistryIndex, listImportedBenches, storeImportedBench } from "./benchRegistryStore.js";
 import { loadBenchRegistriesConfig } from "./benchPolicyStore.js";
 
@@ -195,9 +196,11 @@ export async function importBenchFromRegistry(params: {
   }
   const tmpPath = join(resolve(params.workspace), ".amc", "bench", "imports", "tmp-import.amcbench");
   writeFileAtomic(tmpPath, bytes, 0o644);
-  const verified = verifyBenchArtifactFile({ file: tmpPath });
+  // The signer counts because the pinned registry's signed index names it for this version (P0-09).
+  const trust = withPins(loadTrustContext(), [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: `bench registry ${registry.id} index` }]);
+  const verified = verifyBenchArtifactFile({ file: tmpPath, trust });
   if (!verified.ok) {
-    throw new Error(`bench artifact verify failed: ${verified.errors.map((row) => row.message).join("; ")}`);
+    throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);
   }
   if (registry.requireBenchProofs && verified.bench && verified.bench.proofBindings.includedEventProofIds.length === 0) {
     throw new Error("bench proofs required by registry policy but artifact has no inclusion proofs");
@@ -209,7 +212,8 @@ export async function importBenchFromRegistry(params: {
     signerFingerprint: selected.signerFingerprint,
     sourceUrl: selected.url,
     version: selected.version,
-    file: tmpPath
+    file: tmpPath,
+    trust
   });
   return {
     benchId: stored.meta.benchId,

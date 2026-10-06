@@ -79,7 +79,7 @@ describe("verify surfaces (P0-09)", () => {
     shipped.text = JSON.stringify({ distrust: [distrustEntry(registry.fingerprint, { reason: "exposed-in-public-history", source: "amc-project" })] });
     for (const allowUnpinned of [false, true]) {
       const trust = trustFromFlags({ pubkey: registry.pubPath, allowUnpinned }, ["artifact-seal"]);
-      const out = verifyPluginRegistry(dir, trust as never) as unknown as { ok: boolean; report: Parameters<typeof verdictExitCode>[0] };
+      const out = verifyPluginRegistry(dir, trust);
       expect(out.ok).toBe(false);
       expect(out.report.issuerAdmission.signatures[0]).toMatchObject({ status: "distrusted", keyId: registry.fingerprint });
       expect(verdictExitCode(out.report)).toBe(1);

@@ -16,6 +16,7 @@ import {
 } from "./promptPackApi.js";
 import { promptPolicySchema, type PromptPolicy } from "./promptPolicySchema.js";
 import { verifyPromptPackFile } from "./promptPackVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import type { PromptPackProvider } from "./promptPackSchema.js";
 
 export function promptInitCli(workspace: string) {
@@ -60,10 +61,12 @@ export function promptPackBuildCli(params: {
 export function promptPackVerifyCli(params: {
   file: string;
   pubkeyPath?: string;
+  trust: TrustContext;
 }) {
   return verifyPromptPackFile({
     file: resolve(params.file),
-    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined
+    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined,
+    trust: params.trust
   });
 }
 

@@ -8,7 +8,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { checkNotaryTrust } from "../trust/trustConfig.js";
-import { verifyPromptPackFile } from "./promptPackVerifier.js";
+import { verifyWorkspacePromptPack } from "./promptPackVerifier.js";
 import { buildPromptPackArtifact, inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { diffLatestPromptPack } from "./promptDiff.js";
 import {
@@ -326,9 +326,7 @@ export function promptVerifyForApi(workspace: string): {
     errors.push(`scheduler signature invalid: ${schedulerSig.reason ?? "unknown"}`);
   }
   for (const agentId of listPromptAgentsWithPacks(workspace)) {
-    const verify = verifyPromptPackFile({
-      file: promptLatestPackPath(workspace, agentId)
-    });
+    const verify = verifyWorkspacePromptPack(workspace, promptLatestPackPath(workspace, agentId));
     if (!verify.ok) {
       errors.push(`pack(${agentId}) invalid: ${verify.errors.join("; ")}`);
     }
@@ -467,7 +465,7 @@ export function promptStatusForApi(workspace: string): Array<{
       };
     }
     const inspect = inspectPromptPackArtifact(latest);
-    const verify = verifyPromptPackFile({ file: latest });
+    const verify = verifyWorkspacePromptPack(workspace, latest);
     const lint = promptLintSchema.parse(inspect.lint ?? { v: 1, status: "FAIL", findings: [] });
     return {
       agentId,
@@ -698,7 +696,7 @@ export async function preparePromptForBridgeRequest(params: {
       reasons: ["no prompt pack available"]
     };
   }
-  const verify = verifyPromptPackFile({ file: latestPath });
+  const verify = verifyWorkspacePromptPack(params.workspace, latestPath);
   if (policy.promptPolicy.enforcement.mode === "ENFORCE" && policy.promptPolicy.enforcement.requirePackSignatureValid && !verify.ok) {
     return {
       ok: false as const,
