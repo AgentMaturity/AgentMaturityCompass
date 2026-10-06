@@ -17,6 +17,7 @@ import {
 } from "./assuranceControlPlane.js";
 import { initAssurancePolicy, verifyAssurancePolicySignature } from "./assurancePolicyStore.js";
 import { verifyAssuranceCertificateFile, verifyAssuranceWorkspace } from "./assuranceVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 export function assuranceInitCli(workspace: string) {
   return initAssurancePolicy(workspace);
@@ -84,6 +85,8 @@ export async function assuranceIssueCertCli(params: {
 
 export function assuranceVerifyCertCli(params: {
   file: string;
+  publicKeyPath?: string;
+  trust: TrustContext;
 }) {
   return verifyAssuranceCertificateFile(params);
 }

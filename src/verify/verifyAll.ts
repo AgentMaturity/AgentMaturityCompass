@@ -6,6 +6,8 @@ import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { verifyTransparencyLog } from "../transparency/logChain.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
+import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { verifyForecastWorkspaceArtifacts } from "../forecast/forecastVerifier.js";
 import { verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { verifyBenchArtifactFile } from "../bench/benchVerifier.js";
@@ -97,6 +99,8 @@ function skip(id: string, critical: boolean, details: string[]): VerifyAllCheck 
 
 export async function verifyAll(params: {
   workspace: string;
+  /** The operator's trust context (P0-09): it anchors the ledger and admits release keys; --allow-unanchored lives here. */
+  trust: TrustContext;
 }): Promise<VerifyAllReport> {
   const workspace = resolve(params.workspace);
   const checks: VerifyAllCheck[] = [];
@@ -330,12 +334,17 @@ export async function verifyAll(params: {
   }
 
   try {
-    const ledger = await verifyLedgerIntegrity(workspace);
+    const ledger = await verifyLedgerIntegrity(workspace, { trust: params.trust });
     checks.push(
       ledger.ok
         ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
         : fail("ledger-hash-chain", true, ledger.errors)
     );
+    checks.push(ledger.trustRoot.anchored
+      ? pass("ledger-trust-root", true, [`monitor key ${ledger.trustRoot.monitorFingerprint ?? ""} admitted for ledger-row`])
+      : params.trust.allowUnanchored
+        ? skip("ledger-trust-root", true, ["UNANCHORED (--allow-unanchored): internal consistency only"])
+        : fail("ledger-trust-root", true, [LEDGER_UNANCHORED_MESSAGE]));
   } catch (error) {
     checks.push(fail("ledger-hash-chain", true, [String(error)]));
   }
@@ -449,7 +458,8 @@ export async function verifyAll(params: {
     const releaseErrors: string[] = [];
     for (const file of releaseFiles) {
       try {
-        const verify = releaseVerifyCli({ bundleFile: file });
+        // Release bundles are signed outside the vault, so only the operator's pins (the command's flags and AMC home) can admit them.
+        const verify = releaseVerifyCli({ bundleFile: file, trust: params.trust });
         if (!verify.ok) {
           releaseErrors.push(`${file}: ${verify.errors.join("; ")}`);
         }

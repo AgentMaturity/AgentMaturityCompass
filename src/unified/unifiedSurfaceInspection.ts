@@ -19,6 +19,7 @@ import {
   verifyPassportPolicySignature,
 } from "../passport/passportStore.js";
 import { verifyPassportArtifactFile } from "../passport/passportVerifier.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { projectOnboardingActivation } from "../setup/onboardingActivation.js";
 import { verifyToolsConfigSignature } from "../toolhub/toolhubValidators.js";
 import { pathExists } from "../utils/fs.js";
@@ -306,7 +307,7 @@ function inspectPassport(workspace: string, agentId: string): UnifiedSurfaceModu
   const exports = listPassportExportFiles(workspace);
   const verifications = exports.map((file) => {
     try {
-      return { file, verification: verifyPassportArtifactFile({ file, workspace }) };
+      return { file, verification: verifyPassportArtifactFile({ file, workspace, trust: workspaceSelfTrust(workspace) }) };
     } catch (error) {
       return {
         file,

@@ -12,7 +12,7 @@ import { runBundleGate, parseGatePolicy, evaluateGatePolicy } from "../ci/gate.j
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPrivateKeyPem, signHexDigest, verifyHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { computeFailureRiskIndices } from "./indices.js";
@@ -21,6 +21,10 @@ import { appendTransparencyEntry, verifyTransparencyLog } from "../transparency/
 import { ensureTransparencyMerkleInitialized, verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+import {
+  admitKey, buildVerifierReport, checkDigestSignature, untrustedReasons, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1
+} from "../trust/index.js";
+import { fileSha256 } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -247,9 +251,10 @@ export async function issueCertificate(params: {
     outFile: tmpBundle,
     agentId
   });
-  const bundleVerification = await verifyEvidenceBundle(exported.outFile);
+  // An internal round trip: this workspace re-checks the bundle it just exported, so its own keys are the pins.
+  const bundleVerification = await verifyEvidenceBundle(exported.outFile, workspaceSelfTrust(workspace));
   if (!bundleVerification.ok) {
-    throw new Error(`Cannot issue certificate: bundle verification failed (${bundleVerification.errors.join("; ")})`);
+    throw new Error(`Cannot issue certificate: bundle verification failed (${untrustedReasons(bundleVerification.report).join("; ")})`);
   }
 
   const gateResult = await runBundleGate({
@@ -453,16 +458,38 @@ export function inspectCertificate(certFile: string): {
   }
 }
 
+type CertificateVerification = { ok: boolean; errors: string[]; certId: string | null; report: VerifierReportV1 };
+
+/**
+ * Verifies a .amccert offline. The keys it carries only locate the signer: the auditor signatures need a key the
+ * trust context admits for artifact-seal, the carried ledger is anchored only by an admitted monitor key, and a
+ * revocation counts only when its issuer is admitted for revocation-list and is the certificate's own issuer (P0-09).
+ */
 export async function verifyCertificate(params: {
   certFile: string;
   revocationFile?: string;
-}): Promise<{ ok: boolean; errors: string[]; certId: string | null }> {
+  trust: TrustContext;
+}): Promise<CertificateVerification> {
   const extracted = mkTmp("amc-cert-verify-");
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "unanchored", detail: "the certificate ledger was not verified" };
+  const finish = (certId: string | null): CertificateVerification => {
+    const report = buildVerifierReport({ artifact: { kind: "certificate", path: params.certFile, sha256: sha256Hex(readFileSync(params.certFile)) },
+      context: params.trust, integrityErrors: errors, signatures, anchoring });
+    return { ok: report.trusted, errors, certId, report };
+  };
+  const sealedBy = (signature: string, digestHex: string, signatureB64: string): IssuerAdmission | null => {
+    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: params.trust,
+      candidates: getPublicKeyHistoryFromCert(extracted, "auditor"), keyHistory: certKeyHistory(extracted, "auditor") });
+    signatures.push(check.admission);
+    return check.verified ? check.admission : null;
+  };
   try {
     runTarExtract(params.certFile, extracted);
     if (!pathExists(join(extracted, "cert.json")) || !pathExists(join(extracted, "cert.sig"))) {
-      return { ok: false, errors: ["certificate missing cert.json or cert.sig"], certId: null };
+      errors.push("certificate missing cert.json or cert.sig");
+      return finish(null);
     }
     let cert: CertificatePayload | null = null;
     let certSig: CertSignature | null = null;
@@ -477,16 +504,16 @@ export async function verifyCertificate(params: {
       errors.push(`invalid cert.sig: ${String(error)}`);
     }
     if (!cert || !certSig) {
-      return { ok: false, errors, certId: cert?.certId ?? null };
+      return finish(cert?.certId ?? null);
     }
 
     const certBytes = readFileSync(join(extracted, "cert.json"));
     const certSha = sha256Hex(certBytes);
-    const auditorKeys = getPublicKeyHistoryFromCert(extracted, "auditor");
     if (certSha !== certSig.certSha256) {
       errors.push("cert digest mismatch");
     }
-    if (!verifyHexDigestAny(certSha, certSig.signature, auditorKeys)) {
+    const issuer = sealedBy("cert.sig", certSha, certSig.signature);
+    if (!issuer) {
       errors.push("cert signature invalid");
     }
 
@@ -497,7 +524,7 @@ export async function verifyCertificate(params: {
       errors.push(`invalid run.json: ${String(error)}`);
     }
     if (!run) {
-      return { ok: false, errors, certId: cert.certId };
+      return finish(cert.certId);
     }
     const runBase = {
       ...run,
@@ -508,7 +535,7 @@ export async function verifyCertificate(params: {
     if (runHash !== run.reportJsonSha256) {
       errors.push("run report hash mismatch");
     }
-    if (!verifyHexDigestAny(run.reportJsonSha256, run.runSealSig, auditorKeys)) {
+    if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig)) {
       errors.push("run seal signature invalid");
     }
 
@@ -528,14 +555,14 @@ export async function verifyCertificate(params: {
       errors.push(`invalid gatePolicy.json.sig: ${String(error)}`);
     }
     if (!policy || !policySig) {
-      return { ok: false, errors, certId: cert.certId };
+      return finish(cert.certId);
     }
     const policyBytes = readFileSync(join(extracted, "gatePolicy.json"));
     const policySha = sha256Hex(policyBytes);
     if (policySha !== policySig.digestSha256) {
       errors.push("gate policy digest mismatch");
     }
-    if (!verifyHexDigestAny(policySha, policySig.signature, auditorKeys)) {
+    if (!sealedBy("gatePolicy.json.sig", policySha, policySig.signature)) {
       errors.push("gate policy signature invalid");
     }
 
@@ -551,10 +578,16 @@ export async function verifyCertificate(params: {
 
     const verifyWorkspace = materializeCertWorkspace(extracted);
     try {
-      const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace);
+      const monitor = admitKey({ publicKeyPem: readUtf8(join(extracted, "public-keys", "monitor.pub")), purpose: "ledger-row",
+        signature: "public-keys/monitor.pub", context: params.trust, keyHistory: certKeyHistory(extracted, "monitor") });
+      const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace,
+        monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {});
       if (!ledgerResult.ok) {
         errors.push(...ledgerResult.errors.map((error) => `ledger verify failed: ${error}`));
       }
+      anchoring = ledgerResult.trustRoot.anchored
+        ? { status: "anchored", detail: `monitor key ${monitor.keyId} admitted for ledger-row (${monitor.source})` }
+        : { status: "unanchored", detail: `monitor key ${monitor.status}: ${monitor.detail ?? "not admitted for ledger-row"}` };
     } finally {
       rmSync(verifyWorkspace, { recursive: true, force: true });
     }
@@ -571,35 +604,35 @@ export async function verifyCertificate(params: {
     }
 
     if (params.revocationFile) {
-      const revocation = verifyRevocationFile(params.revocationFile);
-      if (!revocation.ok) {
+      const revocation = verifyRevocationFile(params.revocationFile, params.trust);
+      if (revocation.errors.length > 0) {
         errors.push(...revocation.errors.map((error) => `revocation invalid: ${error}`));
+      } else if (revocation.admission.status !== "admitted" || !issuer || revocation.admission.keyId !== issuer.keyId) {
+        errors.push(`revocation issuer does not match certificate issuer (${revocation.admission.status}: ${revocation.admission.detail ?? `key ${revocation.admission.keyId}`})`);
       } else if (revocation.payload && revocation.payload.certId === cert.certId) {
         errors.push(`certificate revoked: ${revocation.payload.reason}`);
       }
     }
 
-    return {
-      ok: errors.length === 0,
-      errors,
-      certId: cert.certId
-    };
+    return finish(cert.certId);
   } finally {
     rmSync(extracted, { recursive: true, force: true });
   }
 }
 
-function authenticatedHistoryFromCert(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
-  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
-  const historyFile = join(root, "public-keys", "key-history.json");
+/** The key-history envelope a certificate carries for a role, unverified: admitKey checks it against a pinned anchor. */
+function certKeyHistory(root: string, kind: "monitor" | "auditor"): unknown {
   try {
-    const parsed: unknown = JSON.parse(readUtf8(historyFile));
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-    const result = verifyKeyHistoryEnvelope((parsed as Record<string, unknown>)[kind], kind, direct);
-    return result.valid ? result.envelope : null;
+    const parsed: unknown = JSON.parse(readUtf8(join(root, "public-keys", "key-history.json")));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as Record<string, unknown>)[kind] : undefined;
   } catch {
-    return null;
+    return undefined;
   }
+}
+
+function authenticatedHistoryFromCert(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
+  const result = verifyKeyHistoryEnvelope(certKeyHistory(root, kind), kind, readUtf8(join(root, "public-keys", `${kind}.pub`)));
+  return result.valid ? result.envelope : null;
 }
 
 function getPublicKeyHistoryFromCert(root: string, kind: "monitor" | "auditor"): string[] {
@@ -650,13 +683,15 @@ export function revokeCertificate(params: {
   };
 }
 
-function verifyRevocationFile(revocationFile: string): {
-  ok: boolean;
+/** Integrity of a revocation file, plus the admission of its issuer for revocation-list. Its auditorPub never vouches. */
+function verifyRevocationFile(revocationFile: string, trust: TrustContext): {
   errors: string[];
   payload: RevocationPayload | null;
+  admission: IssuerAdmission;
 } {
   const errors: string[] = [];
   let payload: RevocationPayload | null = null;
+  let admission = admitKey({ publicKeyPem: null, purpose: "revocation-list", signature: "revocation signature", context: trust });
   try {
     payload = JSON.parse(readUtf8(revocationFile)) as RevocationPayload;
     const base = {
@@ -668,7 +703,8 @@ function verifyRevocationFile(revocationFile: string): {
     };
     const digest = sha256Hex(canonicalize(base));
     const pubKey = payload.auditorPub;
-    if (!verifyHexDigestAny(digest, payload.signature, [pubKey])) {
+    admission = admitKey({ publicKeyPem: pubKey, purpose: "revocation-list", signature: "revocation signature", context: trust });
+    if (!verifyHexDigest(digest, payload.signature, pubKey)) {
       errors.push("revocation signature invalid");
     }
     if (sha256Hex(pubKey) !== payload.issuerFingerprint) {
@@ -677,18 +713,14 @@ function verifyRevocationFile(revocationFile: string): {
   } catch (error) {
     errors.push(`failed to parse revocation file: ${String(error)}`);
   }
-  return {
-    ok: errors.length === 0,
-    errors,
-    payload
-  };
+  return { errors, payload, admission };
 }
 
-export function verifyRevocation(revocationFile: string): { ok: boolean; errors: string[]; certId: string | null } {
-  const result = verifyRevocationFile(revocationFile);
-  return {
-    ok: result.ok,
-    errors: result.errors,
-    certId: result.payload?.certId ?? null
-  };
+export function verifyRevocation(revocationFile: string, trust: TrustContext): {
+  ok: boolean; errors: string[]; certId: string | null; report: VerifierReportV1;
+} {
+  const result = verifyRevocationFile(revocationFile, trust);
+  const report = buildVerifierReport({ artifact: { kind: "revocation", path: revocationFile, sha256: fileSha256(revocationFile) },
+    context: trust, integrityErrors: result.errors, signatures: [result.admission], anchoring: { status: "not-applicable", detail: null } });
+  return { ok: report.trusted, errors: result.errors, certId: result.payload?.certId ?? null, report };
 }

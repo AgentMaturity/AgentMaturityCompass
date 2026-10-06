@@ -19,6 +19,7 @@ import { signHexDigest, verifyHexDigestAny, getPrivateKeyPem, getPublicKeyHistor
 import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
+import { untrustedReasons, workspaceSelfTrust } from "../trust/index.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 
 const layerNames: LayerName[] = [
@@ -470,10 +471,11 @@ export async function runBundleGate(params: {
   policyPath: string;
   requireSignedPolicy?: boolean;
 }): Promise<{ pass: boolean; reasons: string[]; report: DiagnosticReport; policy: GatePolicy }> {
-  const verification = await verifyEvidenceBundle(resolve(params.workspace, params.bundlePath));
+  // The gate checks a bundle against this workspace's own keys (workspace-self), so a bundle signed elsewhere fails.
+  const verification = await verifyEvidenceBundle(resolve(params.workspace, params.bundlePath), workspaceSelfTrust(params.workspace));
   const reasons: string[] = [];
   if (!verification.ok) {
-    reasons.push(...verification.errors.map((error) => `bundle verify failed: ${error}`));
+    reasons.push(...untrustedReasons(verification.report).map((error) => `bundle verify failed: ${error}`));
   }
 
   const policyRaw = JSON.parse(readFileSync(resolve(params.workspace, params.policyPath), "utf8")) as unknown;

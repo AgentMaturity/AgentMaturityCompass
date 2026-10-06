@@ -15,9 +15,10 @@ import { orgSignatureSchema } from "../org/orgSchema.js";
 import { canonicalize } from "../utils/json.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { verifyHexDigest } from "../crypto/keys.js";
-import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
-import { verifyBenchProofBundle, type BenchInclusionProof } from "../bench/benchProofs.js";
+import { verifyProofsAgainstSignedRoot, type BenchInclusionProof } from "../bench/benchProofs.js";
+import {
+  buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1
+} from "../trust/index.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 
 /**
@@ -80,17 +81,31 @@ export interface AssuranceCertVerifyResult {
   fileSha256: string;
   cert: z.infer<typeof assuranceCertSchema> | null;
   errors: string[];
+  report: VerifierReportV1;
 }
 
+/**
+ * Verifies an assurance certificate offline. signer.pub, the signature envelope and --pubkey only locate the signer:
+ * the certificate and its signed Merkle root need keys the trust context admits for artifact-seal, and inclusion
+ * proofs must resolve to that signed root (P0-09). ok equals report.trusted.
+ */
 export function verifyAssuranceCertificateFile(params: {
   file: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }): AssuranceCertVerifyResult {
   const file = resolve(params.file);
   const fileSha256 = sha256Hex(readFileSync(file));
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "not-applicable", detail: null };
   const tmp = mkdtempSync(join(tmpdir(), "amc-assurance-cert-verify-"));
   let cert: z.infer<typeof assuranceCertSchema> | null = null;
+  const finish = (): AssuranceCertVerifyResult => {
+    const report = buildVerifierReport({ artifact: { kind: "assurance-certificate", path: file, sha256: fileSha256 }, context: params.trust,
+      integrityErrors: errors, signatures, anchoring });
+    return { ok: report.trusted, fileSha256, cert, errors, report };
+  };
   try {
     tarExtract(file, tmp);
     const root = resolveRoot(tmp);
@@ -98,11 +113,11 @@ export function verifyAssuranceCertificateFile(params: {
     const sigPath = join(root, "cert.sig");
     if (!pathExists(certPath)) {
       errors.push("cert.json missing");
-      return { ok: false, fileSha256, cert, errors };
+      return finish();
     }
     if (!pathExists(sigPath)) {
       errors.push("cert.sig missing");
-      return { ok: false, fileSha256, cert, errors };
+      return finish();
     }
 
     cert = assuranceCertSchema.parse(JSON.parse(readUtf8(certPath)) as unknown);
@@ -112,58 +127,31 @@ export function verifyAssuranceCertificateFile(params: {
       errors.push("cert digest mismatch");
     }
 
-    const pubPem = params.publicKeyPath
-      ? readUtf8(resolve(params.publicKeyPath))
-      : pathExists(join(root, "signer.pub"))
-        ? readUtf8(join(root, "signer.pub"))
-        : "";
-    if (!pubPem) {
-      errors.push("missing signer public key for cert signature verification");
-    }
-    let sigOk = false;
-    if (sig.envelope) {
-      sigOk =
-        sig.signature === sig.envelope.sigB64 &&
-        verifySignatureEnvelope(digest, sig.envelope, {
-          trustedPublicKeys: pubPem ? [pubPem] : [],
-          requireTrustedKey: true
-        });
-    } else {
-      if (pubPem) {
-        sigOk = verifyHexDigest(digest, sig.signature, pubPem);
-      }
-    }
-    if (!sigOk) {
+    const candidates = [
+      params.publicKeyPath ? readUtf8(resolve(params.publicKeyPath)) : null,
+      pathExists(join(root, "signer.pub")) ? readUtf8(join(root, "signer.pub")) : null,
+      envelopePublicKey(sig.envelope)
+    ];
+    const check = checkDigestSignature({ signature: "cert.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
+      candidates, context: params.trust });
+    signatures.push(check.admission);
+    if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
       errors.push("certificate signature verification failed");
     }
 
     const proofs = parseInclusionProofs(root);
-    const proofVerify = verifyBenchProofBundle({
-      transparencyRoot: null,
-      merkleRoot: null,
-      proofs
-    });
-    if (!proofVerify.ok) {
-      errors.push(...proofVerify.errors.map((row) => `proof invalid: ${row}`));
-    }
+    const proofVerify = verifyProofsAgainstSignedRoot({ root, proofs, trust: params.trust, candidates });
+    errors.push(...proofVerify.errors.map((row) => `proof invalid: ${row}`));
+    if (proofVerify.admission) signatures.push(proofVerify.admission);
+    anchoring = proofVerify.anchoring;
     if (cert.proofBindings.includedEventProofIds.length !== proofs.length) {
       errors.push("proof count mismatch");
     }
 
-    return {
-      ok: errors.length === 0,
-      fileSha256,
-      cert,
-      errors
-    };
+    return finish();
   } catch (error) {
     errors.push(String(error));
-    return {
-      ok: false,
-      fileSha256,
-      cert,
-      errors
-    };
+    return finish();
   } finally {
     cleanup(tmp);
   }
@@ -193,7 +181,9 @@ export function verifyAssuranceWorkspace(params: {
   const latestCertPath = assuranceLatestCertificatePath(params.workspace);
   const latestCert = pathExists(latestCertPath)
     ? verifyAssuranceCertificateFile({
-        file: latestCertPath
+        file: latestCertPath,
+        // A workspace self-check of its own latest certificate: its own keys are the pins, labelled workspace-self.
+        trust: workspaceSelfTrust(params.workspace)
       })
     : null;
 

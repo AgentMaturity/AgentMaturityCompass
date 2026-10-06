@@ -193,6 +193,7 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
+import { finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
 import { registerWireCommands } from "./wire/wireCli.js";
@@ -6304,10 +6305,10 @@ program
 
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
 
-verifyCmd
+withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
   .option("--repair", "Auto-clean corrupted blobs and ledger entries, then re-verify", false)
   .option("--sign-config", "Sign .amc/amc.config.yaml with the auditor key, then stop", false)
-  .action(async (opts: { repair: boolean; signConfig: boolean }) => {
+  .action(async (opts: { repair: boolean; signConfig: boolean } & TrustFlags) => {
     if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
     if (opts.repair) {
       const { rmSync, existsSync } = await import("fs");
@@ -6324,9 +6325,12 @@ verifyCmd
       }
       console.log(chalk.gray("  Re-running verification after repair..."));
     }
-    const result = await verifyLedgerIntegrity(process.cwd());
+    const trust = trustFromFlags(opts, ["ledger-row"]);
+    const result = await verifyLedgerIntegrity(process.cwd(), { trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
     if (result.ok) {
-      console.log(renderLedgerVerdict(result));
+      console.log(renderLedgerVerdict(result, trust.allowUnanchored));
+      const code = ledgerExitCode(result, trust);
+      if (code !== 0) process.exit(code);
       return;
     }
 
@@ -6377,14 +6381,13 @@ verifyCmd
     process.exit(1);
   });
 
-verifyCmd
+withTrustFlags(verifyCmd
   .command("all")
   .description("Verify trust/policies/plugins/logs/ledger/artifacts in one pass")
-  .option("--json", "emit JSON", false)
-  .action(async (opts: { json: boolean }) => {
-    const out = await verifyAll({
-      workspace: process.cwd()
-    });
+  .option("--json", "emit JSON", false), { expectMonitor: true, ledgerOnly: true })
+  .action(async (opts: { json: boolean } & TrustFlags) => {
+    const trust = trustFromFlags(opts, ["ledger-row"]);
+    const out = await verifyAll({ workspace: process.cwd(), trust });
     if (opts.json) {
       console.log(JSON.stringify(out, null, 2));
     } else {
@@ -6406,6 +6409,7 @@ verifyCmd
     if (out.status !== "PASS") {
       process.exit(1);
     }
+    verifyAllExit(out, trust);
   });
 
 const target = program.command("target").description("Target profile operations");
@@ -7556,14 +7560,13 @@ Use --dry-run to preview the exact capture command and next score step.
     }
   });
 
-evidence
+withTrustFlags(evidence
   .command("verify")
   .description("Run full workspace verification suite")
-  .option("--json", "emit JSON output", false)
-  .action(async (opts: { json: boolean }) => {
-    const out = await verifyAll({
-      workspace: process.cwd()
-    });
+  .option("--json", "emit JSON output", false), { expectMonitor: true, ledgerOnly: true })
+  .action(async (opts: { json: boolean } & TrustFlags) => {
+    const trust = trustFromFlags(opts, ["ledger-row"]);
+    const out = await verifyAll({ workspace: process.cwd(), trust });
     if (opts.json) {
       console.log(JSON.stringify(out, null, 2));
     } else {
@@ -7581,6 +7584,7 @@ evidence
     if (out.status !== "PASS") {
       process.exit(1);
     }
+    verifyAllExit(out, trust);
   });
 
 incidents
@@ -8864,27 +8868,13 @@ passport
     console.log(`status: ${out.passport.status.label}`);
   });
 
-passport
+withTrustFlags(passport
   .command("verify")
   .description("Verify .amcpass artifact offline")
-  .argument("<file>")
-  .option("--pubkey <path>", "override signer pubkey path")
-  .action((file: string, opts: { pubkey?: string }) => {
-    const out = passportVerifyCli({
-      workspace: process.cwd(),
-      file,
-      pubkeyPath: opts.pubkey
-    });
-    if (!out.ok) {
-      console.log(chalk.red("Passport verify failed"));
-      for (const error of out.errors) {
-        console.log(`- ${error.code}: ${error.message}`);
-      }
-      process.exit(1);
-      return;
-    }
-    console.log(chalk.green("Passport verified"));
-    console.log(`passportId: ${out.passport?.passportId ?? "unknown"}`);
+  .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const out = passportVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    finishVerify("Passport", out.report, { json: opts.json, result: out, details: [`passportId: ${out.passport?.passportId ?? "unknown"}`] });
   });
 
 passport
@@ -10369,22 +10359,13 @@ bundle
     console.log(`Files: ${result.fileCount}, Events: ${result.eventCount}, Sessions: ${result.sessionCount}`);
   });
 
-bundle
+withTrustFlags(bundle
   .command("verify")
   .description("Verify evidence bundle offline")
-  .argument("<file>")
-  .action(async (file: string) => {
-    const result = await verifyEvidenceBundle(resolve(process.cwd(), file));
-    if (result.ok) {
-      console.log(chalk.green("Bundle verification PASSED"));
-      console.log(`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`);
-      return;
-    }
-    console.log(chalk.red("Bundle verification FAILED"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the auditor public key (artifact-seal)", expectMonitor: true, json: true })
+  .action(async (file: string, opts: TrustFlags) => {
+    const result = await verifyEvidenceBundle(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]));
+    finishVerify("Bundle", result.report, { json: opts.json, result, details: [`runId=${result.runId ?? "unknown"} agentId=${result.agentId ?? "unknown"}`] });
   });
 
 bundle
@@ -11239,23 +11220,14 @@ assurance
     console.log(`certId=${issued.cert.certId}`);
   });
 
-assurance
+withTrustFlags(assurance
   .command("cert-verify")
   .description("Verify assurance certificate bundle offline")
-  .argument("<file>")
-  .action((file: string) => {
-    const verified = assuranceVerifyCertCli({
-      file: resolve(process.cwd(), file)
-    });
-    if (verified.ok) {
-      console.log(chalk.green("Assurance certificate verification PASSED"));
-      return;
-    }
-    console.log(chalk.red("Assurance certificate verification FAILED"));
-    for (const error of verified.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const verified = assuranceVerifyCertCli({ file: resolve(process.cwd(), file), trust: trustFromFlags(opts, ["artifact-seal"]),
+      ...(opts.pubkey ? { publicKeyPath: resolve(process.cwd(), opts.pubkey) } : {}) });
+    finishVerify("Assurance certificate", verified.report, { json: opts.json, result: verified });
   });
 
 const assuranceScheduler = assurance.command("scheduler").description("Assurance scheduler controls");
@@ -11519,43 +11491,28 @@ function readTrustCertificateEnvelope(
   }
 }
 
-cert
+withTrustFlags(cert
   .command("verify")
   .description("Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON)")
   .argument("<file>")
-  .option("--revocation <path>", "optional revocation file")
-  .action(async (file: string, opts: { revocation?: string }) => {
+  .option("--revocation <path>", "optional revocation file"), { pubkey: "pin the issuer public key (artifact-seal, revocation-list)", expectMonitor: true, json: true })
+  .action(async (file: string, opts: { revocation?: string } & TrustFlags) => {
     const certPath = resolve(process.cwd(), file);
-
+    const trust = trustFromFlags(opts, ["artifact-seal", "revocation-list"]);
     const envelope = readTrustCertificateEnvelope(certPath);
     if (envelope) {
       const { verifyTrustCertificateEnvelope } = await import("./cert/trustCertificate.js");
-      const verdict = verifyTrustCertificateEnvelope(envelope as never);
-      if (verdict.ok) {
-        console.log(chalk.green("Certificate verification PASSED"));
-        console.log(`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`);
-        console.log(`type=amc-trust-certificate`);
-        return;
-      }
-      console.log(chalk.red("Certificate verification FAILED"));
-      for (const error of verdict.errors) console.log(`- ${error}`);
-      process.exit(1);
-    }
-
-    const result = await verifyCertificate({
-      certFile: certPath,
-      revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined
-    });
-    if (result.ok) {
-      console.log(chalk.green("Certificate verification PASSED"));
-      console.log(`certId=${result.certId ?? "unknown"}`);
+      const verdict = verifyTrustCertificateEnvelope(envelope as never, trust, certPath);
+      finishVerify("Certificate", verdict.report, { json: opts.json, result: verdict,
+        details: [`certId=${(envelope as { certId?: string }).certId ?? "unknown"}`, "type=amc-trust-certificate"] });
       return;
     }
-    console.log(chalk.red("Certificate verification FAILED"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+    const result = await verifyCertificate({
+      certFile: certPath,
+      revocationFile: opts.revocation ? resolve(process.cwd(), opts.revocation) : undefined,
+      trust
+    });
+    finishVerify("Certificate", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`] });
   });
 
 cert
@@ -11603,22 +11560,13 @@ cert
     console.log(`certId=${revoked.certId}`);
   });
 
-cert
+withTrustFlags(cert
   .command("verify-revocation")
   .description("Verify revocation file signature")
-  .argument("<file>")
-  .action((file: string) => {
-    const result = verifyRevocation(resolve(process.cwd(), file));
-    if (result.ok) {
-      console.log(chalk.green("Revocation verification PASSED"));
-      console.log(`certId=${result.certId ?? "unknown"}`);
-      return;
-    }
-    console.log(chalk.red("Revocation verification FAILED"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+  .argument("<file>"), { pubkey: "pin the revocation issuer public key (revocation-list)", json: true })
+  .action((file: string, opts: TrustFlags) => {
+    const result = verifyRevocation(resolve(process.cwd(), file), trustFromFlags(opts, ["revocation-list"]));
+    finishVerify("Revocation", result.report, { json: opts.json, result, details: [`certId=${result.certId ?? "unknown"}`] });
   });
 
 vault
@@ -18542,35 +18490,18 @@ release
     console.log(`Signing fingerprint: ${out.fingerprint}`);
   });
 
-release
+withTrustFlags(release
   .command("verify")
   .description("Verify a .amcrelease bundle offline")
-  .argument("<bundleFile>", "path to .amcrelease bundle")
-  .option("--pubkey <path>", "override public key for verification")
-  .action((bundleFile: string, opts: { pubkey?: string }) => {
-    const result = releaseVerifyCli({
-      bundleFile: resolve(process.cwd(), bundleFile),
-      publicKeyPath: opts.pubkey ? resolve(process.cwd(), opts.pubkey) : undefined
-    });
-    if (!result.summary) {
-      console.log(chalk.red("Release verification FAILED"));
-      for (const error of result.errors) {
-        console.log(`- ${error}`);
-      }
-      process.exit(1);
-      return;
+  .argument("<bundleFile>", "path to .amcrelease bundle"), { pubkey: "pin the release signing public key (release)", json: true })
+  .action((bundleFile: string, opts: TrustFlags) => {
+    const result = releaseVerifyCli({ bundleFile: resolve(process.cwd(), bundleFile), trust: trustFromFlags(opts, ["release"]),
+      publicKeyPath: opts.pubkey ? resolve(process.cwd(), opts.pubkey) : undefined });
+    if (result.summary && !opts.json) {
+      console.log(`package: ${result.summary.packageName}@${result.summary.version}`);
+      console.log(`git: commit=${result.summary.commit} tag=${result.summary.tag ?? "none"}`);
     }
-    console.log(`package: ${result.summary.packageName}@${result.summary.version}`);
-    console.log(`git: commit=${result.summary.commit} tag=${result.summary.tag ?? "none"}`);
-    if (result.ok) {
-      console.log(chalk.green("integrity: PASS"));
-      return;
-    }
-    console.log(chalk.red("integrity: FAIL"));
-    for (const error of result.errors) {
-      console.log(`- ${error}`);
-    }
-    process.exit(1);
+    finishVerify("Release", result.report, { json: opts.json, result, details: ["integrity: PASS"] });
   });
 
 release

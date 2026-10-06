@@ -24,6 +24,7 @@ import {
 } from "./passportStore.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { verifyPassportArtifactFile, verifyPassportWorkspace } from "./passportVerifier.js";
+import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
 
 const pendingExportSchema = z.object({
   v: z.literal(1),
@@ -266,11 +267,13 @@ export function passportVerifyForApi(params: {
   workspace?: string;
   file: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }) {
   const verified = verifyPassportArtifactFile({
     workspace: params.workspace,
     file: params.file,
-    publicKeyPath: params.publicKeyPath
+    publicKeyPath: params.publicKeyPath,
+    trust: params.trust
   });
   if (verified.ok && verified.passport) {
     appendTransparencyEntry({
@@ -503,9 +506,11 @@ export function passportVerifyPublicForApi(params: {
   if (!found) {
     return null;
   }
+  // A public verify endpoint: the server operator's trust context decides, never the workspace's own keys.
   const verified = passportVerifyForApi({
     workspace: params.workspace,
-    file: found.file
+    file: found.file,
+    trust: loadTrustContext()
   });
   const passport = verified.passport ?? inspectPassportArtifact(found.file).passport;
   const revocation = getPassportRevocation(params.workspace, passport.passportId);

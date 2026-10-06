@@ -37,6 +37,8 @@ import { verifySessionChains } from "./sessionVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
+import { admitKey } from "../trust/admission.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -107,6 +109,11 @@ export interface VerifyResult {
   };
 }
 
+/** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
+export const LEDGER_UNANCHORED_MESSAGE = "Ledger verification FAILED: UNANCHORED. The monitor key was read from the workspace being verified, " +
+  "so this proves internal consistency only. Pin it with --expect-monitor, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list, " +
+  "using a fingerprint recorded outside this workspace.";
+
 export interface LedgerVerifyOptions {
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;
   /**
@@ -130,6 +137,8 @@ export interface LedgerVerifyOptions {
    * instead of depending on wall-clock timing.
    */
   sessionStaleAfterMs?: number;
+  /** P0-09: when given, trustRoot.anchored means the monitor key is admitted for ledger-row by this context. */
+  trust?: TrustContext;
 }
 
 
@@ -656,8 +665,10 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   const expectedFingerprint =
     options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
   let monitorFingerprint: string | null = null;
+  let monitorPem: string | null = null;
   try {
-    monitorFingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspacePath, "monitor"), "utf8"));
+    monitorPem = getPublicKeyPem(workspacePath, "monitor");
+    monitorFingerprint = sha256Hex(Buffer.from(monitorPem, "utf8"));
   } catch {
     // No monitor key at all. verifyEvents reports the consequences per event;
     // recording null here keeps the trust-root verdict honest rather than
@@ -723,7 +734,9 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
     governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
     trustRoot: {
-      anchored: Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
+      anchored: options.trust
+        ? admitKey({ publicKeyPem: monitorPem, purpose: "ledger-row", signature: "ledger monitor key", context: options.trust }).status === "admitted"
+        : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
       monitorFingerprint,
       expectedFingerprint
     },

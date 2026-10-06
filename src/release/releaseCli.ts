@@ -4,6 +4,7 @@ import { ensureReleaseDirs, releasePaths } from "./releasePaths.js";
 import { initReleaseSigningKey, releasePublicKeyFingerprint } from "./releaseSigner.js";
 import { createReleaseBundle } from "./releaseBundle.js";
 import { printReleaseBundleSummary, verifyReleaseBundle } from "./releaseVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { writeSbom } from "./releaseSbom.js";
 import { writeLicenseInventory } from "./releaseLicenses.js";
 import { scanReleaseArchive, writeSecretScanReport } from "./releaseSecretScan.js";
@@ -61,8 +62,9 @@ export function releasePackCli(params: {
 export function releaseVerifyCli(params: {
   bundleFile: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }): ReturnType<typeof verifyReleaseBundle> {
-  return verifyReleaseBundle(params.bundleFile, params.publicKeyPath);
+  return verifyReleaseBundle(params.bundleFile, params.trust, params.publicKeyPath);
 }
 
 export function releaseSbomCli(params: { workspace: string; outPath: string }): {

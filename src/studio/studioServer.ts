@@ -287,6 +287,8 @@ import {
 } from "../plugins/pluginStore.js";
 import { loadInstalledPluginAssets } from "../plugins/pluginLoader.js";
 import { checkNotaryTrust, fetchNotaryLogTail, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
+import { loadTrustContext } from "../trust/trustContext.js";
+import { requestTrustOverride } from "../trust/requestTrust.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import {
   ackAdvisoryForApi,
@@ -5203,16 +5205,18 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           return;
         }
         const body = await readBody(req, options.maxRequestBytes ?? 1_048_576);
-        const parsed = body ? (JSON.parse(body) as { file?: unknown; publicKeyPath?: unknown }) : {};
+        const parsed = body ? (JSON.parse(body) as { file?: unknown }) : {};
         if (typeof parsed.file !== "string" || parsed.file.trim().length === 0) {
           json(res, 400, { error: "file is required" });
           return;
         }
-        const out = passportVerifyForApi({
-          workspace: options.workspace,
-          file: parsed.file,
-          publicKeyPath: typeof parsed.publicKeyPath === "string" ? parsed.publicKeyPath : undefined
-        });
+        // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const refused = requestTrustOverride(parsed);
+        if (refused) {
+          json(res, 400, { error: refused });
+          return;
+        }
+        const out = passportVerifyForApi({ workspace: options.workspace, file: parsed.file, trust: loadTrustContext() });
         writeStudioAuditEvent({
           workspace: options.workspace,
           auditType: out.ok ? "PASSPORT_VERIFIED" : "PASSPORT_VERIFICATION_FAILED",

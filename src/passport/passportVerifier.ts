@@ -11,8 +11,9 @@ import { sha256Hex } from "../utils/hash.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { passportJsonSchema, passportPiiScanSchema, passportSignatureSchema, type PassportJson } from "./passportSchema.js";
-import { digestFile, verifyPassportDigestSignature } from "./passportSigner.js";
-import { verifyPassportProofBundle } from "./passportProofs.js";
+import { digestFile } from "./passportSigner.js";
+import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
+import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import {
   verifyPassportPolicySignature,
   listPassportExportFiles,
@@ -43,6 +44,7 @@ export interface PassportVerifyResult {
   passport: PassportJson | null;
   errors: PassportVerifyError[];
   fileSha256: string;
+  report: VerifierReportV1;
 }
 
 function tarExtract(bundleFile: string, outDir: string): void {
@@ -54,16 +56,29 @@ function tarExtract(bundleFile: string, outDir: string): void {
   });
 }
 
+/**
+ * Verifies a .amcpass offline. signer.pub, the signature envelope and --pubkey only locate the signer: the passport
+ * and its signed Merkle root need keys the trust context admits for artifact-seal, and inclusion proofs must resolve
+ * to that signed root (P0-09). ok equals report.trusted.
+ */
 export function verifyPassportArtifactFile(params: {
   file: string;
   workspace?: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }): PassportVerifyResult {
   const file = resolve(params.file);
   const errors: PassportVerifyError[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "not-applicable", detail: null };
   const fileSha256 = digestFile(file);
   const tmp = mkdtempSync(join(tmpdir(), "amc-passport-verify-"));
   let passport: PassportJson | null = null;
+  const finish = (): PassportVerifyResult => {
+    const report = buildVerifierReport({ artifact: { kind: "passport", path: file, sha256: fileSha256 }, context: params.trust,
+      integrityErrors: errors.map((error) => `${error.code}: ${error.message}`), signatures, anchoring });
+    return { ok: report.trusted, passport, errors, fileSha256, report };
+  };
   try {
     tarExtract(file, tmp);
     const root = resolveSignedArtifactRoot(tmp, "amc-passport", "passport.json", "passport.sig");
@@ -72,11 +87,11 @@ export function verifyPassportArtifactFile(params: {
     const pubPath = join(root, "signer.pub");
     if (!pathExists(passportPath)) {
       errors.push({ code: "MISSING_PASSPORT_JSON", message: "passport.json missing" });
-      return { ok: false, passport: null, errors, fileSha256 };
+      return finish();
     }
     if (!pathExists(sigPath)) {
       errors.push({ code: "MISSING_PASSPORT_SIG", message: "passport.sig missing" });
-      return { ok: false, passport: null, errors, fileSha256 };
+      return finish();
     }
 
     passport = passportJsonSchema.parse(JSON.parse(readUtf8(passportPath)) as unknown);
@@ -104,18 +119,15 @@ export function verifyPassportArtifactFile(params: {
       errors.push({ code: "DIGEST_MISMATCH", message: "passport.json digest mismatch with passport.sig" });
     }
 
-    const pubPem = params.publicKeyPath
-      ? readUtf8(resolve(params.publicKeyPath))
-      : pathExists(pubPath)
-        ? readUtf8(pubPath)
-        : undefined;
-    const sigOk = verifyPassportDigestSignature({
-      digestHex: digest,
-      signature,
-      workspace: params.workspace,
-      publicKeyPem: pubPem
-    });
-    if (!sigOk) {
+    const candidates = [
+      params.publicKeyPath ? readUtf8(resolve(params.publicKeyPath)) : null,
+      pathExists(pubPath) ? readUtf8(pubPath) : null,
+      envelopePublicKey(signature.envelope)
+    ];
+    const check = checkDigestSignature({ signature: "passport.sig", purpose: "artifact-seal", digestHex: digest,
+      signatureB64: signature.signature, candidates, context: params.trust });
+    signatures.push(check.admission);
+    if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "passport signature verification failed" });
     }
 
@@ -128,16 +140,10 @@ export function verifyPassportArtifactFile(params: {
     });
 
     const inclusion = readSignedArtifactInclusionProofs(root);
-    const proofOk = verifyPassportProofBundle({
-      transparencyRoot: null,
-      merkleRoot: null,
-      proofs: inclusion
-    });
-    if (!proofOk.ok) {
-      for (const error of proofOk.errors) {
-        errors.push({ code: "PROOF_INVALID", message: error });
-      }
-    }
+    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates });
+    errors.push(...proofs.errors.map((message) => ({ code: "PROOF_INVALID", message })));
+    if (proofs.admission) signatures.push(proofs.admission);
+    anchoring = proofs.anchoring;
     const proofIds = inclusion.map((row) => row.proofId).sort((a, b) => a.localeCompare(b));
     const expectedProofIds = [...passport.proofBindings.includedEventProofIds].sort((a, b) => a.localeCompare(b));
     if (JSON.stringify(proofIds) !== JSON.stringify(expectedProofIds)) {
@@ -169,23 +175,13 @@ export function verifyPassportArtifactFile(params: {
       }
     }
 
-    return {
-      ok: errors.length === 0,
-      passport,
-      errors,
-      fileSha256
-    };
+    return finish();
   } catch (error) {
     errors.push({
       code: "VERIFY_EXCEPTION",
       message: String(error)
     });
-    return {
-      ok: false,
-      passport,
-      errors,
-      fileSha256
-    };
+    return finish();
   } finally {
     cleanupSignedArtifactVerification(tmp);
   }
@@ -203,9 +199,11 @@ export function verifyPassportWorkspace(params: {
     errors.push(`policy: ${policy.reason ?? "invalid signature"}`);
   }
   for (const file of listPassportExportFiles(params.workspace)) {
+    // A workspace self-check of its own exports: its own keys are the pins, labelled workspace-self.
     const verify = verifyPassportArtifactFile({
       file,
-      workspace: params.workspace
+      workspace: params.workspace,
+      trust: workspaceSelfTrust(params.workspace)
     });
     if (!verify.ok) {
       errors.push(`export ${file}: ${verify.errors.map((error) => error.message).join("; ")}`);

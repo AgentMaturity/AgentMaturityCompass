@@ -6,14 +6,14 @@ import {
   ensureSigningKeys,
   getPrivateKeyPem,
   getPublicKeyPem,
-  signHexDigest,
-  verifyHexDigest
+  signHexDigest
 } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_CHAIN_SAMPLES = 24;
@@ -84,6 +84,7 @@ export interface GeneratedTrustCertificate {
 export interface TrustCertificateVerificationResult {
   ok: boolean;
   errors: string[];
+  report: VerifierReportV1;
 }
 
 interface RunSnapshot {
@@ -406,8 +407,14 @@ export function generateTrustCertificate(input: GenerateTrustCertificateInput): 
   };
 }
 
-export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelope): TrustCertificateVerificationResult {
+/** The signing key in the payload only locates the signer; it must be admitted for artifact-seal (P0-09). */
+export function verifyTrustCertificateEnvelope(
+  envelope: TrustCertificateEnvelope,
+  trust: TrustContext,
+  path = "(trust-certificate envelope)"
+): TrustCertificateVerificationResult {
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
   if (envelope.type !== "amc-trust-certificate") {
     errors.push(`Unexpected certificate type: ${envelope.type}`);
   }
@@ -426,12 +433,10 @@ export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelop
   }
 
   if (signatureStatus === "SIGNED") {
-    const verified = verifyHexDigest(
-      envelope.payloadSha256,
-      envelope.signature,
-      envelope.payload.signingKey.publicKeyPem
-    );
-    if (!verified) {
+    const check = checkDigestSignature({ signature: "trust certificate signature", purpose: "artifact-seal", digestHex: envelope.payloadSha256,
+      signatureB64: envelope.signature, candidates: [envelope.payload.signingKey.publicKeyPem], context: trust });
+    signatures.push(check.admission);
+    if (!check.verified) {
       errors.push("signature verification failed");
     }
   }
@@ -449,8 +454,7 @@ export function verifyTrustCertificateEnvelope(envelope: TrustCertificateEnvelop
     errors.push("preview signing marker mismatch");
   }
 
-  return {
-    ok: errors.length === 0,
-    errors
-  };
+  const report = buildVerifierReport({ artifact: { kind: "trust-certificate", path, sha256: sha256Hex(canonicalize(envelope)) },
+    context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
+  return { ok: report.trusted, errors, report };
 }

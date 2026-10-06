@@ -1,9 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync as pathExists, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { releaseManifestSchema } from "./releaseSchema.js";
 import { verifyReleaseManifest } from "./releaseSigner.js";
 import { cleanupDir, fileSha256, mkTmp, runTarExtract } from "./releaseUtils.js";
 import { scanExtractedReleaseForSecrets, secretScanSchema } from "./releaseSecretScan.js";
+import { buildVerifierReport, checkSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { fileSha256 as artifactSha256 } from "../trust/signatureCheck.js";
 
 export interface ReleaseVerifyResult {
   ok: boolean;
@@ -15,6 +17,7 @@ export interface ReleaseVerifyResult {
     commit: string;
     tag: string | null;
   } | null;
+  report: VerifierReportV1;
 }
 
 function readSig(path: string): string {
@@ -51,19 +54,29 @@ export function printReleaseBundleSummary(bundleFile: string): {
   }
 }
 
-export function verifyReleaseBundle(bundleFile: string, overridePublicKeyPath?: string): ReleaseVerifyResult {
+/**
+ * Verifies a .amcrelease offline. keys/release-signing.pub and --pubkey only locate the signer; the manifest
+ * signature needs a key the trust context admits for the release purpose (P0-09). ok equals report.trusted.
+ */
+export function verifyReleaseBundle(bundleFile: string, trust: TrustContext, pubkeyPath?: string): ReleaseVerifyResult {
   const tmp = mkTmp("amc-release-verify-");
   const errors: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  const report = () => buildVerifierReport({ artifact: { kind: "release", path: bundleFile, sha256: artifactSha256(resolve(bundleFile)) },
+    context: trust, integrityErrors: errors, signatures, anchoring: { status: "not-applicable", detail: null } });
   try {
     runTarExtract(resolve(bundleFile), tmp);
     const root = resolveBundleRoot(tmp);
     const manifestPath = join(root, "manifest.json");
     const sigPath = join(root, "manifest.sig");
-    const pubPath = overridePublicKeyPath ? resolve(overridePublicKeyPath) : join(root, "keys", "release-signing.pub");
+    const embeddedPath = join(root, "keys", "release-signing.pub");
     const manifest = releaseManifestSchema.parse(JSON.parse(readFileSync(manifestPath, "utf8")));
     const sig = readSig(sigPath);
-    const pub = readFileSync(pubPath, "utf8");
-    if (!verifyReleaseManifest(manifest, sig, pub)) {
+    const check = checkSignature({ signature: "manifest.sig", purpose: "release", context: trust,
+      verify: pem => verifyReleaseManifest(manifest, sig, pem),
+      candidates: [pubkeyPath ? readFileSync(resolve(pubkeyPath), "utf8") : null, pathExists(embeddedPath) ? readFileSync(embeddedPath, "utf8") : null] });
+    signatures.push(check.admission);
+    if (!check.verified) {
       errors.push("manifest signature verification failed");
     }
 
@@ -97,9 +110,11 @@ export function verifyReleaseBundle(bundleFile: string, overridePublicKeyPath?: 
       errors.push("bundle content secret scan failed");
     }
 
+    const verdict = report();
     return {
-      ok: errors.length === 0,
+      ok: verdict.trusted,
       errors,
+      report: verdict,
       manifest,
       summary: {
         packageName: manifest.package.name,
@@ -109,10 +124,12 @@ export function verifyReleaseBundle(bundleFile: string, overridePublicKeyPath?: 
       }
     };
   } catch (error) {
+    errors.push(String(error));
     return {
       ok: false,
-      errors: [...errors, String(error)],
-      summary: null
+      errors,
+      summary: null,
+      report: report()
     };
   } finally {
     cleanupDir(tmp);
