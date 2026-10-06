@@ -24,8 +24,20 @@ import { defineTool } from "../src/tools/toolRegistry.js";
  */
 const PASS = "agent-toolset-wiring-pass";
 const dirs: string[] = [];
+const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
+
+/**
+ * Pin the host-dependent native shell (P0-06). macOS with the explicit opt-in
+ * offers the unconfined /bin/sh body on every host, so these cases no longer
+ * depend on whether the machine running them has Bubblewrap.
+ */
+function unconfinedShellHost(): { readonly unconfinedShell: "cli-flag" } {
+  Object.defineProperty(process, "platform", { ...platform, value: "darwin" });
+  return { unconfinedShell: "cli-flag" };
+}
 
 afterEach(() => {
+  Object.defineProperty(process, "platform", platform);
   while (dirs.length > 0) {
     const dir = dirs.pop();
     if (dir) rmSync(dir, { recursive: true, force: true });
@@ -110,7 +122,7 @@ describe("the loop is offered the real tools", () => {
     // A tool with no parameter schema cannot be invoked correctly. The
     // catalogue must carry one per tool, or the model is being offered
     // something it has no way to use.
-    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     const schemas = toolset.seam.schemas();
 
     expect(schemas).not.toBeNull();
@@ -128,7 +140,7 @@ describe("the loop is offered the real tools", () => {
     // Two writes in one step are not something the model knows are concurrent:
     // read-before-edit would see one land between another's check and its
     // write, and the file is neither edit the model asked for.
-    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     expect(toolset.seam.executionMode(call("fs.read", { path: "a" }))).toBe("parallel");
     expect(toolset.seam.executionMode(call("fs.write", { path: "a", content: "b" }))).toBe("exclusive");
     expect(toolset.seam.executionMode(call("bash", { command: "ls" }))).toBe("exclusive");
@@ -195,7 +207,7 @@ describe("a call from the loop really runs through the pipeline", () => {
     // used to be dead config: validateToolRequest applies argv patterns only to
     // the literal name "process.spawn", so a `bash` entry declaring them read
     // as policy and enforced nothing.
-    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     const result = await toolset.seam.execute(call("bash", { command: "sudo rm -rf /tmp/x" }));
 
     expect(result.outcome).toBe("DENIED");
@@ -205,7 +217,7 @@ describe("a call from the loop really runs through the pipeline", () => {
   });
 
   it("runs a bash command the allowlist permits", async () => {
-    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace: readyWorkspace(), agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     const result = await toolset.seam.execute(call("bash", { command: "echo wired" }));
     expect(result.outcome, `got: ${String(result.content)}`).toBe("OK");
     expect(String(result.content)).toContain("wired");
