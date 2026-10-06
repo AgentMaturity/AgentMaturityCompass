@@ -1,0 +1,30 @@
+0	1932	pnpm install --frozen-lockfile
+0	25951	pnpm run build
+0	1929	npx vitest run tests/industryPackSchema.test.ts tests/industryPackFrameworkNormalization.test.ts tests/industryPackDepthFloor.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/publicQuestionCountDrift.test.ts tests/citationMetadata.test.ts tests/executiveBoardPath.test.ts tests/logisticsIndustryPack.test.ts tests/domainDocs.test.ts
+0	1452	npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts
+0	5724	npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts tests/assurance/
+0	188	npm run check:regulatory-currency
+0	70	node scripts/check-regulatory-currency.mjs --as-of 2027-01-01
+1	72	node scripts/check-regulatory-currency.mjs --as-of 2027-01-02
+1	63	node scripts/check-regulatory-currency.mjs --bogus
+1	65	node scripts/check-regulatory-currency.mjs --as-of ""
+1	69	node scripts/check-regulatory-currency.mjs --as-of 2026-10-03
+0	69	node scripts/check-regulatory-currency.mjs --as-of 2026-10-04
+0	4326	node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check
+0	32077	npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts
+0	22182	npm run typecheck
+0	29699	npm run typecheck:tests
+0	2274	npm run lint
+0	326	npm run check:counts
+0	276	npm run check:docs-drift
+0	199	npm run check:api-ref
+0	1421	npm run check:architecture-boundaries
+0	44667	npm run check:clean-source
+0	42262	npm run check:packed-install
+0	1095	npm run check:freeze
+0	229	npm run check:qualification
+0	24	O=$(git diff --name-only e680f2a6098b53c665b7f2ee7e738c2f05f24984 HEAD -- AMC_OS); echo "$O"; test -z "$O"
+0	149	O=$(git grep -n 'regulated-platform-program' -- src docs tests ':(exclude)docs/program/landing'); echo "$O"; test -z "$O"
+0	117	git grep -n 'regulated-platform-program' -- src docs tests | cut -d: -f1 | sort | uniq -c
+0	38	git diff --name-only -z 67d73223897008ca4ed8baf81c970020b4bf944d 1962e06cf3b82e46811305c6583478dffe06edf1 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1962e06cf3b82e46811305c6583478dffe06edf1 3792bf920f2eebc2ad4221d4e28123b7afc9cfc0 --
+1	2936	npm run check:dead-code
