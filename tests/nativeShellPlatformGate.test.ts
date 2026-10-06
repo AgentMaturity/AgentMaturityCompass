@@ -26,7 +26,7 @@ const rows: ReadonlyArray<readonly [NodeJS.Platform, typeof bwrapOk | typeof bwr
     expect(decision.remediation).toContain("--unsafe-unconfined-shell");
   }],
   ["darwin", notChecked, "cli-flag", decision => expect(decision).toEqual({ kind: "unconfined-opt-in", platform: "darwin", source: "cli-flag" })],
-  ["darwin", notChecked, "signed-config", decision => expect(decision).toEqual({ kind: "unconfined-opt-in", platform: "darwin", source: "signed-config" })],
+  ["darwin", notChecked, "sdk-option", decision => expect(decision).toEqual({ kind: "unconfined-opt-in", platform: "darwin", source: "sdk-option" })],
   ["win32", notChecked, "cli-flag", decision => expect(decision.kind).toBe("refused")],
   ["freebsd", notChecked, "sdk-option", decision => expect(decision.kind).toBe("refused")]
 ];
@@ -38,7 +38,7 @@ describe("the native shell platform gate", () => {
 
   it("uses the exact remediation strings operators are told", () => {
     expect(decideNativeShell({ platform: "darwin", bwrap: notChecked, optIn: null })).toEqual({ kind: "refused", platform: "darwin",
-      remediation: "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell or set runtime.shell.allowUnconfined: true in a signed .amc/amc.config.yaml." });
+      remediation: "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1)." });
     expect(decideNativeShell({ platform: "linux", bwrap: { ok: false, reason: "Bubblewrap requires Linux." }, optIn: null })).toEqual({ kind: "refused", platform: "linux",
       remediation: "The native shell is refused: Bubblewrap requires Linux. Install Bubblewrap at /usr/bin/bwrap (Debian and Ubuntu: apt install bubblewrap); on Ubuntu 24.04 also follow docs/NATIVE_SANDBOX_UBUNTU.md. AMC never falls back to an unconfined Linux shell." });
     expect(decideNativeShell({ platform: "win32", bwrap: notChecked, optIn: "cli-flag" })).toEqual({ kind: "refused", platform: "win32",

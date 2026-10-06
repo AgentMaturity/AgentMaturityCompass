@@ -79,8 +79,8 @@ test.each(["sqlite", "jsonl"] as const)("same Studio explicitly reattaches a dea
 
 // The validation check runs through the native shell inside a Studio-spawned
 // ACP process, whose environment is an allowlist, so the platform cannot be
-// pinned there. macOS offers the shell through the fixture's signed opt-in on
-// every Mac; Linux would depend on the host's Bubblewrap (P0-06). Darwin-only
+// pinned there. macOS offers the shell through Studio's AMC_UNSAFE_UNCONFINED_SHELL=1
+// opt-in, which the fixture sets, on every Mac; Linux would depend on the host's Bubblewrap (P0-06). Darwin-only
 // for the same reason as nativeValidationOutcomeSurfaces.
 test.runIf(process.platform === "darwin").each(["sqlite", "jsonl"] as const)("reattached %s native controller retains approval quorum, accounting and validation pins", async backend => {
   const f = await fixture(backend), input = f.input("Original native validation controller.", true);

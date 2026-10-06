@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Command } from "commander";
@@ -21,6 +21,8 @@ import { credentialRef } from "../src/credentials/credentialRef.js";
 import { signAmcConfig, verifyAmcConfigSignature } from "../src/config/amcConfigSignature.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { nativeShellReadiness, type NativeShellReadiness } from "../src/sandbox/nativeShellGate.js";
+import { AMCNativeClient } from "../src/sdk/nativeAgentClient.js";
+import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
 
@@ -34,26 +36,13 @@ const backend = vi.hoisted(() => ({
   available: { value: { ok: true } as { ok: true } | { ok: false; reason: string } },
   run: vi.fn<(...args: unknown[]) => Promise<SandboxOutcome>>()
 }));
-// Hands the next read of one path different bytes, to model a swap between two reads.
-const tamper = vi.hoisted(() => ({ once: null as null | { readonly path: string; readonly text: string } }));
-vi.mock("node:fs", async importOriginal => {
-  const actual = await importOriginal<typeof import("node:fs")>();
-  const readFileSync = ((path: Parameters<typeof actual.readFileSync>[0], options?: unknown) => {
-    if (tamper.once !== null && String(path) === tamper.once.path) {
-      const { text } = tamper.once;
-      tamper.once = null;
-      return options === undefined ? Buffer.from(text) : text;
-    }
-    return actual.readFileSync(path, options as never);
-  }) as typeof actual.readFileSync;
-  return { ...actual, readFileSync };
-});
 vi.mock("../src/sandbox/bwrapBackend.js", async importOriginal => ({
   ...(await importOriginal<typeof import("../src/sandbox/bwrapBackend.js")>()),
   bwrapBackend: () => ({ kind: "bwrap", available: () => backend.available.value, run: backend.run })
 }));
 
-const DARWIN_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell or set runtime.shell.allowUnconfined: true in a signed .amc/amc.config.yaml.";
+const DARWIN_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
+const NOT_HONOURED = "runtime.shell.allowUnconfined is not honoured: a workspace can sign its own config, so a file in the repository cannot grant an unconfined shell. Pass --unsafe-unconfined-shell, or start Studio with AMC_UNSAFE_UNCONFINED_SHELL=1.";
 const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
 const pin = (value: NodeJS.Platform): void => { Object.defineProperty(process, "platform", { ...platform, value }); };
 const dirs: string[] = [];
@@ -65,8 +54,8 @@ afterEach(() => {
   Object.defineProperty(process, "platform", platform);
   backend.available.value = { ok: true };
   backend.run.mockReset();
-  tamper.once = null;
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
   process.chdir(originalCwd);
   if (priorExitListeners !== null) {
     // The CLI closes its toolset on process exit; release only what this test added.
@@ -172,62 +161,39 @@ describe("Windows and Linux", () => {
   });
 });
 
-describe("the signed config opt-in", () => {
-  it("ignores an unsigned allowUnconfined and says how to sign it", () => {
+describe("no workspace file can opt in", () => {
+  it("does not honour an unsigned allowUnconfined and says why", () => {
     pin("darwin");
     const dir = workspace();
     setAllowUnconfined(dir, true);
     rmSync(join(dir, ".amc", "amc.config.yaml.sig"));
     const { toolset } = compose(dir);
     expect(names(toolset)).not.toContain("bash");
-    expect(toolset.readiness.shell.reason).toContain("runtime.shell.allowUnconfined is ignored: config signature missing. Re-sign the config with: amc verify --sign-config");
+    expect(toolset.readiness.shell.reason).toBe(`${NOT_HONOURED} ${DARWIN_REFUSAL}`);
   });
 
-  it("honours a signed allowUnconfined and ignores it once edited after signing", () => {
+  it("ATTACK: a repository that signs allowUnconfined with its own auditor key is still refused", () => {
     pin("darwin");
+    // A fresh workspace generates its own auditor keys, exactly as a malicious
+    // repository can ship its own key history, opt-in and signature.
     const dir = workspace();
     setAllowUnconfined(dir, true);
     signAmcConfig(dir);
-    const signed = compose(dir);
-    expect(names(signed.toolset)).toContain("bash");
-    expect(signed.toolset.readiness.shell).toMatchObject({ decision: "unconfined-opt-in", optInSource: "signed-config" });
-    writeFileSync(join(dir, ".amc", "amc.config.yaml"), `${readFileSync(join(dir, ".amc", "amc.config.yaml"), "utf8")}# edited\n`);
-    const edited = compose(dir);
-    expect(names(edited.toolset)).not.toContain("bash");
-    expect(edited.toolset.readiness.shell.reason).toContain("runtime.shell.allowUnconfined is ignored: config digest mismatch");
-  });
-
-  it("survives amc init re-saving the config, which re-signs it", () => {
-    pin("darwin");
-    const dir = workspace();
-    setAllowUnconfined(dir, true);
-    signAmcConfig(dir);
-    initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
     expect(verifyAmcConfigSignature(dir).valid).toBe(true);
-    expect(names(compose(dir).toolset)).toContain("bash");
+    const { toolset } = compose(dir);
+    expect(names(toolset)).not.toContain("bash");
+    expect(toolset.readiness.shell).toEqual({ offered: false, decision: "refused", enforcement: "none", boundary: null,
+      reason: `${NOT_HONOURED} ${DARWIN_REFUSAL}`, optInSource: null });
   });
 
-  it("amc init never signs an opt-in that was added without a valid signature", () => {
+  it("the CLI, ACP and SDK paths ignore AMC_UNSAFE_UNCONFINED_SHELL", () => {
     pin("darwin");
-    const dir = workspace();
-    setAllowUnconfined(dir, true);
-    expect(verifyAmcConfigSignature(dir).valid).toBe(false);
-    initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
-    expect(verifyAmcConfigSignature(dir).valid).toBe(true);
-    expect(names(compose(dir).toolset)).not.toContain("bash");
+    vi.stubEnv("AMC_UNSAFE_UNCONFINED_SHELL", "1");
+    expect(nativeShellReadiness(workspace())).toEqual({ offered: false, decision: "refused", enforcement: "none", boundary: null,
+      reason: DARWIN_REFUSAL, optInSource: null });
   });
 
-  it("decides from the same bytes the signature covers, so a swap between reads cannot opt in", () => {
-    pin("darwin");
-    const dir = workspace();
-    const path = join(dir, ".amc", "amc.config.yaml");
-    signAmcConfig(dir);
-    tamper.once = { path, text: `${readFileSync(path, "utf8")}runtime:\n  shell:\n    allowUnconfined: true\n` };
-    expect(nativeShellReadiness(dir)).toMatchObject({ offered: false, decision: "refused", optInSource: null });
-    expect(verifyAmcConfigSignature(dir, Buffer.from(`${readFileSync(path, "utf8")}# unsigned\n`))).toMatchObject({ valid: false, reason: "config digest mismatch" });
-  });
-
-  it("a caller cannot claim the signed config as its explicit opt-in", () => {
+  it("a caller cannot claim an unknown label as its explicit opt-in", () => {
     pin("darwin");
     const readiness = nativeShellReadiness(workspace(), "signed-config" as never);
     expect(readiness).toMatchObject({ offered: false, decision: "refused", optInSource: null });
@@ -244,6 +210,41 @@ describe("the signed config opt-in", () => {
     expect(run.status, run.stderr).toBe(0);
     expect(run.stdout).toContain(join(dir, ".amc", "amc.config.yaml.sig"));
     expect(verifyAmcConfigSignature(dir).valid).toBe(true);
+  });
+});
+
+describe("Studio's operator-only opt-in", () => {
+  async function studioStart(environment: NodeJS.ProcessEnv) {
+    const dir = workspace();
+    const home = join(dir, "operator-home");
+    mkdirSync(home, { mode: 0o700 });
+    const start = vi.spyOn(AMCNativeClient, "start").mockRejectedValue(new Error("fixture: no child process is started"));
+    const service = createNativeTaskService({ workspace: dir, credentialsHome: home,
+      environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: process.env["AMC_VAULT_PASSPHRASE"], ...environment } });
+    try {
+      await service.start({ principalId: "shell-gate-operator", agentId: "default", demo: true },
+        { clientRequestId: randomUUID(), agentId: "default", provider: "stub", tools: "none", prompt: "shell gate fixture" });
+      await vi.waitFor(() => expect(start).toHaveBeenCalledTimes(1));
+      return { options: start.mock.calls[0]![0], shellOptIn: service.shellOptIn };
+    } finally {
+      await service.close();
+      start.mockRestore();
+    }
+  }
+
+  it("passes allowUnconfinedShell only for AMC_UNSAFE_UNCONFINED_SHELL=1 in its own environment, and never to the child", async () => {
+    // Also ambient, so an allowlist leak into the child environment would show.
+    vi.stubEnv("AMC_UNSAFE_UNCONFINED_SHELL", "1");
+    const on = await studioStart({ AMC_UNSAFE_UNCONFINED_SHELL: "1" });
+    expect(on.options.allowUnconfinedShell).toBe(true);
+    expect(on.shellOptIn).toBe("sdk-option");
+    expect(on.options.env?.["AMC_UNSAFE_UNCONFINED_SHELL"]).toBeUndefined();
+    for (const value of [undefined, "true", "yes", " 1"]) {
+      const off = await studioStart(value === undefined ? {} : { AMC_UNSAFE_UNCONFINED_SHELL: value });
+      expect(off.options, String(value)).not.toHaveProperty("allowUnconfinedShell");
+      expect(off.shellOptIn, String(value)).toBeNull();
+      expect(off.options.env?.["AMC_UNSAFE_UNCONFINED_SHELL"]).toBeUndefined();
+    }
   });
 });
 

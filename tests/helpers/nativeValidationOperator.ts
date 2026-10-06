@@ -10,7 +10,6 @@ import { writeRuntimeFirewallPolicy } from "../../src/runtime/firewall.js";
 import { defaultToolsConfig } from "../../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot } from "../../src/toolhub/toolhubValidators.js";
 import { loadNativeValidationConfiguration } from "../../src/setup/nativeValidationConfig.js";
-import { signAmcConfig } from "../../src/config/amcConfigSignature.js";
 
 export type OutcomeCase = "success" | "nonzero" | "denied" | "budget";
 /** Disposable signed operator policy. No production credential or external model. */
@@ -18,11 +17,9 @@ export function validationOperatorFixture(workspace: string, mode: OutcomeCase) 
   mkdirSync(workspace, { recursive: true });
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
   // The checks run through the native shell. On macOS it is offered only by an
-  // explicit opt-in (P0-06); Studio accepts only the signed config key, so the
-  // fixture signs it. Linux ignores it and still requires Bubblewrap.
-  const configPath = join(workspace, ".amc", "amc.config.yaml");
-  writeFileSync(configPath, YAML.stringify({ ...YAML.parse(readFileSync(configPath, "utf8")), runtime: { shell: { allowUnconfined: true } } }));
-  signAmcConfig(workspace);
+  // explicit operator opt-in (P0-06), which no workspace file can grant: each
+  // caller passes --unsafe-unconfined-shell, allowUnconfinedShell, or starts
+  // Studio with AMC_UNSAFE_UNCONFINED_SHELL=1. Linux still requires Bubblewrap.
   const budget = defaultBudgets("default");
   if (mode === "budget") budget.budgets.perAgent.default!.daily.maxToolExecutes.WRITE_HIGH = 0;
   writeFileSync(budgetsPath(workspace), YAML.stringify(budget)); signBudgetsConfig(workspace);
