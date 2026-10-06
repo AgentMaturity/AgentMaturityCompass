@@ -10,7 +10,7 @@ import type {
 } from "./regulatorySchema.js";
 
 /** Date of the October 2026 regulatory-currency review. */
-export const REVIEWED = "2026-10-03";
+const REVIEWED = "2026-10-03";
 
 type Extra = Partial<Omit<RegulatoryInstrument, "id" | "citation" | "aliases">>;
 

@@ -85,12 +85,12 @@ export interface ComplianceFrameworkRef {
   external: boolean;
 }
 
-export const PACK_REVIEW_MAX_AGE_DAYS = 365;
+const PACK_REVIEW_MAX_AGE_DAYS = 365;
 /** Minimum questions per pack: the measured median (15) on 2026-10-03. */
 export const PACK_QUESTION_FLOOR = 15;
 /** Content version stamped on every pack by the October 2026 review. */
-export const PACK_CONTENT_VERSION = "2026.10";
-export const UNRESOLVED_JURISDICTION = "unresolved";
+const PACK_CONTENT_VERSION = "2026.10";
+const UNRESOLVED_JURISDICTION = "unresolved";
 
 /**
  * Hosts accepted as the official source of a verified instrument (exact host or
@@ -152,7 +152,7 @@ export function resolveRegulatoryRefParts(ref: string): Array<{ part: string; in
     .map((part) => ({ part, instrument: resolveRegulatoryInstrument(part) }));
 }
 
-export function toRegulatoryReference(text: string): RegulatoryReference {
+function toRegulatoryReference(text: string): RegulatoryReference {
   const inst = resolveRegulatoryInstrument(text);
   if (!inst) return { citation: text, jurisdiction: UNRESOLVED_JURISDICTION, status: "unverified", text, instrumentId: null };
   return {
