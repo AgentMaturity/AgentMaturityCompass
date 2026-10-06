@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { generateTrustCertificate, verifyTrustCertificateEnvelope } from "../src/cert/trustCertificate.js";
 import { initWorkspace } from "../src/workspace.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 
 /**
  * G3-01: three certificate systems shared one command group. `amc cert
@@ -45,7 +46,7 @@ describe("certificate artifacts are self-describing", () => {
     expect(generated.signatureStatus).toBe("UNSIGNED_PREVIEW");
 
     // The verifier must reject it as evidence rather than fail to read it.
-    const verdict = verifyTrustCertificateEnvelope(generated.envelope);
+    const verdict = verifyTrustCertificateEnvelope(generated.envelope, pinnedTrust([]));
     expect(verdict.ok).toBe(false);
     expect(verdict.errors.join(" ")).toMatch(/not verifier-ready/i);
   });

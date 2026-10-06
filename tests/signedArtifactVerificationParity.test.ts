@@ -20,6 +20,8 @@ import { passportPiiScanSchema } from "../src/passport/passportSchema.js";
 import { extractValidatedTarGzipArchive } from "../src/security/safeTarArchive.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { cleanupSignedArtifactVerification } from "../src/utils/signedArtifactVerification.js";
+import type { TrustContext } from "../src/trust/index.js";
+import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const archive = "unused-code/2026-10-02-native/signed-artifacts";
 const owned: string[] = [];
@@ -80,18 +82,30 @@ let workspace: string;
 let originalBinder: typeof binderVerifier;
 let originalPassport: typeof passportVerifier;
 let domains: Domain[];
+let operatorTrust: TrustContext;
+
+/**
+ * P0-09 PR 2: the passport verifier takes the operator's trust context and returns a report. The parity runs with the
+ * workspace's auditor key pinned (recorded at creation), keeps the getter order of the original parameters and
+ * compares every original field; the cases where P0-09 changes the verdict on purpose are asserted below.
+ */
+function passportWithTrust(params: VerifyParams, trust: TrustContext = operatorTrust): VerifyResult {
+  const { report: _report, ...rest } = passportVerifier.verifyPassportArtifactFile(Object.create(params, { trust: { value: trust } }));
+  return rest;
+}
 
 beforeAll(async () => {
   originalBinder = await originalModule<typeof binderVerifier>("src/audit/binderVerifier.ts");
   originalPassport = await originalModule<typeof passportVerifier>("src/passport/passportVerifier.ts");
   workspace = fixture();
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  operatorTrust = workspaceKeyTrust(workspace);
   savePassportPolicy(workspace, defaultPassportPolicy());
   const binder = await createAuditBinderArtifact({ workspace, scopeType: "WORKSPACE", outFile: join(workspace, "test.amcaudit") });
   const passport = createPassportArtifact({ workspace, scopeType: "WORKSPACE", outFile: join(workspace, "test.amcpass") });
   domains = [
     { name: "binder", directory: "amc-audit", file: binder.outFile, verify: binderVerifier.verifyAuditBinderFile, original: originalBinder.verifyAuditBinderFile },
-    { name: "passport", directory: "amc-passport", file: passport.outFile, verify: passportVerifier.verifyPassportArtifactFile, original: originalPassport.verifyPassportArtifactFile }
+    { name: "passport", directory: "amc-passport", file: passport.outFile, verify: (params) => passportWithTrust(params), original: originalPassport.verifyPassportArtifactFile }
   ];
 });
 
@@ -165,7 +179,10 @@ describe("entire archived signed artifact workflows against real local signature
           get publicKeyPath() { access.push("publicKeyPath"); return undefined; }
         });
         expect(d.verify(params(currentAccess))).toEqual(d.original(params(originalAccess)));
-        expect(currentAccess).toEqual(originalAccess);
+        // P0-09: the passport verifier no longer reads workspace keys to check the signature (the original read
+        // workspace a second time for that); the trust context decides instead.
+        expect(currentAccess).toEqual(name === "passport" ? originalAccess.slice(0, -1) : originalAccess);
+        if (name === "passport") expect(originalAccess.at(-1)).toBe("workspace");
       });
 
       test.each(["renamed child", "flat root"])("preserves %s root discovery", layout => {
@@ -224,10 +241,23 @@ describe("entire archived signed artifact workflows against real local signature
         const d = domain(), { root, document } = unpack(d);
         rmSync(join(document, "signer.pub"));
         const file = pack(root);
-        expect(codes(compare(d, { file }))).toContain("SIGNATURE_INVALID");
         const key = join(fixture(), "wrong.pub");
         writeFileSync(key, "invalid public key");
-        expect(codes(compare(d, { file, workspace, publicKeyPath: key }))).toContain("SIGNATURE_INVALID");
+        if (name === "binder") {
+          expect(codes(compare(d, { file }))).toContain("SIGNATURE_INVALID");
+          expect(codes(compare(d, { file, workspace, publicKeyPath: key }))).toContain("SIGNATURE_INVALID");
+          return;
+        }
+        // P0-09: the original refused because no key was named; now the signature is checked against the keys the
+        // artifact names (here only its envelope) and admission decides. Unpinned it is refused as not-pinned;
+        // with the operator's pin the same signature is admitted, whatever --pubkey text is supplied.
+        expect(codes(d.original({ file }))).toContain("SIGNATURE_INVALID");
+        expect(codes(d.original({ file, workspace, publicKeyPath: key }))).toContain("SIGNATURE_INVALID");
+        const unpinned = passportVerifier.verifyPassportArtifactFile({ file, trust: pinnedTrust([]) });
+        expect(unpinned.ok).toBe(false);
+        expect(unpinned.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
+        expect(passportWithTrust({ file }).ok).toBe(true);
+        expect(passportWithTrust({ file, workspace, publicKeyPath: key }).ok).toBe(true);
       });
 
       test.each(["missing scan", "failed scan", "malformed scan", "checksum mismatch", "missing checksum"])("privacy %s retains the domain policy", tamper => {
@@ -303,9 +333,11 @@ describe("entire archived signed artifact workflows against real local signature
         const dir = join(document, "proofs", "inclusion");
         mkdirSync(dir, { recursive: true });
         writeFileSync(join(dir, "added.json"), JSON.stringify({ v: 1, proofId: "unexpected-proof", eventHash: "a".repeat(64), rootHash: "b".repeat(64), merklePath: [], verifiedBy: "amc" }));
-        const result = compare(d, { file: pack(root) });
+        // P0-09: a passport proof is also bound to the signed merkle root, which adds a refusal the original lacked.
+        const result = name === "binder" ? compare(d, { file: pack(root) }) : passportWithTrust({ file: pack(root) });
         expect(codes(result)).toContain("PROOF_INVALID");
         expect(codes(result)).toContain("PROOF_IDS_MISMATCH");
+        if (name === "passport") expect(result.errors.map(row => row.message)).toContain("inclusion proof unexpected-proof does not resolve to the signed merkle root");
       });
 
       test("root and calculation-manifest hash tampering refuses", () => {
@@ -314,9 +346,13 @@ describe("entire archived signed artifact workflows against real local signature
           const { root, document } = unpack(d);
           mkdirSync(dirname(join(document, path)), { recursive: true });
           writeFileSync(join(document, path), "{}");
-          const result = compare(d, { file: pack(root) });
+          // P0-09: a passport's inclusion proofs are also checked against the signed merkle root, so replacing that
+          // root adds proof refusals the original lacked; every other case keeps exact parity.
+          const signedRoot = name === "passport" && path === "proofs/merkle.root.json";
+          const result = signedRoot ? passportWithTrust({ file: pack(root) }) : compare(d, { file: pack(root) });
           expect(result.ok).toBe(false);
           expect(codes(result).some(code => code.endsWith("SHA_MISMATCH"))).toBe(true);
+          if (signedRoot) expect(result.errors.map(row => row.message)).toContain("signed merkle root digest mismatch");
         }
       });
 
@@ -395,7 +431,7 @@ describe("entire archived signed artifact workflows against real local signature
 
   test("passport revocation remains enforced with workspace trust", () => {
     const d = domains.find(row => row.name === "passport")!;
-    const verified = passportVerifier.verifyPassportArtifactFile({ file: d.file, workspace });
+    const verified = passportVerifier.verifyPassportArtifactFile({ file: d.file, workspace, trust: operatorTrust });
     revokePassport({ workspace, passportId: verified.passport!.passportId, reason: "parity test revocation" });
     expect(codes(compare(d, { file: d.file, workspace }))).toContain("PASSPORT_REVOKED");
   });

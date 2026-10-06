@@ -5,6 +5,10 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { generateTrustCertificate, verifyTrustCertificateEnvelope } from "../src/cert/trustCertificate.js";
 import { sha256Hex } from "../src/utils/hash.js";
+import { pinnedTrust, workspaceKeyPem } from "./helpers/trustContext.js";
+
+/** The workspace operator pins the auditor key that signs its trust certificates (P0-09). */
+const auditorTrust = (workspace: string) => pinnedTrust([{ publicKeyPem: workspaceKeyPem(workspace, "auditor"), purposes: ["artifact-seal"] }]);
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -82,7 +86,7 @@ describe("generateTrustCertificate", () => {
     expect(out.envelope.payload.score).toBe(82);
     expect(out.envelope.payload.evidenceHashChain.eventCount).toBe(2);
     expect(out.envelope.payload.validity.daysValid).toBe(45);
-    expect(verifyTrustCertificateEnvelope(out.envelope).ok).toBe(true);
+    expect(verifyTrustCertificateEnvelope(out.envelope, auditorTrust(workspace)).ok).toBe(true);
   });
 
   test("detects tampering when payload is modified", () => {
@@ -104,7 +108,7 @@ describe("generateTrustCertificate", () => {
       }
     };
 
-    const verified = verifyTrustCertificateEnvelope(tampered);
+    const verified = verifyTrustCertificateEnvelope(tampered, auditorTrust(workspace));
     expect(verified.ok).toBe(false);
     expect(verified.errors.some((error) => error.includes("payloadSha256"))).toBe(true);
   });
@@ -130,7 +134,7 @@ describe("generateTrustCertificate", () => {
     expect(out.envelope.payload.signingKey.kind).toBe("preview");
     expect(out.envelope.payload.score).toBe(73);
 
-    const verified = verifyTrustCertificateEnvelope(out.envelope);
+    const verified = verifyTrustCertificateEnvelope(out.envelope, pinnedTrust([]));
     expect(verified.ok).toBe(false);
     expect(verified.errors.some((error) => error.includes("unsigned preview certificate"))).toBe(true);
   });

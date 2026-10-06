@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from "node:crypto";
+import { createPublicKey, generateKeyPairSync } from "node:crypto";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,6 +10,7 @@ import { writeSbom } from "../src/release/releaseSbom.js";
 import { writeLicenseInventory } from "../src/release/releaseLicenses.js";
 import { scanReleaseArchive } from "../src/release/releaseSecretScan.js";
 import { canonicalize } from "../src/utils/json.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 
 const workspace = process.cwd();
 
@@ -19,6 +20,12 @@ function tmp(prefix: string): string {
 
 function makePrivateKeyPem(): string {
   return generateKeyPairSync("ed25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+}
+
+/** The release signer pins the public half of the key it generated (P0-09). */
+function releaseTrust(privateKeyPath: string) {
+  const publicKeyPem = createPublicKey(readFileSync(privateKeyPath, "utf8")).export({ format: "pem", type: "spki" }).toString();
+  return pinnedTrust([{ publicKeyPem, purposes: ["release"] }]);
 }
 
 function repackFromDir(sourceDir: string, outFile: string): void {
@@ -42,7 +49,7 @@ describe("release engineering pack", () => {
         skipInstallBuild: true
       });
       expect(packed.manifest.package.name).toBe("agent-maturity-compass");
-      const verified = verifyReleaseBundle(outFile);
+      const verified = verifyReleaseBundle(outFile, releaseTrust(privateKeyPath));
       expect(verified.ok).toBe(true);
       const summary = printReleaseBundleSummary(outFile);
       expect(summary.manifest.package.version).toBeTruthy();
@@ -75,7 +82,7 @@ describe("release engineering pack", () => {
       writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
       const tamperedManifestBundle = join(dir, "tampered-manifest.amcrelease");
       repackFromDir(join(dir, "amc-release"), tamperedManifestBundle);
-      expect(verifyReleaseBundle(tamperedManifestBundle).ok).toBe(false);
+      expect(verifyReleaseBundle(tamperedManifestBundle, releaseTrust(privateKeyPath)).ok).toBe(false);
 
       // re-extract from original and tamper an artifact file
       rmSync(join(dir, "amc-release"), { recursive: true, force: true });
@@ -84,12 +91,15 @@ describe("release engineering pack", () => {
       writeFileSync(sbomPath, `${readFileSync(sbomPath, "utf8")}\n/*tamper*/\n`);
       const tamperedArtifactBundle = join(dir, "tampered-artifact.amcrelease");
       repackFromDir(join(dir, "amc-release"), tamperedArtifactBundle);
-      expect(verifyReleaseBundle(tamperedArtifactBundle).ok).toBe(false);
+      expect(verifyReleaseBundle(tamperedArtifactBundle, releaseTrust(privateKeyPath)).ok).toBe(false);
 
       const wrongPubPath = join(dir, "wrong.pub");
       const wrongPub = generateKeyPairSync("ed25519").publicKey.export({ format: "pem", type: "spki" }).toString();
       writeFileSync(wrongPubPath, wrongPub);
-      expect(verifyReleaseBundle(outFile, wrongPubPath).ok).toBe(false);
+      // The embedded key still verifies the signature, but a different pinned key does not admit it.
+      const wrongPin = verifyReleaseBundle(outFile, pinnedTrust([{ publicKeyPem: wrongPub, purposes: ["release"] }]), wrongPubPath);
+      expect(wrongPin.ok).toBe(false);
+      expect(wrongPin.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
     } finally {
       rmSync(dir, { recursive: true, force: true });
       rmSync(extracted, { recursive: true, force: true });

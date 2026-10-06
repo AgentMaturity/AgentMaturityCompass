@@ -17,6 +17,7 @@ import {
 import { passportCompareCli, passportShareCli } from "../src/passport/passportCli.js";
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { savePassportPolicy } from "../src/passport/passportStore.js";
+import { operatorTrustHome, workspaceKeyPem } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -387,14 +388,28 @@ describe("passport public API + sharing + comparison", () => {
       base: 3.1
     });
     const created = createAgentPassport(ws, "agent-a");
-    const out = await callApi({
+    const verify = () => callApi({
       workspace: ws,
       pathname: `/api/v1/passport/${created.passport.passportId}/verify`,
       method: "GET"
     });
-    expect(out.status).toBe(200);
-    expect(out.json.ok).toBe(true);
-    expect(out.json.data.ok).toBe(true);
+    // P0-09: the endpoint uses the server operator's trust list, never the workspace's own keys.
+    const previousHome = process.env.AMC_HOME;
+    process.env.AMC_HOME = mkdtempSync(join(tmpdir(), "amc-passport-public-home-"));
+    roots.push(process.env.AMC_HOME);
+    try {
+      const unpinned = await verify();
+      expect(unpinned.status).toBe(422);
+      process.env.AMC_HOME = operatorTrustHome([{ publicKeyPem: workspaceKeyPem(ws, "auditor"), purposes: ["artifact-seal"] }]);
+      roots.push(process.env.AMC_HOME);
+      const out = await verify();
+      expect(out.status).toBe(200);
+      expect(out.json.ok).toBe(true);
+      expect(out.json.data.ok).toBe(true);
+    } finally {
+      if (previousHome === undefined) delete process.env.AMC_HOME;
+      else process.env.AMC_HOME = previousHome;
+    }
   });
 
   test("POST /api/v1/passport/:id/revoke requires admin token and then fails verify", async () => {

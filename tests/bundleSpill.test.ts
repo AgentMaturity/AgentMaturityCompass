@@ -15,6 +15,7 @@ import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { getVaultSecretReadOnly, lockVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { BundleManifest, EvidenceEvent } from "../src/types.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const FULL = Buffer.from(`synthetic-bundle-head\n${"private-spill-middle-sentinel-".repeat(220)}\nsynthetic-bundle-tail`);
 const LEGACY = Buffer.from("private-historical-spill-only-fixture-".repeat(60));
@@ -162,7 +163,7 @@ describe("portable evidence bundles retain encrypted spill commitments and expli
     }
     lockVault(workspace);
     delete process.env.AMC_VAULT_PASSPHRASE;
-    const verified = await verifyEvidenceBundle(artifact.bundle);
+    const verified = await verifyEvidenceBundle(artifact.bundle, workspaceKeyTrust(workspace));
     expect(verified.ok, verified.errors.join("; ")).toBe(true);
     expect(verified.retainedSpills).toEqual({ objectsComplete: true, plaintextVerified: false, gaps: [] });
   }, 60_000);
@@ -179,7 +180,7 @@ describe("portable evidence bundles retain encrypted spill commitments and expli
       expect(bytes.includes(FULL), file).toBe(false);
       expect(bytes.includes(LEGACY), file).toBe(false);
     }
-    const verified = await verifyEvidenceBundle(artifact.bundle);
+    const verified = await verifyEvidenceBundle(artifact.bundle, workspaceKeyTrust(workspace));
     expect(verified.ok, verified.errors.join("; ")).toBe(true);
     expect(verified.retainedSpills?.objectsComplete).toBe(false);
     expect(verified.retainedSpills?.plaintextVerified).toBe(false);
@@ -208,7 +209,7 @@ describe("portable evidence bundles retain encrypted spill commitments and expli
     resignManifest(artifact.root);
     const attacked = join(temporary("amc-bundle-spill-attack-"), "changed.amcbundle");
     archive("create", attacked, artifact.root);
-    const verified = await verifyEvidenceBundle(attacked);
+    const verified = await verifyEvidenceBundle(attacked, workspaceKeyTrust(workspace));
     expect(verified.ok).toBe(false);
     expect(verified.errors.join("; ")).toMatch(/spill.*(commitment|refus|differ|match|authoriz)/i);
     expect(verified.errors.join("; ")).not.toMatch(/Manifest signature verification failed|File hash mismatch/i);

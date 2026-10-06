@@ -14,6 +14,7 @@ import { stableStandardSchemaSnapshot } from "../src/standard/standardTests.js";
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { passportPolicySigPath, savePassportPolicy } from "../src/passport/passportStore.js";
 import { scanPassportForPii } from "../src/passport/passportRedaction.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -107,7 +108,8 @@ describe("agent passport + open standard", () => {
 
     const verified = verifyPassportArtifactFile({
       workspace: ws,
-      file: created.outFile
+      file: created.outFile,
+      trust: workspaceKeyTrust(ws)
     });
     expect(verified.ok, JSON.stringify(verified.errors)).toBe(true);
 
@@ -117,7 +119,8 @@ describe("agent passport + open standard", () => {
     writeFileSync(tamperedFile, bytes);
     const tampered = verifyPassportArtifactFile({
       workspace: ws,
-      file: tamperedFile
+      file: tamperedFile,
+      trust: workspaceKeyTrust(ws)
     });
     expect(tampered.ok).toBe(false);
   });

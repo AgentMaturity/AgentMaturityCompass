@@ -1,6 +1,8 @@
-import { readFileSync } from "node:fs";
+import { generateKeyPairSync } from "node:crypto";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ed25519KeyId, type KeyPurpose, type TrustContext } from "../../src/trust/index.js";
+import { ed25519KeyId, signTrustList, type KeyPurpose, type TrustContext } from "../../src/trust/index.js";
 
 /**
  * Verifier trust for tests (P0-09). Verifiers no longer trust the keys an artifact carries, so a test states which
@@ -48,4 +50,28 @@ export function keyHistoryTrust(auditorPem: string, monitorPem: string): TrustCo
       distrust: []
     }]
   };
+}
+
+/**
+ * An operator's AMC home with a signed trust list that pins these keys, for API routes that build their context
+ * from the server's AMC home (P0-09 step 11). The caller owns and removes the returned directory.
+ */
+export function operatorTrustHome(pins: readonly TestPin[]): string {
+  const home = mkdtempSync(join(tmpdir(), "amc-operator-home-"));
+  const root = generateKeyPairSync("ed25519");
+  const rootPem = root.publicKey.export({ format: "pem", type: "spki" }).toString();
+  const now = Date.now();
+  const signed = signTrustList({
+    type: "amc.trust-list", version: 1, listId: "test-operator", sequence: 1,
+    issuedAt: new Date(now - 3_600_000).toISOString(), expiresAt: new Date(now + 86_400_000).toISOString(),
+    entries: pins.map(pin => ({
+      keyId: ed25519KeyId(pin.publicKeyPem)!, algorithm: "ed25519" as const, publicKeyPem: pin.publicKeyPem, purposes: [...pin.purposes],
+      subject: "test operator pin", validFrom: new Date(now - 3_600_000).toISOString(), validTo: null, source: "operator"
+    })),
+    distrust: []
+  }, root.privateKey.export({ format: "pem", type: "pkcs8" }).toString());
+  mkdirSync(join(home, "trust"), { recursive: true, mode: 0o700 });
+  writeFileSync(join(home, "trust", "amc-trust-list.json"), JSON.stringify(signed), { mode: 0o600 });
+  writeFileSync(join(home, "trust", "trust-roots.json"), JSON.stringify({ type: "amc.trust-roots", version: 1, roots: [ed25519KeyId(rootPem)] }), { mode: 0o600 });
+  return home;
 }

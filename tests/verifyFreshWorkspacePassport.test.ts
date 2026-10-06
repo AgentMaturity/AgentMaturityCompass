@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { verifyAll } from "../src/verify/verifyAll.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 describe("verify all on a fresh workspace (first-run passport boundary)", () => {
   let dir: string;
@@ -18,7 +19,7 @@ describe("verify all on a fresh workspace (first-run passport boundary)", () => 
   });
 
   test("uninitialized passport reports SKIP, not a critical failure", async () => {
-    const report = await verifyAll({ workspace: dir });
+    const report = await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) });
     const policy = report.checks.find((check) => check.id === "passport-policy-signature");
     const integrity = report.checks.find((check) => check.id === "passport-workspace-integrity");
     expect(policy?.status).toBe("SKIP");
@@ -34,7 +35,7 @@ describe("verify all on a fresh workspace (first-run passport boundary)", () => 
     const cacheDir = join(dir, ".amc", "passport", "cache");
     mkdirSync(cacheDir, { recursive: true });
     writeFileSync(join(cacheDir, "latest_agent_default.json"), "{}");
-    const report = await verifyAll({ workspace: dir });
+    const report = await verifyAll({ workspace: dir, trust: workspaceKeyTrust(dir) });
     const policy = report.checks.find((check) => check.id === "passport-policy-signature");
     expect(policy?.status).toBe("FAIL");
     expect(report.criticalFail).toBe(true);

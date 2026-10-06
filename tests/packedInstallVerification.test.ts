@@ -41,6 +41,18 @@ describe("packed runtime evidence gate", () => {
     expect(calls).toEqual([["session", "verify", "--json"], ["agent-loop", "verify", "installed-session", "--json"]]);
   });
 
+  it("anchors both cold verifiers to the monitor fingerprint recorded at init (P0-09)", () => {
+    const f = fixture();
+    const calls: string[][] = [];
+    const pin = "a".repeat(64);
+    expect(verifyPackedRun({ summary: f.summary, expectMonitor: pin, runCommand: (_label: string, args: string[]) => {
+      calls.push(args);
+      return { ok: true, stdout: JSON.stringify(calls.length === 1 ? f.ledger : f.run) };
+    } })).toBe(true);
+    expect(calls).toEqual([["session", "verify", "--json", "--expect-monitor", pin],
+      ["agent-loop", "verify", "installed-session", "--json", "--expect-monitor", pin]]);
+  });
+
   it("refuses a completed signed summary when payload verification failed", () => {
     const f = fixture();
     f.ledger.ok = false; f.ledger.chain.ok = false; f.ledger.errors = ["payload authentication failed"];

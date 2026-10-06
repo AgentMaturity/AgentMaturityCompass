@@ -10,6 +10,9 @@ import { signReleaseManifest } from "../src/release/releaseSigner.js";
 import { fileSha256, runTarCreate, runTarExtract } from "../src/release/releaseUtils.js";
 import type { ReleaseManifest } from "../src/release/releaseSchema.js";
 import { canonicalize } from "../src/utils/json.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
+
+const releaseTrust = (publicKeyPath: string) => pinnedTrust([{ publicKeyPem: readFileSync(publicKeyPath, "utf8"), purposes: ["release"] }]);
 
 const temporary: string[] = [];
 afterEach(() => {
@@ -66,7 +69,7 @@ describe("release scan authority", () => {
   it("independently refuses secret-bearing npm members despite valid hashes, signature and a PASS report", () => {
     const f = fixture();
     createReleaseBundle(f);
-    expect(verifyReleaseBundle(f.outFile, f.publicKeyPath).ok).toBe(true);
+    expect(verifyReleaseBundle(f.outFile, releaseTrust(f.publicKeyPath), f.publicKeyPath).ok).toBe(true);
     const extracted = join(f.dir, "extract");
     mkdirSync(extracted);
     runTarExtract(f.outFile, extracted);
@@ -81,7 +84,7 @@ describe("release scan authority", () => {
     manifest.artifacts.npmTgzSha256 = fileSha256(npmPath);
     const changed = join(f.dir, "changed.amcrelease");
     resign(f, root, manifest, changed);
-    const verified = verifyReleaseBundle(changed, f.publicKeyPath);
+    const verified = verifyReleaseBundle(changed, releaseTrust(f.publicKeyPath), f.publicKeyPath);
     expect(verified.ok).toBe(false);
     expect(verified.errors.some(error => /content secret scan/i.test(error))).toBe(true);
     expect(verified.errors.some(error => /signature|sha mismatch/i.test(error))).toBe(false);
@@ -103,7 +106,7 @@ describe("release scan authority", () => {
     manifest.artifacts.secretScanSha256 = fileSha256(reportPath);
     const changed = join(f.dir, "changed.amcrelease");
     resign(f, root, manifest, changed);
-    const verified = verifyReleaseBundle(changed, f.publicKeyPath);
+    const verified = verifyReleaseBundle(changed, releaseTrust(f.publicKeyPath), f.publicKeyPath);
     expect(verified.ok).toBe(false);
     expect(verified.errors.some(error => /signature|sha mismatch/i.test(error))).toBe(false);
   });
@@ -116,6 +119,6 @@ describe("release scan authority", () => {
     expect(install.status).toBe(0);
     const packed = createReleaseBundle({ ...f, skipInstallBuild: false });
     expect(existsSync(join(f.workspace, "dist", "built.txt"))).toBe(true);
-    expect(verifyReleaseBundle(packed.outFile, f.publicKeyPath).ok).toBe(true);
+    expect(verifyReleaseBundle(packed.outFile, releaseTrust(f.publicKeyPath), f.publicKeyPath).ok).toBe(true);
   });
 });
