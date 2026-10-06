@@ -24,7 +24,7 @@ const MANIFEST = "unused-code/plan-edits/manifest.json";
 const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;
 const USAGE = "Usage: node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <rev> <path>...";
 const EMPTY = { schemaVersion: 1, decision: "D-15", files: [] };
-const PACKAGE_JSON = "package.json is pinned by entries in tests/helpers/packageEntries.ts, not by snapshot";
+// package.json is archived like any other frozen file: the P0-01 package-entries pin reads its landed bytes.
 const sha256 = bytes => createHash("sha256").update(bytes).digest("hex");
 
 function git(cwd, args, encoding = "utf8") {
@@ -88,7 +88,6 @@ function snapshotPlanEdit({ cwd, issue, base, paths }) {
   const requested = paths.map(input => {
     const path = relative(root, resolve(cwd, input)).split(sep).join("/");
     if (!path || isAbsolute(path) || path === ".." || path.startsWith("../")) throw new Error(`Path is outside the repository: ${input}`);
-    if (path === "package.json") throw new Error(PACKAGE_JSON);
     if (registered(path)) throw new Error(`${path} is already registered; the first issue's snapshot stays: ${JSON.stringify(registered(path))}`);
     return path;
   });

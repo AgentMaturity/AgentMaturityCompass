@@ -6,7 +6,6 @@
   "main": "dist/index.js",
   "files": [
     "dist/**",
-    "dist/trust/amc-distrust.json",
     "!dist/sea/**",
     "!dist/installers/**",
     "scripts/postinstall.js",
@@ -69,7 +68,6 @@
     "check:counts": "node scripts/gen-counts.mjs --check",
     "check:freeze": "node scripts/check-freeze.mjs",
     "check:qualification": "node scripts/check-qualification-receipts.mjs",
-    "trust-list": "node scripts/trust-list.mjs",
     "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
     "check:evidence-paths": "node scripts/evidence-path-check.mjs",
     "gen:api-ref": "node scripts/gen-api-ref.cjs",
@@ -149,10 +147,6 @@
     "./telemetry/pi": {
       "types": "./dist/importers/piTelemetryCallbacks.d.ts",
       "import": "./dist/importers/piTelemetryCallbacks.js"
-    },
-    "./trust": {
-      "types": "./dist/trust/index.d.ts",
-      "import": "./dist/trust/index.js"
     }
   },
   "dependencies": {
@@ -203,8 +197,7 @@
       "qs": ">=6.16.0",
       "fast-uri": "^3.1.8",
       "@modelcontextprotocol/sdk>hono": "^4.13.5",
-      "ip-address": "^10.7.1",
-      "proxy-addr": "^2.0.8"
+      "ip-address": "^10.7.1"
     }
   }
 }

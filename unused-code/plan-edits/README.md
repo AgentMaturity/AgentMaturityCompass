@@ -20,7 +20,7 @@ Run this once, before you rebuild `dist/`, with your issue key and the commit yo
 node scripts/snapshot-plan-edit.mjs --issue <KEY> --base <base-commit> <path>...
 ```
 
-Commit `manifest.json` and the new `.landed` archive with the edit. The first issue to edit a file archives it; a later issue that edits the same file keeps that entry, because the proof is about the original landed bytes. The script refuses a path that is already registered, an issue key that does not match `P[0-3]-NN`, a path that is outside the repository or is not a file at the base commit, and `package.json`, which `tests/helpers/packageEntries.ts` pins by its entries instead.
+Commit `manifest.json` and the new `.landed` archive with the edit. The first issue to edit a file archives it; a later issue that edits the same file keeps that entry, because the proof is about the original landed bytes. The script refuses a path that is already registered, an issue key that does not match `P[0-3]-NN` and a path that is outside the repository or is not a file at the base commit. `package.json` is snapshotted the same way: `tests/helpers/packageEntries.ts` pins its entries (name, type, main, types, exports, bin and files), and the four tests that use that pin read its landed bytes.
 
 ## Build outputs under `dist/`
 

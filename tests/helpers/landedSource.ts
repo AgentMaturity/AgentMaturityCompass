@@ -14,6 +14,8 @@ export type PlanEdit = { path: string; issue: string; baseCommit: string; archiv
 const PLAN_EDITS_MANIFEST = "unused-code/plan-edits/manifest.json";
 const ISSUE_KEY = /^P[0-3]-[0-9]{2}$/;
 const sha256 = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
+// package.json was refused here while only P0-01's package-entries pin froze it. P0-09 must change its
+// exports and files, so it is snapshotted like any other frozen file and the entries pin reads landed bytes.
 
 export function validatePlanEdits(value: unknown): readonly PlanEdit[] {
   const manifest = value as { schemaVersion?: unknown; decision?: unknown; files?: unknown } | null;
@@ -25,7 +27,6 @@ export function validatePlanEdits(value: unknown): readonly PlanEdit[] {
     const fail = (reason: string) => { throw new Error(`Invalid plan-edits entry ${index} (${String(row?.path)}): ${reason}`); };
     if (typeof row?.path !== "string" || row.path.includes("\\")
       || row.path.split("/").some(part => part === "" || part === "." || part === "..")) fail("path must be repo-relative POSIX");
-    if (row.path === "package.json") fail("package.json is pinned by entries in tests/helpers/packageEntries.ts, not by snapshot");
     if (!ISSUE_KEY.test(row.issue)) fail("issue must match " + ISSUE_KEY);
     if (!/^[0-9a-f]{40}$/.test(row.baseCommit)) fail("baseCommit must be 40 hex");
     if (row.archivePath !== `unused-code/plan-edits/${row.issue}/${row.path}.landed`) fail("archivePath must be unused-code/plan-edits/<issue>/<path>.landed");

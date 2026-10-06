@@ -93,9 +93,11 @@ describe("committed plan-edits manifest (D-15)", () => {
       [manifest([entry({ issue: "P9-01", archivePath: "unused-code/plan-edits/P9-01/src/a.ts.landed" })]), "issue"],
       [manifest([entry({ path: "../outside.ts", archivePath: "unused-code/plan-edits/P0-06/../outside.ts.landed" })]), "path"],
       [manifest([entry({ path: "src\\a.ts", archivePath: "unused-code/plan-edits/P0-06/src\\a.ts.landed" })]), "path"],
-      [manifest([entry({ path: "package.json", archivePath: "unused-code/plan-edits/P0-06/package.json.landed" })]), "tests/helpers/packageEntries.ts"],
     ];
     for (const [value, reason] of bad) expect(() => validatePlanEdits(value), reason).toThrow(reason);
+    // package.json is snapshotted like any frozen file; the entries pin then reads its landed bytes.
+    const pkg = entry({ path: "package.json", archivePath: "unused-code/plan-edits/P0-06/package.json.landed" });
+    expect(validatePlanEdits(manifest([pkg]))).toEqual([pkg]);
   });
 });
 
@@ -180,7 +182,6 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
       [["--issue", "P0-06", "--base", "HEAD", "../outside.ts"], "outside the repository"],
       [["--issue", "P0-06", "--base", "HEAD", "src/missing.ts"], "not present at HEAD"],
       [["--issue", "P0-06", "--base", "HEAD", "src"], "not present at HEAD"],
-      [["--issue", "P0-06", "--base", "HEAD", "package.json"], "pinned by entries in tests/helpers/packageEntries.ts"],
       [["--issue", "P0-06", "--base", "HEAD"], "Usage"],
     ] as const) {
       const result = snapshot(root, ...args);
@@ -188,6 +189,19 @@ describe("scripts/snapshot-plan-edit.mjs", () => {
       expect(result.stderr).toContain(message);
     }
     expect(git(root, "status", "--porcelain", "--untracked-files=all")).toBe("M src/a.ts");
+  });
+
+  it("archives package.json at the base, so the package-entries pin keeps reading the landed manifest", () => {
+    const { root } = repo();
+    put(root, "package.json", '{"name":"at-base"}\n');
+    git(root, "add", "package.json");
+    git(root, "commit", "-q", "-m", "package");
+    put(root, "package.json", '{"name":"edited","exports":{"./trust":"./dist/trust/index.js"}}\n');
+    const result = snapshot(root, "--issue", "P0-09", "--base", "HEAD", "package.json");
+    expect(result.stderr).toBe("");
+    expect(result.status).toBe(0);
+    expect(read(root).files.map(row => [row.path, row.baseCommit])).toEqual([["package.json", git(root, "rev-parse", "HEAD")]]);
+    expect(landedSourceAt(root).landedText("package.json")).toBe('{"name":"at-base"}\n');
   });
 
   it("runs when invoked through a symlinked script path", () => {

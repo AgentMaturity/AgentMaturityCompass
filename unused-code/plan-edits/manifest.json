@@ -17,6 +17,13 @@
       "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
     },
     {
+      "path": "package.json",
+      "issue": "P0-09",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+    },
+    {
       "path": "pnpm-lock.yaml",
       "issue": "P0-49",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",

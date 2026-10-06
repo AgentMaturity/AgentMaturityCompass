@@ -24,3 +24,7 @@ Claim kinds (`synthetic_example`, `self_reported`, `observed`, `independently_re
 - Agents cannot submit question-level scores directly (current implementation: 89-question bank).
 - Auto-answering derives measured levels from ledger events, receipts, approvals, policy checks, assurance runs, and signed config state.
 - All critical artifacts and state transitions are signed and auditable.
+
+## Issuer keys
+
+A signature shows who signed a record and that it is unchanged, not that the record is true, and a key shipped inside an artifact cannot vouch for that artifact. `agent-maturity-compass/trust` adds signed trust lists and an admission check that counts a signature only when the verifier operator pinned its key for that purpose. `evidence-authority` and `independent-attestation` are purposes there, and a workspace's own keys are never admitted for them. No verify command or trust tier uses this yet: P0-09 PR 2 and PR 3 wire the verifiers, and P0-18 ties trust tiers to provenance. See `docs/TRUST_LIST.md`.
