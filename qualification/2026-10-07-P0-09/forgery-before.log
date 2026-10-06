@@ -1,0 +1,619 @@
+# Forgery suite and amc verify CLI test on 9b905870 (worktree build), test files from 6b7e7bf5
+# npx vitest run --reporter=verbose tests/trust/embeddedKeyForgery.test.ts tests/ledgerTrustRootAnchorCli.test.ts
+
+ RUN  v4.1.11 <worktree@9b905870>
+
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ × tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails the workspace-write forgery as UNANCHORED by default 1065ms
+   → Ledger verification PASSED
+  Unanchored: this checked internal consistency, not authorship.
+  Signed by monitor key 218d11cfc7e04103…, read from inside the workspace.
+  To make this adversarial, pin the expected fingerprint out of band:
+    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>
+
+: expected +0 to be 1 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 805ms
+   → Bundle verification PASSED
+runId=9d65ca2d-c486-42be-b10b-80b85d96ac3f agentId=default
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy still fails when the legitimate key is pinned 749ms
+ × tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor 812ms
+   → expected '\nerror: unknown option \'--expect-mo…' to contain 'trust root'
+ × tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > passes a clean workspace whose monitor key is pinned 806ms
+   → 
+error: unknown option '--expect-monitor'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with its key pinned is trusted 648ms
+   → 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a clean workspace whose monitor key is not pinned 820ms
+   → Ledger verification PASSED
+  Unanchored: this checked internal consistency, not authorship.
+  Signed by monitor key ab4779d73efdf8f2…, read from inside the workspace.
+  To make this adversarial, pin the expected fingerprint out of band:
+    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>
+
+: expected +0 to be 1 // Object.is equality
+ × tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > gives an integrity-only result with exit 2 under --allow-unanchored 830ms
+   → 
+error: unknown option '--allow-unanchored'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 663ms
+   → 
+error: unknown option '--expect-monitor'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy re-signed with an embedded key fails as not-pinned by default 816ms
+   → Certificate verification PASSED
+certId=7b27cf0c-c5ac-47eb-b110-4a7230aef685
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy still fails when the legitimate key is pinned 714ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with its key pinned is trusted 619ms
+   → 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 615ms
+   → 
+error: unknown option '--expect-monitor'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy re-signed with an embedded key fails as not-pinned by default 633ms
+   → Revocation verification PASSED
+certId=7b27cf0c-c5ac-47eb-b110-4a7230aef685
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy still fails when the legitimate key is pinned 613ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with its key pinned is trusted 617ms
+   → 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 630ms
+   → 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a revocation signed by a different pinned key does not revoke the certificate 633ms
+   → expected '\nerror: unknown option \'--pubkey\'\…' to contain 'revocation issuer does not match cert…'
+ × tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 718ms
+   → Passport verified
+passportId: pass_97a9c441897a04e15d5ae526d69875d0
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy still fails when the legitimate key is pinned 712ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with its key pinned is trusted 686ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 633ms
+   → 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a distrusted key is refused even when it is pinned with --pubkey 611ms
+   → expected '\nerror: unknown option \'--trust-lis…' to contain 'distrusted'
+ × tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a passport whose inclusion proof carries its own fabricated root is refused 731ms
+   → Passport verified
+passportId: pass_97a9c441897a04e15d5ae526d69875d0
+
+: expected +0 to be 1 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 692ms
+   → Assurance certificate verification PASSED
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy still fails when the legitimate key is pinned 657ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with its key pinned is trusted 612ms
+   → 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 612ms
+   → 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > an assurance certificate whose inclusion proof carries its own fabricated root is refused 633ms
+   → expected '\nerror: unknown option \'--pubkey\'\…' to contain 'signed merkle root'
+ × tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy re-signed with an embedded key fails as not-pinned by default 623ms
+   → Certificate verification PASSED
+certId=unknown
+type=amc-trust-certificate
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy still fails when the legitimate key is pinned 617ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with its key pinned is trusted 635ms
+   → 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 638ms
+   → 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+ × tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy re-signed with an embedded key fails as not-pinned by default 710ms
+   → package: agent-maturity-compass@1.0.0
+git: commit=ffffffffffffffffffffffffffffffffffffffff tag=none
+integrity: PASS
+
+: expected +0 to be 1 // Object.is equality
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy still fails when the legitimate key is pinned 684ms
+ ✓ tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with its key pinned is trusted 665ms
+ × tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2 625ms
+   → 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 28 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails the workspace-write forgery as UNANCHORED by default
+AssertionError: Ledger verification PASSED
+  Unanchored: this checked internal consistency, not authorship.
+  Signed by monitor key 218d11cfc7e04103…, read from inside the workspace.
+  To make this adversarial, pin the expected fingerprint out of band:
+    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:84:42
+     82|     forge(workspace);
+     83|     const result = amcVerify(workspace);
+     84|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     85|     expect(result.output).toContain("UNANCHORED");
+     86|     expect(result.output).not.toContain("Ledger verification PASSED");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/28]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor
+AssertionError: expected '\nerror: unknown option \'--expect-mo…' to contain 'trust root'
+
+- Expected
++ Received
+
+- trust root
++
++ error: unknown option '--expect-monitor'
++
++ Tip: add '--help' after any command to see available options.
++
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:94:27
+     92|     const result = amcVerify(workspace, ["--expect-monitor", fingerpri…
+     93|     expect(result.status, result.output).toBe(1);
+     94|     expect(result.output).toContain("trust root");
+       |                           ^
+     95|   });
+     96|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/28]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > passes a clean workspace whose monitor key is pinned
+AssertionError: 
+error: unknown option '--expect-monitor'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:100:42
+     98|     const { workspace, fingerprint } = buildWorkspace();
+     99|     const result = amcVerify(workspace, ["--expect-monitor", fingerpri…
+    100|     expect(result.status, result.output).toBe(0);
+       |                                          ^
+    101|     expect(result.output).toContain("Ledger verification PASSED");
+    102|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/28]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a clean workspace whose monitor key is not pinned
+AssertionError: Ledger verification PASSED
+  Unanchored: this checked internal consistency, not authorship.
+  Signed by monitor key ab4779d73efdf8f2…, read from inside the workspace.
+  To make this adversarial, pin the expected fingerprint out of band:
+    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:107:42
+    105|     const { workspace } = buildWorkspace();
+    106|     const result = amcVerify(workspace);
+    107|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    108|     expect(result.output).toContain("UNANCHORED");
+    109|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/28]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > gives an integrity-only result with exit 2 under --allow-unanchored
+AssertionError: 
+error: unknown option '--allow-unanchored'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:114:42
+    112|     const { workspace } = buildWorkspace();
+    113|     const result = amcVerify(workspace, ["--allow-unanchored"]);
+    114|     expect(result.status, result.output).toBe(2);
+       |                                          ^
+    115|     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.…
+    116|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Bundle verification PASSED
+runId=9d65ca2d-c486-42be-b10b-80b85d96ac3f agentId=default
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with its key pinned is trusted
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with its key pinned is trusted
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with its key pinned is trusted
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with its key pinned is trusted
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with its key pinned is trusted
+AssertionError: 
+error: unknown option '--pubkey'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:106:42
+    104|   test("the untouched artifact with its key pinned is trusted", () => {
+    105|     const result = row.verify(row.genuine(), row.pin());
+    106|     expect(result.status, result.output).toBe(0);
+       |                                          ^
+    107|   });
+    108|   test("the untouched artifact with --allow-unpinned is integrity-only…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+AssertionError: 
+error: unknown option '--expect-monitor'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:110:42
+    108|   test("the untouched artifact with --allow-unpinned is integrity-only…
+    109|     const result = row.verify(row.genuine(), [...(row.anchor?.() ?? []…
+    110|     expect(result.status, result.output).toBe(2);
+       |                                          ^
+    111|     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.…
+    112|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Certificate verification PASSED
+certId=7b27cf0c-c5ac-47eb-b110-4a7230aef685
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Revocation verification PASSED
+certId=7b27cf0c-c5ac-47eb-b110-4a7230aef685
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > the untouched artifact with --allow-unpinned is integrity-only and exits 2
+AssertionError: 
+error: unknown option '--allow-unpinned'
+
+Tip: add '--help' after any command to see available options.
+: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:110:42
+    108|   test("the untouched artifact with --allow-unpinned is integrity-only…
+    109|     const result = row.verify(row.genuine(), [...(row.anchor?.() ?? []…
+    110|     expect(result.status, result.output).toBe(2);
+       |                                          ^
+    111|     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.…
+    112|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyRevocationFile (amc cert verify-revocation and cert verify --revocation) > a revocation signed by a different pinned key does not revoke the certificate
+AssertionError: expected '\nerror: unknown option \'--pubkey\'\…' to contain 'revocation issuer does not match cert…'
+
+- Expected
++ Received
+
+- revocation issuer does not match certificate issuer
++
++ error: unknown option '--pubkey'
++
++ Tip: add '--help' after any command to see available options.
++
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:275:27
+    273|       "--trust-list", listPath, "--trust-root", root.keyId, "--revocat…
+    274|     expect(result.status, result.output).toBe(1);
+    275|     expect(result.output).toContain("revocation issuer does not match …
+       |                           ^
+    276|   });
+    277| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Passport verified
+passportId: pass_97a9c441897a04e15d5ae526d69875d0
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a distrusted key is refused even when it is pinned with --pubkey
+AssertionError: expected '\nerror: unknown option \'--trust-lis…' to contain 'distrusted'
+
+- Expected
++ Received
+
+- distrusted
++
++ error: unknown option '--trust-list'
++
++ Tip: add '--help' after any command to see available options.
++
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:369:27
+    367|       "--trust-list", listPath, "--trust-root", root.keyId, "--allow-u…
+    368|     expect(result.status, result.output).toBe(1);
+    369|     expect(result.output).toContain("distrusted");
+       |                           ^
+    370|   });
+    371|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyPassportArtifactFile (amc passport verify) > a passport whose inclusion proof carries its own fabricated root is refused
+AssertionError: Passport verified
+passportId: pass_97a9c441897a04e15d5ae526d69875d0
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:374:42
+    372|   test("a passport whose inclusion proof carries its own fabricated ro…
+    373|     const result = amc(signed.workspace, ["passport", "verify", fabric…
+    374|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    375|     expect(result.output).toContain("signed merkle root");
+    376|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Assurance certificate verification PASSED
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > an assurance certificate whose inclusion proof carries its own fabricated root is refused
+AssertionError: expected '\nerror: unknown option \'--pubkey\'\…' to contain 'signed merkle root'
+
+- Expected
++ Received
+
+- signed merkle root
++
++ error: unknown option '--pubkey'
++
++ Tip: add '--help' after any command to see available options.
++
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:391:27
+    389|     const result = amc(signed.workspace, ["assurance", "cert-verify", …
+    390|     expect(result.status, result.output).toBe(1);
+    391|     expect(result.output).toContain("signed merkle root");
+       |                           ^
+    392|   });
+    393| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSON) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: Certificate verification PASSED
+certId=unknown
+type=amc-trust-certificate
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/28]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > a forged copy re-signed with an embedded key fails as not-pinned by default
+AssertionError: package: agent-maturity-compass@1.0.0
+git: commit=ffffffffffffffffffffffffffffffffffffffff tag=none
+integrity: PASS
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:97:42
+     95|   test("a forged copy re-signed with an embedded key fails as not-pinn…
+     96|     const result = row.verify(row.forged(), []);
+     97|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+     98|     expect(result.output).toContain("not-pinned");
+     99|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/28]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  28 failed | 9 passed (37)
+   Start at  02:00:56
+   Duration  24.79s (transform 2.92s, setup 44ms, import 3.95s, tests 26.99s, environment 0ms)
+
+exit=1

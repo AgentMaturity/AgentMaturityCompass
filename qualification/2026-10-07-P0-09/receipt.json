@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-09",
+  "date": "2026-10-07",
+  "commit": "08edda23cec48607d7417fa39c8c6f59ec3611ca",
+  "branch": "rtd/p0-09-verifier-wiring-a",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 628
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 25022
+    },
+    {
+      "cmd": "npx vitest run tests/trust tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/keyHistoryBundleCertificate.test.ts tests/trustCertificate.test.ts tests/verifyFreshWorkspacePassport.test.ts",
+      "exit": 0,
+      "durationMs": 28571
+    },
+    {
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/affected-tests.txt)",
+      "exit": 0,
+      "durationMs": 115181
+    },
+    {
+      "cmd": "npm run typecheck && npm run typecheck:tests && npm run lint",
+      "exit": 0,
+      "durationMs": 52252
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 315
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1133
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 265
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1355
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 194
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 31780
+    },
+    {
+      "cmd": "npm run check:packed-install",
+      "exit": 0,
+      "durationMs": 42614
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21258
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 28819
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 868
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 307
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 237
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1348
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 258
+    }
+  ],
+  "tests": {
+    "total": 16904,
+    "passed": 16904,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "3ee68e5a2e305fc1dc26015cb4b2bca9763388cd7d2c4ae79283e625df287c86"
+    },
+    {
+      "path": "affected-tests.txt",
+      "sha256": "72ff622a760f965e3296f2829976bbbeeb68c09364ae4d3c9b2eab826e0f4833"
+    },
+    {
+      "path": "forgery-before.log",
+      "sha256": "45d03cb345d58546c8a3e9fe379e4b199a573848f30b9222a488e16d8b634576"
+    },
+    {
+      "path": "forgery-after.log",
+      "sha256": "8a56cd4c494b386f04b984e6d7e5c8ebe947ad77ed449b73d8c41d898d13afed"
+    },
+    {
+      "path": "mutations.log",
+      "sha256": "df16d1003db4b15cf69c1d10aca7aa9073c4d1c25b8d971cf3326eba5af0910e"
+    }
+  ],
+  "notes": "P0-09 PR 2 (seven verifiers, ledger anchoring, flags, API routes, internal round trips), run in the PR clone on the last code commit 08edda23 (base 9b905870). tests sums three separate vitest runs that overlap in files: the issue focused set (250), every test file that calls a changed verifier, command, route, script or doc (391 files, 9,541) and the restoration-parity plus plan-edit-manifest run (7,113). check:packed-install passed with the installed session verify and agent-loop verify pinned to the monitor fingerprint recorded at init. check:qualification ran with this receipt in place. forgery-before.log holds the failing-before run on a 9b905870 worktree build (28 failed, 9 passed), forgery-after.log the passing run (37 passed), mutations.log the five mutation reruns. The full npm test, coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt. PR 3 extends this folder."
+}

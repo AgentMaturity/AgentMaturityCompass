@@ -1,0 +1,76 @@
+# Mutation checks on 08edda23's code (run at 426a9b18, identical src); dist/ rebuilt per mutation, restored with git checkout and verified with git diff --quiet
+## M1: admitKey admits the artifact's embedded (unpinned) key
+ src/trust/admission.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+     × an explicit pin for another purpose 4ms
+     × an absent key 0ms
+     × tenant B's key against tenant A's list 0ms
+     × names the key id to pin and the signature in every refusal 1ms
+     × refuses it without allowKeyHistory 0ms
+     × refuses history signed by an unpinned anchor 1ms
+     × refuses history for a role that does not sign the purpose 1ms
+     × refuses tampered history 0ms
+     × refuses history anchored by a distrusted key 0ms
+     × refuses history anchored by a key that another list revoked for key compromise 0ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 780ms
+     × a forged copy still fails when the legitimate key is pinned 774ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 806ms
+     × a forged copy still fails when the legitimate key is pinned 776ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 648ms
+     × a forged copy still fails when the legitimate key is pinned 631ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 728ms
+     × a forged copy still fails when the legitimate key is pinned 726ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 691ms
+     × a forged copy still fails when the legitimate key is pinned 677ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 649ms
+     × a forged copy still fails when the legitimate key is pinned 649ms
+     × a forged copy re-signed with an embedded key fails as not-pinned by default 699ms
+     × a forged copy still fails when the legitimate key is pinned 721ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 24 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  24 failed | 49 passed (73)
+restored byte-identically
+## M2: admitKey skips the distrust check (distrustOf never matches)
+ src/trust/admission.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+build=0
+     × refuses a key in an injected built-in entry even when --pubkey pins it, with or without --allow-unpinned 7ms
+     × a pinned and distrusted key 4ms
+     × a distrusted key with --allow-unpinned and an explicit pin 1ms
+     × a key distrusted from a date, claim at it 0ms
+     × a key distrusted from a date, no claimed time 0ms
+     × a CRLF copy of a distrusted key with an explicit pin 0ms
+     × a CRLF copy of a distrusted key with --allow-unpinned 0ms
+     × still applies distrust to a history key 0ms
+     × refuses history anchored by a distrusted key 0ms
+     × a distrusted key is refused even when it is pinned with --pubkey 719ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  10 failed | 66 passed (76)
+restored byte-identically
+## M3: amc verify (ledgerExitCode) ignores trustRoot.anchored
+ src/cli-trust-flags.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+build=0
+     × fails the workspace-write forgery as UNANCHORED by default 856ms
+     × fails a clean workspace whose monitor key is not pinned 789ms
+     × gives an integrity-only result with exit 2 under --allow-unanchored 805ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  3 failed | 2 passed (5)
+restored byte-identically
+## M4: verifyProofsAgainstSignedRoot drops the proof.rootHash vs signed root comparison
+ src/bench/benchProofs.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+build=0
+       × a cryptographically invalid inclusion proof and mismatched ids refuse 50ms
+     × a passport whose inclusion proof carries its own fabricated root is refused 743ms
+     × an assurance certificate whose inclusion proof carries its own fabricated root is refused 675ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  3 failed | 88 passed (91)
+restored byte-identically
+## M5 (extra): verifyCertificate accepts a revocation from any admitted revocation-list key
+ src/assurance/certificate.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+build=0
+     × a revocation signed by a different pinned key does not revoke the certificate 709ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  1 failed | 4 passed | 27 skipped (32)
+restored byte-identically
