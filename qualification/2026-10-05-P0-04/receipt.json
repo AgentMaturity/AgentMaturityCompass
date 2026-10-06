@@ -6,7 +6,7 @@
   "branch": "main",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
-  "os": "darwin",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
   "arch": "arm64",
   "commands": [
     {
@@ -75,7 +75,7 @@
       "durationMs": 0
     },
     {
-      "cmd": "npm run test:coverage -- --reporter=default --reporter=json --outputFile.json=tmp/ci-coverage/tests.json",
+      "cmd": "mkdir -p tmp/ci-coverage && npm run test:coverage -- --reporter=default --reporter=json --outputFile.json=tmp/ci-coverage/tests.json",
       "exit": 0,
       "durationMs": 409000
     },
@@ -120,12 +120,12 @@
       "durationMs": 0
     },
     {
-      "cmd": "npm pack --ignore-scripts && node dist/cli.js release sbom/licenses/provenance/scan",
+      "cmd": "T=$(mktemp -d) && npm pack --ignore-scripts --json > $T/pack.json && TGZ=$(node -e 'const j=JSON.parse(require(\"fs\").readFileSync(process.argv[1],\"utf8\"));process.stdout.write(j[0].filename)' $T/pack.json) && node dist/cli.js release sbom --out $T/sbom.json && node dist/cli.js release licenses --out $T/lic.json && node dist/cli.js release provenance --out $T/prov.json && node dist/cli.js release scan --in \"$TGZ\" --out $T/scan.json; rc=$?; rm -f \"$TGZ\"; exit $rc",
       "exit": 0,
       "durationMs": 6000
     },
     {
-      "cmd": "node dist/cli.js e2e smoke --mode local --json",
+      "cmd": "node dist/cli.js e2e smoke --mode local --json > tmp/e2e-smoke-local.json",
       "exit": 0,
       "durationMs": 9000
     },
@@ -173,5 +173,5 @@
       "sha256": "7ee4a3db3d6cf3c927c40246c94ee437d725989761e406fc41c14d9784cf638e"
     }
   ],
-  "notes": "Baseline for the landing slices: every step of .github/workflows/ci.yml (build-test, e2e-smoke, clean-source and packed-install jobs) plus npm run release:gate, run in one fresh clone of origin/main at this commit on 2026-10-05. Non-zero exits: check:duplicates (1,253 jscpd clones) and check:dead-code (2,339 Knip findings), which ci.yml runs as report-only until decision D-11, and release:gate (17 of 19 executed checks passed; the two failures are source-duplicates and source-dead-code; live-deploy-health skipped). runtime-dependency-audit passed on 2026-10-05. A rerun of npm run audit:runtime alone on this commit on 2026-10-06 exits 1 on critical advisory GHSA-jqcg-44mw-7w3h (proxy-addr), published that day; see README.md and audit-runtime-2026-10-06.log. tests are the full suite under coverage: 21,409 tests in 1,522 files."
+  "notes": "Baseline for the landing slices: the steps of the build-test, e2e-smoke-local, clean-source and packed-install jobs of .github/workflows/ci.yml plus npm run release:gate, run in one fresh clone of origin/main at this commit on 2026-10-05. Not run: the docker-smoke, helm-lint-template and security-scan-lite jobs (no baseline exists for them; slice C runs them, see RUNBOOK.md section 8), and the changeset job, which runs only on pull requests. Non-zero exits: check:duplicates (1,253 jscpd clones) and check:dead-code (2,339 Knip findings), which ci.yml runs as report-only until decision D-11, and release:gate (17 of 19 executed checks passed; the two failures are source-duplicates and source-dead-code; live-deploy-health skipped). runtime-dependency-audit passed on 2026-10-05. A rerun of npm run audit:runtime alone on this commit on 2026-10-06 exits 1 on critical advisory GHSA-jqcg-44mw-7w3h (proxy-addr), published that day; see README.md and audit-runtime-2026-10-06.log. tests are the full suite under coverage: 21,409 tests in 1,522 files."
 }

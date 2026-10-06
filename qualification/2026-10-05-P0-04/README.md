@@ -4,8 +4,9 @@ This is the baseline every landing slice is compared with ([`docs/program/landin
 
 - Commit: `786d8abb2a12b82d0986c3a286864d7966d21166` (`origin/main` after Sid landed the root patch in `aa087090`, `ed031ade` and `786d8abb`).
 - Run: 2026-10-05, one fresh clone, clean tree, detached at that commit.
-- Toolchain: Node v25.5.0, pnpm 10.33.0, macOS (darwin) arm64.
-- Commands: every step of `.github/workflows/ci.yml` (the `build-test`, `e2e-smoke`, `clean-source` and `packed-install` jobs) and `npm run release:gate`. `receipt.json` lists each command with its exit code and duration. `ci-summary.tsv` is the runner's own step table.
+- Toolchain: Node v25.5.0, pnpm 10.33.0, macOS 26.6.2 (Darwin 25.6.0) arm64. The logs do not print the OS version. It comes from the host that ran both runs: the logs' temporary paths are this host's per-user temporary directory, the host has not rebooted since 2026-09-02, and its system version file is unchanged since 2026-08-13.
+- Commands: the steps of the `build-test`, `e2e-smoke-local`, `clean-source` and `packed-install` jobs of `.github/workflows/ci.yml`, and `npm run release:gate`. `receipt.json` lists each command with its exit code and duration. `ci-summary.tsv` is the runner's own step table.
+- Not run: the `docker-smoke` (`docker build` and `scripts/container-smoke.mjs`), `helm-lint-template` (`helm lint` and `helm template` of `deploy/helm/amc`) and `security-scan-lite` (`scripts/security-scan-lite.mjs` and the signed release-bundle scan) jobs, and the `changeset` job, which runs only on pull requests. This receipt is no baseline for those jobs; helm is not installed on the host. Slice C (P0-14) changes the files they check, so it runs them on `origin/main` and on the slice ([`RUNBOOK.md`](../../docs/program/landing/RUNBOOK.md), section 8).
 
 ## Results
 
