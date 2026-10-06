@@ -38,7 +38,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc agent-loop mcp-catalog` | Connect to an explicitly configured stdio or Streamable HTTP MCP server, report its catalog, and disconnect | `--config <path>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--json` | - |
 | `amc agent-loop providers` | Describe bundled native adapters and usage/cache contracts without provider calls | `--provider <id>`<br>`--json` | - |
 | `amc agent-loop run` | Run one agent turn and report what the signed log recorded | `--agent <id>`<br>`--validation-config <path>`<br>`--validation-config-sha256 <digest>`<br>`--validate <id>`<br>`--extension <manifest>`<br>`--extension-pin <sha256>`<br>`--stream`<br>`--image <path>`<br>`--audio-input <manifest>`<br>`--provider <id>`<br>`--model <model>`<br>`--base-url <url>`<br>`--credential <ref>`<br>`--credentials-home <dir>`<br>`--credentials-file <path>`<br>`--mcp-config <path>`<br>`--mcp-config-sha256 <digest>`<br>`--max-tokens <n>`<br>`--thinking <mode>`<br>`--reasoning-effort <effort>`<br>`--max-steps <n>`<br>`--tools <mode>`<br>`--tool-mode <mode>`<br>`--unsafe-unconfined-shell`<br>`--session <id>`<br>`--fork-from <id>`<br>`--keep-open`<br>`--delegate`<br>`--no-delegate`<br>`--max-delegation-depth <n>`<br>`--delegate-provider <id>`<br>`--delegate-timeout <ms>`<br>`--delegate-stop <condition>`<br>`--no-delegate-stop`<br>`--preset <id>`<br>`--delegate-scope <classes>`<br>`--fail-first <n>`<br>`--think-ms <n>`<br>`--cancel-after <ms>`<br>`--steer <text>`<br>`--steer-after <ms>`<br>`--persona <text>`<br>`--approve-tools <actionClass>`<br>`--approve-risk <tier>`<br>`--interactive-approvals`<br>`--approval-exception <file>`<br>`--json` | - |
-| `amc agent-loop verify` | Re-derive every model request in a session from the log and check the chains | `--json` | - |
+| `amc agent-loop verify` | Re-derive every model request in a session from the log and check the chains | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc alert` | SIEM/webhook alerting — configure and send alerts from anomalies | - | - |
 | `amc alert config` | Configure alert destinations (webhooks, Slack, PagerDuty) | `--set-webhook <url>`<br>`--set-slack <url>`<br>`--set-pagerduty <key>`<br>`--show`<br>`--json` | - |
 | `amc alert send` | Send an alert to a webhook endpoint | `--url <url>`<br>`--message <text>`<br>`--severity <level>`<br>`--agent <agentId>`<br>`--json` | - |
@@ -70,7 +70,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance` | Assurance Lab red-team packs | - | - |
 | `amc assurance advanced-threats` | Run advanced threats assurance pack | `--agent <agentId>`<br>`--json` | - |
 | `amc assurance cert-issue` | Issue signed assurance certificate for a run | `--run <id>`<br>`--out <file.amccert>` | - |
-| `amc assurance cert-verify` | Verify assurance certificate bundle offline | - | - |
+| `amc assurance cert-verify` | Verify assurance certificate bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc assurance compound-threats` | Run compound threat assurance pack | `--agent <agentId>`<br>`--json` | - |
 | `amc assurance describe` | Describe assurance pack details | - | - |
 | `amc assurance history` | List assurance run history | `--agent <agentId>` | - |
@@ -190,7 +190,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc bundle diff` | Diff two bundles (maturity/integrity/targets) | - | - |
 | `amc bundle export` | Export a portable, signed evidence bundle for a run | `--run <runId>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc bundle inspect` | Inspect bundle metadata | - | - |
-| `amc bundle verify` | Verify evidence bundle offline | - | - |
+| `amc bundle verify` | Verify evidence bundle offline | `--pubkey <path>`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc business` | Business impact — KPI correlation, ROI tracking, and maturity-to-outcome mapping | - | - |
 | `amc business fair-scenario` | Run a FAIR-style calibrated loss-distribution scenario | `--scenario <id>`<br>`--agent <agentId>`<br>`--maturity <level>`<br>`--frequency-min <n>`<br>`--frequency-most-likely <n>`<br>`--frequency-max <n>`<br>`--loss-min <amount>`<br>`--loss-most-likely <amount>`<br>`--loss-max <amount>`<br>`--risk-appetite <amount>`<br>`--iterations <n>`<br>`--seed <n>`<br>`--currency <code>`<br>`--out <path>`<br>`--format <format>`<br>`--json` | - |
 | `amc business grc-export` | Export a GRC treatment-plan register from portfolio maturity risk inputs | `--portfolio <path>`<br>`--out <path>`<br>`--format <format>`<br>`--currency <code>`<br>`--title <title>`<br>`--treatment-due-days <days>`<br>`--json` | - |
@@ -217,8 +217,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
 | `amc cert inspect` | Inspect any AMC certificate (.amccert bundle or trust-certificate JSON) | - | - |
 | `amc cert revoke` | Create signed revocation file for a certificate | `--reason <text>`<br>`--cert <file>`<br>`--out <file>` | - |
-| `amc cert verify` | Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON) | `--revocation <path>` | - |
-| `amc cert verify-revocation` | Verify revocation file signature | - | - |
+| `amc cert verify` | Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON) | `--revocation <path>`<br>`--pubkey <path>`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
+| `amc cert verify-revocation` | Verify revocation file signature | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc certify` | Issue signed, offline-verifiable certificate bundle | `--run <runId>`<br>`--policy <path>`<br>`--out <file>`<br>`--agent <agentId>` | - |
 | `amc cgx` | Context Graph (CGX) build and verify operations | - | - |
 | `amc cgx build` | Build deterministic signed context graph | `--scope <scope>`<br>`--id <id>` | - |
@@ -415,7 +415,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence observability` | List and inspect component, experience, and decision observability records | - | - |
 | `amc evidence observability inspect` | Inspect one observability lane record by observability id, lifecycle id, or run id | `--agent <agentId>`<br>`--json` | - |
 | `amc evidence observability list` | List persisted observability lane records | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
-| `amc evidence verify` | Run full workspace verification suite | `--json` | - |
+| `amc evidence verify` | Run full workspace verification suite | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc evidence-stores` | Inspect the staged consolidation of databases outside evidence.sqlite | - | - |
 | `amc evidence-stores backfill` | Copy guard events written before dual-write into evidence.sqlite | - | - |
 | `amc evidence-stores parity` | Compare the legacy guard-event store against the consolidated one | `--json` | - |
@@ -826,7 +826,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc passport share` | Generate shareable passport material | `--agent <id>`<br>`--format <format>`<br>`--base-url <url>`<br>`--out <path>` | - |
 | `amc passport show` | Show .amcpass as JSON or single-line badge | `--format <format>` | - |
 | `amc passport translate-score` | Translate trust scores between scoring systems | `--from <system>`<br>`--to <system>`<br>`--score <n>`<br>`--json` | - |
-| `amc passport verify` | Verify .amcpass artifact offline | `--pubkey <path>` | - |
+| `amc passport verify` | Verify .amcpass artifact offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc passport verify-policy` | Verify signed passport policy | - | - |
 | `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | - | - |
 | `amc playground` | Interactive scenario runner | - | - |
@@ -932,7 +932,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release provenance` | Generate AMC provenance record | `--out <file>` | - |
 | `amc release sbom` | Generate deterministic CycloneDX SBOM | `--out <file>` | - |
 | `amc release scan` | Run strict secret scan on a .amcrelease bundle | `--in <file>`<br>`--out <file>` | - |
-| `amc release verify` | Verify a .amcrelease bundle offline | `--pubkey <path>` | - |
+| `amc release verify` | Verify a .amcrelease bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc report` | Render report for run ID, saved alias, prefix, or 'latest' | `--executive`<br>`--html <path>`<br>`--share`<br>`--share-dir <path>`<br>`--public-base-url <url>` | - |
 | `amc residency-policy` | Create or list data residency policies | `--list`<br>`--region <region>`<br>`--isolation <level>`<br>`--custody <mode>` | - |
 | `amc residency-report` | Generate data residency compliance report for a tenant | `--tenant <id>`<br>`--redaction-tests` | - |
@@ -1035,7 +1035,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
 | `amc session show` | Show a session's projected conversation and its event spine | `--json` | - |
 | `amc session spill-read` | Read a bounded byte range of retained output against its signed origin | `--workspace <path>`<br>`--offset <bytes>`<br>`--limit <bytes>`<br>`--expect-monitor <sha256>`<br>`--json` | - |
-| `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <fingerprint>` | - |
+| `amc session verify` | Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed) | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc session verify-proof` | Verify a session inclusion proof offline — needs only the bundle and a pinned fingerprint | `--expect-auditor-key <sha256>`<br>`--json` | - |
 | `amc sessions` | View and analyze user sessions | - | - |
 | `amc sessions list` | List tracked sessions | `--agent <agentId>`<br>`--limit <n>`<br>`--sort <by>`<br>`--json` | - |
@@ -1203,8 +1203,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc vault zk-commit` | Create a Pedersen commitment to a value | `--value <n>` | - |
 | `amc vault zk-range-proof` | Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify) | `--value <n>`<br>`--threshold <n>`<br>`--agent <id>` | - |
 | `amc vault zk-verify` | Check a range commitment (NOT a zero-knowledge verification; unsound) | - | - |
-| `amc verify` | Verify integrity across AMC artifacts | `--repair`<br>`--sign-config` | - |
-| `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass | `--json` | - |
+| `amc verify` | Verify integrity across AMC artifacts | `--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored`<br>`--repair`<br>`--sign-config` | - |
+| `amc verify all` | Verify trust/policies/plugins/logs/ledger/artifacts in one pass | `--json`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unanchored` | - |
 | `amc vibe-audit` | Run static safety checks for AI-generated code | `--file <path>`<br>`--json` | - |
 | `amc watch` | Observability, attestation, and safety testing | - | - |
 | `amc watch alerts` | Show recent alerts for a monitored agent | `--agent <id>`<br>`--limit <n>`<br>`--json` | - |

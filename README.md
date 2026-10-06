@@ -189,6 +189,21 @@ Chat shows provisional live text and then the recorded result. Use `/inspect` to
 
 See the [native workflow guide](docs/NATIVE_AGENT_WORKFLOW.md), [signed native extensions](docs/NATIVE_EXTENSIONS.md), [MCP setup](docs/NATIVE_MCP.md), [session handoff](docs/SESSION_RESUME.md), and [native SDK](docs/NATIVE_SDK.md). Optional external capture and portable imports are separate evidence workflows. Installed local-provider acceptance, live-provider outcomes, platform qualification and human usability remain distinct measurements.
 
+### Verify with pinned keys
+
+A signature counts only when you pinned its key. A key shipped inside a bundle, certificate, passport or release cannot vouch for it, and a ledger whose monitor key is read from the workspace being verified is unanchored. Record the fingerprints and `.pub` files when you create the workspace, outside it, then verify against them:
+
+```sh
+shasum -a 256 .amc/keys/monitor_ed25519.pub                 # record once: the monitor fingerprint
+cp .amc/keys/auditor_ed25519.pub ~/amc-pins/auditor.pub     # record once: the auditor key
+amc verify --expect-monitor <monitor sha256>
+amc agent-loop verify <session-id> --expect-monitor <monitor sha256>
+amc bundle verify run.amcbundle --pubkey ~/amc-pins/auditor.pub --expect-monitor <monitor sha256>
+amc passport verify agent.amcpass --pubkey ~/amc-pins/auditor.pub
+```
+
+Exit code 0 means trusted, 1 failed (including an unpinned issuer or an unanchored ledger, with the key id to pin), and 2 means `--allow-unpinned` or `--allow-unanchored` gave an integrity-only result. For many keys, use a signed trust list: see [Trust lists](docs/TRUST_LIST.md).
+
 ---
 
 ## How AMC Compares

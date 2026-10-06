@@ -1548,6 +1548,10 @@ Re-derive every model request in a session from the log and check the chains
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unanchored` | - |
 
 #### `amc alert config`
 
@@ -1724,6 +1728,20 @@ Issue signed assurance certificate for a run
 |--------|-------------|
 | `--run <id>` | - |
 | `--out <file.amccert>` | - |
+
+#### `amc assurance cert-verify`
+
+Verify assurance certificate bundle offline
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc assurance compound-threats`
 
@@ -2369,6 +2387,21 @@ Export a portable, signed evidence bundle for a run
 | `--out <file>` | - |
 | `--agent <agentId>` | - |
 
+#### `amc bundle verify`
+
+Verify evidence bundle offline
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
 #### `amc business fair-scenario`
 
 Run a FAIR-style calibrated loss-distribution scenario
@@ -2589,6 +2622,27 @@ Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON)
 | Option | Description |
 |--------|-------------|
 | `--revocation <path>` | - |
+| `--pubkey <path>` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
+
+#### `amc cert verify-revocation`
+
+Verify revocation file signature
+
+
+| Option | Description |
+|--------|-------------|
+| `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc certify`
 
@@ -4335,6 +4389,10 @@ Run full workspace verification suite
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unanchored` | - |
 
 #### `amc evidence-stores parity`
 
@@ -7255,6 +7313,11 @@ Verify .amcpass artifact offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc playground run`
 
@@ -7888,6 +7951,11 @@ Verify a .amcrelease bundle offline
 | Option | Description |
 |--------|-------------|
 | `--pubkey <path>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unpinned` | - |
+| `--allow-unanchored` | - |
+| `--json` | - |
 
 #### `amc report`
 
@@ -8880,7 +8948,10 @@ Verify the ledger and report per-session lifecycle verdicts (open / released / i
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
-| `--expect-monitor <fingerprint>` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unanchored` | - |
 
 #### `amc session verify-proof`
 
@@ -9939,6 +10010,10 @@ Verify integrity across AMC artifacts
 
 | Option | Description |
 |--------|-------------|
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unanchored` | - |
 | `--repair` | - |
 | `--sign-config` | - |
 
@@ -9950,6 +10025,10 @@ Verify trust/policies/plugins/logs/ledger/artifacts in one pass
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+| `--expect-monitor <sha256>` | - |
+| `--trust-list <file>` | - |
+| `--trust-root <sha256>` | - |
+| `--allow-unanchored` | - |
 
 #### `amc vibe-audit`
 

@@ -76,9 +76,12 @@ workspace tools then run under:
 export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'   # every signing command reads it from the shell
 amc init --minimal                                        # 0. workspace, keys, signed tools.yaml
 amc firewall enable                                       # 1. create + sign the Runtime Firewall policy (idempotent; explains what it wrote)
+shasum -a 256 .amc/keys/monitor_ed25519.pub              #    record the monitor fingerprint outside the workspace
 amc --agent default agent-loop run "Check recording with a local demonstration." --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512   # 2. governed keyless turn
-amc agent-loop verify <session-id>                        # 3. verify the recorded evidence (the run prints the session id)
+amc agent-loop verify <session-id> --expect-monitor <monitor sha256>   # 3. verify the recorded evidence (the run prints the session id)
 ```
+
+Since P0-09, verification fails when the ledger is unanchored: the monitor key lives inside the workspace, so a verdict anchored only to it proves internal consistency, not authorship. Pin the fingerprint you recorded with `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`); `--allow-unanchored` gives an integrity-only result with exit code 2.
 
 If `AMC_VAULT_PASSPHRASE` is not set, `amc init --minimal` generates one and prints
 the `export` line once; without it every signing command refuses with `Vault locked`.
@@ -115,8 +118,8 @@ incur provider charges. See [Doctor](DOCTOR.md) for exact scope and fix hints.
 After a run, use the reported session ID to verify its evidence separately:
 
 ```bash
-amc agent-loop verify YOUR_REPORTED_SESSION_ID --json
-amc session verify --json
+amc agent-loop verify YOUR_REPORTED_SESSION_ID --json --expect-monitor <monitor sha256>
+amc session verify --json --expect-monitor <monitor sha256>
 ```
 
 The run summary is a record of the response; verification checks evidence integrity. Neither proves the answer correct or changes an evidence baseline to `READY`. Ctrl-C cancels the active turn; incomplete or failed results remain visible. Existing session continuation is available through `amc agent-loop run --help`.
