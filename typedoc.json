@@ -5,7 +5,8 @@
     "src/sdk/mobileFetch.ts",
     "src/sdk/nativeAgentClient.ts",
     "src/standard/externalEvidenceProfile.ts",
-    "src/importers/piTelemetryCallbacks.ts"
+    "src/importers/piTelemetryCallbacks.ts",
+    "src/trust/index.ts"
   ],
   "entryPointStrategy": "resolve",
   "out": "tmp/api-reference",
