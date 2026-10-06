@@ -11,6 +11,7 @@ import {
 import { scanBinderForPii } from "../src/audit/binderRedaction.js";
 import type { AuditBinderJson } from "../src/audit/binderSchema.js";
 import { verifyAuditBinderFile } from "../src/audit/binderVerifier.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const DOC = "docs/source-reviews/GAP-1070-modelop-audit-binder.md";
 const HOME = "https://www.modelop.com";
@@ -152,6 +153,7 @@ describe("GAP-1070 ModelOp audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: created.outFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok, JSON.stringify(verified.errors)).toBe(true);
     expect(verified.fileSha256).toBe(created.sha256);
@@ -187,6 +189,7 @@ describe("GAP-1070 ModelOp audit-binder boundary", () => {
     const verified = verifyAuditBinderFile({
       file: tamperedFile,
       workspace: ws,
+      trust: workspaceKeyTrust(ws),
     });
     expect(verified.ok).toBe(false);
     expect(verified.errors.map((error) => error.code)).toEqual(expect.arrayContaining([

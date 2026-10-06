@@ -22,6 +22,9 @@ import { exportBenchmarkArtifact } from "../src/benchmarks/benchExport.js";
 import { benchmarkStats } from "../src/benchmarks/benchStats.js";
 import { federateInitCli } from "../src/federation/federationCli.js";
 import { exportFederationPackage, importFederationPackage, verifyFederationPackage } from "../src/federation/federationSync.js";
+import { ensureFederationPublisherKey } from "../src/federation/federationIdentity.js";
+import { addFederationPeer } from "../src/federation/federationStore.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 import { initIntegrationsConfig, integrationsConfigPath, integrationsConfigSigPath, verifyIntegrationsConfigSignature } from "../src/integrations/integrationStore.js";
 import { dispatchIntegrationTest } from "../src/integrations/integrationDispatcher.js";
 import { verifyOpsReceipt, verifyOpsReceiptForEvent } from "../src/integrations/opsReceipt.js";
@@ -249,12 +252,16 @@ describe("compliance + merkle + federation + integrations", () => {
       outFile: fedFile
     });
     expect(exported.outFile).toBe(fedFile);
-    const verified = verifyFederationPackage(fedFile);
+    // The operators exchange publisher keys out of band; the package's own publisher.pub vouches for nothing (P0-09).
+    const sourcePublisher = ensureFederationPublisherKey(source).publicKeyPem;
+    const verified = verifyFederationPackage(fedFile, pinnedTrust([{ publicKeyPem: sourcePublisher, purposes: ["artifact-seal"] }]));
     expect(verified.ok).toBe(true);
     federateInitCli({
       workspace: dest,
       orgName: "Dest Org"
     });
+    expect(() => importFederationPackage({ workspace: dest, bundleFile: fedFile })).toThrow(/not-pinned/);
+    addFederationPeer({ workspace: dest, peerId: "source", name: "Source Org", publisherPublicKeyPem: sourcePublisher });
     const imported = importFederationPackage({
       workspace: dest,
       bundleFile: fedFile

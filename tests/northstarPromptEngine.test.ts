@@ -16,6 +16,7 @@ import { inspectPromptPackArtifact } from "../src/prompt/promptPackArtifact.js";
 import { verifyPromptPackFile } from "../src/prompt/promptPackVerifier.js";
 import { loadPromptPolicy, promptLatestPackPath, promptPolicySigPath } from "../src/prompt/promptPolicyStore.js";
 import { readTransparencyEntries } from "../src/transparency/logChain.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 const previousVaultPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -156,7 +157,8 @@ describe("northstar prompt engine", () => {
     expect(two.lint.status).toBe("PASS");
 
     const verify = verifyPromptPackFile({
-      file: promptLatestPackPath(workspace, "default")
+      file: promptLatestPackPath(workspace, "default"),
+      trust: workspaceKeyTrust(workspace)
     });
     expect(verify.ok).toBe(true);
     expect(verify.lintStatus).toBe("PASS");
@@ -487,7 +489,7 @@ describe("supported prompt pack public inspection workflows", () => {
     const workspace = newWorkspace();
     buildPromptPackForApi({ workspace, agentId: "default" });
     const file = promptLatestPackPath(workspace, "default"), original = inspectPromptPackArtifact(file);
-    expect(verifyPromptPackFile({ file }).ok).toBe(true);
+    expect(verifyPromptPackFile({ file, trust: workspaceKeyTrust(workspace) }).ok).toBe(true);
     for (const layout of ["alternate", "flat"] as const) {
       const content = join(workspace, `owned-${layout}-prompt`);
       mkdirSync(content);

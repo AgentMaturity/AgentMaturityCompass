@@ -61,7 +61,7 @@ describe("untrusted tar archive containment", () => {
     const archive = join(dir, "malicious.amcplug");
     createArchive(dir, "amc-plugin", archive);
 
-    expect(() => verifyPluginPackage({ file: archive })).toThrow(/link|special entry|archive type/i);
+    expect(() => verifyPluginPackage({ file: archive, trust: pinnedTrust([]) })).toThrow(/link|special entry|archive type/i);
   });
 
   test("preflight enforces uncompressed member and total byte limits", () => {

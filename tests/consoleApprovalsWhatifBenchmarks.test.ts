@@ -38,6 +38,7 @@ import { verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
 import { verifyAlertsConfigSignature } from "../src/drift/alerts.js";
 import { verifyApprovalPolicySignature } from "../src/approvals/approvalPolicyEngine.js";
 import { NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -465,7 +466,7 @@ describe("console + approvals + what-if + benchmarks", () => {
       runId: "run_bench",
       outFile
     });
-    const verify = verifyBenchmarkArtifact(exported.outFile);
+    const verify = verifyBenchmarkArtifact(exported.outFile, workspaceKeyTrust(workspace));
     expect(verify.ok).toBe(true);
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-bench-tamper-"));
@@ -481,13 +482,13 @@ describe("console + approvals + what-if + benchmarks", () => {
       const tamperedBundle = join(tamperDir, "tampered.amcbench");
       const pack = spawnSync("tar", ["-czf", tamperedBundle, "-C", extracted, "."], { encoding: "utf8" });
       expect(pack.status).toBe(0);
-      const bad = verifyBenchmarkArtifact(tamperedBundle);
+      const bad = verifyBenchmarkArtifact(tamperedBundle, workspaceKeyTrust(workspace));
       expect(bad.ok).toBe(false);
     } finally {
       rmSync(tamperDir, { recursive: true, force: true });
     }
 
-    const ingested = ingestBenchmarks(workspace, outFile);
+    const ingested = ingestBenchmarks(workspace, outFile, workspaceKeyTrust(workspace));
     expect(ingested.imported.length).toBe(1);
     const statsA = benchmarkStats({ workspace, groupBy: "riskTier" });
     const statsB = benchmarkStats({ workspace, groupBy: "riskTier" });

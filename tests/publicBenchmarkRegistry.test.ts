@@ -19,6 +19,7 @@ import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
 import { initTransparencyLog, appendTransparencyEntry } from "../src/transparency/logChain.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -132,7 +133,7 @@ describe("public benchmark registry", () => {
       windowDays: 30
     });
     expect(out.bench.benchId).toMatch(/^bench_/);
-    const verify = verifyBenchArtifactFile({ file: out.outFile });
+    const verify = verifyBenchArtifactFile({ file: out.outFile, trust: workspaceKeyTrust(ws) });
     expect(verify.ok).toBe(true);
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-bench-proof-tamper-"));
@@ -146,7 +147,7 @@ describe("public benchmark registry", () => {
       const tampered = join(ws, "tampered.amcbench");
       const repack = spawnSync("tar", ["-czf", tampered, "-C", tamperDir, "amc-bench"], { encoding: "utf8" });
       expect(repack.status).toBe(0);
-      const failed = verifyBenchArtifactFile({ file: tampered });
+      const failed = verifyBenchArtifactFile({ file: tampered, trust: workspaceKeyTrust(ws) });
       expect(failed.ok).toBe(false);
     } finally {
       rmSync(tamperDir, { recursive: true, force: true });

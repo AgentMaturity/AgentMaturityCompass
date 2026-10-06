@@ -18,6 +18,7 @@ import {
 } from "../src/ops/maintenance/maintenanceCli.js";
 import { ensureMetricsBaseline } from "../src/ops/metrics/metricsMiddleware.js";
 import { startMetricsServer } from "../src/ops/metrics/metricsServer.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -199,7 +200,8 @@ describe("ops hardening pack", () => {
 
     const verifyOk = verifyBackup({
       backupFile: created.outFile,
-      passphrase: "backup-passphrase"
+      passphrase: "backup-passphrase",
+      trust: workspaceKeyTrust(workspace)
     });
     expect(verifyOk.ok).toBe(true);
 
@@ -209,7 +211,8 @@ describe("ops hardening pack", () => {
     writeFileSync(tamperedPath, tampered);
     const verifyTampered = verifyBackup({
       backupFile: tamperedPath,
-      passphrase: "backup-passphrase"
+      passphrase: "backup-passphrase",
+      trust: workspaceKeyTrust(workspace)
     });
     expect(verifyTampered.ok).toBe(false);
 
@@ -218,7 +221,8 @@ describe("ops hardening pack", () => {
       backupFile: created.outFile,
       toDir: restoreTo,
       force: true,
-      passphrase: "backup-passphrase"
+      passphrase: "backup-passphrase",
+      trust: workspaceKeyTrust(workspace)
     });
     expect(restored.restoredTo).toBe(restoreTo);
     expect(Array.isArray(restored.warnings)).toBe(true);
