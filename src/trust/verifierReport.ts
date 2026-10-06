@@ -63,3 +63,25 @@ export function buildVerifierReport(input: VerifierReportInput): VerifierReportV
     overrides, warnings
   };
 }
+
+/**
+ * Exit codes for every verify command: 0 trusted; 2 integrity verified but untrusted only because an allow flag was
+ * used (the caller prints "UNTRUSTED:" on stderr); 1 for everything else.
+ */
+export function verdictExitCode(report: VerifierReportV1): 0 | 1 | 2 {
+  if (report.trusted) return 0;
+  const onlyOverrides = report.integrity.status === "pass"
+    && report.issuerAdmission.signatures.every(signature => signature.status === "admitted" || signature.status === "unpinned-allowed")
+    && (report.anchoring.status !== "unanchored" || report.overrides.includes("allow-unanchored"));
+  return onlyOverrides && report.overrides.length > 0 ? 2 : 1;
+}
+
+/** One line per reason the report is not trusted: integrity errors, refused signatures and an unanchored ledger. */
+export function untrustedReasons(report: VerifierReportV1): string[] {
+  return [
+    ...report.integrity.errors,
+    ...report.issuerAdmission.signatures.filter(signature => signature.status !== "admitted")
+      .map(signature => `${signature.signature} (${signature.purpose}): ${signature.status}${signature.detail ? ` — ${signature.detail}` : ""}`),
+    ...(report.anchoring.status === "unanchored" ? [`ledger UNANCHORED: ${report.anchoring.detail ?? "the monitor key is not pinned"}`] : [])
+  ];
+}
