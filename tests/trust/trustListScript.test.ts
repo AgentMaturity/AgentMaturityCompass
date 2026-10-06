@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -50,6 +50,32 @@ describe("scripts/trust-list.mjs (maintainer tooling)", () => {
     expect(stranger.stderr).toContain("TRUST_LIST_SIGNATURE_INVALID");
     expect(run("add", "--list", list, "--pubkey", join(dir, "root.pub"), "--purpose", "release", "--subject", "release").status).toBe(0);
     expect(run("verify", "--list", list, "--root", rootId).stderr).toContain("TRUST_LIST_SIGNATURE_INVALID");
+  });
+
+  it("creates missing directories with mode 0700 on a fresh machine", () => {
+    const roots = join(dir, "fresh", "amc-roots");
+    expect(run("keygen", "--out", roots, "--name", "root").status).toBe(0);
+    expect(statSync(roots).mode & 0o777).toBe(0o700);
+    const list = join(dir, "fresh", "home", "trust", "amc-trust-list.json");
+    const init = run("init", "--list-id", "fresh", "--out", list);
+    expect(init.status, init.stderr).toBe(0);
+    expect(statSync(join(dir, "fresh", "home", "trust")).mode & 0o777).toBe(0o700);
+  });
+
+  it("adds a CRLF public key in canonical form and refuses a private key file", () => {
+    const list = join(dir, "keys.json");
+    expect(run("init", "--list-id", "keys", "--out", list).status).toBe(0);
+    const pub = readFileSync(join(dir, "auditor.pub"), "utf8");
+    const crlf = join(dir, "auditor-crlf.pub");
+    writeFileSync(crlf, pub.replaceAll("\n", "\r\n"));
+    const added = run("add", "--list", list, "--pubkey", crlf, "--purpose", "artifact-seal", "--subject", "x");
+    expect(added.status, added.stderr).toBe(0);
+    expect((JSON.parse(readFileSync(list, "utf8")) as { list: { entries: Array<{ publicKeyPem: string }> } }).list.entries[0]!.publicKeyPem).toBe(pub);
+    const before = readFileSync(list, "utf8");
+    const secret = run("add", "--list", list, "--pubkey", join(dir, "auditor.key"), "--purpose", "release", "--subject", "x");
+    expect(secret.status).toBe(1);
+    expect(secret.stderr).toContain("TRUST_LIST_INVALID");
+    expect(readFileSync(list, "utf8")).toBe(before);
   });
 
   it("refuses an invalid entry instead of writing it", () => {

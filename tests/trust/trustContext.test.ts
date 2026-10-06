@@ -48,6 +48,14 @@ describe("loadTrustContext", () => {
     expect(() => loadTrustContext({ amcHome: home(), pubkey: { path: put(join(home(), "rsa.pub"), rsa), purposes } })).toThrow("Ed25519");
   });
 
+  it("pins the key, not the PEM text: a CRLF --pubkey file gets the canonical key id, and a private key is refused", () => {
+    const purposes: KeyPurpose[] = ["artifact-seal"];
+    const crlf = put(join(home(), "auditor.pub"), auditor.publicKeyPem.replaceAll("\n", "\r\n"));
+    expect(loadTrustContext({ amcHome: home(), pubkey: { path: crlf, purposes } }).explicitPins.map(pin => pin.keyId)).toEqual([auditor.keyId]);
+    const key = put(join(home(), "auditor.key"), auditor.privateKeyPem);
+    expect(() => loadTrustContext({ amcHome: home(), pubkey: { path: key, purposes } })).toThrow("Ed25519");
+  });
+
   it("pins ledger-row from --expect-monitor, else from AMC_EXPECTED_MONITOR_FINGERPRINT", () => {
     const fingerprint = "a".repeat(64);
     expect(loadTrustContext({ amcHome: home(), expectMonitor: fingerprint, env: { AMC_EXPECTED_MONITOR_FINGERPRINT: "b".repeat(64) } }).explicitPins)
@@ -105,7 +113,7 @@ describe("workspaceSelfTrust", () => {
     expect(self).toMatchObject({ mode: "workspace-self", lists: [], distrust: shipped.distrust, allowUnpinned: false, allowUnanchored: false });
     expect(admit("auditor", "artifact-seal")).toMatchObject({ status: "admitted", source: "workspace-self" });
     expect(admit("monitor", "ledger-row")).toMatchObject({ status: "admitted", source: "workspace-self" });
-    expect(admit("monitor", "artifact-seal").status).toBe("wrong-purpose");
+    expect(admit("monitor", "artifact-seal").status).toBe("not-pinned"); // a pin admits only for its purposes (step 6 order)
   });
 
   it("never admits a workspace key as an independent or third-party issuer", () => {

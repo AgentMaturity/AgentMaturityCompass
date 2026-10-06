@@ -66,6 +66,11 @@ describe("signed trust lists", () => {
     ["validTo not after validFrom", () => trustList([listEntry(auditor, { validTo: "2026-01-01T00:00:00.000Z" })])],
     ["a PEM whose sha256 is not the key id", () => trustList([listEntry(auditor, { publicKeyPem: testKey().publicKeyPem })])],
     ["an RSA key", () => trustList([listEntry(auditor, { keyId: sha256(rsa), publicKeyPem: rsa })])],
+    ["a private key in place of the public key", () => trustList([listEntry(auditor, { keyId: sha256(auditor.privateKeyPem), publicKeyPem: auditor.privateKeyPem })])],
+    ["a non-canonical (CRLF) PEM", () => {
+      const crlf = auditor.publicKeyPem.replaceAll("\n", "\r\n");
+      return trustList([listEntry(auditor, { keyId: sha256(crlf), publicKeyPem: crlf })]);
+    }],
     ["an unknown entry field", () => trustList([{ ...listEntry(auditor), trusted: true } as never])],
     ["an unknown list field", () => ({ ...trustList([listEntry(auditor)]), note: "x" })],
     ["a non-UTC time", () => trustList([listEntry(auditor, { validFrom: "2026-01-01T00:00:00+02:00" })])],
@@ -88,12 +93,17 @@ describe("signed trust lists", () => {
     expect(trustListSchema.parse(list)).toEqual(list);
   });
 
-  it("refuses an unknown signature field and a list with more than 4,096 entries", () => {
+  it("refuses an unknown signature field", () => {
     const list = trustList([listEntry(auditor)]);
     expect(codeOf(() => verify({ list, signatures: [{ ...rawSignature(list, root), at: 1 }] }))).toBe("TRUST_LIST_INVALID");
-    const entries = Array.from({ length: 4097 }, () => listEntry(auditor));
-    expect(trustListSchema.safeParse(trustList(entries)).success).toBe(false);
   });
+
+  it("accepts 4,096 distinct entries and refuses 4,097 on the size limit", () => {
+    const entries = Array.from({ length: 4097 }, () => listEntry(testKey()));
+    expect(trustListSchema.safeParse(trustList(entries.slice(0, 4096))).success).toBe(true);
+    const tooMany = trustListSchema.safeParse(trustList(entries));
+    expect(tooMany.error?.issues.map(issue => [issue.path.join("."), issue.code])).toEqual([["entries", "too_big"]]);
+  }, 30_000);
 });
 
 describe("trust-list files", () => {
@@ -110,6 +120,17 @@ describe("trust-list files", () => {
     const file = join(dir(), "amc-trust-list.json");
     writeFileSync(file, JSON.stringify(reverse(signed), null, 2));
     expect(verify(readSignedTrustListFile(file))).toEqual(signed.list);
+  });
+
+  it("refuses a __proto__ field at any level, which a parsed object would otherwise drop", () => {
+    const signed = JSON.stringify(signTrustList(trustList([listEntry(auditor)]), root.privateKeyPem));
+    const base = dir();
+    for (const [name, text] of [["inner", signed.replace('{"list":{', '{"list":{"__proto__":{"polluted":1},')],
+      ["outer", signed.replace('{"list":', '{"__proto__":{"a":1},"list":')]]) {
+      const file = join(base, `${name}.json`);
+      writeFileSync(file, text!);
+      expect(codeOf(() => verify(readSignedTrustListFile(file)))).toBe("TRUST_LIST_INVALID");
+    }
   });
 
   it("refuses files over 1 MiB and symlinks", () => {
