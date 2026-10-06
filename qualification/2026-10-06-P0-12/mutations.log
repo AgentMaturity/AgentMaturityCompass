@@ -1,0 +1,63 @@
+### M1 delete MOB-F3W-15
+ 1 file changed, 1 deletion(-)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/industryPackDepthFloor.test.ts > industry pack question-depth floor > the floor is the measured median of 15 and no pack falls below it
+AssertionError: expected [ 'freight-3pl-warehouse: 14 < 15' ] to deeply equal []
+ FAIL  tests/industryPackDepthFloor.test.ts > industry pack question-depth floor > docs/DOMAIN_PACKS.md sector-pack counts match the registry
+AssertionError: mobility: expected '# AMC Domain Packs\n\nAMC domain pack…' to contain '| `mobility` | 6 | 89 |'
+      Tests  2 failed | 2 passed (4)
+vitest exit=1
+restored
+### M2 PACK_QUESTION_FLOOR = 13
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/industryPackDepthFloor.test.ts > industry pack question-depth floor > the floor is the measured median of 15 and no pack falls below it
+AssertionError: expected 13 to be 15 // Object.is equality
+ FAIL  tests/industryPackDepthFloor.test.ts > industry pack question-depth floor > the validator rejects a thin pack
+AssertionError: expected 'pack farm-to-fork: 3 questions is bel…' to match /3 questions is below the floor of 15/
+      Tests  2 failed | 2 passed (4)
+vitest exit=1
+restored
+### M3 nist-ai-rmf url
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/industryPackSchema.test.ts > industry pack schema > every pack carries version, lastReviewed and v1-conformant regulatory references
+AssertionError: expected [ Array(1) ] to deeply equal []
+ FAIL  tests/industryPackSchema.test.ts > industry pack schema > every catalogued instrument is valid, sourced from an official host or unverified
+AssertionError: expected [ Array(1) ] to deeply equal []
+      Tests  2 failed | 8 passed (10)
+vitest exit=1
+restored
+### M4 eu-ai-act lastReviewed 2024-01-01
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+entries=17 verified=11 unverified=6 asOf=2026-10-06
+  FAIL eu-ai-act: lastReviewed 2024-01-01 is 1009 days old; policy window is 90 days
+script exit=1
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/regulatoryCurrency.test.ts > check-regulatory-currency script > passes on the committed register and prints the counts
+AssertionError: expected '  FAIL eu-ai-act: lastReviewed 2024-0…' to be '' // Object.is equality
+ FAIL  tests/regulatoryCurrency.test.ts > check-regulatory-currency script > --json lists every entry with status, lastReviewed, windowDays and sources
+AssertionError: expected 1 to be +0 // Object.is equality
+ FAIL  tests/regulatoryCurrency.test.ts > regulatory register schema > validates cleanly as of its review date
+AssertionError: expected [ Array(1) ] to deeply equal []
+      Tests  3 failed | 18 passed (21)
+vitest exit=1
+restored
+### M5 annexIIIHighRisk 2026-08-02
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/euAiActTimeline.test.ts > EU AI Act classifier timeline parity with the register > every classifier date equals the verified register date of the same id
+AssertionError: annexIIIHighRisk: expected '2026-08-02' to be '2027-12-02' // Object.is equality
+ FAIL  tests/euAiActTimeline.test.ts > EU AI Act classifier timeline parity with the register > encodes the post-omnibus high-risk dates (Art. 113(c))
+AssertionError: expected '2026-08-02' to be '2027-12-02' // Object.is equality
+      Tests  2 failed | 9 passed (11)
+vitest exit=1
+restored
+### M6 whitepaper back to 600
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/citationMetadata.test.ts > citation metadata > whitepaper sector-pack totals match the current compiled catalog claim
+AssertionError: expected '# AMC: A Multi-Dimensional Maturity F…' to contain '632 sector-specific diagnostic questi…'
+      Tests  1 failed | 3 passed (4)
+vitest exit=1
+restored

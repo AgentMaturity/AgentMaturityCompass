@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-12",
+  "date": "2026-10-06",
+  "commit": "248fa066c4cc82864c8c356ae4ff9db5adddbaad",
+  "branch": "rtd/p0-12-slice-a",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 1725
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 25344
+    },
+    {
+      "cmd": "npx vitest run tests/industryPackSchema.test.ts tests/industryPackFrameworkNormalization.test.ts tests/industryPackDepthFloor.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/publicQuestionCountDrift.test.ts tests/citationMetadata.test.ts tests/executiveBoardPath.test.ts tests/logisticsIndustryPack.test.ts tests/domainDocs.test.ts",
+      "exit": 0,
+      "durationMs": 1769
+    },
+    {
+      "cmd": "npx vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts",
+      "exit": 0,
+      "durationMs": 1834
+    },
+    {
+      "cmd": "npm run check:regulatory-currency",
+      "exit": 0,
+      "durationMs": 190
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs --as-of 2027-01-01",
+      "exit": 0,
+      "durationMs": 80
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs --as-of 2027-01-02",
+      "exit": 1,
+      "durationMs": 78
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs --bogus",
+      "exit": 1,
+      "durationMs": 74
+    },
+    {
+      "cmd": "node scripts/check-regulatory-currency.mjs --as-of \"\"",
+      "exit": 1,
+      "durationMs": 75
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21002
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 28972
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 2536
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 320
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 258
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1403
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1031
+    },
+    {
+      "cmd": "node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check",
+      "exit": 0,
+      "durationMs": 4027
+    },
+    {
+      "cmd": "O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 48
+    },
+    {
+      "cmd": "O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 47
+    },
+    {
+      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 HEAD --",
+      "exit": 0,
+      "durationMs": 49
+    },
+    {
+      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 HEAD --",
+      "exit": 0,
+      "durationMs": 47
+    },
+    {
+      "cmd": "O=$(git diff --name-only origin/main HEAD -- AMC_OS); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 34
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 31043
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 43681
+    },
+    {
+      "cmd": "npm run check:packed-install",
+      "exit": 0,
+      "durationMs": 40371
+    }
+  ],
+  "tests": {
+    "total": 7290,
+    "passed": 7290,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "82ea8d9e748a8a8cf5738614e40de806e81283bc5dd889798171087fa7d8c878"
+    },
+    {
+      "path": "red-run.log",
+      "sha256": "2beb2f12830cd34e808bab36c98b9d993b2ca54def6fc5290976e28b9599c314"
+    },
+    {
+      "path": "mutations.log",
+      "sha256": "49175baf8c6e75707e8909285b3d19b04f670cc9c08743d9e1bb671d7d0b83b1"
+    },
+    {
+      "path": "review-red.log",
+      "sha256": "b44d4d5e40937e702f2172b414491cfe79e402b718eb1c4c0f8e1ab3f18945ed"
+    }
+  ],
+  "notes": "Slice A PR 1 (S3 and S5), rerun in one fresh clone of the branch head on 2026-10-06 after the review fixes (the first run, at ba2121599ff3, passed the same commands; see README.md). tests sums the three vitest runs in commands.tsv (35 focused S3 tests, 142 focused S5 tests, 7,113 restoration-parity and plan-edit-manifest tests); the full suite, npm run release:gate and the coverage steps are run by the orchestrator in CI and are not part of this receipt. Expected non-zero exits: node scripts/check-regulatory-currency.mjs --as-of 2027-01-02 exits 1 because every register entry is then 91 days past its 2026-10-03 review (window 90 days); --bogus exits 1 on the unknown flag; --as-of \"\" exits 1 because an empty value counts as missing. These are the negative runs. The tree-equivalence commands at f4ad34cd use test -z, so exit 0 means the diff printed nothing; the S3 and S5 comparisons against HEAD are recorded without test -z because they list named exceptions (see README.md). review-red.log holds the failing runs of the two review-fix regression tests."
+}

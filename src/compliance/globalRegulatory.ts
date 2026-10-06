@@ -86,6 +86,8 @@ export interface RegulatoryFramework {
   keyRequirements: RegulatoryRequirement[];
   mappingStatus: "complete" | "partial" | "planned";
   priorityRank: number;
+  /** Id of the sourced entry in src/compliance/regulatory/ — the authority for dates, status and articles. */
+  registerId?: string;
 }
 
 export interface RegulatoryRequirement {
@@ -97,10 +99,18 @@ export interface RegulatoryRequirement {
   complianceStatus: "mapped" | "gap" | "not-applicable";
 }
 
+/**
+ * Legacy mapping view kept for existing callers. Article numbers below were
+ * re-checked on 2026-10-03 against the sources in the regulatory register;
+ * effectiveDate is the legacy single date — use the register entry named by
+ * registerId for current key dates, status and what is still unverified.
+ * mappingStatus is "partial": each record maps a handful of articles, not the
+ * whole instrument, and several register entries are still unverified.
+ */
 export const GLOBAL_FRAMEWORKS: RegulatoryFramework[] = [
   {
     frameworkId: "china-pipl", name: "China Personal Information Protection Law (PIPL)", jurisdiction: "China",
-    effectiveDate: "2021-11-01", mappingStatus: "complete", priorityRank: 1,
+    effectiveDate: "2021-11-01", mappingStatus: "partial", priorityRank: 1, registerId: "cn-pipl",
     keyRequirements: [
       { requirementId: "pipl-13", article: "Article 13", title: "Legal Basis for Processing", amcMapping: "governance.dataProcessingBasis", evidenceType: "policy-document", complianceStatus: "mapped" },
       { requirementId: "pipl-38", article: "Article 38", title: "Cross-Border Transfer", amcMapping: "governance.crossBorderTransfer", evidenceType: "dpia-document + sccs", complianceStatus: "mapped" },
@@ -110,16 +120,16 @@ export const GLOBAL_FRAMEWORKS: RegulatoryFramework[] = [
   },
   {
     frameworkId: "china-genai", name: "China Generative AI Management Measures", jurisdiction: "China",
-    effectiveDate: "2023-08-15", mappingStatus: "complete", priorityRank: 1,
+    effectiveDate: "2023-08-15", mappingStatus: "partial", priorityRank: 1, registerId: "cn-genai-interim-measures",
     keyRequirements: [
       { requirementId: "genai-4", article: "Article 4", title: "Content Safety", amcMapping: "safety.contentFiltering", evidenceType: "safety-test-results", complianceStatus: "mapped" },
       { requirementId: "genai-7", article: "Article 7", title: "Training Data Compliance", amcMapping: "governance.trainingDataGovernance", evidenceType: "data-lineage-audit", complianceStatus: "mapped" },
-      { requirementId: "genai-12", article: "Article 12", title: "User Identity Verification", amcMapping: "auth.userIdentification", evidenceType: "auth-config", complianceStatus: "mapped" },
+      { requirementId: "genai-12", article: "Article 12", title: "Labelling of Generated Content", amcMapping: "transparency.contentLabelling", evidenceType: "labelling-config", complianceStatus: "mapped" },
     ],
   },
   {
     frameworkId: "brazil-lgpd", name: "Brazil Lei Geral de Proteção de Dados (LGPD)", jurisdiction: "Brazil",
-    effectiveDate: "2020-09-18", mappingStatus: "complete", priorityRank: 2,
+    effectiveDate: "2020-09-18", mappingStatus: "partial", priorityRank: 2, registerId: "br-lgpd",
     keyRequirements: [
       { requirementId: "lgpd-7", article: "Article 7", title: "Legal Bases for Processing", amcMapping: "governance.dataProcessingBasis", evidenceType: "policy-document", complianceStatus: "mapped" },
       { requirementId: "lgpd-33", article: "Article 33", title: "International Data Transfer", amcMapping: "governance.crossBorderTransfer", evidenceType: "transfer-impact-assessment", complianceStatus: "mapped" },
@@ -129,21 +139,21 @@ export const GLOBAL_FRAMEWORKS: RegulatoryFramework[] = [
   },
   {
     frameworkId: "india-dpdp", name: "India Digital Personal Data Protection Act (DPDP)", jurisdiction: "India",
-    effectiveDate: "2023-08-11", mappingStatus: "complete", priorityRank: 3,
+    effectiveDate: "2023-08-11", mappingStatus: "partial", priorityRank: 3, registerId: "in-dpdp",
     keyRequirements: [
       { requirementId: "dpdp-4", article: "Section 4", title: "Consent for Processing", amcMapping: "governance.consentManagement", evidenceType: "consent-records", complianceStatus: "mapped" },
       { requirementId: "dpdp-8", article: "Section 8", title: "Obligations of Data Fiduciary", amcMapping: "governance.fiduciaryObligations", evidenceType: "policy-document", complianceStatus: "mapped" },
       { requirementId: "dpdp-16", article: "Section 16", title: "Cross-Border Transfer Restrictions", amcMapping: "governance.crossBorderTransfer", evidenceType: "transfer-assessment", complianceStatus: "mapped" },
-      { requirementId: "dpdp-9", article: "Section 9", title: "Significant Data Fiduciary Obligations", amcMapping: "governance.dpiaRequired", evidenceType: "dpia-document", complianceStatus: "mapped" },
+      { requirementId: "dpdp-10", article: "Section 10", title: "Significant Data Fiduciary Obligations", amcMapping: "governance.dpiaRequired", evidenceType: "dpia-document", complianceStatus: "mapped" },
     ],
   },
   {
     frameworkId: "japan-appi", name: "Japan Act on Protection of Personal Information (APPI)", jurisdiction: "Japan",
-    effectiveDate: "2022-04-01", mappingStatus: "complete", priorityRank: 4,
+    effectiveDate: "2022-04-01", mappingStatus: "partial", priorityRank: 4, registerId: "jp-appi",
     keyRequirements: [
-      { requirementId: "appi-17", article: "Article 17", title: "Proper Acquisition", amcMapping: "governance.dataAcquisition", evidenceType: "acquisition-records", complianceStatus: "mapped" },
-      { requirementId: "appi-24", article: "Article 24", title: "Cross-Border Transfer", amcMapping: "governance.crossBorderTransfer", evidenceType: "ppc-equivalency-assessment", complianceStatus: "mapped" },
-      { requirementId: "appi-23", article: "Article 23", title: "Restriction on Third-Party Provision", amcMapping: "governance.thirdPartySharing", evidenceType: "sharing-consent-records", complianceStatus: "mapped" },
+      { requirementId: "appi-20", article: "Article 20", title: "Proper Acquisition", amcMapping: "governance.dataAcquisition", evidenceType: "acquisition-records", complianceStatus: "mapped" },
+      { requirementId: "appi-28", article: "Article 28", title: "Cross-Border Transfer", amcMapping: "governance.crossBorderTransfer", evidenceType: "ppc-equivalency-assessment", complianceStatus: "mapped" },
+      { requirementId: "appi-27", article: "Article 27", title: "Restriction on Third-Party Provision", amcMapping: "governance.thirdPartySharing", evidenceType: "sharing-consent-records", complianceStatus: "mapped" },
     ],
   },
 ];
@@ -253,13 +263,13 @@ export const EU_AI_ACT_RISK_MATRIX: {
   { sector: "HR", useCase: "Employee training recommendation", defaultRisk: "limited", annexRef: "N/A", modifiers: [{ condition: "Affects promotion decisions", riskChange: "high" }] },
   { sector: "Finance", useCase: "Credit scoring", defaultRisk: "high", annexRef: "Annex III, 5(b)", modifiers: [] },
   { sector: "Finance", useCase: "Fraud detection", defaultRisk: "limited", annexRef: "N/A", modifiers: [{ condition: "Auto-blocks transactions", riskChange: "high" }] },
-  { sector: "Healthcare", useCase: "Clinical decision support", defaultRisk: "high", annexRef: "Annex III, 5(a)", modifiers: [] },
+  { sector: "Healthcare", useCase: "Clinical decision support", defaultRisk: "high", annexRef: "Art. 6(1) + Annex I (Regulation (EU) 2017/745)", modifiers: [] },
   { sector: "Healthcare", useCase: "Administrative scheduling", defaultRisk: "minimal", annexRef: "N/A", modifiers: [] },
-  { sector: "Law Enforcement", useCase: "Predictive policing", defaultRisk: "high", annexRef: "Annex III, 6(a)", modifiers: [{ condition: "Real-time biometric", riskChange: "unacceptable" }] },
-  { sector: "Education", useCase: "Student assessment scoring", defaultRisk: "high", annexRef: "Annex III, 3(a)", modifiers: [] },
+  { sector: "Law Enforcement", useCase: "Predictive policing", defaultRisk: "high", annexRef: "Annex III, 6(d)", modifiers: [{ condition: "Real-time biometric", riskChange: "unacceptable" }] },
+  { sector: "Education", useCase: "Student assessment scoring", defaultRisk: "high", annexRef: "Annex III, 3(b)", modifiers: [] },
   { sector: "Education", useCase: "Content recommendation", defaultRisk: "minimal", annexRef: "N/A", modifiers: [{ condition: "Minors involved", riskChange: "limited" }] },
-  { sector: "Critical Infrastructure", useCase: "Energy grid management", defaultRisk: "high", annexRef: "Annex III, 2(a)", modifiers: [] },
-  { sector: "Customer Service", useCase: "Chatbot", defaultRisk: "limited", annexRef: "Article 52", modifiers: [{ condition: "Handles complaints affecting rights", riskChange: "high" }] },
+  { sector: "Critical Infrastructure", useCase: "Energy grid management", defaultRisk: "high", annexRef: "Annex III, 2", modifiers: [] },
+  { sector: "Customer Service", useCase: "Chatbot", defaultRisk: "limited", annexRef: "Article 50", modifiers: [{ condition: "Handles complaints affecting rights", riskChange: "high" }] },
   { sector: "General", useCase: "Internal productivity tool", defaultRisk: "minimal", annexRef: "N/A", modifiers: [] },
 ];
 
@@ -380,8 +390,10 @@ export interface DpiaAssessment {
   mitigations: DpiaMitigation[];
   residualRiskLevel: "low" | "medium" | "high";
   dpoApproval: boolean;
-  lastReviewDate: number;
-  nextReviewDate: number;
+  /** Epoch ms of the last human review; null when the assessment has never been reviewed (always so for the template). */
+  lastReviewDate: number | null;
+  /** Epoch ms the next review is due; null until a reviewer sets it. */
+  nextReviewDate: number | null;
 }
 
 export interface DataFlow {
@@ -443,9 +455,9 @@ export const AMC_EVALUATION_DPIA: DpiaAssessment = {
     { mitigationId: "m-4", riskId: "r-4", measure: "Differential privacy on aggregated metrics; rate limiting on evaluation API", implemented: true, effectivenessRating: "full" },
   ],
   residualRiskLevel: "low",
-  dpoApproval: true,
-  lastReviewDate: 0,  // computed in getDpiaAssessment()
-  nextReviewDate: 0,  // computed in getDpiaAssessment()
+  dpoApproval: false,  // no DPO has reviewed this template
+  lastReviewDate: null,  // never reviewed; a reviewer records the date
+  nextReviewDate: null,
 };
 
 export function getGlobalFrameworks(): RegulatoryFramework[] {
@@ -456,9 +468,7 @@ export function getFrameworkByJurisdiction(jurisdiction: string): RegulatoryFram
   return GLOBAL_FRAMEWORKS.filter((f) => f.jurisdiction.toLowerCase() === jurisdiction.toLowerCase());
 }
 
+/** A deep copy of the template; review dates and DPO approval stay as recorded, never stamped with the clock. */
 export function getDpiaAssessment(): DpiaAssessment {
-  const copy = JSON.parse(JSON.stringify(AMC_EVALUATION_DPIA)) as DpiaAssessment;
-  copy.lastReviewDate = Date.now();
-  copy.nextReviewDate = Date.now() + 180 * 86400 * 1000;
-  return copy;
+  return JSON.parse(JSON.stringify(AMC_EVALUATION_DPIA)) as DpiaAssessment;
 }

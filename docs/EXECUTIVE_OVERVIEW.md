@@ -45,7 +45,7 @@ We tested a content moderation agent with two methods:
 
 ### For Your Engineering Team
 - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
-- **600 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
+- **632 sector-specific questions** for regulated industries (healthcare, finance, education, etc.)
 - **142 assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
 - **Auto-generated guardrails** that plug directly into agent config files
 - **CI/CD integration** — fail builds if agents don't meet maturity targets
@@ -67,7 +67,7 @@ We tested a content moderation agent with two methods:
 | **L4** | Managed | Proactive, risk-calibrated, stress-tested | Stronger operating assurance |
 | **L5** | Optimizing | Self-correcting, continuously verified | Continuous assurance target |
 
-No AMC level is a legal compliance threshold. A `VALID` signature proves artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 following the AI Omnibus political agreement. See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
+No AMC level is a legal compliance threshold. A `VALID` signature proves artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 under Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI). See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
 Board L3 business-risk memo: [docs/BOARD_RISK_L3_MEMO.md](BOARD_RISK_L3_MEMO.md)
 

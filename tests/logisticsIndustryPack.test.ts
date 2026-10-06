@@ -39,8 +39,10 @@ describe("freight, 3PL, and warehouse industry pack", () => {
       "MOB-F3W-3",
       "MOB-F3W-4",
       "MOB-F3W-7",
-      "MOB-F3W-8"
+      "MOB-F3W-8",
+      "MOB-F3W-15"
     ]));
+    expect(pack.questions.length).toBeGreaterThanOrEqual(15);
     expect(baseline.level).toBe(1);
     expect(baseline.certified).toBe(false);
     expect(baseline.complianceGaps.length).toBe(pack.questions.length);

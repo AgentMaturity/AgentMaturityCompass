@@ -1,0 +1,39 @@
+ FAIL  tests/euAiActTimeline.test.ts [ tests/euAiActTimeline.test.ts ]
+Error: Cannot find module '../src/compliance/regulatory/index.js' imported from tests/euAiActTimeline.test.ts
+ FAIL  tests/industryPackDepthFloor.test.ts [ tests/industryPackDepthFloor.test.ts ]
+Error: Cannot find module '../src/domains/packs/regulatorySchema.js' imported from tests/industryPackDepthFloor.test.ts
+ FAIL  tests/industryPackFrameworkNormalization.test.ts [ tests/industryPackFrameworkNormalization.test.ts ]
+Error: Cannot find module '../src/domains/packs/regulatorySchema.js' imported from tests/industryPackFrameworkNormalization.test.ts
+ FAIL  tests/industryPackRegulatoryRefresh.test.ts [ tests/industryPackRegulatoryRefresh.test.ts ]
+Error: Cannot find module '../src/domains/packs/regulatorySchema.js' imported from tests/industryPackRegulatoryRefresh.test.ts
+ FAIL  tests/industryPackSchema.test.ts [ tests/industryPackSchema.test.ts ]
+Error: Cannot find module '../src/domains/packs/regulatorySchema.js' imported from tests/industryPackSchema.test.ts
+ FAIL  tests/publicQuestionCountDrift.test.ts [ tests/publicQuestionCountDrift.test.ts ]
+Error: Cannot find module '../src/domains/packs/regulatorySchema.js' imported from tests/publicQuestionCountDrift.test.ts
+ FAIL  tests/regulatoryCurrency.test.ts [ tests/regulatoryCurrency.test.ts ]
+Error: Cannot find module '../scripts/check-regulatory-currency.mjs' imported from tests/regulatoryCurrency.test.ts
+ FAIL  tests/round4Gaps.test.ts [ tests/round4Gaps.test.ts ]
+Error: Cannot find module '../src/compliance/regulatory/index.js' imported from tests/round4Gaps.test.ts
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/logisticsIndustryPack.test.ts > freight, 3PL, and warehouse industry pack > scores concrete logistics controls and surfaces low-level compliance gaps
+AssertionError: expected [ 'MOB-F3W-1', 'MOB-F3W-2', …(6) ] to deeply equal ArrayContaining{…}
+ FAIL  tests/regulatoryAutomation.test.ts > RegulatoryMonitor > checkAllFeeds reads feeds through the injected fetchImpl, never the network
+AssertionError: expected [] to deeply equal [ Array(1) ]
+ FAIL  tests/regulatoryAutomation.test.ts > RegulatoryMonitor > reports an HTTP error from fetchImpl as a feed failure
+AssertionError: expected 'network disabled in tests; inject fet…' to contain 'HTTP 503'
+ FAIL  tests/regulatoryAutomation.test.ts > DEFAULT_REGULATORY_FEEDS contract (no fake feeds) > every feed declares a contract, authority and recorded reachability
+AssertionError: eu-ai-act-rss: expected [ 'live', 'manual-review-required' ] to include undefined
+ FAIL  tests/regulatoryAutomation.test.ts > DEFAULT_REGULATORY_FEEDS contract (no fake feeds) > a live feed is enabled, official, https, machine-readable and was reachable
+AssertionError: expected 0 to be greater than or equal to 4
+ FAIL  tests/regulatoryAutomation.test.ts > DEFAULT_REGULATORY_FEEDS contract (no fake feeds) > a feed that is not a live official source is disabled and says why
+AssertionError: eu-ai-act-rss: expected true to be false // Object.is equality
+ FAIL  tests/regulatoryAutomation.test.ts > DEFAULT_REGULATORY_FEEDS contract (no fake feeds) > the default monitor polls only live feeds
+AssertionError: expected [ 'china-tc260-ai', …(7) ] to deeply equal []
+ FAIL  tests/regulatoryAutomation.test.ts > parsed changes do not invent legal dates > marks an RSS item's effective date as an estimate
+Error: network disabled in tests; inject fetchImpl
+ FAIL  tests/regulatoryAutomation.test.ts > parsed changes do not invent legal dates > reads Federal Register API fields and keeps a stated effective date
+Error: network disabled in tests; inject fetchImpl
+ FAIL  tests/regulatoryClaimsHonesty.test.ts > regulatory artifacts do not claim studies that never happened > does not manufacture review freshness or DPO approval on the template
+AssertionError: expected true to be false // Object.is equality
+ Test Files  11 failed (11)
+      Tests  10 failed | 19 passed (29)

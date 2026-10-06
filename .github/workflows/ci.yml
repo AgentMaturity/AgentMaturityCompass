@@ -75,6 +75,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Regulatory register currency
+        run: npm run check:regulatory-currency
+
       - name: Published package lint
         run: npm run check:package
 
