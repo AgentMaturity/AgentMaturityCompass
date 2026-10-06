@@ -1,9 +1,10 @@
-import { readFileSync, writeFileSync, mkdirSync, realpathSync } from "node:fs";
+import { readFileSync, mkdirSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { z } from "zod";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
+import { writeFileAtomicSync } from "./atomicWrite.js";
 
 /**
  * Filesystem tools (P4.3).
@@ -158,7 +159,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           return { output: `SIMULATE fs.write ${args.path} (${Buffer.byteLength(args.content, "utf8")} bytes)`, bytes: 0 };
         }
         mkdirSync(dirname(full), { recursive: true });
-        writeFileSync(full, args.content, "utf8");
+        writeFileAtomicSync(full, args.content);
         // Refresh: the agent now knows this file's contents, because it just
         // produced them.
         ledger.recordRead(execution.agentId, full, Buffer.from(args.content, "utf8"));
@@ -198,11 +199,14 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
             `that text appears ${occurrences} times in "${args.path}" — include more context so the match is unique`
           );
         }
-        const after = before.replace(args.find, args.replace);
+        // A splice, not String.prototype.replace: replace would expand $$, $&,
+        // $` and $' in the agent's text. The check above guarantees one match.
+        const at = before.indexOf(args.find);
+        const after = before.slice(0, at) + args.replace + before.slice(at + args.find.length);
         if (simulated(execution)) {
           return { output: `SIMULATE fs.edit ${args.path} (1 replacement)`, bytes: 0 };
         }
-        writeFileSync(full, after, "utf8");
+        writeFileAtomicSync(full, after);
         ledger.recordRead(execution.agentId, full, Buffer.from(after, "utf8"));
         return { output: `edited ${args.path}`, bytes: Buffer.byteLength(after, "utf8") };
       }
