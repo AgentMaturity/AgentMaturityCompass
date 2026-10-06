@@ -74,3 +74,4 @@ export {
   type DomainApplyOptions,
   type DomainApplyResult
 } from "./domainApply.js";
+export { normalizeComplianceFrameworkLabel, type RegulatoryReference } from "./packs/regulatorySchema.js";
