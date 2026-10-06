@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, realpathSync, writeFileSync, chmodSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import Database from "better-sqlite3";
 import { initWorkspace } from "../src/workspace.js";
 import { rootIdentity } from "../src/agent/delegationIdentity.js";
@@ -166,7 +166,18 @@ describe("a truncated answer is not an answer", () => {
     // 5 MiB of output, past the cap.
     const runner = runnerFor(dir, fakeAgent(dir, "head -c 5242880 /dev/zero | tr '\\0' 'x'"));
 
-    const result = await runner(ctx());
+    // The monitor tees the child's output to this process's stdout, here as one
+    // 5 MiB line. A single line that long stalls the GitHub Actions runner's log
+    // pipeline until the job times out with no log at all (every CI build-test
+    // run from 2026-09-16 to 2026-10-05 died this way), so the tee is swallowed
+    // here. The assertion is about what the runner records, not what it prints.
+    const write = vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+    let result: Awaited<ReturnType<typeof runner>>;
+    try {
+      result = await runner(ctx());
+    } finally {
+      write.mockRestore();
+    }
 
     expect(result.ok).toBe(false);
     expect(result.reason).toContain("cannot be reported in full");
