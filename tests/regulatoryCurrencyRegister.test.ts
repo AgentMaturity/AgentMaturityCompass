@@ -41,7 +41,7 @@ describe("register entries carry per-date provenance", () => {
   });
 });
 
-describe("root ruling: CN, BR, IN and JP entries assert nothing as verified", () => {
+describe("root ruling: CN, BR, IN and JP entries are unverified and assert no verified obligation", () => {
   it("every CN, BR, IN and JP entry is unverified and has no verified obligation", () => {
     const ruled = ["CN", "BR", "IN", "JP"];
     const scoped = entries.filter((e) => ruled.includes(e.jurisdiction));
