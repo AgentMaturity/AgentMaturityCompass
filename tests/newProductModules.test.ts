@@ -1,18 +1,23 @@
-import { describe, it, expect, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, afterAll, beforeEach, vi } from 'vitest';
 import { ScratchpadManager, closeScratchpadDb } from '../src/product/scratchpad.js';
 import { PromptModuleRegistry, closePromptModulesDb } from '../src/product/promptModules.js';
 import { validateAndRepair } from '../src/product/structuredOutput.js';
 import { diffOutputs } from '../src/product/outputDiff.js';
-import { rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const AMC_DIR = join(process.cwd(), '.amc');
+// Both stores open <cwd>/.amc/*.sqlite; point cwd at a temp workspace so the
+// tests never write to the repository's own .amc directory.
+const WORKSPACE = mkdtempSync(join(tmpdir(), 'amc-new-product-modules-'));
+const AMC_DIR = join(WORKSPACE, '.amc');
+const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(WORKSPACE);
 
 afterAll(() => {
   closeScratchpadDb();
   closePromptModulesDb();
-  try { rmSync(join(AMC_DIR, 'scratchpad.sqlite')); } catch (_) {}
-  try { rmSync(join(AMC_DIR, 'prompt_modules.sqlite')); } catch (_) {}
+  cwdSpy.mockRestore();
+  rmSync(WORKSPACE, { recursive: true, force: true });
 });
 
 describe('ScratchpadManager', () => {
