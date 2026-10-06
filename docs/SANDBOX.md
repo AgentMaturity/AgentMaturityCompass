@@ -37,10 +37,9 @@ these opt-ins:
   starts, and starts each native task's `amc acp` with
   `--unsafe-unconfined-shell`, so the task's warning and receipts record
   `cli-flag`; only the exact value `1` counts. This is the only opt-in Studio's
-  native tasks accept; the browser and the native-task API cannot enable their
-  shell. Studio's CLI bridge (`POST /cli/exec` and `/cli/batch`) is separate:
-  an authenticated OWNER or OPERATOR can pass `--unsafe-unconfined-shell` to
-  `amc agent-loop run` through it. The CLI, ACP and SDK never read this
+  native tasks accept. The browser and the HTTP API cannot enable the shell:
+  Studio's CLI bridge (`POST /cli/exec` and `/cli/batch`) refuses any request
+  that carries `--unsafe-unconfined-shell`. The CLI, ACP and SDK never read this
   variable, because they can load project dotenv files and configured
   environment.
 

@@ -47,6 +47,18 @@ describe("CLI Bridge", () => {
       expect(validateCliExec({ command: "evidence list default" })).toBeNull();
     });
 
+    it("never passes the unconfined-shell opt-in through the HTTP bridge (P0-06)", () => {
+      // The opt-in belongs to an operator at a terminal or in Studio's own
+      // environment; a request (or a forged one, through CSRF) must not carry it.
+      const refusal = "--unsafe-unconfined-shell cannot be passed through the Studio API";
+      expect(validateCliExec({ command: "agent-loop run list --unsafe-unconfined-shell" })).toContain(refusal);
+      expect(validateCliExec({ command: "amc acp --unsafe-unconfined-shell=true" })).toContain(refusal);
+      expect(validateCliExec({ command: "agent-loop run list", args: { "unsafe-unconfined-shell": "" } })).toContain(refusal);
+      expect(validateCliExec({ command: "agent-loop run list", args: { "--unsafe-unconfined-shell": "true" } })).toContain(refusal);
+      expect(validateCliExec({ command: "agent-loop run list", args: { tools: "--unsafe-unconfined-shell" } })).toContain(refusal);
+      expect(validateCliExec({ command: "agent-loop run list", args: { tools: "workspace" } })).toBeNull();
+    });
+
     it("rejects overly long commands", () => {
       const long = "a".repeat(2001);
       expect(validateCliExec({ command: long })).toContain("too long");

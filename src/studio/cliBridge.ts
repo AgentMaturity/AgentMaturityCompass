@@ -114,6 +114,16 @@ export function validateCliExec(req: CliExecRequest): string | null {
     return "command contains disallowed shell characters";
   }
 
+  // The unconfined-shell opt-in (P0-06) belongs to an operator at a terminal or
+  // in Studio's own environment, never to an HTTP request: a forged request would
+  // otherwise grant a macOS agent full user rights. Checked in values too,
+  // because a value is spliced into argv where Commander may read it as a flag.
+  const UNSAFE_SHELL_FLAG = "--unsafe-unconfined-shell";
+  const argParts = Object.entries(req.args ?? {}).flatMap(([k, v]) => [k.startsWith("--") ? k : `--${k}`, String(v)]);
+  if ([cmd, ...argParts].some(part => part.includes(UNSAFE_SHELL_FLAG))) {
+    return `${UNSAFE_SHELL_FLAG} cannot be passed through the Studio API; run the command in a terminal`;
+  }
+
   // Check dangerous commands
   const isDangerous = DANGEROUS_PREFIXES.some(p => normalized.startsWith(p));
   if (isDangerous && !req.confirm) {
