@@ -1,24 +1,25 @@
-0	1686	pnpm install --frozen-lockfile
-0	25333	pnpm run build
-0	1834	npx vitest run tests/industryPackSchema.test.ts tests/industryPackFrameworkNormalization.test.ts tests/industryPackDepthFloor.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/publicQuestionCountDrift.test.ts tests/citationMetadata.test.ts tests/executiveBoardPath.test.ts tests/logisticsIndustryPack.test.ts tests/domainDocs.test.ts
-0	1918	npx vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts
-0	196	npm run check:regulatory-currency
-0	78	node scripts/check-regulatory-currency.mjs --as-of 2027-01-01
+0	1725	pnpm install --frozen-lockfile
+0	25344	pnpm run build
+0	1769	npx vitest run tests/industryPackSchema.test.ts tests/industryPackFrameworkNormalization.test.ts tests/industryPackDepthFloor.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/publicQuestionCountDrift.test.ts tests/citationMetadata.test.ts tests/executiveBoardPath.test.ts tests/logisticsIndustryPack.test.ts tests/domainDocs.test.ts
+0	1834	npx vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts
+0	190	npm run check:regulatory-currency
+0	80	node scripts/check-regulatory-currency.mjs --as-of 2027-01-01
 1	78	node scripts/check-regulatory-currency.mjs --as-of 2027-01-02
-1	77	node scripts/check-regulatory-currency.mjs --bogus
-0	21299	npm run typecheck
-0	28697	npm run typecheck:tests
-0	2191	npm run lint
-0	321	npm run check:counts
-0	262	npm run check:docs-drift
-0	1411	npm run check:architecture-boundaries
-0	1042	npm run check:freeze
-0	4072	node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check
+1	74	node scripts/check-regulatory-currency.mjs --bogus
+1	75	node scripts/check-regulatory-currency.mjs --as-of ""
+0	21002	npm run typecheck
+0	28972	npm run typecheck:tests
+0	2536	npm run lint
+0	320	npm run check:counts
+0	258	npm run check:docs-drift
+0	1403	npm run check:architecture-boundaries
+0	1031	npm run check:freeze
+0	4027	node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check
 0	48	O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo "$O"; test -z "$O"
-0	48	O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo "$O"; test -z "$O"
-0	48	O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 HEAD --); echo "$O"; test -z "$O"
-0	49	git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 HEAD --
+0	47	O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo "$O"; test -z "$O"
+0	49	git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 HEAD --
+0	47	git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 HEAD --
 0	34	O=$(git diff --name-only origin/main HEAD -- AMC_OS); echo "$O"; test -z "$O"
-0	31205	npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts
-0	43165	npm run check:clean-source
-0	40727	npm run check:packed-install
+0	31043	npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts
+0	43681	npm run check:clean-source
+0	40371	npm run check:packed-install

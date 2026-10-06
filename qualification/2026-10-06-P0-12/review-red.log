@@ -1,0 +1,25 @@
+# Review fixes: failing runs before each fix (fresh clone at 248fa066, the fixed file swapped back to 3edd34e8, then restored)
+
+## adversarial/P0-12-A-2: scripts/check-regulatory-currency.mjs from 3edd34e8
+$ node scripts/check-regulatory-currency.mjs --as-of ""
+entries=17 verified=11 unverified=6 asOf=2026-10-06
+exit=0
+$ npx vitest run tests/regulatoryCurrency.test.ts
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/regulatoryCurrency.test.ts > check-regulatory-currency script > rejects unknown flags and flags without a value
+AssertionError: expected +0 to be 1 // Object.is equality
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 passed (21)
+
+## integration/F6: docs/adr/005-free-core-paid-industry-packs.md from 3edd34e8
+$ npx vitest run tests/publicQuestionCountDrift.test.ts
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/publicQuestionCountDrift.test.ts > public diagnostic question-count claims > current-facing product surfaces use 244 default, 264 expanded, and registry-derived total framing
+AssertionError: expected '# ADR-005: Free Core + Paid Industry …' to contain '632 sector-specific diagnostic questi…'
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+
+## After restore
+$ npx vitest run tests/regulatoryCurrency.test.ts tests/publicQuestionCountDrift.test.ts
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
