@@ -2,6 +2,61 @@
 
 Sandbox mode executes agent commands in Docker and writes explicit sandbox attestation evidence.
 
+## Native shell by platform
+
+The native `bash` tool is offered to an agent only when AMC can confine it, or
+when an operator explicitly accepts an unconfined shell on macOS. AMC decides
+this once when it composes the agent's tools, on every surface: `amc agent-loop
+run` and `chat`, `amc acp`, the TypeScript SDK, Studio native tasks and
+delegated children.
+
+| Platform | Default | With an explicit opt-in |
+|---|---|---|
+| Linux with a usable `/usr/bin/bwrap` | Offered, enforced at `linux-bwrap` | Same; the opt-in is ignored |
+| Linux without Bubblewrap | Refused; the message names `/usr/bin/bwrap` | Still refused; AMC never falls back to an unconfined Linux shell |
+| macOS | Refused | Offered **unconfined**, with your full user rights |
+| Windows and other platforms | Refused | Still refused |
+
+A refused shell is not registered at all, so a guessed `bash` call is denied as
+an unknown tool. The other workspace tools are unaffected.
+
+On macOS, AMC cannot confine the shell yet (Seatbelt confinement arrives with
+P1-05). An unconfined shell runs `/bin/sh` as you: it can read files outside the
+workspace, including `~/.ssh`, and it can reach the network. AMC's policy
+guards still evaluate each call and provider keys are stripped from its
+environment, but nothing confines the process. To accept that risk, use one of
+these opt-ins:
+
+- `--unsafe-unconfined-shell` on `amc agent-loop run`, `amc agent-loop chat` or
+  `amc acp`.
+- `allowUnconfinedShell: true` in `AMCNativeClient.start()` options, which passes
+  that flag to the spawned `amc acp`, or `unconfinedShell: "sdk-option"` for
+  `openAgentSession()`.
+- `runtime.shell.allowUnconfined: true` in `.amc/amc.config.yaml`. AMC honours it
+  only while the file carries a valid auditor signature; an unsigned or edited
+  file is ignored with a message. Sign the file with `amc verify --sign-config`.
+  This is the only opt-in Studio accepts; the browser and the HTTP API cannot
+  enable the shell.
+
+An agent cannot grant itself the opt-in: `.amc` is a forbidden path for the
+file tools, and the config key needs the auditor signature. Delegated children
+inherit the parent's opt-in and can never widen it.
+
+Every opted-in session prints this warning on stderr (never on the ACP protocol
+stream), and Studio shows the same text as `shell.reason` in the native-task
+options:
+
+```text
+WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.
+```
+
+The session also records one `NATIVE_SHELL_UNCONFINED_ENABLED` audit row
+(`platform`, `optInSource`, `sessionId`). Each unconfined shell call records a
+`NATIVE_SHELL_CONFINEMENT` row with `backend: "none"`, `confined: false`,
+`enforcementLevel: "none"` and `optInSource` before the command runs. Linux
+receipts carry `enforcementLevel: "enforced"` and `boundary: "linux-bwrap"` when
+Bubblewrap confirmed the confinement.
+
 ## Native Linux shell tools
 
 Native `agentToolset` shell calls on Linux use the Bubblewrap backend. This is
