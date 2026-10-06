@@ -355,6 +355,20 @@ describe("verifyPassportArtifactFile (amc passport verify)", () => {
     pin: () => ["--pubkey", signed.auditorPub]
   });
 
+  test("a distrusted key is refused even when it is pinned with --pubkey", () => {
+    const root = testKey();
+    const auditorKeyId = sha(readFileSync(signed.auditorPub, "utf8"));
+    const now = Date.now();
+    const list = trustList([], { issuedAt: new Date(now - 3_600_000).toISOString(), expiresAt: new Date(now + 86_400_000).toISOString(),
+      distrust: [{ keyId: auditorKeyId, distrustedFrom: null, reason: "key-compromise", note: "forgery suite", source: "operator" }] });
+    const listPath = join(dir("amc-forgery-list-"), "list.json");
+    writeJson(listPath, signTrustList(list, root.privateKeyPem));
+    const result = amc(signed.workspace, ["passport", "verify", signed.passport, "--pubkey", signed.auditorPub,
+      "--trust-list", listPath, "--trust-root", root.keyId, "--allow-unpinned"]);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("distrusted");
+  });
+
   test("a passport whose inclusion proof carries its own fabricated root is refused", () => {
     const result = amc(signed.workspace, ["passport", "verify", fabricateProofRoot(signed.passport, "amc-passport"), "--pubkey", signed.auditorPub]);
     expect(result.status, result.output).toBe(1);
@@ -394,7 +408,7 @@ describe("verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSO
 
   function forge(): string {
     const envelope = readJson(fixture.file);
-    const payload = { ...(envelope.payload as Record<string, unknown>), score: 99 };
+    const payload: Record<string, unknown> = { ...(envelope.payload as Record<string, unknown>), score: 99 };
     payload.signingKey = { ...(payload.signingKey as Record<string, unknown>), publicKeyPem: attacker.publicKeyPem, fingerprint: sha(attacker.publicKeyPem) };
     const payloadSha256 = sha(canonicalize(payload));
     const path = join(dir("amc-forgery-tcf-"), "forged-trust.json");
