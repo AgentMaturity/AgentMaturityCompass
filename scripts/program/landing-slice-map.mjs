@@ -74,7 +74,7 @@ function checkRuleSlice(rule, slices, where) {
 }
 
 /** @returns {object} the slice map (schema in docs/program/landing/RUNBOOK.md) */
-export function buildSliceMap({ candidate, base, rules }) {
+function buildSliceMap({ candidate, base, rules }) {
   const head = git("rev-parse", "--verify", `${candidate}^{commit}`);
   const walked = walk(head, base);
   const slices = new Map(rules.slices.map((s) => [s.id, s]));
@@ -217,7 +217,7 @@ export function validateSliceMap(map) {
   return errors;
 }
 
-export const serialize = (map) => `${JSON.stringify(map, null, 2)}\n`;
+const serialize = (map) => `${JSON.stringify(map, null, 2)}\n`;
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const { values } = parseArgs({
