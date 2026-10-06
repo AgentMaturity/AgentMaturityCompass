@@ -3,6 +3,13 @@
   "decision": "D-15",
   "files": [
     {
+      "path": "pnpm-lock.yaml",
+      "issue": "P0-49",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+    },
+    {
       "path": "tests/privateModuleHelperVisibility.test.ts",
       "issue": "P0-47",
       "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
