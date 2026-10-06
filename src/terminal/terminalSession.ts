@@ -236,7 +236,11 @@ export class TerminalSession {
         // Attach immediately in case the second permission/write call throws.
         if (commandWrite) void commandWrite.catch(() => undefined);
         const markerWrite = this.backend.write(`printf '%s%d\\n' '${nonce}' "$?"\n`);
-        await Promise.all([commandWrite, markerWrite]);
+        // `exit 0; false` can close the shell before the sentinel line is accepted, and the
+        // backend may report that exit only after the write error. Once the command line is
+        // submitted, a rejected write goes to the ladder: `exited` when the shell is gone,
+        // otherwise `timeout` with the command left unresolved. A synchronous refusal still throws.
+        await Promise.all([commandWrite, markerWrite]).catch(() => undefined);
       }
       const result = await this.awaitReadiness();
       if (result.readiness.rung === "idle" || result.readiness.rung === "timeout") this.unresolved = this.pending;
