@@ -9,6 +9,157 @@
     "branches": 59,
     "statements": 64
   },
+  "platformFloorsSource": {
+    "linux": "GitHub Actions ubuntu-latest Node 22, CI run 37483109284 on main 8d78504d (the first build-test to complete since 2026-09-16)"
+  },
+  "platformFloors": {
+    "linux": {
+      "src/acp/acpProjection.ts": {
+        "lines": {
+          "total": 48,
+          "covered": 39
+        },
+        "branches": {
+          "total": 59,
+          "covered": 40
+        },
+        "statements": {
+          "total": 56,
+          "covered": 41
+        }
+      },
+      "src/adapters/adapterDetection.ts": {
+        "branches": {
+          "total": 42,
+          "covered": 29
+        }
+      },
+      "src/ops/backup/backupEngine.ts": {
+        "lines": {
+          "total": 218,
+          "covered": 171
+        },
+        "branches": {
+          "total": 113,
+          "covered": 60
+        },
+        "statements": {
+          "total": 223,
+          "covered": 172
+        }
+      },
+      "src/prompt/promptPackApi.ts": {
+        "lines": {
+          "total": 281,
+          "covered": 160
+        },
+        "statements": {
+          "total": 289,
+          "covered": 165
+        }
+      },
+      "src/prompt/promptPackVerifier.ts": {
+        "lines": {
+          "total": 41,
+          "covered": 27
+        },
+        "branches": {
+          "total": 32,
+          "covered": 17
+        },
+        "statements": {
+          "total": 41,
+          "covered": 27
+        }
+      },
+      "src/release/releaseProvenance.ts": {
+        "branches": {
+          "total": 15,
+          "covered": 11
+        }
+      },
+      "src/sandbox/seatbeltBackend.ts": {
+        "lines": {
+          "total": 25,
+          "covered": 13
+        },
+        "functions": {
+          "total": 8,
+          "covered": 6
+        },
+        "branches": {
+          "total": 18,
+          "covered": 4
+        },
+        "statements": {
+          "total": 26,
+          "covered": 14
+        }
+      },
+      "src/session/approvalEventMeta.ts": {
+        "branches": {
+          "total": 74,
+          "covered": 56
+        }
+      },
+      "src/studio/nativeTaskProjection.ts": {
+        "lines": {
+          "total": 66,
+          "covered": 41
+        },
+        "functions": {
+          "total": 7,
+          "covered": 5
+        },
+        "branches": {
+          "total": 101,
+          "covered": 45
+        },
+        "statements": {
+          "total": 110,
+          "covered": 52
+        }
+      },
+      "src/terminal/nativePtySandbox.ts": {
+        "lines": {
+          "total": 85,
+          "covered": 3
+        },
+        "functions": {
+          "total": 10,
+          "covered": 0
+        },
+        "branches": {
+          "total": 75,
+          "covered": 0
+        },
+        "statements": {
+          "total": 115,
+          "covered": 3
+        }
+      },
+      "src/vault/passphraseStore.ts": {
+        "branches": {
+          "total": 39,
+          "covered": 31
+        }
+      },
+      "src/vault/vault.ts": {
+        "lines": {
+          "total": 280,
+          "covered": 255
+        },
+        "branches": {
+          "total": 206,
+          "covered": 159
+        },
+        "statements": {
+          "total": 290,
+          "covered": 261
+        }
+      }
+    }
+  },
   "files": {
     "src/cli-agent-commands.ts": {
       "lines": {

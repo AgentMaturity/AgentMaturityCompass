@@ -41,12 +41,20 @@ export function coverageFiles(summary, root) {
   return files;
 }
 
-/** Existing files cannot fall below measured floors; new files meet global floors. */
-export function checkPerFileCoverage(files, baseline, expectedFiles = Object.keys(files)) {
+/**
+ * Existing files cannot fall below measured floors; new files meet global floors.
+ * `platformFloors[platform]` lowers named metrics of tracked files where tests are platform-gated
+ * (Seatbelt and keychain paths run only on macOS, so Linux CI covers fewer lines of them).
+ */
+export function checkPerFileCoverage(files, baseline, expectedFiles = Object.keys(files), platform = process.platform) {
   if (baseline?.v !== 1 || !baseline.files || !Object.keys(baseline.files).length) throw new Error("Missing per-file coverage baseline");
   for (const metric of metrics) {
     const value = baseline.newFileMinimum?.[metric];
     if (!Number.isFinite(value) || value < 0 || value > 100) throw new Error(`Invalid new-file coverage minimum: ${metric}`);
+  }
+  const platformFloors = baseline.platformFloors?.[platform] ?? {};
+  for (const name of Object.keys(platformFloors)) {
+    if (!baseline.files[name]) throw new Error(`Invalid platform floor for an untracked file: ${platform}:${name}`);
   }
   const failures = [];
   const expected = new Set(expectedFiles);
@@ -63,7 +71,7 @@ export function checkPerFileCoverage(files, baseline, expectedFiles = Object.key
     for (const metric of metrics) {
       const actual = fraction(values[metric], `${name}:${metric}`);
       const floor = baseline.files[name]
-        ? fraction(baseline.files[name][metric], `baseline:${name}:${metric}`)
+        ? fraction(platformFloors[name]?.[metric] ?? baseline.files[name][metric], `baseline:${name}:${metric}`)
         : baseline.newFileMinimum[metric] / 100;
       if (actual + Number.EPSILON < floor) failures.push({ file: name, metric, actual: actual * 100, minimum: floor * 100 });
     }
