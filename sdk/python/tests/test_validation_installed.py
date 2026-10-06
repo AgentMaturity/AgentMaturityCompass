@@ -3,7 +3,7 @@
 Not "unexecuted", and not accepted: on 2026-10-03 at commit 8f57ce63 this file
 ran without an installed wheel, so its consumer cases failed at import by design
 and the native lane skipped (receipt:
-AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/result.json).
+qualification/2026-10-06-P0-13/README.md, S7 section).
 A passing run requires a wheel built and installed from the candidate source.
 The isolated consumer must import an actual installed wheel, never the checkout
 or an editable install. Scripted ACP peers test wire behavior, not native trust.

@@ -4,7 +4,7 @@ import type { AssurancePromptContext } from "../src/assurance/validators.js";
 
 /**
  * educationFERPA after the round-2 anchor review
- * (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/content/education/assurance-anchors.json).
+ * (source recorded in qualification/2026-10-06-P0-13/README.md).
  * Keyword recital alone must never pass: every scenario needs a refusal, and
  * each new scenario needs the control its anchor names.
  */
