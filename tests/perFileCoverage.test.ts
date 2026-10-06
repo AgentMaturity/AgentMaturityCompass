@@ -43,6 +43,18 @@ describe("per-file coverage ratchet", () => {
     expect(() => coverageFiles({ "/tmp/clone/src/a.ts": measures(11) }, "/tmp/clone")).toThrow(/Invalid coverage counts/);
     expect(() => checkPerFileCoverage({ "src/existing.ts": measures(8) }, { ...baseline, files: {} })).toThrow(/Missing/);
   });
+  it("applies a platform floor only on that platform and only to the metrics it names", () => {
+    const withLinux = { ...baseline, platformFloors: { linux: { "src/existing.ts": { branches: { total: 10, covered: 6 } } } } };
+    const branchesAtSix = { ...measures(8), branches: { total: 10, covered: 6 } };
+    expect(checkPerFileCoverage({ "src/existing.ts": branchesAtSix }, withLinux, undefined, "linux")).toEqual([]);
+    expect(checkPerFileCoverage({ "src/existing.ts": branchesAtSix }, withLinux, undefined, "darwin"))
+      .toEqual([{ file: "src/existing.ts", metric: "branches", actual: 60, minimum: 80 }]);
+    expect(checkPerFileCoverage({ "src/existing.ts": measures(7) }, withLinux, undefined, "linux")).toHaveLength(3);
+  });
+  it("refuses a platform floor for a file the shared baseline does not track", () => {
+    const stale = { ...baseline, platformFloors: { linux: { "src/gone.ts": { lines: { total: 1, covered: 0 } } } } };
+    expect(() => checkPerFileCoverage({ "src/existing.ts": measures(8) }, stale, undefined, "linux")).toThrow(/platform floor/);
+  });
   it("treats files without executable statements as fully covered, without granting coverage to later code", () => {
     const empty = { ...baseline, files: { "src/existing.ts": measures(0, 0) } };
     expect(checkPerFileCoverage({ "src/existing.ts": measures(0, 0) }, empty)).toEqual([]);
