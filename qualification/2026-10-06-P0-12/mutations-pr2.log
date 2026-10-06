@@ -1,0 +1,38 @@
+## M1 eu-ai-act.lastReviewed -> 2024-01-01
+script exit=1
+### M1
+ FAIL  tests/regulatoryCurrency.test.ts > check-regulatory-currency script > passes on the committed register and prints the counts
+ FAIL  tests/regulatoryCurrency.test.ts > check-regulatory-currency script > --json lists every entry with status, lastReviewed, windowDays and sources
+ FAIL  tests/regulatoryCurrency.test.ts > regulatory register schema > validates cleanly as of the 2026-10-04 apply (sources read that day)
+      Tests  3 failed | 18 passed (21)
+restored: clean
+## M2 EU_AI_ACT_TIMELINE.annexIIIHighRisk -> 2026-08-02
+ src/compliance/euAiActClassifier.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+### M2
+ FAIL  tests/euAiActTimeline.test.ts > EU AI Act classifier timeline parity with the register > every classifier date equals the verified register date of the same id
+ FAIL  tests/euAiActTimeline.test.ts > EU AI Act classifier timeline parity with the register > encodes the post-omnibus high-risk dates (Art. 113(c))
+      Tests  2 failed | 9 passed (11)
+restored: clean
+## M3 EU_AI_ACT_TIMELINE.publicAuthorityHighRiskDeadline -> 2030-08-03
+ src/compliance/euAiActClassifier.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+### M3
+ FAIL  tests/euAiActTimeline.test.ts > EU AI Act classifier timeline parity with the register > every classifier date equals the verified register date of the same id
+      Tests  1 failed | 10 passed (11)
+restored: clean
+## M4 delete retrievedAt from eu-ai-act keyDates[0]
+### M4
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > register entries carry per-date provenance > every keyDate cites an official url and a retrievedAt
+      Tests  1 failed | 12 passed (13)
+restored: clean
+## M5 br-lgpd obligation Art. 7 verified -> true
+### M5
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > root ruling: CN, BR, IN and JP entries assert nothing as verified > every CN, BR, IN and JP entry is unverified and has no verified obligation
+      Tests  1 failed | 12 passed (13)
+restored: clean
+## M6 one digestRows reference back to AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/
+### M6
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > program-record references are labels, not repository paths > cites program records as program-records/2026-10-03/<path> and says they are held outside the repository
+      Tests  1 failed | 12 passed (13)
+restored: clean

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "key": "P0-12",
   "date": "2026-10-06",
-  "commit": "248fa066c4cc82864c8c356ae4ff9db5adddbaad",
-  "branch": "rtd/p0-12-slice-a",
+  "commit": "3698a021b725df9873670ea3f80604b25b64ff95",
+  "branch": "rtd/p0-12-slice-a-register",
   "node": "v25.5.0",
   "pnpm": "10.33.0",
   "os": "darwin 25.6.0 (macOS 26.6.2)",
@@ -12,132 +12,132 @@
     {
       "cmd": "pnpm install --frozen-lockfile",
       "exit": 0,
-      "durationMs": 1725
+      "durationMs": 1707
     },
     {
       "cmd": "pnpm run build",
       "exit": 0,
-      "durationMs": 25344
+      "durationMs": 25306
     },
     {
-      "cmd": "npx vitest run tests/industryPackSchema.test.ts tests/industryPackFrameworkNormalization.test.ts tests/industryPackDepthFloor.test.ts tests/industryPackRegulatoryRefresh.test.ts tests/publicQuestionCountDrift.test.ts tests/citationMetadata.test.ts tests/executiveBoardPath.test.ts tests/logisticsIndustryPack.test.ts tests/domainDocs.test.ts",
+      "cmd": "npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts",
       "exit": 0,
-      "durationMs": 1769
+      "durationMs": 2306
     },
     {
-      "cmd": "npx vitest run tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts",
+      "cmd": "npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts tests/assurance/",
       "exit": 0,
-      "durationMs": 1834
+      "durationMs": 5366
     },
     {
       "cmd": "npm run check:regulatory-currency",
       "exit": 0,
-      "durationMs": 190
+      "durationMs": 218
     },
     {
       "cmd": "node scripts/check-regulatory-currency.mjs --as-of 2027-01-01",
       "exit": 0,
-      "durationMs": 80
+      "durationMs": 72
     },
     {
       "cmd": "node scripts/check-regulatory-currency.mjs --as-of 2027-01-02",
       "exit": 1,
-      "durationMs": 78
+      "durationMs": 73
     },
     {
       "cmd": "node scripts/check-regulatory-currency.mjs --bogus",
       "exit": 1,
-      "durationMs": 74
+      "durationMs": 67
     },
     {
       "cmd": "node scripts/check-regulatory-currency.mjs --as-of \"\"",
       "exit": 1,
-      "durationMs": 75
-    },
-    {
-      "cmd": "npm run typecheck",
-      "exit": 0,
-      "durationMs": 21002
-    },
-    {
-      "cmd": "npm run typecheck:tests",
-      "exit": 0,
-      "durationMs": 28972
-    },
-    {
-      "cmd": "npm run lint",
-      "exit": 0,
-      "durationMs": 2536
-    },
-    {
-      "cmd": "npm run check:counts",
-      "exit": 0,
-      "durationMs": 320
-    },
-    {
-      "cmd": "npm run check:docs-drift",
-      "exit": 0,
-      "durationMs": 258
-    },
-    {
-      "cmd": "npm run check:architecture-boundaries",
-      "exit": 0,
-      "durationMs": 1403
-    },
-    {
-      "cmd": "npm run check:freeze",
-      "exit": 0,
-      "durationMs": 1031
+      "durationMs": 68
     },
     {
       "cmd": "node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check",
       "exit": 0,
-      "durationMs": 4027
-    },
-    {
-      "cmd": "O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo \"$O\"; test -z \"$O\"",
-      "exit": 0,
-      "durationMs": 48
-    },
-    {
-      "cmd": "O=$(git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 f4ad34cd4d130ab101fd78b68cb30da76c052873 --); echo \"$O\"; test -z \"$O\"",
-      "exit": 0,
-      "durationMs": 47
-    },
-    {
-      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 97027c5d9ca87c686fd54c3d43c947fce8bcc0b0 HEAD --",
-      "exit": 0,
-      "durationMs": 49
-    },
-    {
-      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da a54b88fc94fc181a87c3d1d1bff9160040589610 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat a54b88fc94fc181a87c3d1d1bff9160040589610 HEAD --",
-      "exit": 0,
-      "durationMs": 47
-    },
-    {
-      "cmd": "O=$(git diff --name-only origin/main HEAD -- AMC_OS); echo \"$O\"; test -z \"$O\"",
-      "exit": 0,
-      "durationMs": 34
+      "durationMs": 4344
     },
     {
       "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
       "exit": 0,
-      "durationMs": 31043
+      "durationMs": 32258
     },
     {
-      "cmd": "npm run check:clean-source",
+      "cmd": "npm run typecheck",
       "exit": 0,
-      "durationMs": 43681
+      "durationMs": 21647
     },
     {
-      "cmd": "npm run check:packed-install",
+      "cmd": "npm run typecheck:tests",
       "exit": 0,
-      "durationMs": 40371
+      "durationMs": 28709
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 2421
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 318
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 272
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 195
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1401
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1020
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 215
+    },
+    {
+      "cmd": "O=$(git diff --name-only e680f2a6098b53c665b7f2ee7e738c2f05f24984 HEAD -- AMC_OS); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 21
+    },
+    {
+      "cmd": "O=$(git grep -n 'regulated-platform-program' -- src docs tests ':(exclude)docs/program/landing'); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 132
+    },
+    {
+      "cmd": "git grep -n 'regulated-platform-program' -- src docs tests | cut -d: -f1 | sort | uniq -c",
+      "exit": 0,
+      "durationMs": 119
+    },
+    {
+      "cmd": "git diff --name-only -z 67d73223897008ca4ed8baf81c970020b4bf944d 1962e06cf3b82e46811305c6583478dffe06edf1 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1962e06cf3b82e46811305c6583478dffe06edf1 3792bf920f2eebc2ad4221d4e28123b7afc9cfc0 --",
+      "exit": 0,
+      "durationMs": 37
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 2720
     }
   ],
   "tests": {
-    "total": 7290,
-    "passed": 7290,
+    "total": 7787,
+    "passed": 7787,
     "failed": 0,
     "skipped": 0
   },
@@ -157,7 +157,19 @@
     {
       "path": "review-red.log",
       "sha256": "b44d4d5e40937e702f2172b414491cfe79e402b718eb1c4c0f8e1ab3f18945ed"
+    },
+    {
+      "path": "commands-pr2.tsv",
+      "sha256": "71eb43c021660ab8aa394117014275eb1d575f7768c36e1a43f46b036b06a19d"
+    },
+    {
+      "path": "red-run-pr2.log",
+      "sha256": "3b5c775d8d7307c2abf4118d62bb928a992d093ac701218aa1ae7ad4aebe1306"
+    },
+    {
+      "path": "mutations-pr2.log",
+      "sha256": "052952db6b1f6de4f3beb6b4807f668ac634d8d29df82287fbe4d0e20efe80d1"
     }
   ],
-  "notes": "Slice A PR 1 (S3 and S5), rerun in one fresh clone of the branch head on 2026-10-06 after the review fixes (the first run, at ba2121599ff3, passed the same commands; see README.md). tests sums the three vitest runs in commands.tsv (35 focused S3 tests, 142 focused S5 tests, 7,113 restoration-parity and plan-edit-manifest tests); the full suite, npm run release:gate and the coverage steps are run by the orchestrator in CI and are not part of this receipt. Expected non-zero exits: node scripts/check-regulatory-currency.mjs --as-of 2027-01-02 exits 1 because every register entry is then 91 days past its 2026-10-03 review (window 90 days); --bogus exits 1 on the unknown flag; --as-of \"\" exits 1 because an empty value counts as missing. These are the negative runs. The tree-equivalence commands at f4ad34cd use test -z, so exit 0 means the diff printed nothing; the S3 and S5 comparisons against HEAD are recorded without test -z because they list named exceptions (see README.md). review-red.log holds the failing runs of the two review-fix regression tests."
+  "notes": "This receipt covers both PRs of P0-12. commit, branch, commands and tests describe PR 2 (slice A-register: the round-2 register commits 9d2636531 and 1962e06cf with their AMC_OS receipt paths stripped, the re-pointed program-record references, changeset and counts), run in one fresh clone of 3698a021 on 2026-10-06 (UTC) with origin/main, candidate/head and the worktree-wf_* track branches fetched; the same commands are in commands-pr2.tsv. tests sums two vitest runs of PR 2 (674 register, regulatory and assurance tests, which include the 45 in the first focused run, and 7,113 restoration-parity and plan-edit-manifest tests). The full suite, coverage, per-file floors and npm run release:gate are run by the orchestrator and are not part of this receipt. Expected non-zero exits in PR 2: --as-of 2027-01-02 exits 1 (all 176 entries are then 91 days past their 2026-10-03 review); --bogus and --as-of \"\" exit 1 (unknown flag, empty value); npm run check:dead-code exits 1 with 2,342 findings, the same list as e680f2a6 (compared without line numbers on git archive exports); the tree-equivalence diff against 1962e06cf lists three named exceptions that PR 1's review fixes changed on main (see README.md). PR 1 (slice A, rtd/p0-12-slice-a at 248fa066): Slice A PR 1 (S3 and S5), rerun in one fresh clone of the branch head on 2026-10-06 after the review fixes (the first run, at ba2121599ff3, passed the same commands; see README.md). tests sums the three vitest runs in commands.tsv (35 focused S3 tests, 142 focused S5 tests, 7,113 restoration-parity and plan-edit-manifest tests); the full suite, npm run release:gate and the coverage steps are run by the orchestrator in CI and are not part of this receipt. Expected non-zero exits: node scripts/check-regulatory-currency.mjs --as-of 2027-01-02 exits 1 because every register entry is then 91 days past its 2026-10-03 review (window 90 days); --bogus exits 1 on the unknown flag; --as-of \"\" exits 1 because an empty value counts as missing. These are the negative runs. The tree-equivalence commands at f4ad34cd use test -z, so exit 0 means the diff printed nothing; the S3 and S5 comparisons against HEAD are recorded without test -z because they list named exceptions (see README.md). review-red.log holds the failing runs of the two review-fix regression tests."
 }

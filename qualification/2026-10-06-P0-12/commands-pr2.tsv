@@ -1,0 +1,25 @@
+0	1707	pnpm install --frozen-lockfile
+0	25306	pnpm run build
+0	2306	npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts
+0	5366	npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts tests/regulatoryAutomation.test.ts tests/round4Gaps.test.ts tests/regulatoryClaimsHonesty.test.ts tests/complyRiskClassifyDocs.test.ts tests/apiRouters.test.ts tests/assurance/
+0	218	npm run check:regulatory-currency
+0	72	node scripts/check-regulatory-currency.mjs --as-of 2027-01-01
+1	73	node scripts/check-regulatory-currency.mjs --as-of 2027-01-02
+1	67	node scripts/check-regulatory-currency.mjs --bogus
+1	68	node scripts/check-regulatory-currency.mjs --as-of ""
+0	4344	node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check
+0	32258	npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts
+0	21647	npm run typecheck
+0	28709	npm run typecheck:tests
+0	2421	npm run lint
+0	318	npm run check:counts
+0	272	npm run check:docs-drift
+0	195	npm run check:api-ref
+0	1401	npm run check:architecture-boundaries
+0	1020	npm run check:freeze
+0	215	npm run check:qualification
+0	21	O=$(git diff --name-only e680f2a6098b53c665b7f2ee7e738c2f05f24984 HEAD -- AMC_OS); echo "$O"; test -z "$O"
+0	132	O=$(git grep -n 'regulated-platform-program' -- src docs tests ':(exclude)docs/program/landing'); echo "$O"; test -z "$O"
+0	119	git grep -n 'regulated-platform-program' -- src docs tests | cut -d: -f1 | sort | uniq -c
+0	37	git diff --name-only -z 67d73223897008ca4ed8baf81c970020b4bf944d 1962e06cf3b82e46811305c6583478dffe06edf1 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1962e06cf3b82e46811305c6583478dffe06edf1 3792bf920f2eebc2ad4221d4e28123b7afc9cfc0 --
+1	2720	npm run check:dead-code

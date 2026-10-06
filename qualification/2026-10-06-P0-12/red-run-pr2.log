@@ -1,0 +1,27 @@
+### 1. tests/regulatoryCurrencyRegister.test.ts and tests/regulatoryCurrency.test.ts from 1962e06cf checked out onto unchanged e680f2a6, with tests/euAiActTimeline.test.ts
+$ npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > register entries carry per-date provenance > every keyDate cites an official url and a retrievedAt
+AssertionError: eu-ai-act.entryIntoForce url undefined: expected false to be true // Object.is equality
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > root ruling: CN, BR, IN and JP entries assert nothing as verified > every CN, BR, IN and JP entry is unverified and has no verified obligation
+AssertionError: cn-pipl: expected true to be false // Object.is equality
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > round-2 refuter fixes are applied > EHDS entered into force 2025-03-25 (OJ Art. 105 + Cellar)
+AssertionError: expected undefined to match object { date: '2025-03-25', verified: true }
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > round-2 refuter fixes are applied > the contested Machinery Regulation application date stays unverified
+AssertionError: expected undefined to be false // Object.is equality
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > round-2 refuter fixes are applied > CMS-0057-F decision-timeframe duties carry the 2026-01-01 day, not a bare year
+AssertionError: expected undefined to be '2026-01-01' // Object.is equality
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > round-2 refuter fixes are applied > retrieval observations are flagged so the calendar can skip them
+AssertionError: expected [] to deeply equal [ 'us-eeoc-ai-ta', …(2) ]
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > round-2 refuter fixes are applied > the withdrawn AI Liability Directive proposal is not presented as in force
+AssertionError: expected undefined to match object { status: 'superseded', …(1) }
+ Test Files  1 failed | 2 passed (3)
+      Tests  7 failed | 37 passed (44)
+vitest exit=1
+
+### 2. program-record regression test (d2a671c6) at 3792bf92, before the re-point (fa0c7fdd)
+$ npx vitest run tests/regulatoryCurrencyRegister.test.ts
+ FAIL  tests/regulatoryCurrencyRegister.test.ts > program-record references are labels, not repository paths > cites program records as program-records/2026-10-03/<path> and says they are held outside the repository
+AssertionError: expected '{\n  "schemaVersion": 1,\n  "policy":…' not to contain 'AMC_OS/'
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+vitest exit=1
