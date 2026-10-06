@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": minor
+---
+
+The regulatory register (`src/compliance/regulatory/register.json`) grows from 17 to 176 instruments across 20 jurisdictions: 108 verified and 68 unverified, all last reviewed on 2026-10-03, so `npm run check:regulatory-currency` fails from 2 January 2027 until they are re-reviewed. Every key date now carries the official `url` it was read from (or sought on, when it is unverified) and its `retrievedAt` date, and register entries may name the industry packs they affect, superseded or withdrawn predecessors (`taskStatus`) and retrieval observations that are not legal dates. China, Brazil, India and Japan entries assert nothing as verified. `EU_AI_ACT_TIMELINE` adds `publicAuthorityHighRiskDeadline` (2 August 2030, Art. 111(2) as amended) and `annexXLargeScaleIt` (31 December 2030, Art. 111(1)). Register bases cite program receipts as `program-records/2026-10-03/<path>`, a name for records held outside the repository. The register is agent-drafted and stays experimental until a named expert reviews it: `verified` means the fact was read from an official source, not that an expert approved it, and it is not legal advice.
