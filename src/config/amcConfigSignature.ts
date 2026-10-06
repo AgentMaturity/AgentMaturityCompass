@@ -38,10 +38,9 @@ export function signAmcConfig(workspace: string): string {
  * Verifies the signature over amc.config.yaml.
  *
  * Returns signatureExists: false when unsigned, so callers can distinguish
- * "never signed" from "signature does not match". A caller that acts on the
- * config passes the bytes it parsed, so the check covers exactly those bytes.
+ * "never signed" from "signature does not match".
  */
-export function verifyAmcConfigSignature(workspace: string, configBytes?: Buffer): {
+export function verifyAmcConfigSignature(workspace: string): {
   valid: boolean;
   signatureExists: boolean;
   reason: string | null;
@@ -59,7 +58,7 @@ export function verifyAmcConfigSignature(workspace: string, configBytes?: Buffer
       configSha256: string;
       signature: string;
     };
-    const digest = sha256Hex(configBytes ?? readFileSync(configPath));
+    const digest = sha256Hex(readFileSync(configPath));
     if (digest !== payload.configSha256) {
       return { valid: false, signatureExists: true, reason: "config digest mismatch" };
     }

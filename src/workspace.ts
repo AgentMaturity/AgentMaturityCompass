@@ -49,7 +49,7 @@ import { assurancePolicyPath, initAssurancePolicy } from "./assurance/assuranceP
 import { auditPolicyPath, initAuditPolicy } from "./audit/auditPolicyStore.js";
 import { auditMapActivePath, auditMapBuiltinPath, initAuditMaps } from "./audit/auditMapStore.js";
 import { readFileSync } from "node:fs";
-import { signAmcConfig, verifyAmcConfigSignature } from "./config/amcConfigSignature.js";
+import { signAmcConfig } from "./config/amcConfigSignature.js";
 
 export interface WorkspacePaths {
   agentId: string;
@@ -154,8 +154,7 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
   if (!pathExists(paths.config)) {
     return defaultAMCConfig();
   }
-  const bytes = readFileSync(paths.config);
-  const raw = YAML.parse(bytes.toString("utf8")) as Partial<AMCConfig> | null;
+  const raw = YAML.parse(readUtf8(paths.config)) as Partial<AMCConfig> | null;
   const base = defaultAMCConfig();
   return {
     profile: raw?.profile === "ci" || raw?.profile === "prod" || raw?.profile === "dev" ? raw.profile : base.profile,
@@ -170,9 +169,6 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
       trustBoundaryMode: raw?.security?.trustBoundaryMode === "isolated" ? "isolated" : base.security.trustBoundaryMode,
       durability: raw?.security?.durability === "power-loss" ? "power-loss" : "crash"
     },
-    // Kept only while the signature covers these bytes: amc init re-saves and re-signs, and must never sign an unsigned opt-in.
-    ...(raw?.runtime?.shell?.allowUnconfined === true && verifyAmcConfigSignature(workspace, bytes).valid
-      ? { runtime: { shell: { allowUnconfined: true } } } : {}),
     supervise: {
       extraEnv: raw?.supervise?.extraEnv ?? {},
       includeProxyEnv: raw?.supervise?.includeProxyEnv ?? base.supervise.includeProxyEnv,

@@ -17,20 +17,6 @@
       "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
     },
     {
-      "path": "src/types.ts",
-      "issue": "P0-06",
-      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
-      "archivePath": "unused-code/plan-edits/P0-06/src/types.ts.landed",
-      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
-    },
-    {
-      "path": "src/workspace.ts",
-      "issue": "P0-06",
-      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
-      "archivePath": "unused-code/plan-edits/P0-06/src/workspace.ts.landed",
-      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
-    },
-    {
       "path": "tests/privateModuleHelperVisibility.test.ts",
       "issue": "P0-47",
       "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",

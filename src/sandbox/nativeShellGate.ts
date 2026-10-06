@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import YAML from "yaml";
-import { verifyAmcConfigSignature } from "../config/amcConfigSignature.js";
 import { bwrapBackend } from "./bwrapBackend.js";
 
 /**
@@ -10,8 +9,10 @@ import { bwrapBackend } from "./bwrapBackend.js";
  * Linux runs it under Bubblewrap. Nothing else can confine it yet, so every
  * other platform is refused, except macOS when an operator explicitly accepts
  * an unconfined shell. An opt-in never re-enables an unconfined Linux shell.
+ * No workspace file is an opt-in: a workspace verifies its config against its
+ * own keys, so a repository could sign one itself.
  */
-export type ShellOptInSource = "cli-flag" | "signed-config" | "sdk-option";
+export type ShellOptInSource = "cli-flag" | "sdk-option";
 export type NativeShellDecision =
   | { readonly kind: "confined"; readonly boundary: "linux-bwrap" }
   | { readonly kind: "unconfined-opt-in"; readonly platform: NodeJS.Platform; readonly source: ShellOptInSource }
@@ -27,7 +28,8 @@ export interface NativeShellReadiness {
   readonly optInSource: ShellOptInSource | null;
 }
 
-const MACOS_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell or set runtime.shell.allowUnconfined: true in a signed .amc/amc.config.yaml.";
+const MACOS_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
+const NOT_HONOURED = "runtime.shell.allowUnconfined is not honoured: a workspace can sign its own config, so a file in the repository cannot grant an unconfined shell. Pass --unsafe-unconfined-shell, or start Studio with AMC_UNSAFE_UNCONFINED_SHELL=1.";
 const WINDOWS_REFUSAL = "The native shell is not available on Windows. AMC has no confined Windows runner yet; the unsafe flag does not apply on Windows.";
 
 export function decideNativeShell(input: {
@@ -51,27 +53,19 @@ export function unconfinedShellWarning(platform: NodeJS.Platform, source: ShellO
   return `WARNING: the native shell is UNCONFINED on ${platform} (opt-in: ${source}). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.`;
 }
 
-/** The explicit opt-ins a caller may pass; "signed-config" is only ever derived from a verified file. */
-export type ExplicitShellOptIn = Exclude<ShellOptInSource, "signed-config">;
-type ResolvedOptIn = { readonly optIn: ShellOptInSource | null; readonly ignored: string | null };
-const NO_OPT_IN: ResolvedOptIn = { optIn: null, ignored: null };
+/** The explicit opt-ins a caller may pass. */
+export type ExplicitShellOptIn = ShellOptInSource;
 
-/** `runtime.shell.allowUnconfined: true` counts only under a valid auditor signature over the bytes read here. */
-function signedConfigOptIn(workspace: string): ResolvedOptIn {
-  let bytes: Buffer;
-  let raw: { runtime?: { shell?: { allowUnconfined?: unknown } } } | null;
+/** Whether the config still carries the retired key, so a refusal can say it is not honoured. */
+function configCarriesOptIn(workspace: string): boolean {
   try {
-    bytes = readFileSync(join(workspace, ".amc", "amc.config.yaml"));
-    raw = YAML.parse(bytes.toString("utf8")) as typeof raw;
-  } catch { return NO_OPT_IN; } // No readable config: nothing was opted in.
-  if (raw?.runtime?.shell?.allowUnconfined !== true) return NO_OPT_IN;
-  const signature = verifyAmcConfigSignature(workspace, bytes);
-  return signature.valid ? { optIn: "signed-config", ignored: null } : { optIn: null,
-    ignored: `runtime.shell.allowUnconfined is ignored: ${signature.reason ?? "signature invalid"}. Re-sign the config with: amc verify --sign-config` };
+    const raw = YAML.parse(readFileSync(join(workspace, ".amc", "amc.config.yaml"), "utf8")) as { runtime?: { shell?: { allowUnconfined?: unknown } } } | null;
+    return raw?.runtime?.shell?.allowUnconfined !== undefined;
+  } catch { return false; } // No readable config: nothing to explain.
 }
 
-function readinessFor(config: ResolvedOptIn): NativeShellReadiness {
-  const decision = decideNativeShell({ platform: process.platform, bwrap: bwrapBackend().available(), optIn: config.optIn });
+function readinessFor(workspace: string, optIn: ShellOptInSource | null): NativeShellReadiness {
+  const decision = decideNativeShell({ platform: process.platform, bwrap: bwrapBackend().available(), optIn });
   if (decision.kind === "confined") {
     return { offered: true, decision: decision.kind, enforcement: "enforced", boundary: decision.boundary, reason: null, optInSource: null };
   }
@@ -80,24 +74,21 @@ function readinessFor(config: ResolvedOptIn): NativeShellReadiness {
       reason: unconfinedShellWarning(decision.platform, decision.source), optInSource: decision.source };
   }
   return { offered: false, decision: decision.kind, enforcement: "none", boundary: null,
-    reason: config.ignored === null ? decision.remediation : `${config.ignored} ${decision.remediation}`, optInSource: null };
+    reason: configCarriesOptIn(workspace) ? `${NOT_HONOURED} ${decision.remediation}` : decision.remediation, optInSource: null };
 }
 
-/** Decide once for a top-level session; an explicit opt-in wins over the config. */
+/** Decide once for a top-level session from the caller's explicit opt-in only; never from a file or the environment. */
 export function nativeShellReadiness(workspace: string, explicit?: ExplicitShellOptIn): NativeShellReadiness {
-  // Checked at run time too: a JavaScript caller must not label its own opt-in as the signed config.
-  return readinessFor(explicit === "cli-flag" || explicit === "sdk-option" ? { optIn: explicit, ignored: null } : signedConfigOptIn(workspace));
+  // Checked at run time too: a JavaScript caller may pass any value.
+  return readinessFor(workspace, explicit === "cli-flag" || explicit === "sdk-option" ? explicit : null);
 }
 
 /**
  * A delegated child's decision: the parent's, never wider. A refused parent
- * refuses the child; otherwise the child re-checks the platform and backend
- * (and re-verifies a signed-config opt-in), which can only narrow it. A child
- * with no parent decision inherits no opt-in.
+ * refuses the child; otherwise the child re-checks the platform and backend,
+ * which can only narrow it. A child with no parent decision inherits no opt-in.
  */
 export function childShellReadiness(workspace: string, parent: NativeShellReadiness | null): NativeShellReadiness {
   if (parent !== null && !parent.offered) return parent;
-  const source = parent?.optInSource ?? null;
-  if (source === "signed-config") return readinessFor(signedConfigOptIn(workspace));
-  return readinessFor(source === "cli-flag" || source === "sdk-option" ? { optIn: source, ignored: null } : NO_OPT_IN);
+  return readinessFor(workspace, parent?.optInSource ?? null);
 }

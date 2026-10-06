@@ -90,9 +90,9 @@ export async function handleNativeTasksRoute(
     if (pathname === `${prefix}/options` && method === "GET") {
       assertQuery(params, ["agentId"]);
       const configuration = await native.service.configuration(actorFor(context.workspace, native, params.get("agentId")));
-      // Studio's only opt-in is the signed config key; `shell.reason` is the banner text (P0-06).
+      // Studio's only opt-in is the service's, from its operator environment at start; `shell.reason` is the banner text (P0-06).
       apiSuccess(res, { ...configuration, nativeCsrfToken: native.nativeCsrfToken, executionBlocked: !native.executionAllowed(),
-        shell: nativeShellReadiness(context.workspace) });
+        shell: nativeShellReadiness(context.workspace, native.service.shellOptIn ?? undefined) });
       return true;
     }
     if (pathname === prefix && method === "GET") {

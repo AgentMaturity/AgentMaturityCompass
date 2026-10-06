@@ -3227,13 +3227,12 @@ components:
         optInSource:
           type: string
           enum:
-            - signed-config
             - cli-flag
             - sdk-option
             - null
           nullable: true
       description: "Whether native tasks are offered bash. Show reason as a banner: the refusal, or the warning for
-        an UNCONFINED macOS shell enabled by the signed config."
+        an UNCONFINED macOS shell enabled by the operator's environment when Studio started."
     NativeTaskResponse:
       type: object
       additionalProperties: false
