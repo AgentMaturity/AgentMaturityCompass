@@ -40,9 +40,11 @@ export function withTrustFlags(command: Command, extra: { pubkey?: string; expec
 
 /** The verifier operator's trust: --pubkey for `purposes`, --expect-monitor, trust lists and the AMC home defaults. */
 export function trustFromFlags(flags: TrustFlags, purposes: readonly KeyPurpose[]): TrustContext {
+  // An empty value (often an unset shell variable) is a mistake, not "no pin": refuse it.
+  if (flags.pubkey === "") throw new Error("--pubkey needs a path");
   return loadTrustContext({
-    ...(flags.pubkey ? { pubkey: { path: resolve(flags.pubkey), purposes } } : {}),
-    ...(flags.expectMonitor ? { expectMonitor: flags.expectMonitor } : {}),
+    ...(flags.pubkey !== undefined ? { pubkey: { path: resolve(flags.pubkey), purposes } } : {}),
+    ...(flags.expectMonitor !== undefined ? { expectMonitor: flags.expectMonitor } : {}),
     trustLists: (flags.trustList ?? []).map((path) => resolve(path)),
     trustRoots: flags.trustRoot ?? [],
     allowUnpinned: flags.allowUnpinned === true,

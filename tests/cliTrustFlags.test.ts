@@ -152,9 +152,14 @@ describe("trustFromFlags", () => {
     ["65 hex digits", `${FINGERPRINT}a`],
     ["not hex", `${"z".repeat(64)}`],
     ["a 0x prefix", `0x${FINGERPRINT.slice(2)}`],
-    ["an inner space", `${FINGERPRINT.slice(0, 32)} ${FINGERPRINT.slice(33)}`]
+    ["an inner space", `${FINGERPRINT.slice(0, 32)} ${FINGERPRINT.slice(33)}`],
+    ["an empty value, as from an unset shell variable", ""]
   ])("refuses a malformed --expect-monitor value (%s) instead of pinning it", (_label, value) => {
     expect(() => trustFromFlags({ expectMonitor: value }, ["ledger-row"])).toThrow("--expect-monitor must be a 64 hex sha256 fingerprint");
+  });
+
+  it("refuses an empty --pubkey instead of silently verifying unpinned", () => {
+    expect(() => trustFromFlags({ pubkey: "" }, ["artifact-seal"])).toThrow("--pubkey needs a path");
   });
 
   it.each(["abc", "g".repeat(64), `${FINGERPRINT}00`])("refuses a malformed --trust-root value %j", (value) => {
