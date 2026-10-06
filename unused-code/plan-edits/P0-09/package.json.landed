@@ -6,7 +6,6 @@
   "main": "dist/index.js",
   "files": [
     "dist/**",
-    "dist/trust/data/amc-distrust.json",
     "!dist/sea/**",
     "!dist/installers/**",
     "scripts/postinstall.js",
@@ -148,10 +147,6 @@
     "./telemetry/pi": {
       "types": "./dist/importers/piTelemetryCallbacks.d.ts",
       "import": "./dist/importers/piTelemetryCallbacks.js"
-    },
-    "./trust": {
-      "types": "./dist/trust/index.d.ts",
-      "import": "./dist/trust/index.js"
     }
   },
   "dependencies": {

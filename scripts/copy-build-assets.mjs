@@ -13,6 +13,8 @@ for (const [source, destination] of [
   rmSync(target, { recursive: true, force: true });
   cpSync(join(root, source), target, { recursive: true });
 }
+mkdirSync(join(root, "dist/trust/data"), { recursive: true });
+cpSync(join(root, "src/trust/data/amc-distrust.json"), join(root, "dist/trust/data/amc-distrust.json"));
 mkdirSync(join(root, "dist/acp"), { recursive: true });
 cpSync(join(root, "vendor/acp-schema/schema.json"), join(root, "dist/acp/acp-schema.json"));
 const cli = join(root, "dist/cli.js");

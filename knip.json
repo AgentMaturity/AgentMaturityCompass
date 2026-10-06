@@ -5,7 +5,7 @@
       "entry": [
         "src/index.ts", "src/cli.ts", "api/index.ts",
         "src/sdk/mobileFetch.ts", "src/sdk/nativeAgentClient.ts",
-        "src/standard/externalEvidenceProfile.ts", "src/importers/piTelemetryCallbacks.ts",
+        "src/standard/externalEvidenceProfile.ts", "src/importers/piTelemetryCallbacks.ts", "src/trust/index.ts",
         "examples/hello-agent/agent.js",
         "scripts/dev/reachability.mjs", "scripts/standalone-api-smoke.mjs",
         "scripts/compat-matrix-report.mjs", "scripts/fake-external-signer.mjs",
