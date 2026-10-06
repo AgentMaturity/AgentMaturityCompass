@@ -554,12 +554,26 @@ describe('LongTermMemory (enhanced)', () => {
   });
 
   it('gets stats', () => {
-    const mem = new LongTermMemory();
-    mem.set('a', 1, { namespace: 'ns1' });
-    mem.set('b', 2, { namespace: 'ns2' });
-    const stats = mem.getStats();
-    expect(stats.totalEntries).toBe(2);
-    expect(stats.namespaces).toHaveLength(2);
+    // Fixed clock: entries one millisecond apart or in the same millisecond must not
+    // change which oldest/newest comparisons run (it flipped per-file branch coverage).
+    vi.useFakeTimers();
+    try {
+      const mem = new LongTermMemory();
+      vi.setSystemTime(new Date('2026-06-21T00:00:01.000Z'));
+      mem.set('a', 1, { namespace: 'ns1' });
+      mem.set('same-ms', 1, { namespace: 'ns1' });
+      vi.setSystemTime(new Date('2026-06-21T00:00:02.000Z'));
+      mem.set('b', 2, { namespace: 'ns2' });
+      vi.setSystemTime(new Date('2026-06-21T00:00:00.000Z'));
+      mem.set('c', 3, { namespace: 'ns2' });
+      const stats = mem.getStats();
+      expect(stats.totalEntries).toBe(4);
+      expect(stats.namespaces).toHaveLength(2);
+      expect(stats.oldestEntry).toBe(Date.parse('2026-06-21T00:00:00.000Z'));
+      expect(stats.newestEntry).toBe(Date.parse('2026-06-21T00:00:02.000Z'));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('clears namespace', () => {
