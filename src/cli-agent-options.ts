@@ -67,6 +67,7 @@ export interface RunOptions {
   maxSteps?: string;
   tools?: string;
   toolMode?: string;
+  unsafeUnconfinedShell?: boolean;
   failFirst?: string;
   thinkMs?: string;
   cancelAfter?: string;

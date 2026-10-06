@@ -153,6 +153,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--approve-tools <actionClass>", "require the signed approval gate before each tool call")
     .option("--approve-risk <tier>", "approval risk tier (default high)")
     .option("--tools <mode>", "none, echo, or explicitly enabled workspace tools; existing policy still applies")
+    .option("--unsafe-unconfined-shell", "macOS only: offer the native shell UNCONFINED, with your full user rights; refused on Windows, never needed on Linux")
     .option("--max-tokens <n>", "output-token limit per request (default 512)")
     .option("--thinking <mode>", "DeepSeek only: enabled or disabled; tools-free chat requires explicit disabled")
     .option("--reasoning-effort <effort>", "DeepSeek only: exact low, high, or max with enabled thinking")
@@ -191,6 +192,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--max-steps <n>", "how many model steps one turn may take")
     .option("--tools <mode>", 'tool seam: "workspace" (the governed built-ins), "echo", or "none"')
     .option("--tool-mode <mode>", '"native" (one call per step) or "code" (dispatch from a program)')
+    .option("--unsafe-unconfined-shell", "macOS only: offer the native shell UNCONFINED, with your full user rights; refused on Windows, never needed on Linux")
     .option("--session <id>", "resume this existing, unsealed session as its next writer (verified before dispatch)")
     .option("--fork-from <id>", "open a new session whose lineage names this parent's verified final row")
     .option("--keep-open", "leave the session unsealed at exit so a later process can --session it")
@@ -444,6 +446,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
         return;
       }
       const dispatchMode = (opts.toolMode ?? preset?.toolMode) === "code" ? "code" as const : "native" as const;
+      const shellOptIn = opts.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
       // Resume names its existing session; a fresh run supplies a new ID. Fork
       // selects its own ID inside composition, which binds the actual writer
       // to the prebuilt toolset before dispatch.
@@ -474,7 +477,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
           recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row) },
-          ...(dispatchMode === "code" ? { mode: dispatchMode } : {})
+          ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
+          ...shellOptIn
         });
         bindToolSession = (session) => { boundSession = session; };
         if (wantsDelegation) {
@@ -502,6 +506,8 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           io.fail();
           return;
         }
+        // Refused means no `bash` this run; the opt-in warning is printed by the toolset itself.
+        if (!toolset.readiness.shell.offered) io.error(chalk.yellow(toolset.readiness.shell.reason ?? "the native shell is refused"));
         progress(chalk.dim(
           `tool writes are scoped to: ${
             toolset.readiness.writeScope.length > 0 ? toolset.readiness.writeScope.join(", ") : "(nothing)"
@@ -673,6 +679,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(audioParts === undefined ? {} : { audioParts }),
           route: { providerId, model, params: requestParams },
           routes: [route],
+          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }),
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),

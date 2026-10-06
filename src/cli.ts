@@ -34,7 +34,7 @@ import {
 import { loadTargetProfile, loadTargetProfileFromFile, setTargetProfileInteractive, verifyTargetProfileSignature } from "./targets/targetProfile.js";
 import { runTuneWizard, runUpgradeWizard } from "./tuning/tuneWizard.js";
 import { loadContextGraph } from "./context/contextGraph.js";
-import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig } from "./workspace.js";
+import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, quickstartWizard, saveAMCConfig, signAmcConfig } from "./workspace.js";
 import { runDoctorCli } from "./doctor/doctorCli.js";
 import { firstRunActions, firstRunFixCommands } from "./doctor/firstRunPlan.js";
 import {
@@ -6306,7 +6306,9 @@ const verifyCmd = program.command("verify").description("Verify integrity across
 
 verifyCmd
   .option("--repair", "Auto-clean corrupted blobs and ledger entries, then re-verify", false)
-  .action(async (opts: { repair: boolean }) => {
+  .option("--sign-config", "Sign .amc/amc.config.yaml with the auditor key, then stop", false)
+  .action(async (opts: { repair: boolean; signConfig: boolean }) => {
+    if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
     if (opts.repair) {
       const { rmSync, existsSync } = await import("fs");
       const { join: pathJoin } = await import("path");

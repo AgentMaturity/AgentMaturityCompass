@@ -16,6 +16,10 @@ export type OutcomeCase = "success" | "nonzero" | "denied" | "budget";
 export function validationOperatorFixture(workspace: string, mode: OutcomeCase) {
   mkdirSync(workspace, { recursive: true });
   initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  // The checks run through the native shell. On macOS it is offered only by an
+  // explicit operator opt-in (P0-06), which no workspace file can grant: each
+  // caller passes --unsafe-unconfined-shell, allowUnconfinedShell, or starts
+  // Studio with AMC_UNSAFE_UNCONFINED_SHELL=1. Linux still requires Bubblewrap.
   const budget = defaultBudgets("default");
   if (mode === "budget") budget.budgets.perAgent.default!.daily.maxToolExecutes.WRITE_HIGH = 0;
   writeFileSync(budgetsPath(workspace), YAML.stringify(budget)); signBudgetsConfig(workspace);

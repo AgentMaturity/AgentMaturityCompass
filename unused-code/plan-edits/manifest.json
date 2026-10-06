@@ -3,11 +3,25 @@
   "decision": "D-15",
   "files": [
     {
+      "path": "dist/sdk/nativeAgentClient.d.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
+      "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+    },
+    {
       "path": "pnpm-lock.yaml",
       "issue": "P0-49",
       "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
       "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
       "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
     },
     {
       "path": "tests/privateModuleHelperVisibility.test.ts",

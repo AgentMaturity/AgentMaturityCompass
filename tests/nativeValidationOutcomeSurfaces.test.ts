@@ -37,7 +37,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
       const result = await new Promise<{ stdout: string; stderr: string; code: number | null }>((done, reject) => {
         const child = spawn(process.execPath, [resolve("dist/cli.js"), "agent-loop", "run", "Record this synthetic public validation fixture.",
           "--provider", "stub", "--tools", "workspace", "--approve-tools", "WRITE_HIGH", "--approve-risk", "high", "--json",
-          "--validation-config", f.checks, "--validation-config-sha256", f.sha256, "--validate", "public"], { cwd: workspace, env, stdio: ["ignore", "pipe", "pipe"] });
+          "--validation-config", f.checks, "--validation-config-sha256", f.sha256, "--validate", "public", "--unsafe-unconfined-shell"], { cwd: workspace, env, stdio: ["ignore", "pipe", "pipe"] });
         let stdout = "", stderr = "";
         const term = setTimeout(() => child.kill("SIGTERM"), 30000), kill = setTimeout(() => child.kill("SIGKILL"), 33000);
         child.stdout.setEncoding("utf8"); child.stderr.setEncoding("utf8");
@@ -51,7 +51,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
     } else if (surface === "SDK") {
       const { AMCNativeClient } = await import(pathToFileURL(resolve("dist/sdk/nativeAgentClient.js")).href) as typeof import("../src/sdk/nativeAgentClient.js");
       const client = await AMCNativeClient.start({ workspace, provider: "stub", tools: "workspace", approveTools: "WRITE_HIGH", approveRisk: "high",
-        validationConfig: f.checks, validationConfigSha256: f.sha256, validate: ["public"], env, timeoutMs: 30000 });
+        validationConfig: f.checks, validationConfigSha256: f.sha256, validate: ["public"], env, timeoutMs: 30000, allowUnconfinedShell: true });
       try {
         const session = await client.newSession(), result = await session.prompt("Record this synthetic public validation fixture.").result;
         expect(result.state).toBe("completed"); expect(result.stopReason).toBe("end_turn"); expect(result.verification).toBe("not-verified");
@@ -60,7 +60,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
       } finally { await client.close(); }
     } else {
       const { createNativeTaskService } = await import(pathToFileURL(resolve("dist/studio/nativeTaskService.js")).href) as typeof import("../src/studio/nativeTaskService.js");
-      const service = createNativeTaskService({ workspace, validationConfig: f.checks, environment: env, credentialsHome: home });
+      const service = createNativeTaskService({ workspace, validationConfig: f.checks, environment: { ...env, AMC_UNSAFE_UNCONFINED_SHELL: "1" }, credentialsHome: home });
       const actor = { principalId: "automated-validation-fixture", agentId: "default", demo: false };
       let task: NativeTaskView;
       try {

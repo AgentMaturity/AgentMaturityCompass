@@ -23,8 +23,19 @@ import { NATIVE_BUDGET_RESERVATION } from "../src/budgets/nativeBudgetUsage.js";
 const PASS = "tool-evidence-recording-pass";
 const dirs: string[] = [];
 const open: Array<{ close: () => void }> = [];
+const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
+/**
+ * Pin the host-dependent native shell (P0-06): macOS with the explicit opt-in
+ * registers the shell on every host, so a guessed shell call reaches the signed
+ * allowlist instead of depending on whether this machine has Bubblewrap.
+ */
+function unconfinedShellHost(): { readonly unconfinedShell: "cli-flag" } {
+  Object.defineProperty(process, "platform", { ...platform, value: "darwin" });
+  return { unconfinedShell: "cli-flag" };
+}
 
 afterEach(() => {
+  Object.defineProperty(process, "platform", platform);
   while (open.length > 0) {
     try { open.pop()?.close(); } catch { /* already closed */ }
   }
@@ -87,7 +98,7 @@ describe("a governed call leaves evidence", () => {
     // The row that matters most. A denial the caller sees and the log does not
     // is enforcement nobody can audit afterwards.
     const workspace = readyWorkspace();
-    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     open.push(toolset);
 
     await toolset.seam.execute(call("bash", { command: "sudo rm -rf /tmp/x" }));
@@ -128,7 +139,7 @@ describe("a governed call leaves evidence", () => {
 
   it("correlates a call to its token, so a denial can be traced", async () => {
     const workspace = readyWorkspace();
-    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session"});
+    const toolset = agentToolset({ workspace, agentId: "default", sessionId: "toolset-test-session", ...unconfinedShellHost() });
     open.push(toolset);
 
     const request = call("bash", { command: "sudo ls" });

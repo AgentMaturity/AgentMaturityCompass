@@ -28,6 +28,8 @@ export async function publicTaskHttpFixture(mode: OutcomeCase = "success", backe
     AMC_VAULT_REMEMBER: "0", AMC_SESSION_STORE: undefined, AMC_EXPECTED_MONITOR_FINGERPRINT: undefined,
     AMC_NO_SIGN: undefined, AMC_NATIVE_VALIDATION_CONFIG: join(workspace, "operator-checks.json"),
     AMC_CONTROL_CHECKPOINT_DIR: join(root, "control-checkpoints"),
+    // Studio's operator-only opt-in for the macOS native shell the validation check runs through (P0-06).
+    AMC_UNSAFE_UNCONFINED_SHELL: "1",
     OPENAI_API_KEY: undefined, ANTHROPIC_API_KEY: undefined,
   };
   const prior = Object.fromEntries(Object.keys(chosen).map(key => [key, process.env[key]]));

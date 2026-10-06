@@ -1,0 +1,209 @@
+import type { AgentRunVerification } from "../agent/runReport.js";
+import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import { type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+import type { NativeImageInput } from "../attachments/nativeImageInput.js";
+import { type NativeAudioPart } from "../attachments/nativeAudioInput.js";
+export * as llm from "../llm/index.js";
+/** Native in-process and capability-negotiated subprocess image input. */
+export { openAgentSession, resumeAgentSession, type AgentSession, type OrderedAgentSession, type AgentSessionInit } from "../agent/agentSession.js";
+export { NATIVE_ORDERED_INPUT_FORMAT, snapshotNativeInputParts, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
+export { snapshotNativeImages, type NativeImageInput, type NativeImageMediaType } from "../attachments/nativeImageInput.js";
+export { NATIVE_AUDIO_INPUT_FORMAT, snapshotNativeAudioParts, type NativeAudioInput, type NativeAudioPart, type NativeAudioMediaType } from "../attachments/nativeAudioInput.js";
+export { loadNativeAudioManifest, NATIVE_AUDIO_FILE_MANIFEST_FORMAT } from "../attachments/nativeAudioFiles.js";
+export { loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefusal, type SessionEventHistory, type SessionEventHistoryOptions } from "../session/sessionEventHistory.js";
+export { inspectJsonlSessionRecovery, type JsonlSessionRecoveryReadiness } from "../session/jsonlContinuation.js";
+export type { NativeValidationResult, NativeValidationCheckResult, NativeValidationStatus } from "../agent/nativeValidation.js";
+type JsonObject = Record<string, unknown>;
+/** Hard retention ceilings, independently applied to each turn and each history replay. */
+export declare const AMC_NATIVE_EVENT_LIMITS: Readonly<{
+    maxEvents: 8192;
+    maxBytes: number;
+}>;
+/** Lower the retention ceilings; no event is silently dropped when a ceiling is reached. */
+export interface AMCNativeEventBufferOptions {
+    readonly maxEvents?: number;
+    readonly maxBytes?: number;
+}
+export { AMCNativeCancelledError, AMCNativeInputError, AMCNativeLimitError, AMCNativeProcessError, AMCNativeProtocolError, AMCNativeRefusedError } from "./nativeAgentErrors.js";
+export interface AMCNativeClientOptions {
+    readonly workspace: string;
+    /** Explicit selection: stub is a local demonstration, never a live-provider fallback. */
+    readonly provider: string;
+    readonly model?: string;
+    readonly credential?: string;
+    readonly baseUrl?: string;
+    readonly agentId?: string;
+    readonly tools?: "none" | "workspace";
+    /** Pin the signed workspace tool policy for every native tool dispatch. */
+    readonly expectedToolsDigest?: string;
+    /** Operator-owned file and explicit check IDs; ACP prompts cannot supply commands. */
+    readonly validationConfig?: string;
+    readonly validationConfigSha256?: string;
+    readonly validate?: readonly string[];
+    readonly approveTools?: string;
+    readonly approveRisk?: "low" | "medium" | "high" | "critical";
+    readonly mcpConfig?: string;
+    readonly mcpConfigSha256?: string;
+    readonly credentialsHome?: string;
+    readonly credentialsFile?: string;
+    /** Exclude project and user dotenv fallback in operator-owned server integrations. */
+    readonly credentialsMode?: "layered" | "operator-only";
+    readonly maxTokens?: number;
+    /** DeepSeek-only explicit wire options; omitted thinking defaults to enabled. */
+    readonly thinking?: "enabled" | "disabled";
+    readonly reasoningEffort?: "low" | "high" | "max";
+    readonly maxSteps?: number;
+    /** Defaults to the CLI shipped in this same installed package. Never resolves another AMC from PATH. */
+    readonly command?: readonly [string, ...string[]];
+    readonly env?: NodeJS.ProcessEnv;
+    readonly timeoutMs?: number;
+    /** Cancel process initialization before it has returned a usable client. */
+    readonly startupSignal?: AbortSignal;
+    /** Bounded, lossless retained updates. Overflow fails the connection, never pauses replies behind a slow iterator. */
+    readonly eventBuffer?: AMCNativeEventBufferOptions;
+}
+export interface AMCNativeUpdate {
+    readonly sessionId: string;
+    /** Committed-block notifications from ACP, not provider token deltas or a verifier verdict. */
+    readonly update: Readonly<JsonObject> & {
+        readonly sessionUpdate: string;
+    };
+}
+export interface AMCNativeRunResult {
+    readonly sessionId: string;
+    readonly state: "completed";
+    /** ACP end_turn also represents some lossy endings; inspect meta and verify evidence separately. */
+    readonly stopReason: string;
+    readonly text: string;
+    readonly updates: readonly AMCNativeUpdate[];
+    readonly meta: Readonly<JsonObject>;
+    readonly verification: "not-verified";
+    /** Public operator checks only; independent from turn completion and evidence verification. */
+    readonly validation: NativeValidationResult;
+}
+export interface AMCNativeReceipt {
+    readonly sessionId: string;
+    readonly state: "verified";
+    readonly scope: "workspace-key-consistency" | "externally-anchored";
+    readonly report: AgentRunVerification;
+}
+/** One prompt in flight. Cancelling requests a stop; only the result establishes its outcome. */
+export declare class AMCNativeTurn implements AsyncIterable<AMCNativeUpdate> {
+    readonly sessionId: string;
+    private readonly requestCancel;
+    readonly result: Promise<AMCNativeRunResult>;
+    private resolveResult;
+    private rejectResult;
+    private readonly updates;
+    private bytes;
+    private wake;
+    private done;
+    private error;
+    private iterated;
+    private cancelRequested;
+    private readonly limits;
+    state: "submitted" | "receiving" | "cancel-requested" | "completed" | "failed";
+    constructor(sessionId: string, requestCancel: () => void, options?: AMCNativeEventBufferOptions);
+    cancel(): void;
+    /** @internal */
+    receive(update: AMCNativeUpdate): void;
+    /** @internal */
+    finish(value: JsonObject): void;
+    /** @internal */
+    fail(error: Error): void;
+    [Symbol.asyncIterator](): AsyncIterableIterator<AMCNativeUpdate>;
+}
+export declare class AMCNativeSession {
+    private readonly client;
+    readonly sessionId: string;
+    readonly history: readonly AMCNativeUpdate[];
+    readonly state: "accepted";
+    private released;
+    private releasePromise;
+    constructor(client: AMCNativeClient, sessionId: string, history?: readonly AMCNativeUpdate[]);
+    /** Local handle lifecycle only, not a signed writer or evidence verdict. */
+    get lifecycle(): "accepted" | "releasing" | "released" | "closed";
+    private assertUsable;
+    prompt(text: string, options?: {
+        readonly signal?: AbortSignal;
+        readonly images?: readonly NativeImageInput[];
+    }): AMCNativeTurn;
+    promptParts(parts: readonly NativeInputPart[], options?: {
+        readonly signal?: AbortSignal;
+    }): AMCNativeTurn;
+    promptAudioParts(parts: readonly NativeAudioPart[], options?: {
+        readonly signal?: AbortSignal;
+    }): AMCNativeTurn;
+    /** Closing the owned agent seals all its sessions before a fresh verifier reads the ledger. */
+    closeAndVerify(): Promise<AMCNativeReceipt>;
+    /** Relinquish the signed writer without sealing, for a later verified session load. */
+    release(): Promise<void>;
+}
+/** Local operator client. This spawns the governed ACP runtime; it does not turn a bridge lease into execution authority. */
+export declare class AMCNativeClient {
+    readonly workspace: string;
+    readonly protocolVersion = 1;
+    agentInfo: Readonly<Record<string, unknown>>;
+    capabilities: Readonly<Record<string, unknown>>;
+    private negotiatedCapabilities;
+    private readonly child;
+    private readonly command;
+    private readonly env;
+    private readonly timeout;
+    private readonly limits;
+    private readonly pending;
+    private readonly sessions;
+    private readonly turns;
+    private readonly loading;
+    private readonly releasing;
+    private nextId;
+    private buffer;
+    private readonly decoder;
+    private readonly outbound;
+    private outboundBytes;
+    private writeBlocked;
+    private fatal;
+    private closing;
+    private closed;
+    private exitDetails;
+    private closePromise;
+    private readonly childClosed;
+    /**
+     * True only after Node observed the owned ACP child's actual close event.
+     * A timeout, requested cancellation or a broken pipe is not process closure.
+     * This says nothing about a signed release, task success, or tool side effects.
+     */
+    get processClosed(): boolean;
+    /** Actual close-event details, also available when an earlier pipe error caused failure. */
+    get processExit(): Readonly<{
+        exitCode: number | null;
+        signal: NodeJS.Signals | null;
+    }> | undefined;
+    get state(): "open" | "closing" | "closed" | "failed";
+    private constructor();
+    static start(options: AMCNativeClientOptions): Promise<AMCNativeClient>;
+    newSession(): Promise<AMCNativeSession>;
+    /** A peer must advertise verified loading. Never substitute a new session for a failed resume. */
+    resumeSession(sessionId: string): Promise<AMCNativeSession>;
+    /** @internal */
+    releaseSession(sessionId: string): Promise<void>;
+    /** @internal */
+    promptSession(sessionId: string, text: string, signal?: AbortSignal, images?: readonly NativeImageInput[]): AMCNativeTurn;
+    /** @internal */
+    promptSessionParts(sessionId: string, parts: readonly NativeInputPart[], signal?: AbortSignal): AMCNativeTurn;
+    private assertPromptSlot;
+    /** @internal Exact version negotiation precedes submission; snapshot precedes async work. */
+    promptSessionAudioParts(sessionId: string, parts: readonly NativeAudioPart[], signal?: AbortSignal): AMCNativeTurn;
+    private submitPrompt;
+    private assertAvailable;
+    private write;
+    private flushWrites;
+    private request;
+    private notify;
+    private ingest;
+    private fail;
+    close(): Promise<void>;
+    private closeOwnedChild;
+    /** Runs the same installed CLI after shutdown. A live summary is never promoted to verification. */
+    verifySession(sessionId: string): Promise<AMCNativeReceipt>;
+}

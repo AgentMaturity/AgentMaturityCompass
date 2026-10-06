@@ -95,6 +95,8 @@ export interface AcpStdioInit {
   readonly credential?: string;
   readonly systemPrompt: string;
   readonly tools?: "none" | "workspace";
+  /** `--unsafe-unconfined-shell`: macOS only, see `AgentToolsetOptions.unconfinedShell`. */
+  readonly unconfinedShell?: boolean;
   readonly expectedToolsDigest?: string;
   readonly validationConfig?: string;
   readonly validationConfigSha256?: string;
@@ -161,10 +163,13 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const mcp = init.mcpConfig === undefined ? undefined : loadNativeMcpConfiguration(init.mcpConfig, init.mcpConfigSha256);
   if (mcp && (tools !== "workspace" || !approval)) throw new Error("ACP MCP requires --tools workspace and --approve-tools.");
   const mcpReview = mcp && approval ? requireReviewedNativeMcpGrants(mcp, init.workspace, approval.actionClass) : undefined;
+  const shellOptIn = init.unconfinedShell === true ? { unconfinedShell: "cli-flag" as const } : {};
+  let shellRefusal: string | null = null;
   if (tools === "workspace") {
     const snapshot = loadVerifiedToolsConfigSnapshot(init.workspace);
     const additionalCapabilities = mcpReview?.capabilities ?? [];
-    const readiness = checkToolsetReadiness(init.workspace, { snapshot, additionalCapabilities });
+    const readiness = checkToolsetReadiness(init.workspace, { snapshot, additionalCapabilities, ...shellOptIn });
+    shellRefusal = readiness.shell.offered ? null : readiness.shell.reason;
     if (!readiness.ready) throw new Error("ACP workspace tools require a supported signed tool subset and the existing firewall policy; run the native guide and configure them explicitly.");
     if (init.expectedToolsDigest !== undefined && snapshot.digestSha256 !== init.expectedToolsDigest) throw new Error("The signed workspace tool policy changed before native startup.");
   }
@@ -172,6 +177,8 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
   const stdin: AcpInputStream = init.stdin ?? process.stdin;
   const stdout = init.stdout ?? process.stdout;
   const stderr = init.stderr ?? process.stderr;
+  // stderr only: stdout is the protocol stream. Each opted-in session also warns as it composes.
+  if (shellRefusal !== null) stderr.write(`amc acp: ${shellRefusal}\n`);
 
   // One registry and one credentials service for the process. A session gets its
   // own runtime over them, because `LlmRuntime` captures its session at
@@ -216,7 +223,7 @@ export function startAcpStdio(init: AcpStdioInit): AcpStdioHandle {
       policyDigest: sha256Hex(JSON.stringify({ tools, signedTools: tools === "workspace" ? loadVerifiedToolsConfigSnapshot(params.workspace).digestSha256 : null, approval, mcp: mcp?.sha256 ?? null,
         ...(validation === undefined ? {} : { validation }),
         ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }) })),
-      tools, maxSteps, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+      tools, maxSteps, ...shellOptIn, ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
       ...(validation === undefined ? {} : { validation })
     });
 

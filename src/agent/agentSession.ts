@@ -5,6 +5,7 @@ import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { agentToolset, type AgentToolset } from "./agentToolset.js";
 import type { NativeToolCapability } from "./nativeToolCapabilities.js";
+import type { ExplicitShellOptIn } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "./nativeValidation.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
 import type { AgentStatus } from "./loopTypes.js";
@@ -61,6 +62,8 @@ export interface AgentSessionInit {
   /** ACP explicitly defaults to none; existing direct callers retain workspace tools. */
   readonly tools?: "none" | "workspace";
   readonly expectedToolsDigest?: string;
+  /** Explicit acceptance of an unconfined macOS shell; see `AgentToolsetOptions.unconfinedShell`. */
+  readonly unconfinedShell?: ExplicitShellOptIn;
   /** Server-composed, reviewed mounts; not a browser or wire-provided capability grant. */
   readonly additionalCapabilities?: readonly NativeToolCapability[];
   readonly maxSteps?: number;
@@ -138,6 +141,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
     sessionId,
     ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }),
     ...(init.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: init.expectedToolsDigest }),
+    ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
     // Handing over the writer is what keeps the session ANCHORABLE. Pointing the
     // rows at the right session id was only half of it: written through the raw
     // ledger they carry no envelope, and `sessionRootDescriptor` then refuses to

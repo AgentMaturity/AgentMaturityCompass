@@ -43,6 +43,7 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/
 import type { AgentLoopConfig, AgentStatus, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
+import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
 import { projectNativeValidation } from "../agent/nativeValidationProjection.js";
 import type { ApprovalAnswerer } from "../approvals/seam/approvalSeamTypes.js";
@@ -209,6 +210,8 @@ export interface ComposedTurnOptions {
   readonly onLiveText?: (event: LiveTextPreviewEvent) => void;
   /** Called once the driver exists and before the prompt is sent. */
   readonly onReady?: (handle: ComposedTurnHandle) => void;
+  /** The parent's resolved shell decision, which in-process children inherit and never widen (P0-06). */
+  readonly parentShell?: NativeShellReadiness;
   /**
    * Let this run delegate to in-process children (P6.1a).
    *
@@ -544,6 +547,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           policyDigest: policyDigestOf(options),
           ...(options.config === undefined ? {} : { config: options.config }),
           ...(gate === undefined ? {} : { approvalGate: gate }),
+          ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }),
           ...(options.delegation === undefined ? {} : { grantDelegation: { runner: runNative,
             ...(options.delegation.maxDepth === undefined ? {} : { maxDepth: options.delegation.maxDepth }),
             ...(options.delegation.scope === undefined ? {} : { delegationScope: options.delegation.scope }),

@@ -15,7 +15,7 @@ export function nativeTasksShell(agentId) {
       <p id="nativeTaskCredential" class="muted"></p><div id="nativeTaskScope"></div>
       <div id="nativeTaskValidationSetup"></div>
       <details><summary>Run limits</summary><div class="native-task-fields"><label>Maximum steps<input id="nativeTaskMaxSteps" type="number" min="1" step="1" disabled></label><label>Maximum output tokens<input id="nativeTaskMaxTokens" type="number" min="1" step="1" disabled></label></div><p id="nativeTaskLimits" class="muted"></p></details>
-      <p id="nativeTaskBoundary" class="muted"></p>
+      <p id="nativeTaskShell" class="native-task-approval-banner" role="status" hidden></p><p id="nativeTaskBoundary" class="muted"></p>
     </section>
     <div class="native-task-layout"><section class="card native-task-conversation" aria-labelledby="nativeTranscriptTitle">
       <div class="native-task-row"><h3 id="nativeTranscriptTitle">Conversation</h3><span id="nativeTaskState" class="pill">No task selected</span></div>

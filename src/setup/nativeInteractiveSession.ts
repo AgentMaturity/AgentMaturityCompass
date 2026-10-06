@@ -26,6 +26,7 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly approveTools?: string;
   readonly approveRisk?: string;
   readonly tools?: string;
+  readonly unsafeUnconfinedShell?: boolean;
   readonly maxTokens?: string;
   readonly thinking?: string;
   readonly reasoningEffort?: string;
@@ -244,7 +245,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const routeBaseArgs = ["--agent", guide.agentId, "--provider", provider!, ...(guide.baseUrl === null ? [] : ["--base-url", guide.baseUrl]), "--model", guide.model!,
       ...(options.credentialsHome === undefined ? [] : ["--credentials-home", options.credentialsHome]), "--credentials-file", credentialFile,
       ...(guide.credential === null ? [] : ["--credential", guide.credential.ref]),
-      "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens,
+      "--tools", tools, "--max-steps", maxSteps, "--max-tokens", maxTokens, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
       ...(options.thinking === undefined ? [] : ["--thinking", options.thinking]),
       ...(options.reasoningEffort === undefined ? [] : ["--reasoning-effort", options.reasoningEffort]),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]), ...mcpArgs,

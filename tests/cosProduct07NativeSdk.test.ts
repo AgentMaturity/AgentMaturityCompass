@@ -284,6 +284,17 @@ describe("P07 controlled native lifecycle and transport", () => {
     await expect(AMCAgent.startNative({ workspace: process.cwd(), provider: "" })).rejects.toBeInstanceOf(AMCNativeInputError);
     expect(processMock.spawn.mock.calls).toHaveLength(count);
   });
+  test("allowUnconfinedShell: true adds --unsafe-unconfined-shell to the spawned amc acp argv; false or absent does not", async () => {
+    for (const allowUnconfinedShell of [true, false, undefined]) {
+      await connect(new ControlledPeer(), { command: ["fixture-node", "fixture-cli.js"],
+        ...(allowUnconfinedShell === undefined ? {} : { allowUnconfinedShell }) });
+    }
+    expect(processMock.spawn.mock.calls.map(([executable, argv]) => [executable, argv])).toEqual([
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub", "--unsafe-unconfined-shell"]],
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub"]],
+      ["fixture-node", ["fixture-cli.js", "acp", "--provider", "stub"]]
+    ]);
+  });
   test("invalid validation IDs are rejected before spawn, not coerced into CLI flags", async () => {
     await expect(AMCNativeClient.start({ workspace: process.cwd(), provider: "stub", validationConfig: "checks.json",
       validate: [7] as unknown as readonly string[] })).rejects.toBeInstanceOf(AMCNativeInputError);

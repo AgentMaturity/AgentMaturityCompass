@@ -157,8 +157,12 @@ export function nativeTaskSchemas(): Record<string, unknown> {
         { type: "null" }, object({ ref: string, configured: bool, source: { type: ["string", "null"], enum: ["env", "file", null] } })
       ] }, input: ref("NativeTaskInputCapabilities") }, ["id", "local", "model", "credential"]) }, scope: ref("NativeTaskToolScope"), validation: ref("NativeTaskValidationConfiguration"),
       limits: object(Object.fromEntries(["maxActive", "maxSteps", "maxTokens", "turnTimeoutMs", "idleTimeoutMs", "lifetimeMs", "maxEvents", "maxEventBytes", "maxPromptBytes"].map(key => [key, integer]))),
-      boundary: string, nativeCsrfToken: nullableString, executionBlocked: bool
+      boundary: string, nativeCsrfToken: nullableString, executionBlocked: bool, shell: ref("NativeTaskShell")
     }),
+    NativeTaskShell: { ...object({ offered: bool, decision: { type: "string", enum: ["confined", "unconfined-opt-in", "refused"] },
+      enforcement: { type: "string", enum: ["enforced", "none"] }, boundary: { type: ["string", "null"], enum: ["linux-bwrap", null] },
+      reason: nullableString, optInSource: { type: ["string", "null"], enum: ["cli-flag", "sdk-option", null] } }),
+      description: "Whether native tasks are offered bash. Show reason as a banner: the refusal, or the warning for an UNCONFINED macOS shell enabled by the operator's environment when Studio started." },
     NativeTaskResponse: envelope(ref("NativeTask")),
     NativeTaskOptionsResponse: envelope(ref("NativeTaskOptions")),
     NativeTaskListResponse: envelope(object({ tasks: { type: "array", items: ref("NativeTask") } })),

@@ -5,6 +5,7 @@ import { resolveAgentId } from "../fleet/paths.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskService } from "../studio/nativeTaskTypes.js";
 import { assertNativeExecutionIdentity, NativeAdmissionError, type NativeAdmissionActor } from "../studio/nativeAdmission.js";
 import { apiError, apiSuccess, isRequestBodyError } from "./apiHelpers.js";
+import { nativeShellReadiness } from "../sandbox/nativeShellGate.js";
 
 /** Supplied only by Studio's authenticated, origin-checked delegation boundary. */
 export interface NativeTaskApiContext {
@@ -89,7 +90,9 @@ export async function handleNativeTasksRoute(
     if (pathname === `${prefix}/options` && method === "GET") {
       assertQuery(params, ["agentId"]);
       const configuration = await native.service.configuration(actorFor(context.workspace, native, params.get("agentId")));
-      apiSuccess(res, { ...configuration, nativeCsrfToken: native.nativeCsrfToken, executionBlocked: !native.executionAllowed() });
+      // Studio's only opt-in is the service's, from its operator environment at start; `shell.reason` is the banner text (P0-06).
+      apiSuccess(res, { ...configuration, nativeCsrfToken: native.nativeCsrfToken, executionBlocked: !native.executionAllowed(),
+        shell: nativeShellReadiness(context.workspace, native.service.shellOptIn ?? undefined) });
       return true;
     }
     if (pathname === prefix && method === "GET") {
