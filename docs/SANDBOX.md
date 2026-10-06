@@ -34,16 +34,20 @@ these opt-ins:
   `openAgentSession()`.
 - `AMC_UNSAFE_UNCONFINED_SHELL=1` in the environment of `amc studio start` or
   `amc up`. Studio reads it once, from its own process environment, when it
-  starts, and passes the explicit SDK opt-in to each native task; only the
-  exact value `1` counts. This is the only opt-in Studio accepts; the browser
-  and the HTTP API cannot enable the shell. The CLI, ACP and SDK never read
-  this variable, because they can load project dotenv files and configured
+  starts, and starts each native task's `amc acp` with
+  `--unsafe-unconfined-shell`, so the task's warning and receipts record
+  `cli-flag`; only the exact value `1` counts. This is the only opt-in Studio's
+  native tasks accept; the browser and the native-task API cannot enable their
+  shell. Studio's CLI bridge (`POST /cli/exec` and `/cli/batch`) is separate:
+  an authenticated OWNER or OPERATOR can pass `--unsafe-unconfined-shell` to
+  `amc agent-loop run` through it. The CLI, ACP and SDK never read this
+  variable, because they can load project dotenv files and configured
   environment.
 
 No workspace file can opt in. A `runtime.shell.allowUnconfined` key in
 `.amc/amc.config.yaml` is not honoured, even when the file is signed, because a
-workspace can sign its own config with keys a repository ships; a refusal then
-says so. Delegated children inherit the parent's decision and can never widen
+workspace can sign its own config with keys a repository ships; a macOS refusal
+then says so. Delegated children inherit the parent's decision and can never widen
 it: a child of a refused parent is refused.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
