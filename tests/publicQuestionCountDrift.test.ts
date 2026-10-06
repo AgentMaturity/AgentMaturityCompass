@@ -58,7 +58,7 @@ describe("public diagnostic question-count claims", () => {
     expect(SECTOR_QUESTION_COUNT).toBeGreaterThanOrEqual(industryPacks.length * PACK_QUESTION_FLOOR);
   });
 
-  test("current-facing product surfaces use 244 default, 264 expanded, and 844 total framing", () => {
+  test("current-facing product surfaces use 244 default, 264 expanded, and registry-derived total framing", () => {
     for (const path of PRODUCT_COUNT_FILES) {
       const body = readProjectFile(path);
       for (const pattern of STALE_PRODUCT_COUNT_PATTERNS) {
@@ -67,9 +67,7 @@ describe("public diagnostic question-count claims", () => {
     }
 
     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("244 default diagnostic questions");
-    // website/blog is outside the pack track's claims: 844 = 244 + the pre-October-2026 sector total of 600.
-    // The derived replacement is in the S3 ready-to-wire diff.
-    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("844 total");
+    expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain(`${DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT} total`);
     expect(readProjectFile("website/vs-promptfoo.html")).toContain("264 with lifecycle expansion");
   });
 
