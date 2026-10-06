@@ -69,6 +69,10 @@ describe("check-regulatory-currency script", () => {
     const missing = spawnSync(process.execPath, [SCRIPT, "--now"], { encoding: "utf8" });
     expect(missing.status).toBe(1);
     expect(missing.stderr).toContain("--now needs a value");
+    // An unset shell variable (`--as-of "$DATE"`) must not fall back to today.
+    const empty = spawnSync(process.execPath, [SCRIPT, "--as-of", ""], { encoding: "utf8" });
+    expect(empty.status).toBe(1);
+    expect(empty.stderr).toContain("--as-of needs a value");
   });
 
   it("--json lists every entry with status, lastReviewed, windowDays and sources", () => {

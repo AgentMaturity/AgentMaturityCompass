@@ -147,7 +147,7 @@ export function parseArgs(argv) {
     if (flag === "--json") opts.json = true;
     else if (flag in VALUE_FLAGS) {
       const value = argv[i + 1];
-      if (value === undefined || value.startsWith("--")) return { error: `${flag} needs a value` };
+      if (value === undefined || value === "" || value.startsWith("--")) return { error: `${flag} needs a value` };
       opts[VALUE_FLAGS[flag]] = value;
       i += 1;
     } else return { error: `unknown argument ${JSON.stringify(flag)}; usage: [--register <path>] [--as-of|--now YYYY-MM-DD] [--json]` };
