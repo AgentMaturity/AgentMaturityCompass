@@ -49,7 +49,7 @@ export function decideNativeShell(input: {
     : `The native shell is not available on ${platform}. AMC has no confined runner for this platform; the unsafe flag applies only on macOS.` };
 }
 
-export function unconfinedShellWarning(platform: NodeJS.Platform, source: ShellOptInSource): string {
+function unconfinedShellWarning(platform: NodeJS.Platform, source: ShellOptInSource): string {
   return `WARNING: the native shell is UNCONFINED on ${platform} (opt-in: ${source}). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.`;
 }
 
