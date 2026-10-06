@@ -30,7 +30,7 @@ Run `amc domain list` to see the same canonical domains, aliases, sector tags, a
 
 ## Sector Pack Counts
 
-Industry sector packs (`src/domains/industryPacks.ts`) per station. The Questions column counts sector-pack questions (not the domain-pack questions in the table above). No pack may fall below 15 questions (`PACK_QUESTION_FLOOR`: the median pack size measured on 2026-10-03); the October 2026 review added 24 questions to the 19 packs below the floor. Counts are measured from the registry with `getStationSummary` and checked by `tests/industryPackDepthFloor.test.ts`.
+Industry sector packs (`src/domains/industryPacks.ts`) per station. The Questions column counts sector-pack questions (not the domain-pack questions in the table above). No pack may fall below 15 questions (`PACK_QUESTION_FLOOR`: the median pack size measured on 2026-10-03); the October 2026 review added 32 questions to the 19 packs below the floor. Counts are measured from the registry with `getStationSummary` and checked by `tests/industryPackDepthFloor.test.ts`.
 
 | Station | Packs | Questions |
 |---|---:|---:|

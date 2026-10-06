@@ -69,6 +69,7 @@ describe("public diagnostic question-count claims", () => {
     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain("244 default diagnostic questions");
     expect(readProjectFile("website/blog/langchain-scoring-tutorial.html")).toContain(`${DEFAULT_QUESTION_COUNT + SECTOR_QUESTION_COUNT} total`);
     expect(readProjectFile("website/vs-promptfoo.html")).toContain("264 with lifecycle expansion");
+    expect(readProjectFile("docs/adr/005-free-core-paid-industry-packs.md")).toContain(`${SECTOR_QUESTION_COUNT} sector-specific diagnostic questions`);
   });
 
   test("industry station pages match compiled sector-pack counts", () => {
