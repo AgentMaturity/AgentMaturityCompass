@@ -125,7 +125,7 @@ Then run the commands in `commands.tsv` in order.
 
 # P0-12 PR 2: slice A-register (round-2 regulatory register)
 
-Branch `rtd/p0-12-slice-a-register`, built on `e680f2a6` (the verified integration head of #46, #47, #49 and #50; P0-12 PR 1 and P0-13 slice B are on it, so S9's `src/assurance/packs/industryPackManifest.ts`, which the register test imports, exists). All commands in `commands-pr2.tsv` ran in one fresh clone of the code head `3698a021b725df9873670ea3f80604b25b64ff95` on 2026-10-06 (UTC). The register is agent-drafted: the apply round fetched no source URL and the repair after the REJECTED monitor verdict on `9d263653` was not re-verified, so it stays experimental until a named expert signs off (truth rule 8); P0-24 and the D-08 reviewers re-check it.
+Branch `rtd/p0-12-slice-a-register`, built on `e680f2a6` (the verified integration head of #46, #47, #49 and #50; P0-12 PR 1 and P0-13 slice B are on it, so S9's `src/assurance/packs/industryPackManifest.ts`, which the register test imports, exists). All commands in `commands-pr2.tsv` ran in one fresh clone of the code head `1086b30f1c046b18dfe4af3080a056941721a236` on 2026-10-06 (UTC), after the review fixes. A first fresh-clone run at `3698a021b725df9873670ea3f80604b25b64ff95`, before the review, passed the same commands except the five the review added (the S3 focused line, `--as-of 2026-10-03`/`2026-10-04`, `check:clean-source` and `check:packed-install`). The register is agent-drafted: the apply round fetched no source URL and the repair after the REJECTED monitor verdict on `9d263653` was not re-verified, so it stays experimental until a named expert signs off (truth rule 8); P0-24 and the D-08 reviewers re-check it.
 
 ## Commit map
 
@@ -138,6 +138,15 @@ Picked with `git cherry-pick -x` in slice-map order. Each pick's `AMC_OS/` paths
 
 The merge `61d53315` is `record-only`. Follow-up commits: `d2a671c6` (regression test: `register.json` cites no `AMC_OS/` path, cites `program-records/2026-10-03/research/…`, and its `policy.note` and `docs/COMPLIANCE_FRAMEWORKS.md` say the records are held outside the repository), `fa0c7fdd` (the re-point), `fc9dd3f0` (changeset) and `3698a021` (`node scripts/gen-counts.mjs --write`: test source files 1,570 to 1,571, for `tests/regulatoryCurrencyRegister.test.ts`).
 
+Review fixes, after the first PR 2 receipt commit `79691e3f` (wording only; no register data, code or test assertion changes):
+
+| Commit | Finding | Change |
+|---|---|---|
+| `9b956dda` | spec/F1, adversarial/F1, integration/F1, integration/F3 | The changeset, `docs/COMPLIANCE_FRAMEWORKS.md` and the root-ruling `describe` title in `tests/regulatoryCurrencyRegister.test.ts` said CN, BR, IN and JP entries "assert nothing as verified"; 13 of their key dates are `verified: true` (cn-pipl 2, cn-genai-interim-measures 2, br-lgpd 2, in-dpdp 1, jp-appi 1, jp-ai-promotion-act 2, cn-ai-content-labeling-measures 3). The ruling and the test cover the entry flag and its obligations only, so the text now says the entries are unverified and assert no verified obligation. The changeset names `supersedes`/`supersedesInstruments` for predecessors and `taskStatus` for the entry's own withdrawn or revoked state, and says `policy.officialHosts` grows from 27 to 57 hosts pending ratification |
+| `1086b30f` | adversarial/F2, integration/F2 | `register.json` `policy.note` says the round-2 batches read their sources on 2026-10-04 while every entry keeps `lastReviewed` 2026-10-03, and that the register validates from 2026-10-04 |
+
+`mutations-pr2.log` and `red-run-pr2.log` were recorded before `9b956dda` and show the old `describe` title.
+
 ## Program-record references (D-13)
 
 The prefix `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/` becomes the label `program-records/2026-10-03/` in 233 references on 190 lines of `register.json` (211 `research/<station>/digest.json`, 18 `map/root-decisions.md`, 4 `round2/*/review.json`), the `EU_AI_ACT_TIMELINE` comment in `src/compliance/euAiActClassifier.ts` and two references in `docs/EU_AI_ACT_COMPLIANCE.md` that `9d2636531` added. Replacing the label back with the old prefix reproduces the picked `register.json` except for the `policy.note` sentence, so every `url`, `retrievedAt` and `verified` value is unchanged. `policy.note`, `docs/COMPLIANCE_FRAMEWORKS.md` and `docs/EU_AI_ACT_COMPLIANCE.md` say the records are held outside the repository.
@@ -146,13 +155,17 @@ The prefix `AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/` becomes the 
 
 ## Tree equivalence (RUNBOOK section 4)
 
-The track has no accepted head (`acceptedHead: null`, verdict "NO MONITOR VERDICT: worker receipt only"), so the comparison uses its head `1962e06cf` from its map base `67d73223` against the last pick `3792bf92`. It lists three named exceptions, all PR 1 review fixes already on `main`: `docs/COMPLIANCE_FRAMEWORKS.md` and `docs/EU_AI_ACT_COMPLIANCE.md` (the experimental label, `c45cff2a`) and `tests/regulatoryCurrency.test.ts` (the empty `--as-of` case, `dd64c83c`). `git diff --name-only e680f2a6 HEAD -- AMC_OS` prints nothing.
+The track has no accepted head (`acceptedHead: null`, verdict "NO MONITOR VERDICT: worker receipt only"), so the comparison uses its head `1962e06cf` from its map base `67d73223` against the last pick `3792bf92`. It lists three named exceptions, all PR 1 review fixes already on `main`: `docs/COMPLIANCE_FRAMEWORKS.md` and `docs/EU_AI_ACT_COMPLIANCE.md` (the experimental label, `c45cff2a`) and `tests/regulatoryCurrency.test.ts` (the empty `--as-of` case, `dd64c83c`). `git diff --name-only e680f2a6 HEAD -- AMC_OS` prints nothing. After the last pick, `docs/COMPLIANCE_FRAMEWORKS.md`, `docs/EU_AI_ACT_COMPLIANCE.md`, `src/compliance/euAiActClassifier.ts` and `register.json` change for the re-point, and `docs/COMPLIANCE_FRAMEWORKS.md`, `tests/regulatoryCurrencyRegister.test.ts` (`describe` title) and `register.json` (`policy.note`) for the review fixes above.
+
+Named exception, review date: `node scripts/check-regulatory-currency.mjs --as-of 2026-10-03` exits 1 with 104 failures of the form "retrievedAt 2026-10-04T… is in the future": 93 entries (61 of them verified) carry sources or key dates read on 2026-10-04, while every entry keeps `lastReviewed` 2026-10-03 as the issue requires. `--as-of 2026-10-04` exits 0. The picked `9d2636531` (`261f0a35`) moved `AS_OF` in `tests/regulatoryCurrency.test.ts` and the schema test's `asOf` from 2026-10-03 to 2026-10-04 and renamed that test "validates cleanly as of the 2026-10-04 apply (sources read that day)"; it is carried as picked, because the register cannot validate before its sources were read. Keeping `lastReviewed` at 2026-10-03 makes every entry go stale one day earlier, the stricter choice. `policy.note` now says this (`1086b30f`).
 
 ## Results
 
 - `npm run check:regulatory-currency`: `entries=176 verified=108 unverified=68`, exit 0; 20 jurisdictions; every entry `lastReviewed` 2026-10-03. `--as-of 2027-01-01` exits 0; `--as-of 2027-01-02` exits 1; `--bogus` and `--as-of ""` exit 1.
-- `npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts`: 45/45. With `tests/regulatoryAutomation.test.ts`, `tests/round4Gaps.test.ts`, `tests/regulatoryClaimsHonesty.test.ts`, `tests/complyRiskClassifyDocs.test.ts`, `tests/apiRouters.test.ts` and `tests/assurance/`: 674/674 in 19 files. Restoration parity plus `tests/planEditsManifest.test.ts`: 7,113/7,113 in 26 files. In the same fresh clone, the 317 test files that name any path this PR changes passed (1,701 tests).
-- `typecheck`, `typecheck:tests`, `lint`, `check:counts`, `check:docs-drift`, `check:api-ref`, `check:architecture-boundaries`, `check:freeze`, `check:qualification` and the slice-map `--check`: exit 0.
+- `--as-of 2026-10-03` exits 1 and `--as-of 2026-10-04` exits 0 (named exception above).
+- S3 focused line (`tests/industryPackSchema.test.ts` … `tests/domainDocs.test.ts`, the first line of the issue's Commands): 35/35 in 9 files, after the count commit `3698a021` touched the whitepaper and `website/index.html`.
+- `npx vitest run tests/regulatoryCurrencyRegister.test.ts tests/regulatoryCurrency.test.ts tests/euAiActTimeline.test.ts`: 45/45. With `tests/regulatoryAutomation.test.ts`, `tests/round4Gaps.test.ts`, `tests/regulatoryClaimsHonesty.test.ts`, `tests/complyRiskClassifyDocs.test.ts`, `tests/apiRouters.test.ts` and `tests/assurance/`: 674/674 in 19 files. Restoration parity plus `tests/planEditsManifest.test.ts`: 7,113/7,113 in 26 files. In the first fresh clone (`3698a021`), the 317 test files that name any path this PR changes passed (1,701 tests); after the review fixes, the test files that name `docs/COMPLIANCE_FRAMEWORKS.md` or `register.json`, `tests/publicDistributionTruth.test.ts` (changeset headers) and the register and regulatory set passed in the working clone (51 files, 818 tests).
+- `typecheck`, `typecheck:tests`, `lint`, `check:counts`, `check:docs-drift`, `check:api-ref`, `check:architecture-boundaries`, `check:clean-source`, `check:packed-install` (keyless; the real-provider smoke is skipped without `AMC_PACKED_SMOKE_PROVIDER`), `check:freeze`, `check:qualification` and the slice-map `--check`: exit 0.
 - D-15: no frozen file is edited. No path this PR changes is named under `unused-code/`, the parity tests pass after the rebuild, and no snapshot was registered.
 - Freeze: the register adds no CLI path and no station-pack question; `check:freeze` passes on the unchanged baseline.
 - `check:dead-code`: 2,342 findings, the same list as `e680f2a6`. The slice-A named exception stands: `EuAiActApplicationDate`, `RegisterStatus`, `RegisterSource`, `RegisterKeyDate` and `RegisterObligation` are still exported and unused. The picks no longer constrain them, so a follow-up may un-export them.
@@ -184,6 +197,8 @@ Each mutation was applied in the working clone, the named test run and the file 
 | Calendars must skip `observation: true` key dates | Open: P1-42 (S10's calendar generator). Three entries carry one (`us-eeoc-ai-ta`, `us-fda-ai-dsf-draft`, `us-qmsr`). |
 | Entries without `affectedPacks` | Open: 17 entries have none (the apply receipt names six kept S5 entries among them). |
 | Facts from iso.org, coe.int, le.utah.gov, ilga.gov, nysed.gov and codes.ohio.gov not re-read | Open: P0-24. |
+| 30 hosts `9d2636531` added to `policy.officialHosts` (27 to 57; read by `OFFICIAL_SOURCE_HOSTS` in `src/compliance/regulatory/index.ts` and by the currency check, subdomains included): gov.uk, ico.org.uk, cao.go.jp, korea.kr, imda.gov.sg, mddi.gov.sg, coe.int, oecd.org, oecd.ai, etsi.org, whitehouse.gov, ecfr.gov, govinfo.gov, reginfo.gov, ftc.gov, fcc.gov, cisa.gov, epa.gov, eeoc.gov, ada.gov, federalreserve.gov, finra.org, nyc.gov, coag.gov, calcivilrights.ca.gov, nysed.gov, ohio.gov, illinois.gov, ilga.gov, utah.gov | Open: ratify or reject with S3's five, Sid with the D-08 expert reviewer; P0-24 applies the ruling. Includes a self-regulatory organisation (finra.org) and intergovernmental publishers (oecd.org, oecd.ai, coe.int), and whole state domains (utah.gov, ohio.gov, illinois.gov). Landed unchanged. |
+| `lastReviewed` 2026-10-03 versus `retrievedAt` 2026-10-04 | Open: 61 verified entries (93 in all) carry sources or key dates read on 2026-10-04. `policy.note` now says so; P0-24 or the re-review before 2027-01-02 sets `lastReviewed` consistently. |
 | Release-gate step for the currency check | P0-33. |
 
 ## Reproduce PR 2
@@ -191,12 +206,13 @@ Each mutation was applied in the working clone, the named test run and the file 
 ```
 git fetch origin amc/regulated-platform-20261003:refs/remotes/candidate/head
 git fetch origin 'refs/heads/worktree-wf_*:refs/remotes/origin/worktree-wf_*'
-git checkout 3698a021b725df9873670ea3f80604b25b64ff95
+git checkout 1086b30f1c046b18dfe4af3080a056941721a236
 ```
 
 Then run the commands in `commands-pr2.tsv` in order.
 
 ## Full logs (not committed)
 
-- Fresh-clone log at `3698a021`: sha256 `670a0af595aa3f1560dd92638ec613299348434469005aa41952cf78c25a094a`
+- Fresh-clone log at `1086b30f` (after the review): sha256 `73f5e4e7edff85e5a2da991344b9a5b0f538eb07aefa944733c3fb4f5c581947`
+- First fresh-clone log at `3698a021`: sha256 `670a0af595aa3f1560dd92638ec613299348434469005aa41952cf78c25a094a`
 - Run of the 317 test files that name a changed path: sha256 `4d9c21bca933ff4477a1560aa223d3e53178560f0264d9701369c322df6c7363`
