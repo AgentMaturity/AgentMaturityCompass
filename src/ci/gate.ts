@@ -19,6 +19,7 @@ import { signHexDigest, verifyHexDigestAny, getPrivateKeyPem, getPublicKeyHistor
 import type { FleetEnvironment } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { loadBundleRunAndTrustMap, verifyEvidenceBundle } from "../bundles/bundle.js";
+import { untrustedReasons, workspaceSelfTrust } from "../trust/index.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 
 const layerNames: LayerName[] = [
@@ -415,8 +416,13 @@ export function initCiForAgent(params: {
     "        run: npm ci",
     "      - name: Build",
     "        run: npm run build",
+    // P0-09: bundle verify needs pinned keys. Pin ones recorded outside this repository (repository variables),
+    // never the .amc/keys files in the checkout, which would let the bundle vouch for itself.
     "      - name: Verify evidence bundle",
-    `        run: amc bundle verify ${relBundle}`,
+    "        env:",
+    "          AMC_AUDITOR_PUBKEY: ${{ vars.AMC_AUDITOR_PUBKEY }}",
+    "          AMC_MONITOR_FINGERPRINT: ${{ vars.AMC_MONITOR_FINGERPRINT }}",
+    `        run: printf '%s\\n' "$AMC_AUDITOR_PUBKEY" > "$RUNNER_TEMP/amc-auditor.pub" && ${pinnedBundleVerify(relBundle, "$RUNNER_TEMP/amc-auditor.pub")}`,
     "      - name: Generate outcomes report",
     `        run: amc outcomes report --agent ${agentId} --window 14d --out ${relOutcomeReport}`,
     "      - name: Optional experiment gate",
@@ -438,6 +444,11 @@ export function initCiForAgent(params: {
   };
 }
 
+/** The pinned bundle verify a CI step runs: the auditor key and monitor fingerprint come from outside the checkout. */
+function pinnedBundleVerify(bundle: string, auditorPubFile: string): string {
+  return `amc bundle verify ${bundle} --pubkey "${auditorPubFile}" --expect-monitor "$AMC_MONITOR_FINGERPRINT"`;
+}
+
 export function printCiSteps(params: {
   workspace: string;
   agentId?: string;
@@ -448,7 +459,7 @@ export function printCiSteps(params: {
   return [
     "npm ci",
     "npm run build",
-    `amc bundle verify ${relativeAgentPathFromWorkspace(params.workspace, bundlePath)}`,
+    pinnedBundleVerify(relativeAgentPathFromWorkspace(params.workspace, bundlePath), "$AMC_AUDITOR_PUB_FILE"),
     `amc outcomes report --agent ${agentId} --window 14d --out ${relativeAgentPathFromWorkspace(
       params.workspace,
       join(agentPaths.rootDir, "outcomes", "reports", "ci-latest.json")
@@ -470,10 +481,11 @@ export async function runBundleGate(params: {
   policyPath: string;
   requireSignedPolicy?: boolean;
 }): Promise<{ pass: boolean; reasons: string[]; report: DiagnosticReport; policy: GatePolicy }> {
-  const verification = await verifyEvidenceBundle(resolve(params.workspace, params.bundlePath));
+  // The gate checks a bundle against this workspace's own keys (workspace-self), so a bundle signed elsewhere fails.
+  const verification = await verifyEvidenceBundle(resolve(params.workspace, params.bundlePath), workspaceSelfTrust(params.workspace));
   const reasons: string[] = [];
   if (!verification.ok) {
-    reasons.push(...verification.errors.map((error) => `bundle verify failed: ${error}`));
+    reasons.push(...untrustedReasons(verification.report).map((error) => `bundle verify failed: ${error}`));
   }
 
   const policyRaw = JSON.parse(readFileSync(resolve(params.workspace, params.policyPath), "utf8")) as unknown;

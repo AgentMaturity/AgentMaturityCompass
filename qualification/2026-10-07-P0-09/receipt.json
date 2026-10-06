@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-09",
+  "date": "2026-10-07",
+  "commit": "f40184095c2c4d25f2dd2d9c6efb68e33187ba74",
+  "branch": "rtd/p0-09-verifier-wiring-a",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 628
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 25022
+    },
+    {
+      "cmd": "npx vitest run tests/trust tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/keyHistoryBundleCertificate.test.ts tests/trustCertificate.test.ts tests/verifyFreshWorkspacePassport.test.ts",
+      "exit": 0,
+      "durationMs": 28571
+    },
+    {
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/affected-tests.txt)",
+      "exit": 0,
+      "durationMs": 115181
+    },
+    {
+      "cmd": "npm run typecheck && npm run typecheck:tests && npm run lint",
+      "exit": 0,
+      "durationMs": 52252
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 315
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1133
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 265
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1355
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 194
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 31780
+    },
+    {
+      "cmd": "npm run check:packed-install",
+      "exit": 0,
+      "durationMs": 42614
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21258
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 28819
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 868
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 307
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 237
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1348
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 258
+    },
+    {
+      "cmd": "npx vitest run tests/trust tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/keyHistoryBundleCertificate.test.ts tests/trustCertificate.test.ts tests/verifyFreshWorkspacePassport.test.ts",
+      "exit": 0,
+      "durationMs": 34573
+    },
+    {
+      "cmd": "npx vitest run $(cat qualification/2026-10-07-P0-09/review-affected-tests.txt)",
+      "exit": 0,
+      "durationMs": 99172
+    },
+    {
+      "cmd": "npm run typecheck && npm run typecheck:tests && npm run lint",
+      "exit": 0,
+      "durationMs": 51018
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 311
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1063
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 265
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1335
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 185
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 30073
+    },
+    {
+      "cmd": "npm run check:packed-install",
+      "exit": 0,
+      "durationMs": 43218
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 42150
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 260
+    }
+  ],
+  "tests": {
+    "total": 15597,
+    "passed": 15597,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "3ee68e5a2e305fc1dc26015cb4b2bca9763388cd7d2c4ae79283e625df287c86"
+    },
+    {
+      "path": "affected-tests.txt",
+      "sha256": "72ff622a760f965e3296f2829976bbbeeb68c09364ae4d3c9b2eab826e0f4833"
+    },
+    {
+      "path": "forgery-before.log",
+      "sha256": "45d03cb345d58546c8a3e9fe379e4b199a573848f30b9222a488e16d8b634576"
+    },
+    {
+      "path": "forgery-after.log",
+      "sha256": "8a56cd4c494b386f04b984e6d7e5c8ebe947ad77ed449b73d8c41d898d13afed"
+    },
+    {
+      "path": "mutations.log",
+      "sha256": "df16d1003db4b15cf69c1d10aca7aa9073c4d1c25b8d971cf3326eba5af0910e"
+    },
+    {
+      "path": "review-affected-tests.txt",
+      "sha256": "95bc15273a90b7d2de8bcbb8312393682b001bbdfebda740418e3248875ba0e2"
+    },
+    {
+      "path": "review-commands.tsv",
+      "sha256": "bbde4a2733e6e579e9e9a3954b9722409717d6a71629daae39f6cece92a7ff6c"
+    },
+    {
+      "path": "review-before.log",
+      "sha256": "6849aeb89d845293bb0c8833e5e01fdf330ebfb1fb23c5fc6a4fa7aa1920dabf"
+    },
+    {
+      "path": "review-after.log",
+      "sha256": "f858332b52631eb55026b3f0ca82d57bc158caf54c02ff6d0e609a86149212ea"
+    },
+    {
+      "path": "review-mutations.log",
+      "sha256": "1918f2ee8a4e4f64bf9a11c75a79b112b06add4ce0be1bd60796a363c2b463bb"
+    }
+  ],
+  "notes": "P0-09 PR 2 (seven verifiers, ledger anchoring, flags, API routes, internal round trips), with the review round of confirmed findings. The first commands block ran on 08edda23 (base 9b905870); the second block (from the second focused vitest run on) ran on f4018409 after the review fixes, and commit names that tree. tests sums the three vitest runs of the second block, which overlap in files: the issue focused set (268), every test file that calls a changed verifier, route, script or doc plus the restoration-parity files (126 files, 8,216, listed in review-affected-tests.txt) and the restoration-parity plus plan-edit-manifest run (7,113). check:packed-install and check:clean-source passed with both cold verifiers pinned to the monitor fingerprint recorded at init. check:qualification ran with this receipt in place. forgery-before.log and forgery-after.log are the first round (28 failed then 37 passed); review-before.log is the review tests on a 0f9e7f77 build (15 failed, 212 passed), review-after.log the passing run on f4018409 (440 passed), mutations.log M1-M5 and review-mutations.log M6-M11. The full npm test, coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt. PR 3 extends this folder."
+}

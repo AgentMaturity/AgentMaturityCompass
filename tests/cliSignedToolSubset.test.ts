@@ -14,6 +14,8 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { readAgentRunSummary, type AgentRunSummary } from "../src/agent/runReport.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { workspaceKeyPem } from "./helpers/trustContext.js";
 
 interface ModelRequest {
   stream: boolean;
@@ -43,6 +45,8 @@ test.each(["CLI", "ACP"] as const)("the built native %s uses provider-valid alia
   const checkpointRoot = join(workspace, "control-checkpoints");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpointRoot);
   initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  // Recorded at creation, outside the ledger later verified, so the cold verifiers can anchor it (P0-09).
+  const monitor = sha256Hex(workspaceKeyPem(root, "monitor"));
   initBudgets(root, "default"); writeRuntimeFirewallPolicy({ workspace: root, mode: "observe" });
   mkdirSync(join(root, "workspace"), { recursive: true });
   const fixtureText = "independent read-only fixture bytes: 17b4";
@@ -169,7 +173,7 @@ test.each(["CLI", "ACP"] as const)("the built native %s uses provider-valid alia
       wireName: requests[0]!.tools!.find(tool => !["glob", "grep"].includes(tool.function.name))!.function.name });
     for (const row of audits) { expect(row.writer_sig).not.toBe("unsigned"); expect(extractEnvelope(row.meta_json)?.sessionId).toBe(summary.sessionId); }
   } finally { ledger.close(); }
-  for (const args of [["session", "verify", "--json"], ["agent-loop", "verify", summary.sessionId, "--json"]]) {
+  for (const args of [["session", "verify", "--json", "--expect-monitor", monitor], ["agent-loop", "verify", summary.sessionId, "--json", "--expect-monitor", monitor]]) {
     const verification = await run(args); expect(verification.code, verification.stderr).toBe(0);
     expect(JSON.parse(verification.stdout).ok).toBe(true);
   }

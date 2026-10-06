@@ -77,11 +77,13 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
   writeFileSync(isolated.npm_config_userconfig, "");
   writeFileSync(isolated.npm_config_globalconfig, "");
   const amc = join(consumer, "node_modules", ".bin", "amc");
+  // The monitor-key fingerprint recorded right after `amc init`, outside the ledger it later anchors (P0-09).
+  let expectMonitor;
   const verifyRun = (r, requireTool = true) => {
     if (!r.ok) return false;
     let summary;
     try { summary = JSON.parse(r.stdout); } catch { console.error("FAIL native run did not return a JSON summary"); return false; }
-    const verified = verifyPackedRun({ summary, requireTool,
+    const verified = verifyPackedRun({ summary, requireTool, expectMonitor,
       runCommand: (label, args) => run(label, amc, args, { cwd: workspace, env: isolated }) });
     console.log(`${verified ? "ok  " : "FAIL"} installed evidence and request reconstruction`);
     return verified;
@@ -113,7 +115,11 @@ export function packedInstallCheck({ root = process.cwd(), build = true, keep = 
       [join(root, "scripts", "standalone-api-smoke.mjs"), join(consumer, "node_modules", pkg.name, "dist", "standalone-api.js")],
       { cwd: workspace, env: isolated }).ok,
     () => run("amc doctor", join(consumer, "node_modules", ".bin", "amc"), ["doctor"], { cwd: workspace, env: isolated }).ok,
-    () => run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok,
+    () => {
+      const ok = run("amc init (isolated workspace)", join(consumer, "node_modules", ".bin", "amc"), ["init", "--trust-boundary", "isolated"], { cwd: workspace, env: isolated }).ok;
+      if (ok) expectMonitor = createHash("sha256").update(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"))).digest("hex");
+      return ok;
+    },
     () => {
       // Inspection must work without resolving either @amc/core or the plugin.
       const source = "- id: packed-inspection\n  name: ./not-installed-plugin.mjs\n  disabled: true\n";

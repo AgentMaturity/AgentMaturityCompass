@@ -1,0 +1,449 @@
+
+ RUN  v4.1.11 <before-worktree>
+
+ ❯ tests/cleanSourceDocs.test.ts (8 tests | 1 failed) 25ms
+     × isolates install/build/runtime and verifies a cold resumed session 10ms
+ ❯ tests/passportPublicApiAndCli.test.ts (13 tests | 1 failed) 3588ms
+     × GET /api/v1/passport/:id/verify is public 295ms
+ ❯ tests/auditEvidenceAccountingParity.test.ts (142 tests | 1 failed) 231ms
+   × unsigned CI initialization preserves real policy/workflow bytes and disclosed signing boundary 10ms
+ ❯ tests/cliAgentLoopCommands.test.ts (9 tests | 1 failed) 5062ms
+       × runs a turn from argv and reports what the log recorded 1346ms
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts (8 tests | 3 failed) 8102ms
+     × accepts the recorded fingerprint in upper case, as the trust context does 926ms
+     × prints the full monitor key id with an UNANCHORED refusal, so the operator can compare it with their record 918ms
+     × fails a distrusted monitor key even when it is pinned and --allow-unanchored is used 931ms
+stderr | tests/trust/embeddedKeyForgery.test.ts
+[diagnostic] untagged evidence counts toward no question at any level; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts (47 tests | 8 failed) 32409ms
+     × AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 842ms
+     × a distrusted monitor key fails even with --expect-monitor and --allow-unanchored 804ms
+     × an issuer key superseded after it sealed the bundle is admitted on the claimed signing time 800ms
+     × AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 741ms
+     × proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate 764ms
+     × verify all names the key to pin when it refuses an unpinned release bundle 1722ms
+     × POST /api/v1/assurance/cert/verify refuses a body that carries pubkey 35ms
+     × POST /api/v1/assurance/cert/verify answers an unpinned issuer with ok:false and the verifier report 17ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 15 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/auditEvidenceAccountingParity.test.ts > unsigned CI initialization preserves real policy/workflow bytes and disclosed signing boundary
+AssertionError: expected 'name: AMC Release Gate\n\non:\n  push…' to be 'name: AMC Release Gate\n\non:\n  push…' // Object.is equality
+
+- Expected
++ Received
+
+@@ -15,14 +15,11 @@
+        - name: Install dependencies
+          run: npm ci
+        - name: Build
+          run: npm run build
+        - name: Verify evidence bundle
+-         env:
+-           AMC_AUDITOR_PUBKEY: ${{ vars.AMC_AUDITOR_PUBKEY }}
+-           AMC_MONITOR_FINGERPRINT: ${{ vars.AMC_MONITOR_FINGERPRINT }}
+-         run: printf '%s\n' "$AMC_AUDITOR_PUBKEY" > "$RUNNER_TEMP/amc-auditor.pub" && amc bundle verify .amc/agents/ci-parity-agent/bundles/latest.amcbundle --pubkey "$RUNNER_TEMP/amc-auditor.pub" --expect-monitor "$AMC_MONITOR_FINGERPRINT"
++         run: amc bundle verify .amc/agents/ci-parity-agent/bundles/latest.amcbundle
+        - name: Generate outcomes report
+          run: amc outcomes report --agent ci-parity-agent --window 14d --out .amc/agents/ci-parity-agent/outcomes/reports/ci-latest.json
+        - name: Optional experiment gate
+          run: if [ -n "$AMC_EXPERIMENT_ID" ] && [ -f ".amc/agents/ci-parity-agent/experimentGate.json" ]; then amc experiment gate --agent ci-parity-agent --experiment "$AMC_EXPERIMENT_ID" --policy .amc/agents/ci-parity-agent/experimentGate.json; else echo "Experiment gate skipped (set AMC_EXPERIMENT_ID and commit .amc/agents/ci-parity-agent/experimentGate.json)"; fi
+        - name: Enforce AMC gate policy
+
+ ❯ tests/auditEvidenceAccountingParity.test.ts:259:55
+    257|       `        run: printf '%s\\n' "$AMC_AUDITOR_PUBKEY" > "$RUNNER_TE…
+    258|     expect(expectedWorkflow).not.toBe(workflow.toString("utf8"));
+    259|     expect(readFileSync(actual.workflowPath, "utf8")).toBe(expectedWor…
+       |                                                       ^
+    260|     expect(statSync(actual.policyPath).mode & 0o777).toBe(policyMode);
+    261|     expect(statSync(actual.workflowPath).mode & 0o777).toBe(workflowMo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  tests/cleanSourceDocs.test.ts > clean-source command orchestration (synthetic subprocesses, not install acceptance) > isolates install/build/runtime and verifies a cold resumed session
+AssertionError: expected [ 'verify', '--json' ] to deeply equal [ '--expect-monitor', …(1) ]
+
+- Expected
++ Received
+
+  [
+-   "--expect-monitor",
+-   "2c5ee6c32f48dc19ffa56ac06fd758e9e725c176a20bc511e76e5cebfd1bfa4a",
++   "verify",
++   "--json",
+  ]
+
+ ❯ tests/cleanSourceDocs.test.ts:108:75
+    106|     // Both cold verifiers are anchored to the fingerprint recorded at…
+    107|     const pin = createHash("sha256").update(SYNTHETIC_MONITOR_PUB).dig…
+    108|     for (const [, args] of verifies) expect((args as string[]).slice(-…
+       |                                                                           ^
+    109|   });
+    110|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  tests/cliAgentLoopCommands.test.ts > amc agent-loop — the operator surface > the command wiring > runs a turn from argv and reports what the log recorded
+AssertionError: expected 'session cb03eeea-94e2-4099-b303-326b4…' to contain 'Ledger verification FAILED: UNANCHORED'
+
+- Expected
++ Received
+
+- Ledger verification FAILED: UNANCHORED
++ session cb03eeea-94e2-4099-b303-326b4ea9f58a: NOT VERIFIED: UNANCHORED (integrity verified, authorship not)
++   ledger chain        ok
++   session chain       ok
++   unsigned rows       0
++   requests derived    3/3
++   trust root          UNANCHORED — internal consistency only, not authorship
++   To make this adversarial, pin the expected key out of band:
++     --expect-monitor <sha256 of the monitor .pub>, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list
+
+ ❯ tests/cliAgentLoopCommands.test.ts:280:42
+    278|       expect(unpinnedOut.out.join("\n")).toContain("NOT VERIFIED: UNAN…
+    279|       // Step 9's message, as amc verify and session verify print it, …
+    280|       expect(unpinnedOut.out.join("\n")).toContain("Ledger verificatio…
+       |                                          ^
+    281|       expect(unpinnedOut.out.join("\n")).toContain(sha256Hex(workspace…
+    282|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > accepts the recorded fingerprint in upper case, as the trust context does
+AssertionError: Ledger verification FAILED — evidence chain
+- trust root: monitor key fingerprint 861275d2119c6f23… does not match the expected 861275D2119C6F23… — the evidence may have been re-signed with a substituted key
+
+  Tip: run with --repair to auto-clean corrupted entries
+
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:115:42
+    113|     const { workspace, fingerprint } = buildWorkspace();
+    114|     const result = amcVerify(workspace, ["--expect-monitor", fingerpri…
+    115|     expect(result.status, result.output).toBe(0);
+       |                                          ^
+    116|     expect(result.output).not.toContain("substituted key");
+    117|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > prints the full monitor key id with an UNANCHORED refusal, so the operator can compare it with their record
+AssertionError: expected 'Ledger verification FAILED: UNANCHORE…' to contain '3540cf892dbffe89d06c627ec41c76cbd75ba…'
+
+- Expected
++ Received
+
+- 3540cf892dbffe89d06c627ec41c76cbd75ba185c13f2812cae23f6af1849595
++ Ledger verification FAILED: UNANCHORED. The monitor key was read from the workspace being verified, so this proves internal consistency only. Pin it with --expect-monitor, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list, using a fingerprint recorded outside this workspace.
++   Signed by monitor key 3540cf892dbffe89…, read from inside the workspace.
++
++
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:123:27
+    121|     const result = amcVerify(workspace);
+    122|     expect(result.status, result.output).toBe(1);
+    123|     expect(result.output).toContain(fingerprint);
+       |                           ^
+    124|   });
+    125|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  tests/ledgerTrustRootAnchorCli.test.ts > amc verify and the ledger trust root > fails a distrusted monitor key even when it is pinned and --allow-unanchored is used
+AssertionError: Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This proves internal consistency only.
+  Signed by monitor key c8fa3e8a05502009…, read from inside the workspace.
+
+UNTRUSTED: integrity verified, but --allow-unanchored was used: ledger UNANCHORED: the monitor key was read from the workspace being verified (internal consistency only)
+: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/ledgerTrustRootAnchorCli.test.ts:139:42
+    137|     writeFileSync(listPath, JSON.stringify(list));
+    138|     const result = amcVerify(workspace, ["--expect-monitor", fingerpri…
+    139|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    140|     expect(result.output).toContain("distrusted");
+    141|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  tests/passportPublicApiAndCli.test.ts > passport public API + sharing + comparison > GET /api/v1/passport/:id/verify is public
+TypeError: Cannot read properties of undefined (reading 'issuerAdmission')
+ ❯ tests/passportPublicApiAndCli.test.ts:405:40
+    403|       expect(unpinned.status).toBe(422);
+    404|       // The response carries the verifier report and says why, with t…
+    405|       expect(unpinned.json.data.report.issuerAdmission.status).toBe("f…
+       |                                        ^
+    406|       const auditorKeyId = createHash("sha256").update(workspaceKeyPem…
+    407|       expect(unpinned.json.data.errors).toContainEqual(expect.objectCo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key
+AssertionError: Bundle verification PASSED
+runId=49ca987f-177c-4ad0-95d2-3bf64c38b0f7 agentId=default
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:269:42
+    267|     const result = amc(evidence.workspace, ["bundle", "verify", eviden…
+    268|       ...listFlags([], [distrusted(evidence.monitorFingerprint)])], { …
+    269|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    270|     expect(result.output).toContain("distrusted");
+    271|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > a distrusted monitor key fails even with --expect-monitor and --allow-unanchored
+AssertionError: Bundle integrity verified, UNTRUSTED
+- ledger UNANCHORED: monitor key distrusted: key a079bea8251414b1f1aea2bd23d04096cb471d7006fe5be59bf7466f70c88cb4 is distrusted (key-compromise, operator): forgery suite
+
+UNTRUSTED: integrity verified, but --allow-unanchored was used: ledger UNANCHORED: monitor key distrusted: key a079bea8251414b1f1aea2bd23d04096cb471d7006fe5be59bf7466f70c88cb4 is distrusted (key-compromise, operator): forgery suite
+: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:276:42
+    274|     const result = amc(evidence.workspace, ["bundle", "verify", eviden…
+    275|       ...listFlags([], [distrusted(evidence.monitorFingerprint)])]);
+    276|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    277|     expect(result.output).toContain("distrusted");
+    278|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyEvidenceBundle (amc bundle verify) > an issuer key superseded after it sealed the bundle is admitted on the claimed signing time
+AssertionError: {
+  "ok": false,
+  "errors": [],
+  "runId": "49ca987f-177c-4ad0-95d2-3bf64c38b0f7",
+  "agentId": "default",
+  "retainedSpills": {
+    "objectsComplete": true,
+    "plaintextVerified": false,
+    "gaps": []
+  },
+  "report": {
+    "type": "amc.verifier-report",
+    "version": 1,
+    "artifact": {
+      "kind": "bundle",
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-forgery-ws-Zq9gsJ/run.amcbundle",
+      "sha256": "c1898d8c549859d4d64aa449e34f6b5d935f40e60c5927204a4cf817fb09f10a"
+    },
+    "verifier": {
+      "name": "agent-maturity-compass",
+      "version": "1.2.0"
+    },
+    "verifiedAt": "2026-10-06T21:12:21.680Z",
+    "asOf": "2026-10-06T21:12:21.617Z",
+    "integrity": {
+      "status": "pass",
+      "errors": []
+    },
+    "issuerAdmission": {
+      "status": "fail",
+      "signatures": [
+        {
+          "signature": "manifest.sig",
+          "purpose": "artifact-seal",
+          "keyId": "f2b947c7e47db83d5c831dcee792793f6485334b98ff68e6d37a41fe850dd0c7",
+          "status": "revoked",
+          "source": null,
+          "listId": "tenant-a",
+          "timeBasis": null,
+          "detail": "trust list tenant-a revoked this key at 2026-10-06T21:12:19.891Z (superseded)"
+        },
+        {
+          "signature": "run.json runSealSig",
+          "purpose": "artifact-seal",
+          "keyId": "f2b947c7e47db83d5c831dcee792793f6485334b98ff68e6d37a41fe850dd0c7",
+          "status": "revoked",
+          "source": null,
+          "listId": "tenant-a",
+          "timeBasis": null,
+          "detail": "trust list tenant-a revoked this key at 2026-10-06T21:12:19.891Z (superseded)"
+        },
+        {
+          "signature": "target.json signature",
+          "purpose": "artifact-seal",
+          "keyId": "f2b947c7e47db83d5c831dcee792793f6485334b98ff68e6d37a41fe850dd0c7",
+          "status": "revoked",
+          "source": null,
+          "listId": "tenant-a",
+          "timeBasis": null,
+          "detail": "trust list tenant-a revoked this key at 2026-10-06T21:12:19.891Z (superseded)"
+        }
+      ]
+    },
+    "anchoring": {
+      "status": "anchored",
+      "detail": "monitor key a079bea8251414b1f1aea2bd23d04096cb471d7006fe5be59bf7466f70c88cb4 admitted for ledger-row (explicit-key)"
+    },
+    "scope": {
+      "status": "not-evaluated",
+      "reasons": []
+    },
+    "freshness": {
+      "status": "not-evaluated",
+      "reasons": []
+    },
+    "completeness": {
+      "status": "not-evaluated",
+      "reasons": []
+    },
+    "satisfaction": {
+      "status": "not-evaluated",
+      "reasons": []
+    },
+    "trusted": false,
+    "overrides": [],
+    "warnings": []
+  }
+}
+
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:286:42
+    284|       validTo: null, revokedAt: new Date(now - 1_000).toISOString(), r…
+    285|     const result = amc(evidence.workspace, ["bundle", "verify", eviden…
+    286|     expect(result.status, result.output).toBe(0);
+       |                                          ^
+    287|     const report = (JSON.parse(result.stdout) as { report: { issuerAdm…
+    288|     expect(report.issuerAdmission.signatures.find(row => row.signature…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyCertificate (amc cert verify, .amccert) > AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key
+AssertionError: Certificate verification PASSED
+certId=beefd9f8-5e7f-4632-bf8a-c04eb107ea4b
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:304:42
+    302|     const result = amc(evidence.workspace, ["cert", "verify", evidence…
+    303|       ...listFlags([], [distrusted(evidence.monitorFingerprint)])], { …
+    304|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    305|     expect(result.output).toContain("distrusted");
+    306|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyAssuranceCertificateFile (amc assurance cert-verify) > proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate
+AssertionError: Assurance certificate verification PASSED
+
+: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:461:42
+    459|   test("proofs and a signed root the same issuer produced later cannot…
+    460|     const result = amc(signed.workspace, ["assurance", "cert-verify", …
+    461|     expect(result.status, result.output).toBe(1);
+       |                                          ^
+    462|     expect(result.output).toContain("proofBindings.merkleRootSha256 mi…
+    463|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > verifyReleaseBundle (amc release verify) > verify all names the key to pin when it refuses an unpinned release bundle
+AssertionError: expected '/private/var/folders/kt/r665rkj5159bw…' to contain 'key f9f330a7f8187714712e2fa90c471ebc4…'
+
+Expected: "key f9f330a7f8187714712e2fa90c471ebc42e59e331137884fc22d2cbdf0172a03 is not pinned"
+Received: "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-forgery-relws-fyoKNZ/dist/release.amcrelease: "
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:548:39
+    546|     const check = report.checks.find(row => row.id === "release-bundle…
+    547|     expect(check?.status, result.output).toBe("FAIL");
+    548|     expect(check?.details.join("\n")).toContain(`key ${sha(readFileSyn…
+       |                                       ^
+    549|   }, 120_000);
+    550| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify refuses a body that carries pubkey
+AssertionError: expected 200 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 200
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:586:26
+    584|     test(`${name} refuses a body that carries ${field}`, async () => {
+    585|       const out = await route(handler, pathname, { ...body(), [field]:…
+    586|       expect(out.status).toBe(400);
+       |                          ^
+    587|       expect(out.json.error).toContain(`request field "${field}" is re…
+    588|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  tests/trust/embeddedKeyForgery.test.ts > API verify routes use the server's trust context and refuse request-supplied trust > POST /api/v1/assurance/cert/verify answers an unpinned issuer with ok:false and the verifier report
+AssertionError: expected undefined to be false // Object.is equality
+
+- Expected:
+false
+
++ Received:
+undefined
+
+ ❯ tests/trust/embeddedKeyForgery.test.ts:591:33
+    589|     test(`${name} answers an unpinned issuer with ok:false and the ver…
+    590|       const out = await route(handler, pathname, body(), evidence.work…
+    591|       expect(out.json.data?.ok).toBe(false);
+       |                                 ^
+    592|       expect(out.json.data?.report?.trusted).toBe(false);
+    593|       expect(out.json.data?.report?.issuerAdmission.status).toBe("fail…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+
+ Test Files  6 failed (6)
+      Tests  15 failed | 212 passed (227)
+   Start at  02:42:10
+   Duration  36.35s (transform 12.96s, setup 171ms, import 19.18s, tests 49.42s, environment 1ms)
+

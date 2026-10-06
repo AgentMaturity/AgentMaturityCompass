@@ -37,6 +37,8 @@ import { verifySessionChains } from "./sessionVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
+import { admitKey, type IssuerAdmission } from "../trust/admission.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 /**
  * Default heartbeat window for the OPEN vs INTERRUPTED verdict on an unsealed,
@@ -80,6 +82,8 @@ export interface VerifyResult {
     anchored: boolean;
     monitorFingerprint: string | null;
     expectedFingerprint: string | null;
+    /** With a trust context: the monitor key's ledger-row admission (a distrusted or revoked key is a failure, not UNANCHORED). */
+    monitorAdmission?: IssuerAdmission;
   };
   /**
    * Per-session lifecycle verdicts for agent sessions — those whose events carry
@@ -107,6 +111,11 @@ export interface VerifyResult {
   };
 }
 
+/** P0-09 step 9: what a ledger verdict says when no pinned monitor key anchors it. */
+export const LEDGER_UNANCHORED_MESSAGE = "Ledger verification FAILED: UNANCHORED. The monitor key was read from the workspace being verified, " +
+  "so this proves internal consistency only. Pin it with --expect-monitor, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list, " +
+  "using a fingerprint recorded outside this workspace.";
+
 export interface LedgerVerifyOptions {
   externallyAuthenticatedPayloads?: ReadonlyMap<string, string>;
   /**
@@ -130,6 +139,8 @@ export interface LedgerVerifyOptions {
    * instead of depending on wall-clock timing.
    */
   sessionStaleAfterMs?: number;
+  /** P0-09: when given, trustRoot.anchored means the monitor key is admitted for ledger-row by this context. */
+  trust?: TrustContext;
 }
 
 
@@ -653,11 +664,14 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   // is not the key the operator expects, nothing below this line means
   // anything. An explicit option wins over the environment so a caller can
   // verify one workspace against a specific key without changing process state.
+  // Fingerprints are lowercase hex; the trust context lowercases its pin, so the comparison here must too.
   const expectedFingerprint =
-    options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+    (options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"])?.trim().toLowerCase() || null;
   let monitorFingerprint: string | null = null;
+  let monitorPem: string | null = null;
   try {
-    monitorFingerprint = sha256Hex(Buffer.from(getPublicKeyPem(workspacePath, "monitor"), "utf8"));
+    monitorPem = getPublicKeyPem(workspacePath, "monitor");
+    monitorFingerprint = sha256Hex(Buffer.from(monitorPem, "utf8"));
   } catch {
     // No monitor key at all. verifyEvents reports the consequences per event;
     // recording null here keeps the trust-root verdict honest rather than
@@ -717,15 +731,19 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   }
 
   const errors = [...chainErrors, ...governanceErrors];
+  const monitorAdmission = options.trust
+    ? admitKey({ publicKeyPem: monitorPem, purpose: "ledger-row", signature: "ledger monitor key", context: options.trust })
+    : undefined;
   return {
     ok: errors.length === 0,
     errors,
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
     governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
     trustRoot: {
-      anchored: Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
+      anchored: monitorAdmission ? monitorAdmission.status === "admitted" : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
       monitorFingerprint,
-      expectedFingerprint
+      expectedFingerprint,
+      ...(monitorAdmission ? { monitorAdmission } : {})
     },
     sessions: {
       open: sessionLifecycle.open,

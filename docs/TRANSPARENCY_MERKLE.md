@@ -24,5 +24,5 @@ AMC keeps the existing append-only transparency log and adds a Merkle index for 
 ## Console
 Use `/console/transparency` for chain status + Merkle root history.
 
-## Pinned root keys (planned)
-P0-09 adds pinned issuer keys (`agent-maturity-compass/trust`, see `docs/TRUST_LIST.md`). Once its PR 2 and PR 3 wire the verifiers, a signed root counts only when its key is admitted for `artifact-seal` by `--pubkey` or a signed trust list, and bench inclusion proofs are checked against the signed root. Until then these commands behave as before.
+## Pinned root keys
+P0-09 adds pinned issuer keys (`agent-maturity-compass/trust`, see `docs/TRUST_LIST.md`). Since PR 2, `amc passport verify` and `amc assurance cert-verify` check the inclusion proofs an artifact carries against its signed `proofs/merkle.root.json`: the root's signature must come from a key admitted for `artifact-seal` by `--pubkey` or a signed trust list, and every proof must resolve to that signed root, never to a root the proof file names for itself. Proofs without a signed root leave the artifact unanchored. Bench proofs follow in PR 3; the commands above behave as before.

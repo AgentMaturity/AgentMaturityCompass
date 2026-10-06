@@ -20,6 +20,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { defaultPassportPolicy } from "../src/passport/passportPolicySchema.js";
 import { savePassportPolicy } from "../src/passport/passportStore.js";
 import { landedText } from "./helpers/landedSource.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });
@@ -166,7 +167,7 @@ describe("actual public evidence and passport rendering", () => {
       expect(passportPolicyPrintCli(ws)).toEqual(init.policy);
     }
     const created = passportCreateCli({ workspace: ws, scope: "agent", id: "default", outFile: join(ws, "owned.amcpass") });
-    expect(passportVerifyCli({ workspace: ws, file: created.outFile }).ok).toBe(true);
+    expect(passportVerifyCli({ workspace: ws, file: created.outFile, trust: workspaceKeyTrust(ws) }).ok).toBe(true);
     expect(passportShowCli({ file: created.outFile, format: "json" })).toHaveProperty("passport.passportId", created.passport.passportId);
     expect(passportShowCli({ file: created.outFile, format: "badge" })).toContain("AMC ");
     expect(passportBadgeCli({ workspace: ws, agentId: "default" }).badge).toContain("AMC ");

@@ -81,14 +81,16 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
     const guide = requireStep(runCli("read-only-guide", ["agent-loop", "guide", "--json"]));
     JSON.parse(guide.stdout);
     requireStep(runCli("initialize", ["init", "--trust-boundary", "isolated"]));
+    // The monitor-key fingerprint recorded right after init, outside the ledger it later anchors (P0-09).
+    const expectMonitor = hash(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
     const turn = requireStep(runCli("native-keyless-task", ["agent-loop", "run", "--provider", "stub", "--json", "say hello"]));
-    if (!verifyPackedRun({ summary: JSON.parse(turn.stdout), runCommand: runCli })) throw new Error("Installed native evidence failed cold verification");
+    if (!verifyPackedRun({ summary: JSON.parse(turn.stdout), runCommand: runCli, expectMonitor })) throw new Error("Installed native evidence failed cold verification");
     const held = `${cli}.platform-held`;
     renameSync(cli, held);
     try { requireStep(command("missing-launcher-refuses", process.execPath, [cli, "--help"], workspace, true)); }
     finally { renameSync(held, cli); }
     requireStep(runCli("restored-launcher", ["--help"]));
-    if (!verifyPackedRun({ summary: JSON.parse(turn.stdout), runCommand: runCli })) throw new Error("Evidence did not survive launcher restoration");
+    if (!verifyPackedRun({ summary: JSON.parse(turn.stdout), runCommand: runCli, expectMonitor })) throw new Error("Evidence did not survive launcher restoration");
     report.status = report.supportedNode ? "passed" : "inconclusive";
     if (!report.supportedNode) report.limitations.push("This Node major is not a supported production qualification target.");
   } catch (error) {

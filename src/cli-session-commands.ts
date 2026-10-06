@@ -12,6 +12,7 @@ import { randomUUID } from "node:crypto";
 import chalk from "chalk";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
+import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 
 export function registerSessionCommands(program: Command): void {
   const session = program
@@ -21,26 +22,23 @@ export function registerSessionCommands(program: Command): void {
   registerSessionCompactionCommands(session);
   registerSessionSpillReadCommand(session);
 
-  session
+  withTrustFlags(session
     .command("verify")
     .description("Verify the ledger and report per-session lifecycle verdicts (open / released / interrupted / closed)")
-    .option("--json", "Output as JSON")
-    .option(
-      "--expect-monitor <fingerprint>",
-      "Expected monitor public-key fingerprint, supplied out of band (sha256 of the monitor .pub)"
-    )
-    .action(async (opts: { json?: boolean; expectMonitor?: string }) => {
+    .option("--json", "Output as JSON"), { expectMonitor: true, ledgerOnly: true })
+    .action(async (opts: TrustFlags) => {
       const { verifyLedgerIntegrity } = await import("./ledger/ledger.js");
       const { renderLedgerVerdict } = await import("./cli-evidence-store-commands.js");
+      const trust = trustFromFlags(opts, ["ledger-row"]);
       const result = await verifyLedgerIntegrity(process.cwd(), {
-        ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
+        trust, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {})
       });
       if (opts.json) {
         console.log(JSON.stringify(result, null, 2));
-        process.exit(result.ok ? 0 : 1);
+        process.exit(ledgerExitCode(result, trust));
         return;
       }
-      console.log(renderLedgerVerdict(result));
+      console.log(renderLedgerVerdict(result, trust.allowUnanchored));
       const { open, released, interrupted, closed } = result.sessions;
       console.log("");
       console.log(chalk.bold("Agent sessions"));
@@ -53,7 +51,7 @@ export function registerSessionCommands(program: Command): void {
         // so an operator can decide whether to `session recover` it.
         console.log(chalk.yellow(`    interrupted: ${id}`));
       }
-      process.exit(result.ok ? 0 : 1);
+      process.exit(ledgerExitCode(result, trust));
     });
 
   session

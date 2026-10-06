@@ -20,7 +20,9 @@ import {
   saveAssuranceWaiver,
   verifyAssurancePolicySignature
 } from "./assurancePolicyStore.js";
-import { issueAssuranceCertificate, inspectAssuranceCertificate } from "./assuranceCertificates.js";
+import { issueAssuranceCertificate } from "./assuranceCertificates.js";
+import { verifyAssuranceCertificateFile } from "./assuranceVerifier.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { latestAssuranceCertificateSummary } from "./assuranceStore.js";
 import {
   assuranceSchedulerRunNow,
@@ -434,10 +436,12 @@ export function assuranceCertLatestForApi(workspace: string) {
   };
 }
 
+/** A verdict, not an inspection: the issuer and signed root need keys the server operator's trust context admits (P0-09). */
 export function assuranceCertVerifyForApi(params: {
   file: string;
+  trust: TrustContext;
 }) {
-  return inspectAssuranceCertificate(params.file);
+  return verifyAssuranceCertificateFile({ file: params.file, trust: params.trust });
 }
 
 export function assuranceReadinessGate(workspace: string): {

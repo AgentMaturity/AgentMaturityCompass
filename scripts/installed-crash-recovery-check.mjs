@@ -206,8 +206,8 @@ try {
   assert.equal(final.events.filter(row => row.event_type === "request/header").length, 2);
   assert.equal(final.events.filter(row => row.event_type === "tool/call").length, 1);
   assert.deepEqual(readFileSync(effectsPath), effectsBefore);
-  const cold = await command("13-cold-native-verification", ["agent-loop", "verify", sessionId, "--json"]); assert.equal(cold.ok, true);
-  const ledger = await command("14-cold-ledger-verification", ["session", "verify", "--json"]); assert.equal(ledger.ok, true); assert.deepEqual(ledger.errors, []);
+  const cold = await command("13-cold-native-verification", ["agent-loop", "verify", sessionId, "--json", "--expect-monitor", monitor]); assert.equal(cold.ok, true);
+  const ledger = await command("14-cold-ledger-verification", ["session", "verify", "--json", "--expect-monitor", monitor]); assert.equal(ledger.ok, true); assert.deepEqual(ledger.errors, []);
   const finalBudget = await command("15-final-budget", ["budgets", "status", "--agent", "default"]);
   assert.equal(finalBudget.usage.daily.toolPending.WRITE_LOW, 1);
   check("new-explicit-turn-without-side-effect-replay-and-cold-verification", { finalModelCalls: 2, finalToolCalls: 1, effectCount: 1,

@@ -24,6 +24,7 @@ import { getPrivateKeyPem, signHexDigest } from "../src/crypto/keys.js";
 import { ingestEvidence } from "../src/ingest/ingest.js";
 import { resolveAgentId, getAgentPaths } from "../src/fleet/paths.js";
 import { pathExists } from "../src/utils/fs.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -233,7 +234,7 @@ describe("release bundles, gates, archetypes, badges", () => {
     const extracted = extractBundle(bundlePath);
     expect(pathExists(join(extracted, "payloads", artifactRelativePath))).toBe(true);
 
-    const verified = await verifyEvidenceBundle(bundlePath);
+    const verified = await verifyEvidenceBundle(bundlePath, workspaceKeyTrust(workspace));
     expect(verified.errors).toEqual([]);
     expect(verified.ok).toBe(true);
   });
@@ -277,7 +278,7 @@ describe("release bundles, gates, archetypes, badges", () => {
     db.close();
     expect(assuranceRows.count).toBe(0);
 
-    const verified = await verifyEvidenceBundle(bundlePath);
+    const verified = await verifyEvidenceBundle(bundlePath, workspaceKeyTrust(workspace));
     expect(verified.ok).toBe(true);
   });
 
@@ -294,7 +295,7 @@ describe("release bundles, gates, archetypes, badges", () => {
     const bundlePath = join(workspace, ".amc", "tamper-base.amcbundle");
     exportEvidenceBundle({ workspace, runId: run.runId, outFile: bundlePath });
 
-    const baseVerify = await verifyEvidenceBundle(bundlePath);
+    const baseVerify = await verifyEvidenceBundle(bundlePath, workspaceKeyTrust(workspace));
     expect(baseVerify.ok).toBe(true);
 
     const tamperManifest = join(workspace, ".amc", "tamper-manifest.amcbundle");
@@ -303,7 +304,7 @@ describe("release bundles, gates, archetypes, badges", () => {
       writeFileSync(join(extracted, "manifest.json"), `${readFileSync(join(extracted, "manifest.json"), "utf8")}\n`);
       packBundle(extracted, tamperManifest);
     }
-    const manifestVerify = await verifyEvidenceBundle(tamperManifest);
+    const manifestVerify = await verifyEvidenceBundle(tamperManifest, workspaceKeyTrust(workspace));
     expect(manifestVerify.ok).toBe(false);
 
     const tamperMissing = join(workspace, ".amc", "tamper-missing.amcbundle");
@@ -316,7 +317,7 @@ describe("release bundles, gates, archetypes, badges", () => {
       rmSync(join(extracted, victim));
       packBundle(extracted, tamperMissing);
     }
-    const missingVerify = await verifyEvidenceBundle(tamperMissing);
+    const missingVerify = await verifyEvidenceBundle(tamperMissing, workspaceKeyTrust(workspace));
     expect(missingVerify.ok).toBe(false);
 
     const tamperBlob = join(workspace, ".amc", "tamper-blob.amcbundle");
@@ -333,7 +334,7 @@ describe("release bundles, gates, archetypes, badges", () => {
       }
       packBundle(extracted, tamperBlob);
     }
-    const blobVerify = await verifyEvidenceBundle(tamperBlob);
+    const blobVerify = await verifyEvidenceBundle(tamperBlob, workspaceKeyTrust(workspace));
     expect(blobVerify.ok).toBe(false);
 
     const tamperSig = join(workspace, ".amc", "tamper-signature.amcbundle");
@@ -345,7 +346,7 @@ describe("release bundles, gates, archetypes, badges", () => {
       writeFileSync(sigPath, JSON.stringify(sig, null, 2));
       packBundle(extracted, tamperSig);
     }
-    const sigVerify = await verifyEvidenceBundle(tamperSig);
+    const sigVerify = await verifyEvidenceBundle(tamperSig, workspaceKeyTrust(workspace));
     expect(sigVerify.ok).toBe(false);
   });
 
@@ -410,7 +411,7 @@ describe("release bundles, gates, archetypes, badges", () => {
     const modifiedBundle = join(workspace, ".amc", "gate-modified.amcbundle");
     packBundle(extracted, modifiedBundle);
 
-    const verifyModified = await verifyEvidenceBundle(modifiedBundle);
+    const verifyModified = await verifyEvidenceBundle(modifiedBundle, workspaceKeyTrust(workspace));
     expect(verifyModified.ok).toBe(true);
 
     const policyPath = join(getAgentPaths(workspace, resolveAgentId(workspace)).rootDir, "gatePolicy.test.json");

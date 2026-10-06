@@ -5,6 +5,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
 import { generateTransparencyInclusionProof, verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyMerkleProof } from "../transparency/merkle.js";
+import type { IssuerAdmission, TrustContext, VerifierReportV1 } from "../trust/index.js";
+import { checkDigestSignature, envelopePublicKey } from "../trust/signatureCheck.js";
 
 export interface BenchInclusionProof {
   v: 1;
@@ -130,6 +132,44 @@ export function verifyBenchProofBundle(bundle: BenchProofBundle): {
     ok: errors.length === 0,
     errors
   };
+}
+
+/**
+ * P0-09: inclusion proofs count only against the signed proofs/merkle.root.json an artifact carries. The root's
+ * signature needs a key the trust context admits for artifact-seal, and every proof must resolve to that signed root,
+ * never to a root the proof file names for itself. Proofs without a signed root leave the artifact unanchored.
+ */
+export function verifyProofsAgainstSignedRoot(params: {
+  root: string;
+  proofs: readonly BenchInclusionProof[];
+  trust: TrustContext;
+  candidates: ReadonlyArray<string | null | undefined>;
+  /** The artifact's claimed signing time, which the root signature shares. */
+  claimedSignedAt?: number | null;
+}): { errors: string[]; admission: IssuerAdmission | null; anchoring: VerifierReportV1["anchoring"] } {
+  const errors = params.proofs
+    .filter((proof) => !verifyMerkleProof({ entryHash: proof.eventHash, proofPath: proof.merklePath, root: proof.rootHash }))
+    .map((proof) => `invalid inclusion proof: ${proof.proofId}`);
+  if (params.proofs.length === 0) return { errors, admission: null, anchoring: { status: "not-applicable", detail: "no inclusion proofs" } };
+  const rootPath = join(params.root, "proofs", "merkle.root.json");
+  const sigPath = join(params.root, "proofs", "merkle.root.sig");
+  if (!pathExists(rootPath) || !pathExists(sigPath)) {
+    return { errors, admission: null, anchoring: { status: "unanchored", detail: "inclusion proofs without a signed proofs/merkle.root.json" } };
+  }
+  const digest = sha256Hex(readFileSync(rootPath));
+  const sig = JSON.parse(readUtf8(sigPath)) as { digestSha256?: unknown; signature?: unknown; envelope?: unknown };
+  if (sig.digestSha256 !== digest) errors.push("signed merkle root digest mismatch");
+  const check = checkDigestSignature({ signature: "proofs/merkle.root.sig", purpose: "artifact-seal", digestHex: digest,
+    signatureB64: String(sig.signature ?? ""), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,
+    claimedSignedAt: params.claimedSignedAt ?? null });
+  if (!check.verified) errors.push("signed merkle root signature invalid");
+  const signedRoot = (JSON.parse(readUtf8(rootPath)) as { root?: unknown }).root;
+  const unbound = params.proofs.filter((proof) => proof.rootHash !== signedRoot);
+  errors.push(...unbound.map((proof) => `inclusion proof ${proof.proofId} does not resolve to the signed merkle root`));
+  const anchored = check.verified && unbound.length === 0;
+  return { errors, admission: check.admission, anchoring: anchored
+    ? { status: "anchored", detail: `inclusion proofs resolve to signed merkle root ${String(signedRoot)}` }
+    : { status: "unanchored", detail: "inclusion proofs do not resolve to a verified signed merkle root" } };
 }
 
 export function writeBenchProofFiles(params: {

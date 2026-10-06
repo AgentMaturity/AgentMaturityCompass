@@ -249,7 +249,14 @@ test("unsigned CI initialization preserves real policy/workflow bytes and disclo
     const actual = gate.initCiForAgent(options);
     expect(actual).toEqual(expected);
     expect(readFileSync(actual.policyPath).equals(policy)).toBe(true);
-    expect(readFileSync(actual.workflowPath).equals(workflow)).toBe(true);
+    // P0-09: the one intended change is the bundle verify step, which now pins keys recorded outside the checkout
+    // (repository variables), because an unpinned `amc bundle verify` fails since PR 2. Every other byte is preserved.
+    const pinned = (bundle: string, pubFile: string) => `amc bundle verify ${bundle} --pubkey "${pubFile}" --expect-monitor "$AMC_MONITOR_FINGERPRINT"`;
+    const expectedWorkflow = workflow.toString("utf8").replace(/( {6}- name: Verify evidence bundle\n) {8}run: amc bundle verify (\S+)\n/, (_line, name: string, bundle: string) =>
+      `${name}        env:\n          AMC_AUDITOR_PUBKEY: \${{ vars.AMC_AUDITOR_PUBKEY }}\n          AMC_MONITOR_FINGERPRINT: \${{ vars.AMC_MONITOR_FINGERPRINT }}\n` +
+      `        run: printf '%s\\n' "$AMC_AUDITOR_PUBKEY" > "$RUNNER_TEMP/amc-auditor.pub" && ${pinned(bundle, "$RUNNER_TEMP/amc-auditor.pub")}\n`);
+    expect(expectedWorkflow).not.toBe(workflow.toString("utf8"));
+    expect(readFileSync(actual.workflowPath, "utf8")).toBe(expectedWorkflow);
     expect(statSync(actual.policyPath).mode & 0o777).toBe(policyMode);
     expect(statSync(actual.workflowPath).mode & 0o777).toBe(workflowMode);
     expect(policyMode).toBe(0o644);
@@ -260,7 +267,8 @@ test("unsigned CI initialization preserves real policy/workflow bytes and disclo
     expect(actual.workflowPath).toBe(join(workspace, ".github", "workflows", "amc.yml"));
     expect(workflow.toString("utf8")).toContain("--no-sign");
     expect(workflow.toString("utf8")).toContain("UNSIGNED CI mode: maturity BOM signing skipped");
-    expect(gate.printCiSteps(options)).toEqual(original.printCiSteps!(options));
+    expect(gate.printCiSteps(options)).toEqual((original.printCiSteps!(options) as string[]).map(step =>
+      step.replace(/^amc bundle verify (\S+)$/, (_step, bundle: string) => pinned(bundle, "$AMC_AUDITOR_PUB_FILE"))));
     expect(gate.printCiSteps(options).join("\n")).toContain("amc bundle verify .amc/");
   } finally {
     rmSync(workspace, { recursive: true, force: true });

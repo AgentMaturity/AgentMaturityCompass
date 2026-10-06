@@ -18,16 +18,21 @@ export function isCompletedRunSummary(summary, { requireTool = true, expectedTur
       && ending?.reason === "complete" && ending.interrupted === false);
 }
 
-export function verifyPackedRun({ summary, runCommand, requireTool = true, expectedTurns = 1 }) {
+/**
+ * expectMonitor is the workspace's monitor-key fingerprint recorded when it was created. Since P0-09 both verifiers
+ * fail an unanchored ledger, so a caller pins it; without it they refuse, which fails this check closed.
+ */
+export function verifyPackedRun({ summary, runCommand, requireTool = true, expectedTurns = 1, expectMonitor = "" }) {
   if (!isCompletedRunSummary(summary, { requireTool, expectedTurns })) return false;
+  const pin = expectMonitor ? ["--expect-monitor", expectMonitor] : [];
 
   // Separate CLI processes exercise cold credential access in the installed artifact.
-  const ledger = parsed(runCommand("amc session verify --json", ["session", "verify", "--json"]));
+  const ledger = parsed(runCommand("amc session verify --json", ["session", "verify", "--json", ...pin]));
   if (ledger?.ok !== true || ledger.chain?.ok !== true || !empty(ledger.errors)
       || !Array.isArray(ledger.sessions?.closed)
       || !ledger.sessions.closed.includes(summary.sessionId)) return false;
 
-  const run = parsed(runCommand("amc agent-loop verify --json", ["agent-loop", "verify", summary.sessionId, "--json"]));
+  const run = parsed(runCommand("amc agent-loop verify --json", ["agent-loop", "verify", summary.sessionId, "--json", ...pin]));
   return run?.ok === true && run.sessionId === summary.sessionId && run.ledgerOk === true
     && empty(run.ledgerErrors) && empty(run.sessionChainErrors) && empty(run.unsignedRowIds)
     && Array.isArray(run.requests) && run.requests.length === summary.requests

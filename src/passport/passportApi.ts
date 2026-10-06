@@ -24,6 +24,8 @@ import {
 } from "./passportStore.js";
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { verifyPassportArtifactFile, verifyPassportWorkspace } from "./passportVerifier.js";
+import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
+import { untrustedReasons } from "../trust/verifierReport.js";
 
 const pendingExportSchema = z.object({
   v: z.literal(1),
@@ -266,11 +268,13 @@ export function passportVerifyForApi(params: {
   workspace?: string;
   file: string;
   publicKeyPath?: string;
+  trust: TrustContext;
 }) {
   const verified = verifyPassportArtifactFile({
     workspace: params.workspace,
     file: params.file,
-    publicKeyPath: params.publicKeyPath
+    publicKeyPath: params.publicKeyPath,
+    trust: params.trust
   });
   if (verified.ok && verified.passport) {
     appendTransparencyEntry({
@@ -503,9 +507,11 @@ export function passportVerifyPublicForApi(params: {
   if (!found) {
     return null;
   }
+  // A public verify endpoint: the server operator's trust context decides, never the workspace's own keys.
   const verified = passportVerifyForApi({
     workspace: params.workspace,
-    file: found.file
+    file: found.file,
+    trust: loadTrustContext()
   });
   const passport = verified.passport ?? inspectPassportArtifact(found.file).passport;
   const revocation = getPassportRevocation(params.workspace, passport.passportId);
@@ -517,6 +523,10 @@ export function passportVerifyPublicForApi(params: {
     code: error.code,
     message: error.message
   }));
+  // Intact but untrusted (an unpinned or refused issuer, unanchored proofs): say why, with the key id to pin.
+  if (!verified.report.trusted && verified.report.integrity.status === "pass") {
+    runtimeErrors.push(...untrustedReasons(verified.report).map((message) => ({ code: "ISSUER_NOT_ADMITTED", message })));
+  }
   if (expired && !runtimeErrors.some((error) => error.code === "PASSPORT_EXPIRED")) {
     runtimeErrors.push({
       code: "PASSPORT_EXPIRED",
@@ -549,7 +559,8 @@ export function passportVerifyPublicForApi(params: {
     }),
     qrCodeUrl: qr.qrCodeUrl,
     errors: runtimeErrors,
-    passport
+    passport,
+    report: verified.report
   };
 }
 

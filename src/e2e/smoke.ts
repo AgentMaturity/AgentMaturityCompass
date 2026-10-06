@@ -10,6 +10,7 @@ import { refreshForecastForApi } from "../forecast/forecastApi.js";
 import { benchCreateCli, benchInitCli, benchVerifyCli } from "../bench/benchCli.js";
 import { backupCreateCli, backupVerifyCli } from "../ops/backup/backupCli.js";
 import { releaseVerifyCli } from "../release/releaseCli.js";
+import { loadTrustContext } from "../trust/trustContext.js";
 import { createReleaseBundle } from "../release/releaseBundle.js";
 import { verifyTransparencyLog } from "../transparency/logChain.js";
 import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
@@ -339,6 +340,9 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
         const keyPair = generateKeyPairSync("ed25519");
         const privatePem = keyPair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
         writeFileSync(keyPath, privatePem, { mode: 0o600, encoding: "utf8" });
+        // The smoke run owns this signing key, so it pins the public half as the release key (P0-09).
+        const publicKeyPath = join(tempRoot, "release-signing.pub");
+        writeFileSync(publicKeyPath, keyPair.publicKey.export({ format: "pem", type: "spki" }).toString(), "utf8");
         const bundlePath = join(tempRoot, "smoke.amcrelease");
         createReleaseBundle({
           workspace: repoRoot,
@@ -347,7 +351,8 @@ async function runLocalSmoke(params: SmokeParams): Promise<SmokeReport> {
           skipInstallBuild: true
         });
         const verified = releaseVerifyCli({
-          bundleFile: bundlePath
+          bundleFile: bundlePath,
+          trust: loadTrustContext({ pubkey: { path: publicKeyPath, purposes: ["release"] } })
         });
         if (!verified.ok) {
           throw new Error(`release verify failed: ${verified.errors.join("; ")}`);

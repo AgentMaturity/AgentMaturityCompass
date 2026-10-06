@@ -10,6 +10,7 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
+import { loadTrustContext, requestTrustOverride } from "../trust/index.js";
 import {
   assuranceCertIssueForApi,
   assuranceCertLatestForApi,
@@ -287,7 +288,13 @@ export async function handleAssuranceRoute(
         apiError(res, 400, "file path is required");
         return true;
       }
-      apiSuccess(res, assuranceCertVerifyForApi({ file: body.file }));
+      // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+      const refused = requestTrustOverride(body);
+      if (refused) {
+        apiError(res, 400, refused);
+        return true;
+      }
+      apiSuccess(res, assuranceCertVerifyForApi({ file: body.file, trust: loadTrustContext() }));
     } catch (err) {
       apiRequestError(res, err, "cert verify failed");
     }

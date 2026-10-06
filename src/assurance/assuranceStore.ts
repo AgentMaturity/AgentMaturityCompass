@@ -12,6 +12,7 @@ import {
 import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyAssuranceCertificateFile } from "./assuranceVerifier.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 
 function listAssuranceRuns(workspace: string): AssuranceRun[] {
   return listAssuranceRunIds(workspace)
@@ -47,7 +48,7 @@ export function latestAssuranceCertificateSummary(workspace: string):
   if (!pathExists(file)) {
     return null;
   }
-  const verify = verifyAssuranceCertificateFile({ file });
+  const verify = verifyAssuranceCertificateFile({ file, trust: workspaceSelfTrust(workspace) });
   if (!verify.cert) {
     return null;
   }

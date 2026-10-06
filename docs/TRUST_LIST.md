@@ -6,7 +6,7 @@ This page describes the trust-list format, how a key is admitted, the built-in d
 
 ## Status
 
-P0-09 lands in three pull requests. This one (PR 1) adds the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **No verify command uses them yet.** PR 2 and PR 3 wire the verifiers listed in [the verifier inventory](security/verifier-inventory.md) and add the flags and exit codes below. Until then, the commands behave as before. The sections "Flags" and "Exit codes" describe that planned behaviour, and the sections on admission and distrust describe what the library does when a verifier calls it. The README's verify examples, the command examples in the other docs and the breaking changeset also move to PR 2 and PR 3, because verification results do not change in this PR.
+P0-09 lands in three pull requests. PR 1 added the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **PR 2 wires `amc verify`, `verify all`, `evidence verify`, `session verify`, `agent-loop verify`, `bundle verify`, `cert verify`, `cert verify-revocation`, `passport verify`, `assurance cert-verify` and `release verify`**, their API routes and the flags and exit codes below. PR 3 wires the remaining verifiers marked PR 3 in [the verifier inventory](security/verifier-inventory.md); until then they behave as before.
 
 ## Two-minute path: pin your own keys
 
@@ -133,9 +133,11 @@ Every refusal names the key id, so you can pin the right key.
 
 Until trusted time lands (P1-25), a signing time is whatever the artifact claims. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
 
+The claim each command checks: `bundle verify` and `cert verify` use the run seal's own `ts` for `run.json`, and the `signedTs` of `manifest.sig` or `cert.sig` for every other signature the artifact carries; `passport verify` and `assurance cert-verify` use their signature's `signedTs`, which the signed Merkle root shares; `cert verify-revocation` uses the revocation's `ts`; a trust certificate uses its `generatedTs`. Two checks have no signing claim and run at verification time: a release bundle (its `generatedTs` is a reproducible build time, not a signing time) and the ledger's monitor key for `ledger-row`.
+
 ## Built-in distrust list
 
-The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. The verify commands apply it once PR 2 and PR 3 wire them. A malformed file stops verification instead of being ignored.
+The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. Every verify command wired so far applies it. A malformed file stops verification instead of being ignored.
 
 ## Workspace self-trust
 
@@ -145,11 +147,23 @@ The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory,
 
 Every verifier will return `VerifierReportV1` (`type: "amc.verifier-report"`, `version: 1`). It keeps integrity separate from issuer admission: `integrity` (`pass` or `fail` with errors), `issuerAdmission` (every signature's admission), `anchoring` (`anchored`, `unanchored` or `not-applicable`), and `scope`, `freshness`, `completeness` and `satisfaction`, which stay `not-evaluated` until P1-06. `trusted` is true only when integrity passes, every signature is admitted and anchoring is not `unanchored`. `--allow-unpinned` and `--allow-unanchored` appear in `overrides` and never make a report trusted.
 
-## Flags (planned, PR 2 and PR 3)
+## Flags
 
-On every portable verify command: `--trust-list <file>`, `--trust-root <sha256>`, `--allow-unpinned`, `--allow-unanchored` and `--json`. `--pubkey <path>` is added where missing (`bundle verify`, `cert verify`, `cert verify-revocation`), and `--expect-monitor <sha256>` is added to `verify`, `bundle verify` and `session verify`. These are flags on existing commands; no command path is added. Allow flags are never read from environment variables or API request bodies, and API routes build their trust context from the server's AMC home.
+On every portable verify command wired so far: `--trust-list <file>` and `--trust-root <sha256>` (both repeatable), `--allow-unpinned`, `--allow-unanchored` and `--json`. `--pubkey <path>` pins one key for the purposes the command checks; PR 2 added it to `bundle verify`, `cert verify`, `cert verify-revocation` and `assurance cert-verify`. `--expect-monitor <sha256>` pins the monitor key on `verify`, `verify all`, `evidence verify`, `bundle verify`, `cert verify`, `session verify` and `agent-loop verify`. The ledger-only commands have no issuer to pin, so they take every flag except `--allow-unpinned`. These are flags on existing commands; no command path is added. Allow flags are never read from environment variables or API request bodies, and API routes build their trust context from the server's AMC home and refuse a body that names a pin or an allow flag.
 
-## Exit codes (planned, PR 2 and PR 3)
+Example, with the fingerprints and `.pub` files recorded when the workspace was created:
+
+```
+amc verify --expect-monitor <monitor sha256>
+amc bundle verify run.amcbundle --pubkey ~/amc-pins/auditor.pub --expect-monitor <monitor sha256>
+amc cert verify agent.amccert --pubkey ~/amc-pins/auditor.pub --expect-monitor <monitor sha256> --revocation agent.amcrevoke
+amc passport verify agent.amcpass --pubkey ~/amc-pins/auditor.pub
+amc release verify amc-2.0.0.amcrelease --pubkey release-signing.pub
+```
+
+A bundle or certificate carries its own ledger, so it is anchored only when its monitor key is pinned; a passport or assurance certificate is anchored when its inclusion proofs resolve to its signed Merkle root.
+
+## Exit codes
 
 | Code | Meaning |
 |---|---|

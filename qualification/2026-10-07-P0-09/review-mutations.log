@@ -1,0 +1,30 @@
+M6 src/trust/signatureCheck.ts: '  if (isKeyRefused(monitor)) signatures.push(monitor);\n  return monitor.status === "admitted" && ledgerAnchored' -> '  return ledgerAnchored'
+  vitest exit 1; Tests  3 failed | 44 skipped (47)
+  × AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 707ms
+  × a distrusted monitor key fails even with --expect-monitor and --allow-unanchored 695ms
+  × AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key 693ms
+  restored: git diff --quiet exit 0
+M7 src/cli-trust-flags.ts: 'if (!trust.allowUnanchored || (result.trustRoot.monitorAdmission && isKeyRefused(result.trustRoot.monitorAdmission))) return 1;' -> 'if (!trust.allowUnanchored) return 1;'
+  vitest exit 1; Tests  1 failed | 7 skipped (8)
+  × fails a distrusted monitor key even when it is pinned and --allow-unanchored is used 843ms
+  restored: git diff --quiet exit 0
+M8 src/trust/signatureCheck.ts: ', claimedSignedAt: claimedTime(input.claimedSignedAt) })' -> ' })'
+  vitest exit 1; Tests  1 failed | 46 skipped (47)
+  × an issuer key superseded after it sealed the bundle is admitted on the claimed signing time 697ms
+  restored: git diff --quiet exit 0
+M9 src/assurance/assuranceVerifier.ts: 'if (rootSha("merkle.root.json") !== cert.proofBindings.merkleRootSha256) errors.push("proofBindings.merkleRootSha256 mismatch");' -> ''
+  vitest exit 1; Tests  1 failed | 46 skipped (47)
+  × proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate 686ms
+  restored: git diff --quiet exit 0
+M10 src/trust/requestTrust.ts: '  if (!body || typeof body !== "object") return null;' -> '  return null;\n  if (!body || typeof body !== "object") return null;'
+  vitest exit 1; Tests  5 failed | 1 passed | 41 skipped (47)
+  × POST /api/v1/bundle/verify refuses a body that carries publicKeyPath 50ms
+  × POST /api/v1/crypto/cert/verify refuses a body that carries allowUnpinned 44ms
+  × POST /api/v1/crypto/cert/verify-revocation refuses a body that carries trustList 1ms
+  × POST /api/v1/assurance/cert/verify refuses a body that carries pubkey 17ms
+  × Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer 41ms
+  restored: git diff --quiet exit 0
+M11 src/verify/verifyAll.ts: 'untrustedReasons(verify.report).join("; ")' -> 'verify.errors.join("; ")'
+  vitest exit 1; Tests  1 failed | 46 skipped (47)
+  × verify all names the key to pin when it refuses an unpinned release bundle 844ms
+  restored: git diff --quiet exit 0

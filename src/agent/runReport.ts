@@ -22,7 +22,10 @@
  * happened, `verify` says whether the log can prove it.
  */
 import { openLedger } from "../ledger/ledger.js";
-import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import type { TrustContext } from "../trust/trustContext.js";
+import type { IssuerAdmission } from "../trust/admission.js";
+import { isKeyRefused } from "../trust/signatureCheck.js";
 import { verifySessionChains } from "../ledger/sessionVerification.js";
 import { openSessionEventStore, readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import { deriveSessionRequests } from "../llm/request/deriveRequest.js";
@@ -162,8 +165,10 @@ export interface RequestDerivationRow {
 
 export interface AgentRunVerification {
   readonly sessionId: string;
-  /** Every check below, conjoined. */
+  /** Every check below, conjoined; with a trust context (P0-09) it also needs the monitor key admitted (anchored). */
   readonly ok: boolean;
+  /** The integrity checks alone: chains, signatures, unsigned rows and request derivation. */
+  readonly integrityOk: boolean;
   /** The workspace-wide chain verdict, which a session cannot be sound without. */
   readonly ledgerOk: boolean;
   readonly ledgerErrors: readonly string[];
@@ -186,6 +191,7 @@ export interface AgentRunVerification {
     readonly anchored: boolean;
     readonly monitorFingerprint: string | null;
     readonly expectedFingerprint: string | null;
+    readonly monitorAdmission?: IssuerAdmission;
   };
 }
 
@@ -198,8 +204,8 @@ export interface AgentRunVerification {
  * what it sent. An operator asking "can this run be reconstructed" deserves
  * "no, lawfully" rather than a green tick.
  */
-export async function verifyAgentRun(workspace: string, sessionId: string): Promise<AgentRunVerification> {
-  const result = await verifyLedgerIntegrity(workspace);
+export async function verifyAgentRun(workspace: string, sessionId: string, trust?: TrustContext): Promise<AgentRunVerification> {
+  const result = await verifyLedgerIntegrity(workspace, trust ? { trust } : {});
   const sessionChainErrors: string[] = [];
   let unsignedRowIds: string[];
   if (readSessionStoreMarker(workspace) === "jsonl") {
@@ -239,13 +245,12 @@ export async function verifyAgentRun(workspace: string, sessionId: string): Prom
     status: derivation.status,
     detail: derivation.detail
   }));
+  const integrityOk = result.chain.ok && sessionChainErrors.length === 0 && unsignedRowIds.length === 0
+    && requests.every((request) => request.status === "reconstructed");
   return {
     sessionId,
-    ok:
-      result.chain.ok &&
-      sessionChainErrors.length === 0 &&
-      unsignedRowIds.length === 0 &&
-      requests.every((request) => request.status === "reconstructed"),
+    ok: integrityOk && (trust === undefined || result.trustRoot.anchored),
+    integrityOk,
     ledgerOk: result.chain.ok,
     ledgerErrors: result.chain.errors,
     sessionChainErrors,
@@ -294,7 +299,7 @@ export function renderRunSummary(summary: AgentRunSummary): string {
 /** Render a verification report for a terminal. */
 export function renderVerifyReport(report: AgentRunVerification): string {
   const lines = [
-    `session ${report.sessionId}: ${report.ok ? "VERIFIED" : "NOT VERIFIED"}`,
+    `session ${report.sessionId}: ${report.ok ? "VERIFIED" : report.integrityOk ? "NOT VERIFIED: UNANCHORED (integrity verified, authorship not)" : "NOT VERIFIED"}`,
     `  ledger chain        ${report.ledgerOk ? "ok" : `${report.ledgerErrors.length} error(s)`}`,
     `  session chain       ${report.sessionChainErrors.length === 0 ? "ok" : `${report.sessionChainErrors.length} error(s)`}`,
     `  unsigned rows       ${report.unsignedRowIds.length}`,
@@ -304,15 +309,16 @@ export function renderVerifyReport(report: AgentRunVerification): string {
     // key they were checked against lives inside the workspace being checked.
     `  trust root          ${
       report.trustRoot.anchored
-        ? `anchored to ${report.trustRoot.monitorFingerprint?.slice(0, 16)}…`
+        ? `anchored to ${report.trustRoot.monitorFingerprint ?? ""}`
         : "UNANCHORED — internal consistency only, not authorship"
     }`
   ];
-  if (!report.trustRoot.anchored) {
-    lines.push(
-      "  To make this adversarial, pin the expected key out of band:",
-      "    AMC_EXPECTED_MONITOR_FINGERPRINT=<sha256 of the monitor .pub>"
-    );
+  const admission = report.trustRoot.monitorAdmission;
+  if (admission && isKeyRefused(admission)) {
+    lines.push(`  ! monitor key ${admission.status}: ${admission.detail ?? ""}`);
+  } else if (!report.trustRoot.anchored) {
+    // Step 9's message, word for word on every ledger surface, then the full key id to compare with the recorded one.
+    lines.push(`  ${LEDGER_UNANCHORED_MESSAGE}`, `  monitor key read from the workspace: ${report.trustRoot.monitorFingerprint ?? "(absent)"}`);
   }
   for (const error of [...report.ledgerErrors, ...report.sessionChainErrors]) {
     lines.push(`  ! ${error}`);

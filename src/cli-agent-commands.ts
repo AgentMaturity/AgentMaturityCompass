@@ -60,6 +60,7 @@ import type { AgentToolSeam } from "./agent/toolSeam.js";
 import type { SubagentCapability } from "./agent/delegateTool.js";
 import type { ComposedToolSession } from "./kernel/agentLoopRunner.js";
 import { readAgentRunSummary, renderRunSummary, renderVerifyReport, verifyAgentRun } from "./agent/runReport.js";
+import { ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { registerPromptCommands } from "./cli-prompt-commands.js";
 import { registerNativeScheduleCommands } from "./cli-native-schedule-commands.js";
 import { registerAgentGuideCommands, selectedAgentOption } from "./cli-agent-guide-commands.js";
@@ -758,14 +759,18 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
       }
     });
 
-  group
+  withTrustFlags(group
     .command("verify")
     .description("Re-derive every model request in a session from the log and check the chains")
     .argument("<sessionId>", "session id, as reported by `agent-loop run`")
-    .option("--json", "Output as JSON")
-    .action(async (sessionId: string, opts: { json?: boolean }) => {
-      const report = await verifyAgentRun(process.cwd(), sessionId);
+    .option("--json", "Output as JSON"), { expectMonitor: true, ledgerOnly: true })
+    .action(async (sessionId: string, opts: TrustFlags) => {
+      const trust = trustFromFlags(opts, ["ledger-row"]);
+      const report = await verifyAgentRun(process.cwd(), sessionId, trust);
       io.log(opts.json ? JSON.stringify(report, null, 2) : renderVerifyReport(report));
-      if (!report.ok) io.fail();
+      // An unanchored run fails (P0-09 step 9); --allow-unanchored makes it an integrity-only exit 2.
+      const code = ledgerExitCode({ ok: report.integrityOk, trustRoot: report.trustRoot }, trust);
+      if (code === 1) io.fail();
+      if (code === 2) process.exitCode = 2;
     });
 }

@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C571-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-1%2C574-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -188,6 +188,21 @@ The guide creates nothing and calls no provider. Chat asks you to choose a provi
 Chat shows provisional live text and then the recorded result. Use `/inspect` to see history, `/verify` to check evidence, `/compact` to summarize a reviewed range, `/fork` to queue a new conversation with parent lineage, and `/exit` to leave. Resume eligible sessions across processes while preserving original evidence. Start with tools disabled, then enable workspace or MCP tools after reviewing their signed policy and grants. Applications can own an AMC process through the native SDK.
 
 See the [native workflow guide](docs/NATIVE_AGENT_WORKFLOW.md), [signed native extensions](docs/NATIVE_EXTENSIONS.md), [MCP setup](docs/NATIVE_MCP.md), [session handoff](docs/SESSION_RESUME.md), and [native SDK](docs/NATIVE_SDK.md). Optional external capture and portable imports are separate evidence workflows. Installed local-provider acceptance, live-provider outcomes, platform qualification and human usability remain distinct measurements.
+
+### Verify with pinned keys
+
+A signature counts only when you pinned its key. A key shipped inside a bundle, certificate, passport or release cannot vouch for it, and a ledger whose monitor key is read from the workspace being verified is unanchored. Record the fingerprints and `.pub` files when you create the workspace, outside it, then verify against them:
+
+```sh
+shasum -a 256 .amc/keys/monitor_ed25519.pub                 # record once: the monitor fingerprint
+cp .amc/keys/auditor_ed25519.pub ~/amc-pins/auditor.pub     # record once: the auditor key
+amc verify --expect-monitor <monitor sha256>
+amc agent-loop verify <session-id> --expect-monitor <monitor sha256>
+amc bundle verify run.amcbundle --pubkey ~/amc-pins/auditor.pub --expect-monitor <monitor sha256>
+amc passport verify agent.amcpass --pubkey ~/amc-pins/auditor.pub
+```
+
+Exit code 0 means trusted, 1 failed (including an unpinned issuer or an unanchored ledger, with the key id to pin), and 2 means `--allow-unpinned` or `--allow-unanchored` gave an integrity-only result. For many keys, use a signed trust list: see [Trust lists](docs/TRUST_LIST.md).
 
 ---
 
@@ -890,7 +905,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,571<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->1,574<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

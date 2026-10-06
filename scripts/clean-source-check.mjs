@@ -20,7 +20,8 @@
  * them, and tests/cleanSourceDocs.test.ts asserts the docs quote them verbatim.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdtempSync, rmSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -93,9 +94,11 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
   const isolated = cleanSourceRuntimeEnvironment(process.env, home);
   const cli = join(clone, "dist", "cli.js");
   let firstTurn = null;
+  // The monitor-key fingerprint recorded right after `amc init`, outside the ledger it later anchors (P0-09).
+  let expectMonitor = "";
   const runCli = (label, args) => run(label, process.execPath, [cli, ...args], { cwd: workspace, env: isolated });
   const verifyRun = (summary, expectedTurns = 1) => {
-    const verified = verifyPackedRun({ summary, expectedTurns, runCommand: runCli });
+    const verified = verifyPackedRun({ summary, expectedTurns, runCommand: runCli, expectMonitor });
     console.log(`${verified ? "ok  " : "FAIL"} signed evidence and request reconstruction (${expectedTurns} expected turns)`);
     return verified;
   };
@@ -109,7 +112,11 @@ export function cleanSourceCheck({ root = process.cwd(), keep = false } = {}) {
     }),
     () => existsSync(cli) || (console.error(`FAIL build produced no ${cli}`), false),
     () => runCli("amc doctor", ["doctor"]).ok,
-    () => runCli("amc init (isolated workspace)", ["init", "--trust-boundary", "isolated"]).ok,
+    () => {
+      const ok = runCli("amc init (isolated workspace)", ["init", "--trust-boundary", "isolated"]).ok;
+      if (ok) expectMonitor = createHash("sha256").update(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"))).digest("hex");
+      return ok;
+    },
     () => verifyRun(summaryFrom(runCli("keyless native tool turn", ["agent-loop", "run", "--provider", "stub", "--tools", "echo", "--json", SMOKE_PROMPT]))),
     // AMC-1511, across REAL processes: A leaves the session unsealed, B resumes
     // it by id, and the verifier re-derives every request from the log.

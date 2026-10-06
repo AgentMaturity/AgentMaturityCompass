@@ -11,11 +11,13 @@ import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadRunReport, generateReport } from "../diagnostic/runner.js";
-import { getAuthenticatedKeyHistory, getPrivateKeyPem, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getAuthenticatedKeyHistory, getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
+import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { carriedLedgerAnchoring } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -553,19 +555,21 @@ function readBundleManifestSig(root: string): BundleManifestSignature {
   return JSON.parse(readUtf8(file)) as BundleManifestSignature;
 }
 
-function authenticatedHistoryFromBundle(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
-  const direct = readUtf8(join(root, "public-keys", `${kind}.pub`));
-  const historyFile = join(root, "public-keys", "key-history.json");
+/** The key-history envelope a bundle carries for a role, unverified: admitKey checks it against a pinned anchor. */
+function bundleKeyHistory(root: string, kind: "monitor" | "auditor"): unknown {
   try {
-    const parsed: unknown = JSON.parse(readUtf8(historyFile));
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
-    // The history cannot choose its own anchor or gain authority merely by
-    // being copied into a manifest. Only the direct role key admits old keys.
-    const result = verifyKeyHistoryEnvelope((parsed as Record<string, unknown>)[kind], kind, direct);
-    return result.valid ? result.envelope : null;
+    const parsed: unknown = JSON.parse(readUtf8(join(root, "public-keys", "key-history.json")));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? (parsed as Record<string, unknown>)[kind] : undefined;
   } catch {
-    return null;
+    return undefined;
   }
+}
+
+function authenticatedHistoryFromBundle(root: string, kind: "monitor" | "auditor"): KeyHistoryEnvelope | null {
+  // The history cannot choose its own anchor or gain authority merely by
+  // being copied into a manifest. Only the direct role key admits old keys.
+  const result = verifyKeyHistoryEnvelope(bundleKeyHistory(root, kind), kind, readUtf8(join(root, "public-keys", `${kind}.pub`)));
+  return result.valid ? result.envelope : null;
 }
 
 function collectRoleKeysFromBundle(root: string, kind: "monitor" | "auditor"): string[] {
@@ -811,18 +815,34 @@ export function exportEvidenceBundle(params: {
   }
 }
 
-export async function verifyEvidenceBundle(bundleFile: string): Promise<{
+/**
+ * Verifies a bundle offline. Its embedded keys only locate the signer: every auditor signature must come from a key
+ * the trust context admits for artifact-seal, and the ledger is anchored only when its monitor key is admitted for
+ * ledger-row (P0-09). ok equals report.trusted.
+ */
+export async function verifyEvidenceBundle(bundleFile: string, trust: TrustContext): Promise<{
   ok: boolean;
   errors: string[];
   runId: string | null;
   agentId: string | null;
   retainedSpills: { objectsComplete: boolean; plaintextVerified: false; gaps: string[] };
+  report: VerifierReportV1;
 }> {
   const extracted = withExtractedBundle(bundleFile);
   const errors: string[] = [];
   const spillGaps: string[] = [];
+  const signatures: IssuerAdmission[] = [];
+  let anchoring: VerifierReportV1["anchoring"] = { status: "unanchored", detail: "the bundle ledger was not verified" };
   let manifestSignatureVerified = false;
   let manifestFilesVerified = false;
+  // Claimed signing times (step 6): each signature's own claim where it has one, else the bundle's manifest.sig claim.
+  let bundleClaim: number | null = null;
+  const sealedBy = (signature: string, digestHex: string, signatureB64: string, claimedSignedAt = bundleClaim): boolean => {
+    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: trust, claimedSignedAt,
+      candidates: collectAuditorKeysFromBundle(extracted.rootDir), keyHistory: bundleKeyHistory(extracted.rootDir, "auditor") });
+    signatures.push(check.admission);
+    return check.verified;
+  };
 
   try {
     let manifest: BundleManifest | null = null;
@@ -842,13 +862,13 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
     try {
       const manifestRaw = readFileSync(join(extracted.rootDir, "manifest.json"));
       const manifestSig = readBundleManifestSig(extracted.rootDir);
+      bundleClaim = manifestSig.signedTs;
       const digest = sha256Hex(manifestRaw);
       const digestMatches = digest === manifestSig.manifestSha256;
       if (!digestMatches) {
         errors.push("Manifest signature payload digest mismatch.");
       }
-      const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-      const signatureMatches = verifyHexDigestAny(digest, manifestSig.signature, auditorKeys);
+      const signatureMatches = sealedBy("manifest.sig", digest, manifestSig.signature);
       if (!signatureMatches) {
         errors.push("Manifest signature verification failed.");
       }
@@ -901,53 +921,28 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
       if (digest !== run.reportJsonSha256) {
         errors.push("run.json reportJsonSha256 mismatch.");
       }
-      const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-      if (!verifyHexDigestAny(run.reportJsonSha256, run.runSealSig, auditorKeys)) {
+      if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig, run.ts)) {
         errors.push("run.json runSealSig verification failed.");
       }
     }
 
-    const outcomeFile = join(extracted.rootDir, "outcomes", "report.json");
-    if (pathExists(outcomeFile)) {
+    for (const report of ["outcomes/report.json", "experiments/report.json"]) {
+      const reportFile = join(extracted.rootDir, report);
+      if (!pathExists(reportFile)) continue;
       try {
-        const parsed = JSON.parse(readUtf8(outcomeFile)) as Record<string, unknown>;
-        const payload = { ...parsed };
+        const payload = { ...(JSON.parse(readUtf8(reportFile)) as Record<string, unknown>) };
         const reportJsonSha256 = String(payload.reportJsonSha256 ?? "");
         const reportSealSig = String(payload.reportSealSig ?? "");
         delete payload.reportJsonSha256;
         delete payload.reportSealSig;
-        const digest = sha256Hex(canonicalize(payload));
-        if (digest !== reportJsonSha256) {
-          errors.push("outcomes/report.json reportJsonSha256 mismatch.");
+        if (sha256Hex(canonicalize(payload)) !== reportJsonSha256) {
+          errors.push(`${report} reportJsonSha256 mismatch.`);
         }
-        const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-        if (!verifyHexDigestAny(reportJsonSha256, reportSealSig, auditorKeys)) {
-          errors.push("outcomes/report.json reportSealSig verification failed.");
+        if (!sealedBy(`${report} reportSealSig`, reportJsonSha256, reportSealSig)) {
+          errors.push(`${report} reportSealSig verification failed.`);
         }
       } catch (error) {
-        errors.push(`outcomes/report.json parse/verify failure: ${String(error)}`);
-      }
-    }
-
-    const experimentFile = join(extracted.rootDir, "experiments", "report.json");
-    if (pathExists(experimentFile)) {
-      try {
-        const parsed = JSON.parse(readUtf8(experimentFile)) as Record<string, unknown>;
-        const payload = { ...parsed };
-        const reportJsonSha256 = String(payload.reportJsonSha256 ?? "");
-        const reportSealSig = String(payload.reportSealSig ?? "");
-        delete payload.reportJsonSha256;
-        delete payload.reportSealSig;
-        const digest = sha256Hex(canonicalize(payload));
-        if (digest !== reportJsonSha256) {
-          errors.push("experiments/report.json reportJsonSha256 mismatch.");
-        }
-        const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-        if (!verifyHexDigestAny(reportJsonSha256, reportSealSig, auditorKeys)) {
-          errors.push("experiments/report.json reportSealSig verification failed.");
-        }
-      } catch (error) {
-        errors.push(`experiments/report.json parse/verify failure: ${String(error)}`);
+        errors.push(`${report} parse/verify failure: ${String(error)}`);
       }
     }
 
@@ -957,9 +952,7 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
         const signature = String(parsed.signature ?? "");
         const payload = { ...parsed };
         delete payload.signature;
-        const digest = sha256Hex(canonicalize(payload));
-        const auditorKeys = collectAuditorKeysFromBundle(extracted.rootDir);
-        if (!verifyHexDigestAny(digest, signature, auditorKeys)) {
+        if (!sealedBy("target.json signature", sha256Hex(canonicalize(payload)), signature)) {
           errors.push("target.json signature verification failed.");
         }
       } catch (error) {
@@ -985,12 +978,16 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
             }
           }
         }
+        const monitor = admitKey({ publicKeyPem: readUtf8(join(extracted.rootDir, "public-keys", "monitor.pub")), purpose: "ledger-row",
+          signature: "public-keys/monitor.pub", context: trust, keyHistory: bundleKeyHistory(extracted.rootDir, "monitor") });
         const ledgerResult = await verifyLedgerIntegrity(verifyWorkspace, {
-          externallyAuthenticatedPayloads
+          externallyAuthenticatedPayloads,
+          ...(monitor.status === "admitted" && monitor.keyId ? { expectedMonitorFingerprint: monitor.keyId } : {})
         });
         for (const error of ledgerResult.errors) {
           errors.push(`Ledger verify: ${error}`);
         }
+        anchoring = carriedLedgerAnchoring(monitor, ledgerResult.trustRoot.anchored, signatures);
       } finally {
         rmSync(verifyWorkspace, { recursive: true, force: true });
       }
@@ -1010,12 +1007,15 @@ export async function verifyEvidenceBundle(bundleFile: string): Promise<{
       }
     }
 
+    const report = buildVerifierReport({ artifact: { kind: "bundle", path: bundleFile, sha256: sha256Hex(readFileSync(bundleFile)) },
+      context: trust, integrityErrors: errors, signatures, anchoring });
     return {
-      ok: errors.length === 0,
+      ok: report.trusted,
       errors,
       runId: manifest?.runId ?? run?.runId ?? null,
       agentId: manifest?.agentId ?? run?.agentId ?? null,
-      retainedSpills: { objectsComplete: errors.length === 0 && spillGaps.length === 0, plaintextVerified: false, gaps: spillGaps }
+      retainedSpills: { objectsComplete: errors.length === 0 && spillGaps.length === 0, plaintextVerified: false, gaps: spillGaps },
+      report
     };
   } finally {
     extracted.cleanup();

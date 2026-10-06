@@ -189,13 +189,18 @@ export async function handleBomRoute(
       try {
         const body = await bodyJson<{ file: string }>(req);
         if (!body.file) { apiError(res, 400, 'file required'); return true; }
+        // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+        const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+        const refused = requestTrustOverride(body);
+        if (refused) { apiError(res, 400, refused); return true; }
         const { verifyEvidenceBundle } = await import('../bundles/bundle.js');
-        const result = await verifyEvidenceBundle(resolve(workspace, body.file));
+        const result = await verifyEvidenceBundle(resolve(workspace, body.file), loadTrustContext());
         apiSuccess(res, {
           ok: result.ok,
           errors: result.errors,
           runId: result.runId,
           agentId: result.agentId,
+          report: result.report,
         });
       } catch (err) {
         apiError(res, 500, err instanceof Error ? err.message : 'Bundle verification failed');

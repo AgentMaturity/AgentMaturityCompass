@@ -2,6 +2,7 @@ import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { verifySignatureEnvelope } from "../crypto/signing/signatureEnvelope.js";
 import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { signFileWithAuditor, signSerializedPayloadWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
@@ -223,7 +224,7 @@ function validateSchemaPayload(name: SchemaName, payload: unknown): void {
   }
 }
 
-function extractPayloadForValidation(name: SchemaName, file: string): unknown {
+function extractPayloadForValidation(name: SchemaName, file: string, workspace: string): unknown {
   const resolved = resolve(file);
   if (name === "amcbench.schema.json" && resolved.endsWith(".amcbench")) {
     return inspectBenchArtifact(resolved).bench;
@@ -232,7 +233,8 @@ function extractPayloadForValidation(name: SchemaName, file: string): unknown {
     return inspectPromptPackArtifact(resolved).pack;
   }
   if (name === "amccert.schema.json" && resolved.endsWith(".amccert")) {
-    const verify = verifyAssuranceCertificateFile({ file: resolved });
+    // Schema validation of this workspace's own certificate: its own keys are the pins, labelled workspace-self.
+    const verify = verifyAssuranceCertificateFile({ file: resolved, trust: workspaceSelfTrust(workspace) });
     if (!verify.ok || !verify.cert) {
       throw new Error(`certificate verification failed: ${verify.errors.join("; ")}`);
     }
@@ -397,7 +399,7 @@ export function validateWithStandard(params: {
   const schemaName = resolveSchemaName(params.schemaId);
   const errors: string[] = [];
   try {
-    const payload = extractPayloadForValidation(schemaName, params.file);
+    const payload = extractPayloadForValidation(schemaName, params.file, params.workspace);
     validateSchemaPayload(schemaName, payload);
   } catch (error) {
     errors.push(String(error));

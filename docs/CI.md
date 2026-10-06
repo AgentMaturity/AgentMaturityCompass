@@ -16,6 +16,8 @@ amc gate --bundle .amc/agents/<agentId>/bundles/latest.amcbundle --policy .amc/a
 - `.amc/agents/<agentId>/gatePolicy.json`
 - `.amc/agents/<agentId>/gatePolicy.json.sig`
 
+The workflow's "Verify evidence bundle" step runs `amc bundle verify` with pinned keys (P0-09): the auditor public key from the repository variable `AMC_AUDITOR_PUBKEY` and the monitor fingerprint from `AMC_MONITOR_FINGERPRINT`. Set both from the values recorded when the vault was created, never from the `.amc/keys` files in the checkout, which would let the bundle vouch for itself. Without them the step fails. `amc ci print` prints the same command with `$AMC_AUDITOR_PUB_FILE` (a path to the recorded auditor `.pub`) and `$AMC_MONITOR_FINGERPRINT`.
+
 ## Gate Policy Shape
 
 ```json

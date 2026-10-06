@@ -1,0 +1,12 @@
+cmd	exit	durationMs
+npx vitest run tests/trust tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/keyHistoryBundleCertificate.test.ts tests/trustCertificate.test.ts tests/verifyFreshWorkspacePassport.test.ts	0	34573
+npx vitest run $(cat qualification/2026-10-07-P0-09/review-affected-tests.txt)	0	99172
+npm run typecheck && npm run typecheck:tests && npm run lint	0	51018
+npm run check:counts	0	311
+npm run check:freeze	0	1063
+npm run check:docs-drift	0	265
+npm run check:architecture-boundaries	0	1335
+npm run check:api-ref	0	185
+npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts	0	30073
+npm run check:packed-install	0	43218
+npm run check:clean-source	0	42150

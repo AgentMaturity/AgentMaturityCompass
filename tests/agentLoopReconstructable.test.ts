@@ -2,12 +2,12 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
-import { afterEach, describe, expect, test } from "vitest";
-import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { verifySessionChains } from "../src/ledger/sessionVerification.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { deriveRecordedRequest } from "../src/llm/request/deriveRequest.js";
-import { readAgentRunSummary, renderVerifyReport, verifyAgentRun } from "../src/agent/runReport.js";
+import { readAgentRunSummary, renderVerifyReport, verifyAgentRun, type AgentRunVerification } from "../src/agent/runReport.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -15,6 +15,9 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { bodyFromChunks } from "../src/llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../src/llm/adapter/transport.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { ed25519KeyId } from "../src/trust/index.js";
+import { distrustEntry } from "./trust/trustFixtures.js";
+import { pinnedTrust, workspaceKeyPem, workspaceKeyTrust } from "./helpers/trustContext.js";
 import {
   loopHarness,
   ok,
@@ -304,5 +307,120 @@ describe("P3.2 — the run reconstructs and is signed", () => {
 
     const report = await verifyAgentRun(harness.dir, harness.sessionId);
     expect(report.ok).toBe(false);
+    // The operator reads the rendering, so the altered request has to be named there, with its header row.
+    expect(report.requests.find((request) => request.headerEventId === header.id)?.status).toBe("digest-mismatch");
+    expect(renderVerifyReport(report)).toContain(`  ! ${header.id}: digest-mismatch`);
+  });
+});
+
+/**
+ * P0-09 step 9 on the run verifier: with a trust context, `ok` also needs the monitor key admitted, `integrityOk`
+ * says what the chains and signatures alone proved, and the rendering says which of the two is missing.
+ */
+describe("verifyAgentRun under a trust context", () => {
+  const workspaces: string[] = [];
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    for (const workspace of workspaces.splice(0)) {
+      lockVault(workspace);
+      rmSync(workspace, { recursive: true, force: true });
+    }
+  });
+
+  async function sealedRun(): Promise<string> {
+    vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
+    const workspace = mkdtempSync(join(tmpdir(), "amc-run-trust-"));
+    workspaces.push(workspace);
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    const ledger = openLedger(workspace);
+    try {
+      ledger.startSession({ sessionId: "trust-run", runtime: "unknown", binaryPath: "test", binarySha256: "fixture" });
+      ledger.appendEvidence({ sessionId: "trust-run", runtime: "unknown", eventType: "stdout", payload: "signed event", inline: true });
+      ledger.sealSession("trust-run");
+    } finally {
+      ledger.close();
+    }
+    return workspace;
+  }
+
+  test("a pinned monitor key anchors the run, and the rendering names the full key id it is anchored to", async () => {
+    const workspace = await sealedRun();
+    const monitorId = ed25519KeyId(workspaceKeyPem(workspace, "monitor"))!;
+    const report = await verifyAgentRun(workspace, "trust-run", workspaceKeyTrust(workspace));
+    expect(report).toMatchObject({ ok: true, integrityOk: true, ledgerOk: true, trustRoot: { anchored: true, monitorFingerprint: monitorId } });
+    expect(report.trustRoot.monitorAdmission).toMatchObject({ status: "admitted", source: "explicit-key", purpose: "ledger-row" });
+    const text = renderVerifyReport(report);
+    expect(text).toContain("session trust-run: VERIFIED");
+    expect(text).not.toContain("NOT VERIFIED");
+    expect(text).toContain(`anchored to ${monitorId}`);
+    expect(monitorId).toHaveLength(64);
+  });
+
+  test("an unpinned monitor key leaves the run unanchored: integrity verified, not ok, and rendered as UNANCHORED", async () => {
+    const workspace = await sealedRun();
+    const monitorId = ed25519KeyId(workspaceKeyPem(workspace, "monitor"))!;
+    const report = await verifyAgentRun(workspace, "trust-run", pinnedTrust([]));
+    expect(report).toMatchObject({ ok: false, integrityOk: true, ledgerOk: true, trustRoot: { anchored: false } });
+    expect(report.trustRoot.monitorAdmission?.status).toBe("not-pinned");
+    const text = renderVerifyReport(report);
+    expect(text).toContain("session trust-run: NOT VERIFIED: UNANCHORED (integrity verified, authorship not)");
+    expect(text).toContain(LEDGER_UNANCHORED_MESSAGE);
+    expect(text).toContain(`monitor key read from the workspace: ${monitorId}`);
+    expect(text).not.toContain("! monitor key");
+  });
+
+  test("a distrusted monitor key is refused even though it is pinned, and rendered as a refusal rather than UNANCHORED", async () => {
+    const workspace = await sealedRun();
+    const monitorId = ed25519KeyId(workspaceKeyPem(workspace, "monitor"))!;
+    const trust = workspaceKeyTrust(workspace, { distrust: [distrustEntry(monitorId, { note: "run report test" })] });
+    const report = await verifyAgentRun(workspace, "trust-run", trust);
+    expect(report).toMatchObject({ ok: false, integrityOk: true, trustRoot: { anchored: false } });
+    expect(report.trustRoot.monitorAdmission?.status).toBe("distrusted");
+    const text = renderVerifyReport(report);
+    expect(text).toContain("  ! monitor key distrusted: ");
+    expect(text).toContain("run report test");
+    expect(text).not.toContain(LEDGER_UNANCHORED_MESSAGE);
+    expect(text).not.toContain("monitor key read from the workspace");
+  });
+
+  test("a run that fails integrity is plainly NOT VERIFIED, not UNANCHORED, even with the key pinned", async () => {
+    const workspace = await sealedRun();
+    const report = await verifyAgentRun(workspace, "never-recorded", workspaceKeyTrust(workspace));
+    expect(report).toMatchObject({ ok: false, integrityOk: false, trustRoot: { anchored: true } });
+    const text = renderVerifyReport(report);
+    expect(text.split("\n")[0]).toBe("session never-recorded: NOT VERIFIED");
+    expect(text).toContain("  ! Session never-recorded not found");
+  });
+
+  test("without a trust context the verdict is the integrity verdict alone", async () => {
+    const workspace = await sealedRun();
+    const report = await verifyAgentRun(workspace, "trust-run");
+    expect(report).toMatchObject({ ok: true, integrityOk: true, trustRoot: { anchored: false } });
+    expect(report.trustRoot.monitorAdmission).toBeUndefined();
+  });
+
+  test("lists each request that did not reconstruct, with its detail only when there is one", () => {
+    const report: AgentRunVerification = {
+      sessionId: "gaps", ok: false, integrityOk: false, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [], unsignedRowIds: [],
+      requests: [
+        { headerEventId: "h-ok", status: "reconstructed", detail: null },
+        { headerEventId: "h-pruned", status: "payload-pruned", detail: "payload deleted by retention" },
+        { headerEventId: "h-gone", status: "payload-missing", detail: null }
+      ],
+      trustRoot: { anchored: true, monitorFingerprint: "f".repeat(64), expectedFingerprint: null }
+    };
+    const text = renderVerifyReport(report);
+    expect(text).toContain("  requests derived    1/3");
+    expect(text).toContain("  ! h-pruned: payload-pruned — payload deleted by retention");
+    expect(text.split("\n")).toContain("  ! h-gone: payload-missing");
+    expect(text).not.toContain("h-ok");
+  });
+
+  test("names a missing monitor key as absent instead of printing a blank fingerprint", () => {
+    const report: AgentRunVerification = {
+      sessionId: "keyless", ok: false, integrityOk: true, ledgerOk: true, ledgerErrors: [], sessionChainErrors: [], unsignedRowIds: [],
+      requests: [], trustRoot: { anchored: false, monitorFingerprint: null, expectedFingerprint: null }
+    };
+    expect(renderVerifyReport(report)).toContain("  monitor key read from the workspace: (absent)");
   });
 });

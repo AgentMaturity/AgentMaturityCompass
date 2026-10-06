@@ -15,6 +15,7 @@ import {
   passportVerifyUrlForApi
 } from "./passportApi.js";
 import { inspectPassportArtifact } from "./passportArtifact.js";
+import type { TrustContext } from "../trust/trustContext.js";
 
 function parseJsonOrYaml(raw: string): unknown {
   try {
@@ -115,11 +116,13 @@ export function passportVerifyCli(params: {
   workspace?: string;
   file: string;
   pubkeyPath?: string;
+  trust: TrustContext;
 }) {
   return passportVerifyForApi({
     workspace: params.workspace,
     file: resolve(params.file),
-    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined
+    publicKeyPath: params.pubkeyPath ? resolve(params.pubkeyPath) : undefined,
+    trust: params.trust
   });
 }
 

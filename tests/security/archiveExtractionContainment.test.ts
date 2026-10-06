@@ -12,6 +12,7 @@ import { afterEach, describe, expect, test } from "vitest";
 import { verifyPassportArtifactFile } from "../../src/passport/passportVerifier.js";
 import { verifyPluginPackage } from "../../src/plugins/pluginPackage.js";
 import { inspectTarGzipArchive } from "../../src/security/safeTarArchive.js";
+import { pinnedTrust } from "../helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -45,7 +46,7 @@ describe("untrusted tar archive containment", () => {
     const archive = join(dir, "malicious.amcpass");
     createArchive(dir, "amc-passport", archive);
 
-    const result = verifyPassportArtifactFile({ file: archive });
+    const result = verifyPassportArtifactFile({ file: archive, trust: pinnedTrust([]) });
 
     expect(result.ok).toBe(false);
     expect(result.errors.map((error) => error.message).join(" ")).toMatch(/link|special entry|archive type/i);

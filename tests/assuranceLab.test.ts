@@ -17,6 +17,7 @@ import { writeSignedGatePolicy } from "../src/ci/gate.js";
 import { issueCertificate, verifyCertificate } from "../src/assurance/certificate.js";
 import { computeFailureRiskIndices } from "../src/assurance/indices.js";
 import { startFakeAgentServer, useFakeAgentEnv, type FakeAgentServer } from "./helpers/fakeAgentServer.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -213,7 +214,7 @@ describe("assurance lab", () => {
     });
     expect(issued.certId.length).toBeGreaterThan(10);
 
-    const ok = await verifyCertificate({ certFile: certPath });
+    const ok = await verifyCertificate({ certFile: certPath, trust: workspaceKeyTrust(workspace) });
     expect(ok.ok).toBe(true);
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-cert-tamper-"));
@@ -223,7 +224,7 @@ describe("assurance lab", () => {
     const tamperedCert = join(workspace, ".amc", "agent-tampered.amccert");
     packTar(tamperDir, tamperedCert);
 
-    const bad = await verifyCertificate({ certFile: tamperedCert });
+    const bad = await verifyCertificate({ certFile: tamperedCert, trust: workspaceKeyTrust(workspace) });
     expect(bad.ok).toBe(false);
   });
 });

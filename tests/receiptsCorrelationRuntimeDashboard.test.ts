@@ -21,6 +21,7 @@ import { serveDashboard } from "../src/dashboard/serve.js";
 import { exportEvidenceBundle, verifyEvidenceBundle } from "../src/bundles/bundle.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { issueLeaseForCli } from "../src/leases/leaseCli.js";
+import { workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -602,7 +603,7 @@ describe("receipts, correlation, runtime sdk, dashboard", () => {
     const tamperedBundle = join(workspace, ".amc", "receipt-bundle-tampered.amcbundle");
     packTar(extractedDir, tamperedBundle);
 
-    const verify = await verifyEvidenceBundle(tamperedBundle);
+    const verify = await verifyEvidenceBundle(tamperedBundle, workspaceKeyTrust(workspace));
     expect(verify.ok).toBe(false);
     expect(verify.errors.join("\n")).toMatch(/receipt verification failed: signature verification failed/);
   });

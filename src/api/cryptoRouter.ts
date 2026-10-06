@@ -168,10 +168,15 @@ export async function handleCryptoRoute(
     try {
       const body = await bodyJson<{ certFile: string; revocationFile?: string }>(req);
       if (!body.certFile) { apiError(res, 400, 'certFile required'); return true; }
+      // P0-09: the server operator's trust context decides; a request cannot add pins or allow flags.
+      const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { verifyCertificate } = await import('../assurance/certificate.js');
       const result = await verifyCertificate({
         certFile: resolve(workspace, body.certFile),
-        revocationFile: body.revocationFile ? resolve(workspace, body.revocationFile) : undefined
+        revocationFile: body.revocationFile ? resolve(workspace, body.revocationFile) : undefined,
+        trust: loadTrustContext()
       });
       apiSuccess(res, result);
     } catch (err) {
@@ -228,8 +233,11 @@ export async function handleCryptoRoute(
     try {
       const body = await bodyJson<{ file: string }>(req);
       if (!body.file) { apiError(res, 400, 'file required'); return true; }
+      const { loadTrustContext, requestTrustOverride } = await import('../trust/index.js');
+      const refused = requestTrustOverride(body);
+      if (refused) { apiError(res, 400, refused); return true; }
       const { verifyRevocation } = await import('../assurance/certificate.js');
-      const result = verifyRevocation(resolve(workspace, body.file));
+      const result = verifyRevocation(resolve(workspace, body.file), loadTrustContext());
       apiSuccess(res, result);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Cert verify-revocation failed');

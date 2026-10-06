@@ -22,6 +22,8 @@ import type { AgentRunSummary } from "../src/agent/runReport.js";
 import type { EvidenceEvent } from "../src/types.js";
 import YAML from "yaml";
 import { budgetUsageSnapshot, budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { workspaceKeyPem } from "./helpers/trustContext.js";
 
 /**
  * P3.2 stage 4 — the operator surface, and the composed path it runs on.
@@ -266,9 +268,17 @@ describe("amc agent-loop — the operator surface", () => {
       expect(summary.assistantText.join(" ")).toContain("stub provider");
 
       const { program: verifier, captured: verifyOut } = programWith();
-      await run(verifier, ["agent-loop", "verify", summary.sessionId]);
+      // P0-09: an unanchored run is NOT VERIFIED; the operator pins the monitor key recorded at creation.
+      await run(verifier, ["agent-loop", "verify", summary.sessionId, "--expect-monitor", sha256Hex(workspaceKeyPem(dir, "monitor"))]);
       expect(verifyOut.failures).toEqual([]);
-      expect(verifyOut.out.join("\n")).toContain("VERIFIED");
+      expect(verifyOut.out.join("\n")).toContain(`session ${summary.sessionId}: VERIFIED`);
+      const { program: unpinned, captured: unpinnedOut } = programWith();
+      await run(unpinned, ["agent-loop", "verify", summary.sessionId]);
+      expect(unpinnedOut.failures).toEqual([1]);
+      expect(unpinnedOut.out.join("\n")).toContain("NOT VERIFIED: UNANCHORED");
+      // Step 9's message, as amc verify and session verify print it, with the full key id to compare.
+      expect(unpinnedOut.out.join("\n")).toContain("Ledger verification FAILED: UNANCHORED");
+      expect(unpinnedOut.out.join("\n")).toContain(sha256Hex(workspaceKeyPem(dir, "monitor")));
     });
 
     it("cancels on --cancel-after and still exits with a balanced, attributed turn", async () => {

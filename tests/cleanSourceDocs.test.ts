@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
@@ -10,6 +11,7 @@ import { cleanSourceCheck, DOCUMENTED_SOURCE_COMMANDS } from "../scripts/clean-s
 vi.mock("node:child_process", () => ({ spawnSync: vi.fn() }));
 
 const SOURCE_DOCS = ["README.md", "docs/INSTALL.md", "CONTRIBUTING.md"];
+const SYNTHETIC_MONITOR_PUB = "synthetic monitor public key written by the mocked amc init\n";
 
 describe("AMC-1509 — documented source install matches the executable check", () => {
   test.each(SOURCE_DOCS)("%s quotes every documented command and no npm ci", (file) => {
@@ -63,7 +65,11 @@ describe("clean-source command orchestration (synthetic subprocesses, not instal
         }
       } else if (command !== "git") {
         expect(command).toBe(process.execPath);
-        if (args[1] === "agent-loop" && args[2] === "run") {
+        if (args[1] === "init") {
+          // `amc init` creates the vault; the check records its monitor key fingerprint right after (P0-09).
+          mkdirSync(join(options.cwd!, ".amc", "keys"), { recursive: true });
+          writeFileSync(join(options.cwd!, ".amc", "keys", "monitor_ed25519.pub"), SYNTHETIC_MONITOR_PUB);
+        } else if (args[1] === "agent-loop" && args[2] === "run") {
           expect(args.slice(args.indexOf("--provider"), args.indexOf("--provider") + 2)).toEqual(["--provider", "stub"]);
           expect(args).toContain("--json");
           const resumed = args.includes("--session");
@@ -95,7 +101,11 @@ describe("clean-source command orchestration (synthetic subprocesses, not instal
     expect(calls.filter(([cmd]) => cmd === "pnpm").map(([, args]) => args)).toEqual([
       ["install", "--frozen-lockfile"], ["run", "build"]
     ]);
-    expect(calls.filter(([, args]) => Array.isArray(args) && args.includes("verify"))).toHaveLength(4);
+    const verifies = calls.filter(([, args]) => Array.isArray(args) && args.includes("verify"));
+    expect(verifies).toHaveLength(4);
+    // Both cold verifiers are anchored to the fingerprint recorded at init; unanchored they fail since P0-09.
+    const pin = createHash("sha256").update(SYNTHETIC_MONITOR_PUB).digest("hex");
+    for (const [, args] of verifies) expect((args as string[]).slice(-2)).toEqual(["--expect-monitor", pin]);
   });
 
   test.each(["ledger", "resume", "install"] as const)("refuses %s failure even when other subprocesses exit zero", (mode) => {

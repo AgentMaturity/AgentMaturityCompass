@@ -15,6 +15,7 @@ import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../src/crypto
 import { rotateMonitorKeyInVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { BundleManifest } from "../src/types.js";
+import { keyHistoryTrust, workspaceKeyPem, workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 const previousPassphrase = process.env.AMC_VAULT_PASSPHRASE;
@@ -151,7 +152,7 @@ describe("AMC-1525 portable authenticated key history", () => {
     const root = extract(bundle);
     expect(readHistory(root)).toEqual({ monitor: null, auditor: null });
     expect(JSON.stringify(exported.manifest.publicKeyFingerprints)).not.toContain(sha256Hex(plantedPem));
-    const verification = await verifyEvidenceBundle(bundle);
+    const verification = await verifyEvidenceBundle(bundle, workspaceKeyTrust(source.workspace));
     expect(verification.ok, verification.errors.join("; ")).toBe(true);
   });
 
@@ -172,7 +173,8 @@ describe("AMC-1525 portable authenticated key history", () => {
       expect(readFileSync(join(root, "public-keys", "auditor.pub"), "utf8")).toBe(direct);
       const path = join(temporaryDirectory(), `attacker.amc${kind === "bundle" ? "bundle" : "cert"}`);
       archive("create", path, root);
-      const result = kind === "bundle" ? await verifyEvidenceBundle(path) : await verifyCertificate({ certFile: path });
+      const trust = workspaceKeyTrust(current.workspace);
+      const result = kind === "bundle" ? await verifyEvidenceBundle(path, trust) : await verifyCertificate({ certFile: path, trust });
       expect(result.ok).toBe(false);
       expect(result.errors).toContain(kind === "bundle" ? "Manifest signature verification failed." : "cert signature invalid");
     });
@@ -186,8 +188,15 @@ describe("AMC-1525 portable authenticated key history", () => {
       else signCertificate(root, attacker);
       const path = join(temporaryDirectory(), "admitted-auditor.tar.gz");
       archive("create", path, root);
-      const result = kind === "bundle" ? await verifyEvidenceBundle(path) : await verifyCertificate({ certFile: path });
+      // P0-09: the history admits the new key only because the operator's trust list pins the source auditor with
+      // allowKeyHistory; an explicit pin of the source auditor alone would not admit it.
+      const trust = keyHistoryTrust(workspaceKeyPem(source.workspace, "auditor"), workspaceKeyPem(source.workspace, "monitor"));
+      const result = kind === "bundle" ? await verifyEvidenceBundle(path, trust) : await verifyCertificate({ certFile: path, trust });
       expect(result.ok, result.errors.join("; ")).toBe(true);
+      expect(result.report.issuerAdmission.signatures.map((signature) => signature.source)).toContain("trust-list-history");
+      const pinnedOnly = kind === "bundle" ? await verifyEvidenceBundle(path, workspaceKeyTrust(source.workspace))
+        : await verifyCertificate({ certFile: path, trust: workspaceKeyTrust(source.workspace) });
+      expect(pinnedOnly.ok).toBe(false);
     });
 
     test(`${kind} preserves authenticated monitor rotation for offline ledger verification`, async () => {
@@ -197,9 +206,10 @@ describe("AMC-1525 portable authenticated key history", () => {
       expect(direct).not.toBe(rotated.previousMonitor);
       expect(history.monitor?.entries.map((entry) => entry.publicKeyPem)).toContain(rotated.previousMonitor);
       expect(verifyKeyHistoryEnvelope(history.monitor, "monitor", direct).valid).toBe(true);
+      const trust = workspaceKeyTrust(rotated.workspace);
       const result = kind === "bundle"
-        ? await verifyEvidenceBundle(rotated.bundle)
-        : await verifyCertificate({ certFile: rotated.certificate });
+        ? await verifyEvidenceBundle(rotated.bundle, trust)
+        : await verifyCertificate({ certFile: rotated.certificate, trust });
       expect(result.ok, result.errors.join("; ")).toBe(true);
 
       // Same artifact, same live public key, but unsigned history cannot carry
@@ -208,7 +218,7 @@ describe("AMC-1525 portable authenticated key history", () => {
       if (kind === "bundle") signBundleManifest(root, rotated.workspace);
       const legacy = join(temporaryDirectory(), "rotated-legacy.tar.gz");
       archive("create", legacy, root);
-      const refused = kind === "bundle" ? await verifyEvidenceBundle(legacy) : await verifyCertificate({ certFile: legacy });
+      const refused = kind === "bundle" ? await verifyEvidenceBundle(legacy, trust) : await verifyCertificate({ certFile: legacy, trust });
       expect(refused.ok).toBe(false);
       expect(refused.errors.some((error) => /ledger verify/i.test(error))).toBe(true);
     });
@@ -224,7 +234,8 @@ describe("AMC-1525 portable authenticated key history", () => {
       if (kind === "bundle") signBundleManifest(root, current.workspace);
       const path = join(temporaryDirectory(), "current-key.tar.gz");
       archive("create", path, root);
-      const result = kind === "bundle" ? await verifyEvidenceBundle(path) : await verifyCertificate({ certFile: path });
+      const trust = workspaceKeyTrust(current.workspace);
+      const result = kind === "bundle" ? await verifyEvidenceBundle(path, trust) : await verifyCertificate({ certFile: path, trust });
       expect(result.ok, result.errors.join("; ")).toBe(true);
     });
   }
