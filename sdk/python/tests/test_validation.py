@@ -1,5 +1,8 @@
-"""Canonical Python public-validation contract: AUTHORED UNEXECUTED (task10).
+"""Canonical Python public-validation contract (task10).
 
+Executed against checkout source (PYTHONPATH=sdk/python) at commit 8f57ce63 on
+2026-10-03, macOS arm64, Python 3.14.7, pytest 8.4.2; receipt:
+qualification/2026-10-06-P0-13/README.md (S7 section).
 These are client/decoder regressions, not signed-runtime or package acceptance.
 No CLI discovery, imports of the native runtime, or provider calls at collection.
 Install the canonical Python package in the eventual test environment first.

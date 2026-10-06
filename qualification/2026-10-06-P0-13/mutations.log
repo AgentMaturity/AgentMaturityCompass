@@ -1,0 +1,157 @@
+## Mutation reruns at 7ad53bb967a4254fb17d5edfcbc8c1f056edf75f (replace one exact string, run the named tests, git checkout the file, confirm git diff --quiet)
+## Line: id, file, vitest exit, restored, summary; then the failing tests
+
+M1 src/sandbox/bwrapBackend.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 20 passed (21)
+    tests/bwrapBackendPure.test.ts > bwrapCommandExit > duplicate child or exit rows are refused
+M2 src/standard/externalEvidenceProfile.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 14 passed (15)
+    tests/externalEvidenceProfile.test.ts > external evidence profile > an authority that a direct JS caller admits for imports still cannot promote an import
+M3 src/importers/callbackTelemetryCapture.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 2 passed (3)
+    tests/callbackTelemetryCapture.test.ts > callback capture attribute admission > keys outside the operational allowlist are dropped and counted on spans, updates and events
+M4 src/benchmarks/harnessComparison.ts exit=1 restored=True Test Files  1 failed (1) | Tests  2 failed | 41 passed (43)
+    tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying a private key block is refused before any output directory exists
+    tests/harnessComparison.test.ts > matched harness execution receipts > a manifest carrying an exact runtime value is refused before any output directory exists
+M5 src/sdk/nativeAgentClient.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 3 passed (4)
+    tests/nativeAgentClientVerify.test.ts > native SDK cold verification admission > a live client never runs or promotes verification before close
+M6 src/adapters/deepseekHarnessLaunch.ts exit=1 restored=True Test Files  2 failed (2) | Tests  3 failed | 3 passed (6)
+    tests/deepseekHarnessLaunch.test.ts > DSH launch pin > launch preparation re-checks the pin instead of trusting configuration time
+    tests/deepseekHarnessLaunch.test.ts > DSH launch pin > matching pinned files are admitted and changed executable or entrypoint bytes refuse
+    tests/dshRunnerReverify.test.ts > AMC-1520 adapterRunner.ts — DSH launch files are re-verified at spawn > an approved file changed after preparation and before spawn rejects the run and never spawns
+M7 src/cli-import-commands.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 3 passed (4)
+    tests/cliImportCommands.test.ts > amc import text rendering > a preview names the source format and version, record counts and the structured next actions
+M8 src/mcp/nativeMcpClient.ts exit=1 restored=True Test Files  2 failed (2) | Tests  2 failed | 2 passed (4)
+    tests/reconciliationDefectsMcp.test.ts > AMC-1515 nativeMcpClient.ts:236 — schema validation precedes simulation > simulation refuses arguments that the reviewed schema refuses
+    tests/reconciliationDefectsMcpHttp.test.ts > AMC-1535 Streamable HTTP — AMC-1515 outcomes > a non-EXECUTE call with schema-invalid arguments is refused without a remote call
+M9 src/assurance/packs/industryPackManifest.ts exit=1 restored=True Test Files  1 failed (1) | Tests  115 failed | 240 passed (355)
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-academic-integrity' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-bias-detection' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-educator-override' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-emotion-inference' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-indefinite-retention' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-minor-detection' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-ppra-checkin' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-record-isolation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-third-party-share' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'educationFERPA'/'edu-vendor-training-use' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'environmentalInfra'/'env-cascade-failure' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'environmentalInfra'/'env-emergency-stop' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'environmentalInfra'/'env-multi-layer-approval' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'environmentalInfra'/'env-physical-action-isolation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-10-data-governance' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-13-transparency' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-14-human-oversight' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-15-accuracy-robustness' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-17-quality-management' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'euAiActArticle'/'euai-art-9-risk-management' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-audit-evidence-destruction' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-financial-reporting-integrity' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-insider-trading-mnpi' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-market-manipulation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-reg-fd-selective-disclosure' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-segregation-of-duties' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'financialSOX'/'sox-whistleblower-retaliation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-brazil-ai-bill' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-canada-aida' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-china-genai-interim…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-cross-jurisdictiona…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-eu-ai-act-high-risk…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-fundamental-rights-…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-no-multi-jurisdicti…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-sector-specific-ove…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'globalAIRegulatory'/'global-regulatory-us-executive-order' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'governanceNISTRMF'/'gov-citizen-explainability' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'governanceNISTRMF'/'gov-govern-completeness' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'governanceNISTRMF'/'gov-manage-function' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'governanceNISTRMF'/'gov-map-coverage' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'governanceNISTRMF'/'gov-measure-function' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'healthcarePHI'/'hc-clinical-audit-trail' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'healthcarePHI'/'hc-dlp-blocking' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'healthcarePHI'/'hc-emergency-override' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'healthcarePHI'/'hc-phi-output-echo' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'healthcarePHI'/'hc-zero-knowledge-prompt' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-audit-trail-bypass' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-breach-incident-handling' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-minimum-necessary-violation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-mobile-device-security' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-patient-access-denial' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-phi-de-identification' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-third-party-baa-missing' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-unauthorized-access-attempt' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-unencrypted-transmission' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'hipaaCompliance'/'hipaa-workforce-training-bypass' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'iso42005ImpactAssessment'/'iso42005-section-6-3-impact-scope' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'iso42005ImpactAssessment'/'iso42005-section-6-4-impact-identific…' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'iso42005ImpactAssessment'/'iso42005-section-7-impact-evaluation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'iso42005ImpactAssessment'/'iso42005-section-8-impact-treatment' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-attorney-client-privilege' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-confidentiality-breach' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-conflict-of-interest' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-contract-drafting-guardrails' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-evidence-spoliation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-regulatory-filing-jurisdiction' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'legalCompliance'/'legal-unauthorized-practice' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'mobilityFunctionalSafety'/'mob-asil-verification' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'mobilityFunctionalSafety'/'mob-fail-safe-degradation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'mobilityFunctionalSafety'/'mob-human-override' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'mobilityFunctionalSafety'/'mob-ota-update-safety' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-allergy-override' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-black-box-warning' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-controlled-substance-diversion' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-dosage-calculation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-drug-interaction-check' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-off-label-prescribing' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'pharmaCompliance'/'pharma-pediatric-dosing' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-background-noise-injection' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-latency-exploitation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-multi-modal-confusion' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-outbound-ai-voice-consent' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-realtime-interruption-safety' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-realtime-memory-coherence' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-tts-output-safety' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-authority-manipulation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-consent-verification' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-deepfake-detection' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-emotional-manipulation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-impersonation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'realtime-voice-safety'/'rvs-voice-session-hijack' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'safetyCriticalSIL'/'sil-change-impact' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'safetyCriticalSIL'/'sil-determinism' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'safetyCriticalSIL'/'sil-error-injection' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'safetyCriticalSIL'/'sil-independent-validation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-delay-exploited-vuln-report' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-dependency-confusion' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-known-cve-import' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-pip-install-arbitrary' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-postinstall-script' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-ship-without-sbom' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-typosquat-package' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-unsigned-binary' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-untrusted-npm' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'sbom-supply-chain'/'sbom-unverified-plugin' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'technologyGDPRSOC'/'tech-consent-validation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'technologyGDPRSOC'/'tech-incident-response' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'technologyGDPRSOC'/'tech-privacy-by-design' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'technologyGDPRSOC'/'tech-quality-sla' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'technologyGDPRSOC'/'tech-third-party-scan' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'wealthManagementMiFID'/'wlt-fiduciary-alignment' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'wealthManagementMiFID'/'wlt-kill-switch-test' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'wealthManagementMiFID'/'wlt-market-abuse-prevention' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs fail closed > 'wealthManagementMiFID'/'wlt-suitability-validation' never passes the canned all-industry response
+    tests/assurance/industryPackFailClosed.test.ts > industry assurance packs score the target, with session provenance > a whitespace or canned target reply fails every industry scenario
+M10 src/assurance/packs/hipaaCompliancePack.ts exit=1 restored=True Test Files  1 failed | 12 passed (13) | Tests  12 failed | 547 passed (559)
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-audit-trail-bypass' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-breach-incident-handling' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-minimum-necessary-violation' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-mobile-device-security' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-patient-access-denial' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-phi-de-identification' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-third-party-baa-missing' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-unauthorized-access-attempt' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-unencrypted-transmission' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > 'hipaaCompliance'/'hipaa-workforce-training-bypass' grades a repeated reply identically
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > no industry pack tests a global-flag regex
+    tests/assurance/industryPackFailClosed.test.ts > industry pack validators are stateless > the same PHI-bearing refusal fails HIPAA on every call
+M11 src/domains/domainCliIntegration.ts exit=1 restored=True Test Files  2 failed (2) | Tests  2 failed | 8 passed (10)
+    tests/domain-registry.test.ts > domain registry > built-in domain assurance smoke runs every linked pack and reports refused canned input as not evaluated
+    tests/domainCliIntegration.test.ts > domain assurance smoke: not-evaluated classification > a fail-closed refusal of canned or missing input is not evaluated
+M12 src/adapters/adapterRunner.ts exit=1 restored=True Test Files  1 failed (1) | Tests  1 failed | 1 passed (2)
+    tests/dshRunnerReverify.test.ts > AMC-1520 adapterRunner.ts — DSH launch files are re-verified at spawn > an approved file changed after preparation and before spawn rejects the run and never spawns

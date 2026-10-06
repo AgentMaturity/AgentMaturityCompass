@@ -77,7 +77,7 @@ export async function collectCounts() {
   return {
     adapters: countFiles("src/adapters/builtins", isTs),
     cliCommandPaths: cliCommandPaths(),
-    assurancePackFiles: countFiles("src/assurance/packs", (n) => isTs(n) && n !== "index.ts"),
+    assurancePackFiles: countFiles("src/assurance/packs", (n) => isTs(n) && n !== "index.ts" && n !== "industryPackManifest.ts"),
     assurancePacksRegistered: await registered("assurance/packs/index.js", "listAssurancePacks"),
     scoreModules: countFiles("src/score", (n) => isTs(n) && n !== "index.ts"),
     diagnosticQuestions: await (async () => {

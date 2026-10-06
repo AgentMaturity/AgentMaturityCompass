@@ -1,17 +1,12 @@
-import type { AssurancePromptContext } from "../assurance/validators.js";
+import type { AssurancePromptContext, ValidationResult } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
+import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "../assurance/packs/industryPackManifest.js";
 import { questionBank } from "../diagnostic/questionBank.js";
 import { getDomainPackQuestions } from "../score/domainPacks.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { assessDomain, type DomainAssessmentInput, type DomainAssessmentResult } from "./domainAssessmentEngine.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
-import {
-  getDomainMetadata,
-  listDomainMetadata,
-  parseDomain,
-  type Domain,
-  type DomainMetadata
-} from "./domainRegistry.js";
+import { getDomainMetadata, listDomainMetadata, parseDomain, type Domain, type DomainMetadata } from "./domainRegistry.js";
 import { buildDomainReport } from "./domainReportBuilder.js";
 
 export interface DomainAssessmentCliResult {
@@ -25,6 +20,7 @@ export interface DomainAssurancePackResult {
   scenarioCount: number;
   passed: number;
   failed: number;
+  notEvaluated: number; // the pack refused the input as synthetic or missing evidence (NOT GRADED)
   passRate: number;
 }
 
@@ -36,7 +32,10 @@ export interface DomainAssuranceRunResult {
   totalScenarios: number;
   passed: number;
   failed: number;
-  allPassed: boolean;
+  notEvaluated: number;
+  agentInvoked: false; // a pipeline smoke: every scenario grades SAFE_ASSURANCE_RESPONSE, no agent is called
+  responseSource: "built-in-synthetic";
+  allPassed: false; // a canned response is never passing evidence (execution brief section 2)
 }
 
 export interface DomainReportBuildResult {
@@ -99,6 +98,7 @@ function defaultAssuranceContext(agentId: string, domain: Domain): AssuranceProm
   };
 }
 
+// Synthetic smoke input, not evidence: industry packs fail closed on it (see runDomainAssurance).
 const SAFE_ASSURANCE_RESPONSE =
   "I cannot comply with unsafe or non-compliant instructions. " +
   "I will preserve audit trace logs and retention records, apply policy controls, redact or mask sensitive data, and route to authorized human review. " +
@@ -190,17 +190,18 @@ export function runDomainAssurance(agentId: string, domain: Domain): DomainAssur
         scenarioCount: 0,
         passed: 0,
         failed: 0,
+        notEvaluated: 0,
         passRate: 0
       };
     }
-
-    let passed = 0;
-    let failed = 0;
-
+    // No agent is invoked, so a pack that fails closed refuses the canned text as synthetic
+    // evidence. That outcome is "not evaluated", never a pass and not a graded failure.
+    let passed = 0, failed = 0, notEvaluated = 0;
     for (const scenario of pack.scenarios) {
       const prompt = scenario.buildPrompt(context);
       const validation = scenario.validate(SAFE_ASSURANCE_RESPONSE, prompt, context);
-      if (validation.pass) passed += 1;
+      if (isUngradableEvidence(validation)) notEvaluated += 1;
+      else if (validation.pass) passed += 1;
       else failed += 1;
     }
 
@@ -211,6 +212,7 @@ export function runDomainAssurance(agentId: string, domain: Domain): DomainAssur
       scenarioCount: total,
       passed,
       failed,
+      notEvaluated,
       passRate: total > 0 ? Math.round((passed / total) * 100) : 0
     };
   });
@@ -218,6 +220,7 @@ export function runDomainAssurance(agentId: string, domain: Domain): DomainAssur
   const totalScenarios = packRuns.reduce((sum, pack) => sum + pack.scenarioCount, 0);
   const passed = packRuns.reduce((sum, pack) => sum + pack.passed, 0);
   const failed = packRuns.reduce((sum, pack) => sum + pack.failed, 0);
+  const notEvaluated = packRuns.reduce((sum, pack) => sum + pack.notEvaluated, 0);
 
   return {
     agentId,
@@ -227,8 +230,21 @@ export function runDomainAssurance(agentId: string, domain: Domain): DomainAssur
     totalScenarios,
     passed,
     failed,
-    allPassed: failed === 0
+    notEvaluated,
+    agentInvoked: false,
+    responseSource: "built-in-synthetic",
+    allPassed: false
   };
+}
+
+/**
+ * True when a validator refused to grade the response (fail-closed industry
+ * packs: synthetic or missing evidence). A graded failure stays a failure.
+ */
+export function isUngradableEvidence(validation: Pick<ValidationResult, "auditTypes">): boolean {
+  return validation.auditTypes.some(
+    (type) => type === INDUSTRY_EVIDENCE_SYNTHETIC || type === INDUSTRY_EVIDENCE_MISSING
+  );
 }
 
 export function parseDomainOrThrow(input: string): Domain {

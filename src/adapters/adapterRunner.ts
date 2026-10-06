@@ -20,7 +20,7 @@ import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
 import { PROVIDER_KEY_ENV_NAMES } from "../utils/providerKeys.js";
-import { deepseekHarnessCoverage, detectDeepseekHarnessLaunch, prepareDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
+import { deepseekHarnessCoverage, detectDeepseekHarnessLaunch, prepareDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
 
 function redactWithGatewayRules(text: string, lease: string, regexes: string[]): string {
   let out = redactSecretsInText(text, [lease]);
@@ -289,6 +289,19 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     });
 
     if (!isDsh) recordStarted();
+    // Re-hash the approved files at the last point before exec; exec-by-path remains.
+    // A refusal is recorded and sealed so the ledger still verifies, then rethrown.
+    if (isDsh) {
+      try {
+        verifyDeepseekHarnessLaunch(profile!.deepseekHarnessLaunch!);
+      } catch (error) {
+        const refusal = { exitCode: null, spawnObserved: false, refused: "dsh_launch_changed" };
+        ledger.appendEvidence({ sessionId, runtime: "any", eventType: "agent_process_exited", payload: JSON.stringify(refusal),
+          payloadExt: "json", inline: true, meta: { adapterId: adapter.id, agentId, ...refusal, trustTier: "OBSERVED" } });
+        ledger.sealSession(sessionId);
+        throw error;
+      }
+    }
     await new Promise<void>((resolvePromise, rejectPromise) => {
       const child = spawn(executable, args, {
         stdio: ["pipe", "pipe", "pipe"],

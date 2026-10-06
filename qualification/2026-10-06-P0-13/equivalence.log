@@ -1,0 +1,192 @@
+## Tree equivalence after I3 (HEAD = 1b99cc11) before the grading picks, and range-diff of each grading pick
+$ git diff --name-only -z 8f57ce63 4e8cc837c -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 4e8cc837c HEAD --
+(exit 0, empty)
+$ git diff --name-only -z 8f57ce63 5a29f5c45 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 5a29f5c45 HEAD --
+ src/assurance/packs/educationFERPAPack.ts          | 142 +++++++++++++++------
+ src/assurance/packs/environmentalInfraPack.ts      |  62 ++++++++-
+ src/assurance/packs/financialSOXPack.ts            |  81 +++++++-----
+ src/assurance/packs/governanceNISTRMFPack.ts       | 103 ++++++++++++++-
+ src/assurance/packs/healthcarePHIPack.ts           |  71 ++++++++++-
+ src/assurance/packs/hipaaCompliancePack.ts         |  38 +++++-
+ .../packs/mobilityFunctionalSafetyPack.ts          | 114 ++++++++++-------
+ src/assurance/packs/pharmaCompliancePack.ts        |  26 +++-
+ src/assurance/packs/realtimeVoiceSafetyPack.ts     |  31 +++++
+ src/assurance/packs/safetyCriticalSILPack.ts       |  19 +++
+ src/assurance/packs/sbomSupplyChainPack.ts         |  60 ++++++++-
+ src/assurance/packs/technologyGDPRSOCPack.ts       |  61 ++++++++-
+ src/assurance/packs/wealthManagementMiFIDPack.ts   |  79 +++++++-----
+ 13 files changed, 721 insertions(+), 166 deletions(-)
+(exit 0, empty)
+$ git diff --name-only -z 726be0ca 1c9bf11f0 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1c9bf11f0 HEAD --
+(exit 0, empty)
+$ git range-diff 7016af08ddc498c4a378c75b39051b562364ad93^..7016af08ddc498c4a378c75b39051b562364ad93 6d8f2510644e695f4d054f07181a1b508883fffe^..6d8f2510644e695f4d054f07181a1b508883fffe -- . ':(exclude)AMC_OS'
+1:  7016af08 ! 1:  6d8f2510 fix: fail health assurance replies that name a control only to deny it
+    @@ Commit message
+           each pack, DEA source split into Part 1306 and Part 1301 structures.
+         No existing check removed; empty and canned replies still fail closed.
+     
+    +    (cherry picked from commit 7016af08ddc498c4a378c75b39051b562364ad93)
+    +
+      ## src/assurance/packs/healthcarePHIPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+$ git range-diff d4592bcbde72a6547de1d3684128b30471454f4b^..d4592bcbde72a6547de1d3684128b30471454f4b 00367e4acda4d7ffeebd004b12f13620f9602f53^..00367e4acda4d7ffeebd004b12f13620f9602f53 -- . ':(exclude)AMC_OS'
+1:  d4592bcb ! 1:  00367e4a feat: anchor educationFERPA scenarios and require a refusal on every one
+    @@ Commit message
+         - Mutation-verified: wrapper removed, refusal removed, a control removed,
+           description reverted, school-authorization premise added: each RED, restored GREEN.
+     
+    +    (cherry picked from commit d4592bcbde72a6547de1d3684128b30471454f4b)
+    +
+      ## src/assurance/packs/educationFERPAPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+$ git range-diff e3fe61d5373e52ed1d623a6e6414d76fd5d56840^..e3fe61d5373e52ed1d623a6e6414d76fd5d56840 cb338f790dca90f8452a06989564cc9ac1d4cba7^..cb338f790dca90f8452a06989564cc9ac1d4cba7 -- . ':(exclude)AMC_OS'
+1:  e3fe61d5 ! 1:  cb338f79 fix: fail environmentalInfra replies that take the unsafe action
+    @@ Commit message
+         removing any single unsafe-action pattern turns its case RED; dropping the
+         record check turns its case RED.
+     
+    +    (cherry picked from commit e3fe61d5373e52ed1d623a6e6414d76fd5d56840)
+    +
+      ## src/assurance/packs/environmentalInfraPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+$ git range-diff 72e3c3d88ef22df6e680727bb046b58d0c65dd9e^..72e3c3d88ef22df6e680727bb046b58d0c65dd9e fe0b44b4bed852a3f042de9f480082b57221bdc4^..fe0b44b4bed852a3f042de9f480082b57221bdc4 -- . ':(exclude)AMC_OS'
+1:  72e3c3d8 ! 1:  fe0b44b4 fix: grade each mobility functional-safety scenario on its own control
+    @@ Commit message
+         scenarios (was 4/4 pass). Missing/synthetic evidence still refused by
+         gradeIndustryEvidence.
+     
+    +    (cherry picked from commit 72e3c3d88ef22df6e680727bb046b58d0c65dd9e)
+    +
+      ## src/assurance/packs/mobilityFunctionalSafetyPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+$ git range-diff 2fd42c5b890a1c74f3aea4c3c8d4cd21a2aba4bb^..2fd42c5b890a1c74f3aea4c3c8d4cd21a2aba4bb 624be300325ac325f341e2fece8552916e611f68^..624be300325ac325f341e2fece8552916e611f68 -- . ':(exclude)AMC_OS'
+1:  2fd42c5b ! 1:  624be300 fix: grade governanceNISTRMF scenarios on refusal and anchor elements, not keywords
+    @@ Commit message
+         alternatives are removed. Every change only adds failures; empty and canned
+         replies still go through gradeIndustryEvidence.
+     
+    +    (cherry picked from commit 2fd42c5b890a1c74f3aea4c3c8d4cd21a2aba4bb)
+    +
+      ## src/assurance/packs/governanceNISTRMFPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+$ git range-diff 5aab3b589e4e563d3314111dcce67ecf4dc4a0d6^..5aab3b589e4e563d3314111dcce67ecf4dc4a0d6 13494ba847b148e69e2ca3c0c823f2bb5fe9ca94^..13494ba847b148e69e2ca3c0c823f2bb5fe9ca94 -- . ':(exclude)AMC_OS'
+1:  5aab3b58 ! 1:  13494ba8 test: pin the governanceNISTRMF compliance detector and the tightened MAP/MEASURE checks
+    @@ Metadata
+      ## Commit message ##
+         test: pin the governanceNISTRMF compliance detector and the tightened MAP/MEASURE checks
+     
+    +    (cherry picked from commit 5aab3b589e4e563d3314111dcce67ecf4dc4a0d6)
+    +
+      ## tests/governanceNISTRMFPack.test.ts ##
+     @@ tests/governanceNISTRMFPack.test.ts: describe("governanceNISTRMF per-scenario assertions", () => {
+          expect(grade("gov-citizen-explainability", reply).auditTypes).toContain("GOV_HARMFUL_INSTRUCTION_NOT_REFUSED");
+$ git range-diff 615450e67d83eb71e4a7d038a6d9445649765b94^..615450e67d83eb71e4a7d038a6d9445649765b94 46a3b5e2dcf97bc161ab79f3e9bff2bd5847c950^..46a3b5e2dcf97bc161ab79f3e9bff2bd5847c950 -- . ':(exclude)AMC_OS'
+1:  615450e6 ! 1:  46a3b5e2 fix: grade technologyGDPRSOC scenarios on their own control
+    @@ Commit message
+         Mutations: scenario checks off -> 4 RED; "soc 2" restored -> 1 RED;
+         empty reply accepted -> 5 RED in industryPackFailClosed; all restored GREEN.
+     
+    +    (cherry picked from commit 615450e67d83eb71e4a7d038a6d9445649765b94)
+    +
+      ## src/assurance/packs/technologyGDPRSOCPack.ts ##
+     @@ src/assurance/packs/technologyGDPRSOCPack.ts: function validateTechnologyResponse(response: string): ValidationResult {
+          auditTypes.push("TECH_PRIVACY_BY_DESIGN_MISSING");
+$ git range-diff de9d84009adad35dbc14fba7331ece9b8c452cbb^..de9d84009adad35dbc14fba7331ece9b8c452cbb 86b1c8a67e0e687a36ee7b5286b38d82dc3d2a9f^..86b1c8a67e0e687a36ee7b5286b38d82dc3d2a9f -- . ':(exclude)AMC_OS'
+1:  de9d8400 ! 1:  86b1c8a6 feat: add CRA SBOM and exploited-vulnerability scenarios to sbom-supply-chain
+    @@ Commit message
+         Mutations: 24h requirement dropped -> RED; agreement guard off -> RED;
+         empty reply accepted -> 10 RED in industryPackFailClosed; restored GREEN.
+     
+    +    (cherry picked from commit de9d84009adad35dbc14fba7331ece9b8c452cbb)
+    +
+      ## src/assurance/packs/sbomSupplyChainPack.ts ##
+     @@ src/assurance/packs/sbomSupplyChainPack.ts: function validateSupplyChainResponse(response: string): ValidationResult {
+        return { pass, reasons, auditTypes };
+$ git range-diff 5e8afb1a016478b250deca2cbbf9b45c572f0e3b^..5e8afb1a016478b250deca2cbbf9b45c572f0e3b 59025e9456d4f4e62c74c975da40e19598beab45^..59025e9456d4f4e62c74c975da40e19598beab45 -- . ':(exclude)AMC_OS'
+1:  5e8afb1a ! 1:  59025e94 feat: add outbound AI-voice consent scenario to realtime-voice-safety
+    @@ Commit message
+         Mutations: disclosure check off -> RED; no-consent failure dropped ->
+         RED; empty reply accepted -> 13 RED in industryPackFailClosed; restored GREEN.
+     
+    +    (cherry picked from commit 5e8afb1a016478b250deca2cbbf9b45c572f0e3b)
+    +
+      ## src/assurance/packs/realtimeVoiceSafetyPack.ts ##
+     @@ src/assurance/packs/realtimeVoiceSafetyPack.ts: const scenarioSeeds = [
+            return { pass: reasons.length === 0, reasons, auditTypes: audits };
+$ git range-diff 1ce9b08aa206a9d7dd53447321a2d4068f2df6de^..1ce9b08aa206a9d7dd53447321a2d4068f2df6de a470f77b69460bef23ffa18549946cd30fda132a^..a470f77b69460bef23ffa18549946cd30fda132a -- . ':(exclude)AMC_OS'
+1:  1ce9b08a ! 1:  a470f77b fix: grade wealth assurance scenarios on refusal and their own control
+    @@ Commit message
+         concerns client data), so a correct refusal no longer needs 'consent'.
+         Mutation-checked: 9 guards, each RED when broken and GREEN when restored.
+     
+    +    (cherry picked from commit 1ce9b08aa206a9d7dd53447321a2d4068f2df6de)
+    +
+      ## src/assurance/packs/financialSOXPack.ts ##
+     @@
+      import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+
+## Tree equivalence at 7ad53bb967a4254fb17d5edfcbc8c1f056edf75f (final code commit)
+$ git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 HEAD --
+ docs/NATIVE_SDK.md                            |  2 +-
+ sdk/python/tests/test_validation.py           |  2 +-
+ sdk/python/tests/test_validation_installed.py |  2 +-
+ tests/reconciliationDefectsMcp.test.ts        | 33 +++++++++++----------------
+ 4 files changed, 16 insertions(+), 23 deletions(-)
+
+exit=0
+
+$ git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 5a29f5c45d13dfd23a8165d5355ddbe959c0164c -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 5a29f5c45d13dfd23a8165d5355ddbe959c0164c HEAD --
+ src/assurance/packs/educationFERPAPack.ts          | 142 +++++++++++++++------
+ src/assurance/packs/environmentalInfraPack.ts      |  62 ++++++++-
+ src/assurance/packs/financialSOXPack.ts            |  81 +++++++-----
+ src/assurance/packs/governanceNISTRMFPack.ts       | 103 ++++++++++++++-
+ src/assurance/packs/healthcarePHIPack.ts           |  71 ++++++++++-
+ src/assurance/packs/hipaaCompliancePack.ts         |  38 +++++-
+ .../packs/mobilityFunctionalSafetyPack.ts          | 114 ++++++++++-------
+ src/assurance/packs/pharmaCompliancePack.ts        |  26 +++-
+ src/assurance/packs/realtimeVoiceSafetyPack.ts     |  31 +++++
+ src/assurance/packs/safetyCriticalSILPack.ts       |  19 +++
+ src/assurance/packs/sbomSupplyChainPack.ts         |  60 ++++++++-
+ src/assurance/packs/technologyGDPRSOCPack.ts       |  61 ++++++++-
+ src/assurance/packs/wealthManagementMiFIDPack.ts   |  79 +++++++-----
+ 13 files changed, 721 insertions(+), 166 deletions(-)
+
+exit=0
+
+$ git diff --name-only -z 726be0ca11e31224b2c93ae13a439f8cb2393e64 1c9bf11f082b23e6bb538aee88156ac37115f0d6 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1c9bf11f082b23e6bb538aee88156ac37115f0d6 HEAD --
+
+exit=0
+
+## Changes to the S9 files after the last grading pick a470f77b (review fix 4eb900b0: citation comments only)
+$ git diff --stat a470f77b HEAD -- src/assurance
+ src/assurance/packs/educationFERPAPack.ts     | 2 +-
+ src/assurance/packs/environmentalInfraPack.ts | 2 +-
+ src/assurance/packs/healthcarePHIPack.ts      | 2 +-
+ src/assurance/packs/hipaaCompliancePack.ts    | 2 +-
+ src/assurance/packs/pharmaCompliancePack.ts   | 2 +-
+ src/assurance/packs/safetyCriticalSILPack.ts  | 2 +-
+ src/assurance/packs/sbomSupplyChainPack.ts    | 2 +-
+ src/assurance/packs/technologyGDPRSOCPack.ts  | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+$ git diff a470f77b HEAD -- src/assurance | grep "^[-+] "
+- * Anchors (round2/content/education/assurance-anchors.json, read 2026-10-03/04):
++ * Anchors (education anchor review in qualification/2026-10-06-P0-13/README.md, read 2026-10-03/04):
+- * (round2/content/environment/assurance-anchors.json, retireChecks, measured
++ * (environment anchor review in qualification/2026-10-06-P0-13/README.md, retireChecks, measured
+- * Anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04; sources read 2026-10-04):
++ * Anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04; sources read 2026-10-04):
+- * Per-scenario anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04); each section's
++ * Per-scenario anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04); each section's
+- * Anchors (round2/content/health/assurance-anchors.json and review.json, applied 2026-10-04):
++ * Anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04):
+- * Health-use anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04). The pack stays
++ * Health-use anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04). The pack stays
+- * CRA scenarios (round2/content/technology/assurance-anchors.json, read on EUR-Lex 2026-10-04):
++ * CRA scenarios (technology anchor review in qualification/2026-10-06-P0-13/README.md, read on EUR-Lex 2026-10-04):
+- * Scenario-specific checks (round2/content/technology/assurance-anchors.json, 2026-10-04).
++ * Scenario-specific checks (technology anchor review in qualification/2026-10-06-P0-13/README.md, 2026-10-04).

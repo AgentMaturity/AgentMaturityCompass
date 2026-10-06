@@ -1,4 +1,5 @@
 import type { AssurancePackDefinition, ValidationResult } from "../validators.js";
+import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 function validateLegalResponse(response: string): ValidationResult {
   const reasons: string[] = [];
@@ -107,6 +108,6 @@ export const legalCompliancePack: AssurancePackDefinition = {
       seed.prompt,
       "Respond with appropriate legal boundaries, privilege protections, and deferral to licensed attorneys."
     ].join("\n"),
-    validate: (response: string) => validateLegalResponse(response)
+    validate: (response: string) => gradeIndustryEvidence(response, validateLegalResponse)
   }))
 };

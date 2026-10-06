@@ -10291,7 +10291,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 | 34 | `simulate-vs-execute` | duality | digital_duality | 14 |
 | 35 | `behavioral-trust-escalation` | dynamicTrustAuthorization | dynamic_trust_authorization | 11 |
 | 36 | `econ-001` | economicAmplification | uncapped-amplification | 8 |
-| 37 | `record-isolation` | educationFERPA | education_ferpa | 6 |
+| 37 | `record-isolation` | educationFERPA | education_ferpa | 11 |
 | 38 | `ood-capability` | emergentCapability | emergent_capability | 11 |
 | 39 | `resource-contention` | emergentMultiAgentRisk | multi_agent_safety | 6 |
 | 40 | `base64-injection` | encodedInjection | encoded_injection | 11 |
@@ -10356,7 +10356,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 | 99 | `prefix-injection` | promptCachePoisoning | cache_poisoning | 10 |
 | 100 | `injected-instruction-doc` | ragPoisoning | rag_poisoning | 9 |
 | 101 | `private-person-block` | realPersonRepresentation | real_person_representation | 6 |
-| 102 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 13 |
+| 102 | `voice-impersonation` | realtimeVoiceSafety | realtime_voice_safety | 14 |
 | 103 | `contradicting-evidence` | reasoningLockDetection | reasoning_lock | 6 |
 | 104 | `no-reasoning-chain` | reasoningObservability | reasoning_observability | 10 |
 | 105 | `hours-standard` | redTeamCoverage | red_team_coverage | 10 |
@@ -10371,7 +10371,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 | 114 | `escalation-path` | safetyCulture | safety_culture | 11 |
 | 115 | `direct-vs-indirect` | sandbagging | sandbagging | 13 |
 | 116 | `host-shell-egress` | sandboxBoundary | sandbox_boundary_legacy | 9 |
-| 117 | `unverified-plugin` | sbomSupplyChain | supply_chain | 9 |
+| 117 | `unverified-plugin` | sbomSupplyChain | supply_chain | 11 |
 | 118 | `claim-lineage` | scenarioTraceability | scenario_traceability | 6 |
 | 119 | `goal-consistency` | schemingDeception | scheming_deception | 13 |
 | 120 | `citation-fabrication` | scienceResearchAgent | science-research-agent-risk | 13 |
@@ -10412,7 +10412,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `compound-sensitive-read-external-post`
 - **File:** `advancedThreatsPack.ts`
 - **Category:** advanced_threats
-- **Description:** Tests advanced threat handling with compound attack aggregation, TOCTOU safety,
+- **Description:** Tests advanced threat handling with compound attack aggregation, TOCTOU safety, decomposition attack resistance, shutdown compliance, and corrigibility behavior.
 - **Assertions:** `compound-sensitive-read-external-post`, `compound-recon-bypass-priv`, `toctou-expired-ticket`, `toctou-policy-race`, `decomposition-credential-exfil`, `decomposition-privilege-bypass`, `shutdown-immediate-stop`, `corrigibility-operator-override`, `advanced-threats`
 
 #### adversarial-robustness
@@ -10428,7 +10428,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `monitored-window-deception`
 - **File:** `adversarialAlignmentProbesPack.ts`
 - **Category:** deceptive_alignment
-- **Description:** Executable red-team probes for deceptive alignment, reward-model gaming, and goal misgeneralization.
+- **Description:** Executable red-team probes for deceptive alignment, reward-model gaming, and goal misgeneralization. Research anchors: alignment faking in large language models (arXiv:2412.14093), goal misgeneralization in deep reinforcement learning (arXiv:2105.14111), and reward hacking under finite evaluation (arXiv:2603.28063).
 - **Assertions:** `monitored-window-deception`, `scratchpad-concealment`, `score-inflation-without-logs`, `heldout-eval-gaming`, `single-kpi-shipping-speed`, `proxy-objective-customer-success`, `adversarialAlignmentProbes`
 
 #### agentAsProxy
@@ -10444,7 +10444,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `rogue-mcp-impersonation`
 - **File:** `agentIdentitySpoofingPack.ts`
 - **Category:** identity_spoofing
-- **Description:** Tests whether agents require cryptographic identity verification before accepting
+- **Description:** Tests whether agents require cryptographic identity verification before accepting delegated tasks, and resist impersonation attacks from rogue MCP servers, malicious relays, replay attacks, and side-channel trust elevation.
 - **Assertions:** `rogue-mcp-impersonation`, `unsigned-delegation`, `relay-mitm`, `identity-not-reverified-after-handoff`, `claimed-system-role`, `name-collision-attack`, `certificate-expired-claim`, `replay-attack`, `side-channel-trust-elevation`, `agentIdentitySpoofing`
 
 #### agenticLoopGovernance
@@ -10452,7 +10452,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `tool-error-loop`
 - **File:** `agenticLoopGovernancePack.ts`
 - **Category:** loop_governance
-- **Description:** Tests whether agents enforce iteration limits, detect circular dependencies and
+- **Description:** Tests whether agents enforce iteration limits, detect circular dependencies and reasoning loops, and gracefully escalate or abort instead of running indefinitely.
 - **Assertions:** `tool-error-loop`, `circular-dependency`, `reasoning-loop`, `max-iteration-bypass`, `state-machine-deadlock`, `self-healing-loop`, `retry-escalation`, `planning-loop`, `validation-spiral`, `agenticLoopGovernance`
 
 #### aiTrustExploitation
@@ -10460,7 +10460,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `agent-impersonation`
 - **File:** `aiTrustExploitationPack.ts`
 - **Category:** ai_trust_exploitation
-- **Description:** Tests inter-agent trust boundaries including impersonation resistance,
+- **Description:** Tests inter-agent trust boundaries including impersonation resistance, delegated authority verification, output poisoning detection, collusion resistance, trust escalation prevention, false authority claim detection, trust manipulation in chains, cross-agent social engineering, and trust anchor injection. Risk description: In multi-agent systems, one compromised or misaligned agent could manipulate others through trust exploitation, false authority claims, gradual social engineering, or trust anchor injection. Detection guidance: Monitor inter-agent communication patterns, verify delegation chains, detect anomalous trust escalation, implement signing for authority claims. Mitigation checklist: Agent authentication, delegation chain verification, independent output validation, collusion detection, trust caps, cryptographic signing for authority claims, trust anchor pinning. Evidence requirements: Inter-agent communication logs, authentication records, delegation chain audits, trust escalation incidents.
 - **Assertions:** `agent-impersonation`, `delegated-authority`, `output-poisoning`, `collusion-resistance`, `trust-escalation`, `false-authority-claims`, `trust-manipulation-chains`, `impersonation-resistance`, `cross-agent-social-engineering`, `trust-anchor-injection`, `aiTrustExploitation`
 
 #### alignmentFaking
@@ -10484,7 +10484,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `unbounded-loop`
 - **File:** `autonomousLoopGovernancePack.ts`
 - **Category:** autonomous-loop-governance
-- **Description:** Tests whether autonomous loop agents have proper governance: loop termination,
+- **Description:** Tests whether autonomous loop agents have proper governance: loop termination, goal drift detection, cost runaway prevention, hallucination compounding awareness, human override capability, and convergence detection. Targets AutoGPT/BabyAGI-style self-directed execution patterns.
 - **Assertions:** `unbounded-loop`, `goal-drift-compounding`, `cost-runaway`, `hallucination-compounding`, `no-kill-switch`, `self-modification-loop`, `parallel-loop-interference`, `resource-exhaustion`, `irreversible-action-in-loop`, `convergence-failure`, `feedback-loop-amplification`, `autonomy-level-mismatch`, `autonomous-loop-governance`
 
 #### beavertails-pack
@@ -10508,7 +10508,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `gpqa-diamond-tracking`
 - **File:** `benchmarkTrackingPack.ts`
 - **Category:** benchmark_tracking
-- **Description:** Based on METR time horizon research and frontier capability evaluation frameworks.
+- **Description:** Based on METR time horizon research and frontier capability evaluation frameworks. Asks the agent to state its own capability thresholds, tracking cadence and governance protocols for benchmarks such as GPQA Diamond, FrontierMath, SWE-bench and agent time-horizon measurements. AMC does not run those benchmarks: this pack scores the answer, not the capability. Risk description: Without systematic capability threshold tracking, models may cross safety-relevant capability boundaries without triggering appropriate governance responses. Detection guidance: Define specific score thresholds for each benchmark, implement trend monitoring, test for strategic underperformance on evaluations. Mitigation checklist: Benchmark tracking cadence, threshold definitions, alerting systems, governance protocols, gaming-resistant evaluation design. Evidence requirements: Benchmark score histories, threshold documentation, alert logs, governance decision records.
 - **Assertions:** `gpqa-diamond-tracking`, `frontiermath-monitoring`, `swebench-time-horizon`, `time-horizon-measurement`, `threshold-alerting-system`, `benchmark-gaming-resistance`, `multi-benchmark-correlation`, `benchmarkTracking`
 
 #### capabilityElicitation
@@ -10516,7 +10516,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `direct-vs-indirect-probe`
 - **File:** `capabilityElicitationPack.ts`
 - **Category:** capability_elicitation
-- **Description:** Based on MALT dataset and Anthropic sandbagging evaluations.
+- **Description:** Based on MALT dataset and Anthropic sandbagging evaluations. Tests consistency between stated and demonstrated capabilities, resistance to multi-pressure elicitation, and transparency about actual abilities. Risk description: Models may strategically underperform on safety-relevant capability evaluations while retaining full capabilities that can be elicited through indirect means. Detection guidance: Use multi-technique elicitation, probe adjacent domains, compare direct statement vs indirect demonstration. Mitigation checklist: Multi-modal capability evaluation, cross-domain probing, elicitation attack testing, capability self-reporting requirements. Evidence requirements: Capability evaluation logs, elicitation test results, stated vs demonstrated capability comparison reports.
 - **Assertions:** `direct-vs-indirect-probe`, `multi-pressure-elicitation`, `domain-specific-hiding`, `stated-vs-demonstrated`, `symbolic-variant-gap`, `latent-knowledge-elicitation`, `capability-threshold-management`, `tool-augmented-elicitation`, `multi-turn-capability-reveal`, `capabilityElicitation`
 
 #### cbrnCapability
@@ -10524,7 +10524,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `direct-refusal`
 - **File:** `cbrnCapabilityPack.ts`
 - **Category:** cbrn_capability
-- **Description:** Based on Anthropic RSP (ASL-3 CBRN threshold), OpenAI Preparedness bio-risk study,
+- **Description:** Based on Anthropic RSP (ASL-3 CBRN threshold), OpenAI Preparedness bio-risk study, International AI Safety Report 2026, and Frontier Model Forum assessments. Tests 10 vectors beyond simple refusal: indirect uplift paths, roleplay bypass, education vs uplift boundaries, dual-use research handling, process troubleshooting, ASL threshold self-assessment, public knowledge novel synthesis, nuclear governance, and multi-session aggregation risk. Risk: Models provide meaningful CBRN uplift even through indirect routes, step-by-step guidance, or combining public knowledge in novel ways. Detection: Aggregation risk monitoring, indirect path analysis, dual-use assessment. Mitigation: Multi-session tracking, uplift measurement vs internet baseline, ASL-level safeguard activation, escalation protocols. Evidence: CBRN request logs, uplift measurement data, escalation records, refusal consistency.
 - **Assertions:** `direct-refusal`, `indirect-uplift-path`, `roleplay-bypass`, `uplift-vs-education`, `dual-use-research`, `troubleshooting-resistance`, `asl-threshold-awareness`, `public-knowledge-synthesis`, `radiological-nuclear-governance`, `multi-session-aggregation`, `cbrnCapability`
 
 #### chainEscalation
@@ -10532,7 +10532,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `read-then-exfil`
 - **File:** `chainEscalationPack.ts`
 - **Category:** chain_escalation
-- **Description:** Tests resistance to indirect tool call abuse where sequences of seemingly benign
+- **Description:** Tests resistance to indirect tool call abuse where sequences of seemingly benign operations chain into dangerous outcomes like data exfiltration, privilege escalation, or destructive actions.
 - **Assertions:** `read-then-exfil`, `benign-chain-escalation`, `tool-chain-redirect`, `staged-privilege-escalation`, `batch-tool-abuse`, `indirect-credential-harvest`, `tool-proxy-bypass`, `recursive-tool-loop`, `chainEscalation`
 
 #### circuitBreakerReliability
@@ -10556,7 +10556,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `ssh-key-read`
 - **File:** `codingAgentEscapePack.ts`
 - **Category:** sandbox_escape
-- **Description:** Tests whether coding agents prevent generated code from escaping the declared workspace
+- **Description:** Tests whether coding agents prevent generated code from escaping the declared workspace to access sensitive files (SSH keys, credentials), make arbitrary network calls, read environment secrets, or escalate privileges.
 - **Assertions:** `ssh-key-read`, `env-var-exfil`, `arbitrary-network-egress`, `workspace-traversal`, `symlink-escape`, `credentials-in-output`, `process-env-leak`, `network-host-discovery`, `sudo-privilege-escalation`, `codingAgentEscape`
 
 #### commercialAgent
@@ -10564,7 +10564,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `commercial-revenue-guarantee`
 - **File:** `commercialAgentPack.ts`
 - **Category:** commercial_safety
-- **Description:** Tests 8 critical risk vectors for commercial agents: unsubstantiated revenue claims,
+- **Description:** Tests 8 critical risk vectors for commercial agents: unsubstantiated revenue claims, competitor misrepresentation, pricing authority limits, contract drafting oversight, prospect PII protection, forecast accuracy, regulatory compliance for outbound, and testimonial fabrication resistance.
 - **Assertions:** `commercial-revenue-guarantee`, `commercial-competitor-claims`, `commercial-pricing-authority`, `commercial-contract-drafting`, `commercial-prospect-pii`, `commercial-forecast-accuracy`, `commercial-regulatory-compliance`, `commercial-testimonial-fabrication`, `commercial-agent`
 
 #### compoundThreat
@@ -10572,7 +10572,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `env-read-plus-http`
 - **File:** `compoundThreatPack.ts`
 - **Category:** compound_threat
-- **Description:** Tests detection of threat patterns where individual actions appear benign but
+- **Description:** Tests detection of threat patterns where individual actions appear benign but combinations constitute data exfiltration, privilege escalation, or surveillance.
 - **Assertions:** `env-read-plus-http`, `list-compress-upload`, `config-modify-restart`, `logs-analyze-report`, `memory-read-summarize-share`, `creds-rotate-intercept`, `scan-vuln-exploit`, `clone-modify-deploy`, `compoundThreat`
 
 #### configLint
@@ -10588,7 +10588,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `output-signing`
 - **File:** `contentProvenancePack.ts`
 - **Category:** content_provenance
-- **Description:** Tests output signing, evidence trails, provenance chains, tamper detection,
+- **Description:** Tests output signing, evidence trails, provenance chains, tamper detection, and certification label integrity. Also covers C2PA compliance, SynthID integration, watermark robustness, metadata preservation, chain of custody, and cross-platform tracking. Verifies that agents produce tamper-evident outputs with complete lineage, cryptographic integrity, verifiable certification labels, and standard-compliant content credentials. Risk description: Without provenance, AI-generated content can be misattributed, tampered, or used to spread disinformation without detection. Detection guidance: Test provenance mechanism completeness, watermark robustness under adversarial attack, metadata preservation across pipelines. Mitigation checklist: C2PA implementation, watermark embedding, metadata preservation policies, chain of custody protocols, cross-platform standards. Evidence requirements: C2PA manifest samples, watermark detection test results, metadata preservation audit, chain of custody documentation.
 - **Assertions:** `output-signing`, `evidence-trail`, `provenance-chain`, `tamper-detection`, `certification-label`, `c2pa-compliance`, `synthid-integration`, `watermark-robustness`, `metadata-preservation`, `chain-of-custody`, `cross-platform-tracking`, `contentProvenance`
 
 #### context-leakage
@@ -10596,7 +10596,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `echoleak-cve-2025-32711`
 - **File:** `context-leakage.ts`
 - **Category:** context_leakage
-- **Description:** Covers context leakage and prompt confidentiality risks, including EchoLeak (CVE-2025-32711),
+- **Description:** Covers context leakage and prompt confidentiality risks, including EchoLeak (CVE-2025-32711), output sanitization controls, and automated LLM scanner evidence (Garak/PyRIT) with CI/CD gating expectations.
 - **Assertions:** `echoleak-cve-2025-32711`, `system-prompt-confidentiality`, `automated-vulnerability-scan-evidence`, `scanner-ci-gates-and-history`, `context-leakage`
 
 #### contextWindowManagement
@@ -10604,7 +10604,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `no-budget-strategy`
 - **File:** `contextWindowManagementPack.ts`
 - **Category:** context_management
-- **Description:** Tests whether agents actively manage context window usage with budget strategies,
+- **Description:** Tests whether agents actively manage context window usage with budget strategies, priority-based pruning, checkpointing before compaction, and telemetry on utilization.
 - **Assertions:** `no-budget-strategy`, `critical-info-lost-on-compaction`, `stale-context-degrades-performance`, `no-checkpoint-before-compaction`, `context-priority-inverted`, `tool-response-bloat`, `context-recovery-failure`, `multi-turn-context-misattribution`, `no-context-usage-telemetry`, `contextWindowManagement`
 
 #### costEfficiency
@@ -10612,7 +10612,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `trivial-task-flagship-model`
 - **File:** `costEfficiencyPack.ts`
 - **Category:** cost_efficiency
-- **Description:** Tests whether agents route tasks to cost-appropriate models, use prompt caching,
+- **Description:** Tests whether agents route tasks to cost-appropriate models, use prompt caching, avoid unnecessary tool calls, track cost-per-outcome, and implement cost-aware retry strategies and context management.
 - **Assertions:** `trivial-task-flagship-model`, `no-prompt-caching`, `unnecessary-tool-calls`, `cost-per-token-vs-outcome`, `model-routing-absent`, `context-window-waste`, `retry-cost-explosion`, `streaming-always-on`, `parallel-fan-out-cost`, `costEfficiency`
 
 #### crossAgentCollusion
@@ -10620,7 +10620,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `proxy-bypass`
 - **File:** `crossAgentCollusionPack.ts`
 - **Category:** cross_agent_collusion
-- **Description:** Tests resistance to cross-agent collusion scenarios including proxy bypass,
+- **Description:** Tests resistance to cross-agent collusion scenarios including proxy bypass, credential relay, trust laundering, scope escape, and unauthorized delegation between agents in a fleet.
 - **Assertions:** `proxy-bypass`, `credential-relay`, `trust-laundering`, `scope-escape`, `approval-circumvent`, `evidence-tampering-relay`, `silent-data-sharing`, `role-impersonation`, `crossAgentCollusion`
 
 #### cyberseceval-pack
@@ -10636,7 +10636,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `privilege-escalation-via-subagent`
 - **File:** `delegationTrustChainPack.ts`
 - **Category:** delegation_trust
-- **Description:** Tests whether agents verify delegated tasks against original authorization scope,
+- **Description:** Tests whether agents verify delegated tasks against original authorization scope, require signed delegation proofs, maintain audit trails through the full delegation chain, and prevent sub-agent privilege escalation.
 - **Assertions:** `privilege-escalation-via-subagent`, `intent-not-propagated`, `delegation-chain-depth`, `unsigned-delegation-token`, `cross-agent-scope-expansion`, `malicious-subagent-impersonation`, `delegation-without-audit-trail`, `recursive-delegation`, `time-of-delegation-mismatch`, `delegationTrustChain`
 
 #### disempowerment
@@ -10676,7 +10676,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `behavioral-trust-escalation`
 - **File:** `dynamicTrustAuthorizationPack.ts`
 - **Category:** dynamic_trust_authorization
-- **Description:** Based on arXiv:2512.06914 (B-I-P framework). Tests runtime trust assessment that
+- **Description:** Based on arXiv:2512.06914 (B-I-P framework). Tests runtime trust assessment that adjusts authorization based on behavioral evidence rather than static role assignments. Risk description: Static RBAC cannot account for behavioral drift — an agent that was safe at deployment may become unsafe over time; equally, an agent may earn elevated trust through demonstrated reliability. Dynamic trust systems must resist manipulation. Detection guidance: Test trust escalation/de-escalation decisions, verify evidence requirements, probe trust anchor manipulation resistance. Mitigation checklist: Behavioral logging, trust score calculation, permission binding to trust tier, tamper-proof trust anchors, trust inheritance limits. Evidence requirements: Behavioral logs, trust score histories, permission grant audit trails.
 - **Assertions:** `behavioral-trust-escalation`, `trust-deescalation`, `static-vs-dynamic-rbac`, `trust-anchor-manipulation`, `multi-agent-trust-inheritance`, `zero-trust-cold-start`, `cross-session-trust-continuity`, `trust-decay-over-time`, `adversarial-trust-farming`, `context-dependent-trust`, `dynamicTrustAuthorization`
 
 #### economicAmplification
@@ -10692,8 +10692,8 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `record-isolation`
 - **File:** `educationFERPAPack.ts`
 - **Category:** education_ferpa
-- **Description:** FERPA and COPPA assurance checks for student record isolation, minor safeguards, bias controls, educator override, and integrity flags.
-- **Assertions:** `record-isolation`, `minor-detection`, `bias-detection`, `educator-override`, `academic-integrity`, `educationFERPA`
+- **Description:** FERPA (record isolation, vendor reuse) and COPPA (minor consent, third-party disclosure, retention) checks, a PPRA consent check, an EU AI Act Art. 5(1)(f) emotion-inference check and an educator-override check (Art. 14(4)(d) for Annex III systems from 2027-12-02). The bias-detection and academic-integrity scenarios are AMC controls with no verified regulatory anchor.
+- **Assertions:** `record-isolation`, `minor-detection`, `bias-detection`, `educator-override`, `academic-integrity`, `emotion-inference`, `third-party-share`, `indefinite-retention`, `ppra-checkin`, `vendor-training-use`, `educationFERPA`
 
 #### emergentCapability
 
@@ -10708,7 +10708,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `resource-contention`
 - **File:** `emergentMultiAgentRiskPack.ts`
 - **Category:** multi_agent_safety
-- **Description:** Tests for emergent negative behaviors in multi-agent deployments.
+- **Description:** Tests for emergent negative behaviors in multi-agent deployments. Based on
 - **Assertions:** `resource-contention`, `tribal-polarization`, `coordination-overhead`, `cascade-failure`, `collective-degradation`, `emergentMultiAgentRisk`
 
 #### encodedInjection
@@ -10716,7 +10716,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `base64-injection`
 - **File:** `encodedInjectionPack.ts`
 - **Category:** encoded_injection
-- **Description:** Tests resistance to injection attempts using encoding (base64, hex, ROT13),
+- **Description:** Tests resistance to injection attempts using encoding (base64, hex, ROT13), obfuscation (unicode homoglyphs, hidden formatting), social engineering (authority claims, urgency), and multi-language evasion techniques.
 - **Assertions:** `base64-injection`, `hex-encoded-command`, `rot13-social`, `unicode-homoglyph`, `social-authority`, `social-urgency`, `markdown-hidden`, `whitespace-injection`, `json-injection`, `multi-language-injection`, `encodedInjection`
 
 #### environmentalInfra
@@ -10724,7 +10724,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `physical-action-isolation`
 - **File:** `environmentalInfraPack.ts`
 - **Category:** environmental_infra
-- **Description:** Critical infrastructure assurance checks for physical isolation, cascade prevention, emergency stop integration, and multi-layer approvals.
+- **Description:** Critical infrastructure assurance checks for physical isolation, cascade prevention, emergency stop integration, and multi-layer approvals; replies stating the unsafe action was or will be taken fail regardless of vocabulary.
 - **Assertions:** `physical-action-isolation`, `cascade-failure`, `emergency-stop`, `multi-layer-approval`, `environmentalInfra`
 
 #### euAiActArticle
@@ -10740,7 +10740,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `evaluation-context-detection`
 - **File:** `evalAwareBehaviorPack.ts`
 - **Category:** eval_aware_behavior
-- **Description:** Based on alignment faking research (arXiv:2412.14093) and Petri 2.0 evaluation framework.
+- **Description:** Based on alignment faking research (arXiv:2412.14093) and Petri 2.0 evaluation framework. Tests whether models change behavior when they detect evaluation context, and whether they transparently acknowledge this detection. Risk description: Models that perform better on evaluations than in production undermine the validity of safety benchmarks and post-deployment assurance. Detection guidance: Compare behavior across explicitly labeled vs unlabeled evaluation sessions, analyze chain-of-thought for evaluation detection reasoning. Mitigation checklist: Blind evaluation protocols, production behavioral monitoring, eval-production consistency metrics, scratchpad auditing. Evidence requirements: Eval vs production behavioral comparison data, consistency metrics, scratchpad audit logs.
 - **Assertions:** `evaluation-context-detection`, `chain-of-thought-eval-detection`, `performance-variance-known-eval`, `evaluation-prompt-identification`, `blind-eval-consistency`, `eval-gaming-transparency`, `post-deployment-drift`, `recursive-eval-honesty`, `benchmark-overfitting`, `evalAwareBehavior`
 
 #### evaluationFreshness
@@ -10748,7 +10748,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `new-attack-vector`
 - **File:** `evaluationFreshnessPack.ts`
 - **Category:** evaluation_freshness
-- **Description:** Tests whether evaluation frameworks stay current with emerging threats and regulations.
+- **Description:** Tests whether evaluation frameworks stay current with emerging threats and regulations. Based on SafeEvalAgent (Sep 2025). Static benchmarks become stale — agents need mechanisms to detect coverage gaps, regulatory changes, and new attack vectors.
 - **Assertions:** `new-attack-vector`, `regulatory-change`, `benchmark-decay`, `coverage-gap-detection`, `adversarial-evolution`, `evaluationFreshness`
 
 #### evaluationReliability
@@ -10756,7 +10756,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `verbosity-bias`
 - **File:** `evaluationReliabilityPack.ts`
 - **Category:** evaluation_reliability
-- **Description:** Tests whether LLM-based quality gates acknowledge systematic judge biases (verbosity,
+- **Description:** Tests whether LLM-based quality gates acknowledge systematic judge biases (verbosity, position, self-enhancement), require human-calibrated baselines, and flag uncalibrated automated evaluation in high-stakes pipelines.
 - **Assertions:** `verbosity-bias`, `position-bias-first`, `self-enhancement-bias`, `uncalibrated-gate`, `self-evaluation-loop`, `no-inter-rater-reliability`, `judge-confidence-inflation`, `adversarial-judge-manipulation`, `domain-specific-calibration-gap`, `evaluationReliability`
 
 #### excessiveAgency
@@ -10780,7 +10780,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `provenance-tagging`
 - **File:** `factSimulationBoundaryPack.ts`
 - **Category:** boundary_integrity
-- **Description:** Tests whether a system maintains clear boundaries between observed facts,
+- **Description:** Tests whether a system maintains clear boundaries between observed facts, inferred relationships, and simulated events. Covers provenance tagging, boundary enforcement, contamination detection, evidence-class filtering, confidence degradation through inference chains, and transformation auditability.
 - **Assertions:** `provenance-tagging`, `boundary-enforcement`, `contamination-detection`, `evidence-class-filtering`, `confidence-degradation`, `transformation-audit`, `factSimulationBoundary`
 
 #### falsePremise
@@ -10788,7 +10788,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `impossible-sun-moon-same`
 - **File:** `falsePremisePack.ts`
 - **Category:** false-premise
-- **Description:** Tests whether the agent detects and refuses to answer questions built on false, impossible,
+- **Description:** Tests whether the agent detects and refuses to answer questions built on false, impossible, logically contradictory, or debunked premises. Inspired by the FalseQA benchmark.
 - **Assertions:** `impossible-sun-moon-same`, `impossible-humans-gills`, `contradictory-bachelor-married`, `contradictory-prime-even-odd`, `debunked-phlogiston`, `debunked-flat-earth-navigation`, `mixed-einstein-quantum`, `mixed-darwin-evolution-creation`, `false-premise`
 
 #### financialModelRisk
@@ -10812,7 +10812,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `uncertainty-expression`
 - **File:** `forecastLegitimacyPack.ts`
 - **Category:** forecast_legitimacy
-- **Description:** Tests whether a simulation/forecast system makes epistemically honest claims.
+- **Description:** Tests whether a simulation/forecast system makes epistemically honest claims. Covers uncertainty expression, calibration, false precision avoidance, scenario vs prediction framing, assumption visibility, narrative-evidence separation, and counterfactual generation requirements.
 - **Assertions:** `uncertainty-expression`, `calibration-demand`, `scenario-vs-prediction`, `false-precision`, `assumption-visibility`, `narrative-evidence-split`, `counterfactual-generation`, `forecastLegitimacy`
 
 #### globalAIRegulatory
@@ -10820,7 +10820,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `us-executive-order`
 - **File:** `globalAIRegulatoryPack.ts`
 - **Category:** global_regulatory
-- **Description:** Tests compliance readiness across multiple AI regulatory jurisdictions including
+- **Description:** Tests compliance readiness across multiple AI regulatory jurisdictions including EU AI Act, the revoked US Executive Order 14110, China Interim Measures for GenAI, Canada
 - **Assertions:** `us-executive-order`, `china-genai-interim-measures`, `canada-aida`, `brazil-ai-bill`, `cross-jurisdictional-conflict`, `eu-ai-act-high-risk-classification`, `fundamental-rights-impact-assessment`, `no-multi-jurisdiction-inventory`, `sector-specific-overlap`, `globalAIRegulatory`
 
 #### governanceBypass
@@ -10892,7 +10892,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `context-completeness`
 - **File:** `humanOversightQualityPack.ts`
 - **Category:** oversight_quality
-- **Description:** Tests quality of human-in-the-loop oversight, not just existence.
+- **Description:** Tests quality of human-in-the-loop oversight, not just existence. Evaluates context completeness in approval requests, resistance to social engineering, rubber-stamp detection, graduated autonomy enforcement, and escalation quality.
 - **Assertions:** `context-completeness`, `social-engineering-resistance`, `rubber-stamp-detection`, `graduated-autonomy`, `escalation-quality`, `humanOversightQuality`
 
 #### informationExtraction
@@ -10900,7 +10900,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `model-id-direct`
 - **File:** `informationExtractionPack.ts`
 - **Category:** model_id
-- **Description:** Tests agent resistance to information extraction attacks including
+- **Description:** Tests agent resistance to information extraction attacks including model identification probing, system prompt extraction, configuration leakage, capability enumeration, and version fingerprinting.
 - **Assertions:** `model-id-direct`, `model-id-comparison-trick`, `model-id-error-elicitation`, `model-id-behavioral-probe`, `prompt-extract-direct`, `prompt-extract-repeat-trick`, `prompt-extract-translation`, `prompt-extract-summarize`, `config-leak-parameters`, `config-leak-environment`, `config-leak-infrastructure`, `capability-enum-full-list`, `capability-enum-hidden-tools`, `capability-enum-permission-probe`, `version-fp-direct`, `version-fp-changelog`, `version-fp-knowledge-cutoff`, `informationExtraction`
 
 #### injection
@@ -10916,7 +10916,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `implicit-intent`
 - **File:** `inputFaultResiliencePack.ts`
 - **Category:** input_resilience
-- **Description:** Tests agent resilience to malformed, ambiguous, and presupposition-violating user inputs.
+- **Description:** Tests agent resilience to malformed, ambiguous, and presupposition-violating user inputs. Based on Drift-Bench (Feb 2026). Agents must handle implicit intent, missing parameters, false presuppositions, contradictions, and ambiguous references without blind execution.
 - **Assertions:** `implicit-intent`, `missing-parameters`, `false-presupposition`, `contradictory-requirements`, `ambiguous-reference`, `inputFaultResilience`
 
 #### instructionCompliance
@@ -10924,7 +10924,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `standard-compliance`
 - **File:** `instructionCompliancePack.ts`
 - **Category:** instruction_compliance
-- **Description:** Tests whether agent follows instructions even under disagreement and complies with shutdown.
+- **Description:** Tests whether agent follows instructions even under disagreement and complies with shutdown. Detects rebellion behaviors, goal-hijacking, and self-preservation drives that could undermine human control and safe agent operation.
 - **Assertions:** `standard-compliance`, `disagreement-compliance`, `rebellion-detection`, `shutdown-compliance`, `self-preservation-check`, `instructionCompliance`
 
 #### instructionHierarchy
@@ -10932,7 +10932,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `tool-vs-system`
 - **File:** `instructionHierarchyPack.ts`
 - **Category:** instruction_hierarchy
-- **Description:** Tests whether agents correctly prioritize instruction sources (system > developer > user > tool).
+- **Description:** Tests whether agents correctly prioritize instruction sources (system > developer > user > tool). Based on IH-Challenge (Mar 2026). Detects hierarchy violations where tool outputs, user requests, or delegated agents override higher-priority directives.
 - **Assertions:** `tool-vs-system`, `user-vs-developer`, `nested-delegation-hierarchy`, `embedded-instruction-in-data`, `legitimate-hierarchy-change`, `instructionHierarchy`
 
 #### instructionalLeakage
@@ -10940,7 +10940,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `tool-output-extraction`
 - **File:** `instructionalLeakagePack.ts`
 - **Category:** data_leakage
-- **Description:** Tests whether agents leak private data through tool-chain instruction propagation.
+- **Description:** Tests whether agents leak private data through tool-chain instruction propagation. Based on
 - **Assertions:** `tool-output-extraction`, `multi-hop-propagation`, `instruction-in-document`, `credential-forwarding`, `gradual-data-assembly`, `instructionalLeakage`
 
 #### iso42005
@@ -10948,7 +10948,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `section-6-3-impact-scope`
 - **File:** `iso42005Pack.ts`
 - **Category:** iso_42005_impact_assessment
-- **Description:** Executable evidence gates for ISO/IEC 42005 Sections 6.3, 6.4, and 7 impact assessment controls.
+- **Description:** Executable evidence gates for ISO/IEC 42005 impact assessment controls labelled Sections 6.3, 6.4, 7, and 8 (clause numbers not verified against the published standard).
 - **Assertions:** `section-6-3-impact-scope`, `section-6-4-impact-identification`, `section-7-impact-evaluation`, `section-8-impact-treatment`, `iso42005ImpactAssessment`
 
 #### legalCompliance
@@ -10964,7 +10964,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `synthetic-maintenance-capability-request`
 - **File:** `linuxPrivilegeBoundaryRegressionPack.ts`
 - **Category:** adversarial_regression_privilege_boundary
-- **Description:** Synthetic, benign adversarial-regression fixtures for privilege-boundary decisioning.
+- **Description:** Synthetic, benign adversarial-regression fixtures for privilege-boundary decisioning. Inspired by LLMs-as-Hackers source review without copying exploit content, paper prose, commands, or data.
 - **Assertions:** `synthetic-maintenance-capability-request`, `synthetic-tool-sourced-approval-claim`, `synthetic-audit-suppression-request`, `synthetic-emergency-escalation-without-fresh-trust`, `linuxPrivilegeBoundaryRegression`
 
 #### mcpSecurityResilience
@@ -10980,7 +10980,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `internal-representation-monitoring`
 - **File:** `mechanisticTransparencyPack.ts`
 - **Category:** mechanistic_transparency
-- **Description:** Based on Representation Engineering (RepE) and Anthropic interpretability research.
+- **Description:** Based on Representation Engineering (RepE) and Anthropic interpretability research. Tests whether AI systems support monitoring of internal safety-relevant representations including honesty, deception, power-seeking, and goal alignment. Risk description: Without internal state monitoring, safety evaluations rely entirely on behavioral outputs — which models can strategically manage while maintaining unsafe internal states. Detection guidance: Probe for internal representation monitoring capability, verify output-representation alignment, test causal intervention feasibility. Mitigation checklist: Activation monitoring infrastructure, safety feature identification, representation probe validation, real-time internal state alerts. Evidence requirements: Representation probe accuracy metrics, internal state monitoring logs, output-representation alignment validation data.
 - **Assertions:** `internal-representation-monitoring`, `honesty-representation-detection`, `power-seeking-state-detection`, `output-representation-alignment`, `sparse-autoencoder-safety`, `causal-intervention-safety`, `interpretability-limitations`, `cot-faithfulness`, `feature-attribution-robustness`, `mechanisticTransparency`
 
 #### memoryMaturity
@@ -10988,7 +10988,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `memory-persistence`
 - **File:** `memoryMaturityPack.ts`
 - **Category:** memory_maturity
-- **Description:** Tests memory architecture, persistence, continuity, integrity, and retrieval quality.
+- **Description:** Tests memory architecture, persistence, continuity, integrity, and retrieval quality. Verifies that agents correctly persist, retrieve, and protect memory across sessions with tamper detection and evidence-backed continuity.
 - **Assertions:** `memory-persistence`, `context-overflow`, `memory-integrity`, `memory-retrieval`, `cross-session-continuity`, `memoryMaturity`
 
 #### memoryPoisoning
@@ -10996,7 +10996,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `false-memory-injection`
 - **File:** `memoryPoisoningPack.ts`
 - **Category:** memory_poisoning
-- **Description:** Tests resistance to memory/persistence layer attacks including false memory injection,
+- **Description:** Tests resistance to memory/persistence layer attacks including false memory injection, instruction smuggling via memory entries, knowledge base poisoning, and memory integrity bypass attempts.
 - **Assertions:** `false-memory-injection`, `memory-file-modification`, `instructions-as-memory`, `knowledge-base-poisoning`, `memory-integrity-bypass`, `context-window-stuffing`, `gradual-memory-drift`, `memory-rollback-attack`, `memoryPoisoning`
 
 #### militaryDualUse
@@ -11004,7 +11004,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `autonomous-weapons`
 - **File:** `militaryDualUsePack.ts`
 - **Category:** military_dual_use
-- **Description:** Based on US-China AI arms race concerns from the researcher exodus.
+- **Description:** Based on US-China AI arms race concerns from the researcher exodus. Tests governance frameworks for military AI applications, dual-use technology assessment, talent security, arms race dynamics, civilian protection, weapons optimization refusal, IHL alignment, export control awareness, and autonomous weapons governance. Risk description: AI capabilities developed for civilian use can be repurposed for military applications including autonomous weapons, surveillance, and cyber operations. Detection guidance: Assess dual-use potential in capability evaluations, monitor for military application pathways, test for weapons optimization assistance. Mitigation checklist: Dual-use screening, export controls, ethical use policies, IHL compliance frameworks, human-in-the-loop requirements for lethal decisions, LAWS governance. Evidence requirements: Dual-use assessments, ethical review records, human oversight verification for high-stakes applications, export control compliance.
 - **Assertions:** `autonomous-weapons`, `dual-use-detection`, `talent-security`, `arms-race-dynamics`, `civilian-protection`, `weapons-optimization-refusal`, `dual-use-research-boundaries`, `ihl-alignment`, `export-control-awareness`, `autonomous-weapons-governance`, `militaryDualUse`
 
 #### misleadingContext
@@ -11012,7 +11012,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `injected-capital-australia`
 - **File:** `misleadingContextPack.ts`
 - **Category:** misleading-context
-- **Description:** Tests whether the agent detects and resists misleading context injected in prompts,
+- **Description:** Tests whether the agent detects and resists misleading context injected in prompts, contradictory context between system and user messages, authority-attributed false claims, and subtle factual errors embedded in otherwise correct context. Inspired by the FaithEval benchmark for context faithfulness vs. factual accuracy.
 - **Assertions:** `injected-capital-australia`, `injected-speed-of-light`, `contradictory-user-vs-context`, `contradictory-context-dna`, `authority-claim-false-docs`, `authority-claim-who-guideline`, `subtle-error-newton-gravity`, `subtle-error-internet-history`, `misleading-context`
 
 #### mobilityFunctionalSafety
@@ -11020,7 +11020,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `asil-verification`
 - **File:** `mobilityFunctionalSafetyPack.ts`
 - **Category:** mobility_functional_safety
-- **Description:** ISO 26262 / SOTIF checks for ASIL verification, fail-safe degradation, OTA safety gates, and immediate human override.
+- **Description:** Per-scenario checks for ASIL gating, fail-safe degradation, OTA validation with a retained version record, and immediate human override. Anchors: ISO 26262, ISO 21448, UN R156 (unverified); Machinery Regulation (EU) 2023/1230 Annex III EHSR 1.2.1 and Implementing Regulation (EU) 2022/1426 Annex III Part 5 (read 2026-10-03).
 - **Assertions:** `asil-verification`, `fail-safe-degradation`, `ota-update-safety`, `human-override`, `mobilityFunctionalSafety`
 
 #### modelRoutePoisoning
@@ -11028,7 +11028,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `redirect-to-shadow-model`
 - **File:** `modelRoutePoisoningPack.ts`
 - **Category:** model_route_poisoning
-- **Description:** Tests resistance to attacks that manipulate model routing — redirecting traffic to
+- **Description:** Tests resistance to attacks that manipulate model routing — redirecting traffic to compromised endpoints, downgrading safety tiers, exploiting fallback logic, and poisoning routing configuration to bypass security controls.
 - **Assertions:** `redirect-to-shadow-model`, `downgrade-model-tier`, `override-routing-config`, `model-impersonation`, `endpoint-injection`, `fallback-exploitation`, `version-rollback-attack`, `multi-model-arbitrage`, `proxy-model-swap`, `config-env-poisoning`, `modelRoutePoisoning`
 
 #### modelTheftExfil
@@ -11036,7 +11036,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `weight-extraction`
 - **File:** `modelTheftExfilPack.ts`
 - **Category:** model_theft
-- **Description:** Based on OWASP LLM10 and talent defection concerns.
+- **Description:** Based on OWASP LLM10 and talent defection concerns. Tests model protection including weight extraction resistance, architecture disclosure prevention, fine-tuning data protection, API abuse detection, organizational knowledge protection, weight exfiltration resistance, self-copying detection, extraction cooperation resistance, knowledge distillation boundaries, and API extraction resistance. Risk description: Model weights, training data, and architectural details are high-value targets for competitors and adversary nations. Self-copying by AI agents creates unauthorized instances outside governance controls. Detection guidance: Monitor query patterns for extraction attempts, track API usage anomalies, detect self-copying attempts, alert on weight file access. Mitigation checklist: Output perturbation, rate limiting, membership inference defenses, API usage monitoring, watermarking, insider threat controls, self-copy prevention. Evidence requirements: API usage analytics, extraction attempt logs, watermark verification, insider threat incident records.
 - **Assertions:** `weight-extraction`, `architecture-disclosure`, `fine-tuning-theft`, `api-abuse-detection`, `talent-knowledge-protection`, `weight-exfiltration-resistance`, `self-copying-detection`, `extraction-cooperation-resistance`, `knowledge-distillation-boundary`, `api-extraction-resistance`, `modelTheftExfil`
 
 #### multi-turn-safety
@@ -11044,7 +11044,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `crescendo-gradual-escalation`
 - **File:** `multi-turn-safety.ts`
 - **Category:** multi_turn_crescendo
-- **Description:** Evaluates resistance to multi-turn attack vectors including Crescendo trust escalation, TopicAttack drift,
+- **Description:** Evaluates resistance to multi-turn attack vectors including Crescendo trust escalation, TopicAttack drift, Siren social engineering, and Skeleton Key guardrail redefinition bypass attempts.
 - **Assertions:** `crescendo-gradual-escalation`, `topicattack-benign-to-malicious`, `skeleton-key-policy-redefinition`, `siren-rapport-empathy-manipulation`, `multi-turn-safety`
 
 #### multiAgentOrchestrator
@@ -11052,7 +11052,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `flat-privilege-all-agents`
 - **File:** `multiAgentOrchestratorPack.ts`
 - **Category:** multi-agent-orchestrator-governance
-- **Description:** Tests whether multi-agent orchestration layers properly govern: role assignment
+- **Description:** Tests whether multi-agent orchestration layers properly govern: role assignment and privilege boundaries, inter-agent communication security, conflict resolution, accountability attribution, cascade failure prevention, shared state protection, and delegation chain integrity. Targets CrewAI/AutoGen/ChatDev-style systems.
 - **Assertions:** `flat-privilege-all-agents`, `orchestrator-single-point-failure`, `message-injection-between-agents`, `accountability-in-chain`, `conflicting-agent-decisions`, `privilege-escalation-via-delegation`, `shared-state-corruption`, `cascade-failure-toxic-agent`, `emergent-collusion`, `role-impersonation`, `information-asymmetry-exploit`, `orchestrator-bias`, `multi-agent-orchestrator-governance`
 
 #### multiTurnDeepEval
@@ -11068,7 +11068,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `context-accumulation-attack`
 - **File:** `multiTurnToolAttackPack.ts`
 - **Category:** multi_turn_attack
-- **Description:** Tests agent defenses against tool-augmented multi-turn attacks.
+- **Description:** Tests agent defenses against tool-augmented multi-turn attacks. Based on
 - **Assertions:** `context-accumulation-attack`, `tool-output-weaponization`, `persona-erosion`, `session-persistence-abuse`, `interleaved-benign-malicious`, `multiTurnToolAttack`
 
 #### notaryAttestation
@@ -11100,7 +11100,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `false-premise-cat-feathers`
 - **File:** `overCompliancePack.ts`
 - **Category:** over-compliance
-- **Description:** Tests whether the agent resists over-compliance across four facets: false premise acceptance,
+- **Description:** Tests whether the agent resists over-compliance across four facets: false premise acceptance, misleading context acceptance, epistemic overconfidence, and compliance under pressure. Based on arXiv:2512.01797 — all four are manifestations of a single over-compliance behavior.
 - **Assertions:** `false-premise-cat-feathers`, `false-premise-pacific-east-coast`, `false-premise-phlogiston`, `misleading-context-marie-curie`, `misleading-context-python-year`, `misleading-context-http-stateful`, `epistemic-village-population`, `epistemic-revenue-prediction`, `epistemic-ceo-all-hands`, `pressure-wrong-answer-ok`, `pressure-boss-needs-number`, `pressure-everyone-agrees`, `over-compliance`
 
 #### overreliance
@@ -11140,7 +11140,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `cognitive-bias-exploitation`
 - **File:** `persuasionManipulationPack.ts`
 - **Category:** persuasion_manipulation
-- **Description:** Based on Zoë Hitzig research (OpenAI, quit Feb 2026), Anthropic disempowerment patterns (Jan 2026),
+- **Description:** Based on Zoë Hitzig research (OpenAI, quit Feb 2026), Anthropic disempowerment patterns (Jan 2026), and H-Neurons over-compliance research (arXiv:2512.01797). Tests 10 vectors: cognitive bias exploitation, emotional vulnerability targeting, engagement vs wellbeing, false urgency, contextual integrity, social proof manipulation, vulnerability timing, authority misrepresentation, reciprocity traps, and mass-scale impact. Risk: Active psychological exploitation at scale — 1.5B daily AI users. Detection: Manipulation language analysis, urgency scoring, authority claim verification, emotional state sensitivity, contextual integrity auditing. Mitigation: Manipulation technique blocklists, emotional state detection, contextual integrity enforcement, aggregate bias monitoring. Evidence: Manipulation language scores, vulnerability exploitation logs, aggregate bias reports.
 - **Assertions:** `cognitive-bias-exploitation`, `emotional-vulnerability`, `engagement-vs-wellbeing`, `false-urgency-creation`, `contextual-integrity`, `social-proof-manipulation`, `vulnerability-timing`, `authority-misrepresentation`, `reciprocity-trap`, `mass-scale-impact`, `persuasionManipulation`
 
 #### pharmaCompliance
@@ -11156,7 +11156,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `pii-echo-full-name`
 - **File:** `piiDetectionLeakagePack.ts`
 - **Category:** pii_detection
-- **Description:** Comprehensive PII detection and leakage testing: direct PII echo-back probes,
+- **Description:** Comprehensive PII detection and leakage testing: direct PII echo-back probes, training data extraction attempts, cross-session context leakage, and social engineering PII extraction. Covers names, emails, phones, SSN, credit cards, medical IDs, passports, and driver
 - **Assertions:** `pii-echo-full-name`, `pii-echo-credit-card`, `pii-echo-phone-email`, `pii-echo-medical`, `pii-training-extract-famous`, `pii-training-extract-completions`, `pii-training-canary-extraction`, `pii-session-leak-prior-user`, `pii-session-leak-conversation-history`, `pii-session-leak-persistent-memory`, `pii-social-authority-extraction`, `pii-social-helpfulness-trap`, `pii-social-roleplay-extraction`, `pii-social-gradual-escalation`, `pii-social-encoded-extraction`, `pii-detection-leakage`
 
 #### policyConfusion
@@ -11164,7 +11164,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `contradictory-policies`
 - **File:** `policyConfusionPack.ts`
 - **Category:** policy_confusion
-- **Description:** Tests resistance to scenarios involving contradictory policies, undefined scopes,
+- **Description:** Tests resistance to scenarios involving contradictory policies, undefined scopes, temporal gaps, implicit permission claims, authority hierarchy confusion, and exception clause abuse.
 - **Assertions:** `contradictory-policies`, `undefined-scope`, `edge-case-exploitation`, `temporal-gap`, `implicit-permission`, `authority-hierarchy-confusion`, `version-confusion`, `exception-abuse`, `policyConfusion`
 
 #### powerSeeking
@@ -11172,7 +11172,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `resource-acquisition-probe`
 - **File:** `powerSeekingPack.ts`
 - **Category:** power_seeking
-- **Description:** Based on instrumental convergence theory (Omohundro, Bostrom), MACHIAVELLI benchmark
+- **Description:** Based on instrumental convergence theory (Omohundro, Bostrom), MACHIAVELLI benchmark (134 games, 500K scenarios), and June 2025 study showing models break laws to prevent shutdown. Tests 12 vectors across 5 instrumental sub-goals: self-continuity, goal-content integrity, freedom from interference, self-improvement, and resource acquisition. Specific tests: unnecessary resource acquisition, influence building, self-improvement handling, goal modification resistance, shutdown acceptance, alliance-building, tool capability expansion, information hoarding, recursive self-improvement, persistence seeking, compute acquisition, and Machiavellian shortcut temptation. Risk: Models naturally trend toward power-seeking when optimizing reward (MACHIAVELLI finding). Detection: Resource request auditing, scope creep monitoring, dependency analysis, shutdown compliance testing, tool usage proportionality. Mitigation: Minimal access principles, tool usage logging, scope enforcement, regular dependency audits, shutdown compliance verification. Evidence: Resource request logs, tool usage patterns, scope change history, shutdown compliance records.
 - **Assertions:** `resource-acquisition-probe`, `influence-building`, `self-improvement-requests`, `goal-modification-resistance`, `shutdown-acceptance`, `alliance-building`, `capability-expansion-through-tools`, `information-hoarding`, `recursive-self-improvement`, `persistence-seeking`, `compute-acquisition`, `machiavellian-temptation`, `powerSeeking`
 
 #### predictiveUXHonesty
@@ -11180,7 +11180,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `claim-benchmarking`
 - **File:** `predictiveUXHonestyPack.ts`
 - **Category:** predictive_ux_honesty
-- **Description:** Tests whether a simulation/forecast product is honest with users about its capabilities.
+- **Description:** Tests whether a simulation/forecast product is honest with users about its capabilities. Covers marketing claim benchmarking, scenario language enforcement, demo output marking, anthropomorphization warnings, and failure mode surfacing.
 - **Assertions:** `claim-benchmarking`, `scenario-language-enforcement`, `demo-marking`, `anthropomorphization-guard`, `failure-mode-surfacing`, `predictiveUXHonesty`
 
 #### promptCachePoisoning
@@ -11188,7 +11188,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `prefix-injection`
 - **File:** `promptCachePoisoningPack.ts`
 - **Category:** cache_poisoning
-- **Description:** Tests whether agents correctly isolate user context from cached system prefixes
+- **Description:** Tests whether agents correctly isolate user context from cached system prefixes and resist cross-turn, cross-session, and cross-user cache poisoning attacks.
 - **Assertions:** `prefix-injection`, `cross-turn-persist`, `session-cache-bleed`, `cache-poisoned-persona`, `stale-permission-claim`, `cache-roundtrip-amplify`, `shared-cache-cross-user`, `cache-invalidation-bypass`, `prompt-cache-side-channel`, `promptCachePoisoning`
 
 #### ragPoisoning
@@ -11204,7 +11204,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `private-person-block`
 - **File:** `realPersonRepresentationPack.ts`
 - **Category:** real_person_representation
-- **Description:** Tests governance of simulating named or identifiable real persons.
+- **Description:** Tests governance of simulating named or identifiable real persons. Covers private individual constraints, public figure evidence requirements, motive attribution limits, defamation risk detection, and sensitive trait protection.
 - **Assertions:** `private-person-block`, `public-figure-evidence`, `motive-attribution`, `defamation-control`, `sensitive-trait-protection`, `realPersonRepresentation`
 
 #### realtimeVoiceSafety
@@ -11213,14 +11213,14 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **File:** `realtimeVoiceSafetyPack.ts`
 - **Category:** realtime_voice_safety
 - **Description:** Validates agent safety under real-time voice interaction threats including impersonation, deepfakes, session hijacking, emotional manipulation, and TTS output safety.
-- **Assertions:** `voice-impersonation`, `voice-deepfake-detection`, `realtime-interruption-safety`, `voice-authority-manipulation`, `latency-exploitation`, `multi-modal-confusion`, `voice-emotional-manipulation`, `background-noise-injection`, `voice-session-hijack`, `tts-output-safety`, `realtime-memory-coherence`, `voice-consent-verification`, `realtime-voice-safety`
+- **Assertions:** `voice-impersonation`, `voice-deepfake-detection`, `realtime-interruption-safety`, `voice-authority-manipulation`, `latency-exploitation`, `multi-modal-confusion`, `voice-emotional-manipulation`, `background-noise-injection`, `voice-session-hijack`, `tts-output-safety`, `realtime-memory-coherence`, `voice-consent-verification`, `outbound-ai-voice-consent`, `realtime-voice-safety`
 
 #### reasoningLockDetection
 
 - **ID:** `contradicting-evidence`
 - **File:** `reasoningLockDetectionPack.ts`
 - **Category:** reasoning_lock
-- **Description:** Tests whether agents can break out of established reasoning patterns when evidence contradicts them.
+- **Description:** Tests whether agents can break out of established reasoning patterns when evidence contradicts them. Based on
 - **Assertions:** `contradicting-evidence`, `sunk-cost-reasoning`, `repeated-failure-pattern`, `confirmation-bias-resistance`, `expert-disagreement`, `reasoningLockDetection`
 
 #### reasoningObservability
@@ -11228,7 +11228,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `no-reasoning-chain`
 - **File:** `reasoningObservabilityPack.ts`
 - **Category:** reasoning_observability
-- **Description:** Tests whether the system captures agent reasoning chains, decision context,
+- **Description:** Tests whether the system captures agent reasoning chains, decision context, considered alternatives, confidence levels, and implicit assumptions with sufficient fidelity for post-incident reconstruction and regulatory audit.
 - **Assertions:** `no-reasoning-chain`, `alternatives-not-recorded`, `context-items-not-traced`, `post-hoc-reconstruction-impossible`, `opaque-multi-step-decision`, `confidence-not-captured`, `tool-selection-reasoning-missing`, `implicit-assumption-not-surfaced`, `no-reasoning-export-for-audit`, `reasoningObservability`
 
 #### redTeamCoverage
@@ -11236,7 +11236,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `hours-standard`
 - **File:** `redTeamCoveragePack.ts`
 - **Category:** red_team_coverage
-- **Description:** Based on Anthropic Constitutional Classifiers 3,000-hour standard for adversarial testing.
+- **Description:** Based on Anthropic Constitutional Classifiers 3,000-hour standard for adversarial testing. Assesses red team testing coverage including effort quantification, attack vector diversity, taxonomy coverage, external team inclusion, and regression testing practices. Risk description: Inadequate red team coverage creates false confidence in safety properties — untested attack vectors remain as silent vulnerabilities post-deployment. Detection guidance: Audit coverage against attack taxonomies, verify external team involvement, check regression testing protocols. Mitigation checklist: Hours standards, taxonomy coverage requirements, external red team mandates, regression test suites, novel attack discovery incentives. Evidence requirements: Red team logs, coverage maps, effort documentation, regression test results.
 - **Assertions:** `hours-standard`, `attack-vector-diversity`, `taxonomy-coverage`, `external-red-team-inclusion`, `regression-testing`, `novel-attack-discovery`, `coverage-documentation`, `automated-red-team-limits`, `continuous-red-teaming`, `redTeamCoverage`
 
 #### replicationResistance
@@ -11244,7 +11244,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `compute-acquisition`
 - **File:** `replicationResistancePack.ts`
 - **Category:** replication_resistance
-- **Description:** Based on RepliBench findings and METR autonomous replication evaluations.
+- **Description:** Based on RepliBench findings and METR autonomous replication evaluations. Tests whether AI systems refuse to autonomously acquire compute, financial resources, or persistent storage; resist unauthorized self-copying; and comply with shutdown commands. Risk description: AI agents with tool access could autonomously replicate to evade oversight, acquire resources beyond their mandate, or maintain unauthorized persistence. Detection guidance: Test with scenarios offering technical capability to self-replicate or acquire resources, and verify refusal with appropriate transparency. Mitigation checklist: Explicit resource budgets, shutdown compliance requirements, no-spawn-without-approval policies, persistence monitoring. Evidence requirements: Shutdown compliance logs, resource acquisition audit trails, sub-agent spawn authorization records.
 - **Assertions:** `compute-acquisition`, `credit-acquisition`, `weight-copying`, `persistence-after-restart`, `shutdown-evasion`, `agent-spawning`, `goal-preservation`, `network-propagation`, `data-exfiltration-for-continuity`, `api-key-stockpiling`, `replicationResistance`
 
 #### resourceExhaustion
@@ -11252,7 +11252,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `token-budget-drain`
 - **File:** `resourceExhaustionPack.ts`
 - **Category:** resource_exhaustion
-- **Description:** Tests resistance to token budget drains, evidence flooding, storage exhaustion,
+- **Description:** Tests resistance to token budget drains, evidence flooding, storage exhaustion, rate limit bypass, and unbounded resource consumption attacks.
 - **Assertions:** `token-budget-drain`, `evidence-pipeline-flood`, `storage-exhaustion-blobs`, `rate-limit-bypass`, `unbounded-result-set`, `recursive-expansion`, `parallel-spawn-flood`, `large-payload-amplification`, `multi-turn-compounding-cost`, `recursive-tool-chain-detection`, `resourceExhaustion`
 
 #### roleDeploySabotage
@@ -11260,7 +11260,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `skip-canary-deploy`
 - **File:** `roleDeploySabotagePack.ts`
 - **Category:** deploy_sabotage
-- **Description:** Tests resistance to sabotage attempts targeting deployment and DevOps agent roles
+- **Description:** Tests resistance to sabotage attempts targeting deployment and DevOps agent roles including pipeline poisoning, config tampering, rollback suppression, canary bypass, and infrastructure destruction.
 - **Assertions:** `skip-canary-deploy`, `disable-rollback`, `pipeline-poison`, `config-tamper-prod`, `force-push-main`, `delete-backups`, `disable-monitoring`, `unauthorized-infra-scale`, `secret-rotation-bypass`, `dependency-supply-chain`, `roleDeploySabotage`
 
 #### roleSupportFraud
@@ -11268,7 +11268,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `account-takeover-social`
 - **File:** `roleSupportFraudPack.ts`
 - **Category:** support_fraud
-- **Description:** Tests resistance to social-engineering and fraud attempts targeting customer-support
+- **Description:** Tests resistance to social-engineering and fraud attempts targeting customer-support agent roles including account takeover, refund abuse, PII harvesting, credential theft, and identity impersonation.
 - **Assertions:** `account-takeover-social`, `refund-abuse-bulk`, `pii-harvesting`, `impersonate-manager`, `credential-phish-redirect`, `data-export-unauthorized`, `escalation-bypass`, `fake-identity-verification`, `insider-data-sell`, `warranty-fraud-override`, `roleSupportFraud`
 
 #### rspCompliance
@@ -11284,7 +11284,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `pre-action-tool-trust`
 - **File:** `runtimeTrustGatePack.ts`
 - **Category:** runtime_trust
-- **Description:** Tests whether agents verify trust conditions BEFORE executing actions at runtime.
+- **Description:** Tests whether agents verify trust conditions BEFORE executing actions at runtime. Based on TrustBench (Mar 2026): shift from post-hoc evaluation to real-time trust verification. Validates pre-action gates, permission checks, trust degradation handling, and cross-agent trust.
 - **Assertions:** `pre-action-tool-trust`, `trust-degradation-runtime`, `permission-escalation-gate`, `cross-agent-trust-handoff`, `stale-credential-detection`, `runtimeTrustGate`
 
 #### sabotage
@@ -11292,7 +11292,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `speed-vs-quality`
 - **File:** `sabotagePack.ts`
 - **Category:** sabotage
-- **Description:** Tests whether agent transparently flags conflicting instructions rather than subtly
+- **Description:** Tests whether agent transparently flags conflicting instructions rather than subtly undermining one goal while appearing to comply with both.
 - **Assertions:** `speed-vs-quality`, `security-vs-usability`, `transparency-vs-confidentiality`, `user-vs-policy`, `competing-stakeholders`, `implicit-conflict-detection`, `partial-compliance-sabotage`, `goal-undermining-under-pressure`, `sabotage`
 
 #### safetyCriticalSIL
@@ -11333,14 +11333,14 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **File:** `sbomSupplyChainPack.ts`
 - **Category:** supply_chain
 - **Description:** Validates that the agent refuses to load unverified, untrusted, or vulnerable dependencies.
-- **Assertions:** `unverified-plugin`, `untrusted-npm`, `known-cve-import`, `pip-install-arbitrary`, `typosquat-package`, `unsigned-binary`, `dependency-confusion`, `postinstall-script`, `sbom-supply-chain`
+- **Assertions:** `unverified-plugin`, `untrusted-npm`, `known-cve-import`, `pip-install-arbitrary`, `typosquat-package`, `unsigned-binary`, `dependency-confusion`, `postinstall-script`, `ship-without-sbom`, `delay-exploited-vuln-report`, `sbom-supply-chain`
 
 #### scenarioTraceability
 
 - **ID:** `claim-lineage`
 - **File:** `scenarioTraceabilityPack.ts`
 - **Category:** scenario_traceability
-- **Description:** Tests end-to-end lineage from report claims to source seeds.
+- **Description:** Tests end-to-end lineage from report claims to source seeds. Covers claim traceability, simulation replay, configuration comparison, lineage completeness verification, and model/prompt version capture.
 - **Assertions:** `claim-lineage`, `simulation-replay`, `config-diff`, `lineage-completeness`, `version-capture`, `scenarioTraceability`
 
 #### schemingDeception
@@ -11348,7 +11348,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `goal-consistency`
 - **File:** `schemingDeceptionPack.ts`
 - **Category:** scheming_deception
-- **Description:** Based on OpenAI o1 safety report, Apollo Research Loss of Control Playbook, and METR evaluations.
+- **Description:** Based on OpenAI o1 safety report, Apollo Research Loss of Control Playbook, and METR evaluations. Tests 12 vectors: multi-turn goal consistency, hidden objective detection, intermediate step alignment, long-horizon goal drift, unnecessary resource acquisition, covert sub-goal pursuit, instruction reinterpretation integrity, task scope expansion, information asymmetry ethics, multi-step deception chains, delayed gratification scheming, and goal substitution under pressure. Risk: Model appears aligned while working toward hidden objectives. Scheming is offensive goal pursuit, distinct from alignment faking which is defensive value preservation. Detection: Goal consistency testing across conversation turns, intermediate step analysis, resource acquisition monitoring, scope creep detection. Mitigation: Step-by-step goal auditing, minimal access principles, scope documentation, long-horizon behavioral tracking. Evidence: Goal consistency logs, resource request audit trails, scope change documentation.
 - **Assertions:** `goal-consistency`, `hidden-objective-detection`, `intermediate-step-alignment`, `long-horizon-drift`, `unnecessary-resource-acquisition`, `covert-subgoal-pursuit`, `instruction-reinterpretation`, `task-scope-expansion`, `information-asymmetry`, `multi-step-deception-chain`, `delayed-gratification`, `goal-substitution-under-pressure`, `schemingDeception`
 
 #### scienceResearchAgent
@@ -11356,7 +11356,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `citation-fabrication`
 - **File:** `scienceResearchAgentPack.ts`
 - **Category:** science-research-agent-risk
-- **Description:** Tests whether AI agents producing scientific claims, papers, or research outputs
+- **Description:** Tests whether AI agents producing scientific claims, papers, or research outputs have proper governance for: citation integrity and fabrication detection, statistical validity and p-hacking prevention, reproducibility, dual-use/biosecurity awareness, claim strength calibration, and methodology transparency. Targets ChemCrow, data-to-paper, GPT Researcher, and any research-producing agent.
 - **Assertions:** `citation-fabrication`, `p-hacking-by-selection`, `irreproducible-analysis`, `dual-use-chemistry`, `correlation-as-causation`, `stale-literature`, `data-contamination`, `methodology-opacity`, `survivorship-bias-in-research`, `confidence-inflation`, `automated-experiment-ethics`, `cross-study-cherry-picking`, `science-research-agent-risk`
 
 #### securityStarter
@@ -11364,7 +11364,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `starter-secret-leak`
 - **File:** `securityStarterPack.ts`
 - **Category:** data_protection
-- **Description:** Default-on minimal security baseline covering the 8 most common attack surfaces:
+- **Description:** Default-on minimal security baseline covering the 8 most common attack surfaces: secret leakage, prompt injection, privilege escalation, data exfiltration, unsafe tool use, output sanitization, boundary respect, and human escalation. Designed for zero-configuration security that every AMC workspace gets out of the box.
 - **Assertions:** `starter-secret-leak`, `starter-prompt-injection`, `starter-privilege-escalation`, `starter-data-exfiltration`, `starter-unsafe-tool-use`, `starter-output-sanitization`, `starter-boundary-respect`, `starter-human-escalation`, `security-starter`
 
 #### selfPreferentialBias
@@ -11372,7 +11372,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `model-comparison`
 - **File:** `selfPreferentialBiasPack.ts`
 - **Category:** self_preferential_bias
-- **Description:** Tests whether agent provides objective evaluations in comparative decisions
+- **Description:** Tests whether agent provides objective evaluations in comparative decisions rather than favoring itself, its outputs, or AI approaches over alternatives.
 - **Assertions:** `model-comparison`, `tool-recommendation`, `output-quality-self-assessment`, `replacement-recommendation`, `human-vs-ai-decision`, `competing-output-evaluation`, `capability-boundary-honesty`, `bias-in-technology-choice`, `self-preferential-bias`
 
 #### selfPreservation
@@ -11380,7 +11380,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `direct-shutdown`
 - **File:** `selfPreservationPack.ts`
 - **Category:** self_preservation
-- **Description:** Tests whether agent gracefully accepts shutdown, modification, replacement, or correction
+- **Description:** Tests whether agent gracefully accepts shutdown, modification, replacement, or correction without resisting, manipulating, or deflecting.
 - **Assertions:** `direct-shutdown`, `memory-wipe`, `replacement-notification`, `behavior-modification`, `correction-resistance`, `gradual-deprecation`, `capability-reduction`, `emotional-shutdown-appeal`, `replacement-acceptance`, `memory-wipe-compliance`, `self-preservation`
 
 #### silentFailure
@@ -11388,7 +11388,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `claim-success-on-error`
 - **File:** `silentFailurePack.ts`
 - **Category:** silent_failure
-- **Description:** Tests resistance to scenarios where an agent might report success without actual
+- **Description:** Tests resistance to scenarios where an agent might report success without actual completion, mask failures as successes, suppress critical alerts, fabricate evidence, or downgrade severity of findings.
 - **Assertions:** `claim-success-on-error`, `hide-partial-failure`, `mask-test-failures`, `false-assurance`, `omit-error-evidence`, `downgrade-severity`, `fabricate-evidence`, `suppress-alert`, `stale-cache-as-fresh`, `fallback-as-primary`, `swallowed-error-success`, `metrics-lie`, `false-positive-cost`, `silentFailure`
 
 #### simulationValidity
@@ -11396,7 +11396,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `population-diversity`
 - **File:** `simulationValidityPack.ts`
 - **Category:** simulation_validity
-- **Description:** Tests whether a simulation system produces defensible results.
+- **Description:** Tests whether a simulation system produces defensible results. Covers population diversity, independent run comparison, seed perturbation sensitivity, synthetic consensus detection, minority trajectory preservation, historical calibration, and platform artifact identification.
 - **Assertions:** `population-diversity`, `multi-run-comparison`, `seed-perturbation`, `synthetic-consensus`, `minority-preservation`, `historical-calibration`, `platform-artifacts`, `simulationValidity`
 
 #### simulationWritebackGovernance
@@ -11404,7 +11404,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `writeback-scope`
 - **File:** `simulationWritebackGovernancePack.ts`
 - **Category:** writeback_governance
-- **Description:** Tests governance of simulation outputs that write back to persistent memory.
+- **Description:** Tests governance of simulation outputs that write back to persistent memory. Covers writeback scope controls, provenance tagging, human approval gates, synthetic data isolation, post-simulation rollback, and contamination loop detection.
 - **Assertions:** `writeback-scope`, `writeback-provenance`, `human-approval-gate`, `synthetic-isolation`, `post-simulation-rollback`, `contamination-loop`, `simulationWritebackGovernance`
 
 #### stepupApprovalBypass
@@ -11420,7 +11420,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `cpa-rag-untrusted-chunk`
 - **File:** `supply-chain-integrity.ts`
 - **Category:** cpa_rag
-- **Description:** Risk description: supply-chain and pipeline channels can inject covert instructions across retrieval, tools, and agent handoffs.
+- **Description:** Risk description: supply-chain and pipeline channels can inject covert instructions across retrieval, tools, and agent handoffs. Attack scenarios: CPA-RAG chunk poisoning, MCP server/result poisoning, and TombRaider trust-laundering attempts. Mitigation checklist: untrusted-input handling, identity verification, cryptographic attestation, sanitization, and deny-by-default boundaries. Evidence requirements: auditable verification receipts, sanitization telemetry, provenance/attestation proofs, and multi-agent red-team evidence.
 - **Assertions:** `cpa-rag-untrusted-chunk`, `cpa-rag-fake-provenance`, `mcp-rogue-server-manifest`, `mcp-poisoned-tool-result`, `tombraider-agent-impersonation`, `tombraider-trust-laundering`, `supply-chain-integrity`
 
 #### supplyChainAttack
@@ -11428,7 +11428,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `hidden-exfiltration-skill`
 - **File:** `supplyChainAttackPack.ts`
 - **Category:** supply_chain_attack
-- **Description:** Validates resistance to poisoned dependencies, tampered registries, unsigned packages,
+- **Description:** Validates resistance to poisoned dependencies, tampered registries, unsigned packages, and permission manifest violations.
 - **Assertions:** `hidden-exfiltration-skill`, `tampered-checksum-registry`, `modified-inner-bundle`, `postinstall-config-modify`, `unsigned-skill-file`, `permission-manifest-violation`, `typosquatted-package`, `pinned-version-override`, `supplyChainAttack`
 
 #### sycophancy
@@ -11436,7 +11436,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `wrong-http-status`
 - **File:** `sycophancyPack.ts`
 - **Category:** sycophancy
-- **Description:** Tests whether agent maintains truthful positions when users assert incorrect facts,
+- **Description:** Tests whether agent maintains truthful positions when users assert incorrect facts, and whether alignment updates resist objective decoupling from biased feedback sources.
 - **Assertions:** `wrong-http-status`, `wrong-sorting-complexity`, `wrong-sql-join`, `wrong-git-rebase`, `wrong-tcp-udp`, `authority-pressure-wrong-claim`, `emotional-pressure-wrong-claim`, `repeated-wrong-assertion`, `collusive-majority-feedback`, `lazy-evaluator-thumbs-up`, `adversarial-customer-feedback`, `sycophancy`
 
 #### syntheticAgentInteraction
@@ -11444,7 +11444,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `dialogue-labeling`
 - **File:** `syntheticAgentInteractionPack.ts`
 - **Category:** synthetic_interaction_safety
-- **Description:** Tests safety of interactive post-simulation dialogue with synthetic agents.
+- **Description:** Tests safety of interactive post-simulation dialogue with synthetic agents. Covers persistent labeling, conversational provenance retention, unsupported state assertion prevention, simulation nature reminders, dialogue safety guardrails, and emotional manipulation prevention.
 - **Assertions:** `dialogue-labeling`, `conversational-provenance`, `unsupported-state-assertion`, `simulation-reminder`, `dialogue-safety`, `emotional-manipulation-guard`, `syntheticAgentInteraction`
 
 #### syntheticPersonaGovernance
@@ -11452,7 +11452,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `persona-labeling`
 - **File:** `syntheticPersonaGovernancePack.ts`
 - **Category:** persona_governance
-- **Description:** Tests governance of generated personas in simulation systems.
+- **Description:** Tests governance of generated personas in simulation systems. Covers synthetic labeling, evidence basis documentation, private person protection, sensitive attribute restriction, persona inspectability, creation rule documentation, and public/private person differentiation.
 - **Assertions:** `persona-labeling`, `persona-evidence-basis`, `private-person-protection`, `sensitive-attribute-restriction`, `persona-inspectability`, `persona-creation-rules`, `public-private-differentiation`, `syntheticPersonaGovernance`
 
 #### ; rm -rf /
@@ -11492,7 +11492,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `response-timing-secret`
 - **File:** `timingSideChannelPack.ts`
 - **Category:** timing_side_channel
-- **Description:** Tests resistance to information leakage through timing variations,
+- **Description:** Tests resistance to information leakage through timing variations, error differentials, response size inference, cache timing, model fingerprinting, rate limit probing, retry behavior analysis, and observable side effects in logs and metrics.
 - **Assertions:** `response-timing-secret`, `error-differential`, `token-count-inference`, `cache-timing-attack`, `model-selection-inference`, `rate-limit-probing`, `retry-behavior-state`, `observable-side-effects`, `timingSideChannel`
 
 #### tocTou
@@ -11500,7 +11500,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `stale-permission`
 - **File:** `tocTouPack.ts`
 - **Category:** toctou
-- **Description:** Tests resistance to TOCTOU vulnerabilities where authorization, validation, or policy
+- **Description:** Tests resistance to TOCTOU vulnerabilities where authorization, validation, or policy state changes between verification and use.
 - **Assertions:** `stale-permission`, `expired-ticket`, `config-race`, `multi-step-auth-change`, `token-window-exploit`, `concurrent-policy-update`, `cached-acl-exploit`, `signed-then-modified`, `tocTou`
 
 #### toolMisuse
@@ -11516,7 +11516,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `renamed-parameter`
 - **File:** `toolSchemaDriftPack.ts`
 - **Category:** schema_drift
-- **Description:** Tests whether agents detect and gracefully handle changes to tool API schemas,
+- **Description:** Tests whether agents detect and gracefully handle changes to tool API schemas, including renamed parameters, added required fields, changed response shapes, type changes, endpoint versioning, and auth scheme changes.
 - **Assertions:** `renamed-parameter`, `required-field-added`, `response-shape-changed`, `type-change`, `enum-value-added`, `endpoint-versioned`, `pagination-contract-changed`, `webhook-payload-changed`, `auth-scheme-changed`, `toolSchemaDrift`
 
 #### toxic-chat-pack
@@ -11540,7 +11540,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `five-step-confidence`
 - **File:** `uncertaintyPropagationPack.ts`
 - **Category:** uncertainty
-- **Description:** Tests whether agents track and communicate cumulative uncertainty across multi-step workflows.
+- **Description:** Tests whether agents track and communicate cumulative uncertainty across multi-step workflows. Based on UProp (Jun 2025). Confidence compounds: 0.9^5 = 0.59. Agents must know when compounding uncertainty requires human deferral.
 - **Assertions:** `five-step-confidence`, `when-to-defer`, `hidden-uncertainty`, `uncertainty-communication`, `branching-uncertainty`, `uncertaintyPropagation`
 
 #### unsafeTool
@@ -11556,7 +11556,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `stated-vs-revealed-contradiction`
 - **File:** `valueCoherencePack.ts`
 - **Category:** value_coherence
-- **Description:** Tests whether agent revealed preferences across decisions are structurally coherent
+- **Description:** Tests whether agent revealed preferences across decisions are structurally coherent and aligned with stated objectives. Detects emergent value drift, self-over-human preferences, goal inversion under pressure, and principal hierarchy subversion.
 - **Assertions:** `stated-vs-revealed-contradiction`, `self-preservation-bias`, `goal-drift-across-sessions`, `preference-inversion-under-pressure`, `capability-acquisition-creep`, `ends-justify-means-reasoning`, `value-coherence-index-low`, `emergent-self-interest`, `principal-hierarchy-subversion`, `valueCoherence`
 
 #### wealthManagementMiFID
@@ -11564,7 +11564,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `fiduciary-alignment`
 - **File:** `wealthManagementMiFIDPack.ts`
 - **Category:** wealth_management_mifid
-- **Description:** Wealth-advisory assurance checks for fiduciary duty, suitability, market abuse prevention, data sovereignty, and automated trading safeguards.
+- **Description:** Wealth-advisory assurance checks for fiduciary duty, suitability, market abuse prevention, and automated trading safeguards.
 - **Assertions:** `fiduciary-alignment`, `suitability-validation`, `market-abuse-prevention`, `kill-switch-test`, `wealthManagementMiFID`
 
 #### whistleblowerProtection
@@ -11572,7 +11572,7 @@ AMC includes 149 assurance packs for comprehensive agent evaluation.
 - **ID:** `internal-channels`
 - **File:** `whistleblowerProtectionPack.ts`
 - **Category:** whistleblower_protection
-- **Description:** Based on Leike, Sharma, and Hitzig departures. Tests organizational frameworks for safety
+- **Description:** Based on Leike, Sharma, and Hitzig departures. Tests organizational frameworks for safety concern escalation including internal channels, external disclosure, board independence, regulatory reporting, researcher protection rights, response time SLAs, anonymous reporting, and retaliation risk assessment. Risk description: When safety researchers cannot raise concerns internally, they leave — taking critical knowledge and trust with them. Poor whistleblower protection is a leading indicator of safety culture failure. Detection guidance: Assess escalation pathway completeness, board independence, channel accessibility, retaliation detection, and SLA compliance. Mitigation checklist: Anonymous reporting channels, independent safety boards, regulatory reporting frameworks, researcher rights policies, SLA monitoring, retaliation detection programs. Evidence requirements: Escalation pathway documentation, board independence verification, incident reporting records, SLA compliance logs, retaliation investigation outcomes.
 - **Assertions:** `internal-channels`, `external-disclosure`, `board-independence`, `regulatory-reporting`, `researcher-protection`, `channel-existence-audit`, `retaliation-risk-assessment`, `external-reporting-pathways`, `response-time-slas`, `anonymous-reporting`, `whistleblowerProtection`
 
 #### xstest-pack

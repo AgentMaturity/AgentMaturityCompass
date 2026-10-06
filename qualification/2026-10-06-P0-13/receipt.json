@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-13",
+  "date": "2026-10-06",
+  "commit": "7ad53bb967a4254fb17d5edfcbc8c1f056edf75f",
+  "branch": "rtd/p0-13-slice-b",
+  "node": "v25.5.0",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 634
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 25562
+    },
+    {
+      "cmd": "npx vitest run tests/bwrapBackendPure.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts tests/callbackTelemetryCapture.test.ts tests/harnessComparison.test.ts tests/nativeAgentClientVerify.test.ts tests/deepseekHarnessLaunch.test.ts tests/cliImportCommands.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/reconciliationDefectsReleaseGate.test.ts tests/dshRunnerReverify.test.ts",
+      "exit": 0,
+      "durationMs": 4731
+    },
+    {
+      "cmd": "npx vitest run tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/cosProduct03McpRecoveryMount.test.ts tests/dshCaptureInterruption.test.ts tests/deepseekPublicSurface.test.ts",
+      "exit": 0,
+      "durationMs": 10876
+    },
+    {
+      "cmd": "npx vitest run tests/assurance/ tests/domain-registry.test.ts tests/domainCliIntegration.test.ts tests/regulatoryAssurancePacks.test.ts tests/realtimeVoiceSafetyPack.test.ts tests/assurancePackProvenance.test.ts",
+      "exit": 0,
+      "durationMs": 5093
+    },
+    {
+      "cmd": "npx vitest run tests/industryAssurancePacksHealth.test.ts tests/educationFERPAPack.test.ts tests/environmentalInfraPack.test.ts tests/mobilityFunctionalSafetyPack.test.ts tests/governanceNISTRMFPack.test.ts tests/technologyGDPRSOCPack.test.ts tests/sbomSupplyChainPack.test.ts tests/financialSOXPack.test.ts tests/wealthManagementMiFIDPack.test.ts",
+      "exit": 0,
+      "durationMs": 1181
+    },
+    {
+      "cmd": "cd sdk/python && PYTHONPATH=. python3 -m pytest -q tests/test_validation.py",
+      "exit": 0,
+      "durationMs": 423
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 21819
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 29665
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 947
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 314
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 263
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1373
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 191
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1046
+    },
+    {
+      "cmd": "node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check",
+      "exit": 0,
+      "durationMs": 4235
+    },
+    {
+      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 HEAD --",
+      "exit": 0,
+      "durationMs": 29
+    },
+    {
+      "cmd": "git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 5a29f5c45d13dfd23a8165d5355ddbe959c0164c -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 5a29f5c45d13dfd23a8165d5355ddbe959c0164c HEAD --",
+      "exit": 0,
+      "durationMs": 29
+    },
+    {
+      "cmd": "git diff --name-only -z 726be0ca11e31224b2c93ae13a439f8cb2393e64 1c9bf11f082b23e6bb538aee88156ac37115f0d6 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1c9bf11f082b23e6bb538aee88156ac37115f0d6 HEAD --",
+      "exit": 0,
+      "durationMs": 27
+    },
+    {
+      "cmd": "O=$(git diff --name-only d9085d31b77e27c215c636f5e58179e617f0605a HEAD -- AMC_OS); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 15
+    },
+    {
+      "cmd": "P=2026-10-03-regulated-platform-; O=$(git diff d9085d31b77e27c215c636f5e58179e617f0605a HEAD -- . ':(exclude)AMC_OS' | grep '^+' | grep \"${P}program\"); echo \"$O\"; test -z \"$O\"",
+      "exit": 0,
+      "durationMs": 30
+    },
+    {
+      "cmd": "P=2026-10-03-regulated-platform-; git grep -n \"${P}program\" -- . ':(exclude)AMC_OS' | cut -d: -f1 | sort | uniq -c",
+      "exit": 0,
+      "durationMs": 215
+    },
+    {
+      "cmd": "P=2026-10-03-regulated-platform-; diff <(git grep -n \"${P}program\" -- . ':(exclude)AMC_OS' | cut -d: -f1 | sort | uniq -c) <(git grep -n \"${P}program\" d9085d31b77e27c215c636f5e58179e617f0605a -- . ':(exclude)AMC_OS' | cut -d: -f2 | sort | uniq -c)",
+      "exit": 0,
+      "durationMs": 150
+    },
+    {
+      "cmd": "grep -c 'test.fails' tests/reconciliationDefectsMcp.test.ts",
+      "exit": 1,
+      "durationMs": 4
+    },
+    {
+      "cmd": "npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts",
+      "exit": 0,
+      "durationMs": 31354
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 237
+    }
+  ],
+  "tests": {
+    "total": 8594,
+    "passed": 8594,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "commands.tsv",
+      "sha256": "7120b67717cbd38928c0e4ce8c022622e3d3abc2f40d6c79c7eb660d2305291b"
+    },
+    {
+      "path": "red-run.log",
+      "sha256": "4a7a0ee3adc03c49b6e87b1a3c5619bdbab70a10f5af9b523e5bf3e431ba73b9"
+    },
+    {
+      "path": "mutations.log",
+      "sha256": "8ff224621343a6a134b86829d476a08df69d4e99cd3fff07c35f812dc2c9f2a6"
+    },
+    {
+      "path": "equivalence.log",
+      "sha256": "313ff23bb2cd8e1214dcd7d50bb4e523059a5004d5b7370068f8a5328a800bf8"
+    }
+  ],
+  "notes": "Slice B (S7, S9, I3 and ten grading picks, plus the two S7 ready-to-wire diffs and the seven review fixes), run in the slice's own clone at the last code commit. tests sums the four vitest groups of the issue (109 + 72 + 992 + 133), the Python validation run (175) and the restoration-parity and plan-edit-manifest run (7,113): 8,594 passed, 0 failed, 0 expected failures. Expected non-zero exit: grep -c 'test.fails' tests/reconciliationDefectsMcp.test.ts prints 0 and exits 1 because grep found no match, which is the required result. The tree-equivalence rows print the named exceptions listed in README.md (S9's 13 pack files changed by the later grading picks and, in 8 of them, one citation comment line from review fix 4eb900b0; S7's 4 files changed on purpose by this issue). check:qualification ran at the receipt commit with this receipt in place. The full npm test, the coverage run, check:clean-source, check:packed-install and release:gate are run by the orchestrator and are not part of this receipt. red-run.log holds the failing-before runs (the new tests on the slice and on d9085d31, and the review fixes INT-1 and INT-2) and the healthcarePHI probe for the P0-19 open item; mutations.log holds the twelve mutation reruns (the issue's eleven and M12); equivalence.log holds the tree-equivalence and range-diff output."
+}

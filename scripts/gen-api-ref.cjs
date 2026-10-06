@@ -95,7 +95,7 @@ function extractConfigTypes() {
 // 3. Extract assurance packs
 function extractAssurancePacks() {
   const packsDir = path.join(SRC, 'assurance', 'packs');
-  const files = fs.readdirSync(packsDir).filter(f => f.endsWith('.ts') && f !== 'index.ts');
+  const files = fs.readdirSync(packsDir).filter(f => f.endsWith('.ts') && f !== 'index.ts' && f !== 'industryPackManifest.ts');
   const packs = [];
   
   for (const file of files) {
@@ -104,7 +104,9 @@ function extractAssurancePacks() {
       // Extract pack id/name
       const idMatch = content.match(/id:\s*["']([^"']+)["']/);
       const nameMatch = content.match(/name:\s*["']([^"']+)["']/);
-      const descMatch = content.match(/description:\s*["']([^"']+)["']/);
+      // A description may be split into "a" + "b" literals; join the pieces.
+      const descMatch = content.match(/description:\s*(["'][^"']+["'](?:\s*\+\s*["'][^"']*["'])*)/);
+      const description = descMatch ? [...descMatch[1].matchAll(/["']([^"']*)["']/g)].map(m => m[1]).join('') : '';
       const categoryMatch = content.match(/category:\s*["']([^"']+)["']/);
       
       // Extract assertions/checks
@@ -118,7 +120,7 @@ function extractAssurancePacks() {
         file,
         id: idMatch?.[1] || file.replace('.ts', ''),
         name: nameMatch?.[1] || file.replace('.ts', '').replace(/Pack$/, ''),
-        description: descMatch?.[1] || '',
+        description,
         category: categoryMatch?.[1] || '',
         assertions
       });

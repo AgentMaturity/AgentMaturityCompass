@@ -1,0 +1,27 @@
+# exit	durationMs	command	summary (run at 7ad53bb967a4254fb17d5edfcbc8c1f056edf75f on 2026-10-06)
+0	634	pnpm install --frozen-lockfile	
+0	25562	pnpm run build	
+0	4731	npx vitest run tests/bwrapBackendPure.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts tests/callbackTelemetryCapture.test.ts tests/harnessComparison.test.ts tests/nativeAgentClientVerify.test.ts tests/deepseekHarnessLaunch.test.ts tests/cliImportCommands.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/reconciliationDefectsReleaseGate.test.ts tests/dshRunnerReverify.test.ts	Test Files  12 passed (12) | Tests  109 passed (109)
+0	10876	npx vitest run tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/cosProduct03McpRecoveryMount.test.ts tests/dshCaptureInterruption.test.ts tests/deepseekPublicSurface.test.ts	Test Files  5 passed (5) | Tests  72 passed (72)
+0	5093	npx vitest run tests/assurance/ tests/domain-registry.test.ts tests/domainCliIntegration.test.ts tests/regulatoryAssurancePacks.test.ts tests/realtimeVoiceSafetyPack.test.ts tests/assurancePackProvenance.test.ts	Test Files  16 passed (16) | Tests  992 passed (992)
+0	1181	npx vitest run tests/industryAssurancePacksHealth.test.ts tests/educationFERPAPack.test.ts tests/environmentalInfraPack.test.ts tests/mobilityFunctionalSafetyPack.test.ts tests/governanceNISTRMFPack.test.ts tests/technologyGDPRSOCPack.test.ts tests/sbomSupplyChainPack.test.ts tests/financialSOXPack.test.ts tests/wealthManagementMiFIDPack.test.ts	Test Files  9 passed (9) | Tests  133 passed (133)
+0	423	cd sdk/python && PYTHONPATH=. python3 -m pytest -q tests/test_validation.py	175 passed, 1 warning in 0.10s
+0	21819	npm run typecheck	
+0	29665	npm run typecheck:tests	
+0	947	npm run lint	
+0	314	npm run check:counts	
+0	263	npm run check:docs-drift	
+0	1373	npm run check:architecture-boundaries	
+0	191	npm run check:api-ref	docs/API_REFERENCE.md matches the source.
+0	1046	npm run check:freeze	Freeze guard passed: {"cliCommandPaths":1228,"cliInventoryPaths":1228,"stationPacks":41,"stationPackQuestions":632}
+0	4235	node scripts/program/landing-slice-map.mjs --candidate candidate/head --base origin/main --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check	docs/program/landing/slice-map.json matches 37c1466b32ed878ed89877fdcae2e3145d82d546: 229 commits, 31 merges, 13 slices, 35 overlaps.
+0	29	git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347 HEAD --	
+0	29	git diff --name-only -z 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da 5a29f5c45d13dfd23a8165d5355ddbe959c0164c -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 5a29f5c45d13dfd23a8165d5355ddbe959c0164c HEAD --	
+0	27	git diff --name-only -z 726be0ca11e31224b2c93ae13a439f8cb2393e64 1c9bf11f082b23e6bb538aee88156ac37115f0d6 -- . ':(exclude)AMC_OS' | xargs -0 git diff --stat 1c9bf11f082b23e6bb538aee88156ac37115f0d6 HEAD --	
+0	15	O=$(git diff --name-only d9085d31b77e27c215c636f5e58179e617f0605a HEAD -- AMC_OS); echo "$O"; test -z "$O"	
+0	30	P=2026-10-03-regulated-platform-; O=$(git diff d9085d31b77e27c215c636f5e58179e617f0605a HEAD -- . ':(exclude)AMC_OS' | grep '^+' | grep "${P}program"); echo "$O"; test -z "$O"	
+0	215	P=2026-10-03-regulated-platform-; git grep -n "${P}program" -- . ':(exclude)AMC_OS' | cut -d: -f1 | sort | uniq -c	
+0	150	P=2026-10-03-regulated-platform-; diff <(git grep -n "${P}program" -- . ':(exclude)AMC_OS' | cut -d: -f1 | sort | uniq -c) <(git grep -n "${P}program" d9085d31b77e27c215c636f5e58179e617f0605a -- . ':(exclude)AMC_OS' | cut -d: -f2 | sort | uniq -c)	
+1	4	grep -c 'test.fails' tests/reconciliationDefectsMcp.test.ts	
+0	31354	npx vitest run $(git grep -l 'unused-code/' -- tests) tests/planEditsManifest.test.ts	Test Files  26 passed (26) | Tests  7113 passed (7113)
+0	237	npm run check:qualification	Qualification receipts valid: 4 receipt(s) under qualification.
