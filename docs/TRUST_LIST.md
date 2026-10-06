@@ -1,29 +1,29 @@
 # Trust lists and pinned issuers
 
-A signature proves who signed a record and that it has not changed since. It does not prove the record is true, and a public key shipped inside an artifact cannot vouch for that artifact: anyone can sign fabricated content with a fresh key and include that key. AMC therefore counts a signature only when the person running the verifier pinned its key for that purpose, and the key is neither revoked nor distrusted.
+A signature proves who signed a record and that it has not changed since. It does not prove the record is true, and a public key shipped inside an artifact cannot vouch for that artifact: anyone can sign fabricated content with a fresh key and include that key. AMC's trust library (`agent-maturity-compass/trust`) therefore counts a signature only when the person running the verifier pinned its key for that purpose, and the key is neither revoked nor distrusted. The verify commands adopt it in P0-09 PR 2 and PR 3; see "Status" below.
 
 This page describes the trust-list format, how a key is admitted, the built-in distrust list and the verifier report.
 
 ## Status
 
-P0-09 lands in three pull requests. This one (PR 1) adds the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **No verify command uses them yet.** PR 2 and PR 3 wire the verifiers listed in [the verifier inventory](security/verifier-inventory.md) and add the flags and exit codes below. Until then, the commands behave as before. The sections "Flags" and "Exit codes" describe that planned behaviour.
+P0-09 lands in three pull requests. This one (PR 1) adds the library, exported as `agent-maturity-compass/trust`, and the maintainer tool `scripts/trust-list.mjs`. **No verify command uses them yet.** PR 2 and PR 3 wire the verifiers listed in [the verifier inventory](security/verifier-inventory.md) and add the flags and exit codes below. Until then, the commands behave as before. The sections "Flags" and "Exit codes" describe that planned behaviour, and the sections on admission and distrust describe what the library does when a verifier calls it. The README's verify examples, the command examples in the other docs and the breaking changeset also move to PR 2 and PR 3, because verification results do not change in this PR.
 
 ## Two-minute path: pin your own keys
 
-1. When you create a workspace, record the fingerprints of its role keys somewhere outside the workspace, such as a ticket, a release note or a password manager. An AMC fingerprint is the sha256 of the PEM file exactly as written:
+1. When you create a workspace, record the fingerprints of its role keys somewhere outside the workspace, such as a ticket, a release note or a password manager. An AMC fingerprint is the sha256 of the key's canonical PEM (Node's SPKI export, LF line endings), which for the `.pub` files AMC writes is the sha256 of the file:
 
    ```
    shasum -a 256 .amc/keys/auditor_ed25519.pub .amc/keys/monitor_ed25519.pub
    ```
 
-2. Build the package once (`npm run build`), then create a trust-list root key and a list, and add the auditor key with the purposes it signs. Compare the key id the tool prints with the fingerprint you recorded in step 1, never with one read back from the workspace or artifact you are about to verify.
+2. Build the package once (`npm run build`), then create a trust-list root key and a list, and add the auditor key with the purposes it signs. The tool creates missing directories with mode 0700. Pass `--valid-from` with the vault's creation time: an entry admits signatures that claim a time from `validFrom` on, and without the flag it starts now, so artifacts the key signed before today would be refused as `not-yet-valid`. Compare the key id the tool prints with the fingerprint you recorded in step 1, never with one read back from the workspace or artifact you are about to verify.
 
    ```
    node scripts/trust-list.mjs keygen --out ~/amc-roots --name root
    node scripts/trust-list.mjs init --list-id acme-prod --out ~/.config/amc/trust/amc-trust-list.json --days 90
    node scripts/trust-list.mjs add --list ~/.config/amc/trust/amc-trust-list.json \
      --pubkey auditor_ed25519.pub --purpose artifact-seal --purpose revocation-list \
-     --subject "Acme prod-eu-1 workspace, auditor role"
+     --subject "Acme prod-eu-1 workspace, auditor role" --valid-from 2026-03-17T00:00:00.000Z
    node scripts/trust-list.mjs sign --list ~/.config/amc/trust/amc-trust-list.json --key ~/amc-roots/root.key
    ```
 
@@ -49,7 +49,7 @@ The AMC home is `$AMC_HOME`, or `~/.config/amc` when it is unset. A trust list i
 
 ## Format
 
-A trust-list file holds the list and one or more root signatures. Unknown fields are refused everywhere, and files over 1 MiB, symbolic links and lists with more than 4,096 entries are refused.
+A trust-list file holds the list and one or more root signatures. Unknown fields, including `__proto__`, are refused everywhere, and files over 1 MiB, symbolic links and lists with more than 4,096 entries are refused.
 
 ```json
 {
@@ -74,7 +74,7 @@ A trust-list file holds the list and one or more root signatures. Unknown fields
 
 Entry rules:
 
-- `keyId` is 64 lowercase hex: the sha256 of the UTF-8 `publicKeyPem`, which must be an Ed25519 SPKI key. Key ids are unique within a list.
+- `keyId` is 64 lowercase hex: the sha256 of the UTF-8 `publicKeyPem`, which must be an Ed25519 SPKI public key in canonical PEM form (as Node exports it, with LF line endings). Private keys and certificates are refused. Key ids are unique within a list. `scripts/trust-list.mjs add` stores a CRLF key file in canonical form.
 - `purposes` is a non-empty set of: `ledger-row`, `receipt`, `artifact-seal`, `revocation-list`, `config-signature`, `lease`, `session`, `release`, `notary`, `evidence-authority`, `independent-attestation`, `trust-list-root`. An `evidence-authority` entry also needs `authority` (`producers`, `captureMethods`, `maxTrustTier`).
 - Times are RFC 3339 UTC (`Z`). `validTo` is after `validFrom`, or `null` for "until revoked".
 - `revokedAt` and `revocationReason` (`superseded`, `cessation`, `key-compromise` or `unspecified`) appear together.
@@ -119,23 +119,23 @@ Lists are checked against `--trust-root <sha256>` (repeatable), else `<AMC home>
 
 ## How a key is admitted
 
-`admitKey` checks one signature's key for one purpose, in this order:
+`admitKey` checks one signature's key for one purpose. It identifies the key by the sha256 of its canonical PEM, so a re-encoded copy of a key (for example with CRLF line endings) matches the same pins and distrust entries, and a PEM that is not an Ed25519 public key is never admitted. The checks run in this order:
 
 1. **Distrusted** when the key is on the built-in distrust list or a loaded list's `distrust` entries. A `null` `distrustedFrom` refuses every signature; a date refuses signatures that claim that time or later, and signatures that claim no time.
-2. **Admitted (`explicit-key`)** when `--pubkey` or `--expect-monitor` pinned it for this purpose.
-3. For a trust-list entry: **wrong-purpose**, **not-yet-valid** or **expired** (checked at the signature's claimed time, else at verification time), or **revoked**. A `key-compromise` revocation refuses every signature. Other reasons refuse signatures that claim `revokedAt` or later, or claim no time, and admit earlier claims with `timeBasis: "claimed"` and a warning.
-4. **Admitted (`trust-list-history`)** when the artifact carries a key-history envelope (AMC-1525) signed by a key that a list admits for this purpose with `allowKeyHistory: true`, and the envelope's role signs this purpose.
+2. **Admitted (`explicit-key`)** when `--pubkey` or `--expect-monitor` pinned it for this purpose. A pin for another purpose does not admit the key; the checks continue.
+3. **Revoked** when any loaded list revokes the key for `key-compromise`, whatever the purpose, the claimed time or the other lists say. Otherwise, for a trust-list entry: **wrong-purpose**, **not-yet-valid** or **expired** (checked at the signature's claimed time, else at verification time), or **revoked**. A claimed time later than the verification time is refused as **not-yet-valid**. A revocation for another reason refuses signatures that claim `revokedAt` or later, or claim no time, and admits earlier claims with `timeBasis: "claimed"` and a warning. An expired entry likewise admits a claim before `validTo` with `timeBasis: "claimed"` and a warning.
+4. **Admitted (`trust-list-history`)** when the artifact carries a key-history envelope (AMC-1525) signed by a key that a list admits for this purpose with `allowKeyHistory: true`, and the envelope's role signs this purpose. An anchor that is distrusted, or revoked for `key-compromise` in any loaded list, vouches for no key.
 5. Otherwise **not-pinned**, or **unpinned-allowed** under `--allow-unpinned`.
 
 Every refusal names the key id, so you can pin the right key.
 
 ### Signing times are claims
 
-Until trusted time lands (P1-25), a signing time is whatever the artifact claims. A leaked key can backdate a signature to before its revocation, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
+Until trusted time lands (P1-25), a signing time is whatever the artifact claims. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
 
 ## Built-in distrust list
 
-The package ships `dist/trust/data/amc-distrust.json` (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). It always applies: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey`. A malformed file stops verification instead of being ignored.
+The package ships `dist/trust/data/amc-distrust.json` (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. The verify commands apply it once PR 2 and PR 3 wire them. A malformed file stops verification instead of being ignored.
 
 ## Workspace self-trust
 

@@ -11,6 +11,7 @@ In the staged documentation site, [open the generated package reference](../api/
 | `agent-maturity-compass/sdk/mobile-fetch` | `src/sdk/mobileFetch.ts` | Fetch-based client helpers |
 | `agent-maturity-compass/standard/external-evidence` | `src/standard/externalEvidenceProfile.ts` | Standalone external-evidence profile and verification |
 | `agent-maturity-compass/telemetry/pi` | `src/importers/piTelemetryCallbacks.ts` | Optional producer telemetry callbacks with explicit self-reported provenance |
+| `agent-maturity-compass/trust` | `src/trust/index.ts` | Signed trust lists, issuer admission, the built-in distrust list and `VerifierReportV1`; no verify command uses them yet |
 
 The native runtime runs within AMC; using its native SDK does not require DSH or Pi. Optional interoperability entry points do not change that boundary. API signatures do not establish a task result, evidence trust tier, compatibility with an untested platform or a published release.
 

@@ -2,14 +2,14 @@
 
 Every `verify` command that the CLI registers, from `git grep -n -F 'command("verify' -- src` (72 registrations) matched to the generated [CLI command inventory](../CLI_COMMAND_INVENTORY.md). Issue P0-09 uses this list to decide which commands must refuse issuer keys that the verifier operator has not pinned.
 
-- **Portable artifact**: the command verifies a file or bundle that may come from somewhere else, so the signing key must be pinned by `--pubkey` or a signed trust list ([TRUST_LIST.md](../TRUST_LIST.md)). A key shipped inside the artifact never vouches for it.
+- **Portable artifact**: the command verifies a file, bundle or token that may come from somewhere else, so the signing key has to be pinned by `--pubkey`, a signed trust list ([TRUST_LIST.md](../TRUST_LIST.md)) or another operator-held key. A key shipped inside the artifact must never vouch for it.
 - **Workspace self-check**: the command checks the workspace's own signed configuration or records with keys read from that same workspace. A pass shows internal consistency only, not that an independent party vouches for the content. A workspace can sign its own configuration, so its keys never count as an independent issuer.
 
 ## Status on this branch
 
 P0-09 PR 1 adds the trust-list format, issuer admission, the built-in distrust list and the `VerifierReportV1` shape (`agent-maturity-compass/trust`). **No command below is wired to them yet.** Until PR 2 and PR 3 land, every portable command still trusts the keys it trusted before, including keys shipped inside the artifact for the rows marked PR 2 or PR 3. The "Pinning" column states the planned change, not current behaviour.
 
-22 of the 72 commands are portable artifact verifiers.
+23 of the 72 commands are portable artifact verifiers.
 
 | Command | Description | Kind | Pinning |
 |---|---|---|---|
@@ -38,7 +38,7 @@ P0-09 PR 1 adds the trust-list format, issuer admission, the built-in distrust l
 | `amc cgx verify` | Verify CGX policy/graph/pack signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc compliance verify` | Verify compliance maps signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc diagnostic bank verify` | Verify diagnostic bank signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc domain pack verify` | Verify an Industry Packs license key | workspace self-check | Keys come from the workspace under test; internal consistency only |
+| `amc domain pack verify` | Verify an Industry Packs license key | portable artifact | Not in the P0-09 table; the license string comes from the caller and is checked against an operator key or secret from the environment (`AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY`, `AMC_INDUSTRY_PACKS_LICENSE_SECRET`), never a workspace key |
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | portable artifact | Not in the P0-09 table; not yet reviewed |
 | `amc evidence verify` | Run full workspace verification suite | workspace self-check | Keys come from the workspace under test; internal consistency only |
