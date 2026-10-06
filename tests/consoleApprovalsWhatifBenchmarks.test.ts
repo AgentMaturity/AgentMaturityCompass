@@ -38,7 +38,7 @@ import { verifyBudgetsConfigSignature } from "../src/budgets/budgets.js";
 import { verifyAlertsConfigSignature } from "../src/drift/alerts.js";
 import { verifyApprovalPolicySignature } from "../src/approvals/approvalPolicyEngine.js";
 import { NATIVE_INTENT_HEADER, NATIVE_INTENT_VALUE } from "../src/studio/nativeAdmission.js";
-import { workspaceKeyTrust } from "./helpers/trustContext.js";
+import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -468,6 +468,12 @@ describe("console + approvals + what-if + benchmarks", () => {
     });
     const verify = verifyBenchmarkArtifact(exported.outFile, workspaceKeyTrust(workspace));
     expect(verify.ok).toBe(true);
+    // P0-09: the embedded public-keys/auditor.pub only locates the signer; with no pin the signer is refused.
+    const unpinned = verifyBenchmarkArtifact(exported.outFile, pinnedTrust([]));
+    expect(unpinned.ok).toBe(false);
+    expect(unpinned.report.issuerAdmission.signatures[0]?.status).toBe("not-pinned");
+    const auditorPub = join(workspace, ".amc", "keys", "auditor_ed25519.pub");
+    expect(verifyBenchmarkArtifact(exported.outFile, pinnedTrust([{ publicKeyPem: readFileSync(auditorPub, "utf8"), purposes: ["artifact-seal"] }]), auditorPub).ok).toBe(true);
 
     const tamperDir = mkdtempSync(join(tmpdir(), "amc-bench-tamper-"));
     try {
@@ -484,6 +490,10 @@ describe("console + approvals + what-if + benchmarks", () => {
       expect(pack.status).toBe(0);
       const bad = verifyBenchmarkArtifact(tamperedBundle, workspaceKeyTrust(workspace));
       expect(bad.ok).toBe(false);
+      rmSync(join(extracted, "bench.sig"));
+      const unsigned = join(tamperDir, "unsigned.amcbench");
+      expect(spawnSync("tar", ["-czf", unsigned, "-C", extracted, "."], { encoding: "utf8" }).status).toBe(0);
+      expect(verifyBenchmarkArtifact(unsigned, workspaceKeyTrust(workspace)).errors).toEqual(["bench.sig missing"]);
     } finally {
       rmSync(tamperDir, { recursive: true, force: true });
     }

@@ -18,7 +18,7 @@ import {
 } from "../src/ops/maintenance/maintenanceCli.js";
 import { ensureMetricsBaseline } from "../src/ops/metrics/metricsMiddleware.js";
 import { startMetricsServer } from "../src/ops/metrics/metricsServer.js";
-import { workspaceKeyTrust } from "./helpers/trustContext.js";
+import { pinnedTrust, workspaceKeyTrust } from "./helpers/trustContext.js";
 
 const roots: string[] = [];
 
@@ -215,6 +215,16 @@ describe("ops hardening pack", () => {
       trust: workspaceKeyTrust(workspace)
     });
     expect(verifyTampered.ok).toBe(false);
+
+    // P0-09: a restore needs the backup's auditor key pinned; --allow-unpinned restores integrity-only, flagged UNTRUSTED.
+    await expect(restoreBackup({ backupFile: created.outFile, toDir: join(tmpdir(), `amc-restore-unpinned-${Date.now()}`),
+      force: true, passphrase: "backup-passphrase", trust: pinnedTrust([]) })).rejects.toThrow(/not-pinned/);
+    const integrityOnlyTo = join(tmpdir(), `amc-restore-integrity-${Date.now()}`);
+    roots.push(integrityOnlyTo);
+    const integrityOnly = await restoreBackup({ backupFile: created.outFile, toDir: integrityOnlyTo, force: true,
+      passphrase: "backup-passphrase", trust: pinnedTrust([], { allowUnpinned: true }) });
+    expect(integrityOnly.trusted).toBe(false);
+    expect(integrityOnly.warnings[0]).toMatch(/^UNTRUSTED \(--allow-unpinned\): manifest\.sig \(artifact-seal\): unpinned-allowed/);
 
     const restoreTo = join(tmpdir(), `amc-restore-${Date.now()}`);
     const restored = await restoreBackup({

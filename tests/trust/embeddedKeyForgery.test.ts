@@ -599,6 +599,7 @@ describe("API verify routes use the server's trust context and refuse request-su
     ["POST /api/v1/crypto/cert/verify-revocation", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify-revocation", () => ({ file: evidence.revocation }), "trustList"],
     ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"],
     ["POST /api/v1/plugins/verify", handleToolsRoute as Handler, "/api/v1/plugins/verify", () => ({ file: plugin.file }), "pubkeyPath"],
+    ["POST /api/v1/plugins/registry/verify", handleToolsRoute as Handler, "/api/v1/plugins/registry/verify", () => ({ dir: plugin.registry }), "trustList"],
     ["POST /api/v1/benchmarks/verify", handleBenchmarkRoute as Handler, "/api/v1/benchmarks/verify", () => ({ file: benchmark }), "trustRoot"]
   ];
   for (const [name, handler, pathname, body, field] of cases) {

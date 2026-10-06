@@ -477,6 +477,11 @@ describe("plugin marketplace", () => {
         approvalRequestId: requested.approvalRequestId
       })
     ).toThrow(/publisher fingerprint mismatch|risk category mismatch/i);
+
+    // P0-09: dropping the recorded publisher does not skip the check; with no pinned publisher nothing is admitted.
+    writeFileSync(pendingPath, JSON.stringify({ ...pending, publisherFingerprint: null, riskCategory: "HIGH" }, null, 2));
+    expect(() => executePluginRequest({ workspace: ws, approvalRequestId: requested.approvalRequestId }))
+      .toThrow(/publisher not admitted: manifest\.sig \(artifact-seal\): not-pinned/);
   });
 
   test("override denied by default and allowed with signed overrides", () => {
