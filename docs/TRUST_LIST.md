@@ -133,6 +133,8 @@ Every refusal names the key id, so you can pin the right key.
 
 Until trusted time lands (P1-25), a signing time is whatever the artifact claims. A claim later than the verification time is refused, but a leaked key can backdate a signature to before its revocation or expiry, so treat `timeBasis: "claimed"` admissions as weaker than unconditional ones, and use `key-compromise` when a key leaked.
 
+The claim each command checks: `bundle verify` and `cert verify` use the run seal's own `ts` for `run.json`, and the `signedTs` of `manifest.sig` or `cert.sig` for every other signature the artifact carries; `passport verify` and `assurance cert-verify` use their signature's `signedTs`, which the signed Merkle root shares; `cert verify-revocation` uses the revocation's `ts`; a trust certificate uses its `generatedTs`. Two checks have no signing claim and run at verification time: a release bundle (its `generatedTs` is a reproducible build time, not a signing time) and the ledger's monitor key for `ledger-row`.
+
 ## Built-in distrust list
 
 The package ships `dist/trust/amc-distrust.json` (outside any `data/` directory, which the release bundle's tarball safety check refuses) (`{ "distrust": [] }` until P0-37 adds the keys exposed in public history). `loadTrustContext` and `workspaceSelfTrust` always include it, and `admitKey` applies it first: no flag, environment variable or trust list turns it off, and it beats every pin, including `--pubkey` pins and key-history anchors. Every verify command wired so far applies it. A malformed file stops verification instead of being ignored.
