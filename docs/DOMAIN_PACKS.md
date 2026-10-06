@@ -5,7 +5,7 @@ AMC domain packs extend the base 244-question AMC rubric with industry-specific 
 > The base-rubric figure is whatever `node scripts/gen-counts.mjs` reports (244
 > today); the earlier "138-question rubric" and "1,021 total" predate several
 > expansions and did not reconcile with the code. The sector-pack counts below
-> are checked against the registry by `tests/industryPacks.test.ts`, which fails
+> are checked against the registry by `tests/industryPackDepthFloor.test.ts`, which fails
 > when they drift.
 
 - Base AMC remains mandatory for every agent.

@@ -50,7 +50,7 @@ If residual risk is above appetite, the right board decision is not "approve bec
 ## Source Alignment
 
 - NIST AI Risk Management Framework: NIST describes AI risk management as improving the ability to incorporate trustworthiness considerations into AI design, development, use, and evaluation.
-- EU AI Act: obligations depend on the system, role, use case, and classification. The European Commission's current timeline applies Annex III high-risk rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 following the AI Omnibus political agreement. See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems).
+- EU AI Act: obligations depend on the system, role, use case, and classification. The European Commission's current timeline applies Annex III high-risk rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 under Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI). See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems).
 - AMC: L3 maps to repeatable and auditable controls. L4 and L5 target stronger operating assurance and continuous verification; AMC does not certify legal compliance.
 
 ## Board Decision Template
