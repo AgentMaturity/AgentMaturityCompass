@@ -27,6 +27,7 @@ export function registerAcpCommands(program: Command): void {
     .option("--credentials-file <path>", "Explicit credential file fixed for this ACP process")
     .option("--credentials-mode <mode>", "layered or operator-only (exclude project/user dotenv)", "layered")
     .option("--tools <mode>", "none or explicitly enabled workspace tools", "none")
+    .option("--unsafe-unconfined-shell", "macOS only: offer the native shell UNCONFINED, with your full user rights; refused on Windows, never needed on Linux")
     .option("--expected-tools-digest <sha256>", "Refuse any workspace tool call after its signed policy digest changes")
     .option("--validation-config <path>", "Operator JSON containing named public checks")
     .option("--validation-config-sha256 <digest>", "Pin exact reviewed validation configuration bytes")
@@ -50,6 +51,7 @@ export function registerAcpCommands(program: Command): void {
       credentialsFile?: string;
       credentialsMode: string;
       tools: string;
+      unsafeUnconfinedShell?: boolean;
       expectedToolsDigest?: string;
       validationConfig?: string;
       validationConfigSha256?: string;
@@ -73,6 +75,7 @@ export function registerAcpCommands(program: Command): void {
           providerId: opts.provider,
           systemPrompt: opts.systemPrompt,
           tools: opts.tools as "none" | "workspace",
+          ...(opts.unsafeUnconfinedShell === true ? { unconfinedShell: true } : {}),
           ...(opts.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: opts.expectedToolsDigest }),
           ...(opts.validationConfig === undefined ? {} : { validationConfig: opts.validationConfig }),
           ...(opts.validationConfigSha256 === undefined ? {} : { validationConfigSha256: opts.validationConfigSha256 }),

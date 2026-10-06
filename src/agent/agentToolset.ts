@@ -4,6 +4,7 @@ import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
 import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
+import { nativeShellReadiness, type NativeShellReadiness, type ShellOptInSource } from "../sandbox/nativeShellGate.js";
 import { measureProcessConfinement, processConfinementReason, processIsConfined, type ConfinementMeasurement } from "../sandbox/processConfinement.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
@@ -47,6 +48,8 @@ export interface AgentToolsetOptions {
   readonly mode?: "native" | "code";
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
+  /** Explicit operator acceptance of an unconfined macOS shell (P0-06); ignored on Linux and refused elsewhere. */
+  readonly unconfinedShell?: ShellOptInSource;
   /**
    * Enables the `delegate` tool (P6.1a).
    *
@@ -123,6 +126,8 @@ export interface ToolsetReadiness {
    * it is.
    */
   readonly writeScope: readonly string[];
+  /** Whether `bash` is offered, and under what enforcement (P0-06). */
+  readonly shell: NativeShellReadiness;
 }
 
 /**
@@ -138,6 +143,7 @@ export interface ToolsetReadiness {
 export function checkToolsetReadiness(workspace: string, options: {
   readonly snapshot?: VerifiedToolsConfigSnapshot;
   readonly additionalCapabilities?: readonly NativeToolCapability[];
+  readonly unconfinedShell?: ShellOptInSource;
 } = {}): ToolsetReadiness {
   const blockers: string[] = [];
 
@@ -175,7 +181,8 @@ export function checkToolsetReadiness(workspace: string, options: {
     sandboxReason: backend === null
       ? `${confinementReason}; no sandbox backend on this machine: ${sandbox.unavailableReasons().join("; ")}`
       : confinementReason,
-    writeScope
+    writeScope,
+    shell: nativeShellReadiness(workspace, options.unconfinedShell)
   };
 }
 
@@ -210,7 +217,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   const readiness = checkToolsetReadiness(workspace, { additionalCapabilities: [
     ...(options.additionalCapabilities ?? []), ...(options.subagents ? NATIVE_DELEGATION_CAPABILITIES : [])
-  ] });
+  ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }) });
   const registry = new ToolRegistry();
   const nativeIdentities = new Map([...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES]
     .map(capability => [capability.name, capability]));
@@ -218,28 +225,54 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const ledger = new ReadBeforeEditLedger();
   for (const tool of fsTools({ ledger })) registry.define(tool);
   for (const tool of searchTools()) registry.define(tool);
-  registry.define(process.platform === "linux" ? createNativeSandboxBash({
+  // Use the actual native session writer. An owned session refuses raw
+  // ledger appends; a receipt write failure also prevents tool success.
+  const recordAudit = (receipt: Record<string, unknown>): void => {
+    const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
+    if (options.recorder) options.recorder.recordProjectedEvidence(row);
+    else {
+      ledgerHandle ??= openLedger(workspace);
+      ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
+    }
+  };
+  // Refused means no `bash` at all: a guessed call is an unknown tool, never an unconfined one.
+  const shell = readiness.shell;
+  let unconfinedEnabledRecorded = false;
+  // Once per composition, lazily: the CLI binds its session writer after composing.
+  const recordUnconfinedEnabled = (): void => {
+    if (shell.decision !== "unconfined-opt-in" || unconfinedEnabledRecorded) return;
+    recordAudit({ schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_UNCONFINED_ENABLED", platform: process.platform,
+      optInSource: shell.optInSource, sessionId: options.sessionId });
+    unconfinedEnabledRecorded = true;
+  };
+  if (shell.decision === "confined") registry.define(createNativeSandboxBash({
     workspace,
     scrubValues: options.scrubValues,
-    record: (execution, outcome) => {
-      const receipt = {
-        schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
-        backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
-        writableRoots: outcome.confined ? outcome.writableRoots : [], enforcement: outcome.enforcement ?? null,
-        exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
-        treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
-        callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
-      };
-      const row = { eventType: "audit" as const, payload: JSON.stringify(receipt), meta: receipt };
-      // Use the actual native session writer. An owned session refuses raw
-      // ledger appends; a receipt write failure also prevents tool success.
-      if (options.recorder) options.recorder.recordProjectedEvidence(row);
-      else {
-        ledgerHandle ??= openLedger(workspace);
-        ledgerHandle.appendEvidence({ sessionId: options.sessionId, runtime: "amc", ...row, payloadExt: "json" });
+    // The per-call refusal stays: availability at composition is a prerequisite, not proof.
+    record: (execution, outcome) => recordAudit({
+      schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
+      backend: outcome.backend, confined: outcome.confined, failure: outcome.failure,
+      enforcementLevel: outcome.confined ? "enforced" : "none", boundary: "linux-bwrap",
+      writableRoots: outcome.confined ? outcome.writableRoots : [], enforcement: outcome.enforcement ?? null,
+      exitCode: outcome.exitCode, timedOut: outcome.timedOut, cancelled: outcome.cancelled ?? false,
+      treeExitProven: outcome.treeExitProven ?? false, droppedBytes: outcome.droppedBytes ?? 0,
+      callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token
+    })
+  }));
+  if (shell.decision === "unconfined-opt-in") {
+    process.stderr.write(`${shell.reason}\n`);
+    const unconfined = bashTool({ scrubValues: options.scrubValues });
+    registry.define({ ...unconfined, body: execution => {
+      // Recorded before the command runs, so no unconfined execution goes unreceipted.
+      if (execution.effectiveMode !== "SIMULATE") {
+        recordUnconfinedEnabled();
+        recordAudit({ schemaVersion: "2026-09-08", auditType: "NATIVE_SHELL_CONFINEMENT", platform: process.platform,
+          backend: "none", confined: false, enforcementLevel: "none", optInSource: shell.optInSource,
+          callId: execution.callId, rootCallId: execution.rootCallId, token: execution.token });
       }
-    }
-  }) : bashTool({ scrubValues: options.scrubValues }));
+      return unconfined.body(execution);
+    } });
+  }
   if (options.subagents !== undefined) {
     // Both tools, from one capability. `delegate` is one child; `workflow` is a
     // declared plan of them. Each is still gated a second time by the operator's
@@ -329,6 +362,7 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   return {
     seam: { ...seam, schemas: () => {
+      recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);
       // The body guard runs after model/approval waits. It cannot stop a newer
       // signed policy from exposing unreviewed schemas to that earlier request.

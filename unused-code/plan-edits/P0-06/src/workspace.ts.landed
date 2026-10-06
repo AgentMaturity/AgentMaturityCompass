@@ -169,8 +169,6 @@ export function loadAMCConfig(workspace = process.cwd()): AMCConfig {
       trustBoundaryMode: raw?.security?.trustBoundaryMode === "isolated" ? "isolated" : base.security.trustBoundaryMode,
       durability: raw?.security?.durability === "power-loss" ? "power-loss" : "crash"
     },
-    // Kept so a re-save (amc init) does not drop it; the shell gate reads only the signed file.
-    ...(raw?.runtime?.shell?.allowUnconfined === true ? { runtime: { shell: { allowUnconfined: true } } } : {}),
     supervise: {
       extraEnv: raw?.supervise?.extraEnv ?? {},
       includeProxyEnv: raw?.supervise?.includeProxyEnv ?? base.supervise.includeProxyEnv,

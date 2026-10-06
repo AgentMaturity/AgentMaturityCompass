@@ -3380,8 +3380,6 @@ export interface AMCConfig {
      */
     durability?: "crash" | "power-loss";
   };
-  /** Honoured only under a valid auditor signature over this file (P0-06). */
-  runtime?: { shell?: { allowUnconfined?: boolean } };
   supervise: {
     extraEnv: Record<string, string>;
     includeProxyEnv: boolean;
