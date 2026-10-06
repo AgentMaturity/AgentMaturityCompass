@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "policy": {
     "reviewWindowDays": 90,
-    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice. A keyDate whose basis names a dated program receipt (research/<station>/digest.json, read 2026-10-03) counts as read in the 2026-10-03 review; its url and retrievedAt are the receipt's. status \"superseded\" also covers revoked and withdrawn instruments; taskStatus says which. A keyDate with observation=true records a retrieval observation, not a legal date, and is not a calendar event. supersedes/supersededBy hold register entry ids only; supersedesInstruments names predecessors that have no entry.",
+    "note": "An entry whose lastReviewed is older than reviewWindowDays fails scripts/check-regulatory-currency.mjs. verified=true means every keyDate and obligation encoded in the entry was read from an official source in the review that set lastReviewed and the entry has no open questions; it is not legal advice. A keyDate whose basis names a dated program receipt (research/<station>/digest.json, read 2026-10-03) counts as read in the 2026-10-03 review; its url and retrievedAt are the receipt's. Program receipts are cited as program-records/2026-10-03/<path>: a name for the 2026-10-03 program records, which are held outside the repository, not a path in it. status \"superseded\" also covers revoked and withdrawn instruments; taskStatus says which. A keyDate with observation=true records a retrieval observation, not a legal date, and is not a calendar event. supersedes/supersededBy hold register entry ids only; supersedesInstruments names predecessors that have no entry.",
     "officialHostsNote": "Every source URL's hostname must equal an officialHosts entry or be a subdomain of one: regulators, legislatures, official journals and standards bodies. Secondary or commentary sites are not sources. finra.org is a self-regulatory organisation, cited only for its own rules; oecd.org, oecd.ai and coe.int are the intergovernmental publishers of their own instruments; etsi.org is a European standards organisation. aiverifyfoundation.sg was proposed and rejected (a foundation, not a regulator).",
     "officialHosts": ["europa.eu", "nist.gov", "iso.org", "federalregister.gov", "hhs.gov", "healthit.gov", "fda.gov", "nerc.com", "ferc.gov", "sec.gov", "ed.gov", "nhtsa.gov", "transportation.gov", "leg.colorado.gov", "capitol.texas.gov", "leginfo.legislature.ca.gov", "gov.ca.gov", "cppa.ca.gov", "msit.go.kr", "law.go.kr", "pcisecuritystandards.org", "cac.gov.cn", "planalto.gov.br", "pib.gov.in", "indiacode.nic.in", "ppc.go.jp", "japaneselawtranslation.go.jp", "gov.uk", "ico.org.uk", "cao.go.jp", "korea.kr", "imda.gov.sg", "mddi.gov.sg", "coe.int", "oecd.org", "oecd.ai", "etsi.org", "whitehouse.gov", "ecfr.gov", "govinfo.gov", "reginfo.gov", "ftc.gov", "fcc.gov", "cisa.gov", "epa.gov", "eeoc.gov", "ada.gov", "federalreserve.gov", "finra.org", "nyc.gov", "coag.gov", "calcivilrights.ca.gov", "nysed.gov", "ohio.gov", "illinois.gov", "ilga.gov", "utah.gov"]
   },
@@ -60,7 +60,7 @@
       "affectedPacks": ["blockchain", "circular-economy", "citizen-services", "clinical-lifecycle", "clinical-trials", "cognition-to-intelligence", "dance-of-democracy", "differently-abled", "digital-citizens-rights", "digital-health-record", "digital-payments", "drug-discovery", "educationFERPA", "farm-to-fork", "freight-3pl-warehouse", "future-of-work", "higher-education", "infotainment", "k12-pm3", "life-technology", "material-to-machines", "networked-ecosystems", "no-poverty", "os-sustainable-outcomes", "partnerships-prosperity", "patient-lifecycle", "petition-to-law", "privacy-security-mobility", "professional-practice", "public-private-collaboration", "realtime-voice-safety", "sip-to-sanitation", "skills-training", "source-to-sustenance", "specialized-medicine", "sustainable-communities", "sustainable-ports", "sustainable-real-estate", "ubiquity-to-utility", "virtual-infrastructure", "weave-to-wear", "wellness-management"],
       "codeSurfaces": ["docs/AGENT_GUIDE.md", "docs/EU_AI_ACT_COMPLIANCE.md", "environment (domain)", "euAiActClassifier", "frameworks.EU_AI_ACT", "globalRegulatory.EU_AI_ACT_RISK_MATRIX", "score/euAIActCompliance"],
       "catalogueIds": ["eu-ai-act"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[0]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[18]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[17]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[19]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[0]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[0]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[1]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[0]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[1]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[0]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[1]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[0]", "program-records/2026-10-03/research/health/digest.json#instruments[18]", "program-records/2026-10-03/research/education/digest.json#instruments[17]", "program-records/2026-10-03/research/education/digest.json#instruments[19]", "program-records/2026-10-03/research/environment/digest.json#instruments[0]", "program-records/2026-10-03/research/mobility/digest.json#instruments[0]", "program-records/2026-10-03/research/mobility/digest.json#instruments[1]", "program-records/2026-10-03/research/governance/digest.json#instruments[0]", "program-records/2026-10-03/research/governance/digest.json#instruments[1]", "program-records/2026-10-03/research/technology/digest.json#instruments[0]", "program-records/2026-10-03/research/wealth/digest.json#instruments[1]"]
     },
     {
       "id": "eu-gdpr",
@@ -79,9 +79,9 @@
       "keyDates": [
         { "id": "entryIntoForce", "date": "2016-05-24", "event": "Entered into force", "verified": true, "url": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en", "retrievedAt": "2026-10-03", "basis": "copied from S5 register.json (S5 review 2026-10-03)" },
         { "id": "application", "date": "2018-05-25", "event": "Applies (Art. 99(2))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32016R0679", "retrievedAt": "2026-10-04T05:07:04Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "edpbOpinion28_2024", "date": "2024-12-18", "event": "EDPB Opinion 28/2024 on personal data in AI models adopted", "verified": true, "url": "https://www.edpb.europa.eu/our-work-tools/our-documents/opinion-board-art-64/opinion-282024-certain-data-protection-aspects_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
-        { "id": "cjeuC203_22", "date": "2025-02-27", "event": "CJEU judgment C-203/22 (Dun & Bradstreet Austria) on Art. 15(1)(h)", "verified": true, "url": "https://publications.europa.eu/resource/celex/62022CJ0203", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
-        { "id": "digitalOmnibusProposal", "date": "2025-11-19", "event": "Digital Omnibus proposal COM(2025) 837 (2025/0360(COD)) published; it would amend GDPR, ePrivacy and the Data Act and is pending", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025%2F0360%28COD%29", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" }
+        { "id": "edpbOpinion28_2024", "date": "2024-12-18", "event": "EDPB Opinion 28/2024 on personal data in AI models adopted", "verified": true, "url": "https://www.edpb.europa.eu/our-work-tools/our-documents/opinion-board-art-64/opinion-282024-certain-data-protection-aspects_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
+        { "id": "cjeuC203_22", "date": "2025-02-27", "event": "CJEU judgment C-203/22 (Dun & Bradstreet Austria) on Art. 15(1)(h)", "verified": true, "url": "https://publications.europa.eu/resource/celex/62022CJ0203", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
+        { "id": "digitalOmnibusProposal", "date": "2025-11-19", "event": "Digital Omnibus proposal COM(2025) 837 (2025/0360(COD)) published; it would amend GDPR, ePrivacy and the Data Act and is pending", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025%2F0360%28COD%29", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en", "url": "https://commission.europa.eu/law/law-topic/data-protection/legal-framework-eu-data-protection_en", "publisher": "European Commission", "retrievedAt": "2026-10-03", "fetched": true },
@@ -97,7 +97,7 @@
       "affectedPacks": ["cognition-to-intelligence", "digital-payments", "future-of-work", "infotainment", "networked-ecosystems", "no-poverty", "os-sustainable-outcomes", "technologyGDPRSOC"],
       "codeSurfaces": ["frameworks.GDPR", "globalRegulatory.AMC_EVALUATION_DPIA"],
       "catalogueIds": ["eu-gdpr"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[18]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[3]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[2]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[18]", "program-records/2026-10-03/research/technology/digest.json#instruments[3]", "program-records/2026-10-03/research/wealth/digest.json#instruments[2]"]
     },
     {
       "id": "eu-dora",
@@ -126,7 +126,7 @@
       "affectedPacks": ["blockchain", "digital-payments", "os-sustainable-outcomes", "virtual-infrastructure"],
       "codeSurfaces": ["frameworks", "wealth station"],
       "catalogueIds": ["eu-dora"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[13]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[24]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[12]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[19]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[13]", "program-records/2026-10-03/research/mobility/digest.json#instruments[24]", "program-records/2026-10-03/research/technology/digest.json#instruments[12]", "program-records/2026-10-03/research/wealth/digest.json#instruments[19]"]
     },
     {
       "id": "eu-nis2",
@@ -146,8 +146,8 @@
         { "id": "transpositionDeadline", "date": "2024-10-17", "event": "Member State transposition deadline", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022L2555", "retrievedAt": "2026-10-04T05:06:55Z", "basis": "Publications Office Cellar metadata field directive_date_transposition lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "nationalMeasuresApply", "date": "2024-10-18", "event": "Member State measures apply", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022L2555", "retrievedAt": "2026-10-04T05:06:55Z", "basis": "Publications Office Cellar metadata field directive_date_transposition lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "ir2024_2690EntryIntoForce", "date": "2024-11-07", "event": "Implementing Regulation (EU) 2024/2690 in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R2690", "retrievedAt": "2026-10-04T05:06:55Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "targetedAmendmentProposed", "date": "2026-01-20", "event": "Commission proposed targeted NIS2 amendments (pending)", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[14] (read 2026-10-03; not re-read in this run)" },
-        { "id": "cjeuReferral", "date": "2026-07-08", "event": "Commission referred IE, ES, FR, NL to the CJEU for non-transposition", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-refers-ireland-spain-france-and-netherlands-court-justice-failing-transpose-rules", "retrievedAt": "2026-10-03T17:00:29Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[14] (read 2026-10-03; not re-read in this run)" }
+        { "id": "targetedAmendmentProposed", "date": "2026-01-20", "event": "Commission proposed targeted NIS2 amendments (pending)", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[14] (read 2026-10-03; not re-read in this run)" },
+        { "id": "cjeuReferral", "date": "2026-07-08", "event": "Commission referred IE, ES, FR, NL to the CJEU for non-transposition", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-refers-ireland-spain-france-and-netherlands-court-justice-failing-transpose-rules", "retrievedAt": "2026-10-03T17:00:29Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[14] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32022L2555", "url": "https://publications.europa.eu/resource/celex/32022L2555", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:06:55Z", "fetched": true },
@@ -161,7 +161,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "networked-ecosystems", "os-sustainable-outcomes", "privacy-security-mobility", "sip-to-sanitation", "sustainable-communities", "sustainable-ports", "technologyGDPRSOC", "ubiquity-to-utility", "virtual-infrastructure"],
       "codeSurfaces": ["frameworks"],
       "catalogueIds": ["eu-nis2"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[14]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[13]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[21]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[13]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[14]", "program-records/2026-10-03/research/environment/digest.json#instruments[13]", "program-records/2026-10-03/research/mobility/digest.json#instruments[21]", "program-records/2026-10-03/research/technology/digest.json#instruments[13]"]
     },
     {
       "id": "eu-cra",
@@ -192,7 +192,7 @@
       "affectedPacks": ["material-to-machines", "partnerships-prosperity", "privacy-security-mobility", "sbom-supply-chain", "technologyGDPRSOC", "ubiquity-to-utility", "virtual-infrastructure"],
       "codeSurfaces": ["frameworks", "technology station"],
       "catalogueIds": ["eu-cra"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[15]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[31]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[22]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[14]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[15]", "program-records/2026-10-03/research/environment/digest.json#instruments[31]", "program-records/2026-10-03/research/mobility/digest.json#instruments[22]", "program-records/2026-10-03/research/technology/digest.json#instruments[14]"]
     },
     {
       "id": "eu-mdr-ivdr",
@@ -212,7 +212,7 @@
         { "id": "ivdrApplication", "date": "2022-05-26", "event": "IVDR applies (Art. 113(2))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32017R0746", "retrievedAt": "2026-10-04T05:07:04Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "reg2023_607EntryIntoForce", "date": "2023-03-20", "event": "Regulation (EU) 2023/607 (MDR transition extension) in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32023R0607", "retrievedAt": "2026-10-04T05:07:00Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "art10aApplies", "date": "2025-01-10", "event": "Art. 10a supply-interruption notice applies", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1860", "retrievedAt": "2026-10-04T05:07:03Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "eudamedModulesMandatory", "date": "2026-05-27", "event": "Mandatory use of first EUDAMED modules (computed from Decision 2025/2371 notice)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1860", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[20] (read 2026-10-03; not re-read in this run)" },
+        { "id": "eudamedModulesMandatory", "date": "2026-05-27", "event": "Mandatory use of first EUDAMED modules (computed from Decision 2025/2371 notice)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1860", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/health/digest.json#instruments[20] (read 2026-10-03; not re-read in this run)" },
         { "id": "mdrLegacyClassIII", "date": "2027-12-31", "event": "End of extended transition for class III and IIb implantable legacy devices", "verified": true, "url": "https://publications.europa.eu/resource/celex/32023R0607", "retrievedAt": "2026-10-04T05:07:03Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "ivdrClassD", "date": "2027-12-31", "event": "IVDR legacy transition end, class D", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1860", "retrievedAt": "2026-10-04T05:07:05Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "mdrLegacyOther", "date": "2028-12-31", "event": "End of extended transition for other IIb, IIa, Is/Im legacy devices", "verified": true, "url": "https://publications.europa.eu/resource/celex/32023R0607", "retrievedAt": "2026-10-04T05:07:03Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
@@ -234,7 +234,7 @@
       "affectedPacks": ["clinical-lifecycle", "digital-health-record", "life-technology", "patient-lifecycle"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-mdr", "eu-ivdr"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[20]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[21]"]
+      "digestRows": ["program-records/2026-10-03/research/health/digest.json#instruments[20]", "program-records/2026-10-03/research/health/digest.json#instruments[21]"]
     },
     {
       "id": "us-nist-ai-rmf",
@@ -291,7 +291,7 @@
         { "ref": "ISO/IEC 42001:2023", "summary": "AI management system requirements: AI policy, risk assessment and treatment, AI system impact assessment, operational controls (Annex A).", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2023-12-18", "event": "Publication date (ISO Open Data id 81230, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42001", "retrievedAt": "2026-10-04", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[9]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
+        { "id": "published", "date": "2023-12-18", "event": "Publication date (ISO Open Data id 81230, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42001", "retrievedAt": "2026-10-04", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[9]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
       ],
       "sources": [
         { "title": "ISO catalogue page (iso-iec-42001)", "url": "https://www.iso.org/standard/42001", "publisher": "ISO", "retrievedAt": "2026-10-04", "fetched": false, "note": "HTTP 403 measured 2026-10-04 from this harness; primary text unreachable 2026-10-03" }
@@ -302,7 +302,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["frameworks.ISO_42001"],
       "catalogueIds": ["iso-42001"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[9]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[9]"]
     },
     {
       "id": "intl-iso-iec-42005",
@@ -316,7 +316,7 @@
         { "ref": "ISO/IEC 42005:2025", "summary": "Guidance for assessing impacts of AI systems on individuals, groups and society, and documenting the assessment.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025-05-28", "event": "Publication date (ISO Open Data id 44545, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42005", "retrievedAt": "2026-10-04", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[10]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
+        { "id": "published", "date": "2025-05-28", "event": "Publication date (ISO Open Data id 44545, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42005", "retrievedAt": "2026-10-04", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[10]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
       ],
       "sources": [
         { "title": "ISO catalogue page (iso-iec-42005)", "url": "https://www.iso.org/standard/42005", "publisher": "ISO", "retrievedAt": "2026-10-04", "fetched": false, "note": "HTTP 403 measured 2026-10-04 from this harness; primary text unreachable 2026-10-03" }
@@ -327,7 +327,7 @@
       "affectedPacks": ["cognition-to-intelligence", "infotainment"],
       "codeSurfaces": ["frameworks.ISO_42001"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[10]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[22]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[10]", "program-records/2026-10-03/research/technology/digest.json#instruments[22]"]
     },
     {
       "id": "us-co-sb24-205",
@@ -388,7 +388,7 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
+        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
       ],
       "keyDates": [
         { "id": "adopted", "date": "2021-08-20", "event": "Adopted by the NPC Standing Committee", "verified": true, "url": "https://www.cac.gov.cn/2021-08/20/c_1631050028355286.htm", "retrievedAt": "2026-10-03T16:24:47Z", "basis": "copied from S5 register.json (S5 review 2026-10-03)" },
@@ -399,7 +399,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
       "affectedPacks": [],
       "codeSurfaces": [],
       "catalogueIds": [],
@@ -414,22 +414,22 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
+        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
       ],
       "keyDates": [
-        { "id": "promulgated", "date": "2023-07-10", "event": "Promulgation date in notice", "verified": true, "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[23] (read 2026-10-03; not re-read in this run)" },
-        { "id": "effective", "date": "2023-08-15", "event": "Effective", "verified": true, "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[23] (read 2026-10-03; not re-read in this run)" }
+        { "id": "promulgated", "date": "2023-07-10", "event": "Promulgation date in notice", "verified": true, "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[23] (read 2026-10-03; not re-read in this run)" },
+        { "id": "effective", "date": "2023-08-15", "event": "Effective", "verified": true, "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[23] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Cyberspace Administration of China - Interim Measures for the Management of Generative AI Services", "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm", "publisher": "Cyberspace Administration of China", "retrievedAt": "2026-10-03T17:05:10Z", "fetched": true }
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory.GLOBAL_FRAMEWORKS"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[23]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[23]"]
     },
     {
       "id": "br-lgpd",
@@ -440,10 +440,10 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "Art. 7", "summary": "Legal bases for processing personal data.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
-        { "ref": "Art. 33", "summary": "International transfer of personal data only in listed cases.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
-        { "ref": "Art. 38", "summary": "The national authority may require a data protection impact report.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
-        { "ref": "Art. 46", "summary": "Technical and administrative security measures.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." }
+        { "ref": "Art. 7", "summary": "Legal bases for processing personal data.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 33", "summary": "International transfer of personal data only in listed cases.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 38", "summary": "The national authority may require a data protection impact report.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Art. 46", "summary": "Technical and administrative security measures.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the Planalto text read 2026-10-03; not asserted as an obligation." }
       ],
       "keyDates": [
         { "id": "anpdProvisions", "date": "2018-12-28", "event": "ANPD provisions (Arts. 55-A to 55-L, 58-A, 58-B) in force — Art. 65(I)", "verified": true, "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm", "retrievedAt": "2026-10-03T16:25:04Z", "basis": "S5 review 2026-10-03: Lei nº 13.709, de 14 de agosto de 2018" },
@@ -455,7 +455,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "Art. 65(II) as read says 24 months after publication; the 2020-09-18 day depends on Lei 14.058/2020, which was not read in this review."]
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "Art. 65(II) as read says 24 months after publication; the 2020-09-18 day depends on Lei 14.058/2020, which was not read in this review."]
     },
     {
       "id": "in-dpdp",
@@ -466,8 +466,8 @@
       "status": "partially-applicable",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "Rules: consent notices", "summary": "Data Fiduciaries issue standalone, clear consent notices stating the specific purpose.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." },
-        { "ref": "Significant Data Fiduciaries", "summary": "Enhanced obligations: independent audits, impact assessments, due diligence on deployed technologies, data restrictions including localisation where required.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." }
+        { "ref": "Rules: consent notices", "summary": "Data Fiduciaries issue standalone, clear consent notices stating the specific purpose.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." },
+        { "ref": "Significant Data Fiduciaries", "summary": "Enhanced obligations: independent audits, impact assessments, due diligence on deployed technologies, data restrictions including localisation where required.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted. Recorded from the PIB release of 14 Nov 2025 read 2026-10-03; not asserted as an obligation." }
       ],
       "keyDates": [
         { "id": "rulesNotified", "date": "2025-11-14", "event": "DPDP Rules, 2025 notified; 18-month phased compliance timeline", "verified": true, "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2190014&reg=3&lang=2", "retrievedAt": "2026-10-03T16:24:43Z", "basis": "S5 review 2026-10-03: Government notifies DPDP Rules to empower citizens and protect privacy (PIB, 14 Nov 2025)" }
@@ -478,7 +478,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "The dates of each phase of the 18-month timeline were not on the page read.", "Assent date of the Act (2023-08-11 in the legacy entry) was not re-read."]
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "The dates of each phase of the 18-month timeline were not on the page read.", "Assent date of the Act (2023-08-11 in the legacy entry) was not re-read."]
     },
     {
       "id": "jp-appi",
@@ -489,7 +489,7 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
+        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
       ],
       "keyDates": [
         { "id": "latestAmendmentEnforced", "date": "2023-04-01", "event": "Latest amendment enforcement date shown by the PPC", "verified": true, "url": "https://www.ppc.go.jp/en/legal/", "retrievedAt": "2026-10-03", "basis": "copied from S5 register.json (S5 review 2026-10-03)" }
@@ -500,7 +500,7 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
       "affectedPacks": [],
       "codeSurfaces": [],
       "catalogueIds": [],
@@ -533,7 +533,7 @@
       "affectedPacks": ["citizen-services", "clinical-lifecycle", "dance-of-democracy", "digital-citizens-rights", "digital-health-record", "life-technology", "patient-lifecycle", "petition-to-law", "professional-practice", "public-private-collaboration", "wellness-management"],
       "codeSurfaces": ["docs/EU_AI_ACT_COMPLIANCE.md", "euAiActClassifier"],
       "catalogueIds": ["eu-ai-omnibus"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[1]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[19]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[3]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[1]", "program-records/2026-10-03/research/health/digest.json#instruments[19]", "program-records/2026-10-03/research/governance/digest.json#instruments[3]"]
     },
     {
       "id": "eu-ai-act-guidelines-prohibited-definition",
@@ -547,8 +547,8 @@
         { "ref": "Guidelines (Art. 5)", "summary": "Non-binding Commission interpretation of the Art. 5 prohibitions used when classifying agent use cases.", "verified": false, "basis": "not verified: guidance content not re-read in this run; only publication dates come from the digest receipts" }
       ],
       "keyDates": [
-        { "id": "prohibitedPracticesGuidelines", "date": "2025-02-04", "event": "Guidelines on prohibited AI practices published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
-        { "id": "aiSystemDefinitionGuidelines", "date": "2025-02-06", "event": "Guidelines on the AI system definition published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" }
+        { "id": "prohibitedPracticesGuidelines", "date": "2025-02-04", "event": "Guidelines on prohibited AI practices published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
+        { "id": "aiSystemDefinitionGuidelines", "date": "2025-02-06", "event": "Guidelines on the AI system definition published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "European Commission - Guidelines on prohibited AI practices (4 February 2025)", "url": "https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act", "publisher": "European Commission", "retrievedAt": "2026-10-03T16:59:04Z", "fetched": true },
@@ -560,7 +560,7 @@
       "affectedPacks": ["dance-of-democracy", "digital-citizens-rights", "petition-to-law"],
       "codeSurfaces": ["euAiActClassifier"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[2]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[0]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[2]", "program-records/2026-10-03/research/governance/digest.json#instruments[0]"]
     },
     {
       "id": "eu-gpai-code-of-practice",
@@ -574,10 +574,10 @@
         { "ref": "Arts. 53/55 via Code", "summary": "Signatory GPAI providers document models, inform downstream providers, keep a copyright policy and, for systemic-risk models, evaluate and report incidents.", "verified": true, "basis": "Article 53 heading in OJ text (CELEX 32024R1689) read 2026-10-04: Obligations for providers of general-purpose AI models" }
       ],
       "keyDates": [
-        { "id": "codePublished", "date": "2025-07-10", "event": "GPAI Code of Practice published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
-        { "id": "gpaiObligationsApply", "date": "2025-08-02", "event": "GPAI obligations apply", "verified": true, "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
-        { "id": "aiOfficeEnforcement", "date": "2026-08-02", "event": "AI Office enforcement powers over GPAI providers, incl. fines", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
-        { "id": "legacyGpaiDeadline", "date": "2027-08-02", "event": "GPAI models placed on the market before 2 August 2025 comply", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[1] (read 2026-10-03; not re-read in this run)" }
+        { "id": "codePublished", "date": "2025-07-10", "event": "GPAI Code of Practice published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
+        { "id": "gpaiObligationsApply", "date": "2025-08-02", "event": "GPAI obligations apply", "verified": true, "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
+        { "id": "aiOfficeEnforcement", "date": "2026-08-02", "event": "AI Office enforcement powers over GPAI providers, incl. fines", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[3] (read 2026-10-03; not re-read in this run)" },
+        { "id": "legacyGpaiDeadline", "date": "2027-08-02", "event": "GPAI models placed on the market before 2 August 2025 comply", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-gpai-providers", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[1] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "European Commission - The General-Purpose AI Code of Practice (published 10 July 2025)", "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai", "publisher": "European Commission", "retrievedAt": "2026-10-03T16:59:04Z", "fetched": true },
@@ -592,7 +592,7 @@
       "affectedPacks": ["cognition-to-intelligence", "networked-ecosystems", "partnerships-prosperity"],
       "codeSurfaces": ["euAiActClassifier", "frameworks.EU_AI_ACT"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[3]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[1]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[3]", "program-records/2026-10-03/research/technology/digest.json#instruments[1]"]
     },
     {
       "id": "eu-ai-act-art50-guidance",
@@ -606,10 +606,10 @@
         { "ref": "Art. 50 via Code", "summary": "Machine-readable marking and labelling of AI-generated or manipulated content; applies cumulatively with high-risk duties.", "verified": true, "basis": "Article 50 heading in OJ text (CELEX 32024R1689) read 2026-10-04: Transparency obligations for providers and deployers of certain AI systems" }
       ],
       "keyDates": [
-        { "id": "codeOfPracticeFinal", "date": "2026-06-10", "event": "Code of Practice on transparency of AI-generated content published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
-        { "id": "commissionOpinionOnCode", "date": "2026-07-09", "event": "Commission opinion on the assessment of the Code", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
-        { "id": "guidelinesPublished", "date": "2026-07-20", "event": "Transparency guidelines listed on the AI Act policy page", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
-        { "id": "art50Applies", "date": "2026-08-02", "event": "Art. 50 obligations apply", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
+        { "id": "codeOfPracticeFinal", "date": "2026-06-10", "event": "Code of Practice on transparency of AI-generated content published", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" },
+        { "id": "commissionOpinionOnCode", "date": "2026-07-09", "event": "Commission opinion on the assessment of the Code", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
+        { "id": "guidelinesPublished", "date": "2026-07-20", "event": "Transparency guidelines listed on the AI Act policy page", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
+        { "id": "art50Applies", "date": "2026-08-02", "event": "Art. 50 obligations apply", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems", "retrievedAt": "2026-10-03T16:59:27Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
         { "id": "legacyMarkingDeadline", "date": "2026-12-02", "event": "Art. 50(2) deadline for generative systems placed on the market before 2 August 2026", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026R1744", "retrievedAt": "2026-10-04T05:06:57Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" }
       ],
       "sources": [
@@ -625,7 +625,7 @@
       "affectedPacks": ["citizen-services", "cognition-to-intelligence", "dance-of-democracy", "digital-citizens-rights", "infotainment", "petition-to-law", "realtime-voice-safety"],
       "codeSurfaces": ["euAiActClassifier"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[4]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[2]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[2]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[4]", "program-records/2026-10-03/research/governance/digest.json#instruments[2]", "program-records/2026-10-03/research/technology/digest.json#instruments[2]"]
     },
     {
       "id": "eu-mdcg-2025-6-aib-2025-1",
@@ -639,7 +639,7 @@
         { "ref": "FAQ", "summary": "Medical-device AI is high-risk under AI Act Art. 6(1)/Annex I where the device needs notified-body conformity assessment; one technical documentation set may serve both regimes.", "verified": false, "basis": "not verified: FAQ text not re-read in this run" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025-06-19", "event": "FAQ published", "verified": true, "url": "https://health.ec.europa.eu/latest-updates/mdcg-2025-6-faq-interplay-between-medical-devices-regulation-vitro-diagnostic-medical-devices-2025-06-19_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[22] (read 2026-10-03; not re-read in this run)" }
+        { "id": "published", "date": "2025-06-19", "event": "FAQ published", "verified": true, "url": "https://health.ec.europa.eu/latest-updates/mdcg-2025-6-faq-interplay-between-medical-devices-regulation-vitro-diagnostic-medical-devices-2025-06-19_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/health/digest.json#instruments[22] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "European Commission DG SANTE: MDCG 2025-6 FAQ on MDR/IVDR and AI Act", "url": "https://health.ec.europa.eu/latest-updates/mdcg-2025-6-faq-interplay-between-medical-devices-regulation-vitro-diagnostic-medical-devices-2025-06-19_en", "publisher": "European Commission", "retrievedAt": "2026-10-03", "fetched": true }
@@ -650,7 +650,7 @@
       "affectedPacks": ["clinical-lifecycle", "life-technology"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[22]"]
+      "digestRows": ["program-records/2026-10-03/research/health/digest.json#instruments[22]"]
     },
     {
       "id": "eu-data-act",
@@ -682,7 +682,7 @@
       "affectedPacks": ["farm-to-fork", "material-to-machines", "networked-ecosystems", "partnerships-prosperity", "privacy-security-mobility", "public-private-collaboration", "virtual-infrastructure"],
       "codeSurfaces": ["frameworks"],
       "catalogueIds": ["eu-data-act"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[16]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[32]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[23]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[37]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[4]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[16]", "program-records/2026-10-03/research/environment/digest.json#instruments[32]", "program-records/2026-10-03/research/mobility/digest.json#instruments[23]", "program-records/2026-10-03/research/governance/digest.json#instruments[37]", "program-records/2026-10-03/research/technology/digest.json#instruments[4]"]
     },
     {
       "id": "eu-ehds",
@@ -698,11 +698,11 @@
       ],
       "keyDates": [
         { "id": "ojPublication", "date": "2025-03-05", "event": "Published in the OJ", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:06:59Z", "basis": "Publications Office Cellar metadata field date_publication lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "entryIntoForce", "date": "2025-03-25", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:06:59Z", "basis": "Regulation (EU) 2025/327 Art. 105 (in force on the twentieth day following publication) with Cellar date_publication 2025-03-05 and resource_legal_date_entry-into-force 2025-03-25; confirmed in AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-eu-intl/review.json refuted[0]", "note": "The Commission EHDS page states 26 March 2025; the OJ article and Cellar give 25 March 2025, which the register follows." },
+        { "id": "entryIntoForce", "date": "2025-03-25", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:06:59Z", "basis": "Regulation (EU) 2025/327 Art. 105 (in force on the twentieth day following publication) with Cellar date_publication 2025-03-05 and resource_legal_date_entry-into-force 2025-03-25; confirmed in program-records/2026-10-03/round2/register-eu-intl/review.json refuted[0]", "note": "The Commission EHDS page states 26 March 2025; the OJ article and Cellar give 25 March 2025, which the register follows." },
         { "id": "application", "date": "2027-03-26", "event": "General date of application (Art. 105)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:07:00Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "priorityCategoriesAToC", "date": "2029-03-26", "event": "Arts. 3-15 etc. apply to priority categories (a)-(c) and EHR systems processing them (Art. 105)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:07:00Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "priorityCategoriesDToF", "date": "2031-03-26", "event": "Same provisions apply to remaining priority categories (Art. 105(b))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025R0327", "retrievedAt": "2026-10-04T05:07:00Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "thirdCountriesHealthData", "date": "2035-03", "event": "Third countries may apply to join HealthData@EU", "verified": true, "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" }
+        { "id": "thirdCountriesHealthData", "date": "2035-03", "event": "Third countries may apply to join HealthData@EU", "verified": true, "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_en", "retrievedAt": "2026-10-03T16:59:04Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32025R0327", "url": "https://publications.europa.eu/resource/celex/32025R0327", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:06:59Z", "fetched": true },
@@ -714,7 +714,7 @@
       "affectedPacks": ["digital-health-record", "life-technology", "wellness-management"],
       "codeSurfaces": ["health station"],
       "catalogueIds": ["eu-ehds"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[17]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[23]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[17]", "program-records/2026-10-03/research/health/digest.json#instruments[23]"]
     },
     {
       "id": "eu-eudralex-gmp-annex11-22",
@@ -728,8 +728,8 @@
         { "ref": "Annex 11", "summary": "Computerised systems in GMP are validated, access-controlled and audit-trailed; draft Annex 22 would set AI-model requirements for GMP use.", "verified": false, "basis": "not verified: Annex text not re-read in this run" }
       ],
       "keyDates": [
-        { "id": "consultationOpened", "date": "2025-07-07", "event": "Consultation opened on revised Chapter 4, Annex 11 and new Annex 22", "verified": true, "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" },
-        { "id": "consultationClosed", "date": "2025-10-07", "event": "Consultation closed", "verified": true, "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" }
+        { "id": "consultationOpened", "date": "2025-07-07", "event": "Consultation opened on revised Chapter 4, Annex 11 and new Annex 22", "verified": true, "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/health/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" },
+        { "id": "consultationClosed", "date": "2025-10-07", "event": "Consultation closed", "verified": true, "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/health/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "European Commission: Stakeholders' consultation Ch. 4, Annex 11, new Annex 22", "url": "https://health.ec.europa.eu/consultations/stakeholders-consultation-eudralex-volume-4-good-manufacturing-practice-guidelines-chapter-4-annex_en", "publisher": "European Commission", "retrievedAt": "2026-10-03", "fetched": true }
@@ -740,7 +740,7 @@
       "affectedPacks": ["drug-discovery", "specialized-medicine"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[26]"]
+      "digestRows": ["program-records/2026-10-03/research/health/digest.json#instruments[26]"]
     },
     {
       "id": "eu-cdsm",
@@ -767,7 +767,7 @@
       "affectedPacks": ["infotainment", "partnerships-prosperity", "specialized-education"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-cdsm"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[27]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[9]"]
+      "digestRows": ["program-records/2026-10-03/research/education/digest.json#instruments[27]", "program-records/2026-10-03/research/technology/digest.json#instruments[9]"]
     },
     {
       "id": "eu-eqf-ila-recommendations",
@@ -781,8 +781,8 @@
         { "ref": "EQF", "summary": "Qualifications referenced to the eight EQF levels; AI-based credentialing agents should map outputs to EQF levels.", "verified": false, "basis": "not verified: recommendation text not parsed in this run" }
       ],
       "keyDates": [
-        { "id": "eqfAdopted", "date": "2017-05-22", "event": "EQF Recommendation adopted", "verified": true, "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32017H0615(01)", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" },
-        { "id": "ilaAdopted", "date": "2022-06-16", "event": "Council Recommendation on individual learning accounts", "verified": false, "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022H0627(03)", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)", "note": "digest marks it unverified" }
+        { "id": "eqfAdopted", "date": "2017-05-22", "event": "EQF Recommendation adopted", "verified": true, "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32017H0615(01)", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/education/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)" },
+        { "id": "ilaAdopted", "date": "2022-06-16", "event": "Council Recommendation on individual learning accounts", "verified": false, "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022H0627(03)", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/education/digest.json#instruments[26] (read 2026-10-03; not re-read in this run)", "note": "digest marks it unverified" }
       ],
       "sources": [
         { "title": "EUR-Lex EQF Council Recommendation 32017H0615(01)", "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32017H0615(01)", "publisher": "Publications Office of the EU (EUR-Lex)", "retrievedAt": "2026-10-03", "fetched": true },
@@ -794,7 +794,7 @@
       "affectedPacks": ["skills-training"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-eqf"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[26]"]
+      "digestRows": ["program-records/2026-10-03/research/education/digest.json#instruments[26]"]
     },
     {
       "id": "eu-eudr",
@@ -823,7 +823,7 @@
       "affectedPacks": ["farm-to-fork", "source-to-sustenance"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-eudr"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[1]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[1]"]
     },
     {
       "id": "eu-csrd",
@@ -838,7 +838,7 @@
       ],
       "keyDates": [
         { "id": "stopTheClockInForce", "date": "2025-04-17", "event": "Stop-the-clock Directive (EU) 2025/794 in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025L0794", "retrievedAt": "2026-10-04T05:07:07Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "omnibusIPublished", "date": "2026-02-26", "event": "Directive (EU) 2026/470 published", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0045(COD)", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[45] (read 2026-10-03; not re-read in this run)" },
+        { "id": "omnibusIPublished", "date": "2026-02-26", "event": "Directive (EU) 2026/470 published", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2025/0045(COD)", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[45] (read 2026-10-03; not re-read in this run)" },
         { "id": "omnibusIEntryIntoForce", "date": "2026-03-18", "event": "Omnibus I in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026L0470", "retrievedAt": "2026-10-04T05:07:07Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "revisedEsrsAdopted", "date": "2026-07-03", "event": "Commission adopts revised ESRS delegated act", "verified": false, "url": "https://publications.europa.eu/resource/celex/32025L0794", "retrievedAt": "2026-10-04T05:07:07Z", "basis": "not confirmed", "note": "only an EFRAG page supports this date; EFRAG is not an official host; url is the entry's primary source; the date is not stated on this page." },
         { "id": "revisedEsrsApply", "date": "2027-01-01", "event": "Revised ESRS apply to financial years starting on/after this date", "verified": false, "url": "https://publications.europa.eu/resource/celex/32025L0794", "retrievedAt": "2026-10-04T05:07:07Z", "basis": "not confirmed", "note": "only an EFRAG page supports this date; url is the entry's primary source; the date is not stated on this page." }
@@ -855,7 +855,7 @@
       "affectedPacks": ["circular-economy", "farm-to-fork", "material-to-machines", "sip-to-sanitation", "ubiquity-to-utility", "virtual-infrastructure", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-csrd"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[2]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[31]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[45]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[2]", "program-records/2026-10-03/research/mobility/digest.json#instruments[31]", "program-records/2026-10-03/research/wealth/digest.json#instruments[45]"]
     },
     {
       "id": "eu-csddd",
@@ -883,7 +883,7 @@
       "affectedPacks": ["farm-to-fork", "material-to-machines", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-csddd"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[3]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[3]"]
     },
     {
       "id": "eu-espr",
@@ -900,7 +900,7 @@
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-07-18", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1781", "retrievedAt": "2026-10-04T05:07:08Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "destructionBanLarge", "date": "2026-07-19", "event": "Destruction ban for unsold apparel/footwear applies to large enterprises", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1781", "retrievedAt": "2026-10-04T05:07:10Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "unsoldDisclosureFormat", "date": "2027-02", "event": "Disclosure of discarded unsold products in standard format applies", "verified": true, "url": "https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[5] (read 2026-10-03; not re-read in this run)" }
+        { "id": "unsoldDisclosureFormat", "date": "2027-02", "event": "Disclosure of discarded unsold products in standard format applies", "verified": true, "url": "https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[5] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32024R1781", "url": "https://publications.europa.eu/resource/celex/32024R1781", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:08Z", "fetched": true },
@@ -912,7 +912,7 @@
       "affectedPacks": ["material-to-machines", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-espr"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[5]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[5]"]
     },
     {
       "id": "eu-waste-framework",
@@ -928,7 +928,7 @@
       "keyDates": [
         { "id": "entryIntoForce", "date": "2025-10-16", "event": "Amendment in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025L1892", "retrievedAt": "2026-10-04T05:07:09Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "transposition", "date": "2027-06-17", "event": "Transposition deadline", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025L1892", "retrievedAt": "2026-10-04T05:07:10Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "textileEpr", "date": "2028-04-17", "event": "Textile EPR schemes in place", "verified": true, "url": "https://environment.ec.europa.eu/news/revised-waste-framework-directive-enters-force-2025-10-16_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[6] (read 2026-10-03; not re-read in this run)" },
+        { "id": "textileEpr", "date": "2028-04-17", "event": "Textile EPR schemes in place", "verified": true, "url": "https://environment.ec.europa.eu/news/revised-waste-framework-directive-enters-force-2025-10-16_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[6] (read 2026-10-03; not re-read in this run)" },
         { "id": "foodWasteTargets", "date": "2030-12-31", "event": "Food waste reduction targets", "verified": true, "url": "https://publications.europa.eu/resource/celex/32025L1892", "retrievedAt": "2026-10-04T05:07:10Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" }
       ],
       "sources": [
@@ -941,7 +941,7 @@
       "affectedPacks": ["farm-to-fork", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-waste-framework"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[6]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[6]"]
     },
     {
       "id": "eu-ecgt-green-claims",
@@ -958,7 +958,7 @@
         { "id": "entryIntoForce", "date": "2024-03-26", "event": "Directive 2024/825 in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L0825", "retrievedAt": "2026-10-04T05:07:09Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "transposition", "date": "2026-03-27", "event": "Transposition deadline", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L0825", "retrievedAt": "2026-10-04T05:07:11Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "application", "date": "2026-09-27", "event": "Directive 2024/825 measures apply", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L0825", "retrievedAt": "2026-10-04T05:07:11Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "greenClaimsWithdrawalIntent", "date": "2025-06-20", "event": "Commission announced intention to withdraw the Green Claims proposal", "verified": true, "url": "https://www.europarl.europa.eu/legislative-train/theme-a-european-green-deal/file-substantiating-green-claims", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" }
+        { "id": "greenClaimsWithdrawalIntent", "date": "2025-06-20", "event": "Commission announced intention to withdraw the Green Claims proposal", "verified": true, "url": "https://www.europarl.europa.eu/legislative-train/theme-a-european-green-deal/file-substantiating-green-claims", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32024L0825", "url": "https://publications.europa.eu/resource/celex/32024L0825", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:09Z", "fetched": true },
@@ -970,7 +970,7 @@
       "affectedPacks": ["farm-to-fork", "material-to-machines", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[7]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[7]"]
     },
     {
       "id": "eu-ppwr",
@@ -996,7 +996,7 @@
       "affectedPacks": ["farm-to-fork", "weave-to-wear"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[8]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[8]"]
     },
     {
       "id": "eu-machinery",
@@ -1011,8 +1011,8 @@
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2023-07-19", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32023R1230", "retrievedAt": "2026-10-04T05:07:11Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "application", "date": "2027-01-20", "event": "Applies (Cellar date; the OJ Art. 54 text as published reads 14 January 2027; corrigendum not read, see openQuestions)", "verified": false, "url": "https://publications.europa.eu/resource/celex/32023R1230", "retrievedAt": "2026-10-04T05:07:11Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted", "note": "Unverified: Cellar gives 2027-01-20, the OJ Art. 54 text as published reads 14 January 2027, and the corrigendum was not read (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-eu-intl/review.json refuted[1])." },
-        { "id": "aiDelegatedActs", "date": "2028-08-02", "event": "Delegated acts reflecting AI Act requirements in Machinery Annex III", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026R1744", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[25] (read 2026-10-03; not re-read in this run)" }
+        { "id": "application", "date": "2027-01-20", "event": "Applies (Cellar date; the OJ Art. 54 text as published reads 14 January 2027; corrigendum not read, see openQuestions)", "verified": false, "url": "https://publications.europa.eu/resource/celex/32023R1230", "retrievedAt": "2026-10-04T05:07:11Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted", "note": "Unverified: Cellar gives 2027-01-20, the OJ Art. 54 text as published reads 14 January 2027, and the corrigendum was not read (program-records/2026-10-03/round2/register-eu-intl/review.json refuted[1])." },
+        { "id": "aiDelegatedActs", "date": "2028-08-02", "event": "Delegated acts reflecting AI Act requirements in Machinery Annex III", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026R1744", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[25] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32023R1230", "url": "https://publications.europa.eu/resource/celex/32023R1230", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:11Z", "fetched": true },
@@ -1024,7 +1024,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "material-to-machines", "sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-machinery"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[10]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[25]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[10]", "program-records/2026-10-03/research/mobility/digest.json#instruments[25]"]
     },
     {
       "id": "eu-uwwtd-2024",
@@ -1051,7 +1051,7 @@
       "affectedPacks": ["sip-to-sanitation"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-uwwtd-2024"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[11]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[11]"]
     },
     {
       "id": "eu-cer",
@@ -1079,7 +1079,7 @@
       "affectedPacks": ["sip-to-sanitation", "ubiquity-to-utility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[14]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[14]"]
     },
     {
       "id": "eu-nccs-electricity",
@@ -1094,8 +1094,8 @@
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-06-13", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1366", "retrievedAt": "2026-10-04T05:07:12Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "competentAuthority", "date": "2024-12-13", "event": "Member States designate competent authority", "verified": true, "url": "https://eur-lex.europa.eu/eli/reg_del/2024/1366/oj/eng", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[15] (read 2026-10-03; not re-read in this run)" },
-        { "id": "standardsList", "date": "2025-06-13", "event": "Provisional list of standards and controls", "verified": true, "url": "https://eur-lex.europa.eu/eli/reg_del/2024/1366/oj/eng", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[15] (read 2026-10-03; not re-read in this run)" },
+        { "id": "competentAuthority", "date": "2024-12-13", "event": "Member States designate competent authority", "verified": true, "url": "https://eur-lex.europa.eu/eli/reg_del/2024/1366/oj/eng", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[15] (read 2026-10-03; not re-read in this run)" },
+        { "id": "standardsList", "date": "2025-06-13", "event": "Provisional list of standards and controls", "verified": true, "url": "https://eur-lex.europa.eu/eli/reg_del/2024/1366/oj/eng", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[15] (read 2026-10-03; not re-read in this run)" },
         { "id": "entsoeExerciseTemplate", "date": "2027-12-31", "event": "ENTSO for Electricity deliverable due by 31 December 2027 and every three years after", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1366", "retrievedAt": "2026-10-04T05:07:13Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" }
       ],
       "sources": [
@@ -1108,7 +1108,7 @@
       "affectedPacks": ["ubiquity-to-utility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[15]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[15]"]
     },
     {
       "id": "eu-iuu",
@@ -1135,7 +1135,7 @@
       "affectedPacks": ["source-to-sustenance"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-iuu"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[23]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[23]"]
     },
     {
       "id": "eu-eed",
@@ -1161,7 +1161,7 @@
       "affectedPacks": ["material-to-machines", "ubiquity-to-utility"],
       "codeSurfaces": ["environment (domain)"],
       "catalogueIds": ["eu-eed"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[28]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[28]"]
     },
     {
       "id": "eu-methane",
@@ -1176,7 +1176,7 @@
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-08-04", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1787", "retrievedAt": "2026-10-04T05:07:15Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "ldarExistingSites", "date": "2026-02-05", "event": "LDAR compliance for existing sites", "verified": true, "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AL_202401787", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[30] (read 2026-10-03; not re-read in this run)" },
+        { "id": "ldarExistingSites", "date": "2026-02-05", "event": "LDAR compliance for existing sites", "verified": true, "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=OJ%3AL_202401787", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[30] (read 2026-10-03; not re-read in this run)" },
         { "id": "importVerification", "date": "2027-01-01", "event": "Importers demonstrate equivalent MRV measures (Art. 28(1))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1787", "retrievedAt": "2026-10-04T05:07:17Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" }
       ],
       "sources": [
@@ -1189,7 +1189,7 @@
       "affectedPacks": ["ubiquity-to-utility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[30]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[30]"]
     },
     {
       "id": "eu-taxonomy",
@@ -1217,7 +1217,7 @@
       "affectedPacks": ["material-to-machines", "sustainable-real-estate", "ubiquity-to-utility"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-taxonomy"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[38]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[30]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[38]", "program-records/2026-10-03/research/mobility/digest.json#instruments[30]"]
     },
     {
       "id": "eu-gsr",
@@ -1234,7 +1234,7 @@
       "keyDates": [
         { "id": "application", "date": "2022-07-06", "event": "GSR applies", "verified": true, "url": "https://publications.europa.eu/resource/celex/32019R2144", "retrievedAt": "2026-10-04T05:07:20Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "adsIrInForce", "date": "2022-09-15", "event": "Implementing Regulation (EU) 2022/1426 in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022R1426", "retrievedAt": "2026-10-04T05:07:18Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "phaseAllNewVehicles", "date": "2026-07-07", "event": "Phase requirements (ADDW, AEB pedestrian/cyclist) apply to all new cars and vans", "verified": true, "url": "https://commission.europa.eu/news-and-media/news/safer-cars-safer-roads-new-rules-take-effect-2026-07-08_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" }
+        { "id": "phaseAllNewVehicles", "date": "2026-07-07", "event": "Phase requirements (ADDW, AEB pedestrian/cyclist) apply to all new cars and vans", "verified": true, "url": "https://commission.europa.eu/news-and-media/news/safer-cars-safer-roads-new-rules-take-effect-2026-07-08_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[2] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32019R2144", "url": "https://publications.europa.eu/resource/celex/32019R2144", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:20Z", "fetched": true },
@@ -1247,7 +1247,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[2]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[2]"]
     },
     {
       "id": "eu-mrv-fueleu",
@@ -1275,7 +1275,7 @@
       "affectedPacks": ["sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[19]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[19]"]
     },
     {
       "id": "eu-efti",
@@ -1290,9 +1290,9 @@
       ],
       "keyDates": [
         { "id": "application", "date": "2024-08-21", "event": "Regulation applies (Art. 18(2))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32020R1056", "retrievedAt": "2026-10-04T05:07:23Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "firstActsInForce", "date": "2025-01-09", "event": "First implementing/delegated acts in force", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" },
-        { "id": "remainingSpecs", "date": "2026-12", "event": "Remaining implementing specifications targeted", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" },
-        { "id": "authoritiesAccept", "date": "2027-07-09", "event": "Authorities must accept eFTI data from certified platforms", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" }
+        { "id": "firstActsInForce", "date": "2025-01-09", "event": "First implementing/delegated acts in force", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" },
+        { "id": "remainingSpecs", "date": "2026-12", "event": "Remaining implementing specifications targeted", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" },
+        { "id": "authoritiesAccept", "date": "2027-07-09", "event": "Authorities must accept eFTI data from certified platforms", "verified": true, "url": "https://transport.ec.europa.eu/transport-themes/logistics-and-multimodal-transport/efti-regulation_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[27] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32020R1056", "url": "https://publications.europa.eu/resource/celex/32020R1056", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:23Z", "fetched": true },
@@ -1304,7 +1304,7 @@
       "affectedPacks": ["freight-3pl-warehouse"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[27]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[27]"]
     },
     {
       "id": "eu-pld",
@@ -1331,7 +1331,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-pld"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[28]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[28]"]
     },
     {
       "id": "eu-epbd",
@@ -1346,7 +1346,7 @@
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-05-28", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-04T05:07:22Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "transposition", "date": "2026-05-29", "event": "Transposition deadline (Art. 35)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[29] (read 2026-10-03; not re-read in this run)" },
+        { "id": "transposition", "date": "2026-05-29", "event": "Transposition deadline (Art. 35)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[29] (read 2026-10-03; not re-read in this run)" },
         { "id": "arts30to34Apply", "date": "2026-05-30", "event": "Articles 30, 31, 33 and 34 apply (Art. 37)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-04T05:07:24Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "publicZeb", "date": "2028-01-01", "event": "New public-owned buildings zero-emission (Art. 7(1)(a))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-04T05:07:24Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "bacs70kW", "date": "2029-12-31", "event": "BACS for non-residential buildings >70 kW (Art. 13(9)(b))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024L1275", "retrievedAt": "2026-10-04T05:07:24Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
@@ -1361,7 +1361,7 @@
       "affectedPacks": ["sustainable-communities", "sustainable-real-estate"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-epbd"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[29]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[29]"]
     },
     {
       "id": "eu-cpr",
@@ -1388,7 +1388,7 @@
       "affectedPacks": ["sustainable-real-estate"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[33]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[33]"]
     },
     {
       "id": "eu-eidas2",
@@ -1405,10 +1405,10 @@
       ],
       "keyDates": [
         { "id": "entryIntoForce", "date": "2024-05-20", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1183", "retrievedAt": "2026-10-04T05:07:23Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "walletImplementingActs", "date": "2024-12-24", "event": "Wallet implementing acts in force (computed by the governance digest)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R2979", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
+        { "id": "walletImplementingActs", "date": "2024-12-24", "event": "Wallet implementing acts in force (computed by the governance digest)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R2979", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
         { "id": "standardsUpdate", "date": "2026-08-11", "event": "Implementing Regulation (EU) 2026/1731 in force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026R1731", "retrievedAt": "2026-10-04T05:07:42Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "walletProvision", "date": "2026-12-24", "event": "Wallet provision deadline (24 months after implementing acts; computed)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1183", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
-        { "id": "privateRelyingParties", "date": "2027-12-24", "event": "Private relying parties accept wallets (Art. 5f(2), 36 months; computed)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1183", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" }
+        { "id": "walletProvision", "date": "2026-12-24", "event": "Wallet provision deadline (24 months after implementing acts; computed)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1183", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" },
+        { "id": "privateRelyingParties", "date": "2027-12-24", "event": "Private relying parties accept wallets (Art. 5f(2), 36 months; computed)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32024R1183", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[4] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32024R1183", "url": "https://publications.europa.eu/resource/celex/32024R1183", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:23Z", "fetched": true },
@@ -1421,7 +1421,7 @@
       "affectedPacks": ["citizen-services", "digital-citizens-rights", "networked-ecosystems"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-eidas2"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[4]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[32]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[4]", "program-records/2026-10-03/research/technology/digest.json#instruments[32]"]
     },
     {
       "id": "eu-dsa",
@@ -1438,8 +1438,8 @@
       "keyDates": [
         { "id": "entryIntoForce", "date": "2022-11-16", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022R2065", "retrievedAt": "2026-10-04T05:07:27Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "generalApplication", "date": "2024-02-17", "event": "General application (Art. 93(2))", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022R2065", "retrievedAt": "2026-10-04T05:07:30Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
-        { "id": "disinfoCodeConversion", "date": "2025-07-01", "event": "Code of Conduct on Disinformation conversion takes effect; commitments auditable", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" },
-        { "id": "xDecision", "date": "2025-12-05", "event": "First non-compliance decision (X)", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-fines-x-eu120-million-under-digital-services-act", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[6] (read 2026-10-03; not re-read in this run)" }
+        { "id": "disinfoCodeConversion", "date": "2025-07-01", "event": "Code of Conduct on Disinformation conversion takes effect; commitments auditable", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/library/code-conduct-disinformation", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" },
+        { "id": "xDecision", "date": "2025-12-05", "event": "First non-compliance decision (X)", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-fines-x-eu120-million-under-digital-services-act", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[6] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32022R2065", "url": "https://publications.europa.eu/resource/celex/32022R2065", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:27Z", "fetched": true },
@@ -1452,7 +1452,7 @@
       "affectedPacks": ["dance-of-democracy", "infotainment"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-dsa"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[6]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[7]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[6]", "program-records/2026-10-03/research/governance/digest.json#instruments[7]"]
     },
     {
       "id": "eu-dma",
@@ -1468,8 +1468,8 @@
       "keyDates": [
         { "id": "entryIntoForce", "date": "2022-11-01", "event": "Entry into force", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022R1925", "retrievedAt": "2026-10-04T05:07:28Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
         { "id": "application", "date": "2023-05-02", "event": "Applies", "verified": true, "url": "https://publications.europa.eu/resource/celex/32022R1925", "retrievedAt": "2026-10-04T05:07:28Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "appleMetaDecisions", "date": "2025-04-23", "event": "Apple and Meta non-compliance decisions", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-finds-apple-and-meta-breach-digital-markets-act", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" },
-        { "id": "googleDecision", "date": "2026-07-23", "event": "Google non-compliance decision", "verified": true, "url": "https://digital-markets-act.ec.europa.eu/commission-fines-google-eur890-million-breaches-digital-markets-act-2026-07-23_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" }
+        { "id": "appleMetaDecisions", "date": "2025-04-23", "event": "Apple and Meta non-compliance decisions", "verified": true, "url": "https://digital-strategy.ec.europa.eu/en/news/commission-finds-apple-and-meta-breach-digital-markets-act", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" },
+        { "id": "googleDecision", "date": "2026-07-23", "event": "Google non-compliance decision", "verified": true, "url": "https://digital-markets-act.ec.europa.eu/commission-fines-google-eur890-million-breaches-digital-markets-act-2026-07-23_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[7] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32022R1925", "url": "https://publications.europa.eu/resource/celex/32022R1925", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:28Z", "fetched": true },
@@ -1482,7 +1482,7 @@
       "affectedPacks": ["infotainment", "networked-ecosystems"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-dma"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[7]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[7]"]
     },
     {
       "id": "eu-emfa",
@@ -1508,7 +1508,7 @@
       "affectedPacks": ["infotainment"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-emfa"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[8]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[8]"]
     },
     {
       "id": "eu-political-ads",
@@ -1535,7 +1535,7 @@
       "affectedPacks": ["dance-of-democracy"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-political-ads"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[8]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[8]"]
     },
     {
       "id": "eu-interoperable-europe",
@@ -1561,7 +1561,7 @@
       "affectedPacks": ["citizen-services", "petition-to-law"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-interoperable-europe"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[11]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[11]"]
     },
     {
       "id": "eu-open-data",
@@ -1588,7 +1588,7 @@
       "affectedPacks": ["petition-to-law"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-open-data"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[12]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[12]"]
     },
     {
       "id": "eu-sdg-regulation",
@@ -1614,7 +1614,7 @@
       "affectedPacks": ["citizen-services"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-sdg-regulation"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[13]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[13]"]
     },
     {
       "id": "eu-ai-liability-directive",
@@ -1639,7 +1639,7 @@
       "affectedPacks": ["citizen-services"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[36]"],
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[36]"],
       "taskStatus": "withdrawn"
     },
     {
@@ -1654,7 +1654,7 @@
         { "ref": "None verified", "summary": "Policy package; no binding obligations verified.", "verified": false, "basis": "not verified: no binding act identified" }
       ],
       "keyDates": [
-        { "id": "adopted", "date": "2025-11-12", "event": "Democracy package adopted", "verified": true, "url": "https://commission.europa.eu/news-and-media/news/stronger-measures-protect-our-democracy-and-civil-society-2025-11-12_en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[38] (read 2026-10-03; not re-read in this run)" }
+        { "id": "adopted", "date": "2025-11-12", "event": "Democracy package adopted", "verified": true, "url": "https://commission.europa.eu/news-and-media/news/stronger-measures-protect-our-democracy-and-civil-society-2025-11-12_en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[38] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "European Commission: Stronger measures to protect our democracy and civil society (European Democracy Shield), 12 Nov 2025", "url": "https://commission.europa.eu/news-and-media/news/stronger-measures-protect-our-democracy-and-civil-society-2025-11-12_en", "publisher": "European Commission", "retrievedAt": "2026-10-03", "fetched": true }
@@ -1665,7 +1665,7 @@
       "affectedPacks": ["dance-of-democracy"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[38]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[38]"]
     },
     {
       "id": "eu-eaa",
@@ -1693,7 +1693,7 @@
       "affectedPacks": ["infotainment"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-eaa"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[26]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[26]"]
     },
     {
       "id": "eu-trade-secrets",
@@ -1719,7 +1719,7 @@
       "affectedPacks": ["partnerships-prosperity"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-trade-secrets"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[34]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[34]"]
     },
     {
       "id": "eu-platform-work",
@@ -1747,7 +1747,7 @@
       "affectedPacks": ["future-of-work"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-platform-work"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[0]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[0]"]
     },
     {
       "id": "eu-pay-transparency",
@@ -1774,7 +1774,7 @@
       "affectedPacks": ["future-of-work"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[14]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[14]"]
     },
     {
       "id": "eu-psd2",
@@ -1801,7 +1801,7 @@
       "affectedPacks": ["digital-payments"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-psd2"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[16]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[16]"]
     },
     {
       "id": "eu-psr-psd3",
@@ -1815,9 +1815,9 @@
         { "ref": "Proposal", "summary": "Not yet law; no obligations encoded.", "verified": false, "basis": "not verified: proposal not adopted" }
       ],
       "keyDates": [
-        { "id": "provisionalAgreement", "date": "2025-11-27", "event": "Provisional political agreement", "verified": true, "url": "https://www.europarl.europa.eu/legislative-train/theme-economic-and-monetary-affairs-econ/file-revision-of-eu-rules-on-payment-services?sid=10001", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" },
-        { "id": "committeeApproval", "date": "2026-05-05", "event": "Committee approval of agreed text", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0209(COD)", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" },
-        { "id": "indicativePlenary", "date": "2026-12-14", "event": "Indicative plenary sitting", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0209(COD)", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" }
+        { "id": "provisionalAgreement", "date": "2025-11-27", "event": "Provisional political agreement", "verified": true, "url": "https://www.europarl.europa.eu/legislative-train/theme-economic-and-monetary-affairs-econ/file-revision-of-eu-rules-on-payment-services?sid=10001", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" },
+        { "id": "committeeApproval", "date": "2026-05-05", "event": "Committee approval of agreed text", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0209(COD)", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" },
+        { "id": "indicativePlenary", "date": "2026-12-14", "event": "Indicative plenary sitting", "verified": true, "url": "https://oeil.europarl.europa.eu/oeil/en/procedure-file?reference=2023/0209(COD)", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[17] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "EP Legislative Train: revision of EU rules on payment services", "url": "https://www.europarl.europa.eu/legislative-train/theme-economic-and-monetary-affairs-econ/file-revision-of-eu-rules-on-payment-services?sid=10001", "publisher": "European Parliament", "retrievedAt": "2026-10-03", "fetched": true },
@@ -1829,7 +1829,7 @@
       "affectedPacks": ["digital-payments"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[17]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[17]"]
     },
     {
       "id": "eu-sepa-instant",
@@ -1857,7 +1857,7 @@
       "affectedPacks": ["digital-payments"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-sepa-instant"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[18]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[18]"]
     },
     {
       "id": "eu-tfr",
@@ -1882,7 +1882,7 @@
       "affectedPacks": ["blockchain"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-tfr"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[21]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[21]"]
     },
     {
       "id": "eu-mica",
@@ -1910,7 +1910,7 @@
       "affectedPacks": ["blockchain"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-mica"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[22]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[22]"]
     },
     {
       "id": "eu-aml-package",
@@ -1937,7 +1937,7 @@
       "affectedPacks": ["blockchain", "digital-payments", "no-poverty"],
       "codeSurfaces": [],
       "catalogueIds": ["eu-amlr", "eu-amld6"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[23]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[23]"]
     },
     {
       "id": "eu-esma-ai-statement",
@@ -1951,7 +1951,7 @@
         { "ref": "Statement", "summary": "Firms using AI keep MiFID II organisational, conduct and best-interest obligations, incl. management body responsibility.", "verified": false, "basis": "not verified: statement text not re-read in this run" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2024-05-30", "event": "Statement published", "verified": true, "url": "https://www.esma.europa.eu/press-news/esma-news/esma-provides-guidance-firms-using-artificial-intelligence-investment-services", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[37] (read 2026-10-03; not re-read in this run)" }
+        { "id": "published", "date": "2024-05-30", "event": "Statement published", "verified": true, "url": "https://www.esma.europa.eu/press-news/esma-news/esma-provides-guidance-firms-using-artificial-intelligence-investment-services", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/wealth/digest.json#instruments[37] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "ESMA statement on AI in investment services", "url": "https://www.esma.europa.eu/press-news/esma-news/esma-provides-guidance-firms-using-artificial-intelligence-investment-services", "publisher": "ESMA", "retrievedAt": "2026-10-03", "fetched": true }
@@ -1962,7 +1962,7 @@
       "affectedPacks": ["wealthManagementMiFID"],
       "codeSurfaces": ["wealth domain (WLT)"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[37]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[37]"]
     },
     {
       "id": "eu-mifid2-mar",
@@ -1994,7 +1994,7 @@
       "affectedPacks": ["wealthManagementMiFID"],
       "codeSurfaces": ["wealth domain (WLT)"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[38]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[38]"]
     },
     {
       "id": "eu-ccd2",
@@ -2022,7 +2022,7 @@
       "affectedPacks": ["digital-payments", "no-poverty"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/wealth/digest.json#instruments[39]"]
+      "digestRows": ["program-records/2026-10-03/research/wealth/digest.json#instruments[39]"]
     },
     {
       "id": "eu-etsi-en-303-645",
@@ -2036,7 +2036,7 @@
         { "ref": "Provisions 5.1-5.13", "summary": "Baseline consumer-IoT security provisions (no universal default passwords, vulnerability disclosure, software updates).", "verified": false, "basis": "not verified: standard text not read; etsi.org deliverable is a PDF file download" }
       ],
       "keyDates": [
-        { "id": "v3_1_3", "date": "2024-09", "event": "V3.1.3 published", "verified": false, "url": "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/03.01.03_60/en_303645v030103p.pdf", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[37] (read 2026-10-03; not re-read in this run)", "note": "digest marks it unverified" }
+        { "id": "v3_1_3", "date": "2024-09", "event": "V3.1.3 published", "verified": false, "url": "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/03.01.03_60/en_303645v030103p.pdf", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[37] (read 2026-10-03; not re-read in this run)", "note": "digest marks it unverified" }
       ],
       "sources": [
         { "title": "ETSI EN 303 645 V3.1.3 (2024-09)", "url": "https://www.etsi.org/deliver/etsi_en/303600_303699/303645/03.01.03_60/en_303645v030103p.pdf", "publisher": "ETSI", "retrievedAt": "2026-10-03", "fetched": false, "note": "cited by the station digest; not confirmed" }
@@ -2047,7 +2047,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": ["etsi-en-303-645"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[37]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[37]"]
     },
     {
       "id": "coe-ai-convention",
@@ -2066,7 +2066,7 @@
       "keyDates": [
         { "id": "euSignature", "date": "2024-09-05", "event": "Signed on behalf of the EU (Council Decision (EU) 2026/1080, recital 1)", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026D1080", "retrievedAt": "2026-10-04T05:07:41Z", "basis": "Official Journal text via Publications Office Cellar, read 2026-10-04" },
         { "id": "euConclusion", "date": "2026-04-21", "event": "Council Decision (EU) 2026/1080 on conclusion", "verified": true, "url": "https://publications.europa.eu/resource/celex/32026D1080", "retrievedAt": "2026-10-04T05:07:40Z", "basis": "Publications Office Cellar metadata field resource_legal_date_entry-into-force lists this date (read 2026-10-04); event wording from the station digest where the OJ text was not quoted" },
-        { "id": "ojText", "date": "2026-05-13", "event": "Convention text published in OJ L 2026/1081", "verified": true, "url": "https://publications.europa.eu/resource/celex/22026A01081", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[9] (read 2026-10-03; not re-read in this run)" }
+        { "id": "ojText", "date": "2026-05-13", "event": "Convention text published in OJ L 2026/1081", "verified": true, "url": "https://publications.europa.eu/resource/celex/22026A01081", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[9] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "Official Journal text and Cellar metadata, CELEX 32026D1080", "url": "https://publications.europa.eu/resource/celex/32026D1080", "publisher": "Publications Office of the EU", "retrievedAt": "2026-10-04T05:07:41Z", "fetched": true },
@@ -2079,7 +2079,7 @@
       "affectedPacks": ["dance-of-democracy", "digital-citizens-rights", "petition-to-law"],
       "codeSurfaces": [],
       "catalogueIds": ["coe-ai-convention"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[9]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[9]"]
     },
     {
       "id": "coe-rec-2017-5",
@@ -2104,7 +2104,7 @@
       "affectedPacks": ["dance-of-democracy"],
       "codeSurfaces": [],
       "catalogueIds": ["coe-rec-2017-5"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[10]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[10]"]
     },
     {
       "id": "oecd-ai-principles",
@@ -2130,7 +2130,7 @@
       "affectedPacks": ["cognition-to-intelligence", "os-sustainable-outcomes", "partnerships-prosperity"],
       "codeSurfaces": [],
       "catalogueIds": ["oecd-ai"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[31]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[31]"]
     },
     {
       "id": "oecd-ppp-recommendation",
@@ -2144,7 +2144,7 @@
         { "ref": "Principles 1-12", "summary": "Public-governance principles for PPPs in groups A-C (institutional framework, value for money, budgetary process).", "verified": false, "basis": "not verified: OECD instrument text not readable in this run" }
       ],
       "keyDates": [
-        { "id": "adopted", "date": "2012-05-04", "event": "Adopted by OECD Council", "verified": true, "url": "https://legalinstruments.oecd.org/api/print?ids=275&lang=en", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[32] (read 2026-10-03; not re-read in this run)" }
+        { "id": "adopted", "date": "2012-05-04", "event": "Adopted by OECD Council", "verified": true, "url": "https://legalinstruments.oecd.org/api/print?ids=275&lang=en", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/governance/digest.json#instruments[32] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "OECD Recommendation of the Council on Principles for Public Governance of PPPs, OECD/LEGAL/0392 (4 May 2012)", "url": "https://legalinstruments.oecd.org/api/print?ids=275&lang=en", "publisher": "OECD", "retrievedAt": "2026-10-03", "fetched": true }
@@ -2155,7 +2155,7 @@
       "affectedPacks": ["public-private-collaboration"],
       "codeSurfaces": [],
       "catalogueIds": ["oecd-ppp"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[32]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[32]"]
     },
     {
       "id": "uk-duaa-2025",
@@ -2169,7 +2169,7 @@
         { "ref": "s.80 (UK GDPR Arts. 22A-22D)", "summary": "Significant decisions based solely on automated processing require safeguards: information about the decision, ability to make representations and contest, and human intervention.", "verified": true, "basis": "official page read 2026-10-04: https://www.gov.uk/guidance/data-use-and-access-act-2025-data-protection-and-privacy-changes" }
       ],
       "keyDates": [
-        { "id": "royalAssent", "date": "2025-06-19", "event": "Royal Assent", "verified": true, "url": "https://www.gov.uk/guidance/data-use-and-access-act-2025-plans-for-commencement", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[19] (read 2026-10-03; not re-read in this run)" },
+        { "id": "royalAssent", "date": "2025-06-19", "event": "Royal Assent", "verified": true, "url": "https://www.gov.uk/guidance/data-use-and-access-act-2025-plans-for-commencement", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[19] (read 2026-10-03; not re-read in this run)" },
         { "id": "commencementNo6", "date": "2026-02-05", "event": "Commencement No. 6: most remaining data protection provisions in force", "verified": true, "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2026/02/statement-on-the-commencement-of-the-data-use-and-access-act-duaa/", "retrievedAt": "2026-10-04", "basis": "official page read 2026-10-04: ICO statement on the commencement of the Data (Use and Access) Act (5 February 2026)" },
         { "id": "complaintsProcedure", "date": "2026-06-19", "event": "Complaints procedure provisions due (per ICO statement)", "verified": true, "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2026/02/statement-on-the-commencement-of-the-data-use-and-access-act-duaa/", "retrievedAt": "2026-10-04", "basis": "official page read 2026-10-04: ICO statement on the commencement of the Data (Use and Access) Act (5 February 2026)" },
         { "id": "s80Commencement", "date": "2026", "event": "Commencement of s.80 (Arts. 22A-22D)", "verified": false, "url": "https://www.gov.uk/guidance/data-use-and-access-act-2025-plans-for-commencement", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "not confirmed", "note": "neither the GOV.UK commencement page nor the ICO statement names s.80; legislation.gov.uk returned a bot challenge (HTTP 202); url is the entry's primary source; the date is not stated on this page." }
@@ -2185,7 +2185,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[19]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[19]"]
     },
     {
       "id": "jp-ai-promotion-act",
@@ -2196,7 +2196,7 @@
       "status": "in-force",
       "stations": ["health", "education", "environment", "mobility", "governance", "technology", "wealth"],
       "agentObligations": [
-        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
+        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
       ],
       "keyDates": [
         { "id": "promulgated", "date": "2025-06-04", "event": "Promulgated; partial entry into force", "verified": true, "url": "https://www8.cao.go.jp/cstp/ai/ai_act/ai_act.html", "retrievedAt": "2026-10-04", "basis": "official page read 2026-10-04: 人工知能関連技術の研究開発及び活用の推進に関する法律（AI法）" },
@@ -2208,11 +2208,11 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "Law number and article text not read."],
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted.", "Law number and article text not read."],
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory.GLOBAL_FRAMEWORKS"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[20]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[20]"]
     },
     {
       "id": "kr-ai-basic-act",
@@ -2229,9 +2229,9 @@
       ],
       "keyDates": [
         { "id": "promulgated", "date": "2025-01-21", "event": "Promulgated as Act No. 20676", "verified": true, "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=268543", "retrievedAt": "2026-10-04", "basis": "official page read 2026-10-04: 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법 (법률 제20676호)" },
-        { "id": "partialAmendment", "date": "2026-01-20", "event": "Partial amendment, Act No. 21311", "verified": true, "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=014820&efYd=20260122&chrClsCd=010202&urlMode=lsInfoP&ancYnChk=0", "retrievedAt": "2026-10-03T17:06:18Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[21] (read 2026-10-03; not re-read in this run)" },
+        { "id": "partialAmendment", "date": "2026-01-20", "event": "Partial amendment, Act No. 21311", "verified": true, "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=014820&efYd=20260122&chrClsCd=010202&urlMode=lsInfoP&ancYnChk=0", "retrievedAt": "2026-10-03T17:06:18Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[21] (read 2026-10-03; not re-read in this run)" },
         { "id": "inForce", "date": "2026-01-22", "event": "Enforcement date", "verified": true, "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=268543", "retrievedAt": "2026-10-04", "basis": "official page read 2026-10-04: 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법 (법률 제20676호)" },
-        { "id": "laterVersion", "date": "2026-07-21", "event": "Later version in force", "verified": true, "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=014820&efYd=20260122&chrClsCd=010202&urlMode=lsInfoP&ancYnChk=0", "retrievedAt": "2026-10-03T17:06:18Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[21] (read 2026-10-03; not re-read in this run)" }
+        { "id": "laterVersion", "date": "2026-07-21", "event": "Later version in force", "verified": true, "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsId=014820&efYd=20260122&chrClsCd=010202&urlMode=lsInfoP&ancYnChk=0", "retrievedAt": "2026-10-03T17:06:18Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[21] (read 2026-10-03; not re-read in this run)" }
       ],
       "sources": [
         { "title": "인공지능 발전과 신뢰 기반 조성 등에 관한 기본법 (법률 제20676호)", "url": "https://www.law.go.kr/lsInfoP.do?lsiSeq=268543", "publisher": "Ministry of Government Legislation (Korea)", "retrievedAt": "2026-10-04", "fetched": true },
@@ -2244,7 +2244,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory.GLOBAL_FRAMEWORKS"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[21]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[21]"]
     },
     {
       "id": "sg-mgf-genai-agentic",
@@ -2269,7 +2269,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory.GLOBAL_FRAMEWORKS"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[22]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[22]"]
     },
     {
       "id": "cn-ai-content-labeling-measures",
@@ -2280,12 +2280,12 @@
       "status": "in-force",
       "stations": ["governance", "technology"],
       "agentObligations": [
-        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
+        { "ref": "none asserted", "summary": "No obligation is asserted for this jurisdiction under the root ruling; see openQuestions.", "verified": false, "basis": "Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted." }
       ],
       "keyDates": [
-        { "id": "notice", "date": "2025-03-07", "event": "Notice date", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
-        { "id": "published", "date": "2025-03-14", "event": "Published by CAC", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
-        { "id": "effective", "date": "2025-09-01", "event": "Effective", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
+        { "id": "notice", "date": "2025-03-07", "event": "Notice date", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
+        { "id": "published", "date": "2025-03-14", "event": "Published by CAC", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
+        { "id": "effective", "date": "2025-09-01", "event": "Effective", "verified": true, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[24] (read 2026-10-03; not re-read in this run)" },
         { "id": "gb45438", "date": "2025", "event": "Companion mandatory national standard GB 45438-2025", "verified": false, "url": "https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm", "retrievedAt": "2026-10-03T17:05:10Z", "basis": "not confirmed", "note": "not fetched; url is the entry's primary source; the date is not stated on this page." }
       ],
       "sources": [
@@ -2293,11 +2293,11 @@
       ],
       "lastReviewed": "2026-10-03",
       "verified": false,
-      "openQuestions": ["Root ruling AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
+      "openQuestions": ["Root ruling program-records/2026-10-03/map/root-decisions.md:26: entries for China, Brazil, India and Japan are allowed only as verified:false with the reason and no obligations asserted."],
       "affectedPacks": [],
       "codeSurfaces": ["globalRegulatory.GLOBAL_FRAMEWORKS"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[24]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[24]"]
     },
     {
       "id": "intl-iso-iec-42006",
@@ -2311,7 +2311,7 @@
         { "ref": "ISO/IEC 42006:2025", "summary": "Competence and process requirements for certification bodies auditing ISO/IEC 42001 AI management systems.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025-07-07", "event": "Publication date (ISO Open Data id 44546, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42006", "retrievedAt": "2026-10-04", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[11]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
+        { "id": "published", "date": "2025-07-07", "event": "Publication date (ISO Open Data id 44546, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/42006", "retrievedAt": "2026-10-04", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[11]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
       ],
       "sources": [
         { "title": "ISO catalogue page (iso-iec-42006)", "url": "https://www.iso.org/standard/42006", "publisher": "ISO", "retrievedAt": "2026-10-04", "fetched": false, "note": "HTTP 403 measured 2026-10-04 from this harness; primary text unreachable 2026-10-03" }
@@ -2322,7 +2322,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["frameworks.ISO_42001"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[11]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[11]"]
     },
     {
       "id": "intl-iso-iec-23894",
@@ -2336,7 +2336,7 @@
         { "ref": "ISO/IEC 23894:2023", "summary": "AI-specific guidance on applying ISO 31000 risk management.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2023-02-06", "event": "Publication date (ISO Open Data id 77304, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/77304.html", "retrievedAt": "2026-10-04", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[12]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
+        { "id": "published", "date": "2023-02-06", "event": "Publication date (ISO Open Data id 77304, per cross-framework digest)", "verified": false, "url": "https://www.iso.org/standard/77304.html", "retrievedAt": "2026-10-04", "basis": "receipt program-records/2026-10-03/research/cross-framework/digest.json#instruments[12]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read; url is the entry's primary source; date from the ISO Open Data CSV (isopublicstorageprod.blob.core.windows.net, read 2026-10-03T17:06:53Z, not an official host) per the receipt." }
       ],
       "sources": [
         { "title": "ISO catalogue page (iso-iec-23894)", "url": "https://www.iso.org/standard/77304.html", "publisher": "ISO", "retrievedAt": "2026-10-04", "fetched": false, "note": "HTTP 403 measured 2026-10-04 from this harness; primary text unreachable 2026-10-03" }
@@ -2347,7 +2347,7 @@
       "affectedPacks": [],
       "codeSurfaces": ["frameworks.ISO_42001"],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/cross-framework/digest.json#instruments[12]"]
+      "digestRows": ["program-records/2026-10-03/research/cross-framework/digest.json#instruments[12]"]
     },
     {
       "id": "intl-iso-27799",
@@ -2361,7 +2361,7 @@
         { "ref": "ISO 27799:2025", "summary": "Health-specific information security controls; replaces ISO 27799:2016.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025", "event": "Third edition published", "verified": false, "url": "https://www.iso.org/standard/84647.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[28]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2025", "event": "Third edition published", "verified": false, "url": "https://www.iso.org/standard/84647.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/health/digest.json#instruments[28]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO: ISO 27799:2025 catalogue entry", "url": "https://www.iso.org/standard/84647.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2372,7 +2372,7 @@
       "affectedPacks": ["digital-health-record", "professional-practice"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-27799-2025"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/health/digest.json#instruments[28]"]
+      "digestRows": ["program-records/2026-10-03/research/health/digest.json#instruments[28]"]
     },
     {
       "id": "intl-iso-iec-40500",
@@ -2386,7 +2386,7 @@
         { "ref": "ISO/IEC 40500:2025", "summary": "Agent-generated web content and interfaces conform to WCAG 2.2 success criteria (WCAG 2.1 remains the reference in some laws).", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025", "event": "ISO/IEC 40500:2025 (WCAG 2.2) published", "verified": false, "url": "https://www.iso.org/standard/91029.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2025", "event": "ISO/IEC 40500:2025 (WCAG 2.2) published", "verified": false, "url": "https://www.iso.org/standard/91029.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/education/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO/IEC 40500:2025 (WCAG 2.2)", "url": "https://www.iso.org/standard/91029.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2397,7 +2397,7 @@
       "affectedPacks": ["citizen-services", "differently-abled", "digital-citizens-rights", "k12-pm3", "specialized-education"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[24]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[15]"]
+      "digestRows": ["program-records/2026-10-03/research/education/digest.json#instruments[24]", "program-records/2026-10-03/research/governance/digest.json#instruments[15]"]
     },
     {
       "id": "intl-iso-29990",
@@ -2411,7 +2411,7 @@
         { "ref": "ISO 29990:2010", "summary": "Withdrawn; packs should cite ISO 21001 for educational-organisation management systems.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "iso21001_2025", "date": "2025-07", "event": "ISO 21001:2025 published (replacement path per education digest)", "verified": false, "url": "https://www.iso.org/standard/21001", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[25]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "iso21001_2025", "date": "2025-07", "event": "ISO 21001:2025 published (replacement path per education digest)", "verified": false, "url": "https://www.iso.org/standard/21001", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/education/digest.json#instruments[25]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO 21001:2025 catalogue page", "url": "https://www.iso.org/standard/21001", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2422,7 +2422,7 @@
       "affectedPacks": ["skills-training"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-29990"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/education/digest.json#instruments[25]"]
+      "digestRows": ["program-records/2026-10-03/research/education/digest.json#instruments[25]"]
     },
     {
       "id": "intl-iso-14001",
@@ -2436,7 +2436,7 @@
         { "ref": "ISO 14001:2026", "summary": "Environmental management system requirements; 2015 edition withdrawn with certification transition.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2026-04-15", "event": "ISO 14001:2026 published (2015 edition withdrawn)", "verified": false, "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[33]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2026-04-15", "event": "ISO 14001:2026 published (2015 edition withdrawn)", "verified": false, "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/environment/digest.json#instruments[33]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO news: ISO 14001:2026 published (April 2026)", "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2447,7 +2447,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "material-to-machines", "source-to-sustenance", "sustainable-communities", "sustainable-ports"],
       "codeSurfaces": ["environment (domain)"],
       "catalogueIds": ["iso-14001-2026"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/environment/digest.json#instruments[33]", "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]"]
+      "digestRows": ["program-records/2026-10-03/research/environment/digest.json#instruments[33]", "program-records/2026-10-03/research/mobility/digest.json#instruments[41]"]
     },
     {
       "id": "intl-iso-9001",
@@ -2461,7 +2461,7 @@
         { "ref": "ISO 9001:2026", "summary": "Quality management system requirements.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2026-09-16", "event": "ISO 9001:2026 published (transition to 2029-09-30 per mobility digest)", "verified": false, "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2026-09-16", "event": "ISO 9001:2026 published (transition to 2029-09-30 per mobility digest)", "verified": false, "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[41]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO news: ISO 14001:2026 published (April 2026)", "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" },
@@ -2473,7 +2473,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "sustainable-communities", "sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-9001-2026"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[41]"]
     },
     {
       "id": "intl-iso-28000",
@@ -2487,7 +2487,7 @@
         { "ref": "ISO 28000:2022/Amd 1:2024", "summary": "Supply-chain security management system requirements.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "amd1", "date": "2024-02", "event": "Amendment 1:2024 (climate action) published", "verified": false, "url": "https://www.iso.org/standard/88413.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "amd1", "date": "2024-02", "event": "Amendment 1:2024 (climate action) published", "verified": false, "url": "https://www.iso.org/standard/88413.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[41]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/88413.html", "url": "https://www.iso.org/standard/88413.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2498,7 +2498,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "sustainable-communities", "sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-28000"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[41]"]
     },
     {
       "id": "intl-iso-37120",
@@ -2523,7 +2523,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "sustainable-communities", "sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-37120"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[41]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[41]"]
     },
     {
       "id": "intl-iso-26262",
@@ -2537,7 +2537,7 @@
         { "ref": "ISO 26262:2018", "summary": "Functional safety lifecycle for E/E systems in road vehicles.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "ed3Dis", "date": "2026", "event": "ISO/DIS 26262 (edition 3) parts at enquiry stage", "verified": false, "url": "https://www.iso.org/standard/90022.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[8]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "ed3Dis", "date": "2026", "event": "ISO/DIS 26262 (edition 3) parts at enquiry stage", "verified": false, "url": "https://www.iso.org/standard/90022.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[8]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/90022.html", "url": "https://www.iso.org/standard/90022.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2548,7 +2548,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[8]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[8]"]
     },
     {
       "id": "intl-iso-21448",
@@ -2573,7 +2573,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[9]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[9]"]
     },
     {
       "id": "intl-iso-pas-8800",
@@ -2587,7 +2587,7 @@
         { "ref": "ISO/PAS 8800:2024", "summary": "Safety assurance of AI elements in road vehicles.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2024-12", "event": "Published (Edition 1)", "verified": false, "url": "https://www.iso.org/standard/83303.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[10]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2024-12", "event": "Published (Edition 1)", "verified": false, "url": "https://www.iso.org/standard/83303.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[10]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/83303.html", "url": "https://www.iso.org/standard/83303.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2598,7 +2598,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[10]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[10]"]
     },
     {
       "id": "intl-iso-ts-5083",
@@ -2612,7 +2612,7 @@
         { "ref": "ISO/TS 5083:2025", "summary": "Safety design and verification for automated driving systems.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025-04", "event": "Published; second edition under development", "verified": false, "url": "https://www.iso.org/standard/81920.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[11]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2025-04", "event": "Published; second edition under development", "verified": false, "url": "https://www.iso.org/standard/81920.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[11]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/81920.html", "url": "https://www.iso.org/standard/81920.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2623,7 +2623,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[11]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[11]"]
     },
     {
       "id": "intl-iso-3691-4",
@@ -2637,7 +2637,7 @@
         { "ref": "ISO 3691-4:2023", "summary": "Safety requirements for driverless industrial trucks and their systems.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2023", "event": "Edition 2 published", "verified": false, "url": "https://www.iso.org/standard/83545.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[26]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2023", "event": "Edition 2 published", "verified": false, "url": "https://www.iso.org/standard/83545.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[26]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/83545.html", "url": "https://www.iso.org/standard/83545.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2648,7 +2648,7 @@
       "affectedPacks": ["freight-3pl-warehouse", "sustainable-ports"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[26]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[26]"]
     },
     {
       "id": "intl-iso-iec-27701",
@@ -2662,7 +2662,7 @@
         { "ref": "ISO/IEC 27701:2025", "summary": "Privacy information management system requirements.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "published", "date": "2025", "event": "Standalone PIMS edition published (replaces 2019)", "verified": false, "url": "https://www.iso.org/standard/27701", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[36]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "published", "date": "2025", "event": "Standalone PIMS edition published (replaces 2019)", "verified": false, "url": "https://www.iso.org/standard/27701", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/mobility/digest.json#instruments[36]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO catalogue page https://www.iso.org/standard/27701", "url": "https://www.iso.org/standard/27701", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2673,7 +2673,7 @@
       "affectedPacks": ["privacy-security-mobility"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-27701-2025"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/mobility/digest.json#instruments[36]"]
+      "digestRows": ["program-records/2026-10-03/research/mobility/digest.json#instruments[36]"]
     },
     {
       "id": "intl-iso-iec-29115",
@@ -2698,7 +2698,7 @@
       "affectedPacks": ["digital-citizens-rights"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-29115"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[28]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[28]"]
     },
     {
       "id": "intl-iso-26000",
@@ -2723,7 +2723,7 @@
       "affectedPacks": ["public-private-collaboration"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-26000"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[29]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[29]"]
     },
     {
       "id": "intl-iso-iec-25012",
@@ -2748,7 +2748,7 @@
       "affectedPacks": ["petition-to-law"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-25000"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/governance/digest.json#instruments[30]"]
+      "digestRows": ["program-records/2026-10-03/research/governance/digest.json#instruments[30]"]
     },
     {
       "id": "intl-iso-22301",
@@ -2762,8 +2762,8 @@
         { "ref": "ISO 22301:2019", "summary": "Business continuity management system requirements.", "verified": false, "basis": "not verified: iso.org returned HTTP 403 to this harness (measured 2026-10-04); standard text is paid and not read" }
       ],
       "keyDates": [
-        { "id": "amd1", "date": "2024", "event": "Amd 1:2024 published", "verified": false, "url": "https://www.iso.org/standard/75106.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" },
-        { "id": "revision", "date": "2026-10-03", "event": "Revision in progress (ISO/CD 22301) at retrieval", "verified": false, "url": "https://www.iso.org/standard/75106.html", "retrievedAt": "2026-10-03", "basis": "receipt AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
+        { "id": "amd1", "date": "2024", "event": "Amd 1:2024 published", "verified": false, "url": "https://www.iso.org/standard/75106.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" },
+        { "id": "revision", "date": "2026-10-03", "event": "Revision in progress (ISO/CD 22301) at retrieval", "verified": false, "url": "https://www.iso.org/standard/75106.html", "retrievedAt": "2026-10-03", "basis": "receipt program-records/2026-10-03/research/technology/digest.json#instruments[24]", "note": "primary text unreachable 2026-10-03: iso.org returns HTTP 403 to this harness (re-measured 2026-10-04); date quoted from the receipt and not re-read" }
       ],
       "sources": [
         { "title": "ISO 22301:2019 page", "url": "https://www.iso.org/standard/75106.html", "publisher": "ISO", "retrievedAt": "2026-10-03", "fetched": false, "note": "iso.org returned HTTP 403 to this harness (2026-10-04); primary text unreachable 2026-10-03" }
@@ -2774,7 +2774,7 @@
       "affectedPacks": ["os-sustainable-outcomes"],
       "codeSurfaces": [],
       "catalogueIds": ["iso-22301"],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[24]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[24]"]
     },
     {
       "id": "intl-iso-iec-5962",
@@ -2799,7 +2799,7 @@
       "affectedPacks": ["partnerships-prosperity", "sbom-supply-chain"],
       "codeSurfaces": [],
       "catalogueIds": [],
-      "digestRows": ["AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/research/technology/digest.json#instruments[35]"]
+      "digestRows": ["program-records/2026-10-03/research/technology/digest.json#instruments[35]"]
     },
     {
       "id": "us-eo-14110",
@@ -3697,7 +3697,7 @@
       ],
       "keyDates": [
         { "id": "2024-04-08-effective", "date": "2024-04-08", "event": "Effective", "verified": true, "url": "https://www.federalregister.gov/documents/2024/02/08/2024-00895/medicare-and-medicaid-programs-patient-protection-and-affordable-care-act-advancing-interoperability", "retrievedAt": "2026-10-03" },
-        { "id": "2026-impacted-payers-must-giv", "date": "2026-01-01", "event": "MA organizations and state Medicaid and CHIP FFS programs must give a specific reason for denials and decide within 72 hours (expedited) or 7 calendar days (standard)", "verified": true, "url": "https://www.federalregister.gov/documents/full_text/text/2024/02/08/2024-00895.txt", "retrievedAt": "2026-10-04", "basis": "Federal Register full text of CMS-0057-F read 2026-10-04 (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-us/review.json refuted[0]): compliance dates starting January 1, 2026" },
+        { "id": "2026-impacted-payers-must-giv", "date": "2026-01-01", "event": "MA organizations and state Medicaid and CHIP FFS programs must give a specific reason for denials and decide within 72 hours (expedited) or 7 calendar days (standard)", "verified": true, "url": "https://www.federalregister.gov/documents/full_text/text/2024/02/08/2024-00895.txt", "retrievedAt": "2026-10-04", "basis": "Federal Register full text of CMS-0057-F read 2026-10-04 (program-records/2026-10-03/round2/register-us/review.json refuted[0]): compliance dates starting January 1, 2026" },
         { "id": "2026-04-14-related-proposed-rule-91", "date": "2026-04-14", "event": "Related proposed rule (91 FR 19890, RIN 0938-AV44) would extend prior-authorization API and interoperability requirements to drugs and require API endpoint reporting; not final", "verified": true, "url": "https://www.federalregister.gov/api/v1/documents/2026-07205.json", "retrievedAt": "2026-10-04T05:05:00Z" },
         { "id": "2027-01-01-prior-authorization-pati", "date": "2027-01-01", "event": "Prior Authorization / Patient Access API changes compliance (MA, Medicaid/CHIP FFS)", "verified": true, "url": "https://www.federalregister.gov/documents/2024/02/08/2024-00895/medicare-and-medicaid-programs-patient-protection-and-affordable-care-act-advancing-interoperability", "retrievedAt": "2026-10-03" }
       ],
@@ -4821,7 +4821,7 @@
         { "ref": "HB26-1263", "summary": "Self-harm protocol letting the chatbot disengage on suicidal-ideation or self-harm concerns, reported annually to the Attorney General; no claims that outputs replicate licensed professional services.", "verified": true }
       ],
       "keyDates": [
-        { "id": "2026-05-29-signed-leg-colorado-gov", "date": "2026-05-29", "event": "Signed (leg.colorado.gov bill page)", "verified": true, "url": "https://leg.colorado.gov/bills/hb26-1263", "retrievedAt": "2026-10-04T05:12:00Z", "basis": "leg.colorado.gov/bills/hb26-1263 read 2026-10-04 by the author and again by AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-us/review.json (confirmedCorrectFlags[0]); the digest's 2026-07-01 from coag.gov/ai is the outlier" },
+        { "id": "2026-05-29-signed-leg-colorado-gov", "date": "2026-05-29", "event": "Signed (leg.colorado.gov bill page)", "verified": true, "url": "https://leg.colorado.gov/bills/hb26-1263", "retrievedAt": "2026-10-04T05:12:00Z", "basis": "leg.colorado.gov/bills/hb26-1263 read 2026-10-04 by the author and again by program-records/2026-10-03/round2/register-us/review.json (confirmedCorrectFlags[0]); the digest's 2026-07-01 from coag.gov/ai is the outlier" },
         { "id": "2026-08-11-ag-files-proposed-admt-a", "date": "2026-08-11", "event": "AG files proposed ADMT and Chatbot Safety Rules; formal comment period opens", "verified": true, "url": "https://coag.gov/ai/", "retrievedAt": "2026-10-03T17:02:19Z" },
         { "id": "2026-10-26-ag-formal-comment-deadli", "date": "2026-10-26", "event": "AG formal comment deadline (extends if hearing continues)", "verified": true, "url": "https://coag.gov/ai/", "retrievedAt": "2026-10-03T17:02:19Z" },
         { "id": "2027-01-01-operator-requirements-ef", "date": "2027-01-01", "event": "Operator requirements effective", "verified": true, "url": "https://leg.colorado.gov/bills/hb26-1263", "retrievedAt": "2026-10-04T05:12:00Z" }

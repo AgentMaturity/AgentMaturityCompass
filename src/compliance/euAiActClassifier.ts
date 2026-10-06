@@ -27,7 +27,7 @@ export const EU_AI_ACT_TIMELINE = {
   article6_1AnnexIHighRisk: "2028-08-02",
   // Art. 111(2) as amended (OJ text of Regulation (EU) 2026/1744, CELEX 32026R1744) and Art. 111(1)
   // (CELEX 32024R1689), read 2026-10-04 via https://publications.europa.eu/resource/celex/<CELEX> by the
-  // round-2 register batch (AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/round2/register-eu-intl).
+  // round-2 register batch (program-records/2026-10-03/round2/register-eu-intl).
   publicAuthorityHighRiskDeadline: "2030-08-02",
   annexXLargeScaleIt: "2030-12-31",
 } as const;
