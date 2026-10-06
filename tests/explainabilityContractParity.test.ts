@@ -12,6 +12,7 @@ import * as realHash from "../src/utils/hash.js";
 import * as realJson from "../src/utils/json.js";
 import { buildWatchObsStudioSourceArtifactLinks } from "../src/watch/evidenceDrilldown.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { landedBytes, landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-02-native/explainability-contracts";
 const hash = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
@@ -125,7 +126,7 @@ describe("explainability shared contracts retain complete original exported flow
     expect(restoration.statusSites).toHaveLength(18);
     expect(restoration.projections).toHaveLength(9);
     for (const row of originals.files.filter(item => item.path.startsWith("src/"))) {
-      let restored = readFileSync(resolve(row.path), "utf8");
+      let restored = landedText(row.path);
       for (const edit of [...restoration.inverseEdits].reverse().filter(item => item.path === row.path)) {
         expect(restored.split(edit.after)).toHaveLength(2);
         restored = restored.replace(edit.after, edit.before);
@@ -134,9 +135,9 @@ describe("explainability shared contracts retain complete original exported flow
     }
     const immutableContracts = originals.heldReadOnly.filter(row => !row.path.startsWith("tests/")
       && !["src/api/scoreRouter.ts", "package.json"].includes(row.path));
-    for (const row of immutableContracts) expect(hash(readFileSync(resolve(row.path)))).toBe(row.sha256);
+    for (const row of immutableContracts) expect(hash(landedBytes(row.path))).toBe(row.sha256);
     expect(originals.heldReadOnly.find(row => row.path === "package.json")?.sha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
-    expect(packageEntriesSha256(readFileSync(resolve("package.json")))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
+    expect(packageEntriesSha256(landedBytes("package.json"))).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     expect(Object.keys(currentQuestion)).toEqual(Object.keys(originalQuestion));
     expect(Object.keys(currentDrilldown)).toEqual(Object.keys(originalDrilldown));
   });

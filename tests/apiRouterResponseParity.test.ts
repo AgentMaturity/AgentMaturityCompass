@@ -11,6 +11,7 @@ import ts from "typescript";
 import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import type { ProviderDriftCanaryRow } from "../src/benchmarks/providerDriftBenchmark.js";
 import * as projections from "../src/api/routerResponseHelpers.js";
+import { landedBytes } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-02-native/api-router-responses";
 const restoration = JSON.parse(readFileSync(resolve(archive, "restoration.json"), "utf8")) as {
@@ -33,7 +34,7 @@ function modules(original: boolean) {
     const bytes = readFileSync(resolve(original ? row!.archive! : path));
     if (original && hash(bytes) !== row!.sha256) throw new Error("Complete original changed: " + path);
     if (!original && row?.archive && !["src/api/scoreRouter.ts", "src/api/shieldRouter.ts", "src/api/watchRouter.ts"].includes(path)
-      && hash(bytes) !== row.sha256) throw new Error("Read-only dependency changed: " + path);
+      && hash(landedBytes(path)) !== row.sha256) throw new Error("Read-only dependency changed: " + path);
     const filename = resolve(path.replace(/^src\//, "dist/").replace(/\.ts$/, ".js"));
     const compiled = ts.transpileModule(bytes.toString("utf8"), { fileName: path, reportDiagnostics: true,
       compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } });

@@ -6,6 +6,7 @@ import * as sdkExports from "../src/sdk/index.js";
 import { orgSignatureSchema, orgScorecardSignatureSchema } from "../src/org/orgSchema.js";
 import { createHash } from "node:crypto";
 import ts from "typescript";
+import { landedText } from "./helpers/landedSource.js";
 
 function headersObject(headers: HeadersInit | undefined): Record<string, string> {
   const headersObj = new Headers(headers);
@@ -159,7 +160,7 @@ describe("public SDK and scorecard identity aliases", () => {
     for (const row of restoration.files.filter(item => item.originalPath.startsWith("src/"))) {
       const original = readFileSync(join(process.cwd(), row.archivePath), "utf8");
       expect(createHash("sha256").update(original).digest("hex")).toBe(row.sha256);
-      expect(unchanged(readFileSync(join(process.cwd(), row.originalPath), "utf8"))).toBe(unchanged(original));
+      expect(unchanged(landedText(row.originalPath))).toBe(unchanged(original));
     }
   });
 });

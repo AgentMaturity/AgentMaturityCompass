@@ -20,6 +20,7 @@ import * as benchCollector from "../src/bench/benchCollector.js";
 import * as passportCollector from "../src/passport/passportCollector.js";
 import * as benchSigner from "../src/bench/benchSigner.js";
 import * as passportSigner from "../src/passport/passportSigner.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-01-main/archive-files";
 const sources = [
@@ -231,7 +232,7 @@ for (const [path, expectedHash] of sources) {
   const original = originalHelpers(originalSource);
   describe(`archive file utility parity: ${path}`, () => {
     test("preserves extraction bounds, all verifiers, domain errors and public APIs", () => {
-      expect(untouched(read(path))).toBe(untouched(originalSource));
+      expect(untouched(landedText(path))).toBe(untouched(originalSource));
       expect(collectFiles.length).toBe(original.collectFiles.length);
       expect(cleanupDir.length).toBe(original.cleanupDir.length);
     });
@@ -297,7 +298,7 @@ for (const row of additionalRestoration.files.filter(item => item.originalPath.s
   const original = additionalCollector(originalSource), current = additionalCollector(read(row.originalPath));
   describe(`additional archive file utility: ${row.originalPath}`, () => {
     test("retains all other declarations, cleanup, crypto, extraction guards and public APIs", () => {
-      expect(additionalUntouched(read(row.originalPath))).toBe(additionalUntouched(originalSource));
+      expect(additionalUntouched(landedText(row.originalPath))).toBe(additionalUntouched(originalSource));
       expect(current.length).toBe(original.length);
     });
     for (const [label, files] of [

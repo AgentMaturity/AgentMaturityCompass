@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "decision": "D-15",
+  "files": [
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "issue": "P0-47",
+      "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+      "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+      "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5"
+    }
+  ]
+}

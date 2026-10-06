@@ -15,6 +15,7 @@ import * as scenarioProvenance from "../src/score/scenarioProvenance.js";
 import * as simulationValidity from "../src/score/simulationValidity.js";
 import * as syntheticIdentityGovernance from "../src/score/syntheticIdentityGovernance.js";
 import { scoreResponse, scoreToLevel } from "../src/score/diagnosticResponseScoring.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const archive = "unused-code/2026-10-01-main/diagnostic-response-scoring";
 const modules = [
@@ -122,7 +123,7 @@ for (const [name, publicFunction, expectedHash] of modules) {
 
   describe(`diagnostic scoring parity: ${name}`, () => {
     test("preserves all criteria, public reports, exports and infrastructure functions", () => {
-      expect(untouched(currentSource, forecast)).toBe(untouched(originalSource, forecast));
+      expect(untouched(landedText(`src/score/${name}.ts`), forecast)).toBe(untouched(originalSource, forecast));
       expect(ids.length).toBeGreaterThan(0);
       expect(current.privateLevel.length).toBe(original.privateLevel.length);
       expect(current.privateResponse.length).toBe(original.privateResponse.length);

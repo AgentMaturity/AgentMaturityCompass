@@ -6,6 +6,7 @@ import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { enforceRoleOrAdmin } from "../src/auth/rbac.js";
 import { USER_ROLES, type UserRole } from "../src/auth/roles.js";
+import { landedText } from "./helpers/landedSource.js";
 
 const prefix = "unused-code/2026-10-01-main/studio-route-role-context";
 const map = JSON.parse(readFileSync(resolve(prefix, "restoration.json"), "utf8")) as {
@@ -150,6 +151,7 @@ const groups = [...new Map(map.calls.map((row, index) => [JSON.stringify(row.rol
 describe("Studio request role context sharing", () => {
   it("reverses exactly the declared calls to the complete unchanged source", () => {
     expect(map.calls).toHaveLength(232);
+    const current = landedText("src/studio/studioServer.ts");
     expect(current.split(map.helperText)).toHaveLength(2);
     let restored = undoVaultSharing(current).replace(map.helperText, "");
     const ast = sourceAst(restored), calls: ts.CallExpression[] = [];

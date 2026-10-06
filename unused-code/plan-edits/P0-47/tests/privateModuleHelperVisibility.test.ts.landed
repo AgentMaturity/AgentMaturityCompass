@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
-import { landedBytes, landedText } from "./helpers/landedSource.js";
 
 const prefix = "unused-code/2026-10-02-main/private-module-helpers";
 const map = JSON.parse(readFileSync(resolve(prefix, "restoration.json"), "utf8")) as {
@@ -54,24 +53,24 @@ describe("individually reviewed module-private helper visibility", () => {
     expect(map.files.filter(file => file.declarations.length)).toHaveLength(map.changedSourceFiles);
     expect(map.heldContractSources).toHaveLength(5);
     for (const contract of map.heldContractSources) {
-      expect(hash(landedBytes(contract.file))).toBe(contract.sha256);
+      expect(hash(readFileSync(resolve(contract.file)))).toBe(contract.sha256);
     }
     expect(map.files.reduce((sum, file) => sum + file.declarations.length, 0)).toBe(map.declarations);
-    const manifest = landedBytes("package.json");
+    const manifest = readFileSync(resolve("package.json"));
     expect(map.packageManifestSha256).toBe(ARCHIVED_PACKAGE_MANIFEST_SHA256);
     expect(packageEntriesSha256(manifest)).toBe(ARCHIVED_PACKAGE_ENTRIES_SHA256);
     const pkg = JSON.parse(manifest.toString("utf8")) as { exports: Record<string, { types: string }> };
     expect(Object.keys(pkg.exports).sort()).toEqual(map.packageEntries.map(row => row.name).sort());
     for (const entry of map.packageEntries) {
       expect(pkg.exports[entry.name].types.replace(/^\.\/dist\//, "src/").replace(/\.d\.ts$/, ".ts")).toBe(entry.file);
-      expect(hash(landedBytes(entry.file))).toBe(entry.sha256);
+      expect(hash(readFileSync(resolve(entry.file)))).toBe(entry.sha256);
     }
   });
   for (const row of map.files) {
     describe(row.originalPath, () => {
       const bytes = readFileSync(resolve(row.archivePath));
       if (hash(bytes) !== row.sha256) throw new Error("Complete source original changed: " + row.originalPath);
-      const original = bytes.toString("utf8"), current = restoreWorkspacePathSharing(row.originalPath, landedText(row.originalPath));
+      const original = bytes.toString("utf8"), current = restoreWorkspacePathSharing(row.originalPath, readFileSync(resolve(row.originalPath), "utf8"));
       it("retains every function, parameter, body and caller while changing only the declared visibility", () => {
         let expected = original;
         for (const declaration of [...row.declarations].sort((a, b) => b.start - a.start)) {
