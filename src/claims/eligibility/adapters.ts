@@ -57,9 +57,11 @@ export function claimKindFromClaimTier(tier: ClaimTier): MappedKind {
   return { claimKind: CLAIM_TIER_KINDS[tier], reasons: [] };
 }
 
+/** An unrecognised stored status (1.x results are untrusted input) is not evaluated. */
 export function fromUppercaseStatus(status: CertificationEvidenceStatus | ComplianceCategoryStatus):
   { result: ResultState; evidence?: "incomplete" } {
-  return { ...UPPERCASE_STATUS[status] };
+  return Object.hasOwn(UPPERCASE_STATUS, status)
+    ? { ...UPPERCASE_STATUS[status] } : { result: "not_evaluated", evidence: "incomplete" };
 }
 
 function evidence(eventCount: number, tiers: ClaimEligibilityInput["evidence"]["tiers"],

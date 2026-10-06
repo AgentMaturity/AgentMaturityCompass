@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import {
+  claimEnvelopeSchema,
   claimKindFromClaimTier,
   claimKindFromTrustTier,
   envelopeForDiagnosticReport,
@@ -57,6 +58,16 @@ describe("tier adapters", () => {
       expect(mapped.evidence).toBe(evidence);
       expect(doc).toContain(`| \`${status}\` | \`${result}\` | ${evidence ? `\`${evidence}\`` : "unchanged"} |`);
     });
+
+  test.each(["COMPLIANT", "partial", "__proto__", "constructor"])("unknown stored status %s is not evaluated", (status) => {
+    const unknown = status as ComplianceCategoryStatus;
+    expect(fromUppercaseStatus(unknown)).toEqual({ result: "not_evaluated", evidence: "incomplete" });
+    const envelope = envelopeForLegacyResult({ producer: "amc 1.x", version: "1.1.1", method: "runtime_observation",
+      status: unknown, level: 3, eventCount: 2, now: NOW });
+    expect(envelope.statusDimensions.result).toBe("not_evaluated");
+    expect(envelope.statusDimensions.evidence).toBe("incomplete");
+    expect(claimEnvelopeSchema.safeParse(envelope).success).toBe(true);
+  });
 });
 
 describe("envelope adapters", () => {

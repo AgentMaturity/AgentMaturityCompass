@@ -87,6 +87,8 @@ The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`) and the co
 | `MISSING` | `not_evaluated` | `incomplete` |
 | `UNKNOWN` | `not_evaluated` | `incomplete` |
 
+Any other stored status is unrecognised and maps to result `not_evaluated` with evidence `incomplete`.
+
 Industry-pack audit findings map the same way: `INDUSTRY_EVIDENCE_MISSING` means evidence `incomplete` and result `not_evaluated`, and `INDUSTRY_EVIDENCE_SYNTHETIC` means kind `synthetic_example`.
 
 ### Diagnostic runs
