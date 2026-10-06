@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { checkRegulatoryCurrency } from "../scripts/check-regulatory-currency.mjs";
 import { INDUSTRY_PACK_MANIFEST } from "../src/assurance/packs/industryPackManifest.js";
@@ -92,5 +93,15 @@ describe("currency script guards the merged register", () => {
     const copy = structuredClone(REGULATORY_REGISTER);
     copy.entries.push(structuredClone(copy.entries[0]!));
     expect(checkRegulatoryCurrency(copy, { asOf: "2026-10-04" }).errors).toContain(`duplicate entry id ${copy.entries[0]!.id}`);
+  });
+});
+
+describe("program-record references are labels, not repository paths", () => {
+  it("cites program records as program-records/2026-10-03/<path> and says they are held outside the repository", () => {
+    const raw = readFileSync("src/compliance/regulatory/register.json", "utf8");
+    expect(raw).not.toContain("AMC_OS/");
+    expect(raw).toContain("program-records/2026-10-03/research/");
+    expect(REGULATORY_REGISTER.policy.note).toContain("held outside the repository");
+    expect(readFileSync("docs/COMPLIANCE_FRAMEWORKS.md", "utf8")).toContain("held outside the repository");
   });
 });
