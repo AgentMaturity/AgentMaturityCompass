@@ -1281,7 +1281,6 @@ export type {
   ConfidenceHistogramBin,
   ClaimConfidenceReport
 } from "./claims/claimConfidence.js";
-export * from "./claims/eligibility/index.js";
 
 // Incident Management (Store/Model/Graph/Timeline/Auto-Assembly)
 export * as IncidentStore from "./incidents/incidentStore.js";

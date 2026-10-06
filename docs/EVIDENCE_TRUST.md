@@ -9,6 +9,8 @@ AMC maturity scoring is evidence-derived. Agents cannot raise their own scores b
 - `OBSERVED`: AMC-observed runtime/tool/gateway evidence.
 - `OBSERVED_HARDENED`: observed evidence with stronger assurance context.
 
+Claim kinds (`synthetic_example`, `self_reported`, `observed`, `independently_reviewed`) and the five status dimensions that every result will carry are defined in [CLAIM_KINDS.md](CLAIM_KINDS.md), with the mapping from each trust tier.
+
 ## Scoring Rules
 
 - Only observed/attested evidence can elevate high-confidence maturity levels.
