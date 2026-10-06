@@ -1,7 +1,8 @@
 import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import { verifyExternalEvidence, type ExternalEvidenceAuthority } from "./externalEvidenceProfile.js";
 
-function boundedFile(path: string, limit: number): Buffer {
+/** Reads a regular file of at most `limit` bytes without following a final symlink. */
+export function boundedFile(path: string, limit: number): Buffer {
   const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
     const before = fstatSync(fd);
