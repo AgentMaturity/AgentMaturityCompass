@@ -276,6 +276,9 @@ describe("amc agent-loop — the operator surface", () => {
       await run(unpinned, ["agent-loop", "verify", summary.sessionId]);
       expect(unpinnedOut.failures).toEqual([1]);
       expect(unpinnedOut.out.join("\n")).toContain("NOT VERIFIED: UNANCHORED");
+      // Step 9's message, as amc verify and session verify print it, with the full key id to compare.
+      expect(unpinnedOut.out.join("\n")).toContain("Ledger verification FAILED: UNANCHORED");
+      expect(unpinnedOut.out.join("\n")).toContain(sha256Hex(workspaceKeyPem(dir, "monitor")));
     });
 
     it("cancels on --cancel-after and still exits with a balanced, attributed turn", async () => {

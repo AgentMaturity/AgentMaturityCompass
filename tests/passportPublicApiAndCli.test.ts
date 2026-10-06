@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -400,12 +401,18 @@ describe("passport public API + sharing + comparison", () => {
     try {
       const unpinned = await verify();
       expect(unpinned.status).toBe(422);
+      // The response carries the verifier report and says why, with the key id to pin.
+      expect(unpinned.json.data.report.issuerAdmission.status).toBe("fail");
+      const auditorKeyId = createHash("sha256").update(workspaceKeyPem(ws, "auditor"), "utf8").digest("hex");
+      expect(unpinned.json.data.errors).toContainEqual(expect.objectContaining({ code: "ISSUER_NOT_ADMITTED",
+        message: expect.stringContaining(`key ${auditorKeyId} is not pinned`) }));
       process.env.AMC_HOME = operatorTrustHome([{ publicKeyPem: workspaceKeyPem(ws, "auditor"), purposes: ["artifact-seal"] }]);
       roots.push(process.env.AMC_HOME);
       const out = await verify();
       expect(out.status).toBe(200);
       expect(out.json.ok).toBe(true);
       expect(out.json.data.ok).toBe(true);
+      expect(out.json.data.report.trusted).toBe(true);
     } finally {
       if (previousHome === undefined) delete process.env.AMC_HOME;
       else process.env.AMC_HOME = previousHome;

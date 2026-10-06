@@ -1,6 +1,8 @@
 import { spawnSync } from "node:child_process";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { Readable } from "node:stream";
 import Database from "better-sqlite3";
-import { createHash, generateKeyPairSync, randomUUID, sign } from "node:crypto";
+import { createHash, generateKeyPairSync, sign } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
@@ -16,11 +18,18 @@ import { defaultPassportPolicy } from "../../src/passport/passportPolicySchema.j
 import { savePassportPolicy } from "../../src/passport/passportStore.js";
 import { appendTransparencyEntry } from "../../src/transparency/logChain.js";
 import { buildBenchProofs, writeBenchProofFiles } from "../../src/bench/benchProofs.js";
-import { signDigestWithPolicy } from "../../src/crypto/signing/signer.js";
 import { generateTrustCertificate } from "../../src/cert/trustCertificate.js";
 import { createReleaseBundle } from "../../src/release/releaseBundle.js";
 import { signReleaseManifest } from "../../src/release/releaseSigner.js";
-import { signTrustList } from "../../src/trust/index.js";
+import { signTrustList, type DistrustEntry, type TrustListEntry } from "../../src/trust/index.js";
+import { runAssurance } from "../../src/assurance/assuranceRunner.js";
+import { initAssurancePolicy, loadAssurancePolicy, saveAssurancePolicy } from "../../src/assurance/assurancePolicyStore.js";
+import { issueAssuranceCertificate } from "../../src/assurance/assuranceCertificates.js";
+import { handleBomRoute } from "../../src/api/bomRouter.js";
+import { handleCryptoRoute } from "../../src/api/cryptoRouter.js";
+import { handleAssuranceRoute } from "../../src/api/assuranceRouter.js";
+import { startStudioApiServer } from "../../src/studio/studioServer.js";
+import { startFakeAgentServer, useFakeAgentEnv } from "../helpers/fakeAgentServer.js";
 import { merkleLeafHash } from "../../src/transparency/merkle.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { listEntry, testKey, trustList, type TestKey } from "./trustFixtures.js";
@@ -43,9 +52,10 @@ function dir(prefix = "amc-forgery-"): string {
 
 const amcHome = dir("amc-forgery-home-");
 
-function amc(cwd: string, args: string[]) {
+function amc(cwd: string, args: string[], extraEnv: NodeJS.ProcessEnv = {}) {
   const env: NodeJS.ProcessEnv = { ...process.env, NO_COLOR: "1", AMC_HOME: amcHome };
   delete env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+  Object.assign(env, extraEnv);
   const result = spawnSync(process.execPath, [CLI, ...args], { cwd, env, encoding: "utf8", timeout: 120_000 });
   return { status: result.status, stdout: result.stdout, stderr: result.stderr, output: `${result.stdout}\n${result.stderr}` };
 }
@@ -72,6 +82,18 @@ const sha = (bytes: string | Buffer) => createHash("sha256").update(bytes).diges
 const signDigest = (digestHex: string, key: TestKey) => sign(null, Buffer.from(digestHex, "hex"), key.privateKeyPem).toString("base64");
 const readJson = (path: string) => JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
 const writeJson = (path: string, value: unknown) => writeFileSync(path, JSON.stringify(value, null, 2));
+
+/** A trust list signed by a fresh root, as --trust-list and --trust-root flags. */
+function listFlags(entries: TrustListEntry[], distrust: DistrustEntry[] = []): string[] {
+  const root = testKey();
+  const now = Date.now();
+  const path = join(dir("amc-forgery-list-"), "list.json");
+  writeJson(path, signTrustList(trustList(entries, { issuedAt: new Date(now - 3_600_000).toISOString(),
+    expiresAt: new Date(now + 86_400_000).toISOString(), distrust }), root.privateKeyPem));
+  return ["--trust-list", path, "--trust-root", root.keyId];
+}
+
+const distrusted = (keyId: string): DistrustEntry => ({ keyId, distrustedFrom: null, reason: "key-compromise", note: "forgery suite", source: "operator" });
 
 function filesUnder(root: string): string[] {
   const out: string[] = [];
@@ -240,6 +262,31 @@ describe("verifyEvidenceBundle (amc bundle verify)", () => {
     pin: ledgerPins,
     anchor: monitorPin
   });
+
+  test("AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key", () => {
+    const result = amc(evidence.workspace, ["bundle", "verify", evidence.bundle, "--pubkey", evidence.auditorPub,
+      ...listFlags([], [distrusted(evidence.monitorFingerprint)])], { AMC_EXPECTED_MONITOR_FINGERPRINT: evidence.monitorFingerprint });
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("distrusted");
+  });
+
+  test("a distrusted monitor key fails even with --expect-monitor and --allow-unanchored", () => {
+    const result = amc(evidence.workspace, ["bundle", "verify", evidence.bundle, ...ledgerPins(), "--allow-unanchored",
+      ...listFlags([], [distrusted(evidence.monitorFingerprint)])]);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("distrusted");
+  });
+
+  test("an issuer key superseded after it sealed the bundle is admitted on the claimed signing time", () => {
+    const pem = readFileSync(evidence.auditorPub, "utf8");
+    const now = Date.now();
+    const superseded = listEntry({ publicKeyPem: pem, privateKeyPem: "", keyId: sha(pem) }, { validFrom: new Date(now - 86_400_000).toISOString(),
+      validTo: null, revokedAt: new Date(now - 1_000).toISOString(), revocationReason: "superseded" });
+    const result = amc(evidence.workspace, ["bundle", "verify", evidence.bundle, ...monitorPin(), ...listFlags([superseded]), "--json"]);
+    expect(result.status, result.output).toBe(0);
+    const report = (JSON.parse(result.stdout) as { report: { issuerAdmission: { signatures: Array<{ signature: string; status: string; timeBasis: string | null }> } } }).report;
+    expect(report.issuerAdmission.signatures.find(row => row.signature === "manifest.sig")).toMatchObject({ status: "admitted", timeBasis: "claimed" });
+  });
 });
 
 describe("verifyCertificate (amc cert verify, .amccert)", () => {
@@ -249,6 +296,13 @@ describe("verifyCertificate (amc cert verify, .amccert)", () => {
     forged: () => forgeCertificate(evidence.certificate, attacker),
     pin: ledgerPins,
     anchor: monitorPin
+  });
+
+  test("AMC_EXPECTED_MONITOR_FINGERPRINT does not anchor a distrusted monitor key", () => {
+    const result = amc(evidence.workspace, ["cert", "verify", evidence.certificate, "--pubkey", evidence.auditorPub, "--allow-unanchored",
+      ...listFlags([], [distrusted(evidence.monitorFingerprint)])], { AMC_EXPECTED_MONITOR_FINGERPRINT: evidence.monitorFingerprint });
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("distrusted");
   });
 });
 
@@ -279,7 +333,7 @@ describe("verifyRevocationFile (amc cert verify-revocation and cert verify --rev
 // ── Passport and assurance certificate (signed Merkle root binding) ───────
 let signed: { workspace: string; passport: string; assurance: string; auditorPub: string };
 
-function signedArtifactFixture() {
+async function signedArtifactFixture() {
   const workspace = dir("amc-forgery-pass-");
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
   const auditorPub = join(dir("amc-forgery-records-"), "auditor.pub");
@@ -289,32 +343,43 @@ function signedArtifactFixture() {
     appendTransparencyEntry({ workspace, type, agentId: "default", artifact: { kind: "policy", sha256: sha(type), id: type } });
   }
   const passport = createPassportArtifact({ workspace, scopeType: "AGENT", scopeId: "default", outFile: "agent.amcpass" }).outFile;
-  return { workspace, passport, assurance: assuranceCertificate(workspace), auditorPub };
+  return { workspace, passport, assurance: await assuranceCertificate(workspace), auditorPub };
 }
 
-/** Packages an assurance certificate exactly as issueAssuranceCertificate does, signed by the workspace vault. */
-function assuranceCertificate(workspace: string): string {
-  const proofs = buildBenchProofs({ workspace, includeEventKinds: ["ASSURANCE_RUN_COMPLETED"], maxProofs: 40 });
-  const cert = {
-    v: 1, certId: `cert_${randomUUID().replace(/-/g, "")}`, issuedTs: Date.now(),
-    scope: { type: "WORKSPACE", idHash: sha("workspace").slice(0, 16) }, runId: "arun_fixture", status: "PASS",
-    riskAssuranceScore: 90, categoryScores: null, findingCounts: { critical: 0, high: 0, medium: 0, low: 0, info: 0 },
-    gates: { integrityIndex: 0.9, correlationRatio: 0.9, observedShare: 0.9 },
-    bindings: { assurancePolicySha256: sha("policy"), cgxPackSha256: sha("cgx"), promptPolicySha256: sha("prompt"), trustMode: "LOCAL_VAULT", notaryFingerprint: null },
-    proofBindings: {
-      transparencyRootSha256: proofs.transparencyRoot?.sha256 ?? "0".repeat(64), merkleRootSha256: proofs.merkleRoot?.sha256 ?? "0".repeat(64),
-      includedEventProofIds: proofs.proofs.map(row => row.proofId).sort((a, b) => a.localeCompare(b))
-    }
-  };
-  const digest = sha(canonicalize(cert));
-  const signedDigest = signDigestWithPolicy({ workspace, kind: "CERT", digestHex: digest });
-  const root = join(dir("amc-forgery-acert-"), "amc-cert");
-  mkdirSync(join(root, "meta"), { recursive: true });
-  writeFileSync(join(root, "cert.json"), `${canonicalize(cert)}\n`);
-  writeFileSync(join(root, "cert.sig"), `${canonicalize({ digestSha256: digest, signature: signedDigest.signature, signedTs: signedDigest.signedTs, signer: "auditor", envelope: signedDigest.envelope })}\n`);
-  writeFileSync(join(root, "signer.pub"), readFileSync(join(workspace, ".amc", "keys", "auditor_ed25519.pub")));
-  writeBenchProofFiles({ outDir: root, bundle: proofs });
-  return pack(join(root, ".."), "assurance.amccert");
+/**
+ * A real assurance certificate from the shipped issuer: an assurance run against the fake agent, then
+ * issueAssuranceCertificate. The run's evidence gates are lowered to zero in the signed policy, because a scan of a
+ * direct endpoint has no gateway-captured evidence; nothing else about the certificate is set by the test.
+ */
+async function assuranceCertificate(workspace: string): Promise<string> {
+  const agent = await startFakeAgentServer();
+  const restoreEnv = useFakeAgentEnv(agent.baseUrl);
+  try {
+    const run = await runAssurance({ workspace, agentId: "default", mode: "supervise", window: "14d", packId: "injection", noSign: true });
+    initAssurancePolicy(workspace);
+    const policy = loadAssurancePolicy(workspace);
+    policy.assurancePolicy.gates = { ...policy.assurancePolicy.gates, minIntegrityIndex: 0, minCorrelationRatio: 0, minObservedShare: 0 };
+    saveAssurancePolicy(workspace, policy);
+    return (await issueAssuranceCertificate({ workspace, runId: run.assuranceRunId, outFile: "assurance.amccert" })).outFile;
+  } finally {
+    restoreEnv();
+    await agent.close();
+  }
+}
+
+/** Replaces a certificate's proofs and signed roots with ones the same issuer produced later, for the same events. */
+function spliceLaterRoot(source: string, workspace: string): string {
+  appendTransparencyEntry({ workspace, type: "DIAGNOSTIC_COMPLETED", agentId: "default", artifact: { kind: "policy", sha256: sha("later"), id: "later" } });
+  const top = extract(source);
+  const root = join(top, "amc-cert");
+  const cert = readJson(join(root, "cert.json")) as { proofBindings: { includedEventProofIds: string[] } };
+  const later = buildBenchProofs({ workspace, includeEventKinds: ["ASSURANCE_RUN_STARTED", "ASSURANCE_RUN_COMPLETED",
+    "ASSURANCE_FINDING_RECORDED", "ASSURANCE_CERT_ISSUED", "NOTARY_ATTESTATION_OBSERVED"], maxProofs: 40 });
+  const proofs = later.proofs.filter(proof => cert.proofBindings.includedEventProofIds.includes(proof.proofId));
+  expect(proofs.length).toBe(cert.proofBindings.includedEventProofIds.length);
+  rmSync(join(root, "proofs"), { recursive: true, force: true });
+  writeBenchProofFiles({ outDir: root, bundle: { ...later, proofs } });
+  return pack(top, "spliced.amccert");
 }
 
 /** Tampers with the signed document, re-signs it without an envelope and swaps signer.pub. */
@@ -345,7 +410,7 @@ function fabricateProofRoot(source: string, directory: string): string {
 }
 
 describe("verifyPassportArtifactFile (amc passport verify)", () => {
-  beforeAll(() => { signed = signedArtifactFixture(); }, 120_000);
+  beforeAll(async () => { signed = await signedArtifactFixture(); }, 180_000);
   expectRow({
     verify: (file, flags) => amc(signed.workspace, ["passport", "verify", file, ...flags]),
     genuine: () => signed.passport,
@@ -377,7 +442,7 @@ describe("verifyPassportArtifactFile (amc passport verify)", () => {
 });
 
 describe("verifyAssuranceCertificateFile (amc assurance cert-verify)", () => {
-  beforeAll(() => { signed ??= signedArtifactFixture(); }, 120_000);
+  beforeAll(async () => { signed ??= await signedArtifactFixture(); }, 180_000);
   expectRow({
     verify: (file, flags) => amc(signed.workspace, ["assurance", "cert-verify", file, ...flags]),
     genuine: () => signed.assurance,
@@ -389,6 +454,12 @@ describe("verifyAssuranceCertificateFile (amc assurance cert-verify)", () => {
     const result = amc(signed.workspace, ["assurance", "cert-verify", fabricateProofRoot(signed.assurance, "amc-cert"), "--pubkey", signed.auditorPub]);
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("signed merkle root");
+  });
+
+  test("proofs and a signed root the same issuer produced later cannot be spliced into an untouched certificate", () => {
+    const result = amc(signed.workspace, ["assurance", "cert-verify", spliceLaterRoot(signed.assurance, signed.workspace), "--pubkey", signed.auditorPub]);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("proofBindings.merkleRootSha256 mismatch");
   });
 });
 
@@ -462,5 +533,89 @@ describe("verifyReleaseBundle (amc release verify)", () => {
     genuine: () => release.file,
     forged: forge,
     pin: () => ["--pubkey", release.publicKeyPath]
+  });
+
+  test("verify all names the key to pin when it refuses an unpinned release bundle", () => {
+    const workspace = dir("amc-forgery-relws-");
+    initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+    mkdirSync(join(workspace, "dist"), { recursive: true });
+    writeFileSync(join(workspace, "dist", "release.amcrelease"), readFileSync(release.file));
+    const result = amc(workspace, ["verify", "all", "--json"]);
+    // The JSON report comes first; the command may print its verdict after it.
+    const report = JSON.parse(`${result.stdout.split(/\n}\n/)[0]}\n}`) as { checks: Array<{ id: string; status: string; details: string[] }> };
+    const check = report.checks.find(row => row.id === "release-bundles");
+    expect(check?.status, result.output).toBe("FAIL");
+    expect(check?.details.join("\n")).toContain(`key ${sha(readFileSync(release.publicKeyPath, "utf8"))} is not pinned`);
+  }, 120_000);
+});
+
+// ── API routes: the server operator's trust only (P0-09 step 11) ───────────
+describe("API verify routes use the server's trust context and refuse request-supplied trust", () => {
+  const previousHome = process.env.AMC_HOME;
+  const previousMonitor = process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+  beforeAll(async () => {
+    signed ??= await signedArtifactFixture();
+    process.env.AMC_HOME = amcHome; // the server's AMC home pins nothing
+    delete process.env.AMC_EXPECTED_MONITOR_FINGERPRINT;
+  }, 180_000);
+  afterAll(() => {
+    if (previousHome === undefined) delete process.env.AMC_HOME;
+    else process.env.AMC_HOME = previousHome;
+    if (previousMonitor !== undefined) process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = previousMonitor;
+  });
+
+  type Handler = (pathname: string, method: string, req: IncomingMessage, res: ServerResponse, workspace?: string) => Promise<boolean>;
+  async function route(handler: Handler, pathname: string, body: Record<string, unknown>, workspace: string) {
+    const req = Object.assign(Readable.from([Buffer.from(JSON.stringify(body))]), { method: "POST", headers: { "content-type": "application/json" } });
+    let status = 0;
+    let text = "";
+    const res = { writeHead: (code: number) => { status = code; return res; }, setHeader: () => res, end: (chunk?: unknown) => { text = String(chunk ?? ""); } };
+    expect(await handler(pathname, "POST", req as unknown as IncomingMessage, res as unknown as ServerResponse, workspace)).toBe(true);
+    return { status, json: JSON.parse(text) as { ok: boolean; error?: string; data?: { ok: boolean; report?: { trusted: boolean; issuerAdmission: { status: string } } } } };
+  }
+
+  const cases: Array<[string, Handler, string, () => Record<string, unknown>, string]> = [
+    ["POST /api/v1/bundle/verify", handleBomRoute as Handler, "/api/v1/bundle/verify", () => ({ file: evidence.bundle }), "publicKeyPath"],
+    ["POST /api/v1/crypto/cert/verify", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify", () => ({ certFile: evidence.certificate }), "allowUnpinned"],
+    ["POST /api/v1/crypto/cert/verify-revocation", handleCryptoRoute as Handler, "/api/v1/crypto/cert/verify-revocation", () => ({ file: evidence.revocation }), "trustList"],
+    ["POST /api/v1/assurance/cert/verify", handleAssuranceRoute as Handler, "/api/v1/assurance/cert/verify", () => ({ file: signed.assurance }), "pubkey"]
+  ];
+  for (const [name, handler, pathname, body, field] of cases) {
+    test(`${name} refuses a body that carries ${field}`, async () => {
+      const out = await route(handler, pathname, { ...body(), [field]: field === "allowUnpinned" ? true : evidence.auditorPub }, evidence.workspace);
+      expect(out.status).toBe(400);
+      expect(out.json.error).toContain(`request field "${field}" is refused`);
+    });
+    test(`${name} answers an unpinned issuer with ok:false and the verifier report`, async () => {
+      const out = await route(handler, pathname, body(), evidence.workspace);
+      expect(out.json.data?.ok).toBe(false);
+      expect(out.json.data?.report?.trusted).toBe(false);
+      expect(out.json.data?.report?.issuerAdmission.status).toBe("fail");
+    });
+  }
+
+  test("Studio POST /passport/verify refuses publicKeyPath and reports an unpinned issuer", async () => {
+    const probe = createServer();
+    await new Promise<void>(done => probe.listen(0, "127.0.0.1", () => done()));
+    const address = probe.address();
+    await new Promise<void>(done => probe.close(() => done()));
+    if (!address || typeof address === "string") throw new Error("no port");
+    const server = await startStudioApiServer({ workspace: signed.workspace, host: "127.0.0.1", port: address.port, token: "forgery-admin-token" });
+    try {
+      const post = async (body: Record<string, unknown>) => {
+        const response = await fetch(`${server.url}/passport/verify`, { method: "POST", body: JSON.stringify(body),
+          headers: { "content-type": "application/json", "x-amc-admin-token": "forgery-admin-token" } });
+        return { status: response.status, json: await response.json() as { error?: string; ok?: boolean; report?: { trusted: boolean } } };
+      };
+      const refused = await post({ file: signed.passport, publicKeyPath: signed.auditorPub });
+      expect(refused.status).toBe(400);
+      expect(refused.json.error).toContain('request field "publicKeyPath" is refused');
+      const unpinned = await post({ file: signed.passport });
+      expect(unpinned.status).toBe(422);
+      expect(unpinned.json.ok).toBe(false);
+      expect(unpinned.json.report?.trusted).toBe(false);
+    } finally {
+      await server.close();
+    }
   });
 });

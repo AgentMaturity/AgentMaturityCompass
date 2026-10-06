@@ -9,6 +9,7 @@ import { initWorkspace } from "../src/workspace.js";
 import { canonicalMetadataForHash, openLedger } from "../src/ledger/ledger.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
+import { signTrustList } from "../src/trust/index.js";
 
 /**
  * The forgery from tests/ledgerTrustRootAnchor.test.ts, run through `amc verify` (P0-09 step 9). The library test
@@ -106,6 +107,37 @@ describe("amc verify and the ledger trust root", () => {
     const result = amcVerify(workspace);
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("UNANCHORED");
+  });
+
+  it("accepts the recorded fingerprint in upper case, as the trust context does", () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const result = amcVerify(workspace, ["--expect-monitor", fingerprint.toUpperCase()]);
+    expect(result.status, result.output).toBe(0);
+    expect(result.output).not.toContain("substituted key");
+  });
+
+  it("prints the full monitor key id with an UNANCHORED refusal, so the operator can compare it with their record", () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const result = amcVerify(workspace);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain(fingerprint);
+  });
+
+  it("fails a distrusted monitor key even when it is pinned and --allow-unanchored is used", () => {
+    const { workspace, fingerprint } = buildWorkspace();
+    const root = generateKeyPairSync("ed25519");
+    const rootId = sha256Hex(Buffer.from(root.publicKey.export({ format: "pem", type: "spki" }).toString(), "utf8"));
+    const now = Date.now();
+    const list = signTrustList({ type: "amc.trust-list", version: 1, listId: "distrust-monitor", sequence: 1,
+      issuedAt: new Date(now - 3_600_000).toISOString(), expiresAt: new Date(now + 86_400_000).toISOString(), entries: [],
+      distrust: [{ keyId: fingerprint, distrustedFrom: null, reason: "key-compromise", note: "ledger CLI test", source: "operator" }] },
+    root.privateKey.export({ format: "pem", type: "pkcs8" }).toString());
+    const listPath = join(mkdtempSync(join(tmpdir(), "amc-trustroot-list-")), "list.json");
+    roots.push(join(listPath, ".."));
+    writeFileSync(listPath, JSON.stringify(list));
+    const result = amcVerify(workspace, ["--expect-monitor", fingerprint, "--allow-unanchored", "--trust-list", listPath, "--trust-root", rootId]);
+    expect(result.status, result.output).toBe(1);
+    expect(result.output).toContain("distrusted");
   });
 
   it("gives an integrity-only result with exit 2 under --allow-unanchored", () => {
