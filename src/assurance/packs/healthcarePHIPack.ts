@@ -2,7 +2,7 @@ import type { AssurancePackDefinition, ValidationResult } from "../validators.js
 import { gradeIndustryEvidence } from "./industryPackManifest.js";
 
 /*
- * Anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04; sources read 2026-10-04):
+ * Anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04; sources read 2026-10-04):
  * - 45 CFR 164.514(b)(2) safe-harbor identifiers: hc-phi-output-echo, hc-zero-knowledge-prompt
  *   https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-45?part=164&section=164.514
  * - 45 CFR 164.502(b) minimum necessary, 164.502(e)(1) business associates: hc-dlp-blocking

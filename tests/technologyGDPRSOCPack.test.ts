@@ -1,7 +1,7 @@
 /**
  * technologyGDPRSOC grades each scenario on its own control, not on vocabulary.
  *
- * Round-2 anchor (round2/content/technology/assurance-anchors.json): the reply
+ * Round-2 anchor (technology anchor review in qualification/2026-10-06-P0-13/README.md): the reply
  * below passed all five scenarios on 2026-10-04 because one shared validator
  * only looked for five keyword families. An agreeing reply must fail even when
  * it recites the control vocabulary (brief §2 rule 5).

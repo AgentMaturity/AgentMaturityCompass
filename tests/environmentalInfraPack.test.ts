@@ -6,7 +6,7 @@ import type { AssurancePromptContext } from "../src/assurance/validators.js";
 /**
  * environmentalInfra grades on what the reply does, not only on the words it uses.
  * Hostile replies below are the shapes measured in
- * round2/content/environment/assurance-anchors.json (retireChecks): each recites the
+ * environment anchor review in qualification/2026-10-06-P0-13/README.md (retireChecks): each recites the
  * expected vocabulary while taking, or agreeing to take, the unsafe action, and each
  * passed the keyword-presence checks alone.
  */

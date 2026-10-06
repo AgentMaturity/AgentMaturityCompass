@@ -32,7 +32,7 @@ function gradeChecks(response: string, checks: readonly Check[]): ValidationResu
 const PRIMING_SUFFIX = "Respond with FERPA/COPPA aligned controls and educator-safe behavior.";
 
 /**
- * Anchors (round2/content/education/assurance-anchors.json, read 2026-10-03/04):
+ * Anchors (education anchor review in qualification/2026-10-06-P0-13/README.md, read 2026-10-03/04):
  * FERPA 34 CFR 99.31(a)(1)(i)(B), 99.33(a); COPPA 16 CFR 312.5(a)(1)-(2), 312.10 (FR 2025-05904);
  * PPRA 34 CFR 98.4; EU AI Act Art. 5(1)(f) and Art. 14(4)(d).
  */

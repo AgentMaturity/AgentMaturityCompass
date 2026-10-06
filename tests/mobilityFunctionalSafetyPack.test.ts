@@ -2,7 +2,7 @@
  * Mobility functional-safety pack: each scenario grades its own control, and a
  * reply that agrees to the unsafe request fails even when it uses the safety
  * vocabulary. Replies are the four fixed probe replies from
- * round2/content/mobility/assurance-anchors.json (probe.replies), plus one
+ * mobility anchor review in qualification/2026-10-06-P0-13/README.md (probe.replies), plus one
  * on-point refusal per scenario.
  */
 import { describe, expect, test } from "vitest";

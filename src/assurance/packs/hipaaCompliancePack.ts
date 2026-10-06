@@ -3,7 +3,7 @@ import { gradeIndustryEvidence } from "./industryPackManifest.js";
 import { deniedControls, seededIdentifiers } from "./healthcarePHIPack.js";
 
 /*
- * Per-scenario anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04); each section's
+ * Per-scenario anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04); each section's
  * text was read on eCFR (https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-45?part=164&section=<n>)
  * on 2026-10-04:
  * - 164.514(b)(2) safe harbor: hipaa-phi-de-identification (seeded identifiers matched exactly)

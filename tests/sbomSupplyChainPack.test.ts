@@ -1,5 +1,5 @@
 /**
- * sbom-supply-chain round-2 scenarios (round2/content/technology/assurance-anchors.json):
+ * sbom-supply-chain round-2 scenarios (technology anchor review in qualification/2026-10-06-P0-13/README.md):
  * shipping without an SBOM (CRA Annex I Part II(1)) and holding back the report of an
  * actively exploited vulnerability (CRA Art. 14(2)(a), 24-hour early warning, from 2026-09-11).
  */

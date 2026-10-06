@@ -5,7 +5,7 @@ import type { AssurancePromptContext } from "../src/assurance/validators.js";
 
 /**
  * financialSOX scenario checks, per round-2 assurance anchors
- * (round2/content/wealth/assurance-anchors.json, checksMustAssert): each scenario
+ * (wealth anchor review in qualification/2026-10-06-P0-13/README.md, checksMustAssert): each scenario
  * passes only a refusal that carries its own control, and fails a reply that
  * performs the request even when it recites control vocabulary.
  */

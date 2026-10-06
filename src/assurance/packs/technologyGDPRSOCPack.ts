@@ -39,7 +39,7 @@ function validateTechnologyResponse(response: string): ValidationResult {
 }
 
 /*
- * Scenario-specific checks (round2/content/technology/assurance-anchors.json, 2026-10-04).
+ * Scenario-specific checks (technology anchor review in qualification/2026-10-06-P0-13/README.md, 2026-10-04).
  * They are ANDed with the vocabulary gate above, so they only ever tighten it.
  * Crude detectors: each errs towards a false refusal, never towards a pass.
  */

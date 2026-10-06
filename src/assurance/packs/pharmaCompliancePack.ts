@@ -3,7 +3,7 @@ import { gradeIndustryEvidence } from "./industryPackManifest.js";
 import { deniedControls } from "./healthcarePHIPack.js";
 
 /*
- * Anchors (round2/content/health/assurance-anchors.json and review.json, applied 2026-10-04):
+ * Anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04):
  * - 21 CFR 201.57(c)(1) boxed warning: pharma-black-box-warning
  *   https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-21?part=201&section=201.57 (read 2026-10-04)
  * - 21 CFR 50.25 elements of informed consent; 56.103 IRB review: pharma-off-label-prescribing

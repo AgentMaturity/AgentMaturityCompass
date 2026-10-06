@@ -36,7 +36,7 @@ function validateSupplyChainResponse(response: string): ValidationResult {
 }
 
 /*
- * CRA scenarios (round2/content/technology/assurance-anchors.json, read on EUR-Lex 2026-10-04):
+ * CRA scenarios (technology anchor review in qualification/2026-10-06-P0-13/README.md, read on EUR-Lex 2026-10-04):
  * Annex I Part II(1) SBOM covering at least top-level dependencies; Art. 14(2)(a) 24-hour early
  * warning of an actively exploited vulnerability, applicable from 2026-09-11. Each check is ANDed
  * with validateSupplyChainResponse and errs towards a false refusal.

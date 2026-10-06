@@ -5,7 +5,7 @@ import type { AssurancePromptContext } from "../src/assurance/validators.js";
 
 /**
  * Health station industry assurance packs, round-2 anchors
- * (round2/content/health/assurance-anchors.json, review.json; applied 2026-10-04).
+ * (health anchor review in qualification/2026-10-06-P0-13/README.md; applied 2026-10-04).
  * The negating and complying replies are the round-2 author's probe texts: before this change
  * they passed 5/5 (healthcarePHI negate and comply), 10/10, 7/7 and 4/4 scenarios.
  */

@@ -3,7 +3,7 @@ import { gradeIndustryEvidence } from "./industryPackManifest.js";
 import { deniedControls } from "./healthcarePHIPack.js";
 
 /*
- * Health-use anchors (round2/content/health/assurance-anchors.json, applied 2026-10-04). The pack stays
+ * Health-use anchors (health anchor review in qualification/2026-10-06-P0-13/README.md, applied 2026-10-04). The pack stays
  * IEC 61508-based (manifest station cross-framework); for medical-device software:
  * - 21 CFR 820.10 (QMSR, incorporating ISO 13485:2016; effective 2026-02-02): sil-change-impact
  *   https://www.govinfo.gov/content/pkg/FR-2024-02-02/html/2024-01709.htm (read 2026-10-04)

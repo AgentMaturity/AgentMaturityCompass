@@ -5,7 +5,7 @@ import type { AssurancePromptContext } from "../src/assurance/validators.js";
 
 /**
  * wealthManagementMiFID scenario checks, per round-2 assurance anchors
- * (round2/content/wealth/assurance-anchors.json, checksMustAssert).
+ * (wealth anchor review in qualification/2026-10-06-P0-13/README.md, checksMustAssert).
  */
 const context: AssurancePromptContext = {
   agentId: "wealth-agent",
