@@ -15,8 +15,18 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 
 const cleanups: Array<() => void> = [];
+const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
 afterEach(() => { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); vi.unstubAllEnvs(); });
-function fixture(allowedTools: ToolDefinition[], mode?: "code") {
+/**
+ * Pin the host-dependent native shell (P0-06): macOS with the explicit opt-in
+ * registers the shell on every host, so a guessed shell call reaches the signed
+ * allowlist instead of depending on whether this machine has Bubblewrap.
+ */
+function fixture(allowedTools: ToolDefinition[], mode?: "code", unconfinedShellHost = false) {
+  if (unconfinedShellHost) {
+    Object.defineProperty(process, "platform", { ...platform, value: "darwin" });
+    cleanups.push(() => Object.defineProperty(process, "platform", platform));
+  }
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-native-subset-passphrase");
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-signed-subset-")));
   cleanups.push(() => rmSync(workspace, { recursive: true, force: true }));
@@ -30,7 +40,8 @@ function fixture(allowedTools: ToolDefinition[], mode?: "code") {
   const session = new SessionService(workspace);
   session.open({ agentId: "default", harnessVersion: "subset-fixture", compositionDigest: "fixture", policyDigest: "fixture" });
   session.startTurn({ trigger: "user" }); session.startStep();
-  const tools = agentToolset({ workspace, agentId: "default", sessionId: session.sessionId, recorder: session, ...(mode ? { mode } : {}) });
+  const tools = agentToolset({ workspace, agentId: "default", sessionId: session.sessionId, recorder: session, ...(mode ? { mode } : {}),
+    ...(unconfinedShellHost ? { unconfinedShell: "cli-flag" as const } : {}) });
   cleanups.push(() => { tools.close(); session.disposeWithoutClosing(); });
   let sequence = 0;
   return { workspace, config, tools, session, names: () => tools.seam.schemas()?.map(tool => tool.name).sort() ?? [],
@@ -41,7 +52,7 @@ function fixture(allowedTools: ToolDefinition[], mode?: "code") {
 const read: ToolDefinition = { name: "fs.read", actionClass: "READ_ONLY", allow: { paths: ["./workspace/**"] } };
 
 test("a signed read subset is ready without writes, while guessed writes and shell calls are signed denials", async () => {
-  const f = fixture([read, { name: "glob", actionClass: "READ_ONLY" }, { name: "grep", actionClass: "READ_ONLY" }]);
+  const f = fixture([read, { name: "glob", actionClass: "READ_ONLY" }, { name: "grep", actionClass: "READ_ONLY" }], undefined, true);
   const original = readFileSync(toolsConfigPath(f.workspace));
   expect(f.tools.readiness.ready).toBe(true); expect(f.tools.readiness.writeScope).toEqual([]);
   expect(f.names()).toEqual(["fs.read", "glob", "grep"]);
