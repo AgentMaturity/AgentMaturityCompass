@@ -120,9 +120,13 @@ jobs:
       - name: Full suite and coverage thresholds
         timeout-minutes: 45
         shell: bash
+        # The full output goes to the log artifact; the runner log gets lines cut at
+        # 4,096 bytes. A test once teed a 5 MiB single-line answer to stdout, and a
+        # line that long stalls the Actions runner until the job times out with no
+        # log at all (every build-test run from 2026-09-16 to 2026-10-05).
         run: |
           mkdir -p tmp/ci-coverage
-          npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log
+          npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
 
       - name: Per-file coverage floors
         run: npm run check:coverage
