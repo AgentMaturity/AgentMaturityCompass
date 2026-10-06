@@ -158,7 +158,7 @@
     },
     {
       "path": "release-gate.log",
-      "sha256": "d2c3f155c2100bedfb68da730a9e2baad2f93d130a2fd2001075ce9eb57ad213"
+      "sha256": "654a309dfef2676b7de71b026f749363bee1bce9e4cad71e1eba4bae5f32bd92"
     },
     {
       "path": "check-duplicates.log",

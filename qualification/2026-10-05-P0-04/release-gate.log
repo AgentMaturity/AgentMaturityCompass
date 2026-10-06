@@ -3,7 +3,7 @@
 > node scripts/release-gate.mjs
 
 FAILED 17/19 executed checks passed; 2 failed; 1 skipped. Acceptance is incomplete: live-deploy-health.
-Receipt: /private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/amc-main/.amc/release-gate/latest.json
+Receipt: <clone>/.amc/release-gate/latest.json
 - PASSED console-js-syntax
 - PASSED openapi-parse
 - PASSED typecheck
