@@ -49,7 +49,7 @@ Complete these checks before going live. Every item is a real `amc` command.
 ## Backup & Operations
 
 - [ ] First backup taken — `amc backup create --out .amc/backups/first.amcbackup`
-- [ ] Backup verified — `amc backup verify .amc/backups/first.amcbackup`
+- [ ] Backup verified — `amc backup verify .amc/backups/first.amcbackup --pubkey <recorded-auditor.pub>`
 - [ ] Budgets configured — `amc budgets init && amc budgets verify`
 - [ ] Alerts configured — `amc alerts init && amc alerts verify`
 

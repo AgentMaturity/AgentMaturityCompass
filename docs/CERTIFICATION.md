@@ -25,7 +25,7 @@ Issuance flow:
 ## Verify (Offline)
 
 ```bash
-amc cert verify ./agent.amccert
+amc cert verify ./agent.amccert --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 amc cert inspect ./agent.amccert
 ```
 
@@ -40,8 +40,8 @@ Verification checks:
 
 ```bash
 amc cert revoke --reason "superseded" --cert ./agent.amccert --out ./agent.amcrevoke
-amc cert verify-revocation ./agent.amcrevoke
-amc cert verify ./agent.amccert --revocation ./agent.amcrevoke
+amc cert verify-revocation ./agent.amcrevoke --pubkey <recorded-auditor.pub>
+amc cert verify ./agent.amccert --revocation ./agent.amcrevoke --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 ```
 
 Revocation files are signed by auditor key and can be verified independently.

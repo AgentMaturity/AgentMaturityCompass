@@ -31,7 +31,7 @@ amc prompt init
 amc prompt verify
 amc prompt pack build --agent <agentId>
 amc prompt pack show --agent <agentId> --provider openai --format text
-amc prompt pack verify .amc/prompt/packs/agents/<agentId>/latest.amcprompt
+amc prompt pack verify .amc/prompt/packs/agents/<agentId>/latest.amcprompt --pubkey <recorded-auditor.pub>
 ```
 
 Fail-closed behavior:

@@ -143,7 +143,7 @@ amc plugin pack \
   --out ./dist/my-plugin.amcplug
 
 # Verify the package
-amc plugin verify ./dist/my-plugin.amcplug
+amc plugin verify ./dist/my-plugin.amcplug --pubkey ./keys/publisher.pub
 
 # Inspect contents
 amc plugin print ./dist/my-plugin.amcplug
@@ -227,7 +227,7 @@ amc plugin keygen --out-dir <dir>              # Generate Ed25519 signing keys
 ### Build & Verify
 ```bash
 amc plugin pack --in <dir> --key <key> --out <file>  # Build .amcplug
-amc plugin verify <file>                              # Verify package integrity
+amc plugin verify <file> --pubkey <publisher.pub>      # Verify package integrity and publisher
 amc plugin print <file>                               # Inspect package contents
 ```
 

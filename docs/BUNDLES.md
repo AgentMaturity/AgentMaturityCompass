@@ -6,7 +6,7 @@ AMC bundles are portable `.amcbundle` TAR.GZ archives that can be verified offli
 
 ```bash
 amc bundle export --agent <agentId> --run <runId> --out .amc/agents/<agentId>/bundles/<runId>.amcbundle
-amc bundle verify .amc/agents/<agentId>/bundles/<runId>.amcbundle
+amc bundle verify .amc/agents/<agentId>/bundles/<runId>.amcbundle --pubkey <recorded-auditor.pub> --expect-monitor <recorded-monitor-sha256>
 amc bundle inspect .amc/agents/<agentId>/bundles/<runId>.amcbundle
 amc bundle diff <bundleA> <bundleB>
 ```

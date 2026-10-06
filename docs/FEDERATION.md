@@ -25,7 +25,7 @@ Federation enables offline cross-org sharing of privacy-safe trust artifacts.
 - `amc federate peer list`
 - `amc federate export --out .amc/federation/outbox/latest.amcfed`
 - `amc federate import .amc/federation/outbox/latest.amcfed`
-- `amc federate verify-bundle latest.amcfed`
+- `amc federate verify-bundle latest.amcfed --pubkey <peer-publisher.pub>` (`federate import` admits only peers added with `amc federate peer add`)
 
 ## Console
 Imported federation benchmarks appear in the benchmarks views and stats.

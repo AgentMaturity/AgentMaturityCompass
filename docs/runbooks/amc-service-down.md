@@ -56,8 +56,8 @@ Recover AMC when Studio/API is unavailable or readiness fails.
    ```
 3. If integrity failures persist, restore from last known-good backup.
    ```bash
-   amc backup verify .amc/backups/latest.amcbackup
-   amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force
+   amc backup verify .amc/backups/latest.amcbackup --pubkey <recorded-auditor.pub>
+   amc backup restore .amc/backups/latest.amcbackup --to /tmp/amc-restore --force --pubkey <recorded-auditor.pub>
    cd /tmp/amc-restore
    amc verify all --json
    ```

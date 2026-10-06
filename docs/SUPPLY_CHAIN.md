@@ -67,5 +67,5 @@ amc release sbom --out sbom.cdx.json
 amc release licenses --out licenses.json
 amc release provenance --out provenance.json
 amc release pack --out dist/amc-<version>.amcrelease
-amc release verify dist/amc-<version>.amcrelease
+amc release verify dist/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
 ```

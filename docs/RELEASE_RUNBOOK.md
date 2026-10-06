@@ -119,7 +119,7 @@ Validate published assets:
 Offline verification:
 
 ```bash
-amc release verify dist/amc-<version>.amcrelease
+amc release verify dist/amc-<version>.amcrelease --pubkey <published-release-signing.pub>
 ```
 
 ---
@@ -141,7 +141,7 @@ Rollback sequence:
 ```bash
 amc verify all --json
 amc retention verify
-amc backup verify <backup-file>
+amc backup verify <backup-file> --pubkey <recorded-auditor.pub>
 ```
 
 5. Create incident note with:

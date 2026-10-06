@@ -5,9 +5,11 @@ Every `verify` command that the CLI registers, from `git grep -n -F 'command("ve
 - **Portable artifact**: the command verifies a file, bundle or token that may come from somewhere else, so the signing key has to be pinned by `--pubkey`, a signed trust list ([TRUST_LIST.md](../TRUST_LIST.md)) or another operator-held key. A key shipped inside the artifact must never vouch for it.
 - **Workspace self-check**: the command checks the workspace's own signed configuration or records with keys read from that same workspace. A pass shows internal consistency only, not that an independent party vouches for the content. A workspace can sign its own configuration, so its keys never count as an independent issuer.
 
-## Status on this branch
+## Status
 
-P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust list and the `VerifierReportV1` shape (`agent-maturity-compass/trust`). **PR 2 wires the rows marked "Wired (PR 2)"**: they admit a signature only when its key is pinned by `--pubkey`, `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`) or a signed trust list, never because the artifact carries it, and they print the key id to pin. They also take `--trust-list`, `--trust-root`, `--allow-unpinned`, `--allow-unanchored` and `--json`, and exit 0 (trusted), 1 (failed) or 2 (integrity verified, untrusted because an allow flag was used; stderr starts with `UNTRUSTED:`). The ledger commands marked "step 9" fail an unanchored ledger unless `--allow-unanchored` is given. The rows marked PR 3 still trust the keys shipped inside the artifact until PR 3 lands; for them the "Pinning" column states the planned change, not current behaviour.
+P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust list and the `VerifierReportV1` shape (`agent-maturity-compass/trust`). PR 2 and PR 3 wired the rows marked "Wired (PR 2)" and "Wired (PR 3)": they admit a signature only when its key is pinned by `--pubkey`, `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`) or a signed trust list, never because the artifact carries it, and they print the key id to pin. They also take `--trust-list`, `--trust-root`, `--allow-unpinned`, `--allow-unanchored` and `--json`, and exit 0 (trusted), 1 (failed) or 2 (integrity verified, untrusted because an allow flag was used; stderr starts with `UNTRUSTED:`). The ledger commands marked "step 9" fail an unanchored ledger unless `--allow-unanchored` is given.
+
+Every row of the P0-09 issue table is wired. The seven portable rows marked "Not wired by P0-09" were outside that table; each still trusts a key that comes with its input or with the current workspace, and the P0-09 receipt names the follow-up that decides them.
 
 23 of the 72 commands are portable artifact verifiers.
 
@@ -18,17 +20,17 @@ P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust 
 | `amc alerts verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc assurance verify` | Verify assurance run determinism and signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc assurance verify-policy` | Verify assurance policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc audit binder verify` | Verify .amcaudit file | portable artifact | PR 3 (`verifyAuditBinderFile`) |
+| `amc audit binder verify` | Verify .amcaudit file | portable artifact | Wired (PR 3): `verifyAuditBinderFile`; signer and signed Merkle root need `artifact-seal`, and inclusion proofs must resolve to that signed root |
 | `amc audit map verify` | Verify builtin and active map signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc audit verify` | Verify audit workspace signatures/artifacts | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc audit verify-policy` | Verify signed audit policy | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc backup verify` | Verify signed backup bundle offline | portable artifact | PR 3 (`verifyBackup`) |
-| `amc bench registry verify` | (no description registered) | portable artifact | Not in the P0-09 table; not yet reviewed |
-| `amc bench verify` | Verify .amcbench artifact offline | portable artifact | PR 3 (`verifyBenchArtifactFile`) |
+| `amc backup verify` | Verify signed backup bundle offline | portable artifact | Wired (PR 3): `verifyBackup`; the manifest signer needs `artifact-seal` (`backup restore` takes the same pins) |
+| `amc bench registry verify` | (no description registered) | portable artifact | Not wired by P0-09 (outside the issue table): checks the index against the `registry.pub` in the directory it verifies; follow-up named in the P0-09 receipt. Bench imports already require the registry fingerprint pinned in the workspace's signed registries config |
+| `amc bench verify` | Verify .amcbench artifact offline | portable artifact | Wired (PR 3): `verifyBenchArtifactFile`; signer and signed Merkle root need `artifact-seal`, and `verifyBenchProofBundle` binds every inclusion proof to that signed root |
 | `amc bench verify-policy` | Verify signed bench policy | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc benchmark verify` | (no description registered) | portable artifact | PR 3 (`verifyBenchmarkArtifact`) |
+| `amc benchmark verify` | (no description registered) | portable artifact | Wired (PR 3): `verifyBenchmarkArtifact`; the signer needs `artifact-seal`; PR 3 also gave it `--pubkey` |
 | `amc blobs verify` | Verify encrypted blob index and payload integrity | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc bom verify` | (no description registered) | portable artifact | Not in the P0-09 table; not yet reviewed |
+| `amc bom verify` | (no description registered) | portable artifact | Not wired by P0-09 (outside the issue table): `--pubkey` or the current workspace's auditor keys decide; follow-up named in the P0-09 receipt |
 | `amc budgets verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc bundle verify` | Verify evidence bundle offline | portable artifact | Wired (PR 2): `verifyEvidenceBundle`; auditor signatures need `artifact-seal`, the carried ledger is anchored only by a monitor key admitted for `ledger-row` (`--expect-monitor`) |
 | `amc canon verify` | Verify canonical compass content signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
@@ -40,10 +42,10 @@ P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust 
 | `amc diagnostic bank verify` | Verify diagnostic bank signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc domain pack verify` | Verify an Industry Packs license key | portable artifact | Not in the P0-09 table; the license string comes from the caller and is checked against an operator key or secret from the environment (`AMC_INDUSTRY_PACKS_LICENSE_PUBLIC_KEY`, `AMC_INDUSTRY_PACKS_LICENSE_SECRET`), never a workspace key |
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | portable artifact | Not in the P0-09 table; not yet reviewed |
+| `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | portable artifact | Not wired by P0-09 (outside the issue table); follow-up named in the P0-09 receipt |
 | `amc evidence verify` | Run full workspace verification suite | workspace self-check | Wired (PR 2, step 9): runs `verifyAll`, whose `ledger-trust-root` check fails when unanchored unless `--allow-unanchored` |
 | `amc federate verify` | Verify federation config signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc federate verify-bundle` | Verify .amcfed package | portable artifact | PR 3 (`verifyFederationPackage`) |
+| `amc federate verify-bundle` | Verify .amcfed package | portable artifact | Wired (PR 3): `verifyFederationPackage`; the publisher needs `artifact-seal`; PR 3 also gave it `--pubkey`. `federate import` admits only peers added with `federate peer add` or pinned by a trust list |
 | `amc forecast verify` | Verify forecast policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc gateway verify-config` | Verify .amc/gateway.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc identity verify` | Verify identity.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
@@ -54,18 +56,18 @@ P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust 
 | `amc mechanic targets verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc mechanic tuning verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc mechanic verify` | Verify mechanic signatures and artifacts | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc notary verify-attest` | Verify a .amcattest bundle offline | portable artifact | Not in the P0-09 table; not yet reviewed |
+| `amc notary verify-attest` | Verify a .amcattest bundle offline | portable artifact | Not wired by P0-09 (outside the issue table); follow-up named in the P0-09 receipt |
 | `amc ops verify` | Verify ops-policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc org verify` | Verify signed org.yaml | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc outcomes verify` | Verify outcome contract signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc passport verify` | Verify .amcpass artifact offline | portable artifact | Wired (PR 2): `verifyPassportArtifactFile`; signer and signed Merkle root need `artifact-seal`, and inclusion proofs must resolve to that signed root |
 | `amc passport verify-policy` | Verify signed passport policy | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | portable artifact | Not in the P0-09 table; not yet reviewed |
-| `amc plugin registry verify` | Verify registry signature and package hashes | portable artifact | PR 3 (plugin registry client) |
-| `amc plugin verify` | Verify plugin package signature + artifact hashes | portable artifact | PR 3 (`verifyPluginPackage`) |
+| `amc passport verify-token` | Verify an AMC Trust Token (pass JSON string) | portable artifact | Not wired by P0-09 (outside the issue table); follow-up named in the P0-09 receipt |
+| `amc plugin registry verify` | Verify registry signature and package hashes | portable artifact | Wired (PR 3): `verifyPluginRegistry`; the index signer needs `artifact-seal`; PR 3 also gave it `--pubkey`. The registry client (`plugin install`, `plugin search`, the marketplace) refuses a `registry.pub` nobody pinned |
+| `amc plugin verify` | Verify plugin package signature + artifact hashes | portable artifact | Wired (PR 3): `verifyPluginPackage`; the publisher needs `artifact-seal` |
 | `amc policy action verify` | Verify action policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc policy approval verify` | Verify approval-policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc prompt pack verify` | Verify .amcprompt signature and lint signature | portable artifact | PR 3 (`verifyPromptPackFile`) |
+| `amc prompt pack verify` | Verify .amcprompt signature and lint signature | portable artifact | Wired (PR 3): `verifyPromptPackFile`; `pack.sig` and `lint/lint.sig` need `artifact-seal` (before PR 3 `--pubkey` was accepted and ignored) |
 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc release verify` | Verify a .amcrelease bundle offline | portable artifact | Wired (PR 2): `verifyReleaseBundle`; the manifest signer needs `release` |
 | `amc retention verify` | Verify archive manifests/signatures and ledger continuity | workspace self-check | Keys come from the workspace under test; internal consistency only |
@@ -76,9 +78,9 @@ P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust 
 | `amc ticket verify` | Verify signed execution ticket | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc tools verify` | Verify tools.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc transform verify` | Verify signed transform map | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | portable artifact | Not in the P0-09 table; not yet reviewed |
+| `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | portable artifact | Not wired by P0-09 (outside the issue table); follow-up named in the P0-09 receipt |
 | `amc transparency verify` | Verify transparency chain + seal signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc transparency verify-bundle` | Verify exported transparency bundle | portable artifact | Not in the P0-09 table; not yet reviewed |
+| `amc transparency verify-bundle` | Verify exported transparency bundle | portable artifact | Not wired by P0-09 (outside the issue table); follow-up named in the P0-09 receipt |
 | `amc user verify` | Verify users.yaml signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc value contract verify` | Verify value contract signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc value verify` | Verify value workspace signatures/artifacts | workspace self-check | Keys come from the workspace under test; internal consistency only |
@@ -92,5 +94,7 @@ P0-09 PR 1 added the trust-list format, issuer admission, the built-in distrust 
 - `amc assurance cert-verify` (registered as `command("cert-verify")`) verifies an assurance certificate bundle offline. It is a portable artifact verifier, wired with `verifyAssuranceCertificateFile` in PR 2 (signer and signed Merkle root need `artifact-seal`); PR 2 also gave it `--pubkey`.
 - API routes for the PR 2 verifiers (`POST /api/v1/bundle/verify`, `POST /api/v1/crypto/cert/verify`, `POST /api/v1/crypto/cert/verify-revocation`, `POST /api/v1/assurance/cert/verify`, Studio `POST /passport/verify`, `GET /api/v1/passport/:id/verify`) build the trust context from the server's AMC home, refuse request bodies that try to add pins or allow flags, and return the report. Before PR 2, `POST /api/v1/assurance/cert/verify` only parsed the certificate; it now runs `verifyAssuranceCertificateFile`. When an intact passport's issuer is not admitted, `GET /api/v1/passport/:id/verify` adds an `ISSUER_NOT_ADMITTED` error that names the key id.
 - Internal round trips (certificate issuance re-checking its bundle, `amc gate` bundle checks, workspace passport and assurance self-checks, standard schema validation, unified inspection) use `workspaceSelfTrust`, and their reports carry the `workspace-self` label.
-- The console seal check (`src/console/assets/app.js`) and the audit packet README guide are not commands; PR 3 relabels and rewrites them.
-- Rows marked "not yet reviewed" verify portable inputs but were not in the P0-09 sweep. Each needs a decision (wire it in PR 3 or record why it is safe) before P0-36 lists the fixed verifiers.
+- The console seal check (`src/console/assets/app.js`) and the audit packet README guide are not commands. Since PR 3 the console shows the server's verdict and labels its browser check of the seal "consistency only", because the key it checks with arrives in the same response; the packet README tells an auditor to verify `meta/manifest.sig.json` with an auditor key pinned outside the packet, never the copy in `keys/`.
+- PR 3 imports and installs: `benchmark ingest` (CLI, `POST /api/v1/benchmarks/import`, Studio `POST /benchmarks/ingest`) admits benchmark signers only through the operator's AMC home trust list; `federate import` admits a package only from a peer added with `federate peer add` (auditor-signed peer records) or pinned by a trust list, and then takes the benchmarks inside it on that peer's signed manifest; `plugin install`, `plugin search` and the marketplace refuse a registry whose `registry.pub` is not pinned (the workspace's signed registries config, or the trust list), and a package is admitted only for the publisher the pinned registry's signed index names; a bench registry import admits the signer the pinned bench registry's index names. Publishing to a plugin or bench registry checks integrity only: the registry operator vouches for the publisher by signing the index.
+- PR 3 API routes: `POST /api/v1/plugins/verify`, `POST /api/v1/plugins/print`, `POST /api/v1/plugins/registry/verify`, `POST /api/v1/benchmarks/verify`, `POST /api/v1/benchmarks/import`, Studio `POST /benchmarks/ingest` and Studio `GET /audit/binders/:id/verify` build the trust context from the server's AMC home, refuse request bodies that try to add pins or allow flags (including `pubkeyPath`), and return the report.
+- PR 3 internal round trips keep the `workspace-self` label: `verify all` (prompt packs, binder, bench and backup exports, and imported benches against the signer the workspace recorded at import), the audit and passport workspace checks, standard schema validation of a binder, the e2e smoke run, the prompt-pack status and enforcement checks, Studio readiness, workspace health, and installed plugins (the publisher the auditor-signed install lock records).
