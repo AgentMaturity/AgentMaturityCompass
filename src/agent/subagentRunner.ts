@@ -7,7 +7,7 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "./approva
 import { NO_HOOKS, type AgentLoopConfig, type LoopHookControl, type LoopHooks } from "./loopTypes.js";
 import type { ActionClass } from "../types.js";
 import { agentToolset } from "./agentToolset.js";
-import type { ShellOptInSource } from "../sandbox/nativeShellGate.js";
+import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { AgentDriver } from "./agentDriver.js";
 import { readAgentRunSummary } from "./runReport.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
@@ -95,8 +95,8 @@ export interface DriverRunnerInit {
    * so a parent's live observer would see a child's steps as its own.
    */
   readonly hookControl?: LoopHookControl;
-  /** The parent's explicit shell opt-in. Absent, a child never gains an unconfined shell the parent was not given. */
-  readonly unconfinedShell?: ShellOptInSource;
+  /** The parent's resolved shell decision; children inherit it and never widen it. Absent, a child inherits no opt-in. */
+  readonly parentShell?: NativeShellReadiness;
   /**
    * Lets a child delegate further.
    *
@@ -280,7 +280,7 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
       opened = true;
       toolset = agentToolset({ workspace: init.workspace, sessionId: ctx.childSessionId,
         recorder: session, agentId: ctx.toolsetAgentId,
-        ...(init.unconfinedShell === undefined ? {} : { unconfinedShell: init.unconfinedShell }),
+        parentShell: init.parentShell ?? null,
         ...(grant === undefined ? {} : { subagents: {
           identity: ctx.identity, runner: grant.runner, session,
           ...(grant.maxDepth === undefined ? {} : { maxDepth: grant.maxDepth }),

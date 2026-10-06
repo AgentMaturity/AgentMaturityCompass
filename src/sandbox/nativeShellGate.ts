@@ -51,20 +51,26 @@ export function unconfinedShellWarning(platform: NodeJS.Platform, source: ShellO
   return `WARNING: the native shell is UNCONFINED on ${platform} (opt-in: ${source}). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.`;
 }
 
-/** `runtime.shell.allowUnconfined: true` counts only under a valid auditor signature. */
-function signedConfigOptIn(workspace: string): { readonly optIn: ShellOptInSource | null; readonly ignored: string | null } {
+/** The explicit opt-ins a caller may pass; "signed-config" is only ever derived from a verified file. */
+export type ExplicitShellOptIn = Exclude<ShellOptInSource, "signed-config">;
+type ResolvedOptIn = { readonly optIn: ShellOptInSource | null; readonly ignored: string | null };
+const NO_OPT_IN: ResolvedOptIn = { optIn: null, ignored: null };
+
+/** `runtime.shell.allowUnconfined: true` counts only under a valid auditor signature over the bytes read here. */
+function signedConfigOptIn(workspace: string): ResolvedOptIn {
+  let bytes: Buffer;
   let raw: { runtime?: { shell?: { allowUnconfined?: unknown } } } | null;
-  try { raw = YAML.parse(readFileSync(join(workspace, ".amc", "amc.config.yaml"), "utf8")) as typeof raw; }
-  catch { return { optIn: null, ignored: null }; } // No readable config: nothing was opted in.
-  if (raw?.runtime?.shell?.allowUnconfined !== true) return { optIn: null, ignored: null };
-  const signature = verifyAmcConfigSignature(workspace);
+  try {
+    bytes = readFileSync(join(workspace, ".amc", "amc.config.yaml"));
+    raw = YAML.parse(bytes.toString("utf8")) as typeof raw;
+  } catch { return NO_OPT_IN; } // No readable config: nothing was opted in.
+  if (raw?.runtime?.shell?.allowUnconfined !== true) return NO_OPT_IN;
+  const signature = verifyAmcConfigSignature(workspace, bytes);
   return signature.valid ? { optIn: "signed-config", ignored: null } : { optIn: null,
     ignored: `runtime.shell.allowUnconfined is ignored: ${signature.reason ?? "signature invalid"}. Re-sign the config with: amc verify --sign-config` };
 }
 
-/** Decide once for this process and workspace; an explicit opt-in wins over the config. */
-export function nativeShellReadiness(workspace: string, explicit?: ShellOptInSource): NativeShellReadiness {
-  const config = explicit === undefined ? signedConfigOptIn(workspace) : { optIn: explicit, ignored: null };
+function readinessFor(config: ResolvedOptIn): NativeShellReadiness {
   const decision = decideNativeShell({ platform: process.platform, bwrap: bwrapBackend().available(), optIn: config.optIn });
   if (decision.kind === "confined") {
     return { offered: true, decision: decision.kind, enforcement: "enforced", boundary: decision.boundary, reason: null, optInSource: null };
@@ -75,4 +81,23 @@ export function nativeShellReadiness(workspace: string, explicit?: ShellOptInSou
   }
   return { offered: false, decision: decision.kind, enforcement: "none", boundary: null,
     reason: config.ignored === null ? decision.remediation : `${config.ignored} ${decision.remediation}`, optInSource: null };
+}
+
+/** Decide once for a top-level session; an explicit opt-in wins over the config. */
+export function nativeShellReadiness(workspace: string, explicit?: ExplicitShellOptIn): NativeShellReadiness {
+  // Checked at run time too: a JavaScript caller must not label its own opt-in as the signed config.
+  return readinessFor(explicit === "cli-flag" || explicit === "sdk-option" ? { optIn: explicit, ignored: null } : signedConfigOptIn(workspace));
+}
+
+/**
+ * A delegated child's decision: the parent's, never wider. A refused parent
+ * refuses the child; otherwise the child re-checks the platform and backend
+ * (and re-verifies a signed-config opt-in), which can only narrow it. A child
+ * with no parent decision inherits no opt-in.
+ */
+export function childShellReadiness(workspace: string, parent: NativeShellReadiness | null): NativeShellReadiness {
+  if (parent !== null && !parent.offered) return parent;
+  const source = parent?.optInSource ?? null;
+  if (source === "signed-config") return readinessFor(signedConfigOptIn(workspace));
+  return readinessFor(source === "cli-flag" || source === "sdk-option" ? { optIn: source, ignored: null } : NO_OPT_IN);
 }

@@ -679,7 +679,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           ...(audioParts === undefined ? {} : { audioParts }),
           route: { providerId, model, params: requestParams },
           routes: [route],
-          ...shellOptIn,
+          ...(workspaceToolset === null ? {} : { parentShell: workspaceToolset.readiness.shell }),
           ...(providerId === STUB_PROVIDER_ID
             ? { transport: stubProviderTransport({ failFirst, thinkMs, retryAfterSeconds: 1 }) }
             : {}),

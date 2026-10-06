@@ -20,6 +20,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { signAmcConfig, verifyAmcConfigSignature } from "../src/config/amcConfigSignature.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
+import { nativeShellReadiness, type NativeShellReadiness } from "../src/sandbox/nativeShellGate.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
 import { FixedCredentials, LOOP_MODEL, LOOP_PROVIDER, scriptedAdapter, silentTransport, textStep } from "./helpers/agentLoopHarness.js";
 
@@ -33,6 +34,20 @@ const backend = vi.hoisted(() => ({
   available: { value: { ok: true } as { ok: true } | { ok: false; reason: string } },
   run: vi.fn<(...args: unknown[]) => Promise<SandboxOutcome>>()
 }));
+// Hands the next read of one path different bytes, to model a swap between two reads.
+const tamper = vi.hoisted(() => ({ once: null as null | { readonly path: string; readonly text: string } }));
+vi.mock("node:fs", async importOriginal => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  const readFileSync = ((path: Parameters<typeof actual.readFileSync>[0], options?: unknown) => {
+    if (tamper.once !== null && String(path) === tamper.once.path) {
+      const { text } = tamper.once;
+      tamper.once = null;
+      return options === undefined ? Buffer.from(text) : text;
+    }
+    return actual.readFileSync(path, options as never);
+  }) as typeof actual.readFileSync;
+  return { ...actual, readFileSync };
+});
 vi.mock("../src/sandbox/bwrapBackend.js", async importOriginal => ({
   ...(await importOriginal<typeof import("../src/sandbox/bwrapBackend.js")>()),
   bwrapBackend: () => ({ kind: "bwrap", available: () => backend.available.value, run: backend.run })
@@ -50,6 +65,7 @@ afterEach(() => {
   Object.defineProperty(process, "platform", platform);
   backend.available.value = { ok: true };
   backend.run.mockReset();
+  tamper.once = null;
   vi.restoreAllMocks();
   process.chdir(originalCwd);
   if (priorExitListeners !== null) {
@@ -191,6 +207,32 @@ describe("the signed config opt-in", () => {
     expect(names(compose(dir).toolset)).toContain("bash");
   });
 
+  it("amc init never signs an opt-in that was added without a valid signature", () => {
+    pin("darwin");
+    const dir = workspace();
+    setAllowUnconfined(dir, true);
+    expect(verifyAmcConfigSignature(dir).valid).toBe(false);
+    initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+    expect(verifyAmcConfigSignature(dir).valid).toBe(true);
+    expect(names(compose(dir).toolset)).not.toContain("bash");
+  });
+
+  it("decides from the same bytes the signature covers, so a swap between reads cannot opt in", () => {
+    pin("darwin");
+    const dir = workspace();
+    const path = join(dir, ".amc", "amc.config.yaml");
+    signAmcConfig(dir);
+    tamper.once = { path, text: `${readFileSync(path, "utf8")}runtime:\n  shell:\n    allowUnconfined: true\n` };
+    expect(nativeShellReadiness(dir)).toMatchObject({ offered: false, decision: "refused", optInSource: null });
+    expect(verifyAmcConfigSignature(dir, Buffer.from(`${readFileSync(path, "utf8")}# unsigned\n`))).toMatchObject({ valid: false, reason: "config digest mismatch" });
+  });
+
+  it("a caller cannot claim the signed config as its explicit opt-in", () => {
+    pin("darwin");
+    const readiness = nativeShellReadiness(workspace(), "signed-config" as never);
+    expect(readiness).toMatchObject({ offered: false, decision: "refused", optInSource: null });
+  });
+
   it("amc verify --sign-config writes a signature that verifies", () => {
     const cli = resolve("dist/cli.js");
     if (!existsSync(cli)) throw new Error("Build dist/ before the amc verify --sign-config regression.");
@@ -235,13 +277,13 @@ describe("every surface composes through the gate", () => {
     expect(session(dir, { unconfinedShell: "sdk-option" })).toContain("bash");
   });
 
-  async function childTools(dir: string, unconfinedShell?: "cli-flag"): Promise<string[]> {
+  async function childTools(dir: string, parentShell?: NativeShellReadiness): Promise<string[]> {
     const bodies: unknown[] = [];
     const registry = scriptedRegistry(bodies);
     const runner = createDriverRunner({ workspace: dir, route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 64 } },
       makeLlm: session => new LlmRuntime({ session, credentials: new FixedCredentials(), registry, transport: silentTransport }),
       systemPrompt: "child", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p",
-      ...(unconfinedShell === undefined ? {} : { unconfinedShell }) });
+      ...(parentShell === undefined ? {} : { parentShell }) });
     const parent = new SessionService(dir);
     parent.open({ agentId: "default", harnessVersion: "3.2.0", compositionDigest: "c", policyDigest: "p" });
     const outcome = await spawnSubagent({ workspace: dir, parent: rootIdentity("default"), request: { runAs: "child", goal: "g" },
@@ -259,7 +301,19 @@ describe("every surface composes through the gate", () => {
     const without = await childTools(dir);
     expect(without.length, "the child is offered its other workspace tools").toBeGreaterThan(0);
     expect(without).not.toContain("bash");
-    expect(await childTools(dir, "cli-flag")).toContain("bash");
+    expect(await childTools(dir, compose(dir, { unconfinedShell: "cli-flag" }).toolset.readiness.shell)).toContain("bash");
+  });
+
+  it("a child never widens a refused parent, even when the config is signed mid-run", async () => {
+    pin("darwin");
+    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    const dir = workspace();
+    const parent = compose(dir).toolset.readiness.shell;
+    expect(parent.decision).toBe("refused");
+    setAllowUnconfined(dir, true);
+    signAmcConfig(dir);
+    expect(await childTools(dir, parent)).not.toContain("bash");
+    expect(await childTools(dir), "a child with no parent decision inherits no opt-in").not.toContain("bash");
   });
 
   async function runCli(dir: string, extra: string[]) {

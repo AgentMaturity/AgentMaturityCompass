@@ -4,7 +4,7 @@ import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
 import { loadVerifiedToolsConfigSnapshot, type VerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import { SandboxRunner } from "../sandbox/sandboxRunner.js";
 import { createNativeSandboxBash } from "../sandbox/nativeSandboxBinding.js";
-import { nativeShellReadiness, type NativeShellReadiness, type ShellOptInSource } from "../sandbox/nativeShellGate.js";
+import { childShellReadiness, nativeShellReadiness, type ExplicitShellOptIn, type NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import { measureProcessConfinement, processConfinementReason, processIsConfined, type ConfinementMeasurement } from "../sandbox/processConfinement.js";
 import { bashTool } from "../tools/builtin/bashTool.js";
 import { fsTools } from "../tools/builtin/fsTools.js";
@@ -49,7 +49,9 @@ export interface AgentToolsetOptions {
   /** Values scrubbed from tool output, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
   /** Explicit operator acceptance of an unconfined macOS shell (P0-06); ignored on Linux and refused elsewhere. */
-  readonly unconfinedShell?: ShellOptInSource;
+  readonly unconfinedShell?: ExplicitShellOptIn;
+  /** Set only for a delegated child: the parent's decision (null when unknown), which the child can never widen. */
+  readonly parentShell?: NativeShellReadiness | null;
   /**
    * Enables the `delegate` tool (P6.1a).
    *
@@ -143,7 +145,8 @@ export interface ToolsetReadiness {
 export function checkToolsetReadiness(workspace: string, options: {
   readonly snapshot?: VerifiedToolsConfigSnapshot;
   readonly additionalCapabilities?: readonly NativeToolCapability[];
-  readonly unconfinedShell?: ShellOptInSource;
+  readonly unconfinedShell?: ExplicitShellOptIn;
+  readonly parentShell?: NativeShellReadiness | null;
 } = {}): ToolsetReadiness {
   const blockers: string[] = [];
 
@@ -182,7 +185,8 @@ export function checkToolsetReadiness(workspace: string, options: {
       ? `${confinementReason}; no sandbox backend on this machine: ${sandbox.unavailableReasons().join("; ")}`
       : confinementReason,
     writeScope,
-    shell: nativeShellReadiness(workspace, options.unconfinedShell)
+    shell: options.parentShell === undefined ? nativeShellReadiness(workspace, options.unconfinedShell)
+      : childShellReadiness(workspace, options.parentShell)
   };
 }
 
@@ -217,7 +221,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
   let ledgerHandle: ReturnType<typeof openLedger> | null = null;
   const readiness = checkToolsetReadiness(workspace, { additionalCapabilities: [
     ...(options.additionalCapabilities ?? []), ...(options.subagents ? NATIVE_DELEGATION_CAPABILITIES : [])
-  ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }) });
+  ], ...(options.unconfinedShell === undefined ? {} : { unconfinedShell: options.unconfinedShell }),
+  ...(options.parentShell === undefined ? {} : { parentShell: options.parentShell }) });
   const registry = new ToolRegistry();
   const nativeIdentities = new Map([...NATIVE_BUILTIN_CAPABILITIES, ...NATIVE_DELEGATION_CAPABILITIES]
     .map(capability => [capability.name, capability]));
