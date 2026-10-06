@@ -3073,6 +3073,7 @@ components:
         - boundary
         - nativeCsrfToken
         - executionBlocked
+        - shell
       properties:
         schemaVersion:
           type: string
@@ -3188,6 +3189,51 @@ components:
           nullable: true
         executionBlocked:
           type: boolean
+        shell:
+          $ref: "#/components/schemas/NativeTaskShell"
+    NativeTaskShell:
+      type: object
+      additionalProperties: false
+      required:
+        - offered
+        - decision
+        - enforcement
+        - boundary
+        - reason
+        - optInSource
+      properties:
+        offered:
+          type: boolean
+        decision:
+          type: string
+          enum:
+            - confined
+            - unconfined-opt-in
+            - refused
+        enforcement:
+          type: string
+          enum:
+            - enforced
+            - none
+        boundary:
+          type: string
+          enum:
+            - linux-bwrap
+            - null
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        optInSource:
+          type: string
+          enum:
+            - signed-config
+            - cli-flag
+            - sdk-option
+            - null
+          nullable: true
+      description: "Whether native tasks are offered bash. Show reason as a banner: the refusal, or the warning for
+        an UNCONFINED macOS shell enabled by the signed config."
     NativeTaskResponse:
       type: object
       additionalProperties: false

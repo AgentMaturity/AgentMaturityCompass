@@ -407,6 +407,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     }
     el("nativeTaskPrompt").maxLength=config.limits.maxPromptBytes;
     el("nativeTaskLimits").textContent=`Task lifetime: ${Math.round(config.limits.lifetimeMs/60000)} minutes. Idle timeout: ${Math.round(config.limits.idleTimeoutMs/60000)} minutes. These limits do not grant additional tools or budget.`;
+    const shellBanner=el("nativeTaskShell"); shellBanner.textContent=config.shell?.reason || ""; shellBanner.hidden=!config.shell?.reason;
     el("nativeTaskBoundary").textContent=`${config.executionBlocked ? "Execution is blocked by workspace trust or user-signature checks. An operator must correct the reported setup before a new task, follow-up or resume. Existing tasks can still be stopped or released. " : ""}${config.boundary}`;
     updateUrl(task?.taskId || new URL(window.location.href).searchParams.get("task")); controls(); return true;
   }

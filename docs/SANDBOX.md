@@ -33,18 +33,24 @@ these opt-ins:
   that flag to the spawned `amc acp`, or `unconfinedShell: "sdk-option"` for
   `openAgentSession()`.
 - `runtime.shell.allowUnconfined: true` in `.amc/amc.config.yaml`. AMC honours it
-  only while the file carries a valid auditor signature; an unsigned or edited
-  file is ignored with a message. Sign the file with `amc verify --sign-config`.
+  only while the file carries a valid auditor signature over the exact bytes it
+  read; an unsigned or edited file is ignored with a message. Sign the file
+  with `amc verify --sign-config`. `amc init` and `amc up` re-sign the config,
+  so they drop an opt-in that was not already covered by a valid signature
+  rather than sign it.
   This is the only opt-in Studio accepts; the browser and the HTTP API cannot
   enable the shell.
 
 An agent cannot grant itself the opt-in: `.amc` is a forbidden path for the
 file tools, and the config key needs the auditor signature. Delegated children
-inherit the parent's opt-in and can never widen it.
+inherit the parent's decision and can never widen it: a child of a refused
+parent is refused even if the config is signed later in the run.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
-stream), and Studio shows the same text as `shell.reason` in the native-task
-options:
+stream). Studio returns the same text as `shell.reason` in the native-task
+options and shows it as a banner in task setup. `AMCNativeClient` discards the
+spawned `amc acp` process's stderr, so an SDK caller that opts in does not see
+the warning; the receipts below still record it.
 
 ```text
 WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.
