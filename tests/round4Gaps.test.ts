@@ -251,6 +251,13 @@ describe("R4-06 Global Regulatory Coverage", () => {
     expect(ids).toContain("japan-appi");
   });
 
+  test("getGlobalFrameworks returns a copy the caller cannot use to change the registry", () => {
+    const frameworks = getGlobalFrameworks();
+    expect(frameworks).toEqual(GLOBAL_FRAMEWORKS);
+    frameworks.length = 0;
+    expect(GLOBAL_FRAMEWORKS.length).toBeGreaterThanOrEqual(5);
+  });
+
   test("every entry has registerId, >=1 source with retrievedAt and a lastReviewed", () => {
     for (const f of GLOBAL_FRAMEWORKS) {
       expect(f.mappingStatus, f.frameworkId).not.toBe("complete");
