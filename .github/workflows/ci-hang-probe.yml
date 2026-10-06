@@ -6,6 +6,9 @@
 # Round 4: shard 8 of 8 hung (others finished in ~5 min); split its 190 files
 # into 8 explicit lists under .github/probe/.
 # Round 5: part 4 hung (24 files); run each file on its own runner.
+# Round 6: only tests/foreignSubagentRunner.test.ts hung. Confirm the cause (a
+# 5 MiB single-line tee to stdout): A = original test with stdout redirected,
+# B = patched test printing normally.
 name: CI hang probe (P0-48)
 
 on:
@@ -23,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        file: ["tests/compliance/dataResidencyPersistence.test.ts", "tests/falsePositiveTracker.test.ts", "tests/approvalPolicyFailClosed.test.ts", "tests/gap0812PerceptUiReplayCorpusBoundary.test.ts", "tests/cliDelegateFlag.test.ts", "tests/foreignSubagentRunner.test.ts", "tests/artifactProvenance.test.ts", "tests/connectHookIntegration.test.ts", "tests/deepseekNativeWire.test.ts", "tests/execProcessTree.test.ts", "tests/gap0708AzobenzeneReplayCorpusUnavailableBoundary.test.ts", "tests/gap1044GraphRagBenchmarkLiveDriftBoundary.test.ts", "tests/publicDistributionTruth.test.ts", "tests/mislabeledSynthesis.test.ts", "tests/jsonlWriterResume.test.ts", "tests/gap0663DbmsConfigurationQuestionExplainabilityBoundary.test.ts", "tests/studioNativeTaskValidation.test.ts", "tests/gap0925BiliCorePublicMethodologyBoundary.test.ts", "tests/sessionSpillRead.test.ts", "tests/gap1236PromptfooAdversarialRegressionBoundary.test.ts", "tests/gap1081TruthTheoryProviderRiskBoundary.test.ts", "tests/humanFirstUseCapture.test.ts", "tests/networkTrust.test.ts", "tests/platformQualificationOutputOwnership.test.ts"]
+        variant: [original-redirected, patched-printing]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -37,8 +40,17 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: npm run build
-      - name: Single file
+      - name: Run ${{ matrix.variant }}
         timeout-minutes: 15
         env:
-          FILE: ${{ matrix.file }}
-        run: npx vitest run "$FILE" --reporter=verbose
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          if [ "$VARIANT" = "original-redirected" ]; then
+            git show origin/main:tests/foreignSubagentRunner.test.ts > tests/foreignSubagentRunner.test.ts
+            npx vitest run tests/foreignSubagentRunner.test.ts > /tmp/out.txt 2>&1; rc=$?
+            echo "exit=$rc bytes=$(wc -c < /tmp/out.txt) longest=$(awk '{ if (length($0) > m) m = length($0) } END { print m }' /tmp/out.txt)"
+            grep -E 'Tests  ' /tmp/out.txt
+            exit $rc
+          else
+            npx vitest run tests/foreignSubagentRunner.test.ts --reporter=verbose
+          fi
