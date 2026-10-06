@@ -20,7 +20,7 @@ import type { AdapterRunMode } from "./adapterTypes.js";
 import { nodeFetchSnippet } from "./snippets/nodeFetch.js";
 import { pythonRequestsSnippet } from "./snippets/pythonRequests.js";
 import { PROVIDER_KEY_ENV_NAMES } from "../utils/providerKeys.js";
-import { deepseekHarnessCoverage, detectDeepseekHarnessLaunch, prepareDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
+import { deepseekHarnessCoverage, detectDeepseekHarnessLaunch, prepareDeepseekHarnessLaunch, verifyDeepseekHarnessLaunch } from "./deepseekHarnessLaunch.js";
 
 function redactWithGatewayRules(text: string, lease: string, regexes: string[]): string {
   let out = redactSecretsInText(text, [lease]);
@@ -290,6 +290,9 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
 
     if (!isDsh) recordStarted();
     await new Promise<void>((resolvePromise, rejectPromise) => {
+      // Re-hash the approved files at the last point before exec. A throw here
+      // rejects this promise exactly like a spawn failure; exec-by-path remains.
+      if (isDsh) verifyDeepseekHarnessLaunch(profile!.deepseekHarnessLaunch!);
       const child = spawn(executable, args, {
         stdio: ["pipe", "pipe", "pipe"],
         env,
