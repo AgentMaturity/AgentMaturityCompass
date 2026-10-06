@@ -204,7 +204,10 @@ jobs:
             exit 0
           fi
           node dist/cli.js release pack --out "dist/amc-${VERSION}.amcrelease"
-          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" | tee dist/release-verify.txt
+          # P0-09: release verify admits only a pinned release key. Until P0-37/P0-38 publish its fingerprint, the
+          # job pins the public half of the signing secret it holds, never the key the bundle carries.
+          node -e 'const c=require("node:crypto");process.stdout.write(c.createPublicKey(Buffer.from(process.env.AMC_RELEASE_SIGNING_KEY.trim(),"base64").toString("utf8")).export({format:"pem",type:"spki"}))' > "$RUNNER_TEMP/release-signing.pub"
+          node dist/cli.js release verify "dist/amc-${VERSION}.amcrelease" --pubkey "$RUNNER_TEMP/release-signing.pub" | tee dist/release-verify.txt
           tar -xzf "dist/amc-${VERSION}.amcrelease" -C dist
           cp dist/amc-release/artifacts/sbom/sbom.cdx.json dist/sbom.cdx.json
           cp dist/amc-release/artifacts/licenses/licenses.json dist/licenses.json

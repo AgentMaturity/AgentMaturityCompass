@@ -36,10 +36,13 @@ function secret(name, content) {
 function volume(name) { const v = `${id}-${name}`; docker(["volume", "create", v]); volumes.push(v); return v; }
 const sandbox = ["--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--tmpfs", "/tmp", "--tmpfs", "/home/amc:uid=10001,gid=10001,mode=0700"];
 const cliWithSecret = ["sh", "-c", 'export AMC_VAULT_PASSPHRASE="$(cat "$AMC_VAULT_PASSPHRASE_FILE")"; exec amc "$@"', "sh"];
-function qualifyRun(label, invoke) {
+/** Node one-liner printing the workspace's monitor-key fingerprint, recorded before any turn so it can anchor the ledger (P0-09). */
+const monitorFingerprint = (workspace) => `process.stdout.write(require('node:crypto').createHash('sha256')`
+  + `.update(require('node:fs').readFileSync('${workspace}/.amc/keys/monitor_ed25519.pub')).digest('hex'))`;
+function qualifyRun(label, invoke, expectMonitor) {
   const result = invoke(["agent-loop", "run", "--provider", "stub", "--json", "say hello"]);
   const summary = JSON.parse(result.stdout);
-  check(`${label}: keyless turn and cold signed verification`, verifyPackedRun({ summary, runCommand: (_label, args) => invoke(args) }));
+  check(`${label}: keyless turn and cold signed verification`, verifyPackedRun({ summary, expectMonitor, runCommand: (_label, args) => invoke(args) }));
   return summary;
 }
 const installedCheck = `
@@ -94,6 +97,7 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
   docker(["exec", name, "node", "-e", installedCheck]); check("studio: non-root installed artifact, SQLite and bundle notices", true);
   docker(["exec", name, "node", "-e", auth]); check("studio: anonymous refusal and authenticated access", true);
   const invoke = (args) => docker(["exec", "-w", "/data/amc", name, ...cliWithSecret, ...args]);
+  const expectMonitor = docker(["exec", name, "node", "-e", monitorFingerprint("/data/amc")]).stdout.trim();
   const summary = JSON.parse(invoke(["agent-loop", "run", "--provider", "stub", "--json", "say hello"]).stdout);
   // The live legacy gateway seals only during shutdown. Verify completeness after
   // graceful stop, in fresh CLI containers that cannot reuse the Studio process's keys.
@@ -106,7 +110,7 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
     receipt.verificationResults.push({ phase, command: args, processOk: result.ok, exitCode: result.exitCode, report, stderr: redact(result.stderr.slice(-1500)) });
     return result;
   }
-  const verifyCold = (phase) => verifyPackedRun({ summary, runCommand: (_label, args) => coldInvoke(phase, args) });
+  const verifyCold = (phase) => verifyPackedRun({ summary, expectMonitor, runCommand: (_label, args) => coldInvoke(phase, args) });
   docker(["stop", "--time", "30", name]);
   check("studio: keyless turn and cold signed verification after graceful shutdown", verifyCold("first shutdown"));
   docker(["start", name]); await ready();
@@ -120,8 +124,8 @@ console.log(JSON.stringify({unauthenticated:unauth.status,authenticated:auth.sta
   // fail; passing this negative control would hide interrupted or corrupted evidence.
   docker(["start", name]); await ready();
   docker(["kill", "--signal", "KILL", name]);
-  const ledgerResult = coldInvoke("abrupt shutdown", ["session", "verify", "--json"]);
-  const runResult = coldInvoke("abrupt shutdown", ["agent-loop", "verify", summary.sessionId, "--json"]);
+  const ledgerResult = coldInvoke("abrupt shutdown", ["session", "verify", "--json", "--expect-monitor", expectMonitor]);
+  const runResult = coldInvoke("abrupt shutdown", ["agent-loop", "verify", summary.sessionId, "--json", "--expect-monitor", expectMonitor]);
   const ledgerReport = JSON.parse(ledgerResult.stdout); const runReport = JSON.parse(runResult.stdout);
   const sealError = ledgerReport.errors?.length === 1 ? ledgerReport.errors[0] : null;
   const missingSession = typeof sealError === "string" ? /^Session ([0-9a-f-]+) missing seal$/.exec(sealError)?.[1] : null;
@@ -145,7 +149,8 @@ function runner() {
   check("runner: Python, Git and jq available", true);
   const invoke = (args) => docker([...base, "--entrypoint", "sh", runnerImage, ...cliWithSecret.slice(1), ...args]);
   invoke(["init", "--trust-boundary", "isolated"]);
-  qualifyRun("runner across separate containers", invoke);
+  const expectMonitor = docker([...base, "--entrypoint", "node", runnerImage, "-e", monitorFingerprint("/workspace")]).stdout.trim();
+  qualifyRun("runner across separate containers", invoke, expectMonitor);
 }
 try {
   const info = JSON.parse(docker(["info", "--format", "{{json .}}"], { timeout: 15000 }).stdout);
