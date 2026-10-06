@@ -1,6 +1,6 @@
 # AMC API Reference
 
-> Auto-generated from source on 2026-09-29
+> Auto-generated from source on 2026-10-06
 
 ## Table of Contents
 
@@ -1263,6 +1263,7 @@ Serve the Agent Client Protocol on stdio (for editors; prints nothing but frames
 | `--credentials-file <path>` | - |
 | `--credentials-mode <mode>` | - |
 | `--tools <mode>` | - |
+| `--unsafe-unconfined-shell` | - |
 | `--expected-tools-digest <sha256>` | - |
 | `--validation-config <path>` | - |
 | `--validation-config-sha256 <digest>` | - |
@@ -1438,6 +1439,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--approve-tools <actionClass>` | - |
 | `--approve-risk <tier>` | - |
 | `--tools <mode>` | - |
+| `--unsafe-unconfined-shell` | - |
 | `--max-tokens <n>` | - |
 | `--thinking <mode>` | - |
 | `--reasoning-effort <effort>` | - |
@@ -1513,6 +1515,7 @@ Run one agent turn and report what the signed log recorded
 | `--max-steps <n>` | - |
 | `--tools <mode>` | - |
 | `--tool-mode <mode>` | - |
+| `--unsafe-unconfined-shell` | - |
 | `--session <id>` | - |
 | `--fork-from <id>` | - |
 | `--keep-open` | - |
@@ -9937,6 +9940,7 @@ Verify integrity across AMC artifacts
 | Option | Description |
 |--------|-------------|
 | `--repair` | - |
+| `--sign-config` | - |
 
 #### `amc verify all`
 
