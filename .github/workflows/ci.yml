@@ -134,7 +134,13 @@ jobs:
         # log at all (every build-test run from 2026-09-16 to 2026-10-05).
         run: |
           mkdir -p tmp/ci-coverage
-          npm run test:coverage -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
+          npm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
+
+      # Throughput floors hold for uninstrumented code with the CPU to itself. Under
+      # coverage, with every worker busy, the 500 ev/s control-plane floor measured
+      # 477-496 ev/s on hosted runners, so the performance files run here instead.
+      - name: Performance floors (no coverage, one file at a time)
+        run: npx vitest run tests/performance --no-file-parallelism
 
       # Tests must use temp workspaces; a write to a tracked or untracked path
       # (for example .amc/keys/*) fails here. Ignored dist/, tmp/ and coverage/ do not show.
