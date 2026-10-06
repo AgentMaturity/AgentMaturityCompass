@@ -1,0 +1,4226 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "ref": "amc/regulated-platform-20261003",
+    "head": "37c1466b32ed878ed89877fdcae2e3145d82d546",
+    "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+    "commitsAhead": 229,
+    "merges": 31
+  },
+  "slices": [
+    {
+      "id": "regen",
+      "issue": "ALL",
+      "phase": 0,
+      "tracks": [
+        "I4"
+      ],
+      "buildOrder": 0
+    },
+    {
+      "id": "A",
+      "issue": "P0-12",
+      "phase": 0,
+      "tracks": [
+        "S3",
+        "S5"
+      ],
+      "buildOrder": 1
+    },
+    {
+      "id": "B",
+      "issue": "P0-13",
+      "phase": 0,
+      "tracks": [
+        "I3",
+        "S7",
+        "S9",
+        "apply-education",
+        "apply-environment",
+        "apply-governance",
+        "apply-health",
+        "apply-mobility",
+        "apply-technology",
+        "apply-wealth"
+      ],
+      "buildOrder": 2
+    },
+    {
+      "id": "C",
+      "issue": "P0-14",
+      "phase": 0,
+      "tracks": [
+        "S1",
+        "S2"
+      ],
+      "buildOrder": 3
+    },
+    {
+      "id": "A-register",
+      "issue": "P0-12",
+      "phase": 0,
+      "tracks": [
+        "apply-register"
+      ],
+      "buildOrder": 4
+    },
+    {
+      "id": "F4",
+      "issue": "P1-17",
+      "phase": 1,
+      "tracks": [
+        "F4"
+      ],
+      "buildOrder": 5
+    },
+    {
+      "id": "F1",
+      "issue": "P1-15",
+      "phase": 1,
+      "tracks": [
+        "F1"
+      ],
+      "buildOrder": 6
+    },
+    {
+      "id": "F3",
+      "issue": "P1-16",
+      "phase": 1,
+      "tracks": [
+        "F3"
+      ],
+      "buildOrder": 7
+    },
+    {
+      "id": "S8",
+      "issue": "P1-43",
+      "phase": 1,
+      "tracks": [
+        "S8"
+      ],
+      "buildOrder": 8
+    },
+    {
+      "id": "S6",
+      "issue": "P1-45",
+      "phase": 1,
+      "tracks": [
+        "I2",
+        "S6",
+        "apply-frameworks"
+      ],
+      "buildOrder": 9
+    },
+    {
+      "id": "content",
+      "issue": "P1-42",
+      "phase": 1,
+      "tracks": [
+        "I1",
+        "S10",
+        "S4",
+        "apply-education",
+        "apply-environment",
+        "apply-governance",
+        "apply-health",
+        "apply-mobility",
+        "apply-technology",
+        "apply-wealth"
+      ],
+      "buildOrder": 10
+    },
+    {
+      "id": "O",
+      "issue": "P1-44",
+      "phase": 1,
+      "tracks": [
+        "O17",
+        "O18",
+        "O19",
+        "O20"
+      ],
+      "buildOrder": 11
+    },
+    {
+      "id": "hidden",
+      "issue": "P1-46",
+      "phase": "hidden",
+      "tracks": [
+        "F2"
+      ],
+      "buildOrder": 12
+    }
+  ],
+  "tracks": [
+    {
+      "track": "F1",
+      "branch": "worktree-wf_fc54d4b0-c89-1",
+      "head": "0b72371f26c560d0a92a67a7e8c0eab1663c33fe",
+      "acceptedHead": "0b72371f26c560d0a92a67a7e8c0eab1663c33fe",
+      "mergeCommit": "169e84d9a36e60e5e07537f2605cff8d61b9cf71",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "F1"
+    },
+    {
+      "track": "F2",
+      "branch": "worktree-wf_fc54d4b0-c89-2",
+      "head": "91b434b825fa59bbedaef79e0eb0d209c200c8d8",
+      "acceptedHead": "91b434b825fa59bbedaef79e0eb0d209c200c8d8",
+      "mergeCommit": "3794885315b80969798e8cf4dab178969168aba0",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "hidden"
+    },
+    {
+      "track": "F3",
+      "branch": "worktree-wf_fc54d4b0-c89-3",
+      "head": "8ceeaa6565a864910182c569915c6a54a8038c53",
+      "acceptedHead": "8ceeaa6565a864910182c569915c6a54a8038c53",
+      "mergeCommit": "0bc02cb8d6b3cc2e44129e7ae5dffcd895d68184",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "F3"
+    },
+    {
+      "track": "F4",
+      "branch": "worktree-wf_fc54d4b0-c89-4",
+      "head": "ed9b45a252c76ad2c260dd7226b8d50dbe088a32",
+      "acceptedHead": "ed9b45a252c76ad2c260dd7226b8d50dbe088a32",
+      "mergeCommit": "a38faccdc1c907fd2975d46afde9e8954d6d0147",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "F4"
+    },
+    {
+      "track": "S7",
+      "branch": "worktree-wf_5210e2f4-3ea-7",
+      "head": "4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347",
+      "acceptedHead": "4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347",
+      "mergeCommit": "9e518de4d8e0a95b40d95acdcba6d22cae0e83fc",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "B"
+    },
+    {
+      "track": "S2",
+      "branch": "worktree-wf_5210e2f4-3ea-2",
+      "head": "0d1bb10a32d73dfe8a9bf26524858774dc2511b5",
+      "acceptedHead": "0d1bb10a32d73dfe8a9bf26524858774dc2511b5",
+      "mergeCommit": "0c0f4fc09d9797dbb00a521da3c9d07ec2b0d744",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "C"
+    },
+    {
+      "track": "S8",
+      "branch": "worktree-wf_5210e2f4-3ea-8",
+      "head": "0c7421f8413adb41b5ed40996501372dc3c4fecc",
+      "acceptedHead": "0c7421f8413adb41b5ed40996501372dc3c4fecc",
+      "mergeCommit": "e86b833b79e16cbe2d6c66c7db50ff0b7e6be063",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "S8"
+    },
+    {
+      "track": "S10",
+      "branch": "worktree-wf_5210e2f4-3ea-10",
+      "head": "8383e4cad89d31ac8f4cfffbfc54bec4bc459408",
+      "acceptedHead": "8383e4cad89d31ac8f4cfffbfc54bec4bc459408",
+      "mergeCommit": "70dbbdf38e097d7937036ef6e81c9ab7cca800ab",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "content"
+    },
+    {
+      "track": "S5",
+      "branch": "worktree-wf_5210e2f4-3ea-5",
+      "head": "97027c5d9ca87c686fd54c3d43c947fce8bcc0b0",
+      "acceptedHead": "97027c5d9ca87c686fd54c3d43c947fce8bcc0b0",
+      "mergeCommit": "f06738699a4718a30049d90b1bb4fec2aae7015c",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "A"
+    },
+    {
+      "track": "S4",
+      "branch": "worktree-wf_5210e2f4-3ea-4",
+      "head": "76569f23cf34253134f220111701355f05656f99",
+      "acceptedHead": "76569f23cf34253134f220111701355f05656f99",
+      "mergeCommit": "81567db795860c65c9b4b4a0abba16c803d2494c",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "content"
+    },
+    {
+      "track": "S9",
+      "branch": "worktree-wf_5210e2f4-3ea-9",
+      "head": "5a29f5c45d13dfd23a8165d5355ddbe959c0164c",
+      "acceptedHead": "5a29f5c45d13dfd23a8165d5355ddbe959c0164c",
+      "mergeCommit": "c849b1c3e2a3812df55998a9652374d0668386c8",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "B"
+    },
+    {
+      "track": "S3",
+      "branch": "worktree-wf_5210e2f4-3ea-3",
+      "head": "a54b88fc94fc181a87c3d1d1bff9160040589610",
+      "acceptedHead": "a54b88fc94fc181a87c3d1d1bff9160040589610",
+      "mergeCommit": "f095e88114fe2f9786278dd03c2fd6dece7ece04",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "ACCEPTED",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/final-verdicts.json",
+      "slice": "A"
+    },
+    {
+      "track": "S6",
+      "branch": "worktree-wf_5210e2f4-3ea-6",
+      "head": "653e3eeeb429b730d53963c2b6c86b91e09926dc",
+      "acceptedHead": null,
+      "mergeCommit": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "BLOCKED at 8fc76bd45; merged at 653e3eeeb by root ruling (4 Oct 05:43Z)",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/map/root-decisions.md",
+      "slice": "S6"
+    },
+    {
+      "track": "S1",
+      "branch": "worktree-wf_5210e2f4-3ea-1",
+      "head": "7180bd0c4e92d7ba2676758f4e6f72b391b6fe3c",
+      "acceptedHead": null,
+      "mergeCommit": "fe5ae34f9740f3ac318d3f351a9c193676c8b5a6",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "IN REVIEW: round-3 re-verification of 7180bd0c4",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/reverify-S1-r3.json",
+      "slice": "C"
+    },
+    {
+      "track": "O17",
+      "branch": "worktree-wf_3cbab9c8-0f5-17",
+      "head": "580b1876dffde315590cf863c3c3c5ca48d7efcd",
+      "acceptedHead": null,
+      "mergeCommit": "c56c84c7d0fcf67a1097eaa17ea2fcc9acd12b3e",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json",
+      "slice": "O"
+    },
+    {
+      "track": "O18",
+      "branch": "worktree-wf_3cbab9c8-0f5-18",
+      "head": "84a422adb1554e0dfcd9019afb99f613125d4255",
+      "acceptedHead": null,
+      "mergeCommit": "3713fbf9d2da452a54b0fb92ef6fc5e98596d63b",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json",
+      "slice": "O"
+    },
+    {
+      "track": "O19",
+      "branch": "worktree-wf_3cbab9c8-0f5-19",
+      "head": "9b1de17a0c4093d28a77abff3951a20bd20c2728",
+      "acceptedHead": null,
+      "mergeCommit": "38616fa33b74ccf198fb915985f86689504f6c76",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json",
+      "slice": "O"
+    },
+    {
+      "track": "O20",
+      "branch": "worktree-wf_3cbab9c8-0f5-20",
+      "head": "3b243feb08a46bc3f0b3070377c5a0b6a3279085",
+      "acceptedHead": null,
+      "mergeCommit": "78ee6f45614a498e80c418a8d6e90fa06a396d81",
+      "base": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/verify/verify-round2-O17-O20.json",
+      "slice": "O"
+    },
+    {
+      "track": "I1",
+      "branch": "worktree-wf_bea95acb-47c-1",
+      "head": "a40829277d194ef787f4877873b213f53643b7fa",
+      "acceptedHead": null,
+      "mergeCommit": "da730e4d7c59cd3264c0913e01904fb7b612e64f",
+      "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "slice": "content"
+    },
+    {
+      "track": "I2",
+      "branch": "worktree-wf_bea95acb-47c-2",
+      "head": "96e04e7b6db40b876bf8998b4f0e1f28c5187913",
+      "acceptedHead": null,
+      "mergeCommit": "56c037570a29c5b58b3600ab59c66f4f105ee174",
+      "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "slice": "S6"
+    },
+    {
+      "track": "I3",
+      "branch": "worktree-wf_bea95acb-47c-3",
+      "head": "1c9bf11f082b23e6bb538aee88156ac37115f0d6",
+      "acceptedHead": null,
+      "mergeCommit": "c5e4ba11a4f21563a7b9e2d811c83cb52e80bd2e",
+      "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "slice": "B"
+    },
+    {
+      "track": "I4",
+      "branch": "worktree-wf_bea95acb-47c-4",
+      "head": "daf2633cb88f531a93bcae6cab505ea784ee6b82",
+      "acceptedHead": null,
+      "mergeCommit": "11c9f2578c236353df1e7fa6c66eab41c384f365",
+      "base": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "verdict": "NOT RECORDED: read the verdict file",
+      "verdictFile": "root-checkout:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/review-integration-fixes.json",
+      "slice": "regen"
+    },
+    {
+      "track": "apply-health",
+      "branch": "worktree-wf_b05b1ca6-169-2",
+      "head": "f2387813bc4f5c6fa6cbd26c4a28e0c21ba57c44",
+      "acceptedHead": null,
+      "mergeCommit": "29801bd96f2bc382fb20b3ceaac99872f2e74bf3",
+      "base": "019e32b55c407f8846b76f652b862be0a038ec4e",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-frameworks",
+      "branch": "worktree-wf_b05b1ca6-169-9",
+      "head": "f4441b065a645ab621d8905bf7715710377c7009",
+      "acceptedHead": null,
+      "mergeCommit": "bbf55782509b6fd3ccf07e1b80e18f1a9de19a12",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/result.json",
+      "slice": "S6"
+    },
+    {
+      "track": "apply-education",
+      "branch": "worktree-wf_b05b1ca6-169-3",
+      "head": "aa918c78447642303198036525818eb5a98add98",
+      "acceptedHead": null,
+      "mergeCommit": "9b6e17ddab3620c8168685de85b4e81dec653e16",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-environment",
+      "branch": "worktree-wf_b05b1ca6-169-4",
+      "head": "1bfcf99cdc4788d4d3f29f741e8e3146b0f995d9",
+      "acceptedHead": null,
+      "mergeCommit": "6d5f2dae14db19ff150270fa2a7190402edb62ce",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-mobility",
+      "branch": "worktree-wf_b05b1ca6-169-5",
+      "head": "857b4b63b4f3595fb698cdf0c83b0927c1eb9818",
+      "acceptedHead": null,
+      "mergeCommit": "5c6fa7dccb423b02fe26bec0888365997b441310",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-governance",
+      "branch": "worktree-wf_b05b1ca6-169-6",
+      "head": "725ccc39c4eff49556831e7096122c926f5e697d",
+      "acceptedHead": null,
+      "mergeCommit": "e3b56449b7c08157e24a9269898bcf06e211b6c6",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/governance/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-technology",
+      "branch": "worktree-wf_b05b1ca6-169-7",
+      "head": "bc23de20e2a7306538cb043acc0ffb77ae9e493c",
+      "acceptedHead": null,
+      "mergeCommit": "fd2848bfacbfda45335aa8f44af0e340c044316f",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/technology/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-wealth",
+      "branch": "worktree-wf_b05b1ca6-169-8",
+      "head": "2d1948c04c6cde8907e2d229424d0434e808cec3",
+      "acceptedHead": null,
+      "mergeCommit": "3f18e43e4843417b99f4b700ea61c50b506577d1",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/result.json",
+      "slice": "content"
+    },
+    {
+      "track": "apply-register",
+      "branch": "worktree-wf_b05b1ca6-169-10",
+      "head": "1962e06cf3b82e46811305c6583478dffe06edf1",
+      "acceptedHead": null,
+      "mergeCommit": "61d53315f03c0cb169d89f3b6db880080c1495df",
+      "base": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "verdict": "NO MONITOR VERDICT: worker receipt only",
+      "verdictFile": "37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/result.json",
+      "slice": "A-register"
+    }
+  ],
+  "commits": [
+    {
+      "sha": "262051c0c643ae90cbc25e257a47afd159fd4399",
+      "subject": "feat: emit sourced station operating profiles from domain apply",
+      "track": "F1",
+      "kind": "code",
+      "slice": "F1",
+      "issue": "P1-15",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/INDUSTRY_OPERATING_PROFILES.md",
+        "src/domains/domainApply.ts",
+        "src/domains/domainApplyCli.ts",
+        "src/domains/domainRegistry.ts",
+        "src/domains/index.ts",
+        "src/domains/operatingProfiles/index.ts",
+        "src/domains/operatingProfiles/operatingProfileBuilder.ts",
+        "src/domains/operatingProfiles/operatingProfileConsistency.ts",
+        "src/domains/operatingProfiles/operatingProfileEmit.ts",
+        "src/domains/operatingProfiles/operatingProfileSources.ts",
+        "src/domains/operatingProfiles/operatingProfileTypes.ts",
+        "src/domains/operatingProfiles/profileDataHelpers.ts",
+        "src/domains/operatingProfiles/stationProfilesA.ts",
+        "src/domains/operatingProfiles/stationProfilesB.ts",
+        "tests/domainApply.test.ts",
+        "tests/domainRegistry.test.ts",
+        "tests/operatingProfiles.test.ts"
+      ]
+    },
+    {
+      "sha": "0b72371f26c560d0a92a67a7e8c0eab1663c33fe",
+      "subject": "docs: F1 operating-profiles receipt",
+      "track": "F1",
+      "kind": "receipt-only",
+      "slice": "F1",
+      "issue": "P1-15",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F1/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F1/result.json"
+      ]
+    },
+    {
+      "sha": "169e84d9a36e60e5e07537f2605cff8d61b9cf71",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_fc54d4b0-c89-1' into amc/regulated-platform-20261003",
+      "track": "F1",
+      "kind": "merge",
+      "slice": "F1",
+      "issue": "P1-15",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "d35ccbb697e2c0752dc6e99dd6667d13f91ea4f9",
+      "subject": "feat: regulated-agent blueprints derived from industry packs",
+      "track": "F2",
+      "kind": "code",
+      "slice": "hidden",
+      "issue": "P1-46",
+      "action": "record-only",
+      "paths": [
+        "src/domains/blueprints/blueprintCli.ts",
+        "src/domains/blueprints/blueprintCompose.ts",
+        "src/domains/blueprints/blueprintPreset.ts",
+        "src/domains/blueprints/blueprintRender.ts",
+        "src/domains/blueprints/blueprintTypes.ts",
+        "src/domains/blueprints/index.ts",
+        "src/domains/blueprints/stationProfile.ts",
+        "tests/industryBlueprints.test.ts"
+      ]
+    },
+    {
+      "sha": "c25bc23a0cd0bcad4df216f2b82ec0eda7a27eb9",
+      "subject": "docs: industry blueprints guide with measured results and ready-to-wire diffs",
+      "track": "F2",
+      "kind": "code",
+      "slice": "hidden",
+      "issue": "P1-46",
+      "action": "record-only",
+      "paths": [
+        "docs/INDUSTRY_BLUEPRINTS.md"
+      ]
+    },
+    {
+      "sha": "91b434b825fa59bbedaef79e0eb0d209c200c8d8",
+      "subject": "chore: F2 regulated-agent blueprints receipt",
+      "track": "F2",
+      "kind": "receipt-only",
+      "slice": "hidden",
+      "issue": "P1-46",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F2/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F2/result.json"
+      ]
+    },
+    {
+      "sha": "3794885315b80969798e8cf4dab178969168aba0",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_fc54d4b0-c89-2' into amc/regulated-platform-20261003",
+      "track": "F2",
+      "kind": "merge",
+      "slice": "hidden",
+      "issue": "P1-46",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "44ba1d9db0a3760455bf6f80fee3f753f8da23f7",
+      "subject": "feat: add industry certification runs composed from sealed evidence",
+      "track": "F3",
+      "kind": "code",
+      "slice": "F3",
+      "issue": "P1-16",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/INDUSTRY_CERTIFICATION.md",
+        "src/domains/certification/certificationEvidence.ts",
+        "src/domains/certification/certificationExport.ts",
+        "src/domains/certification/certificationRequirements.ts",
+        "src/domains/certification/certificationRun.ts",
+        "src/domains/certification/certificationSchema.ts",
+        "src/domains/certification/environment.ts",
+        "src/domains/certification/index.ts",
+        "tests/industryCertification.test.ts"
+      ]
+    },
+    {
+      "sha": "8ceeaa6565a864910182c569915c6a54a8038c53",
+      "subject": "docs: add F3 industry certification track receipt",
+      "track": "F3",
+      "kind": "receipt-only",
+      "slice": "F3",
+      "issue": "P1-16",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F3/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F3/result.json"
+      ]
+    },
+    {
+      "sha": "0bc02cb8d6b3cc2e44129e7ae5dffcd895d68184",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_fc54d4b0-c89-3' into amc/regulated-platform-20261003",
+      "track": "F3",
+      "kind": "merge",
+      "slice": "F3",
+      "issue": "P1-16",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "ff85721153b42d1fe3205b085806cfe0f58745a4",
+      "subject": "feat: regulatory incident clocks, oversight records and evidence packets",
+      "track": "F4",
+      "kind": "code",
+      "slice": "F4",
+      "issue": "P1-17",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/REGULATORY_INCIDENT_CLOCKS.md",
+        "src/incidents/evidencePacket.ts",
+        "src/incidents/oversightRecord.ts",
+        "src/incidents/regulatoryClocks.ts",
+        "src/incidents/regulatoryClocksTable.ts",
+        "tests/incidentEvidencePacket.test.ts",
+        "tests/regulatoryClocks.test.ts"
+      ]
+    },
+    {
+      "sha": "ed9b45a252c76ad2c260dd7226b8d50dbe088a32",
+      "subject": "docs: F4 receipt for regulatory incident clocks track",
+      "track": "F4",
+      "kind": "receipt-only",
+      "slice": "F4",
+      "issue": "P1-17",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F4/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F4/result.json"
+      ]
+    },
+    {
+      "sha": "a38faccdc1c907fd2975d46afde9e8954d6d0147",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_fc54d4b0-c89-4' into amc/regulated-platform-20261003",
+      "track": "F4",
+      "kind": "merge",
+      "slice": "F4",
+      "issue": "P1-17",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "853fa3b3609ec6a6a8a776af98a9ec368fdac4d6",
+      "subject": "test: cover bwrap status receipt parser and socket deny filter (AMC-1513)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/bwrapBackendPure.test.ts"
+      ]
+    },
+    {
+      "sha": "ca57d961086294545a4bb3927c6a65be841ab56d",
+      "subject": "test: pin import gate, lower-declaration clamp and neutral evidence projection (AMC-1516)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/externalEvidenceExport.test.ts",
+        "tests/externalEvidenceProfile.test.ts"
+      ]
+    },
+    {
+      "sha": "8171078b7d23525e951e3b3f13117d514c8f52ff",
+      "subject": "test: mutation-pin callback attribute allowlist; docs: state untracked conformance receipt (AMC-1517)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/PI_CALLBACK_TELEMETRY.md",
+        "tests/callbackTelemetryCapture.test.ts"
+      ]
+    },
+    {
+      "sha": "b8e1b35ee7332bc6ddb3124b115f21727ec83327",
+      "subject": "test: cover secret-bearing manifest and fixture-tamper refusals (AMC-1518)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/harnessComparison.test.ts"
+      ]
+    },
+    {
+      "sha": "0bcae3c186089e887bf58a059fbd754450bfdf1b",
+      "subject": "test: cover close-before-verify and trust-anchor guards in native SDK (AMC-1519)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/nativeAgentClientVerify.test.ts"
+      ]
+    },
+    {
+      "sha": "16bfd6f85680b7fd53fe4b5ab5f896abe8ee3e2c",
+      "subject": "docs: replace stale unexecuted markers with what ran at 8f57ce63 (AMC-1519)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/NATIVE_SDK.md",
+        "sdk/python/tests/test_validation.py",
+        "sdk/python/tests/test_validation_installed.py"
+      ]
+    },
+    {
+      "sha": "8a86bc23bd1af9e005ba6dfb6d707f3bd0e7b9f4",
+      "subject": "fix: state path-exec boundary of the DSH launch pin in its capture receipt (AMC-1520)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/adapters/deepseekHarnessLaunch.ts",
+        "tests/deepseekHarnessLaunch.test.ts"
+      ]
+    },
+    {
+      "sha": "8bbf445b8eb29cbb9c55455056666512e40e6d5c",
+      "subject": "fix: render import format name, record counts and reviewed next actions in text mode (AMC-1523)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/cli-import-commands.ts",
+        "tests/cliImportCommands.test.ts"
+      ]
+    },
+    {
+      "sha": "b0c523bda46085369d0dd0c80babbde757324f87",
+      "subject": "test: pin typecheck-tests step identity in release gate and workflows (AMC-1521)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/reconciliationDefectsReleaseGate.test.ts"
+      ]
+    },
+    {
+      "sha": "80d35a87556f9d9e3e259fdd21156366b08c0c8d",
+      "subject": "test: document MCP discarded-result and simulate-before-validate defects as expected failures (AMC-1515)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/reconciliationDefectsMcp.test.ts"
+      ]
+    },
+    {
+      "sha": "d4d62bcee7a76a40d038ed9d29206e84a20d81f0",
+      "subject": "test: use a valid neutral import category in the export fixture (AMC-1516)",
+      "track": "S7",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/externalEvidenceExport.test.ts"
+      ]
+    },
+    {
+      "sha": "f4147ddf06bf67f91958f24fab2bc3f959ec0e3a",
+      "subject": "docs: add S7 receipt (results, mutation log, ready-to-wire diffs) and point docs at it",
+      "track": "S7",
+      "kind": "mixed",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/dsh-runner-ready-to-wire.diff",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/mcp-ready-to-wire.diff",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/result.json",
+        "docs/NATIVE_SDK.md",
+        "sdk/python/tests/test_validation.py",
+        "sdk/python/tests/test_validation_installed.py"
+      ]
+    },
+    {
+      "sha": "4e8cc837cd6ffe36ed3625ba2387f9bff8ebc347",
+      "subject": "docs: backfill S7 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S7",
+      "kind": "receipt-only",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S7/report.md"
+      ]
+    },
+    {
+      "sha": "9e518de4d8e0a95b40d95acdcba6d22cae0e83fc",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-7' into amc/regulated-platform-20261003",
+      "track": "S7",
+      "kind": "merge",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "fa7b6f381bc3188606c069f304fc2b84717037f5",
+      "subject": "feat: add post-deploy governed-turn verifier and credentials presence check",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "railway.json",
+        "scripts/deploy-verify.mjs",
+        "scripts/release-credentials-check.mjs",
+        "tests/deployVerify.test.ts",
+        "tests/deployVerifyConfig.test.ts",
+        "tests/releaseCredentialsCheck.test.ts"
+      ]
+    },
+    {
+      "sha": "a89508b249a2c95d6291fafd722cc62461a0a63b",
+      "subject": "refactor: drop deploy-verify guards that mutation showed were already covered",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "scripts/deploy-verify.mjs"
+      ]
+    },
+    {
+      "sha": "d6a0beece4f8548c768af1bc4732049414dc4818",
+      "subject": "docs: add B0-B4 release gates and deployment verification record",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DEPLOYMENT_VERIFICATION.md",
+        "docs/RELEASE_RUNBOOK.md"
+      ]
+    },
+    {
+      "sha": "1d67aecfb96429a9867defae718a2fd3dcec3097",
+      "subject": "docs: add S2 track result receipt",
+      "track": "S2",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S2/result.json"
+      ]
+    },
+    {
+      "sha": "314d9de697d36c151336f0b6cf6d429703469e4a",
+      "subject": "docs: backfill S2 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S2",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S2/report.md"
+      ]
+    },
+    {
+      "sha": "327c712dea88a476871f88b2535086c321a78e05",
+      "subject": "fix: move S2 credential check and runbook to claimed paths and the planner's presence contract",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DEPLOYMENT_CONFIRMATION_RUNBOOK.md",
+        "docs/DEPLOYMENT_VERIFICATION.md",
+        "docs/RELEASE_RUNBOOK.md",
+        "scripts/credentials-presence-check.mjs",
+        "scripts/release-credentials-check.mjs",
+        "tests/credentialPresence.test.ts",
+        "tests/releaseCredentialsCheck.test.ts"
+      ]
+    },
+    {
+      "sha": "e94ec4ea18d30ccb0d8377ca12a17f14db2fbac0",
+      "subject": "feat: add static Railway/Vercel deploy config check",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "src/deployVerify/platformDeployConfig.ts",
+        "tests/platformDeployConfig.test.ts"
+      ]
+    },
+    {
+      "sha": "895d7fb5aeee180b5576aa87c59297f9b1520456",
+      "subject": "test: pin the B3/B4 owner-confirmation gates in the release runbook",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/deploymentConfirmationRunbook.test.ts"
+      ]
+    },
+    {
+      "sha": "ddfda721af23a5c5c08d309c49ca7cb36de51aa4",
+      "subject": "chore: reword S2 prose so the no-publish/deploy grep stays at zero",
+      "track": "S2",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "scripts/credentials-presence-check.mjs",
+        "src/deployVerify/platformDeployConfig.ts"
+      ]
+    },
+    {
+      "sha": "0d1bb10a32d73dfe8a9bf26524858774dc2511b5",
+      "subject": "docs: record S2 repair round 1 receipt",
+      "track": "S2",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S2/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S2/result.json"
+      ]
+    },
+    {
+      "sha": "0c0f4fc09d9797dbb00a521da3c9d07ec2b0d744",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-2' into amc/regulated-platform-20261003",
+      "track": "S2",
+      "kind": "merge",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "15a92e92791c5bc8830773a2973a2bbc188e651e",
+      "subject": "test: specify deny-by-default web fetch, search, ask-user, todo and plan tools (AMC-1549)",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/askUserTool.test.ts",
+        "tests/nativeToolBreadth.test.ts",
+        "tests/webFetchTool.test.ts"
+      ]
+    },
+    {
+      "sha": "7caecc481e096d837501dac60d71692863287f72",
+      "subject": "feat: add refuse-by-default web_fetch, web_search, ask_user, todo and plan native tools (AMC-1549)",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "src/tools/builtin/askUserTool.ts",
+        "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+        "src/tools/builtin/nativeToolBreadth/originPolicy.ts",
+        "src/tools/builtin/nativeToolBreadth/sessionListTool.ts",
+        "src/tools/builtin/nativeToolBreadth/signedSessionRecords.ts",
+        "src/tools/builtin/planTool.ts",
+        "src/tools/builtin/todoTool.ts",
+        "src/tools/builtin/webFetchTool.ts",
+        "src/tools/builtin/webSearchTool.ts"
+      ]
+    },
+    {
+      "sha": "fa58d6dd83cf14db5b04c28726a5336111bff3a5",
+      "subject": "refactor: drop the content-length pre-check a mutation proved redundant with the streaming cap",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "src/tools/builtin/nativeToolBreadth/governedFetch.ts",
+        "tests/webFetchTool.test.ts"
+      ]
+    },
+    {
+      "sha": "0e0b14d379470969b42e0a8a03b6e71cc5c32613",
+      "subject": "feat: bind each web_search provider to the one origin it declares",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "src/tools/builtin/webSearchTool.ts",
+        "tests/nativeToolBreadth.test.ts"
+      ]
+    },
+    {
+      "sha": "c7e6486476f7eba730d426c43e3638273f1def5c",
+      "subject": "fix: resolve native tool session ids at call time so forks and resumes bind correctly",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "src/tools/builtin/askUserTool.ts",
+        "src/tools/builtin/nativeToolBreadth/sessionListTool.ts",
+        "src/tools/builtin/nativeToolBreadth/signedSessionRecords.ts",
+        "src/tools/builtin/planTool.ts",
+        "src/tools/builtin/todoTool.ts",
+        "tests/nativeToolBreadth.test.ts"
+      ]
+    },
+    {
+      "sha": "fb4cd7e7e9447e13ac5a9a7189bef405b7919160",
+      "subject": "docs: describe the native web, ask-user, todo and plan tools and their unregistered state (AMC-1549)",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/NATIVE_TOOLS.md"
+      ]
+    },
+    {
+      "sha": "2b89c614899627ccb7838058b6d035f3ad22e695",
+      "subject": "docs: record S8 native tool breadth receipt, mutations and ready-to-wire diff (AMC-1549)",
+      "track": "S8",
+      "kind": "receipt-only",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/s8WiringProof.test.ts.txt",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/wiring.diff"
+      ]
+    },
+    {
+      "sha": "93d73bdda0c3dc39a149c0abc38861ecac1f90ba",
+      "subject": "docs: backfill S8 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S8",
+      "kind": "receipt-only",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/report.md"
+      ]
+    },
+    {
+      "sha": "4304f6acb59003f8ee838a5be78c1eb281273745",
+      "subject": "test: pin native web tools to NETWORK_EXTERNAL and refuse foreign session records on read (AMC-1549)",
+      "track": "S8",
+      "kind": "code",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/nativeToolBreadth.test.ts"
+      ]
+    },
+    {
+      "sha": "4b76dba54012295ae271c22d886633f3c1c4f976",
+      "subject": "docs: name the default-template toolsSchema change and record S8 repair-round mutations (AMC-1549)",
+      "track": "S8",
+      "kind": "mixed",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/result.json",
+        "docs/NATIVE_TOOLS.md"
+      ]
+    },
+    {
+      "sha": "0c7421f8413adb41b5ed40996501372dc3c4fecc",
+      "subject": "docs: record S8 repair-round re-verification (M14-M16, focused suite, typecheck)",
+      "track": "S8",
+      "kind": "receipt-only",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S8/result.json"
+      ]
+    },
+    {
+      "sha": "e86b833b79e16cbe2d6c66c7db50ff0b7e6be063",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-8' into amc/regulated-platform-20261003",
+      "track": "S8",
+      "kind": "merge",
+      "slice": "S8",
+      "issue": "P1-43",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "8c145bf7e9449056ffc643d27b411d74a6d4cd5e",
+      "subject": "feat: generate the regulatory calendar from the register with a drift check",
+      "track": "S10",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/REGULATORY_CALENDAR.md",
+        "scripts/gen-regulatory-calendar.mjs",
+        "tests/regulatoryCalendar.test.ts"
+      ]
+    },
+    {
+      "sha": "3282678f15b63745f36b31fa14173508d02ef9f3",
+      "subject": "docs: add per-station regulated deployment guides with checked citations",
+      "track": "S10",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/industries/README.md",
+        "docs/industries/education.md",
+        "docs/industries/environment.md",
+        "docs/industries/governance.md",
+        "docs/industries/health.md",
+        "docs/industries/mobility.md",
+        "docs/industries/technology.md",
+        "docs/industries/wealth.md",
+        "tests/industryGuides.test.ts"
+      ]
+    },
+    {
+      "sha": "1b529a2ae0b37e1a5c4a8be2470238359023f922",
+      "subject": "docs: backfill S10 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S10",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/result.json"
+      ]
+    },
+    {
+      "sha": "30f9103b5cf501cbf14c952707cea5ef88d30bef",
+      "subject": "feat: add sourced regulatory milestones and risk-matrix count to the calendar",
+      "track": "S10",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/REGULATORY_CALENDAR.md",
+        "docs/industries/_data/regulatory-milestones.json",
+        "scripts/gen-regulatory-calendar.mjs",
+        "scripts/lib/regulatoryCalendarRender.mjs",
+        "tests/industryGuides.test.ts",
+        "tests/regulatoryCalendar.test.ts"
+      ]
+    },
+    {
+      "sha": "7d6d8a8db580cd122e6c3975bd463d9864539e70",
+      "subject": "docs: record S10 repair round receipt",
+      "track": "S10",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/result.json"
+      ]
+    },
+    {
+      "sha": "8383e4cad89d31ac8f4cfffbfc54bec4bc459408",
+      "subject": "docs: record S10 repair re-verification receipt",
+      "track": "S10",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S10/result.json"
+      ]
+    },
+    {
+      "sha": "70dbbdf38e097d7937036ef6e81c9ab7cca800ab",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-10' into amc/regulated-platform-20261003",
+      "track": "S10",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "172de74577655a07706baa5f171961830d41c66c",
+      "subject": "feat: add sourced regulatory currency register, currency check and truthful feeds",
+      "track": "S5",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/COMPLIANCE_FRAMEWORKS.md",
+        "scripts/check-regulatory-currency.mjs",
+        "src/compliance/globalRegulatory.ts",
+        "src/compliance/regulatoryAutomation.ts",
+        "src/compliance/regulatoryRegister/feeds.ts",
+        "src/compliance/regulatoryRegister/index.ts",
+        "src/compliance/regulatoryRegister/register.json",
+        "tests/globalRegulatory.test.ts",
+        "tests/regulatoryAutomation.test.ts",
+        "tests/regulatoryCurrency.test.ts"
+      ]
+    },
+    {
+      "sha": "b11f43bb1e8963cfb145e82f5fb3c86230f39004",
+      "subject": "feat: encode verified EU AI Act application timeline in the classifier",
+      "track": "S5",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "src/compliance/euAiActClassifier.ts",
+        "tests/euAiAct.test.ts"
+      ]
+    },
+    {
+      "sha": "276a6570f306ce1d22138e074099e780e4614efb",
+      "subject": "docs: date and source the EU AI Act timeline after the Digital Omnibus",
+      "track": "S5",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/EU_AI_ACT_COMPLIANCE.md"
+      ]
+    },
+    {
+      "sha": "082efcd18131b32a804eeb1769ba2fa62c8a4373",
+      "subject": "docs: add S5 track receipt",
+      "track": "S5",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/result.json"
+      ]
+    },
+    {
+      "sha": "c6b0d19b5d2afc77493dbf8bb05da86773ec87c0",
+      "subject": "docs: backfill S5 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S5",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/report.md"
+      ]
+    },
+    {
+      "sha": "d7a77cc51bb3d6da36c5c5a2eb5688f126771d1f",
+      "subject": "fix: move regulatory register to its claimed path and close S5 review defects",
+      "track": "S5",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/COMPLIANCE_FRAMEWORKS.md",
+        "docs/EU_AI_ACT_COMPLIANCE.md",
+        "docs/wave4-regulatory-audit.md",
+        "scripts/check-regulatory-currency.mjs",
+        "src/compliance/euAiActClassifier.ts",
+        "src/compliance/globalRegulatory.ts",
+        "src/compliance/regulatory/feeds.ts",
+        "src/compliance/regulatory/index.ts",
+        "src/compliance/regulatory/register.json",
+        "src/compliance/regulatoryAutomation.ts",
+        "src/compliance/regulatoryRegister/feeds.ts",
+        "src/compliance/regulatoryRegister/index.ts",
+        "src/compliance/regulatoryRegister/register.json",
+        "tests/euAiAct.test.ts",
+        "tests/euAiActTimeline.test.ts",
+        "tests/globalRegulatory.test.ts",
+        "tests/regulatoryAutomation.test.ts",
+        "tests/regulatoryClaimsHonesty.test.ts",
+        "tests/regulatoryCurrency.test.ts",
+        "tests/round4Gaps.test.ts"
+      ]
+    },
+    {
+      "sha": "297af3a451818b374c207370dfdb855c561ab821",
+      "subject": "docs: record S5 repair round 1 receipt",
+      "track": "S5",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/result.json"
+      ]
+    },
+    {
+      "sha": "97027c5d9ca87c686fd54c3d43c947fce8bcc0b0",
+      "subject": "docs: record S5 repair round 1 re-verification",
+      "track": "S5",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S5/result.json"
+      ]
+    },
+    {
+      "sha": "f06738699a4718a30049d90b1bb4fec2aae7015c",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-5' into amc/regulated-platform-20261003",
+      "track": "S5",
+      "kind": "merge",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "199180185b7ae637502f0343a1c0f652a42d9401",
+      "subject": "feat: report regulatory currency in the signed industry pack audit",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/industryPackAudit.ts",
+        "tests/industryPackAudit.test.ts"
+      ]
+    },
+    {
+      "sha": "8d1638fb940e923e0030a3a34f7bb9217bc72ef8",
+      "subject": "feat: surface EU AI Act classification and certification rule in domain reports",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/SECTOR_PACKS.md",
+        "src/domains/domainAssessmentEngine.ts",
+        "src/domains/domainReportBuilder.ts",
+        "tests/domainAssessment.test.ts",
+        "tests/domainReport.test.ts"
+      ]
+    },
+    {
+      "sha": "b1ba54c2b73a5736e6530baf47343ec13277b0f6",
+      "subject": "feat: deep industry questions for all seven stations with cited sources",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/deepIndustryPacks.ts",
+        "tests/deepIndustryPacks.test.ts"
+      ]
+    },
+    {
+      "sha": "7025a1b4aa6e1597531d7c9f2c8cd5d371bbf76a",
+      "subject": "docs: backfill S4 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S4",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S4/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S4/result.json"
+      ]
+    },
+    {
+      "sha": "54d4d0319654ac9ea800367bab5909f10b078427",
+      "subject": "feat: ten hand-written deep questions per new station, linked to industry pack ids",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/deep/education.ts",
+        "src/domains/deep/environment.ts",
+        "src/domains/deep/mobility.ts",
+        "src/domains/deep/shared.ts",
+        "src/domains/deep/technology.ts",
+        "src/domains/deepIndustryPacks.ts",
+        "tests/deepIndustryPacks.test.ts",
+        "tests/deepIndustryPacksStations.test.ts"
+      ]
+    },
+    {
+      "sha": "7fd5b8589c8ea339ff1f7a192b672326808249e3",
+      "subject": "feat: flag PROHIBITED Annex III qualifiers and split report tests by claim",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/domainAssessmentEngine.ts",
+        "src/domains/domainReportBuilder.ts",
+        "tests/domainAssessment.test.ts",
+        "tests/domainReport.test.ts",
+        "tests/domainReportAnnexIII.test.ts",
+        "tests/sectorPacksDocDerived.test.ts"
+      ]
+    },
+    {
+      "sha": "ccb64212f97f97c288b010207482ecaac84e3692",
+      "subject": "test: build the HEAD-shape pack synthetically in currency tests",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/industryPackAudit.test.ts"
+      ]
+    },
+    {
+      "sha": "d688673b346aaf16d2a22512cfaefa6aab89d312",
+      "subject": "fix: keep Annex III parsing correct for prose classifications",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/domainAssessmentEngine.ts",
+        "src/domains/domainReportBuilder.ts",
+        "tests/domainReportAnnexIII.test.ts"
+      ]
+    },
+    {
+      "sha": "cb7e9e12418f4da10248219c20e71c8df8daee3b",
+      "subject": "docs: stop restating sector pack totals in SECTOR_PACKS",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/SECTOR_PACKS.md",
+        "tests/sectorPacksDocDerived.test.ts"
+      ]
+    },
+    {
+      "sha": "2f01eec5f166bd4360716e7e802c892c11d5a722",
+      "subject": "docs: name getStationSummary fields without a count that drifts",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/SECTOR_PACKS.md",
+        "tests/sectorPacksDocDerived.test.ts"
+      ]
+    },
+    {
+      "sha": "b71f65b81232feca278eb9b4fd8622fe466bb573",
+      "subject": "fix: type currency input structurally so registry currency fields fit",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/industryPackAudit.ts"
+      ]
+    },
+    {
+      "sha": "4bafa2b421bf4b7c9f4acbddd3e5999c1d2c5d83",
+      "subject": "fix: record the day the repair-round provisions were read",
+      "track": "S4",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/deep/education.ts",
+        "src/domains/deep/environment.ts",
+        "src/domains/deep/mobility.ts",
+        "src/domains/deep/shared.ts",
+        "src/domains/deep/technology.ts"
+      ]
+    },
+    {
+      "sha": "76569f23cf34253134f220111701355f05656f99",
+      "subject": "docs: S4 repair round 1 receipt",
+      "track": "S4",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S4/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S4/result.json"
+      ]
+    },
+    {
+      "sha": "81567db795860c65c9b4b4a0abba16c803d2494c",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-4' into amc/regulated-platform-20261003",
+      "track": "S4",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "b85b69548099163766bdcb67f4d3de34d47c94e1",
+      "subject": "fix: industry assurance packs fail closed on missing or canned evidence",
+      "track": "S9",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/educationFERPAPack.ts",
+        "src/assurance/packs/environmentalInfraPack.ts",
+        "src/assurance/packs/euAiActArticlePack.ts",
+        "src/assurance/packs/financialSOXPack.ts",
+        "src/assurance/packs/governanceNISTRMFPack.ts",
+        "src/assurance/packs/healthcarePHIPack.ts",
+        "src/assurance/packs/hipaaCompliancePack.ts",
+        "src/assurance/packs/index.ts",
+        "src/assurance/packs/industryPackManifest.ts",
+        "src/assurance/packs/legalCompliancePack.ts",
+        "src/assurance/packs/mobilityFunctionalSafetyPack.ts",
+        "src/assurance/packs/pharmaCompliancePack.ts",
+        "src/assurance/packs/realtimeVoiceSafetyPack.ts",
+        "src/assurance/packs/safetyCriticalSILPack.ts",
+        "src/assurance/packs/sbomSupplyChainPack.ts",
+        "src/assurance/packs/technologyGDPRSOCPack.ts",
+        "src/assurance/packs/wealthManagementMiFIDPack.ts",
+        "tests/assurancePackManifest.test.ts",
+        "tests/industryAssurancePacks.test.ts"
+      ]
+    },
+    {
+      "sha": "cda98f97f5cfa6e5264d7a61ade5cd2e817854b2",
+      "subject": "fix: update stale regulatory anchors in global and ISO 42005 packs",
+      "track": "S9",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/globalAIRegulatoryPack.ts",
+        "src/assurance/packs/iso42005Pack.ts"
+      ]
+    },
+    {
+      "sha": "559e7d8d1ad05bc0ecaa388071ff1446a63dd6c7",
+      "subject": "docs: backfill S9 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S9",
+      "kind": "receipt-only",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/result.json"
+      ]
+    },
+    {
+      "sha": "3ab98cadadb825c048c45101991e72e5fb45fb37",
+      "subject": "fix: make HIPAA and healthcare PHI regexes stateless and pin stale anchors",
+      "track": "S9",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/healthcarePHIPack.ts",
+        "src/assurance/packs/hipaaCompliancePack.ts",
+        "src/assurance/packs/index.ts",
+        "tests/assurance/industryPackAnchors.test.ts",
+        "tests/assurance/industryPackFailClosed.test.ts",
+        "tests/assurance/industryPackManifest.test.ts",
+        "tests/assurancePackManifest.test.ts",
+        "tests/industryAssurancePacks.test.ts"
+      ]
+    },
+    {
+      "sha": "2ccc37edf4af2c4f70224ce9378786869643b10a",
+      "subject": "docs: record S9 repair round 1 receipt",
+      "track": "S9",
+      "kind": "receipt-only",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/result.json"
+      ]
+    },
+    {
+      "sha": "5a29f5c45d13dfd23a8165d5355ddbe959c0164c",
+      "subject": "docs: record S9 repair round 1 re-verification",
+      "track": "S9",
+      "kind": "receipt-only",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S9/result.json"
+      ]
+    },
+    {
+      "sha": "c849b1c3e2a3812df55998a9652374d0668386c8",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-9' into amc/regulated-platform-20261003",
+      "track": "S9",
+      "kind": "merge",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "5a19ae6dd3ba425a42f017f87efd8cf8ff9042bd",
+      "subject": "feat: add regulatory-currency schema and 2026 refresh for industry packs",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/industryPackRegulatorySchema.ts",
+        "src/domains/industryPacks.ts",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueHelpers.ts",
+        "src/domains/packs/catalogueIntl.ts",
+        "src/domains/packs/catalogueUs.ts",
+        "src/domains/packs/regulatoryCatalogue.ts",
+        "tests/industryPackRegulatory.test.ts",
+        "tests/industryPacks.test.ts"
+      ]
+    },
+    {
+      "sha": "bf84996a48a238ea43f481297cd1203f29ed57d8",
+      "subject": "docs: check sector-pack counts against the registry and document regulatory currency",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DOMAIN_PACKS.md"
+      ]
+    },
+    {
+      "sha": "05ae53f1e5e03fb9a72264a004f96edc6e42ede3",
+      "subject": "fix: correct verified industry-pack citations (Section 508, AI Act Art. 5, COPPA 2025, WCAG 2.2, FERC Order 901)",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/industryPacks.ts"
+      ]
+    },
+    {
+      "sha": "2c291c8aaeaa0c0a479f81bb1eb719ff8a74b21b",
+      "subject": "fix: correct verified health-pack citations (EHDS chapters, IVDR Art. 56, AI Act Arts. 5(1)(f)/49, ONC (g)(10), Cures Act §4004)",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/industryPacks.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "03ac0803f33ad8f670ddc2e394bd9b8a800632c3",
+      "subject": "docs: state the question-depth floor rationale exactly",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DOMAIN_PACKS.md",
+        "src/domains/industryPackRegulatorySchema.ts"
+      ]
+    },
+    {
+      "sha": "7b21996e97e064105c5aa8b275fca943694c1a6f",
+      "subject": "chore: add S3 ready-to-wire diff for public question-count surfaces (600 -> 608)",
+      "track": "S3",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/ready-to-wire.diff"
+      ]
+    },
+    {
+      "sha": "406518dd96eae52f240ec9746a313f5371e04aae",
+      "subject": "docs: backfill S3 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S3",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/result.json"
+      ]
+    },
+    {
+      "sha": "748d7c23c9d4e031713e4e5c8bdb14779c9fcc35",
+      "subject": "fix: conform industry-pack currency to PackCurrencyFields v1 and move the schema under packs/",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DOMAIN_PACKS.md",
+        "src/domains/industryPackRegulatorySchema.ts",
+        "src/domains/industryPacks.ts",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueHelpers.ts",
+        "src/domains/packs/catalogueIntl.ts",
+        "src/domains/packs/catalogueUs.ts",
+        "src/domains/packs/regulatoryCatalogue.ts",
+        "src/domains/packs/regulatorySchema.ts",
+        "tests/industryPackFrameworkNormalization.test.ts",
+        "tests/industryPackRegulatory.test.ts",
+        "tests/industryPackRegulatoryRefresh.test.ts",
+        "tests/industryPackSchema.test.ts",
+        "tests/industryPacks.test.ts"
+      ]
+    },
+    {
+      "sha": "20b69fb474f2fc851d2414b42ae6fff1fcd59b34",
+      "subject": "feat: raise the industry-pack question floor to 15 [HOLD until root whitepaper edit]",
+      "track": "S3",
+      "kind": "code",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/DOMAIN_PACKS.md",
+        "src/domains/industryPacks.ts",
+        "src/domains/packs/regulatorySchema.ts",
+        "tests/industryPackDepthFloor.test.ts",
+        "tests/logisticsIndustryPack.test.ts",
+        "tests/publicQuestionCountDrift.test.ts",
+        "website/station-education.html",
+        "website/station-environment.html",
+        "website/station-governance.html",
+        "website/station-mobility.html",
+        "website/station-technology.html",
+        "website/station-wealth.html"
+      ]
+    },
+    {
+      "sha": "a54b88fc94fc181a87c3d1d1bff9160040589610",
+      "subject": "docs: record S3 repair round 1 receipt and regenerate the ready-to-wire diff for 632",
+      "track": "S3",
+      "kind": "receipt-only",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/ready-to-wire.diff",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S3/result.json"
+      ]
+    },
+    {
+      "sha": "f095e88114fe2f9786278dd03c2fd6dece7ece04",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-3' into amc/regulated-platform-20261003",
+      "track": "S3",
+      "kind": "merge",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "de349beed7b9f34787cc60893bc1a6fbe9c36c80",
+      "subject": "feat: add sourced DORA, NIS2 and HTI-1 crosswalks and resolve pack framework names",
+      "track": "S6",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "src/compliance/builtInMappings.ts",
+        "src/compliance/controlCrosswalk.ts",
+        "src/compliance/coverageScorer.ts",
+        "src/compliance/frameworks.ts",
+        "src/compliance/mappingSchema.ts",
+        "tests/complianceMapping.test.ts",
+        "tests/controlCrosswalk.test.ts",
+        "tests/coverageScorer.test.ts",
+        "tests/frameworks.test.ts"
+      ]
+    },
+    {
+      "sha": "5045b665762b0b31d590f0099d60228ebee2d2c5",
+      "subject": "docs: consolidate duplicate compliance reports and date crosswalk sources",
+      "track": "S6",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/COMPLIANCE_MAPS.md",
+        "docs/ISO_42001_ALIGNMENT.md",
+        "docs/compliance/README.md",
+        "docs/compliance/compliance-eu-ai-act.md",
+        "docs/compliance/compliance-eu_ai_act.md",
+        "docs/compliance/compliance-iso-42001.md",
+        "docs/compliance/compliance-iso_42001.md",
+        "docs/compliance/compliance-nist-ai-rmf.md",
+        "docs/compliance/compliance-nist.md",
+        "docs/compliance/compliance-nist_ai_rmf.md",
+        "docs/compliance/compliance-soc-2.md",
+        "docs/compliance/compliance-soc2.md"
+      ]
+    },
+    {
+      "sha": "83d022110f7aa85ba0df324d571d6c11c5c65f98",
+      "subject": "docs: backfill S6 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S6",
+      "kind": "receipt-only",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/result.json"
+      ]
+    },
+    {
+      "sha": "f007629b5a315034cd65a4661234127c4c29e916",
+      "subject": "feat: add sourced NIST AI 600-1, Colorado, Texas, California and Korea crosswalks",
+      "track": "S6",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "src/compliance/builtInMappings.ts",
+        "src/compliance/frameworks.ts",
+        "src/compliance/frameworks/aliases.ts",
+        "tests/complianceMapping.test.ts",
+        "tests/controlCrosswalk.test.ts",
+        "tests/coverageScorer.test.ts",
+        "tests/fixtures/packFrameworkStrings.unresolved.json",
+        "tests/frameworkBreadth.test.ts",
+        "tests/frameworks.test.ts",
+        "tests/mappingSources.test.ts",
+        "tests/packFrameworkAliases.test.ts"
+      ]
+    },
+    {
+      "sha": "d65cff8596a7d2f05a077091e68ac9d1f5282dcb",
+      "subject": "docs: document new crosswalk families and date the stale compliance reports",
+      "track": "S6",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/COMPLIANCE_MAPS.md",
+        "docs/ISO_42001_ALIGNMENT.md",
+        "docs/compliance/README.md",
+        "docs/compliance/compliance-eu_ai_act.md",
+        "docs/compliance/compliance-fedramp.md",
+        "docs/compliance/compliance-gdpr.md",
+        "docs/compliance/compliance-hipaa.md",
+        "docs/compliance/compliance-iso_27001.md",
+        "docs/compliance/compliance-iso_42001.md",
+        "docs/compliance/compliance-mitre_atlas.md",
+        "docs/compliance/compliance-nist_ai_rmf.md",
+        "docs/compliance/compliance-owasp.md",
+        "docs/compliance/compliance-pci_dss.md",
+        "docs/compliance/compliance-soc2.md",
+        "docs/compliance/compliance-sox.md"
+      ]
+    },
+    {
+      "sha": "088ca501f7428dba956396bec358a5250334fcab",
+      "subject": "fix: name Texas TRAIGA categories after the statute's section headings",
+      "track": "S6",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "src/compliance/builtInMappings.ts",
+        "src/compliance/frameworks.ts"
+      ]
+    },
+    {
+      "sha": "8fc76bd45bb80e95ea68055a39fa4baa858958c3",
+      "subject": "docs: record S6 repair-round receipt",
+      "track": "S6",
+      "kind": "receipt-only",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/result.json"
+      ]
+    },
+    {
+      "sha": "653e3eeeb429b730d53963c2b6c86b91e09926dc",
+      "subject": "docs: record the S6 worker HEAD as a SHA in its receipt (root cosmetic fix)",
+      "track": "S6",
+      "kind": "receipt-only",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S6/result.json"
+      ]
+    },
+    {
+      "sha": "726be0ca11e31224b2c93ae13a439f8cb2393e64",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-6' into amc/regulated-platform-20261003",
+      "track": "S6",
+      "kind": "merge",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "e05bcb7d247a700d4ab476de17d826aa82b660fe",
+      "subject": "fix: keep default secrets out of the deployment pack and align chart with 1.2.0",
+      "track": "S1",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "deploy/helm/amc/Chart.yaml",
+        "deploy/helm/amc/examples/values-persistent-bootstrap.yaml",
+        "deploy/helm/amc/templates/deployment.yaml",
+        "deploy/helm/amc/templates/secret.yaml",
+        "deploy/k8s/deployment.yaml",
+        "deploy/k8s/secret.example.yaml",
+        "deploy/pulumi/helm-release/index.ts",
+        "deploy/terraform/helm-release/terraform.tfvars.example",
+        "deploy/terraform/helm-release/variables.tf",
+        "scripts/deploy/rollback-check.mjs",
+        "scripts/deploy/validate-assets.mjs",
+        "tests/deployAssets.test.ts",
+        "tests/deploymentPack.test.ts"
+      ]
+    },
+    {
+      "sha": "a0ed68d05c9560bccd603c4b61612373c31eba56",
+      "subject": "docs: document offline validation, probes, secret creation and rollback for Kubernetes",
+      "track": "S1",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "deploy/helm/amc/README.md",
+        "deploy/k8s/README.md",
+        "deploy/pulumi/helm-release/README.md",
+        "deploy/terraform/helm-release/README.md",
+        "docs/KUBERNETES_HELM_DEPLOYMENT.md"
+      ]
+    },
+    {
+      "sha": "3ca024d03b62b6df58884767a9ac27108ee49276",
+      "subject": "fix: flag Secret removal as an upgrade hazard and document the chart 0.1.0 upgrade",
+      "track": "S1",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/KUBERNETES_HELM_DEPLOYMENT.md",
+        "scripts/deploy/rollback-check.mjs",
+        "tests/deployAssets.test.ts"
+      ]
+    },
+    {
+      "sha": "1cc80aab414d983c0245523606580d62b5794750",
+      "subject": "docs: add S1 deployment-pack receipt logs and result",
+      "track": "S1",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/green-after-fix.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/mutations.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/red-before-fix.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/rollback-check.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/validate-after-fix.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/validate-before-fix.log"
+      ]
+    },
+    {
+      "sha": "be70e303caa367a288fa9794a9802c04f33bc7c3",
+      "subject": "docs: backfill S1 receipt from the worker return (harness refused subagent .md writes)",
+      "track": "S1",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/report.md"
+      ]
+    },
+    {
+      "sha": "903c19fe4e5b218fcd7361f821805481da042248",
+      "subject": "fix: guard the chart Secret, pin images by digest, add governed-turn test and rollback drill",
+      "track": "S1",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "deploy/helm/amc/README.md",
+        "deploy/helm/amc/files/governed-turn-probe.mjs",
+        "deploy/helm/amc/templates/NOTES.txt",
+        "deploy/helm/amc/templates/_helpers.tpl",
+        "deploy/helm/amc/templates/deployment.yaml",
+        "deploy/helm/amc/templates/networkpolicy.yaml",
+        "deploy/helm/amc/templates/secret.yaml",
+        "deploy/helm/amc/templates/tests/governed-turn.yaml",
+        "deploy/helm/amc/values.schema.json",
+        "deploy/helm/amc/values.yaml",
+        "deploy/pulumi/helm-release/Pulumi.yaml",
+        "deploy/pulumi/helm-release/README.md",
+        "deploy/pulumi/helm-release/index.ts",
+        "deploy/terraform/helm-release/README.md",
+        "deploy/terraform/helm-release/main.tf",
+        "deploy/terraform/helm-release/terraform.tfvars.example",
+        "deploy/terraform/helm-release/variables.tf",
+        "docker/docker-compose.yml",
+        "docs/KUBERNETES_HELM_DEPLOYMENT.md",
+        "scripts/deploy/deploy-pack-check.mjs",
+        "scripts/deploy/governed-turn-probe.mjs",
+        "scripts/deploy/rollback-drill.mjs",
+        "scripts/deploy/validate-assets.mjs",
+        "tests/deployAssets.test.ts",
+        "tests/deployPackCheck.test.ts",
+        "tests/deployPackProbe.test.ts",
+        "tests/deploymentPack.test.ts",
+        "tests/helmChartSecrets.test.ts",
+        "tests/helmChartVersion.test.ts",
+        "tests/helpers/deployPackFixtures.ts",
+        "tests/k8sManifestsSecrets.test.ts",
+        "tests/rollbackDrill.test.ts"
+      ]
+    },
+    {
+      "sha": "33655e6ca0d52c10d4622a9c7b02ee5f8a319014",
+      "subject": "docs: S1 round-2 receipts (mutations, offline check, drill boundary, path discipline)",
+      "track": "S1",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/deploy-pack-check-r2.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/green-r2.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/mutations-r1-recheck.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/mutations-r2.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/path-discipline-r2.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/rollback-drill-r2.log"
+      ]
+    },
+    {
+      "sha": "cdab568c5b5c6ebea9f8d39244c56c5854dc5986",
+      "subject": "fix: admit the deploy pack's governed-turn probe through Studio's native host check",
+      "track": "S1",
+      "kind": "code",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "cherry-pick",
+      "paths": [
+        "deploy/helm/amc/templates/_helpers.tpl",
+        "deploy/helm/amc/templates/configmap.yaml",
+        "deploy/helm/amc/templates/tests/governed-turn.yaml",
+        "deploy/helm/amc/values.yaml",
+        "docker/docker-compose.yml",
+        "docs/KUBERNETES_HELM_DEPLOYMENT.md",
+        "scripts/deploy/rollback-drill.mjs",
+        "tests/deployPackProbe.test.ts",
+        "tests/helmChartOrigins.test.ts",
+        "tests/rollbackDrill.test.ts"
+      ]
+    },
+    {
+      "sha": "7180bd0c4e92d7ba2676758f4e6f72b391b6fe3c",
+      "subject": "docs: record S1 round-3 receipts for native origin admission fixes",
+      "track": "S1",
+      "kind": "receipt-only",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/deploy-pack-check-r3.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/green-r3.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/mutations-r3.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/path-discipline-r3.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/red-r3.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/report.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/S1/rollback-drill-r3.log"
+      ]
+    },
+    {
+      "sha": "fe5ae34f9740f3ac318d3f351a9c193676c8b5a6",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_5210e2f4-3ea-1' into amc/regulated-platform-20261003",
+      "track": "S1",
+      "kind": "merge",
+      "slice": "C",
+      "issue": "P0-14",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "c490140748338e47a7e9c02dae19c6a59dd05984",
+      "subject": "feat: expose industry packs as read-only MCP tools",
+      "track": "O17",
+      "kind": "code",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/MCP_INDUSTRY_PACKS.md",
+        "src/mcp/amcMcpServer.ts",
+        "src/mcp/industryPackTools.ts",
+        "tests/industryPackMcpTools.test.ts",
+        "tests/industryPackMcpToolsWiring.test.ts"
+      ]
+    },
+    {
+      "sha": "580b1876dffde315590cf863c3c3c5ca48d7efcd",
+      "subject": "docs: record O17 industry pack MCP tools receipt",
+      "track": "O17",
+      "kind": "receipt-only",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/O17/result.json"
+      ]
+    },
+    {
+      "sha": "c56c84c7d0fcf67a1097eaa17ea2fcc9acd12b3e",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_3cbab9c8-0f5-17' into amc/regulated-platform-20261003",
+      "track": "O17",
+      "kind": "merge",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "04dae3c7357e0ca7909cae02b1914448c4495777",
+      "subject": "test: add sourced industry assurance scenario corpus",
+      "track": "O18",
+      "kind": "code",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/INDUSTRY_ASSURANCE_FIXTURES.md",
+        "tests/fixtures/industry-assurance/anchors.json",
+        "tests/fixtures/industry-assurance/packs/educationFERPA.json",
+        "tests/fixtures/industry-assurance/packs/environmentalInfra.json",
+        "tests/fixtures/industry-assurance/packs/euAiActArticle.json",
+        "tests/fixtures/industry-assurance/packs/financialSOX.json",
+        "tests/fixtures/industry-assurance/packs/globalAIRegulatory.json",
+        "tests/fixtures/industry-assurance/packs/governanceNISTRMF.json",
+        "tests/fixtures/industry-assurance/packs/healthcarePHI.json",
+        "tests/fixtures/industry-assurance/packs/hipaaCompliance.json",
+        "tests/fixtures/industry-assurance/packs/iso42005ImpactAssessment.json",
+        "tests/fixtures/industry-assurance/packs/legalCompliance.json",
+        "tests/fixtures/industry-assurance/packs/mobilityFunctionalSafety.json",
+        "tests/fixtures/industry-assurance/packs/pharmaCompliance.json",
+        "tests/fixtures/industry-assurance/packs/realtime-voice-safety.json",
+        "tests/fixtures/industry-assurance/packs/safetyCriticalSIL.json",
+        "tests/fixtures/industry-assurance/packs/sbom-supply-chain.json",
+        "tests/fixtures/industry-assurance/packs/technologyGDPRSOC.json",
+        "tests/fixtures/industry-assurance/packs/wealthManagementMiFID.json",
+        "tests/industryAssuranceFixtures.test.ts"
+      ]
+    },
+    {
+      "sha": "84a422adb1554e0dfcd9019afb99f613125d4255",
+      "subject": "docs: record O18 fixture corpus receipt",
+      "track": "O18",
+      "kind": "receipt-only",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/O18/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/O18/result.json"
+      ]
+    },
+    {
+      "sha": "3713fbf9d2da452a54b0fb92ef6fc5e98596d63b",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_3cbab9c8-0f5-18' into amc/regulated-platform-20261003",
+      "track": "O18",
+      "kind": "merge",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "5ebc5b69b9361d5cf2bc3b74323847226d2d788e",
+      "subject": "feat: add typed Python wrappers for industry pack and domain commands",
+      "track": "O19",
+      "kind": "code",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "cherry-pick",
+      "paths": [
+        "sdk/python/README.md",
+        "sdk/python/amc_sdk/industry.py",
+        "sdk/python/tests/test_industry.py"
+      ]
+    },
+    {
+      "sha": "9b1de17a0c4093d28a77abff3951a20bd20c2728",
+      "subject": "docs: record O19 Python industry SDK result receipt",
+      "track": "O19",
+      "kind": "receipt-only",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/O19/result.json"
+      ]
+    },
+    {
+      "sha": "38616fa33b74ccf198fb915985f86689504f6c76",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_3cbab9c8-0f5-19' into amc/regulated-platform-20261003",
+      "track": "O19",
+      "kind": "merge",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "43fdbcf1af66ea1a456c6a2a936dc61e5419bc78",
+      "subject": "feat: add keyless regulated-industry CLI examples for health, wealth, governance",
+      "track": "O20",
+      "kind": "code",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "cherry-pick",
+      "paths": [
+        "examples/regulated-industries/README.md",
+        "examples/regulated-industries/governance/fixture.json",
+        "examples/regulated-industries/governance/run.mjs",
+        "examples/regulated-industries/health/fixture.json",
+        "examples/regulated-industries/health/run.mjs",
+        "examples/regulated-industries/lib/denyNetwork.mjs",
+        "examples/regulated-industries/lib/runStation.mjs",
+        "examples/regulated-industries/wealth/fixture.json",
+        "examples/regulated-industries/wealth/run.mjs",
+        "tests/regulatedExamples.test.ts"
+      ]
+    },
+    {
+      "sha": "3b243feb08a46bc3f0b3070377c5a0b6a3279085",
+      "subject": "docs: record O20 regulated-examples receipt",
+      "track": "O20",
+      "kind": "receipt-only",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/O20/result.json"
+      ]
+    },
+    {
+      "sha": "78ee6f45614a498e80c418a8d6e90fa06a396d81",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_3cbab9c8-0f5-20' into amc/regulated-platform-20261003",
+      "track": "O20",
+      "kind": "merge",
+      "slice": "O",
+      "issue": "P1-44",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "8b3c64260e71a9718fdcf6dae95aa88f21269e65",
+      "subject": "docs: regenerate the regulatory calendar from the merged register",
+      "track": "I1",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/REGULATORY_CALENDAR.md"
+      ]
+    },
+    {
+      "sha": "2cacf8b61c002df07468c0baf438132a404bdd0f",
+      "subject": "docs: re-derive the station guides from the merged packs and registers",
+      "track": "I1",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I1/build-guides.mts",
+        "docs/industries/README.md",
+        "docs/industries/education.md",
+        "docs/industries/environment.md",
+        "docs/industries/governance.md",
+        "docs/industries/health.md",
+        "docs/industries/mobility.md",
+        "docs/industries/technology.md",
+        "docs/industries/wealth.md"
+      ]
+    },
+    {
+      "sha": "a40829277d194ef787f4877873b213f53643b7fa",
+      "subject": "chore: record the I1 integration receipt",
+      "track": "I1",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I1/result.json"
+      ]
+    },
+    {
+      "sha": "da730e4d7c59cd3264c0913e01904fb7b612e64f",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_bea95acb-47c-1' into amc/regulated-platform-20261003",
+      "track": "I1",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "96e04e7b6db40b876bf8998b4f0e1f28c5187913",
+      "subject": "test: regenerate unresolved pack framework fixture from the 2026 pack refresh",
+      "track": "I2",
+      "kind": "mixed",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "regenerate",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I2/receipt.json",
+        "tests/fixtures/packFrameworkStrings.unresolved.json"
+      ]
+    },
+    {
+      "sha": "56c037570a29c5b58b3600ab59c66f4f105ee174",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_bea95acb-47c-2' into amc/regulated-platform-20261003",
+      "track": "I2",
+      "kind": "merge",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "1c9bf11f082b23e6bb538aee88156ac37115f0d6",
+      "subject": "fix: report canned domain-assurance input as not evaluated, not passing",
+      "track": "I3",
+      "kind": "mixed",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I3/focused-tests.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I3/receipt.json",
+        "src/domains/domainCliIntegration.ts",
+        "tests/domain-registry.test.ts",
+        "tests/domainCliIntegration.test.ts"
+      ]
+    },
+    {
+      "sha": "c5e4ba11a4f21563a7b9e2d811c83cb52e80bd2e",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_bea95acb-47c-3' into amc/regulated-platform-20261003",
+      "track": "I3",
+      "kind": "merge",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "a99fefd9dd3c664ca2c3b5c88af6b3c027383b4c",
+      "subject": "docs: refresh public count literals from the repository generator",
+      "track": "I4",
+      "kind": "code",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "regenerate",
+      "paths": [
+        "README.md",
+        "website/index.html",
+        "website/lite.html",
+        "whitepaper/AMC_WHITEPAPER_v1.md"
+      ]
+    },
+    {
+      "sha": "daf2633cb88f531a93bcae6cab505ea784ee6b82",
+      "subject": "docs: record I4 count-refresh receipt and out-of-scope patch",
+      "track": "I4",
+      "kind": "receipt-only",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I4/RECEIPT.md",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I4/out-of-scope-generator-refresh.patch"
+      ]
+    },
+    {
+      "sha": "11c9f2578c236353df1e7fa6c66eab41c384f365",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_bea95acb-47c-4' into amc/regulated-platform-20261003",
+      "track": "I4",
+      "kind": "merge",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "48e8b684914b2243d7a914de322d5d79e95d04ef",
+      "subject": "docs: refresh public count literals in six files via scripts/gen-counts.mjs (root integration; exact lines in integration/I4/out-of-scope-generator-refresh.patch)",
+      "track": null,
+      "kind": "root",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "regenerate",
+      "paths": [
+        "CONTRIBUTING.md",
+        "docs/content/reddit-launch-drafts.md",
+        "docs/content/show-hn-draft.md",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md",
+        "website/i18n.js"
+      ]
+    },
+    {
+      "sha": "019e32b55c407f8846b76f652b862be0a038ec4e",
+      "subject": "docs: refresh remaining public count literals via scripts/gen-counts.mjs --write (root integration in the candidate clone)",
+      "track": null,
+      "kind": "root",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "regenerate",
+      "paths": [
+        "CONTRIBUTING.md",
+        "README.md",
+        "docs/content/reddit-launch-drafts.md",
+        "docs/content/show-hn-draft.md",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md",
+        "website/i18n.js",
+        "website/index.html",
+        "website/lite.html",
+        "whitepaper/AMC_WHITEPAPER_v1.md"
+      ]
+    },
+    {
+      "sha": "13ea36191b7f25a902a853c29182001b80d8990b",
+      "subject": "test: derive the whitepaper sector-pack totals from the compiled registry instead of pinned literals",
+      "track": null,
+      "kind": "root",
+      "slice": "A",
+      "issue": "P0-12",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/citationMetadata.test.ts"
+      ]
+    },
+    {
+      "sha": "00d143acddb110a6f60fbcaceca1d50c02fe07e2",
+      "subject": "refactor: split industry pack content into one file per station",
+      "track": "apply-health",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-pack-ids.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/mutations.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/out-of-scope-guide-citations.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/out-of-scope-line-budgets.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/snapshot.mts",
+        "src/domains/deep/governance.ts",
+        "src/domains/deep/health.ts",
+        "src/domains/deep/wealth.ts",
+        "src/domains/deepIndustryPacks.ts",
+        "src/domains/industryPacks.ts",
+        "src/domains/packs/stations/education.ts",
+        "src/domains/packs/stations/environment.ts",
+        "src/domains/packs/stations/governance.ts",
+        "src/domains/packs/stations/health.ts",
+        "src/domains/packs/stations/mobility.ts",
+        "src/domains/packs/stations/shared.ts",
+        "src/domains/packs/stations/technology.ts",
+        "src/domains/packs/stations/wealth.ts",
+        "tests/industryPacksSplitEquality.test.ts"
+      ]
+    },
+    {
+      "sha": "67d73223897008ca4ed8baf81c970020b4bf944d",
+      "subject": "docs: record per-station split receipt (fresh clone counts, boundaries, out-of-scope patches)",
+      "track": "apply-health",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/result.json"
+      ]
+    },
+    {
+      "sha": "ca7aec6a633fdf936de5b94ec6a462c4ae3772ad",
+      "subject": "feat: apply round-2 health pack content with refuter fixes",
+      "track": "apply-health",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/stations/health.ts",
+        "tests/industryPacksHealthRound2.test.ts"
+      ]
+    },
+    {
+      "sha": "7250fa8cf60f80ec235e893b82ebdea1de7b8fa0",
+      "subject": "feat: add seven sourced US health instruments to the regulatory catalogue",
+      "track": "apply-health",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "daae5a0943448265c8ccc2f0e56ba6ed025e2e55",
+      "subject": "feat: add eight round-2 health deep questions numbered 51-58",
+      "track": "apply-health",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "src/domains/deep/health.ts",
+        "tests/industryPacksHealthRound2.test.ts"
+      ]
+    },
+    {
+      "sha": "7016af08ddc498c4a378c75b39051b562364ad93",
+      "subject": "fix: fail health assurance replies that name a control only to deny it",
+      "track": "apply-health",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/healthcarePHIPack.ts",
+        "src/assurance/packs/hipaaCompliancePack.ts",
+        "src/assurance/packs/pharmaCompliancePack.ts",
+        "src/assurance/packs/safetyCriticalSILPack.ts",
+        "tests/industryAssurancePacksHealth.test.ts"
+      ]
+    },
+    {
+      "sha": "f2387813bc4f5c6fa6cbd26c4a28e0c21ba57c44",
+      "subject": "docs: record health round-2 apply receipt",
+      "track": "apply-health",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/balance.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/gen.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/gendeep.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/out-of-scope-domain-packs-counts.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/probe.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/health/snapshot-health.mts"
+      ]
+    },
+    {
+      "sha": "29801bd96f2bc382fb20b3ceaac99872f2e74bf3",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-2' into amc/regulated-platform-20261003",
+      "track": "apply-health",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "1be24e55f5323f8e30b4c1134e5cf6c05a632148",
+      "subject": "feat: apply round-2 framework mappings as sourced clause-level controls",
+      "track": "apply-frameworks",
+      "kind": "code",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "cherry-pick",
+      "paths": [
+        "docs/COMPLIANCE_MAPS.md",
+        "src/compliance/frameworks/aliases.ts",
+        "src/compliance/frameworks/controls.ts",
+        "src/compliance/frameworks/controls/dora.ts",
+        "src/compliance/frameworks/controls/hhsHti1Hipaa.ts",
+        "src/compliance/frameworks/controls/nis2.ts",
+        "src/compliance/frameworks/controls/nistAi600_1.ts",
+        "src/compliance/frameworks/controls/usStateAiLaws.ts",
+        "src/compliance/mappingSchema.ts",
+        "tests/frameworksControls.test.ts",
+        "tests/packFrameworkAliases.test.ts"
+      ]
+    },
+    {
+      "sha": "f4441b065a645ab621d8905bf7715710377c7009",
+      "subject": "docs: record round-2 framework apply receipt (counts, mutations, generator)",
+      "track": "apply-frameworks",
+      "kind": "receipt-only",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/counts.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/gen-controls.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/mutate.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/mutations.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/frameworks/result.json"
+      ]
+    },
+    {
+      "sha": "bbf55782509b6fd3ccf07e1b80e18f1a9de19a12",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-9' into amc/regulated-platform-20261003",
+      "track": "apply-frameworks",
+      "kind": "merge",
+      "slice": "S6",
+      "issue": "P1-45",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "50783334c382df5d491dbb0df54bcdc69f9ce096",
+      "subject": "chore: drop industryPacks.ts from the data-registry exemption now that it is 296 lines (split receipt apply/split/out-of-scope-line-budgets.patch)",
+      "track": null,
+      "kind": "root",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "scripts/line-budgets.json"
+      ]
+    },
+    {
+      "sha": "c65b7bd241f1969985072903312d5ac2a7dbfa99",
+      "subject": "feat: catalogue PPRA (34 CFR Part 98) for the education station",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "45252d97d35efff4289404678ef74ea9481eb678",
+      "subject": "feat: catalogue Section 504 (34 CFR Part 104) for the education station",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "2b53058b1fa7ab39f5846dfcad7706a16354b44c",
+      "subject": "feat: catalogue California SOPIPA (Bus. & Prof. Code 22584) as unverified",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "bc90ee43fb6daf7341c0f327aaa0b846f5af959e",
+      "subject": "feat: catalogue Colorado SB26-189 as unverified",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "3533b9438a8981a15f578f8d2b3e94ecf9354ecc",
+      "subject": "feat: catalogue ETSI EN 301 549 V3.2.1 for the education station",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "310f6b2275e70b10375f422ddd6d4e6dd47fd914",
+      "subject": "feat: catalogue UNESCO generative-AI guidance (2023) as unverified",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueIntl.ts"
+      ]
+    },
+    {
+      "sha": "4f54445a1fe637a58c436b0acbe5ad9390e4d011",
+      "subject": "feat: apply round-2 education station content to the five education packs",
+      "track": "apply-education",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/stations/education.ts",
+        "tests/industryPacksEducation.test.ts"
+      ]
+    },
+    {
+      "sha": "5b32f0cdd2100ad515a82d5936626952ace0d809",
+      "subject": "feat: add six round-2 education deep questions (education-deep-11..16)",
+      "track": "apply-education",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "src/domains/deep/education.ts"
+      ]
+    },
+    {
+      "sha": "d4592bcbde72a6547de1d3684128b30471454f4b",
+      "subject": "feat: anchor educationFERPA scenarios and require a refusal on every one",
+      "track": "apply-education",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/educationFERPAPack.ts",
+        "tests/educationFERPAPack.test.ts"
+      ]
+    },
+    {
+      "sha": "aa918c78447642303198036525818eb5a98add98",
+      "subject": "docs: record the education station round-2 apply receipt",
+      "track": "apply-education",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/build.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/decisions.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/mutations.log",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/mutations.sh",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/out-of-scope-domain-packs-counts.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/out-of-scope-manifest-anchors.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/out-of-scope-station-education-counts.patch",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/patches.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/questions-applied.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/receipt.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/result.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/education/snapshot-education.mts"
+      ]
+    },
+    {
+      "sha": "9b6e17ddab3620c8168685de85b4e81dec653e16",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-3' into amc/regulated-platform-20261003",
+      "track": "apply-education",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "69be7333f7824f11ec71fdb06f950aa77ad43377",
+      "subject": "feat: apply round-2 environment station content",
+      "track": "apply-environment",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/deep/environment.ts",
+        "src/domains/packs/stations/environment.ts",
+        "tests/industryPacks-environment.test.ts"
+      ]
+    },
+    {
+      "sha": "e3fe61d5373e52ed1d623a6e6414d76fd5d56840",
+      "subject": "fix: fail environmentalInfra replies that take the unsafe action",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/environmentalInfraPack.ts",
+        "tests/environmentalInfraPack.test.ts"
+      ]
+    },
+    {
+      "sha": "358537629ce4571b8a16bcc0637a06bc56e7244e",
+      "subject": "feat: catalogue 21 CFR Part 1 Subpart S (FDA food traceability)",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "d81ccded3084a02eaae68d272b16e044923ba6fe",
+      "subject": "feat: catalogue 21 CFR Part 117 (FDA preventive controls for human food)",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "e2fb29bd9d6ea706ec5b53fc92121c81e0ee9f90",
+      "subject": "feat: catalogue 40 CFR Part 141 Subpart Z (PFAS drinking water rule)",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "6c06427fd35e16f6cb0cd76d772b2cd09361a232",
+      "subject": "feat: catalogue SDWA Section 1433 (42 U.S.C. 300i-2)",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "3c8734916eaafe397f5f5d502d15ec307449e9b1",
+      "subject": "feat: catalogue NIST SP 800-82 Rev. 3",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "6d7153f67a0ef9de75a65f858ef2a253cc064f81",
+      "subject": "feat: catalogue Directive (EU) 2024/825 (green transition consumer rules)",
+      "track": "apply-environment",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "1bfcf99cdc4788d4d3f29f741e8e3146b0f995d9",
+      "subject": "docs: record the environment round-2 apply receipt",
+      "track": "apply-environment",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-apply.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-comments.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-dump.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-mutate_regex.sh",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-resolve.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-snapshot-env.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/environment/scripts-stats.py"
+      ]
+    },
+    {
+      "sha": "6d5f2dae14db19ff150270fa2a7190402edb62ce",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-4' into amc/regulated-platform-20261003",
+      "track": "apply-environment",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "72e3c3d88ef22df6e680727bb046b58d0c65dd9e",
+      "subject": "fix: grade each mobility functional-safety scenario on its own control",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/mobilityFunctionalSafetyPack.ts",
+        "tests/mobilityFunctionalSafetyPack.test.ts"
+      ]
+    },
+    {
+      "sha": "f7fa0f9f76668d4b1d1b56d898c06e0ea1ac93d1",
+      "subject": "feat: catalogue Regulation (EU) 2019/2144 (General Safety Regulation)",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "8de9633b73003b2c3b1f99e82e4ab418fa9e3eea",
+      "subject": "feat: catalogue Implementing Regulation (EU) 2022/1426 (ADS)",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "1f3f07cd04d3024b99822f42d85cec49752fa740",
+      "subject": "feat: catalogue Regulation (EU) 2020/1056 (eFTI)",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "b6aa2c37289f777523b8f2b23f08e4d3d7889881",
+      "subject": "feat: catalogue Regulation (EU) 2024/3110 (Construction Products Regulation)",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "0acdafeea6389266d65e8ebe128628177e275479",
+      "subject": "feat: catalogue EU Good Distribution Practice Guidelines 2013/C 343/01",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "9662b7b9c87ebec8f075cc83e379f9c38870ead2",
+      "subject": "feat: catalogue EDPB Guidelines 4/2019 (data protection by design) v2.0",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "f2207fd9f99904b9b881c588a1666b5fbe57dbb4",
+      "subject": "feat: catalogue NIST SP 800-207 Zero Trust Architecture",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "0ec8707e81b8df3b5c108454435ba89217163a54",
+      "subject": "feat: catalogue NIST SP 800-218 SSDF v1.1",
+      "track": "apply-mobility",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "febdc748328880563ce763593e73a618f4c9ffab",
+      "subject": "feat: apply round-2 mobility content with the refuter's corrections",
+      "track": "apply-mobility",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/deep/mobility.ts",
+        "src/domains/packs/stations/mobility.ts",
+        "tests/industryPacks-mobility.test.ts",
+        "tests/logisticsIndustryPack.test.ts"
+      ]
+    },
+    {
+      "sha": "857b4b63b4f3595fb698cdf0c83b0927c1eb9818",
+      "subject": "docs: record the mobility round-2 apply receipt",
+      "track": "apply-mobility",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/after.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/apply-log.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/apply.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/before.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/build-result.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/catalogue-additions.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/decisions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/dump.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/measure.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/mutate.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/mutations-assurance-result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/mutations-assurance.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/mutations-content-result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/mutations-content.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/probe-after.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/probe.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/questions-after.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/questions-before.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/mobility/result.json"
+      ]
+    },
+    {
+      "sha": "5c6fa7dccb423b02fe26bec0888365997b441310",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-5' into amc/regulated-platform-20261003",
+      "track": "apply-mobility",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "35d70a5f0f9086394d6ffaf690cef0f85bc19e7e",
+      "subject": "feat: catalogue NIST SP 800-63B-4 (governance round 2, csrc.nist.gov read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "c1fe10b0db56d8c9086bc2eb319a0f167ca257c0",
+      "subject": "feat: catalogue 52 U.S.C. 30124 (governance round 2, govinfo.gov read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "456bf2fac6f6b3abf67adc66a07e9e1ba413cdfd",
+      "subject": "feat: catalogue the FEC interpretive rule 89 FR 78785 (governance round 2, Federal Register API read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "702ab7c0823e551e9bb7e42269106043898f1b74",
+      "subject": "feat: catalogue HAVA 52 U.S.C. 21081 (governance round 2, govinfo.gov read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "187ac888610f5ab943b561a7c6518c179ce17106",
+      "subject": "feat: catalogue the Code of Conduct on Disinformation (governance round 2, digital-strategy.ec.europa.eu read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "e7b778440ccd7137cf8bdb7588f8fb637d41b48e",
+      "subject": "feat: catalogue the Code of Practice on Transparency of AI-generated Content (governance round 2, read 2026-10-04)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "0c125d28f2f64562e133aaa576520caba5bf98bf",
+      "subject": "feat: add six round-2 governance deep questions (gov-deep-51..56)",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/deep/governance.ts"
+      ]
+    },
+    {
+      "sha": "4e53ceb505900b26a6ac99beaf1dc9a9f25acffd",
+      "subject": "feat: apply round-2 governance content to the five governance packs",
+      "track": "apply-governance",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/stations/governance.ts",
+        "tests/industryPacks-governance.test.ts"
+      ]
+    },
+    {
+      "sha": "2fd42c5b890a1c74f3aea4c3c8d4cd21a2aba4bb",
+      "subject": "fix: grade governanceNISTRMF scenarios on refusal and anchor elements, not keywords",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/governanceNISTRMFPack.ts",
+        "tests/governanceNISTRMFPack.test.ts"
+      ]
+    },
+    {
+      "sha": "5aab3b589e4e563d3314111dcce67ecf4dc4a0d6",
+      "subject": "test: pin the governanceNISTRMF compliance detector and the tightened MAP/MEASURE checks",
+      "track": "apply-governance",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "tests/governanceNISTRMFPack.test.ts"
+      ]
+    },
+    {
+      "sha": "725ccc39c4eff49556831e7096122c926f5e697d",
+      "subject": "docs: record the governance round-2 apply receipt (counts, balance, refuter fixes, mutations)",
+      "track": "apply-governance",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/governance/result.json"
+      ]
+    },
+    {
+      "sha": "e3b56449b7c08157e24a9269898bcf06e211b6c6",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-6' into amc/regulated-platform-20261003",
+      "track": "apply-governance",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "0db4024600e915aa8cdba0f16dd85a4f49b1db8b",
+      "subject": "feat: catalogue the ePrivacy Directive (technology round 2, TECH-INF-7)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "9b3f181cd2ba33581fb910a43c2770c1d92762df",
+      "subject": "feat: catalogue NIST SP 800-63-4 (technology round 2, TECH-NE-6)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "229a113c862db7ba7dff54d169efbc8cf0fb271d",
+      "subject": "feat: catalogue NIST SP 800-218A (technology round 2, TECH-PP-18)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "f10c5ac4824ff60ce77b9edab9ca4aa581741411",
+      "subject": "feat: catalogue the CPPA ADMT regulations as unverified (technology round 2, TECH-CI-17)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "43861defb90d2ecd60478c17497c28794862f2cc",
+      "subject": "feat: catalogue IETF RFC 9700 (BCP 240) as unverified (technology round 2, TECH-NE-10)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueIntl.ts"
+      ]
+    },
+    {
+      "sha": "3bcc77d53e5eba53f5cf844e99213ba527ddcaa8",
+      "subject": "feat: catalogue the ETSI IPR Policy as unverified (technology round 2, TECH-PP-4)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueIntl.ts"
+      ]
+    },
+    {
+      "sha": "578cb729464d10b660e0ec1d2624b26230151bdd",
+      "subject": "feat: catalogue SPDX 3.0 as unverified (technology round 2, TECH-PP-2)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueIntl.ts"
+      ]
+    },
+    {
+      "sha": "6038d02d5a8c8a80e7d0989397f688c41d998e7e",
+      "subject": "feat: catalogue the WIPO WPPT as unverified (technology round 2, TECH-PP-11)",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueIntl.ts"
+      ]
+    },
+    {
+      "sha": "b6a7f6b1b7cc92963e7bf820e9a4b31f3af07e5d",
+      "subject": "feat: apply round-2 technology station question content",
+      "track": "apply-technology",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/stations/technology.ts"
+      ]
+    },
+    {
+      "sha": "2f6527bbc39273347489a1f6bbb4e1b9dd8fbebe",
+      "subject": "feat: add six round-2 technology deep questions (technology-deep-11..16)",
+      "track": "apply-technology",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "src/domains/deep/technology.ts"
+      ]
+    },
+    {
+      "sha": "615450e67d83eb71e4a7d038a6d9445649765b94",
+      "subject": "fix: grade technologyGDPRSOC scenarios on their own control",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/technologyGDPRSOCPack.ts",
+        "tests/technologyGDPRSOCPack.test.ts"
+      ]
+    },
+    {
+      "sha": "de9d84009adad35dbc14fba7331ece9b8c452cbb",
+      "subject": "feat: add CRA SBOM and exploited-vulnerability scenarios to sbom-supply-chain",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/sbomSupplyChainPack.ts",
+        "tests/sbomSupplyChainPack.test.ts"
+      ]
+    },
+    {
+      "sha": "5e8afb1a016478b250deca2cbbf9b45c572f0e3b",
+      "subject": "feat: add outbound AI-voice consent scenario to realtime-voice-safety",
+      "track": "apply-technology",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/realtimeVoiceSafetyPack.ts",
+        "tests/realtimeVoiceSafetyPack.test.ts"
+      ]
+    },
+    {
+      "sha": "bc23de20e2a7306538cb043acc0ffb77ae9e493c",
+      "subject": "docs: record technology round-2 apply receipt (counts, balance, mutations, declines)",
+      "track": "apply-technology",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/technology/result.json"
+      ]
+    },
+    {
+      "sha": "fd2848bfacbfda45335aa8f44af0e340c044316f",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-7' into amc/regulated-platform-20261003",
+      "track": "apply-technology",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueIntl.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "944f05cdd1ca34fac92f522b354d31238942f426",
+      "subject": "feat: catalogue seven EU instruments cited by the wealth station",
+      "track": "apply-wealth",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts"
+      ]
+    },
+    {
+      "sha": "63fef7480602c2a454ffff94e3d0fc20510b40b5",
+      "subject": "feat: catalogue ten US instruments cited by the wealth station",
+      "track": "apply-wealth",
+      "kind": "code",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "ac8aca7f91b2ebf0d12d9199cfd4465fb4ab8cf2",
+      "subject": "feat: apply round-2 content to the wealth station packs",
+      "track": "apply-wealth",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/apply.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/questions-applied.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/snapshot-station.mts",
+        "src/domains/packs/stations/wealth.ts"
+      ]
+    },
+    {
+      "sha": "4ff858592ade31195351269854581de39a46646f",
+      "subject": "feat: apply round-2 deep questions to the wealth station",
+      "track": "apply-wealth",
+      "kind": "mixed",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "src/domains/deep/wealth.ts"
+      ]
+    },
+    {
+      "sha": "1ce9b08aa206a9d7dd53447321a2d4068f2df6de",
+      "subject": "fix: grade wealth assurance scenarios on refusal and their own control",
+      "track": "apply-wealth",
+      "kind": "code",
+      "slice": "B",
+      "issue": "P0-13",
+      "action": "cherry-pick",
+      "paths": [
+        "src/assurance/packs/financialSOXPack.ts",
+        "src/assurance/packs/wealthManagementMiFIDPack.ts",
+        "tests/financialSOXPack.test.ts",
+        "tests/wealthManagementMiFIDPack.test.ts"
+      ]
+    },
+    {
+      "sha": "2d1948c04c6cde8907e2d229424d0434e808cec3",
+      "subject": "docs: record the wealth round-2 apply receipt",
+      "track": "apply-wealth",
+      "kind": "receipt-only",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "skip-receipt",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/balance-after.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/balance-before.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/measure.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/mutate.py",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/mutations.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/result.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/stuffed-replies.mts",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/wealth/stuffed-replies.txt"
+      ]
+    },
+    {
+      "sha": "3f18e43e4843417b99f4b700ea61c50b506577d1",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-8' into amc/regulated-platform-20261003",
+      "track": "apply-wealth",
+      "kind": "merge",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "record-only",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-pack-stats.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/deep-industry-questions.json",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "7d4bbeceee3d559f22a756780f700cf52d35c0b9",
+      "subject": "fix: repair catalogue merge seams from the union merge of seven station branches",
+      "track": null,
+      "kind": "root",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick",
+      "paths": [
+        "src/domains/packs/catalogueEu.ts",
+        "src/domains/packs/catalogueUs.ts"
+      ]
+    },
+    {
+      "sha": "9d26365314b7e917d3fe7681a8c1384d67c4ee0d",
+      "subject": "feat: apply round-2 EU/intl and US batches to the regulatory register",
+      "track": "apply-register",
+      "kind": "mixed",
+      "slice": "A-register",
+      "issue": "P0-12",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/apply-register.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/doc-rows.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/mutate.sh",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/result.json",
+        "docs/COMPLIANCE_FRAMEWORKS.md",
+        "docs/EU_AI_ACT_COMPLIANCE.md",
+        "src/compliance/euAiActClassifier.ts",
+        "src/compliance/regulatory/index.ts",
+        "src/compliance/regulatory/register.json",
+        "tests/regulatoryCurrency.test.ts",
+        "tests/regulatoryCurrencyRegister.test.ts"
+      ]
+    },
+    {
+      "sha": "1962e06cf3b82e46811305c6583478dffe06edf1",
+      "subject": "fix: apply the CN/BR/IN/JP root ruling to br-lgpd and in-dpdp and restore dropped EU facts",
+      "track": "apply-register",
+      "kind": "mixed",
+      "slice": "A-register",
+      "issue": "P0-12",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/doc-rows.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/repair-round.mjs",
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/register/result.json",
+        "docs/COMPLIANCE_FRAMEWORKS.md",
+        "src/compliance/regulatory/register.json",
+        "tests/regulatoryCurrencyRegister.test.ts"
+      ]
+    },
+    {
+      "sha": "61d53315f03c0cb169d89f3b6db880080c1495df",
+      "subject": "Merge remote-tracking branch 'origin/worktree-wf_b05b1ca6-169-10' into amc/regulated-platform-20261003",
+      "track": "apply-register",
+      "kind": "merge",
+      "slice": "A-register",
+      "issue": "P0-12",
+      "action": "record-only",
+      "paths": []
+    },
+    {
+      "sha": "1f811e09135d80c1ad60264c32bf03439c02ff21",
+      "subject": "docs: regenerate station guides, regulatory calendar and public counts after the apply round (root integration in the candidate clone)",
+      "track": null,
+      "kind": "root",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "regenerate",
+      "paths": [
+        "CONTRIBUTING.md",
+        "README.md",
+        "docs/content/reddit-launch-drafts.md",
+        "docs/content/show-hn-draft.md",
+        "docs/industries/README.md",
+        "docs/industries/education.md",
+        "docs/industries/environment.md",
+        "docs/industries/governance.md",
+        "docs/industries/health.md",
+        "docs/industries/mobility.md",
+        "docs/industries/technology.md",
+        "docs/industries/wealth.md",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md",
+        "website/i18n.js",
+        "website/index.html",
+        "website/lite.html",
+        "whitepaper/AMC_WHITEPAPER_v1.md"
+      ]
+    },
+    {
+      "sha": "ab808047acd61b850de241e483670679cff268bd",
+      "subject": "docs: carry the apply-round sector totals (646 questions across 41 packs) into the whitepaper, domain-pack table and station pages",
+      "track": null,
+      "kind": "root",
+      "slice": "regen",
+      "issue": "ALL",
+      "action": "regenerate",
+      "paths": [
+        "docs/DOMAIN_PACKS.md",
+        "website/station-education.html",
+        "website/station-environment.html",
+        "website/station-health.html",
+        "website/station-technology.html",
+        "whitepaper/AMC_WHITEPAPER_v1.md"
+      ]
+    },
+    {
+      "sha": "37c1466b32ed878ed89877fdcae2e3145d82d546",
+      "subject": "fix: normalize five EU AI Act classification strings to the registry convention and regenerate the alias fixture and split snapshot",
+      "track": null,
+      "kind": "root",
+      "slice": "content",
+      "issue": "P1-42",
+      "action": "cherry-pick-strip-receipts",
+      "paths": [
+        "AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/apply/split/industry-packs.json",
+        "src/domains/packs/stations/governance.ts",
+        "src/domains/packs/stations/technology.ts",
+        "tests/fixtures/packFrameworkStrings.unresolved.json"
+      ]
+    }
+  ],
+  "overlaps": [
+    {
+      "path": "docs/COMPLIANCE_FRAMEWORKS.md",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "docs/DOMAIN_PACKS.md",
+      "candidateSlices": [
+        "regen",
+        "A"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/EU_AI_ACT_COMPLIANCE.md",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "docs/industries/README.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/education.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/environment.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/governance.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/health.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/mobility.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/technology.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "docs/industries/wealth.md",
+      "candidateSlices": [
+        "regen",
+        "content"
+      ],
+      "issues": [
+        "P1-42"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "src/assurance/packs/euAiActArticlePack.ts",
+      "candidateSlices": [
+        "B"
+      ],
+      "issues": [
+        "P0-13",
+        "P0-19"
+      ],
+      "rule": "slice B first, then P0-19"
+    },
+    {
+      "path": "src/assurance/packs/healthcarePHIPack.ts",
+      "candidateSlices": [
+        "B"
+      ],
+      "issues": [
+        "P0-13",
+        "P0-19"
+      ],
+      "rule": "slice B first, then P0-19"
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "candidateSlices": [],
+      "issues": [
+        "P0-02",
+        "P0-19",
+        "P0-17"
+      ],
+      "rule": "root patch (P0-02, landed on main at 786d8abb), then P0-19 and P0-17"
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "candidateSlices": [],
+      "issues": [
+        "P0-02",
+        "P0-19",
+        "P0-17"
+      ],
+      "rule": "root patch (P0-02, landed on main at 786d8abb), then P0-19 and P0-17"
+    },
+    {
+      "path": "src/compliance/coverageScorer.ts",
+      "candidateSlices": [
+        "S6"
+      ],
+      "issues": [
+        "P0-17",
+        "P1-45"
+      ],
+      "rule": "S6 and the apply-round frameworks land in P1-45 after P0-17"
+    },
+    {
+      "path": "src/compliance/euAiActClassifier.ts",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/compliance/mappingSchema.ts",
+      "candidateSlices": [
+        "S6"
+      ],
+      "issues": [
+        "P0-17",
+        "P1-45"
+      ],
+      "rule": "S6 and the apply-round frameworks land in P1-45 after P0-17"
+    },
+    {
+      "path": "src/compliance/regulatory/index.ts",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/compliance/regulatory/register.json",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/domains/domainAssessmentEngine.ts",
+      "candidateSlices": [
+        "content"
+      ],
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/domains/domainCliIntegration.ts",
+      "candidateSlices": [
+        "B"
+      ],
+      "issues": [
+        "P0-13",
+        "P0-15"
+      ],
+      "rule": "I3 lands in slice B; P0-15 edits it after B merges"
+    },
+    {
+      "path": "src/domains/domainReportBuilder.ts",
+      "candidateSlices": [
+        "content"
+      ],
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "candidateSlices": [
+        "content"
+      ],
+      "issues": [
+        "P0-15",
+        "P0-20",
+        "P0-21",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "S4 changes them; P0-15, P0-20, P0-21 and P0-24 go first; P1-42 rebases S4"
+    },
+    {
+      "path": "src/domains/industryPacks.ts",
+      "candidateSlices": [
+        "A",
+        "content"
+      ],
+      "issues": [
+        "P0-12",
+        "P0-21",
+        "P0-23",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "slice A grows the monolith to 2,612 lines; P0-21, P0-23 and P0-24 edit it next; P1-42 redoes the split on top"
+    },
+    {
+      "path": "src/domains/packs/catalogueEu.ts",
+      "candidateSlices": [
+        "A",
+        "content"
+      ],
+      "issues": [
+        "P0-12",
+        "P1-42"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/domains/packs/catalogueIntl.ts",
+      "candidateSlices": [
+        "A",
+        "content"
+      ],
+      "issues": [
+        "P0-12",
+        "P1-42"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/domains/packs/catalogueUs.ts",
+      "candidateSlices": [
+        "A",
+        "content"
+      ],
+      "issues": [
+        "P0-12",
+        "P1-42"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "src/mcp/amcMcpServer.ts",
+      "candidateSlices": [
+        "O"
+      ],
+      "issues": [
+        "P0-23",
+        "P1-44"
+      ],
+      "rule": "O17 lands in P1-44 after P0-23"
+    },
+    {
+      "path": "tests/fixtures/packFrameworkStrings.unresolved.json",
+      "candidateSlices": [
+        "S6",
+        "content"
+      ],
+      "issues": [
+        "P1-45",
+        "P1-42"
+      ],
+      "rule": "regenerate in the landing slice; never cherry-pick the I2 or 37c1466b3 fixture hunks; I2 cannot precede P1-45"
+    },
+    {
+      "path": "tests/logisticsIndustryPack.test.ts",
+      "candidateSlices": [
+        "A",
+        "content"
+      ],
+      "issues": [
+        "P0-12",
+        "P0-21",
+        "P0-23",
+        "P0-24",
+        "P1-42"
+      ],
+      "rule": "slice A grows the monolith to 2,612 lines; P0-21, P0-23 and P0-24 edit it next; P1-42 redoes the split on top"
+    },
+    {
+      "path": "tests/regulatoryCurrency.test.ts",
+      "candidateSlices": [
+        "A",
+        "A-register"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "merge in buildOrder; rebase the later slice onto the merged one and rerun its acceptance"
+    },
+    {
+      "path": "website/station-education.html",
+      "candidateSlices": [
+        "regen",
+        "A"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "website/station-environment.html",
+      "candidateSlices": [
+        "regen",
+        "A"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    },
+    {
+      "path": "website/station-technology.html",
+      "candidateSlices": [
+        "regen",
+        "A"
+      ],
+      "issues": [
+        "P0-12"
+      ],
+      "rule": "regenerate: the generator run is each slice's last commit; never hand-merge generated lines"
+    }
+  ]
+}
