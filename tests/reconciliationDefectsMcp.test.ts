@@ -1,9 +1,10 @@
-// AMC-1515: two defects in src/mcp/nativeMcpClient.ts, which is another
-// session's uncommitted work and is not edited here. Each defect has a pinned
-// observation of today's behaviour and a `test.fails` stating the intended
-// property; when the patch in the S7 receipt lands, the `test.fails` cases turn
-// red and must become ordinary tests. A genuine separate stdio JSON-RPC process
-// plays the server; no network, provider or credential is involved.
+// AMC-1515: two defects in src/mcp/nativeMcpClient.ts, fixed by S7's MCP
+// ready-to-wire diff (source and sha256 in qualification/2026-10-06-P0-13/README.md).
+// Arguments are validated before a non-EXECUTE call is simulated, and a result
+// received after grant disposal is reported as executed and discarded. A
+// genuine separate stdio JSON-RPC process plays the server; no network,
+// provider or credential is involved. tests/reconciliationDefectsMcpHttp.test.ts
+// covers the same two properties over Streamable HTTP (AMC-1535).
 import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -76,28 +77,20 @@ async function mounted(notifyOnCall: boolean) {
   };
 }
 
-describe("AMC-1515 nativeMcpClient.ts:253 — a received result discarded after grant disposal", () => {
-  test("observed today: the remote call ran but the refusal omits any execution notice", async () => {
+describe("AMC-1515 nativeMcpClient.ts:264 — a received result discarded after grant disposal", () => {
+  test("a discarded received result says the remote tool executed and was not replayed", async () => {
     const fixture = await mounted(true);
     const outcome = await fixture.call();
     expect(fixture.remoteCalls()).toBe(1);
     expect(outcome.outcome).toBe("ERROR");
-    expect(String(outcome.content)).toBe("MCP call failed or catalog changed; review and mount again");
-  });
-  test.fails("intended: a discarded received result says the remote tool executed and was not replayed", async () => {
-    const fixture = await mounted(true);
-    expect(String((await fixture.call()).content)).toMatch(/remote tool (?:may have )?executed/);
+    expect(String(outcome.content)).toContain("the remote tool executed and its received result was discarded. It was not replayed.");
   });
 });
 
-describe("AMC-1515 nativeMcpClient.ts:235 — simulation precedes schema validation", () => {
-  test("observed today: a non-EXECUTE run reports success for arguments EXECUTE would refuse", async () => {
-    const fixture = await mounted(false);
-    await expect(fixture.simulate({ query: 12 })).resolves.toMatchObject({ exitCode: 0, output: "MCP call simulated; the remote tool was not invoked." });
-    expect(fixture.remoteCalls()).toBe(0);
-  });
-  test.fails("intended: simulation refuses arguments that the reviewed schema refuses", async () => {
+describe("AMC-1515 nativeMcpClient.ts:236 — schema validation precedes simulation", () => {
+  test("simulation refuses arguments that the reviewed schema refuses", async () => {
     const fixture = await mounted(false);
     await expect(fixture.simulate({ query: 12 })).rejects.toThrow("MCP arguments do not match the reviewed tool schema");
+    expect(fixture.remoteCalls()).toBe(0);
   });
 });
