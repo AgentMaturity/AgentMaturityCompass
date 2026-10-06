@@ -36,7 +36,7 @@ interface SliceMap {
 - `cherry-pick`: `git cherry-pick -x <sha>`.
 - `cherry-pick-strip-receipts`: cherry-pick, then remove every `AMC_OS/` path (section 3). The generator gives this action to every picked commit that touches `AMC_OS/`.
 - `skip-receipt`: never picked. Every `receipt-only` commit gets it.
-- `regenerate`: never picked. Rerun the generator that produced it (section 7).
+- `regenerate`: never picked. Rerun the generator that produced it, or, where section 7 says no generator exists, redo the edit by hand as section 7 describes.
 - `record-only`: never picked. Every merge gets it, and so does F2 until P1-46 decides.
 
 `acceptedHead` is the head a monitor accepted, or `null` when no acceptance is recorded. `verdictFile` starts with `37c1466b:` when the file is in the candidate (read it with `git show`), or with `root-checkout:` when it exists only in Sid's root checkout and in no commit.
@@ -84,7 +84,7 @@ node -e 'const m=require("./docs/program/landing/slice-map.json");for(const c of
 
 ## 2. Baseline
 
-The baseline is every step of `.github/workflows/ci.yml` plus `npm run release:gate`, run in a fresh clone of `origin/main` and committed as `qualification/<date>-P0-04/` in P0-01's receipt format. The current one ran at `786d8abb` on 2026-10-05:
+The baseline is the steps of the `build-test`, `e2e-smoke-local`, `clean-source` and `packed-install` jobs of `.github/workflows/ci.yml` plus `npm run release:gate`, run in a fresh clone of `origin/main` and committed as `qualification/<date>-P0-04/` in P0-01's receipt format. The `docker-smoke`, `helm-lint-template` and `security-scan-lite` jobs were not run, so the baseline has no result for them (section 8 says who runs them); the `changeset` job runs only on pull requests. The current baseline ran at `786d8abb` on 2026-10-05:
 
 ```
 pnpm install --frozen-lockfile && pnpm run build
@@ -112,8 +112,33 @@ Rule: a slice may not add a failure. A check that fails on the baseline must fai
      ```
 
      `main` has no file under that folder, so the `git rm` removes only what the pick brought in.
+   - Root `37c1466b3` (`content`, `cherry-pick-strip-receipts`) also changes `tests/fixtures/packFrameworkStrings.unresolved.json`. That hunk is regenerated, never picked (section 7), so drop it in the same pick:
+
+     ```
+     PRE=$(git rev-parse HEAD)
+     git cherry-pick -x 37c1466b3    # may stop on AMC_OS/ or the fixture only
+     git rm -r -q -f --ignore-unmatch -- AMC_OS/RESEARCH/2026-10-03-regulated-platform-program
+     git checkout "$PRE" -- tests/fixtures/packFrameworkStrings.unresolved.json
+     if git rev-parse -q --verify CHERRY_PICK_HEAD >/dev/null; then git cherry-pick --continue; else git commit --amend --no-edit; fi
+     git diff --quiet "$PRE" HEAD -- tests/fixtures/packFrameworkStrings.unresolved.json && echo fixture-unchanged
+     ```
+
+     Then regenerate the fixture in `content` (section 7).
    - `skip-receipt`, `regenerate`, `record-only`: do not pick.
-4. Check after every commit: `git diff --name-only origin/main HEAD -- AMC_OS` prints nothing. `main` already tracks 559 older `AMC_OS/` files; slices never add or change one.
+4. Slice `content` only: the six apply-round merges `9b6e17dda`, `6d5f2dae1`, `5c6fa7dcc`, `e3b56449b`, `fd2848bfa` and `3f18e43e4` resolved `src/domains/packs/catalogue{Eu,Us,Intl}.ts` with a union merge, and root `7d4bbecee` repairs the seams it left. Picked one by one, the stations' commits conflict in those files, starting at `c65b7bd24`. Before the slice's first pick, tell git to take the same union. The setting lives in `.git/info/`, so it is never committed; keep it while you build or rebase the slice:
+
+   ```
+   printf '%s merge=union\n' src/domains/packs/catalogueEu.ts src/domains/packs/catalogueUs.ts src/domains/packs/catalogueIntl.ts >> .git/info/attributes
+   ```
+
+   At each of those six `record-only` merge rows, check the replay against the merge's resolution:
+
+   ```
+   git diff <merge> HEAD -- src/domains/packs/catalogueEu.ts src/domains/packs/catalogueUs.ts src/domains/packs/catalogueIntl.ts
+   ```
+
+   It prints nothing, or only lines that `main` changed in those files after `8f57ce63`. If it prints any other line, edit the files to match the merge and commit `fix: replay catalogue resolution of <merge>` before the next pick. Checked on 2026-10-06 in a fresh clone: slices A, B, C, A-register, F4, F1, F3, S8, S6 and `content` replayed in map order onto `786d8abb` with these steps, all 138 picks applied, each of the six checks printed nothing, and after `7d4bbecee` the three files equal `candidate/head`.
+5. Check after every commit: `git diff --name-only origin/main HEAD -- AMC_OS` prints nothing. `main` already tracks 559 older `AMC_OS/` files; slices never add or change one.
 
 ## 4. Tree equivalence per track
 
@@ -158,15 +183,22 @@ Count-literal parts of these diffs are regenerated instead (section 7).
 
 ## 7. Regeneration
 
-Generated lines are never cherry-picked or hand-merged. The `regenerate` commits are root `48e8b6849`, `019e32b55`, `1f811e091` and `ab808047a`, I4 `a99fefd9d` (its receipt `daf2633cb` is skipped) and I2 `96e04e7b6`. Root `37c1466b3` is picked into `content` with its station strings, but its fixture hunk is regenerated.
+Generated lines are never cherry-picked or hand-merged. The `regenerate` commits are root `48e8b6849`, `019e32b55`, `1f811e091` and `ab808047a`, I4 `a99fefd9d` (its receipt `daf2633cb` is skipped) and I2 `96e04e7b6`. Root `37c1466b3` is picked into `content` with its station strings, but its fixture hunk is dropped (section 3) and regenerated.
 
 - `npm run gen-counts` is each slice's last commit. After a rebase, drop that commit and rerun it.
+- No generator produces root `ab808047a`. It hand-edited the station question totals: the station table in `docs/DOMAIN_PACKS.md`, the "N packs · M questions" strings in `website/station-{education,environment,health,technology}.html` and the sector totals in `whitepaper/AMC_WHITEPAPER_v1.md`. `gen-counts` covers none of these lines. Every slice that changes a station's question count (A with S3's question floor, `content` with the apply round) rewrites them by hand from the compiled packs, in the same commit as `gen-counts`, and updates the strings `tests/publicQuestionCountDrift.test.ts` pins. Use `ab808047a` only to find the lines. After `npm run build`, this prints packs and questions per station:
+
+  ```
+  node --input-type=module -e 'import {listIndustryPacks} from "./dist/domains/industryPacks.js"; const t={}; for (const p of listIndustryPacks()) { t[p.stationId] ??= [0, 0]; t[p.stationId][0]++; t[p.stationId][1] += p.questions.length; } console.log(t)'
+  ```
 - `docs/REGULATORY_CALENDAR.md` comes from `scripts/gen-regulatory-calendar.mjs`, which S10 adds in `content`; rerun it there after the register changes. I1 derived the station guides under `docs/industries/` with `build-guides.mts`, which exists only as a program record (`37c1466b:AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/integration/I1/build-guides.mts`). P1-42 decides whether to land it as a script; until then, run it from a `git show` copy outside the repository.
-- `tests/fixtures/packFrameworkStrings.unresolved.json` is regenerated in P1-45 from the packs on its base; I2 cannot precede P1-45.
+- `tests/fixtures/packFrameworkStrings.unresolved.json` is regenerated in P1-45 from the packs on its base; I2 cannot precede P1-45. No script writes it either: it is the sorted list of pack `complianceFrameworks` strings that `classifyFrameworkString` leaves unresolved, which the S6 test `tests/packFrameworkAliases.test.ts` asserts. `content` regenerates it again after `37c1466b3`, which changes five station strings.
 
 ## 8. Acceptance
 
 Run the baseline commands, the slice issue's own checks, `npm run check:freeze` and `npm run check:qualification`. A slice that raises a frozen count (CLI paths or station-pack questions; slice A raises questions with S3's 15-question floor) adds `freeze-exception: <KEY> — <reason>` to its changeset and rewrites the baseline with `node scripts/check-freeze.mjs --write-baseline`. Every slice key is already in `allowedExceptionKeys`.
+
+The baseline has no result for the `docker-smoke`, `helm-lint-template` and `security-scan-lite` jobs (section 2). Slice C (P0-14) changes the Helm chart, the `deploy/k8s/` manifests, the Pulumi and Terraform files and `docker/docker-compose.yml`, so it runs the steps of those three jobs from `.github/workflows/ci.yml` (`docker build` of the `studio` and `runner` targets with `node scripts/container-smoke.mjs`, `helm lint` and `helm template` of `deploy/helm/amc` with the job's `grep` checks, and `node scripts/security-scan-lite.mjs` with the release-bundle scan) on `origin/main` and on the slice, and records both runs in its receipt. Any other slice that changes files under `deploy/`, `docker/` or the `Dockerfile` does the same.
 
 Merge with `--no-ff`, which keeps the `cherry picked from` lines. Then rerun the commands on the merge commit in a fresh clone and put the result in the closing note.
 
@@ -180,6 +212,8 @@ Merge with `--no-ff`, which keeps the `cherry picked from` lines. Then rerun the
 ## 10. Overlap map
 
 The generator lists every product path that more than one slice touches, plus the paths the rules name. `regen` overlaps mean the path is regenerated, not merged.
+
+Frozen files (D-15) overlap with `main` itself: restoration parity tests byte-freeze about 190 files, and a slice that edits one without a snapshot fails them. Section 3 step 2 estimates 16 such paths in C, 11 in `regen` (count-literal and station-total files that each slice rewrites, section 7), 11 in A or A-register, 2 in B, 2 in S6 and 1 in `content`. Run `node scripts/snapshot-plan-edit.mjs` as section 3 step 2 says before the first commit that edits one.
 
 | Path | Slices in the candidate | Issues | Rule |
 |---|---|---|---|
@@ -199,20 +233,20 @@ The generator lists every product path that more than one slice touches, plus th
 | `tests/fixtures/packFrameworkStrings.unresolved.json` | S6, content | P1-45, P1-42 | regenerate in the landing slice; never cherry-pick the I2 or 37c1466b3 fixture hunks; I2 cannot precede P1-45 |
 | `website/station-{education,environment,technology}.html` | regen, A | P0-12 | regenerate: the generator run is each slice's last commit; never hand-merge generated lines |
 
-Merge resolutions: only six merges resolved conflicts, all in the apply round (`9b6e17dda`, `6d5f2dae1`, `5c6fa7dcc`, `e3b56449b`, `fd2848bfa`, `3f18e43e4`). Each resolved `src/domains/packs/catalogue{Eu,Us,Intl}.ts` and the split snapshot under `AMC_OS/`; root `7d4bbecee` repairs the seams. All of that is in `content`, which replays the six resolutions. Count literals in `README.md`, `CONTRIBUTING.md`, the whitepaper, `website/` and `docs/content/` are touched only by `regen` and are regenerated (section 7).
+Merge resolutions: only six merges resolved conflicts, all in the apply round (`9b6e17dda`, `6d5f2dae1`, `5c6fa7dcc`, `e3b56449b`, `fd2848bfa`, `3f18e43e4`). Each resolved `src/domains/packs/catalogue{Eu,Us,Intl}.ts` and the split snapshot under `AMC_OS/`; root `7d4bbecee` repairs the seams. All of that is in `content`, which replays the six resolutions with section 3 step 4. Count literals in `README.md`, `CONTRIBUTING.md`, the whitepaper, `website/` and `docs/content/` are touched only by `regen` and are regenerated (section 7).
 
 ## 11. Monitors' open items per slice
 
 The slice issue's own list wins. This list adds what the map and the candidate show.
 
-- **A (P0-12):** S3's HOLD commit `20b69fb47` leaves `tests/publicQuestionCountDrift.test.ts` red until the slice's `gen-counts` commit; root `13ea36191` derives the whitepaper totals. The question raise needs `freeze-exception: P0-12`. S5's `scripts/check-regulatory-currency.mjs` has no `package.json` entry in the candidate; P0-12 adds it. Re-point the register's 190 program citations (section 5).
-- **A-register (P0-12):** waits for B. Both commits are mixed; strip them.
-- **B (P0-13):** S7 `80d35a875` records the MCP discarded-result and simulate-before-validate defects as expected failures; they stay open. S7's two ready-to-wire diffs are not applied. I3 changes `tests/domain-registry.test.ts` so that a canned response is "not evaluated", not passing. The 10 assurance-grading commits come from apply-round branches whose refuter reviews exist only in the root checkout.
-- **C (P0-14):** S1 has no recorded acceptance: its round-3 re-verification of `7180bd0c4` (`root-checkout:…/verify/reverify-S1-r3.json`) must be read before landing. S2's `scripts/deploy-verify.mjs` and `scripts/credentials-presence-check.mjs` have no `package.json` entries in the candidate; P0-14 adds them. D-03 and Sid's B3/B4 owner confirmations gate it. 16 of its files may be frozen (section 3).
+- **A (P0-12):** S3's HOLD commit `20b69fb47` leaves `tests/publicQuestionCountDrift.test.ts` red until the slice's `gen-counts` commit; root `13ea36191` derives the whitepaper totals. The question raise needs `freeze-exception: P0-12`. S5's `scripts/check-regulatory-currency.mjs` has no `package.json` entry in the candidate; P0-12 adds it. Re-point the register's 190 program citations (section 5). Up to 11 of A's and A-register's files may be frozen: snapshot them first (D-15, section 3 step 2).
+- **A-register (P0-12):** waits for B. Both commits are mixed; strip them. Check its files for frozen ones with A's (D-15, section 3 step 2).
+- **B (P0-13):** S7 `80d35a875` records the MCP discarded-result and simulate-before-validate defects as expected failures; they stay open. S7's two ready-to-wire diffs are not applied. I3 changes `tests/domain-registry.test.ts` so that a canned response is "not evaluated", not passing. The 10 assurance-grading commits come from apply-round branches whose refuter reviews exist only in the root checkout. 2 of its files may be frozen (D-15, section 3 step 2).
+- **C (P0-14):** S1 has no recorded acceptance: its round-3 re-verification of `7180bd0c4` (`root-checkout:…/verify/reverify-S1-r3.json`) must be read before landing. S2's `scripts/deploy-verify.mjs` and `scripts/credentials-presence-check.mjs` have no `package.json` entries in the candidate; P0-14 adds them. D-03 and Sid's B3/B4 owner confirmations gate it. 16 of its files may be frozen (D-15, section 3 step 2). It runs the `docker-smoke`, `helm-lint-template` and `security-scan-lite` jobs on `origin/main` and on the slice, because the baseline has none (section 8).
 - **F1, F3, F4 (P1-15, P1-16, P1-17):** one code commit each. F3 and F4 have follow-up work named in their issue titles.
 - **S8 (P1-43):** the tools ship unregistered; `tracks/S8/wiring.diff` wires them.
-- **S6 (P1-45):** BLOCKED at `8fc76bd45` and merged at `653e3eeeb` only by root ruling (`root-checkout:…/map/root-decisions.md`, 4 Oct 05:43Z). It needs a fresh independent review. Regenerate I2's fixture.
-- **content (P1-42):** needs an expert. It lands after the G0 edits to the files in section 10 and replays the six catalogue resolutions.
+- **S6 (P1-45):** BLOCKED at `8fc76bd45` and merged at `653e3eeeb` only by root ruling (`root-checkout:…/map/root-decisions.md`, 4 Oct 05:43Z). It needs a fresh independent review. Regenerate I2's fixture. 2 of its files may be frozen (D-15, section 3 step 2).
+- **content (P1-42):** needs an expert. It lands after the G0 edits to the files in section 10 and replays the six catalogue resolutions with section 3 step 4. It drops `37c1466b3`'s fixture hunk (section 3) and regenerates the fixture and the station totals by hand (section 7). 1 of its files may be frozen (D-15, section 3 step 2).
 - **O (P1-44):** the verdicts are in `root-checkout:…/verify/verify-round2-O17-O20.json`, which no commit holds.
 - **hidden (P1-46):** F2 is record-only until P1-46 decides.
 - **Not in the candidate:** `worktree-wf_5210e2f4-3ea-20` (`fefc204a8`, one receipt-only commit on `8f57ce63` adding `reconcile/AMC-15xx.json`) was never merged and is not in the map.
