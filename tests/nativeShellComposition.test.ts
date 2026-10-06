@@ -20,7 +20,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { signAmcConfig, verifyAmcConfigSignature } from "../src/config/amcConfigSignature.js";
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
-import { nativeShellReadiness, type NativeShellReadiness } from "../src/sandbox/nativeShellGate.js";
+import { decideNativeShell, nativeShellReadiness, type NativeShellReadiness } from "../src/sandbox/nativeShellGate.js";
 import { AMCNativeClient } from "../src/sdk/nativeAgentClient.js";
 import { createNativeTaskService } from "../src/studio/nativeTaskService.js";
 import type { SandboxOutcome } from "../src/sandbox/sandboxTypes.js";
@@ -43,6 +43,7 @@ vi.mock("../src/sandbox/bwrapBackend.js", async importOriginal => ({
 
 const DARWIN_REFUSAL = "The native shell is refused on macOS: AMC cannot confine it yet (Seatbelt confinement arrives with P1-05). To accept an unconfined shell with your full user rights, pass --unsafe-unconfined-shell (Studio: start it with AMC_UNSAFE_UNCONFINED_SHELL=1).";
 const NOT_HONOURED = "runtime.shell.allowUnconfined is not honoured: a workspace can sign its own config, so a file in the repository cannot grant an unconfined shell. Pass --unsafe-unconfined-shell, or start Studio with AMC_UNSAFE_UNCONFINED_SHELL=1.";
+const CLI_FLAG_WARNING = "WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.";
 const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
 const pin = (value: NodeJS.Platform): void => { Object.defineProperty(process, "platform", { ...platform, value }); };
 const dirs: string[] = [];
@@ -124,9 +125,8 @@ describe("macOS", () => {
       expect(receipt).toMatchObject({ platform: "darwin", backend: "none", confined: false, enforcementLevel: "none", optInSource: "cli-flag" });
     }
     expect(audits("NATIVE_SHELL_UNCONFINED_ENABLED")).toEqual([expect.objectContaining({ platform: "darwin", optInSource: "cli-flag", sessionId: "shell-gate-session" })]);
-    const warning = "WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.";
-    expect(toolset.readiness.shell).toMatchObject({ offered: true, decision: "unconfined-opt-in", enforcement: "none", boundary: null, reason: warning });
-    expect(stderr.mock.calls.filter(([chunk]) => String(chunk).includes(warning))).toHaveLength(1);
+    expect(toolset.readiness.shell).toMatchObject({ offered: true, decision: "unconfined-opt-in", enforcement: "none", boundary: null, reason: CLI_FLAG_WARNING });
+    expect(stderr.mock.calls.filter(([chunk]) => String(chunk).includes(CLI_FLAG_WARNING))).toHaveLength(1);
   });
 });
 
@@ -186,6 +186,18 @@ describe("no workspace file can opt in", () => {
       reason: `${NOT_HONOURED} ${DARWIN_REFUSAL}`, optInSource: null });
   });
 
+  it("adds the not-honoured note only to the macOS refusal, never where the flag cannot help", () => {
+    const missing = { ok: false, reason: "Install a supported system Bubblewrap at /usr/bin/bwrap; AMC does not fall back to an unconfined Linux shell." } as const;
+    for (const [os, bwrap] of [["win32", { ok: true }], ["linux", missing]] as const) {
+      pin(os);
+      backend.available.value = bwrap;
+      const dir = workspace();
+      setAllowUnconfined(dir, true);
+      const expected = (decideNativeShell({ platform: os, bwrap, optIn: null }) as { remediation: string }).remediation;
+      for (const explicit of [undefined, "cli-flag"] as const) expect(nativeShellReadiness(dir, explicit).reason, `${os} ${explicit}`).toBe(expected);
+    }
+  });
+
   it("the CLI, ACP and SDK paths ignore AMC_UNSAFE_UNCONFINED_SHELL", () => {
     pin("darwin");
     vi.stubEnv("AMC_UNSAFE_UNCONFINED_SHELL", "1");
@@ -225,7 +237,7 @@ describe("Studio's operator-only opt-in", () => {
       await service.start({ principalId: "shell-gate-operator", agentId: "default", demo: true },
         { clientRequestId: randomUUID(), agentId: "default", provider: "stub", tools: "none", prompt: "shell gate fixture" });
       await vi.waitFor(() => expect(start).toHaveBeenCalledTimes(1));
-      return { options: start.mock.calls[0]![0], shellOptIn: service.shellOptIn };
+      return { dir, options: start.mock.calls[0]![0], shellOptIn: service.shellOptIn };
     } finally {
       await service.close();
       start.mockRestore();
@@ -237,7 +249,10 @@ describe("Studio's operator-only opt-in", () => {
     vi.stubEnv("AMC_UNSAFE_UNCONFINED_SHELL", "1");
     const on = await studioStart({ AMC_UNSAFE_UNCONFINED_SHELL: "1" });
     expect(on.options.allowUnconfinedShell).toBe(true);
-    expect(on.shellOptIn).toBe("sdk-option");
+    // The child gets --unsafe-unconfined-shell and records "cli-flag" (see the agent-loop run test), so the banner must too.
+    expect(on.shellOptIn).toBe("cli-flag");
+    pin("darwin");
+    expect(nativeShellReadiness(on.dir, on.shellOptIn ?? undefined)).toMatchObject({ optInSource: "cli-flag", reason: CLI_FLAG_WARNING });
     expect(on.options.env?.["AMC_UNSAFE_UNCONFINED_SHELL"]).toBeUndefined();
     for (const value of [undefined, "true", "yes", " 1"]) {
       const off = await studioStart(value === undefined ? {} : { AMC_UNSAFE_UNCONFINED_SHELL: value });
@@ -334,6 +349,6 @@ describe("every surface composes through the gate", () => {
     expect(await runCli(dir, [])).toContain(DARWIN_REFUSAL);
     expect(stderr.mock.calls.some(([chunk]) => String(chunk).includes("UNCONFINED"))).toBe(false);
     await runCli(dir, ["--unsafe-unconfined-shell"]);
-    expect(stderr.mock.calls.filter(([chunk]) => String(chunk).includes("WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag)"))).toHaveLength(1);
+    expect(stderr.mock.calls.filter(([chunk]) => String(chunk).includes(CLI_FLAG_WARNING))).toHaveLength(1);
   });
 });

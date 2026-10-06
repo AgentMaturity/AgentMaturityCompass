@@ -73,8 +73,9 @@ function readinessFor(workspace: string, optIn: ShellOptInSource | null): Native
     return { offered: true, decision: decision.kind, enforcement: "none", boundary: null,
       reason: unconfinedShellWarning(decision.platform, decision.source), optInSource: decision.source };
   }
-  return { offered: false, decision: decision.kind, enforcement: "none", boundary: null,
-    reason: configCarriesOptIn(workspace) ? `${NOT_HONOURED} ${decision.remediation}` : decision.remediation, optInSource: null };
+  // The note names opt-ins that only work on macOS, where a refusal means no explicit opt-in was passed.
+  return { offered: false, decision: decision.kind, enforcement: "none", boundary: null, optInSource: null,
+    reason: decision.platform === "darwin" && configCarriesOptIn(workspace) ? `${NOT_HONOURED} ${decision.remediation}` : decision.remediation };
 }
 
 /** Decide once for a top-level session from the caller's explicit opt-in only; never from a file or the environment. */

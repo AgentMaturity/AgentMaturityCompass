@@ -57,7 +57,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   const environment = { ...(options.environment ?? process.env) };
   const validationConfig = options.validationConfig ?? environment.AMC_NATIVE_VALIDATION_CONFIG;
   // Studio's only shell opt-in (P0-06): the operator's environment at Studio start, read once, exactly "1".
-  // Never forwarded to the child; the explicit option becomes its --unsafe-unconfined-shell.
+  // Never forwarded to the child; the explicit option becomes its --unsafe-unconfined-shell, recorded as "cli-flag".
   const unconfinedShell = environment.AMC_UNSAFE_UNCONFINED_SHELL === "1";
   // The queued input becomes one signed session row, or above the per-event cap a signed spill commitment plus a
   // descriptor row (src/session/spill/spillInput.ts), so its bound is the smaller of the prompt frame and the
@@ -344,7 +344,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
   sweep.unref();
 
   return {
-    shellOptIn: unconfinedShell ? "sdk-option" : null,
+    shellOptIn: unconfinedShell ? "cli-flag" : null,
     configuration,
     list(actor, includeArchived = false) { assertActor(actor); return descriptors.list(includeArchived).filter(d => d.principalId === actor.principalId && d.agentId === actor.agentId
       && (!actor.demo || (d.demo && d.provider === "stub" && d.tools === "none"))).map(d => view(remember(d))).sort((a, b) => b.createdAt - a.createdAt); },

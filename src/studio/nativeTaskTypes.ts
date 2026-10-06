@@ -121,8 +121,8 @@ export interface NativeTaskView {
 }
 export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
 export interface NativeTaskService {
-  /** Studio's explicit shell opt-in, read once from its operator environment at start; absent means none (P0-06). */
-  readonly shellOptIn?: "sdk-option" | null;
+  /** Studio's opt-in from its operator environment at start, as the child records it (--unsafe-unconfined-shell); absent means none (P0-06). */
+  readonly shellOptIn?: "cli-flag" | null;
   configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration>;
   list(actor: NativeTaskActor, includeArchived?: boolean): readonly NativeTaskView[];
   start(actor: NativeTaskActor, input: NativeTaskStartRequest): Promise<NativeTaskView>;
