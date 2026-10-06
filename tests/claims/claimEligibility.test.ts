@@ -87,8 +87,34 @@ const rows: Row[] = [
     result: "not_evaluated", reason: "UNBOUND_EVIDENCE"
   },
   {
+    name: "regulated fail on events from another control",
+    input: withEvidence({ boundToControl: false }, { regulated: true, applicability: applicable,
+      proposed: { result: "fail", level: 2 } }),
+    result: "not_evaluated", reason: "UNBOUND_EVIDENCE"
+  },
+  {
+    name: "negative event count, regulated",
+    input: withEvidence({ eventCount: -1 }, { regulated: true, applicability: applicable }),
+    result: "not_evaluated", evidence: "incomplete", eligibleLevel: null, reason: "EMPTY_EVIDENCE"
+  },
+  {
+    name: "NaN event count, regulated",
+    input: withEvidence({ eventCount: Number.NaN }, { regulated: true, applicability: applicable }),
+    result: "not_evaluated", evidence: "incomplete", eligibleLevel: null, reason: "EMPTY_EVIDENCE"
+  },
+  {
     name: "stale evidence",
     input: withEvidence({ newestTs: NOW - 2 * DAY }),
+    result: "not_evaluated", evidence: "stale", reason: "STALE_EVIDENCE"
+  },
+  {
+    name: "future-dated evidence (replayed or forged timestamp)",
+    input: withEvidence({ newestTs: NOW + DAY }),
+    result: "not_evaluated", evidence: "stale", reason: "STALE_EVIDENCE"
+  },
+  {
+    name: "evidence of unknown age with a freshness bound",
+    input: withEvidence({ newestTs: null }),
     result: "not_evaluated", evidence: "stale", reason: "STALE_EVIDENCE"
   },
   {

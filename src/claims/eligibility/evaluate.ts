@@ -52,8 +52,8 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
     kind ??= "self_reported";
     reasons.push("LEGACY_1X_UNVERIFIED");
   }
-  // 3. An empty stream is never a pass and never a default score.
-  if (ev.eventCount === 0 && method !== "numeric_self_answer") {
+  // 3. An empty stream is never a pass and never a default score. A negative or NaN count is no evidence either.
+  if (!(ev.eventCount > 0) && method !== "numeric_self_answer") {
     evidence = worse(evidence, "incomplete");
     result = "not_evaluated";
     level = null;
@@ -87,12 +87,17 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
     evidence = worse(evidence, "contradictory");
     blockPass("CONTRADICTORY_EVIDENCE");
   }
-  if (ev.maxAgeMs !== undefined && ev.newestTs !== null && input.now - ev.newestTs > ev.maxAgeMs) {
+  // With a freshness bound, an unknown or future-dated (replayed or forged) timestamp is not fresh.
+  if (ev.maxAgeMs !== undefined
+    && !(ev.newestTs !== null && ev.newestTs <= input.now && input.now - ev.newestTs <= ev.maxAgeMs)) {
     evidence = worse(evidence, "stale");
     blockPass("STALE_EVIDENCE");
   }
-  // 7. Coincidental event types from another control do not count.
-  if (regulated && ev.boundToControl === false) blockPass("UNBOUND_EVIDENCE");
+  // 7. Coincidental event types from another control decide nothing, pass or fail.
+  if (regulated && ev.boundToControl === false) {
+    result = "not_evaluated";
+    reasons.push("UNBOUND_EVIDENCE");
+  }
   // 8. Kind for everything else.
   if (kind === null) kind = decideKind(input, reasons);
   // 9. Applicability.
