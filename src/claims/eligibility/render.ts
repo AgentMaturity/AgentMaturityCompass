@@ -19,7 +19,7 @@ export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   STALE_EVIDENCE: "the newest evidence is older than the allowed age",
   CONTRADICTORY_EVIDENCE: "the evidence contradicts itself",
   CROSS_SCOPE_EVIDENCE: "the evidence belongs to another tenant or scope",
-  SIGNATURE_INVALID: "the signature is missing or does not verify",
+  SIGNATURE_INVALID: "the signature does not verify",
   ISSUER_NOT_PINNED: "the reviewer's key is not pinned",
   REVIEW_NOT_INDEPENDENT: "the review is not independent of the producer",
   LEGACY_1X_UNVERIFIED: "results stored by AMC 1.x were never verified",

@@ -133,6 +133,11 @@ const rows: Row[] = [
     result: "not_evaluated", evidence: "untrusted", reason: "SIGNATURE_INVALID"
   },
   {
+    name: "missing signature is not an invalid one (rule 6 checks signatureValid false only)",
+    input: withEvidence({ signatureValid: null }),
+    result: "pass", evidence: "sufficient"
+  },
+  {
     name: "independent approved review, issuer not pinned",
     input: withEvidence({ tiers: ["ATTESTED"], issuerPinned: false },
       { method: "human_review", review: { state: "approved", independent: true } }),

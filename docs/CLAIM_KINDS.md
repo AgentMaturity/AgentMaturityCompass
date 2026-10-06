@@ -38,10 +38,10 @@ A result is regulated when it asserts conformity with a law, regulation, standar
 3. An empty event stream (except numeric self-answers), including a negative or non-numeric event count: evidence `incomplete`, result `not_evaluated`, no level. `EMPTY_EVIDENCE`.
 4. Numeric self-answers: kind `self_reported`, evidence `incomplete`, level 1 at most (`SELF_REPORTED_LEVEL_CAP`); a regulated pass becomes `not_evaluated` (`SELF_REPORTED_NO_POSITIVE_STATUS`).
 5. Keyword matches, unkeyed checksums and path-presence checks: level 1 at most; a regulated pass becomes `not_evaluated`. `WEAK_METHOD`.
-6. An invalid or missing signature (`SIGNATURE_INVALID`) or evidence from another tenant or scope (`CROSS_SCOPE_EVIDENCE`) makes evidence `untrusted`; contradictory evidence makes it `contradictory` (`CONTRADICTORY_EVIDENCE`); evidence older than the allowed age makes it `stale` (`STALE_EVIDENCE`), and so does evidence with a future or unknown timestamp when an allowed age is set. Each turns a pass into `not_evaluated`. When several apply, the evidence dimension shows the most serious, in the order untrusted, contradictory, stale, incomplete.
+6. A signature that does not verify (`signatureValid` is false, `SIGNATURE_INVALID`) or evidence from another tenant or scope (`CROSS_SCOPE_EVIDENCE`) makes evidence `untrusted`; contradictory evidence makes it `contradictory` (`CONTRADICTORY_EVIDENCE`); evidence older than the allowed age makes it `stale` (`STALE_EVIDENCE`), and so does evidence with a future or unknown timestamp when an allowed age is set. Each turns a pass into `not_evaluated`. A missing signature (`signatureValid` is null) does not by itself block a pass. When several apply, the evidence dimension shows the most serious, in the order untrusted, contradictory, stale, incomplete.
 7. A regulated result whose events are not bound to the control: the result becomes `not_evaluated`, whether it was a pass or a fail. `UNBOUND_EVIDENCE`.
 8. Kind for everything else: `independently_reviewed` only when the review is `approved`, the reviewer is independent (`REVIEW_NOT_INDEPENDENT` otherwise) and the issuer key is pinned (`ISSUER_NOT_PINNED` otherwise); `observed` when the method is a runtime observation or an executed test and the evidence includes an `OBSERVED` or `OBSERVED_HARDENED` tier; otherwise `self_reported`.
-9. Applicability `not_applicable` makes the result `not_evaluated` (`NOT_APPLICABLE`). A regulated result with no applicability decision is `unresolved`, and an unresolved result cannot pass (`APPLICABILITY_UNRESOLVED`).
+9. Applicability `not_applicable` makes the result `not_evaluated` (`NOT_APPLICABLE`). A regulated result with no applicability decision is `unresolved`, and an unresolved result cannot pass (`APPLICABILITY_UNRESOLVED`), because unknown applicability means not evaluated.
 
 The service reads no clock, file or environment: callers pass `now`. Changing `now` can only change staleness.
 
@@ -75,7 +75,7 @@ Payment unlocks access, never a better result or a higher trust tier. The envelo
 
 ### Uppercase statuses
 
-The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`) and the compliance category statuses (`SATISFIED`, `PARTIAL`, `MISSING`, `UNKNOWN`). `PARTIAL` is not a result: missing evidence means not evaluated.
+The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`; they come from candidate 37c1466b and are not on main yet) and the compliance category statuses (`SATISFIED`, `PARTIAL`, `MISSING`, `UNKNOWN`). `PARTIAL` is not a result: missing evidence means not evaluated.
 
 | Status | Result | Evidence |
 | --- | --- | --- |
@@ -89,7 +89,7 @@ The certification-evidence statuses (`PASS`, `FAIL`, `NOT_EVALUATED`) and the co
 
 Any other stored status is unrecognised and maps to result `not_evaluated` with evidence `incomplete`.
 
-Industry-pack audit findings map the same way: `INDUSTRY_EVIDENCE_MISSING` means evidence `incomplete` and result `not_evaluated`, and `INDUSTRY_EVIDENCE_SYNTHETIC` means kind `synthetic_example`.
+The industry-pack audit types `INDUSTRY_EVIDENCE_MISSING` and `INDUSTRY_EVIDENCE_SYNTHETIC` exist only on candidate 37c1466b, not on main, and no adapter maps them yet.
 
 ### Diagnostic runs
 

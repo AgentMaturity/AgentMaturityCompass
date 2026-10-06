@@ -100,7 +100,8 @@ export function evaluateClaimEligibility(input: ClaimEligibilityInput): ClaimEnv
   }
   // 8. Kind for everything else.
   if (kind === null) kind = decideKind(input, reasons);
-  // 9. Applicability.
+  // 9. Applicability. Truth rule 2: unknown applicability means not evaluated, so an unresolved
+  // result cannot pass (APPLICABILITY_UNRESOLVED goes beyond the issue's 14 codes; see D-03).
   const applicability: Applicability = input.applicability
     ?? (regulated ? { state: "unresolved", reason: "no applicability decision recorded" } : { state: "applicable" });
   if (applicability.state === "not_applicable") {
