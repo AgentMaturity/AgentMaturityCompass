@@ -350,6 +350,8 @@ To add a new framework or extend existing mappings:
 
 `src/compliance/regulatory/register.json` is the sourced list of instruments that govern AI agents across the seven stations (health, education, environment, mobility, governance, technology, wealth). Each entry records the instrument, obligations relevant to agents, key dates, official sources with `retrievedAt`, `lastReviewed`, and per-fact `verified` flags. An entry is `verified` only when every date and obligation it encodes was read from an official source and nothing is left open; otherwise its `openQuestions` say what was not confirmed. It replaces the five 2020-2023 `GLOBAL_FRAMEWORKS` records as the authority for dates and status; `GLOBAL_FRAMEWORKS` remains as a legacy view and links each record by `registerId`.
 
+The register is agent-drafted and stays experimental until a named expert reviews it: `verified` means the facts were read from an official source, not that an expert approved them. It is not legal advice.
+
 ```bash
 node scripts/check-regulatory-currency.mjs            # exit 1 if any entry is malformed, unsourced, cites a non-official host or is older than 90 days
 node scripts/check-regulatory-currency.mjs --now 2027-01-15 --json   # --now is an alias of --as-of; unknown flags exit 1

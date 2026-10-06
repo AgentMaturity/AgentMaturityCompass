@@ -208,6 +208,8 @@ AMC does not perform the conformity assessment itself — that requires a notifi
 
 Dates are Art. 113 and Art. 111 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, read on 2026-10-03 from the Commission's AI Act Service Desk (consolidated text as of 27 July 2026). The same dates are encoded in `EU_AI_ACT_TIMELINE` (`src/compliance/euAiActClassifier.ts`) and the `eu-ai-act` entry of the regulatory register (`src/compliance/regulatory/register.json`); `tests/euAiActTimeline.test.ts` fails if the two drift apart, and `node scripts/check-regulatory-currency.mjs` fails once the entry's review is older than 90 days.
 
+These dates are agent-drafted and stay experimental until a named expert reviews them: they were read from official sources but have no expert sign-off, and they are not legal advice.
+
 | Date | Milestone | Provision |
 |---|---|---|
 | 2024-08-01 | Regulation entered into force | Art. 113 |

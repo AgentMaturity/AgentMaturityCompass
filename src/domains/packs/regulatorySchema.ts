@@ -7,10 +7,10 @@
  * currency: citation, jurisdiction, url, effectiveDate, lastReviewed and status.
  *
  * The pack-level fields (version, lastReviewed, regulatoryReferences) follow
- * the "PackCurrencyFields v1" contract shared with the pack-audit module:
+ * the "PackCurrencyFields v1" contract:
  * RegulatoryReference = { citation: string; jurisdiction: string; url?;
  * effectiveDate?; lastReviewed?; status: in-force | applies-from | proposed |
- * repealed | unverified }. The audit side declares the same shape structurally.
+ * repealed | unverified }.
  *
  * Evidence rule: an instrument may only claim a status other than
  * "unverified" when it names the official source it was checked against
