@@ -24,7 +24,8 @@ export const REASON_TEXT: Record<ClaimReasonCode, string> = {
   REVIEW_NOT_INDEPENDENT: "the review is not independent of the producer",
   LEGACY_1X_UNVERIFIED: "results stored by AMC 1.x were never verified",
   NOT_APPLICABLE: "the control does not apply",
-  APPLICABILITY_UNRESOLVED: "no applicability decision is recorded"
+  APPLICABILITY_UNRESOLVED: "no applicability decision is recorded",
+  EVIDENCE_NOT_CLAIM_READY: "the run did not meet AMC's evidence-readiness gate for claims"
 };
 
 // These explain the kind or the level, never why a result was withheld.

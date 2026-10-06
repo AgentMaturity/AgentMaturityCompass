@@ -10,6 +10,8 @@ import {
   envelopeForSelfAssessment,
   envelopeForSyntheticExample,
   fromUppercaseStatus,
+  REASON_TEXT,
+  renderClaimLabel,
   type DiagnosticReportClaimInput
 } from "../../src/claims/eligibility/index.js";
 import type { TrustTier } from "../../src/types.js";
@@ -76,6 +78,12 @@ describe("envelope adapters", () => {
     runId: "run-1",
     windowEndTs: NOW - 1_000,
     status: "VALID",
+    verificationPassed: true,
+    trustBoundaryViolated: false,
+    trustBoundaryMessage: null,
+    integrityIndex: 0.9,
+    evidenceCoverage: 0.8,
+    contradictionCount: 0,
     trustLabel: "HIGH TRUST",
     layerScores: [
       { layerName: "Strategic Agent Operations", avgFinalLevel: 3, confidenceWeightedFinalLevel: 3 },
@@ -84,11 +92,35 @@ describe("envelope adapters", () => {
     evidenceTrustCoverage: { observed: 0.6, attested: 0.1, selfReported: 0.3 }
   };
 
-  test("a valid observed diagnostic keeps its real level", () => {
+  test("a valid, claim-ready observed diagnostic keeps its real level", () => {
     const envelope = envelopeForDiagnosticReport(report, NOW);
     expect(envelope.claimKind).toBe("observed");
+    expect(envelope.statusDimensions.result).toBe("pass");
     expect(envelope.statusDimensions.evidence).toBe("sufficient");
     expect(envelope.eligibleLevel).toBe(3.5);
+    expect(envelope.reasons).toEqual([]);
+  });
+
+  test.each<[string, Partial<DiagnosticReportClaimInput>, string]>([
+    ["a LOW TRUST run", { trustLabel: "LOW TRUST", integrityIndex: 0.5 }, "incomplete"],
+    ["a self-reported-only run", { trustLabel: "LOW TRUST", integrityIndex: 0.5,
+      evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 } }, "incomplete"],
+    ["a run with no accepted evidence", { evidenceCoverage: 0 }, "incomplete"],
+    ["a run that crossed its trust boundary", { trustBoundaryViolated: true }, "untrusted"],
+    ["a run whose evidence chain did not verify", { verificationPassed: false }, "untrusted"]
+  ])("%s does not pass and says why", (_name, patch, evidence) => {
+    const envelope = envelopeForDiagnosticReport({ ...report, ...patch }, NOW);
+    expect(envelope.statusDimensions.result).toBe("not_evaluated");
+    expect(envelope.statusDimensions.evidence).toBe(evidence);
+    expect(envelope.reasons).toContain("EVIDENCE_NOT_CLAIM_READY");
+    expect(renderClaimLabel(envelope).line).toContain("Result: not evaluated (");
+  });
+
+  test("a claim-ready run with contradictions does not pass", () => {
+    const envelope = envelopeForDiagnosticReport({ ...report, contradictionCount: 2 }, NOW);
+    expect(envelope.statusDimensions.result).toBe("not_evaluated");
+    expect(envelope.statusDimensions.evidence).toBe("contradictory");
+    expect(envelope.reasons).toContain("CONTRADICTORY_EVIDENCE");
   });
 
   test("an UNSIGNED run is untrusted", () => {
@@ -99,8 +131,11 @@ describe("envelope adapters", () => {
 
   test("INVALID and UNRELIABLE runs are untrusted", () => {
     expect(envelopeForDiagnosticReport({ ...report, status: "INVALID" }, NOW).statusDimensions.evidence).toBe("untrusted");
-    expect(envelopeForDiagnosticReport({ ...report, trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" }, NOW)
-      .statusDimensions.evidence).toBe("untrusted");
+    const unreliable = envelopeForDiagnosticReport({ ...report, trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS" }, NOW);
+    expect(unreliable.statusDimensions.evidence).toBe("untrusted");
+    expect(unreliable.statusDimensions.result).toBe("not_evaluated");
+    expect(unreliable.reasons).toEqual(["EVIDENCE_NOT_CLAIM_READY"]);
+    expect(renderClaimLabel(unreliable).line).toContain(`Result: not evaluated (${REASON_TEXT.EVIDENCE_NOT_CLAIM_READY})`);
   });
 
   test("a diagnostic with no observed coverage is self-reported", () => {

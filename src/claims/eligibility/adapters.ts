@@ -1,6 +1,10 @@
 import type { ComplianceCategoryStatus } from "../../compliance/mappingSchema.js";
 import type { ClaimTier } from "../../score/claimProvenance.js";
 import type { TrustTier as IngestTrustTier } from "../../score/evidenceIngestion.js";
+import {
+  evaluateDiagnosticEvidenceReadiness,
+  type DiagnosticEvidenceReadinessInput
+} from "../../diagnostic/evidenceReadiness.js";
 import type { DiagnosticReport, TrustTier } from "../../types.js";
 import { evaluateClaimEligibility } from "./evaluate.js";
 import type {
@@ -70,31 +74,39 @@ function evidence(eventCount: number, tiers: ClaimEligibilityInput["evidence"]["
     signatureValid: null, issuerPinned: null };
 }
 
-export type DiagnosticReportClaimInput = Pick<DiagnosticReport,
-  "agentId" | "runId" | "windowEndTs" | "status" | "trustLabel" | "layerScores" | "evidenceTrustCoverage">;
+export type DiagnosticReportClaimInput = DiagnosticEvidenceReadinessInput
+  & Pick<DiagnosticReport, "agentId" | "runId" | "windowEndTs" | "layerScores" | "contradictionCount">;
 
-/** Keeps a diagnostic run's real level; only the run's own trust signals can withhold it. */
+/**
+ * Keeps a diagnostic run's real level. A run proposes a pass only when AMC's own evidence-readiness gate
+ * marks it claim-eligible; otherwise the result is not evaluated and the reason says so.
+ */
 export function envelopeForDiagnosticReport(report: DiagnosticReportClaimInput, now: number): ClaimEnvelope {
   const coverage = report.evidenceTrustCoverage;
   const layers = report.layerScores;
   const level = layers.length === 0 ? null : layers.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / layers.length;
+  const readiness = evaluateDiagnosticEvidenceReadiness(report);
   const envelope = evaluateClaimEligibility({
     producer: `diagnostic:${report.agentId}`,
     method: "runtime_observation",
     regulated: false,
-    proposed: { result: "pass", level },
+    proposed: { result: readiness.claimEligible ? "pass" : "not_evaluated", level },
     // The report carries coverage fractions, not counts; the rules only need empty versus not empty.
     evidence: {
       ...evidence(coverage.observed + coverage.attested + coverage.selfReported > 0 ? 1 : 0,
         coverage.observed > 0 ? ["OBSERVED"] : ["SELF_REPORTED"], report.windowEndTs),
+      contradictory: report.contradictionCount > 0,
       signatureValid: report.status === "VALID"
     },
     evidenceRefs: [report.runId],
     now
   });
-  if (report.trustLabel !== "UNRELIABLE — DO NOT USE FOR CLAIMS") return envelope;
-  const result = envelope.statusDimensions.result === "pass" ? "not_evaluated" : envelope.statusDimensions.result;
-  return { ...envelope, statusDimensions: { ...envelope.statusDimensions, evidence: "untrusted", result } };
+  if (readiness.claimEligible) return envelope;
+  const untrusted = readiness.status === "UNVERIFIED" || report.trustLabel === "UNRELIABLE — DO NOT USE FOR CLAIMS";
+  const current = envelope.statusDimensions.evidence;
+  const evidenceState = untrusted ? "untrusted" : current === "sufficient" ? "incomplete" : current;
+  return { ...envelope, statusDimensions: { ...envelope.statusDimensions, evidence: evidenceState },
+    reasons: [...envelope.reasons, "EVIDENCE_NOT_CLAIM_READY"] };
 }
 
 interface AdapterBase { producer: string; regulated?: boolean; applicability?: Applicability;

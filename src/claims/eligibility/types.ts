@@ -41,7 +41,8 @@ export type ClaimReasonCode =
   | "REVIEW_NOT_INDEPENDENT"
   | "LEGACY_1X_UNVERIFIED"
   | "NOT_APPLICABLE"
-  | "APPLICABILITY_UNRESOLVED";
+  | "APPLICABILITY_UNRESOLVED"
+  | "EVIDENCE_NOT_CLAIM_READY";
 
 export interface ClaimProvenance {
   producer: string;

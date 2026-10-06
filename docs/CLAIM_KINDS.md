@@ -93,7 +93,7 @@ Industry-pack audit findings map the same way: `INDUSTRY_EVIDENCE_MISSING` means
 
 ### Diagnostic runs
 
-`envelopeForDiagnosticReport` keeps a run's real level (the mean of its layer levels), so surfaces that show diagnostic levels use it instead of the weak-method cap. A run whose status is `INVALID` or `UNSIGNED` has evidence `untrusted` (`SIGNATURE_INVALID`). A run labelled "UNRELIABLE — DO NOT USE FOR CLAIMS" also has evidence `untrusted`. None of them can pass. The kind is `observed` only when the run's observed evidence coverage is above zero, otherwise `self_reported`.
+`envelopeForDiagnosticReport` keeps a run's real level (the mean of its layer levels), so surfaces that show diagnostic levels use it instead of the weak-method cap. A diagnostic run has no pass or fail of its own: it proposes a pass only when AMC's evidence-readiness gate (`evaluateDiagnosticEvidenceReadiness`) marks the run claim-eligible, and otherwise its result is `not_evaluated` with `EVIDENCE_NOT_CLAIM_READY`. A run that is not claim-ready has evidence `untrusted` when the gate finds it unverified (unsigned, invalid, failed verification, a crossed trust boundary, missing metadata or an import) or when it is labelled "UNRELIABLE — DO NOT USE FOR CLAIMS", and `incomplete` otherwise. A run whose status is `INVALID` or `UNSIGNED` also records `SIGNATURE_INVALID`, and a run with contradictions records `CONTRADICTORY_EVIDENCE`; neither can pass. The kind is `observed` only when the run's observed evidence coverage is above zero, otherwise `self_reported`.
 
 ### Other adapters
 
