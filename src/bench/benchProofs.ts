@@ -144,6 +144,8 @@ export function verifyProofsAgainstSignedRoot(params: {
   proofs: readonly BenchInclusionProof[];
   trust: TrustContext;
   candidates: ReadonlyArray<string | null | undefined>;
+  /** The artifact's claimed signing time, which the root signature shares. */
+  claimedSignedAt?: number | null;
 }): { errors: string[]; admission: IssuerAdmission | null; anchoring: VerifierReportV1["anchoring"] } {
   const errors = params.proofs
     .filter((proof) => !verifyMerkleProof({ entryHash: proof.eventHash, proofPath: proof.merklePath, root: proof.rootHash }))
@@ -158,7 +160,8 @@ export function verifyProofsAgainstSignedRoot(params: {
   const sig = JSON.parse(readUtf8(sigPath)) as { digestSha256?: unknown; signature?: unknown; envelope?: unknown };
   if (sig.digestSha256 !== digest) errors.push("signed merkle root digest mismatch");
   const check = checkDigestSignature({ signature: "proofs/merkle.root.sig", purpose: "artifact-seal", digestHex: digest,
-    signatureB64: String(sig.signature ?? ""), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust });
+    signatureB64: String(sig.signature ?? ""), candidates: [...params.candidates, envelopePublicKey(sig.envelope)], context: params.trust,
+    claimedSignedAt: params.claimedSignedAt ?? null });
   if (!check.verified) errors.push("signed merkle root signature invalid");
   const signedRoot = (JSON.parse(readUtf8(rootPath)) as { root?: unknown }).root;
   const unbound = params.proofs.filter((proof) => proof.rootHash !== signedRoot);

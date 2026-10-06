@@ -24,7 +24,7 @@ import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../securi
 import {
   admitKey, buildVerifierReport, checkDigestSignature, untrustedReasons, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1
 } from "../trust/index.js";
-import { fileSha256 } from "../trust/signatureCheck.js";
+import { carriedLedgerAnchoring, claimedTime, fileSha256 } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -381,7 +381,7 @@ export async function issueCertificate(params: {
         gatePolicySigSha256: sha256Hex(readFileSync(policySigAbs))
       },
       verificationInstructions: [
-        "Run `amc cert verify <file.amccert>` to verify signatures and ledger integrity offline.",
+        "Run `amc cert verify <file.amccert> --pubkey <issuer .pub> --expect-monitor <monitor sha256>`, with keys recorded outside this certificate, to verify signatures and ledger integrity offline.",
         "Use `amc cert inspect <file.amccert>` to review maturity and assurance summary.",
         "Optionally pass `--revocation <file.amcrevoke>` during verification."
       ]
@@ -479,8 +479,10 @@ export async function verifyCertificate(params: {
       context: params.trust, integrityErrors: errors, signatures, anchoring });
     return { ok: report.trusted, errors, certId, report };
   };
-  const sealedBy = (signature: string, digestHex: string, signatureB64: string): IssuerAdmission | null => {
-    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: params.trust,
+  // Claimed signing times (step 6): the run seal's own claim, else the cert.sig claim for everything the cert seals.
+  let certClaim: number | null = null;
+  const sealedBy = (signature: string, digestHex: string, signatureB64: string, claimedSignedAt = certClaim): IssuerAdmission | null => {
+    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: params.trust, claimedSignedAt,
       candidates: getPublicKeyHistoryFromCert(extracted, "auditor"), keyHistory: certKeyHistory(extracted, "auditor") });
     signatures.push(check.admission);
     return check.verified ? check.admission : null;
@@ -509,6 +511,7 @@ export async function verifyCertificate(params: {
 
     const certBytes = readFileSync(join(extracted, "cert.json"));
     const certSha = sha256Hex(certBytes);
+    certClaim = certSig.signedTs;
     if (certSha !== certSig.certSha256) {
       errors.push("cert digest mismatch");
     }
@@ -535,7 +538,7 @@ export async function verifyCertificate(params: {
     if (runHash !== run.reportJsonSha256) {
       errors.push("run report hash mismatch");
     }
-    if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig)) {
+    if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig, run.ts)) {
       errors.push("run seal signature invalid");
     }
 
@@ -585,9 +588,7 @@ export async function verifyCertificate(params: {
       if (!ledgerResult.ok) {
         errors.push(...ledgerResult.errors.map((error) => `ledger verify failed: ${error}`));
       }
-      anchoring = ledgerResult.trustRoot.anchored
-        ? { status: "anchored", detail: `monitor key ${monitor.keyId} admitted for ledger-row (${monitor.source})` }
-        : { status: "unanchored", detail: `monitor key ${monitor.status}: ${monitor.detail ?? "not admitted for ledger-row"}` };
+      anchoring = carriedLedgerAnchoring(monitor, ledgerResult.trustRoot.anchored, signatures);
     } finally {
       rmSync(verifyWorkspace, { recursive: true, force: true });
     }
@@ -703,7 +704,8 @@ function verifyRevocationFile(revocationFile: string, trust: TrustContext): {
     };
     const digest = sha256Hex(canonicalize(base));
     const pubKey = payload.auditorPub;
-    admission = admitKey({ publicKeyPem: pubKey, purpose: "revocation-list", signature: "revocation signature", context: trust });
+    admission = admitKey({ publicKeyPem: pubKey, purpose: "revocation-list", signature: "revocation signature", context: trust,
+      claimedSignedAt: claimedTime(payload.ts) });
     if (!verifyHexDigest(digest, payload.signature, pubKey)) {
       errors.push("revocation signature invalid");
     }

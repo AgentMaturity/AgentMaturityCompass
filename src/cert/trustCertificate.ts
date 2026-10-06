@@ -434,7 +434,8 @@ export function verifyTrustCertificateEnvelope(
 
   if (signatureStatus === "SIGNED") {
     const check = checkDigestSignature({ signature: "trust certificate signature", purpose: "artifact-seal", digestHex: envelope.payloadSha256,
-      signatureB64: envelope.signature, candidates: [envelope.payload.signingKey.publicKeyPem], context: trust });
+      signatureB64: envelope.signature, candidates: [envelope.payload.signingKey.publicKeyPem], context: trust,
+      claimedSignedAt: envelope.payload.generatedTs });
     signatures.push(check.admission);
     if (!check.verified) {
       errors.push("signature verification failed");

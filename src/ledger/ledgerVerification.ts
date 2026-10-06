@@ -37,7 +37,7 @@ import { verifySessionChains } from "./sessionVerification.js";
 import { verifyAlternateBackendEvidence } from "./alternateBackendVerification.js";
 import { readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import type { EvidenceEvent } from "../types.js";
-import { admitKey } from "../trust/admission.js";
+import { admitKey, type IssuerAdmission } from "../trust/admission.js";
 import type { TrustContext } from "../trust/trustContext.js";
 
 /**
@@ -82,6 +82,8 @@ export interface VerifyResult {
     anchored: boolean;
     monitorFingerprint: string | null;
     expectedFingerprint: string | null;
+    /** With a trust context: the monitor key's ledger-row admission (a distrusted or revoked key is a failure, not UNANCHORED). */
+    monitorAdmission?: IssuerAdmission;
   };
   /**
    * Per-session lifecycle verdicts for agent sessions — those whose events carry
@@ -662,8 +664,9 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   // is not the key the operator expects, nothing below this line means
   // anything. An explicit option wins over the environment so a caller can
   // verify one workspace against a specific key without changing process state.
+  // Fingerprints are lowercase hex; the trust context lowercases its pin, so the comparison here must too.
   const expectedFingerprint =
-    options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"] ?? null;
+    (options.expectedMonitorFingerprint ?? process.env["AMC_EXPECTED_MONITOR_FINGERPRINT"])?.trim().toLowerCase() || null;
   let monitorFingerprint: string | null = null;
   let monitorPem: string | null = null;
   try {
@@ -728,17 +731,19 @@ function verifyLedger(workspacePath: string, options: LedgerVerifyOptions, conti
   }
 
   const errors = [...chainErrors, ...governanceErrors];
+  const monitorAdmission = options.trust
+    ? admitKey({ publicKeyPem: monitorPem, purpose: "ledger-row", signature: "ledger monitor key", context: options.trust })
+    : undefined;
   return {
     ok: errors.length === 0,
     errors,
     chain: { ok: chainErrors.length === 0, errors: chainErrors },
     governance: { ok: governanceErrors.length === 0, errors: governanceErrors },
     trustRoot: {
-      anchored: options.trust
-        ? admitKey({ publicKeyPem: monitorPem, purpose: "ledger-row", signature: "ledger monitor key", context: options.trust }).status === "admitted"
-        : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
+      anchored: monitorAdmission ? monitorAdmission.status === "admitted" : Boolean(expectedFingerprint) && monitorFingerprint === expectedFingerprint,
       monitorFingerprint,
-      expectedFingerprint
+      expectedFingerprint,
+      ...(monitorAdmission ? { monitorAdmission } : {})
     },
     sessions: {
       open: sessionLifecycle.open,

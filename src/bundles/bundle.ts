@@ -17,6 +17,7 @@ import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
+import { carriedLedgerAnchoring } from "../trust/signatureCheck.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -834,8 +835,10 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
   let anchoring: VerifierReportV1["anchoring"] = { status: "unanchored", detail: "the bundle ledger was not verified" };
   let manifestSignatureVerified = false;
   let manifestFilesVerified = false;
-  const sealedBy = (signature: string, digestHex: string, signatureB64: string): boolean => {
-    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: trust,
+  // Claimed signing times (step 6): each signature's own claim where it has one, else the bundle's manifest.sig claim.
+  let bundleClaim: number | null = null;
+  const sealedBy = (signature: string, digestHex: string, signatureB64: string, claimedSignedAt = bundleClaim): boolean => {
+    const check = checkDigestSignature({ signature, purpose: "artifact-seal", digestHex, signatureB64, context: trust, claimedSignedAt,
       candidates: collectAuditorKeysFromBundle(extracted.rootDir), keyHistory: bundleKeyHistory(extracted.rootDir, "auditor") });
     signatures.push(check.admission);
     return check.verified;
@@ -859,6 +862,7 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
     try {
       const manifestRaw = readFileSync(join(extracted.rootDir, "manifest.json"));
       const manifestSig = readBundleManifestSig(extracted.rootDir);
+      bundleClaim = manifestSig.signedTs;
       const digest = sha256Hex(manifestRaw);
       const digestMatches = digest === manifestSig.manifestSha256;
       if (!digestMatches) {
@@ -917,7 +921,7 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
       if (digest !== run.reportJsonSha256) {
         errors.push("run.json reportJsonSha256 mismatch.");
       }
-      if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig)) {
+      if (!sealedBy("run.json runSealSig", run.reportJsonSha256, run.runSealSig, run.ts)) {
         errors.push("run.json runSealSig verification failed.");
       }
     }
@@ -983,9 +987,7 @@ export async function verifyEvidenceBundle(bundleFile: string, trust: TrustConte
         for (const error of ledgerResult.errors) {
           errors.push(`Ledger verify: ${error}`);
         }
-        anchoring = ledgerResult.trustRoot.anchored
-          ? { status: "anchored", detail: `monitor key ${monitor.keyId} admitted for ledger-row (${monitor.source})` }
-          : { status: "unanchored", detail: `monitor key ${monitor.status}: ${monitor.detail ?? "not admitted for ledger-row"}` };
+        anchoring = carriedLedgerAnchoring(monitor, ledgerResult.trustRoot.anchored, signatures);
       } finally {
         rmSync(verifyWorkspace, { recursive: true, force: true });
       }

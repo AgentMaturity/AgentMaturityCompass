@@ -10,6 +10,8 @@ import type { Command } from "commander";
 import chalk from "chalk";
 import { join } from "node:path";
 import { LEDGER_UNANCHORED_MESSAGE } from "./ledger/ledgerVerification.js";
+import type { IssuerAdmission } from "./trust/admission.js";
+import { isKeyRefused } from "./trust/signatureCheck.js";
 
 export function registerEvidenceStoreCommands(program: Command): void {
   program
@@ -124,15 +126,20 @@ export function registerEvidenceStoreCommands(program: Command): void {
  */
 export function renderLedgerVerdict(result: {
   ok: boolean;
-  trustRoot: { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null };
+  trustRoot: { anchored: boolean; monitorFingerprint: string | null; expectedFingerprint: string | null; monitorAdmission?: IssuerAdmission };
 }, allowUnanchored = false): string {
   const fingerprint = result.trustRoot.monitorFingerprint;
   if (!result.ok) return chalk.red("Ledger verification FAILED");
   if (result.trustRoot.anchored) {
-    return `${chalk.green("Ledger verification PASSED")}\n${chalk.gray(`  Anchored to the pinned monitor key ${fingerprint?.slice(0, 16)}…`)}`;
+    return `${chalk.green("Ledger verification PASSED")}\n${chalk.gray(`  Anchored to the pinned monitor key ${fingerprint ?? ""}`)}`;
+  }
+  const admission = result.trustRoot.monitorAdmission;
+  if (admission && isKeyRefused(admission)) {
+    return chalk.red(`Ledger verification FAILED: monitor key ${admission.status}. ${admission.detail ?? ""}`);
   }
   const headline = allowUnanchored
     ? chalk.yellow("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This proves internal consistency only.")
     : chalk.red(LEDGER_UNANCHORED_MESSAGE);
-  return `${headline}\n${chalk.gray(`  Signed by monitor key ${fingerprint?.slice(0, 16) ?? "(absent)"}…, read from inside the workspace.`)}`;
+  // The full key id, so an operator can compare it with the fingerprint recorded outside the workspace and pin that.
+  return `${headline}\n${chalk.gray(`  Signed by monitor key ${fingerprint ?? "(absent)"}, read from inside the workspace.`)}`;
 }

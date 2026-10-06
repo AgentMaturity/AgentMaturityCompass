@@ -8,6 +8,8 @@ import { verifyTransparencyMerkle } from "../transparency/merkleIndexStore.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { LEDGER_UNANCHORED_MESSAGE } from "../ledger/ledgerVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import { untrustedReasons } from "../trust/verifierReport.js";
+import { isKeyRefused } from "../trust/signatureCheck.js";
 import { verifyForecastWorkspaceArtifacts } from "../forecast/forecastVerifier.js";
 import { verifyBenchPolicySignature } from "../bench/benchPolicyStore.js";
 import { verifyBenchArtifactFile } from "../bench/benchVerifier.js";
@@ -340,8 +342,11 @@ export async function verifyAll(params: {
         ? pass("ledger-hash-chain", true, ["event hash-chain and signatures verified"])
         : fail("ledger-hash-chain", true, ledger.errors)
     );
+    const monitor = ledger.trustRoot.monitorAdmission;
     checks.push(ledger.trustRoot.anchored
       ? pass("ledger-trust-root", true, [`monitor key ${ledger.trustRoot.monitorFingerprint ?? ""} admitted for ledger-row`])
+      // Distrust beats every pin and allow flag, so a distrusted or revoked monitor key fails even with --allow-unanchored.
+      : monitor && isKeyRefused(monitor) ? fail("ledger-trust-root", true, [`monitor key ${monitor.status}: ${monitor.detail ?? ""}`])
       : params.trust.allowUnanchored
         ? skip("ledger-trust-root", true, ["UNANCHORED (--allow-unanchored): internal consistency only"])
         : fail("ledger-trust-root", true, [LEDGER_UNANCHORED_MESSAGE]));
@@ -461,7 +466,8 @@ export async function verifyAll(params: {
         // Release bundles are signed outside the vault, so only the operator's pins (the command's flags and AMC home) can admit them.
         const verify = releaseVerifyCli({ bundleFile: file, trust: params.trust });
         if (!verify.ok) {
-          releaseErrors.push(`${file}: ${verify.errors.join("; ")}`);
+          // untrustedReasons names a refused signer's key id, so the operator knows what to pin (or to pass --trust-list).
+          releaseErrors.push(`${file}: ${untrustedReasons(verify.report).join("; ")}`);
         }
       } catch (error) {
         releaseErrors.push(`${file}: ${String(error)}`);

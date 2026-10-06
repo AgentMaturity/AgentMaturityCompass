@@ -125,7 +125,7 @@ export function verifyPassportArtifactFile(params: {
       envelopePublicKey(signature.envelope)
     ];
     const check = checkDigestSignature({ signature: "passport.sig", purpose: "artifact-seal", digestHex: digest,
-      signatureB64: signature.signature, candidates, context: params.trust });
+      signatureB64: signature.signature, candidates, context: params.trust, claimedSignedAt: signature.signedTs });
     signatures.push(check.admission);
     if (!check.verified || (signature.envelope !== undefined && signature.signature !== signature.envelope.sigB64)) {
       errors.push({ code: "SIGNATURE_INVALID", message: "passport signature verification failed" });
@@ -140,7 +140,7 @@ export function verifyPassportArtifactFile(params: {
     });
 
     const inclusion = readSignedArtifactInclusionProofs(root);
-    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates });
+    const proofs = verifyProofsAgainstSignedRoot({ root, proofs: inclusion, trust: params.trust, candidates, claimedSignedAt: signature.signedTs });
     errors.push(...proofs.errors.map((message) => ({ code: "PROOF_INVALID", message })));
     if (proofs.admission) signatures.push(proofs.admission);
     anchoring = proofs.anchoring;

@@ -133,20 +133,25 @@ export function verifyAssuranceCertificateFile(params: {
       envelopePublicKey(sig.envelope)
     ];
     const check = checkDigestSignature({ signature: "cert.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: sig.signature,
-      candidates, context: params.trust });
+      candidates, context: params.trust, claimedSignedAt: sig.signedTs });
     signatures.push(check.admission);
     if (!check.verified || (sig.envelope !== undefined && sig.signature !== sig.envelope.sigB64)) {
       errors.push("certificate signature verification failed");
     }
 
     const proofs = parseInclusionProofs(root);
-    const proofVerify = verifyProofsAgainstSignedRoot({ root, proofs, trust: params.trust, candidates });
+    const proofVerify = verifyProofsAgainstSignedRoot({ root, proofs, trust: params.trust, candidates, claimedSignedAt: sig.signedTs });
     errors.push(...proofVerify.errors.map((row) => `proof invalid: ${row}`));
     if (proofVerify.admission) signatures.push(proofVerify.admission);
     anchoring = proofVerify.anchoring;
-    if (cert.proofBindings.includedEventProofIds.length !== proofs.length) {
-      errors.push("proof count mismatch");
+    // The signed cert binds its proofs and roots (as passports do), so proofs from another artifact cannot be spliced in.
+    const proofIds = proofs.map((row) => row.proofId).sort((a, b) => a.localeCompare(b));
+    if (JSON.stringify(proofIds) !== JSON.stringify([...cert.proofBindings.includedEventProofIds].sort((a, b) => a.localeCompare(b)))) {
+      errors.push("included proof ids do not match cert proofBindings");
     }
+    const rootSha = (name: string) => pathExists(join(root, "proofs", name)) ? sha256Hex(readFileSync(join(root, "proofs", name))) : "0".repeat(64);
+    if (rootSha("merkle.root.json") !== cert.proofBindings.merkleRootSha256) errors.push("proofBindings.merkleRootSha256 mismatch");
+    if (rootSha("transparency.root.json") !== cert.proofBindings.transparencyRootSha256) errors.push("proofBindings.transparencyRootSha256 mismatch");
 
     return finish();
   } catch (error) {

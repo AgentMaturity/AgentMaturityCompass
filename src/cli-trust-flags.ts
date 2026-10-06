@@ -8,7 +8,8 @@
 import type { Command } from "commander";
 import { resolve } from "node:path";
 import chalk from "chalk";
-import { loadTrustContext, untrustedReasons, verdictExitCode, type KeyPurpose, type TrustContext, type VerifierReportV1 } from "./trust/index.js";
+import { loadTrustContext, untrustedReasons, verdictExitCode, type IssuerAdmission, type KeyPurpose, type TrustContext, type VerifierReportV1 } from "./trust/index.js";
+import { isKeyRefused } from "./trust/signatureCheck.js";
 
 export interface TrustFlags {
   pubkey?: string;
@@ -68,11 +69,15 @@ export function finishVerify(label: string, report: VerifierReportV1, opts: { js
   if (code !== 0) process.exit(code);
 }
 
-/** Step 9: a ledger verdict is 0 only when it verified and its monitor key is admitted; unanchored is 1, or 2 when allowed. */
-export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boolean } }, trust: TrustContext): 0 | 1 | 2 {
+/**
+ * Step 9: a ledger verdict is 0 only when it verified and its monitor key is admitted; unanchored is 1, or 2 when
+ * allowed. A distrusted or revoked monitor key is 1 whatever the flags: distrust beats every pin and allow flag.
+ */
+export function ledgerExitCode(result: { ok: boolean; trustRoot: { anchored: boolean; monitorAdmission?: IssuerAdmission } },
+  trust: TrustContext): 0 | 1 | 2 {
   if (!result.ok) return 1;
   if (result.trustRoot.anchored) return 0;
-  if (!trust.allowUnanchored) return 1;
+  if (!trust.allowUnanchored || (result.trustRoot.monitorAdmission && isKeyRefused(result.trustRoot.monitorAdmission))) return 1;
   untrusted(["ledger UNANCHORED: the monitor key was read from the workspace being verified (internal consistency only)"], ["allow-unanchored"]);
   return 2;
 }

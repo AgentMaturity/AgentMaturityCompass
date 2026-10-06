@@ -25,6 +25,7 @@ import {
 import { computePassportExpiresTs } from "./passportConstants.js";
 import { verifyPassportArtifactFile, verifyPassportWorkspace } from "./passportVerifier.js";
 import { loadTrustContext, type TrustContext } from "../trust/trustContext.js";
+import { untrustedReasons } from "../trust/verifierReport.js";
 
 const pendingExportSchema = z.object({
   v: z.literal(1),
@@ -522,6 +523,10 @@ export function passportVerifyPublicForApi(params: {
     code: error.code,
     message: error.message
   }));
+  // Intact but untrusted (an unpinned or refused issuer, unanchored proofs): say why, with the key id to pin.
+  if (!verified.report.trusted && verified.report.integrity.status === "pass") {
+    runtimeErrors.push(...untrustedReasons(verified.report).map((message) => ({ code: "ISSUER_NOT_ADMITTED", message })));
+  }
   if (expired && !runtimeErrors.some((error) => error.code === "PASSPORT_EXPIRED")) {
     runtimeErrors.push({
       code: "PASSPORT_EXPIRED",
@@ -554,7 +559,8 @@ export function passportVerifyPublicForApi(params: {
     }),
     qrCodeUrl: qr.qrCodeUrl,
     errors: runtimeErrors,
-    passport
+    passport,
+    report: verified.report
   };
 }
 

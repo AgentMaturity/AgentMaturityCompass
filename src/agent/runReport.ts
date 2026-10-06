@@ -22,8 +22,10 @@
  * happened, `verify` says whether the log can prove it.
  */
 import { openLedger } from "../ledger/ledger.js";
-import { verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
+import { LEDGER_UNANCHORED_MESSAGE, verifyLedgerIntegrity } from "../ledger/ledgerVerification.js";
 import type { TrustContext } from "../trust/trustContext.js";
+import type { IssuerAdmission } from "../trust/admission.js";
+import { isKeyRefused } from "../trust/signatureCheck.js";
 import { verifySessionChains } from "../ledger/sessionVerification.js";
 import { openSessionEventStore, readSessionStoreMarker } from "../persistence/openSessionEventStore.js";
 import { deriveSessionRequests } from "../llm/request/deriveRequest.js";
@@ -189,6 +191,7 @@ export interface AgentRunVerification {
     readonly anchored: boolean;
     readonly monitorFingerprint: string | null;
     readonly expectedFingerprint: string | null;
+    readonly monitorAdmission?: IssuerAdmission;
   };
 }
 
@@ -306,15 +309,16 @@ export function renderVerifyReport(report: AgentRunVerification): string {
     // key they were checked against lives inside the workspace being checked.
     `  trust root          ${
       report.trustRoot.anchored
-        ? `anchored to ${report.trustRoot.monitorFingerprint?.slice(0, 16)}…`
+        ? `anchored to ${report.trustRoot.monitorFingerprint ?? ""}`
         : "UNANCHORED — internal consistency only, not authorship"
     }`
   ];
-  if (!report.trustRoot.anchored) {
-    lines.push(
-      "  To make this adversarial, pin the expected key out of band:",
-      "    --expect-monitor <sha256 of the monitor .pub>, AMC_EXPECTED_MONITOR_FINGERPRINT or a trust list"
-    );
+  const admission = report.trustRoot.monitorAdmission;
+  if (admission && isKeyRefused(admission)) {
+    lines.push(`  ! monitor key ${admission.status}: ${admission.detail ?? ""}`);
+  } else if (!report.trustRoot.anchored) {
+    // Step 9's message, word for word on every ledger surface, then the full key id to compare with the recorded one.
+    lines.push(`  ${LEDGER_UNANCHORED_MESSAGE}`, `  monitor key read from the workspace: ${report.trustRoot.monitorFingerprint ?? "(absent)"}`);
   }
   for (const error of [...report.ledgerErrors, ...report.sessionChainErrors]) {
     lines.push(`  ! ${error}`);
