@@ -289,10 +289,20 @@ export async function runAdapterCommand(input: AdapterRunInput): Promise<Adapter
     });
 
     if (!isDsh) recordStarted();
+    // Re-hash the approved files at the last point before exec; exec-by-path remains.
+    // A refusal is recorded and sealed so the ledger still verifies, then rethrown.
+    if (isDsh) {
+      try {
+        verifyDeepseekHarnessLaunch(profile!.deepseekHarnessLaunch!);
+      } catch (error) {
+        const refusal = { exitCode: null, spawnObserved: false, refused: "dsh_launch_changed" };
+        ledger.appendEvidence({ sessionId, runtime: "any", eventType: "agent_process_exited", payload: JSON.stringify(refusal),
+          payloadExt: "json", inline: true, meta: { adapterId: adapter.id, agentId, ...refusal, trustTier: "OBSERVED" } });
+        ledger.sealSession(sessionId);
+        throw error;
+      }
+    }
     await new Promise<void>((resolvePromise, rejectPromise) => {
-      // Re-hash the approved files at the last point before exec. A throw here
-      // rejects this promise exactly like a spawn failure; exec-by-path remains.
-      if (isDsh) verifyDeepseekHarnessLaunch(profile!.deepseekHarnessLaunch!);
       const child = spawn(executable, args, {
         stdio: ["pipe", "pipe", "pipe"],
         env,

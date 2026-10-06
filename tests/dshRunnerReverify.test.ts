@@ -11,6 +11,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { adaptersConfigureCli } from "../src/adapters/adapterCli.js";
 import { runAdapterCommand } from "../src/adapters/adapterRunner.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 
 const hooks = vi.hoisted(() => ({ afterPrepare: undefined as (() => void) | undefined }));
 vi.mock("node:child_process", async (importOriginal) => {
@@ -63,10 +65,19 @@ describe("AMC-1520 adapterRunner.ts — DSH launch files are re-verified at spaw
     hooks.afterPrepare = () => appendFileSync(entry, "// changed after approval\n");
     await expect(run()).rejects.toThrow("DSH approved launch artifact changed; review and reconfigure its signed hash before running.");
     expect(runtimeSpawns()).toHaveLength(0);
+    // The refused run is recorded and sealed, so the workspace ledger still verifies.
+    expect(verifyLedgerIntegrity(workspace)).toMatchObject({ ok: true, errors: [] });
+    const ledger = openLedger(workspace);
+    try {
+      const exited = ledger.getAllEvents().filter((event) => event.event_type === "agent_process_exited");
+      expect(exited).toHaveLength(1);
+      expect(JSON.parse(exited[0]!.meta_json)).toMatchObject({ spawnObserved: false, refused: "dsh_launch_changed" });
+    } finally { ledger.close(); }
   });
   test("untouched approved files spawn the runtime once", async () => {
     const result = await run();
     expect(result.exitCode).toBe(0);
     expect(runtimeSpawns()).toHaveLength(1);
+    expect(verifyLedgerIntegrity(workspace).ok).toBe(true);
   });
 });
