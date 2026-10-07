@@ -1,4 +1,8 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { initWorkspace } from "../src/workspace.js";
 import {
   startCanary,
   stopCanary,
@@ -28,9 +32,26 @@ import {
   type CanaryConfig,
 } from "../src/governor/policyCanary.js";
 
+const workspaces: string[] = [];
+
 afterEach(() => {
   resetPolicyCanaryState();
+  vi.unstubAllEnvs();
+  for (const dir of workspaces.splice(0)) rmSync(dir, { recursive: true, force: true });
 });
+
+/**
+ * Emergency overrides must carry a verifiable auditor signature (P0-10). These
+ * tests used to create them without a workspace, which recorded the literal
+ * signature "unsigned" and still counted the override as active.
+ */
+function keyedWorkspace(): string {
+  vi.stubEnv("AMC_VAULT_PASSPHRASE", "policy-canary-test-passphrase");
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-policy-canary-")));
+  workspaces.push(dir);
+  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  return dir;
+}
 
 function makeCanaryConfig(overrides: Partial<CanaryConfig> = {}): CanaryConfig {
   return {
@@ -223,72 +244,86 @@ describe("rollback packs", () => {
 // Emergency overrides
 // ---------------------------------------------------------------------------
 describe("emergency overrides", () => {
+  test("refuses an override without a workspace signing key", () => {
+    expect(() => activateEmergencyOverride({
+      agentId: "agent-1",
+      reason: "production emergency",
+      actionDescription: "allow DEPLOY for agent-1",
+      ttlMs: 3600000,
+    })).toThrow(/requires a workspace with an auditor signing key/);
+  });
+
   test("activates an override with TTL", () => {
+    const ws = keyedWorkspace();
     const override = activateEmergencyOverride({
       agentId: "agent-1",
       reason: "production emergency",
       actionDescription: "allow DEPLOY for agent-1",
       ttlMs: 3600000,
-    });
+    }, ws);
     expect(override.overrideId).toMatch(/^emo_/);
     expect(override.expiresTs).toBeGreaterThan(Date.now());
     expect(override.postmortemFiled).toBe(false);
   });
 
   test("getActiveOverrides returns only non-expired", () => {
+    const ws = keyedWorkspace();
     activateEmergencyOverride({
       agentId: "agent-1",
       reason: "active",
       actionDescription: "allow all",
       ttlMs: 3600000,
-    });
+    }, ws);
     activateEmergencyOverride({
       agentId: "agent-1",
       reason: "expired",
       actionDescription: "allow all",
       ttlMs: -1, // already expired
-    });
+    }, ws);
 
-    const active = getActiveOverrides("agent-1");
+    const active = getActiveOverrides("agent-1", ws);
     expect(active.length).toBe(1);
     expect(active[0]!.reason).toBe("active");
   });
 
   test("filePostmortem records the artifact", () => {
+    const ws = keyedWorkspace();
     const override = activateEmergencyOverride({
       agentId: "agent-1",
       reason: "test",
       actionDescription: "allow test",
       ttlMs: 3600000,
-    });
+    }, ws);
 
-    expect(filePostmortem(override.overrideId, "artifact-123")).toBe(true);
-    expect(filePostmortem("nonexistent", "artifact-123")).toBe(false);
+    expect(filePostmortem(override.overrideId, "artifact-123", ws)).toBe(true);
+    expect(filePostmortem("nonexistent", "artifact-123", ws)).toBe(false);
   });
 
   test("getOverridesMissingPostmortem finds expired without postmortem", () => {
+    const ws = keyedWorkspace();
     const override = activateEmergencyOverride({
       agentId: "agent-1",
       reason: "expired no postmortem",
       actionDescription: "allow test",
       ttlMs: -1, // already expired
-    });
+    }, ws);
 
-    const missing = getOverridesMissingPostmortem("agent-1");
+    const missing = getOverridesMissingPostmortem("agent-1", ws);
     expect(missing.length).toBe(1);
     expect(missing[0]!.overrideId).toBe(override.overrideId);
   });
 
   test("override with postmortem not in missing list", () => {
+    const ws = keyedWorkspace();
     const override = activateEmergencyOverride({
       agentId: "agent-1",
       reason: "expired with postmortem",
       actionDescription: "allow test",
       ttlMs: -1,
-    });
-    filePostmortem(override.overrideId, "artifact-456");
+    }, ws);
+    filePostmortem(override.overrideId, "artifact-456", ws);
 
-    const missing = getOverridesMissingPostmortem("agent-1");
+    const missing = getOverridesMissingPostmortem("agent-1", ws);
     expect(missing.length).toBe(0);
   });
 });
@@ -429,14 +464,15 @@ describe("governance drift detection", () => {
   });
 
   test("detects expired overrides without postmortem", () => {
+    const ws = keyedWorkspace();
     activateEmergencyOverride({
       agentId: "agent-1",
       reason: "test",
       actionDescription: "allow test",
       ttlMs: -1,
-    });
+    }, ws);
 
-    const result = detectGovernanceDrift("agent-1");
+    const result = detectGovernanceDrift("agent-1", ws);
     expect(result.drifted).toBe(true);
     expect(result.driftItems.some((i) => i.category === "OVERRIDE_HYGIENE")).toBe(true);
     expect(result.driftItems[0]!.severity).toBe("HIGH");
@@ -517,15 +553,16 @@ describe("report generation", () => {
 // ---------------------------------------------------------------------------
 describe("markdown rendering", () => {
   test("renders report to markdown", () => {
+    const ws = keyedWorkspace();
     createRollbackPack("agent-1", "{}", "test");
     activateEmergencyOverride({
       agentId: "agent-1",
       reason: "test",
       actionDescription: "allow test",
       ttlMs: -1,
-    });
+    }, ws);
 
-    const report = generatePolicyCanaryReport("agent-1");
+    const report = generatePolicyCanaryReport("agent-1", ws);
     const md = renderPolicyCanaryMarkdown(report);
     expect(md).toContain("# Policy Canary Report");
     expect(md).toContain("## Canary Status");
@@ -553,7 +590,7 @@ describe("resetPolicyCanaryState", () => {
       reason: "test",
       actionDescription: "test",
       ttlMs: 3600000,
-    });
+    }, keyedWorkspace());
     registerPolicyDebt({
       agentId: "agent-1",
       waivedRequirement: "test",
