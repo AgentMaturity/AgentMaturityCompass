@@ -175,7 +175,8 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       const signal = execution.signal ? AbortSignal.any([execution.signal, timeout]) : timeout;
       let given: SignedAskUserAnswer | null;
       try {
-        given = await awaitAnswer(answerer, question, signal);
+        // The answerer gets a copy, so it cannot change the question its answer is checked against.
+        given = await awaitAnswer(answerer, structuredClone(question), signal);
       } catch (error: unknown) {
         throw new Error(`ask_user: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
       }
