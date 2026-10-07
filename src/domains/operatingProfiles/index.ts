@@ -22,6 +22,22 @@ export {
   type EmitOperatingProfileInput,
   type EmitOperatingProfileResult
 } from "./operatingProfileEmit.js";
+export {
+  activateOperatingProfile,
+  type ActivateOperatingProfileInput,
+  type ActivatedConfig,
+  type ActivationResult,
+  type SignedConfigName
+} from "./operatingProfileActivation.js";
+export {
+  inspectOperatingProfileForSigning,
+  loadSignedOperatingProfile,
+  operatingProfileSigPath,
+  signOperatingProfile,
+  verifyOperatingProfileSignature,
+  type OperatingProfileSignature,
+  type OperatingProfileSignatureCheck
+} from "./operatingProfileSignature.js";
 export { SOURCES as OPERATING_PROFILE_SOURCES, listProfileSources, type SourceId } from "./operatingProfileSources.js";
 export {
   LEGACY_OPERATING_PROFILE_SCHEMA_VERSION,
