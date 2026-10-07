@@ -38,7 +38,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
       "name": "claim-envelope.schema.json",
-      "sha256": "b31dbc4986ae942e292b1fcb059b92b8dcd9be01430aee1cddba971aeb3575b0"
+      "sha256": "4f6e86e990419e882a984e1da270180a7f98b18b59d4de362a6222a498201567"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",

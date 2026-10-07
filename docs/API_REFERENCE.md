@@ -10221,6 +10221,9 @@ Verify integrity across AMC artifacts
 | `--apply` | - |
 | `--yes` | - |
 | `--sign-config` | - |
+| `--relabel-legacy` | - |
+| `--dry-run` | - |
+| `--path <file>` | - |
 
 #### `amc verify all`
 

@@ -6,6 +6,7 @@ import {
   type DiagnosticEvidenceReadinessInput
 } from "../../diagnostic/evidenceReadiness.js";
 import type { DiagnosticReport, TrustTier } from "../../types.js";
+import { noticeRef } from "../../migration/legacy/notices.js";
 import { evaluateClaimEligibility } from "./evaluate.js";
 import type {
   Applicability,
@@ -164,13 +165,15 @@ export function envelopeForLegacyResult(input: AdapterBase & {
   status: CertificationEvidenceStatus | ComplianceCategoryStatus; level: number | null; eventCount: number;
 }): ClaimEnvelope {
   const mapped = fromUppercaseStatus(input.status);
-  const legacy = input.originalTier === undefined
-    ? { version: input.version } : { version: input.version, originalTier: input.originalTier };
+  // Read under the current legacy notice (P1-35, docs/migration/LEGACY_RESULTS.md): level 1 at most; the original
+  // level stays in the stored result and in its relabel record.
+  const legacy = { version: input.version, ...(input.originalTier === undefined ? {} : { originalTier: input.originalTier }),
+    notice: noticeRef() };
   const envelope = evaluateClaimEligibility({
     producer: input.producer,
     method: input.method,
     regulated: input.regulated ?? false,
-    proposed: { result: mapped.result, level: input.level },
+    proposed: { result: mapped.result, level: input.level === null ? null : Math.min(input.level, 1) },
     evidence: evidence(input.eventCount, []),
     evidenceRefs: input.evidenceRefs,
     applicability: input.applicability,

@@ -46,6 +46,9 @@
         "legacy": {
           "additionalProperties": false,
           "properties": {
+            "notice": {
+              "type": "string"
+            },
             "originalTier": {
               "type": "string"
             },

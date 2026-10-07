@@ -13,7 +13,7 @@ AMC output is evidence of conformity. It is not a certificate.
 | `observed` | Observed | AMC observed the behaviour at runtime or in an executed test, backed by `OBSERVED` or `OBSERVED_HARDENED` evidence. |
 | `independently_reviewed` | Independently reviewed | Approved by a reviewer who is independent of the producer and whose key is pinned. |
 
-Results stored by AMC 1.x are labelled "Legacy (1.x), self-reported".
+Results stored by AMC 1.x are labelled "Legacy (1.x), self-reported" or "Legacy (1.x), synthetic example", followed by the legacy notice they are read under, for example "(notice AMC-LEGACY-2026-001 v1)". See [migration/LEGACY_RESULTS.md](migration/LEGACY_RESULTS.md).
 
 JSON consumers read `claimKind`. The label text is public output too, so changing its wording is a breaking change for text parsers.
 
@@ -34,7 +34,7 @@ JSON consumers read `claimKind`. The label text is public output too, so changin
 A result is regulated when it asserts conformity with a law, regulation, standard or framework mapping. The rules run in this order, and each records a reason code on the envelope.
 
 1. Synthetic values (`synthetic`): kind `synthetic_example`, result `not_evaluated`, evidence `incomplete`, no level. `SYNTHETIC_VALUES`.
-2. A legacy 1.x result: kind `self_reported`, with the original version and tier kept in `provenance.legacy`. `LEGACY_1X_UNVERIFIED`.
+2. A legacy 1.x result: kind `self_reported` (or `synthetic_example` under rule 1), with the original version, the original tier and the legacy notice kept in `provenance.legacy`. `LEGACY_1X_UNVERIFIED`.
 3. An empty event stream (except numeric self-answers), including a negative or non-numeric event count: evidence `incomplete`, result `not_evaluated`, no level. `EMPTY_EVIDENCE`.
 4. Numeric self-answers: kind `self_reported`, evidence `incomplete`, level 1 at most (`SELF_REPORTED_LEVEL_CAP`); a regulated pass becomes `not_evaluated` (`SELF_REPORTED_NO_POSITIVE_STATUS`).
 5. Keyword matches, unkeyed checksums and path-presence checks: level 1 at most; a regulated pass becomes `not_evaluated`. `WEAK_METHOD`.
@@ -100,7 +100,7 @@ The industry-pack audit types `INDUSTRY_EVIDENCE_MISSING` and `INDUSTRY_EVIDENCE
 - `envelopeForSelfAssessment`: numeric answers; the proposed level is the lowest answer, then rule 4 applies.
 - `envelopeForSyntheticExample`: always `synthetic_example` with no level.
 - `envelopeForPathPresence`: a found path proposes a pass, then rule 5 applies.
-- `envelopeForLegacyResult`: maps the stored uppercase status, then rule 2 applies.
+- `envelopeForLegacyResult`: maps the stored uppercase status, caps the level at 1, records the current legacy notice in `provenance.legacy.notice`, then rule 2 applies.
 - `envelopeForUnboundResult`: a surface result that no adapter binds to evidence yet. The result is `not_evaluated` with no level, and the first reason is `RESULT_NOT_BOUND` ("this result is not yet bound to claim-eligible evidence"), so the label never suggests the producer recorded nothing. The kind is `self_reported` unless the method is synthetic.
 
 ## Rendering
@@ -126,7 +126,8 @@ Reports print a claim line, a claim kind per result and a "How to read claim kin
 | Result | Claim |
 | --- | --- |
 | A diagnostic run, freshly written or read back (`run`, `report`, `quickscore --auto`, `ci check`, `executive brief`, `eval run`, `lite-score`) | `envelopeForStoredRun`: the run's seal is checked against the workspace auditor keys. A run whose seal does not verify is never more than self-reported, and its own `VALID` status does not count. |
-| A run, certificate or bundle stored by AMC 1.x (no `methodology.amcVersion`, or one below 1.2.0) | "Legacy (1.x), self-reported", result not evaluated. |
+| A run, certificate or bundle stored by AMC 1.x (no `methodology.amcVersion`, or one below 1.2.0) | "Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1)", result not evaluated, level 1 at most. |
+| An assurance run stored by AMC 1.x (no `evidenceStatus`; `amc assurance verify`) | "Legacy (1.x), synthetic example (notice AMC-LEGACY-2026-001 v1)": 1.x graded a canned reply, so no seal makes it observed. |
 | Questionnaire and answer-file results (`quickscore`, `score`, `score tier`, `improve`, `fix`, `quickstart`, `domain pack run`) | `envelopeForSelfAssessment`: self-reported, level 1 at most, never a regulated pass. |
 | The control-surface scorers (`score fail-secure` and the others that check files) | `envelopeForPathPresence`: nothing found is not evaluated; a found file is self-reported at level 1 at most. |
 | Static scans of files or text (`shield posture`, `shield analyze-mcp`, `comms-check`, `shield reputation`) | Self-reported keyword matches: level 1 at most, never a regulated pass. |
@@ -178,7 +179,7 @@ Observed (a sealed, claim-ready run with observed evidence, in `amc report <runI
 Legacy (`amc report` on a run stored by AMC 1.1.1):
 
 ```
-**Claim:** Legacy (1.x), self-reported · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable
+**Claim:** Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · **Result:** not evaluated · **Evidence:** sufficient · **Enforcement:** none · **Review:** pending · **Applicability:** applicable
 ```
 
 Commands that list several results (`leaderboard show`, `fleet score`) end their text output with `Claim kinds: synthetic example · self-reported · observed · independently reviewed (see docs/CLAIM_KINDS.md)`.

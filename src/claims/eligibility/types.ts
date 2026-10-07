@@ -49,8 +49,11 @@ export interface ClaimProvenance {
   producer: string;
   method: ClaimMethod;
   evidenceRefs: string[];
-  legacy?: { version: string; originalTier?: string };
+  /** A stored 1.x result: its AMC version, original tier and the legacy notice it is read under ("AMC-LEGACY-2026-001 v1"). */
+  legacy?: LegacyProvenance;
 }
+
+export interface LegacyProvenance { version: string; originalTier?: string; notice?: string }
 
 export interface ClaimEnvelope {
   claimKind: ClaimKind;
@@ -85,7 +88,7 @@ export interface ClaimEligibilityInput {
   applicability?: Applicability;
   enforcement?: Enforcement;
   review?: { state: ReviewState; independent: boolean };
-  legacy?: { version: string; originalTier?: string };
+  legacy?: LegacyProvenance;
   /** Copied to the envelope untouched; no rule reads it. Payment never changes a result. */
   entitlement?: { active: boolean };
   now: number;
