@@ -114,11 +114,12 @@ export function probeInstalledClaudeHook(input: { workspace: string }): Promise<
   const result = (reason: ClaudeHookProbeReason, exitCode: number | null, durationMs: number): ClaudeHookProbeResult =>
     ({ ok: reason === "ok", reason, exitCode, durationMs });
   if (!handler) return Promise.resolve(result("not_installed", null, 0));
+  // Gate first, so no path a foreign handler names is even looked at.
+  if (!isAmcInstalledHandler(workspace, handler)) return Promise.resolve(result("stale", null, 0));
   const script = handler.args[0];
   if (!isAbsolute(handler.command) || !existsSync(handler.command) || script === undefined || !(isAbsolute(script) && existsSync(script))) {
     return Promise.resolve(result("command_missing", null, 0));
   }
-  if (!isAmcInstalledHandler(workspace, handler)) return Promise.resolve(result("stale", null, 0));
   const started = Date.now();
   return new Promise((resolvePromise) => {
     let stdout = "";

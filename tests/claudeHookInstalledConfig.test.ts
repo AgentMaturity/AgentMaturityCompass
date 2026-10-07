@@ -199,7 +199,7 @@ describe("installed Claude Code control configuration", () => {
     expect(run.durationMs).toBeLessThan(handler.timeout * 1000);
   }, 90_000);
 
-  test("reports a missing command as command_missing and status exits 1", async () => {
+  test("reports a switched Node as stale, a missing own Node as command_missing, and status exits 1", async () => {
     const workspace = newWorkspace();
     const home = tempDir("amc-claude-home-");
     const linkDir = tempDir("amc-claude-node-");
@@ -215,14 +215,22 @@ describe("installed Claude Code control configuration", () => {
     expect(installedPreToolUse(workspace).command).toBe(nodeLink);
     unlinkSync(nodeLink);
 
-    const probe = await probeInstalledClaudeHook({ workspace });
-    expect(probe).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
-
+    // This AMC runs another Node than the one installed, so the handler is not its own.
+    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "stale", exitCode: null });
     const status = await amcStatus(workspace, home);
     expect(status.status).toBe(1);
-    expect(status.stdout).toContain("Control: NOT VERIFIED (command_missing)");
-    expect(status.stdout).toContain("stale");
+    expect(status.stdout).toContain("Control: NOT VERIFIED (stale)");
     expect(status.stdout).toContain("amc connect hooks install --provider claude-code --mode control");
+
+    // The handler is AMC's own, but the Node it names is gone.
+    process.execPath = nodeLink;
+    try {
+      const missing = await verifyClaudeControl({ workspace, home });
+      expect(missing).toMatchObject({ verified: false, summary: "Control: NOT VERIFIED (command_missing)", probe: { reason: "command_missing", exitCode: null } });
+      expect(missing.notes.join("\n")).toContain("amc connect hooks install --provider claude-code --mode control");
+    } finally {
+      process.execPath = realExecPath;
+    }
   }, 90_000);
 
   test("reports disableAllHooks in project settings and status exits 1", async () => {
@@ -289,17 +297,16 @@ describe("Claude hook probe outcomes", () => {
     const workspace = tempDir("amc-claude-probe-");
     expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "not_installed" });
 
-    writeControlHandler(workspace, { command: "amc", args: ["connect", "hooks", "forward"], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing" });
-
-    writeControlHandler(workspace, { command: join(workspace, "missing-node"), args: [], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing" });
-
-    writeControlHandler(workspace, { command: process.execPath, args: [], timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
-
-    writeControlHandler(workspace, { command: process.execPath, timeout: 10 });
-    expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
+    // A handler AMC did not write is stale before any of its paths is looked at.
+    for (const handler of [
+      { command: "amc", args: ["connect", "hooks", "forward"], timeout: 10 },
+      { command: join(workspace, "missing-node"), args: [], timeout: 10 },
+      { command: process.execPath, args: [], timeout: 10 },
+      { command: process.execPath, timeout: 10 },
+    ]) {
+      writeControlHandler(workspace, handler);
+      expect(await probeInstalledClaudeHook({ workspace })).toMatchObject({ ok: false, reason: "stale", exitCode: null, durationMs: 0 });
+    }
 
     // Existing paths are not enough: without a signed manifest nothing matches what AMC would install.
     const denyMarker = join(workspace, "deny-ran");
@@ -325,6 +332,8 @@ describe("Claude hook probe outcomes", () => {
       expect(await probeAs(`printf '%s' '${DENY_JSON}'; exit 2`, 0o644)).toMatchObject({ ok: false, reason: "spawn_failed" });
       expect(await probeAs(`printf '%s' '${DENY_JSON}'; exit 2`)).toMatchObject({ ok: true, reason: "ok", exitCode: 2 });
       expect(await probeAs("exec sleep 30")).toMatchObject({ ok: false, reason: "timed_out", exitCode: null });
+      unlinkSync(fakeNode);
+      expect(await probeInstalledClaudeHook({ workspace: installed })).toMatchObject({ ok: false, reason: "command_missing", exitCode: null });
     } finally {
       process.execPath = realExecPath;
     }
@@ -428,6 +437,12 @@ describe("Claude control probe runs only the handler AMC would install", () => {
     }],
     ["a longer timeout", (_group: { matcher: string }, handler: InstalledHandler) => { handler.timeout = 600; }],
     ["a narrowed matcher", (group: { matcher: string }) => { group.matcher = "Read"; }],
+    ["a bare command name", (_group: { matcher: string }, handler: InstalledHandler) => {
+      handler.command = "sh";
+      handler.args = ["-c", "true"];
+    }],
+    ["a command that does not exist", (_group: { matcher: string }, handler: InstalledHandler) => { handler.command = "/nonexistent/amc-node"; }],
+    ["no script argument", (_group: { matcher: string }, handler: InstalledHandler) => { handler.args = []; }],
   ])("reports a signed handler with %s as stale and never runs it", async (_label, edit) => {
     const workspace = installControl("forged-args");
     forgeSignedHandler(workspace, edit);
