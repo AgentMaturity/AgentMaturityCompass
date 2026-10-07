@@ -164,7 +164,9 @@ describe("countAttestedOnce", () => {
     const unverified = at(8, attestedMeta(attestation(testKey())));
     expect(countAttestedOnce([replay, first, observed, unverified], tierOf, { startTs: 0, endTs: 10 })).toEqual([first, observed, unverified]);
     // A row read as ATTESTED without a bound attestation (stale OBSERVED in the diagnostic) is not an attested event.
-    expect(countAttestedOnce([observed, observed], () => "ATTESTED", { startTs: 0, endTs: 10 })).toEqual([observed, observed]);
+    const unbound = at(9, { ...attestedMeta(), agentId: "agent-b" });
+    expect(countAttestedOnce([observed, observed, unbound, unbound], () => "ATTESTED", { startTs: 0, endTs: 10 }))
+      .toEqual([observed, observed, unbound, unbound]);
   });
 
   test("an attested event counts only in a window that holds its attested time", () => {
