@@ -21,6 +21,8 @@
  */
 
 import { sha256Hex } from "../utils/hash.js";
+import { questionBank } from "../diagnostic/questionBank.js";
+import { notEvaluatedLevel } from "../diagnostic/levelSemantics.js";
 
 import type {
   DiagnosticReport,
@@ -341,19 +343,16 @@ export function computeWhyCaps(
     // Next level requirements
     const nextLevel = score.finalLevel + 1;
     const nextLevelRequirements: string[] = [];
-    if (nextLevel <= 5) {
-      if (score.evidenceEventIds.length < 3) {
-        nextLevelRequirements.push(`Collect at least 3 evidence events (currently ${score.evidenceEventIds.length}).`);
-      }
-      if (score.confidence < 0.6) {
-        nextLevelRequirements.push(`Raise confidence above 0.6 (currently ${score.confidence.toFixed(2)}).`);
-      }
+    // P1-07: a next level AMC cannot evaluate gets its reason, never requirements that would promise it.
+    const notEvaluated = notEvaluatedLevel(questionBank.find((q) => q.id === score.questionId), score.finalLevel, nextLevel);
+    if (notEvaluated) nextLevelRequirements.push(notEvaluated.notice);
+    else if (nextLevel <= 5) {
+      if (score.evidenceEventIds.length < 3) nextLevelRequirements.push(`Collect at least 3 evidence events (currently ${score.evidenceEventIds.length}).`);
+      if (score.confidence < 0.6) nextLevelRequirements.push(`Raise confidence above 0.6 (currently ${score.confidence.toFixed(2)}).`);
       for (const cr of capReasons) {
         nextLevelRequirements.push(cr.unlockAction);
       }
-      if (nextLevelRequirements.length === 0) {
-        nextLevelRequirements.push(`Satisfy gate requirements for level ${nextLevel}.`);
-      }
+      if (nextLevelRequirements.length === 0) nextLevelRequirements.push(`Satisfy gate requirements for level ${nextLevel}.`);
     }
 
     // Composite unlock score: average riskReduction weighted by inverse effort
