@@ -1,15 +1,22 @@
 {
   "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "additionalProperties": false,
   "properties": {
     "agentId": {
       "type": "string"
     },
     "body_sha256": {
+      "minLength": 1,
       "type": "string"
     },
+    "delegation_chain": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
     "event_hash": {
+      "minLength": 1,
       "type": "string"
     },
     "kind": {
@@ -24,6 +31,16 @@
       "type": "string"
     },
     "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "parent_receipt_id": {
       "anyOf": [
         {
           "type": "string"

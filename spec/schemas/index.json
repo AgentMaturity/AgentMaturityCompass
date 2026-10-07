@@ -58,12 +58,12 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
       "name": "legacy-receipt.schema.json",
-      "sha256": "ad36c898688c28913b566184f6df9636f9e403da8d3e31811dd5207e82628a8a"
+      "sha256": "ca6d3edac1871d0c24c1bc0a9904a23071376dd4006656f4df79b963df8beca5"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
       "name": "receipt.schema.json",
-      "sha256": "667b4844030ffc3cd78cfd386f0409b707ac80fc182575186b4450321c6593aa"
+      "sha256": "cca6d15e3ac4dc4c78fd99ab32cdb499ba88f5db498c62d7e6be6d25dcbaa7c8"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",

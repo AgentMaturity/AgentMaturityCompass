@@ -12,13 +12,21 @@ const payloadFields = {
   agentId: z.string(),
   providerId: z.string(),
   model: z.string().nullable(),
-  event_hash: z.string(),
-  body_sha256: z.string(),
+  event_hash: nonEmpty,
+  body_sha256: nonEmpty,
   session_id: z.string()
 };
 
-/** The signed payload AMC mints today (`mintReceipt`): a kind, no state. */
-export const receiptV1Schema = z.strictObject({ v: z.literal(1), ...payloadFields });
+/**
+ * The signed payload AMC mints today (`mintReceipt`): a kind, no state. Not strict: `mintChainedReceipt` signs two
+ * more members into the same v1 payload, and AMC's receipt check accepts any signed member it does not know.
+ */
+export const receiptV1Schema = z.object({
+  v: z.literal(1),
+  ...payloadFields,
+  parent_receipt_id: z.string().nullable().optional(),
+  delegation_chain: z.array(z.string()).optional()
+});
 true satisfies ([z.infer<typeof receiptV1Schema>] extends [ReceiptPayloadV1] ? [ReceiptPayloadV1] extends [z.infer<typeof receiptV1Schema>] ? true : false : false);
 
 /** How an `outcome_unknown` execution was settled. A receipt that follows `outcome_unknown` must carry it (acceptance rule). */

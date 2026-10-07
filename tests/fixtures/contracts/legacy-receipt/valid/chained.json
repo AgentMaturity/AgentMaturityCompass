@@ -9,5 +9,8 @@
   "event_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "body_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "session_id": "session-1",
-  "state": "completed"
+  "parent_receipt_id": "rcpt-0",
+  "delegation_chain": [
+    "rcpt-0"
+  ]
 }
