@@ -25,7 +25,8 @@ export const federationConfigSchema = z.object({
   federation: z.object({
     version: z.literal(1),
     orgName: z.string().min(1),
-    orgId: z.string().min(1),
+    // Becomes the sourceOrgId of every exported manifest, which is a path segment on import (P0-52).
+    orgId: safeIdSchema,
     publisherKeyFingerprint: z.string().length(64),
     sharePolicy: z.object({
       allowBenchmarks: z.boolean(),

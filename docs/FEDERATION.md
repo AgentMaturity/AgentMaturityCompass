@@ -36,5 +36,11 @@ The bundle is extracted once to verify it and again to copy from. `federate impo
 
 A benchmark inside a package is checked the same way before it reaches your stats: its `benchId` must be one safe path segment and its import directory must stay inside `.amc/benchmarks/imported`, whoever signed it.
 
+Every benchmark's signer and `benchId` are checked before the package is written, so a package refused for one of its benchmarks leaves nothing in the inbox. The package is written to a staging directory beside its final place and renamed into place in one step.
+
+Each package is imported once. `federate import` refuses a `manifestId` already imported from the same publisher, since importing it again would overwrite what was imported. It also refuses, as a rollback, a package whose `createdTs` is older than one already imported from that publisher, and says which package is newer. It refuses as well when an imported package's `manifest.json` cannot be read, until that package is restored or removed.
+
+`amc federate peer add` refuses a peer id that is not one safe path segment, because the id names the peer record file. The `orgId` in `.amc/federation/config.yaml` must also be one safe path segment, since it becomes the `sourceOrgId` of every package you export. `amc federate init` generates a UUID, which qualifies.
+
 ## Console
 Imported federation benchmarks appear in the benchmarks views and stats. A peer added with `amc federate peer add` admits the package seal only: each benchmark inside is ingested only when its own signer is pinned in your AMC home trust list (or is that peer's publisher key), otherwise `federate import` refuses the package and prints the key id to pin.
