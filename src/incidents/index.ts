@@ -4,6 +4,8 @@ export type {
   CausalRelationship,
   CausalEdge,
   Incident,
+  IncidentClockEvent,
+  IncidentClockEventKind,
   IncidentTransition
 } from "./incidentTypes.js";
 
@@ -84,8 +86,10 @@ export {
   createOversightRecord,
   oversightRecordPath,
   readOversightRecords,
+  recordWorkspaceOversight,
   verifyOversightRecord,
   type CreateOversightRecordInput,
+  type RecordWorkspaceOversightInput,
   type HumanOversightRecord,
   type OversightDecision
 } from "./oversightRecord.js";
@@ -101,3 +105,17 @@ export {
   type PacketTimelineEvent,
   type UnverifiedClockSource
 } from "./evidencePacket.js";
+
+export {
+  CLOCK_LISTING_NOTES,
+  IncidentInputError,
+  MAX_CLOCK_EVENT_FUTURE_MS,
+  RECORDABLE_TRIGGERS,
+  clockListing,
+  loadIncidentClocks,
+  parseIsoTimestamp,
+  parseStation,
+  recordIncidentClockEvent,
+  type LoadedIncidentClocks,
+  type RecordIncidentClockEventInput
+} from "./incidentClockEvents.js";

@@ -1,3 +1,5 @@
+import type { Domain } from "../domains/domainRegistry.js";
+
 export type IncidentSeverity = "INFO" | "WARN" | "CRITICAL";
 
 export type IncidentState =
@@ -56,6 +58,26 @@ export interface IncidentTransition {
   toState: IncidentState;
   reason: string;
   ts: number;
+  signature: string;
+}
+
+export type IncidentClockEventKind = "TRIGGER" | "NOTIFIED";
+
+/**
+ * Append-only, signed record of a regulatory clock event (P1-17): a trigger
+ * happened (`triggerOrClockId` is a ClockTrigger) or a notice was submitted
+ * (`triggerOrClockId` is a clockId). `ts` is the operator's claim; `recordedTs`
+ * and `recordedBy` say when and through which surface it was recorded.
+ */
+export interface IncidentClockEvent {
+  eventId: string;
+  incidentId: string;
+  kind: IncidentClockEventKind;
+  triggerOrClockId: string;
+  station: Domain;
+  ts: number;
+  recordedTs: number;
+  recordedBy: string;
   signature: string;
 }
 

@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { signHexDigest, verifyHexDigestAny, getPublicKeyHistory } from "../crypto/keys.js";
-import type { CausalEdge, Incident, IncidentTransition, IncidentState } from "./incidentTypes.js";
+import type { CausalEdge, Incident, IncidentClockEvent, IncidentTransition, IncidentState } from "./incidentTypes.js";
 
 /** Typed DB row for incident records — matches the incidents table schema */
 /** Raw SQLite row — snake_case DB columns */
@@ -27,6 +27,11 @@ type CausalEdgeRow = {
   edge_id: string; incident_id: string; from_event_id: string;
   to_event_id: string; relationship: string; confidence: number;
   evidence_json: string; added_ts: number; added_by: string; signature: string;
+};
+/** Raw SQLite row for regulatory clock events */
+type ClockEventRow = {
+  event_id: string; incident_id: string; kind: string; trigger_or_clock_id: string;
+  station: string; ts: number; recorded_ts: number; recorded_by: string; signature: string;
 };
 
 function initIncidentTables(db: Database.Database): void {
@@ -78,6 +83,19 @@ function initIncidentTables(db: Database.Database): void {
       FOREIGN KEY (incident_id) REFERENCES incidents(incident_id)
     );
 
+    CREATE TABLE IF NOT EXISTS incident_clock_events (
+      event_id TEXT PRIMARY KEY,
+      incident_id TEXT NOT NULL,
+      kind TEXT NOT NULL CHECK (kind IN ('TRIGGER', 'NOTIFIED')),
+      trigger_or_clock_id TEXT NOT NULL,
+      station TEXT NOT NULL,
+      ts INTEGER NOT NULL,
+      recorded_ts INTEGER NOT NULL,
+      recorded_by TEXT NOT NULL,
+      signature TEXT NOT NULL,
+      FOREIGN KEY (incident_id) REFERENCES incidents(incident_id)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_incidents_agent ON incidents(agent_id);
     CREATE INDEX IF NOT EXISTS idx_incidents_agent_created_ts ON incidents(agent_id, created_ts DESC);
     CREATE INDEX IF NOT EXISTS idx_incidents_state ON incidents(state);
@@ -92,6 +110,7 @@ function initIncidentTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_causal_edges_incident_added ON causal_edges(incident_id, added_ts);
     CREATE INDEX IF NOT EXISTS idx_causal_edges_from_event ON causal_edges(from_event_id);
     CREATE INDEX IF NOT EXISTS idx_causal_edges_to_event ON causal_edges(to_event_id);
+    CREATE INDEX IF NOT EXISTS idx_incident_clock_events_incident_ts ON incident_clock_events(incident_id, ts);
     CREATE TRIGGER IF NOT EXISTS enforce_incident_transition_state_change
     BEFORE INSERT ON incident_transitions
     WHEN NEW.from_state = NEW.to_state
@@ -168,6 +187,18 @@ function initIncidentTables(db: Database.Database): void {
     BEGIN
       SELECT RAISE(ABORT, 'causal_edges cannot be deleted');
     END;
+
+    CREATE TRIGGER IF NOT EXISTS protect_incident_clock_events_immutable
+    BEFORE UPDATE ON incident_clock_events
+    BEGIN
+      SELECT RAISE(ABORT, 'incident_clock_events are append-only');
+    END;
+
+    CREATE TRIGGER IF NOT EXISTS no_delete_incident_clock_events
+    BEFORE DELETE ON incident_clock_events
+    BEGIN
+      SELECT RAISE(ABORT, 'incident_clock_events cannot be deleted');
+    END;
   `);
 }
 
@@ -243,6 +274,41 @@ function insertCausalEdge(db: Database.Database, incidentId: string, edge: Causa
     added_by: edge.addedBy,
     signature: edge.signature
   });
+}
+
+function insertIncidentClockEvent(db: Database.Database, event: IncidentClockEvent): void {
+  db.prepare(
+    `INSERT INTO incident_clock_events
+    (event_id, incident_id, kind, trigger_or_clock_id, station, ts, recorded_ts, recorded_by, signature)
+    VALUES (@event_id, @incident_id, @kind, @trigger_or_clock_id, @station, @ts, @recorded_ts, @recorded_by, @signature)`
+  ).run({
+    event_id: event.eventId,
+    incident_id: event.incidentId,
+    kind: event.kind,
+    trigger_or_clock_id: event.triggerOrClockId,
+    station: event.station,
+    ts: event.ts,
+    recorded_ts: event.recordedTs,
+    recorded_by: event.recordedBy,
+    signature: event.signature
+  });
+}
+
+function getIncidentClockEvents(db: Database.Database, incidentId: string): IncidentClockEvent[] {
+  const rows = db
+    .prepare("SELECT * FROM incident_clock_events WHERE incident_id = ? ORDER BY ts ASC, rowid ASC")
+    .all(incidentId) as ClockEventRow[];
+  return rows.map((row) => ({
+    eventId: row.event_id,
+    incidentId: row.incident_id,
+    kind: row.kind as IncidentClockEvent["kind"],
+    triggerOrClockId: row.trigger_or_clock_id,
+    station: row.station as IncidentClockEvent["station"],
+    ts: row.ts,
+    recordedTs: row.recorded_ts,
+    recordedBy: row.recorded_by,
+    signature: row.signature
+  }));
 }
 
 function getIncident(db: Database.Database, incidentId: string): Incident | null {
@@ -429,6 +495,9 @@ export interface IncidentStoreInstance {
   getLatestIncidentStates: (incidentIds: string[]) => Map<string, IncidentState>;
   getCausalEdges: (incidentId: string) => CausalEdge[];
   getLastIncidentHash: (agentId: string) => string;
+  /** Rows are returned as stored; loadIncidentClocks (incidentClockEvents.ts) verifies them. */
+  insertIncidentClockEvent: (event: IncidentClockEvent) => void;
+  getIncidentClockEvents: (incidentId: string) => IncidentClockEvent[];
 }
 
 export function createIncidentStore(db: Database.Database): IncidentStoreInstance {
@@ -443,7 +512,9 @@ export function createIncidentStore(db: Database.Database): IncidentStoreInstanc
     getIncidentTransitions: (incidentId: string) => getIncidentTransitions(db, incidentId),
     getLatestIncidentStates: (incidentIds: string[]) => getLatestIncidentStates(db, incidentIds),
     getCausalEdges: (incidentId: string) => getCausalEdges(db, incidentId),
-    getLastIncidentHash: (agentId: string) => getLastIncidentHash(db, agentId)
+    getLastIncidentHash: (agentId: string) => getLastIncidentHash(db, agentId),
+    insertIncidentClockEvent: (event: IncidentClockEvent) => insertIncidentClockEvent(db, event),
+    getIncidentClockEvents: (incidentId: string) => getIncidentClockEvents(db, incidentId)
   };
 }
 

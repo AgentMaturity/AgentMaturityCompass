@@ -16,7 +16,9 @@ import { dirname, join } from "node:path";
 import { signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { IncidentInputError } from "./incidentClockEvents.js";
 import type { Incident } from "./incidentTypes.js";
+import { REGULATORY_CLOCK_TABLE } from "./regulatoryClocksTable.js";
 
 export type OversightDecision =
   | "ACKNOWLEDGED"
@@ -159,4 +161,44 @@ export function readOversightRecords(filePath: string): HumanOversightRecord[] {
     }
     return parsed as HumanOversightRecord;
   });
+}
+
+export interface RecordWorkspaceOversightInput {
+  workspace: string;
+  incident: Incident;
+  reviewerId: string;
+  decision: string;
+  rationale: string;
+  clockIds: string[];
+  reviewedTs: number;
+  privateKeyPem: string;
+}
+
+/**
+ * Appends a record for a stored incident to its workspace file, chained to the
+ * file's last record (P1-17). The reviewer id is stored as stated: the key
+ * proves which workspace signed the record, not which person reviewed.
+ */
+export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): HumanOversightRecord {
+  if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) {
+    throw new IncidentInputError(`unknown decision ${input.decision}; expected one of ${OVERSIGHT_DECISIONS.join(", ")}`);
+  }
+  if (!input.reviewerId.trim()) throw new IncidentInputError("reviewer id must not be empty");
+  if (!input.rationale.trim()) throw new IncidentInputError("rationale must not be empty");
+  const unknown = input.clockIds.filter((clockId) => !REGULATORY_CLOCK_TABLE.some((clock) => clock.clockId === clockId));
+  if (unknown.length > 0) throw new IncidentInputError(`unknown clock id: ${unknown.join(", ")}`);
+  const path = oversightRecordPath(input.workspace, input.incident.incidentId);
+  const previous = readOversightRecords(path).at(-1);
+  const record = createOversightRecord({
+    incident: input.incident,
+    reviewerId: input.reviewerId,
+    reviewedTs: input.reviewedTs,
+    decision: input.decision as OversightDecision,
+    rationale: input.rationale,
+    clockIds: input.clockIds,
+    prevRecordHash: previous?.recordHash ?? null,
+    privateKeyPem: input.privateKeyPem
+  });
+  appendOversightRecord(path, record);
+  return record;
 }
