@@ -336,7 +336,8 @@ export function signIndustryPackAudit(workspace: string, audit: IndustryPackAudi
   return { ...unsigned, signature: { ...signed, keyFingerprint: `sha256:${keyId}` } };
 }
 
-export type IndustryPackAuditVerifyCode = "UNSIGNED" | "CHECKSUM_MISMATCH" | "DIGEST_MISMATCH" | "SIGNATURE_INVALID" | "SIGNER_UNTRUSTED";
+export type IndustryPackAuditVerifyCode =
+  "UNREADABLE" | "UNSIGNED" | "CHECKSUM_MISMATCH" | "DIGEST_MISMATCH" | "SIGNATURE_INVALID" | "SIGNER_UNTRUSTED";
 
 export interface IndustryPackAuditVerification {
   /** Equals report.trusted. */
@@ -404,12 +405,25 @@ export function verifyIndustryPackAuditSignature(audit: IndustryPackAudit, opts:
 
 /**
  * For `amc audit binder verify`: verifies `file` when it is a .json industry-pack audit (any schema version, so
- * older unsigned bundles report UNSIGNED), else returns null and the caller treats it as a binder.
+ * older unsigned bundles report UNSIGNED), else returns null and the caller treats it as a binder. A file or key that
+ * cannot be read is a generic UNREADABLE result: no OS error text, so a caller learns nothing about other paths.
  */
 export function verifyIndustryPackAuditFile(params: { file: string; publicKeyPath?: string; trust: TrustContext }):
-  (IndustryPackAuditVerification & { audit: IndustryPackAudit; fileSha256: string }) | null {
+  (IndustryPackAuditVerification & { audit: IndustryPackAudit | null; fileSha256: string }) | null {
   if (!params.file.toLowerCase().endsWith(".json")) return null;
-  const bytes = readFileSync(params.file);
+  let bytes: Buffer;
+  let publicKeyPem: string | null;
+  try {
+    bytes = readFileSync(params.file);
+    publicKeyPem = params.publicKeyPath ? readFileSync(params.publicKeyPath, "utf8") : null;
+  } catch {
+    const errors = [{ code: "UNREADABLE" as const, message: "cannot read audit file" }];
+    const fileSha256 = "0".repeat(64);
+    const report = buildVerifierReport({ artifact: { kind: "industry-pack-audit", path: params.file, sha256: fileSha256 },
+      context: params.trust, integrityErrors: ["UNREADABLE: cannot read audit file"], signatures: [],
+      anchoring: { status: "not-applicable", detail: null } });
+    return { ok: false, signed: false, checksumOk: false, signatureOk: false, keyFingerprint: null, errors, report, audit: null, fileSha256 };
+  }
   let audit: unknown;
   try {
     audit = JSON.parse(bytes.toString("utf8"));
@@ -422,7 +436,7 @@ export function verifyIndustryPackAuditFile(params: { file: string; publicKeyPat
   const fileSha256 = sha256Hex(bytes);
   const verification = verifyIndustryPackAuditSignature(audit as IndustryPackAudit, {
     trust: params.trust,
-    publicKeyPem: params.publicKeyPath ? readFileSync(params.publicKeyPath, "utf8") : null,
+    publicKeyPem,
     artifact: { kind: "industry-pack-audit", path: params.file, sha256: fileSha256 }
   });
   return { ...verification, audit: audit as IndustryPackAudit, fileSha256 };

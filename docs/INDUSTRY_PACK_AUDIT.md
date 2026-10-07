@@ -89,13 +89,16 @@ taken from the bundle. On success it prints
 `Industry-pack audit verified: signer sha256:<key id>, checksum ok`; otherwise
 it prints each error and exits 1:
 
+- `UNREADABLE`: the file cannot be read (no operating-system error text is shown).
 - `UNSIGNED`: a checksum-only bundle (`--no-sign`, or written before signing existed).
 - `CHECKSUM_MISMATCH`: `receiptHash` does not match the body.
 - `DIGEST_MISMATCH` or `SIGNATURE_INVALID`: the bundle changed after signing, even if `receiptHash` was recomputed.
 - An unpinned, distrusted or revoked signer key (`SIGNER_UNTRUSTED` in `--json`).
 
 `--allow-unpinned` gives an integrity-only result with exit code 2, never a
-trusted one. The checksum alone is
+trusted one. Studio's binder verify route (`GET /audit/binders/:id/verify`)
+verifies a `?file=` only inside `.amc/audit/binders/exports/`, so copy a bundle
+there to verify it from Studio. The checksum alone is
 `sha256(canonicalize(bundle without receiptHash and signature))`; recomputing it
 detects accidental edits, not deliberate ones.
 
