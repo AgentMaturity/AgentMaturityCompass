@@ -214,7 +214,8 @@ describe("studio + vault + mode + loop", () => {
       "guardrails disable",
       "guardrails profile",
       "domain apply --sign-profile",
-      "domain apply --activate-profile"
+      "domain apply --activate-profile",
+      "catalog compile"
     ]) {
       expect(() => assertOwnerMode(workspace, command), command).toThrow("blocked in agent mode");
     }

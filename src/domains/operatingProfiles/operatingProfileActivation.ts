@@ -83,13 +83,13 @@ interface PlannedConfig {
 }
 
 /** How a change to a field moves its control. A field with no rule is weakened by any change (fail closed). */
-type Rule =
+export type Rule =
   | { kind: "ignore" }
   | { kind: "floor"; absent: number }
   | { kind: "ceiling"; absent: number }
   | { kind: "trueIsWeaker" | "falseIsWeaker" | "addedIsWeaker" | "removedIsWeaker" }
   | { kind: "order"; weakestFirst: readonly string[] };
-type Rules = ReadonlyArray<readonly [RegExp, Rule]>;
+export type Rules = ReadonlyArray<readonly [RegExp, Rule]>;
 
 const FLOOR: Rule = { kind: "floor", absent: -Infinity }; // a minimum; lower or removed is weaker
 const CEILING: Rule = { kind: "ceiling", absent: Infinity }; // a limit; higher or removed (unlimited) is weaker
@@ -162,7 +162,7 @@ function show(value: unknown): string {
  * Every change from `before` to `after` that weakens a control, as "<config>: <path> <old> -> <new>".
  * Objects are compared field by field; a field no rule covers counts as weakened by any change.
  */
-function weakenings(config: string, rules: Rules, before: unknown, after: unknown, path = ""): string[] {
+export function weakenings(config: string, rules: Rules, before: unknown, after: unknown, path = ""): string[] {
   if (same(before, after)) return [];
   const weaker = [`${config}: ${path || "(all)"} ${show(before)} -> ${show(after)}`];
   const recurse = (): string[] => {
@@ -207,7 +207,7 @@ function weakenings(config: string, rules: Rules, before: unknown, after: unknow
 }
 
 /** A list as a record keyed "[key]", so entries are matched by identity, not by position. */
-function keyed<T>(items: readonly T[], key: (item: T) => string): Record<string, T> {
+export function keyed<T>(items: readonly T[], key: (item: T) => string): Record<string, T> {
   const out: Record<string, T> = {};
   for (const item of items) {
     let id = `[${key(item)}]`;
@@ -231,6 +231,31 @@ function approvalWeakenings(current: ApprovalPolicy, next: ApprovalPolicy): stri
     .filter((actionClass) => current.approvalPolicy.actionClasses[actionClass] && !next.approvalPolicy.actionClasses[actionClass])
     .map((actionClass) => `approvalPolicy: actionClasses.${actionClass} ${show(current.approvalPolicy.actionClasses[actionClass])} -> absent`);
   return [...removed, ...weakenings("approvalPolicy", APPROVAL_RULES, effective(current), effective(next))];
+}
+
+/**
+ * Every weakening from one set of proposed signed-config fragments to another, by the rules activation applies to the
+ * live configs (P1-10 compares a new control plan's fragments with the previous plan's). Agents compared by id.
+ */
+export function fragmentWeakenings(before: OperatingProfile["proposedSignedConfigs"], after: OperatingProfile["proposedSignedConfigs"]): string[] {
+  const parse = (f: OperatingProfile["proposedSignedConfigs"]) => ({
+    approval: approvalPolicySchema.parse(f.approvalPolicy),
+    budgets: budgetsSchema.parse(f.budgets).budgets.perAgent,
+    tools: keyedTools(toolsConfigSchema.parse(f.tools)),
+    action: keyedActions(actionPolicySchema.parse(f.actionPolicy)),
+    ops: opsPolicySchema.parse(f.opsPolicy).opsPolicy,
+    firewall: firewallFragmentSchema.parse(f.firewall)
+  });
+  const [a, b] = [parse(before), parse(after)];
+  const agents = [...new Set([...Object.keys(a.budgets), ...Object.keys(b.budgets)])].sort();
+  return [
+    ...approvalWeakenings(a.approval, b.approval),
+    ...agents.flatMap((id) => weakenings(`budgets[${id}]`, BUDGET_RULES, a.budgets[id], b.budgets[id])),
+    ...weakenings("tools", TOOLS_RULES, a.tools, b.tools),
+    ...weakenings("actionPolicy", ACTION_RULES, a.action, b.action),
+    ...weakenings("opsPolicy", OPS_RULES, a.ops, b.ops),
+    ...weakenings("firewall", FIREWALL_RULES, a.firewall, b.firewall)
+  ];
 }
 
 /** The current config when it exists; one that fails its signature check stops the activation. */

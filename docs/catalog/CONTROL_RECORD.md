@@ -84,7 +84,8 @@ Seven operators, nothing else (ADR 011): `{ always: true }`, `{ all: [...] }`, `
 `primaryStation`, `domains`, `jurisdictions`, `roles`, `entityTypes`, `riskClass`, `useCases` and `dataClasses`.
 `primaryStation` and `riskClass` take `equals`; the list facts take `includesAny` or `includesAll`. Lists are non-empty.
 Every term must be in the fact's vocabulary list (`CAT_VOCAB`). A predicate is at most 8 levels deep and 64 nodes.
-`parsePredicate(value)` and `validatePredicate(p, vocabulary)` check these rules; evaluation is P1-10's.
+`parsePredicate(value)` and `validatePredicate(p, vocabulary)` check these rules; the compiler evaluates them
+three-valued ([COMPILER.md](COMPILER.md)).
 
 ## Citations (law as data)
 
