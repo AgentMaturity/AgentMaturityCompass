@@ -3,7 +3,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
       "name": "amcaudit.schema.json",
-      "sha256": "f77547ee3303b2be16ae1ba3c97b907b9bb46fc24f3e0eadac412edeb151f595"
+      "sha256": "7ec9cb7ec49311ae6960a0de8f3b0f56f1c6245b626afd5d78de4a9abcba9c6d"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",

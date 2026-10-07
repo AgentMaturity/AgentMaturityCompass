@@ -36,6 +36,7 @@ import { signBinderJson } from "./binderSigner.js";
 import { buildBinderProofs, writeBinderProofFiles } from "./binderProofs.js";
 import { type AuditBinderJson } from "./binderSchema.js";
 import { type EvidenceRequest } from "./evidenceRequestSchema.js";
+import type { TrustContext } from "../trust/trustContext.js";
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 
 /**
@@ -251,6 +252,8 @@ export async function createAuditBinderArtifact(params: {
   outFile: string;
   nowTs?: number;
   request?: EvidenceRequest | null;
+  /** Pinned trust for ingesting a conformance run; defaults to the operator's (loadTrustContext). */
+  trust?: TrustContext;
 }): Promise<AuditBinderCreateResult> {
   const policySig = verifyAuditPolicySignature(params.workspace);
   if (!policySig.valid) {
@@ -278,7 +281,8 @@ export async function createAuditBinderArtifact(params: {
     policy,
     map,
     nowTs: params.nowTs,
-    request: params.request ?? null
+    request: params.request ?? null,
+    trust: params.trust
   });
 
   const proofs = buildBinderProofs({
@@ -376,6 +380,12 @@ export async function createAuditBinderArtifact(params: {
     writeFileAtomic(join(root, "summaries", "summary.md"), `${summaryMd}\n`, 0o644);
     if (policy.auditPolicy.export.allowPdfSummary) {
       writeFileAtomic(join(root, "summaries", "summary.pdf"), renderSummaryPdf(summaryMd), 0o644);
+    }
+    // P1-16: the allowlisted projection of a run that verified under pinned trust, as the exact bytes whose digests
+    // binder.json (signed above) records in sections.conformanceRun.
+    if (collected.conformanceFiles) {
+      writeFileAtomic(join(root, "checks", "conformance-run.json"), collected.conformanceFiles.json, 0o644);
+      writeFileAtomic(join(root, "summaries", "conformance-run.md"), collected.conformanceFiles.markdown, 0o644);
     }
 
     const outFile = resolve(params.workspace, params.outFile);

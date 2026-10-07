@@ -1045,6 +1045,10 @@ export class Ledger {
       .all(endTs, startTs) as SessionRecord[];
   }
 
+  getSessionById(sessionId: string): SessionRecord | null {
+    return (this.db.prepare("SELECT * FROM sessions WHERE session_id = ? LIMIT 1").get(sessionId) as SessionRecord | undefined) ?? null;
+  }
+
   getRun(runId: string): RunRecord | null {
     const row = this.db.prepare("SELECT * FROM runs WHERE run_id = ?").get(runId) as RunRecord | undefined;
     return row ?? null;

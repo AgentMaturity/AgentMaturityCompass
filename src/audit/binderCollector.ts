@@ -37,6 +37,7 @@ import { hashAuditId } from "./binderRedaction.js";
 import { binderJsonSchema, type AuditBinderJson } from "./binderSchema.js";
 import { type EvidenceRequest } from "./evidenceRequestSchema.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
+import { binderConformanceRun } from "./binderConformanceRun.js";
 
 interface ScopeInput {
   type: "WORKSPACE" | "NODE" | "AGENT";
@@ -97,6 +98,7 @@ interface BinderCollectResult {
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
   sourceEventHashes: string[];
+  conformanceFiles: ReturnType<typeof binderConformanceRun>["files"];
 }
 
 function dedupeSorted(values: string[]): string[] {
@@ -479,6 +481,7 @@ export async function collectAuditBinderData(params: {
   map: AuditMapFile;
   nowTs?: number;
   request?: EvidenceRequest | null;
+  trust?: import("../trust/trustContext.js").TrustContext;
 }): Promise<BinderCollectResult> {
   const nowTs = Number.isFinite(Number(params.nowTs)) ? Number(params.nowTs) : Date.now();
   const scope = scopeFromInput(params.workspace, params.scope);
@@ -554,6 +557,7 @@ export async function collectAuditBinderData(params: {
   const assurancePolicy = loadAssurancePolicy(params.workspace);
 
   const trust = loadTrustConfig(params.workspace);
+  const conformance = binderConformanceRun(params.workspace, scope.type === "AGENT" ? scope.id : null, params.policy.auditPolicy.privacy.hashTruncBytes, params.trust);
   const notary = await checkNotaryTrust(params.workspace).catch(() => null);
 
   const opsPolicy = loadOpsPolicy(params.workspace);
@@ -1034,15 +1038,7 @@ export async function collectAuditBinderData(params: {
       maturity: {
         status: maturityStatus,
         overall: maturityStatus === "OK" ? maturityOverall : null,
-        byDimensions: maturityStatus === "OK"
-          ? maturityByDim
-          : {
-              DIM1: null,
-              DIM2: null,
-              DIM3: null,
-              DIM4: null,
-              DIM5: null
-            },
+        byDimensions: maturityStatus === "OK" ? maturityByDim : { DIM1: null, DIM2: null, DIM3: null, DIM4: null, DIM5: null },
         unknownQuestionsCount,
         evidenceRefs: maturityRefs,
         notes: dedupeSorted([
@@ -1154,7 +1150,8 @@ export async function collectAuditBinderData(params: {
       controls: {
         mapId: params.map.auditMap.id,
         families: filteredFamilies
-      }
+      },
+      conformanceRun: conformance.section
     },
     proofBindings: {
       transparencyRootSha256: fileSha(transparencySealPath(params.workspace)),
@@ -1164,10 +1161,5 @@ export async function collectAuditBinderData(params: {
     }
   });
 
-  return {
-    binder,
-    includedEventKinds,
-    calculationManifest,
-    sourceEventHashes
-  };
+  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files };
 }
