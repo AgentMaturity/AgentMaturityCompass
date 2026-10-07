@@ -206,6 +206,7 @@ import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
 } from "./cli-trust-flags.js";
 import { printArchivedStoreNote, runVerifyRepair } from "./cli-verify-repair.js";
+import { relabelLegacyArtifacts } from "./migration/legacy/scan.js";
 import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
@@ -6183,13 +6184,36 @@ program
 
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
 
+/** P1-35: records 1.x results under legacy labels in .amc/migrations/; the originals are never written. */
+function relabelLegacy(opts: { dryRun: boolean; path: string[] }): void {
+  try {
+    const run = relabelLegacyArtifacts(process.cwd(), { dryRun: opts.dryRun, paths: opts.path });
+    const scanned = Object.values(run.receipt.scanned).reduce((sum, count) => sum + count, 0);
+    console.log(`Legacy relabel (notice ${run.receipt.noticeId} v${run.receipt.noticeVersion}): ${scanned} scanned, `
+      + `${run.records.length} ${opts.dryRun ? "to record" : "recorded"}, ${run.receipt.skipped.length} skipped`);
+    for (const row of run.records.slice(0, 20)) console.log(`- ${row.artifact.locator}: legacy ${row.assigned.claimKind} (${row.rule})`);
+    if (run.records.length > 20) console.log(chalk.gray(`  ... and ${run.records.length - 20} more`));
+    for (const skip of run.receipt.skipped) console.log(chalk.gray(`- skipped ${skip.locator}: ${skip.reason}`));
+    console.log(run.receiptPath ? `Receipt: ${run.receiptPath} (signed as MIGRATION_RECEIPT); records: .amc/migrations/relabel.jsonl`
+      : "Dry run: nothing was written.");
+  } catch (error) {
+    console.error(chalk.red(`Legacy relabel failed: ${toErrorMessage(error)}`));
+    process.exit(1);
+  }
+}
+
 withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
   .option("--repair", "Diagnose a failed verification and print a recovery plan (changes nothing)", false)
   .option("--apply", "With --repair: move a failing evidence store to .amc/quarantine/ with a signed receipt", false)
   .option("--yes", "With --repair --apply: confirm without the typed prompt", false)
   .option("--sign-config", "Sign .amc/amc.config.yaml with the auditor key, then stop", false)
-  .action(async (opts: { repair: boolean; apply: boolean; yes: boolean; signConfig: boolean } & TrustFlags) => {
+  .option("--relabel-legacy", "Unless the integrity check fails, record AMC 1.x results under legacy labels (originals are never modified)", false)
+  .option("--dry-run", "With --relabel-legacy: print what would be recorded and write nothing", false)
+  .option("--path <file>", "With --relabel-legacy: also classify this file (repeatable)", (value: string, previous: string[]) => [...previous, value], [] as string[])
+  .action(async (opts: { repair: boolean; apply: boolean; yes: boolean; signConfig: boolean; relabelLegacy: boolean; dryRun: boolean; path: string[] } & TrustFlags) => {
     if (opts.signConfig) { console.log(`Signed amc.config.yaml: ${signAmcConfig(process.cwd())}`); return; }
+    if (opts.relabelLegacy && opts.repair) { console.error("--relabel-legacy cannot be combined with --repair"); process.exit(2); }
+    if (!opts.relabelLegacy && (opts.dryRun || opts.path.length > 0)) { console.error("--dry-run and --path only work with --relabel-legacy"); process.exit(2); }
     if (opts.repair) {
       const code = await runVerifyRepair({ apply: opts.apply, yes: opts.yes, ...(opts.expectMonitor ? { expectedMonitorFingerprint: opts.expectMonitor } : {}) });
       if (code !== 0) process.exit(code);
@@ -6202,6 +6226,8 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
       printArchivedStoreNote(process.cwd());
       const code = ledgerExitCode(result, trust);
+      if (opts.relabelLegacy && code === 1) console.log("Legacy relabel skipped: the integrity check failed. Nothing was written.");
+      else if (opts.relabelLegacy) relabelLegacy(opts);
       if (code !== 0) process.exit(code);
       return;
     }
@@ -6230,6 +6256,7 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
     }
     console.log(chalk.gray("\n  Tip: amc verify --repair explains the failure; it changes nothing without --apply."));
     printArchivedStoreNote(process.cwd());
+    if (opts.relabelLegacy) console.log("Legacy relabel skipped: the integrity check failed. Nothing was written.");
     process.exit(1);
   });
 
