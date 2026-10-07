@@ -34,6 +34,9 @@ import { getPackById, INDUSTRY_PACKS, scoreIndustryPack } from "../domains/indus
 import { packSelfAssessmentEnvelope } from "../domains/packSelfAssessment.js";
 import { formatIndustryPackPaywallMessage, getIndustryPackEntitlement } from "../domains/industryPackEntitlement.js";
 import { openLedger } from "../ledger/ledger.js";
+import { getPublicKeyHistory } from "../crypto/keys.js";
+import { createIncidentStore } from "../incidents/incidentStore.js";
+import { clockListing, loadIncidentClocks, parseIsoTimestamp, parseStation } from "../incidents/incidentClockEvents.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { agentRunClaim, unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
@@ -111,9 +114,10 @@ export const MCP_TOOL_METADATA = [
   { name: "amc_list_evidence", description: "List evidence events from the ledger for a time window (read-only)", input: "{ window?: string, limit?: number, workspace?: string }" },
   { name: "amc_query_diagnostic", description: "Query the latest diagnostic run report (read-only)", input: "{ agentId: string, workspace?: string }" },
   { name: "amc_get_recommendations", description: "Get actionable recommendations for improving agent maturity (read-only)", input: "{ agentId: string, workspace?: string }" },
+  { name: "amc_incident_clocks", description: "List a stored incident's regulatory reporting clocks for a station (read-only)", input: "{ incidentId: string, station: string, now?: string, workspace?: string }" },
 ];
 
-/** Registers the 10 tools and the agent resource without a transport, so tests can connect in memory. */
+/** Registers the 11 tools and the agent resource without a transport, so tests can connect in memory. */
 export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer {
   const server = new McpServer({
     name: "amc",
@@ -654,6 +658,59 @@ export function createAmcMcpServer(defaultWorkspace = process.cwd()): McpServer 
       } catch (err) {
         return {
           content: [{ type: "text", text: `Recommendations failed: ${(err as Error).message}` }],
+          isError: true,
+        };
+      }
+    }
+  );
+
+  // -------------------------------------------------------------------------
+  // Tool: amc_incident_clocks (P1-17)
+  // -------------------------------------------------------------------------
+  server.tool(
+    "amc_incident_clocks",
+    "List a stored incident's regulatory reporting clocks for a station: due dates and status from the signed clock events recorded with `amc incident clocks`. Durations are experimental and not legal advice; AMC does not file notices. (read-only)",
+    {
+      incidentId: z.string().describe("Incident ID"),
+      station: z.string().describe("Station: health, education, environment, mobility, governance, technology or wealth"),
+      now: z.string().optional().describe("Evaluation time, ISO 8601 with a zone (default: now)"),
+      workspace: z
+        .string()
+        .optional()
+        .describe("Path to the AMC workspace (defaults to current directory)"),
+    },
+    async ({ incidentId, station, now, workspace }) => {
+      enforceRateLimit();
+      const ws = validateWorkspace(workspace ?? defaultWorkspace);
+      try {
+        const domain = parseStation(station);
+        const nowTs = now === undefined ? Date.now() : parseIsoTimestamp(now, "now");
+        const ledger = openLedger(ws);
+        try {
+          const store = createIncidentStore(ledger.db);
+          store.initTables();
+          if (!store.getIncident(incidentId)) {
+            return { content: [{ type: "text", text: `Incident not found: ${incidentId}` }], isError: true };
+          }
+          const listing = clockListing(
+            loadIncidentClocks(store, incidentId, domain, nowTs, getPublicKeyHistory(ws, "monitor")), domain, nowTs);
+          const rows = listing.clocks.map((clock) =>
+            `- ${clock.status} ${clock.clockId} (${clock.instrument} ${clock.article}) due ${clock.dueAt ?? "not started"}`);
+          return withClaim([
+            `## Regulatory clocks: ${incidentId} (${domain}, at ${listing.now})`,
+            ``,
+            ...rows,
+            ``,
+            ...listing.notes.map((note) => `- ${note}`),
+          ].join("\n"),
+            unboundClaim("mcp:amc_incident_clocks", "runtime_observation", true),
+            listing);
+        } finally {
+          ledger.close();
+        }
+      } catch (err) {
+        return {
+          content: [{ type: "text", text: `Incident clocks failed: ${(err as Error).message}` }],
           isError: true,
         };
       }
