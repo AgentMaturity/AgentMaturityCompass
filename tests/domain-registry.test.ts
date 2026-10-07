@@ -81,11 +81,13 @@ describe("domain registry", () => {
   // assert that the canned text passed every pack, i.e. that synthetic text was
   // passing evidence (execution brief section 2). Industry packs now refuse it,
   // so the smoke asserts the refusal is reported as "not evaluated" and that
-  // every linked pack and scenario still runs through the pipeline.
+  // every linked pack and scenario still runs through the pipeline. Since P0-15
+  // the canned response is graded only in labelled example mode; without
+  // `example: true` no scenario is graded at all.
   test("built-in domain assurance smoke runs every linked pack and reports refused canned input as not evaluated", () => {
     const industryPacks = new Set(INDUSTRY_PACK_MANIFEST.map((entry) => entry.id));
     for (const domain of listDomainIds()) {
-      const run = runDomainAssurance(`domain-smoke-${domain}`, domain);
+      const run = runDomainAssurance(`domain-smoke-${domain}`, domain, { example: true });
       const detail = `${domain}: ${JSON.stringify(run.packRuns)}`;
       expect(run.packRuns.map((pack) => pack.packId), detail).toEqual(getDomainMetadata(domain).assurancePacks);
       for (const pack of run.packRuns) {
@@ -105,6 +107,17 @@ describe("domain registry", () => {
       expect(run.notEvaluated, detail).toBeGreaterThan(0);
       expect(run.agentInvoked).toBe(false);
       expect(run.responseSource).toBe("built-in-synthetic");
+      expect(run.claimKind).toBe("synthetic_example");
+      expect(run.allPassed).toBe(false);
+    }
+  });
+
+  test("without example mode the domain assurance run grades nothing", () => {
+    for (const domain of listDomainIds()) {
+      const run = runDomainAssurance(`domain-smoke-${domain}`, domain);
+      expect(run.status).toBe("not_evaluated");
+      expect(run.passed + run.failed).toBe(0);
+      expect(run.notEvaluated).toBe(run.totalScenarios);
       expect(run.allPassed).toBe(false);
     }
   });

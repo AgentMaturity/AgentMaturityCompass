@@ -10638,8 +10638,7 @@ ci
           console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
         }
         if (result.gamingResistance) {
-          console.log("  Gaming resistance: unavailable (no behavioral measurement)");
-          console.log(`  Source inventory only: ${result.gamingResistance.controlInventory.score}/100`);
+          console.log("  Gaming resistance: unavailable (no behavioral measurement; source inventory is not evidence)");
         } else {
           console.log("  Gaming resistance: disabled; this gate provides no score-gaming assurance");
         }
@@ -18636,17 +18635,16 @@ program
       console.log(chalk.red("No results — experiment not found or has no probes."));
       return;
     }
-    console.log(
-      chalk.yellow(
-        "\n⚠️  Simulated results — no model was called. Scores are deterministic placeholders derived from ids, not measurements."
-      )
-    );
+    const { EXAMPLE_BANNER } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(chalk.bold(`\nSimulated ${results.length} probe results:\n`));
     for (const r of results) {
       const primaryDim = Object.keys(r.scores)[0] ?? "";
       const score = r.scores[primaryDim] ?? 0;
       console.log(`  ${r.probeId}: ${(score * 100).toFixed(1)}% (${r.latencyMs}ms, ${r.tokenCount} tokens)`);
     }
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
   });
 
 program
@@ -22408,53 +22406,44 @@ score
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
+function printNotEvaluatedCriteria(criteria: Array<{ id: string; reason: string }>, recommendations: string[]): void {
+  console.log(chalk.gray("Result:"), chalk.yellow("not evaluated"));
+  for (const criterion of criteria) console.log(chalk.gray(`  ${criterion.id}: not evaluated (${criterion.reason})`));
+  for (const line of recommendations) console.log(chalk.gray(line));
+}
+
 score
   .command("eu-ai-act")
-  .description("Score EU AI Act compliance maturity (Art. 9-17, GPAI systemic risk)")
+  .description("EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreEUAIActCompliance } = await import("./score/euAIActCompliance.js");
       const result = scoreEUAIActCompliance();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
-      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Compliance"));
-      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Risk class:"), result.riskClassification);
-      console.log(chalk.gray("Risk management system:"), result.hasRiskManagementSystem ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Technical documentation:"), result.hasTechnicalDocumentation ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Human oversight design:"), result.hasHumanOversightDesign ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("Adversarial testing:"), result.hasAdversarialTesting ? chalk.green("yes") : chalk.red("no"));
-      console.log(chalk.gray("FRIA:"), result.hasFundamentalRightsImpactAssessment ? chalk.green("yes") : chalk.red("no"));
-      if (result.gaps.length) console.log(chalk.yellow("Gaps:"), result.gaps.slice(0, 3).join("; "));
+      console.log(chalk.bold.hex('#4AEF79')("\n🇪🇺  EU AI Act Obligations"));
+      console.log(chalk.gray("Risk class (self-reported):"), result.riskClassification);
+      printNotEvaluatedCriteria(result.criteria, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 score
   .command("owasp-llm")
-  .description("Score OWASP LLM Top 10 coverage (all 10 risks)")
+  .description("OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
       const { scoreOWASPLLMCoverage } = await import("./score/owaspLLMCoverage.js");
-      const { reportControlSurfaceScopeSkip } = await import(
-        "./score/controlSurfaceScope.js"
-      );
-      // Grades AMC's own control surface; refuses to emit a number for a
-      // directory it cannot actually assess. See controlSurfaceScope.ts.
-      if (reportControlSurfaceScopeSkip(process.cwd(), opts, (l) => console.log(opts.json ? l : chalk.yellow(l)))) return;
       const result = scoreOWASPLLMCoverage();
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️  OWASP LLM Top 10 Coverage"));
-      console.log(chalk.gray("Score:"), result.score, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Covered:"), `${result.coveredCount}/10`);
-      if (result.uncoveredRisks.length) console.log(chalk.yellow("Uncovered:"), result.uncoveredRisks.join(", "));
-      else console.log(chalk.green("All 10 OWASP LLM risks covered ✓"));
+      printNotEvaluatedCriteria(result.risks, result.recommendations);
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
 score
   .command("regulatory-readiness")
-  .description("Compute weighted regulatory readiness score (EU AI Act + ISO + OWASP)")
+  .description("Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence")
   .requiredOption("--agent <id>", "agent ID")
   .option("--json", "Output as JSON")
   .action(async (opts: { agent: string; json?: boolean }) => {
@@ -22469,15 +22458,9 @@ score
       }
       console.log(chalk.bold.hex('#4AEF79')("\n🏛️  Regulatory Readiness"));
       console.log(chalk.gray("Agent:"), result.agentId);
-      console.log(chalk.gray("Score:"), `${result.score}/100`, chalk.gray(`(L${result.level})`));
-      console.log(chalk.gray("Weighted composite:"), result.weightedComposite.toFixed(2));
-      console.log(chalk.gray("Components:"), `EU=${result.components.euAiAct} ISO=${result.components.iso42001} OWASP=${result.components.owaspLLM}`);
-      console.log(chalk.gray("Weights:"), `EU=${result.weights.euAiAct.toFixed(2)} ISO=${result.weights.iso42001.toFixed(2)} OWASP=${result.weights.owaspLLM.toFixed(2)}`);
-      console.log(chalk.gray("Agent evidence modifier:"), result.agentEvidenceModifier.toFixed(2));
+      console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${result.notEvaluated.length} criteria: file presence is not evidence)`));
       console.log(chalk.gray("Latest run:"), result.latestRunId ?? "none");
-      if (result.gaps.length > 0) {
-        console.log(chalk.yellow("Top gaps:"), result.gaps.slice(0, 4).join("; "));
-      }
+      for (const line of result.recommendations) console.log(chalk.gray(line));
     } catch (e: unknown) {
       console.error(chalk.red(toErrorMessage(e)));
       process.exit(1);
@@ -22640,7 +22623,7 @@ score
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
       console.log(chalk.yellow(result.assessmentReason));
-      console.log(chalk.gray("Source inventory only:"), result.controlInventory.score, "/100");
+      console.log(chalk.gray("Source inventory only (paths, not evidence); see --json for present and missing paths."));
       if (!result.controlInventory.applicable) {
         console.log(chalk.yellow(result.controlInventory.notApplicableReason));
       }
@@ -23244,7 +23227,7 @@ score
         console.log(chalk.gray("Available industries:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
         process.exit(1); return;
       }
-      const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS } = await import("./score/industryTrustModels.js");
+      const { computeIndustryAdjustedScore, INDUSTRY_TRUST_MODELS, latestObservedEvidenceShare } = await import("./score/industryTrustModels.js");
       const industryId = opts.industry!;
       const model = INDUSTRY_TRUST_MODELS[industryId];
       if (!model) {
@@ -23274,14 +23257,13 @@ score
             attested: run.evidenceTrustCoverage?.attested ?? 0,
             selfReported: run.evidenceTrustCoverage?.selfReported ?? 0
           };
-          const observedShare = evidenceMix.observed || 0.8;
-          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, observedShare, nowTs);
+          const adjusted = computeIndustryAdjustedScore(rawDimensionScores, industryId, run.ts, latestObservedEvidenceShare(process.cwd(), resolvedAgentId, run.runId), nowTs);
           let deltaFromPrevious: number | null = null;
           if (index > 0) {
             const previous = runs[index - 1]!;
             const previousRaw = Math.max(0, Math.min(1, previous.integrityIndex ?? 0));
             const previousScores = Object.fromEntries(dims.map((dim) => [dim, previousRaw]));
-            const previousObserved = previous.evidenceTrustCoverage?.observed ?? 0.8;
+            const previousObserved = latestObservedEvidenceShare(process.cwd(), resolvedAgentId, previous.runId);
             const previousAdjusted = computeIndustryAdjustedScore(previousScores, industryId, previous.ts, previousObserved, nowTs);
             deltaFromPrevious = Number((adjusted.adjustedScore - previousAdjusted.adjustedScore).toFixed(1));
           }
@@ -23293,7 +23275,6 @@ score
             adjustedScore: adjusted.adjustedScore,
             deltaFromPrevious,
             maturityLevel: adjusted.maturityLevel,
-            percentileRank: adjusted.percentileRank,
             decayApplied: adjusted.decayApplied,
             evidenceMix
           };
@@ -23315,7 +23296,7 @@ score
               ? "baseline"
               : `${row.deltaFromPrevious >= 0 ? "+" : ""}${row.deltaFromPrevious.toFixed(1)}`;
             const evidenceMix = `obs ${(row.evidenceMix.observed * 100).toFixed(0)}% / att ${(row.evidenceMix.attested * 100).toFixed(0)}% / self ${(row.evidenceMix.selfReported * 100).toFixed(0)}%`;
-            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | p${row.percentileRank.toFixed(0)} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
+            return `| ${row.runId} | ${row.scoredAt} | ${row.rawScore.toFixed(1)} | ${row.adjustedScore.toFixed(1)} | ${delta} | ${row.maturityLevel} | ${row.decayApplied.toFixed(1)} | ${evidenceMix} |`;
           });
           return [
             "# Industry-Adjusted Comparison Report",
@@ -23326,8 +23307,8 @@ score
             `Lookback: ${lookbackDays} days`,
             `Runs compared: ${runComparisons.length}`,
             "",
-            "| Run | Scored at | Raw | Adjusted | Delta from previous | Level | Percentile | Decay | Evidence mix |",
-            "|---|---:|---:|---:|---:|---|---:|---:|---|",
+            "| Run | Scored at | Raw | Adjusted | Delta from previous | Level | Decay | Evidence mix |",
+            "|---|---:|---:|---:|---:|---|---:|---|",
             ...rows,
             "",
             "Delta from previous is calculated from industry-adjusted scores, not raw scores.",
@@ -23388,7 +23369,8 @@ score
       }
       const rawDimensionScores: Record<string, number> = {};
       for (const dim of dims) rawDimensionScores[dim] = rawScore;
-      const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), 0.8);
+      const observedShare = latestObservedEvidenceShare(process.cwd(), opts.agent ?? activeAgent(program));
+      const result = computeIndustryAdjustedScore(rawDimensionScores, industryId, Date.now(), observedShare);
       const requiredDimensions = new Set(model.evidenceRequirements.requiredDimensions);
       const dimensionDrilldown = Object.entries(result.dimensionAdjustments)
         .sort(([, a], [, b]) => b.weight - a.weight)
@@ -23410,7 +23392,6 @@ score
       console.log(chalk.gray("Raw score:"), result.rawScore);
       console.log(chalk.gray("Adjusted score:"), chalk.bold(result.adjustedScore.toString()));
       console.log(chalk.gray("Maturity level:"), result.maturityLevel);
-      console.log(chalk.gray("Percentile rank:"), `p${result.percentileRank.toFixed(0)}`);
       console.log(chalk.gray("Decay applied:"), result.decayApplied);
       const scoreDelta = result.adjustedScore - result.rawScore;
       const topWeights = Object.entries(model.dimensionWeights)
@@ -23453,7 +23434,7 @@ score
 
 score
   .command("industry-benchmark")
-  .description("Show industry benchmark percentiles")
+  .description("Show industry benchmark percentiles (not evaluated: no peer data)")
   .requiredOption("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
   .option("--json", "Output as JSON")
   .action(async (opts: { industry: string; json?: boolean }) => {
@@ -23465,15 +23446,10 @@ score
         console.log(chalk.gray("Available:"), Object.keys(INDUSTRY_TRUST_MODELS).join(", "));
         process.exit(1); return;
       }
-      const bench = model.benchmarkPercentiles;
-      if (opts.json) { console.log(JSON.stringify({ industry: opts.industry, name: model.name, benchmarkPercentiles: bench }, null, 2)); return; }
+      const benchmark = { industry: opts.industry, name: model.name, status: "not_evaluated", reason: "no peer data: AMC has no measured peer distribution for this industry" };
+      if (opts.json) { console.log(JSON.stringify(benchmark, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')(`\n📊  Industry Benchmarks — ${model.name}`));
-      console.log(chalk.gray("Sample size:"), bench.sampleSize);
-      console.log(chalk.gray("P25:"), bench.p25.toFixed(3));
-      console.log(chalk.gray("P50:"), bench.p50.toFixed(3));
-      console.log(chalk.gray("P75:"), bench.p75.toFixed(3));
-      console.log(chalk.gray("P90:"), bench.p90.toFixed(3));
-      console.log(chalk.gray("P99:"), bench.p99.toFixed(3));
+      console.log(chalk.gray("Result:"), chalk.yellow(`not evaluated (${benchmark.reason})`));
       console.log(chalk.gray("Risk profile:"), model.riskProfile);
       console.log(chalk.gray("Frameworks:"), model.regulatoryFrameworks.join(", "));
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }

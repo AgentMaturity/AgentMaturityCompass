@@ -80,7 +80,7 @@ describe("self-referential path evidence", () => {
     expect(evidencePathExists(checkout, "src/policy")).toBe(true);
   });
 
-  it("leaves every ISO 42001 control satisfiable by a non-AMC agent", () => {
+  it("reports every ISO 42001 control as not evaluated, whatever files a non-AMC agent has", () => {
     // Three controls previously listed only src/ paths, capping any external
     // ISO score at 5 of 8 no matter what the operator actually had in place.
     const workspace = mkdtempSync(join(tmpdir(), "amc-iso-"));
@@ -96,9 +96,10 @@ describe("self-referential path evidence", () => {
       }
       writeFileSync(join(workspace, ".amc/evidence.sqlite"), "");
 
+      // Since P0-15 no file satisfies a control: file presence is not evidence.
       const result = scoreISO42001Coverage(workspace);
-      expect(result.passedControls).toBe(result.totalControls);
-      expect(result.gaps).toHaveLength(0);
+      expect(result.score).toBeNull();
+      expect(result.controls.every((control) => control.status === "not_evaluated")).toBe(true);
     } finally {
       rmSync(workspace, { recursive: true, force: true });
     }

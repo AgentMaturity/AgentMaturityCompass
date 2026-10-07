@@ -317,7 +317,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc demo` | Run interactive demos of AMC capabilities | - | - |
 | `amc demo gap` | Scripted illustration of the 84-point documentation inflation gap (no agent is executed) | `--json`<br>`--fast` | - |
 | `amc demo prospect` | Run a guided 5-minute prospect demo flow | `--share`<br>`--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
-| `amc demo run` | Run a simulated agent through the AMC gateway and produce a real score (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
+| `amc demo run` | Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s) | `--gateway <url>`<br>`--no-vault`<br>`--demo`<br>`--json` | - |
 | `amc demo share` | Generate a static client-facing prospect demo bundle | `--out <dir>`<br>`--slug <slug>`<br>`--public-base-url <url>`<br>`--live`<br>`--json` | - |
 | `amc diagnostic` | Diagnostic bank/render operations | - | - |
 | `amc diagnostic bank` | Signed diagnostic 126-question bank operations | - | - |
@@ -330,9 +330,9 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
 | `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--json` | `sector apply` |
-| `amc domain assess` | Run full domain assessment | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assess` |
-| `amc domain assurance` | Run domain-specific assurance packs | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector assurance` |
-| `amc domain gaps` | Show compliance gaps for an agent and domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector gaps` |
+| `amc domain assess` | Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assess` |
+| `amc domain assurance` | Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assurance` |
+| `amc domain gaps` | Show compliance gaps for an agent and domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector gaps` |
 | `amc domain list` | List all 7 domains with metadata | `--json` | `sector list` |
 | `amc domain modules` | Show module activation map for domain | `--domain <d>`<br>`--json` | `sector modules` |
 | `amc domain pack` | Industry sector packs — 41 packs across 7 domains | - | `sector pack` |
@@ -343,8 +343,8 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc domain pack list` | List all available industry sector packs | `--domain <d>`<br>`--json` | `sector pack list` |
 | `amc domain pack run` | Run an industry sector pack — interactive assessment or baseline score | `--pack <packId>`<br>`--baseline`<br>`--json` | `sector pack run` |
 | `amc domain pack verify` | Verify an Industry Packs license key | `--key <licenseKey>`<br>`--json` | `sector pack verify` |
-| `amc domain report` | Build full domain report and write it to a file | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--json` | `sector report` |
-| `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain | `--agent <id>`<br>`--domain <d>`<br>`--json` | `sector roadmap` |
+| `amc domain report` | Build full domain report and write it to a file (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--output <file>`<br>`--example`<br>`--json` | `sector report` |
+| `amc domain roadmap` | Generate 30/60/90-day roadmap for this domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector roadmap` |
 | `amc down` | Stop AMC Studio local control plane | - | - |
 | `amc drift` | Drift/regression detection and reporting | - | - |
 | `amc drift check` | - | `--agent <agentId>`<br>`--against <kind>` | - |
@@ -991,7 +991,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score collect-evidence` | Collect an agent's evidence from the ledger | `--window-days <n>`<br>`--json` | - |
 | `amc score density-map` | Heatmap of evidence density per question per dimension — reveals blind spots | `--json` | - |
 | `amc score distributed-agents` | Score distributed multi-agent execution: partitions, sync, failover, consensus, load, observability | `--file <path>`<br>`--json` | - |
-| `amc score eu-ai-act` | Score EU AI Act compliance maturity (Art. 9-17, GPAI systemic risk) | `--json` | - |
+| `amc score eu-ai-act` | EU AI Act obligations (Art. 9-17, GPAI systemic risk); not evaluated: file presence is not evidence | `--json` | - |
 | `amc score evidence-conflict` | Measure internal consistency of evidence — detect conflicting signals | `--json` | - |
 | `amc score evidence-coverage` | Show automated vs manual evidence coverage | `--json` | - |
 | `amc score evidence-ingest` | Ingest evidence from external systems (openai-evals, langsmith, mlflow, custom) | `--json`<br>`--format <fmt>` | - |
@@ -1001,7 +1001,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score formal-spec` | Compute formal maturity score for an agent | `--json` | - |
 | `amc score gaming-resistance` | Inventory AMC source controls; behavioral gaming resistance is not measured | `--json` | - |
 | `amc score industry-adjust` | Adjust a score using an industry-specific trust model | `--industry <id>`<br>`--score <n>`<br>`--agent <id>`<br>`--drilldown`<br>`--history`<br>`--lookback-days <n>`<br>`--out <path>`<br>`--json` | - |
-| `amc score industry-benchmark` | Show industry benchmark percentiles | `--industry <id>`<br>`--json` | - |
+| `amc score industry-benchmark` | Show industry benchmark percentiles (not evaluated: no peer data) | `--industry <id>`<br>`--json` | - |
 | `amc score industry-list` | List all available industry trust models | `--json` | - |
 | `amc score interpretability` | Score structural transparency and explainability | `--json` | - |
 | `amc score kernel-sandbox` | Score kernel-level sandbox maturity (OS isolation, filesystem/network restrictions) | `--json` | - |
@@ -1013,11 +1013,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
 | `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
-| `amc score owasp-llm` | Score OWASP LLM Top 10 coverage (all 10 risks) | `--json` | - |
+| `amc score owasp-llm` | OWASP LLM Top 10 coverage (all 10 risks); not evaluated: file presence is not evidence | `--json` | - |
 | `amc score pause-quality` | Score quality of agent-initiated pauses | `--json` | - |
 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) | `--json` | - |
 | `amc score production-ready` | Run production readiness gate for an agent | `--strict`<br>`--json` | - |
-| `amc score regulatory-readiness` | Compute weighted regulatory readiness score (EU AI Act + ISO + OWASP) | `--agent <id>`<br>`--json` | - |
+| `amc score regulatory-readiness` | Regulatory readiness (EU AI Act + ISO + OWASP); not evaluated: file presence is not evidence | `--agent <id>`<br>`--json` | - |
 | `amc score runtime-identity` | Score runtime execution identity maturity (JIT credentials, user propagation, revocation) | `--json` | - |
 | `amc score safety-research` | Run the AI Safety Research evaluation lane — 4-dimension assessment based on frontier safety research | `--json`<br>`--responses <file>` | - |
 | `amc score self-knowledge` | Score prior art self-knowledge maturity (typed attention, trace layer, confidence+citation) | `--json` | - |

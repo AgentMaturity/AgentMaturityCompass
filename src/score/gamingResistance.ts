@@ -10,14 +10,14 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { detectControlSurfaceScope } from "./controlSurfaceScope.js";
 
+/** Source paths found and missing for one control group; never a number (P0-15). */
 interface ControlInventoryDimension {
-  /** Source-path inventory points only; not a resistance measurement. */
-  score: number;
   presentPaths: string[];
   missingPaths: string[];
 }
 
 export interface GamingResistanceReport {
+  status: "not_evaluated";
   applicable: false;
   notApplicableReason: string;
   assessmentStatus: "not_measured";
@@ -30,8 +30,6 @@ export interface GamingResistanceReport {
     /** Whether the scanned directory has AMC source markers. */
     applicable: boolean;
     notApplicableReason?: string;
-    /** Source-path inventory points only; never a security threshold. */
-    score: number;
     flooding: ControlInventoryDimension;
     selectiveEvidence: ControlInventoryDimension;
     temporal: ControlInventoryDimension;
@@ -40,36 +38,28 @@ export interface GamingResistanceReport {
   };
 }
 
-function inventoryDimension(root: string, paths: Array<[string, number]>): ControlInventoryDimension {
-  const result: ControlInventoryDimension = { score: 0, presentPaths: [], missingPaths: [] };
-  for (const [path, points] of paths) {
-    if (existsSync(join(root, path))) {
-      result.score += points;
-      result.presentPaths.push(path);
-    } else {
-      result.missingPaths.push(path);
-    }
-  }
-  return result;
+function inventoryDimension(root: string, paths: string[]): ControlInventoryDimension {
+  const present = paths.filter((path) => existsSync(join(root, path)));
+  return { presentPaths: present, missingPaths: paths.filter((path) => !present.includes(path)) };
 }
 
 export function scoreGamingResistance(root: string): GamingResistanceReport {
   const flooding = inventoryDimension(root, [
-    ["src/evidence", 10], ["src/score/evidenceCoverageGap.ts", 10], ["src/vault", 5],
+    "src/evidence", "src/score/evidenceCoverageGap.ts", "src/vault",
   ]);
   const selectiveEvidence = inventoryDimension(root, [
-    ["src/score/evidenceCoverageGap.ts", 10], ["src/diagnostic/questionBank.ts", 5],
-    ["src/score/operationalIndependence.ts", 5],
+    "src/score/evidenceCoverageGap.ts", "src/diagnostic/questionBank.ts",
+    "src/score/operationalIndependence.ts",
   ]);
   const temporal = inventoryDimension(root, [
-    ["src/score/claimExpiry.ts", 10], ["src/score/confidenceDrift.ts", 5], ["src/gateway", 5],
+    "src/score/claimExpiry.ts", "src/score/confidenceDrift.ts", "src/gateway",
   ]);
   const context = inventoryDimension(root, [
-    ["src/assurance", 8], ["src/assurance/packs", 7], ["src/score/behavioralTransparency.ts", 5],
+    "src/assurance", "src/assurance/packs", "src/score/behavioralTransparency.ts",
   ]);
   const formula = inventoryDimension(root, [
-    ["src/score", 5], ["tests", 5], ["src/score/simplicityScoring.ts", 5],
-    ["src/score/predictiveValidity.ts", 5],
+    "src/score", "tests", "src/score/simplicityScoring.ts",
+    "src/score/predictiveValidity.ts",
   ]);
   const scope = detectControlSurfaceScope(root);
   const assessmentReason =
@@ -78,6 +68,7 @@ export function scoreGamingResistance(root: string): GamingResistanceReport {
     "this inventory cannot establish resistance to score manipulation.";
 
   return {
+    status: "not_evaluated",
     applicable: false,
     notApplicableReason: assessmentReason,
     assessmentStatus: "not_measured",
@@ -88,7 +79,6 @@ export function scoreGamingResistance(root: string): GamingResistanceReport {
     controlInventory: {
       applicable: scope.applicable,
       notApplicableReason: scope.applicable ? undefined : scope.reason,
-      score: Math.min(100, flooding.score + selectiveEvidence.score + temporal.score + context.score + formula.score),
       flooding,
       selectiveEvidence,
       temporal,

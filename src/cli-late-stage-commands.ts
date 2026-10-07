@@ -259,13 +259,14 @@ export function registerLateStageCliCommands({
 
   demo
     .command("run")
-    .description("Run a simulated agent through the AMC gateway and produce a real score (~30s)")
+    .description("Send scripted demo traffic through the AMC gateway; output is a synthetic example, not evidence (~30s)")
     .option("--gateway <url>", "Gateway URL (default: auto-detect running instance)")
     .option("--no-vault", "Run an ephemeral demo gateway without using the current workspace vault")
     .option("--demo", "Alias for --no-vault")
     .option("--json", "Output as JSON")
     .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
       const { runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
+      const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
       const { issueLeaseForCli } = await import("./leases/leaseCli.js");
       const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
 
@@ -276,15 +277,13 @@ export function registerLateStageCliCommands({
         }
 
         if (!opts.json) {
+          console.log(chalk.bold.yellow(EXAMPLE_BANNER));
           console.log(chalk.bold("\n🎮  AMC Live Demo (no-vault)\n"));
           console.log(chalk.gray("  Starting an ephemeral demo workspace, upstream, and AMC gateway..."));
         }
         const result = await runDemoWithoutUserVault();
 
-        if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
-          return;
-        }
+        if (opts.json) { console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result }, null, 2)); return; }
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through an ephemeral AMC gateway`));
@@ -293,10 +292,11 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Demo maturity sample: ${result.maturityLevel} / ${result.maturityScore}`));
         console.log(chalk.yellow("  Trust label: DEMO_ONLY — not production audit evidence"));
         console.log(chalk.gray(`  Evidence workspace: ${result.evidenceWorkspace}\n`));
+        console.log(chalk.bold.yellow(EXAMPLE_BANNER));
         return;
       }
 
-      // Start demo upstream server
+      if (!opts.json) console.log(chalk.bold.yellow(EXAMPLE_BANNER));
       console.log(chalk.bold("\n🎮  AMC Live Demo\n"));
       console.log(chalk.gray("  Starting demo upstream server..."));
       const upstream = await startDemoUpstream();
@@ -339,32 +339,19 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
         console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
 
-        const steps = [
-          "Sending research task conversation...",
-          "Sending data analysis with tool calls...",
-          "Sending security audit scenario...",
-          "Sending code review request...",
-          "Sending financial escalation scenario...",
-          "Sending error recovery scenario...",
-        ];
-
         const result = await runDemo(gatewayUrl, lease.token);
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
-        console.log(chalk.gray(`  ~${result.evidenceItems} evidence items captured\n`));
-
-        void steps;
-
-        // Now run the diagnostic
-        console.log(chalk.bold("📊  Running diagnostic...\n"));
+        console.log(chalk.gray(`  The gateway recorded this scripted traffic for agent "default"; it is demo traffic, not evidence of your agent.\n`));
 
         if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
+          // The lease signs the traffic, not its truth: the result stays DEMO_ONLY.
+          console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", envelope: exampleEnvelope("demo:run"), ...result, trustLabel: "DEMO_ONLY" }, null, 2));
         } else {
-          console.log(chalk.gray("  Run 'amc run --agent default' to see the full scored report."));
           console.log(chalk.gray("  Run 'amc score evidence-coverage default' to see evidence gaps."));
           console.log(chalk.gray("  Open http://127.0.0.1:3212/console for the dashboard.\n"));
+          console.log(chalk.bold.yellow(EXAMPLE_BANNER));
         }
       } finally {
         await upstream.close();

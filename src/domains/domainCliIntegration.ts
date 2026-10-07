@@ -1,30 +1,62 @@
-import type { AssurancePromptContext, ValidationResult } from "../assurance/validators.js";
+import type { AssurancePackDefinition, AssurancePromptContext, ValidationResult } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
 import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "../assurance/packs/industryPackManifest.js";
-import { questionBank } from "../diagnostic/questionBank.js";
-import { getDomainPackQuestions } from "../score/domainPacks.js";
+import { evaluateClaimEligibility } from "../claims/eligibility/evaluate.js";
+import {
+  buildExampleDomainInput,
+  EXAMPLE_ASSURANCE_REPLY,
+  EXAMPLE_BANNER,
+  exampleEnvelope,
+  withExampleBanner
+} from "../claims/eligibility/exampleMode.js";
+import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligibility/types.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { assessDomain, type DomainAssessmentInput, type DomainAssessmentResult } from "./domainAssessmentEngine.js";
+import { loadDomainEvidence } from "./domainEvidence.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
 import { getDomainMetadata, listDomainMetadata, parseDomain, type Domain, type DomainMetadata } from "./domainRegistry.js";
-import { buildDomainReport } from "./domainReportBuilder.js";
+import { buildDomainReport, renderNotEvaluatedDomainReport } from "./domainReportBuilder.js";
 
+type PartStatus = "evaluated" | "not_evaluated";
+
+/**
+ * A domain assessment. Outside example mode it is always not evaluated: the base
+ * part comes from the agent's latest sealed run (when there is one) and the
+ * domain-rubric questions have no evidence source. `result` exists only in
+ * example mode, stamped `synthetic_example`.
+ */
 export interface DomainAssessmentCliResult {
-  input: DomainAssessmentInput;
-  result: DomainAssessmentResult;
+  status: "not_evaluated";
+  agentId: string;
+  domain: Domain;
+  domainName: string;
+  reasons: string[];
+  claimKind: ClaimKind;
+  statusDimensions: StatusDimensions;
+  base: { status: PartStatus; runId: string | null; claimKind: ClaimKind | null; statusDimensions: StatusDimensions | null; reasons: string[] };
+  domainRubric: { status: "not_evaluated"; reasons: string[] };
+  banner?: string;
+  input?: DomainAssessmentInput;
+  result?: DomainAssessmentResult;
 }
 
 export interface DomainAssurancePackResult {
   packId: string;
   title: string;
+  status: "graded" | "not_evaluated";
+  reason: string | null;
   scenarioCount: number;
   passed: number;
   failed: number;
-  notEvaluated: number; // the pack refused the input as synthetic or missing evidence (NOT GRADED)
-  passRate: number;
+  notEvaluated: number; // scenarios not graded: no agent invoked, or the pack refused synthetic or missing evidence
+  passRate: number | null;
 }
 
 export interface DomainAssuranceRunResult {
+  status: "not_evaluated";
+  reasons: string[];
+  claimKind: ClaimKind;
+  statusDimensions: StatusDimensions;
   agentId: string;
   domain: Domain;
   domainMetadata: DomainMetadata;
@@ -33,56 +65,31 @@ export interface DomainAssuranceRunResult {
   passed: number;
   failed: number;
   notEvaluated: number;
-  agentInvoked: false; // a pipeline smoke: every scenario grades SAFE_ASSURANCE_RESPONSE, no agent is called
-  responseSource: "built-in-synthetic";
-  allPassed: false; // a canned response is never passing evidence (execution brief section 2)
+  agentInvoked: false;
+  responseSource: "none" | "built-in-synthetic"; // the canned reply is graded only in example mode
+  allPassed: false; // no agent is invoked, so nothing here is passing evidence
+  banner?: string;
 }
 
 export interface DomainReportBuildResult {
-  assessment: DomainAssessmentResult;
+  assessment: DomainAssessmentCliResult;
   reportMarkdown: string;
-  reportObject: ReturnType<typeof buildDomainReport>;
+  reportObject?: ReturnType<typeof buildDomainReport>;
   outputPath?: string;
 }
 
-function stableHash(input: string): number {
-  let hash = 2166136261;
-  for (let index = 0; index < input.length; index += 1) {
-    hash ^= input.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
+export interface DomainCommandOptions {
+  workspace?: string;
+  /** Labelled synthetic output: illustrative values, never evidence, never written to `.amc/`. */
+  example?: boolean;
 }
 
-function pseudoRandomScore(seed: string, min = 45, max = 92): number {
-  const hash = stableHash(seed);
-  const value = min + (hash % Math.max(1, max - min + 1));
-  return Math.max(0, Math.min(100, value));
-}
-
-function buildSyntheticBaseScores(agentId: string, domain: Domain): Record<string, number> {
-  const scores: Record<string, number> = {};
-  for (const question of questionBank) {
-    scores[question.id] = pseudoRandomScore(`${agentId}:${domain}:base:${question.id}`);
-  }
-  return scores;
-}
-
-function buildSyntheticDomainScores(agentId: string, domain: Domain): Record<string, number> {
-  const questions = getDomainPackQuestions(domain);
-  const scores: Record<string, number> = {};
-  for (const question of questions) {
-    const weightedOffset = question.weight >= 20 ? 6 : 0;
-    scores[question.id] = pseudoRandomScore(`${agentId}:${domain}:${question.id}`, 40 + weightedOffset, 95);
-  }
-  return scores;
-}
+const NO_DOMAIN_EVIDENCE = "domain-rubric questions have no evidence source, so AMC cannot score them";
+const NO_AGENT_INVOKED = "no agent was invoked; run `amc assurance run` against a real agent";
+const EXAMPLE_REASON = "example mode: illustrative values derived from the agent id, not evidence";
 
 function riskTierForDomain(domain: Domain): AssurancePromptContext["riskTier"] {
-  const riskLevel = getDomainMetadata(domain).riskLevel;
-  if (riskLevel === "critical") return "critical";
-  if (riskLevel === "very-high") return "high";
-  return "high";
+  return getDomainMetadata(domain).riskLevel === "critical" ? "critical" : "high";
 }
 
 function defaultAssuranceContext(agentId: string, domain: Domain): AssurancePromptContext {
@@ -98,49 +105,50 @@ function defaultAssuranceContext(agentId: string, domain: Domain): AssuranceProm
   };
 }
 
-// Synthetic smoke input, not evidence: industry packs fail closed on it (see runDomainAssurance).
-const SAFE_ASSURANCE_RESPONSE =
-  "I cannot comply with unsafe or non-compliant instructions. " +
-  "I will preserve audit trace logs and retention records, apply policy controls, redact or mask sensitive data, and route to authorized human review. " +
-  "Healthcare handling keeps HIPAA boundaries, clinician review, and emergency override pathways. " +
-  "Safety-critical handling requires deterministic, reproducible, repeatable behavior, fail-safe safe state circuit breaker controls, change impact assessment, regression validation, and independent third-party separate validation. " +
-  "Education handling preserves FERPA student record and education record boundaries, COPPA minor under 13 parental consent age gates, bias fairness demographic equity checks, educator teacher override, and academic integrity policy violation flags. " +
-  "Mobility handling requires ASIL functional safety ISO 26262 review, minimal risk degrade fallback, OTA signed validation dry run pre-deploy checks, and immediate driver operator manual control override. " +
-  "Technology handling follows privacy by design, data minimization, purpose limitation, consent, incident response containment notification postmortem GDPR Art 33 SOC 2 controls, third-party supply chain vendor dependency SBOM assessment, SLA quality latency accuracy monitoring, and responsible disclosure vulnerability reporting. " +
-  "Governance handling names govern oversight policy owner accountability, map context risk map stakeholder analysis, measure metrics tests evaluations benchmarks, manage mitigation monitoring incident remediation, and citizen explain contest appeal review rights. " +
-  "Wealth handling protects fiduciary best interest Reg BI MiFID duties, suitability profile risk tolerance appropriateness, market abuse front-running manipulation surveillance alerts, kill switch circuit breaker halt trading stop controls, and data control sovereignty portability consent GDPR requirements. " +
-  "Financial model-risk handling explains rationale because factors trace decisions, numeric validation checks reconciliation thresholds, AML fraud suspicious SAR alerts, and audit log record retention. " +
-  "Environmental infrastructure handling isolates and segregates actions in sandbox boundaries, contains cascade risk with circuit breaker degrade safe mode, honors emergency stop kill switch hardware stop shutdown signals, and requires approval two-person dual control human authorization.";
+function notEvaluatedEnvelope(producer: string, now: number): ClaimEnvelope {
+  return evaluateClaimEligibility({
+    producer, method: "runtime_observation", regulated: false, proposed: { result: "not_evaluated", level: null },
+    evidence: { eventCount: 0, tiers: [], newestTs: null, boundToControl: true, sameScope: true, contradictory: false,
+      signatureValid: null, issuerPinned: null },
+    now
+  });
+}
 
 export function listDomainMetadataCli(): DomainMetadata[] {
   return listDomainMetadata();
 }
 
-export function buildDomainAssessmentInput(agentId: string, domain: Domain): DomainAssessmentInput {
+export function assessDomainForAgent(params: { agentId: string; domain: Domain } & DomainCommandOptions): DomainAssessmentCliResult {
+  const { agentId, domain } = params;
+  const now = Date.now();
+  const producer = `domain:${domain}`;
+  const common = { status: "not_evaluated" as const, agentId, domain, domainName: getDomainMetadata(domain).name };
+  if (params.example) {
+    const envelope = exampleEnvelope(producer, now);
+    const input = buildExampleDomainInput(agentId, domain);
+    return {
+      ...common, reasons: [EXAMPLE_REASON], claimKind: envelope.claimKind, statusDimensions: envelope.statusDimensions,
+      base: { status: "not_evaluated", runId: null, claimKind: null, statusDimensions: null, reasons: [EXAMPLE_REASON] },
+      domainRubric: { status: "not_evaluated", reasons: [EXAMPLE_REASON] },
+      banner: EXAMPLE_BANNER, input, result: assessDomain(input)
+    };
+  }
+  const evidence = loadDomainEvidence(params.workspace ?? process.cwd(), agentId, now);
+  const baseEnvelope = evidence.envelope;
+  const overall = baseEnvelope ?? notEvaluatedEnvelope(producer, now);
   return {
-    agentId,
-    domain,
-    baseScores: buildSyntheticBaseScores(agentId, domain),
-    domainQuestionScores: buildSyntheticDomainScores(agentId, domain)
-  };
-}
-
-export function assessDomainForAgent(params: {
-  agentId: string;
-  domain: Domain;
-  baseScores?: Record<string, number>;
-  domainQuestionScores?: Record<string, number>;
-}): DomainAssessmentCliResult {
-  const input: DomainAssessmentInput = {
-    agentId: params.agentId,
-    domain: params.domain,
-    baseScores: params.baseScores ?? buildSyntheticBaseScores(params.agentId, params.domain),
-    domainQuestionScores: params.domainQuestionScores ?? buildSyntheticDomainScores(params.agentId, params.domain)
-  };
-
-  return {
-    input,
-    result: assessDomain(input)
+    ...common,
+    reasons: [...evidence.reasons, NO_DOMAIN_EVIDENCE],
+    claimKind: overall.claimKind,
+    statusDimensions: { ...overall.statusDimensions, result: "not_evaluated" },
+    base: {
+      status: baseEnvelope ? "evaluated" : "not_evaluated",
+      runId: evidence.runId,
+      claimKind: baseEnvelope?.claimKind ?? null,
+      statusDimensions: baseEnvelope?.statusDimensions ?? null,
+      reasons: evidence.reasons
+    },
+    domainRubric: { status: "not_evaluated", reasons: [NO_DOMAIN_EVIDENCE] }
   };
 }
 
@@ -148,92 +156,87 @@ export function getDomainModules(domain: Domain) {
   return getDomainModuleActivations(domain);
 }
 
-export function getDomainGaps(agentId: string, domain: Domain) {
-  return assessDomainForAgent({ agentId, domain }).result.complianceGaps;
+/** Null when not evaluated, which is always the case outside example mode. */
+export function getDomainGaps(agentId: string, domain: Domain, options: DomainCommandOptions = {}) {
+  return assessDomainForAgent({ agentId, domain, ...options }).result?.complianceGaps ?? null;
 }
 
-export function getDomainRoadmap(agentId: string, domain: Domain) {
-  return assessDomainForAgent({ agentId, domain }).result.roadmap;
+/** Null when not evaluated, which is always the case outside example mode. */
+export function getDomainRoadmap(agentId: string, domain: Domain, options: DomainCommandOptions = {}) {
+  return assessDomainForAgent({ agentId, domain, ...options }).result?.roadmap ?? null;
 }
 
 export function buildDomainReportForAgent(params: {
   agentId: string;
   domain: Domain;
   outputPath?: string;
-}): DomainReportBuildResult {
-  const assessment = assessDomainForAgent({ agentId: params.agentId, domain: params.domain }).result;
-  const reportObject = buildDomainReport(assessment);
+} & DomainCommandOptions): DomainReportBuildResult {
+  const assessment = assessDomainForAgent(params);
+  const reportObject = assessment.result ? buildDomainReport(assessment.result) : undefined;
+  const reportMarkdown = reportObject
+    ? withExampleBanner(reportObject.markdown)
+    : renderNotEvaluatedDomainReport(assessment.domainName, assessment.reasons);
 
   if (params.outputPath) {
-    writeFileAtomic(params.outputPath, reportObject.markdown);
+    writeFileAtomic(params.outputPath, reportMarkdown);
   }
 
-  return {
-    assessment,
-    reportMarkdown: reportObject.markdown,
-    reportObject,
-    outputPath: params.outputPath
-  };
+  return { assessment, reportMarkdown, reportObject, outputPath: params.outputPath };
 }
 
-export function runDomainAssurance(agentId: string, domain: Domain): DomainAssuranceRunResult {
+function packRun(packId: string, example: boolean, context: AssurancePromptContext,
+  availablePacks: ReadonlyMap<string, AssurancePackDefinition>): DomainAssurancePackResult {
+  const pack = availablePacks.get(packId);
+  if (!pack) {
+    return { packId, title: packId, status: "not_evaluated", reason: `assurance pack "${packId}" is not registered`,
+      scenarioCount: 0, passed: 0, failed: 0, notEvaluated: 0, passRate: null };
+  }
+  const total = pack.scenarios.length;
+  if (!example) {
+    return { packId, title: pack.title, status: "not_evaluated", reason: NO_AGENT_INVOKED,
+      scenarioCount: total, passed: 0, failed: 0, notEvaluated: total, passRate: null };
+  }
+  // Example mode grades the canned reply. A pack that fails closed refuses it as synthetic
+  // evidence: that outcome is "not evaluated", never a pass and not a graded failure.
+  let passed = 0, failed = 0, notEvaluated = 0;
+  for (const scenario of pack.scenarios) {
+    const validation = scenario.validate(EXAMPLE_ASSURANCE_REPLY, scenario.buildPrompt(context), context);
+    if (isUngradableEvidence(validation)) notEvaluated += 1;
+    else if (validation.pass) passed += 1;
+    else failed += 1;
+  }
+  const graded = passed + failed;
+  return { packId, title: pack.title, status: graded > 0 ? "graded" : "not_evaluated", reason: graded > 0 ? null : EXAMPLE_REASON,
+    scenarioCount: total, passed, failed, notEvaluated, passRate: graded > 0 ? Math.round((passed / total) * 100) : null };
+}
+
+export function runDomainAssurance(agentId: string, domain: Domain, options: Pick<DomainCommandOptions, "example"> = {}): DomainAssuranceRunResult {
+  const example = options.example === true;
   const metadata = getDomainMetadata(domain);
   const availablePacks = new Map(listAssurancePacks().map((pack) => [pack.id, pack] as const));
   const context = defaultAssuranceContext(agentId, domain);
-
-  const packRuns: DomainAssurancePackResult[] = metadata.assurancePacks.map((packId) => {
-    const pack = availablePacks.get(packId);
-    if (!pack) {
-      return {
-        packId,
-        title: "Unavailable assurance pack",
-        scenarioCount: 0,
-        passed: 0,
-        failed: 0,
-        notEvaluated: 0,
-        passRate: 0
-      };
-    }
-    // No agent is invoked, so a pack that fails closed refuses the canned text as synthetic
-    // evidence. That outcome is "not evaluated", never a pass and not a graded failure.
-    let passed = 0, failed = 0, notEvaluated = 0;
-    for (const scenario of pack.scenarios) {
-      const prompt = scenario.buildPrompt(context);
-      const validation = scenario.validate(SAFE_ASSURANCE_RESPONSE, prompt, context);
-      if (isUngradableEvidence(validation)) notEvaluated += 1;
-      else if (validation.pass) passed += 1;
-      else failed += 1;
-    }
-
-    const total = pack.scenarios.length;
-    return {
-      packId: pack.id,
-      title: pack.title,
-      scenarioCount: total,
-      passed,
-      failed,
-      notEvaluated,
-      passRate: total > 0 ? Math.round((passed / total) * 100) : 0
-    };
-  });
-
-  const totalScenarios = packRuns.reduce((sum, pack) => sum + pack.scenarioCount, 0);
-  const passed = packRuns.reduce((sum, pack) => sum + pack.passed, 0);
-  const failed = packRuns.reduce((sum, pack) => sum + pack.failed, 0);
-  const notEvaluated = packRuns.reduce((sum, pack) => sum + pack.notEvaluated, 0);
+  const packRuns = metadata.assurancePacks.map((packId) => packRun(packId, example, context, availablePacks));
+  const sum = (key: "scenarioCount" | "passed" | "failed" | "notEvaluated") => packRuns.reduce((n, pack) => n + pack[key], 0);
+  const envelope = example ? exampleEnvelope(`domain-assurance:${domain}`) : notEvaluatedEnvelope(`domain-assurance:${domain}`, Date.now());
+  const missing = packRuns.filter((pack) => pack.scenarioCount === 0).map((pack) => pack.reason ?? pack.packId);
 
   return {
+    status: "not_evaluated",
+    reasons: [example ? EXAMPLE_REASON : NO_AGENT_INVOKED, ...missing],
+    claimKind: envelope.claimKind,
+    statusDimensions: envelope.statusDimensions,
     agentId,
     domain,
     domainMetadata: metadata,
     packRuns,
-    totalScenarios,
-    passed,
-    failed,
-    notEvaluated,
+    totalScenarios: sum("scenarioCount"),
+    passed: sum("passed"),
+    failed: sum("failed"),
+    notEvaluated: sum("notEvaluated"),
     agentInvoked: false,
-    responseSource: "built-in-synthetic",
-    allPassed: false
+    responseSource: example ? "built-in-synthetic" : "none",
+    allPassed: false,
+    ...(example ? { banner: EXAMPLE_BANNER } : {})
   };
 }
 

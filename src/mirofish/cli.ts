@@ -14,6 +14,7 @@ import {
   formatScenarioList,
 } from "./format.js";
 import type { SimulationOptions } from "./types.js";
+import { exampleEnvelope, EXAMPLE_BANNER, withExampleBanner } from "../claims/eligibility/exampleMode.js";
 
 function defaultSeed(): number {
   return Math.floor(Math.random() * 2 ** 31);
@@ -41,15 +42,16 @@ export function registerMirofishCommands(program: Command): void {
 
       const result = runSimulation(scenario, simOpts);
 
+      // Seeded Monte Carlo output, not an observation of any agent: always labelled synthetic_example.
       switch (opts.output) {
         case "json":
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify({ banner: EXAMPLE_BANNER, envelope: exampleEnvelope("mirofish:run"), ...result }, null, 2));
           break;
         case "markdown":
-          console.log(formatSimulationMarkdown(result));
+          console.log(withExampleBanner(formatSimulationMarkdown(result)));
           break;
         default:
-          console.log(formatSimulationText(result));
+          console.log(withExampleBanner(formatSimulationText(result)));
       }
     });
 
@@ -119,7 +121,7 @@ export function registerMirofishCommands(program: Command): void {
       const r1 = runSimulation(s1, simOpts);
       const r2 = runSimulation(s2, simOpts);
 
-      console.log(formatComparisonText(r1, r2));
+      console.log(withExampleBanner(formatComparisonText(r1, r2)));
     });
 
   /* ── stress ──────────────────────────────────────── */
@@ -135,6 +137,6 @@ export function registerMirofishCommands(program: Command): void {
         seed: parseInt(opts.seed, 10),
       });
 
-      console.log(formatStressText(result));
+      console.log(withExampleBanner(formatStressText(result)));
     });
 }

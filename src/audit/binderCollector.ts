@@ -36,6 +36,7 @@ import { type AuditPolicy } from "./auditPolicySchema.js";
 import { hashAuditId } from "./binderRedaction.js";
 import { binderJsonSchema, type AuditBinderJson } from "./binderSchema.js";
 import { type EvidenceRequest } from "./evidenceRequestSchema.js";
+import { assertNotExample } from "../claims/eligibility/exampleMode.js";
 
 interface ScopeInput {
   type: "WORKSPACE" | "NODE" | "AGENT";
@@ -190,9 +191,7 @@ function findLatestAgentRunId(workspace: string, agentId: string): string | null
   const files = readdirSync(runsDir)
     .filter((name) => name.endsWith(".json"))
     .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
+  if (files.length === 0) return null;
   return files[files.length - 1]!.replace(/\.json$/, "");
 }
 
@@ -765,6 +764,7 @@ export async function collectAuditBinderData(params: {
     const runId = findLatestAgentRunId(params.workspace, scope.id);
     if (runId) {
       const run = loadRunReport(params.workspace, runId, scope.id);
+      assertNotExample(run, "included in an audit binder");
       maturityOverall = Number((run.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / Math.max(1, run.layerScores.length)).toFixed(6));
       maturityByDim = byDimensionFromRun(run);
       unknownQuestionsCount = run.questionScores.filter((row) => row.finalLevel <= 1).length;

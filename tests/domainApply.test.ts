@@ -121,4 +121,20 @@ describe("domain apply", () => {
       })
     ).rejects.toThrow(/Unknown domain: not-a-domain/);
   });
+
+  test("reports the domain assessment as not evaluated, never a composite score", async () => {
+    const result = await applyDomainToAgent({ agentId: "default", domain: "health", workspacePath: createWorkspace(), dryRun: true });
+    expect(result.assessment.status).toBe("not_evaluated");
+    expect(result.assessment.reasons.length).toBeGreaterThan(0);
+    expect(JSON.stringify(result)).not.toMatch(/compositeScore|"composite"/);
+  });
+
+  test("argument errors name the problem", async () => {
+    const workspacePath = createWorkspace();
+    await expect(applyDomainToAgent({ agentId: " ", domain: "health", workspacePath })).rejects.toThrow("agentId is required.");
+    await expect(applyDomainToAgent({ agentId: "default", workspacePath })).rejects.toThrow(/--domain <domain> or --pack <packId>/);
+    await expect(applyDomainToAgent({ agentId: "default", packId: "no-such-pack", workspacePath })).rejects.toThrow(/Unknown pack: no-such-pack/);
+    await expect(applyDomainToAgent({ agentId: "default", packId: "clinical-trials", domain: "education", workspacePath }))
+      .rejects.toThrow(/belongs to domain/);
+  });
 });

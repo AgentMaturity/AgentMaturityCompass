@@ -92,7 +92,8 @@ describe("red-team CI gate", () => {
     expect(result.gamingResistance?.score).toBeNull();
     expect(result.gamingResistance?.level).toBeNull();
     expect(result.gamingResistance?.controlInventory.applicable).toBe(spoofSource);
-    expect(result.gamingResistance?.controlInventory.score).toBe(spoofSource ? 100 : 0);
+    // P0-15: the inventory is a path list, never a number a spoofed source tree could raise.
+    expect(result.gamingResistance?.controlInventory).not.toHaveProperty("score");
   });
 
   it("fails closed when vulnerability thresholds are exceeded", async () => {

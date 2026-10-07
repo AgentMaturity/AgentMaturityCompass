@@ -39,7 +39,6 @@ export {
 
 export {
   assessDomainForAgent,
-  buildDomainAssessmentInput,
   buildDomainReportForAgent,
   getDomainGaps,
   getDomainModules,
@@ -48,6 +47,7 @@ export {
   parseDomainOrThrow,
   runDomainAssurance,
   type DomainAssessmentCliResult,
+  type DomainCommandOptions,
   type DomainAssurancePackResult,
   type DomainAssuranceRunResult,
   type DomainReportBuildResult

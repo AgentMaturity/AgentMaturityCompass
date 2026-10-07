@@ -34,12 +34,13 @@ function writeArtifact(workspace: string, relPath: string): void {
   writeFileSync(abs, "fixture\n");
 }
 
-function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number): void {
+function writeRun(workspace: string, agentId: string, runId: string, ts: number, integrityIndex: number | null,
+  extra: Record<string, unknown> = {}): void {
   const runPath = join(workspace, ".amc", "agents", agentId, "runs", `${runId}.json`);
   mkdirSync(dirname(runPath), { recursive: true });
   // Sealed the way the diagnostic writer seals: since G9-05, an unsealed run
   // file is refused as a scoring input, so the fixture must be a real one.
-  const base = { runId, ts, integrityIndex, reportJsonSha256: "", runSealSig: "" };
+  const base = { runId, ts, ...(integrityIndex === null ? {} : { integrityIndex }), ...extra, reportJsonSha256: "", runSealSig: "" };
   const hash = sha256Hex(canonicalize(base));
   const ledger = openLedger(workspace);
   const sig = ledger.signRunHash(hash);
@@ -101,56 +102,69 @@ afterEach(() => {
   }
 });
 
+// These tests used to assert path-presence scores (ISO controls covered by doc
+// file names, a readiness score of 70+ from AMC source paths). File presence is
+// not evidence, so since P0-15 all three components are not evaluated.
 describe("scoreISO42001Coverage", () => {
-  test("returns zero score when no controls are present", () => {
-    const workspace = bareWorkspace();
-    const score = scoreISO42001Coverage(workspace);
-    expect(score.score).toBe(0);
-    expect(score.passedControls).toBe(0);
-    expect(score.gaps.length).toBe(score.totalControls);
+  test("reports every control as not evaluated in a bare workspace", () => {
+    const score = scoreISO42001Coverage(bareWorkspace());
+    expect(score.status).toBe("not_evaluated");
+    expect(score.score).toBeNull();
+    expect(score.controls).toHaveLength(score.totalControls);
   });
 
-  test("detects covered ISO controls from workspace artifacts", () => {
+  test("stays not evaluated when governance documents exist", () => {
     const workspace = newWorkspace();
     writeArtifact(workspace, "docs/AI_GOVERNANCE.md");
     writeArtifact(workspace, "docs/POLICY.md");
     writeArtifact(workspace, "docs/MONITORING.md");
-
     const score = scoreISO42001Coverage(workspace);
-    expect(score.passedControls).toBeGreaterThanOrEqual(3);
-    expect(score.score).toBeGreaterThan(0);
+    expect(score.score).toBeNull();
+    expect(score.controls.every((control) => control.status === "not_evaluated")).toBe(true);
   });
 });
 
 describe("scoreRegulatoryReadiness", () => {
-  test("combines EU + ISO + OWASP into a single readiness score", () => {
+  test("is not evaluated even with every formerly accepted artifact and lists all 28 criteria", () => {
     const workspace = newWorkspace();
     populateHighCoverageArtifacts(workspace);
     writeRun(workspace, "agent-reg", "run-1", 1000, 0.95);
 
-    const score = scoreRegulatoryReadiness({
-      workspace,
-      agentId: "agent-reg"
-    });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
 
-    expect(score.components.euAiAct).toBeGreaterThanOrEqual(90);
-    expect(score.components.owaspLLM).toBe(100);
-    expect(score.components.iso42001).toBeGreaterThanOrEqual(90);
-    expect(score.score).toBeGreaterThanOrEqual(70);
+    expect(score.status).toBe("not_evaluated");
+    expect(score.score).toBeNull();
+    expect(score.components).toEqual({ euAiAct: null, iso42001: null, owaspLLM: null });
+    expect(score.notEvaluated).toHaveLength(28);
     expect(score.agentId).toBe("agent-reg");
   });
 
-  test("agent evidence modifier increases with stronger latest integrity index", () => {
+  test("still reports the latest sealed run", () => {
     const workspace = newWorkspace();
-    populateHighCoverageArtifacts(workspace);
     writeRun(workspace, "agent-reg", "run-low", 1000, 0.4);
-    const low = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
-
     writeRun(workspace, "agent-reg", "run-high", 2000, 0.9);
-    const high = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBe("run-high");
+    expect(score.latestIntegrityIndex).toBe(0.9);
+  });
 
-    expect(high.agentEvidenceModifier).toBeGreaterThan(low.agentEvidenceModifier);
-    expect(high.score).toBeGreaterThanOrEqual(low.score);
+  test("ignores unsealed and malformed run files", () => {
+    const workspace = newWorkspace();
+    const runsDir = join(workspace, ".amc", "agents", "agent-reg", "runs");
+    mkdirSync(runsDir, { recursive: true });
+    writeFileSync(join(runsDir, "run-unsealed.json"), JSON.stringify({ runId: "run-unsealed", ts: 5000, integrityIndex: 1 }));
+    writeFileSync(join(runsDir, "run-broken.json"), "{not json");
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBeNull();
+    expect(score.latestIntegrityIndex).toBeNull();
+  });
+
+  test("derives the latest integrity from layer scores when the run has no integrity index", () => {
+    const workspace = newWorkspace();
+    writeRun(workspace, "agent-reg", "run-layers", 1000, null, { layerScores: [{ avgFinalLevel: 4 }, { avgFinalLevel: 2 }] });
+    const score = scoreRegulatoryReadiness({ workspace, agentId: "agent-reg" });
+    expect(score.latestRunId).toBe("run-layers");
+    expect(score.latestIntegrityIndex).toBeCloseTo(0.6);
   });
 
   test("normalizes custom weights for deterministic weighted composite", () => {

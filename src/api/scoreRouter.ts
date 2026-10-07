@@ -708,7 +708,7 @@ export async function handleScoreRoute(
         body.rawDimensionScores,
         body.industryId,
         body.lastVerifiedAt ?? Date.now() - 3600000,
-        body.observedEvidenceShare ?? 0.5,
+        body.observedEvidenceShare ?? null,
       );
       apiSuccess(res, result);
     } catch (err) {

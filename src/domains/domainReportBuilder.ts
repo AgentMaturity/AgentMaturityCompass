@@ -62,7 +62,6 @@ function renderExecutiveSummary(summary: ExecutiveSummary): string {
     "## Executive Summary",
     `- Domain: ${summary.domain}`,
     `- Level: ${summary.level}`,
-    `- Certification Readiness: ${summary.certificationReadiness ? "yes" : "no"}`,
     `- Base Score: ${summary.baseScore}`,
     `- Domain Score: ${summary.domainScore}`,
     `- Composite Score: ${summary.compositeScore}`,
@@ -160,6 +159,20 @@ export function renderDomainReportMarkdown(result: DomainAssessmentResult): stri
   ];
 
   return sections.join("\n");
+}
+
+/** The report for an assessment AMC could not evaluate: the reasons, no scores and no gap verdict. */
+export function renderNotEvaluatedDomainReport(domainName: string, reasons: readonly string[]): string {
+  return [
+    `# AMC Domain Report: ${domainName}`,
+    `Generated: ${new Date().toISOString()}`,
+    "",
+    "## Result: Not evaluated",
+    ...reasons.map((reason) => `- ${reason}`),
+    "",
+    "Next step: run `amc quickscore` to evaluate the base part from observed evidence.",
+    ""
+  ].join("\n");
 }
 
 export function buildDomainReport(result: DomainAssessmentResult): DomainReport {

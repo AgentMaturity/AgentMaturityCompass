@@ -127,10 +127,7 @@ export function registerDomainApplyCommand(domainCmd: Command): void {
         console.log(chalk.gray("Packs Applied:"), result.packsApplied.join(", "));
         console.log(chalk.gray("Guardrails Generated:"), result.guardrailsGenerated);
         console.log(chalk.gray("Guardrails Enabled:"), result.guardrailsEnabled.length);
-        console.log(
-          chalk.gray("Assessment:"),
-          `composite=${result.assessmentScore.composite} level=${result.assessmentScore.level} gaps=${result.assessmentScore.gaps}`
-        );
+        console.log(chalk.gray("Assessment:"), `not evaluated (${result.assessment.reasons.join("; ")})`);
         if (result.complianceFrameworks.length > 0) {
           console.log(chalk.gray("Compliance Frameworks:"), result.complianceFrameworks.join(", "));
         }

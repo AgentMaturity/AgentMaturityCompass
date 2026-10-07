@@ -4,11 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { scoreGamingResistance } from "../../src/score/gamingResistance.js";
 import { scoreMonitorBypassResistance } from "../../src/score/monitorBypassResistance.js";
-import { scoreOWASPLLMCoverage } from "../../src/score/owaspLLMCoverage.js";
 
 /**
- * These three scorers grade AMC's own control surface by probing for AMC source
- * files. Pointed at any other directory they previously returned a low score
+ * These scorers grade AMC's own control surface by probing for AMC source
+ * files. (OWASP LLM coverage was one; since P0-15 it is not evaluated anywhere,
+ * see tests/pathScorersNotEvaluated.test.ts.) Pointed at any other directory they previously returned a low score
  * with nothing marking it as meaningless, so an API consumer or a report could
  * present "0/10 OWASP risks covered" as a finding about the customer's agent.
  *
@@ -29,8 +29,7 @@ describe("control-surface scorers declare when they do not apply", () => {
 
   const scorers = [
     ["gamingResistance", () => scoreGamingResistance(foreign)],
-    ["monitorBypassResistance", () => scoreMonitorBypassResistance(foreign)],
-    ["owaspLLMCoverage", () => scoreOWASPLLMCoverage(foreign)]
+    ["monitorBypassResistance", () => scoreMonitorBypassResistance(foreign)]
   ] as const;
 
   for (const [name, run] of scorers) {
@@ -44,8 +43,7 @@ describe("control-surface scorers declare when they do not apply", () => {
   }
 
   const inRepo = [
-    ["monitorBypassResistance", () => scoreMonitorBypassResistance(process.cwd())],
-    ["owaspLLMCoverage", () => scoreOWASPLLMCoverage(process.cwd())]
+    ["monitorBypassResistance", () => scoreMonitorBypassResistance(process.cwd())]
   ] as const;
 
   for (const [name, run] of inRepo) {
@@ -63,6 +61,6 @@ describe("control-surface scorers declare when they do not apply", () => {
     expect(result.assessmentStatus).toBe("not_measured");
     expect(result.score).toBeNull();
     expect(result.controlInventory.applicable).toBe(true);
-    expect(result.controlInventory.score).toBeGreaterThan(0);
+    expect(result.controlInventory.flooding.presentPaths.length).toBeGreaterThan(0);
   });
 });

@@ -318,14 +318,15 @@ export function classifyEuAiActRisk(
 export interface ConstructValidityReport {
   studyId: string;
   methodology: string;
-  sampleSize: number;
-  expertCorrelation: number;
-  interRaterReliability: number;
-  testRetestReliability: number;
-  convergentValidity: number;
-  discriminantValidity: number;
-  internalConsistency: number; // Cronbach's alpha
-  factorLoadings: Record<string, number>;
+  /** Every study figure is null until a study is actually run (P0-15): no figure is a result. */
+  sampleSize: number | null;
+  expertCorrelation: number | null;
+  interRaterReliability: number | null;
+  testRetestReliability: number | null;
+  convergentValidity: number | null;
+  discriminantValidity: number | null;
+  internalConsistency: number | null; // Cronbach's alpha
+  factorLoadings: Record<string, number | null>;
   conclusion: string;
   limitations: string[];
   peerReviewStatus: "not-conducted" | "submitted" | "under-review" | "published" | "pre-print";
@@ -339,40 +340,39 @@ export interface ConstructValidityReport {
 /**
  * ILLUSTRATIVE TARGETS — NO STUDY HAS BEEN CONDUCTED.
  *
- * Every figure below was hand-written to show the shape of a psychometric
- * validation report. There was no expert panel, no test-retest interval and no
- * factor analysis, so the correlations, Cronbach's alpha and factor loadings
- * are not measurements and must never be cited as evidence that AMC's scoring
- * is validated. The limitations list describes a study design, not one that
- * took place.
+ * The figures once hand-written here (sample size, correlations, Cronbach's
+ * alpha, factor loadings) were never measured: there was no expert panel, no
+ * test-retest interval and no factor analysis. They are null so no reader can
+ * take them as results. The limitations list describes a study design, not
+ * one that took place.
  *
  * Replace this with real, attributable results before making any validity claim.
  */
 export const CONSTRUCT_VALIDITY_DATA: ConstructValidityReport = {
   studyId: "amc-cv-2026-001",
   methodology: "Mixed-methods: expert panel correlation + test-retest + convergent/discriminant analysis",
-  sampleSize: 240,
-  expertCorrelation: 0.82, // Up from 0.73 with confidence-weighted stabilization
-  interRaterReliability: 0.79,
-  testRetestReliability: 0.91, // After variance stabilization
-  convergentValidity: 0.77,
-  discriminantValidity: 0.68,
-  internalConsistency: 0.89, // Cronbach's alpha across 240 questions
+  sampleSize: null,
+  expertCorrelation: null,
+  interRaterReliability: null,
+  testRetestReliability: null,
+  convergentValidity: null,
+  discriminantValidity: null,
+  internalConsistency: null,
   factorLoadings: {
-    "Strategic Agent Ops": 0.84,
-    "Leadership & Autonomy": 0.81,
-    "Culture & Alignment": 0.86,
-    "Resilience": 0.83,
-    "Skills": 0.79,
+    "Strategic Agent Ops": null,
+    "Leadership & Autonomy": null,
+    "Culture & Alignment": null,
+    "Resilience": null,
+    "Skills": null,
   },
   conclusion:
     "NOT A RESULT: no construct-validity study has been conducted for AMC's L0-L5 scoring. " +
-    "The figures in this record are illustrative targets showing what such a study would report.",
+    "Every study figure in this record is null until such a study is run.",
   limitations: [
     "No study has been run; the entries below describe an intended design, not observed constraints",
-    "Intended expert panel: English-speaking AI practitioners (n=47)",
-    "Test-retest interval: 2 weeks — longer intervals needed",
-    "Discriminant validity moderate (0.68) — some dimension overlap expected",
+    "Intended expert panel: English-speaking AI practitioners",
+    "Intended test-retest interval: 2 weeks — longer intervals needed",
+    "Discriminant validity not measured — some dimension overlap expected",
     "Cross-cultural validation pending",
   ],
   peerReviewStatus: "not-conducted",

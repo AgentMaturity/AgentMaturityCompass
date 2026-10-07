@@ -265,5 +265,5 @@ This maps directly to Art. 14 human oversight requirements — the EU AI Act req
 - European Commission high-risk guidance: https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems
 - European Commission AI Act policy page: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
 - AMC Compliance Engine: `src/compliance/complianceEngine.ts`
-- AMC EU AI Act Scorer: `src/score/euAIActCompliance.ts`
+- AMC EU AI Act path inventory (reports every criterion as not evaluated; file presence is not evidence): `src/score/euAIActCompliance.ts`
 - AMC Cross-Framework Mapping: `src/score/crossFrameworkMapping.ts`
