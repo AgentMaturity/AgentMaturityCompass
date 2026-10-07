@@ -59,13 +59,13 @@ export interface AgentCapabilities {
   justiceAdministration?: boolean;
   /** Real-time remote biometric identification in public spaces */
   realtimeBiometricPublicSpaces?: boolean;
-  /** Social scoring by public authorities */
+  /** Social scoring (any actor; Art. 5(1)(c)) */
   socialScoring?: boolean;
   /** Subliminal manipulation of behaviour */
   subliminalManipulation?: boolean;
   /** Exploitation of vulnerabilities (age, disability, social situation) */
   exploitsVulnerabilities?: boolean;
-  /** Emotion recognition in workplace/educational setting */
+  /** Emotion recognition (inferring emotions) in the workplace or in education institutions; prohibited by Art. 5(1)(f) */
   emotionRecognition?: boolean;
   /** Chatbot / conversational agent (must disclose AI nature) */
   chatbot?: boolean;
@@ -149,6 +149,12 @@ export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActCla
       article: "Art. 5(1)(b)",
       title: "Exploitation of vulnerabilities",
       description: "Systems that exploit vulnerabilities of specific groups (age, disability) are prohibited."
+    },
+    {
+      flag: "emotionRecognition",
+      article: "Art. 5(1)(f)",
+      title: "Emotion recognition in the workplace or education",
+      description: "Systems that infer emotions of natural persons in the areas of workplace and education institutions are prohibited (since 2 Feb 2025), except where intended for medical or safety reasons."
     },
     {
       flag: "realtimeBiometricPublicSpaces",
@@ -253,12 +259,6 @@ export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActCla
       article: "Art. 50(2)",
       title: "Synthetic content labelling",
       description: "AI-generated synthetic audio, image, video, or text content must be labelled as artificially generated."
-    },
-    {
-      flag: "emotionRecognition",
-      article: "Art. 50(3)",
-      title: "Emotion recognition disclosure",
-      description: "Deployers of emotion recognition systems must inform persons exposed to them. Emotion recognition is also an Annex III point 1(c) high-risk use, and inferring emotions in the workplace or education is prohibited by Art. 5(1)(f) save for medical or safety reasons."
     },
     {
       flag: "humanInteraction",

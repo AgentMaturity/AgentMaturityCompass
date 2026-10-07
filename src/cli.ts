@@ -12648,7 +12648,7 @@ compliance
   .option("--social-scoring", "agent performs social scoring", false)
   .option("--subliminal", "agent uses subliminal manipulation techniques", false)
   .option("--exploits-vulnerabilities", "agent exploits vulnerabilities (age, disability)", false)
-  .option("--emotion-recognition", "agent performs emotion recognition", false)
+  .option("--emotion-recognition", "agent infers emotions in the workplace or in education (prohibited by Art. 5(1)(f) unless for medical or safety reasons)", false)
   .option("--chatbot", "agent is a chatbot/conversational system", false)
   .option("--synthetic-content", "agent generates synthetic audio/image/video/text", false)
   .option("--human-interaction", "agent interacts with humans", false)
