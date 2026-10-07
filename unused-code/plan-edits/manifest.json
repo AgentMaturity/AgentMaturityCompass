@@ -94,6 +94,13 @@
       "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5"
     },
     {
+      "path": "src/executive/brief.ts",
+      "issue": "P0-22",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-22/src/executive/brief.ts.landed",
+      "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a"
+    },
+    {
       "path": "src/governor/emergencyOverride.ts",
       "issue": "P0-10",
       "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
