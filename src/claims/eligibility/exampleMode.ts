@@ -70,12 +70,20 @@ export function assertNotExample(subject: unknown, action: string): void {
   if (isExample(subject)) throw new Error(`synthetic_example results cannot be ${action}`);
 }
 
-/** As assertNotExample, for a JSON file a signing path reads; a missing or non-JSON file is not an example. */
+/**
+ * As assertNotExample, for a file a signing path reads: refuses an example JSON
+ * result and any text with a line equal to EXAMPLE_BANNER (what `--example`
+ * stamps into text and Markdown output). A missing or unlabelled file passes.
+ */
 export function assertFileNotExample(path: string, action: string): void {
   if (!existsSync(path)) return;
+  const text = readFileSync(path, "utf8");
+  if (text.split(/\r?\n/).some((line) => line.trim() === EXAMPLE_BANNER)) {
+    throw new Error(`synthetic_example results cannot be ${action}`);
+  }
   let parsed: unknown = null;
   try {
-    parsed = JSON.parse(readFileSync(path, "utf8"));
+    parsed = JSON.parse(text);
   } catch {
     return;
   }

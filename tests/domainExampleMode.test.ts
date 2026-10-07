@@ -165,11 +165,17 @@ describe("example mode in process", () => {
     expect(real.reportMarkdown).not.toMatch(/No compliance gaps identified|Certification Readiness|Composite Score/);
   });
 
-  test("assertFileNotExample refuses an example JSON file and ignores missing or non-JSON files", () => {
+  test("assertFileNotExample refuses an example JSON or banner-stamped file and ignores missing or unlabelled files", () => {
     const dir = tempDir("amc-p015-file-");
     const example = join(dir, "example.json");
     writeFileSync(example, JSON.stringify(EXAMPLE));
     expect(() => assertFileNotExample(example, "signed")).toThrow("synthetic_example results cannot be signed");
+    const stamped = join(dir, "example.md");
+    buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: dir, outputPath: stamped, example: true });
+    expect(() => assertFileNotExample(stamped, "signed")).toThrow("synthetic_example results cannot be signed");
+    const quoted = join(dir, "quoted.md");
+    writeFileSync(quoted, `The banner reads "${EXAMPLE_BANNER}" in example output.\n`);
+    expect(() => assertFileNotExample(quoted, "signed")).not.toThrow();
     const text = join(dir, "notes.txt");
     writeFileSync(text, "plain text, not JSON");
     expect(() => assertFileNotExample(text, "signed")).not.toThrow();
@@ -237,6 +243,14 @@ describe("signing paths refuse a synthetic_example result", () => {
     const { auditBinderCreateCli } = await import("../src/audit/auditCli.js");
     await expect(auditBinderCreateCli({ workspace, scope: "agent", id: "example-binder" }))
       .rejects.toThrow(/synthetic_example results cannot be/);
+  });
+
+  test("amc notary sign (notarySignCli) refuses the banner-stamped Markdown --example --output writes", async () => {
+    const inFile = join(workspace, "example-report.md");
+    buildDomainReportForAgent({ agentId: "a", domain: "health", workspace: tempDir("amc-p015-md-"), outputPath: inFile, example: true });
+    const { notarySignCli } = await import("../src/notary/notaryCli.js");
+    expect(() => notarySignCli({ notaryDir: tempDir("amc-p015-notary-"), kind: "report", inFile, outFile: join(workspace, "md.sig") }))
+      .toThrow(/synthetic_example results cannot be/);
   });
 
   test("amc notary sign (notarySignCli) refuses an example payload before loading any key", async () => {
