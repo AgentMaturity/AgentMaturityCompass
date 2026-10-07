@@ -143,6 +143,54 @@ exactly when the producer is planned. A fixture envelope has `fixtureVersion: 1`
 `evidenceClass`, `setup` (read by the harness for the binding point) and `expected` (`result` and `reasonCode`).
 Fixtures are synthetic inputs for tests; they are never evidence.
 
+## Status dimensions
+
+Code: `src/catalog/evidence/` (P1-11). `evaluateControl(record, items, ctx)` admits or rejects each evidence item
+against the control's evidence contracts and returns a `ControlResult`: the five status dimensions of
+[CLAIM_KINDS.md](../CLAIM_KINDS.md), a claim kind derived through `evaluateClaimEligibility`, the admitted and rejected
+refs with reasons, and a `digest` (sha256 of the canonical result without `evaluatedAt`, with review `pending`, so a
+review can name it). It is deterministic: items are taken in ref order.
+
+An item's provenance is proved by the loader that read it, from the same bytes, never by reading a field back from an
+editable file. Ledger rows count only when the whole hash chain verifies and its head carries the workspace
+monitor-key signature; that key is the workspace's own, so this is a local audit trail, not a portable verdict
+(P0-09), and a truncated tail stays invisible until anchoring (P1-26). A row's receipt must verify and commit to that
+row. Sealed assurance reports must verify against the auditor key. Trust tiers come from P0-18's `effectiveTrustTier`
+on the verified row, capped by the producer's `maxClaimKind`.
+
+Admission, first failure wins:
+
+| Check | Rejection |
+| --- | --- |
+| The producer is in `producers.yaml`, `available`, and is the contract's producer | `producer_not_admitted` |
+| The loader proved that producer from the bytes it read | `producer_unverified` |
+| A `tenantId` on the item equals the evaluation's tenant (an unknown tenant included) | `cross_tenant` |
+| A `system`-session record binds an agent-scoped contract only as a violation | `binding_mismatch` |
+| Every `bindingFields` entry is present | `binding_missing` |
+| Every stated binding field the evaluation knows matches (`controlId`, `controlVersion`, `policyDigest`, `workspaceId`, `deploymentId`, `agentId`, `subjectId`, `producerId`) | `binding_mismatch` |
+| Recorded time inside the window | `outside_window` |
+| Recorded time no more than `freshness.maxAgeDays` before the window end (never the producer's claimed time) | `stale` |
+| No earlier presentation of the ref or receipt id in this evaluation or, through `priorUses`, under another control, subject or window; no receipt for another record | `replayed` |
+| No `invalidatedBy` trigger after the recorded time | `invalidated` |
+
+Dimensions:
+
+| Dimension | Rule |
+| --- | --- |
+| Applicability | The compiled plan's decision (P1-10). No plan: `unresolved`, so nothing passes. |
+| Evidence | First match: `contradictory` when admitted items disagree on one observation (an allow and a deny for one tool call id); `untrusted` when items exist, none is admitted and one failed for its producer or tenant, or a contract's admitted items fall below its minimum observed ratio; `stale` when a contract lacks `minItems` admitted items and some of its items were stale; `incomplete` when a contract lacks `minItems` admitted items (an empty window included); else `sufficient`. |
+| Result | `fail` when an admitted item violates, whatever the evidence. A violating item that was not admitted blocks a pass. `pass` only when applicability is `applicable` and evidence `sufficient`; otherwise `not_evaluated`. A not-applicable control never passes. |
+| Enforcement | `advisory` when the plan runs the control's enforcement point in warn mode; `enforced at <point>` only on admitted allow or deny records from that point's producer under the plan's policy digest; `observed` when items were admitted otherwise; else `none`. |
+| Review | `pending` unless a review from the approval engine names this result's digest: `rejected` wins, then `approved`, which is `expired` after `expiresAt`. |
+| Claim kind | `synthetic_example` when an admitted item's producer is synthetic; `observed` only when every admitted item derives OBSERVED or OBSERVED_HARDENED; otherwise `self_reported`. Never `independently_reviewed` here. |
+
+Compliance mappings (`.amc/compliance-maps.yaml`) run through the same evaluator, one control per requirement
+(`src/catalog/evidence/mappingAdapter.ts`): `requires_evidence_event` admits control-bound ledger records from
+`amc.ledger` bound to the control and the agent (or the workspace); `requires_no_audit` admits any record of the
+subject as coverage, so an empty window is incomplete, and treats a denied audit type as a violation;
+`requires_assurance_pack` admits sealed reports from `amc.assuranceRunner`. Mapping contracts use a 30-day freshness
+bound and no invalidation triggers until P1-53 re-keys them to catalog controls.
+
 ## Digests
 
 `digestOf(value)` is `"sha256:" + sha256Hex(canonicalize(value))`, over the parsed, schema-normalized value, so key
