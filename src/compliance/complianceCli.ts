@@ -1,4 +1,5 @@
 import type { ComplianceFramework } from "./frameworks.js";
+import type { Station } from "../domains/stations.js";
 import { generateComplianceReport, initComplianceMaps, verifyComplianceMapsSignature } from "./complianceEngine.js";
 import { writeComplianceReport, diffComplianceReports } from "./complianceReport.js";
 import { listAgents } from "../fleet/registry.js";
@@ -26,6 +27,7 @@ export function complianceReportCli(params: {
   outFile: string;
   format: "md" | "json";
   agentId?: string;
+  station?: Station;
 }): {
   outFile: string;
   report: ReturnType<typeof generateComplianceReport>;
@@ -34,7 +36,8 @@ export function complianceReportCli(params: {
     workspace: params.workspace,
     framework: params.framework,
     window: params.window,
-    agentId: params.agentId
+    agentId: params.agentId,
+    station: params.station
   });
   const outFile = writeComplianceReport({
     workspace: params.workspace,

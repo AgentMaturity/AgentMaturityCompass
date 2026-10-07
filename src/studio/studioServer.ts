@@ -8604,10 +8604,20 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const { listIndustryPacks } = await import("../domains/industryPacks.js");
         const { getIndustryPackEntitlement, toIndustryPackCatalogItem } = await import("../domains/industryPackEntitlement.js");
+        const { parseStation } = await import("../domains/stations.js");
+        const stationParam = url.searchParams.get("station");
+        let station: string | null = null;
+        try {
+          station = stationParam === null ? null : parseStation(stationParam);
+        } catch {
+          json(res, 400, { error: `unknown station: ${stationParam}` });
+          return;
+        }
         const entitlement = getIndustryPackEntitlement(options.workspace);
         json(res, 200, {
           entitlement, entitlementNote: ENTITLEMENT_NOTE,
-          packs: listIndustryPacks().map((pack) => toIndustryPackCatalogItem(pack, entitlement))
+          packs: listIndustryPacks().filter((pack) => station === null || pack.stationId === station)
+            .map((pack) => toIndustryPackCatalogItem(pack, entitlement))
         });
         return;
       }
