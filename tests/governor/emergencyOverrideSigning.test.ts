@@ -345,3 +345,16 @@ describe("an override is not honoured without a usable auditor public key", () =
     expect(invalidCode(ws, entry)).toBe("SIGNATURE_INVALID");
   });
 });
+
+describe("the canary report counts invalid overrides only where it can verify them", () => {
+  it("does not call a valid override from another workspace, or with no workspace, invalid", () => {
+    const a = keyed();
+    const b = keyed();
+    activateEmergencyOverride(CANARY_PARAMS, a);
+    for (const [ws, active] of [[a, 1], [b, 0], [undefined, 0]] as const) {
+      const report = generatePolicyCanaryReport(AGENT, ws);
+      expect(report.activeOverrides).toBe(active);
+      expect(report.invalidOverrides).toBe(0);
+    }
+  });
+});

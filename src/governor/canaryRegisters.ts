@@ -22,10 +22,9 @@ import type { RollbackPack, EmergencyOverride } from "./policyCanary.js";
 const ROLLBACK_PACKS_AT = { area: ["governor"], kind: "rollback-packs" };
 const OVERRIDES_AT = { area: ["governor"], kind: "emergency-overrides" };
 
-/** Clears the in-process caches. Used by resetPolicyCanaryState(). */
+/** Clears the in-process rollback-pack cache. Used by resetPolicyCanaryState(). */
 export function resetCanaryRegisters(): void {
   rollbackPacks.length = 0;
-  emergencyOverrides.length = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -105,12 +104,9 @@ export function getLatestRollbackPack(agentId: string, workspace?: string): Roll
 // Emergency overrides
 // ---------------------------------------------------------------------------
 
-/**
- * In-process cache; see rollbackPacks above. An override that vanished also
- * disappeared from `governance-drift`, so the postmortem it required was never
- * chased.
- */
-const emergencyOverrides: EmergencyOverride[] = [];
+// Overrides live only in the workspace record store. Activation always needs a
+// workspace, and an in-process cache not keyed by workspace leaked one
+// workspace's overrides into another's report, where they failed verification.
 
 /** The signed activation-time fields; postmortem fields change later. */
 function overrideDigest(o: EmergencyOverride): string {
@@ -169,17 +165,15 @@ export function activateEmergencyOverride(
   };
 
   persistOverride(workspace, override, now);
-  emergencyOverrides.push(override);
   return override;
 }
 
-/** Live overrides plus any persisted earlier, verified or not. */
+/** The workspace's stored overrides, verified or not; none without a workspace (not evaluated). */
 function allOverrides(workspace?: string): EmergencyOverride[] {
-  const stored = workspace
+  return workspace
     ? loadWorkspaceRecords<EmergencyOverride & { override_signature?: string }>(workspace, OVERRIDES_AT)
       .map((o) => ({ ...o, signature: o.override_signature ?? "" }))
     : [];
-  return mergeStored(emergencyOverrides, stored, (o) => o.overrideId);
 }
 
 /** Overrides whose signature verifies against the workspace auditor key history. */
@@ -209,16 +203,9 @@ export function filePostmortem(
   artifactId: string,
   workspace?: string,
 ): boolean {
-  const live = emergencyOverrides.find((o) => o.overrideId === overrideId);
-  const override = live ?? allOverrides(workspace).find((o) => o.overrideId === overrideId);
-  if (!override) return false;
-  override.postmortemFiled = true;
-  override.postmortemArtifactId = artifactId;
-  if (live) {
-    live.postmortemFiled = true;
-    live.postmortemArtifactId = artifactId;
-  }
-  if (workspace) persistOverride(workspace, override, Date.now());
+  const override = allOverrides(workspace).find((o) => o.overrideId === overrideId);
+  if (!workspace || !override) return false;
+  persistOverride(workspace, { ...override, postmortemFiled: true, postmortemArtifactId: artifactId }, Date.now());
   return true;
 }
 
