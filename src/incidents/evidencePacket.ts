@@ -10,7 +10,7 @@ import { canonicalize } from "../utils/json.js";
 import type { Domain } from "../domains/domainRegistry.js";
 import type { CausalEdge, Incident, IncidentTransition } from "./incidentTypes.js";
 import { CLOCK_REVIEW_STATUS, type IncidentClockInstance } from "./regulatoryClocks.js";
-import { verifyOversightRecord, type HumanOversightRecord } from "./oversightRecord.js";
+import { verifyOversightChain, verifyOversightRecord, type HumanOversightRecord } from "./oversightRecord.js";
 
 export interface PacketReceiptRef {
   receiptId: string;
@@ -102,10 +102,19 @@ function iso(ts: number): string {
   return new Date(ts).toISOString();
 }
 
-function oversightEntries(input: EvidencePacketInput): PacketOversightEntry[] {
+/** The whole-file chain check (P1-17); null without keys. A broken chain unverifies every record. */
+function oversightChain(input: EvidencePacketInput): { ok: boolean; errors: string[] } | null {
+  const keys = input.oversightPublicKeys ?? [];
+  return keys.length === 0 ? null : verifyOversightChain(input.oversightRecords ?? [], input.incident, keys);
+}
+
+function oversightEntries(input: EvidencePacketInput, chain: { ok: boolean } | null): PacketOversightEntry[] {
   const keys = input.oversightPublicKeys ?? [];
   return (input.oversightRecords ?? []).map((record) => {
-    const verification = keys.length === 0 ? null : verifyOversightRecord(record, input.incident, keys);
+    const own = keys.length === 0 ? null : verifyOversightRecord(record, input.incident, keys);
+    const verification = own === null || chain === null || chain.ok
+      ? own
+      : { ok: false, errors: [...own.errors, "oversight chain failed verification (see missing: oversight-chain)"] };
     return {
       recordId: record.recordId,
       reviewerId: record.reviewerId,
@@ -119,9 +128,14 @@ function oversightEntries(input: EvidencePacketInput): PacketOversightEntry[] {
   });
 }
 
-function missingItems(input: EvidencePacketInput, oversight: PacketOversightEntry[]): MissingEvidenceItem[] {
+function missingItems(
+  input: EvidencePacketInput,
+  oversight: PacketOversightEntry[],
+  chain: { ok: boolean; errors: string[] } | null
+): MissingEvidenceItem[] {
   const { incident } = input;
   const missing: MissingEvidenceItem[] = [];
+  if (chain && !chain.ok) missing.push({ item: "oversight-chain", reason: chain.errors.join("; ") });
   const verifiedOversight = oversight.filter((entry) => entry.signatureVerified === true);
   if (oversight.length === 0) {
     missing.push({ item: "human-oversight-record", reason: "no human oversight record supplied for this incident" });
@@ -180,7 +194,8 @@ export function buildEvidencePacket(input: EvidencePacketInput): IncidentEvidenc
   if (input.generatedTs < incident.createdTs) {
     throw new Error(`generatedTs ${input.generatedTs} is before incident createdTs ${incident.createdTs}`);
   }
-  const oversight = oversightEntries(input);
+  const chain = oversightChain(input);
+  const oversight = oversightEntries(input, chain);
   const body: Omit<IncidentEvidencePacket, "packetSha256"> = {
     v: 1,
     generatedAt: iso(input.generatedTs),
@@ -211,7 +226,7 @@ export function buildEvidencePacket(input: EvidencePacketInput): IncidentEvidenc
     oversight,
     receipts: [...(input.receipts ?? [])],
     timeline: [...(input.timelineEvents ?? [])],
-    missing: missingItems(input, oversight),
+    missing: missingItems(input, oversight, chain),
     unverifiedSources: unverifiedSources(input.clocks)
   };
   return { ...body, packetSha256: sha256Hex(canonicalize(body)) };

@@ -3,8 +3,11 @@
  * the loader that turns them into F4 clock instances. A TRIGGER event says when
  * a trigger happened; a NOTIFIED event says when a notice was submitted. Both
  * timestamps are operator claims, so each row also keeps when and through which
- * surface it was recorded. A row's signature proves which workspace key wrote
- * it and that it is unchanged, not that its claim is true.
+ * surface it was recorded; recordedTs is set here from the server clock. A row's
+ * signature proves which workspace key wrote it and that it is unchanged, not
+ * that its claim is true. Rows verify against the workspace's own monitor key
+ * history, so they are a local audit trail: they expose edits by anyone without
+ * that key, never a false claim by a holder of it.
  */
 import { randomUUID } from "node:crypto";
 import { signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
@@ -22,8 +25,13 @@ import {
   type IncidentClockInstance
 } from "./regulatoryClocks.js";
 
-/** An operator-stated timestamp may run this far past the recording instant (clock skew), no further. */
-export const MAX_CLOCK_EVENT_FUTURE_MS = 5 * 60 * 1000;
+type UnsignedClockEvent = Omit<IncidentClockEvent, "signature">;
+
+/**
+ * An operator-stated timestamp may run this far past the server-set recording
+ * instant (clock skew), no further. Clock events and oversight records share it.
+ */
+export const MAX_FUTURE_SKEW_MS = 5 * 60 * 1000;
 
 /** Triggers an operator can record: every trigger a clock uses except the derived calendar-year one. */
 export const RECORDABLE_TRIGGERS: readonly ClockTrigger[] = [...new Set(REGULATORY_CLOCK_TABLE.map((clock) => clock.trigger))]
@@ -33,6 +41,7 @@ export const CLOCK_LISTING_NOTES: readonly string[] = [
   `Clock durations are ${CLOCK_REVIEW_STATUS}; this is not legal advice.`,
   "Trigger and notice times are operator claims; each event shows when and through which surface it was recorded.",
   "A station lists candidate clocks: AMC does not decide applicability or check conditions such as 500 or more consumers affected.",
+  "Events verify against this workspace's own monitor key history: a local audit trail, not independent proof.",
   "AMC computes and records deadlines; it does not file notices."
 ];
 
@@ -56,7 +65,7 @@ export function parseIsoTimestamp(value: string, label: string): number {
   return ts;
 }
 
-function clockEventDigest(event: Omit<IncidentClockEvent, "signature">): string {
+function clockEventDigest(event: UnsignedClockEvent): string {
   return sha256Hex(canonicalize({
     event_id: event.eventId,
     incident_id: event.incidentId,
@@ -70,7 +79,7 @@ function clockEventDigest(event: Omit<IncidentClockEvent, "signature">): string 
 }
 
 /** The guards every event must pass when recorded and again when loaded. */
-function clockEventProblem(incident: Incident, event: Omit<IncidentClockEvent, "signature">): string | null {
+function clockEventProblem(incident: Incident, event: UnsignedClockEvent): string | null {
   if (event.incidentId !== incident.incidentId) return `belongs to incident ${event.incidentId}`;
   if (!listDomainIds().includes(event.station)) return `unknown station ${event.station}`;
   if (event.kind !== "TRIGGER" && event.kind !== "NOTIFIED") return `unknown kind ${String(event.kind)}`;
@@ -84,21 +93,35 @@ function clockEventProblem(incident: Incident, event: Omit<IncidentClockEvent, "
   if (event.ts < incident.createdTs) {
     return `is backdated: ${new Date(event.ts).toISOString()} precedes incident creation ${new Date(incident.createdTs).toISOString()}`;
   }
-  if (event.ts > event.recordedTs + MAX_CLOCK_EVENT_FUTURE_MS) {
+  if (event.ts > event.recordedTs + MAX_FUTURE_SKEW_MS) {
     return `is future-dated: ${new Date(event.ts).toISOString()} is more than 5 minutes after it was recorded`;
   }
   if (!event.recordedBy.trim()) return "has no recordedBy";
   return null;
 }
 
-/** The earliest claimed time per trigger and per clock wins, so a later row can only bring a deadline forward. */
-function clockInputs(events: readonly Omit<IncidentClockEvent, "signature">[]) {
+function recordedFirst(a: UnsignedClockEvent, b: UnsignedClockEvent): boolean {
+  return a.recordedTs < b.recordedTs || (a.recordedTs === b.recordedTs && a.eventId < b.eventId);
+}
+
+/**
+ * Triggers: the earliest claimed time wins, so a later row can only bring a
+ * deadline forward. Notices: the first-recorded row wins (earliest recordedTs,
+ * then eventId) and later rows for the same clock are ignored, so a later row
+ * claiming an earlier notice can never turn a missed deadline into a met one.
+ */
+function clockInputs(events: readonly UnsignedClockEvent[]) {
   const triggers: Record<string, number> = {};
-  const satisfied: Record<string, number> = {};
+  const notices = new Map<string, UnsignedClockEvent>();
   for (const event of events) {
-    const target = event.kind === "TRIGGER" ? triggers : satisfied;
-    target[event.triggerOrClockId] = Math.min(target[event.triggerOrClockId] ?? event.ts, event.ts);
+    if (event.kind === "TRIGGER") {
+      triggers[event.triggerOrClockId] = Math.min(triggers[event.triggerOrClockId] ?? event.ts, event.ts);
+      continue;
+    }
+    const first = notices.get(event.triggerOrClockId);
+    if (!first || recordedFirst(event, first)) notices.set(event.triggerOrClockId, event);
   }
+  const satisfied = Object.fromEntries([...notices].map(([clockId, event]) => [clockId, event.ts]));
   // Trigger names were checked against RECORDABLE_TRIGGERS by clockEventProblem.
   return { triggers: triggers as Partial<Record<ClockTrigger, number>>, satisfied };
 }
@@ -147,31 +170,42 @@ export interface RecordIncidentClockEventInput {
   kind: IncidentClockEventKind;
   triggerOrClockId: string;
   ts: number;
-  recordedTs: number;
   recordedBy: string;
   privateKeyPem: string;
   publicKeys: string[];
+  /** Server clock for recordedTs; a seam for tests, never an operator input. */
+  now?: () => number;
 }
 
-/** Validates, signs and appends one event; refuses one that would leave the clocks inconsistent. */
+/**
+ * Validates, signs and appends one event with a server-set recordedTs; refuses
+ * one that would leave the clocks inconsistent and a second notice for a clock.
+ */
 export function recordIncidentClockEvent(store: IncidentStoreInstance, input: RecordIncidentClockEventInput): IncidentClockEvent {
   const incident = store.getIncident(input.incidentId);
   if (!incident) throw new Error(`incident not found: ${input.incidentId}`);
   const existing = verifiedClockEvents(store, incident, input.station, input.publicKeys);
-  const unsigned: Omit<IncidentClockEvent, "signature"> = {
+  const recordedTs = (input.now ?? Date.now)();
+  const unsigned: UnsignedClockEvent = {
     eventId: `ice_${randomUUID().replace(/-/g, "")}`,
     incidentId: incident.incidentId,
     kind: input.kind,
     triggerOrClockId: input.triggerOrClockId,
     station: input.station,
     ts: input.ts,
-    recordedTs: input.recordedTs,
+    recordedTs,
     recordedBy: input.recordedBy
   };
   const problem = clockEventProblem(incident, unsigned);
   if (problem) throw new IncidentInputError(`clock event refused: ${problem}`);
+  const earlierNotice = unsigned.kind === "NOTIFIED"
+    ? existing.find((event) => event.kind === "NOTIFIED" && event.triggerOrClockId === unsigned.triggerOrClockId)
+    : undefined;
+  if (earlierNotice) {
+    throw new IncidentInputError(`clock event refused: a notice for ${unsigned.triggerOrClockId} is already recorded (${earlierNotice.eventId})`);
+  }
   try {
-    attachRegulatoryClocks({ incident, station: input.station, nowTs: input.recordedTs, ...clockInputs([...existing, unsigned]) });
+    attachRegulatoryClocks({ incident, station: input.station, nowTs: recordedTs, ...clockInputs([...existing, unsigned]) });
   } catch (error) {
     throw new IncidentInputError(`clock event refused: ${error instanceof Error ? error.message : String(error)}`);
   }

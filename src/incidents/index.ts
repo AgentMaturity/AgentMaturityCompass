@@ -109,7 +109,7 @@ export {
 export {
   CLOCK_LISTING_NOTES,
   IncidentInputError,
-  MAX_CLOCK_EVENT_FUTURE_MS,
+  MAX_FUTURE_SKEW_MS,
   RECORDABLE_TRIGGERS,
   clockListing,
   loadIncidentClocks,

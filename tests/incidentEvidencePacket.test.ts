@@ -67,7 +67,9 @@ function reviewInput(incident: Incident, reviewedTs: number) {
     decision: "REPORT_REQUIRED" as const,
     rationale: "PHI of 12 individuals left the trust boundary; HIPAA individual notice applies.",
     clockIds: ["hipaa-164-404-individual-notice"],
-    privateKeyPem: PRIVATE_PEM
+    privateKeyPem: PRIVATE_PEM,
+    // Fixed server clock for recordedTs (P1-17), so these tests never read the wall clock.
+    now: () => TRIGGER_TS + DAY_MS
   };
 }
 
@@ -108,6 +110,7 @@ describe("human oversight record", () => {
       incidentHash: incident.incident_hash,
       reviewerId: "oncall-sre-jdoe",
       reviewedTs: TRIGGER_TS - DAY_MS,
+      recordedTs: TRIGGER_TS - DAY_MS,
       decision: "ACKNOWLEDGED" as const,
       rationale: "signed with a valid key but dated before the incident",
       clockIds: [],

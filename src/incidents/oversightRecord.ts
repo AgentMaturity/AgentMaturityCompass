@@ -9,6 +9,12 @@
  * Guard: a record cannot be backdated before the incident's createdTs, both at
  * creation and at verification (a stored record with an edited reviewedTs fails
  * verification even if its signature were somehow re-minted).
+ *
+ * P1-17: each record carries a server-set recordedTs beside the operator-stated
+ * reviewedTs, and verifyOversightChain checks a whole file (every record, the
+ * prevRecordHash links, non-decreasing reviewedTs). Records verify against the
+ * workspace's own auditor key history: a local audit trail that exposes edits,
+ * deletions and reordering by anyone without that key, not who reviewed.
  */
 import { randomUUID } from "node:crypto";
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
@@ -16,7 +22,7 @@ import { dirname, join } from "node:path";
 import { signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { IncidentInputError } from "./incidentClockEvents.js";
+import { IncidentInputError, MAX_FUTURE_SKEW_MS } from "./incidentClockEvents.js";
 import type { Incident } from "./incidentTypes.js";
 import { REGULATORY_CLOCK_TABLE } from "./regulatoryClocksTable.js";
 
@@ -37,7 +43,10 @@ export interface HumanOversightRecord {
   incidentId: string;
   incidentHash: string;
   reviewerId: string;
+  /** Operator-stated review time. */
   reviewedTs: number;
+  /** Server clock when the record was signed. */
+  recordedTs: number;
   decision: OversightDecision;
   rationale: string;
   clockIds: string[];
@@ -56,6 +65,8 @@ export interface CreateOversightRecordInput {
   prevRecordHash?: string | null;
   privateKeyPem: string;
   recordId?: string;
+  /** Server clock for recordedTs; a seam for tests, never an operator input. */
+  now?: () => number;
 }
 
 type OversightPayload = Omit<HumanOversightRecord, "recordHash" | "signature">;
@@ -68,6 +79,7 @@ function payloadOf(record: OversightPayload): OversightPayload {
     incidentHash: record.incidentHash,
     reviewerId: record.reviewerId,
     reviewedTs: record.reviewedTs,
+    recordedTs: record.recordedTs,
     decision: record.decision,
     rationale: record.rationale,
     clockIds: [...record.clockIds],
@@ -93,6 +105,10 @@ export function createOversightRecord(input: CreateOversightRecordInput): HumanO
       `oversight record would be backdated: reviewedTs ${input.reviewedTs} precedes incident createdTs ${input.incident.createdTs}`
     );
   }
+  const recordedTs = (input.now ?? Date.now)();
+  if (input.reviewedTs > recordedTs + MAX_FUTURE_SKEW_MS) {
+    throw new Error(`oversight record would be future-dated: reviewedTs ${input.reviewedTs} is more than 5 minutes after recordedTs ${recordedTs}`);
+  }
 
   const payload: OversightPayload = {
     v: 1,
@@ -101,6 +117,7 @@ export function createOversightRecord(input: CreateOversightRecordInput): HumanO
     incidentHash: input.incident.incident_hash,
     reviewerId,
     reviewedTs: input.reviewedTs,
+    recordedTs,
     decision: input.decision,
     rationale,
     clockIds: [...(input.clockIds ?? [])],
@@ -129,12 +146,40 @@ export function verifyOversightRecord(
   if (!Number.isFinite(record.reviewedTs) || record.reviewedTs < incident.createdTs) {
     errors.push(`record is backdated: reviewedTs ${String(record.reviewedTs)} precedes incident createdTs ${incident.createdTs}`);
   }
+  if (!Number.isFinite(record.recordedTs) || record.reviewedTs > record.recordedTs + MAX_FUTURE_SKEW_MS) {
+    errors.push(`record is future-dated: reviewedTs ${String(record.reviewedTs)} is more than 5 minutes after recordedTs ${String(record.recordedTs)}`);
+  }
   const expectedHash = computeOversightRecordHash(record);
   if (record.recordHash !== expectedHash) {
     errors.push("record hash does not match its content");
   } else if (!verifyHexDigestAny(record.recordHash, record.signature, publicKeys)) {
     errors.push("record signature verification failed");
   }
+  return { ok: errors.length === 0, errors };
+}
+
+/**
+ * Verifies a whole oversight file: every record, the first prevRecordHash null
+ * and each later one equal to its predecessor's recordHash (so a deleted,
+ * reordered or inserted record breaks the chain), and non-decreasing reviewedTs.
+ */
+export function verifyOversightChain(
+  records: readonly HumanOversightRecord[],
+  incident: Incident,
+  publicKeys: string[]
+): { ok: boolean; errors: string[] } {
+  const errors: string[] = [];
+  records.forEach((record, index) => {
+    const label = `record ${index + 1} (${record.recordId})`;
+    for (const error of verifyOversightRecord(record, incident, publicKeys).errors) errors.push(`${label}: ${error}`);
+    const previous = index === 0 ? null : records[index - 1]!;
+    if (record.prevRecordHash !== (previous?.recordHash ?? null)) {
+      errors.push(`${label}: prevRecordHash does not link to ${previous ? `record ${index}` : "the start of the chain"}`);
+    }
+    if (previous && record.reviewedTs < previous.reviewedTs) {
+      errors.push(`${label}: reviewedTs precedes record ${index}'s`);
+    }
+  });
   return { ok: errors.length === 0, errors };
 }
 
@@ -172,12 +217,17 @@ export interface RecordWorkspaceOversightInput {
   clockIds: string[];
   reviewedTs: number;
   privateKeyPem: string;
+  /** Workspace auditor key history: the existing file must verify against it before anything is appended. */
+  publicKeys: string[];
+  now?: () => number;
 }
 
 /**
  * Appends a record for a stored incident to its workspace file, chained to the
- * file's last record (P1-17). The reviewer id is stored as stated: the key
- * proves which workspace signed the record, not which person reviewed.
+ * file's last record (P1-17). Refuses to append when the existing file fails
+ * verifyOversightChain, so a forged or edited record is never endorsed. The
+ * reviewer id is stored as stated: the key proves which workspace signed the
+ * record, not which person reviewed.
  */
 export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): HumanOversightRecord {
   if (!OVERSIGHT_DECISIONS.includes(input.decision as OversightDecision)) {
@@ -188,7 +238,13 @@ export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): 
   const unknown = input.clockIds.filter((clockId) => !REGULATORY_CLOCK_TABLE.some((clock) => clock.clockId === clockId));
   if (unknown.length > 0) throw new IncidentInputError(`unknown clock id: ${unknown.join(", ")}`);
   const path = oversightRecordPath(input.workspace, input.incident.incidentId);
-  const previous = readOversightRecords(path).at(-1);
+  const existing = readOversightRecords(path);
+  const chain = verifyOversightChain(existing, input.incident, input.publicKeys);
+  if (!chain.ok) throw new Error(`refusing to append: ${path} failed verification: ${chain.errors.join("; ")}`);
+  const previous = existing.at(-1);
+  if (previous && input.reviewedTs < previous.reviewedTs) {
+    throw new IncidentInputError(`reviewedTs precedes the last record's (${new Date(previous.reviewedTs).toISOString()})`);
+  }
   const record = createOversightRecord({
     incident: input.incident,
     reviewerId: input.reviewerId,
@@ -197,7 +253,8 @@ export function recordWorkspaceOversight(input: RecordWorkspaceOversightInput): 
     rationale: input.rationale,
     clockIds: input.clockIds,
     prevRecordHash: previous?.recordHash ?? null,
-    privateKeyPem: input.privateKeyPem
+    privateKeyPem: input.privateKeyPem,
+    now: input.now
   });
   appendOversightRecord(path, record);
   return record;
