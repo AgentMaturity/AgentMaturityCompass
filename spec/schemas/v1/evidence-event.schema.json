@@ -116,7 +116,8 @@
         "loop/cancel",
         "loop/veto",
         "loop/retry",
-        "loop/compact"
+        "loop/compact",
+        "time/checkpoint"
       ],
       "type": "string"
     },

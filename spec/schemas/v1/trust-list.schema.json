@@ -210,6 +210,42 @@
           "maximum": 9007199254740991,
           "type": "integer"
         },
+        "timestampAuthorities": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "anchorId": {
+                "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$",
+                "type": "string"
+              },
+              "name": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "policyOids": {
+                "items": {
+                  "pattern": "^[0-2](\\.(0|[1-9][0-9]*))+$",
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "rootCertificatePem": {
+                "maxLength": 16384,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "anchorId",
+              "name",
+              "rootCertificatePem"
+            ],
+            "type": "object"
+          },
+          "maxItems": 64,
+          "type": "array"
+        },
         "type": {
           "const": "amc.trust-list",
           "type": "string"

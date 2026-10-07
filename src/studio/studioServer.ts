@@ -63,6 +63,7 @@ import {
 } from "../value/valueApi.js";
 import { loadValuePolicy, verifyValuePolicySignature } from "../value/valueStore.js";
 import { valueSchedulerTick } from "../value/valueScheduler.js";
+import { timeCheckpointTick } from "../time/checkpoint.js";
 import { emitValueSse } from "../value/valueSse.js";
 import {
   assuranceCertIssueForApi,
@@ -1655,6 +1656,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
             });
           }
         }
+        // P1-25: a no-op unless time.tsa is configured; pending checkpoints retry on the next tick.
+        if (state.ok) await timeCheckpointTick(options.workspace);
       }).catch(() => {
         // Scheduler loop is best effort; failures are surfaced via explicit endpoints and subsequent ticks.
       });

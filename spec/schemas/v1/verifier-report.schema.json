@@ -311,6 +311,152 @@
       ],
       "type": "object"
     },
+    "time": {
+      "additionalProperties": false,
+      "properties": {
+        "attested": {
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "accuracyMs": {
+                  "anyOf": [
+                    {
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "genTime": {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                "kind": {
+                  "const": "rfc3161",
+                  "type": "string"
+                },
+                "messageImprint": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "digest": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "hashAlgorithm": {
+                      "const": "sha256",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "hashAlgorithm",
+                    "digest"
+                  ],
+                  "type": "object"
+                },
+                "policyOid": {
+                  "type": "string"
+                },
+                "revocationChecked": {
+                  "const": false,
+                  "type": "boolean"
+                },
+                "serialNumber": {
+                  "pattern": "^[0-9a-f]+$",
+                  "type": "string"
+                },
+                "tokenDerB64": {
+                  "type": "string"
+                },
+                "tsa": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "anchorId": {
+                      "type": "string"
+                    },
+                    "certSha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "subject",
+                    "certSha256",
+                    "anchorId"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "kind",
+                "tsa",
+                "genTime",
+                "accuracyMs",
+                "policyOid",
+                "serialNumber",
+                "messageImprint",
+                "tokenDerB64",
+                "revocationChecked"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "basis": {
+          "enum": [
+            "claimed",
+            "attested-upper-bound",
+            "attested-window"
+          ],
+          "type": "string"
+        },
+        "claimedAt": {
+          "type": "string"
+        },
+        "window": {
+          "additionalProperties": false,
+          "properties": {
+            "notAfter": {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string"
+            },
+            "notBefore": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "notBefore",
+            "notAfter"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "claimedAt",
+        "attested",
+        "basis"
+      ],
+      "type": "object"
+    },
     "trusted": {
       "type": "boolean"
     },
