@@ -68,6 +68,11 @@ jobs:
       - name: Typecheck tests
         run: npm run typecheck:tests
 
+      # P0-16: random or hash-derived results, fabricated-result identifiers,
+      # path-presence scoring and certification wording (docs/CI.md).
+      - name: No fabricated results
+        run: npm run check:no-fabrication
+
       - name: Acceptance runner process cleanup
         timeout-minutes: 1
         run: node --test scripts/lib/ownedProcessCommand.test.mjs

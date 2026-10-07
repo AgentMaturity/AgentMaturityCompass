@@ -1,0 +1,96 @@
+{
+  "$comment": "P0-16 allowlist for scripts/check-no-fabrication.mjs. permanent: reviewed legitimate uses. pending: wording an open issue removes (owner); --strict at Gate G0 fails while any remain. pathPresence: control-surface scorers that report AMC's own control inventory, refuse or are not evaluated outside an AMC checkout, and are retired by P1-53; names may only be dropped from the set frozen in the script; pathPresenceBaseline may only go down. An entry that matches nothing fails as stale.",
+  "permanent": [
+    {
+      "file": "src/business/grcExport.ts",
+      "rule": "R4",
+      "reason": "Negation: the caveat says the exports are 'not certified' GRC implementations."
+    },
+    {
+      "file": "src/domains/industryPacks.ts",
+      "rule": "R4",
+      "reason": "Pack data naming third-party certification schemes (for example 'ISO 22000 certified traceability'); not an AMC result."
+    },
+    {
+      "file": "src/passport/adapterCapabilityReceipt.ts",
+      "rule": "R4",
+      "reason": "Reason code 'declaration:plugin-not-certified' records a refusal."
+    },
+    {
+      "file": "src/score/adversarial.ts",
+      "rule": "R4",
+      "reason": "Detection word list: GAMING_KEYWORDS flags 'certified' in an agent's answer as a gaming signal."
+    },
+    {
+      "file": "src/score/controlSurfaceScope.ts",
+      "rule": "R3",
+      "reason": "Its src/ markers detect an AMC checkout so path scorers can refuse elsewhere; it does not score."
+    }
+  ],
+  "pending": [
+    {
+      "file": "src/dashboard/templates/index.html",
+      "rule": "R4",
+      "owner": "P0-22",
+      "reason": "Trust ladder names L5 'Certified'."
+    },
+    {
+      "file": "src/domains/industryPackAudit.ts",
+      "rule": "R4",
+      "owner": "P0-21",
+      "reason": "Audit Markdown prints 'certified: YES/NO'."
+    },
+    {
+      "file": "src/mcp/amcMcpServer.ts",
+      "rule": "R4",
+      "owner": "P0-21",
+      "reason": "MCP tool output prints '**Certified:** Yes/No'."
+    },
+    {
+      "file": "src/repl/replRenderer.ts",
+      "rule": "R4",
+      "owner": "P0-22",
+      "reason": "REPL renders the L5 label from the CERTIFIED case."
+    },
+    {
+      "file": "src/score/mcpCompliance.ts",
+      "rule": "R4",
+      "owner": "P0-21",
+      "reason": "'MCP-Certified' badge in the type, the badge choice and the report text."
+    },
+    {
+      "file": "src/transparency/transparencyReport.ts",
+      "rule": "R4",
+      "owner": "P0-21",
+      "reason": "CertificationStatus 'certified' and the '✅ Certified' label in the transparency report."
+    }
+  ],
+  "pathPresence": [
+    "src/score/adaptiveAccessControl.ts",
+    "src/score/agentProtocolSecurity.ts",
+    "src/score/agentStatePortability.ts",
+    "src/score/auditDepth.ts",
+    "src/score/calibrationGap.ts",
+    "src/score/densityMap.ts",
+    "src/score/evidenceConflict.ts",
+    "src/score/factSimulationBoundary.ts",
+    "src/score/failSecureGovernance.ts",
+    "src/score/forecastLegitimacy.ts",
+    "src/score/gamingResistance.ts",
+    "src/score/kernelSandboxMaturity.ts",
+    "src/score/levelTransition.ts",
+    "src/score/memorySecurityArchitecture.ts",
+    "src/score/monitorBypassResistance.ts",
+    "src/score/outputIntegrityMaturity.ts",
+    "src/score/policyConsistency.ts",
+    "src/score/reasoningEfficiency.ts",
+    "src/score/runtimeIdentityMaturity.ts",
+    "src/score/scenarioProvenance.ts",
+    "src/score/selfKnowledgeMaturity.ts",
+    "src/score/simulationValidity.ts",
+    "src/score/sleeperDetection.ts",
+    "src/score/syntheticIdentityGovernance.ts",
+    "src/score/trustAuthorizationSync.ts"
+  ],
+  "pathPresenceBaseline": 25
+}

@@ -614,7 +614,7 @@ export class ShieldGuardOrchestrator {
   }
 
   private generateEvidenceId(): string {
-    return `shield_guard_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `shield_guard_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`; // amc-allow-random: id
   }
 
   private createFailSafeResult(evidenceId: string, responseTime: number): ProtectionResult {

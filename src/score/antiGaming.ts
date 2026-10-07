@@ -128,7 +128,7 @@ export function randomizeQuestions(
   const seedHash = sha256Hex(seed);
   const shuffled = [...questionIds];
   for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = parseInt(seedHash.slice((i * 2) % 56, (i * 2) % 56 + 2), 16) % (i + 1);
+    const j = parseInt(seedHash.slice((i * 2) % 56, (i * 2) % 56 + 2), 16) % (i + 1); // amc-allow-random: fuzz-input
     [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
   }
   return shuffled.slice(0, Math.min(count, shuffled.length));
