@@ -523,7 +523,7 @@ export function generateClaimConfidenceReport(
   }
 
   return {
-    reportId: `ccr_${Math.random().toString(36).slice(2, 14)}`,
+    reportId: `ccr_${Math.random().toString(36).slice(2, 14)}`, // amc-allow-random: id
     agentId,
     ts: Date.now(),
     totalClaims,
