@@ -99,13 +99,15 @@ if (process.env.AMC_PUBLIC_TASK_BROWSER === "1" && process.platform === "darwin"
   finally { await browser.close(); }
 }, 240_000);
 
-test("a successful HTTP verifier label is withdrawn on evidence loss and is not restored by a metadata read", async () => {
+test("an HTTP verifier label is withdrawn on evidence loss and is not restored by a metadata read", async () => {
   const f = await fixture("jsonl");
   const start = await f.request("/api/v1/native-tasks", { body: f.input("Closed task verification freshness.") });
   const task = await f.settle(start.body.data.taskId);
   const verified = await f.control(task.taskId, "verify", task.revision);
   expect(verified.status).toBe(200);
-  expect(verified.body.data.verification, JSON.stringify(verified.body)).toBe("workspace-key-consistency");
+  // The fixture pins no monitor key, so the intact run is untrusted, never verified (P0-51).
+  expect(verified.body.data.verification, JSON.stringify(verified.body)).toBe("failed");
+  expect(verified.body.data.error).toContain("UNTRUSTED: the recorded evidence is internally consistent");
   const path = join(f.workspace, ".amc/jsonl/events.jsonl"), original = f.jsonlBytes();
   try {
     writeFileSync(path, Buffer.concat([original, Buffer.from('{"torn":')]));

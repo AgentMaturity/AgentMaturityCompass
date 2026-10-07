@@ -122,7 +122,8 @@ test("real stub turns are committed once, survive release/restart/resume and col
   task = await idle(restarted, task.taskId); expect(task.revision).toBe(3);
   await restarted.release(actor, task.taskId, 3);
   const verified = await restarted.verify(actor, task.taskId, 3);
-  expect(verified.verification).toBe("workspace-key-consistency");
+  // No operator pin admits the workspace's monitor key, so the intact run is untrusted, never verified (P0-51).
+  expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
   const recorded = rows(sessionId);
   expect(recorded.filter(row => row.event_type === "request/header")).toHaveLength(3);
   expect(recorded.every(row => row.writer_sig !== "unsigned" && extractEnvelope(row.meta_json)?.sessionId === sessionId)).toBe(true);
@@ -179,7 +180,7 @@ test("JSONL managed task cold inspection, verification and archive retain actual
   const first = service(), request = input("JSONL managed archive evidence.");
   let task = await first.start(actor, request); task = await idle(first, task.taskId);
   task = await first.verify(actor, task.taskId, task.revision);
-  expect(task).toMatchObject({ state: "closed", verification: "workspace-key-consistency" });
+  expect(task).toMatchObject({ state: "closed", verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
   await first.close();
   const before = loadSessionEventHistory({ workspace: root, sessionId: task.sessionId!, requireSealed: true });
   expect(before.backend).toBe("jsonl");
@@ -188,7 +189,7 @@ test("JSONL managed task cold inspection, verification and archive retain actual
   expect(restarted.poll(actor, task.taskId).events.some(event => event.kind === "user" && event.text === request.prompt)).toBe(true);
   expect(restarted.archive(actor, task.taskId, task.revision).archived).toBe(true);
   expect((await restarted.start(actor, request)).archived).toBe(true);
-  expect((await restarted.verify(actor, task.taskId, task.revision)).verification).toBe("workspace-key-consistency");
+  expect(await restarted.verify(actor, task.taskId, task.revision)).toMatchObject({ verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
   expect(loadSessionEventHistory({ workspace: root, sessionId: task.sessionId! }).events).toEqual(before.events);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(0);
 }, 60_000);

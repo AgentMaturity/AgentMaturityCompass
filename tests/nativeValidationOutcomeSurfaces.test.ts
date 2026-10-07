@@ -73,7 +73,8 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
         } while (!["idle", "failed"].includes(task.state));
         expect(task.error).toBeNull(); expect(task.state).toBe("idle"); expect(task.verification).toBe("not-verified");
         const verified = await service.verify(actor, task.taskId, task.revision);
-        expect(verified.verification).toBe("workspace-key-consistency");
+        // No operator pin admits the workspace's monitor key: intact but untrusted, never verified (P0-51).
+        expect(verified).toMatchObject({ verification: "failed", error: expect.stringContaining("UNTRUSTED: the recorded evidence is internally consistent") });
         summary = readAgentRunSummary(workspace, task.sessionId!, "idle"); expect(verified.validation).toEqual(summary.validation);
       } finally { await service.close(); }
       const cold = createNativeTaskService({ workspace, validationConfig: f.checks, environment: env, credentialsHome: home });
