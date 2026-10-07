@@ -206,7 +206,7 @@ import {
   exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
 } from "./cli-trust-flags.js";
 import { printArchivedStoreNote, runVerifyRepair } from "./cli-verify-repair.js";
-import { relabelLegacyArtifacts } from "./migration/legacy/scan.js";
+import { relabelLegacyArtifacts, type RelabelOptions } from "./migration/legacy/scan.js";
 import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
 import { registerSpillCommands } from "./cli-spill-commands.js";
@@ -6185,13 +6185,15 @@ program
 const verifyCmd = program.command("verify").description("Verify integrity across AMC artifacts");
 
 /** P1-35: records 1.x results under legacy labels in .amc/migrations/; the originals are never written. */
-function relabelLegacy(opts: { dryRun: boolean; path: string[] }): void {
+async function relabelLegacy(opts: { dryRun: boolean; path: string[] }, verified: Pick<RelabelOptions, "trust" | "ledgerCheck">): Promise<void> {
   try {
-    const run = relabelLegacyArtifacts(process.cwd(), { dryRun: opts.dryRun, paths: opts.path });
+    const run = await relabelLegacyArtifacts(process.cwd(), { ...verified, dryRun: opts.dryRun, paths: opts.path });
     const scanned = Object.values(run.receipt.scanned).reduce((sum, count) => sum + count, 0);
     console.log(`Legacy relabel (notice ${run.receipt.noticeId} v${run.receipt.noticeVersion}): ${scanned} scanned, `
       + `${run.records.length} ${opts.dryRun ? "to record" : "recorded"}, ${run.receipt.skipped.length} skipped`);
-    for (const row of run.records.slice(0, 20)) console.log(`- ${row.artifact.locator}: legacy ${row.assigned.claimKind} (${row.rule})`);
+    for (const row of run.records.slice(0, 20)) {
+      console.log(`- ${row.artifact.locator}: legacy ${row.assigned.claimKind} (${row.rule})${row.integrity.status === "integrityFailed" ? `, integrityFailed: ${row.integrity.reasons.join("; ")}` : ""}`);
+    }
     if (run.records.length > 20) console.log(chalk.gray(`  ... and ${run.records.length - 20} more`));
     for (const skip of run.receipt.skipped) console.log(chalk.gray(`- skipped ${skip.locator}: ${skip.reason}`));
     console.log(run.receiptPath ? `Receipt: ${run.receiptPath} (signed as MIGRATION_RECEIPT); records: .amc/migrations/relabel.jsonl`
@@ -6227,7 +6229,7 @@ withTrustFlags(verifyCmd, { expectMonitor: true, ledgerOnly: true })
       printArchivedStoreNote(process.cwd());
       const code = ledgerExitCode(result, trust);
       if (opts.relabelLegacy && code === 1) console.log("Legacy relabel skipped: the integrity check failed. Nothing was written.");
-      else if (opts.relabelLegacy) relabelLegacy(opts);
+      else if (opts.relabelLegacy) await relabelLegacy(opts, { trust, ledgerCheck: result });
       if (code !== 0) process.exit(code);
       return;
     }
