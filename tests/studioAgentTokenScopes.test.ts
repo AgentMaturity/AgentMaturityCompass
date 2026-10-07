@@ -204,7 +204,7 @@ describe("agent token scopes come from the signed action policy, not a constant"
     const full = agentTokenGrantFromLease(workspace, lease(workspace, ALL_LEASE).payload);
     expect(full.executeActionClasses).toEqual(["WRITE_LOW"]);
     expect(full.grantedBy).toMatchObject({ kind: "lease", executeClassesFrom: "action-policy" });
-    expect(String((full.grantedBy as { reason?: string }).reason)).toContain("leaseScopeSchema");
+    expect(String((full.grantedBy as { reason?: string }).reason)).toContain("the lease names no execute classes");
   });
 
   it("reads a legacy scopes-only meta as granting no execute action class", () => {
@@ -262,9 +262,9 @@ describe("Studio enforces the token's execute action classes at /toolhub/execute
   }, 45_000);
 
   it("keeps a lease-only execute governed by the live signed policy and says so", async () => {
-    // Boundary, not a guard: a lease cannot name action classes (leaseScopeSchema
-    // is a closed enum outside this track), so a lease-only WRITE_LOW execute is
-    // decided by the governor's action-policy-execute condition alone.
+    // Boundary, not a guard: this lease names no executeActionClasses, so a
+    // lease-only WRITE_LOW execute is decided by the governor's
+    // action-policy-execute condition alone.
     const f = await serverFixture(policyAllowingExecuteFor(["READ_ONLY", "WRITE_LOW"]));
     const grant = lease(f.workspace, ALL_LEASE);
     const prepared = await approvedWriteLow(f, grant.token);

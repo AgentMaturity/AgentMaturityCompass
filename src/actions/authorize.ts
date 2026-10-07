@@ -146,11 +146,12 @@ const LEASE_ERRORS: Record<string, RecheckFailure> = {
   "lease revoked": "lease_revoked", "lease expired": "capability_expired", "signature verification failed": "authority_store_unavailable"
 };
 
-/** The lease, verified with its signature, expiry, agent, execute scope and the signed revocation list. */
-function checkLease(workspace: string, token: string, agentId: string): { readonly payload: LeasePayload } | Failed {
+/** The lease, verified with its signature, expiry, agent, execute scope and classes, and the signed revocation list. */
+function checkLease(execution: ToolExecution, token: string): { readonly payload: LeasePayload } | Failed {
+  const workspace = execution.workspace;
   try {
-    const verified = verifyLeaseToken({ workspace, token, expectedAgentId: agentId, requiredScope: "toolhub:execute",
-      revokedLeaseIds: revokedLeaseIdSet(workspace) });
+    const verified = verifyLeaseToken({ workspace, token, expectedAgentId: execution.agentId, requiredScope: "toolhub:execute",
+      actionClass: execution.actionClass, revokedLeaseIds: revokedLeaseIdSet(workspace) });
     if (verified.ok && verified.payload) return { payload: verified.payload };
     return failed(LEASE_ERRORS[verified.error ?? ""] ?? "scope_widened", verified.error ?? "lease refused");
   } catch (error) {
@@ -176,7 +177,7 @@ export function bindAuthorization(execution: ToolExecution, ctx: AuthorizationCo
     if ("ok" in bound) return bound;
     approvals.push(bound);
   }
-  const lease = ctx.leaseToken === undefined ? null : checkLease(execution.workspace, ctx.leaseToken, execution.agentId);
+  const lease = ctx.leaseToken === undefined ? null : checkLease(execution, ctx.leaseToken);
   if (lease !== null && "ok" in lease) return lease;
   const issuedTs = Date.now();
   // Earliest of every authority's own expiry. ponytail: no parent record is in reach in-process; P2-25 clamps to it.
@@ -280,7 +281,7 @@ export function recheckAuthorization(record: AuthorizationRecordV1, execution: T
   for (const approval of record.authority.approvals) add(...recheckApproval(record, execution, approval));
   if (ctx.leaseToken !== undefined || record.delegation.leaseId !== null) {
     const lease = ctx.leaseToken === undefined ? failed("scope_widened", "the record names a lease the call does not carry")
-      : checkLease(execution.workspace, ctx.leaseToken, execution.agentId);
+      : checkLease(execution, ctx.leaseToken);
     if ("ok" in lease) add(...lease.failures);
     else if (lease.payload.leaseId !== record.delegation.leaseId) add("scope_widened");
   }
