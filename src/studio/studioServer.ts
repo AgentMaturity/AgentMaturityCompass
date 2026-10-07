@@ -41,7 +41,8 @@ import {
   auditSchedulerStatusForApi
 } from "../audit/auditApi.js";
 import { verifyAuditMapActiveSignature } from "../audit/auditMapStore.js";
-import { verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
+import { auditBindersExportsDir, verifyAuditPolicySignature } from "../audit/auditPolicyStore.js";
+import { containedPath } from "../utils/pathSafety.js";
 import { auditSchedulerTick } from "../audit/auditScheduler.js";
 import { emitAuditSse } from "../audit/auditSse.js";
 import {
@@ -4516,17 +4517,25 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         }
         const binderId = decodeURIComponent(auditVerifyMatch[1] ?? "");
         const fileQuery = url.searchParams.get("file");
-        const file = fileQuery
-          ? fileQuery
-          : (() => {
-              const row = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId);
-              return row?.file ?? "";
-            })();
-        if (!file) {
+        let file = "";
+        if (fileQuery) {
+          // P0-20: a request names a file only inside the binder exports directory (AMC has no other directory it
+          // writes binders or industry-pack audits to); anything else is refused unread.
+          try {
+            file = containedPath(auditBindersExportsDir(options.workspace), "the audit binder exports directory", fileQuery);
+          } catch {
+            json(res, 400, { error: "file must be inside the audit binder exports directory" });
+            return;
+          }
+        } else {
+          file = auditBindersForApi(options.workspace).exports.find((item) => item.binderId === binderId)?.file ?? "";
+        }
+        if (!file || !pathExists(file)) {
           json(res, 404, { error: "binder export not found" });
           return;
         }
-        // P0-09: the server operator's trust context decides, never the workspace's own keys.
+        // P0-09: the server operator's trust context decides, never the workspace's own keys. No public-key path is
+        // taken from a request.
         const verify = auditBinderVerifyForApi({ file, workspace: options.workspace, trust: loadTrustContext() });
         json(res, verify.ok ? 200 : 422, verify);
         return;

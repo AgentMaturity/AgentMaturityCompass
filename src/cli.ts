@@ -17094,10 +17094,15 @@ auditBinder
 
 withTrustFlags(auditBinder
   .command("verify")
-  .description("Verify .amcaudit file")
-  .argument("<file.amcaudit>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
+  .description("Verify an .amcaudit binder or a signed industry-pack audit (.json)")
+  .argument("<file>"), { pubkey: "pin the signer public key (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const verify = auditBinderVerifyCli({ workspace: process.cwd(), file, pubkeyPath: opts.pubkey, trust: trustFromFlags(opts, ["artifact-seal"]) });
+    if ("audit" in verify) {
+      finishVerify("Industry-pack audit", verify.report, { json: opts.json, result: verify,
+        details: [`Industry-pack audit verified: signer ${verify.keyFingerprint}, checksum ok`, `sha256: ${verify.fileSha256}`] });
+      return;
+    }
     finishVerify("Audit binder", verify.report, { json: opts.json, result: verify,
       details: [`sha256: ${verify.fileSha256}`, `binderId: ${verify.binder?.binderId ?? "unknown"}`] });
   });

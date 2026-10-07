@@ -29,6 +29,7 @@ import {
   listExportedAuditBinders
 } from "./binderArtifact.js";
 import { verifyAuditBinderFile, verifyAuditWorkspace } from "./binderVerifier.js";
+import { verifyIndustryPackAuditFile } from "../domains/industryPackAudit.js";
 import { loadBinderCache } from "./binderStore.js";
 import {
   createAuditEvidenceRequest,
@@ -398,12 +399,11 @@ export function auditBinderVerifyForApi(params: {
   publicKeyPath?: string;
   trust: TrustContext;
 }) {
-  return verifyAuditBinderFile({
-    file: resolve(params.file),
-    workspace: params.workspace,
-    publicKeyPath: params.publicKeyPath ? resolve(params.publicKeyPath) : undefined,
-    trust: params.trust
-  });
+  const file = resolve(params.file);
+  const publicKeyPath = params.publicKeyPath ? resolve(params.publicKeyPath) : undefined;
+  // P0-20: a .json industry-pack audit verifies here too, under the same pinned trust as a binder.
+  return verifyIndustryPackAuditFile({ file, publicKeyPath, trust: params.trust })
+    ?? verifyAuditBinderFile({ file, workspace: params.workspace, publicKeyPath, trust: params.trust });
 }
 
 export function auditRequestCreateForApi(params: {

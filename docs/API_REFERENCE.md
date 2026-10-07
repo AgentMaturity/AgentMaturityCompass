@@ -116,7 +116,7 @@ AMC provides 1,228 public CLI command paths in the live command inventory.
 | 97 | `amc audit binder export-execute` | Execute previously approved external binder export |
 | 98 | `amc audit binder export-request` | Create dual-control approval request for external binder sharing |
 | 99 | `amc audit binder list` | List exported binders and cached workspace binder |
-| 100 | `amc audit binder verify` | Verify .amcaudit file |
+| 100 | `amc audit binder verify` | Verify an .amcaudit binder or a signed industry-pack audit (.json) |
 | 101 | `amc audit export` | Export enterprise audit logs for Splunk, Datadog, CloudTrail, or Azure Monitor |
 | 102 | `amc audit init` | Initialize signed audit policy and compliance maps |
 | 103 | `amc audit map` | Audit compliance map operations |
@@ -1921,7 +1921,7 @@ Create dual-control approval request for external binder sharing
 
 #### `amc audit binder verify`
 
-Verify .amcaudit file
+Verify an .amcaudit binder or a signed industry-pack audit (.json)
 
 
 | Option | Description |
@@ -3679,6 +3679,7 @@ Alias: `amc sector apply`
 | `--responses <path>` | - |
 | `--framework <id>` | - |
 | `--audit-bundle <path>` | - |
+| `--no-sign` | - |
 | `--json` | - |
 
 #### `amc domain assess`

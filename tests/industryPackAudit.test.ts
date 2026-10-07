@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { getPackById } from "../src/domains/industryPacks.js";
 import {
   buildIndustryPackAudit,
-  verifyIndustryPackAudit,
+  verifyIndustryPackAuditChecksum,
   renderIndustryPackAuditMarkdown,
   normalizeAuditFramework,
   AUDIT_FRAMEWORKS,
@@ -24,22 +24,23 @@ function responsesAll(level: number): Record<string, number> {
 }
 
 describe("industry pack audit", () => {
-  test("produces a deterministic, verifiable signed receipt", () => {
+  test("produces a deterministic, recomputable checksum and no signature until signed", () => {
     const a = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW });
     const b = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW });
     expect(a.receiptHash).toBe(b.receiptHash);
     expect(a.receiptHash).toMatch(/^[a-f0-9]{64}$/);
-    expect(verifyIndustryPackAudit(a)).toBe(true);
+    expect(verifyIndustryPackAuditChecksum(a)).toBe(true);
+    expect(a.signature).toBeNull();
     expect(a.generatedAt).toBe(new Date(NOW).toISOString());
   });
 
-  test("detects tampering — any edit invalidates the receipt", () => {
+  test("an edit without a recomputed checksum fails the checksum", () => {
     const audit = buildIndustryPackAudit({ pack: pack(), responses: responsesAll(3), now: NOW });
     const tampered: IndustryPackAudit = {
       ...audit,
       controls: audit.controls.map((c, i) => (i === 0 ? { ...c, level: 5, status: "PASS" as const } : c)),
     };
-    expect(verifyIndustryPackAudit(tampered)).toBe(false);
+    expect(verifyIndustryPackAuditChecksum(tampered)).toBe(false);
   });
 
   test("maps every control across all frameworks plus the sector regulation", () => {
@@ -105,7 +106,7 @@ describe("industry pack audit", () => {
     expect(md).toContain("# Industry Pack Audit — ");
     expect(md).toContain("## Framework coverage");
     expect(md).toContain("## Controls");
-    expect(md).toContain("Receipt: `sha256:");
+    expect(md).toContain("Checksum only — not signed (`sha256:");
     expect(md).toContain("```yaml");
   });
 });

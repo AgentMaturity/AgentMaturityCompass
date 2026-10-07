@@ -103,7 +103,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc audit binder export-execute` | Execute previously approved external binder export | `--approval <id>` | - |
 | `amc audit binder export-request` | Create dual-control approval request for external binder sharing | `--scope <scope>`<br>`--agent <agentId>`<br>`--out <file.amcaudit>`<br>`--id <id>`<br>`--request-id <id>` | - |
 | `amc audit binder list` | List exported binders and cached workspace binder | - | - |
-| `amc audit binder verify` | Verify .amcaudit file | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
+| `amc audit binder verify` | Verify an .amcaudit binder or a signed industry-pack audit (.json) | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc audit export` | Export enterprise audit logs for Splunk, Datadog, CloudTrail, or Azure Monitor | `--format <format>`<br>`--output <path>`<br>`--limit <n>` | - |
 | `amc audit init` | Initialize signed audit policy and compliance maps | - | - |
 | `amc audit map` | Audit compliance map operations | - | - |
@@ -329,7 +329,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc doctor` | Check runtime availability and wrap readiness | `--json`<br>`--strict`<br>`--live-probes` | - |
 | `amc doctor-fix` | Auto-repair common setup issues | `--dry-run`<br>`--json` | - |
 | `amc domain` | Domain-specific architecture and compliance operations | - | `sector` |
-| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--json` | `sector apply` |
+| `amc domain apply` | Apply domain-specific guardrails and industry pack rules to an agent | `--agent <id>`<br>`--domain <domain>`<br>`--pack <packId>`<br>`--dry-run`<br>`--compliance <frameworks>`<br>`--file <path>`<br>`--audit`<br>`--responses <path>`<br>`--framework <id>`<br>`--audit-bundle <path>`<br>`--no-sign`<br>`--json` | `sector apply` |
 | `amc domain assess` | Run full domain assessment (not evaluated without evidence; --example shows labelled synthetic output) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assess` |
 | `amc domain assurance` | Run domain-specific assurance packs (no agent is invoked; --example grades a canned reply) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector assurance` |
 | `amc domain gaps` | Show compliance gaps for an agent and domain (not evaluated without evidence) | `--agent <id>`<br>`--domain <d>`<br>`--example`<br>`--json` | `sector gaps` |

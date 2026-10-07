@@ -20,7 +20,7 @@ Every row of the P0-09 issue table is wired. The seven portable rows marked "Not
 | `amc alerts verify` | (no description registered) | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc assurance verify` | Verify assurance run determinism and signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc assurance verify-policy` | Verify assurance policy signature | workspace self-check | Keys come from the workspace under test; internal consistency only |
-| `amc audit binder verify` | Verify .amcaudit file | portable artifact | Wired (PR 3): `verifyAuditBinderFile`; signer and signed Merkle root need `artifact-seal`, and inclusion proofs must resolve to that signed root |
+| `amc audit binder verify` | Verify an .amcaudit binder or a signed industry-pack audit (.json) | portable artifact | Wired (PR 3): `verifyAuditBinderFile`; signer and signed Merkle root need `artifact-seal`, and inclusion proofs must resolve to that signed root. A `.json` industry-pack audit goes to `verifyIndustryPackAuditSignature` (P0-20), whose auditor signer needs `artifact-seal` |
 | `amc audit map verify` | Verify builtin and active map signatures | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc audit verify` | Verify audit workspace signatures/artifacts | workspace self-check | Keys come from the workspace under test; internal consistency only |
 | `amc audit verify-policy` | Verify signed audit policy | workspace self-check | Keys come from the workspace under test; internal consistency only |
