@@ -33,7 +33,7 @@ import { signDigestWithPolicy, verifySignedDigest } from "../crypto/signing/sign
 import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../security/safeTarArchive.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, type IssuerAdmission, type PublicAnchoring, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { latestAnchorFiles, verifyBundledAnchor } from "./anchors/anchor.js";
-import { consistencyProof } from "./rfc9162.js";
+import { consistencyProof, rootHash } from "./rfc9162.js";
 import { fileSha256 } from "../trust/signatureCheck.js";
 
 /**
@@ -510,10 +510,14 @@ export function exportTransparencyProofBundle(params: {
     writeFileAtomic(join(tmp, "proof.json"), JSON.stringify(proof, null, 2), 0o644);
     writeFileAtomic(join(tmp, "root.json"), rootBytes, 0o644);
     writeFileAtomic(join(tmp, "root.sig"), readFileSync(merkleCurrentRootSigPath(params.workspace)), 0o644);
-    // P1-26: the newest public anchor, with the consistency proof from its tree to the signed root.
+    // P1-26: the newest public anchor, with the consistency proof from its tree to the signed root. A log that no
+    // longer extends what it anchored was rewritten: say so instead of exporting without the anchor.
     const anchor = proof.algorithm === "rfc9162-sha256" ? latestAnchorFiles(params.workspace) : null;
-    if (anchor && anchor.treeSize <= signedRow.leafCount) {
+    if (anchor) {
       const leaves = readTransparencyEntryHashes(params.workspace).slice(0, signedRow.leafCount).map((hash) => entryLeafHash("rfc9162-sha256", hash));
+      if (anchor.treeSize > leaves.length || rootHash(leaves.slice(0, anchor.treeSize)) !== anchor.rootHash) {
+        throw new Error(`the log no longer extends its publicly anchored tree of ${anchor.treeSize} leaves`);
+      }
       writeFileAtomic(join(tmp, "anchor.note"), anchor.note, 0o644);
       writeFileAtomic(join(tmp, "anchor.receipt.json"), anchor.receipt, 0o644);
       writeFileAtomic(join(tmp, "anchor.consistency.json"), JSON.stringify({ hashes: consistencyProof(leaves, anchor.treeSize) }, null, 2), 0o644);

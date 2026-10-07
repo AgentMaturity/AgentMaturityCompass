@@ -113,7 +113,7 @@ export function verifyAnchorReceipt(receiptBytes: Buffer, note: Buffer, trust: P
 }
 
 /** The newest checkpoint note with a stored receipt, for a proof bundle; null when nothing was anchored yet. */
-export function latestAnchorFiles(workspace: string): { note: Buffer; receipt: Buffer; treeSize: number } | null {
+export function latestAnchorFiles(workspace: string): { note: Buffer; receipt: Buffer; treeSize: number; rootHash: string } | null {
   if (!pathExists(anchorsDir(workspace))) return null;
   const receipts = readdirSync(anchorsDir(workspace)).flatMap(name => {
     const match = /^([1-9][0-9]*)\.([a-z0-9][a-z0-9._-]{0,63})\.json$/.exec(name);
@@ -122,7 +122,8 @@ export function latestAnchorFiles(workspace: string): { note: Buffer; receipt: B
   const newest = receipts[0];
   if (!newest) return null;
   const note = boundedFile(checkpointNotePath(workspace, newest.sequence), NOTE_MAX_BYTES);
-  return { note, receipt: boundedFile(join(anchorsDir(workspace), newest.name), RECEIPT_MAX_BYTES), treeSize: parseCheckpoint(parseSignedNote(note).text).treeSize };
+  const { treeSize, rootHash } = parseCheckpoint(parseSignedNote(note).text);
+  return { note, receipt: boundedFile(join(anchorsDir(workspace), newest.name), RECEIPT_MAX_BYTES), treeSize, rootHash };
 }
 
 /**
