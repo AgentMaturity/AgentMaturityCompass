@@ -26,6 +26,9 @@ import {
 } from "../trust/index.js";
 import { carriedLedgerAnchoring, claimedTime, fileSha256 } from "../trust/signatureCheck.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
+import { timestampDigest } from "../time/tsaClient.js";
+import { artifactTime } from "../time/verifyTimestamp.js";
+import type { VerifierReportInput } from "../trust/verifierReport.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -180,6 +183,8 @@ export async function issueCertificate(params: {
 }): Promise<{
   outFile: string;
   certId: string;
+  /** Why no RFC 3161 token is attached although TSAs are configured (P1-25); empty otherwise. */
+  timestampWarnings: string[];
 }> {
   const workspace = params.workspace;
   const plugins = verifyPluginWorkspace({ workspace });
@@ -362,6 +367,16 @@ export async function issueCertificate(params: {
       signer: "auditor"
     };
     writeFileAtomic(join(certRoot, "cert.sig"), JSON.stringify(certSig, null, 2), 0o644);
+    // P1-25: an RFC 3161 token over cert.json's digest, when TSAs are configured; required ones fail issuance.
+    const stamp = await timestampDigest(workspace, certSha);
+    if (stamp.config.required && !stamp.grant) {
+      throw new Error(`Cannot issue certificate: time.required and no TSA granted a verified token (${stamp.failures.join("; ") || "no TSA answered"})`);
+    }
+    const timestamps = stamp.grant ? [`timestamps/${certSha}.tsr`] : [];
+    if (stamp.grant) {
+      ensureDir(join(certRoot, "timestamps"));
+      writeFileAtomic(join(certRoot, timestamps[0]!), stamp.grant.tokenDer, 0o644);
+    }
 
     writeFileAtomic(
       join(certRoot, "metadata", "exportInfo.json"),
@@ -372,7 +387,8 @@ export async function issueCertificate(params: {
           runId: run.runId,
           agentId,
           exportedTs: Date.now(),
-          fileCount: listFiles(certRoot).length
+          fileCount: listFiles(certRoot).length,
+          ...(timestamps.length ? { timestamps } : {})
         },
         null,
         2
@@ -395,7 +411,8 @@ export async function issueCertificate(params: {
     });
     return {
       outFile,
-      certId
+      certId,
+      timestampWarnings: stamp.grant ? [] : stamp.failures
     };
   } finally {
     rmSync(bundleDir, { recursive: true, force: true });
@@ -446,9 +463,11 @@ export async function verifyCertificate(params: {
   const errors: string[] = [];
   const signatures: IssuerAdmission[] = [];
   let anchoring: VerifierReportV1["anchoring"] = { status: "unanchored", detail: "the certificate ledger was not verified" };
+  let time: VerifierReportInput["time"];
+  const warnings: string[] = [];
   const finish = (certId: string | null): CertificateVerification => {
     const report = buildVerifierReport({ artifact: { kind: "certificate", path: params.certFile, sha256: sha256Hex(readFileSync(params.certFile)) },
-      context: params.trust, integrityErrors: errors, signatures, anchoring });
+      context: params.trust, integrityErrors: errors, signatures, anchoring, warnings, time });
     return { ok: report.trusted, errors, certId, report };
   };
   // Claimed signing times (step 6): the run seal's own claim, else the cert.sig claim for everything the cert seals.
@@ -491,6 +510,11 @@ export async function verifyCertificate(params: {
     if (!issuer) {
       errors.push("cert signature invalid");
     }
+    const tokenFile = join(extracted, "timestamps", `${certSha}.tsr`);
+    const stamped = artifactTime({ token: pathExists(tokenFile) ? readFileSync(tokenFile) : null, digestHex: certSha, claimedAt: cert.issuedTs, trust: params.trust });
+    time = stamped.time;
+    if (stamped.integrityError) errors.push(stamped.integrityError);
+    if (stamped.warning) warnings.push(stamped.warning);
 
     let run: DiagnosticReport | null = null;
     try {

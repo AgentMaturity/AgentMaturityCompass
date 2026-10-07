@@ -2,7 +2,7 @@ import { createHash, verify, X509Certificate } from "node:crypto";
 import type { TrustContext } from "../trust/trustContext.js";
 import type { TimestampAuthority } from "../trust/trustList.js";
 import { children, derTime, expectTag, oid, parseDer, uintHex, type Der } from "./der.js";
-import type { AttestedTime } from "./timeEvidence.js";
+import { evaluateTime, type AttestedTime, type TimeEvidence, type TimeFinding } from "./timeEvidence.js";
 
 /**
  * Offline RFC 3161 token verification (P1-25): CMS SignedData (RFC 5652), ESSCertID / ESSCertIDv2 (RFC 2634,
@@ -235,4 +235,24 @@ export function verifyTimestampToken(input: {
     // A DER or X.509 parse failure past the token envelope (a certificate, an attribute) is still a malformed token.
     return { ok: false, code: "TST_MALFORMED", detail: error instanceof Error ? error.message : String(error) };
   }
+}
+
+/**
+ * The time dimension of an artifact verdict: basis "claimed" without a token, "attested-upper-bound" when the token
+ * verifies against the trust context's TSA anchors. A token that is present but broken is an integrity error; one
+ * whose TSA is not pinned leaves the basis "claimed" and says so as a warning.
+ */
+export function artifactTime(input: { token: Buffer | null; digestHex: string; claimedAt: string | number; trust: Pick<TrustContext, "lists"> }): {
+  time: { evidence: TimeEvidence; findings: TimeFinding[] }; integrityError: string | null; warning: string | null;
+} {
+  const claimed = evaluateTime({ claimedAt: input.claimedAt, upper: null });
+  const simple = { time: { evidence: claimed.time, findings: claimed.findings }, integrityError: null, warning: null };
+  if (!input.token) return simple;
+  const verified = verifyTimestampToken({ token: input.token, expectedDigestHex: input.digestHex, anchors: timestampAnchors(input.trust) });
+  if (verified.ok) {
+    const attested = evaluateTime({ claimedAt: input.claimedAt, upper: verified.attested });
+    return { ...simple, time: { evidence: attested.time, findings: attested.findings } };
+  }
+  const message = `timestamp ${verified.code}: ${verified.detail}`;
+  return verified.code === "TST_UNTRUSTED_TSA" ? { ...simple, warning: `${message}; time basis stays claimed` } : { ...simple, integrityError: message };
 }

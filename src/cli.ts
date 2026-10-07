@@ -11422,6 +11422,7 @@ program
       agentId: opts.agent ?? activeAgent(program)
     });
     console.log(chalk.green(`Certificate issued: ${issued.outFile}`));
+    for (const warning of issued.timestampWarnings) console.log(chalk.yellow(`No RFC 3161 timestamp attached: ${warning}`));
     printClaimResult(runIdClaim(opts.run, opts.agent ?? activeAgent(program)), {});
     console.log(`certId=${issued.certId}`);
   });
