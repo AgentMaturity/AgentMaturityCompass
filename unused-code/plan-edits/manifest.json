@@ -38,6 +38,13 @@
       "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd"
     },
     {
+      "path": "src/api/index.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/src/api/index.ts.landed",
+      "sha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b"
+    },
+    {
       "path": "src/assurance/assuranceCertificates.ts",
       "issue": "P0-15",
       "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
