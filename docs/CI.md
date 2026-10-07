@@ -46,3 +46,27 @@ The gate fails if any policy rule fails, including:
 - any level-5 claim backed by non-OBSERVED evidence when required.
 
 Policy signatures are verified before gate evaluation.
+
+## No fabricated results (AMC repository CI)
+
+`npm run check:no-fabrication` (`scripts/check-no-fabrication.mjs`) runs in the `build-test` job as the step "No fabricated results" and as part of `npm run lint`. It parses `src/` with the TypeScript compiler API, so comments, strings and regular expressions are told apart, and fails with `file:line rule message` on:
+
+- **R1 random value.** A call to `Math.random`, `crypto.randomInt`, `randomInt` or `crypto.getRandomValues` under `src/{score,domains,assurance,shield,compliance,diagnostic,claims,exports}`. A random number must never reach a score, level, verdict or status.
+- **R2 fabricated-result identifier.** A declared name starting with `pseudoRandom`, or with `fake`, `mock`, `canned` or `synthetic` followed by `Score`, `Level`, `Result`, `Verdict` or `Response`, anywhere in `src/` except `src/claims/eligibility/exampleMode.ts`, the labelled example mode.
+- **R3 path-presence scoring.** A string literal starting with `src/` anywhere under `src/score/`, or inside an `existsSync` or `statSync` call under the R1 roots. A file existing in AMC's own source tree is not evidence about an agent.
+- **R4 certification wording.** A string or template literal under `src/` (not a comment and not a regular expression) containing the word "certified" or the phrase "certification ready" or "certification readiness". `.html` and `.js` files under `src/console/` and `src/dashboard/` are checked line by line. AMC output is evidence of conformity, never a certification.
+
+Exceptions live in `scripts/no-fabrication-allowlist.json`:
+
+- `permanent` holds reviewed legitimate uses, each with a reason: detection word lists, refusals such as "cannot be certified", and pack data naming third-party schemes.
+- `pending` holds wording an open issue removes, each naming its owning issue key (for example `P0-21`).
+- `pathPresence` lists the control-surface scorers that refuse outside an AMC checkout until P1-53 retires them. `pathPresenceBaseline` may only go down: the check fails when the list grows past it, and asks for the baseline to be lowered when the list shrinks.
+
+An entry that no longer matches anything fails as stale, so the list shrinks as issues land.
+
+A legitimate random call carries a marker on the same or the previous line:
+
+- `// amc-allow-random: id` for an identifier that never enters a result;
+- `// amc-allow-random: fuzz-input` for a generated attack or test input that a separate evaluator grades.
+
+Reviewers question every new marker and every new allowlist entry: each one is a place where the guard no longer looks. `npm run check:no-fabrication -- --json` prints counts per rule and the marker count so growth shows in review. `npm run check:no-fabrication -- --strict` also fails while any `pending` entry remains; Gate G0 requires it to exit 0.
