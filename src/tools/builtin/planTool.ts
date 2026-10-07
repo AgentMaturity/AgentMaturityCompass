@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../toolTypes.js";
-import { readSessionList, sessionListTool, type SessionListHeader } from "./nativeToolBreadth/sessionListTool.js";
+import type { NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
+import { readSessionList, sessionListTool, type SessionListHeader, type SessionListStore } from "./nativeToolBreadth/sessionListTool.js";
 import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
@@ -26,14 +27,11 @@ const planArgs = z.object({
 export type PlanPayload = z.infer<typeof planArgs>;
 export type PlanRecord = SessionListHeader & PlanPayload;
 
-const KIND = "amc.native.plan";
-const FILE = "plan.json";
+const STORE: SessionListStore = { name: "plan", kind: "amc.native.plan", fileName: "plan.json", auditType: "NATIVE_PLAN" };
 
-export function planTool(options: { readonly sessionId: SessionIdSource }): ToolDefinition {
+export function planTool(options: { readonly sessionId: SessionIdSource; readonly record: NativeReceiptRecorder }): ToolDefinition {
   return sessionListTool<PlanPayload>({
-    name: "plan",
-    kind: KIND,
-    fileName: FILE,
+    ...STORE,
     description: "Replace this session's plan (summary and ordered steps). Signed and bound to the session.",
     parameters: {
       type: "object",
@@ -61,10 +59,10 @@ export function planTool(options: { readonly sessionId: SessionIdSource }): Tool
       ...(payload.summary ? [payload.summary] : []),
       ...payload.steps.map((step, index) => `${index + 1}. [${step.status}] ${step.title}`)
     ].join("\n") || "[amc: plan is empty]"
-  }, options.sessionId);
+  }, options.sessionId, options.record);
 }
 
-/** The verified current plan record, or null. Throws when the file is not trustworthy. */
+/** The verified current plan record, or null. Throws when the file is not trustworthy or not the one the session ledger names. */
 export function readSessionPlan(workspace: string, sessionId: string): PlanRecord | null {
-  return readSessionList<PlanPayload>(workspace, sessionId, FILE, KIND);
+  return readSessionList<PlanPayload>(workspace, sessionId, STORE);
 }

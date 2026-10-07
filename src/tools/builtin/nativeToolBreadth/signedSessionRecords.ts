@@ -77,10 +77,14 @@ export function verifyRecord(workspace: string, file: SignedRecordFile<unknown>,
     && verifyHexDigestAny(digest, file.signature, getPublicKeyHistory(workspace, signer));
 }
 
-export function writeSignedRecord<T>(workspace: string, path: string, record: T, signer: RecordSigner): SignedRecordFile<T> {
-  const signed = signRecord(workspace, record, signer);
+export function persistSignedRecord<T>(path: string, signed: SignedRecordFile<T>): void {
   ensureDir(join(path, ".."));
   writeFileAtomic(path, JSON.stringify(signed, null, 2), 0o600);
+}
+
+export function writeSignedRecord<T>(workspace: string, path: string, record: T, signer: RecordSigner): SignedRecordFile<T> {
+  const signed = signRecord(workspace, record, signer);
+  persistSignedRecord(path, signed);
   return signed;
 }
 

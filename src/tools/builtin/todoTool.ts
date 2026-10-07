@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../toolTypes.js";
-import { readSessionList, sessionListTool, type SessionListHeader } from "./nativeToolBreadth/sessionListTool.js";
+import type { NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
+import { readSessionList, sessionListTool, type SessionListHeader, type SessionListStore } from "./nativeToolBreadth/sessionListTool.js";
 import type { SessionIdSource } from "./nativeToolBreadth/signedSessionRecords.js";
 
 /**
@@ -27,14 +28,11 @@ const todoArgs = z.object({
 export type TodoPayload = z.infer<typeof todoArgs>;
 export type TodoRecord = SessionListHeader & TodoPayload;
 
-const KIND = "amc.native.todo";
-const FILE = "todo.json";
+const STORE: SessionListStore = { name: "todo", kind: "amc.native.todo", fileName: "todo.json", auditType: "NATIVE_TODO" };
 
-export function todoTool(options: { readonly sessionId: SessionIdSource }): ToolDefinition {
+export function todoTool(options: { readonly sessionId: SessionIdSource; readonly record: NativeReceiptRecorder }): ToolDefinition {
   return sessionListTool<TodoPayload>({
-    name: "todo",
-    kind: KIND,
-    fileName: FILE,
+    ...STORE,
     description: "Replace this session's todo list. Signed and bound to the session; returns the rendered list.",
     parameters: {
       type: "object",
@@ -60,10 +58,10 @@ export function todoTool(options: { readonly sessionId: SessionIdSource }): Tool
     render: (payload) => payload.items.length === 0
       ? "[amc: todo list is empty]"
       : payload.items.map((item) => `${MARK[item.status]} ${item.content}`).join("\n")
-  }, options.sessionId);
+  }, options.sessionId, options.record);
 }
 
-/** The verified current todo record, or null. Throws when the file is not trustworthy. */
+/** The verified current todo record, or null. Throws when the file is not trustworthy or not the one the session ledger names. */
 export function readSessionTodo(workspace: string, sessionId: string): TodoRecord | null {
-  return readSessionList<TodoPayload>(workspace, sessionId, FILE, KIND);
+  return readSessionList<TodoPayload>(workspace, sessionId, STORE);
 }

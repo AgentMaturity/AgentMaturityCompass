@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { z } from "zod";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition } from "../toolTypes.js";
+import { receiptedBody, type NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
 import { NativeToolRefusal } from "./nativeToolBreadth/originPolicy.js";
 import {
   recordDigest,
@@ -28,6 +29,10 @@ import { writeFileAtomic } from "../../utils/fs.js";
  * No answerer, a null answer, a thrown or timed-out answerer, or any record
  * that fails those checks is a failed call whose output carries no answer.
  * There is no default answerer and no code path that synthesizes one.
+ *
+ * RECEIPT. Every call leaves one `NATIVE_ASK_USER` ledger row: on an answer,
+ * the question id and the question and answer digests (never the answer
+ * text), written before the answer is returned; otherwise the refusal.
  *
  * BOUNDARY. A valid signature proves the answer passed through a holder of
  * this workspace's auditor key — the same trust the approvals store rests on.
@@ -123,6 +128,7 @@ function awaitAnswer(answerer: AskUserAnswerer, question: AskUserQuestion, signa
 
 export interface AskUserToolOptions {
   readonly sessionId: SessionIdSource;
+  readonly record: NativeReceiptRecorder;
   /** Omitted means no human is reachable, and every call refuses. */
   readonly answerer?: AskUserAnswerer;
   readonly timeoutMs?: number;
@@ -143,7 +149,7 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       required: ["question"],
       additionalProperties: false
     },
-    body: async (execution) => {
+    body: receiptedBody("NATIVE_ASK_USER", options.record, async (execution, allow) => {
       const args = argsSchema.parse(execution.arguments);
       if (execution.effectiveMode === "SIMULATE") return { output: "[amc: SIMULATE ask_user; no question asked]" };
       const answerer = options.answerer;
@@ -167,20 +173,25 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
 
       const timeout = AbortSignal.timeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       const signal = execution.signal ? AbortSignal.any([execution.signal, timeout]) : timeout;
-      let answer: SignedAskUserAnswer | null;
+      let given: SignedAskUserAnswer | null;
       try {
-        answer = await awaitAnswer(answerer, question, signal);
+        given = await awaitAnswer(answerer, question, signal);
       } catch (error: unknown) {
         throw new Error(`ask_user: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
       }
-      if (!answer) throw new Error("ask_user: no answer was given");
+      if (!given) throw new Error("ask_user: no answer was given");
+      // Checked and used as one plain-data copy, so nothing the answerer handed
+      // back can read differently after it verified.
+      const answer = JSON.parse(JSON.stringify(given)) as SignedAskUserAnswer;
       const problem = answerProblem(execution.workspace, question, answer);
       if (problem) throw new NativeToolRefusal("ask_user", `${problem}; no answer is returned`);
 
+      const answerSha256 = recordDigest(answer.record);
+      allow({ questionId: record.questionId, questionSha256: question.questionSha256, answerSha256 });
       writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
-        record: answer.record, digestSha256: recordDigest(answer.record), signature: answer.signature, signer: "auditor"
+        record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
       }, null, 2), 0o600);
       return { output: `${answer.record.answer}\n[amc: signed answer to ${record.questionId}]` };
-    }
+    })
   });
 }
