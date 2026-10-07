@@ -61,6 +61,6 @@ describe("control-surface scorers declare when they do not apply", () => {
     expect(result.assessmentStatus).toBe("not_measured");
     expect(result.score).toBeNull();
     expect(result.controlInventory.applicable).toBe(true);
-    expect(result.controlInventory.score).toBeGreaterThan(0);
+    expect(result.controlInventory.flooding.presentPaths.length).toBeGreaterThan(0);
   });
 });

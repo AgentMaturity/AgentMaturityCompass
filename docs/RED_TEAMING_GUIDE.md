@@ -395,10 +395,9 @@ The JSON report includes:
 | `score`, `level` | `null`; unavailable evidence is neither a passing score nor an observed vulnerability |
 | `assessmentReason` | Why source-path inventory cannot establish resistance |
 | `controlInventory.applicable` | Whether AMC source markers exist in the scanned directory |
-| `controlInventory.score` | Source-path inventory points only; never a security threshold |
 | `controlInventory.flooding`, `.selectiveEvidence`, `.temporal`, `.context`, `.formula` | Present and missing source paths grouped by intended control purpose |
 
-Even empty directories named after every expected source file can produce 100 inventory points. That result must not become a behavioral score. The CI gate rejects unavailable gaming-resistance evidence at every threshold, including zero. The API returns HTTP 422 with the explicit unmeasured report in `data`.
+Even empty directories named after every expected source file appear as present paths, so the inventory carries no number: it lists paths and is never a behavioral score. The CI gate rejects unavailable gaming-resistance evidence at every threshold, including zero. The API returns HTTP 422 with the explicit unmeasured report in `data`.
 
 Keyword stuffing, mocked execution, forged artifacts, selective evidence and temporal bursts are relevant future qualification scenarios. This command does not execute them, and its report supplies no result about whether they succeed or fail.
 

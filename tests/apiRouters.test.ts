@@ -226,7 +226,7 @@ const m = vi.hoisted(() => ({
     assessmentReason: "Gaming resistance is not measured: source paths are not behavioral evidence.",
     score: null,
     level: null,
-    controlInventory: { applicable: true, score: 100 },
+    controlInventory: { applicable: true },
   })),
   generateInsiderRiskReport: vi.fn(() => ({ risks: [] })),
   renderInsiderRiskMarkdown: vi.fn(() => "# insider report"),
@@ -1549,7 +1549,7 @@ describe("AMC API routers", () => {
       expect(result.json?.ok).toBe(false);
       expect(String(result.json?.error ?? "")).toMatch(/not measured/);
       expect(result.json?.data).toMatchObject({
-        assessmentStatus: "not_measured", score: null, level: null, controlInventory: { score: 100 },
+        assessmentStatus: "not_measured", score: null, level: null, controlInventory: { applicable: true },
       });
     }
 

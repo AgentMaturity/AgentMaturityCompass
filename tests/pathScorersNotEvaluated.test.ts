@@ -161,6 +161,26 @@ describe("gaming resistance", () => {
     await fakeAgent?.close();
   });
 
+  test("carries no inventory number on the library, CLI text or --json, even when every source path exists", () => {
+    const root = fullCheckout();
+    for (const path of ["src/evidence/x.ts", "src/vault/x.ts", "src/gateway/x.ts", "src/score/evidenceCoverageGap.ts", "src/score/claimExpiry.ts"]) {
+      mkdirSync(dirname(join(root, path)), { recursive: true });
+      writeFileSync(join(root, path), "fixture\n");
+    }
+    const report = scoreGamingResistance(root) as unknown as { controlInventory: Record<string, unknown> };
+    expect(report.controlInventory).not.toHaveProperty("score");
+    for (const group of ["flooding", "selectiveEvidence", "temporal", "context", "formula"]) {
+      expect(report.controlInventory[group]).not.toHaveProperty("score");
+    }
+    const cli = (extra: string[]) => spawnSync(process.execPath, [resolve(process.cwd(), "dist/cli.js"), "score", "gaming-resistance", ...extra], {
+      cwd: root, env: { ...process.env, NO_COLOR: "1" }, encoding: "utf8", timeout: 60_000
+    });
+    const text = cli([]);
+    expect(text.status, text.stderr).toBe(0);
+    expect(text.stdout).not.toMatch(/\/100|\d+\s*\/\s*100/);
+    expect(JSON.stringify(JSON.parse(cli(["--json"]).stdout))).not.toMatch(/"score":\d/);
+  });
+
   test("is not evaluated and the red-team gate does not pass on it", async () => {
     const workspace = tempDir("amc-p015-gate-");
     markAsAmcCheckout(workspace);

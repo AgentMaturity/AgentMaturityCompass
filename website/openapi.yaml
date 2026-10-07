@@ -7726,15 +7726,10 @@ paths:
                       controlInventory:
                         type: object
                         description: Source-path inventory only. Each control group lists presentPaths and missingPaths; none is a behavioral measurement.
-                        required: [applicable, score, flooding, selectiveEvidence, temporal, context, formula]
+                        required: [applicable, flooding, selectiveEvidence, temporal, context, formula]
                         properties:
                           applicable:
                             type: boolean
-                          score:
-                            type: number
-                            minimum: 0
-                            maximum: 100
-                            description: Source inventory points, not gaming resistance.
 
   /v1/security/insider/report:
     get:

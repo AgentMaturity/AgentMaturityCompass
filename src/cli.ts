@@ -10635,8 +10635,7 @@ ci
           console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
         }
         if (result.gamingResistance) {
-          console.log("  Gaming resistance: unavailable (no behavioral measurement)");
-          console.log(`  Source inventory only: ${result.gamingResistance.controlInventory.score}/100`);
+          console.log("  Gaming resistance: unavailable (no behavioral measurement; source inventory is not evidence)");
         } else {
           console.log("  Gaming resistance: disabled; this gate provides no score-gaming assurance");
         }
@@ -22621,7 +22620,7 @@ score
       if (opts.json) { console.log(JSON.stringify(result, null, 2)); return; }
       console.log(chalk.bold.hex('#4AEF79')("\n🛡️   Gaming Resistance"));
       console.log(chalk.yellow(result.assessmentReason));
-      console.log(chalk.gray("Source inventory only:"), result.controlInventory.score, "/100");
+      console.log(chalk.gray("Source inventory only (paths, not evidence); see --json for present and missing paths."));
       if (!result.controlInventory.applicable) {
         console.log(chalk.yellow(result.controlInventory.notApplicableReason));
       }

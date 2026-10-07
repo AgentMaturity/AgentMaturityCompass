@@ -245,7 +245,7 @@ describe("gamingResistance", () => {
     expect(result.score).toBeNull();
     expect(result.level).toBeNull();
     expect(result.controlInventory.applicable).toBe(true);
-    expect(result.controlInventory.score).toBeGreaterThan(0);
+    expect(result.controlInventory).not.toHaveProperty("score");
     expect(result.controlInventory.flooding.presentPaths).toContain("src/evidence");
   });
 
@@ -254,7 +254,7 @@ describe("gamingResistance", () => {
     expect(result.score).toBeNull();
     expect(result.level).toBeNull();
     expect(result.controlInventory.applicable).toBe(false);
-    expect(result.controlInventory.score).toBe(0);
+    expect(result.controlInventory.flooding.presentPaths).toEqual([]);
     expect(result.gaps.length).toBeGreaterThan(0);
   });
 });
