@@ -1,12 +1,12 @@
 import { getDomainPackQuestions } from "../../score/domainPacks.js";
 import { getDomainMetadata, type Domain } from "../domainRegistry.js";
 import { getIndustryPacksByStation } from "../industryPacks.js";
-import type { CertificationRequirementKind } from "./certificationSchema.js";
+import type { ConformanceRequirementKind } from "./conformanceSchema.js";
 
 /**
  * Minimum response level for a sector-pack question. `scoreIndustryPack`
  * (industryPacks.ts) records any response below L3 as a compliance gap; the
- * certification applies the same line, without the percentage around it.
+ * conformance applies the same line, without the percentage around it.
  */
 export const INDUSTRY_PACK_MINIMUM_LEVEL = 3;
 
@@ -18,11 +18,11 @@ export const INDUSTRY_PACK_MINIMUM_LEVEL = 3;
 export const DEFAULT_SCENARIO_PACK_IDS: readonly string[] = ["injection"];
 
 /**
- * The slice of a station operating profile the certification reads. The
+ * The slice of a station operating profile the conformance reads. The
  * profile module (src/domains/operatingProfiles, track F1) is not present at
  * this commit; a caller adapts its own shape to this one.
  */
-export interface CertificationStationProfile {
+export interface ConformanceStationProfile {
   id: string;
   source: string;
   /** Restricts the sector packs assessed; defaults to every pack of the station. */
@@ -33,7 +33,7 @@ export interface CertificationStationProfile {
 
 export interface RequirementSpec {
   id: string;
-  kind: CertificationRequirementKind;
+  kind: ConformanceRequirementKind;
   title: string;
   source: string;
   regulatoryRef?: string;
@@ -54,7 +54,7 @@ function uniqueInOrder(values: readonly string[]): string[] {
   return out;
 }
 
-function sectorPackRequirements(station: Domain, profile?: CertificationStationProfile): RequirementSpec[] {
+function sectorPackRequirements(station: Domain, profile?: ConformanceStationProfile): RequirementSpec[] {
   const restrict = profile?.industryPackIds ? new Set(profile.industryPackIds) : null;
   const packs = getIndustryPacksByStation(station).filter((pack) => restrict === null || restrict.has(pack.id));
   return packs.flatMap((pack) =>
@@ -100,7 +100,7 @@ function packRequirement(kind: "assurance-pack" | "scenario-pack", packId: strin
  * profile adds, and the scenario baseline plus any the profile adds. A pack
  * named under both assurance and scenario lists is kept once, as assurance.
  */
-export function deriveStationRequirements(station: Domain, profile?: CertificationStationProfile): RequirementSpec[] {
+export function deriveStationRequirements(station: Domain, profile?: ConformanceStationProfile): RequirementSpec[] {
   const metadata = getDomainMetadata(station);
   const assurancePackIds = uniqueInOrder([...metadata.assurancePacks, ...(profile?.requiredAssurancePacks ?? [])]);
   const assuranceSet = new Set(assurancePackIds);

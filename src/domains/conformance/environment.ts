@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { CertificationEnvironment } from "./certificationSchema.js";
+import type { ConformanceEnvironment } from "./conformanceSchema.js";
 
 const GIT_SHA_RE = /^[0-9a-f]{40}$/;
 
@@ -11,8 +11,8 @@ export interface SourceCommitResolution {
   resolution: string;
 }
 
-/** The boundary every certification result names: OS, architecture, Node. */
-export function currentCertificationEnvironment(): CertificationEnvironment {
+/** The boundary every conformance result names: OS, architecture, Node. */
+export function currentConformanceEnvironment(): ConformanceEnvironment {
   return { platform: process.platform, arch: process.arch, node: process.version };
 }
 

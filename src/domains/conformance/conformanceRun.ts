@@ -13,62 +13,62 @@ import {
   assertAssuranceReportProvenance,
   resolveRequirements,
   type PackResponseEvidence
-} from "./certificationEvidence.js";
-import { renderCertificationJson, renderCertificationMarkdown } from "./certificationExport.js";
-import { deriveStationRequirements, type CertificationStationProfile } from "./certificationRequirements.js";
+} from "./conformanceEvidence.js";
+import { renderConformanceJson, renderConformanceMarkdown } from "./conformanceExport.js";
+import { deriveStationRequirements, type ConformanceStationProfile } from "./conformanceRequirements.js";
 import {
-  certificationExportSchema,
-  type CertificationCounts,
-  type CertificationExport,
-  type CertificationRefusedInput,
-  type CertificationRequirement,
-  type CertificationStatus
-} from "./certificationSchema.js";
-import { currentCertificationEnvironment, resolveSourceCommit } from "./environment.js";
+  conformanceExportSchema,
+  type ConformanceCounts,
+  type ConformanceExport,
+  type ConformanceRefusedInput,
+  type ConformanceRequirement,
+  type ConformanceStatus
+} from "./conformanceSchema.js";
+import { currentConformanceEnvironment, resolveSourceCommit } from "./environment.js";
 
-export interface CertificationVerdict {
-  status: CertificationStatus;
-  counts: CertificationCounts;
+export interface ConformanceVerdict {
+  status: ConformanceStatus;
+  counts: ConformanceCounts;
   failedRequirementIds: string[];
   notEvaluatedRequirementIds: string[];
 }
 
 /**
- * The only rule that turns requirement statuses into a certification status:
- * CERTIFIED when at least one requirement exists and every one is PASS.
- * A FAIL or a NOT_EVALUATED anywhere is NOT_CERTIFIED — nothing is weighted,
+ * The only rule that turns requirement statuses into a conformance status:
+ * REQUIREMENTS_MET when at least one requirement exists and every one is PASS.
+ * A FAIL or a NOT_EVALUATED anywhere is REQUIREMENTS_NOT_MET — nothing is weighted,
  * averaged or thresholded, so nothing can hide an unmeasured requirement.
  */
-export function certificationStatusFrom(requirements: readonly CertificationRequirement[]): CertificationVerdict {
+export function conformanceStatusFrom(requirements: readonly ConformanceRequirement[]): ConformanceVerdict {
   const failedRequirementIds = requirements.filter((row) => row.status === "FAIL").map((row) => row.id);
   const notEvaluatedRequirementIds = requirements.filter((row) => row.status === "NOT_EVALUATED").map((row) => row.id);
   const pass = requirements.filter((row) => row.status === "PASS").length;
-  const counts: CertificationCounts = {
+  const counts: ConformanceCounts = {
     total: requirements.length,
     pass,
     fail: failedRequirementIds.length,
     notEvaluated: notEvaluatedRequirementIds.length
   };
-  const status: CertificationStatus =
-    requirements.length > 0 && failedRequirementIds.length === 0 && notEvaluatedRequirementIds.length === 0 ? "CERTIFIED" : "NOT_CERTIFIED";
+  const status: ConformanceStatus =
+    requirements.length > 0 && failedRequirementIds.length === 0 && notEvaluatedRequirementIds.length === 0 ? "REQUIREMENTS_MET" : "REQUIREMENTS_NOT_MET";
   return { status, counts, failedRequirementIds, notEvaluatedRequirementIds };
 }
 
-export interface ComposeCertificationInput {
+export interface ComposeConformanceInput {
   station: Domain;
   agentId: string;
   packResponses: PackResponseEvidence[];
   /** Reports whose seal the caller has already verified; provenance is checked here. */
   assuranceReports: AssuranceReport[];
-  profile?: CertificationStationProfile;
-  refusedInputs?: CertificationRefusedInput[];
+  profile?: ConformanceStationProfile;
+  refusedInputs?: ConformanceRefusedInput[];
   sourceCommit?: string;
   nowTs?: number;
-  certificationRunId?: string;
+  conformanceRunId?: string;
 }
 
 /** Composes an unsealed run (seal fields empty) from already-loaded evidence. */
-export function composeCertificationRun(input: ComposeCertificationInput): CertificationExport {
+export function composeConformanceRun(input: ComposeConformanceInput): ConformanceExport {
   const specs = deriveStationRequirements(input.station, input.profile);
   const requirements = resolveRequirements({
     station: input.station,
@@ -77,17 +77,17 @@ export function composeCertificationRun(input: ComposeCertificationInput): Certi
     packResponses: input.packResponses,
     assuranceReports: input.assuranceReports
   });
-  const verdict = certificationStatusFrom(requirements);
+  const verdict = conformanceStatusFrom(requirements);
   const commit = resolveSourceCommit(input.sourceCommit);
-  const run: CertificationExport = {
-    v: 1,
-    certificationRunId: input.certificationRunId ?? randomUUID(),
+  const run: ConformanceExport = {
+    schema: "amc.conformance-run/1",
+    conformanceRunId: input.conformanceRunId ?? randomUUID(),
     station: input.station,
     agentId: input.agentId,
     generatedTs: input.nowTs ?? Date.now(),
     sourceCommit: commit.sourceCommit,
     sourceCommitResolution: commit.resolution,
-    environment: currentCertificationEnvironment(),
+    environment: currentConformanceEnvironment(),
     profile: input.profile ? { id: input.profile.id, source: input.profile.source } : null,
     status: verdict.status,
     counts: verdict.counts,
@@ -110,19 +110,19 @@ export function composeCertificationRun(input: ComposeCertificationInput): Certi
     reportJsonSha256: "",
     runSealSig: ""
   };
-  return certificationExportSchema.parse(run);
+  return conformanceExportSchema.parse(run);
 }
 
 /** Hashes the canonical run with empty seal fields and signs it — the shared seal discipline of reportSeal.ts. */
-export function sealCertificationRun(run: CertificationExport, sign: (hashHex: string) => string): CertificationExport {
-  const base: CertificationExport = { ...run, reportJsonSha256: "", runSealSig: "" };
+export function sealConformanceRun(run: ConformanceExport, sign: (hashHex: string) => string): ConformanceExport {
+  const base: ConformanceExport = { ...run, reportJsonSha256: "", runSealSig: "" };
   const hash = sha256Hex(canonicalize(base));
   return { ...base, reportJsonSha256: hash, runSealSig: sign(hash) };
 }
 
 interface LoadedAssuranceEvidence {
   accepted: AssuranceReport[];
-  refused: CertificationRefusedInput[];
+  refused: ConformanceRefusedInput[];
 }
 
 function eventsBelongToSession(ledger: Ledger, report: AssuranceReport): string | null {
@@ -142,7 +142,7 @@ function eventsBelongToSession(ledger: Ledger, report: AssuranceReport): string 
 }
 
 /**
- * Loads the agent's assurance reports as certification evidence. A report is
+ * Loads the agent's assurance reports as conformance evidence. A report is
  * accepted only when its seal verifies against the workspace auditor keys,
  * it names a ledger session, and every measured scenario's event ids exist in
  * that session. Anything else is listed under refusedInputs with the reason.
@@ -156,7 +156,7 @@ function loadAssuranceEvidence(params: {
 }): LoadedAssuranceEvidence {
   const dir = join(getAgentPaths(params.workspace, params.agentId).reportsDir, "assurance");
   const accepted: AssuranceReport[] = [];
-  const refused: CertificationRefusedInput[] = [];
+  const refused: ConformanceRefusedInput[] = [];
   if (!pathExists(dir)) return { accepted, refused };
   const files = readdirSync(dir)
     .filter((file) => file.endsWith(".json"))
@@ -196,37 +196,37 @@ function loadAssuranceEvidence(params: {
   return { accepted, refused };
 }
 
-export interface RunIndustryCertificationInput {
+export interface RunIndustryConformanceInput {
   workspace: string;
   agentId?: string;
   station: Domain;
   packResponses: PackResponseEvidence[];
-  profile?: CertificationStationProfile;
+  profile?: ConformanceStationProfile;
   sourceCommit?: string;
   nowTs?: number;
   /** When set, assurance runs older than this are refused as stale evidence. Off by default. */
   maxEvidenceAgeMs?: number;
 }
 
-export interface RunIndustryCertificationResult {
-  run: CertificationExport;
+export interface RunIndustryConformanceResult {
+  run: ConformanceExport;
   jsonPath: string;
   markdownPath: string;
 }
 
-export function certificationReportsDir(workspace: string, agentId: string): string {
-  const dir = join(getAgentPaths(workspace, agentId).reportsDir, "certification");
+export function conformanceReportsDir(workspace: string, agentId: string): string {
+  const dir = join(getAgentPaths(workspace, agentId).reportsDir, "conformance");
   ensureDir(dir);
   return dir;
 }
 
 /**
- * Runs a station certification against a workspace: loads and verifies the
+ * Runs a station conformance against a workspace: loads and verifies the
  * agent's assurance evidence, composes the requirements, seals the result with
  * the workspace auditor key and writes JSON + Markdown under
- * `reports/certification/`.
+ * `reports/conformance/`.
  */
-export function runIndustryCertification(input: RunIndustryCertificationInput): RunIndustryCertificationResult {
+export function runIndustryConformance(input: RunIndustryConformanceInput): RunIndustryConformanceResult {
   const agentId = resolveAgentId(input.workspace, input.agentId);
   const nowTs = input.nowTs ?? Date.now();
   const ledger = openLedger(input.workspace);
@@ -238,7 +238,7 @@ export function runIndustryCertification(input: RunIndustryCertificationInput): 
       maxEvidenceAgeMs: input.maxEvidenceAgeMs,
       nowTs
     });
-    const unsealed = composeCertificationRun({
+    const unsealed = composeConformanceRun({
       station: input.station,
       agentId,
       packResponses: input.packResponses,
@@ -248,12 +248,12 @@ export function runIndustryCertification(input: RunIndustryCertificationInput): 
       sourceCommit: input.sourceCommit,
       nowTs
     });
-    const run = sealCertificationRun(unsealed, (hash) => ledger.signRunHash(hash));
-    const dir = certificationReportsDir(input.workspace, agentId);
-    const jsonPath = join(dir, `${run.certificationRunId}.json`);
-    const markdownPath = join(dir, `${run.certificationRunId}.md`);
-    writeFileAtomic(jsonPath, renderCertificationJson(run), 0o644);
-    writeFileAtomic(markdownPath, renderCertificationMarkdown(run), 0o644);
+    const run = sealConformanceRun(unsealed, (hash) => ledger.signRunHash(hash));
+    const dir = conformanceReportsDir(input.workspace, agentId);
+    const jsonPath = join(dir, `${run.conformanceRunId}.json`);
+    const markdownPath = join(dir, `${run.conformanceRunId}.md`);
+    writeFileAtomic(jsonPath, renderConformanceJson(run), 0o644);
+    writeFileAtomic(markdownPath, renderConformanceMarkdown(run), 0o644);
     return { run, jsonPath, markdownPath };
   } finally {
     ledger.close();

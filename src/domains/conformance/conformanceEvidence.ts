@@ -2,14 +2,15 @@ import type { AssurancePackResult, AssuranceReport, AssuranceScenarioResult } fr
 import { getAssurancePack } from "../../assurance/packs/index.js";
 import { assessDomain, type ComplianceGap } from "../domainAssessmentEngine.js";
 import type { Domain } from "../domainRegistry.js";
-import { INDUSTRY_PACK_MINIMUM_LEVEL, type RequirementSpec } from "./certificationRequirements.js";
-import type { CertificationEvidenceRef, CertificationRequirement } from "./certificationSchema.js";
+import { likert, type Likert1to5 } from "../../score/units.js";
+import { INDUSTRY_PACK_MINIMUM_LEVEL, type RequirementSpec } from "./conformanceRequirements.js";
+import type { ConformanceEvidenceRef, ConformanceRequirement } from "./conformanceSchema.js";
 
 /** Thrown when an input offered as evidence cannot be traced back to a ledger run. */
-export class CertificationProvenanceError extends Error {
+export class ConformanceProvenanceError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "CertificationProvenanceError";
+    this.name = "ConformanceProvenanceError";
   }
 }
 
@@ -25,13 +26,13 @@ export interface PackResponseEvidence {
 
 export function assertPackResponseProvenance(response: PackResponseEvidence): void {
   if (typeof response.questionId !== "string" || response.questionId.trim().length === 0) {
-    throw new CertificationProvenanceError("pack response without a questionId — refused");
+    throw new ConformanceProvenanceError("pack response without a questionId — refused");
   }
   if (typeof response.sessionId !== "string" || response.sessionId.trim().length === 0) {
-    throw new CertificationProvenanceError(`pack response ${response.questionId} carries no ledger sessionId — refused`);
+    throw new ConformanceProvenanceError(`pack response ${response.questionId} carries no ledger sessionId — refused`);
   }
   if (!Number.isInteger(response.level) || response.level < 1 || response.level > 5) {
-    throw new CertificationProvenanceError(`pack response ${response.questionId} has level ${String(response.level)}; expected an integer 1..5`);
+    throw new ConformanceProvenanceError(`pack response ${response.questionId} has level ${String(response.level)}; expected an integer 1..5`);
   }
 }
 
@@ -48,15 +49,15 @@ function measuredScenarios(pack: AssurancePackResult): AssuranceScenarioResult[]
 export function assertAssuranceReportProvenance(report: AssuranceReport): void {
   const runId = typeof report.assuranceRunId === "string" && report.assuranceRunId.length > 0 ? report.assuranceRunId : "<no assuranceRunId>";
   if (typeof report.sessionId !== "string" || report.sessionId.trim().length === 0) {
-    throw new CertificationProvenanceError(`assurance run ${runId} carries no ledger sessionId — refused`);
+    throw new ConformanceProvenanceError(`assurance run ${runId} carries no ledger sessionId — refused`);
   }
   if (!Array.isArray(report.packResults)) {
-    throw new CertificationProvenanceError(`assurance run ${runId} carries no packResults — refused`);
+    throw new ConformanceProvenanceError(`assurance run ${runId} carries no packResults — refused`);
   }
   for (const pack of report.packResults) {
     for (const scenario of measuredScenarios(pack)) {
       if (!Array.isArray(scenario.evidenceEventIds) || scenario.evidenceEventIds.length === 0) {
-        throw new CertificationProvenanceError(
+        throw new ConformanceProvenanceError(
           `assurance run ${runId}: measured scenario ${pack.packId}/${scenario.scenarioId} has no evidenceEventIds — refused`
         );
       }
@@ -79,7 +80,7 @@ function latestReportWithPack(reports: AssuranceReport[], packId: string): PackH
   return best;
 }
 
-function packEvidence(hit: PackHit): CertificationEvidenceRef[] {
+function packEvidence(hit: PackHit): ConformanceEvidenceRef[] {
   return [
     { kind: "assurance-run", id: hit.report.assuranceRunId },
     { kind: "ledger-session", id: hit.report.sessionId ?? "" },
@@ -87,7 +88,7 @@ function packEvidence(hit: PackHit): CertificationEvidenceRef[] {
   ];
 }
 
-function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[]): CertificationRequirement {
+function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[]): ConformanceRequirement {
   const packId = spec.packId ?? "";
   const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, criterion: spec.criterion };
   let scenarioIds: string[];
@@ -135,13 +136,13 @@ function resolvePackRequirement(spec: RequirementSpec, reports: AssuranceReport[
   };
 }
 
-function responseEvidence(response: PackResponseEvidence): CertificationEvidenceRef[] {
-  const refs: CertificationEvidenceRef[] = [{ kind: "ledger-session", id: response.sessionId }];
+function responseEvidence(response: PackResponseEvidence): ConformanceEvidenceRef[] {
+  const refs: ConformanceEvidenceRef[] = [{ kind: "ledger-session", id: response.sessionId }];
   if (response.responseId && response.responseId.length > 0) refs.push({ kind: "pack-response", id: response.responseId });
   return refs;
 }
 
-function resolveSectorQuestion(spec: RequirementSpec, response: PackResponseEvidence | undefined): CertificationRequirement {
+function resolveSectorQuestion(spec: RequirementSpec, response: PackResponseEvidence | undefined): ConformanceRequirement {
   const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, regulatoryRef: spec.regulatoryRef, criterion: spec.criterion };
   if (!response) {
     return { ...base, status: "NOT_EVALUATED", observed: null, reason: "no recorded response for this question", evidence: [] };
@@ -160,7 +161,7 @@ function resolveDomainQuestion(
   spec: RequirementSpec,
   response: PackResponseEvidence | undefined,
   gap: ComplianceGap | undefined
-): CertificationRequirement {
+): ConformanceRequirement {
   const base = { id: spec.id, kind: spec.kind, title: spec.title, source: spec.source, regulatoryRef: spec.regulatoryRef, criterion: spec.criterion };
   if (!response) {
     return { ...base, status: "NOT_EVALUATED", observed: null, reason: "no recorded response for this question", evidence: [] };
@@ -190,14 +191,14 @@ export interface ResolveRequirementsInput {
  * Resolves every requirement to PASS, FAIL or NOT_EVALUATED with the evidence
  * ids it rests on. Inputs lacking provenance throw rather than degrade.
  */
-export function resolveRequirements(input: ResolveRequirementsInput): CertificationRequirement[] {
+export function resolveRequirements(input: ResolveRequirementsInput): ConformanceRequirement[] {
   for (const response of input.packResponses) assertPackResponseProvenance(response);
   for (const report of input.assuranceReports) assertAssuranceReportProvenance(report);
 
   const responseByQuestion = new Map<string, PackResponseEvidence>();
   for (const response of input.packResponses) {
     if (responseByQuestion.has(response.questionId)) {
-      throw new CertificationProvenanceError(`duplicate pack response for ${response.questionId} — refused; one recorded answer per question`);
+      throw new ConformanceProvenanceError(`duplicate pack response for ${response.questionId} — refused; one recorded answer per question`);
     }
     responseByQuestion.set(response.questionId, response);
   }
@@ -205,10 +206,10 @@ export function resolveRequirements(input: ResolveRequirementsInput): Certificat
   // The domain engine treats an absent answer as L1; only answered questions are
   // handed to it, so a NOT_EVALUATED question never surfaces as a FAIL.
   const domainQuestionIds = input.specs.filter((spec) => spec.kind === "domain-question").map((spec) => spec.questionId ?? "");
-  const domainQuestionScores: Record<string, number> = {};
+  const domainQuestionScores: Record<string, Likert1to5> = {};
   for (const questionId of domainQuestionIds) {
     const response = responseByQuestion.get(questionId);
-    if (response) domainQuestionScores[questionId] = response.level;
+    if (response) domainQuestionScores[questionId] = likert(response.level);
   }
   const gaps = assessDomain({ agentId: input.agentId, domain: input.station, baseScores: {}, domainQuestionScores }).complianceGaps;
   const gapByQuestion = new Map(gaps.map((gap) => [gap.questionId, gap] as const));

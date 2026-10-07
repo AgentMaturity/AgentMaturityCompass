@@ -1,23 +1,23 @@
 import { sealedRunReportVerifies } from "../../diagnostic/reportSeal.js";
-import { certificationExportSchema, type CertificationExport, type CertificationRequirement } from "./certificationSchema.js";
+import { conformanceExportSchema, type ConformanceExport, type ConformanceRequirement } from "./conformanceSchema.js";
 
-/** The JSON export: the sealed run, pretty-printed; `parseCertificationExport` reads it back. */
-export function renderCertificationJson(run: CertificationExport): string {
+/** The JSON export: the sealed run, pretty-printed; `parseConformanceExport` reads it back. */
+export function renderConformanceJson(run: ConformanceExport): string {
   return `${JSON.stringify(run, null, 2)}\n`;
 }
 
-export function parseCertificationExport(text: string): CertificationExport {
-  return certificationExportSchema.parse(JSON.parse(text));
+export function parseConformanceExport(text: string): ConformanceExport {
+  return conformanceExportSchema.parse(JSON.parse(text));
 }
 
 /**
  * Verifies an export without trusting any of its own claims: schema, seal
  * against the workspace auditor keys, and the status recomputed from the
- * requirement statuses. The status rule lives in certificationRun.ts; it is
+ * requirement statuses. The status rule lives in conformanceRun.ts; it is
  * repeated here as a check, not as a second definition.
  */
-export function verifyCertificationExport(workspace: string, candidate: unknown): { ok: boolean; errors: string[] } {
-  const parsed = certificationExportSchema.safeParse(candidate);
+export function verifyConformanceExport(workspace: string, candidate: unknown): { ok: boolean; errors: string[] } {
+  const parsed = conformanceExportSchema.safeParse(candidate);
   if (!parsed.success) {
     return { ok: false, errors: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`) };
   }
@@ -28,7 +28,7 @@ export function verifyCertificationExport(workspace: string, candidate: unknown)
   }
   const failed = run.requirements.filter((row) => row.status === "FAIL").map((row) => row.id);
   const notEvaluated = run.requirements.filter((row) => row.status === "NOT_EVALUATED").map((row) => row.id);
-  const expectedStatus = run.requirements.length > 0 && failed.length === 0 && notEvaluated.length === 0 ? "CERTIFIED" : "NOT_CERTIFIED";
+  const expectedStatus = run.requirements.length > 0 && failed.length === 0 && notEvaluated.length === 0 ? "REQUIREMENTS_MET" : "REQUIREMENTS_NOT_MET";
   if (run.status !== expectedStatus) {
     errors.push(`status ${run.status} does not follow from the requirement statuses (expected ${expectedStatus})`);
   }
@@ -41,7 +41,7 @@ export function verifyCertificationExport(workspace: string, candidate: unknown)
   return { ok: errors.length === 0, errors };
 }
 
-function evidenceSummary(requirement: CertificationRequirement): string {
+function evidenceSummary(requirement: ConformanceRequirement): string {
   if (requirement.evidence.length === 0) return "none";
   const byKind = new Map<string, string[]>();
   for (const ref of requirement.evidence) {
@@ -54,24 +54,24 @@ function evidenceSummary(requirement: CertificationRequirement): string {
     .join("; ");
 }
 
-function requirementRows(requirements: CertificationRequirement[]): string[] {
+function requirementRows(requirements: ConformanceRequirement[]): string[] {
   return requirements.map(
     (row) => `| \`${row.id}\` | ${row.status} | ${row.observed ?? "—"} | ${row.reason.replaceAll("|", "\\|")} | ${evidenceSummary(row).replaceAll("|", "\\|")} |`
   );
 }
 
 /** Markdown summary in the shape the audit binder's `summaries/summary.md` uses. */
-export function renderCertificationMarkdown(run: CertificationExport): string {
+export function renderConformanceMarkdown(run: ConformanceExport): string {
   const failed = run.requirements.filter((row) => row.status === "FAIL");
   const notEvaluated = run.requirements.filter((row) => row.status === "NOT_EVALUATED");
-  const listOrNone = (rows: CertificationRequirement[]): string =>
+  const listOrNone = (rows: ConformanceRequirement[]): string =>
     rows.length === 0 ? "- None" : rows.map((row) => `- \`${row.id}\` — ${row.reason}`).join("\n");
   return [
-    "# AMC Industry Certification Run",
+    "# AMC Conformance Run",
     "",
-    "_Composed conformance of the station's sector packs, assurance packs and scenario packs. Engineering evidence; not legal advice._",
+    "_Evidence of conformity within the station's derived requirement set (sector packs, assurance packs, scenario packs). Engineering evidence; not legal advice._",
     "",
-    `- Certification Run ID: \`${run.certificationRunId}\``,
+    `- Conformance Run ID: \`${run.conformanceRunId}\``,
     `- Station: \`${run.station}\``,
     `- Agent: \`${run.agentId}\``,
     `- Generated: \`${new Date(run.generatedTs).toISOString()}\``,
