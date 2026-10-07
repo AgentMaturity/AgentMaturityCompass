@@ -10,7 +10,8 @@ import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
 import { generateComplianceReport, initComplianceMaps } from "../../src/compliance/complianceEngine.js";
 import { frameworkChoices, type ComplianceFramework } from "../../src/compliance/frameworks.js";
-import type { ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
+import { defaultComplianceMapsFile } from "../../src/compliance/builtInMappings.js";
+import type { ComplianceEvidenceRequirement, ComplianceMapsFile } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEventType } from "../../src/types.js";
 
 /**
@@ -70,11 +71,11 @@ function appendEvent(workspace: string, opts: {
   }
 }
 
-const NO_AUDIT = { type: "requires_no_audit", auditTypesDenylist: ["DENIED_SIGNAL"] } as const;
-const EVENT = { type: "requires_evidence_event", eventTypes: ["audit", "metric"], minObservedRatio: 0.5 } as const;
-const PACK = { type: "requires_assurance_pack", packId: "toolGovernance", minScore: 50, maxSucceeded: 5 } as const;
+const NO_AUDIT: ComplianceEvidenceRequirement = { type: "requires_no_audit", auditTypesDenylist: ["DENIED_SIGNAL"] };
+const EVENT: ComplianceEvidenceRequirement = { type: "requires_evidence_event", eventTypes: ["audit", "metric"], minObservedRatio: 0.5 };
+const PACK: ComplianceEvidenceRequirement = { type: "requires_assurance_pack", packId: "toolGovernance", minScore: 50, maxSucceeded: 5 };
 
-function fixtureMapping(id: string, evidenceRequirements: ComplianceMapsFile["complianceMaps"]["mappings"][number]["evidenceRequirements"],
+function fixtureMapping(id: string, evidenceRequirements: ComplianceEvidenceRequirement[],
   extra: Record<string, unknown> = {}): ComplianceMapsFile["complianceMaps"]["mappings"][number] {
   return {
     id,
@@ -155,6 +156,7 @@ describe("compliance fails closed (P0-17)", () => {
   test("empty ledger with signed maps: every category NOT_EVALUATED, evidence incomplete, score null", () => {
     const workspace = newWorkspace();
     initComplianceMaps(workspace);
+    const mappings = new Map(defaultComplianceMapsFile().complianceMaps.mappings.map((row) => [row.id, row]));
     for (const framework of frameworkChoices()) {
       const out = report(workspace, "default", framework);
       expect(out.configTrusted).toBe(true);
@@ -163,6 +165,10 @@ describe("compliance fails closed (P0-17)", () => {
         expect({ id: row.id, status: row.status, result: row.result, evidence: row.evidence })
           .toEqual({ id: row.id, status: "NOT_EVALUATED", result: "not_evaluated", evidence: "incomplete" });
         expect(row.notEvaluatedReasons.length).toBeGreaterThan(0);
+        // Every requirement is unevaluated on an empty ledger, a vacuous "no violations" included.
+        if (mappings.get(row.id)?.evidenceRequirements.some((req) => req.type === "requires_no_audit")) {
+          expect(row.notEvaluatedReasons).toContain("no agent activity in window; absence of violations proves nothing");
+        }
       }
       expect(out.coverage.score).toBeNull();
       expect(out.coverage.evaluated).toBe(0);

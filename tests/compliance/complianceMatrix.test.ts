@@ -36,7 +36,11 @@ describe("generateCoverageMatrix", () => {
 
     expect(matrix.agentId).toBe("default");
     expect(matrix.frameworks.length).toBe(4);
-    expect(matrix.overallScore).toBeTypeOf("number");
+    // P0-17: a fresh workspace has no control-bound evidence, so nothing is scored (was a number).
+    expect(matrix.overallScore).toBeNull();
+    expect(matrix.gaps).toEqual([]);
+    const total = matrix.frameworks.reduce((sum, fw) => sum + fw.total, 0);
+    expect(matrix.notEvaluated.length).toBe(total);
     expect(matrix.ts).toBeGreaterThan(0);
 
     const fwNames = matrix.frameworks.map((f) => f.framework);
@@ -116,5 +120,7 @@ describe("renderCoverageHeatmap", () => {
     const heatmap = renderCoverageHeatmap(matrix);
 
     expect(heatmap).toContain("EU_AI_ACT");
+    expect(heatmap).toContain("? NOT_EVALUATED");
+    expect(heatmap).toContain("Overall: not evaluated");
   });
 });

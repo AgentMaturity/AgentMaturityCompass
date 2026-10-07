@@ -14,7 +14,7 @@ function frameworkLegalReviewNotes(framework: string): string[] {
     case "EU_AI_ACT":
       return [
         "EU AI Act legal review: confirm provider/deployer role, high-risk classification, FRIA obligations, technical documentation, human oversight, post-market monitoring, and serious-incident reporting duties.",
-        "Confirm whether each PARTIAL, MISSING, or UNKNOWN category maps to a legal obligation, internal policy control, or non-applicable item with counsel-approved rationale."
+        "Confirm whether each PARTIAL, MISSING, NOT_EVALUATED, or UNKNOWN category maps to a legal obligation, internal policy control, or non-applicable item with counsel-approved rationale."
       ];
     case "SOC2":
       return [
@@ -57,17 +57,19 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push(
     `- Trust coverage: OBSERVED ${(report.trustTierCoverage.observed * 100).toFixed(1)}% | ATTESTED ${(report.trustTierCoverage.attested * 100).toFixed(1)}% | SELF_REPORTED ${(report.trustTierCoverage.selfReported * 100).toFixed(1)}%`
   );
-  lines.push(
-    `- Coverage score: ${(report.coverage.score * 100).toFixed(1)}% (S:${report.coverage.satisfied} P:${report.coverage.partial} M:${report.coverage.missing} U:${report.coverage.unknown})`
-  );
+  const counts = `S:${report.coverage.satisfied} P:${report.coverage.partial} M:${report.coverage.missing} N:${report.coverage.notEvaluated} U:${report.coverage.unknown}`;
+  lines.push(report.coverage.score === null
+    ? `- Coverage: not evaluated (0 of ${report.categories.length} categories had control-bound evidence) (${counts})`
+    : `- Coverage score: ${(report.coverage.score * 100).toFixed(1)}% (${counts})`);
   lines.push("- Full hashes remain available in JSON reports: `amc compliance report --json`.");
   lines.push("");
   lines.push("## Status and Evidence Drilldown");
   lines.push("");
-  lines.push("- SATISFIED: mapped evidence is present and compliance maps are trusted.");
-  lines.push("- PARTIAL: some evidence exists, maps are untrusted, or one or more controls need more proof.");
-  lines.push("- MISSING: expected mapped evidence is absent.");
-  lines.push("- UNKNOWN: AMC cannot decide with the current maps and evidence window.");
+  lines.push("- SATISFIED: every requirement passed on control-bound AMC runtime evidence and the compliance maps are trusted.");
+  lines.push("- PARTIAL: at least one requirement failed while another passed.");
+  lines.push("- MISSING: at least one requirement failed and none passed.");
+  lines.push("- NOT_EVALUATED: control-bound evidence is absent, untrusted or outside the window, or the maps are untrusted; this is not a pass.");
+  lines.push("- UNKNOWN: legacy status from reports written before NOT_EVALUATED existed.");
   lines.push("- Hash drill-down: match the `eventId` below in the JSON report to inspect the full `eventHash` and evidence metadata.");
   lines.push("");
   lines.push("## Categories");
@@ -103,7 +105,7 @@ export function complianceReportToMarkdown(report: ComplianceReportJson): string
   lines.push(`- Markdown report: this file, generated for framework \`${report.framework}\`.`);
   lines.push(`- JSON evidence report: \`amc compliance report --framework ${report.framework} --json --out compliance-${report.framework.toLowerCase()}.json\`.`);
   lines.push("- Evidence drill-down: use the event IDs above to recover full hashes and metadata from the JSON report.");
-  lines.push("- Reviewer focus: resolve every PARTIAL, MISSING, and UNKNOWN item before using this report as customer, board, regulator, or audit evidence.");
+  lines.push("- Reviewer focus: resolve every PARTIAL, MISSING, NOT_EVALUATED, and UNKNOWN item before using this report as customer, board, regulator, or audit evidence.");
   lines.push("");
   lines.push("Framework-specific legal-review notes:");
   for (const note of frameworkLegalReviewNotes(report.framework)) {
@@ -142,7 +144,8 @@ export function writeComplianceReport(params: {
 
 export function diffComplianceReports(a: ComplianceReportJson, b: ComplianceReportJson): {
   framework: string;
-  coverageScoreDelta: number;
+  /** Null when either report evaluated nothing. */
+  coverageScoreDelta: number | null;
   categoryDeltas: Array<{
     id: string;
     before: string;
@@ -154,7 +157,8 @@ export function diffComplianceReports(a: ComplianceReportJson, b: ComplianceRepo
   const ids = [...new Set([...beforeById.keys(), ...afterById.keys()])].sort((x, y) => x.localeCompare(y));
   return {
     framework: b.framework,
-    coverageScoreDelta: Number((b.coverage.score - a.coverage.score).toFixed(4)),
+    coverageScoreDelta: a.coverage.score === null || b.coverage.score === null
+      ? null : Number((b.coverage.score - a.coverage.score).toFixed(4)),
     categoryDeltas: ids
       .map((id) => ({
         id,

@@ -243,15 +243,18 @@ function inspectComply(workspace: string, agentId: string): UnifiedSurfaceModule
       evidenceRefs: [signature.path, signature.sigPath],
     });
   }
-  const averageCoverage = reports.reduce((sum, report) => sum + report.coverage.score, 0) / reports.length;
+  // A report that evaluated nothing has a null score and is not averaged in as zero coverage.
+  const scores = reports.flatMap((report) => (report.coverage.score === null ? [] : [report.coverage.score]));
+  const averageCoverage = scores.length > 0 ? scores.reduce((sum, value) => sum + value, 0) / scores.length : null;
   const satisfied = reports.reduce((sum, report) => sum + report.coverage.satisfied, 0);
   const partial = reports.reduce((sum, report) => sum + report.coverage.partial, 0);
-  const score = averageCoverage * 100;
   return result({
     name: "Comply",
     status: satisfied + partial > 0 ? "success" : "skipped",
-    score,
-    summary: `${reports.length}/${frameworks.length} signed-framework reports generated; average evidence coverage ${(averageCoverage * 100).toFixed(1)}% (${satisfied} satisfied, ${partial} partial).`,
+    score: averageCoverage === null ? 0 : averageCoverage * 100,
+    summary: `${reports.length}/${frameworks.length} signed-framework reports generated; ` + (averageCoverage === null
+      ? "not evaluated: no category had control-bound evidence."
+      : `average evidence coverage ${(averageCoverage * 100).toFixed(1)}% over ${scores.length} evaluated framework(s) (${satisfied} satisfied, ${partial} partial).`),
     issues: [
       ...issues,
       ...(satisfied + partial === 0 ? ["framework mappings exist, but current evidence satisfies no mapped control"] : []),

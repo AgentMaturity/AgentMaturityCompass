@@ -12555,13 +12555,15 @@ compliance
     }
     console.log(chalk.green(`Compliance report generated: ${out.outFile}`));
     console.log(`Framework: ${family.displayName}`);
-    // F14: show coverage as percentage with human-readable label
-    const coveragePct = (out.report.coverage.score * 100).toFixed(1);
-    const coverageLabel = out.report.coverage.score >= 0.8 ? "SATISFIED" : out.report.coverage.score >= 0.5 ? "PARTIAL" : "INSUFFICIENT";
-    console.log(`Coverage: ${coveragePct}% (${coverageLabel})`);
-    if (out.report.coverage.score === 0) {
-      console.log(chalk.gray(`  💡 Coverage is 0% because no evidence has been collected yet.`));
-      console.log(chalk.gray(`     This is expected for a fresh workspace. Capture evidence first:`));
+    // P0-17: a percentage is not a status; nothing evaluated prints "not evaluated", never a score.
+    const { coverage } = out.report;
+    const total = out.report.categories.length;
+    console.log(coverage.score === null
+      ? `Coverage: not evaluated (0 of ${total} categories had control-bound evidence)`
+      : `Coverage: ${(coverage.score * 100).toFixed(1)}% (${coverage.evaluated} of ${total} categories evaluated, ${coverage.satisfied} satisfied)`);
+    if (coverage.score === null) {
+      console.log(chalk.gray(`  💡 Categories need control-bound AMC runtime evidence (meta.controlIds) in the window.`));
+      console.log(chalk.gray(`     Absence of violations is not a pass. Capture evidence first:`));
       console.log(chalk.gray(`     amc wrap <runtime> -- <your-agent-command>`));
       console.log(chalk.gray(`     amc evidence collect`));
     }
@@ -12643,7 +12645,7 @@ compliance
     } else {
       console.log(md);
     }
-    console.log(chalk.gray(`\nOverall: ${(matrix.overallScore * 100).toFixed(1)}% | Gaps: ${matrix.gaps.length}`));
+    console.log(chalk.gray(`\nOverall: ${matrix.overallScore === null ? "not evaluated" : `${(matrix.overallScore * 100).toFixed(1)}%`} | Gaps: ${matrix.gaps.length}`));
   });
 
 compliance

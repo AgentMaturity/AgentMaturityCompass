@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { EvidenceEventType } from "../types.js";
+import type { EvidenceState, ResultState } from "../claims/eligibility/types.js";
 import { questionIds } from "../diagnostic/questionBank.js";
 import { frameworkChoices } from "./frameworks.js";
 
@@ -28,7 +29,9 @@ export const complianceEvidenceRequirementSchema = z.discriminatedUnion("type", 
   z.object({
     type: z.literal("requires_evidence_event"),
     eventTypes: z.array(evidenceEventTypeEnum).min(1),
-    minObservedRatio: z.number().min(0).max(1).default(0)
+    minObservedRatio: z.number().min(0).max(1).default(0),
+    /** Audit types that bind an `audit` event to this control without `meta.controlIds`. */
+    auditTypes: z.array(z.string().min(1)).min(1).optional()
   }),
   z.object({
     type: z.literal("requires_assurance_pack"),
@@ -48,6 +51,8 @@ export const complianceMappingSchema = z.object({
   category: z.string().min(1),
   description: z.string().min(1),
   evidenceRequirements: z.array(complianceEvidenceRequirementSchema).min(1),
+  /** Whose evidence counts. Absent means "agent": workspace `system` events can only fail it. */
+  binding: z.object({ scope: z.enum(["agent", "workspace"]) }).optional(),
   related: z.object({
     questions: z.array(questionEnum).default([]),
     packs: z.array(z.string().min(1)).default([]),
@@ -66,7 +71,8 @@ export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceReq
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;
 
-export type ComplianceCategoryStatus = "SATISFIED" | "PARTIAL" | "MISSING" | "UNKNOWN";
+/** UNKNOWN is kept only to read reports written before P0-17; the engine never emits it. */
+export type ComplianceCategoryStatus = "SATISFIED" | "PARTIAL" | "MISSING" | "NOT_EVALUATED" | "UNKNOWN";
 
 export interface ComplianceCategoryResult {
   id: string;
@@ -74,6 +80,9 @@ export interface ComplianceCategoryResult {
   category: string;
   description: string;
   status: ComplianceCategoryStatus;
+  result: ResultState;
+  evidence: EvidenceState;
+  notEvaluatedReasons: string[];
   reasons: string[];
   evidenceRefs: Array<{
     eventId: string;
@@ -103,7 +112,10 @@ export interface ComplianceReportJson {
     partial: number;
     missing: number;
     unknown: number;
-    score: number;
+    notEvaluated: number;
+    evaluated: number;
+    /** Null when no category was evaluated: there is nothing to score. */
+    score: number | null;
   };
   categories: ComplianceCategoryResult[];
   nonClaims: string[];

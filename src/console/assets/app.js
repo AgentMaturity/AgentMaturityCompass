@@ -2393,7 +2393,7 @@ async function renderCompliance() {
           .join("")}
       </div>
       <p>Config signature: <strong>${verify.valid ? "VALID" : "INVALID"}</strong></p>
-      <p>Coverage score: <strong>${Number(report.coverage?.score || 0).toFixed(3)}</strong></p>
+      <p>Coverage score: <strong>${report.coverage?.score == null ? "not evaluated" : Number(report.coverage.score).toFixed(3)}</strong></p>
       <p>Trust coverage (OBS/ATT/SELF): ${((report.trustTierCoverage?.observed || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.attested || 0) * 100).toFixed(1)}% /
       ${((report.trustTierCoverage?.selfReported || 0) * 100).toFixed(1)}%</p>
