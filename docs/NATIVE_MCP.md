@@ -95,6 +95,8 @@ An HTTP server that requires OAuth uses `auth` instead of `headerRefs`:
 
 Choose one client identity: `clientId` for a public client registered with the authorization server for the redirect URI `http://127.0.0.1:<redirectPort>/callback`; `clientIdMetadataUrl` for an HTTPS Client ID Metadata Document you host, used when the authorization server advertises support; or `"allowDynamicRegistration": true` to allow the deprecated dynamic client registration. Without `redirectPort` the callback uses a free local port, which suits only authorization servers that accept any loopback port. `scopes` adds scopes to those the server's challenge or metadata names.
 
+Every OAuth URL comes from the server's metadata, so AMC refuses an authorization, token, registration or metadata host that resolves to a private, loopback, link-local or other non-public address, or that does not resolve. The only exceptions are a literal loopback HTTP endpoint for development, and `auth.allowPrivateNetwork: true` set by the operator for an internal deployment. The remote server's own DNS never decides this.
+
 Authorize once in a terminal:
 
 ```sh

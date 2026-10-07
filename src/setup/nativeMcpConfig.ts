@@ -149,8 +149,9 @@ export function loadNativeMcpConfiguration(path: string, expectedSha256?: string
 
 /** basic/authorization: auth is pinned by the config digest; it never coexists with literal header credentials. */
 function validateOAuthConfiguration(auth: unknown, headerRefs: unknown): void {
-  if (!object(auth) || auth.kind !== "oauth2" || !onlyKeys(auth, ["kind", "clientId", "clientIdMetadataUrl", "allowDynamicRegistration", "scopes", "redirectPort"])) {
-    refuse("MCP HTTP auth requires kind \"oauth2\" and only clientId, clientIdMetadataUrl, allowDynamicRegistration, scopes and redirectPort.");
+  if (!object(auth) || auth.kind !== "oauth2"
+    || !onlyKeys(auth, ["kind", "clientId", "clientIdMetadataUrl", "allowDynamicRegistration", "scopes", "redirectPort", "allowPrivateNetwork"])) {
+    refuse("MCP HTTP auth requires kind \"oauth2\" and only clientId, clientIdMetadataUrl, allowDynamicRegistration, scopes, redirectPort and allowPrivateNetwork.");
   }
   const oauth = auth as Record<string, unknown>;
   if (headerRefs !== undefined) refuse("MCP HTTP auth and headerRefs are exclusive; choose one credential source.");
@@ -162,6 +163,7 @@ function validateOAuthConfiguration(auth: unknown, headerRefs: unknown): void {
     if (!url || url.pathname === "/" || url.search) refuse("MCP OAuth clientIdMetadataUrl must be an HTTPS URL with a path and no query or fragment.");
   }
   if (oauth.allowDynamicRegistration !== undefined && typeof oauth.allowDynamicRegistration !== "boolean") refuse("MCP OAuth allowDynamicRegistration must be a boolean.");
+  if (oauth.allowPrivateNetwork !== undefined && typeof oauth.allowPrivateNetwork !== "boolean") refuse("MCP OAuth allowPrivateNetwork must be a boolean.");
   if (oauth.scopes !== undefined && (!Array.isArray(oauth.scopes) || !nativeMcpScopes(oauth.scopes))) refuse("MCP OAuth scopes must be a bounded array of OAuth scope tokens.");
   if (oauth.redirectPort !== undefined && (typeof oauth.redirectPort !== "number" || !Number.isSafeInteger(oauth.redirectPort)
     || oauth.redirectPort < 1024 || oauth.redirectPort > 65_535)) refuse("MCP OAuth redirectPort must be an integer from 1024 through 65535.");

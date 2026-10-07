@@ -24,6 +24,8 @@ export interface NativeMcpOAuthConfig {
   readonly scopes?: readonly string[];
   /** Loopback callback port; an ephemeral port when absent. */
   readonly redirectPort?: number;
+  /** Operator opt-in: OAuth hosts on private or non-public addresses are allowed (internal deployments). */
+  readonly allowPrivateNetwork?: boolean;
 }
 /** What a receipt may say about a grant: never the token. */
 export interface NativeMcpOAuthReceipt {
@@ -48,8 +50,8 @@ interface Discovered {
   readonly resource: NativeMcpProtectedResource; readonly server: NativeMcpAuthorizationServer; readonly network: NativeMcpOAuthNetwork;
   readonly challengeScopes?: readonly string[];
 }
-async function discover(endpoint: URL, timeoutMs: number): Promise<Discovered> {
-  const network = await nativeMcpOAuthNetwork(endpoint);
+async function discover(endpoint: URL, config: NativeMcpOAuthConfig, timeoutMs: number): Promise<Discovered> {
+  const network = nativeMcpOAuthNetwork(endpoint, config.allowPrivateNetwork === undefined ? {} : { allowPrivateNetwork: config.allowPrivateNetwork });
   const challenge = await nativeMcpOAuthChallenge(endpoint, timeoutMs);
   const resource = await discoverNativeMcpProtectedResource(endpoint, challenge, timeoutMs, network);
   const server = await discoverNativeMcpAuthorizationServer(resource.authorizationServer, network, timeoutMs);
@@ -147,7 +149,7 @@ export async function authorizeNativeMcpOAuth(options: {
 }): Promise<NativeMcpOAuthReceipt> {
   const { endpoint, config, timeoutMs } = options;
   const development = isLoopbackHttp(endpoint);
-  const { resource, server, network, challengeScopes } = await discover(endpoint, timeoutMs);
+  const { resource, server, network, challengeScopes } = await discover(endpoint, config, timeoutMs);
   // authorization §Scope Selection Strategy: the challenge, else scopes_supported; plus operator scopes and step-up scopes.
   const scopes = union(config.scopes, challengeScopes ?? resource.scopesSupported, options.extraScopes);
   const callback = await loopbackCallback(config.redirectPort ?? 0, options.signal);
@@ -183,7 +185,7 @@ export async function resolveNativeMcpOAuth(options: {
   readonly timeoutMs: number;
 }): Promise<{ readonly accessToken: string; readonly receipt: NativeMcpOAuthReceipt }> {
   const { endpoint, config, store, timeoutMs } = options;
-  const { resource, server, network } = await discover(endpoint, timeoutMs);
+  const { resource, server, network } = await discover(endpoint, config, timeoutMs);
   let grant = await store.load(server.issuer, resource.resource);
   if (!grant || (config.clientId !== undefined && grant.clientId !== config.clientId)) {
     return refuse(`MCP OAuth authorization is required (AUTH_REQUIRED). ${NATIVE_MCP_AUTHORIZE_HINT}`, "AUTH_REQUIRED");
