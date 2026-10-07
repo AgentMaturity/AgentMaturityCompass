@@ -23,7 +23,7 @@ export function boundedFile(path: string, limit: number): Buffer {
 /** File adapter only; authority configuration belongs to the verifier operator, never to the evidence. */
 export function verifyExternalEvidenceFile(input: {
   path: string; authoritiesPath?: string; originalPath?: string; expectedNormalizedDigest?: string;
-}): ReturnType<typeof verifyExternalEvidence> {
+}): ReturnType<typeof verifyExternalEvidence> & { signerPublicKeyPem: string | null } {
   const profile = JSON.parse(boundedFile(input.path, 16 * 1024 * 1024).toString("utf8")) as unknown;
   let authorities: ExternalEvidenceAuthority[] | undefined;
   if (input.authoritiesPath !== undefined) {
@@ -41,7 +41,11 @@ export function verifyExternalEvidenceFile(input: {
     })) throw new Error("Invalid independent authority configuration");
     authorities = parsed as ExternalEvidenceAuthority[];
   }
-  return verifyExternalEvidence(profile, { authorities,
+  const result = verifyExternalEvidence(profile, { authorities,
     originalBytes: input.originalPath === undefined ? undefined : boundedFile(input.originalPath, 64 * 1024 * 1024),
     expectedNormalizedDigest: input.expectedNormalizedDigest });
+  // The operator authority key the signature names, for the caller's issuer admission (P0-51); null when unsigned or unmatched.
+  const authorityId = (profile as { signature?: { authorityId?: unknown } | null } | null)?.signature?.authorityId;
+  const named = (authorities ?? []).filter((authority) => authority.id === authorityId);
+  return { ...result, signerPublicKeyPem: named.length === 1 ? named[0]!.publicKeyPem : null };
 }

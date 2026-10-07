@@ -1,6 +1,9 @@
 import { resolve } from "node:path";
 import type { Command } from "commander";
 import chalk from "chalk";
+import { finishVerify, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import { admitKey, buildVerifierReport, ed25519KeyId, withPins } from "./trust/index.js";
+import { fileSha256 } from "./trust/signatureCheck.js";
 
 const shellWord = (value: string): string => /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`;
 
@@ -81,24 +84,30 @@ export function registerNeutralImportCommands(program: Command, activeAgent: (p:
     .command("imports")
     .description("List, inspect, and roll back neutral import runs");
 
-  imports.command("verify-profile <path>")
+  withTrustFlags(imports.command("verify-profile <path>")
     .description("Independently verify an external-evidence profile without opening a workspace")
     .option("--authorities <path>", "operator-admitted authority keys JSON; never taken from the evidence")
     .option("--original <path>", "original source bytes to compare with the declared source digest")
     .option("--expected-digest <sha256>", "independently received normalized semantic digest")
-    .option("--json", "JSON output")
-    .action(async (path: string, opts: { authorities?: string; original?: string; expectedDigest?: string; json?: boolean }) => {
+    .option("--json", "JSON output"))
+    .action(async (path: string, opts: { authorities?: string; original?: string; expectedDigest?: string } & TrustFlags) => {
+      const trust = trustFromFlags(opts, ["evidence-authority"]);
       try {
         const { verifyExternalEvidenceFile } = await import("./standard/externalEvidenceFiles.js");
         const result = verifyExternalEvidenceFile({ path: resolve(path), authoritiesPath: opts.authorities,
           originalPath: opts.original, expectedNormalizedDigest: opts.expectedDigest });
-        if (opts.json) console.log(JSON.stringify(result, null, 2));
-        else {
-          console.log(`Profile: ${result.ok ? "valid" : "refused"}; source trust: ${result.trustTier}`);
+        // --authorities is the operator's own file, so the key it names for this signature is pinned like --pubkey; distrust
+        // still beats it. An unsigned profile names no signer and is never trusted (P0-51).
+        const keyId = result.signerPublicKeyPem === null ? null : ed25519KeyId(result.signerPublicKeyPem);
+        const context = keyId === null ? trust : withPins(trust, [{ keyId, purposes: ["evidence-authority"], origin: `--authorities ${opts.authorities}` }]);
+        const report = buildVerifierReport({ artifact: { kind: "external-evidence-profile", path: resolve(path), sha256: fileSha256(resolve(path)) },
+          context, integrityErrors: result.errors, anchoring: { status: "not-applicable", detail: null },
+          signatures: [admitKey({ publicKeyPem: result.signerPublicKeyPem, purpose: "evidence-authority", signature: "profile signature", context })] });
+        if (!opts.json) {
+          console.log(`Profile: ${result.ok ? "well-formed" : "refused"}; source trust: ${result.trustTier}`);
           console.log(`Original digest: ${result.originalDigest}; signature verified: ${result.signatureVerified}; parent session: ${result.parentSession}`);
-          for (const error of result.errors) console.error(error);
         }
-        if (!result.ok) process.exitCode = 1;
+        finishVerify("External-evidence profile", report, { json: opts.json, result: { ...result, ok: report.trusted, report } });
       } catch {
         const result = { ok: false, errors: ["Unable to read a valid bounded profile or authority file"], trustTier: "SELF_REPORTED" };
         if (opts.json) console.log(JSON.stringify(result)); else console.error(result.errors[0]);

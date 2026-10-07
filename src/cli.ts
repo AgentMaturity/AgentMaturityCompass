@@ -193,7 +193,9 @@ import { registerCompositionCommands } from "./cli-composition-commands.js";
 import { registerVaultZkCommands } from "./cli-vault-zk-commands.js";
 import { registerVaultHistoryCommands, registerVaultRotationCommand } from "./cli-vault-history-commands.js";
 import { registerEvidenceStoreCommands, renderLedgerVerdict } from "./cli-evidence-store-commands.js";
-import { exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, verifyAllExit, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
+import {
+  exitIfUntrusted, finishVerify, ledgerExitCode, trustFromFlags, unsignedArtifactReport, verifyAllExit, withTrustFlags, type TrustFlags
+} from "./cli-trust-flags.js";
 import { printArchivedStoreNote, runVerifyRepair } from "./cli-verify-repair.js";
 import { loadTrustContext } from "./trust/trustContext.js";
 import { registerSessionCommands } from "./cli-session-commands.js";
@@ -21221,22 +21223,18 @@ enforce
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
-enforce
+withTrustFlags(enforce
   .command("verify-certificate <certificateJson>")
-  .description("Verify the integrity of a proof certificate (pass JSON as string)")
-  .action(async (certificateJson: string) => {
+  .description("Verify the integrity of a proof certificate (pass JSON as string)"), { json: true })
+  .action(async (certificateJson: string, opts: TrustFlags) => {
     try {
       const { verifyCertificate } = await import("./enforce/formalVerification.js");
       const cert = JSON.parse(certificateJson) as import("./enforce/formalVerification.js").ProofCertificate;
       const result = verifyCertificate(cert);
-      console.log(chalk.bold.hex('#4AEF79')("\n⚖️  Certificate Verification"));
-      console.log(chalk.gray("Valid:"), result.valid ? chalk.green("yes") : chalk.red("no"));
-      if (result.issues.length > 0) {
-        console.log(chalk.gray("Issues:"));
-        for (const issue of result.issues) console.log(chalk.red(`  • ${issue}`));
-      } else {
-        console.log(chalk.green("Certificate is intact — no issues found."));
-      }
+      // A proof certificate carries an unkeyed hash and names no signer, so it is never trusted (P0-51).
+      const report = unsignedArtifactReport({ kind: "proof-certificate", path: "<certificateJson>", sha256: sha256Hex(certificateJson) },
+        trustFromFlags(opts, ["artifact-seal"]), result.issues, "certificateHash");
+      finishVerify("Proof certificate", report, { json: opts.json, result: { ...result, report } });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
@@ -21982,21 +21980,18 @@ passport
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
-passport
+withTrustFlags(passport
   .command("verify-token <tokenJson>")
-  .description("Verify an AMC Trust Token (pass JSON string)")
-  .action(async (tokenJson: string) => {
+  .description("Verify an AMC Trust Token (pass JSON string)"), { json: true })
+  .action(async (tokenJson: string, opts: TrustFlags) => {
     try {
       const { verifyTrustToken } = await import("./passport/trustInterchange.js");
       const token = JSON.parse(tokenJson);
       const result = verifyTrustToken(token, "cli-demo-secret");
-      console.log(chalk.bold.cyan("\n🔑  Trust Token Verification"));
-      console.log(chalk.gray("Token ID:"), token.tokenId ?? "N/A");
-      console.log(chalk.gray("Valid:"), result.valid ? chalk.green("✓ yes") : chalk.red("✗ no"));
-      if (result.reasons.length > 0) {
-        console.log(chalk.gray("Issues:"));
-        for (const reason of result.reasons) console.log(chalk.red(`  • ${reason}`));
-      }
+      // The token is an HMAC under a shared secret and names no signer, so it is never trusted (P0-51).
+      const report = unsignedArtifactReport({ kind: "trust-token", path: "<tokenJson>", sha256: sha256Hex(tokenJson) },
+        trustFromFlags(opts, ["artifact-seal"]), result.reasons, "signature");
+      finishVerify("Trust token", report, { json: opts.json, result: { ...result, report }, details: [`tokenId: ${token.tokenId ?? "N/A"}`] });
     } catch (e: unknown) { console.error(chalk.red(toErrorMessage(e))); process.exit(1); }
   });
 
