@@ -87,6 +87,13 @@
       "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
     },
     {
+      "path": "src/ledger/ledger.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
+      "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d"
+    },
+    {
       "path": "src/passport/passportCli.ts",
       "issue": "P0-09",
       "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
