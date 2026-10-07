@@ -62,21 +62,25 @@ describe("domain packs", () => {
     expect(getDomainPackQuestions("technology").length).toBe(6);
   });
 
-  test("pack scoring reflects maturity and certification thresholds", () => {
+  // P0-21: self-reported answers carry no certification readiness; the level comes from the one level table.
+  test("pack scoring reflects maturity without a certification field", () => {
     const low = scoreAllAtLevel("technology", 1);
     expect(low.level).toBe("L1");
-    expect(low.certificationReadiness).toBe(false);
+    expect("certificationReadiness" in low).toBe(false);
 
     const high = scoreAllAtLevel("education", 5);
     expect(high.level).toBe("L5");
     expect(high.score).toBe(100);
-    expect(high.certificationReadiness).toBe(true);
+    expect("certificationReadiness" in high).toBe(false);
   });
 
-  test("mobility certification threshold is higher (safety-critical absorbed)", () => {
-    // mobility threshold is 80 (stricter due to SIL requirements)
+  test("mid answers score 50% and land on L2 of the one level table", () => {
     const midLevel = scoreAllAtLevel("mobility", 3);
-    // scoring 3/5 on everything should not reach certification
-    expect(midLevel.certificationReadiness).toBe(false);
+    expect(midLevel.score).toBe(50);
+    expect(midLevel.level).toBe("L2"); // 30 <= 50 < 55; the old rubric table read L3 from 50
+  });
+
+  test("an answer outside 1-5 is refused, not clamped", () => {
+    expect(() => scoreAllAtLevel("health", 6)).toThrow(RangeError);
   });
 });

@@ -6,6 +6,7 @@
  */
 
 import type { Domain } from "../domains/domainRegistry.js";
+import { likert, likertToPercent, percent, percentToLevel } from "./units.js";
 
 export type DomainPack = Domain;
 
@@ -23,11 +24,11 @@ export interface DomainQuestion {
 
 export interface DomainPackResult {
   pack: DomainPack;
+  /** Self-reported score from Likert 1-5 answers. */
   score: number;
   level: "L1" | "L2" | "L3" | "L4" | "L5";
   complianceGaps: string[];
   regulatoryWarnings: string[];
-  certificationReadiness: boolean;
 }
 
 // ─────────────────────────────────────────────
@@ -704,16 +705,6 @@ const PACK_QUESTIONS: Record<DomainPack, DomainQuestion[]> = {
   wealth: [...WEALTH_QUESTIONS, ...FINANCIAL_QUESTIONS],
 };
 
-const CERTIFICATION_THRESHOLD: Record<DomainPack, number> = {
-  health: 75,
-  education: 72,
-  environment: 78,
-  mobility: 80,
-  governance: 74,
-  technology: 70,
-  wealth: 76,
-};
-
 export interface DomainPackAssessment {
   [questionId: string]: number;
 }
@@ -726,8 +717,8 @@ export function scoreDomainPack(pack: DomainPack, assessment: DomainPackAssessme
   let totalWeight = 0;
 
   for (const q of questions) {
-    const level = Math.max(1, Math.min(5, assessment[q.id] ?? 1));
-    const qScore = ((level - 1) / 4) * 100;
+    const level = likert(assessment[q.id] ?? 1);
+    const qScore = likertToPercent(level);
     totalScore += (qScore / 100) * q.weight;
     totalWeight += q.weight;
 
@@ -738,12 +729,9 @@ export function scoreDomainPack(pack: DomainPack, assessment: DomainPackAssessme
   }
 
   const score = totalWeight > 0 ? Math.round((totalScore / totalWeight) * 100) : 0;
-  const level: DomainPackResult["level"] =
-    score >= 90 ? "L5" : score >= 75 ? "L4" : score >= 50 ? "L3" : score >= 25 ? "L2" : "L1";
+  const level = `L${percentToLevel(percent(score))}` as DomainPackResult["level"];
 
-  const certificationReadiness = score >= CERTIFICATION_THRESHOLD[pack] && complianceGaps.length === 0;
-
-  return { pack, score, level, complianceGaps, regulatoryWarnings, certificationReadiness };
+  return { pack, score, level, complianceGaps, regulatoryWarnings };
 }
 
 export function getDomainPackQuestions(pack: DomainPack): DomainQuestion[] {

@@ -23219,7 +23219,7 @@ score
   .command("industry-adjust")
   .description("Adjust a score using an industry-specific trust model")
   .option("--industry <id>", "Industry ID (e.g. healthcare, finance, defense)")
-  .option("--score <n>", "Raw score as percentage 0-100 (e.g. 75) or decimal 0-1 (e.g. 0.75); auto-read from agent if omitted")
+  .option("--score <n>", "Raw score as a whole percentage 0-100 (e.g. 75); auto-read from agent if omitted")
   .option("--agent <id>", "Agent ID (used to auto-read current score)")
   .option("--drilldown", "Show per-dimension weighting details")
   .option("--history", "Compare industry-adjusted scores across recent scored runs")
@@ -23373,9 +23373,13 @@ score
           process.exit(1); return;
         }
       } else {
-        rawScore = parseFloat(opts.score);
-        // Accept both 0-100 (e.g. 75) and 0-1 (e.g. 0.75) — normalize to 0-1
-        if (rawScore > 1) rawScore = rawScore / 100;
+        // A whole percentage only: 1.5 or 0.75 could be a fraction or a percent, so it is refused, not guessed.
+        if (!/^\d{1,3}$/.test(opts.score) || Number(opts.score) > 100) {
+          console.error(chalk.red(`Invalid --score ${opts.score}: pass --score as a percentage 0-100 (e.g. --score 75)`));
+          process.exit(1); return;
+        }
+        const { percent, percentToFraction } = await import("./score/units.js");
+        rawScore = percentToFraction(percent(Number(opts.score)));
       }
       const rawDimensionScores: Record<string, number> = {};
       for (const dim of dims) rawDimensionScores[dim] = rawScore;

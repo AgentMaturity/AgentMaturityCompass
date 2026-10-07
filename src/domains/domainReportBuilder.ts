@@ -3,7 +3,6 @@ import type { ComplianceGap, DomainAssessmentResult, DomainRoadmapItem } from ".
 export interface ExecutiveSummary {
   domain: string;
   level: DomainAssessmentResult["level"];
-  certificationReadiness: boolean;
   baseScore: number;
   domainScore: number;
   compositeScore: number;
@@ -141,7 +140,6 @@ export function renderDomainReportMarkdown(result: DomainAssessmentResult): stri
   const summary: ExecutiveSummary = {
     domain: result.domainMetadata.name,
     level: result.level,
-    certificationReadiness: result.certificationReadiness,
     baseScore: result.baseScore,
     domainScore: result.domainScore,
     compositeScore: result.compositeScore
@@ -181,7 +179,6 @@ export function buildDomainReport(result: DomainAssessmentResult): DomainReport 
     executiveSummary: {
       domain: result.domainMetadata.name,
       level: result.level,
-      certificationReadiness: result.certificationReadiness,
       baseScore: result.baseScore,
       domainScore: result.domainScore,
       compositeScore: result.compositeScore

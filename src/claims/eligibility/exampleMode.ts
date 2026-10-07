@@ -8,13 +8,14 @@ import { questionBank } from "../../diagnostic/questionBank.js";
 import type { DomainAssessmentInput } from "../../domains/domainAssessmentEngine.js";
 import type { Domain } from "../../domains/domainRegistry.js";
 import { getDomainPackQuestions } from "../../score/domainPacks.js";
+import { level, likert, type Level0to5, type Likert1to5 } from "../../score/units.js";
 import { envelopeForSyntheticExample } from "./adapters.js";
 import type { ClaimEnvelope } from "./types.js";
 
 export const EXAMPLE_BANNER = "SYNTHETIC EXAMPLE — illustrative values, not evidence. Never cite this output.";
 
 /** An illustrative value in [min, max] picked by an FNV-1a hash of the seed. Not a measurement. */
-function exampleValue(seed: string, min = 45, max = 92): number {
+function exampleValue(seed: string, min: number, max: number): number {
   let hash = 2166136261;
   for (let index = 0; index < seed.length; index += 1) {
     hash ^= seed.charCodeAt(index);
@@ -24,13 +25,13 @@ function exampleValue(seed: string, min = 45, max = 92): number {
 }
 
 export function buildExampleDomainInput(agentId: string, domain: Domain): DomainAssessmentInput {
-  const baseScores: Record<string, number> = {};
+  const baseScores: Record<string, Level0to5> = {};
   for (const question of questionBank) {
-    baseScores[question.id] = exampleValue(`${agentId}:${domain}:base:${question.id}`);
+    baseScores[question.id] = level(exampleValue(`${agentId}:${domain}:base:${question.id}`, 2, 5));
   }
-  const domainQuestionScores: Record<string, number> = {};
+  const domainQuestionScores: Record<string, Likert1to5> = {};
   for (const question of getDomainPackQuestions(domain)) {
-    domainQuestionScores[question.id] = exampleValue(`${agentId}:${domain}:${question.id}`, question.weight >= 20 ? 46 : 40, 95);
+    domainQuestionScores[question.id] = likert(exampleValue(`${agentId}:${domain}:${question.id}`, question.weight >= 20 ? 3 : 2, 5));
   }
   return { agentId, domain, baseScores, domainQuestionScores };
 }
