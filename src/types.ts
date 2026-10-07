@@ -3384,6 +3384,8 @@ export interface AMCConfig {
     includeProxyEnv: boolean;
     customBaseUrlEnvKeys: string[];
   };
+  /** P1-25 trusted time (TSAs, checkpoints), kept as written; src/time/tsaClient.ts parses it strictly. */
+  time?: unknown;
 }
 
 export interface GatePolicy {
