@@ -9,7 +9,7 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import type { Domain } from "../domains/domainRegistry.js";
 import type { CausalEdge, Incident, IncidentTransition } from "./incidentTypes.js";
-import type { IncidentClockInstance } from "./regulatoryClocks.js";
+import { CLOCK_REVIEW_STATUS, type IncidentClockInstance } from "./regulatoryClocks.js";
 import { verifyOversightRecord, type HumanOversightRecord } from "./oversightRecord.js";
 
 export interface PacketReceiptRef {
@@ -247,6 +247,7 @@ export function renderEvidencePacketMarkdown(packet: IncidentEvidencePacket): st
     );
   }
   lines.push("", `Overdue: ${packet.overdueClockIds.length === 0 ? "none" : packet.overdueClockIds.join(", ")}`, "");
+  lines.push(`Clock review status: ${CLOCK_REVIEW_STATUS}. Not legal advice. Deadlines run from operator-recorded timestamps; AMC does not check statutory conditions or file notices.`, "");
 
   lines.push("## Human oversight", "");
   if (packet.oversight.length === 0) lines.push("None supplied.", "");

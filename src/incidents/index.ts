@@ -60,6 +60,7 @@ export {
 } from "./incidentRegression.js";
 
 export {
+  CLOCK_REVIEW_STATUS,
   REGULATORY_CLOCK_TABLE,
   DUE_SOON_WINDOW_MS,
   addDuration,

@@ -6,6 +6,7 @@
 import type { Domain } from "../domains/domainRegistry.js";
 import type { Incident } from "./incidentTypes.js";
 import {
+  CLOCK_REVIEW_STATUS,
   REGULATORY_CLOCK_TABLE,
   type ClockDuration,
   type ClockSource,
@@ -14,6 +15,7 @@ import {
 } from "./regulatoryClocksTable.js";
 
 export {
+  CLOCK_REVIEW_STATUS,
   REGULATORY_CLOCK_TABLE,
   type ClockDuration,
   type ClockDurationUnit,
@@ -54,6 +56,7 @@ export interface IncidentClockInstance {
   requiredContent: readonly string[];
   condition: string;
   source: ClockSource;
+  review: typeof CLOCK_REVIEW_STATUS;
 }
 
 export interface AttachRegulatoryClocksInput {
@@ -207,6 +210,7 @@ function instance(
     notify: clock.notify,
     requiredContent: clock.requiredContent,
     condition: clock.condition,
-    source: clock.source
+    source: clock.source,
+    review: CLOCK_REVIEW_STATUS
   };
 }

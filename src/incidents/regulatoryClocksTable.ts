@@ -5,8 +5,13 @@
  * runs from, the duration, who must be notified, what the notification must
  * contain, and the official source actually read. `verified: true` means the
  * primary text was read from an official publisher on `retrievedAt`
- * (EU Publications Office cellar, GPO govinfo). `verified: false` entries carry
- * a `reason` and must be confirmed before anyone relies on their duration.
+ * (EU Publications Office cellar, GPO govinfo, Texas Legislative Council,
+ * New York DFS). `verified: false` entries carry a `reason` and must be
+ * confirmed before anyone relies on their duration.
+ *
+ * Every row is agent-drafted and experimental until a named expert signs off
+ * (D-08); CLOCK_REVIEW_STATUS travels with every computed clock. P1-17 added the
+ * NYDFS, GLBA Safeguards and BSA SAR rows and rechecked the Texas rows.
  *
  * This table is deliberately local to src/incidents. When the S5 regulatory
  * register (src/compliance/regulatoryRegister/**) stabilises, each entry here
@@ -28,6 +33,12 @@ export type ClockTrigger =
   | "INTERMEDIATE_REPORT"              // DORA: (latest updated) intermediate report submitted
   | "INCIDENT_NOTIFICATION"            // NIS2: 72-hour incident notification submitted
   | "BREACH_DETERMINATION"             // state law: entity determines a breach occurred
+  // 23 NYCRR 500.17(a)(1): "no later than 72 hours after determining that a cybersecurity incident has occurred"
+  | "INCIDENT_DETERMINATION"
+  // 23 NYCRR 500.17(c): "in the event of an extortion payment made in connection with a cybersecurity event"
+  | "EXTORTION_PAYMENT"
+  // 31 CFR 1020.320(b)(3): "30 calendar days after the date of initial detection by the bank of facts that may constitute a basis for filing a SAR"
+  | "INITIAL_DETECTION"
   | "CALENDAR_YEAR_END_AFTER_AWARENESS"; // derived: 1 Jan UTC of the year after AWARENESS
 
 export type ClockDurationUnit = "hours" | "calendarDays" | "workDays" | "months";
@@ -36,6 +47,9 @@ export interface ClockDuration {
   amount: number;
   unit: ClockDurationUnit;
 }
+
+/** No clock duration has had expert sign-off; this is not legal advice (D-08). */
+export const CLOCK_REVIEW_STATUS = "experimental: agent-drafted, expert review pending (D-08)";
 
 export interface ClockSource {
   title: string;
@@ -129,6 +143,24 @@ const TEXAS_SOURCE: ClockSource = {
   title: "Texas Business and Commerce Code ch. 521, § 521.053 (Notification Required Following Breach of Security of Computerized Data), as amended through Acts 2023, 88th Leg., ch. 246 (S.B. 768), eff. 2023-09-01 — Texas Legislative Council statute file served to statutes.capitol.texas.gov",
   url: "https://tcss.legis.texas.gov/resources/BC/htm/BC.521.htm",
   retrievedAt: "2026-10-07T17:14:09Z",
+  verified: true
+};
+
+const NYDFS_SOURCE: ClockSource = {
+  title: "23 NYCRR Part 500 (Cybersecurity Requirements for Financial Services Companies), Second Amendment as adopted, effective 2023-11-01 (500.1, 500.17, 500.19) — New York State Department of Financial Services",
+  url: "https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf",
+  retrievedAt: "2026-10-07T17:11:34Z",
+  verified: true
+};
+const NYDFS_STATIONS: readonly Domain[] = ["wealth", "technology"];
+const NYDFS_NOTIFY = ["The superintendent, electronically in the form set forth on the department's website (500.17(a)(1), (c))"];
+const NYDFS_COVERED_ENTITY =
+  "Covered entity: a person operating under or required to operate under a license, registration, charter, certificate, permit, accreditation or similar authorization under the Banking Law, the Insurance Law or the Financial Services Law (500.1(e)).";
+
+const BSA_SAR_SOURCE: ClockSource = {
+  title: "31 CFR 1020.320 Reports by banks of suspicious transactions — GPO govinfo, CFR annual edition 2025 (Title 31, Vol. 3, revised 2025-07-01); eCFR text for 2026-10-01 has the same (b)(3) deadlines and its version history shows no amendment after 2016-12-23",
+  url: "https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml",
+  retrievedAt: "2026-10-07T17:10:02Z",
   verified: true
 };
 
@@ -466,5 +498,105 @@ export const REGULATORY_CLOCK_TABLE: readonly RegulatoryClock[] = [
     condition:
       "Person required to disclose or notify a breach of system security under § 521.053; breach involves at least 250 residents of Texas; as soon as practicable and not later than the 30th day after the date on which the person determines that the breach occurred (§ 521.053(i)). AMC does not check the 250-resident threshold.",
     source: TEXAS_SOURCE
+  },
+  {
+    clockId: "nydfs-500-17-notice",
+    instrument: "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+    article: "500.17(a)(1)",
+    authority: "Superintendent of Financial Services, New York State Department of Financial Services",
+    jurisdiction: "US-NY",
+    stations: NYDFS_STATIONS,
+    trigger: "INCIDENT_DETERMINATION",
+    deadline: { amount: 72, unit: "hours" },
+    notify: NYDFS_NOTIFY,
+    requiredContent: [
+      "Notice of the cybersecurity incident on the department's electronic form; Part 500 does not list the form's fields (500.17(a)(1))",
+      "Any information the superintendent requests regarding the incident, provided promptly (500.17(a)(2))",
+      "Continuing updates on material changes or new information previously unavailable (500.17(a)(2))"
+    ],
+    condition: `${NYDFS_COVERED_ENTITY} Cybersecurity incident: a cybersecurity event at the covered entity, its affiliates or a third-party service provider that impacts the covered entity and requires it to notify any government body, self-regulatory agency or other supervisory body; has a reasonable likelihood of materially harming any material part of its normal operations; or results in the deployment of ransomware within a material part of its information systems (500.1(g)). As promptly as possible but in no event later than 72 hours after determining that the incident occurred (500.17(a)(1)). The 500.19(a) limited exemption does not list 500.17; persons exempt from the whole Part under 500.19(e) or (g) are outside it.`,
+    source: NYDFS_SOURCE
+  },
+  {
+    clockId: "nydfs-500-17-extortion-notice",
+    instrument: "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+    article: "500.17(c)(1)",
+    authority: "Superintendent of Financial Services, New York State Department of Financial Services",
+    jurisdiction: "US-NY",
+    stations: NYDFS_STATIONS,
+    trigger: "EXTORTION_PAYMENT",
+    deadline: { amount: 24, unit: "hours" },
+    notify: NYDFS_NOTIFY,
+    requiredContent: ["Notice of the extortion payment on the department's electronic form (500.17(c)(1))"],
+    condition: `${NYDFS_COVERED_ENTITY} An extortion payment made in connection with a cybersecurity event involving the covered entity: notice within 24 hours of the payment (500.17(c)(1)).`,
+    source: NYDFS_SOURCE
+  },
+  {
+    clockId: "nydfs-500-17-extortion-explanation",
+    instrument: "23 NYCRR Part 500 (NYDFS Cybersecurity Regulation)",
+    article: "500.17(c)(2)",
+    authority: "Superintendent of Financial Services, New York State Department of Financial Services",
+    jurisdiction: "US-NY",
+    stations: NYDFS_STATIONS,
+    trigger: "EXTORTION_PAYMENT",
+    deadline: { amount: 30, unit: "calendarDays" },
+    notify: NYDFS_NOTIFY,
+    requiredContent: [
+      "Written description of the reasons payment was necessary (500.17(c)(2))",
+      "Description of alternatives to payment considered (500.17(c)(2))",
+      "All diligence performed to find alternatives to payment (500.17(c)(2))",
+      "All diligence performed to ensure compliance with applicable rules and regulations, including those of the Office of Foreign Assets Control (500.17(c)(2))"
+    ],
+    condition: `${NYDFS_COVERED_ENTITY} An extortion payment made in connection with a cybersecurity event involving the covered entity: written explanation within 30 days of the payment (500.17(c)(2)). The text says "30 days"; AMC counts calendar days.`,
+    source: NYDFS_SOURCE
+  },
+  {
+    clockId: "glba-314-4j-ftc-notice",
+    instrument: "16 CFR Part 314 (FTC Safeguards Rule, Gramm-Leach-Bliley Act)",
+    article: "314.4(j)(1)",
+    authority: "Federal Trade Commission",
+    jurisdiction: "US-federal",
+    stations: ["wealth", "technology"],
+    trigger: "AWARENESS",
+    deadline: { amount: 30, unit: "calendarDays" },
+    notify: ["Federal Trade Commission, electronically on the form located on the FTC's website (314.4(j)(1))"],
+    requiredContent: [
+      "Name and contact information of the reporting financial institution (314.4(j)(1)(i))",
+      "Description of the types of information involved in the notification event (314.4(j)(1)(ii))",
+      "Date or date range of the notification event, if possible to determine (314.4(j)(1)(iii))",
+      "Number of consumers affected or potentially affected (314.4(j)(1)(iv))",
+      "General description of the notification event (314.4(j)(1)(v))",
+      "Whether a law enforcement official has given a written determination that public notice would impede a criminal investigation or damage national security, and a means for the FTC to contact that official (314.4(j)(1)(vi))"
+    ],
+    condition:
+      "Notification event affecting 500 or more consumers: acquisition of unencrypted customer information without the authorization of the individual it pertains to (314.2(m)) that involves the information of at least 500 consumers; as soon as possible and no later than 30 days after discovery (314.4(j)(1)). Discovered on the first day the event is known to the institution, including when known to any employee, officer or other agent other than the person committing the breach (314.4(j)(2)); AMC runs the clock from AWARENESS. Financial institutions under FTC jurisdiction only (314.1(b)). The law-enforcement delay in 314.4(j)(1) runs after notice to the FTC and is not modelled. The text says \"30 days\"; AMC counts calendar days. AMC does not check the 500-consumer threshold.",
+    source: {
+      title: "16 CFR 314.4(j) (with 314.1 and 314.2) Standards for Safeguarding Customer Information — GPO govinfo, CFR annual edition 2026 (Title 16, Vol. 1, revised 2026-01-01); eCFR version history shows no amendment to 314.4 after 2024-05-13",
+      url: "https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml",
+      retrievedAt: "2026-10-07T17:10:30Z",
+      verified: true
+    }
+  },
+  {
+    clockId: "bsa-1020-320-sar-filing",
+    instrument: "31 CFR 1020.320 (Bank Secrecy Act suspicious activity reports by banks)",
+    article: "1020.320(b)(3)",
+    authority: "Financial Crimes Enforcement Network (FinCEN), U.S. Department of the Treasury",
+    jurisdiction: "US-federal",
+    stations: ["wealth"],
+    trigger: "INITIAL_DETECTION",
+    deadline: { amount: 30, unit: "calendarDays" },
+    notify: [
+      "FinCEN, by filing a Suspicious Activity Report as the SAR instructions indicate (1020.320(b)(1)-(2))",
+      "An appropriate law enforcement authority, immediately by telephone, for violations that require immediate attention such as ongoing money laundering schemes (1020.320(b)(3))"
+    ],
+    requiredContent: [
+      "A completed Suspicious Activity Report (SAR) (1020.320(b)(1))",
+      "Supporting documentation, identified and kept with the SAR; the SAR copy and the supporting documentation are kept for five years from filing (1020.320(b)(1), (d))",
+      "Never disclose the SAR or its existence to its subject, or to anyone else except as 1020.320(e) authorizes (1020.320(e)(1))"
+    ],
+    condition:
+      "Bank; a transaction conducted or attempted by, at or through the bank that involves or aggregates at least $5,000 in funds or other assets, where the bank knows, suspects or has reason to suspect a ground in 1020.320(a)(2)(i)-(iii); no later than 30 calendar days after the date of initial detection of facts that may constitute a basis for filing (1020.320(b)(3)). If no suspect was identified on the date of detection, filing may be delayed a further 30 calendar days to identify one, never beyond 60 calendar days after initial detection; that extension is not modelled. Robberies or burglaries reported to law enforcement and lost, missing, counterfeit or stolen securities reported under 17 CFR 240.17f-1 are excepted (1020.320(c)). This clock encodes the bank rule only. AMC never files a SAR.",
+    source: BSA_SAR_SOURCE
   }
 ];

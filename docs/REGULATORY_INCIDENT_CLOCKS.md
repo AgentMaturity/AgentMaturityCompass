@@ -48,7 +48,11 @@ interface RegulatoryClock {
 
 Triggers: `AWARENESS` (defaults to `incident.createdTs`, overridable),
 `CLASSIFICATION_MAJOR`, `INITIAL_NOTIFICATION`, `INTERMEDIATE_REPORT`,
-`INCIDENT_NOTIFICATION`, `BREACH_DETERMINATION`, and the derived
+`INCIDENT_NOTIFICATION`, `BREACH_DETERMINATION`, `INCIDENT_DETERMINATION`
+(23 NYCRR 500.17(a)(1): "after determining that a cybersecurity incident has
+occurred"), `EXTORTION_PAYMENT` (500.17(c)), `INITIAL_DETECTION`
+(31 CFR 1020.320(b)(3): "the date of initial detection by the bank of facts
+that may constitute a basis for filing a SAR"), and the derived
 `CALENDAR_YEAR_END_AFTER_AWARENESS` (1 January UTC of the year after
 awareness). A clock whose trigger has not been recorded is `NOT_STARTED` with
 no due date — it is never invented.
@@ -60,7 +64,11 @@ model public holidays; months add a calendar month and clamp the day
 relief and HIPAA 164.412 law-enforcement delay are not modelled; the
 `condition` text says so.
 
-## Clock table (as encoded on 2026-10-03)
+## Clock table (F4 on 2026-10-03; P1-17 on 2026-10-07)
+
+Every duration below is agent-drafted and experimental until a named expert
+signs off (D-08). Each computed clock carries `review: "experimental:
+agent-drafted, expert review pending (D-08)"`. Nothing here is legal advice.
 
 | clockId | Instrument / article | Station(s) | Trigger | Deadline | Notify | Verified |
 |---|---|---|---|---|---|---|
@@ -83,11 +91,50 @@ relief and HIPAA 164.412 law-enforcement delay are not modelled; the
 | fda-803-53-five-day | 21 CFR 803.53 | health | AWARENESS | 5 work days | FDA | yes |
 | tx-bcc-521-053-individual-notice | Tex. Bus. & Com. Code § 521.053(b) | all | BREACH_DETERMINATION | 60 calendar days | affected individuals | yes (2026-10-07) |
 | tx-bcc-521-053-attorney-general | Tex. Bus. & Com. Code § 521.053(i) | all | BREACH_DETERMINATION | 30 calendar days (250 or more Texas residents) | Texas Attorney General | yes (2026-10-07) |
+| nydfs-500-17-notice | 23 NYCRR 500.17(a)(1) | wealth, technology | INCIDENT_DETERMINATION | 72 hours | NYDFS superintendent | yes |
+| nydfs-500-17-extortion-notice | 23 NYCRR 500.17(c)(1) | wealth, technology | EXTORTION_PAYMENT | 24 hours | NYDFS superintendent | yes |
+| nydfs-500-17-extortion-explanation | 23 NYCRR 500.17(c)(2) | wealth, technology | EXTORTION_PAYMENT | 30 calendar days ("30 days") | NYDFS superintendent | yes |
+| glba-314-4j-ftc-notice | 16 CFR 314.4(j)(1) | wealth, technology | AWARENESS | 30 calendar days ("30 days"), notification event affecting 500 or more consumers | Federal Trade Commission | yes |
+| bsa-1020-320-sar-filing | 31 CFR 1020.320(b)(3) | wealth | INITIAL_DETECTION | 30 calendar days | FinCEN (SAR); law enforcement by telephone when immediate attention is needed | yes |
 
 "Station(s)" is where the clock is *surfaced*; it is not an applicability
 ruling. 45 CFR 164.404 binds HIPAA covered entities, DORA binds financial
-entities, NIS2 binds essential/important entities under national transposition.
-The operator confirms applicability in the oversight record.
+entities, NIS2 binds essential/important entities under national transposition,
+23 NYCRR Part 500 binds NYDFS covered entities, 16 CFR Part 314 binds
+financial institutions under FTC jurisdiction and 31 CFR 1020.320 binds banks.
+The operator confirms applicability in the oversight record. Condition texts
+are descriptive: AMC does not check that 500 or more consumers, or 250 or more
+Texas residents, were affected.
+
+### What the US financial rows encode from their texts
+
+- **NYDFS 500.17.** The 72-hour clock runs from the determination that a
+  cybersecurity incident occurred, not from awareness. A cybersecurity incident
+  is an event at the covered entity, an affiliate or a third-party service
+  provider that requires notice to a government or supervisory body, is
+  reasonably likely to materially harm normal operations, or deploys
+  ransomware within a material part of its systems (500.1(g)). The covered
+  entity must also answer the superintendent's requests and keep updating
+  (500.17(a)(2)). An extortion payment starts two clocks: notice within
+  24 hours and a written explanation (reasons, alternatives considered,
+  diligence, OFAC compliance) within 30 days (500.17(c)). The 500.19(a)
+  limited exemption does not list 500.17.
+- **GLBA Safeguards 314.4(j).** A notification event is the acquisition of
+  unencrypted customer information without authorization (314.2(m)). When it
+  involves at least 500 consumers, the FTC notice is due as soon as possible
+  and no later than 30 days after discovery, discovery being the first day
+  any employee, officer or other agent (other than the person committing the
+  breach) knows of it (314.4(j)(2)). The six content items of
+  314.4(j)(1)(i)–(vi) are listed. The rule binds financial institutions under
+  FTC jurisdiction (314.1(b)).
+- **BSA SAR 1020.320.** The SAR is due 30 calendar days after initial
+  detection of facts that may be a basis for filing. If no suspect was
+  identified, the bank may take 30 more days, never beyond 60 days from
+  detection; that extension is in the condition text and is not modelled as
+  a separate clock. Violations needing immediate attention also require an
+  immediate telephone call to law enforcement. A SAR and anything revealing
+  its existence are confidential (1020.320(e)); supporting records are kept
+  five years (1020.320(d)). AMC never files a SAR.
 
 ## Sources (what was actually read)
 
@@ -107,10 +154,16 @@ saved files' modification times (UTC):
 | 45 CFR 164.410 | GPO govinfo CFR 2024 annual edition, Title 45 Vol. 2 | 2026-10-03T16:38:10Z |
 | 21 CFR 803.50 | GPO govinfo CFR 2024 annual edition, Title 21 Vol. 8 (revised 2024-04-01) | 2026-10-03T16:36:55Z |
 | 21 CFR 803.53 | GPO govinfo CFR 2024 annual edition, Title 21 Vol. 8 (revised 2024-04-01) | 2026-10-03T16:36:56Z |
+| 23 NYCRR 500.1, 500.17, 500.19, 500.22 | NYDFS, Second Amendment as adopted (effective 2023-11-01), `https://www.dfs.ny.gov/system/files/documents/2023/10/rf_fs_2amend23NYCRR500_text_20231101.pdf`; cross-read against the department's consolidated Part 500 text at `https://www.dfs.ny.gov/cybersecurity/23-NYCRR-Part-500` (2026-10-07T17:12:35Z), which it labels unofficial | 2026-10-07T17:11:34Z |
+| 16 CFR 314.4(j) | GPO govinfo CFR 2026 annual edition, Title 16 Vol. 1 (revised 2026-01-01), `https://www.govinfo.gov/content/pkg/CFR-2026-title16-vol1/xml/CFR-2026-title16-vol1-sec314-4.xml`; 314.1 and 314.2 from the same edition (2026-10-07T17:10:47Z); eCFR version history: last amendment 2024-05-13 | 2026-10-07T17:10:30Z |
+| 31 CFR 1020.320 | GPO govinfo CFR 2025 annual edition, Title 31 Vol. 3 (revised 2025-07-01), `https://www.govinfo.gov/content/pkg/CFR-2025-title31-vol3/xml/CFR-2025-title31-vol3-sec1020-320.xml`; eCFR text for 2026-10-01 read at 2026-10-07T17:11:12Z with the same (b)(3) deadlines; eCFR version history: last amendment 2016-12-23 | 2026-10-07T17:10:02Z |
 | Tex. Bus. & Com. Code § 521.053 | Texas Legislative Council statute file `https://tcss.legis.texas.gov/resources/BC/htm/BC.521.htm`, the file `statutes.capitol.texas.gov/Docs/BC/htm/BC.521.htm` loads (the site itself is a script shell); amended through Acts 2023, 88th Leg., ch. 246 (S.B. 768), eff. 2023-09-01 | 2026-10-07T17:14:09Z |
 
-Boundary: the govinfo copies are the 2024 annual CFR edition, not the live
+Boundary: the F4 govinfo copies are the 2024 annual CFR edition, not the live
 eCFR point-in-time text; amendments after the annual edition are not reflected.
+For the P1-17 CFR rows the eCFR version history (ecfr.gov, read 2026-10-07)
+shows no amendment after the annual edition cited. No later amendment to
+Part 500 was looked for beyond the department's pages listed above.
 The two Texas durations were the F4 engineer's recollection on 2026-10-03,
 when only the site shell answered. P1-17 read § 521.053 on 2026-10-07: both
 durations and the 250-resident threshold match the statute, the rows now quote
