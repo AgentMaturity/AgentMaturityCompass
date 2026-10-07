@@ -1,3 +1,4 @@
+import { canonicalHost } from "../../../enforce/egressAllowlist.js";
 import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../../../toolhub/toolhubValidators.js";
 
 /**
@@ -7,8 +8,8 @@ import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../../../to
  * through `hostAllowedForTool`, which reads an EMPTY hostAllowlist without
  * `denyByDefault` as "any host" and ignores scheme and port. A web tool that
  * relied on it alone would fetch `http://127.0.0.1:1/` from a policy that
- * lists nothing. `tests/webFetchTool.test.ts` proves that guard permits the
- * case; this module is what refuses it.
+ * lists nothing. S8's tests showed that guard permits the case; this module
+ * is what refuses it.
  *
  * ORIGINS, NOT HOSTS. A policy entry is either:
  *   - a bare hostname (`docs.example.org`) — grants `https://docs.example.org`
@@ -19,6 +20,10 @@ import { findToolDefinition, loadVerifiedToolsConfigSnapshot } from "../../../to
  * Note the composed `networkEgressGuard` still checks the HOSTNAME against the
  * same list, so an explicit-origin entry only passes that guard when its bare
  * host is also listed — the two checks intersect, they never union.
+ *
+ * `hosts` is what `decideEgress` (P1-05) checks before the socket: the host of
+ * every granted origin, so a non-public address is reachable only when its
+ * exact IP literal is granted (`http://10.0.0.12:8080`, or `10.0.0.12`).
  */
 
 export const HARD_MAX_BYTES = 5_000_000;
@@ -26,6 +31,8 @@ export const DEFAULT_MAX_BYTES = 1_000_000;
 
 export interface OriginPolicy {
   readonly origins: ReadonlySet<string>;
+  /** The hosts of `origins`, canonical, as the egress allowlist `decideEgress` reads. */
+  readonly hosts: readonly string[];
   /** The signed cap, already clamped to HARD_MAX_BYTES. */
   readonly maxBytes: number;
   readonly policyDigestSha256: string;
@@ -72,6 +79,7 @@ export function loadOriginPolicy(workspace: string, tool: string): OriginPolicy 
   // ONE membership check, and an empty set fails it for every request.
   return {
     origins,
+    hosts: [...new Set([...origins].map((origin) => canonicalHost(new URL(origin).hostname)))],
     maxBytes: Math.min(definition.maxBytes ?? DEFAULT_MAX_BYTES, HARD_MAX_BYTES),
     policyDigestSha256: snapshot.digestSha256
   };
