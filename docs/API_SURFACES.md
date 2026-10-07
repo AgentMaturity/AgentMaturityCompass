@@ -36,6 +36,30 @@ Response envelope:
 - most `/api/v1` routes return errors as `{ "ok": false, "error": "..." }`
 - exception: `GET /api/v1/health` returns the raw health payload
 
+Claim labels (P0-23):
+- routes listed in `src/api/resultRouteRegistry.ts` (scores, assurance, compliance and regulatory checks, passports, badges, bundles, attestations, certificates, verifiers, benchmarks, Shield runs and verifiers, CI gates and domain proofs) return a result, and every success on them carries the result's claim from `src/claims/eligibility` (see [CLAIM_KINDS.md](CLAIM_KINDS.md))
+- a single result adds `claimKind`, `statusDimensions` and `claimLabel` beside `data`:
+
+```json
+{
+  "ok": true,
+  "data": { "runId": "run-001", "...": "..." },
+  "claimKind": "self_reported",
+  "statusDimensions": {
+    "applicability": { "state": "applicable" },
+    "evidence": "incomplete",
+    "result": "not_evaluated",
+    "enforcement": { "state": "none" },
+    "review": "pending"
+  },
+  "claimLabel": "Claim: Self-reported · Result: not evaluated (this result is not yet bound to claim-eligible evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable"
+}
+```
+
+- a list result (`score/history`, `assurance`, `assurance/history`, `passports`) puts a `claim` object with the same three fields on each item instead
+- a diagnostic run sealed by this workspace's auditor key carries its own claim (`envelopeForDiagnosticReport`); every other listed result is not evaluated with the reason `RESULT_NOT_BOUND` until an adapter binds it to evidence. Compliance and regulatory results are regulated, so their applicability is unresolved until a decision is recorded
+- the additions are additive; clients that validate strict response schemas should use `ClaimResult` from `website/openapi.yaml`. Markdown report formats (`format=md`) carry no claim fields
+
 Implemented routes:
 - `GET /api/v1/health`
 - `GET /api/v1/config/version`
@@ -541,6 +565,12 @@ Auth:
 - `amc_session` is HttpOnly and SameSite=Strict; it is also Secure when Studio receives HTTPS directly or through `x-forwarded-proto: https`
 
 This is the largest API surface today and should be treated as internal operational contract.
+
+Claim labels (P0-23):
+- the Studio routes that feed result pages, listed in `src/studio/studioClaimOutput.ts`, add `claimKind`, `statusDimensions` and `claimLabel` to every 2xx body, or a `claim` on each item of `/assurance/runs` and `/industry-packs/list`
+- the console shows those claims in a strip on each result page, with the kind and result in a pill, the five dimensions in its tooltip and a link to the legend; "not evaluated" is a neutral state with its reason, never 0
+- Industry Packs pack-gate responses add `entitlementNote`: payment unlocks access to pack content and never changes a result, a trust tier or a verification outcome. Claim fields are the same with or without entitlement
+- `/industry-packs/:id` refuses inherited names such as `__proto__` and `constructor` as pack ids
 
 ## 3) Public Bridge Surface (`/bridge/*`)
 

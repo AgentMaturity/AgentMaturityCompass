@@ -1,4 +1,5 @@
-import { apiGet, apiPost, whoami } from "./api.js";
+import { apiGet, apiPost, whoami, onClaims } from "./api.js";
+import { installClaimStrip } from "./components/claimBadge.js";
 import { renderBenchPercentileTable } from "./components/benchPercentileTable.js";
 import { renderBenchWarnings } from "./components/benchWarnings.js";
 
@@ -80,4 +81,5 @@ async function main() {
   wireActions();
 }
 
+installClaimStrip(document.body.dataset.page, onClaims);
 void main();

@@ -66,6 +66,13 @@ describe("industry pack schema", () => {
     expect(mature.questionResults).toHaveLength(pack.questions.length);
   });
 
+  test("getPackById refuses inherited property names (P0-23)", () => {
+    for (const id of ["__proto__", "constructor", "toString", "hasOwnProperty"]) {
+      expect(industryPacksModule.getPackById(id), id).toBeUndefined();
+    }
+    expect(industryPacksModule.getPackById("clinical-trials")?.id).toBe("clinical-trials");
+  });
+
   test("the status enum is exactly the PackCurrencyFields v1 enum", () => {
     expect([...REGULATORY_STATUSES]).toEqual(V1_STATUSES);
   });

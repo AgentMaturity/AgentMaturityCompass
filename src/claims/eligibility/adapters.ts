@@ -123,6 +123,20 @@ export function envelopeForSelfAssessment(input: AdapterBase & { answers: readon
   });
 }
 
+/**
+ * A surface result no adapter binds to evidence yet: never a pass and never a level. The reason says so,
+ * rather than suggesting the producer recorded nothing.
+ */
+export function envelopeForUnboundResult(input: AdapterBase & { method: ClaimMethod }): ClaimEnvelope {
+  const envelope = evaluateClaimEligibility({
+    ...input,
+    regulated: input.regulated ?? false,
+    proposed: { result: "not_evaluated", level: null },
+    evidence: evidence(0, [])
+  });
+  return { ...envelope, reasons: ["RESULT_NOT_BOUND", ...envelope.reasons] };
+}
+
 export function envelopeForSyntheticExample(input: AdapterBase & { level?: number }): ClaimEnvelope {
   return evaluateClaimEligibility({
     ...input,

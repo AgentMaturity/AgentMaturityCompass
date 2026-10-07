@@ -98,9 +98,7 @@ function guardFactory(source: string, shared: boolean, verify: (workspace: strin
     throw new Error("Actual guard fragment did not compile");
   }
   const exports: { make?: Factory } = {};
-  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.
-  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;
-  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify, withClaimBody }, { timeout: 1_000 });
+  runInNewContext(compiled.outputText, { exports, enforceRoleOrAdmin, verifyUsersConfigSignature: verify }, { timeout: 1_000 });
   return exports.make!;
 }
 

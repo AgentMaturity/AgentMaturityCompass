@@ -76,6 +76,24 @@ describe("full OpenAPI contract", () => {
       }
     }
   });
+  test("every documented result route references ClaimResult (P0-23)", async () => {
+    const { API_RESULT_ROUTES } = await import("../src/api/resultRouteRegistry.js");
+    const spec = YAML.parse(readFileSync(new URL("../website/openapi.yaml", import.meta.url), "utf8"));
+    for (const contract of [spec, generateFullOpenApiSpec()]) {
+      expect(Object.keys(contract.components.schemas)).toEqual(expect.arrayContaining(["ClaimKind", "StatusDimensions", "ClaimResult"]));
+    }
+    let documented = 0;
+    for (const route of API_RESULT_ROUTES) {
+      const shape = route.path.replace(/^\/api/, "").replace(/:\w+/g, "{}");
+      const key = Object.keys(spec.paths).find((path) => path.replace(/\{[^}]+\}/g, "{}") === shape);
+      const operation = key ? spec.paths[key][route.method.toLowerCase()] : undefined;
+      if (!operation) continue;
+      documented += 1;
+      expect(JSON.stringify(operation.responses), `${route.method} ${route.path}`).toContain("#/components/schemas/ClaimResult");
+    }
+    expect(documented).toBeGreaterThanOrEqual(51);
+  });
+
   test("includes studio + bridge + gateway endpoints", () => {
     const spec = generateFullOpenApiSpec();
 

@@ -76,7 +76,9 @@ function guardFactory(source: string, shared: boolean): Factory {
   const compiled = ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }, reportDiagnostics: true });
   if (compiled.diagnostics?.some(row => row.category === ts.DiagnosticCategory.Error)) throw new Error("Actual vault guard fragment did not compile");
   const exports: { make?: Factory } = {};
-  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup }, { timeout: 1_000 });
+  // P0-23: json() labels 2xx result bodies; these guard fragments only answer with refusals.
+  const withClaimBody = (_res: unknown, _status: number, body: unknown) => body;
+  runInNewContext(compiled.outputText, { exports, vaultStatus: vaultLookup, withClaimBody }, { timeout: 1_000 });
   return exports.make!;
 }
 const before = guardFactory(original, false), after = guardFactory(current, true);
