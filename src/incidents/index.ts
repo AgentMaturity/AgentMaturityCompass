@@ -58,3 +58,45 @@ export {
   type IncidentRegressionValidationStatus,
   type IncidentRegressionWatchAlert
 } from "./incidentRegression.js";
+
+export {
+  REGULATORY_CLOCK_TABLE,
+  DUE_SOON_WINDOW_MS,
+  addDuration,
+  attachRegulatoryClocks,
+  clocksForStation,
+  listClockInstruments,
+  type AttachRegulatoryClocksInput,
+  type ClockDuration,
+  type ClockDurationUnit,
+  type ClockSource,
+  type ClockStatus,
+  type ClockTrigger,
+  type IncidentClockInstance,
+  type RegulatoryClock
+} from "./regulatoryClocks.js";
+
+export {
+  OVERSIGHT_DECISIONS,
+  appendOversightRecord,
+  computeOversightRecordHash,
+  createOversightRecord,
+  oversightRecordPath,
+  readOversightRecords,
+  verifyOversightRecord,
+  type CreateOversightRecordInput,
+  type HumanOversightRecord,
+  type OversightDecision
+} from "./oversightRecord.js";
+
+export {
+  buildEvidencePacket,
+  renderEvidencePacketMarkdown,
+  type EvidencePacketInput,
+  type IncidentEvidencePacket,
+  type MissingEvidenceItem,
+  type PacketOversightEntry,
+  type PacketReceiptRef,
+  type PacketTimelineEvent,
+  type UnverifiedClockSource
+} from "./evidencePacket.js";

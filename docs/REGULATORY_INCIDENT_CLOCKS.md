@@ -147,7 +147,7 @@ being rewritten by another session, so storage is a plain append-only JSONL
 file rather than a chain entry; the `prevRecordHash` field preserves ordering
 for a later migration.
 
-Guards, each mutation-verified (see the F4 receipt):
+Guards, each mutation-verified in the F4 track (receipt commit `ed9b45a2`):
 
 - `reviewedTs < incident.createdTs` throws at creation (`backdated`).
 - The verifier re-checks the same inequality, so a validly signed record whose
@@ -180,10 +180,8 @@ pnpm vitest run tests/regulatoryClocks.test.ts tests/incidentEvidencePacket.test
 The tests use a fixed trigger of 2026-03-02T10:00:00Z and never call
 `Date.now()`.
 
-## Not wired yet (ready-to-wire)
+## Exports
 
-`src/incidents/index.ts` is outside this track's claimed paths. The additive
-export block to apply there is recorded in the F4 receipt
-(`AMC_OS/RESEARCH/2026-10-03-regulated-platform-program/tracks/F4/report.md`).
-There is no CLI or API route for these modules yet; the incident API
-(`src/api/*`) is in the other session's dirty set.
+`src/incidents/index.ts` exports the three modules (P1-17 applied the F4
+ready-to-wire block). The F4 track receipt is commit `ed9b45a2` on the public
+branch `worktree-wf_fc54d4b0-c89-4`; the code was cherry-picked from `ff857211`.
