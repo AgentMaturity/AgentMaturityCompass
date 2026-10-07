@@ -18633,17 +18633,16 @@ program
       console.log(chalk.red("No results — experiment not found or has no probes."));
       return;
     }
-    console.log(
-      chalk.yellow(
-        "\n⚠️  Simulated results — no model was called. Scores are deterministic placeholders derived from ids, not measurements."
-      )
-    );
+    const { EXAMPLE_BANNER } = await import("./claims/eligibility/exampleMode.js");
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
+    console.log(chalk.yellow("No model was called. Scores are deterministic placeholders derived from ids, not measurements."));
     console.log(chalk.bold(`\nSimulated ${results.length} probe results:\n`));
     for (const r of results) {
       const primaryDim = Object.keys(r.scores)[0] ?? "";
       const score = r.scores[primaryDim] ?? 0;
       console.log(`  ${r.probeId}: ${(score * 100).toFixed(1)}% (${r.latencyMs}ms, ${r.tokenCount} tokens)`);
     }
+    console.log(chalk.bold.yellow(EXAMPLE_BANNER));
   });
 
 program

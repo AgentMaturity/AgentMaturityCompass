@@ -266,6 +266,7 @@ export function registerLateStageCliCommands({
     .option("--json", "Output as JSON")
     .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
       const { runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
+      const { EXAMPLE_BANNER } = await import("./claims/eligibility/exampleMode.js");
       const { issueLeaseForCli } = await import("./leases/leaseCli.js");
       const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
 
@@ -276,15 +277,13 @@ export function registerLateStageCliCommands({
         }
 
         if (!opts.json) {
+          console.log(chalk.bold.yellow(EXAMPLE_BANNER));
           console.log(chalk.bold("\n🎮  AMC Live Demo (no-vault)\n"));
           console.log(chalk.gray("  Starting an ephemeral demo workspace, upstream, and AMC gateway..."));
         }
         const result = await runDemoWithoutUserVault();
 
-        if (opts.json) {
-          console.log(JSON.stringify(result, null, 2));
-          return;
-        }
+        if (opts.json) { console.log(JSON.stringify({ banner: EXAMPLE_BANNER, claimKind: "synthetic_example", ...result }, null, 2)); return; }
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through an ephemeral AMC gateway`));
@@ -293,6 +292,7 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Demo maturity sample: ${result.maturityLevel} / ${result.maturityScore}`));
         console.log(chalk.yellow("  Trust label: DEMO_ONLY — not production audit evidence"));
         console.log(chalk.gray(`  Evidence workspace: ${result.evidenceWorkspace}\n`));
+        console.log(chalk.bold.yellow(EXAMPLE_BANNER));
         return;
       }
 

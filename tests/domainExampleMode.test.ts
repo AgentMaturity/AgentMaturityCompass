@@ -112,6 +112,24 @@ describe("--example on the five domain commands", () => {
   });
 });
 
+describe("other synthetic producers carry the label", () => {
+  test("amc mirofish run prints the banner first and last, and its JSON is synthetic_example", () => {
+    const scenario = join(workspace, "example-scenario.yml");
+    writeFileSync(scenario, [
+      "name: example", "description: example scenario", "version: 1.0.0", "behavior:", "  autonomy: 0.5", "  errorRate: 0.1",
+      "  escalationFrequency: 0.3", "  toolUsage: 0.5", "  responseLatency: 0.3", "  hallucinationRate: 0.05", "  complianceAdherence: 0.8", ""
+    ].join("\n"));
+    const args = ["mirofish", "run", "--scenario", scenario, "--iterations", "20", "--seed", "7"];
+    const text = runCli(workspace, args);
+    expect(text.status, text.stderr).toBe(0);
+    const lines = text.stdout.trim().split("\n");
+    expect([lines[0], lines.at(-1)]).toEqual([EXAMPLE_BANNER, EXAMPLE_BANNER]);
+    const json = JSON.parse(runCli(workspace, [...args, "--output", "json"]).stdout) as { banner?: string; envelope?: { claimKind?: string } };
+    expect(json.banner).toBe(EXAMPLE_BANNER);
+    expect(json.envelope?.claimKind).toBe("synthetic_example");
+  });
+});
+
 describe("assertNotExample", () => {
   test("refuses a synthetic_example envelope by action name and passes anything else", () => {
     expect(() => assertNotExample({ claimKind: "synthetic_example" }, "certified")).toThrow("synthetic_example results cannot be certified");
@@ -179,7 +197,7 @@ describe("signing paths refuse a synthetic_example result", () => {
   test("amc audit binder create (auditBinderCreateCli)", async () => {
     writeExampleRun(join(workspace, ".amc", "agents", "example-binder", "runs"), "example-binder-run");
     const { auditBinderCreateCli } = await import("../src/audit/auditCli.js");
-    await expect(Promise.resolve().then(() => auditBinderCreateCli({ workspace, scope: "agent", id: "example-binder" })))
+    await expect(auditBinderCreateCli({ workspace, scope: "agent", id: "example-binder" }))
       .rejects.toThrow(/synthetic_example results cannot be/);
   });
 
