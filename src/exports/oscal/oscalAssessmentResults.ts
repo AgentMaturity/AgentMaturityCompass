@@ -57,8 +57,8 @@ const recomputedDigest = ({ evaluatedAt: _at, digest: _digest, ...rest }: Contro
 /**
  * Parses a results file and refuses it whole, as an integrity failure, unless every result has the P1-11 shape and
  * digest, names a catalog control at the digest this catalog has, was evaluated under this (verified) plan with the
- * plan's applicability, and is internally coherent (synthetic is never a result; a pass needs applicable, sufficient). The digest is
- * unkeyed: it shows a result is unchanged since it was hashed, not who produced it.
+ * plan's applicability, and is internally coherent (synthetic is never a result; a pass needs applicable, sufficient).
+ * The digest is unkeyed: it shows a result is unchanged since it was hashed, not who produced it.
  */
 export function parseControlResults(raw: unknown, plan: CompiledPlan, cat: LoadedCatalog): ControlResult[] {
   const parsed = z.array(controlResultSchema).safeParse(raw);
