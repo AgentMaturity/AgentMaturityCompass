@@ -8,7 +8,7 @@ import { dirname, join, resolve } from "node:path";
 import chalk from "chalk";
 import { assertSignedPlan } from "../../catalog/compiler/sign.js";
 import type { CompiledPlan, SignedPlan } from "../../catalog/compiler/types.js";
-import { digestOf } from "../../catalog/digest.js";
+import { readSignedControlResults } from "../../catalog/evidence/signedResults.js";
 import { loadCatalog, type LoadedCatalog } from "../../catalog/loader.js";
 import { verifyCatalogLock } from "../../catalog/lockfile.js";
 import { assertOutsideSignedConfigTree } from "../../domains/operatingProfiles/operatingProfileEmit.js";
@@ -45,12 +45,14 @@ export function runOscalExportCli(opts: { workspace: string; out: string; plan?:
   const catalog = toOscalCatalog(cat);
   const signed = opts.plan ? readVerifiedPlan(opts.workspace, resolve(opts.workspace, opts.plan), cat) : null;
   const profile = signed ? toOscalProfile(signed, "catalog.json") : null;
-  const results = signed && opts.results ? parseControlResults(readJson(resolve(opts.workspace, opts.results)), signed.plan, cat) : [];
-  const assessment = signed ? toOscalAssessmentResults(results, signed.plan) : null;
+  // Read once; the CONTROL_RESULT signature is verified over the same bytes the results are parsed from.
+  const resultsFile = signed && opts.results ? readSignedControlResults(opts.workspace, opts.results) : null;
+  const results = signed && resultsFile ? parseControlResults(resultsFile.value, signed.plan, cat) : [];
+  const assessment = signed && resultsFile ? toOscalAssessmentResults(results, signed.plan, resultsFile.digestSha256) : null;
   const inputs: OscalLossReport["inputs"] = [
     { kind: "catalog", digest: catalog.digest },
     ...(signed ? [{ kind: "plan" as const, digest: signed.plan.digest }] : []),
-    ...(opts.results ? [{ kind: "results" as const, digest: digestOf(results.map((r) => r.digest).sort()) }] : [])
+    ...(resultsFile ? [{ kind: "results" as const, digest: `sha256:${resultsFile.digestSha256}` }] : [])
   ];
   const files: Record<string, object | null> = {
     "catalog.json": catalog.document,
@@ -75,5 +77,11 @@ export function runOscalExportCli(opts: { workspace: string; out: string; plan?:
       + `${count((r) => r.dimensions.result === "pass" && r.claimKind !== "observed")} self-reported passes (observation only, no finding)`);
   }
   if (signed) console.log(chalk.gray("  Plan signature checked against this workspace's auditor keys: a local audit trail, not portable trust."));
+  if (resultsFile) {
+    const a = resultsFile.admission;
+    console.log(chalk.gray(a.status === "admitted" && a.listId
+      ? `  Results signature (CONTROL_RESULT) verified; signer pinned for artifact-seal by trust list ${a.listId}.`
+      : "  Results signature (CONTROL_RESULT) checked against this workspace's auditor keys: a local audit trail, not portable trust."));
+  }
   console.log(chalk.gray("Evidence of conformity, never a compliance statement. Fields OSCAL cannot carry: oscal-loss-report.json (docs/exports/OSCAL.md)."));
 }
